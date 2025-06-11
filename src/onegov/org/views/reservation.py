@@ -1384,6 +1384,7 @@ def send_reservation_summary(
                 'model': self,
                 'resource': self.handler.resource,
                 'reservations': self.handler.reservations,
+                'code': self.handler.data.get('key_code'),
                 'changes': self.handler.get_changes(request),
             }
         )

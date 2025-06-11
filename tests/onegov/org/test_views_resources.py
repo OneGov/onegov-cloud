@@ -1331,6 +1331,82 @@ def test_reserve_allocation_adjustment_post_acceptance(client):
 
 
 @freeze_time("2015-08-28", tick=True)
+def test_send_reservation_summary(client):
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(
+            (datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+            (datetime(2015, 8, 29, 10), datetime(2015, 8, 29, 14)),
+        ),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve1 = client.bound_reserve(allocations[0])
+    reserve2 = client.bound_reserve(allocations[1])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve1('10:00', '12:00').json == {'success': True}
+    assert reserve2('10:30', '12:00').json == {'success': True}
+
+    # fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+
+    ticket = formular.form.submit().follow().form.submit().follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # open the created ticket
+    client.login_admin()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    assert "info@example.org" in ticket
+    assert "28. August 2015" in ticket
+    assert "29. August 2015" in ticket
+    assert "10:00" in ticket
+    assert "12:00" in ticket
+    assert "Anpassen" in ticket
+
+    # adjust the first reservation
+    adjust = ticket.click('Anpassen', index=0)
+    adjust.form['start_time'] = '10:00'
+    adjust.form['end_time'] = '11:00'
+    ticket = adjust.form.submit().follow()
+    assert "10:00" in ticket
+    assert "11:00" in ticket
+
+    # then adjust it back to the original state
+    adjust = ticket.click('Anpassen', index=0)
+    adjust.form['start_time'] = '10:00'
+    adjust.form['end_time'] = '12:00'
+    ticket = adjust.form.submit().follow()
+
+    # reject the second reservation
+    ticket = ticket.click('Absagen', index=1).follow()
+    assert len(os.listdir(client.app.maildir)) == 2
+
+    # send a summary
+    ticket = client.get(
+        ticket.pyquery('a.envelope')[0].attrib['ic-get-from']
+    ).follow()
+    assert 'Erfolgreich 1 E-Mails gesendet' in ticket
+    assert len(os.listdir(client.app.maildir)) == 3
+
+    message = client.get_email(2)['TextBody']
+    assert "Tageskarte" in message
+    assert "10:00 - 12:00  | → |" not in message
+    assert "10:30 - 12:00  | → | Abgelehnt" in message
+
+
+@freeze_time("2015-08-28", tick=True)
 def test_reserve_no_definition_pick_up_hint(client):
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
