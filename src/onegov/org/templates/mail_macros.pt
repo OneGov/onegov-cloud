@@ -9,26 +9,36 @@
 <metal:reservations define-macro="reservations" i18n:domain="onegov.org">
     <tal:b condition="reservations">
         <tal:b repeat="reservation reservations">
-            <tal:b define="start reservation.display_start(); end reservation.display_end()">
+            <tal:b define="start reservation.display_start(); end reservation.display_end(); quota reservation.quota; accepted reservation.data and reservation.data.get('accepted')">
                 <p>
-                    <span>
-                        ${layout.format_date(start, 'weekday_long')},
-                        ${layout.format_date(start, 'date_long')}
-                        <!--! simple whole day check: -->
-                        <tal:b condition="start.time() != end.time()">
-                        <br>
-                            ${layout.format_time_range(start, end)}
-                        </tal:b>
-                    </span>
-                    <br>
-                    <span i18n:translate>Quota</span>: <span>
-                        ${reservation.quota}
-                    </span>
+                    <metal:b use-macro="layout.macros['reservation']" />
                 </p>
             </tal:b>
         </tal:b>
     </tal:b>
 </metal:reservations>
+
+<metal:reservation define-macro="reservation" i18n:domain="onegov.org">
+    <span>
+        ${layout.format_date(start, 'weekday_long')},
+        ${layout.format_date(start, 'date_long')}
+        <!--! simple whole day check: -->
+        <tal:b condition="start.time() != end.time()">
+        <br>
+            ${layout.format_time_range(start, end)}
+        </tal:b>
+    </span>
+    <tal:b tal:condition="exists:quota">
+        <br>
+        <span i18n:translate>Quota</span>: <span>
+            ${quota}
+        </span>
+    </tal:b>
+    <tal:b tal:condition="show_status and not accepted|False">
+        <br>
+        <span i18n:translate>Pending approval</span>
+    </tal:b>
+</metal:reservation>
 
 <metal:event define-macro="event" i18n:domain="onegov.org">
     <p><b>${model.title}</b></p>

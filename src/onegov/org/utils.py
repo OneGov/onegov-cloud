@@ -781,7 +781,7 @@ class ReservationEventInfo:
         return '\n'.join(part for part in (
             self.ticket.number,
             self.event_time,
-            str(self.quota)
+            f'{self.translate(_("Quota"))}: {self.quota}'
             if getattr(self.resource, 'show_quota', False) else '',
             self.ticket.tag,
             self.translate(_('Pending approval')) if not self.accepted else '',

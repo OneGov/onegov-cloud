@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-06-10 14:16+0200\n"
+"POT-Creation-Date: 2025-06-11 13:31+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -3382,6 +3382,22 @@ msgstr "Ajuster"
 msgid "Accept all reservations"
 msgstr "Accepter toutes les réservations"
 
+msgid "Send reservation summary"
+msgstr "Envoyer le résumé de la réservation"
+
+msgid "Do you really want to send a reservation summary?"
+msgstr "Voulez-vous vraiment envoyer un résumé de la réservation ?"
+
+msgid ""
+"This will always be sent via e-mail, even when ticket updates have been "
+"disabled. Make sure to only use this to inform customers, when significant "
+"changes have been made to the reservations, they need to be aware of."
+msgstr ""
+"Elle sera toujours envoyée par courrier électronique, même si les mises à "
+"jour des billets ont été désactivées. Veillez à ne l'utiliser que pour "
+"informer les clients des changements importants apportés aux réservations et "
+"dont ils doivent avoir connaissance."
+
 msgid "Details about the reservation"
 msgstr "Détails à propos de la réservation"
 
@@ -3398,7 +3414,7 @@ msgid "Reject all"
 msgstr "Tout refuser"
 
 msgid "Do you really want to reject all reservations?"
-msgstr "Voulez-vous vraiment refuser toutes les réservations ?"
+msgstr "Voulez-vous vraiment refuser toutes les réservations?"
 
 msgid "Rejecting these reservations can't be undone."
 msgstr "Le refus de ces réservations est irréversible."
@@ -4483,6 +4499,9 @@ msgstr ""
 "contacter un administrateur afin qu'il puisse vous retirer de la liste des "
 "destinataires."
 
+msgid "Pending approval"
+msgstr "En attente d'approbation"
+
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr ""
 "Voici ce qui s'est passé la semaine dernière sur le site web de ${org} :"
@@ -4602,7 +4621,7 @@ msgid "The ticket number is"
 msgstr "Le numéro du ticket est"
 
 msgid "The following reservations have been rejected:"
-msgstr "Les réservations suivantes ont été rejetées :"
+msgstr "Les réservations suivantes ont été rejetées:"
 
 msgid ""
 "This is a notification for the rejected reservations for ${organisation}. If "
@@ -4615,7 +4634,16 @@ msgstr ""
 "destinataires."
 
 msgid "The following reservations have unfortunately been cancelled:"
-msgstr "Les réservations suivantes ont malheureusement été annulées :"
+msgstr "Les réservations suivantes ont malheureusement été annulées:"
+
+msgid "Here's a summary of your reservations:"
+msgstr "Voici un résumé de vos réservations:"
+
+msgid "Changes to your submitted reservations:"
+msgstr "Les modifications apportées aux réservations que vous avez soumises:"
+
+msgid "Rejected"
+msgstr "Rejetée"
 
 msgid "You have a new ticket"
 msgstr "Vous avez un nouveau ticket"
@@ -5343,9 +5371,6 @@ msgid ""
 msgstr ""
 "Pour supprimer cette allocation, toutes les réservations existantes doivent "
 "être annulées en premier."
-
-msgid "Pending approval"
-msgstr "En attente d'approbation"
 
 msgid "A conflicting allocation exists for the requested time period."
 msgstr "Une allocation contradictoire existe pour la période demandée."
@@ -6483,6 +6508,9 @@ msgstr ""
 
 msgid "Reject all reservations with message"
 msgstr "Refuser toutes les réservations avec le message"
+
+msgid "Reservation summary"
+msgstr "Résumé des réservations"
 
 msgid "Reservation not adjustable"
 msgstr "Réservation non ajustable"
