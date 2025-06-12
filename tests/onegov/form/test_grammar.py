@@ -447,6 +447,21 @@ def test_discount():
     assert f.discount.amount == Decimal('33.3')
     assert not f.pricing
 
+    f = field.parseString("(x) Mail delivery (33.3%) (Local)")
+    assert f.type == 'radio'
+    assert f.label == 'Mail delivery'
+    assert f.checked
+    assert f.discount.amount == Decimal('33.3')
+    assert not f.pricing
+
+    # relaxed end line requirement
+    f = field.parseString("(x) Mail delivery (33.3%)   ")
+    assert f.type == 'radio'
+    assert f.label == 'Mail delivery'
+    assert f.checked
+    assert f.discount.amount == Decimal('33.3')
+    assert not f.pricing
+
     field = checkbox()
 
     f = field.parseString("[x] Extra Luggage (99.15%)")
@@ -478,6 +493,14 @@ def test_discount():
     assert not f.pricing
 
     f = field.parseString("[ ] Discount (50%) (For Kids)")
+    assert f.type == 'checkbox'
+    assert f.label == 'Discount'
+    assert not f.checked
+    assert f.discount.amount == Decimal('50')
+    assert not f.pricing
+
+    # relaxed end line requirement
+    f = field.parseString("[ ] Discount (50%)    ")
     assert f.type == 'checkbox'
     assert f.label == 'Discount'
     assert not f.checked
