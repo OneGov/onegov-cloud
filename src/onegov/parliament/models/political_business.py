@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
     from datetime import date
 
-    from onegov.parliament.models import Parliamentarian
+    from onegov.parliament.models import RISParliamentarian
 
     PoliticalBusinessType: TypeAlias = Literal[
         'inquiry',  # Anfrage
@@ -196,7 +196,7 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
     )
 
     #: the related parliamentarian
-    parliamentarian: RelationshipProperty[Parliamentarian] = relationship(
-        'Parliamentarian',
+    parliamentarian: RelationshipProperty[RISParliamentarian] = relationship(
+        'RISParliamentarian',
         back_populates='political_businesses',
     )

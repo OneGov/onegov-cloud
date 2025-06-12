@@ -1,11 +1,5 @@
 from __future__ import annotations
 
-import logging
-
-log = logging.getLogger('onegov.parliament')
-log.addHandler(logging.NullHandler())
-
-from onegov.parliament.i18n import _
 from onegov.parliament.models.attendence import Attendence
 from onegov.parliament.models.change import Change
 from onegov.parliament.models.commission import Commission
@@ -29,14 +23,13 @@ from onegov.parliament.models.settlement_run import SettlementRun
 
 
 __all__ = (
-    '_',
-    'log',
     'Attendence',
     'Change',
     'Commission',
     'CommissionMembership',
     'ImportLog',
     'LegislativePeriod',
+    'Meeting',
     'Parliamentarian',
     'RISParliamentarian',
     'ParliamentarianRole',
@@ -45,5 +38,5 @@ __all__ = (
     'PoliticalBusiness',
     'PoliticalBusinessParticipation',
     'RateSet',
-    'SettlementRun', 'Attendence', 'Meeting'
+    'SettlementRun'
 )

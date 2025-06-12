@@ -7,8 +7,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
-from onegov.parliament.models import ParliamentarianRole
-from onegov.pas import _
+from onegov.parliament import _
 from onegov.search import ORMSearchable
 from sqlalchemy import Column, or_
 from sqlalchemy import Date
@@ -35,6 +34,7 @@ if TYPE_CHECKING:
         PoliticalBusinessParticipation
     )
     from onegov.parliament.models.party import Party
+    from onegov.parliament.models import ParliamentarianRole
 
     Gender: TypeAlias = Literal[
         'male',
