@@ -10,27 +10,12 @@ from sqlalchemy import Text
 from sqlalchemy.ext.declarative import declarative_base
 from uuid import uuid4
 
-# Attempt to ensure that if onegov.libres is present, its Payable models
-# (like Reservation, which uses __tablename__ = 'reservations') are registered
-# on the global `Base.metadata`. This helps ensure that SessionManager's
-# `create_all` will create these tables if they are discoverable by
-# components like PaymentCollection.
-from libres.db.models import Reservation
-from onegov.reservation.models import CustomReservation
+# NOTE:
+# fixes psycopg2.errors.UndefinedTable relation "reservations" does not exist
+from libres.db.models import ORMBase as LibresORMBase
+_libres_db_models_ORMBase = LibresORMBase
+
 from sqlalchemy.exc import IntegrityError
-
-
-@pytest.fixture(autouse=True)
-def clear_payment_registered_links():
-    """
-    Clears the globally stored registered links on the Payment model before
-    each test in this module. This prevents interference from Payable models
-    registered in other tests or modules, ensuring that only relevant links
-    for the current test context are processed.
-    """
-    base_associable = Payment.association_base()
-    # Always reset to a new dictionary to ensure a clean state
-    base_associable.registered_links = {}
 
 
 def test_payment_with_different_bases(postgres_dsn):
