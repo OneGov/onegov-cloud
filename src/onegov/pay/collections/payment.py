@@ -104,68 +104,31 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         )
 
     def subset(self) -> Query[Payment]:
-        return self.query()
+        query = self.query()
 
+        # Filter by payment type
+        if self.payment_type == 'manual':
+            query = query.filter(Payment.provider_id.is_(None))
+        elif self.payment_type == 'provider':
+            query = query.filter(Payment.provider_id.isnot(None))
 
-    def query(self):
-        q = self.session.query(Payment)
-
-        # Existing filters for Payment properties
-        if self.start:
-            q = q.filter(Payment.created >= self.start)
-        if self.end:
-            q = q.filter(Payment.created <= self.end) # self.end is already adjusted by view
-
-        if self.status:
-            if self.status == 'paid':
-                q = q.filter(Payment.state == 'paid')
-            elif self.status == 'open':
-                q = q.filter(Payment.state == 'open')
-            # Add 'invoiced' if it's a real state or a meta-status
-            # For now, assuming 'invoiced' is not a direct DB state in Payment model
-
-        if self.payment_type:
-            if self.payment_type == 'manual':
-                q = q.filter(Payment.source == 'manual')
-            elif self.payment_type == 'provider':
-                # Assuming 'manual' is the only non-provider type
-                q = q.filter(Payment.source != 'manual')
-
-        if self.source and self.source != '*':
-            q = q.filter(Payment.source == self.source)
-
-        # *** NEW FILTERING LOGIC FOR TICKET CREATION DATE ***
+        # Filter by ticket creation date - this is the complex part
         if self.ticket_start or self.ticket_end:
-            # 1. Join Payment to its link with Reservation.
-            #    Reservation.payment is the relationship from Reservation to Payment.
-            #    It uses an association table (secondary).
-            #    So, we join Payment TO that association table, then TO Reservation.
-            #    `Reservation.payment.property.secondary` gives the association table.
-            reservation_payment_association_table = Reservation.payment.property.secondary
-
-            q = q.join(
-                reservation_payment_association_table,
-                Payment.id == reservation_payment_association_table.c.payment_id
+            # Join through reservations to tickets
+            query = query.join(
+                Reservation, 
+                Payment.id == Reservation.payment_id
+            ).join(
+                Ticket,
+                cast(Reservation.token, onegovUUID) == Ticket.handler_id
             )
-            q = q.join(
-                Reservation,
-                Reservation.id == reservation_payment_association_table.c.reservation_id
-            )
-
-            # 2. Join Reservation to Ticket
-            #    Reservation.token (UUID) links to Ticket.handler_id (Text)
-            #    The cast is important: cast(Ticket.handler_id, pgUUID)
-            q = q.join(Ticket, cast(Ticket.handler_id, onegovUUID) == Reservation.token)
-
+            
             if self.ticket_start:
-                q = q.filter(Ticket.created >= self.ticket_start)
+                query = query.filter(Ticket.created >= self.ticket_start)
             if self.ticket_end:
-                q = q.filter(Ticket.created < self.ticket_end) 
-
-        q = q.order_by(Payment.created.desc())
-        q = q.options(joinedload(Payment.provider))  # type:ignore[misc]
-        q = q.options(undefer(Payment.created))
-        return q
+                query = query.filter(Ticket.created <= self.ticket_end)
+                
+        return query.order_by(Payment.created.desc())
 
     @property
     def page_index(self) -> int:
