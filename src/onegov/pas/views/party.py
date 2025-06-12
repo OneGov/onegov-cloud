@@ -8,7 +8,7 @@ from onegov.pas.collections import PartyCollection
 from onegov.pas.forms import PartyForm
 from onegov.pas.layouts import PartyCollectionLayout
 from onegov.pas.layouts import PartyLayout
-from onegov.pas.models import Party
+from onegov.parliament.models import Party
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

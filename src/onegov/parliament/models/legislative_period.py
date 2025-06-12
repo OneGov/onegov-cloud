@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 class LegislativePeriod(Base, TimestampMixin, ORMSearchable):
 
-    __tablename__ = 'pas_legislative_periods'
+    __tablename__ = 'par_legislative_periods'
 
     es_public = False
     es_properties = {'name': {'type': 'text'}}

@@ -9,22 +9,19 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import TimestampMixin, ContentMixin
+from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.ris import _
-
+from onegov.parliament import _
+from onegov.parliament.models.parliamentarian import Parliamentarian
+from onegov.parliament.models.parliamentary_group import ParliamentaryGroup
+from onegov.parliament.models.party import Party
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     import uuid
     from datetime import date
     from typing import Literal
     from typing import TypeAlias
-
-    from onegov.ris.models.parliamentarian import RISParliamentarian
-    from onegov.ris.models.parliamentary_group import RISParliamentaryGroup
-    from onegov.ris.models.party import RISParty
 
     Role: TypeAlias = Literal[
         'none',
@@ -45,20 +42,16 @@ if TYPE_CHECKING:
 
     ParliamentaryGroupRole: TypeAlias = Literal[
         'none',
-        'non_permanent_member',
         'member',
-        'substitute_member',
         'vote_counter',
-        'secretary',
-        'vice_president',
         'president',
     ]
 
 PARLIAMENTARIAN_ROLES: dict[Role, str] = {
     'none': _('none'),
     'member': _('Member'),
-    'vote_counter': _('Vote Counter'),
-    'vice_president': _('Vice President'),
+    'vote_counter': _('Vote counter'),
+    'vice_president': _('Vice president'),
     'president': _('President'),
 }
 
@@ -66,26 +59,34 @@ PARTY_ROLES: dict[PartyRole, str] = {
     'none': _('none'),
     'member': _('Member'),
     'media_manager': _('Media Manager'),
-    'vote_counter': _('Vote Counter'),
-    'vice_president': _('Vice President'),
+    'vote_counter': _('Vote counter'),
+    'vice_president': _('Vice president'),
     'president': _('President'),
 }
 
-PARLIAMENTARY_GROUP_ROLES: dict[ParliamentaryGroupRole, str] = {
+PARLIAMENTARY_GROUP_ROLES: dict[PartyRole, str] = {
     'none': _('none'),
-    'non_permanent_member': _('Non-permanent Member'),
     'member': _('Member'),
-    'substitute_member': _('Substitute Member'),
-    'secretary': _('Secretary'),
-    'vote_counter': _('Vote Counter'),
-    'vice_president': _('Vice President'),
-    'president': _('President'),
+    'vote_counter': _('Vote counter'),
+    'vice_president': _('Vice president'),
+    'president': _('President of the parliamentary group'),
 }
 
 
-class RISParliamentarianRole(Base, ContentMixin, TimestampMixin):
+class ParliamentarianRole(Base, TimestampMixin):
 
-    __tablename__ = 'ris_parliamentarian_roles'
+    __tablename__ = 'par_parliamentarian_roles'
+
+    parliamentarian_type: Column[str] = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
+
+    __mapper_args__ = {
+        'polymorphic_on': parliamentarian_type,
+        'polymorphic_identity': 'generic',
+    }
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(
@@ -109,21 +110,21 @@ class RISParliamentarianRole(Base, ContentMixin, TimestampMixin):
     #: The id of the parliamentarian
     parliamentarian_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey('ris_parliamentarians.id'),
+        ForeignKey('par_parliamentarians.id'),
         nullable=False
     )
 
     #: The parliamentarian
-    parliamentarian: relationship[RISParliamentarian] = relationship(
-        'RISParliamentarian',
+    parliamentarian: relationship[Parliamentarian] = relationship(
+        Parliamentarian,
         back_populates='roles'
     )
 
-    #: The parliament role name
+    #: The role value
     role: Column[Role] = Column(
         Enum(
             *PARLIAMENTARIAN_ROLES.keys(),  # type:ignore[arg-type]
-            name='ris_parliamentarian_role'
+            name='par_parliamentarian_role'
         ),
         nullable=False,
         default='member'
@@ -134,25 +135,24 @@ class RISParliamentarianRole(Base, ContentMixin, TimestampMixin):
     def role_label(self) -> str:
         return PARLIAMENTARIAN_ROLES.get(self.role, '')
 
-    #: Party ID as a foreign key
+    #: The id of the party
     party_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey('ris_parties.id'),
+        ForeignKey('par_parties.id'),
         nullable=True
     )
 
     #: The party
-    party: relationship[RISParty | None] = relationship(
-        'RISParty',
-        back_populates='roles',
-        primaryjoin='RISParliamentarianRole.party_id == RISParty.id'
+    party: relationship[Party | None] = relationship(
+        Party,
+        back_populates='roles'
     )
 
     #: The party role value
     party_role: Column[PartyRole] = Column(
         Enum(
             *PARTY_ROLES.keys(),  # type:ignore[arg-type]
-            name='ris_party_role'
+            name='par_party_role'
         ),
         nullable=False,
         default='member'
@@ -166,14 +166,14 @@ class RISParliamentarianRole(Base, ContentMixin, TimestampMixin):
     #: The id of the parliamentary group
     parliamentary_group_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey('ris_parliamentary_groups.id'),
+        ForeignKey('par_parliamentary_groups.id'),
         nullable=True
     )
 
     #: The parliamentary group
-    parliamentary_group: relationship[RISParliamentaryGroup | None]
+    parliamentary_group: relationship[ParliamentaryGroup | None]
     parliamentary_group = relationship(
-        'RISParliamentaryGroup',
+        ParliamentaryGroup,
         back_populates='roles'
     )
 
@@ -181,7 +181,7 @@ class RISParliamentarianRole(Base, ContentMixin, TimestampMixin):
     parliamentary_group_role: Column[ParliamentaryGroupRole] = Column(
         Enum(
             *PARLIAMENTARY_GROUP_ROLES.keys(),  # type:ignore[arg-type]
-            name='ris_parliamentary_group_role'
+            name='par_parliamentary_group_role'
         ),
         nullable=False,
         default='member'

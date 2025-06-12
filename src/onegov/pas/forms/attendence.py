@@ -8,8 +8,8 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.pas import _
 from onegov.pas.collections import CommissionCollection
 from onegov.pas.collections import ParliamentarianCollection
-from onegov.pas.models import SettlementRun
-from onegov.pas.models.attendence import TYPES
+from onegov.parliament.models import SettlementRun
+from onegov.parliament.models.attendence import TYPES
 from wtforms.fields import DateField
 from wtforms.fields import FloatField
 from wtforms.fields import RadioField
@@ -19,7 +19,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
     from onegov.core.request import CoreRequest
-    from onegov.pas.models import Attendence
+    from onegov.parliament.models import Attendence
     from typing import Any
 
 

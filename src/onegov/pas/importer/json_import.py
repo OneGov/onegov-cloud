@@ -4,7 +4,7 @@ from datetime import date, datetime
 from uuid import UUID
 
 from onegov.pas import log
-from onegov.pas.models import (
+from onegov.parliament.models import (
     CommissionMembership,
     Parliamentarian,
     Commission,
@@ -172,9 +172,11 @@ class MembershipData(TypedDict):
 
 from typing import TYPE_CHECKING, TypedDict
 if TYPE_CHECKING:
-    from onegov.pas.models.parliamentarian_role import ParliamentaryGroupRole
-    from onegov.pas.models.parliamentarian_role import PartyRole
-    from onegov.pas.models.parliamentarian_role import Role
+    from onegov.parliament.models.parliamentarian_role import (
+        ParliamentaryGroupRole
+    )
+    from onegov.parliament.models.parliamentarian_role import PartyRole
+    from onegov.parliament.models.parliamentarian_role import Role
     from collections.abc import Sequence
     from sqlalchemy.orm import Session
 

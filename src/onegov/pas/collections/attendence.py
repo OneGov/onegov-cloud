@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from onegov.core.collection import GenericCollection
-from onegov.pas.models import (
+from onegov.parliament.models import (
     Attendence,
     SettlementRun,
     Parliamentarian,
     ParliamentarianRole,
 )
+
 from sqlalchemy import desc, or_
 
 

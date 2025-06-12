@@ -7,7 +7,7 @@ from onegov.pas import PasApp
 from onegov.pas.collections import CommissionMembershipCollection
 from onegov.pas.forms import CommissionMembershipForm
 from onegov.pas.layouts import CommissionMembershipLayout
-from onegov.pas.models import CommissionMembership
+from onegov.parliament.models import CommissionMembership
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

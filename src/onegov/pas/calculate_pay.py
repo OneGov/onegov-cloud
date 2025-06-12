@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.pas.models.rate_set import RateSet
+    from onegov.parliament.models.rate_set import RateSet
 
 
 def calculate_rate(

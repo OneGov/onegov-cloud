@@ -6,20 +6,21 @@ from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.pas import _
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import String
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
+from onegov.parliament import _
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from onegov.core.orm.mixins import dict_property
-    from onegov.pas.models import Attendence
-    from onegov.pas.models import Commission
-    from onegov.pas.models import Parliamentarian
+    from onegov.parliament.models import Attendence
+    from onegov.parliament.models import Commission
+    from onegov.parliament.models import Parliamentarian
     from onegov.town6.request import TownRequest
     from typing import Literal
     from typing import TypeAlias
@@ -39,7 +40,7 @@ ACTIONS: list[Action] = [
 
 class Change(Base, ContentMixin, TimestampMixin):
 
-    __tablename__ = 'pas_changes'
+    __tablename__ = 'par_changes'
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(
@@ -54,7 +55,7 @@ class Change(Base, ContentMixin, TimestampMixin):
         nullable=True
     )
 
-    #: The user name responsible for the change
+    #: The username responsible for the change
     user_name: Column[str | None] = Column(
         String,
         nullable=True
@@ -74,7 +75,7 @@ class Change(Base, ContentMixin, TimestampMixin):
     action: Column[Action] = Column(
         Enum(
             *ACTIONS,  # type:ignore[arg-type]
-            name='pas_actions'
+            name='par_actions'
         ),
         nullable=False
     )
@@ -97,7 +98,7 @@ class Change(Base, ContentMixin, TimestampMixin):
 
     @property
     def attendence(self) -> Attendence | None:
-        from onegov.pas.models import Attendence
+        from onegov.parliament.models import Attendence
         attendence_id = (self.changes or {}).get('id')
         if self.model == 'attendence' and attendence_id:
             session = object_session(self)
@@ -119,7 +120,7 @@ class Change(Base, ContentMixin, TimestampMixin):
 
     @property
     def parliamentarian(self) -> Parliamentarian | None:
-        from onegov.pas.models import Parliamentarian
+        from onegov.parliament.models import Parliamentarian
         parliamentarian_id = (self.changes or {}).get('parliamentarian_id')
         if self.model == 'attendence' and parliamentarian_id:
             session = object_session(self)
@@ -131,7 +132,7 @@ class Change(Base, ContentMixin, TimestampMixin):
 
     @property
     def commission(self) -> Commission | None:
-        from onegov.pas.models import Commission
+        from onegov.parliament.models import Commission
         commission_id = (self.changes or {}).get('commission_id')
         if self.model == 'attendence' and commission_id:
             session = object_session(self)

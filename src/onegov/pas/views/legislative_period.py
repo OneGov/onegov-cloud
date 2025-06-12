@@ -8,7 +8,7 @@ from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.forms import LegislativePeriodForm
 from onegov.pas.layouts import LegislativePeriodCollectionLayout
 from onegov.pas.layouts import LegislativePeriodLayout
-from onegov.pas.models import LegislativePeriod
+from onegov.parliament.models import LegislativePeriod
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

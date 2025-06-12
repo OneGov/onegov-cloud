@@ -18,11 +18,14 @@ if TYPE_CHECKING:
     from markupsafe import Markup
     from datetime import datetime
 
-    from onegov.ris.models.political_business import RISPoliticalBusiness
+    from onegov.parliament.models.political_business import (
+        PoliticalBusiness,
+    )
 
 
-class RISMeeting(Base, ContentMixin, ORMSearchable):
-    __tablename__ = 'ris_meetings'
+class Meeting(Base, ContentMixin, ORMSearchable):
+
+    __tablename__ = 'par_meetings'
 
     es_public = True
     es_properties = {'title_text': {'type': 'text'}}
@@ -57,17 +60,17 @@ class RISMeeting(Base, ContentMixin, ORMSearchable):
     #: political business id
     political_business_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey('ris_political_businesses.id'),
+        ForeignKey('par_political_businesses.id'),
     )
 
     #: list of political businesses, "Traktanden"
-    political_businesses: RelationshipProperty[RISPoliticalBusiness] = (
+    political_businesses: RelationshipProperty[PoliticalBusiness] = (
         relationship(
-            'RISPoliticalBusiness',
+            'PoliticalBusiness',
             back_populates='meetings',
-            order_by='RISPoliticalBusiness.number',
-            primaryjoin='RISMeeting.political_business_id == '
-            'RISPoliticalBusiness.id',
+            order_by='PoliticalBusiness.number',
+            primaryjoin='Meeting.political_business_id == '
+            'PoliticalBusiness.id',
         )
     )
 

@@ -11,9 +11,9 @@ from onegov.pas.forms import CommissionMembershipAddForm
 from onegov.pas.forms import CommissionForm
 from onegov.pas.layouts import CommissionCollectionLayout
 from onegov.pas.layouts import CommissionLayout
-from onegov.pas.models import Change
-from onegov.pas.models import Commission
-from onegov.pas.models import CommissionMembership
+from onegov.parliament.models import Change
+from onegov.parliament.models import Commission
+from onegov.parliament.models import CommissionMembership
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

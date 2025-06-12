@@ -16,12 +16,14 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import date
-    from onegov.pas.models.parliamentarian_role import ParliamentarianRole
+    from onegov.parliament.models.parliamentarian_role import (
+        ParliamentarianRole
+    )
 
 
 class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
-    __tablename__ = 'pas_parties'
+    __tablename__ = 'par_parties'
 
     es_public = False
     es_properties = {'name': {'type': 'text'}}

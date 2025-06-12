@@ -10,8 +10,8 @@ from onegov.pas.forms import AttendenceAddPlenaryForm
 from onegov.pas.forms import AttendenceForm
 from onegov.pas.layouts import AttendenceCollectionLayout
 from onegov.pas.layouts import AttendenceLayout
-from onegov.pas.models import Attendence
-from onegov.pas.models import Change
+from onegov.parliament.models import Attendence
+from onegov.parliament.models import Change
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

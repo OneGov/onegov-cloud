@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 from onegov.core.collection import GenericCollection
-from onegov.pas.models import RateSet
+from onegov.parliament.models import RateSet
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

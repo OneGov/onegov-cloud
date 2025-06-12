@@ -1,15 +1,19 @@
 from __future__ import annotations
 
-from sqlalchemy import Column, Date, Enum, Text
-from sqlalchemy.orm import relationship
-from uuid import uuid4
-
-from onegov.core.orm import Base, observes
-from onegov.core.orm.mixins import dict_markup_property, ContentMixin
+from onegov.core.orm import Base
+from onegov.core.orm.mixins import dict_markup_property
+from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.ris import _
+from onegov.parliament import _
 from onegov.search import ORMSearchable
+from sqlalchemy import Column
+from sqlalchemy import Date
+from sqlalchemy import Text
+from onegov.core.orm import observes
+from uuid import uuid4
+from sqlalchemy import Enum
+from sqlalchemy.orm import relationship
 
 
 from typing import TYPE_CHECKING
@@ -20,13 +24,14 @@ if TYPE_CHECKING:
     from typing import Literal
     from typing import TypeAlias
 
-    from onegov.ris.models.membership import RISCommissionMembership
+    from onegov.parliament.models import CommissionMembership, Attendence
 
     CommissionType: TypeAlias = Literal[
         'normal',
         'intercantonal',
         'official',
     ]
+
 
 TYPES: dict[CommissionType, str] = {
     'normal': _('normal'),
@@ -35,15 +40,23 @@ TYPES: dict[CommissionType, str] = {
 }
 
 
-class RISCommission(Base, TimestampMixin, ContentMixin, ORMSearchable):
+class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
-    __tablename__ = 'ris_commissions'
+    __tablename__ = 'par_commissions'
 
-    es_public = True
-    es_properties = {
-        'title': {'type': 'text'},
-        'description': {'type': 'localized_html'}
+    commission_type: Column[str] = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
+
+    __mapper_args__ = {
+        'polymorphic_on': commission_type,
+        'polymorphic_identity': 'generic',
     }
+
+    es_public = False
+    es_properties = {'name': {'type': 'text'}}
 
     @property
     def es_suggestion(self) -> str:
@@ -58,6 +71,14 @@ class RISCommission(Base, TimestampMixin, ContentMixin, ORMSearchable):
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
+    )
+
+    #: External ID
+    external_kub_id: Column[uuid.UUID | None] = Column(
+        UUID,   # type:ignore[arg-type]
+        nullable=True,
+        default=uuid4,
+        unique=True
     )
 
     #: the name
@@ -82,7 +103,7 @@ class RISCommission(Base, TimestampMixin, ContentMixin, ORMSearchable):
     type: Column[CommissionType] = Column(
         Enum(
             *TYPES.keys(),  # type:ignore[arg-type]
-            name='ris_commission_type'
+            name='commission_type'
         ),
         nullable=False,
         default='normal'
@@ -97,12 +118,18 @@ class RISCommission(Base, TimestampMixin, ContentMixin, ORMSearchable):
     description = dict_markup_property('content')
 
     #: A commission may have n parliamentarians
-    memberships: relationship[list[RISCommissionMembership]]
+    memberships: relationship[list[CommissionMembership]]
     memberships = relationship(
-        'RISCommissionMembership',
+        'CommissionMembership',
         cascade='all, delete-orphan',
-        back_populates='commission',
-        order_by='Commission.name'
+        back_populates='commission'
+    )
+
+    #: A commission may hold meetings
+    attendences: relationship[list[Attendence]] = relationship(
+        'Attendence',
+        cascade='all, delete-orphan',
+        back_populates='commission'
     )
 
     @observes('end')

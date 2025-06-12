@@ -2,17 +2,17 @@ from __future__ import annotations
 
 from onegov.pas import log
 from onegov.pas.collections import AttendenceCollection
-from onegov.pas.models.party import Party
-from onegov.pas.models.parliamentarian import Parliamentarian
-from onegov.pas.models.parliamentarian_role import ParliamentarianRole
-from onegov.pas.models.attendence import Attendence
+from onegov.parliament.models.party import Party
+from onegov.parliament.models.parliamentarian import Parliamentarian
+from onegov.parliament.models.parliamentarian_role import ParliamentarianRole
+from onegov.parliament.models.attendence import Attendence
 from decimal import Decimal
 from babel.numbers import format_decimal
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.pas.models import SettlementRun
+    from onegov.parliament.models import SettlementRun
     from onegov.town6.request import TownRequest
     from datetime import date
     from sqlalchemy.orm import Session

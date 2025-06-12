@@ -11,15 +11,15 @@ from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration,
 )
-from onegov.pas.models.attendence import TYPES, Attendence
+from onegov.parliament.models.attendence import TYPES, Attendence
 from datetime import date  # noqa: TC003
 from onegov.pas.utils import format_swiss_number
 
 
 from typing import TYPE_CHECKING, Literal, TypedDict
 if TYPE_CHECKING:
-    from onegov.pas.models import Parliamentarian, RateSet
-    from onegov.pas.models.settlement_run import SettlementRun
+    from onegov.parliament.models import Parliamentarian, RateSet
+    from onegov.parliament.models.settlement_run import SettlementRun
 
 
 @dataclass

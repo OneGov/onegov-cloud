@@ -15,7 +15,7 @@ from typing import (
 import openpyxl
 
 from onegov.core.csv import CSVFile, convert_excel_to_csv, detect_encoding
-from onegov.pas.models import (
+from onegov.parliament.models import (
     CommissionMembership,
     ParliamentarianRole,
     Parliamentarian,

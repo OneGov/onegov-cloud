@@ -5,7 +5,7 @@ from onegov.form import Form
 from onegov.org.forms.fields import HtmlField
 from onegov.pas import _
 from onegov.pas.layouts import DefaultLayout
-from onegov.pas.models import SettlementRun
+from onegov.parliament.models import SettlementRun
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import StringField

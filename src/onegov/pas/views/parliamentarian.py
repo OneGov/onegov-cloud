@@ -9,8 +9,8 @@ from onegov.pas.forms import ParliamentarianForm
 from onegov.pas.forms import ParliamentarianRoleForm
 from onegov.pas.layouts import ParliamentarianCollectionLayout
 from onegov.pas.layouts import ParliamentarianLayout
-from onegov.pas.models import Parliamentarian
-from onegov.pas.models import ParliamentarianRole
+from onegov.parliament.models import Parliamentarian
+from onegov.parliament.models import ParliamentarianRole
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

@@ -4,14 +4,14 @@ from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
+from sqlalchemy import Text
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import TimestampMixin, ContentMixin
+from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.ris import _
-
+from onegov.parliament import _
 
 from typing import TYPE_CHECKING
 
@@ -21,8 +21,7 @@ if TYPE_CHECKING:
     from typing import Literal
     from typing import TypeAlias
 
-    from onegov.ris.models.commission import RISCommission
-    from onegov.ris.models.parliamentarian import RISParliamentarian
+    from onegov.parliament.models import Commission, Parliamentarian
 
     MembershipRole: TypeAlias = Literal[
         'guest',
@@ -39,9 +38,20 @@ ROLES: dict[MembershipRole, str] = {
 }
 
 
-class RISCommissionMembership(Base, ContentMixin, TimestampMixin):
+class CommissionMembership(Base, TimestampMixin):
 
-    __tablename__ = 'ris_parliamentary_memberships'
+    __tablename__ = 'par_commission_memberships'
+
+    membership_type: Column[str] = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
+
+    __mapper_args__ = {
+        'polymorphic_on': membership_type,
+        'polymorphic_identity': 'generic',
+    }
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(
@@ -66,7 +76,7 @@ class RISCommissionMembership(Base, ContentMixin, TimestampMixin):
     role: Column[MembershipRole] = Column(
         Enum(
             *ROLES.keys(),  # type:ignore[arg-type]
-            name='ris_parliamentary_membership_role'
+            name='pas_commission_membership_role'
         ),
         nullable=False,
         default='member'
@@ -80,33 +90,32 @@ class RISCommissionMembership(Base, ContentMixin, TimestampMixin):
     #: the id of the commission
     commission_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey('ris_commissions.id'),
+        ForeignKey('par_commissions.id'),
         nullable=False
     )
 
     #: the related commission (which may have any number of memberships)
-    commission: relationship[RISCommission] = relationship(
-        'RISCommission',
+    commission: relationship[Commission] = relationship(
+        'Commission',
         back_populates='memberships'
     )
 
     #: the id of the parliamentarian
-    # NEEDED???
     parliamentarian_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey('ris_parliamentarians.id'),
+        ForeignKey('par_parliamentarians.id'),
         nullable=False
     )
 
     #: the related parliamentarian (which may have any number of memberships)
-    parliamentarian: relationship[RISParliamentarian] = relationship(
-        'RISParliamentarian',
+    parliamentarian: relationship[Parliamentarian] = relationship(
+        'Parliamentarian',
         back_populates='commission_memberships'
     )
 
     def __repr__(self) -> str:
         return (
-            f'<ParliamentaryMembership role={self.role}, '
-            f'p={self.parliamentarian.title}, '
-            f'commission={self.commission.name}'
+            f'<CommissionMembership role={self.role}, '
+            f'p={self.parliamentarian.title}, commission'
+            f'={self.commission.name}'
         )

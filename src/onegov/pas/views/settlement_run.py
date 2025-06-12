@@ -13,7 +13,7 @@ from onegov.pas.export_single_parliamentarian import\
 from onegov.pas.forms import SettlementRunForm
 from onegov.pas.layouts import SettlementRunCollectionLayout
 from onegov.pas.layouts import SettlementRunLayout
-from onegov.pas.models import (
+from onegov.parliament.models import (
     SettlementRun,
     Party,
     Commission,
@@ -23,9 +23,9 @@ from decimal import Decimal
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration)
-from onegov.pas.models.attendence import TYPES, Attendence
+from onegov.parliament.models.attendence import TYPES, Attendence
 from onegov.pas.path import SettlementRunExport, SettlementRunAllExport
-from onegov.pas.models import Parliamentarian
+from onegov.parliament.models import Parliamentarian
 from onegov.pas.utils import (
     format_swiss_number,
     get_parliamentarians_with_settlements,
@@ -1030,7 +1030,7 @@ def view_settlement_run_export(
 
     elif self.category == 'parliamentarian':
         assert isinstance(self.entity, Parliamentarian)
-        # Parliamentarian specific export has it's own rendering function
+        # PASParliamentarian specific export has it's own rendering function
         pdf_bytes = generate_parliamentarian_settlement_pdf(
             self.settlement_run, request, self.entity
         )

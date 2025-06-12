@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 from onegov.core.collection import GenericCollection
-from onegov.pas.models import Party
+from onegov.parliament.models import Party
 from sqlalchemy import or_
 
 from typing import TYPE_CHECKING

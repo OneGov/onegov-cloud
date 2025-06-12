@@ -2,26 +2,29 @@ from __future__ import annotations
 
 from decimal import ROUND_HALF_UP, Decimal
 
-from onegov.core.orm import Base
-from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
-from onegov.pas import _
-from onegov.pas.models.commission import Commission
-from onegov.pas.models.parliamentarian import Parliamentarian
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
+from sqlalchemy import Text
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
+from onegov.core.orm import Base
+from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import UUID
+from onegov.parliament import _
+
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     import uuid
     import datetime
     from typing import Literal
     from typing import TypeAlias
+
+    from onegov.parliament.models import Parliamentarian, Commission
 
     AttendenceType: TypeAlias = Literal[
         'plenary',
@@ -40,7 +43,18 @@ TYPES: dict[AttendenceType, str] = {
 
 class Attendence(Base, TimestampMixin):
 
-    __tablename__ = 'pas_attendence'
+    __tablename__ = 'par_attendence'
+
+    attendence_type: Column[str] = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
+
+    __mapper_args__ = {
+        'polymorphic_on': attendence_type,
+        'polymorphic_identity': 'generic',
+    }
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(
@@ -65,7 +79,7 @@ class Attendence(Base, TimestampMixin):
     type: Column[AttendenceType] = Column(
         Enum(
             *TYPES.keys(),  # type:ignore[arg-type]
-            name='pas_attendence_type'
+            name='par_attendence_type'
         ),
         nullable=False,
         default='plenary'
@@ -79,26 +93,26 @@ class Attendence(Base, TimestampMixin):
     #: The id of the parliamentarian
     parliamentarian_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey('pas_parliamentarians.id'),
+        ForeignKey('par_parliamentarians.id'),
         nullable=False
     )
 
     #: The parliamentarian
     parliamentarian: relationship[Parliamentarian] = relationship(
-        Parliamentarian,
+        'Parliamentarian',
         back_populates='attendences'
     )
 
     #: the id of the commission
     commission_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey('pas_commissions.id'),
+        ForeignKey('par_commissions.id'),
         nullable=True
     )
 
     #: the related commission (which may have any number of memberships)
     commission: relationship[Commission | None] = relationship(
-        Commission,
+        'Commission',
         back_populates='attendences'
     )
 

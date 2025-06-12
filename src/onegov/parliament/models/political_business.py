@@ -8,8 +8,8 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID
 from onegov.file import MultiAssociatedFiles
-from onegov.ris import _
-from onegov.ris.models.meeting import RISMeeting
+from onegov.parliament import _
+from onegov.parliament.models.meeting import Meeting
 from onegov.search import ORMSearchable
 
 
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
     from datetime import date
 
-    from onegov.ris.models import RISParliamentarian
+    from onegov.parliament.models import Parliamentarian
 
     PoliticalBusinessType: TypeAlias = Literal[
         'inquiry',  # Anfrage
@@ -79,11 +79,11 @@ POLITICAL_BUSINESS_STATUS: dict[PoliticalBusinessStatus, str] = {
 }
 
 
-class RISPoliticalBusiness(Base, MultiAssociatedFiles, ContentMixin,
+class PoliticalBusiness(Base, MultiAssociatedFiles, ContentMixin,
                            ORMSearchable):
     # Politisches Geschäft
 
-    __tablename__ = 'ris_political_businesses'
+    __tablename__ = 'par_political_businesses'
 
     es_public = True
     es_properties = {
@@ -112,7 +112,7 @@ class RISPoliticalBusiness(Base, MultiAssociatedFiles, ContentMixin,
     political_business_type: Column[PoliticalBusinessType] = Column(
         Enum(
             *POLITICAL_BUSINESS_TYPE.keys(),  # type:ignore[arg-type]
-            name='ris_political_business_type',
+            name='par_political_business_type',
         ),
         nullable=False,
     )
@@ -121,7 +121,7 @@ class RISPoliticalBusiness(Base, MultiAssociatedFiles, ContentMixin,
     status: Column[PoliticalBusinessStatus | None] = Column(
         Enum(
             *POLITICAL_BUSINESS_STATUS.keys(),  # type:ignore[arg-type]
-            name='ris_political_business_status',
+            name='par_political_business_status',
         ),
         nullable=True,
     )
@@ -131,7 +131,7 @@ class RISPoliticalBusiness(Base, MultiAssociatedFiles, ContentMixin,
 
     #: may have participants (Verfasser/Beteiligte) depending on the type
     participants = relationship(
-        'RISPoliticalBusinessParticipation',
+        'PoliticalBusinessParticipation',
         back_populates='political_business',
         lazy='joined',
     )
@@ -139,15 +139,15 @@ class RISPoliticalBusiness(Base, MultiAssociatedFiles, ContentMixin,
     #: parliamentary group (Fraktion)
     parliamentary_group_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey('ris_parliamentary_groups.id'),
+        ForeignKey('par_parliamentary_groups.id'),
         nullable=True,
     )
 
     #: The meetings this agenda item was discussed in
-    meetings: RelationshipProperty[RISMeeting] = relationship(
-        'RISMeeting',
+    meetings: RelationshipProperty[Meeting] = relationship(
+        'Meeting',
         back_populates='political_businesses',
-        order_by=RISMeeting.start_datetime,
+        order_by=Meeting.start_datetime,
         lazy='joined',
     )
 
@@ -156,10 +156,10 @@ class RISPoliticalBusiness(Base, MultiAssociatedFiles, ContentMixin,
                 f'{self.title}, {self.political_business_type}>')
 
 
-class RISPoliticalBusinessParticipation(Base, ContentMixin):
+class PoliticalBusinessParticipation(Base, ContentMixin):
     """ A participant of a political business, e.g. a parliamentarian. """
 
-    __tablename__ = 'ris_political_business_participants'
+    __tablename__ = 'par_political_business_participants'
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(
@@ -171,32 +171,32 @@ class RISPoliticalBusinessParticipation(Base, ContentMixin):
     #: The id of the political business
     political_business_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey('ris_political_businesses.id'),
+        ForeignKey('par_political_businesses.id'),
         nullable=False,
     )
 
     #: The id of the parliamentarian
     parliamentarian_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey('ris_parliamentarians.id'),
+        ForeignKey('par_parliamentarians.id'),
         nullable=False,
     )
 
     #:
     participant_type: Column[str] = Column(
-        Enum('author', 'participant', name='ris_participant_type'),
+        Enum('author', 'participant', name='par_participant_type'),
         nullable=False,
     )
 
     #: the related political business
-    political_business: RelationshipProperty[RISPoliticalBusiness]
+    political_business: RelationshipProperty[PoliticalBusiness]
     political_business = relationship(
-        'RISPoliticalBusiness',
+        'PoliticalBusiness',
         back_populates='participants',
     )
 
     #: the related parliamentarian
-    parliamentarian: RelationshipProperty[RISParliamentarian] = relationship(
-        'RISParliamentarian',
+    parliamentarian: RelationshipProperty[Parliamentarian] = relationship(
+        'Parliamentarian',
         back_populates='political_businesses',
     )

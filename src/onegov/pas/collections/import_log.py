@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from onegov.core.collection import GenericCollection
-from onegov.pas.models.import_log import ImportLog
+from onegov.parliament.models.import_log import ImportLog
 
 
 from typing import Self, TYPE_CHECKING

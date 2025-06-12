@@ -8,7 +8,7 @@ from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.pas.forms import ParliamentaryGroupForm
 from onegov.pas.layouts import ParliamentaryGroupCollectionLayout
 from onegov.pas.layouts import ParliamentaryGroupLayout
-from onegov.pas.models import ParliamentaryGroup
+from onegov.parliament.models import ParliamentaryGroup
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

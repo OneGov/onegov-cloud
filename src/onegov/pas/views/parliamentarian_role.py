@@ -7,7 +7,7 @@ from onegov.pas import PasApp
 from onegov.pas.collections import ParliamentarianRoleCollection
 from onegov.pas.forms import ParliamentarianRoleForm
 from onegov.pas.layouts import ParliamentarianRoleLayout
-from onegov.pas.models import ParliamentarianRole
+from onegov.parliament.models import ParliamentarianRole
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

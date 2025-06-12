@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from onegov.core.collection import GenericCollection
-from onegov.pas.models import Change
+from onegov.parliament.models import Change
 from sqlalchemy import desc
 
 from typing import TYPE_CHECKING

@@ -1,6 +1,15 @@
 from __future__ import annotations
 
 from datetime import date
+from onegov.core.orm import Base
+from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import UUID
+from onegov.file import AssociatedFiles
+from onegov.file import NamedFile
+from onegov.parliament.models import ParliamentarianRole
+from onegov.pas import _
+from onegov.search import ORMSearchable
 from sqlalchemy import Column, or_
 from sqlalchemy import Date
 from sqlalchemy import Enum
@@ -8,35 +17,37 @@ from sqlalchemy import Text
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
-from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin
-from onegov.core.orm.types import UUID
-from onegov.file import AssociatedFiles
-from onegov.file import NamedFile
-from onegov.ris import _
-from onegov.ris.models.parliamentarian_role import RISParliamentarianRole
-from onegov.search import ORMSearchable
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import uuid
-
-    from sqlalchemy.orm import Session
     from typing import Literal
     from typing import TypeAlias
 
-    from onegov.ris.models.membership import RISCommissionMembership
-    from onegov.ris.models.parliamentary_group import RISParliamentaryGroup
-    from onegov.ris.models.party import RISParty
-    from onegov.ris.models.political_business import (
-        RISPoliticalBusinessParticipation
+    from sqlalchemy.orm import Session
+    import uuid
+
+    from onegov.parliament.models.attendence import Attendence
+    from onegov.parliament.models.commission_membership import (
+        CommissionMembership
     )
+    from onegov.parliament.models.political_business import (
+        PoliticalBusinessParticipation
+    )
+    from onegov.parliament.models.party import Party
 
     Gender: TypeAlias = Literal[
         'male',
         'female',
     ]
+    ShippingMethod: TypeAlias = Literal[
+        'a',
+        'plus',
+        'registered',
+        'confidential',
+        'personal',
+    ]
+
 
 GENDERS: dict[Gender, str] = {
     'male': _('male'),
@@ -44,8 +55,30 @@ GENDERS: dict[Gender, str] = {
 }
 
 
-class RISParliamentarian(Base, AssociatedFiles, ContentMixin, ORMSearchable):
-    __tablename__ = 'ris_parliamentarians'
+SHIPPING_METHODS: dict[ShippingMethod, str] = {
+    'a': _('A mail'),
+    'plus': _('A mail plus'),
+    'registered': _('registered'),
+    'confidential': _('confidential'),
+    'personal': _('personal / confidential')
+}
+
+
+class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles,
+                      ORMSearchable):
+
+    __tablename__ = 'par_parliamentarians'
+
+    parliamentarian_type: Column[str] = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
+
+    __mapper_args__ = {
+        'polymorphic_on': parliamentarian_type,
+        'polymorphic_identity': 'generic',
+    }
 
     es_public = False
     es_properties = {
@@ -64,11 +97,29 @@ class RISParliamentarian(Base, AssociatedFiles, ContentMixin, ORMSearchable):
     def title(self) -> str:
         return f'{self.first_name} {self.last_name}'
 
+    type: Column[str] = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
+
     #: Internal ID
     id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+        UUID,   # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
+    )
+
+    #: External ID
+    #
+    # Note: Value can only be None if the data is imported from an Excel file.
+    # Fixme: The excel data import will not be used in the future so we will be
+    # able to make this Non-Nullable soon.
+    external_kub_id: Column[uuid.UUID | None] = Column(
+        UUID,   # type:ignore[arg-type]
+        nullable=True,
+        default=uuid4,
+        unique=True
     )
 
     #: The first name
@@ -89,11 +140,17 @@ class RISParliamentarian(Base, AssociatedFiles, ContentMixin, ORMSearchable):
         nullable=True
     )
 
+    #: The contract number
+    contract_number: Column[str | None] = Column(
+        Text,
+        nullable=True
+    )
+
     #: The gender value
     gender: Column[Gender] = Column(
         Enum(
             *GENDERS.keys(),  # type:ignore[arg-type]
-            name='ris_gender'
+            name='pas_gender'
         ),
         nullable=False,
         default='male'
@@ -111,6 +168,45 @@ class RISParliamentarian(Base, AssociatedFiles, ContentMixin, ORMSearchable):
         if self.gender == 'female':
             return 'Frau ' + self.first_name + ' ' + self.last_name
         return 'Herr ' + self.first_name + ' ' + self.last_name
+
+    #: The shipping method value
+    shipping_method: Column[ShippingMethod] = Column(
+        Enum(
+            *SHIPPING_METHODS.keys(),   # type:ignore[arg-type]
+            name='pas_shipping_methods'
+        ),
+        nullable=False,
+        default='a'
+    )
+
+    #: The shipping method as translated text
+    @property
+    def shipping_method_label(self) -> str:
+        return SHIPPING_METHODS.get(self.shipping_method, '')
+
+    #: The shipping address
+    shipping_address: Column[str | None] = Column(
+        Text,
+        nullable=True
+    )
+
+    #: The shipping address addition
+    shipping_address_addition: Column[str | None] = Column(
+        Text,
+        nullable=True
+    )
+
+    #: The shipping address zip code
+    shipping_address_zip_code: Column[str | None] = Column(
+        Text,
+        nullable=True
+    )
+
+    #: The shipping address city
+    shipping_address_city: Column[str | None] = Column(
+        Text,
+        nullable=True
+    )
 
     #: The private address
     private_address: Column[str | None] = Column(
@@ -172,6 +268,24 @@ class RISParliamentarian(Base, AssociatedFiles, ContentMixin, ORMSearchable):
         nullable=True
     )
 
+    #: The salutation used in the address
+    salutation_for_address: Column[str | None] = Column(
+        Text,
+        nullable=True
+    )
+
+    #: The salutation used for letters
+    salutation_for_letter: Column[str | None] = Column(
+        Text,
+        nullable=True
+    )
+
+    #: How bills should be delivered
+    forwarding_of_bills: Column[str | None] = Column(
+        Text,
+        nullable=True
+    )
+
     #: The private phone number
     phone_private: Column[str | None] = Column(
         Text,
@@ -218,43 +332,38 @@ class RISParliamentarian(Base, AssociatedFiles, ContentMixin, ORMSearchable):
     picture = NamedFile()
 
     #: A parliamentarian may have n roles
-    roles: relationship[list[RISParliamentarianRole]]
+    roles: relationship[list[ParliamentarianRole]]
     roles = relationship(
-        'RISParliamentarianRole',
+        'ParliamentarianRole',
         cascade='all, delete-orphan',
         back_populates='parliamentarian',
         order_by='desc(ParliamentarianRole.start)'
     )
 
-    #: political businesses participations [0..n]
-    political_businesses: relationship[list[RISPoliticalBusinessParticipation]]
-    political_businesses = relationship(
-        'RISPoliticalBusinessParticipation',
-        back_populates='parliamentarian',
-        lazy='joined'
-    )
-
     def get_party_during_period(
-            self, start_date: date, end_date: date, session: Session
-    ) -> RISParty | None:
+        self, start_date: date, end_date: date, session: Session
+    ) -> Party | None:
         """Get the party this parliamentarian belonged to during a specific
         period."""
 
+        from onegov.parliament.models.parliamentarian_role import (
+            ParliamentarianRole
+        )
         role = (
-            session.query(RISParliamentarianRole)
+            session.query(ParliamentarianRole)
             .filter(
-                RISParliamentarianRole.parliamentarian_id == self.id,
-                RISParliamentarianRole.party_id.isnot(
+                ParliamentarianRole.parliamentarian_id == self.id,
+                ParliamentarianRole.party_id.isnot(
                     None
                 ),
                 or_(
-                    RISParliamentarianRole.end.is_(None),
-                    RISParliamentarianRole.end >= start_date,
+                    ParliamentarianRole.end.is_(None),
+                    ParliamentarianRole.end >= start_date,
                 ),
-                RISParliamentarianRole.start
+                ParliamentarianRole.start
                 <= end_date,
             )
-            .order_by(RISParliamentarianRole.start.desc())
+            .order_by(ParliamentarianRole.start.desc())
             .first()
         )
 
@@ -283,20 +392,19 @@ class RISParliamentarian(Base, AssociatedFiles, ContentMixin, ORMSearchable):
     def display_name(self) -> str:
         return f'{self.first_name} {self.last_name}'
 
-    #: A parliamentarian may be a member of n commissions
-    commission_memberships: relationship[list[RISCommissionMembership]]
+    #: A parliamentarian may be part of n commissions
+    commission_memberships: relationship[list[CommissionMembership]]
     commission_memberships = relationship(
-        'RISCommissionMembership',
+        'CommissionMembership',
         cascade='all, delete-orphan',
         back_populates='parliamentarian'
     )
 
-    political_groups: relationship[list[RISParliamentaryGroup]]
-    political_groups = relationship(
-        'RISParliamentaryGroup',
-        back_populates='members',
-        primaryjoin='RISParliamentarian.id == '
-                    'RISParliamentaryGroup.parliamentarian_id',
+    #: A parliamentarian may attend meetings
+    attendences: relationship[list[Attendence]] = relationship(
+        'Attendence',
+        cascade='all, delete-orphan',
+        back_populates='parliamentarian'
     )
 
     def __repr__(self) -> str:
@@ -314,3 +422,20 @@ class RISParliamentarian(Base, AssociatedFiles, ContentMixin, ORMSearchable):
                 f"email='{self.email_primary}'")
 
         return f"<Parliamentarian {', '.join(info)}>"
+
+
+class RISParliamentarian(Parliamentarian):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'ris_parliamentarian',
+    }
+
+    es_type_name = 'ris_parliamentarian'
+
+    #: political businesses participations [0..n]
+    political_businesses: relationship[list[PoliticalBusinessParticipation]]
+    political_businesses = relationship(
+        'PoliticalBusinessParticipation',
+        back_populates='parliamentarian',
+        lazy='joined'
+    )
