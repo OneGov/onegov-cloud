@@ -81,6 +81,9 @@ class Handler:
         if self.ticket.handler_data != self.data:
             self.ticket.handler_data = self.data
 
+        if self.ticket.ticket_email != self.email:
+            self.ticket.ticket_email = self.email
+
     @property
     def email(self) -> str | None:
         """ Returns the email address behind the ticket request. """

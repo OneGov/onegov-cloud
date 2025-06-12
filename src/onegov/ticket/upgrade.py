@@ -230,3 +230,34 @@ def add_tags_columns_and_index_to_ticket(context: UpgradeContext) -> None:
         ['tags'],
         postgresql_using='gin',
     )
+
+
+@upgrade_task('Add ticket_email column and index to ticket')
+def add_ticket_email_column_and_index(context: UpgradeContext) -> None:
+    if context.has_column('tickets', 'ticket_email'):
+        return
+
+    context.operations.add_column(
+        'tickets', Column('ticket_email', Text, nullable=True)
+    )
+
+    context.operations.create_index(
+        'ix_ticket_email', 'tickets', ['ticket_email']
+    )
+
+    # Fast upgrade path for tickets with snapshots
+    context.operations.execute("""
+        UPDATE tickets
+           SET ticket_email = snapshot->>'email'
+         WHERE snapshot->'email' IS NOT NULL
+    """)
+
+    # Slow upgrade path for open/pending tickets, we won't
+    # bother with closed/archived tickets without a snapshot
+    for ticket in (
+        context.session.query(Ticket)
+        .filter(Ticket.ticket_email.is_(None))
+        .filter(Ticket.state.in_(['open', 'pending']))
+    ):
+        if (email := ticket.handler.email) is not None:
+            ticket.ticket_email = email

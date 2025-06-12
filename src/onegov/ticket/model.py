@@ -98,6 +98,11 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         Column(JSON, nullable=False, default=dict)
     )
 
+    #: the email address of the person submitting the ticket. This is stored
+    #: redudantly so we can easily search and present users with their own
+    #: tickets. This can be missing, once the ticket has been redacted.
+    ticket_email: Column[str | None] = Column(Text, nullable=True, index=True)
+
     #: a snapshot of the ticket containing the last summary that made any sense
     #: use this before deleting the model behind a ticket, lest your ticket
     #: becomes nothing more than a number.
@@ -207,13 +212,6 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         ]
 
     @property
-    def ticket_email(self) -> str | None:
-        if self.handler.deleted:
-            return self.snapshot.get('email')
-        else:
-            return self.handler.email
-
-    @property
     def ticket_data(self) -> Sequence[str] | None:
         if self.handler.deleted:
             return self.snapshot.get('summary')
@@ -244,6 +242,11 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
                 if hasattr(self.snapshot, f'submitter_{info}'):
                     self.snapshot[f'submitter_{info}'] = redact_constant
 
+        self.ticket_email = ''
+
+        # FIXME: Anything below should probably be done by the handler
+        #        since there may be other objects that contain personal
+        #        information, like the reservation.
         submission = getattr(self.handler, 'submission', None)
 
         if not submission or not submission.data:
@@ -345,7 +348,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         """ Takes the current handler and stores the output of the summary
         as a snapshot.
 
-        TODO: This doesn't support multiple langauges at this point. The
+        TODO: This doesn't support multiple languages at this point. The
         language of the user creating the snapshot will be what's stored.
 
         In the future we might change this by iterating over all supported
