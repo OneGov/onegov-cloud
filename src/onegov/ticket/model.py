@@ -239,7 +239,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
             self.snapshot['email'] = ''
 
             for info in ('name', 'address', 'phone'):
-                if hasattr(self.snapshot, f'submitter_{info}'):
+                if f'submitter_{info}' in self.snapshot:
                     self.snapshot[f'submitter_{info}'] = redact_constant
 
         self.ticket_email = ''
