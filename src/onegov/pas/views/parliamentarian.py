@@ -9,8 +9,8 @@ from onegov.pas.forms import ParliamentarianForm
 from onegov.pas.forms import ParliamentarianRoleForm
 from onegov.pas.layouts import ParliamentarianCollectionLayout
 from onegov.pas.layouts import ParliamentarianLayout
-from onegov.parliament.models import Parliamentarian
-from onegov.parliament.models import ParliamentarianRole
+from onegov.pas.models import PASParliamentarian
+from onegov.pas.models import PASParliamentarianRole
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -83,12 +83,12 @@ def add_parliamentarian(
 
 
 @PasApp.html(
-    model=Parliamentarian,
+    model=PASParliamentarian,
     template='parliamentarian.pt',
     permission=Private
 )
 def view_parliamentarian(
-    self: Parliamentarian,
+    self: PASParliamentarian,
     request: TownRequest
 ) -> RenderData:
 
@@ -102,14 +102,14 @@ def view_parliamentarian(
 
 
 @PasApp.form(
-    model=Parliamentarian,
+    model=PASParliamentarian,
     name='edit',
     template='form.pt',
     permission=Private,
     form=ParliamentarianForm
 )
 def edit_parliamentarian(
-    self: Parliamentarian,
+    self: PASParliamentarian,
     request: TownRequest,
     form: ParliamentarianForm
 ) -> RenderData | Response:
@@ -134,12 +134,12 @@ def edit_parliamentarian(
 
 
 @PasApp.view(
-    model=Parliamentarian,
+    model=PASParliamentarian,
     request_method='DELETE',
     permission=Private
 )
 def delete_parliamentarian(
-    self: Parliamentarian,
+    self: PASParliamentarian,
     request: TownRequest
 ) -> None:
 
@@ -150,14 +150,14 @@ def delete_parliamentarian(
 
 
 @PasApp.form(
-    model=Parliamentarian,
+    model=PASParliamentarian,
     name='new-role',
     template='form.pt',
     permission=Private,
     form=ParliamentarianRoleForm
 )
 def add_commission_membership(
-    self: Parliamentarian,
+    self: PASParliamentarian,
     request: TownRequest,
     form: ParliamentarianRoleForm
 ) -> RenderData | Response:
@@ -166,7 +166,7 @@ def add_commission_membership(
 
     if form.submitted(request):
         self.roles.append(
-            ParliamentarianRole(**form.get_useful_data())
+            PASParliamentarianRole(**form.get_useful_data())
         )
         request.success(_('Added a new role'))
         return request.redirect(request.link(self))

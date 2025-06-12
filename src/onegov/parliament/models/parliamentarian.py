@@ -26,15 +26,13 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     import uuid
 
-    from onegov.parliament.models.attendence import Attendence
-    from onegov.parliament.models.commission_membership import (
-        CommissionMembership
+    from onegov.parliament.models import (
+        Attendence,
+        CommissionMembership,
+        PoliticalBusinessParticipation,
+        Party,
+        ParliamentarianRole,
     )
-    from onegov.parliament.models.political_business import (
-        PoliticalBusinessParticipation
-    )
-    from onegov.parliament.models.party import Party
-    from onegov.parliament.models import ParliamentarianRole
 
     Gender: TypeAlias = Literal[
         'male',
@@ -65,7 +63,7 @@ SHIPPING_METHODS: dict[ShippingMethod, str] = {
 
 
 class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles,
-                      ORMSearchable):
+                         ORMSearchable):
 
     __tablename__ = 'par_parliamentarians'
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date
 from onegov.form import Form
 from onegov.pas import _
-from onegov.parliament.models import RateSet
+from onegov.pas.models import RateSet
 from wtforms.fields import DecimalField
 from wtforms.fields import IntegerField
 from wtforms.validators import InputRequired

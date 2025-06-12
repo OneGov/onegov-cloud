@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from onegov.core.collection import GenericCollection
-from onegov.parliament.models import Parliamentarian
+from onegov.pas.models import PASParliamentarian
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from typing import Self
 
 
-class ParliamentarianCollection(GenericCollection[Parliamentarian]):
+class ParliamentarianCollection(GenericCollection[PASParliamentarian]):
 
     def __init__(
         self,
@@ -21,25 +21,25 @@ class ParliamentarianCollection(GenericCollection[Parliamentarian]):
         self.active = active
 
     @property
-    def model_class(self) -> type[Parliamentarian]:
-        return Parliamentarian
+    def model_class(self) -> type[PASParliamentarian]:
+        return PASParliamentarian
 
-    def query(self) -> Query[Parliamentarian]:
+    def query(self) -> Query[PASParliamentarian]:
 
         query = super().query()
 
         if self.active is not None:
-            id_query = self.session.query(Parliamentarian)
+            id_query = self.session.query(PASParliamentarian)
             if self.active:
                 ids = [p.id for p in id_query if p.active]
-                query = query.filter(Parliamentarian.id.in_(ids))
+                query = query.filter(PASParliamentarian.id.in_(ids))
             else:
                 ids = [p.id for p in id_query if not p.active]
-                query = query.filter(Parliamentarian.id.in_(ids))
+                query = query.filter(PASParliamentarian.id.in_(ids))
 
         return query.order_by(
-            Parliamentarian.last_name,
-            Parliamentarian.first_name
+            PASParliamentarian.last_name,
+            PASParliamentarian.first_name
         ).distinct()
 
     def for_filter(

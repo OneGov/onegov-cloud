@@ -15,15 +15,17 @@ from uuid import uuid4
 from onegov.parliament import _
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
+    from typing import Literal
+    from typing import TypeAlias
     import uuid
+
     from onegov.core.orm.mixins import dict_property
     from onegov.parliament.models import Attendence
     from onegov.parliament.models import Commission
     from onegov.parliament.models import Parliamentarian
     from onegov.town6.request import TownRequest
-    from typing import Literal
-    from typing import TypeAlias
 
     Action: TypeAlias = Literal[
         'add',

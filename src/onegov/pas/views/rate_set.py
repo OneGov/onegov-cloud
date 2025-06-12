@@ -8,7 +8,7 @@ from onegov.pas.collections import RateSetCollection
 from onegov.pas.forms import RateSetForm
 from onegov.pas.layouts import RateSetCollectionLayout
 from onegov.pas.layouts import RateSetLayout
-from onegov.parliament.models import RateSet
+from onegov.pas.models import RateSet
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

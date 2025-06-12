@@ -7,7 +7,7 @@ from onegov.pas import PasApp
 from onegov.pas.collections import CommissionMembershipCollection
 from onegov.pas.forms import CommissionMembershipForm
 from onegov.pas.layouts import CommissionMembershipLayout
-from onegov.parliament.models import CommissionMembership
+from onegov.pas.models import PASCommissionMembership
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -17,12 +17,12 @@ if TYPE_CHECKING:
 
 
 @PasApp.html(
-    model=CommissionMembership,
+    model=PASCommissionMembership,
     template='commission_membership.pt',
     permission=Private
 )
 def view_commission_membership(
-    self: CommissionMembership,
+    self: PASCommissionMembership,
     request: TownRequest
 ) -> RenderData:
 
@@ -36,14 +36,14 @@ def view_commission_membership(
 
 
 @PasApp.form(
-    model=CommissionMembership,
+    model=PASCommissionMembership,
     name='edit',
     template='form.pt',
     permission=Private,
     form=CommissionMembershipForm
 )
 def edit_commission_membership(
-    self: CommissionMembership,
+    self: PASCommissionMembership,
     request: TownRequest,
     form: CommissionMembershipForm
 ) -> RenderData | Response:
@@ -68,12 +68,12 @@ def edit_commission_membership(
 
 
 @PasApp.view(
-    model=CommissionMembership,
+    model=PASCommissionMembership,
     request_method='DELETE',
     permission=Private
 )
 def delete_commission_membership(
-    self: CommissionMembership,
+    self: PASCommissionMembership,
     request: TownRequest
 ) -> None:
 

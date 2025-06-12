@@ -1,43 +1,53 @@
 from __future__ import annotations
 
-from onegov.core.elements import Link
-from onegov.core.security import Private
-from onegov.pas import _
-from onegov.pas import PasApp
-from onegov.pas.calculate_pay import calculate_rate
-from onegov.pas.collections import SettlementRunCollection,\
-    AttendenceCollection, CommissionCollection
-from onegov.pas.custom import get_current_rate_set
-from onegov.pas.export_single_parliamentarian import\
-    generate_parliamentarian_settlement_pdf
-from onegov.pas.forms import SettlementRunForm
-from onegov.pas.layouts import SettlementRunCollectionLayout
-from onegov.pas.layouts import SettlementRunLayout
-from onegov.parliament.models import (
-    SettlementRun,
-    Party,
-    Commission,
-)
 from webob import Response
 from decimal import Decimal
+from operator import itemgetter
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration)
-from onegov.parliament.models.attendence import TYPES, Attendence
+
+from onegov.core.elements import Link
+from onegov.core.security import Private
+from onegov.parliament.models.attendence import TYPES
+from onegov.pas import _
+from onegov.pas import PasApp
+from onegov.pas.calculate_pay import calculate_rate
+from onegov.pas.collections import (
+    SettlementRunCollection,
+    AttendenceCollection,
+    CommissionCollection
+)
+from onegov.pas.custom import get_current_rate_set
+from onegov.pas.export_single_parliamentarian import (
+    generate_parliamentarian_settlement_pdf
+)
+from onegov.pas.forms import SettlementRunForm
+from onegov.pas.layouts import SettlementRunCollectionLayout
+from onegov.pas.layouts import SettlementRunLayout
+from onegov.pas.models import (
+    PASAttendence,
+    PASParliamentarian,
+    PASParty,
+    PASCommission,
+    SettlementRun,
+)
 from onegov.pas.path import SettlementRunExport, SettlementRunAllExport
-from onegov.parliament.models import Parliamentarian
 from onegov.pas.utils import (
     format_swiss_number,
     get_parliamentarians_with_settlements,
     get_parties_with_settlements,
 )
-from operator import itemgetter
 
 from typing import TYPE_CHECKING, Literal
+
 if TYPE_CHECKING:
+    from datetime import date
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
-    from datetime import date
+
+    from onegov.parliament.models import Commission, Parliamentarian
+
     SettlementDataRow = tuple[
         'date', Parliamentarian, str, Decimal, Decimal, Decimal
     ]
@@ -241,7 +251,7 @@ def view_settlement_run(
 
     # Get commissions active during settlement run period
     commissions = CommissionCollection(session).query().order_by(
-        Commission.name
+        PASCommission.name
     )
 
     # Get parliamentarians active during settlement run period with settlements
@@ -329,7 +339,7 @@ def view_settlement_run(
 def _get_commission_totals(
     settlement_run: SettlementRun,
     request: TownRequest,
-    commission: Commission
+    commission: PASCommission
 ) -> list[TotalRow]:
     """Get totals for a specific commission grouped by party."""
     session = request.session
@@ -535,19 +545,19 @@ def generate_settlement_pdf(
     settlement_run: SettlementRun,
     request: TownRequest,
     entity_type: Literal['all', 'commission', 'party', 'parliamentarian'],
-    entity: Commission | Party | Parliamentarian | None = None,
+    entity: PASCommission | PASParty | PASParliamentarian | None = None,
 ) -> bytes:
     """ Entry point for almost all settlement PDF generations. """
     font_config = FontConfiguration()
     css = CSS(string=PDF_CSS)
 
-    if entity_type == 'commission' and isinstance(entity, Commission):
+    if entity_type == 'commission' and isinstance(entity, PASCommission):
         settlement_data = _get_commission_settlement_data(
             settlement_run, request, entity
         )
         totals = _get_commission_totals(settlement_run, request, entity)
 
-    elif entity_type == 'party' and isinstance(entity, Party):
+    elif entity_type == 'party' and isinstance(entity, PASParty):
         settlement_data = _get_party_settlement_data(
             settlement_run, request, entity
         )
@@ -588,7 +598,7 @@ def _get_commission_settlement_data(
         date_from=settlement_run.start,
         date_to=settlement_run.end
     ).query().filter(
-        Attendence.commission_id == commission.id
+        PASAttendence.commission_id == commission.id
     )
     cola_multiplier = Decimal(
         str(1 + (rate_set.cost_of_living_adjustment / 100))
@@ -798,7 +808,7 @@ def _get_data_export_all(
 
 
 def get_party_specific_totals(
-    settlement_run: SettlementRun, request: TownRequest, party: Party
+    settlement_run: SettlementRun, request: TownRequest, party: PASParty
 ) -> list[TotalRow]:
     """Get totals for a specific party."""
     session = request.session
@@ -899,7 +909,7 @@ def get_party_specific_totals(
 def _get_party_settlement_data(
     settlement_run: SettlementRun,
     request: TownRequest,
-    party: Party
+    party: PASParty
 ) -> list[SettlementDataRow]:
     """Get settlement data for a specific party."""
 
@@ -1007,7 +1017,7 @@ def view_settlement_run_export(
     parliamentarian) in a settlement run."""
 
     if self.category == 'party':
-        assert isinstance(self.entity, Party)
+        assert isinstance(self.entity, PASParty)
 
         pdf_bytes = generate_settlement_pdf(
             settlement_run=self.settlement_run,
@@ -1018,7 +1028,7 @@ def view_settlement_run_export(
         filename = f'Partei_{self.entity.name}'
 
     elif self.category == 'commission':
-        assert isinstance(self.entity, Commission)
+        assert isinstance(self.entity, PASCommission)
 
         pdf_bytes = generate_settlement_pdf(
             settlement_run=self.settlement_run,
@@ -1029,7 +1039,7 @@ def view_settlement_run_export(
         filename = f'commission_{self.entity.name}'
 
     elif self.category == 'parliamentarian':
-        assert isinstance(self.entity, Parliamentarian)
+        assert isinstance(self.entity, PASParliamentarian)
         # PASParliamentarian specific export has it's own rendering function
         pdf_bytes = generate_parliamentarian_settlement_pdf(
             self.settlement_run, request, self.entity

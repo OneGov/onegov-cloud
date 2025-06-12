@@ -7,7 +7,7 @@ from onegov.pas import _
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import ChangeCollection
 from onegov.user import Auth
-from onegov.parliament.models import SettlementRun, RateSet
+from onegov.pas.models import SettlementRun, RateSet
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

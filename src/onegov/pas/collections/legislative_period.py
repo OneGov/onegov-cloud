@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 from onegov.core.collection import GenericCollection
-from onegov.parliament.models import LegislativePeriod
+from onegov.pas.models import PASLegislativePeriod
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from typing import Self
 
 
-class LegislativePeriodCollection(GenericCollection[LegislativePeriod]):
+class LegislativePeriodCollection(GenericCollection[PASLegislativePeriod]):
 
     def __init__(
         self,
@@ -22,19 +22,19 @@ class LegislativePeriodCollection(GenericCollection[LegislativePeriod]):
         self.active = active
 
     @property
-    def model_class(self) -> type[LegislativePeriod]:
-        return LegislativePeriod
+    def model_class(self) -> type[PASLegislativePeriod]:
+        return PASLegislativePeriod
 
-    def query(self) -> Query[LegislativePeriod]:
+    def query(self) -> Query[PASLegislativePeriod]:
         query = super().query()
 
         if self.active is not None:
             if self.active:
-                query = query.filter(LegislativePeriod.end >= date.today())
+                query = query.filter(PASLegislativePeriod.end >= date.today())
             else:
-                query = query.filter(LegislativePeriod.end < date.today())
+                query = query.filter(PASLegislativePeriod.end < date.today())
 
-        return query.order_by(LegislativePeriod.name)
+        return query.order_by(PASLegislativePeriod.name)
 
     def for_filter(
         self,
