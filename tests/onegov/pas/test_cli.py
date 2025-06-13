@@ -7,6 +7,13 @@ from click.testing import CliRunner
 
 from onegov.org.cli import cli as org_cli
 from onegov.pas.cli import cli
+from onegov.pas.models import (
+    PASCommission,
+    PASParty,
+    PASParliamentaryGroup,
+    PASParliamentarian,
+    PASCommissionMembership
+)
 
 
 def do_run_cli_import(cfg_path, file_type, commission_test_files):

@@ -14,8 +14,6 @@ from onegov.pas.models import (
     RateSet,
     SettlementRun
 )
-from onegov.pas.models import RateSet
-from onegov.pas.models import SettlementRun
 
 
 @freeze_time('2022-06-06')

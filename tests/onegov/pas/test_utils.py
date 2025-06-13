@@ -238,8 +238,8 @@ def test_get_parties_with_settlements(session):
     session.flush()
 
     # Create attendances
-    # PASParl1 has attendance during their party membership - one in first half,
-    # one in second half
+    # PASParl1 has attendance during their party membership - one in first
+    # half, one in second half
     attendance1a = PASAttendence(
         id=uuid4(),
         parliamentarian_id=parl1.id,
