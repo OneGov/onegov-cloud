@@ -38,6 +38,9 @@
             types: types,
         };
 
+        searchBoxElement.style.paddingTop = '0.5em';
+        searchBoxElement.style.paddingBottom = '0.5em';
+
         // Hide the original input element
         inputElement.style.display = 'none';
 
