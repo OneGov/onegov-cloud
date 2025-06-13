@@ -77,14 +77,14 @@ class ParliamentarianRole(Base, TimestampMixin):
 
     __tablename__ = 'par_parliamentarian_roles'
 
-    parliamentarian_type: Column[str] = Column(
+    role_type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
     )
 
     __mapper_args__ = {
-        'polymorphic_on': parliamentarian_type,
+        'polymorphic_on': role_type,
         'polymorphic_identity': 'generic',
     }
 

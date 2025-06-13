@@ -5,6 +5,9 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 from __future__ import annotations
 
+from sqlalchemy import Column
+from sqlalchemy import Text
+
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 
 
@@ -33,3 +36,25 @@ def introduce_parliament_module_rename_pas_tables(
 
             context.operations.rename_table(
                 current_name, target_name)
+
+
+@upgrade_task('Add type column to parliament models 3')
+def add_type_column_to_parliament_models(
+        context: UpgradeContext
+) -> None:
+    for table, type_name in (
+        ('par_attendence', 'party_type'),
+        ('par_changes', 'change_type'),
+        ('par_commission_memberships', 'membership_type'),
+        ('par_commissions', 'commission_type'),
+        ('par_legislative_periods', 'legislative_period_type'),
+        ('par_parliamentarian_roles', 'role_type'),
+        ('par_parliamentarians', 'parliamentarian_type'),
+        ('par_parliamentary_groups', 'group_type'),
+        ('par_parties', 'party_type'),
+    ):
+        if not context.has_column(table, type_name):
+            context.operations.add_column(
+                table,
+                Column(type_name, Text, nullable=False, default='generic')
+            )

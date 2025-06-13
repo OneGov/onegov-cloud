@@ -26,7 +26,18 @@ class ParliamentaryGroup(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'par_parliamentary_groups'
 
-    es_public = False
+    group_type: Column[str] = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
+
+    __mapper_args__ = {
+        'polymorphic_on': group_type,
+        'polymorphic_identity': 'generic',
+    }
+
+    es_public = True
     es_properties = {'name': {'type': 'text'}}
 
     @property

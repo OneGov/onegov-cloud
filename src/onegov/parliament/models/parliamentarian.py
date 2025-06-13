@@ -63,7 +63,7 @@ SHIPPING_METHODS: dict[ShippingMethod, str] = {
 
 
 class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles,
-                         ORMSearchable):
+                      ORMSearchable):
 
     __tablename__ = 'par_parliamentarians'
 
@@ -94,12 +94,6 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles,
     @property
     def title(self) -> str:
         return f'{self.first_name} {self.last_name}'
-
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(

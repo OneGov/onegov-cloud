@@ -10,3 +10,4 @@ class PASLegislativePeriod(LegislativePeriod):
     }
 
     es_type_name = 'pas_legislative_period'
+    es_public = False

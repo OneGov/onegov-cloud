@@ -19,7 +19,18 @@ class LegislativePeriod(Base, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'par_legislative_periods'
 
-    es_public = False
+    legislative_period_type: Column[str] = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
+
+    __mapper_args__ = {
+        'polymorphic_on': legislative_period_type,
+        'polymorphic_identity': 'generic',
+    }
+
+    es_public = True
     es_properties = {'name': {'type': 'text'}}
 
     @property

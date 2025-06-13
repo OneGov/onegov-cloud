@@ -10,3 +10,4 @@ class PASAttendence(Attendence):
     }
 
     es_type_name = 'pas_attendence'
+    es_public = False

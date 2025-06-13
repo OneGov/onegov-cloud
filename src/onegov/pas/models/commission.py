@@ -10,3 +10,5 @@ class PASCommission(Commission):
     }
 
     es_type_name = 'pas_commission'
+    es_public = False
+

@@ -25,7 +25,19 @@ class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'par_parties'
 
-    es_public = False
+    #: The type of the party
+    party_type: Column[str] = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
+
+    __mapper_args__ = {
+        'polymorphic_on': party_type,
+        'polymorphic_identity': 'generic',
+    }
+
+    es_public = True
     es_properties = {'name': {'type': 'text'}}
 
     @property

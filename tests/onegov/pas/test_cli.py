@@ -8,11 +8,11 @@ from click.testing import CliRunner
 from onegov.org.cli import cli as org_cli
 from onegov.pas.cli import cli
 from onegov.pas.models import (
-    Commission,
-    CommissionMembership,
-    Parliamentarian,
-    ParliamentaryGroup,
-    Party
+    PASCommission,
+    PASCommissionMembership,
+    PASParliamentarian,
+    PASParliamentaryGroup,
+    PASParty
 )
 
 

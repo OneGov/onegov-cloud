@@ -10,3 +10,4 @@ class PASParliamentaryGroup(ParliamentaryGroup):
     }
 
     es_type_name = 'pas_parliamentary_group'
+    es_public = False

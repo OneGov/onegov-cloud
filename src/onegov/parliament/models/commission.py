@@ -55,7 +55,7 @@ class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
         'polymorphic_identity': 'generic',
     }
 
-    es_public = False
+    es_public = True
     es_properties = {'name': {'type': 'text'}}
 
     @property
