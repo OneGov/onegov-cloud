@@ -8,7 +8,7 @@ from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.pas.forms import ParliamentaryGroupForm
 from onegov.pas.layouts import ParliamentaryGroupCollectionLayout
 from onegov.pas.layouts import ParliamentaryGroupLayout
-from onegov.parliament.models import ParliamentaryGroup
+from onegov.pas.models import PASParliamentaryGroup
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -82,12 +82,12 @@ def add_parliamentary_group(
 
 
 @PasApp.html(
-    model=ParliamentaryGroup,
+    model=PASParliamentaryGroup,
     template='parliamentary_group.pt',
     permission=Private
 )
 def view_parliamentary_group(
-    self: ParliamentaryGroup,
+    self: PASParliamentaryGroup,
     request: TownRequest
 ) -> RenderData:
 
@@ -101,14 +101,14 @@ def view_parliamentary_group(
 
 
 @PasApp.form(
-    model=ParliamentaryGroup,
+    model=PASParliamentaryGroup,
     name='edit',
     template='form.pt',
     permission=Private,
     form=ParliamentaryGroupForm
 )
 def edit_parliamentary_group(
-    self: ParliamentaryGroup,
+    self: PASParliamentaryGroup,
     request: TownRequest,
     form: ParliamentaryGroupForm
 ) -> RenderData | Response:
@@ -134,12 +134,12 @@ def edit_parliamentary_group(
 
 
 @PasApp.view(
-    model=ParliamentaryGroup,
+    model=PASParliamentaryGroup,
     request_method='DELETE',
     permission=Private
 )
 def delete_parliamentary_group(
-    self: ParliamentaryGroup,
+    self: PASParliamentaryGroup,
     request: TownRequest
 ) -> None:
 
