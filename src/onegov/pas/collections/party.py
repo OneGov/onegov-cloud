@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 from onegov.core.collection import GenericCollection
-from onegov.parliament.models import Party
+from onegov.pas.models import PASParty
 from sqlalchemy import or_
 
 from typing import TYPE_CHECKING
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from typing import Self
 
 
-class PartyCollection(GenericCollection[Party]):
+class PartyCollection(GenericCollection[PASParty]):
 
     def __init__(
         self,
@@ -23,24 +23,24 @@ class PartyCollection(GenericCollection[Party]):
         self.active = active
 
     @property
-    def model_class(self) -> type[Party]:
-        return Party
+    def model_class(self) -> type[PASParty]:
+        return PASParty
 
-    def query(self) -> Query[Party]:
+    def query(self) -> Query[PASParty]:
         query = super().query()
 
         if self.active is not None:
             if self.active:
                 query = query.filter(
                     or_(
-                        Party.end.is_(None),
-                        Party.end >= date.today()
+                        PASParty.end.is_(None),
+                        PASParty.end >= date.today()
                     )
                 )
             else:
-                query = query.filter(Party.end < date.today())
+                query = query.filter(PASParty.end < date.today())
 
-        return query.order_by(Party.name)
+        return query.order_by(PASParty.name)
 
     def for_filter(
         self,
