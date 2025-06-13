@@ -10,6 +10,7 @@
                 language: 'de',
                 types: 'place,region', // Prioritize cities and cantons
                 filterResults: (results) => {
+                    console.log('filterResults')
                     if (!results) {
                         return [];
                     }
