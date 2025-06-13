@@ -16,12 +16,12 @@ import openpyxl
 
 from onegov.core.csv import CSVFile, convert_excel_to_csv, detect_encoding
 from onegov.pas.models import (
-    CommissionMembership,
-    ParliamentarianRole,
-    Parliamentarian,
-    ParliamentaryGroup,
-    Party,
-    Commission,
+    PASCommissionMembership,
+    PASParliamentarianRole,
+    PASParliamentarian,
+    PASParliamentaryGroup,
+    PASParty,
+    PASCommission,
 )
 
 T = TypeVar('T')
@@ -367,12 +367,12 @@ def import_commissions(
     commission_name = commission_name.replace('_', ' ')
 
     # Get or create commission
-    commission = session.query(Commission).filter_by(
+    commission = session.query(PASCommission).filter_by(
         name=commission_name
     ).first()
 
     if not commission:
-        commission = Commission(
+        commission = PASCommission(
             name=commission_name,
             type='normal'
         )
@@ -381,17 +381,17 @@ def import_commissions(
     # First pass - create parties and parliamentary groups
     for row in import_file.rows:
         # Create party if needed
-        party = session.query(Party).filter_by(name=row.partei).first()
+        party = session.query(PASParty).filter_by(name=row.partei).first()
         if not party:
-            party = Party(name=row.partei)
+            party = PASParty(name=row.partei)
             session.add(party)
 
         # Create parliamentary group if needed
-        group = session.query(ParliamentaryGroup).filter_by(
+        group = session.query(PASParliamentaryGroup).filter_by(
             name=row.fraktion
         ).first()
         if not group:
-            group = ParliamentaryGroup(name=row.fraktion)
+            group = PASParliamentaryGroup(name=row.fraktion)
             session.add(group)
 
     session.flush()
@@ -399,18 +399,18 @@ def import_commissions(
     # Second pass - create parliamentarians and memberships
     for row in import_file.rows:
         # Get party and group
-        party = session.query(Party).filter_by(name=row.partei).one()
-        group = session.query(ParliamentaryGroup).filter_by(
+        party = session.query(PASParty).filter_by(name=row.partei).one()
+        group = session.query(PASParliamentaryGroup).filter_by(
             name=row.fraktion
         ).one()
 
         # Create parliamentarian if needed
-        parliamentarian = session.query(Parliamentarian).filter_by(
+        parliamentarian = session.query(PASParliamentarian).filter_by(
             personnel_number=row.personalnummer
         ).first()
 
         if not parliamentarian:
-            parliamentarian = Parliamentarian(
+            parliamentarian = PASParliamentarian(
                 personnel_number=row.personalnummer,
                 contract_number=row.vertragsnummer,
                 first_name=row.vorname,
@@ -444,7 +444,7 @@ def import_commissions(
             session.add(parliamentarian)
 
             # Create roles linking to party and group
-            parliamentarian.roles.append(ParliamentarianRole(
+            parliamentarian.roles.append(PASParliamentarianRole(
                 party=party,
                 party_role='member',
                 parliamentary_group=group,
@@ -460,7 +460,7 @@ def import_commissions(
                 'member',
             )
             # Create commission membership
-            membership = CommissionMembership(
+            membership = PASCommissionMembership(
                 commission=commission,
                 parliamentarian=parliamentarian,
                 role=role,  # type:ignore[misc]

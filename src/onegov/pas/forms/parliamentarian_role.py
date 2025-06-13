@@ -8,9 +8,15 @@ from onegov.pas import _
 from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.pas.collections import PartyCollection
-from onegov.pas.models.parliamentarian_role import PARLIAMENTARIAN_ROLES
-from onegov.pas.models.parliamentarian_role import PARLIAMENTARY_GROUP_ROLES
-from onegov.pas.models.parliamentarian_role import PARTY_ROLES
+from onegov.parliament.models.parliamentarian_role import (
+    PARLIAMENTARIAN_ROLES
+)
+from onegov.parliament.models.parliamentarian_role import (
+    PARLIAMENTARY_GROUP_ROLES
+)
+from onegov.parliament.models.parliamentarian_role import (
+    PARTY_ROLES
+)
 from wtforms.fields import DateField
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
@@ -18,7 +24,7 @@ from wtforms.validators import Optional
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from onegov.pas.models import ParliamentarianRole
+    from onegov.parliament.models import ParliamentarianRole
     from typing import Any
 
 
