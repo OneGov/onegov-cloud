@@ -39,23 +39,18 @@
             types: types,
         };
 
-        // Preserve the initial value from the original input
-        searchBoxElement.value = inputElement.value;
-
         // Hide the original input element
         inputElement.style.display = 'none';
 
         // Insert the MapboxSearchBox element after the original input
         if (inputElement.parentElement) {
             inputElement.parentElement.insertBefore(searchBoxElement, inputElement.nextSibling);
-        } else {
-            // Fallback if the input element has no parent, though unlikely for form inputs
-            document.body.appendChild(searchBoxElement);
         }
+        // Preserve the initial value from the original input, after DOM insertion
+        searchBoxElement.value = inputElement.value;
 
         // Sync the value from the MapboxSearchBox back to the hidden original input
         searchBoxElement.addEventListener('retrieve', () => { inputElement.value = searchBoxElement.value; });
         searchBoxElement.addEventListener('change', () => { inputElement.value = searchBoxElement.value; });
     });
 })();
-
