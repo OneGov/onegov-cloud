@@ -67,14 +67,14 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles,
 
     __tablename__ = 'par_parliamentarians'
 
-    parliamentarian_type: Column[str] = Column(
+    type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
     )
 
     __mapper_args__ = {
-        'polymorphic_on': parliamentarian_type,
+        'polymorphic_on': type,
         'polymorphic_identity': 'generic',
     }
 

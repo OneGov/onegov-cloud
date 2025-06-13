@@ -38,23 +38,38 @@ def introduce_parliament_module_rename_pas_tables(
                 current_name, target_name)
 
 
-@upgrade_task('Add type column to parliament models 3')
+@upgrade_task('Add type column to parliament models',
+              requires='onegov.parliament:Introduce parliament module: '
+                       'rename pas tables')
 def add_type_column_to_parliament_models(
-        context: UpgradeContext
+    context: UpgradeContext
 ) -> None:
-    for table, type_name in (
-        ('par_attendence', 'party_type'),
-        ('par_changes', 'change_type'),
-        ('par_commission_memberships', 'membership_type'),
-        ('par_commissions', 'commission_type'),
-        ('par_legislative_periods', 'legislative_period_type'),
-        ('par_parliamentarian_roles', 'role_type'),
-        ('par_parliamentarians', 'parliamentarian_type'),
-        ('par_parliamentary_groups', 'group_type'),
-        ('par_parties', 'party_type'),
+    for table, type_name, poly_type in (
+        ('par_attendence', 'poly_type', 'pas_attendence'),
+        ('par_changes', 'type', 'pas_change'),
+        ('par_commission_memberships', 'type', 'pas_commission_membership'),
+        ('par_commissions', 'poly_type', 'pas_commission'),
+        ('par_legislative_periods', 'type', 'pas_legislative_period'),
+        ('par_parliamentarian_roles', 'type', 'pas_parliamentarian_role'),
+        ('par_parliamentarians', 'type', 'pas_parliamentarian'),
+        ('par_parliamentary_groups', 'type', 'pas_parliamentary_group'),
+        ('par_parties', 'type', 'pas_party'),
     ):
         if not context.has_column(table, type_name):
             context.operations.add_column(
                 table,
-                Column(type_name, Text, nullable=False, default='generic')
+                Column(type_name, Text, nullable=True)
+            )
+
+            context.operations.execute(
+                f"UPDATE {table} SET {type_name} = '{poly_type}'"
+            )
+
+            context.operations.execute(
+                f"ALTER TABLE {table} ALTER COLUMN {type_name} "
+                f"SET DEFAULT 'generic'"
+            )
+
+            context.operations.execute(
+                f'ALTER TABLE {table} ALTER COLUMN {type_name} SET NOT NULL'
             )

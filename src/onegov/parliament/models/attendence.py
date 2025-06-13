@@ -45,14 +45,14 @@ class Attendence(Base, TimestampMixin):
 
     __tablename__ = 'par_attendence'
 
-    attendence_type: Column[str] = Column(
+    poly_type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
     )
 
     __mapper_args__ = {
-        'polymorphic_on': attendence_type,
+        'polymorphic_on': poly_type,
         'polymorphic_identity': 'generic',
     }
 

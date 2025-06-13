@@ -79,11 +79,26 @@ POLITICAL_BUSINESS_STATUS: dict[PoliticalBusinessStatus, str] = {
 }
 
 
-class PoliticalBusiness(Base, MultiAssociatedFiles, ContentMixin,
-                           ORMSearchable):
+class PoliticalBusiness(
+    Base,
+    MultiAssociatedFiles,
+    ContentMixin,
+    ORMSearchable
+):
     # Politisches Geschäft
 
     __tablename__ = 'par_political_businesses'
+
+    type: Column[str] = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'generic',
+    }
 
     es_public = True
     es_properties = {
@@ -160,6 +175,17 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
     """ A participant of a political business, e.g. a parliamentarian. """
 
     __tablename__ = 'par_political_business_participants'
+
+    type: Column[str] = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'generic',
+    }
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(

@@ -9,6 +9,7 @@ from onegov.core.orm.types import UUID
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import String
+from sqlalchemy import Text
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
@@ -43,6 +44,17 @@ ACTIONS: list[Action] = [
 class Change(Base, ContentMixin, TimestampMixin):
 
     __tablename__ = 'par_changes'
+
+    type: Column[str] = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'generic',
+    }
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(

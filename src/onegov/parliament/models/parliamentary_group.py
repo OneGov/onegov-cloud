@@ -26,14 +26,14 @@ class ParliamentaryGroup(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'par_parliamentary_groups'
 
-    group_type: Column[str] = Column(
+    type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
     )
 
     __mapper_args__ = {
-        'polymorphic_on': group_type,
+        'polymorphic_on': type,
         'polymorphic_identity': 'generic',
     }
 

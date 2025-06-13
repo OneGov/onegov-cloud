@@ -42,14 +42,14 @@ class CommissionMembership(Base, TimestampMixin):
 
     __tablename__ = 'par_commission_memberships'
 
-    membership_type: Column[str] = Column(
+    type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
     )
 
     __mapper_args__ = {
-        'polymorphic_on': membership_type,
+        'polymorphic_on': type,
         'polymorphic_identity': 'generic',
     }
 

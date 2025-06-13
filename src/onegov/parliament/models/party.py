@@ -26,14 +26,14 @@ class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
     __tablename__ = 'par_parties'
 
     #: The type of the party
-    party_type: Column[str] = Column(
+    type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
     )
 
     __mapper_args__ = {
-        'polymorphic_on': party_type,
+        'polymorphic_on': type,
         'polymorphic_identity': 'generic',
     }
 

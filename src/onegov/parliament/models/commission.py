@@ -44,14 +44,14 @@ class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'par_commissions'
 
-    commission_type: Column[str] = Column(
+    poly_type: Column[str] = Column(
         Text,
         nullable=False,
         default=lambda: 'generic'
     )
 
     __mapper_args__ = {
-        'polymorphic_on': commission_type,
+        'polymorphic_on': poly_type,
         'polymorphic_identity': 'generic',
     }
 
