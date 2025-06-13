@@ -1,5 +1,4 @@
 (function() {
-    // Ensure Mapbox Search JS SDK is loaded and token is available
     if (!window.mapboxsearch || !document.body.dataset.mapboxToken) {
         if (!window.mapboxsearch) {
             console.warn('Mapbox Search JS SDK (mapboxsearch) not found.');
