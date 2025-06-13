@@ -571,7 +571,7 @@ def test_newsletter_send(client):
 
     new.select_checkbox("news", "Testnews")
     new.select_checkbox("occurrences", "150 Jahre Govikon")
-    new.select_checkbox("occurrences", "Gemeinsames Turnen")
+    new.select_checkbox("occurrences", "Gemeinsames Turnen", limit=3)
 
     new.form['closing_remark'] = '<p>Closing Remarks</p>'
 
@@ -647,7 +647,7 @@ def test_newsletter_send(client):
     # check content of mail
     assert 'Like many of you,' in message
     assert '150 Jahre Govikon' in message
-    assert 'Gemeinsames Turnen' in message
+    assert message.count('Gemeinsames Turnen') == 3
     assert 'Testnews' in message
     assert 'My Lead Text' in message
     assert 'My Html editor text' in message

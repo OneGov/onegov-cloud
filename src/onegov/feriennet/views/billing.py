@@ -524,7 +524,7 @@ def view_billing_import(
             del request.browser_session['account-statement']
             request.alert(_('No transactions were found in the given file'))
             uploaded = False
-            form.xml.data = None
+            form.xml.data = {}
         else:
             transactions.sort(key=lambda t: t.order)
     else:

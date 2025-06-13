@@ -50,11 +50,19 @@ function main() {
     localepath="$(repository-path)/src/${module/\./\/}/locale"
     mkdir -p "$localepath"
 
+    # ensure uvx presence
+    local uvx="${VIRTUAL_ENV}/bin/uvx"
+
+    if [ ! -e "${uvx}" ]; then
+        echo "uvx command could not be found, please run make install"
+        exit 1
+    fi
+
     # ensure gettext presence
     local msginit
     local msgmerge
     local msgfmt
-    local potcreate="${VIRTUAL_ENV}/bin/pot-create"
+    local potcreate="${uvx} -q --python 3.11 --from lingua@3.12 --with setuptools<80 pot-create"
 
     if is-known-binary brew; then
         if brew list | grep gettext -q; then
@@ -76,11 +84,6 @@ function main() {
         msginit=$(command -v msginit)
         msgmerge=$(command -v msgmerge)
         msgfmt=$(command -v msgfmt)
-    fi
-
-    if [ ! -e "${potcreate}" ]; then
-        echo "pot-create command could not be found, please run make install"
-        exit 1
     fi
 
     if [ ! -e "${msginit}" ]; then

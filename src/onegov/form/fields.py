@@ -310,7 +310,9 @@ class UploadField(FileField):
             # resend_upload
             action = valuelist[0]
             fieldstorage = valuelist[1]
-            self.data = binary_to_dictionary(
+            # NOTE: I'm not sure why mypy complains here, a total version
+            #       of a TypedDict should be assignable to a non-total version
+            self.data = binary_to_dictionary(  # type: ignore[assignment]
                 dictionary_to_binary({'data': str(valuelist[3])}),
                 str(valuelist[2])
             )
@@ -336,7 +338,7 @@ class UploadField(FileField):
     def process_fieldstorage(
         self,
         fs: RawFormValue
-    ) -> StrictFileDict | FileDict:
+    ) -> FileDict:
 
         self.file = getattr(fs, 'file', getattr(fs, 'stream', None))
         self.filename = path_to_filename(getattr(fs, 'filename', None))
@@ -347,7 +349,7 @@ class UploadField(FileField):
         self.file.seek(0)
 
         try:
-            return binary_to_dictionary(self.file.read(), self.filename)
+            return binary_to_dictionary(self.file.read(), self.filename)  # type: ignore[return-value]
         finally:
             self.file.seek(0)
 

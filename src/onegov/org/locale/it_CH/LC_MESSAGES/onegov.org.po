@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-04-30 07:35+0200\n"
+"POT-Creation-Date: 2025-06-11 13:31+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1332,6 +1332,27 @@ msgstr "Informazioni pubbliche aggiuntive su questa persona"
 msgid "Tag"
 msgstr "Tag"
 
+msgid "Starting at"
+msgstr "A partire da"
+
+msgid "Ending at"
+msgstr "Fine a"
+
+msgid "Key Code"
+msgstr "Codice chiave"
+
+msgid "Invalid Kaba Code. Needs to be a 4 to 6 digit number code."
+msgstr "Kaba Code non valido. Deve essere un codice numerico a 4-6 cifre."
+
+msgid "Lead Time"
+msgstr "Tempi di consegna"
+
+msgid "In minutes"
+msgstr "In minuti"
+
+msgid "Lag Time"
+msgstr "Tempo di funzionamento"
+
 msgid "I am looking to make a reservation lasting"
 msgstr "Voglio fare una prenotazione di"
 
@@ -1441,6 +1462,19 @@ msgstr "Prezzo per elemento"
 
 msgid "Price per hour"
 msgstr "Tariffa oraria"
+
+msgid "Prices in extra fields are"
+msgstr "I prezzi nei campi extra sono"
+
+msgid ""
+"If no extra fields are defined or none of the extra fields contain pricing "
+"information, then this setting has no effect."
+msgstr ""
+"Se non sono stati definiti campi extra o se nessuno dei campi extra contiene "
+"informazioni sui prezzi, questa impostazione non ha alcun effetto."
+
+msgid "One-off"
+msgstr "Una tantum"
 
 msgid ""
 "Failed to retrieve the doors from the dormakaba API please make sure your "
@@ -2090,12 +2124,20 @@ msgid ""
 msgstr ""
 "Formato non valido. Definire i tag e i loro meta-dati secondo l'esempio."
 
-msgid "Invalid price, needs to be a non-negative number."
-msgstr "Prezzo non valido, deve essere un numero non negativo."
+#, python-format
+msgid "Invalid price \"${price}\", needs to be a non-negative number."
+msgstr "Prezzo non valido \"${price}\", deve essere un numero non negativo."
 
-msgid "Invalid Kaba Code. Needs to be a 4 to 6 digit number code."
-msgstr "Kaba Code non valido. Deve essere un codice numerico a 4-6 cifre."
+#, python-format
+msgid ""
+"Invalid color \"${color}\", needs to be a 3 or 6 digit hex code, e.g. "
+"\"ff9000\" for orange. If you use a \"#\" prefix, make sure to enclose the "
+"value in quotation marks."
+msgstr ""
+"Colore non valido \"{color}\", deve essere un codice esadecimale di 3 o 6 "
+"cifre, ad esempio \"ff9000\" per l'arancione. Se si usa il prefisso "
 
+# ", assicurarsi di racchiudere il valore tra virgolette."
 msgid "Enable newsletter"
 msgstr "Attiva la newsletter"
 
@@ -2239,9 +2281,6 @@ msgstr "ID del sito"
 
 msgid "Default Lead Time"
 msgstr "Tempi di consegna standard"
-
-msgid "In minutes"
-msgstr "In minuti"
 
 msgid "Default Lag Time"
 msgstr "Tempo di funzionamento standard"
@@ -3326,17 +3365,49 @@ msgstr "Annulla registrazione"
 msgid "Edit submission"
 msgstr "Modifica iscrizione"
 
-msgid "Key Code"
-msgstr "Codice chiave"
+msgid "Reject"
+msgstr "Rifiutare"
+
+msgid "Do you really want to reject this reservation?"
+msgstr "Vuoi davvero rifiutare questa prenotazione?"
+
+#, python-format
+msgid "Rejecting ${title} can't be undone."
+msgstr "Il rifiuto di ${title} non può essere annullato."
+
+msgid "Reject reservation"
+msgstr "Rifiuta prenotazione"
+
+msgid "Adjust"
+msgstr "Regolare"
 
 msgid "Accept all reservations"
 msgstr "Accetta tutte le prenotazioni"
+
+msgid "Send reservation summary"
+msgstr "Invia il riepilogo della prenotazione"
+
+msgid "Do you really want to send a reservation summary?"
+msgstr "Volete davvero inviare un riepilogo della prenotazione?"
+
+msgid ""
+"This will always be sent via e-mail, even when ticket updates have been "
+"disabled. Make sure to only use this to inform customers, when significant "
+"changes have been made to the reservations, they need to be aware of."
+msgstr ""
+"Questo verrà sempre inviato via e-mail, anche quando gli aggiornamenti dei "
+"biglietti sono stati disattivati. Assicuratevi di usarlo solo per informare "
+"i clienti quando sono state apportate modifiche significative alle "
+"prenotazioni, di cui devono essere a conoscenza."
 
 msgid "Details about the reservation"
 msgstr "Dettagli sulla prenotazione"
 
 msgid "Edit details"
 msgstr "Modifica dettagli"
+
+msgid "Edit key code"
+msgstr "Modifica del codice chiave"
 
 msgid "Accept all with message"
 msgstr "Accetta tutto con messaggio"
@@ -3356,22 +3427,8 @@ msgstr "Rifiuta le prenotazioni"
 msgid "Reject all with message"
 msgstr "Rifiuta tutto con messaggio"
 
-#, python-format
-msgid "Reject ${title}"
-msgstr "Rifiuta ${title}"
-
-msgid "Do you really want to reject this reservation?"
-msgstr "Vuoi davvero rifiutare questa prenotazione?"
-
-#, python-format
-msgid "Rejecting ${title} can't be undone."
-msgstr "Il rifiuto di ${title} non può essere annullato."
-
-msgid "Reject reservation"
-msgstr "Rifiuta prenotazione"
-
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -3528,10 +3585,15 @@ msgstr "Una notizia non può essere incollata come argomento"
 msgid "A Topic cannot be pasted as News"
 msgstr "Un argomento non può essere incollato come notizia"
 
-msgid "Please note that this page has subpages which will also be deleted!"
+msgid ""
+"Please note that this page has the following subpages which will also be "
+"deleted:"
 msgstr ""
-"Nota che questa pagina contiene delle sottopagine che verranno anch'esse "
-"eliminate!"
+"Si noti che questa pagina ha le seguenti sottopagine che saranno anch'esse "
+"cancellate"
+
+msgid "Please scroll to the bottom to enable the confirm button."
+msgstr "Scorrere fino in fondo per abilitare il pulsante di conferma."
 
 msgid "This page can't be deleted."
 msgstr "Questa pagina non può essere eliminata."
@@ -3741,8 +3803,8 @@ msgstr ""
 "Per visualizzare le briciole di pane si può aggiungere ${bc_level} come "
 "parametro all'URL. Il numero definisce l'inizio delle briciole di pane. 1 in "
 "questo caso significa che il primo livello è nascosto. È possibile "
-"utilizzare qualsiasi numero, purché sia inferiore al numero di livelli "
-"delle briciole di pane."
+"utilizzare qualsiasi numero, purché sia inferiore al numero di livelli delle "
+"briciole di pane."
 
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
@@ -4424,6 +4486,9 @@ msgstr ""
 "elettronica si prega di contattare un amministratore in modo che possa "
 "rimuovervi dall'elenco dei destinatari lista"
 
+msgid "Pending approval"
+msgstr "In attesa di approvazione"
+
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr "Questo è quello che è successo sul sito web ${org} nell'ultimo mese:"
 
@@ -4550,6 +4615,15 @@ msgstr ""
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
+
+msgid "Here's a summary of your reservations:"
+msgstr "Ecco un riepilogo delle vostre prenotazioni:"
+
+msgid "Changes to your submitted reservations:"
+msgstr "Modifiche alle prenotazioni inviate:"
+
+msgid "Rejected"
+msgstr "Rifiutata"
 
 msgid "You have a new ticket"
 msgstr "Hai un nuovo biglietto"
@@ -4685,6 +4759,9 @@ msgstr "1 prenotazione rifiutata."
 
 msgid "${count} reservations rejected."
 msgstr "${count} prenotazioni rifiutate."
+
+msgid "1 reservation adjusted:"
+msgstr "1 prenotazione regolata:"
 
 msgid "Registration confirmed."
 msgstr "Iscrizione confermata."
@@ -4972,15 +5049,6 @@ msgstr ""
 "fine. Ciò include le allocazioni create utilizzando un periodo di "
 "disponibilità. Per ricreare queste allocazioni, fare clic su \"modifica\" "
 "nel periodo di disponibilità e quindi \"salva\" senza modificare nulla."
-
-msgid "Reservation is pending approval"
-msgstr "La prenotazione è in attesa di approvazione"
-
-msgid "(${num_pending} pending approval)"
-msgstr "(${num_pending} in attesa di approvazione)"
-
-msgid "Utilised"
-msgstr "Utilizzato"
 
 msgid "No recipients defined yet."
 msgstr "Nessun destinatario ancora definito."
@@ -6421,6 +6489,24 @@ msgstr ""
 msgid "Reject all reservations with message"
 msgstr "Rifiuta tutte le prenotazioni con messaggio"
 
+msgid "Reservation summary"
+msgstr "Riepilogo della prenotazione"
+
+msgid "Reservation not adjustable"
+msgstr "Prenotazione non regolabile"
+
+msgid "Adjust reservation"
+msgstr "Regolare la prenotazione"
+
+msgid "The reservation was adjusted"
+msgstr "La prenotazione è stata regolata"
+
+msgid "The reservation was left unchanged"
+msgstr "La prenotazione è rimasta invariata"
+
+msgid "There are no future reservations"
+msgstr "Non ci sono prenotazioni future"
+
 msgid "Added a new daypass"
 msgstr "Aggiunto un nuovo biglietto giornaliero"
 
@@ -6838,6 +6924,14 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Please note that this page has subpages which will also be deleted!"
+#~ msgstr ""
+#~ "Nota che questa pagina contiene delle sottopagine che verranno anch'esse "
+#~ "eliminate!"
+
+#~ msgid "One of your reservations was adjusted"
+#~ msgstr "Una delle vostre prenotazioni è stata regolata"
 
 #~ msgid ""
 #~ "Select a free time span in the calendar below to create an allocation."

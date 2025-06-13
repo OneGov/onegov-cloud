@@ -1291,22 +1291,26 @@
 </metal:reservations>
 
 <metal:reservations define-macro="reservations" i18n:domain="onegov.town6">
-    <ul tal:condition="reservations" class="reservations">
-        <li tal:repeat="reservation reservations">
-            <tal:b define="start reservation.display_start(); end reservation.display_end()">
-                <strong>
-                    ${layout.format_date(start, 'weekday_long')},
-                    ${layout.format_date(start, 'date_long')}
-                </strong>
-                <!--! simple whole day check: -->
-                <span tal:condition="start.time() != end.time()">
-                    <br>
-                    ${layout.format_time_range(start, end)}
-                </span>
-                <br><span i18n:translate>Quota</span>
-                <span>
-                    ${reservation.quota}
-                </span>
+    <ul tal:condition="reservations" tal:define="get_links get_links|None" class="reservations">
+        <li tal:repeat="reservation reservations" tal:attributes="class 'reservation' if get_links else None">
+            <tal:b define="start reservation.display_start(); end reservation.display_end(); links get_links(reservation, request) if get_links else []">
+                <div class="reservation-details" tal:omit-tag="not:links">
+                    <strong>
+                        ${layout.format_date(start, 'weekday_long')},
+                        ${layout.format_date(start, 'date_long')}
+                    </strong>
+                    <!--! simple whole day check: -->
+                    <span tal:condition="start.time() != end.time()">
+                        <br>
+                        ${layout.format_time_range(start, end)}
+                    </span>
+                    <br><span i18n:translate>Quota</span>
+                    <span>
+                        ${reservation.quota}
+                    </span>
+                <div class="reservation-actions text-links" tal:condition="links">
+                    <tal:b repeat="link links" content="link(layout)" />
+                </div>
             </tal:b>
         </li>
     </ul>

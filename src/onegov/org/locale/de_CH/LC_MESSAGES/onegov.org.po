@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-30 07:35+0200\n"
+"POT-Creation-Date: 2025-06-11 13:31+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1329,6 +1329,27 @@ msgstr "Öffentliche Extra Informationen zu dieser Person"
 msgid "Tag"
 msgstr "Schlagwort"
 
+msgid "Starting at"
+msgstr "Von"
+
+msgid "Ending at"
+msgstr "Bis"
+
+msgid "Key Code"
+msgstr "Schlüsselcode"
+
+msgid "Invalid Kaba Code. Needs to be a 4 to 6 digit number code."
+msgstr "Ungültiger Kaba Code. Muss ein 4- bis 6-stelliger Zifferncode sein."
+
+msgid "Lead Time"
+msgstr "Vorlaufszeit"
+
+msgid "In minutes"
+msgstr "In Minuten"
+
+msgid "Lag Time"
+msgstr "Nachlaufszeit"
+
 msgid "I am looking to make a reservation lasting"
 msgstr "Ich suche einen Termin für"
 
@@ -1437,6 +1458,19 @@ msgstr "Preis pro Eintrag"
 
 msgid "Price per hour"
 msgstr "Preis pro Stunde"
+
+msgid "Prices in extra fields are"
+msgstr "Preise in Extra-Felder gelten"
+
+msgid ""
+"If no extra fields are defined or none of the extra fields contain pricing "
+"information, then this setting has no effect."
+msgstr ""
+"Falls keine Extra-Felder definiert sind oder keine der definierten Felder "
+"mit Preisen verknüpft sind, hat diese Auswahl keine Auswirkung."
+
+msgid "One-off"
+msgstr "Einmalig"
 
 msgid ""
 "Failed to retrieve the doors from the dormakaba API please make sure your "
@@ -2059,10 +2093,12 @@ msgstr ""
 "    E-Mail: fc@govikon.ch\n"
 "    PLZ / Ort: 1234 Govikon\n"
 "    Kaba Code: 123456\n"
+"    Color: '#ff0000'\n"
 "- HC Govikon:\n"
 "    E-Mail: hc@govikon.ch\n"
 "    PLZ / Ort: 1234 Govikon\n"
 "    Kaba Code: 654321\n"
+"    Color: '#00ff00'\n"
 "```"
 
 msgid "Categories restricted by user group settings"
@@ -2080,11 +2116,19 @@ msgstr ""
 "Ungültiges Format. Bitte definieren Sie die Schlagworte und Metadaten "
 "entsprechend dem gegebenen Beispiel."
 
-msgid "Invalid price, needs to be a non-negative number."
-msgstr "Ungültiger Preis, muss eine nicht-negative Zahl sein."
+#, python-format
+msgid "Invalid price \"${price}\", needs to be a non-negative number."
+msgstr "Ungültiger Preis \"${price}\", muss eine nicht-negative Zahl sein."
 
-msgid "Invalid Kaba Code. Needs to be a 4 to 6 digit number code."
-msgstr "Ungültiger Kaba Code. Muss ein 4- bis 6-stelliger Zifferncode sein."
+#, python-format
+msgid ""
+"Invalid color \"${color}\", needs to be a 3 or 6 digit hex code, e.g. "
+"\"ff9000\" for orange. If you use a \"#\" prefix, make sure to enclose the "
+"value in quotation marks."
+msgstr ""
+"Ungültige Farbe \"${color}\", es muss eine 3- bis 6-stellige hexadezimal "
+"Zahl sein, z.B. \"ff9000\" für Orange. Wenn Sie \"#\" als Präfix verwenden, "
+"stellen Sie sicher, den Wert in Anführungszeichen einzuschliessen."
 
 msgid "Enable newsletter"
 msgstr "Newsletter aktivieren"
@@ -2229,9 +2273,6 @@ msgstr "ID der Anlage"
 
 msgid "Default Lead Time"
 msgstr "Standard Vorlaufszeit"
-
-msgid "In minutes"
-msgstr "In Minuten"
 
 msgid "Default Lag Time"
 msgstr "Standard Nachlaufszeit"
@@ -3316,17 +3357,49 @@ msgstr "Anmeldung stornieren"
 msgid "Edit submission"
 msgstr "Eingabe bearbeiten"
 
-msgid "Key Code"
-msgstr "Schlüsselcode"
+msgid "Reject"
+msgstr "Absagen"
+
+msgid "Do you really want to reject this reservation?"
+msgstr "Möchten Sie diese Reservation wirklich absagen?"
+
+#, python-format
+msgid "Rejecting ${title} can't be undone."
+msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
+
+msgid "Reject reservation"
+msgstr "Reservation absagen"
+
+msgid "Adjust"
+msgstr "Anpassen"
 
 msgid "Accept all reservations"
 msgstr "Alle Reservationen annehmen"
+
+msgid "Send reservation summary"
+msgstr "Terminübersicht senden"
+
+msgid "Do you really want to send a reservation summary?"
+msgstr "Möchten Sie wirklich eine Terminübersicht versenden?"
+
+msgid ""
+"This will always be sent via e-mail, even when ticket updates have been "
+"disabled. Make sure to only use this to inform customers, when significant "
+"changes have been made to the reservations, they need to be aware of."
+msgstr ""
+"Diese Übersicht wird immer via E-Mail versendet, selbst wenn Ticket Updates "
+"deaktiviert sind. Bitte benutzen Sie diese Funktion nur, wenn signifikante "
+"Änderungen vorgenommen worden sind an den Reservationen und der Kunde "
+"unbedingt informiert werden muss über den aktuellen Zustand."
 
 msgid "Details about the reservation"
 msgstr "Details zu Ihrer Reservation"
 
 msgid "Edit details"
 msgstr "Details bearbeiten"
+
+msgid "Edit key code"
+msgstr "Schlüsselcode bearbeiten"
 
 msgid "Accept all with message"
 msgstr "Alle annehmen mit Kommentar"
@@ -3346,22 +3419,8 @@ msgstr "Reservationen absagen"
 msgid "Reject all with message"
 msgstr "Alle absagen mit Kommentar"
 
-#, python-format
-msgid "Reject ${title}"
-msgstr "${title} absagen"
-
-msgid "Do you really want to reject this reservation?"
-msgstr "Möchten Sie diese Reservation wirklich absagen?"
-
-#, python-format
-msgid "Rejecting ${title} can't be undone."
-msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
-
-msgid "Reject reservation"
-msgstr "Reservation absagen"
-
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3521,10 +3580,17 @@ msgstr "Eine Nachricht kann nicht als Thema eingefügt werden"
 msgid "A Topic cannot be pasted as News"
 msgstr "Ein Thema kann nicht als News eingefügt werden"
 
-msgid "Please note that this page has subpages which will also be deleted!"
+msgid ""
+"Please note that this page has the following subpages which will also be "
+"deleted:"
 msgstr ""
-"Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
-"werden!"
+"Bitte beachten Sie, dass dieses Thema die folgenden Unterthemen hat, welche "
+"ebenfalls gelöscht werden:"
+
+msgid "Please scroll to the bottom to enable the confirm button."
+msgstr ""
+"Bitte scrollen Sie bis zum Ende der Liste, um den Bestätigungsbutton zu "
+"aktivieren."
 
 msgid "This page can't be deleted."
 msgstr "Diese Seite kann nicht gelöscht werden."
@@ -3733,9 +3799,10 @@ msgid ""
 "than the number of levels in the breadcrumbs."
 msgstr ""
 "Um die Breadcrumbs anzuzeigen, können Sie ${bc_level} als Parameter zur URL "
-"hinzufügen. Die Zahl definiert, wo die Breadcrumbs beginnen. 1 in diesem Fall "
-"bedeutet, dass die erste Ebene verborgen ist. Sie können jede Zahl verwenden, "
-"solange sie kleiner ist als die Anzahl der Ebenen in den Breadcrumbs."
+"hinzufügen. Die Zahl definiert, wo die Breadcrumbs beginnen. 1 in diesem "
+"Fall bedeutet, dass die erste Ebene verborgen ist. Sie können jede Zahl "
+"verwenden, solange sie kleiner ist als die Anzahl der Ebenen in den "
+"Breadcrumbs."
 
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
@@ -4423,6 +4490,9 @@ msgstr ""
 "kontaktieren Sie bitte einen Administrator, damit er Sie aus der Liste "
 "entfernen kann."
 
+msgid "Pending approval"
+msgstr "Noch nicht akzeptiert"
+
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr ""
 "Folgendes ist während des letzten Monats auf der ${org} Webseite geschehen:"
@@ -4557,6 +4627,15 @@ msgstr ""
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
 
+msgid "Here's a summary of your reservations:"
+msgstr "Hier ist eine Zusammenfassung Ihrer Reservationen:"
+
+msgid "Changes to your submitted reservations:"
+msgstr "Änderungen an Ihren übermittelten Reservationen:"
+
+msgid "Rejected"
+msgstr "Abgelehnt"
+
 msgid "You have a new ticket"
 msgstr "Sie haben ein neues Ticket"
 
@@ -4688,6 +4767,9 @@ msgstr "1 Reservation abgelehnt."
 
 msgid "${count} reservations rejected."
 msgstr "${count} Reservationen abgelehnt."
+
+msgid "1 reservation adjusted:"
+msgstr "1 Reservation angepasst:"
 
 msgid "Registration confirmed."
 msgstr "Anmeldung bestätigt."
@@ -4971,15 +5053,6 @@ msgstr ""
 "Verfügbarkeitszeitraum erstellt wurden. Um diese Verfügbarkeiten wieder zu "
 "erstellen, klicken Sie auf \"Bearbeiten\" in der Verfügbarkeitszeitraum und "
 "danach auf \"Speichern\" ohne etwas zu ändern."
-
-msgid "Reservation is pending approval"
-msgstr "Diese Reservation wurde noch nicht akzeptiert"
-
-msgid "(${num_pending} pending approval)"
-msgstr "(${num_pending} noch nicht akzeptiert)"
-
-msgid "Utilised"
-msgstr "Ausgelastet"
 
 msgid "No recipients defined yet."
 msgstr "Es wurden noch keine Empfänger definiert."
@@ -6421,6 +6494,24 @@ msgstr ""
 msgid "Reject all reservations with message"
 msgstr "Alle Reservationen absagen mit Kommentar"
 
+msgid "Reservation summary"
+msgstr "Terminübersicht"
+
+msgid "Reservation not adjustable"
+msgstr "Diese Reservation ist nicht anpassbar"
+
+msgid "Adjust reservation"
+msgstr "Reservation Anpassen"
+
+msgid "The reservation was adjusted"
+msgstr "Die Reservation wurde angepasst"
+
+msgid "The reservation was left unchanged"
+msgstr "Die Reservation ist unverändert geblieben"
+
+msgid "There are no future reservations"
+msgstr "Es gibt keine zukünftige Reservationen"
+
 msgid "Added a new daypass"
 msgstr "Eine neue Tageskarte wurde hinzugefügt"
 
@@ -6839,6 +6930,14 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "Please note that this page has subpages which will also be deleted!"
+#~ msgstr ""
+#~ "Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
+#~ "werden!"
+
+#~ msgid "One of your reservations was adjusted"
+#~ msgstr "Eine von Ihren Reservationen wurde angepasst"
 
 #~ msgid ""
 #~ "Select a free time span in the calendar below to create an availability "

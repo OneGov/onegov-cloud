@@ -32,6 +32,7 @@ from onegov.org.forms.fields import (
     UploadOrSelectExistingMultipleFilesField,
 )
 from onegov.org.forms.user import AVAILABLE_ROLES
+from onegov.org.forms.util import KABA_CODE_RE
 from onegov.org.forms.util import TIMESPANS
 from onegov.org.kaba import KabaApiError, KabaClient
 from onegov.org.theme import user_options
@@ -67,7 +68,7 @@ if TYPE_CHECKING:
 
 
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
-KABA_CODE_RE = re.compile(r'^[0-9]{4,6}$')
+COLOR_RE = re.compile(r'^#?(?:[0-9a-fA-F]{3}){1,2}$')
 
 
 class GeneralSettingsForm(Form):
@@ -1172,10 +1173,47 @@ class OrgTicketSettingsForm(Form):
                 if 'Price' in meta or 'Preis' in meta:
                     price = meta.get('Price', meta.get('Preis'))
                     try:
-                        assert Decimal(price) >= Decimal('0')
+                        assert price and Decimal(price) >= Decimal('0')
                     except Exception:
                         self.ticket_tags.errors.append(_(
-                            'Invalid price, needs to be a non-negative number.'
+                            'Invalid price "${price}", needs to be a '
+                            'non-negative number.',
+                            mapping={'price': price}
+                        ))
+                        return False
+
+                if 'Color' in meta:
+                    raw_color = meta['Color']
+                    if isinstance(raw_color, str):
+                        color = raw_color.strip()
+                    elif isinstance(raw_color, int):
+                        color = str(raw_color)
+                        # leading zeroes can be interpreted as octal
+                        # so we need to convert it back to its orginal
+                        # representation
+                        if color not in self.ticket_tags.data:
+                            color = f'{raw_color:o}'
+                        if len(color) < 6:
+                            # try to restore any leading zeroes YAML stripped
+                            for __ in range(6 - len(color)):
+                                prefixed = f'0{color}'
+                                if prefixed in self.ticket_tags.data:
+                                    color = prefixed
+                                else:
+                                    break
+                    else:
+                        color = str(raw_color).strip()
+
+                    if COLOR_RE.match(color):
+                        # Store normalized color
+                        meta['Color'] = '#' + color.removeprefix('#')
+                    else:
+                        self.ticket_tags.errors.append(_(
+                            'Invalid color "${color}", needs to be a 3 or 6 '
+                            'digit hex code, e.g. "ff9000" for orange. '
+                            'If you use a "#" prefix, make sure to enclose '
+                            'the value in quotation marks.',
+                            mapping={'color': color or ''}
                         ))
                         return False
 
@@ -1565,29 +1603,35 @@ class KabaSettingsForm(Form):
         request: OrgRequest
 
     kaba_site_id = StringField(
-        _('Site ID'),
-        [InputRequired()],
+        label=_('Site ID'),
+        validators=[InputRequired()],
     )
 
     kaba_api_key = StringField(
-        'API_KEY',
-        [InputRequired()],
+        label='API_KEY',
+        validators=[InputRequired()],
     )
 
     kaba_api_secret = PasswordField(
-        'API_SECRET',
+        label='API_SECRET',
     )
 
     default_key_code_lead_time = IntegerField(
-        _('Default Lead Time'),
-        [InputRequired()],
-        description=_('In minutes'),
+        label=_('Default Lead Time'),
+        validators=[InputRequired(), NumberRange(0, 1440)],
+        render_kw={
+            'step': 5,
+            'long_description': _('In minutes'),
+        },
     )
 
     default_key_code_lag_time = IntegerField(
-        _('Default Lag Time'),
-        [InputRequired()],
-        description=_('In minutes'),
+        label=_('Default Lag Time'),
+        validators=[InputRequired(), NumberRange(0, 1440)],
+        render_kw={
+            'step': 5,
+            'long_description': _('In minutes'),
+        },
     )
 
     def populate_obj(self, model: Organisation) -> None:  # type:ignore

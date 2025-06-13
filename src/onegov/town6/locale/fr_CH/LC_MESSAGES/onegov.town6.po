@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-04-24 09:21+0200\n"
+"POT-Creation-Date: 2025-06-11 11:26+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -236,6 +236,9 @@ msgstr "Annuler"
 #. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Événement"
+
+msgid "Copy"
+msgstr "Copie"
 
 msgid "Export"
 msgstr "Exporter"
@@ -474,6 +477,18 @@ msgstr "Intégrer une iFrame"
 msgid "You can copy the following code to embed this page as an iFrame:"
 msgstr ""
 "Vous pouvez copier le code suivant pour intégrer cette page dans une iFrame:"
+
+msgid ""
+"To display the breadcrumbs you can add ${bc_level} as a parameter to the "
+"URL. The number defines where the breadcrumbs start. 1 in this case means "
+"that the first level is hidden. You can use any number as long as it is less "
+"than the number of levels in the breadcrumbs."
+msgstr ""
+"Pour afficher le fil d'Ariane, vous pouvez ajouter ${bc_level} comme "
+"paramètre à l'URL. Le nombre définit où le fil d'Ariane commence. 1 dans ce  "
+"cas signifie que le premier niveau est masqué. Vous pouvez utiliser "
+"n'importe quel nombre tant qu'il est inférieur au nombre de niveaux dans le "
+"fil d'Ariane."
 
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
@@ -1259,6 +1274,9 @@ msgstr ""
 "contacter un administrateur afin qu'il puisse vous retirer de la liste des "
 "destinataires."
 
+msgid "Pending approval"
+msgstr "En attente d'approbation"
+
 msgid "A new entry has been added to the \"${directory}\" directory:"
 msgstr "Une nouvelle entrée a été ajoutée au répertoire \"${directory}\":"
 
@@ -1385,6 +1403,15 @@ msgstr ""
 msgid "Key Code"
 msgstr "Code clé"
 
+msgid "Here's a summary of your reservations:"
+msgstr "Voici un résumé de vos réservations:"
+
+msgid "Changes to your submitted reservations:"
+msgstr "Les modifications apportées aux réservations que vous avez soumises:"
+
+msgid "Rejected"
+msgstr "Rejetée"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Les réservations suivantes ont malheureusement été annulées:"
 
@@ -1500,6 +1527,9 @@ msgstr "1 réservation rejetée."
 
 msgid "${count} reservations rejected."
 msgstr "${count} réservations rejetées."
+
+msgid "1 reservation adjusted:"
+msgstr "1 réservation ajustée:"
 
 msgid "Registration confirmed."
 msgstr "Inscription confirmée."
@@ -1820,15 +1850,6 @@ msgstr ""
 "\"éditer\" dans la période de disponibilité, puis \"enregistrer\" sans rien "
 "changer."
 
-msgid "Reservation is pending approval"
-msgstr "La réservation est en attente d'approbation"
-
-msgid "(${num_pending} pending approval)"
-msgstr "(${num_pending} en attente d'approbation)"
-
-msgid "Utilised"
-msgstr "Utilisé"
-
 msgid "No recipients defined yet."
 msgstr "Aucun destinataire défini pour le moment."
 
@@ -2114,14 +2135,26 @@ msgstr "Inactif"
 msgid "Role"
 msgstr "Rôle"
 
-msgid "local"
-msgstr "local"
-
 msgid "User group"
 msgstr "Groupe d'utilisateurs"
 
 msgid "None"
 msgstr "Aucune"
+
+msgid "local"
+msgstr "local"
+
+msgid "Last login"
+msgstr "Dernière connexion"
+
+msgid "Never"
+msgstr "Jamais"
+
+msgid "Session information"
+msgstr "Session Information"
+
+msgid "Display information"
+msgstr "Afficher les informations"
 
 msgid "No links found."
 msgstr "Aucun lien trouvé."

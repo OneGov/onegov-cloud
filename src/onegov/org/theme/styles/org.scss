@@ -2,9 +2,9 @@
     useful mixins
 */
 
-// sass-lint:disable-all
+// stylelint-disable declaration-block-no-duplicate-properties
 @mixin grayscale {
-    filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale");
+            filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale");
             filter: grayscale(100%);
        -moz-filter: grayscale(100%);
         -ms-filter: grayscale(100%);
@@ -20,7 +20,7 @@
             filter: none;
     -webkit-filter: none;
 }
-// sass-lint:enable-all
+// stylelint-enable declaration-block-no-duplicate-properties
 
 @mixin hairline {
     border: 0;
@@ -127,7 +127,7 @@ a[href^="mailto:"] {
     @include prefix(word-break, break-all);
 
     // Non standard for WebKit
-    word-break: break-word;
+    word-break: break-word; /* stylelint-disable-line declaration-property-value-keyword-no-deprecated */
 }
 
 /*
@@ -619,6 +619,11 @@ $footer-border-width: 0;
     line-height: 1.5rem;
     list-style-type: none;
     margin: 0 0 1rem;
+}
+
+.tiktok {
+    margin-left: 2px;
+    margin-right: 2px;
 }
 
 /*
@@ -3079,7 +3084,54 @@ button {
     to {box-shadow: none;}
 }
 
-.calendar {
+.occupancy-calendar {
+    .fc-view:not(.fc-list-view) {
+        .event-accepted,
+        .event-accepted .fc-bg,
+        .event-accepted .fc-content {
+            background-color: $blue-dark;
+        }
+
+        .event-pending,
+        .event-pending .fc-bg,
+        .event-pending .fc-content {
+            background-color: lighten(desaturate($blue-dark, 50%), 10%);
+        }
+    }
+
+    .fc-event {
+        padding: 0 !important;
+    }
+
+    .fc-event .fc-content {
+        padding: 2px 4px;
+        border-top-right-radius: 1.2rem;
+
+        &::first-line {
+            font-weight: bold;
+        }
+    }
+
+    .fc-list-item-title::first-line {
+        font-weight: bold;
+    }
+
+    &[data-editable="true"] .fc-list-item {
+        cursor: pointer;
+    }
+
+    .fc-event .fc-bg {
+        opacity: 1;
+        border-top-right-radius: 1.5rem;
+    }
+
+    .fc-bgevent {
+        background-color: $green;
+        opacity: .15;
+    }
+}
+
+.calendar, .occupancy-calendar {
 
     margin-bottom: 1.5rem;
 
@@ -3285,26 +3337,26 @@ button {
     Fullcalendar responsive design
 */
 @media #{$small-up} {
-    .fc .fc-toolbar {
+    .calendar .fc .fc-toolbar {
         width: 100%;
     }
 }
 
 @media #{$large-up} {
-    .fc .fc-toolbar {
+    .calendar .fc .fc-toolbar {
         width: 80%;
     }
 }
 
 @media (max-width: 850px) {
-    .fc-center {
+    .calendar .fc-center {
         display: block;
         width: 100%;
     }
 }
 
 @media (min-width: 850px) {
-    .fc-center {
+    .calendar .fc-center {
         display: inline-block;
         width: 40%;
     }
@@ -4187,7 +4239,7 @@ ul.search-results {
         width: 20%;
     }
 
-    .fc-view-container,
+    .calendar .fc-view-container,
     .reservation-list {
         display: inline-block;
         float: left;
@@ -4204,7 +4256,7 @@ ul.search-results {
         }
     }
 
-    .fc-view-container,
+    .calendar .fc-view-container,
     .reservation-list {
         width: 75%;
     }
@@ -4217,7 +4269,7 @@ ul.search-results {
         width: 100%;
     }
 
-    .fc-view-container,
+    .calendar .fc-view-container,
     .reservation-list {
         display: block;
         width: 100%;
@@ -4282,6 +4334,26 @@ ul.search-results {
 
         li {
             margin-bottom: .5rem;
+        }
+
+        .reservation {
+            background: $white-smoke;
+            border-radius: 2px;
+            margin-bottom: 1rem;
+            margin-left: -0.5rem;
+            position: relative;
+        }
+
+        .reservation-details {
+            font-size: .8rem;
+            padding: .5rem 8rem .5rem .5rem;
+        }
+
+        .reservation-actions {
+            font-size: .8rem;
+            position: absolute;
+            right: .5rem;
+            top: .275rem;
         }
     }
 
@@ -4836,6 +4908,29 @@ h2 + div.timeline {
     .file {
         margin-left: 4rem;
     }
+
+    .reservation-adjustment {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 0;
+
+        .fa {
+            font-size: 1.5rem;
+            color: rgba(0, 0, 0, .5);
+        }
+
+        .reservation-details {
+            font-size: .8rem;
+            padding: .5rem;
+            background: rgba(255, 255, 255, .7);
+            border-radius: 2px;
+            box-shadow: 3px 3px 3px rgba(220, 220, 220, .2);
+            flex: 0 0 32.66%;
+            margin: .5rem 0;
+        }
+
+    }
 }
 
 /*
@@ -4847,6 +4942,10 @@ h2 + div.timeline {
 .message-directory,
 .message-submission {
     background: lighten($green-pastel, 2.5%);
+}
+
+.message-reservation_adjusted {
+    background: lighten($yellow-pastel, 2.5%);
 }
 
 .message-ticket_note {
@@ -6873,4 +6972,31 @@ pre code,
 code {
     padding: $code-padding-inline;
     display: inline;
+}
+
+// confirm scrollable list
+.confirm-list {
+    margin-bottom: 1rem;
+    max-height: 40vh;
+    overflow: auto;
+    padding: 10px;
+
+    ul {
+        margin-bottom: 0;
+    }
+}
+
+.button.alert.yes.disabled {
+    cursor: not-allowed !important;
+    opacity: .6;
+}
+
+.scroll-hint {
+    color: #8e1c26;
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+p.full-text-width {
+    max-width: 100% !important;
 }

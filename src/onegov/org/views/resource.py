@@ -8,7 +8,7 @@ import collections
 from collections import OrderedDict
 from datetime import date as date_t, datetime, time, timedelta
 from isodate import parse_date, ISO8601Error
-from itertools import groupby, islice
+from itertools import islice
 from libres.modules.errors import LibresError
 from morepath.request import Response
 from onegov.core.security import Public, Private, Personal
@@ -35,7 +35,7 @@ from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
 from sqlalchemy import and_, select
-from sqlalchemy.orm import object_session
+from sqlalchemy.orm import object_session, undefer
 from webob import exc
 
 
@@ -1106,6 +1106,55 @@ def get_date_range(
     return sedate.align_range_to_day(start, end, resource.timezone)
 
 
+def assert_visible_by_members(self: Resource, request: OrgRequest) -> None:
+    # for members check if they're actually allowed to see this
+    if (
+        request.has_role('member')
+        and not getattr(self, 'occupancy_is_visible_to_members', False)
+    ):
+        raise exc.HTTPForbidden()
+
+
+@OrgApp.json(model=Resource, name='occupancy-json', permission=Personal)
+def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
+    """ Returns the reservations in a fullcalendar compatible events feed.
+
+    See `<https://fullcalendar.io/docs/event_data/events_json_feed/>`_ for
+    more information.
+
+    """
+    assert_visible_by_members(self, request)
+
+    start, end = utils.parse_fullcalendar_request(request, self.timezone)
+
+    if not (start and end):
+        return ()
+
+    # get all reservations and tickets
+    query: Query[tuple[Reservation, Ticket]]
+    query = self.reservations_with_tickets_query(  # type:ignore[attr-defined]
+        start, end, exclude_pending=False
+    ).with_entities(Reservation, Ticket)
+    query = query.options(undefer(Reservation.data))
+
+    return *(
+        res.as_dict()
+        for res in utils.ReservationEventInfo.from_reservations(
+            request,
+            self,
+            query.with_entities(Reservation, Ticket)
+        )
+    ), *(
+        av.as_dict()
+        for av in utils.AvailabilityEventInfo.from_allocations(
+            request,
+            self,
+            # get all all master allocations
+            self.scheduler.allocations_in_range(start, end)  # type: ignore[arg-type]
+        )
+    )
+
+
 @OrgApp.html(
     model=Resource,
     permission=Personal,
@@ -1118,72 +1167,15 @@ def view_occupancy(
     layout: ResourceLayout | None = None
 ) -> RenderData:
 
-    # for members check if they're actually allowed to see this
-    if (
-        request.has_role('member')
-        and not getattr(self, 'occupancy_is_visible_to_members', False)
-    ):
-        raise exc.HTTPForbidden()
+    assert_visible_by_members(self, request)
 
-    # infer the default start/end date from the calendar view parameters
-    start, end = get_date_range(self, request.params)
-
-    # include pending reservations
-    query: Query[ReservationTicketRow]
-    # FIXME: Should this view only work on a common base class of our own
-    #        Resources? We can insert an intermediary abstract class, this
-    #        may clean up some other things here as well
-    query = self.reservations_with_tickets_query(  # type:ignore[attr-defined]
-        start, end, exclude_pending=False)
-    query = query.with_entities(
-        Reservation.start, Reservation.end, Reservation.quota,
-        Reservation.data, Ticket.subtitle, Ticket.id
-    )
-
-    def group_key(record: ReservationTicketRow) -> date_t:
-        return sedate.to_timezone(record[0], self.timezone).date()
-
-    occupancy = OrderedDict()
-    grouped = groupby(query.all(), group_key)
-    count = 0
-    pending_count = 0
-
-    for date, records in grouped:
-        occupancy[date] = tuple(
-            OccupancyEntry(
-                start=sedate.to_timezone(start, self.timezone),
-                end=sedate.to_timezone(
-                    end + timedelta(microseconds=1), self.timezone),
-                quota=quota,
-                title=title,
-                pending=not data or not data.get('accepted'),
-                url=request.class_link(Ticket, {
-                    'handler_code': 'RSV',
-                    'id': ticket_id
-                })
-            ) for start, end, quota, data, title, ticket_id in records
-        )
-        count += len(occupancy[date])
-        pending_count += sum(1 for entry in occupancy[date] if entry.pending)
-
-    layout = layout or ResourceLayout(self, request)
-    layout.breadcrumbs.append(Link(_('Occupancy'), '#'))
-    layout.editbar_links = None
-
-    utilisation = 100 - self.scheduler.queries.availability_by_range(
-        start, end, (self.id, )
-    )
+    request.include('occupancycalendar')
 
     return {
-        'layout': layout,
         'title': _('Occupancy'),
-        'occupancy': occupancy,
         'resource': self,
-        'start': sedate.to_timezone(start, self.timezone).date(),
-        'end': sedate.to_timezone(end, self.timezone).date(),
-        'count': count,
-        'pending_count': pending_count,
-        'utilisation': utilisation
+        'layout': layout or ResourceLayout(self, request),
+        'feed': request.link(self, name='occupancy-json'),
     }
 
 

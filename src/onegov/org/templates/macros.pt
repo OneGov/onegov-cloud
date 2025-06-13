@@ -126,6 +126,8 @@
                        twitter layout.org.twitter_url|nothing;
                        instagram layout.org.instagram_url|nothing;
                        youtube layout.org.youtube_url|nothing;
+                       linkedin layout.org.linkedin_url|nothing;
+                       tiktok layout.org.tiktok_url|nothing;
                        custom_links layout.custom_links|nothing;">
         <div class="row footer-columns" tal:condition="any((
             contact,
@@ -136,6 +138,8 @@
             twitter,
             instagram,
             youtube,
+            linkedin,
+            tiktok,
             custom_links
         ))">
             <div class="small-12 columns medium-${request.app.org.footer_left_width}">
@@ -241,30 +245,42 @@
 </metal:footer_opening_hours>
 
 <metal:footer_social_media define-macro="footer_social_media">
-    <h2 i18n:translate tal:condition="facebook or twitter">Social Media</h2>
+    <tal:b condition="any((facebook, twitter, instagram, youtube, linkedin, tiktok))">
+        <h2 i18n:translate>Social Media</h2>
 
-    <ul class="social-media-links" tal:condition="facebook or twitter">
-        <li tal:condition="facebook">
-            <a tal:attributes="href facebook">
-                <i class="fa fa-facebook-official fa-fw"></i> Facebook
-            </a>
-        </li>
-        <li tal:condition="twitter">
-            <a tal:attributes="href twitter">
-                <i class="fa fa-twitter fa-fw"></i> Twitter
-            </a>
-        </li>
-        <li tal:condition="instagram">
-            <a tal:attributes="href instagram">
-                <i class="fa fa-instagram fa-fw"></i> Instagram
-            </a>
-        </li>
-        <li tal:condition="youtube">
-            <a tal:attributes="href youtube">
-                <i class="fa fa-youtube fa-fw"></i> YouTube
-            </a>
-        </li>
-    </ul>
+        <ul class="social-media-links">
+            <li tal:condition="facebook">
+                <a tal:attributes="href facebook">
+                    <i class="fa fa-facebook-official fa-fw"></i> Facebook
+                </a>
+            </li>
+            <li tal:condition="twitter">
+                <a tal:attributes="href twitter">
+                    <i class="fa fa-twitter fa-fw"></i> Twitter
+                </a>
+            </li>
+            <li tal:condition="instagram">
+                <a tal:attributes="href instagram">
+                    <i class="fa fa-instagram fa-fw"></i> Instagram
+                </a>
+            </li>
+            <li tal:condition="youtube">
+                <a tal:attributes="href youtube">
+                    <i class="fa fa-youtube fa-fw"></i> YouTube
+                </a>
+            </li>
+            <li tal:condition="linkedin">
+                <a tal:attributes="href linkedin">
+                    <i class="fa fa-linkedin fa-fw"></i> LinkedIn
+                </a>
+            </li>
+            <li tal:condition="tiktok">
+                <a tal:attributes="href tiktok">
+                    <img class="tiktok" src="static/font-awesome/tiktok-brands-solid.svg" height="14px"></img> TikTok
+                </a>
+            </li>
+        </ul>
+    </tal:b>
 </metal:footer_social_media>
 
 <metal:footer_locales define-macro="footer_locales">
@@ -980,22 +996,27 @@
 </metal:reservations>
 
 <metal:reservations define-macro="reservations" i18n:domain="onegov.org">
-    <ul tal:condition="reservations" class="reservations">
-        <li tal:repeat="reservation reservations">
-            <tal:b define="start reservation.display_start(); end reservation.display_end()">
-                <strong>
-                    ${layout.format_date(start, 'weekday_long')},
-                    ${layout.format_date(start, 'date_long')}
-                </strong>
-                <!--! simple whole day check: -->
-                <span tal:condition="start.time() != end.time()">
-                    <br>
-                    ${layout.format_time_range(start, end)}
-                </span>
-                <br><span i18n:translate>Quota</span>
-                <span>
-                    ${reservation.quota}
-                </span>
+    <ul tal:condition="reservations" tal:define="get_links get_links|None" class="reservations">
+        <li tal:repeat="reservation reservations" tal:attributes="class 'reservation' if get_links else None">
+            <tal:b define="start reservation.display_start(); end reservation.display_end(); links get_links(reservation, request) if get_links else []">
+                <div class="reservation-details" tal:omit-tag="not:links">
+                    <strong>
+                        ${layout.format_date(start, 'weekday_long')},
+                        ${layout.format_date(start, 'date_long')}
+                    </strong>
+                    <!--! simple whole day check: -->
+                    <span tal:condition="start.time() != end.time()">
+                        <br>
+                        ${layout.format_time_range(start, end)}
+                    </span>
+                    <br><span i18n:translate>Quota</span>
+                    <span>
+                        ${reservation.quota}
+                    </span>
+                </div>
+                <div class="reservation-actions text-links" tal:condition="links">
+                    <tal:b repeat="link links" content="link(layout)" />
+                </div>
             </tal:b>
         </li>
     </ul>

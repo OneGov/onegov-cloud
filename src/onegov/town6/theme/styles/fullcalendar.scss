@@ -6,7 +6,54 @@
     to {box-shadow: none;}
 }
 
-.calendar {
+.occupancy-calendar {
+    .fc-view:not(.fc-list-view) {
+        .event-accepted,
+        .event-accepted .fc-bg,
+        .event-accepted .fc-content {
+            background-color: $blue-dark;
+        }
+
+        .event-pending,
+        .event-pending .fc-bg,
+        .event-pending .fc-content {
+            background-color: lighten(desaturate($blue-dark, 50%), 10%);
+        }
+    }
+
+    .fc-event {
+        padding: 0 !important;
+    }
+
+    .fc-event .fc-content {
+        padding: 2px 4px;
+        border-top-right-radius: 1.2rem;
+
+        &::first-line {
+            font-weight: bold;
+        }
+    }
+
+    .fc-list-item-title::first-line {
+        font-weight: bold;
+    }
+
+    &[data-editable="true"] .fc-list-item {
+        cursor: pointer;
+    }
+
+    .fc-event .fc-bg {
+        opacity: 1;
+        border-top-right-radius: 1.5rem;
+    }
+
+    .fc-bgevent {
+        background-color: $green;
+        opacity: .15;
+    }
+}
+
+.calendar, .occupancy-calendar {
 
     margin-bottom: 1.5rem;
 
@@ -227,39 +274,39 @@
     Fullcalendar responsive design
 */
 @include breakpoint(medium only) {
-    .fc .fc-toolbar {
+    .calendar .fc .fc-toolbar {
         width: 100%;
     }
 }
 
 @include breakpoint(large up) {
-    .fc .fc-toolbar {
+    .calendar .fc .fc-toolbar {
         width: 80%;
     }
 }
 
 @media screen and (max-width: 850px) {
-    .fc-center {
+    .calendar .fc-center {
         display: block;
         width: 100%;
     }
 }
 
 @media screen and (min-width: 850px) {
-    .fc-center {
+    .calendar .fc-center {
         display: inline-block;
         width: 40%;
     }
 }
 
 @include breakpoint(small only) {
-    .calendar-footer {
+    .calendar .calendar-footer {
         display: none !important;
     }
 }
 
 @include breakpoint(medium only) {
-    .calendar-footer {
+    .calendar .calendar-footer {
         width: 75%;
     }
 }
@@ -544,7 +591,7 @@
         width: 20%;
     }
 
-    .fc-view-container, .reservation-list {
+    .calendar .fc-view-container, .reservation-list {
         display: inline-block;
         float: left;
         width: 80%;
@@ -560,7 +607,7 @@
         }
     }
 
-    .fc-view-container, .reservation-list {
+    .calendar .fc-view-container, .reservation-list {
         width: 75%;
     }
 }
@@ -572,7 +619,7 @@
         width: 100%;
     }
 
-    .fc-view-container, .reservation-list {
+    .calendar .fc-view-container, .reservation-list {
         display: block;
         width: 100%;
     }

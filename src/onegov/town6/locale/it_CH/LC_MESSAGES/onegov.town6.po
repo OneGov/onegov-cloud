@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-04-24 09:21+0200\n"
+"POT-Creation-Date: 2025-06-11 11:26+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -232,6 +232,9 @@ msgstr "Annulla"
 #. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
+
+msgid "Copy"
+msgstr "Copia"
 
 msgid "Export"
 msgstr "Esporta"
@@ -471,6 +474,18 @@ msgid "You can copy the following code to embed this page as an iFrame:"
 msgstr ""
 "È possibile copiare il seguente codice per incorporare questa pagina come "
 "iFrame:"
+
+msgid ""
+"To display the breadcrumbs you can add ${bc_level} as a parameter to the "
+"URL. The number defines where the breadcrumbs start. 1 in this case means "
+"that the first level is hidden. You can use any number as long as it is less "
+"than the number of levels in the breadcrumbs."
+msgstr ""
+"Per visualizzare le briciole di pane si può aggiungere ${bc_level} come "
+"parametro all'URL. Il numero definisce l'inizio delle briciole di pane. 1 in "
+"questo caso significa che il primo livello è nascosto. È possibile "
+"utilizzare qualsiasi numero, purché sia inferiore al numero di livelli delle "
+"briciole di pane."
 
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
@@ -1259,6 +1274,9 @@ msgstr ""
 "org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, kontaktieren "
 "Sie bitte einen Administrator, damit dieser Sie aus der Liste entfernen kann."
 
+msgid "Pending approval"
+msgstr "In attesa di approvazione"
+
 msgid "A new entry has been added to the \"${directory}\" directory:"
 msgstr "Un nuovo elemento è stato aggiunto alla cartella \"${directory}\":"
 
@@ -1377,6 +1395,15 @@ msgstr ""
 msgid "Key Code"
 msgstr "Codice chiave"
 
+msgid "Here's a summary of your reservations:"
+msgstr "Ecco un riepilogo delle vostre prenotazioni:"
+
+msgid "Changes to your submitted reservations:"
+msgstr "Modifiche alle prenotazioni inviate:"
+
+msgid "Rejected"
+msgstr "Rifiutata"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
 
@@ -1493,6 +1520,9 @@ msgstr "1 prenotazione rifiutata."
 
 msgid "${count} reservations rejected."
 msgstr "${count} prenotazioni rifiutate."
+
+msgid "1 reservation adjusted:"
+msgstr "1 prenotazione regolata:"
 
 msgid "Registration confirmed."
 msgstr "Iscrizione confermata."
@@ -1813,15 +1843,6 @@ msgstr ""
 "disponibilità. Per ricreare queste allocazioni, fare clic su \"modifica\" "
 "nel periodo di disponibilità e quindi \"salva\" senza modificare nulla."
 
-msgid "Reservation is pending approval"
-msgstr "La prenotazione è in attesa di approvazione"
-
-msgid "(${num_pending} pending approval)"
-msgstr "(${num_pending} in attesa di approvazione)"
-
-msgid "Utilised"
-msgstr "Utilizzato"
-
 msgid "No recipients defined yet."
 msgstr "Nessun destinatario ancora definito."
 
@@ -2110,14 +2131,26 @@ msgstr "Inattivo"
 msgid "Role"
 msgstr "Ruolo"
 
-msgid "local"
-msgstr "locale"
-
 msgid "User group"
 msgstr "Gruppo di utenti"
 
 msgid "None"
 msgstr "Nessuno"
+
+msgid "local"
+msgstr "locale"
+
+msgid "Last login"
+msgstr "Ultimo accesso"
+
+msgid "Never"
+msgstr "Mai"
+
+msgid "Session information"
+msgstr "Session Information"
+
+msgid "Display information"
+msgstr "Mostra informazioni"
 
 msgid "No links found."
 msgstr "Nessun collegamento trovato."

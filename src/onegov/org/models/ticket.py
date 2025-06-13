@@ -2,20 +2,21 @@ from __future__ import annotations
 
 from functools import cached_property
 from markupsafe import Markup
+from onegov.chat import Message, MessageCollection
 from onegov.chat.collections import ChatCollection
+from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler, Trait
 from onegov.core.templates import render_macro
 from onegov.directory import Directory, DirectoryEntry
 from onegov.event import EventCollection
 from onegov.form import FormSubmissionCollection
 from onegov.org import _
 from onegov.org.layout import DefaultLayout, EventLayout
-from onegov.chat import Message
-from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler, Trait
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.reservation import Allocation, Resource, Reservation
 from onegov.ticket import Ticket, Handler, handlers
 from onegov.search.utils import extract_hashtags
 from purl import URL
+from sedate import utcnow
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy.orm import object_session, undefer
@@ -23,6 +24,7 @@ from sqlalchemy.orm import object_session, undefer
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from datetime import datetime
     from onegov.chat.models import Chat
     from onegov.event import Event
     from onegov.form import Form, FormSubmission
@@ -31,7 +33,10 @@ if TYPE_CHECKING:
     from onegov.ticket.handler import _Q
     from sqlalchemy import Column
     from sqlalchemy.orm import Query, Session
+    from typing import TypeAlias
     from uuid import UUID
+
+    DateRange: TypeAlias = tuple[datetime, datetime]
 
 
 def ticket_submitter(ticket: Ticket) -> str | None:
@@ -528,12 +533,13 @@ class ReservationHandler(Handler):
         parts.append(
             render_macro(layout.macros['reservations'], request, {
                 'reservations': self.reservations,
+                'get_links': self.get_reservation_links
+                if self.ticket.state == 'pending' else None,
                 'layout': layout
             })
         )
 
         # render key code
-        # TODO: Add a unlock URL?
         if key_code := self.data.get('key_code'):
             parts.append(Markup(
                 '<dl class="field-display">'
@@ -569,6 +575,104 @@ class ReservationHandler(Handler):
 
         return Markup('').join(parts)
 
+    def get_changes(
+        self,
+        request: OrgRequest
+    ) -> dict[DateRange, DateRange | None]:
+        """ Returns a compressed set of changes of reservations.
+
+        If a reservation is moved multiple times and then rejected, then
+        this will only contain the rejection (orginal start/end -> None).
+
+        If there is a chain of time adjustments, only the orginal and
+        current start/end will be included.
+        """
+
+        messages = MessageCollection(
+            request.session,
+            type=('reservation', 'reservation_adjusted'),
+            channel_id=self.ticket.number
+        )
+        changes: dict[DateRange, DateRange | None] = {}
+        # maps current start/end to its original start/end
+        origin: dict[DateRange, DateRange] = {}
+        for message in messages.query():
+            if message.type == 'reservation':
+                if message.meta['change'] != 'rejected':
+                    continue
+
+                for reservation in message.meta['reservations']:
+                    # for old messages we can't reconstruct the change
+                    # so we just return an empty changelog
+                    if not isinstance(reservation, dict):
+                        return {}
+
+                    key = reservation['start'], reservation['end']
+                    key = origin.pop(key, key)
+                    changes[key] = None
+            else:
+                assert message.type == 'reservation_adjusted'
+                key = message.meta['old_start'], message.meta['old_end']
+                current = message.meta['new_start'], message.meta['new_end']
+                # if we have been moved previously map back to the origin
+                key = origin.pop(key, key)
+                origin[current] = key
+                if key == current:
+                    # if we changed a reservation back to its original
+                    # state, then we remove it from the changes,
+                    changes.pop(key, None)
+                else:
+                    changes[key] = current
+
+        return changes
+
+    def get_reservation_links(
+        self,
+        reservation: Reservation,
+        request: OrgRequest
+    ) -> list[Link]:
+
+        links: list[Link] = []
+
+        url_obj = URL(request.link(self.ticket, 'reject-reservation'))
+        url_obj = url_obj.query_param(
+            'reservation-id', str(reservation.id))
+        url = url_obj.as_string()
+
+        title = self.get_reservation_title(reservation)
+        links.append(Link(
+            text=_('Reject'),
+            url=url,
+            attrs={'class': 'delete-link'},
+            traits=(
+                Confirm(
+                    _('Do you really want to reject this reservation?'),
+                    _("Rejecting ${title} can't be undone.", mapping={
+                        'title': title
+                    }),
+                    _('Reject reservation'),
+                    _('Cancel')
+                ),
+                Intercooler(
+                    request_method='GET',
+                    redirect_after=request.url
+                )
+            )
+        ))
+
+        if reservation.is_adjustable:
+            url_obj = URL(request.link(self.ticket, 'adjust-reservation'))
+            url_obj = url_obj.query_param(
+                'reservation-id', str(reservation.id))
+            url = url_obj.as_string()
+            links.append(Link(
+                text=_('Adjust'),
+                url=url,
+                attrs={'class': 'edit-link'}
+            ))
+
+        return links
+
     def get_links(  # type:ignore[override]
         self,
         request: OrgRequest  # type:ignore[override]
@@ -595,6 +699,31 @@ class ReservationHandler(Handler):
 
         advanced_links = []
 
+        if self.reservations:
+            advanced_links.append(Link(
+                text=_('Send reservation summary'),
+                url=request.link(self.ticket, 'send-reservation-summary'),
+                attrs={'class': ('envelope', 'border')},
+                traits=(
+                    Confirm(
+                        _('Do you really want to send a reservation summary?'),
+                        _(
+                            'This will always be sent via e-mail, even when '
+                            'ticket updates have been disabled. Make sure to '
+                            'only use this to inform customers, when '
+                            'significant changes have been made to the '
+                            'reservations, they need to be aware of.'
+                        ),
+                        _('Send'),
+                        _('Cancel')
+                    ),
+                    Intercooler(
+                        request_method='GET',
+                        redirect_after=request.url
+                    )
+                )
+            ))
+
         if self.submission:
             url_obj = URL(request.link(self.ticket, 'submission'))
             url_obj = url_obj.query_param('edit', '')
@@ -606,6 +735,20 @@ class ReservationHandler(Handler):
                 Link(
                     text=_('Edit details'),
                     url=url,
+                    attrs={'class': ('edit-link', 'border')}
+                )
+            )
+
+        now = utcnow()
+        if getattr(self.resource, 'kaba_components', None) and any(
+            True
+            for reservation in self.reservations
+            if reservation.display_start() > now
+        ):
+            advanced_links.append(
+                Link(
+                    text=_('Edit key code'),
+                    url=request.link(self.ticket, 'edit-kaba'),
                     attrs={'class': ('edit-link', 'border')}
                 )
             )
@@ -643,33 +786,6 @@ class ReservationHandler(Handler):
             url=request.link(self.ticket, 'reject-reservation-with-message'),
             attrs={'class': 'delete-link'},
         ))
-
-        for reservation in self.reservations:
-            url_obj = URL(request.link(self.ticket, 'reject-reservation'))
-            url_obj = url_obj.query_param(
-                'reservation-id', str(reservation.id))
-            url = url_obj.as_string()
-
-            title = self.get_reservation_title(reservation)
-            advanced_links.append(Link(
-                text=_('Reject ${title}', mapping={'title': title}),
-                url=url,
-                attrs={'class': 'delete-link'},
-                traits=(
-                    Confirm(
-                        _('Do you really want to reject this reservation?'),
-                        _("Rejecting ${title} can't be undone.", mapping={
-                            'title': title
-                        }),
-                        _('Reject reservation'),
-                        _('Cancel')
-                    ),
-                    Intercooler(
-                        request_method='GET',
-                        redirect_after=request.url
-                    )
-                )
-            ))
 
         links.append(LinkGroup(
             _('Advanced'),

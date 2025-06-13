@@ -4,6 +4,7 @@ from morepath import redirect
 from onegov.core.elements import BackLink, Link
 from onegov.core.security import Private
 from onegov.core.security import Public
+from onegov.core.templates import render_macro
 from onegov.core.utils import append_query_param
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde import LandsgemeindeApp
@@ -12,6 +13,7 @@ from onegov.landsgemeinde.forms import AgendaItemForm
 from onegov.landsgemeinde.layouts import AgendaItemCollectionLayout
 from onegov.landsgemeinde.layouts import AgendaItemLayout
 from onegov.landsgemeinde.models import AgendaItem
+from onegov.landsgemeinde.models.agenda import STATES
 from onegov.landsgemeinde.utils import ensure_states, timestamp_to_seconds
 from onegov.landsgemeinde.utils import update_ticker
 
@@ -159,4 +161,40 @@ def delete_agenda_item(
     ensure_states(
         self.assembly.agenda_items[-1]
         if self.assembly.agenda_items else self.assembly
+    )
+
+
+@LandsgemeindeApp.view(
+    model=AgendaItem,
+    name='change-state',
+    request_method='POST',
+    permission=Private
+)
+def change_agenda_item_state(
+    self: AgendaItem,
+    request: LandsgemeindeRequest
+) -> str:
+    layout = AgendaItemLayout(self, request)
+    request.assert_valid_csrf_token()
+
+    i = list(STATES).index(self.state)
+    self.state = list(STATES)[(i + 1) % len(STATES)]
+
+    updated = ensure_states(self)
+    updated.add(self)
+    update_ticker(request, updated)
+
+    assembly = self.assembly
+    agenda_items = (
+        AgendaItemCollection(request.session)
+        .preloaded_by_assembly(assembly).all()
+    )
+
+    return render_macro(
+        layout.macros['states-list'],
+        request,
+        {'assembly': assembly,
+         'agenda_items': agenda_items,
+         'layout': layout,
+         'state': self.state}
     )

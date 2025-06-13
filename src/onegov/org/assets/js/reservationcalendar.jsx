@@ -364,7 +364,7 @@ rc.reserve = function(calendar, url, start, end, quota, wholeDay) {
 
 rc.shouldRenderReservationForm = function(event, previousReservationState) {
     const showWholeDay = event.partlyAvailable && event.wholeDay;
-    const showTimeRange = event.partlyAvailable && (!event.wholeDay || !event.state.wholeDay);
+    const showTimeRange = event.partlyAvailable && (!event.wholeDay || !(event.state && event.state.wholeDay));
     const hasPreviousTimeToOffer = !_.isEmpty(previousReservationState) &&
         (
             previousReservationState.start !== event.start.format('HH:mm') ||
