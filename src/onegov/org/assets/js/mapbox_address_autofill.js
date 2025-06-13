@@ -1,21 +1,61 @@
 (function() {
-    const getMapboxToken = () => document.body.dataset.mapboxToken || false;
-    const token = getMapboxToken();
-    if (!token) return;
+    // Ensure Mapbox Search JS SDK is loaded and token is available
+    if (!window.mapboxsearch || !document.body.dataset.mapboxToken) {
+        if (!window.mapboxsearch) {
+            console.warn('Mapbox Search JS SDK (mapboxsearch) not found.');
+        }
+        if (!document.body.dataset.mapboxToken) {
+            console.warn('Mapbox token not found in document.body.dataset.mapboxToken.');
+        }
+        return;
+    }
+    const token = document.body.dataset.mapboxToken;
 
-    // instantiate a <mapbox-search-box> element using the MapboxSearchBox class
-    const searchBoxElement = new mapboxsearch.MapboxSearchBox()
+    // Select input fields based on standard autocomplete attributes
+    // that correspond to MapboxPlaceDetail enum values.
+    const inputs = document.querySelectorAll(
+        'input[autocomplete^="address-line"], input[autocomplete^="address-level"]'
+    );
 
-    searchBoxElement.accessToken = token; 
-    searchBoxElement.options = {
+    inputs.forEach((inputElement) => {
+        const autocompleteValue = inputElement.getAttribute('autocomplete');
+
+        const autocompleteToTypes = {
+            'address-line1': 'address', // Street number and name
+            'address-line2': 'address', // Apartment, suite, floor, etc. (part of address)
+            'address-level1': 'region,country', // State, Province, Territory
+            'address-level2': 'place,locality', // City, Municipality
+            'address-level3': 'district', // County or another district level
+            'default': 'address,place,postcode,region,country' // Generic fallback
+        };
+
+        const types = autocompleteToTypes[autocompleteValue] || autocompleteToTypes['default'];
+
+        const searchBoxElement = new mapboxsearch.MapboxSearchBox();
+        searchBoxElement.accessToken = token;
+        searchBoxElement.options = {
             country: 'CH',
             language: 'de',
-            types: 'place,region', // Prioritize cities and cantons
-    }
-    console.log(searchBoxElement);
+            types: types,
+        };
 
-    // append <mapbox-search-box> to the document
-    document.querySelector('#hometown').appendChild(searchBoxElement);
+        // Preserve the initial value from the original input
+        searchBoxElement.value = inputElement.value;
 
+        // Hide the original input element
+        inputElement.style.display = 'none';
+
+        // Insert the MapboxSearchBox element after the original input
+        if (inputElement.parentElement) {
+            inputElement.parentElement.insertBefore(searchBoxElement, inputElement.nextSibling);
+        } else {
+            // Fallback if the input element has no parent, though unlikely for form inputs
+            document.body.appendChild(searchBoxElement);
+        }
+
+        // Sync the value from the MapboxSearchBox back to the hidden original input
+        searchBoxElement.addEventListener('retrieve', () => { inputElement.value = searchBoxElement.value; });
+        searchBoxElement.addEventListener('change', () => { inputElement.value = searchBoxElement.value; });
+    });
 })();
 
