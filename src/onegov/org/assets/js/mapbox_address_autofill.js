@@ -12,16 +12,13 @@
             }
         });
 
-        console.log('bar')
-        console.log(autofillInstance)
-        if (autofillInstance && autofillInstance.searchBox) {
-            console.log('fo')
-            autofillInstance.searchBox.addEventListener('results', (event) => {
-                if (event.detail && event.detail.results) {
-                    console.log('event.detail.results')
-                    // Filter out results identified as 'address' type.
-                    event.detail.results = event.detail.results.filter(result =>
-                        !(result.place_type && result.place_type.includes('address'))
+        if (autofillInstance) {
+            autofillInstance.addEventListener('suggest', (event) => {
+                if (event.detail && event.detail.suggestions) {
+                    // Filter out results identified by 'feature_type' as 'address'.
+                    // The Search Box API /suggest endpoint uses 'feature_type'.
+                    event.detail.suggestions = event.detail.suggestions.filter(
+                        suggestion => !(suggestion.feature_type && suggestion.feature_type === 'address')
                     );
                 }
             });
