@@ -1,23 +1,25 @@
 from freezegun import freeze_time
 from datetime import date
 from onegov.core.utils import Bunch
-from onegov.pas.models import Attendence
-from onegov.pas.models import Change
-from onegov.pas.models import Commission
-from onegov.pas.models import CommissionMembership
-from onegov.pas.models import LegislativePeriod
-from onegov.pas.models import Parliamentarian
-from onegov.pas.models import ParliamentarianRole
-from onegov.pas.models import ParliamentaryGroup
-from onegov.pas.models import Party
-from onegov.pas.models import RateSet
-from onegov.pas.models import SettlementRun
+from onegov.pas.models import (
+    PASAttendence,
+    PASChange,
+    PASCommission,
+    PASCommissionMembership,
+    PASParliamentarian,
+    PASParliamentarianRole,
+    PASParliamentaryGroup,
+    PASParty,
+    PASLegislativePeriod,
+    RateSet,
+    SettlementRun
+)
 
 
 @freeze_time('2022-06-06')
 def test_models(session):
     rate_set = RateSet(year=2022)
-    legislative_period = LegislativePeriod(
+    legislative_period = PASLegislativePeriod(
         name='2022-2024',
         start=date(2022, 1, 1),
         end=date(2022, 12, 31)
@@ -28,13 +30,13 @@ def test_models(session):
         end=date(2022, 3, 31),
         active=True
     )
-    parliamentary_group = ParliamentaryGroup(name='Group')
-    party = Party(name='Party')
-    commission = Commission(
+    parliamentary_group = PASParliamentaryGroup(name='Group')
+    party = PASParty(name='Party')
+    commission = PASCommission(
         name='Official Commission',
         type='official'
     )
-    parliamentarian = Parliamentarian(
+    parliamentarian = PASParliamentarian(
         first_name='First',
         last_name='Last',
         gender='female',
@@ -49,7 +51,7 @@ def test_models(session):
     session.add(parliamentarian)
     session.flush()
 
-    parliamentarian_role = ParliamentarianRole(
+    parliamentarian_role = PASParliamentarianRole(
         parliamentarian_id=parliamentarian.id,
         role='vice_president',
         party_id=party.id,
@@ -57,12 +59,12 @@ def test_models(session):
         parliamentary_group_id=parliamentary_group.id,
         parliamentary_group_role='vote_counter'
     )
-    commission_membership = CommissionMembership(
+    commission_membership = PASCommissionMembership(
         role='president',
         commission_id=commission.id,
         parliamentarian_id=parliamentarian.id
     )
-    attendence = Attendence(
+    attendence = PASAttendence(
         date=date(2022, 1, 1),
         duration=30,
         type='commission',
@@ -74,7 +76,7 @@ def test_models(session):
     session.add(attendence)
     session.flush()
 
-    change = Change.add(
+    change = PASChange.add(
         request=Bunch(
             current_username='user@example.org',
             current_user=Bunch(title='User'),

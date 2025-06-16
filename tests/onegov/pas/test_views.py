@@ -84,7 +84,7 @@ def test_views_manage(client_with_es):
 
     delete.append(page)
 
-    # Parties
+    # parties
     page = settings.click('Parteien')
     page = page.click(href='new')
     page.form['name'] = 'BB'

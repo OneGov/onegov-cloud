@@ -8,7 +8,7 @@ from onegov.pas.collections import PartyCollection
 from onegov.pas.forms import PartyForm
 from onegov.pas.layouts import PartyCollectionLayout
 from onegov.pas.layouts import PartyLayout
-from onegov.pas.models import Party
+from onegov.pas.models import PASParty
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -82,12 +82,12 @@ def add_party(
 
 
 @PasApp.html(
-    model=Party,
+    model=PASParty,
     template='party.pt',
     permission=Private
 )
 def view_party(
-    self: Party,
+    self: PASParty,
     request: TownRequest
 ) -> RenderData:
 
@@ -101,14 +101,14 @@ def view_party(
 
 
 @PasApp.form(
-    model=Party,
+    model=PASParty,
     name='edit',
     template='form.pt',
     permission=Private,
     form=PartyForm
 )
 def edit_party(
-    self: Party,
+    self: PASParty,
     request: TownRequest,
     form: PartyForm
 ) -> RenderData | Response:
@@ -134,12 +134,12 @@ def edit_party(
 
 
 @PasApp.view(
-    model=Party,
+    model=PASParty,
     request_method='DELETE',
     permission=Private
 )
 def delete_party(
-    self: Party,
+    self: PASParty,
     request: TownRequest
 ) -> None:
 
