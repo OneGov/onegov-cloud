@@ -1,11 +1,16 @@
-from onegov.pas.models import Attendence, Commission, RateSet, SettlementRun,\
-    Parliamentarian
+from onegov.pas.models import (
+    PASAttendence,
+    PASCommission,
+    PASParliamentarian,
+    RateSet,
+    SettlementRun
+)
 from datetime import date
 
 
 def test_generate_parliamentarian_export(session):
     # Create parliamentarian
-    parliamentarian = Parliamentarian(
+    parliamentarian = PASParliamentarian(
         first_name='John', last_name='Doe', gender='male'
     )
     session.add(parliamentarian)
@@ -30,21 +35,21 @@ def test_generate_parliamentarian_export(session):
     session.add(rate_set)
 
     # Create test commission
-    commission = Commission(name='Test Commission', type='normal')
+    commission = PASCommission(name='Test PASCommission', type='normal')
     session.add(commission)
     session.flush()
 
     # Create some test attendances
     attendances = [
         # 2 hour plenary session
-        Attendence(
+        PASAttendence(
             parliamentarian=parliamentarian,
             date=date(2023, 10, 15),
             duration=120,  # minutes
             type='plenary',
         ),
         # 1.5 hour commission meeting
-        Attendence(
+        PASAttendence(
             parliamentarian=parliamentarian,
             date=date(2023, 11, 15),
             duration=90,  # minutes
@@ -52,7 +57,7 @@ def test_generate_parliamentarian_export(session):
             commission=commission,
         ),
         # 1 hour study time
-        Attendence(
+        PASAttendence(
             parliamentarian=parliamentarian,
             date=date(2023, 12, 15),
             duration=60,  # minutes

@@ -7,7 +7,7 @@ from onegov.pas import PasApp
 from onegov.pas.collections import ParliamentarianRoleCollection
 from onegov.pas.forms import ParliamentarianRoleForm
 from onegov.pas.layouts import ParliamentarianRoleLayout
-from onegov.pas.models import ParliamentarianRole
+from onegov.pas.models import PASParliamentarianRole
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -17,12 +17,12 @@ if TYPE_CHECKING:
 
 
 @PasApp.html(
-    model=ParliamentarianRole,
+    model=PASParliamentarianRole,
     template='parliamentarian_role.pt',
     permission=Private
 )
 def view_parliamentarian_role(
-    self: ParliamentarianRole,
+    self: PASParliamentarianRole,
     request: TownRequest
 ) -> RenderData:
 
@@ -36,14 +36,14 @@ def view_parliamentarian_role(
 
 
 @PasApp.form(
-    model=ParliamentarianRole,
+    model=PASParliamentarianRole,
     name='edit',
     template='form.pt',
     permission=Private,
     form=ParliamentarianRoleForm
 )
 def edit_parliamentarian_role(
-    self: ParliamentarianRole,
+    self: PASParliamentarianRole,
     request: TownRequest,
     form: ParliamentarianRoleForm
 ) -> RenderData | Response:
@@ -68,12 +68,12 @@ def edit_parliamentarian_role(
 
 
 @PasApp.view(
-    model=ParliamentarianRole,
+    model=PASParliamentarianRole,
     request_method='DELETE',
     permission=Private
 )
 def delete_parliamentarian_role(
-    self: ParliamentarianRole,
+    self: PASParliamentarianRole,
     request: TownRequest
 ) -> None:
 
