@@ -73,4 +73,3 @@ repos:
     rev: v8.18.4
     hooks:
       - id: gitleaks
-        language_version: go1.21
