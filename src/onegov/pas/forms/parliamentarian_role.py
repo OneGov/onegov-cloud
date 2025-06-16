@@ -7,7 +7,7 @@ from onegov.form.fields import TranslatedSelectField
 from onegov.pas import _
 from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
-from onegov.pas.collections import PartyCollection
+from onegov.pas.collections import PASPartyCollection
 from onegov.parliament.models.parliamentarian_role import (
     PARLIAMENTARIAN_ROLES
 )
@@ -88,7 +88,7 @@ class ParliamentarianRoleForm(Form):
         self.party_id.choices = [
             (str(party.id), party.title)
             for party
-            in PartyCollection(self.request.session).query()
+            in PASPartyCollection(self.request.session).query()
         ]
         self.party_id.choices.insert(0, ('', '-'))
 

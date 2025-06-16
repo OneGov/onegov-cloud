@@ -11,7 +11,7 @@ from onegov.pas.forms.legislative_period import LegislativePeriodForm
 from onegov.pas.forms.parliamentarian import ParliamentarianForm
 from onegov.pas.forms.parliamentarian_role import ParliamentarianRoleForm
 from onegov.pas.forms.parliamentary_group import ParliamentaryGroupForm
-from onegov.pas.forms.party import PartyForm
+from onegov.parliament.forms.party import PartyForm
 from onegov.pas.forms.rate_set import RateSetForm
 from onegov.pas.forms.settlement_run import SettlementRunForm
 

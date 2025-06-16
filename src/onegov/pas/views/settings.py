@@ -8,7 +8,7 @@ from onegov.pas.collections import CommissionCollection
 from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
-from onegov.pas.collections import PartyCollection
+from onegov.pas.collections import PASPartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
 from onegov.pas.layouts import DefaultLayout
@@ -54,7 +54,7 @@ def view_settings(
         {
             'name': 'parties',
             'title': _('Parties'),
-            'link': request.class_link(PartyCollection),
+            'link': request.class_link(PASPartyCollection),
             'icon': 'fa-users'
         },
         {

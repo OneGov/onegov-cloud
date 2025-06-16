@@ -12,7 +12,7 @@ from onegov.parliament.models.parliamentarian import (
 )
 from onegov.parliament.models.parliamentarian_role import ParliamentarianRole
 from onegov.parliament.models.parliamentary_group import ParliamentaryGroup
-from onegov.parliament.models.party import Party
+from onegov.parliament.models.party import Party, RISParty
 from onegov.parliament.models.political_business import (
     PoliticalBusiness,
     PoliticalBusinessParticipation,
@@ -31,6 +31,7 @@ __all__ = (
     'ParliamentarianRole',
     'ParliamentaryGroup',
     'Party',
+    'RISParty',
     'PoliticalBusiness',
     'PoliticalBusinessParticipation',
 )

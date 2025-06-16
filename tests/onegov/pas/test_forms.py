@@ -6,7 +6,7 @@ from onegov.pas.collections import CommissionMembershipCollection
 from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.collections import ParliamentarianRoleCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
-from onegov.pas.collections import PartyCollection
+from onegov.pas.collections import PASPartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
 from onegov.pas.forms import AttendenceAddCommissionForm
@@ -276,7 +276,7 @@ def test_parliamentarian_role_form(session, dummy_request):
     groups.add(name='b')
     groups.add(name='c')
 
-    parties = PartyCollection(session)
+    parties = PASPartyCollection(session)
     parties.add(name='x')
     parties.add(name='y')
 

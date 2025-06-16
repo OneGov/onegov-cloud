@@ -70,6 +70,7 @@ from onegov.org.layout import (
 from onegov.org.models import PageMove
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.page import PageCollection
+from onegov.parliament.collections import RISPartyCollection
 from onegov.stepsequence import step_sequences
 from onegov.stepsequence.extension import StepsLayoutExtension
 from onegov.town6 import _
@@ -1024,3 +1025,93 @@ class ArchivedChatsLayout(DefaultLayout):
             )
 
         return bc
+
+
+class RISPartyCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Parties')
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            # Link(_('Settings'), self.ris_settings_url),  # FIXME
+            Link(self.title, self.request.link(self.model)),
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Party'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-party'},
+                        ),
+                    ],
+                ),
+            ]
+        return None
+
+
+# FIXME create base class in onegov/parliament/layouts.py
+class RISPartyLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self) -> RISPartyCollection:
+        return RISPartyCollection(self.request.session)
+
+    @cached_property
+    def title(self) -> str:
+        return self.model.name
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            # Link(_('Settings'), self.ris_settings_url),  # FIXME
+            Link(_('Parties'), self.request.link(self.collection)),
+            Link(self.title, self.request.link(self.model)),
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'},
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(self.request.link(self.model)),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _('Do you really want to delete this party?'),
+                            _('This cannot be undone.'),
+                            _('Delete party'),
+                            _('Cancel'),
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(self.collection),
+                        ),
+                    ),
+                ),
+            ]
+        return None

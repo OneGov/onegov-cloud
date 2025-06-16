@@ -13,6 +13,7 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     import uuid
     from datetime import date
@@ -57,7 +58,7 @@ class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     #: External ID
     external_kub_id: Column[uuid.UUID | None] = Column(
-        UUID,   # type:ignore[arg-type]
+        UUID,  # type:ignore[arg-type]
         nullable=True,
         default=uuid4,
         unique=True
@@ -97,3 +98,12 @@ class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     def __repr__(self) -> str:
         return f'<Party {self.name}>'
+
+
+class RISParty(Party):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'ris_party',
+    }
+
+    es_type_name = 'ris_party'

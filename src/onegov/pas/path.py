@@ -9,7 +9,7 @@ from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.collections import ParliamentarianRoleCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
-from onegov.pas.collections import PartyCollection
+from onegov.pas.collections import PASPartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
 from onegov.pas.collections import ImportLogCollection
@@ -248,15 +248,15 @@ def get_parliamentary_group(
 
 
 @PasApp.path(
-    model=PartyCollection,
+    model=PASPartyCollection,
     path='/parties',
     converters={'active': bool}
 )
 def get_parties(
     app: PasApp,
     active: bool = True,
-) -> PartyCollection:
-    return PartyCollection(app.session(), active)
+) -> PASPartyCollection:
+    return PASPartyCollection(app.session(), active)
 
 
 @PasApp.path(
@@ -268,7 +268,7 @@ def get_party(
     app: PasApp,
     id: UUID
 ) -> Party | None:
-    return PartyCollection(app.session()).by_id(id)
+    return PASPartyCollection(app.session()).by_id(id)
 
 
 @PasApp.path(
