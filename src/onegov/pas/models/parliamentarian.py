@@ -10,3 +10,4 @@ class PASParliamentarian(Parliamentarian):
     }
 
     es_type_name = 'pas_parliamentarian'
+    es_public = False
