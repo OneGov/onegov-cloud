@@ -652,16 +652,3 @@ class TypeAheadInput(TextInput):
         )
 
         return super().__call__(field, **kwargs)
-
-
-class MapboxAutofillWidget(TextInput):
-    def __call__(self, field: Field, **kwargs: Any) -> Markup:
-        request = field.meta.request
-        mapbox_token = request.app.mapbox_token
-        input_html: Markup = super().__call__(field, **kwargs)
-
-        return Markup(
-                '<mapbox-address-autofill access-token='
-                '{mapbox_token}>{input_html}'
-                '</mapbox-address-autofill>'
-        ).format(mapbox_token=mapbox_token, input_html=input_html)
