@@ -211,6 +211,6 @@ class DefaultLayout(ChameleonLayout):
         # Fixes using "," for french locale instead of "." as for german
         if locale == 'fr_CH':
             locale = 'de_CH'
-        decimal, group = self.number_symbols(locale)
+        decimal, group = self.request.number_symbols(locale)
         result = '{{:{},.{}f}}'.format(padding, decimal_places).format(number)
         return result.translate({ord(','): group, ord('.'): decimal})
