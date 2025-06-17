@@ -21,7 +21,6 @@ from onegov.form.utils import path_to_filename
 from onegov.form.validators import ValidPhoneNumber
 from onegov.form.widgets import ChosenSelectWidget
 from onegov.form.widgets import LinkPanelWidget
-from onegov.form.widgets import MapboxAutofillWidget
 from onegov.form.widgets import DurationInput
 from onegov.form.widgets import HoneyPotWidget
 from onegov.form.widgets import IconWidget
@@ -51,7 +50,7 @@ from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 from wtforms.validators import URL
 from wtforms.validators import ValidationError
-from wtforms.widgets import CheckboxInput, ColorInput
+from wtforms.widgets import CheckboxInput, ColorInput, TextInput
 
 
 from typing import Any, IO, Literal, TYPE_CHECKING
@@ -949,22 +948,24 @@ class MapboxPlaceDetail(Enum):
     APPARTMENT_OR_FLOOR = 'address-line2'  # Apartment, suite, floor, etc.
 
     # Administrative levels (geographic areas)
-    # This often corresponds to State, Province, or Territory
+    # Use this to match canton in CH:
     LEAST_SPECIFIC = 'address-level1'
-    # This often corresponds to City or Municipality
+
+    # Use this to match place municipality
     MORE_SPECIFIC = 'address-level2'
-    # This is less commonly used, sometimes County or another district level
+
+    # The most specific area, not commonly used.
     MOST_SPECIFIC = 'address-level3'
 
 
 class PlaceAutocompleteField(StringField):
-    """ Provides address completion for places. """
+    """Provides address completion for places (via mapbox_address_autofill.js).
+    """
 
-    widget = MapboxAutofillWidget()
+    widget = TextInput()
 
     def __init__(self,
-                 autocomplete_attribute:
-                 MapboxPlaceDetail = MapboxPlaceDetail.MORE_SPECIFIC,
+                 autocomplete_attribute: MapboxPlaceDetail | None = None,
                  *args: Any,
                  **kwargs: Any):
 
@@ -973,6 +974,11 @@ class PlaceAutocompleteField(StringField):
             form.meta.request.include('mapbox_address_autofill')
         if 'render_kw' not in kwargs:
             kwargs['render_kw'] = {}
-        kwargs['render_kw'].setdefault('autocomplete',
-                                       autocomplete_attribute.value)
+
+        effective_autocomplete_attribute = (
+            autocomplete_attribute or MapboxPlaceDetail.MORE_SPECIFIC
+        )
+        kwargs['render_kw']['autocomplete'] = (
+                effective_autocomplete_attribute.value
+        )
         super().__init__(*args, **kwargs)

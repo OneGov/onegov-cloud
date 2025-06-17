@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from onegov.core.collection import GenericCollection
-from onegov.pas.models import ParliamentarianRole
+from onegov.parliament.models import ParliamentarianRole
 
 
 class ParliamentarianRoleCollection(GenericCollection[ParliamentarianRole]):

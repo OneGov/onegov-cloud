@@ -13,16 +13,16 @@ from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
 from onegov.pas.collections import ImportLogCollection
-from onegov.pas.models import Attendence
-from onegov.pas.models import Change
-from onegov.pas.models import Commission
-from onegov.pas.models import CommissionMembership
+from onegov.pas.models import PASAttendence
+from onegov.pas.models import PASChange
+from onegov.pas.models import PASCommission
+from onegov.pas.models import PASCommissionMembership
 from onegov.pas.models import ImportLog
-from onegov.pas.models import LegislativePeriod
-from onegov.pas.models import Parliamentarian
-from onegov.pas.models import ParliamentarianRole
-from onegov.pas.models import ParliamentaryGroup
-from onegov.pas.models import Party
+from onegov.pas.models import PASLegislativePeriod
+from onegov.pas.models import PASParliamentarian
+from onegov.pas.models import PASParliamentarianRole
+from onegov.pas.models import PASParliamentaryGroup
+from onegov.pas.models import PASParty
 from onegov.pas.models import RateSet
 from onegov.pas.models import SettlementRun
 from uuid import UUID
@@ -32,6 +32,12 @@ from datetime import date
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
+
+    from onegov.parliament.models import (
+        ParliamentarianRole,
+        Party,
+        ParliamentaryGroup
+    )
 
 
 @PasApp.path(
@@ -68,14 +74,14 @@ def get_attendences(
 
 
 @PasApp.path(
-    model=Attendence,
+    model=PASAttendence,
     path='/attendence/{id}',
     converters={'id': UUID}
 )
 def get_attendence(
     app: PasApp,
     id: UUID
-) -> Attendence | None:
+) -> PASAttendence | None:
     return AttendenceCollection(app.session()).by_id(id)
 
 
@@ -90,14 +96,14 @@ def get_changes(
 
 
 @PasApp.path(
-    model=Change,
+    model=PASChange,
     path='/change/{id}',
     converters={'id': UUID}
 )
 def get_change(
     app: PasApp,
     id: UUID
-) -> Change | None:
+) -> PASChange | None:
     return ChangeCollection(app.session()).by_id(id)
 
 
@@ -114,14 +120,14 @@ def get_commissions(
 
 
 @PasApp.path(
-    model=Commission,
+    model=PASCommission,
     path='/commission/{id}',
     converters={'id': UUID}
 )
 def get_commission(
     app: PasApp,
     id: UUID,
-) -> Commission | None:
+) -> PASCommission | None:
     return CommissionCollection(app.session()).by_id(id)
 
 
@@ -136,14 +142,14 @@ def get_commission_memberships(
 
 
 @PasApp.path(
-    model=CommissionMembership,
+    model=PASCommissionMembership,
     path='/commission-membership/{id}',
     converters={'id': UUID}
 )
 def get_commission_membership(
     app: PasApp,
     id: UUID
-) -> CommissionMembership | None:
+) -> PASCommissionMembership | None:
     return CommissionMembershipCollection(app.session()).by_id(id)
 
 
@@ -160,14 +166,14 @@ def get_legislative_periods(
 
 
 @PasApp.path(
-    model=LegislativePeriod,
+    model=PASLegislativePeriod,
     path='/legislative-period/{id}',
     converters={'id': UUID}
 )
 def get_legislative_period(
     app: PasApp,
     id: UUID
-) -> LegislativePeriod | None:
+) -> PASLegislativePeriod | None:
     return LegislativePeriodCollection(app.session()).by_id(id)
 
 
@@ -184,14 +190,14 @@ def get_parliamentarians(
 
 
 @PasApp.path(
-    model=Parliamentarian,
+    model=PASParliamentarian,
     path='/parliamenarian/{id}',
     converters={'id': UUID}
 )
 def get_parliamentarian(
     app: PasApp,
     id: UUID
-) -> Parliamentarian | None:
+) -> PASParliamentarian | None:
     return ParliamentarianCollection(app.session()).by_id(id)
 
 
@@ -206,7 +212,7 @@ def get_parliamentarian_roles(
 
 
 @PasApp.path(
-    model=ParliamentarianRole,
+    model=PASParliamentarianRole,
     path='/parliamenarian-role/{id}',
     converters={'id': UUID}
 )
@@ -230,7 +236,7 @@ def get_parliamentary_groups(
 
 
 @PasApp.path(
-    model=ParliamentaryGroup,
+    model=PASParliamentaryGroup,
     path='/parliamenary-group/{id}',
     converters={'id': UUID}
 )
@@ -254,7 +260,7 @@ def get_parties(
 
 
 @PasApp.path(
-    model=Party,
+    model=PASParty,
     path='/party/{id}',
     converters={'id': UUID}
 )
@@ -322,7 +328,7 @@ class SettlementRunExport:
     def __init__(
         self,
         settlement_run: SettlementRun,
-        entity: Party | Commission | Parliamentarian,
+        entity: PASParty | PASCommission | PASParliamentarian,
         category: str | None = None
     ):
         self.settlement_run = settlement_run
@@ -363,9 +369,9 @@ def get_settlement_run_export(
         return None
 
     model_map: dict[str, type] = {
-        'Party': Party,
-        'Commission': Commission,
-        'Parliamentarian': Parliamentarian,
+        'Party': PASParty,
+        'Commission': PASCommission,
+        'Parliamentarian': PASParliamentarian,
     }
     entity = (
         session.query(model_map.get(literal_type))

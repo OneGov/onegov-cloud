@@ -1,13 +1,11 @@
 from datetime import date
 from onegov.pas.models import (
-    Parliamentarian,
-    ParliamentarianRole,
-    Attendence,
+    PASAttendence,
+    PASParliamentarian,
+    PASParliamentarianRole,
+    PASParty,
 )
 
-from onegov.pas.models import (
-    Party,
-)
 from onegov.pas.utils import get_parties_with_settlements
 from onegov.pas.utils import get_parliamentarians_with_settlements
 from uuid import uuid4
@@ -19,21 +17,21 @@ def test_get_parliamentarians_with_settlements(session):
     end_date = date(2024, 12, 31)
 
     # Create parliamentarians
-    parl1 = Parliamentarian(
+    parl1 = PASParliamentarian(
         id=uuid4(),
         first_name='John',
         last_name='Smith',
         gender='male',
     )
 
-    parl2 = Parliamentarian(
+    parl2 = PASParliamentarian(
         id=uuid4(),
         first_name='Jane',
         last_name='Doe',
         gender='female',
     )
 
-    parl3 = Parliamentarian(
+    parl3 = PASParliamentarian(
         id=uuid4(),
         first_name='Bob',
         last_name='Johnson',
@@ -44,7 +42,7 @@ def test_get_parliamentarians_with_settlements(session):
     session.flush()
 
     # Create roles for each parliamentarian
-    role1 = ParliamentarianRole(
+    role1 = PASParliamentarianRole(
         parliamentarian_id=parl1.id,
         start=date(2023, 1, 1),
         end=date(2025, 12, 31),
@@ -53,7 +51,7 @@ def test_get_parliamentarians_with_settlements(session):
         parliamentary_group_role='member',
     )
 
-    role2 = ParliamentarianRole(
+    role2 = PASParliamentarianRole(
         parliamentarian_id=parl2.id,
         start=date(2023, 1, 1),
         end=date(2025, 12, 31),
@@ -62,8 +60,8 @@ def test_get_parliamentarians_with_settlements(session):
         parliamentary_group_role='member',
     )
 
-    # Parl3 has no active role during this period
-    role3 = ParliamentarianRole(
+    # PASParl3 has no active role during this period
+    role3 = PASParliamentarianRole(
         parliamentarian_id=parl3.id,
         start=date(2020, 1, 1),
         end=date(2023, 12, 31),
@@ -76,7 +74,7 @@ def test_get_parliamentarians_with_settlements(session):
     session.flush()
 
     # Create attendances
-    attendance1 = Attendence(
+    attendance1 = PASAttendence(
         id=uuid4(),
         parliamentarian_id=parl1.id,
         date=date(2024, 6, 1),
@@ -88,7 +86,7 @@ def test_get_parliamentarians_with_settlements(session):
 
     # Parl3 has attendance but the role does not fall within the date range
     # of the attendance
-    attendance3 = Attendence(
+    attendance3 = PASAttendence(
         id=uuid4(),
         parliamentarian_id=parl3.id,
         date=date(2024, 6, 1),
@@ -109,7 +107,7 @@ def test_get_parliamentarians_with_settlements(session):
     assert result[0].id == parl1.id
 
     # Add attendance for parl2 and test again
-    attendance2 = Attendence(
+    attendance2 = PASAttendence(
         id=uuid4(),
         parliamentarian_id=parl2.id,
         date=date(2024, 6, 1),
@@ -142,21 +140,21 @@ def test_get_parties_with_settlements(session):
     end_date = date(2024, 12, 31)
 
     # Create parties
-    party_a = Party(
+    party_a = PASParty(
         id=uuid4(),
-        name='Party A',
+        name='PASParty A',
         start=date(2020, 1, 1),
         end=date(2026, 12, 31),
     )
-    party_b = Party(
+    party_b = PASParty(
         id=uuid4(),
-        name='Party B',
+        name='PASParty B',
         start=date(2020, 1, 1),
         end=date(2026, 12, 31),
     )
-    party_c = Party(
+    party_c = PASParty(
         id=uuid4(),
-        name='Party C',
+        name='PASParty C',
         start=date(2020, 1, 1),
         end=date(2026, 12, 31),
     )
@@ -165,7 +163,7 @@ def test_get_parties_with_settlements(session):
     session.flush()
 
     # Create parliamentarians
-    parl1 = Parliamentarian(
+    parl1 = PASParliamentarian(
         id=uuid4(),
         first_name='John',
         last_name='Smith',
@@ -173,7 +171,7 @@ def test_get_parties_with_settlements(session):
         shipping_method='a',
     )
 
-    parl2 = Parliamentarian(
+    parl2 = PASParliamentarian(
         id=uuid4(),
         first_name='Jane',
         last_name='Doe',
@@ -181,7 +179,7 @@ def test_get_parties_with_settlements(session):
         shipping_method='a',
     )
 
-    parl3 = Parliamentarian(
+    parl3 = PASParliamentarian(
         id=uuid4(),
         first_name='Bob',
         last_name='Johnson',
@@ -193,8 +191,8 @@ def test_get_parties_with_settlements(session):
     session.flush()
 
     # Create roles
-    # Parl1 in Party A during the entire period
-    role1 = ParliamentarianRole(
+    # PASParl1 in Party A during the entire period
+    role1 = PASParliamentarianRole(
         parliamentarian_id=parl1.id,
         party_id=party_a.id,
         start=date(2023, 1, 1),
@@ -204,8 +202,8 @@ def test_get_parties_with_settlements(session):
         parliamentary_group_role='member',
     )
 
-    # Parl2 switches from Party B to Party C in the middle of the period
-    role2a = ParliamentarianRole(
+    # PASParl2 switches from Party B to Party C in the middle of the period
+    role2a = PASParliamentarianRole(
         parliamentarian_id=parl2.id,
         party_id=party_b.id,
         start=date(2023, 1, 1),
@@ -215,7 +213,7 @@ def test_get_parties_with_settlements(session):
         parliamentary_group_role='member',
     )
 
-    role2b = ParliamentarianRole(
+    role2b = PASParliamentarianRole(
         parliamentarian_id=parl2.id,
         party_id=party_c.id,
         start=date(2024, 7, 1),  # Second half of 2024
@@ -225,8 +223,8 @@ def test_get_parties_with_settlements(session):
         parliamentary_group_role='member',
     )
 
-    # Parl3 was in Party C but left before the period
-    role3 = ParliamentarianRole(
+    # PASParl3 was in Party C but left before the period
+    role3 = PASParliamentarianRole(
         parliamentarian_id=parl3.id,
         party_id=party_c.id,
         start=date(2020, 1, 1),
@@ -240,9 +238,9 @@ def test_get_parties_with_settlements(session):
     session.flush()
 
     # Create attendances
-    # Parl1 has attendance during their party membership - one in first half,
-    # one in second half
-    attendance1a = Attendence(
+    # PASParl1 has attendance during their party membership - one in first
+    # half, one in second half
+    attendance1a = PASAttendence(
         id=uuid4(),
         parliamentarian_id=parl1.id,
         date=date(2024, 3, 15),  # During party A membership
@@ -251,7 +249,7 @@ def test_get_parties_with_settlements(session):
         type='plenary',
     )
 
-    attendance1b = Attendence(
+    attendance1b = PASAttendence(
         id=uuid4(),
         parliamentarian_id=parl1.id,
         date=date(2024, 9, 15),
@@ -261,7 +259,7 @@ def test_get_parties_with_settlements(session):
     )
 
     # Parl2 has attendances during both party memberships
-    attendance2a = Attendence(
+    attendance2a = PASAttendence(
         id=uuid4(),
         parliamentarian_id=parl2.id,
         date=date(2024, 3, 15),  # During party B membership
@@ -269,7 +267,7 @@ def test_get_parties_with_settlements(session):
         type='plenary',
     )
 
-    attendance2b = Attendence(
+    attendance2b = PASAttendence(
         id=uuid4(),
         parliamentarian_id=parl2.id,
         date=date(2024, 9, 15),  # During party C membership
@@ -278,7 +276,7 @@ def test_get_parties_with_settlements(session):
     )
 
     # Parl3 has attendance but was no longer in Party C
-    attendance3 = Attendence(
+    attendance3 = PASAttendence(
         id=uuid4(),
         parliamentarian_id=parl3.id,
         date=date(2024, 3, 15),

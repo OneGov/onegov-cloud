@@ -1,6 +1,7 @@
 """ Provides commands used to initialize org websites. """
 from __future__ import annotations
 
+import json
 import click
 import html
 import isodate
@@ -13,8 +14,12 @@ from bs4 import BeautifulSoup
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from io import BytesIO
+
+from openpyxl import load_workbook
+import yaml
 from onegov.core.orm.utils import QueryChain
-from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
+from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
+                                   TimerangeTooLong)
 from onegov.chat import MessageCollection
 from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.core.crypto import random_token
@@ -37,15 +42,16 @@ from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
 from onegov.town6.upgrade import migrate_theme_options
+from onegov.user.models import TAN
 from onegov.user import UserCollection, User
 from operator import add as add_op
 from pathlib import Path
-from sqlalchemy import or_
+from sqlalchemy import func, and_, or_
 from sqlalchemy.dialects.postgresql import array
 from uuid import uuid4
 
 
-from typing import Any, TYPE_CHECKING
+from typing import IO, Any, TYPE_CHECKING, TypedDict
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from depot.fields.upload import UploadedFile
@@ -956,3 +962,453 @@ def delete_invisible_links() -> Callable[[OrgRequest, OrgApp], None]:
         )
 
     return delete_invisible_links
+
+
+@cli.command(name='get-resources-and-forms')
+@click.argument('option_file', type=click.File('rb'))
+def get_resources_and_forms(
+    option_file: IO[bytes]
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Get the resources and forms from the option file. """
+
+    def print_resources_and_forms(request: OrgRequest, app: OrgApp) -> None:
+        book = load_workbook(option_file)
+        sheet = book['Reservationen']
+
+        class OptionDict(TypedDict):
+            options: set[str]
+            type: str
+
+        resources: dict[str, dict[str, OptionDict]] = {}
+        for index, row in enumerate(sheet.rows):
+            if index <= 3:
+                continue
+            for i, cell in enumerate(row):
+                value = str(cell.value)
+                if i == 0:
+                    resource_name = value
+                    if resource_name not in resources:
+                        resources[resource_name] = {}
+                if i == 13:  # Option name
+                    option = value
+                    if resources[resource_name].get(option) is None:
+                        resources[resource_name][option] = {
+                            'type': 'text',
+                            'options': set()
+                        }
+                if i == 14:  # Option answer
+                    answer = value
+                    resources[resource_name][option]['options'].add(answer)
+                if i == 15:  # Option price
+                    if int(value) > 0:
+                        resources[resource_name][option]['options'].remove(
+                            answer)
+                        answer = answer.replace(' (', ', ').replace(
+                            ')', '') + f' ({value} CHF)'
+                        resources[resource_name][option]['options'].add(
+                            answer)
+                        resources[resource_name][option]['type'] = 'radio'
+
+        for resource in resources.keys():
+            click.secho(resource, fg='blue')
+            for option in resources[resource]:
+                if resources[resource][option]['type'] == 'text':
+                    click.secho(f'{option} = ___', fg='cyan')
+                else:
+                    click.secho(f'{option} =', fg='cyan')
+                    for answer in resources[resource][option]['options']:
+                        click.echo(f'    ( ) {answer}',)
+
+    return print_resources_and_forms
+
+
+@cli.command(name='import-reservations', context_settings={'singular': True})
+@click.argument('reservation_file', type=click.File('rb'))
+@click.argument('option_file', type=click.File('rb'))
+@click.argument('mapping_yaml', type=click.File('rb'))
+@click.option('--dry-run', is_flag=True, default=False)
+def import_reservations(
+    reservation_file: IO[bytes],
+    option_file: IO[bytes],
+    mapping_yaml: IO[bytes],
+    dry_run: bool
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Imports reservations from a Excel file (needs to be .xlsx).
+    Creates no resources or allocations, so the availabilty periods need to
+    be set in the resource settings.
+    """
+
+    def import_reservations(request: OrgRequest, app: OrgApp) -> None:
+
+        class Reservation(TypedDict):
+            general: dict[str, Any]
+            fields: dict[str, Any]
+            dates: list[Any]
+
+        yaml_file = mapping_yaml.read()
+        yaml_dict = yaml.safe_load(yaml_file)
+        shared_fields = yaml_dict.get('shared_fields', {})
+        resource_options = yaml_dict.get('resource_options', {})
+
+        book = load_workbook(reservation_file)
+        sheet = book['Reservationsdaten']
+
+        book_options = load_workbook(option_file)
+        sheet_options = book_options['Reservationen']
+
+        reservations: dict[
+            str, dict[str, Reservation]] = {}
+        count = 0
+        last_reservation_id = ''
+        for index, row in enumerate(sheet.rows):
+            if index <= 3:  # Skip the first 3 rows, they are headers
+                continue
+
+            reservation: Reservation = {
+                'general': {},
+                'fields': {},
+                'dates': []
+            }
+            row_empty: bool = True
+            id = ''
+            resource_name = ''
+
+            for i, cell in enumerate(row):
+                value = cell.value
+                if i == 0:
+                    if value is None:
+                        continue
+                    row_empty = False
+                    resource_name = str(value)
+                elif i == 3:
+                    id = str(value)
+                    if last_reservation_id == id:
+                        reservation = reservations[resource_name][id]
+                elif i == 6 or i == 8:
+                    reservation['dates'].append(value)
+                elif i == 22:
+                    if value is None:
+                        value = 'info@seantis.ch'
+                    reservation['general']['email'] = value
+                elif i in shared_fields:
+                    value = str(value or '-')
+                    key = shared_fields[i]
+                    if reservation['fields'].get(key) is None:
+                        reservation['fields'][key] = value
+                    elif value not in reservation['fields'][key]:
+                        if i == 17 or i == 18:
+                            reservation['fields'][key] += f' {value}'
+                        else:
+                            reservation['fields'][key] += f', {value}'
+
+            if not row_empty:
+                # Check if the dates spread across multiple days
+                start = reservation['dates'][-2]
+                end = reservation['dates'][-1]
+                if start.day != end.day:
+                    days = (end - start).days + 1
+                    for day in range(days):
+                        reservation['dates'].insert(
+                            -1, start + timedelta(days=day)
+                        ) if day != 0 else None
+                        end_of_day = datetime.combine(
+                            start, end.time()
+                        )
+                        reservation['dates'].insert(
+                            -1, end_of_day + timedelta(days=day)
+                        ) if day != days - 1 else None
+                count += 1
+                if resource_name not in reservations:
+                    reservations[resource_name] = {}
+
+                if id not in reservations[resource_name] and (
+                    id != last_reservation_id
+                ):
+                    reservations[resource_name][id] = reservation
+                last_reservation_id = id or ''
+
+        options_count = 0
+        options_not_found = set()
+        for index, row in enumerate(sheet_options.rows):
+            row_empty = True
+            if index <= 3:
+                continue
+            for i, cell in enumerate(row):
+                value = cell.value
+                if value is None:
+                    continue
+                row_empty = False
+                options_count += 1
+                if i == 0:
+                    resource_name = str(value)
+                elif i == 2:
+                    id = str(value)
+                elif resource_name in reservations:
+                    if id in reservations[resource_name]:
+                        if i == 13:  # Option name
+                            key = resource_options[resource_name][
+                                'options'].get(value)
+                            if key is None:
+                                options_not_found.add(
+                                    f'{resource_name}: {value}')
+                        if i == 14:  # Option answer
+                            if key is not None:
+                                reservation = reservations[resource_name][id]
+                                if reservation['fields'].get(key) is None:
+                                    reservation['fields'][key] = value
+        for option in options_not_found:
+            click.secho(f'Option not found in the mapping file: {option}',
+                        fg='yellow')
+
+        if dry_run:
+            res_show = json.dumps(reservations, indent=4, default=str)
+            click.secho(f'Reservations: {res_show}', fg='green')
+
+        # Create reservations
+        if not dry_run:
+            resources = ResourceCollection(app.libres_context)
+            for resource_name in reservations.keys():
+
+                real_resource_name = resource_options[resource_name]['name']
+                resource = resources.by_name(real_resource_name.lower())
+
+                if not resource:
+                    click.echo(
+                        f'Resource {resource} not found in the database'
+                    )
+                    continue
+
+                click.echo(
+                    f'Importing reservations for {resource.title}'
+                )
+                scheduler = resource.scheduler
+
+                for id, reservation in reservations[resource_name].items():
+                    found_conflict = False
+                    session_id = uuid4()
+                    for n in range(int(len(reservation['dates'])/2)):
+                        email = reservation['general'].get('email')
+                        start = reservation['dates'][n*2]
+                        end = reservation['dates'][n*2+1]
+
+                        try:
+                            token_uuid = scheduler.reserve(
+                                email=str(email),
+                                dates=(start, end),
+                                session_id=session_id,
+                                single_token_per_session=True,
+                                data={'accepted': True}
+                            )
+                            token = token_uuid.hex
+                        except InvalidEmailAddress:
+                            abort(f'{email} is an invalid e-mail address')
+                        except AlreadyReservedError:
+                            found_conflict = True
+                            click.secho(
+                                f'Booking conflict in {resource.title} '
+                                f'at {start}', fg='red')
+                        except TimerangeTooLong:
+                            found_conflict = True
+                            click.secho(
+                                f'Timerange too long in {resource.title} '
+                                f'at {start} - {end}', fg='red')
+                            rules = resource.content['rules']
+                            relevant_rules = []
+                            for rule in rules:
+                                rule = rule['options']
+                                if rule['start'] <= start.date(
+                                ) and rule['end'] >= end.date(
+                                ) and start.weekday(
+                                ) not in rule['except_for'] and start.time(
+                                ) <= rule['start_time'] and end.time(
+                                ) >= rule['end_time']:
+                                    relevant_rules.append(rule)
+                            for i, rule in enumerate(relevant_rules):
+                                start = datetime.combine(
+                                    start.date(), rule['start_time'])
+                                end = datetime.combine(
+                                    end.date(), rule['end_time'])
+                                token_uuid = scheduler.reserve(
+                                    email=str(email),
+                                    dates=(start, end),
+                                    session_id=session_id,
+                                    single_token_per_session=True,
+                                    data={'accepted': True}
+                                )
+                                token = token_uuid.hex
+                            if not relevant_rules:
+                                click.secho(
+                                    f'No rules found for {resource.title} '
+                                    f'at {start}', fg='red')
+
+                    if found_conflict:
+                        continue
+
+                    assert resource.form_class is not None
+                    forms = FormCollection(app.session())
+
+                    form_data = {}
+                    for key, value in reservation['fields'].items():
+                        form_data[key] = str(value)
+
+                    form = resource.form_class(data=form_data)
+
+                    if not form.validate():
+                        abort(f'{form_data} failed the form check'
+                            f' with {form.errors}')
+
+                    submission = forms.submissions.add_external(
+                        form=form,
+                        state='pending',
+                        id=token_uuid
+                    )
+
+                    scheduler.queries.confirm_reservations_for_session(
+                        session_id)
+                    scheduler.approve_reservations(token_uuid)
+
+                    forms.submissions.complete_submission(submission)
+
+                    users = UserCollection(app.session())
+                    user = users.query().filter(
+                        User.username == 'info@seantis.ch').first()
+
+                    if not user:
+                        abort('info@seantis.ch not found in users')
+
+                    with forms.session.no_autoflush:
+                        ticket = TicketCollection(request.session).open_ticket(
+                            handler_code='RSV', handler_id=token
+                        )
+                        ticket.accept_ticket(user)
+                        ticket.close_ticket()
+
+                    click.secho(f'Sucessfully imported reservation {id}',
+                                fg='green')
+
+    return import_reservations
+
+
+@cli.command(context_settings={'default_selector': '*'})
+@click.argument('year', type=click.IntRange(1900, date.today().year))
+@click.argument('month', type=click.IntRange(1, 12))
+@pass_group_context
+def mtan_statistics(
+    group_context: GroupContext,
+    year: int,
+    month: int,
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Generate mTAN SMS statistics for the given year and month. """
+
+    if date(year, month, 1) >= date.today().replace(day=1):
+        abort('Year and month needs to be fully in the past')
+
+    def mtan_statistics(request: OrgRequest, app: OrgApp) -> None:
+        mtan_count: int = request.session.query(
+            func.count(TAN.id)
+        ).filter(and_(
+            func.extract('year', TAN.created) == year,
+            func.extract('month', TAN.created) == month,
+            TAN.meta['mobile_number'].isnot(None)
+        )).scalar()
+        if mtan_count:
+            org_name = app.org.name if hasattr(app, 'org') else None
+            title = f'{org_name} ({app.schema})' if org_name else app.schema
+            click.echo(
+                f'{title}: '
+                f'Sent {mtan_count} mTAN SMS'
+            )
+
+    return mtan_statistics
+
+
+@cli.command(name='correct-submission-definitions')
+@pass_group_context
+def correct_definition_for_submissions(
+    group_context: GroupContext
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    ogc-2315 Correct definition of submissions for resource
+    `Singsaal Sunnegrund 4` for Steinhausen.
+    """
+
+    def correct_submission_definition(
+        request: OrgRequest,
+        app: OrgApp
+    ) -> None:
+
+        from onegov.form import FormSubmission
+
+        patterns = [
+            (r'\[ \] Stühle  Anzahl  Bemerkungen = ...',
+             r'[ ] Stühle Anzahl Bemerkungen'),
+            (r'\[ \] Esstische  Anzahl Bemerkungen = ...',
+             r'[ ] Esstische Anzahl Bemerkungen'),
+        ]
+
+        session = request.session
+        query = session.query(FormSubmission).filter(
+            FormSubmission.definition.like(
+                '%Stühle  Anzahl  Bemerkungen = ...%') |
+            FormSubmission.definition.like(
+                '%Esstische  Anzahl Bemerkungen = ...%')
+        )
+        count = query.count()
+
+        for submission in query.all():
+            for pattern, repl in patterns:
+                if re.search(pattern, submission.definition):
+                    submission.definition = (
+                        re.sub(pattern, repl, submission.definition))
+                    click.echo(
+                        f'Correct pattern in submission id {submission.id}')
+
+        click.echo(f'Corrected {count} submissions')
+        session.flush()
+
+    return correct_submission_definition
+
+
+@cli.command(name='correct-submission-definitions-2')
+def correct_definition_for_submissions_2(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    ogc-2315 Correct definition of submissions for resource
+    `Singsaal Sunnegrund 4` for Steinhausen.
+
+    Round 2: Also `Anzahl und Bemerkungen` need to be removed.
+    """
+
+    def correct_submission_definition(
+        request: OrgRequest,
+        app: OrgApp
+    ) -> None:
+
+        from onegov.form import FormSubmission
+
+        patterns = [
+            (r'\[ \] Stühle Anzahl Bemerkungen', r'[ ] Stühle'),
+            (r'\[ \] Esstische Anzahl Bemerkungen', r'[ ] Esstische'),
+        ]
+
+        session = request.session
+        query = session.query(FormSubmission).filter(
+            FormSubmission.definition.like(
+                '%Stühle Anzahl Bemerkungen%') |
+            FormSubmission.definition.like(
+                '%Esstische Anzahl Bemerkungen%')
+        )
+        count = query.count()
+
+        for submission in query.all():
+            for pattern, repl in patterns:
+                if re.search(pattern, submission.definition):
+                    submission.definition = (
+                        re.sub(pattern, repl, submission.definition))
+                    click.echo(
+                        f'Correct pattern in submission id {submission.id}')
+
+        click.echo(f'Corrected {count} submissions')
+        session.flush()
+
+    return correct_submission_definition

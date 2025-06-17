@@ -3084,7 +3084,54 @@ button {
     to {box-shadow: none;}
 }
 
-.calendar {
+.occupancy-calendar {
+    .fc-view:not(.fc-list-view) {
+        .event-accepted,
+        .event-accepted .fc-bg,
+        .event-accepted .fc-content {
+            background-color: $blue-dark;
+        }
+
+        .event-pending,
+        .event-pending .fc-bg,
+        .event-pending .fc-content {
+            background-color: lighten(desaturate($blue-dark, 50%), 10%);
+        }
+    }
+
+    .fc-event {
+        padding: 0 !important;
+    }
+
+    .fc-event .fc-content {
+        padding: 2px 4px;
+        border-top-right-radius: 1.2rem;
+
+        &::first-line {
+            font-weight: bold;
+        }
+    }
+
+    .fc-list-item-title::first-line {
+        font-weight: bold;
+    }
+
+    &[data-editable="true"] .fc-list-item {
+        cursor: pointer;
+    }
+
+    .fc-event .fc-bg {
+        opacity: 1;
+        border-top-right-radius: 1.5rem;
+    }
+
+    .fc-bgevent {
+        background-color: $green;
+        opacity: .15;
+    }
+}
+
+.calendar, .occupancy-calendar {
 
     margin-bottom: 1.5rem;
 
@@ -3290,26 +3337,26 @@ button {
     Fullcalendar responsive design
 */
 @media #{$small-up} {
-    .fc .fc-toolbar {
+    .calendar .fc .fc-toolbar {
         width: 100%;
     }
 }
 
 @media #{$large-up} {
-    .fc .fc-toolbar {
+    .calendar .fc .fc-toolbar {
         width: 80%;
     }
 }
 
 @media (max-width: 850px) {
-    .fc-center {
+    .calendar .fc-center {
         display: block;
         width: 100%;
     }
 }
 
 @media (min-width: 850px) {
-    .fc-center {
+    .calendar .fc-center {
         display: inline-block;
         width: 40%;
     }
@@ -4192,7 +4239,7 @@ ul.search-results {
         width: 20%;
     }
 
-    .fc-view-container,
+    .calendar .fc-view-container,
     .reservation-list {
         display: inline-block;
         float: left;
@@ -4209,7 +4256,7 @@ ul.search-results {
         }
     }
 
-    .fc-view-container,
+    .calendar .fc-view-container,
     .reservation-list {
         width: 75%;
     }
@@ -4222,7 +4269,7 @@ ul.search-results {
         width: 100%;
     }
 
-    .fc-view-container,
+    .calendar .fc-view-container,
     .reservation-list {
         display: block;
         width: 100%;
@@ -6925,4 +6972,31 @@ pre code,
 code {
     padding: $code-padding-inline;
     display: inline;
+}
+
+// confirm scrollable list
+.confirm-list {
+    margin-bottom: 1rem;
+    max-height: 40vh;
+    overflow: auto;
+    padding: 10px;
+
+    ul {
+        margin-bottom: 0;
+    }
+}
+
+.button.alert.yes.disabled {
+    cursor: not-allowed !important;
+    opacity: .6;
+}
+
+.scroll-hint {
+    color: #8e1c26;
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+p.full-text-width {
+    max-width: 100% !important;
 }
