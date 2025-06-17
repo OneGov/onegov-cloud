@@ -9,6 +9,7 @@ from onegov.core.upgrade import upgrade_task
 from onegov.ticket import Ticket
 from sqlalchemy import Boolean, Column, Integer, Text, Enum
 from sqlalchemy import column, update, func, and_, true, false
+from sqlalchemy.orm import load_only
 from sqlalchemy.dialects.postgresql import HSTORE
 
 from typing import TYPE_CHECKING
@@ -256,6 +257,16 @@ def add_ticket_email_column_and_index(context: UpgradeContext) -> None:
     # bother with closed/archived tickets without a snapshot
     for ticket in (
         context.session.query(Ticket)
+        # Use load_only to prevent 'UndefinedColumn column tickets.closed_on
+        # does not exist' under certain conditions
+        .options(load_only(
+            Ticket.id,  # Primary key, always loaded but good to be explicit
+            Ticket.handler_code,  # For ticket.handler
+            Ticket.handler_id,  # For ticket.handler
+            Ticket.snapshot,  # Potentially used by handler.email
+            Ticket.state,  # Used in filter
+            Ticket.ticket_email  # Used in filter and for assignment
+        ))
         .filter(Ticket.ticket_email.is_(None))
         .filter(Ticket.state.in_(['open', 'pending']))
     ):
