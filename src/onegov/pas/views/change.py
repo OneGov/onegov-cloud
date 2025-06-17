@@ -5,7 +5,7 @@ from onegov.pas import PasApp
 from onegov.pas.collections import ChangeCollection
 from onegov.pas.layouts import ChangeCollectionLayout
 from onegov.pas.layouts import ChangeLayout
-from onegov.pas.models import Change
+from onegov.pas.models import PASChange
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -33,12 +33,12 @@ def view_changes(
 
 
 @PasApp.html(
-    model=Change,
+    model=PASChange,
     template='change.pt',
     permission=Private
 )
 def view_change(
-    self: Change,
+    self: PASChange,
     request: TownRequest
 ) -> RenderData:
 

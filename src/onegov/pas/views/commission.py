@@ -11,9 +11,9 @@ from onegov.pas.forms import CommissionMembershipAddForm
 from onegov.pas.forms import CommissionForm
 from onegov.pas.layouts import CommissionCollectionLayout
 from onegov.pas.layouts import CommissionLayout
-from onegov.pas.models import Change
-from onegov.pas.models import Commission
-from onegov.pas.models import CommissionMembership
+from onegov.pas.models import PASChange
+from onegov.pas.models import PASCommission
+from onegov.pas.models import PASCommissionMembership
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -87,12 +87,12 @@ def add_commission(
 
 
 @PasApp.html(
-    model=Commission,
+    model=PASCommission,
     template='commission.pt',
     permission=Private
 )
 def view_commission(
-    self: Commission,
+    self: PASCommission,
     request: TownRequest
 ) -> RenderData:
 
@@ -106,14 +106,14 @@ def view_commission(
 
 
 @PasApp.form(
-    model=Commission,
+    model=PASCommission,
     name='edit',
     template='form.pt',
     permission=Private,
     form=CommissionForm
 )
 def edit_commission(
-    self: Commission,
+    self: PASCommission,
     request: TownRequest,
     form: CommissionForm
 ) -> RenderData | Response:
@@ -139,12 +139,12 @@ def edit_commission(
 
 
 @PasApp.view(
-    model=Commission,
+    model=PASCommission,
     request_method='DELETE',
     permission=Private
 )
 def delete_commission(
-    self: Commission,
+    self: PASCommission,
     request: TownRequest
 ) -> None:
 
@@ -155,21 +155,21 @@ def delete_commission(
 
 
 @PasApp.form(
-    model=Commission,
+    model=PASCommission,
     name='new-membership',
     template='form.pt',
     permission=Private,
     form=CommissionMembershipAddForm
 )
 def add_commission_membership(
-    self: Commission,
+    self: PASCommission,
     request: TownRequest,
     form: CommissionMembershipAddForm
 ) -> RenderData | Response:
 
     if form.submitted(request):
         self.memberships.append(
-            CommissionMembership(**form.get_useful_data())
+            PASCommissionMembership(**form.get_useful_data())
         )
         request.success(_('Added a new parliamentarian'))
         return request.redirect(request.link(self))
@@ -187,14 +187,14 @@ def add_commission_membership(
 
 
 @PasApp.form(
-    model=Commission,
+    model=PASCommission,
     name='add-attendence',
     template='form.pt',
     permission=Private,
     form=AttendenceAddCommissionForm
 )
 def add_plenary_attendence(
-    self: Commission,
+    self: PASCommission,
     request: TownRequest,
     form: AttendenceAddCommissionForm
 ) -> RenderData | Response:
@@ -208,7 +208,7 @@ def add_plenary_attendence(
                 parliamentarian_id=parliamentarian_id,
                 **data
             )
-            Change.add(request, 'add', attendence)
+            PASChange.add(request, 'add', attendence)
         request.success(_('Added commission meeting'))
 
         return request.redirect(request.link(self))

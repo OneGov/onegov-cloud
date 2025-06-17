@@ -784,6 +784,7 @@ class ReservationEventInfo:
             f'{self.translate(_("Quota"))}: {self.quota}'
             if getattr(self.resource, 'show_quota', False) else '',
             self.ticket.tag,
+            self.reservation.email,
             self.translate(_('Pending approval')) if not self.accepted else '',
         ) if part)
 

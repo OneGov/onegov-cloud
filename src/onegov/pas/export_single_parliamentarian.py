@@ -11,14 +11,15 @@ from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration,
 )
-from onegov.pas.models.attendence import TYPES, Attendence
+from onegov.parliament.models.attendence import TYPES
+from onegov.pas.models.attendence import PASAttendence
 from datetime import date  # noqa: TC003
 from onegov.pas.utils import format_swiss_number
 
 
 from typing import TYPE_CHECKING, Literal, TypedDict
 if TYPE_CHECKING:
-    from onegov.pas.models import Parliamentarian, RateSet
+    from onegov.pas.models import PASParliamentarian, RateSet
     from onegov.pas.models.settlement_run import SettlementRun
 
 
@@ -51,7 +52,7 @@ if TYPE_CHECKING:
 def generate_parliamentarian_settlement_pdf(
     settlement_run: SettlementRun,
     request: TownRequest,
-    parliamentarian: Parliamentarian,
+    parliamentarian: PASParliamentarian,
 ) -> bytes:
     """Generate PDF for parliamentarian settlement data."""
     font_config = FontConfiguration()
@@ -281,7 +282,7 @@ th, td {
 def _get_parliamentarian_settlement_data(
     settlement_run: SettlementRun,
     request: TownRequest,
-    parliamentarian: Parliamentarian,
+    parliamentarian: PASParliamentarian,
     rate_set: RateSet,
 ) -> dict[str, list[ParliamentarianEntry]]:
     """Get settlement data for a specific parliamentarian."""
@@ -294,7 +295,7 @@ def _get_parliamentarian_settlement_data(
             date_to=settlement_run.end,
         )
         .query()
-        .filter(Attendence.parliamentarian_id == parliamentarian.id)
+        .filter(PASAttendence.parliamentarian_id == parliamentarian.id)
     )
 
     result = []
