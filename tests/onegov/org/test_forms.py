@@ -19,6 +19,7 @@ from onegov.org.forms import RoomAllocationForm
 from onegov.org.forms import TicketAssignmentForm
 from onegov.org.forms.allocation import AllocationFormHelpers
 from onegov.org.forms.settings import OrgTicketSettingsForm
+from onegov.reservation import ResourceCollection
 from onegov.ticket import Ticket, TicketPermission
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
@@ -641,6 +642,13 @@ def test_user_group_form(session):
         )
     )
 
+    resources = ResourceCollection(session)
+    resource = resources.add(
+        title='Kitchen',
+        type='room',
+        timezone='Europe/Zurich'
+    )
+
     formdefinition_ticket = Ticket(
         number='1',
         title='Existing FRM',
@@ -665,10 +673,19 @@ def test_user_group_form(session):
         handler_id='deleted-id-2'
     )
 
+    deleted_reservation_ticket = Ticket(
+        number='3',
+        title='Deleted RSV',
+        group='Deleted',
+        handler_code='RSV',
+        handler_id='deleted-id-3'
+    )
+
 
     session.add_all((
-        formdefinition, directory, formdefinition_ticket,
-        deleted_formdefinition_ticket, deleted_directory_ticket
+        formdefinition, directory, resource, formdefinition_ticket,
+        deleted_formdefinition_ticket, deleted_directory_ticket,
+        deleted_reservation_ticket
     ))
     session.flush()
 
@@ -689,13 +706,17 @@ def test_user_group_form(session):
     ]
     assert ('EVN', 'EVN') in form.ticket_permissions.choices
     assert ('FRM', 'FRM') in form.ticket_permissions.choices
+    assert ('RSV', 'RSV') in form.ticket_permissions.choices
     # make sure distinct union query works
     assert form.ticket_permissions.choices.count(('FRM-A-1', 'FRM: A-1')) == 1
     assert ('FRM-A-2', 'FRM: A-2') in form.ticket_permissions.choices
+    assert ('FRM-Deleted', 'FRM: Deleted') in form.ticket_permissions.choices
     assert ('PER', 'PER') in form.ticket_permissions.choices
     assert ('DIR', 'DIR') in form.ticket_permissions.choices
     assert ('DIR-Trainers', 'DIR: Trainers') in form.ticket_permissions.choices
     assert ('DIR-Deleted', 'DIR: Deleted') in form.ticket_permissions.choices
+    assert ('RSV-Kitchen', 'RSV: Kitchen') in form.ticket_permissions.choices
+    assert ('RSV-Deleted', 'RSV: Deleted') in form.ticket_permissions.choices
     assert ('EVN', 'EVN') in form.immediate_notification.choices
     assert ('FRM', 'FRM') in form.immediate_notification.choices
     assert ('FRM-A-1', 'FRM: A-1') in form.immediate_notification.choices
@@ -707,6 +728,12 @@ def test_user_group_form(session):
     ) in form.immediate_notification.choices
     assert (
         'DIR-Deleted', 'DIR: Deleted'
+    ) in form.immediate_notification.choices
+    assert (
+        'RSV-Kitchen', 'RSV: Kitchen'
+    ) in form.immediate_notification.choices
+    assert (
+        'RSV-Deleted', 'RSV: Deleted'
     ) in form.immediate_notification.choices
 
     # apply / update
@@ -722,7 +749,7 @@ def test_user_group_form(session):
     form.name.data = 'A/B'
     form.name.raw_data = ['A/B']
     form.users.data = [str(user_a.id), str(user_b.id)]
-    form.ticket_permissions.data = ['EVN', 'FRM-A-1']
+    form.ticket_permissions.data = ['EVN', 'FRM-A-1', 'RSV-Kitchen']
     form.immediate_notification.data = ['EVN', 'DIR-Trainers']
     assert form.validate()
 
@@ -737,7 +764,9 @@ def test_user_group_form(session):
     form.apply_model(group)
     assert form.name.data == 'A/B'
     assert set(form.users.data) == {str(user_a.id), str(user_b.id)}
-    assert set(form.ticket_permissions.data) == {'EVN', 'FRM-A-1'}
+    assert set(form.ticket_permissions.data) == {
+        'EVN', 'FRM-A-1', 'RSV-Kitchen'
+    }
     assert set(form.immediate_notification.data) == {'EVN', 'DIR-Trainers'}
 
     user_a.logout_all_sessions.reset_mock()

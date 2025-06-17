@@ -9,10 +9,9 @@ from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import TagsField
 from onegov.form.filters import yubikey_identifier
 from onegov.org import _
-from onegov.ticket import handlers
-from onegov.user import User, UserGroup
-from onegov.ticket import Ticket, TicketPermission
-from onegov.user import UserCollection
+from onegov.reservation import Resource
+from onegov.ticket import handlers, Ticket, TicketPermission
+from onegov.user import User, UserCollection, UserGroup
 from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
 from wtforms.fields import RadioField
@@ -238,6 +237,21 @@ class ManageUserGroupForm(Form):
             ).union(
                 self.request.session.query(Ticket.group.label('group'))
                 .filter(Ticket.handler_code == 'FRM')
+                .filter(Ticket.group.isnot(None))
+                .distinct()
+            ).order_by('group').distinct()
+        )
+        ticket_choices.extend(
+            (f'RSV-{group}', f'RSV: {group}')
+            for group, in self.request.session.query(
+                Resource.title.label('group')
+            # some groups may get deleted, but as long as there are tickets
+            # we need a corresponding permission
+            ).union(
+                self.request.session.query(
+                    Ticket.group.label('group')
+                )
+                .filter(Ticket.handler_code == 'RSV')
                 .filter(Ticket.group.isnot(None))
                 .distinct()
             ).order_by('group').distinct()
