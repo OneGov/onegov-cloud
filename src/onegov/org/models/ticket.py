@@ -535,6 +535,7 @@ class ReservationHandler(Handler):
                 'reservations': self.reservations,
                 'get_links': self.get_reservation_links
                 if self.ticket.state == 'pending' else None,
+                'get_occupancy_url': self.get_occupancy_url,
                 'layout': layout
             })
         )
@@ -672,6 +673,26 @@ class ReservationHandler(Handler):
             ))
 
         return links
+
+    def get_occupancy_url(
+        self,
+        reservation: Reservation,
+        request: OrgRequest
+    ) -> str | None:
+
+        if self.deleted:
+            return None
+
+        assert self.resource is not None
+        return request.class_link(
+            Resource,
+            {
+                'name': self.resource.name,
+                'date': reservation.display_start(),
+                'view': 'agendaDay'
+            },
+            name='occupancy'
+        )
 
     def get_links(  # type:ignore[override]
         self,
