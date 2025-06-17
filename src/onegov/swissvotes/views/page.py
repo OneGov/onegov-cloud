@@ -180,7 +180,7 @@ def view_page(
     return {
         'layout': layout,
         'files': file_urls,
-        'slides': sample(layout.slides, len(layout.slides))
+        'slides': sample(layout.slides, len(layout.slides))  # nosec: B311
     }
 
 

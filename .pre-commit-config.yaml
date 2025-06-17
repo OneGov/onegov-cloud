@@ -35,14 +35,14 @@ repos:
         - stylelint@16.19.1
         - stylelint-config-standard-scss@15.0.0
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.28.0
+    rev: v9.29.0
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'
       additional_dependencies:
       - eslint-react
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.8.3
+    rev: 1.8.5
     hooks:
       - id: bandit
         args: ["-c", "pyproject.toml", "--quiet"]
