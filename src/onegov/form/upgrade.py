@@ -208,4 +208,5 @@ def remove_no_overlapping_submission_windows_constraint(
 @upgrade_task('Remove state column form survey submissions')
 def remove_state_from_survey_submissions(context: UpgradeContext) -> None:
     if context.has_table('survey_submissions'):
-        context.operations.drop_column('survey_submissions', 'state')
+        if context.has_column('survey_submissions', 'state'):
+            context.operations.drop_column('survey_submissions', 'state')
