@@ -51,3 +51,12 @@ def add_enabled_to_payment_providers(context: UpgradeContext) -> None:
             column=Column('enabled', Boolean, nullable=False),
             default=True
         )
+
+
+@upgrade_task('Add fractured state to payments')
+def add_fractured_state_to_payments(context: UpgradeContext) -> None:
+    if context.has_table('payments'):
+        context.operations.execute(
+            "ALTER TYPE payment_state ADD VALUE IF NOT EXISTS 'fractured'"
+        )
+
