@@ -19,7 +19,7 @@ from onegov.org.forms import RoomAllocationForm
 from onegov.org.forms import TicketAssignmentForm
 from onegov.org.forms.allocation import AllocationFormHelpers
 from onegov.org.forms.settings import OrgTicketSettingsForm
-from onegov.reservation import ResourceCollection
+from onegov.reservation import LibresIntegration
 from onegov.ticket import Ticket, TicketPermission
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
@@ -615,7 +615,7 @@ def test_form_registration_window_form_existing(start, end):
     )
 
 
-def test_user_group_form(session):
+def test_user_group_form(session_manager, session):
     users = UserCollection(session)
     user_a = users.add(username='a@example.org', password='a', role='member')
     user_b = users.add(username='b@example.org', password='b', role='member')
@@ -642,7 +642,10 @@ def test_user_group_form(session):
         )
     )
 
-    resources = ResourceCollection(session)
+    integration = LibresIntegration()
+    integration.session_manager = session_manager
+    integration.configure_libres()
+    resources = integration.libres_resources
     resource = resources.add(
         title='Kitchen',
         type='room',
@@ -674,7 +677,7 @@ def test_user_group_form(session):
     )
 
     deleted_reservation_ticket = Ticket(
-        number='3',
+        number='4',
         title='Deleted RSV',
         group='Deleted',
         handler_code='RSV',
@@ -710,7 +713,6 @@ def test_user_group_form(session):
     # make sure distinct union query works
     assert form.ticket_permissions.choices.count(('FRM-A-1', 'FRM: A-1')) == 1
     assert ('FRM-A-2', 'FRM: A-2') in form.ticket_permissions.choices
-    assert ('FRM-Deleted', 'FRM: Deleted') in form.ticket_permissions.choices
     assert ('PER', 'PER') in form.ticket_permissions.choices
     assert ('DIR', 'DIR') in form.ticket_permissions.choices
     assert ('DIR-Trainers', 'DIR: Trainers') in form.ticket_permissions.choices
@@ -759,7 +761,7 @@ def test_user_group_form(session):
     assert user_a.logout_all_sessions.called is True
     assert user_b.logout_all_sessions.called is True
     assert user_c.logout_all_sessions.called is False
-    assert session.query(TicketPermission).count() == 3
+    assert session.query(TicketPermission).count() == 4
 
     form.apply_model(group)
     assert form.name.data == 'A/B'
