@@ -28,7 +28,7 @@ from datetime import date
 
 
 from typing import Any, TYPE_CHECKING
-if TYPE_CHECKING:
+if TYPE_CHECKING: # pragma: no cover
     from collections.abc import Callable, Sequence # type: ignore[attr-defined]
     from datetime import datetime
     from onegov.core.types import JSON_ro, RenderData
@@ -167,6 +167,38 @@ def mark_selected_payments_invoiced(
         'layout': layout or PaymentCollectionLayout(self, request),
         'payments': self.batch,
     }
+
+
+@OrgApp.json(
+    model=PaymentCollection,
+    name='batch-mark-invoiced',
+    request_method='POST',
+    permission=Private
+)
+def handle_batch_mark_payments_invoiced(
+    self: PaymentCollection,
+    request: OrgRequest
+) -> JSON_ro:
+    request.assert_valid_csrf_token()
+    payment_ids = request.json_body.get('payment_ids', [])
+
+    if not payment_ids:
+        return {'status': 'error', 'message': 'No payments selected.'}
+
+    payments_query = self.session.query(Payment).filter(
+        Payment.id.in_(payment_ids)
+    )
+    updated_count = 0
+    for payment in payments_query:
+        # Add any specific logic here if needed before changing state
+        # For example, check if the payment can be marked as invoiced
+        payment.state = 'invoiced'
+        updated_count += 1
+
+    if updated_count > 0:
+        request.success(_('${count} payments marked as invoiced.',
+                        mapping={'count': updated_count}))
+    return {'status': 'success', 'message': f'{updated_count} payments marked as invoiced.'}
 
 
 @OrgApp.form(
