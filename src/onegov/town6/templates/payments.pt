@@ -6,19 +6,8 @@
         <div metal:use-macro="layout.macros['form']" tal:define="form_two_columns True"/>
             <div class="filter-grid">
                 <div class="form-buttons">
-                    <button type="submit" class="button primary" i18n:translate="">Anwenden</button>
-                    <button type="button" id="exportPaymentsButton" class="button" i18n:translate="">Export Excel</button>
+                    <button type="button" id="exportPaymentsButton" class="button" i18n:translate="">Export Bill run as PDF</button>
                     <tal:block tal:condition="payments">
-                        <!--
-                            To enable batch actions, the payment list rendered by the
-                            layout.macros['payments'] macro needs to include checkboxes
-                            for each payment row.
-                            For example:
-                            <input type="checkbox" name="selected_payments" value="[payment_id_placeholder]"
-                                   aria-label="Select payment for batch action" />
-                            This checkbox should be in the first column of each payment row.
-                            The table header for this column could be a select-all checkbox.
-                        -->
                         <button type="button" class="button hollow batch-action-button" i18n:translate="">Ausgewählte als fakturiert markieren</button>
                     </tal:block>
                 </div>

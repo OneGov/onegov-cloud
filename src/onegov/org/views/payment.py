@@ -147,6 +147,30 @@ def view_payments(
 
 @OrgApp.form(
     model=PaymentCollection,
+    template='payments.pt',
+    form=PaymentSearchForm,
+    permission=Private
+)
+def mark_selected_payments_invoiced(
+    self: PaymentCollection,
+    request: OrgRequest,
+    form: PaymentSearchForm,
+    layout: PaymentCollectionLayout | None = None
+) -> RenderData:
+    layout = layout or PaymentCollectionLayout(self, request)
+
+
+
+    return {
+        'title': _('Receivables'),
+        'form': form,
+        'layout': layout or PaymentCollectionLayout(self, request),
+        'payments': self.batch,
+    }
+
+
+@OrgApp.form(
+    model=PaymentCollection,
     name='export',
     template='form.pt',
     permission=Private,

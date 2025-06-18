@@ -56,7 +56,7 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
     #: the state of the payment
     state: Column[PaymentState] = Column(
         Enum(  # type:ignore[arg-type]
-            'open', 'paid', 'failed', 'cancelled', 'fractured',
+            'open', 'paid', 'failed', 'cancelled', 'invoiced',
             name='payment_state'
         ),
         nullable=False,
