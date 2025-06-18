@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
 function setupXHREditPaymentStatus() {
 
     const markInvoicedButton = document.querySelector('.batch-action-button');
-    console.log('foo');
     if (markInvoicedButton) {
         markInvoicedButton.addEventListener('click', function() {
             const selectedPayments = [];
@@ -18,11 +17,14 @@ function setupXHREditPaymentStatus() {
                 return;
             }
 
-            fetch('${request.link(layout.model, "batch-mark-invoiced")}', {
+            const actionUrl = markInvoicedButton.dataset.actionUrl;
+            const csrfToken = markInvoicedButton.dataset.csrfToken;
+
+            fetch(actionUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-Token': '${layout.csrf_token}'
+                    'X-CSRF-Token': csrfToken
                 },
                 body: JSON.stringify({ payment_ids: selectedPayments })
             })

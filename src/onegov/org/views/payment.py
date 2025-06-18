@@ -154,7 +154,6 @@ def handle_batch_mark_payments_invoiced(
 ) -> JSON_ro:
     request.assert_valid_csrf_token()
     payment_ids = request.json_body.get('payment_ids', [])
-    breakpoint()
 
     if not payment_ids:
         return {'status': 'error', 'message': 'No payments selected.'}

@@ -7,8 +7,13 @@
             <div class="filter-grid">
                 <div class="form-buttons">
                     <button type="button" id="exportPaymentsButton" class="button" i18n:translate="">Export Bill run as PDF</button>
-                    <tal:block tal:condition="payments">
-                        <button type="button" class="button hollow batch-action-button" i18n:translate="">Ausgewählte als fakturiert markieren</button>
+                    <tal:block tal:condition="payments" >
+                        <button type="button"
+                                class="button hollow batch-action-button"
+                                i18n:translate=""
+                                data-action-url="${request.link(layout.model, 'batch-mark-invoiced')}"
+                                data-csrf-token="${layout.csrf_token}"
+                                >Ausgewählte als fakturiert markieren</button>
                     </tal:block>
                 </div>
             </div>
