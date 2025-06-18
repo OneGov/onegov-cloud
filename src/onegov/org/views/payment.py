@@ -24,20 +24,18 @@ from onegov.pay.models.payment_providers.worldline_saferpay import (
     SaferpayPayment)
 from onegov.ticket import Ticket, TicketCollection
 from webob import exc, Response as WebobResponse
-from datetime import date
 
 
 from typing import Any, TYPE_CHECKING
-if TYPE_CHECKING: # pragma: no cover
-    from collections.abc import Callable, Sequence # type: ignore[attr-defined]
+if TYPE_CHECKING:  # pragma: no cover
+    from collections.abc import Callable, Sequence  # type: ignore[attr-defined]
     from datetime import datetime
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
-    from onegov.pay.types import AnyPayableBase, PaymentState
+    from onegov.pay.types import AnyPayableBase
     from sqlalchemy.orm import Session
     from typing import type_check_only
     from webob import Response
-
 
     @type_check_only
     class PaymentExportForm(DateRangeForm, ExportForm):
@@ -126,7 +124,6 @@ def view_payments(
     if not form.errors:
         form.apply_model(self)
 
-
     tickets = TicketCollection(request.session)
     providers = {
         provider.id: provider
@@ -145,30 +142,6 @@ def view_payments(
     }
 
 
-@OrgApp.form(
-    model=PaymentCollection,
-    template='payments.pt',
-    form=PaymentSearchForm,
-    permission=Private
-)
-def mark_selected_payments_invoiced(
-    self: PaymentCollection,
-    request: OrgRequest,
-    form: PaymentSearchForm,
-    layout: PaymentCollectionLayout | None = None
-) -> RenderData:
-    layout = layout or PaymentCollectionLayout(self, request)
-
-
-
-    return {
-        'title': _('Receivables'),
-        'form': form,
-        'layout': layout or PaymentCollectionLayout(self, request),
-        'payments': self.batch,
-    }
-
-
 @OrgApp.json(
     model=PaymentCollection,
     name='batch-mark-invoiced',
@@ -181,6 +154,7 @@ def handle_batch_mark_payments_invoiced(
 ) -> JSON_ro:
     request.assert_valid_csrf_token()
     payment_ids = request.json_body.get('payment_ids', [])
+    breakpoint()
 
     if not payment_ids:
         return {'status': 'error', 'message': 'No payments selected.'}
