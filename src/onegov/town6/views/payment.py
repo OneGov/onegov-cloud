@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from onegov.core.security import Private
 from onegov.form import merge_forms
-from onegov.org.views.payment import view_payments, export_payments
+from onegov.org.views.payment import handle_batch_mark_payments_invoiced
+from onegov.org.views.payment import view_payments
+from onegov.org.views.payment import export_payments
 from onegov.town6 import TownApp
 from onegov.org.forms.payments_search_form import PaymentSearchForm
 from onegov.org.forms import DateRangeForm, ExportForm
@@ -15,6 +17,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.org.views.payment import PaymentExportForm
+    from onegov.server.types import JSON_ro
     from onegov.town6.request import TownRequest
     from webob import Response
 
@@ -32,6 +35,19 @@ def town_view_payments(
 ) -> RenderData:
     return view_payments(self, request, form,
                          PaymentCollectionLayout(self, request))
+
+
+@TownApp.json(
+    model=PaymentCollection,
+    name='batch-mark-invoiced',
+    request_method='POST',
+    permission=Private
+)
+def town_handle_batch_mark_payments_invoiced(
+    self: PaymentCollection,
+    request: TownRequest
+) -> JSON_ro:
+    return handle_batch_mark_payments_invoiced(self, request)
 
 
 @TownApp.form(

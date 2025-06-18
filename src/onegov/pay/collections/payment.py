@@ -5,10 +5,8 @@ from collections import defaultdict
 from libres.db.models import Reservation
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.pay.models import Payment
-from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
 from onegov.core.orm.types import UUID as onegovUUID
-from sqlalchemy.orm import undefer
 from sqlalchemy.sql.expression import cast
 
 
@@ -20,7 +18,6 @@ if TYPE_CHECKING:
     from decimal import Decimal
     from onegov.pay.types import AnyPayableBase, PaymentState
     from sqlalchemy.orm import Query, Session
-    from typing import Self
     from uuid import UUID
 
 
@@ -42,8 +39,8 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         page: int = 0,
         start: datetime | None = None,
         end: datetime | None = None,
-        ticket_start=None,
-        ticket_end=None,
+        ticket_start: datetime | None = None,
+        ticket_end: datetime | None =None,
         status: str | None = None,
         payment_type: str | None = None
     ):
@@ -115,19 +112,21 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         # Filter by ticket creation date - this is the complex part
         if self.ticket_start or self.ticket_end:
             # Join through reservations to tickets
+            # fixme: not sure why this is set... fi ticket_date not set in form
+            breakpoint()
             query = query.join(
-                Reservation, 
+                Reservation,
                 Payment.id == Reservation.payment_id
             ).join(
                 Ticket,
                 cast(Reservation.token, onegovUUID) == Ticket.handler_id
             )
-            
+
             if self.ticket_start:
                 query = query.filter(Ticket.created >= self.ticket_start)
             if self.ticket_end:
                 query = query.filter(Ticket.created <= self.ticket_end)
-                
+
         return query.order_by(Payment.created.desc())
 
     @property

@@ -4673,6 +4673,16 @@ ul.recipients {
             margin-right: .75ex;
         }
     }
+
+    &.payment-state-invoiced {
+        border: 1px solid $secondary-color;
+
+        &::before {
+            @include icon('\f570');
+            color: $warning-color;
+            margin-right: .75ex;
+        }
+    }
 }
 
 .tickets-table .payment-state {

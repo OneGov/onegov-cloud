@@ -2,8 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-06-11 13:31+0200"
-"PO-Revision-Date: 2022-03-15 10:21+0100\n"
+"POT-Creation-Date: 2025-06-18 15:50+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -12,7 +11,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
-"gengo-order-id: 7629695\n"
 "X-Generator: Poedit 3.0.1\n"
 
 #, python-format
@@ -107,6 +105,9 @@ msgstr "Fehlgeschlagen"
 
 msgid "Refunded"
 msgstr "Rückerstattet"
+
+msgid "Invoiced"
+msgstr "Fakturiert"
 
 msgid "Manual"
 msgstr "Manuell"
@@ -1260,6 +1261,30 @@ msgstr "- Oberste Ebene -"
 msgid "Invalid destination selected"
 msgstr "Ungültiger Zielort gewählt"
 
+msgid "From date"
+msgstr "Ab Datum"
+
+msgid "Filter Payments"
+msgstr "Zahlungen filtern"
+
+msgid "To date"
+msgstr "Bis Datum"
+
+msgid "Ticket created from date"
+msgstr "Ticket erstellt ab Datum"
+
+msgid "Filter by Ticket Date"
+msgstr "Nach Ticketdatum filtern"
+
+msgid "Filters payments by the creation date of their associated ticket."
+msgstr "Filtert Zahlungen nach dem Erstellungsdatum des zugehörigen Tickets."
+
+msgid "Ticket created to date"
+msgstr "Ticket erstellt bis Datum"
+
+msgid "Payment Type"
+msgstr "Zahlungsart"
+
 msgid "Salutation"
 msgstr "Anrede"
 
@@ -2114,8 +2139,19 @@ msgstr ""
 "Ungültiges Format. Bitte definieren Sie die Schlagworte und Metadaten "
 "entsprechend dem gegebenen Beispiel."
 
-msgid "Invalid price, needs to be a non-negative number."
-msgstr "Ungültiger Preis, muss eine nicht-negative Zahl sein."
+#, python-format
+msgid "Invalid price \"${price}\", needs to be a non-negative number."
+msgstr "Ungültiger Preis „{price} $“, muss eine nicht-negative Zahl sein."
+
+#, python-format
+msgid ""
+"Invalid color \"${color}\", needs to be a 3 or 6 digit hex code, e.g. "
+"\"ff9000\" for orange. If you use a \"#\" prefix, make sure to enclose the "
+"value in quotation marks."
+msgstr ""
+"Ungültige Farbe „${color}“, muss ein 3- oder 6-stelliger Hex-Code sein, z. "
+"B. „ff9000“ für Orange. Wenn Sie ein \"#\"-Präfix verwenden, stellen Sie "
+"sicher, dass Sie den Wert in Anführungszeichen einschließen."
 
 msgid "Enable newsletter"
 msgstr "Newsletter aktivieren"
@@ -3363,6 +3399,22 @@ msgstr "Anpassen"
 msgid "Accept all reservations"
 msgstr "Alle Reservationen annehmen"
 
+msgid "Send reservation summary"
+msgstr "Reservierungsübersicht senden"
+
+msgid "Do you really want to send a reservation summary?"
+msgstr "Möchten Sie wirklich eine Reservierungszusammenfassung senden?"
+
+msgid ""
+"This will always be sent via e-mail, even when ticket updates have been "
+"disabled. Make sure to only use this to inform customers, when significant "
+"changes have been made to the reservations, they need to be aware of."
+msgstr ""
+"Diese wird immer per E-Mail verschickt, auch wenn die Ticketaktualisierung "
+"deaktiviert wurde. Verwenden Sie dies nur, um Kunden zu informieren, wenn "
+"wichtige Änderungen an den Reservierungen vorgenommen wurden, die sie zur "
+"Kenntnis nehmen müssen."
+
 msgid "Details about the reservation"
 msgstr "Details zu Ihrer Reservation"
 
@@ -3551,10 +3603,17 @@ msgstr "Eine Nachricht kann nicht als Thema eingefügt werden"
 msgid "A Topic cannot be pasted as News"
 msgstr "Ein Thema kann nicht als News eingefügt werden"
 
-msgid "Please note that this page has subpages which will also be deleted!"
+msgid ""
+"Please note that this page has the following subpages which will also be "
+"deleted:"
 msgstr ""
-"Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
-"werden!"
+"Bitte beachten Sie, dass diese Seite folgende Unterseiten hat, die ebenfalls "
+"gelöscht werden:"
+
+msgid "Please scroll to the bottom to enable the confirm button."
+msgstr ""
+"Bitte scrollen Sie nach unten, um die Schaltfläche „Bestätigen“ zu "
+"aktivieren."
 
 msgid "This page can't be deleted."
 msgstr "Diese Seite kann nicht gelöscht werden."
@@ -4454,6 +4513,9 @@ msgstr ""
 "kontaktieren Sie bitte einen Administrator, damit er Sie aus der Liste "
 "entfernen kann."
 
+msgid "Pending approval"
+msgstr "Genehmigung ausstehend"
+
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr ""
 "Folgendes ist während des letzten Monats auf der ${org} Webseite geschehen:"
@@ -4587,6 +4649,15 @@ msgstr ""
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
+
+msgid "Here's a summary of your reservations:"
+msgstr "Hier ist eine Zusammenfassung Ihrer Reservierungen:"
+
+msgid "Changes to your submitted reservations:"
+msgstr "Änderungen an Ihren übermittelten Reservierungen:"
+
+msgid "Rejected"
+msgstr "Abgelehnt"
 
 msgid "You have a new ticket"
 msgstr "Sie haben ein neues Ticket"
@@ -4942,7 +5013,7 @@ msgid "Sent At"
 msgstr "Gesendet am"
 
 msgid "Response Data"
-msgstr "Response Data"
+msgstr "Antwortdaten"
 
 msgid "No notifications"
 msgstr "Keine Benachrichtigungen"
@@ -5005,15 +5076,6 @@ msgstr ""
 "Verfügbarkeitszeitraum erstellt wurden. Um diese Verfügbarkeiten wieder zu "
 "erstellen, klicken Sie auf \"Bearbeiten\" in der Verfügbarkeitszeitraum und "
 "danach auf \"Speichern\" ohne etwas zu ändern."
-
-msgid "Reservation is pending approval"
-msgstr "Diese Reservation wurde noch nicht akzeptiert"
-
-msgid "(${num_pending} pending approval)"
-msgstr "(${num_pending} noch nicht akzeptiert)"
-
-msgid "Utilised"
-msgstr "Ausgelastet"
 
 msgid "No recipients defined yet."
 msgstr "Es wurden noch keine Empfänger definiert."
@@ -6186,7 +6248,11 @@ msgid "Your payment has been refunded"
 msgstr "Ihre Zahlung wurde rückerstattet"
 
 msgid "Receivables"
-msgstr "Forderungen"
+msgstr "Belege"
+
+#, python-format
+msgid "${count} payments marked as invoiced."
+msgstr ""
 
 msgid "The ticket was marked as paid"
 msgstr "Das Ticket wurde als bezahlt markiert"
@@ -6457,6 +6523,12 @@ msgstr ""
 
 msgid "Reject all reservations with message"
 msgstr "Alle Reservationen absagen mit Kommentar"
+
+msgid "Reservation summary"
+msgstr "Reservierungszusammenfassung"
+
+msgid "Reservation not adjustable"
+msgstr "Reservierung nicht anpassbar"
 
 msgid "Adjust reservation"
 msgstr "Reservation Anpassen"
@@ -6888,6 +6960,23 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "Invalid price, needs to be a non-negative number."
+#~ msgstr "Ungültiger Preis, muss eine nicht-negative Zahl sein."
+
+#~ msgid "Please note that this page has subpages which will also be deleted!"
+#~ msgstr ""
+#~ "Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
+#~ "werden!"
+
+#~ msgid "Reservation is pending approval"
+#~ msgstr "Diese Reservation wurde noch nicht akzeptiert"
+
+#~ msgid "(${num_pending} pending approval)"
+#~ msgstr "(${num_pending} noch nicht akzeptiert)"
+
+#~ msgid "Utilised"
+#~ msgstr "Ausgelastet"
 
 #~ msgid ""
 #~ "Select a free time span in the calendar below to create an availability "

@@ -13,27 +13,34 @@ function setupXHREditPaymentStatus() {
             });
 
             if (selectedPayments.length === 0) {
-                alert(document.documentElement.lang === 'de' ? 'Bitte wählen Sie mindestens eine Zahlung aus.' : 'Please select at least one payment.');
+                alert(document.documentElement.lang === 'de-CH' ? 'Bitte wählen Sie mindestens eine Zahlung aus.' : 'Please select at least one payment.');
                 return;
             }
 
             const actionUrl = markInvoicedButton.dataset.actionUrl;
-            const csrfToken = markInvoicedButton.dataset.csrfToken;
-
             fetch(actionUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-Token': csrfToken
                 },
                 body: JSON.stringify({ payment_ids: selectedPayments })
             })
-            .then(response => response.json())
+            .then(async response => {
+                const text = await response.text();
+                try {
+                    console.log(text)
+                    const data = JSON.parse(text);
+                    window.location.reload();
+                } catch (e) {
+                    console.error('Response was not JSON:', text);
+                    alert(document.documentElement.lang === 'de-CH' ? 'Ein Fehler ist aufgetreten.' : 'An error occurred.');
+                }
+            })
             .then(data => {
                 window.location.reload();
             })
             .catch(error => {
-                alert(document.documentElement.lang === 'de' ? 'Ein Fehler ist aufgetreten.' : 'An error occurred.');
+                alert(document.documentElement.lang === 'de-CH' ? 'Ein Fehler ist aufgetreten.' : 'An error occurred.');
                 console.error('Error:', error);
             });
         });

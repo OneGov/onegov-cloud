@@ -33,7 +33,6 @@ from onegov.org.models.document_form import (
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
-from onegov.org.exports.base import OrgExport
 from onegov.org.models import ExportCollection, Editor
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile

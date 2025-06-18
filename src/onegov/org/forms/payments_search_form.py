@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from wtforms import DateField
 from onegov.form.core import Form
 from onegov.form.fields import SelectField, TimezoneDateTimeField
 from onegov.form.validators import StrictOptional

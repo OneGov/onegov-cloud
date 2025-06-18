@@ -116,6 +116,7 @@ def view_payments(
     layout: PaymentCollectionLayout | None = None
 ) -> RenderData | WebobResponse:
     layout = layout or PaymentCollectionLayout(self, request)
+    request.include('invoicing')
 
     if form.submitted(request):
         form.update_model(self)
@@ -152,26 +153,24 @@ def handle_batch_mark_payments_invoiced(
     self: PaymentCollection,
     request: OrgRequest
 ) -> JSON_ro:
+
     request.assert_valid_csrf_token()
     payment_ids = request.json_body.get('payment_ids', [])
-
-    if not payment_ids:
-        return {'status': 'error', 'message': 'No payments selected.'}
-
-    payments_query = self.session.query(Payment).filter(
+    payments_query = self.session.query(Payment).distinct().filter(
         Payment.id.in_(payment_ids)
     )
     updated_count = 0
     for payment in payments_query:
-        # Add any specific logic here if needed before changing state
-        # For example, check if the payment can be marked as invoiced
         payment.state = 'invoiced'
         updated_count += 1
 
     if updated_count > 0:
         request.success(_('${count} payments marked as invoiced.',
                         mapping={'count': updated_count}))
-    return {'status': 'success', 'message': f'{updated_count} payments marked as invoiced.'}
+
+    ok_message = _(f'{updated_count} payments marked as invoiced.')
+    return {'status': 'success', 
+            'message': ok_message}
 
 
 @OrgApp.form(
