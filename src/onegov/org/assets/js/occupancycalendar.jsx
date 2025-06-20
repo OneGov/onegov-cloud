@@ -426,9 +426,20 @@ oc.setupHistory = function(options) {
             return;
         }
 
+        var start = view.currentStart;
+        if (view.type === 'multiMonthYear') {
+            // instead use getDate and truncate to the current month
+            var current = view.calendar.getDate();
+            start = moment({
+                year: current.getFullYear(),
+                month: current.getMonth(),
+                day: 1
+            }).toDate();
+        }
+
         var url = new Url(window.location.href);
         url.query.view = view.type;
-        url.query.date = moment(view.currentStart).format('YYYYMMDD');
+        url.query.date = moment(start).format('YYYYMMDD');
 
         $('a.calendar-dependent').each(function(_ix, el) {
             var dependentUrl = new Url($(el).attr('href'));
@@ -440,7 +451,7 @@ oc.setupHistory = function(options) {
         var state = [
             {
                 'view': view.type,
-                'date': view.currentStart
+                'date': start
             },
             document.title + ' ' + view.title,
             url.toString()
