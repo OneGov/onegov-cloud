@@ -156,11 +156,11 @@ class ResourceBaseForm(Form):
     default_view = RadioField(
         label=_('Default view'),
         fieldset=_('View'),
-        default='agendaWeek',
+        default='timeGridWeek',
         validators=[InputRequired()],
         choices=(
-            ('agendaWeek', _('Week view')),
-            ('month', _('Month view')),
+            ('timeGridWeek', _('Week view')),
+            ('dayGridMonth', _('Month view')),
         ))
 
     kaba_components = ChosenSelectMultipleField(

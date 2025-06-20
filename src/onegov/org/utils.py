@@ -552,7 +552,7 @@ class AllocationEventInfo:
             {
                 'name': self.resource.name,
                 'date': self.allocation.display_start(),
-                'view': 'agendaDay'
+                'view': 'timeGridDay'
             },
             name='occupancy'
         )
@@ -620,11 +620,13 @@ class AllocationEventInfo:
             'start': self.event_start,
             'end': self.event_end,
             'title': self.event_title,
+            'classNames': list(self.event_classes),
+            'display': 'block',
+            # extended properties
             'wholeDay': self.allocation.whole_day,
             'partlyAvailable': self.allocation.partly_available,
             'quota': self.allocation.quota,
             'quotaLeft': self.quota_left,
-            'className': ' '.join(self.event_classes),
             'partitions': self.allocation.availability_partitions(),
             'actions': [
                 link(self.request)
@@ -679,7 +681,7 @@ class AvailabilityEventInfo:
             'start': self.event_start,
             'end': self.event_end,
             'editable': False,
-            'rendering': 'background',
+            'display': 'background',
         }
 
 
@@ -831,12 +833,14 @@ class ReservationEventInfo:
             'id': self.reservation.id,
             'start': self.event_start,
             'end': self.event_end,
-            'color': self.color,
+            'backgroundColor': self.color,
             'title': self.event_title,
+            'classNames': list(self.event_classes),
+            'url': self.request.link(self.ticket),
+            'display': 'block',
+            # extended properties
             'wholeDay': self.whole_day,
             'quota': self.reservation.quota,
-            'className': ' '.join(self.event_classes),
-            'url': self.request.link(self.ticket),
             'editable': self.editable,
             'editurl': self.request.csrf_protected_url(self.request.link(
                 self.ticket,

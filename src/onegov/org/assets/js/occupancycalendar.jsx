@@ -3,7 +3,7 @@
 */
 
 var oc = $.occupancyCalendar = {};
-var defaultOptions = {
+oc.defaultOptions = {
     /*
         Returns the reservations in a fullcalendar compatible events feed.
         See http://fullcalendar.io/docs/event_data/events_json_feed/
@@ -29,7 +29,7 @@ var defaultOptions = {
     /*
         The view shown initially
     */
-    view: 'month',
+    view: 'dayGridMonth',
 
     /*
         The date shown initially
@@ -58,52 +58,59 @@ oc.passEventsToCalendar = function(calendar, target) {
     });
 };
 
-oc.getFullcalendarOptions = function(options) {
-    var ocOptions = $.extend(true, defaultOptions, options);
+oc.getFullcalendarOptions = function(ocExtendOptions) {
+    var ocOptions = $.extend(true, oc.defaultOptions, ocExtendOptions);
 
     // the fullcalendar default options
-    var fcOptions = {
-        allDaySlot: false,
-        height: 'auto',
-        events: ocOptions.feed,
-        minTime: ocOptions.minTime,
-        maxTime: ocOptions.maxTime,
-        editable: ocOptions.editable,
-        selectable: false,
-        defaultView: ocOptions.view,
+    var options = {
+        fc: {
+            allDaySlot: false,
+            height: 'auto',
+            events: ocOptions.feed,
+            slotMinTime: ocOptions.minTime,
+            slotMaxTime: ocOptions.maxTime,
+            snapDuration: '00:15',
+            editable: ocOptions.editable,
+            eventResizableFromStart: ocOptions.editable,
+            selectable: false,
+            initialView: ocOptions.view,
+            locale: window.locale.language,
+            multiMonthMaxColumns: 1
+        },
         highlights_min: ocOptions.highlights_min,
         highlights_max: ocOptions.highlights_max,
         afterSetup: [],
         viewRenderers: [],
-        eventRenderers: [],
-        locale: window.locale.language
+        eventRenderers: []
     };
+
+    var fcOptions = options.fc;
 
     // the reservation calendar type definition
     var views = [];
 
     switch (ocOptions.type) {
         case 'daypass':
-            views = ['month', 'listMonth'];
-            fcOptions.header = {
+            views = ['dayGridMonth', 'listMonth'];
+            fcOptions.headerToolbar = {
                 left: 'title today prev,next',
                 center: '',
                 right: 'month listMonth'
             };
             break;
         case 'room':
-            views = ['month', 'agendaWeek', 'agendaDay', 'listMonth', 'listWeek', 'listDay'];
-            fcOptions.header = {
+            views = ['multiMonthYear', 'dayGridMonth', 'timeGridWeek', 'timeGridDay', 'listMonth'];
+            fcOptions.headerToolbar = {
                 left: 'title today prev,next',
                 center: '',
-                right: 'month,agendaWeek,agendaDay listMonth'
+                right: 'multiMonthYear,dayGridMonth,timeGridWeek,timeGridDay listMonth'
             };
             fcOptions.navLinks = true;
             fcOptions.weekNumbers = true;
             break;
         case 'daily-item':
             views = ['month', 'listMonth'];
-            fcOptions.header = {
+            fcOptions.headerToolbar = {
                 left: 'title today prev,next',
                 center: '',
                 right: 'month listMonth'
@@ -115,95 +122,112 @@ oc.getFullcalendarOptions = function(options) {
 
     // select a valid default view
     if (!_.contains(views, ocOptions.view)) {
-        fcOptions.defaultView = views[0];
+        fcOptions.initialView = views[0];
+    }
+
+    // select initial date
+    if (ocOptions.date) {
+        fcOptions.initialDate = ocOptions.date;
     }
 
     // implements editing
     if (ocOptions.editable) {
 
         fcOptions.eventOverlap = function(stillEvent, _movingEvent) {
-            return stillEvent.rendering === 'background';
+            return stillEvent.display === 'background';
         };
 
         // edit events on drag&drop, resize
-        fcOptions.eventDrop = fcOptions.eventResize = function(event, _delta, revertFunc, _jsEvent, _ui, view) {
-            var url = new Url(event.editurl);
-            url.query.start = event.start.toISOString();
-            url.query.end = event.end.toISOString();
-            var calendar = $(view.el.closest('.fc'));
+        fcOptions.eventDrop = fcOptions.eventResize = function(info) {
+            var event = info.event;
+            var url = new Url(event.extendedProps.editurl);
+            url.query.start = event.startStr;
+            url.query.end = event.endStr;
+            var calendar = $(info.el).closest('.fc');
             oc.post(calendar, url.toString(), function(_evt, _elt, _status, str, _xhr) {
-                revertFunc();
+                info.revert();
                 oc.showErrorPopup(calendar, calendar.find('.event-' + event.id), str);
             });
         };
 
         // make sure other code can react if events are being changed
-        fcOptions.eventDragStart = fcOptions.eventResizeStart = function(event) {
-            event.is_changing = true;
+        fcOptions.eventDragStart = fcOptions.eventResizeStart = function(info) {
+            info.event.is_changing = true;
         };
     }
 
     // after event rendering
-    fcOptions.eventRenderers.push(oc.highlightEvents);
+    options.eventRenderers.push(oc.highlightEvents);
+    options.eventRenderers.push(oc.addEventBackground);
 
-    // truncate title when it doesn't fit
-    fcOptions.eventRender = function(event, element, view) {
-        if (view.name !== 'agendaWeek' && view.name !== 'agendaDay') {
-            return;
+    // render additional content lines
+    fcOptions.eventContent = function(info, h) {
+        var event = info.event;
+        if (event.display === 'background') {
+            return null;
         }
-        if (event.rendering === 'background') {
-            return;
+        var lines = event.title.split('\n');
+        var attrs = {class: 'fc-title'};
+        // truncate title when it doesn't fit
+        if (info.view.type === 'timeGridWeek' || info.view.type === 'timeGridDay') {
+            attrs.title = event.title;
+            var max_lines = Math.max(1, Math.floor(moment(event.end).diff(moment(event.start), 'minutes') / 30));
+            lines = lines.slice(0, max_lines);
+        } else if (info.view.type === 'multiMonthYear') {
+            // limit to three lines
+            attrs.title = event.title;
+            //lines = lines.slice(0, 3);
         }
-        var title = element.find('.fc-title');
-        var lines = title.html().split('<br>');
-        var max_lines = Math.max(1, Math.round(event.end.diff(event.start, 'minutes') / 30));
-        if (lines.length > max_lines) {
-            element.attr('title', event.title);
-            title.html(lines.slice(0, max_lines).join('<br>'));
+        var content = [];
+        for (var i = 0; i < lines.length; i++) {
+            if (i !== 0) {
+                content.push(h('br'));
+            }
+            content.push(lines[i]);
         }
+        return h('div', {class: 'fc-content'}, h('span', attrs, content));
     };
 
-    fcOptions.eventAfterRender = function(event, element, view) {
-        var renderers = view.options.eventRenderers;
+    fcOptions.eventDidMount = function(info) {
+        var renderers = options.eventRenderers;
         for (var i = 0; i < renderers.length; i++) {
-            renderers[i](event, element, view);
+            renderers[i](info.event, $(info.el), info.view);
         }
     };
 
     // view change rendering
-    fcOptions.viewRender = function(view, element) {
-        oc.setupDatePicker(view, element);
-        var renderers = view.options.viewRenderers;
+    fcOptions.viewClassNames = function(info) {
+        var renderers = options.viewRenderers;
         for (var i = 0; i < renderers.length; i++) {
-            renderers[i](view, element);
+            renderers[i](info.view, $(info.el));
         }
+        return null;
     };
 
     // history handling
-    oc.setupHistory(fcOptions);
+    oc.setupHistory(options);
 
     // setup allocation refresh handling
-    fcOptions.afterSetup.push(oc.setupReservationsRefetch);
+    options.afterSetup.push(oc.setupReservationsRefetch);
 
-    // switch to the correct date after the instance has been created
-    if (ocOptions.date) {
-        fcOptions.afterSetup.push(function(calendar) {
-            calendar.fullCalendar('gotoDate', ocOptions.date);
-        });
-    }
+    // setup date picker
+    options.afterSetup.push(rc.setupDatePicker);
 
-    return fcOptions;
+    return options;
 };
 
-$.fn.occupancyCalendar = function(options) {
-    var fcOptions = oc.getFullcalendarOptions($.extend(true, defaultOptions, options));
+$.fn.occupancyCalendar = function(extendOptions) {
+    var options = oc.getFullcalendarOptions(extendOptions);
 
     return this.map(function(_ix, element) {
 
-        var calendar = $(element).fullCalendar(fcOptions);
+        var calendar = new FullCalendar.Calendar(element, options.fc);
+        calendar.exOptions = options;
 
-        for (var i = 0; i < fcOptions.afterSetup.length; i++) {
-            fcOptions.afterSetup[i](calendar);
+        calendar.render();
+
+        for (var i = 0; i < options.afterSetup.length; i++) {
+            options.afterSetup[i](calendar, element);
         }
 
         return calendar;
@@ -211,9 +235,8 @@ $.fn.occupancyCalendar = function(options) {
 };
 
 // show date picker when clicking on title
-oc.setupDatePicker = function(view, _element) {
-    var calendar = $(view.el.closest('.fc'));
-    var title = calendar.find('.fc-header-toolbar .fc-left h2');
+oc.setupDatePicker = function(calendar, element) {
+    var title = $(element).find('.fc-header-toolbar .fc-toolbar-title');
     var input = $(
         '<input type="text" tabindex="-1" aria-hidden="true"/>'
     ).css({
@@ -229,7 +252,7 @@ oc.setupDatePicker = function(view, _element) {
         lang: window.locale.language,
         closeOnDateSelect: true,
         onSelectDate: function(ct, _$i) {
-            calendar.fullCalendar('gotoDate', ct);
+            calendar.gotoDate(ct);
         },
         onShow: function(_ct, $i) {
             this.setOptions({value: $i.val()});
@@ -241,7 +264,7 @@ oc.setupDatePicker = function(view, _element) {
     input.unbind();
     title.append(input);
     title.click(function() {
-        input.val(calendar.fullCalendar('getDate').format('YYYY-MM-DD'));
+        input.val(moment(calendar.getDate()).format('YYYY-MM-DD'));
         input.datetimepicker('show');
     }).on('mouseenter', function() {
         title.css('cursor', 'pointer');
@@ -252,8 +275,8 @@ oc.setupDatePicker = function(view, _element) {
 
 // highlight events implementation
 oc.highlightEvents = function(event, element, view) {
-    var min = view.options.highlights_min;
-    var max = view.options.highlights_max;
+    var min = view.calendar.exOptions.highlights_min;
+    var max = view.calendar.exOptions.highlights_max;
 
     if (min === null || max === null) {
         return;
@@ -264,9 +287,21 @@ oc.highlightEvents = function(event, element, view) {
     }
 };
 
+// adds a fc-bg div to the views where we need it
+oc.addEventBackground = function(event, element, view) {
+    if (event.display === 'background') {
+        return;
+    }
+
+    if (view.type !== 'timeGridWeek' && view.type !== 'timeGridDay') {
+        return;
+    }
+    $('<div class="fc-bg"></div>').insertAfter($('.fc-content', element));
+};
+
 oc.setupReservationsRefetch = function(calendar) {
     $(window).on('oc-reservations-changed', function() {
-        calendar.fullCalendar('refetchEvents');
+        calendar.refetchEvents();
     });
 };
 
@@ -382,18 +417,18 @@ oc.removeAllPopups = function() {
 };
 
 // setup browser history handling
-oc.setupHistory = function(fcOptions) {
+oc.setupHistory = function(options) {
     var isPopping = false;
     var isFirst = true;
 
-    fcOptions.viewRenderers.push(function(view) {
+    options.viewRenderers.push(function(view) {
         if (isPopping) {
             return;
         }
 
         var url = new Url(window.location.href);
-        url.query.view = view.name;
-        url.query.date = view.intervalStart.format('YYYYMMDD');
+        url.query.view = view.type;
+        url.query.date = moment(view.currentStart).format('YYYYMMDD');
 
         $('a.calendar-dependent').each(function(_ix, el) {
             var dependentUrl = new Url($(el).attr('href'));
@@ -404,8 +439,8 @@ oc.setupHistory = function(fcOptions) {
 
         var state = [
             {
-                'view': view.name,
-                'date': view.intervalStart
+                'view': view.type,
+                'date': view.currentStart
             },
             document.title + ' ' + view.title,
             url.toString()
@@ -419,15 +454,15 @@ oc.setupHistory = function(fcOptions) {
         }
     });
 
-    fcOptions.afterSetup.push(function(calendar) {
+    options.afterSetup.push(function(calendar) {
         window.onpopstate = function(event) {
             if (event.state === null) {
                 return;
             }
 
             isPopping = true;
-            calendar.fullCalendar('changeView', event.state.view);
-            calendar.fullCalendar('gotoDate', event.state.date);
+            calendar.changeView(event.state.view);
+            calendar.gotoDate(event.state.date);
             isPopping = false;
         };
     });
