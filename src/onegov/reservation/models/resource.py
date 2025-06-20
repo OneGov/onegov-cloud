@@ -183,7 +183,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     highlights_max: int | None = None
 
     #: the view to open in the calendar (fullCalendar view name)
-    view: str | None = 'month'
+    view: str | None = 'dayGridMonth'
 
     @deadline.setter
     def set_deadline(self, value: tuple[int, DeadlineUnit] | None) -> None:

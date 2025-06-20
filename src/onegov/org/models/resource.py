@@ -226,7 +226,7 @@ class DaypassResource(Resource, AccessExtension, SearchableContent,
     es_type_name = 'daypasses'
 
     # the selected view
-    view = 'month'
+    view = 'dayGridMonth'
 
     # show or hide quota numbers in reports
     show_quota = True
