@@ -3085,31 +3085,39 @@ button {
 }
 
 .occupancy-calendar {
-    .fc-view:not(.fc-list-view) {
+    .fc-view:not(.fc-list), .fc-view:not(.fc-list) + .fc-popover {
         .event-accepted,
         .event-accepted .fc-bg,
         .event-accepted .fc-content {
+            border-width: 0;
             background-color: $blue-dark;
         }
 
         .event-pending,
         .event-pending .fc-bg,
         .event-pending .fc-content {
+            border-width: 0;
             background-color: lighten(desaturate($blue-dark, 50%), 10%);
         }
     }
 
-    .fc-event {
+    .fc-event, .fc-event-main {
         padding: 0 !important;
     }
 
     .fc-event .fc-content {
+        position: relative;
+        z-index: 2;
         padding: 2px 4px;
         border-top-right-radius: 1.2rem;
 
         &::first-line {
             font-weight: bold;
         }
+    }
+
+    .fc-event.fc-timegrid-event-short .fc-title {
+        font-weight: bold;
     }
 
     .fc-list-item-title::first-line {
@@ -3121,13 +3129,14 @@ button {
     }
 
     .fc-event .fc-bg {
-        opacity: 1;
+        opacity: 1 !important;
         border-top-right-radius: 1.5rem;
     }
 
-    .fc-bgevent {
+    .fc-bg-event {
         background-color: $green;
         opacity: .15;
+        cursor: default !important;
     }
 }
 
@@ -3147,14 +3156,12 @@ button {
         outline: none;
     }
 
-    .fc-content {
-        // pass through pointer events to the background, where we have the
-        // hover and javascript handling
-        pointer-events: none;
-    }
-
     .fc-toolbar {
-        margin-bottom: 0;
+        align-items: end;
+
+        &.fc-header-toolbar {
+            margin-bottom: 2rem;
+        }
 
         h2 {
             clear: both;
@@ -3164,13 +3171,12 @@ button {
             text-align: left;
         }
 
-        .fc-left {
-            float: none;
+        h2 + button {
+            margin-left: 0 !important;
+        }
 
-            button {
-                margin-bottom: 15px;
-                margin-left: 0;
-            }
+        select {
+            margin: 0;
         }
     }
 
@@ -3202,10 +3208,23 @@ button {
         background-color: $primary-color !important;
     }
 
-    .fc-month-view {
-        .fc-day-number {
+    .fc-dayGridMonth-view, .fc-multimonth {
+        .fc-daygrid-day-number {
             font-size: .875rem;
             padding: .25rem .5rem;
+        }
+    }
+
+    .fc-view.fc-multimonth {
+        max-height: 850px;
+
+        .fc-event .fc-content {
+            max-height: 2.5rem;
+            overflow-y: hidden;
+
+            .fc-title {
+                font-size: .675rem;
+            }
         }
     }
 
@@ -3235,12 +3254,13 @@ button {
             filter: grayscale(1);
         }
 
-        .fc-day-header,
-        .fc-day-number {
+        .fc-daygrid-day-header,
+        .fc-daygrid-day-number {
             font-size: .9em;
         }
 
         .fc-event {
+            overflow: hidden;
             border: 0;
             border-radius: 2px;
             margin: 0 0 2px;
@@ -3248,7 +3268,13 @@ button {
         }
 
         .fc-bg {
-            background: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+            opacity: .25;
         }
 
         .event-unavailable {
@@ -3270,8 +3296,8 @@ button {
     }
 
     .fc-event {
-        div.fc-time,
-        span.fc-time {
+        div.fc-event-time,
+        span.fc-event-time {
             display: none;
         }
 
@@ -3280,7 +3306,7 @@ button {
             padding: 0;
         }
 
-        &.fc-short .fc-title {
+        &.fc-timegrid-event-short .fc-title {
             display: inline-block;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -3300,25 +3326,53 @@ button {
         }
     }
 
-    .fc button,
-    .fc-button {
+    .fc-more-link {
+        font-size: .8rem;
+    }
+
+    &.fc button,
+    &.fc .fc-button {
         @include button(
             $padding: $button-tny,
             $bg: $smoke
         );
+        margin-bottom: 0;
+        border-radius: 4px;
         background-image: none;
-        box-shadow: none;
+        box-shadow: none !important;
         font-size: .9rem;
         height: 2.25rem;
         text-shadow: none;
 
-        &.fc-state-active,
-        &.fc-state-disabled {
-            background: $charcoal;
-            color: $white;
+        .fc-icon {
+            margin-top: -4px;
+        }
+
+        &.fc-button-active,
+        &:disabled {
+            background: $charcoal !important;
+            color: $white !important;
             opacity: 1;
         }
+
+        &:hover,
+        &:focus,
+        &:active {
+          color: #333;
+          background-color: #bebebe;
+        }
     }
+
+    &.fc .fc-button-primary {
+        background-color: #f5f5f5;
+        color: #333;
+    }
+}
+
+.calendar .fc-event-main {
+    // pass through pointer events to the background, where we have the
+    // hover and javascript handling
+    pointer-events: none;
 }
 
 .calendar-footer {
@@ -3337,28 +3391,27 @@ button {
     Fullcalendar responsive design
 */
 @media #{$small-up} {
-    .calendar .fc .fc-toolbar {
+    .calendar .fc-toolbar {
         width: 100%;
     }
 }
 
 @media #{$large-up} {
-    .calendar .fc .fc-toolbar {
+    .calendar .fc-toolbar {
         width: 80%;
     }
 }
 
 @media (max-width: 850px) {
-    .calendar .fc-center {
-        display: block;
-        width: 100%;
-    }
-}
+    .calendar {
+        .fc-toolbar {
+            flex-direction: column;
+            align-items: start;
+        }
 
-@media (min-width: 850px) {
-    .calendar .fc-center {
-        display: inline-block;
-        width: 40%;
+        .fc-toolbar-chunk {
+            margin-bottom: .5rem;
+        }
     }
 }
 
@@ -3371,6 +3424,17 @@ button {
 @media #{$medium-only} {
     .calendar-footer {
         width: 75%;
+    }
+
+    .occupancy-calendar {
+        .fc-toolbar {
+            flex-direction: column;
+            align-items: start;
+        }
+
+        .fc-toolbar-chunk {
+            margin-bottom: .5rem;
+        }
     }
 }
 
@@ -4239,7 +4303,7 @@ ul.search-results {
         width: 20%;
     }
 
-    .calendar .fc-view-container,
+    .calendar .fc-view,
     .reservation-list {
         display: inline-block;
         float: left;
@@ -4256,7 +4320,7 @@ ul.search-results {
         }
     }
 
-    .calendar .fc-view-container,
+    .calendar .fc-view,
     .reservation-list {
         width: 75%;
     }
@@ -4269,7 +4333,7 @@ ul.search-results {
         width: 100%;
     }
 
-    .calendar .fc-view-container,
+    .calendar .fc-view,
     .reservation-list {
         display: block;
         width: 100%;
@@ -4280,12 +4344,6 @@ ul.search-results {
         .fc-button-group {
             display: inline-block;
             font-size: .7rem;
-        }
-
-        .fc-right {
-            left: -7px;
-            margin-bottom: 1rem;
-            position: relative;
         }
     }
 

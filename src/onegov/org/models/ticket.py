@@ -689,7 +689,7 @@ class ReservationHandler(Handler):
             {
                 'name': self.resource.name,
                 'date': reservation.display_start(),
-                'view': 'agendaDay'
+                'view': 'timeGridDay'
             },
             name='occupancy'
         )

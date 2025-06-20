@@ -2204,7 +2204,11 @@ class ResourceLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(_('Reservations'), self.request.link(self.collection)),
-            Link(_(self.model.title), self.request.link(self.model))
+            Link(
+                _(self.model.title),
+                self.request.link(self.model),
+                {'class': 'calendar-dependent'}
+            )
         ]
 
     @cached_property

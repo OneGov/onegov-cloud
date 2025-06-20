@@ -8,7 +8,7 @@
             data-feed="${feed}"
             data-type="${resource.type}"
             data-editable="${request.is_manager and 'true' or 'false'}"
-            data-view="${resource.view or resource.default_view or 'agendaWeek'}"
+            data-view="${resource.view or resource.default_view or 'timeGridWeek'}"
             data-date="${resource.date and resource.date.isoformat() or ''}"
             data-highlights-min="${resource.highlights_min or ''}"
             data-highlights-max="${resource.highlights_max or ''}"
