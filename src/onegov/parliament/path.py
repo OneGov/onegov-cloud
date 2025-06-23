@@ -1,7 +1,7 @@
 from __future__ import annotations
 from uuid import UUID
 
-from onegov.parliament.collections import RISPartyCollection
+from onegov.parliament.collections import RISPartyCollection, MeetingCollection
 from onegov.parliament.models import RISParty, Party
 from onegov.town6.app import TownApp
 
@@ -28,3 +28,13 @@ def get_party(
     id: UUID
 ) -> Party | None:
     return RISPartyCollection(app.session()).by_id(id)
+
+
+@TownApp.path(
+    model=MeetingCollection,
+    path='/meetings',
+)
+def get_meetings(
+    app: TownApp,
+) -> MeetingCollection:
+    return MeetingCollection(app.session())
