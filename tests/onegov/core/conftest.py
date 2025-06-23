@@ -3,6 +3,7 @@ import pytest
 import transaction
 import yaml
 
+from tests.onegov.org.conftest import create_org_app
 from tests.shared import Client
 from tests.shared.utils import create_app
 from onegov.core.cli import command_group
@@ -174,3 +175,18 @@ def maildir_smtp_app(temporary_directory, maildir, smtp):
     app.smtp = smtp
 
     return app
+
+
+@pytest.fixture(scope='function')
+def org_app(request):
+    yield create_org_app(request, use_elasticsearch=False)
+
+
+@pytest.fixture(scope='function')
+def core_request(org_app):
+    yield org_app.request_class(environ={
+        'PATH_INFO': '/',
+        'SERVER_NAME': '',
+        'SERVER_PORT': '',
+        'SERVER_PROTOCOL': 'https'
+    }, app=org_app)
