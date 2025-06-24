@@ -174,9 +174,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
             var max_lines = Math.max(1, Math.floor(moment(event.end).diff(moment(event.start), 'minutes') / 30));
             lines = lines.slice(0, max_lines);
         } else if (info.view.type === 'multiMonthYear') {
-            // limit to three lines
             attrs.title = event.title;
-            //lines = lines.slice(0, 3);
         }
         var content = [];
         for (var i = 0; i < lines.length; i++) {
@@ -211,7 +209,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
     options.afterSetup.push(oc.setupReservationsRefetch);
 
     // setup date picker
-    options.afterSetup.push(rc.setupDatePicker);
+    options.afterSetup.push(oc.setupDatePicker);
 
     return options;
 };
@@ -238,12 +236,14 @@ $.fn.occupancyCalendar = function(extendOptions) {
 oc.setupDatePicker = function(calendar, element) {
     var title = $(element).find('.fc-header-toolbar .fc-toolbar-title');
     var input = $(
-        '<input type="text" tabindex="-1" aria-hidden="true"/>'
+        '<input type="text" name="date" tabindex="-1" aria-hidden="true"/>'
     ).css({
         visibility: 'hidden',
         width: 0,
         height: 0,
-        border: 0
+        border: 0,
+        margin: 0,
+        padding: 0
     }).datetimepicker({
         allowBlank: true,
         timepicker: false,
@@ -253,6 +253,7 @@ oc.setupDatePicker = function(calendar, element) {
         closeOnDateSelect: true,
         onSelectDate: function(ct, _$i) {
             calendar.gotoDate(ct);
+            oc.setHistory(ct, calendar.view);
         },
         onShow: function(_ct, $i) {
             this.setOptions({value: $i.val()});
@@ -261,7 +262,11 @@ oc.setupDatePicker = function(calendar, element) {
             }, 50);
         }
     });
+    var icon = $(
+        '<span class="fa fa-calendar"></span>'
+    ).css('margin-left', '.5rem');
     input.unbind();
+    title.append(icon);
     title.append(input);
     title.click(function() {
         input.val(moment(calendar.getDate()).format('YYYY-MM-DD'));
@@ -416,10 +421,40 @@ oc.removeAllPopups = function() {
     $('.popup').popup('hide').remove();
 };
 
+oc.isFirstHistoryEntry = true;
+
+oc.setHistory = function(date, view) {
+    var url = new Url(window.location.href);
+    url.query.view = view.type;
+    url.query.date = moment(date).format('YYYYMMDD');
+
+    $('a.calendar-dependent').each(function(_ix, el) {
+        var dependentUrl = new Url($(el).attr('href'));
+        dependentUrl.query.view = url.query.view;
+        dependentUrl.query.date = url.query.date;
+        $(el).attr('href', dependentUrl.toString());
+    });
+
+    var state = [
+        {
+            'view': view.type,
+            'date': date
+        },
+        document.title + ' ' + view.title,
+        url.toString()
+    ];
+
+    if (oc.isFirstHistoryEntry) {
+        window.history.replaceState.apply(window.history, state);
+        oc.isFirstHistoryEntry = false;
+    } else {
+        window.history.pushState.apply(window.history, state);
+    }
+};
+
 // setup browser history handling
 oc.setupHistory = function(options) {
     var isPopping = false;
-    var isFirst = true;
 
     options.viewRenderers.push(function(view) {
         if (isPopping) {
@@ -437,32 +472,7 @@ oc.setupHistory = function(options) {
             }).toDate();
         }
 
-        var url = new Url(window.location.href);
-        url.query.view = view.type;
-        url.query.date = moment(start).format('YYYYMMDD');
-
-        $('a.calendar-dependent').each(function(_ix, el) {
-            var dependentUrl = new Url($(el).attr('href'));
-            dependentUrl.query.view = url.query.view;
-            dependentUrl.query.date = url.query.date;
-            $(el).attr('href', dependentUrl.toString());
-        });
-
-        var state = [
-            {
-                'view': view.type,
-                'date': start
-            },
-            document.title + ' ' + view.title,
-            url.toString()
-        ];
-
-        if (isFirst) {
-            window.history.replaceState.apply(window.history, state);
-            isFirst = false;
-        } else {
-            window.history.pushState.apply(window.history, state);
-        }
+        oc.setHistory(start, view);
     });
 
     options.afterSetup.push(function(calendar) {
