@@ -298,12 +298,14 @@ rc.setupEventPopups = function(event, element) {
 rc.setupDatePicker = function(calendar, element) {
     var title = $(element).find('.fc-header-toolbar .fc-toolbar-title');
     var input = $(
-        '<input type="text" tabindex="-1" aria-hidden="true"/>'
+        '<input type="text" name="date" tabindex="-1" aria-hidden="true"/>'
     ).css({
         visibility: 'hidden',
         width: 0,
         height: 0,
-        border: 0
+        border: 0,
+        margin: 0,
+        padding: 0
     }).datetimepicker({
         allowBlank: true,
         timepicker: false,
@@ -313,6 +315,7 @@ rc.setupDatePicker = function(calendar, element) {
         closeOnDateSelect: true,
         onSelectDate: function(ct, _$i) {
             calendar.gotoDate(ct);
+            rc.setHistory(ct, calendar.view);
         },
         onShow: function(_ct, $i) {
             this.setOptions({value: $i.val()});
@@ -321,7 +324,11 @@ rc.setupDatePicker = function(calendar, element) {
             }, 50);
         }
     });
+    var icon = $(
+        '<span class="fa fa-calendar"></span>'
+    ).css('margin-left', '.5rem');
     input.unbind();
+    title.append(icon);
     title.append(input);
     title.click(function() {
         input.val(moment(calendar.getDate()).format('YYYY-MM-DD'));
@@ -535,10 +542,40 @@ rc.removeAllPopups = function() {
     $('.popup').popup('hide').remove();
 };
 
+rc.isFirstHistoryEntry = true;
+
+rc.setHistory = function(date, view) {
+    var url = new Url(window.location.href);
+    url.query.view = view.type;
+    url.query.date = moment(date).format('YYYYMMDD');
+
+    $('a.calendar-dependent').each(function(_ix, el) {
+        var dependentUrl = new Url($(el).attr('href'));
+        dependentUrl.query.view = url.query.view;
+        dependentUrl.query.date = url.query.date;
+        $(el).attr('href', dependentUrl.toString());
+    });
+
+    var state = [
+        {
+            'view': view.type,
+            'date': date
+        },
+        document.title + ' ' + view.title,
+        url.toString()
+    ];
+
+    if (rc.isFirstHistoryEntry) {
+        window.history.replaceState.apply(window.history, state);
+        rc.isFirstHistoryEntry = false;
+    } else {
+        window.history.pushState.apply(window.history, state);
+    }
+};
+
 // setup browser history handling
 rc.setupHistory = function(options) {
     var isPopping = false;
-    var isFirst = true;
 
     options.viewRenderers.push(function(view) {
         if (isPopping) {
@@ -556,32 +593,7 @@ rc.setupHistory = function(options) {
             }).toDate();
         }
 
-        var url = new Url(window.location.href);
-        url.query.view = view.type;
-        url.query.date = moment(start).format('YYYYMMDD');
-
-        $('a.calendar-dependent').each(function(_ix, el) {
-            var dependentUrl = new Url($(el).attr('href'));
-            dependentUrl.query.view = url.query.view;
-            dependentUrl.query.date = url.query.date;
-            $(el).attr('href', dependentUrl.toString());
-        });
-
-        var state = [
-            {
-                'view': view.type,
-                'date': start
-            },
-            document.title + ' ' + view.title,
-            url.toString()
-        ];
-
-        if (isFirst) {
-            window.history.replaceState.apply(window.history, state);
-            isFirst = false;
-        } else {
-            window.history.pushState.apply(window.history, state);
-        }
+        rc.setHistory(start, view);
     });
 
     options.afterSetup.push(function(calendar) {

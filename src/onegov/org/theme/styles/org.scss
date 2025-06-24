@@ -3169,6 +3169,10 @@ button {
             float: none;
             margin-bottom: 1rem;
             text-align: left;
+
+            &:hover .fa {
+                color: $primary-color;
+            }
         }
 
         h2 + button {
