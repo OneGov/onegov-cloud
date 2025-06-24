@@ -125,7 +125,7 @@ class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
         back_populates='commission'
     )
 
-    #: A commission may hold meetings
+    #: A commission may hold meetings (only used in PAS)
     attendences: relationship[list[Attendence]] = relationship(
         'Attendence',
         cascade='all, delete-orphan',
