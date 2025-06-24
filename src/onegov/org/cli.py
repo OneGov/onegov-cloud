@@ -1292,11 +1292,9 @@ def content_to_markup(element: dict[str, Any]) -> str:
 
 @cli.command(name='import-meetings')
 @click.argument('path', type=click.Path(exists=True, resolve_path=True))
-@click.option('--overwrite-content', is_flag=True, default=False)
 @click.option('--dry-run', is_flag=True, default=False)
 def import_meetings(
     path: str,
-    overwrite_content: bool,
     dry_run: bool,
 ) -> Callable[[OrgRequest, OrgApp], None]:
     """ Imports meetings from archive of json files
@@ -1362,56 +1360,39 @@ def import_meetings(
             # click.echo(f'Parsed date: {date}')
             date = utcnow()
 
-            # Check if article already exists based on title and date
-            if added := session.query(Meeting).filter(
-                Meeting.title == "test").first(): 
-                if overwrite_content:
-                    click.echo(f'Overwriting {article_name}')
+            click.echo(f'Importing {article_name}')
+            import_counter += 1
 
-                    for element in meeting['elements']:
-                        content += content_to_markup(element)
+            if not dry_run:
+                location = Markup(
+                    content_to_markup(meeting['elements'][1]))
 
-                    added.content['text'] = Markup(content)
-                    overwrite_counter += 1
-                else:
-                    click.secho((f'Skipped {article_name} with '
-                                f'title {meeting["metadata"]["title"]}'
-                                f' as it already exists'),
-                                fg='yellow')
-            else:
-                click.echo(f'Importing {article_name}')
-                import_counter += 1
+                for element in meeting['elements']:
+                    desc = False
+                    description = ''
+                    if element['type'] == 'Heading':
+                        if element['text'] == 'Informationen':
+                            desc = True
+                        else:
+                            desc = False
+                    
+                    if element['type'] == 'Paragraph':
+                        description += content_to_markup(element)
+                    elif element['type'] == 'Heading':
+                        break
 
-                if not dry_run:
-                    location = Markup(
-                        content_to_markup(meeting['elements'][1]))
+                added = meeting_collection.add(
+                    title="Sitzung des Stadtparlaments",
+                    type='generic',
+                    address=location,
+                    description=Markup(description),
+                    # content={},
+                )
 
-                    for element in meeting['elements']:
-                        desc = False
-                        description = ''
-                        if element['type'] == 'Heading':
-                            if element['text'] == 'Informationen':
-                                desc = True
-                            else:
-                                desc = False
-                        
-                        if element['type'] == 'Paragraph':
-                            description += content_to_markup(element)
-                        elif element['type'] == 'Heading':
-                            break
+                # for element in meeting['elements']:
+                #     content += content_to_markup(element, image_counter)
 
-                    added = meeting_collection.add(
-                        title="Sitzung des Stadtparlaments",
-                        type='generic',
-                        address=location,
-                        description=Markup(description),
-                        # content={},
-                    )
-
-                    # for element in meeting['elements']:
-                    #     content += content_to_markup(element, image_counter)
-
-                    # added.content['text'] = Markup(content)
+                # added.content['text'] = Markup(content)
 
         click.echo(f'{import_counter} meetings imported')
         click.echo(f'{overwrite_counter} meetings overwritten')
@@ -1422,11 +1403,9 @@ def import_meetings(
 
 @cli.command(name='import-commissions')
 @click.argument('path', type=click.Path(exists=True, resolve_path=True))
-@click.option('--overwrite-content', is_flag=True, default=False)
 @click.option('--dry-run', is_flag=True, default=False)
 def import_commissions(
     path: str,
-    overwrite_content: bool,
     dry_run: bool,
 ) -> Callable[[OrgRequest, OrgApp], None]:
     """ Imports commissions from archive of json files
@@ -1455,46 +1434,29 @@ def import_commissions(
         for commission, article_name in commissions:
             content = ''
 
-            # Check if article already exists based on title and date
-            if added := session.query(Commission).filter(
-                Commission.name == "test").first(): 
-                if overwrite_content:
-                    click.echo(f'Overwriting {article_name}')
+            click.echo(f'Importing {article_name}')
+            import_counter += 1
 
-                    for element in commission['elements']:
+            if not dry_run:
+
+                content = ''
+                people_ids = []
+                for element in commission['elements']:
+                    if element['type'] != 'Heading' and (
+                        element['type'] != 'Table'):
                         content += content_to_markup(element)
-
-                    added.content['text'] = Markup(content)
-                    overwrite_counter += 1
-                else:
-                    click.secho((f'Skipped {article_name} with '
-                                f'title {commission["metadata"]["title"]}'
-                                f' as it already exists'),
-                                fg='yellow')
-            else:
-                click.echo(f'Importing {article_name}')
-                import_counter += 1
-
-                if not dry_run:
-
-                    content = ''
-                    people_ids = []
-                    for element in commission['elements']:
-                        if element['type'] != 'Heading' and (
-                            element['type'] != 'Table'):
-                            content += content_to_markup(element)
-                        if element['type'] == 'Table':
-                            for row in element['rows']:
-                                link = row['cells'][0]['url']
-                                id = link.split('/')[-1]
-                                people_ids.append(id)
-                            break
-                            
-                    added = commission_collection.add(
-                        name=commission['metadata']['title'],
-                        content={'description': Markup(content)},
-                        meta={'people_ids': people_ids},
-                    )
+                    if element['type'] == 'Table':
+                        for row in element['rows']:
+                            link = row['cells'][0]['url']
+                            id = link.split('/')[-1]
+                            people_ids.append(id)
+                        break
+                        
+                added = commission_collection.add(
+                    name=commission['metadata']['title'],
+                    content={'description': Markup(content)},
+                    meta={'people_ids': people_ids},
+                )
 
         click.echo(f'{import_counter} commissions imported')
         click.echo(f'{overwrite_counter} commissions overwritten')
@@ -1502,21 +1464,19 @@ def import_commissions(
     return create_commissions
 
 
-@cli.command(name='import-parliamentarians')
+@cli.command(name='import-parliamentary_groups')
 @click.argument('path', type=click.Path(exists=True, resolve_path=True))
-@click.option('--overwrite-content', is_flag=True, default=False)
 @click.option('--dry-run', is_flag=True, default=False)
-def parliamentarians(
+def import_parliamentary_groups(
     path: str,
-    overwrite_content: bool,
     dry_run: bool,
 ) -> Callable[[OrgRequest, OrgApp], None]:
-    """ Imports parliamentarians from archive of json files
+    """ Imports parliamentary_groups from archive of json files
 
     Example:
     .. code-block:: bash
 
-        onegov-org --select '/foo/bar' import-parliamentarians /path/to/news
+        onegov-org --select '/foo/bar' import-parliamentary_groups /path/to/news
     """
 
     # Read all json files in the given directory
@@ -1526,61 +1486,44 @@ def parliamentarians(
                 with open(file) as f:
                     yield (json.load(f), file.name)
 
-    def create_parliamentarians(request: OrgRequest, app: OrgApp) -> None:
+    def create_parliamentary_groups(request: OrgRequest, app: OrgApp) -> None:
         session = request.session
-        parliamentarian_collection = ParliamentaryGroupCollection(request.session)
+        parliamentary_group_collection = ParliamentaryGroupCollection(request.session)
 
-        parliamentarians = read_json_files(path)
+        parliamentary_groups = read_json_files(path)
         import_counter = 0
         overwrite_counter = 0
 
-        for parliamentary_group, article_name in parliamentarians:
+        for parliamentary_group, article_name in parliamentary_groups:
             content = ''
 
-            # Check if article already exists based on title and date
-            if added := session.query(ParliamentaryGroup).filter(
-                ParliamentaryGroup.name == "test").first(): 
-                if overwrite_content:
-                    click.echo(f'Overwriting {article_name}')
+            click.echo(f'Importing {article_name}')
+            import_counter += 1
 
-                    for element in parliamentary_group['elements']:
+            if not dry_run:
+
+                content = ''
+                people_ids = []
+                for element in parliamentary_group['elements']:
+                    if element['type'] != 'Heading' and (
+                        element['type'] != 'Table'):
                         content += content_to_markup(element)
+                    if element['type'] == 'Table':
+                        for row in element['rows']:
+                            link = row['cells'][0]['url']
+                            id = link.split('/')[-1]
+                            people_ids.append(id)
+                        break
+                        
+                added = parliamentary_group_collection.add(
+                    name=parliamentary_group['metadata']['title'],
+                    content={'description': Markup(content)},
+                    meta={'people_ids': people_ids},
+                )
 
-                    added.content['text'] = Markup(content)
-                    overwrite_counter += 1
-                else:
-                    click.secho((f'Skipped {article_name} with '
-                                f'title {parliamentarians["metadata"]["title"]}'
-                                f' as it already exists'),
-                                fg='yellow')
-            else:
-                click.echo(f'Importing {article_name}')
-                import_counter += 1
+        click.echo(f'{import_counter} parliamentary_groups imported')
+        click.echo(f'{overwrite_counter} parliamentary_groups overwritten')
 
-                if not dry_run:
-
-                    content = ''
-                    people_ids = []
-                    for element in parliamentarians['elements']:
-                        if element['type'] != 'Heading' and (
-                            element['type'] != 'Table'):
-                            content += content_to_markup(element)
-                        if element['type'] == 'Table':
-                            for row in element['rows']:
-                                link = row['cells'][0]['url']
-                                id = link.split('/')[-1]
-                                people_ids.append(id)
-                            break
-                            
-                    added = parliamentarian_collection.add(
-                        name=parliamentarians['metadata']['title'],
-                        content={'description': Markup(content)},
-                        meta={'people_ids': people_ids},
-                    )
-
-        click.echo(f'{import_counter} parliamentarians imported')
-        click.echo(f'{overwrite_counter} parliamentarians overwritten')
-
-    return create_parliamentarians
+    return create_parliamentary_groups
 
 
