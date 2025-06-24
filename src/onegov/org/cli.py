@@ -42,8 +42,8 @@ from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.models.resource import Resource
 from onegov.page.collection import PageCollection
 from onegov.parliament.collections import MeetingCollection
-from onegov.parliament.models import Commission, Meeting
-from onegov.pas.collections import CommissionCollection
+from onegov.parliament.models import ParliamentaryGroup, Commission, Meeting
+from onegov.pas.collections import CommissionCollection, ParliamentaryGroupCollection
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
@@ -1005,6 +1005,36 @@ def mtan_statistics(
     return mtan_statistics
 
 
+def ul(inner: str) -> str:
+    return f'<ul>{inner}</ul>'
+
+def ol(inner: str) -> str:
+    return f'<ol>{inner}</ol>'
+
+def li(inner: str) -> str:
+    return f'<li>{inner}</li>'
+
+def p(inner: str) -> str:
+    return f'<p>{inner}</p>'
+
+def b(inner: str) -> str:
+    return f'<b>{inner}</b>'
+
+def em(inner: str) -> str:
+    return f'<em>{inner}</em>'
+
+def br() -> str:
+    return '<br/>'
+
+def a(href: str, text: str) -> str:
+    return f'<a href="{href}">{text}</a>'
+
+def h(level: int, text: str) -> str:
+    return f'<h{level}>{text}</h{level}>'
+
+def img(src: str, alt: str) -> str:
+    return f'<img class="lazyload-alt" src="{src}" alt="{alt}">'
+
 @cli.command(name='import-news')
 @click.argument('path', type=click.Path(exists=True, resolve_path=True))
 @click.option('--start-date', type=click.DateTime(formats=['%Y-%m-%d']),
@@ -1043,36 +1073,6 @@ def import_news(
             Page.parent_id == None).first()
         news_collection = PageCollection(request.session)
         image_collection = ImageFileCollection(request.session)
-
-        def ul(inner: str) -> str:
-            return f'<ul>{inner}</ul>'
-
-        def ol(inner: str) -> str:
-            return f'<ol>{inner}</ol>'
-
-        def li(inner: str) -> str:
-            return f'<li>{inner}</li>'
-
-        def p(inner: str) -> str:
-            return f'<p>{inner}</p>'
-
-        def b(inner: str) -> str:
-            return f'<b>{inner}</b>'
-
-        def em(inner: str) -> str:
-            return f'<em>{inner}</em>'
-
-        def br() -> str:
-            return '<br/>'
-
-        def a(href: str, text: str) -> str:
-            return f'<a href="{href}">{text}</a>'
-
-        def h(level: int, text: str) -> str:
-            return f'<h{level}>{text}</h{level}>'
-
-        def img(src: str, alt: str) -> str:
-            return f'<img class="lazyload-alt" src="{src}" alt="{alt}">'
 
         if not news_parent:
             click.echo('No news parent found')
@@ -1251,6 +1251,44 @@ def import_news(
 
     return import_news
 
+def content_to_markup(element: dict[str, Any]) -> str:
+    element_markup = ''
+    children_markup = ''
+    bold = element.get('bold', False)
+    italic = element.get('italic', False)
+
+    if 'children' in element:
+        for child in element['children']:
+            children_markup += content_to_markup(
+                child) + ' '
+
+    if element['type'] == 'Text':
+        text = element.get('text', '')
+        if bold:
+            text = b(text)
+        if italic:
+            text = em(text)
+        element_markup = text
+
+    if element['type'] == 'Break':
+        element_markup = br()
+
+    if element['type'] == 'Link':
+        element_markup = a(element['url'], element.get('text', ''))
+
+    if element['type'] == 'Paragraph':
+        element_markup = p(children_markup)
+
+    elif element['type'] == 'Heading':
+        heading = element.get('text', '')
+        level = element.get('level', 1)
+        if bold:
+            heading = b(heading)
+        if italic:
+            heading = em(heading)
+        element_markup = h(level, heading)
+
+    return element_markup
 
 @cli.command(name='import-meetings')
 @click.argument('path', type=click.Path(exists=True, resolve_path=True))
@@ -1280,66 +1318,9 @@ def import_meetings(
         session = request.session
         meeting_collection = MeetingCollection(request.session)
 
-        def p(inner: str) -> str:
-            return f'<p>{inner}</p>'
-
-        def b(inner: str) -> str:
-            return f'<b>{inner}</b>'
-
-        def em(inner: str) -> str:
-            return f'<em>{inner}</em>'
-
-        def br() -> str:
-            return '<br/>'
-
-        def a(href: str, text: str) -> str:
-            return f'<a href="{href}">{text}</a>'
-
-        def h(level: int, text: str) -> str:
-            return f'<h{level}>{text}</h{level}>'
-
         meetings = read_json_files(path)
         import_counter = 0
         overwrite_counter = 0
-
-        def content_to_markup(element: dict[str, Any]) -> str:
-            element_markup = ''
-            children_markup = ''
-            bold = element.get('bold', False)
-            italic = element.get('italic', False)
-
-            if 'children' in element:
-                for child in element['children']:
-                    children_markup += content_to_markup(
-                        child) + ' '
-
-            if element['type'] == 'Text':
-                text = element.get('text', '')
-                if bold:
-                    text = b(text)
-                if italic:
-                    text = em(text)
-                element_markup = text
-
-            if element['type'] == 'Break':
-                element_markup = br()
-
-            if element['type'] == 'Link':
-                element_markup = a(element['url'], element.get('text', ''))
-
-            if element['type'] == 'Paragraph':
-                element_markup = p(children_markup)
-
-            elif element['type'] == 'Heading':
-                heading = element.get('text', '')
-                level = element.get('level', 1)
-                if bold:
-                    heading = b(heading)
-                if italic:
-                    heading = em(heading)
-                element_markup = h(level, heading)
-
-            return element_markup
 
         for meeting, article_name in meetings:
             content = ''
@@ -1467,66 +1448,9 @@ def import_commissions(
         session = request.session
         commission_collection = CommissionCollection(request.session)
 
-        def p(inner: str) -> str:
-            return f'<p>{inner}</p>'
-
-        def b(inner: str) -> str:
-            return f'<b>{inner}</b>'
-
-        def em(inner: str) -> str:
-            return f'<em>{inner}</em>'
-
-        def br() -> str:
-            return '<br/>'
-
-        def a(href: str, text: str) -> str:
-            return f'<a href="{href}">{text}</a>'
-
-        def h(level: int, text: str) -> str:
-            return f'<h{level}>{text}</h{level}>'
-
         commissions = read_json_files(path)
         import_counter = 0
         overwrite_counter = 0
-
-        def content_to_markup(element: dict[str, Any]) -> str:
-            element_markup = ''
-            children_markup = ''
-            bold = element.get('bold', False)
-            italic = element.get('italic', False)
-
-            if 'children' in element:
-                for child in element['children']:
-                    children_markup += content_to_markup(
-                        child) + ' '
-
-            if element['type'] == 'Text':
-                text = element.get('text', '')
-                if bold:
-                    text = b(text)
-                if italic:
-                    text = em(text)
-                element_markup = text
-
-            if element['type'] == 'Break':
-                element_markup = br()
-
-            if element['type'] == 'Link':
-                element_markup = a(element['url'], element.get('text', ''))
-
-            if element['type'] == 'Paragraph':
-                element_markup = p(children_markup)
-
-            elif element['type'] == 'Heading':
-                heading = element.get('text', '')
-                level = element.get('level', 1)
-                if bold:
-                    heading = b(heading)
-                if italic:
-                    heading = em(heading)
-                element_markup = h(level, heading)
-
-            return element_markup
 
         for commission, article_name in commissions:
             content = ''
@@ -1576,5 +1500,87 @@ def import_commissions(
         click.echo(f'{overwrite_counter} commissions overwritten')
 
     return create_commissions
+
+
+@cli.command(name='import-parliamentarians')
+@click.argument('path', type=click.Path(exists=True, resolve_path=True))
+@click.option('--overwrite-content', is_flag=True, default=False)
+@click.option('--dry-run', is_flag=True, default=False)
+def parliamentarians(
+    path: str,
+    overwrite_content: bool,
+    dry_run: bool,
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Imports parliamentarians from archive of json files
+
+    Example:
+    .. code-block:: bash
+
+        onegov-org --select '/foo/bar' import-parliamentarians /path/to/news
+    """
+
+    # Read all json files in the given directory
+    def read_json_files(path: str) -> Iterator[tuple[dict[str, Any], str]]:
+        for file in Path(path).iterdir():
+            if file.suffix == '.json':
+                with open(file) as f:
+                    yield (json.load(f), file.name)
+
+    def create_parliamentarians(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        parliamentarian_collection = ParliamentaryGroupCollection(request.session)
+
+        parliamentarians = read_json_files(path)
+        import_counter = 0
+        overwrite_counter = 0
+
+        for parliamentary_group, article_name in parliamentarians:
+            content = ''
+
+            # Check if article already exists based on title and date
+            if added := session.query(ParliamentaryGroup).filter(
+                ParliamentaryGroup.name == "test").first(): 
+                if overwrite_content:
+                    click.echo(f'Overwriting {article_name}')
+
+                    for element in parliamentary_group['elements']:
+                        content += content_to_markup(element)
+
+                    added.content['text'] = Markup(content)
+                    overwrite_counter += 1
+                else:
+                    click.secho((f'Skipped {article_name} with '
+                                f'title {parliamentarians["metadata"]["title"]}'
+                                f' as it already exists'),
+                                fg='yellow')
+            else:
+                click.echo(f'Importing {article_name}')
+                import_counter += 1
+
+                if not dry_run:
+
+                    content = ''
+                    people_ids = []
+                    for element in parliamentarians['elements']:
+                        if element['type'] != 'Heading' and (
+                            element['type'] != 'Table'):
+                            content += content_to_markup(element)
+                        if element['type'] == 'Table':
+                            for row in element['rows']:
+                                link = row['cells'][0]['url']
+                                id = link.split('/')[-1]
+                                people_ids.append(id)
+                            break
+                            
+                    added = parliamentarian_collection.add(
+                        name=parliamentarians['metadata']['title'],
+                        content={'description': Markup(content)},
+                        meta={'people_ids': people_ids},
+                    )
+
+        click.echo(f'{import_counter} parliamentarians imported')
+        click.echo(f'{overwrite_counter} parliamentarians overwritten')
+
+    return create_parliamentarians
 
 
