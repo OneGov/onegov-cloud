@@ -3,6 +3,7 @@ from uuid import UUID
 
 from onegov.parliament.collections import RISPartyCollection, MeetingCollection
 from onegov.parliament.models import RISParty, Party
+from onegov.parliament.models.meeting import Meeting
 from onegov.town6.app import TownApp
 
 
@@ -38,3 +39,15 @@ def get_meetings(
     app: TownApp,
 ) -> MeetingCollection:
     return MeetingCollection(app.session())
+
+
+@TownApp.path(
+    model=Meeting,
+    path='/meeting/{id}',
+    converters={'id': UUID}
+)
+def get_meeting(
+    app: TownApp,
+    id: UUID
+) -> Meeting | None:
+    return MeetingCollection(app.session()).by_id(id)

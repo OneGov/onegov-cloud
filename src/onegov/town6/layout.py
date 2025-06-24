@@ -1060,6 +1060,41 @@ class MeetingCollectionLayout(DefaultLayout):
             ]
         return None
 
+class MeetingLayout(DefaultLayout):
+    
+    @cached_property
+    def title(self) -> str:
+        return self.model.title
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Meetings'), self.request.link(self.model)),
+            Link(self.model.title, self.request.link(self.model)),
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Meeting'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-meeting'},
+                        ),
+                    ],
+                ),
+            ]
+        return None
+
 
 class RISPartyCollectionLayout(DefaultLayout):
 

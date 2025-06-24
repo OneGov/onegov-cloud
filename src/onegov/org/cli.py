@@ -1,5 +1,7 @@
 """ Provides commands used to initialize org websites. """
 from __future__ import annotations
+import base64
+import json
 
 import click
 import html
@@ -13,6 +15,10 @@ from bs4 import BeautifulSoup
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from io import BytesIO
+
+from markupsafe import Markup
+import pytz
+from sedate import utcnow
 from onegov.core.orm.utils import QueryChain
 from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
 from onegov.chat import MessageCollection
@@ -29,10 +35,14 @@ from onegov.org import log
 from onegov.org.formats import DigirezDB
 from onegov.org.forms.event import TAGS
 from onegov.org.management import LinkMigration
+from onegov.org.models.file import ImageFileCollection
 from onegov.org.models.page import Page
 from onegov.org.models import ExtendedDirectory
 from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.models.resource import Resource
+from onegov.page.collection import PageCollection
+from onegov.parliament.collections import MeetingCollection
+from onegov.parliament.models import Meeting
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
@@ -59,6 +69,8 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
     from translationstring import TranslationString
     from uuid import UUID
+import locale
+import pytz
 
 
 cli = command_group()
@@ -990,3 +1002,438 @@ def mtan_statistics(
             )
 
     return mtan_statistics
+
+
+@cli.command(name='import-news')
+@click.argument('path', type=click.Path(exists=True, resolve_path=True))
+@click.option('--start-date', type=click.DateTime(formats=['%Y-%m-%d']),
+              default=None)
+@click.option('--end-date', type=click.DateTime(formats=['%Y-%m-%d']),
+              default=None)
+@click.option('--overwrite-content', is_flag=True, default=False)
+@click.option('--local', is_flag=True, default=False)
+@click.option('--dry-run', is_flag=True, default=False)
+def import_news(
+    path: str,
+    start_date: datetime | None,
+    end_date: datetime | None,
+    overwrite_content: bool,
+    dry_run: bool,
+    local: bool
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Imports news from archive of json files
+
+    Example:
+    .. code-block:: bash
+
+        onegov-org --select '/foo/bar' import-news /path/to/news
+    """
+
+    # Read all json files in the given directory
+    def read_json_files(path: str) -> Iterator[tuple[dict[str, Any], str]]:
+        for file in Path(path).iterdir():
+            if file.suffix == '.json':
+                with open(file) as f:
+                    yield (json.load(f), file.name)
+
+    def import_news(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        news_parent = session.query(Page).filter(Page.type == 'news').filter(
+            Page.parent_id == None).first()
+        news_collection = PageCollection(request.session)
+        image_collection = ImageFileCollection(request.session)
+
+        def ul(inner: str) -> str:
+            return f'<ul>{inner}</ul>'
+
+        def ol(inner: str) -> str:
+            return f'<ol>{inner}</ol>'
+
+        def li(inner: str) -> str:
+            return f'<li>{inner}</li>'
+
+        def p(inner: str) -> str:
+            return f'<p>{inner}</p>'
+
+        def b(inner: str) -> str:
+            return f'<b>{inner}</b>'
+
+        def em(inner: str) -> str:
+            return f'<em>{inner}</em>'
+
+        def br() -> str:
+            return '<br/>'
+
+        def a(href: str, text: str) -> str:
+            return f'<a href="{href}">{text}</a>'
+
+        def h(level: int, text: str) -> str:
+            return f'<h{level}>{text}</h{level}>'
+
+        def img(src: str, alt: str) -> str:
+            return f'<img class="lazyload-alt" src="{src}" alt="{alt}">'
+
+        if not news_parent:
+            click.echo('No news parent found')
+            return
+
+        news = read_json_files(path)
+        import_counter = 0
+        overwrite_counter = 0
+
+        def content_to_markup(element: dict[str, Any],
+                              image_counter: int) -> str:
+            element_markup = ''
+            children_markup = ''
+            bold = element.get('bold', False)
+            italic = element.get('italic', False)
+
+            if 'children' in element:
+                for child in element['children']:
+                    children_markup += content_to_markup(
+                        child, image_counter) + ' '
+
+            if element['type'] == 'Text':
+                text = element.get('text', '')
+                if bold:
+                    text = b(text)
+                if italic:
+                    text = em(text)
+                element_markup = text
+
+            if element['type'] == 'Break':
+                element_markup = br()
+
+            if element['type'] == 'Link':
+                element_markup = a(element['url'], element.get('text', ''))
+
+            if element['type'] == 'Paragraph':
+                element_markup = p(children_markup)
+
+            elif element['type'] == 'Heading':
+                heading = element.get('text', '')
+                level = element.get('level', 1)
+                if bold:
+                    heading = b(heading)
+                if italic:
+                    heading = em(heading)
+                element_markup = h(level, heading)
+
+            if element['type'] == 'ListItem':
+                if bold:
+                    element_markup = li(b(children_markup))
+                else:
+                    element_markup = li(children_markup)
+
+            elif element['type'] == 'UnorderedList':
+                element_markup = ul(children_markup)
+
+            elif element['type'] == 'OrderedList':
+                element_markup = ol(children_markup)
+
+            elif element['type'] == 'EmbeddedImage':
+                base64_string = element['content']
+                base64_data = base64_string.split(',', 1)[1]
+                image_type = base64_string.split(';')[0].split(
+                    '/')[1]
+                image_bytes = base64.b64decode(base64_data)
+                image_bytes_io = BytesIO(image_bytes)
+
+                try:
+                    image = image_collection.add(
+                        filename=(f'{article_number}-{image_counter}'
+                                  f'.{image_type}'),
+                        content=image_bytes_io
+                    )
+                    if note := element['caption']:
+                        image.note = note
+                    url = request.link(image)
+                    if local:
+                        url = '/' + '/'.join(url.split('/')[3:])
+                    else:
+                        url = '/' + '/'.join(url.split('/')[5:])
+
+                    if image_counter == 0:
+                        added.content['page_image'] = url  # type:ignore
+                        added.meta['page_image'] = url  # type:ignore
+                    else:
+                        alt = element['alt'] if element[
+                            'alt'] else ''
+                        element_markup = img(url, alt)
+                    image_counter += 1
+                except Exception as e:
+                    log.error(
+                        f'Error importing image {image_counter}'
+                        f' for {article_name}: {e}')
+                    if e.args[0].type == 'image':
+                        image = e.args[0]
+                        url = request.link(image)
+                        if local:
+                            url = '/' + '/'.join(url.split('/')[3:])
+                        else:
+                            url = '/' + '/'.join(url.split('/')[5:])
+                        if image_counter == 0:
+                            added.content['page_image'] = url  # type:ignore
+                            added.meta['page_image'] = url  # type:ignore
+                        else:
+                            alt = element['alt'] if element[
+                                'alt'] else ''
+                            element_markup = img(url, alt)
+
+            return element_markup
+
+        for news_item, article_name in news:
+            content = ''
+            image_counter = 0
+            article_number = article_name.split('.')[0]
+
+            article_date = datetime.strptime(article_name.split('_')[0],
+                                             '%Y-%m-%d')
+            publication_start = datetime.strptime(
+                        news_item['metadata']['published'],
+                        '%Y-%m-%dT%H:%M:%S')
+            publication_start = publication_start.replace(
+                        tzinfo=pytz.UTC)
+
+            if start_date and end_date and not (
+                start_date <= article_date <= end_date
+                ) or start_date and (
+                    article_date < start_date) or end_date and (
+                        article_date > end_date):
+                continue
+
+            # Check if article already exists based on title and date
+            if added := session.query(Page).filter(
+                Page.title == news_item['metadata']['title']
+            ).filter(Page.publication_start == publication_start).first():
+                if overwrite_content:
+                    click.echo(f'Overwriting {article_name}')
+
+                    for element in news_item['elements']:
+                        content += content_to_markup(element, image_counter)
+
+                    added.content['text'] = Markup(content)
+                    overwrite_counter += 1
+                else:
+                    click.secho((f'Skipped {article_name} with '
+                                f'title {news_item["metadata"]["title"]}'
+                                f' as it already exists'),
+                                fg='yellow')
+            else:
+                click.echo(f'Importing {article_name}')
+                import_counter += 1
+
+                if not dry_run:
+                    if news_item['metadata'].get('lead', ''):
+                        lead = ' '.join([
+                            t.get('text', '') for t in news_item[
+                                'metadata']['lead']['children']])
+                    else:
+                        lead = ''
+
+                    added = news_collection.add(
+                        parent=news_parent,
+                        title=news_item['metadata']['title'],
+                        lead=lead,
+                        meta={'trait': 'news'},
+                        type='news',
+                        publication_start=publication_start,
+                    )
+
+                    for element in news_item['elements']:
+                        content += content_to_markup(element, image_counter)
+
+                    added.content['text'] = Markup(content)
+
+        click.echo(f'{import_counter} news items imported')
+        click.echo(f'{overwrite_counter} news items overwritten')
+
+    return import_news
+
+
+@cli.command(name='import-meetings')
+@click.argument('path', type=click.Path(exists=True, resolve_path=True))
+@click.option('--overwrite-content', is_flag=True, default=False)
+@click.option('--dry-run', is_flag=True, default=False)
+def import_meetings(
+    path: str,
+    overwrite_content: bool,
+    dry_run: bool,
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Imports meetings from archive of json files
+
+    Example:
+    .. code-block:: bash
+
+        onegov-org --select '/foo/bar' import-meetings /path/to/news
+    """
+
+    # Read all json files in the given directory
+    def read_json_files(path: str) -> Iterator[tuple[dict[str, Any], str]]:
+        for file in Path(path).iterdir():
+            if file.suffix == '.json':
+                with open(file) as f:
+                    yield (json.load(f), file.name)
+
+    def create_meetings(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        meeting_collection = MeetingCollection(request.session)
+
+        def p(inner: str) -> str:
+            return f'<p>{inner}</p>'
+
+        def b(inner: str) -> str:
+            return f'<b>{inner}</b>'
+
+        def em(inner: str) -> str:
+            return f'<em>{inner}</em>'
+
+        def br() -> str:
+            return '<br/>'
+
+        def a(href: str, text: str) -> str:
+            return f'<a href="{href}">{text}</a>'
+
+        def h(level: int, text: str) -> str:
+            return f'<h{level}>{text}</h{level}>'
+
+        meetings = read_json_files(path)
+        import_counter = 0
+        overwrite_counter = 0
+
+        def content_to_markup(element: dict[str, Any]) -> str:
+            element_markup = ''
+            children_markup = ''
+            bold = element.get('bold', False)
+            italic = element.get('italic', False)
+
+            if 'children' in element:
+                for child in element['children']:
+                    children_markup += content_to_markup(
+                        child) + ' '
+
+            if element['type'] == 'Text':
+                text = element.get('text', '')
+                if bold:
+                    text = b(text)
+                if italic:
+                    text = em(text)
+                element_markup = text
+
+            if element['type'] == 'Break':
+                element_markup = br()
+
+            if element['type'] == 'Link':
+                element_markup = a(element['url'], element.get('text', ''))
+
+            if element['type'] == 'Paragraph':
+                element_markup = p(children_markup)
+
+            elif element['type'] == 'Heading':
+                heading = element.get('text', '')
+                level = element.get('level', 1)
+                if bold:
+                    heading = b(heading)
+                if italic:
+                    heading = em(heading)
+                element_markup = h(level, heading)
+
+            return element_markup
+
+        for meeting, article_name in meetings:
+            content = ''
+            # date = meeting['elements'][0]['children'][0]['text']
+            # # Set locale to German for month parsing
+            # try:
+            #     locale.setlocale(locale.LC_TIME, 'de_CH.UTF-8')
+            # except locale.Error:
+            #     # fallback for systems without de_CH
+            #     locale.setlocale(locale.LC_TIME, 'de_DE.UTF-8')
+
+            # # Remove "Uhr" and extra spaces
+            # date_str = date.replace('Uhr', '').strip()
+
+            # # Some months may be abbreviated with a dot, e.g. "Sept."
+            # # Normalize known abbreviations to full month names for strptime
+            # month_map = {
+            #     'Jan.': 'Januar',
+            #     'Feb.': 'Februar',
+            #     'März': 'März',
+            #     'Apr.': 'April',
+            #     'Mai': 'Mai',
+            #     'Juni': 'Juni',
+            #     'Juli': 'Juli',
+            #     'Aug.': 'August',
+            #     'Sept.': 'September',
+            #     'Okt.': 'Oktober',
+            #     'Nov.': 'November',
+            #     'Dez.': 'Dezember'
+            # }
+            # for abbr, full in month_map.items():
+            #     if abbr in date_str:
+            #         date_str = date_str.replace(abbr, full)
+
+            # # Parse the date string
+            # dt = datetime.strptime(date_str, '%d. %B %Y, %H.%M')
+            # dt = dt.replace(tzinfo=pytz.timezone('Europe/Zurich'))
+            # date = dt
+            # click.echo(f'Parsed date: {date}')
+            date = utcnow()
+
+            # Check if article already exists based on title and date
+            if added := session.query(Meeting).filter(
+                Meeting.title == "test").first(): 
+                if overwrite_content:
+                    click.echo(f'Overwriting {article_name}')
+
+                    for element in meeting['elements']:
+                        content += content_to_markup(element)
+
+                    added.content['text'] = Markup(content)
+                    overwrite_counter += 1
+                else:
+                    click.secho((f'Skipped {article_name} with '
+                                f'title {meeting["metadata"]["title"]}'
+                                f' as it already exists'),
+                                fg='yellow')
+            else:
+                click.echo(f'Importing {article_name}')
+                import_counter += 1
+
+                if not dry_run:
+                    location = Markup(
+                        content_to_markup(meeting['elements'][1]))
+
+                    for element in meeting['elements']:
+                        desc = False
+                        description = ''
+                        if element['type'] == 'Heading':
+                            if element['text'] == 'Informationen':
+                                desc = True
+                            else:
+                                desc = False
+                        
+                        if element['type'] == 'Paragraph':
+                            description += content_to_markup(element)
+                        elif element['type'] == 'Heading':
+                            break
+
+                    added = meeting_collection.add(
+                        title="Sitzung des Stadtparlaments",
+                        type='generic',
+                        address=location,
+                        description=Markup(description),
+                        # content={},
+                    )
+
+                    # for element in meeting['elements']:
+                    #     content += content_to_markup(element, image_counter)
+
+                    # added.content['text'] = Markup(content)
+
+        click.echo(f'{import_counter} meetings imported')
+        click.echo(f'{overwrite_counter} meetings overwritten')
+
+    return create_meetings
+
+

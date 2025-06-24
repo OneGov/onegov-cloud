@@ -9,13 +9,13 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID, MarkupText, UTCDateTime
 from onegov.search import ORMSearchable
+from markupsafe import Markup
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     import uuid
 
-    from markupsafe import Markup
     from datetime import datetime
 
     from onegov.parliament.models.political_business import (
@@ -64,7 +64,7 @@ class Meeting(Base, ContentMixin, ORMSearchable):
     start_datetime = Column(UTCDateTime, nullable=True)
 
     #: location address of meeting
-    address: Column[str] = Column(Text, nullable=False)
+    address: Column[Markup] = Column(MarkupText, nullable=False)
 
     description: Column[Markup | None] = Column(MarkupText, nullable=True)
 
