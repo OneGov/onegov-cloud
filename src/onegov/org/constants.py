@@ -26,5 +26,7 @@ PAYMENT_STATES: dict[PaymentState, str] = {
 
 PAYMENT_SOURCES = {
     'manual': _('Manual'),
-    'stripe_connect': _('Stripe Connect')
+    'datatrans': _('Datatrans'),
+    'stripe_connect': _('Stripe Connect'),
+    'worldline_saferpay': _('Worldline Saferpay'),
 }
