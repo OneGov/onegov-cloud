@@ -44,11 +44,20 @@ if TYPE_CHECKING:
     ]
 
     PoliticalBusinessStatus: TypeAlias = Literal[
-        'pending legislative',
-        'pending executive',
-        'substantial',
-        'converted',
+        'abgeschrieben',
+        'beantwortet',
+        'erheblich_erklaert',
+        'erledigt',
+        'nicht_erheblich_erklaert',
+        'nicht_zustandegekommen',
+        'pendent_exekutive',
+        'pendent_legislative',
+        'rueckzug',
+        'umgewandelt',
+        'zurueckgewiesen',
+        'ueberwiesen',
     ]
+
 
 POLITICAL_BUSINESS_TYPE: dict[PoliticalBusinessType, str] = {
     'inquiry': _('Inquiry'),
@@ -72,10 +81,18 @@ POLITICAL_BUSINESS_TYPE: dict[PoliticalBusinessType, str] = {
 }
 
 POLITICAL_BUSINESS_STATUS: dict[PoliticalBusinessStatus, str] = {
-    'pending legislative': _('Pending legislative'),
-    'pending executive': _('Pending executive'),
-    'substantial': _('Substantial'),
-    'converted': _('Converted'),
+    'abgeschrieben': _('Abgeschrieben'),
+    'beantwortet': _('Beantwortet'),
+    'erheblich_erklaert': _('Erheblich erklärt'),
+    'erledigt': _('Erledigt'),
+    'nicht_erheblich_erklaert': _('Nicht erheblich erklärt'),
+    'nicht_zustandegekommen': _('Nicht zustandegekommen'),
+    'pendent_exekutive': _('Pendent Exekutive'),
+    'pendent_legislative': _('Pendent Legislative'),
+    'rueckzug': _('Rückzug'),
+    'umgewandelt': _('Umgewandelt'),
+    'zurueckgewiesen': _('Zurückgewiesen'),
+    'ueberwiesen': _('Überwiesen'),
 }
 
 
@@ -85,6 +102,22 @@ class PoliticalBusiness(
     ContentMixin,
     ORMSearchable
 ):
+
+    GERMAN_STATUS_NAME_TO_VALUE_MAP: dict[str, str] = {
+        'Abgeschrieben': 'abgeschrieben',
+        'Beantwortet': 'beantwortet',
+        'Erheblich erklärt': 'erheblich_erklaert',
+        'Erledigt': 'erledigt',
+        'Nicht erheblich erklärt': 'nicht_erheblich_erklaert',
+        'Nicht zustandegekommen': 'nicht_zustandegekommen',
+        'Pendent Exekutive': 'pendent_exekutive',
+        'Pendent Legislative': 'pendent_legislative',
+        'Rückzug': 'rueckzug',
+        'Umgewandelt': 'umgewandelt',
+        'Zurückgewiesen': 'zurueckgewiesen',
+        'Überwiesen': 'ueberwiesen',
+    }
+
     # Politisches Geschäft
 
     __tablename__ = 'par_political_businesses'

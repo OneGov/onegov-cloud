@@ -10,6 +10,7 @@ import re
 import shutil
 import sys
 import textwrap
+from functools import wraps
 
 from bs4 import BeautifulSoup
 from collections import defaultdict
@@ -42,8 +43,9 @@ from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.models.resource import Resource
 from onegov.page.collection import PageCollection
 from onegov.parliament.collections import MeetingCollection
-from onegov.parliament.models import ParliamentaryGroup, Commission, Meeting
-from onegov.pas.collections import CommissionCollection, ParliamentarianCollection, ParliamentaryGroupCollection
+from onegov.parliament.collections import PoliticalBusinessCollection
+from onegov.pas.collections import CommissionCollection
+from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
@@ -55,6 +57,7 @@ from pathlib import Path
 from sqlalchemy import func, and_, or_
 from sqlalchemy.dialects.postgresql import array
 from uuid import uuid4
+from elasticsearch.exceptions import ConnectionError as ESConnectionError
 
 
 from typing import Any, TYPE_CHECKING
@@ -71,7 +74,6 @@ if TYPE_CHECKING:
     from translationstring import TranslationString
     from uuid import UUID
 import locale
-import pytz
 
 
 cli = command_group()
@@ -1008,32 +1010,42 @@ def mtan_statistics(
 def ul(inner: str) -> str:
     return f'<ul>{inner}</ul>'
 
+
 def ol(inner: str) -> str:
     return f'<ol>{inner}</ol>'
+
 
 def li(inner: str) -> str:
     return f'<li>{inner}</li>'
 
+
 def p(inner: str) -> str:
     return f'<p>{inner}</p>'
+
 
 def b(inner: str) -> str:
     return f'<b>{inner}</b>'
 
+
 def em(inner: str) -> str:
     return f'<em>{inner}</em>'
+
 
 def br() -> str:
     return '<br/>'
 
+
 def a(href: str, text: str) -> str:
     return f'<a href="{href}">{text}</a>'
+
 
 def h(level: int, text: str) -> str:
     return f'<h{level}>{text}</h{level}>'
 
+
 def img(src: str, alt: str) -> str:
     return f'<img class="lazyload-alt" src="{src}" alt="{alt}">'
+
 
 @cli.command(name='import-news')
 @click.argument('path', type=click.Path(exists=True, resolve_path=True))
@@ -1251,6 +1263,7 @@ def import_news(
 
     return import_news
 
+
 def content_to_markup(element: dict[str, Any]) -> str:
     element_markup = ''
     children_markup = ''
@@ -1289,6 +1302,7 @@ def content_to_markup(element: dict[str, Any]) -> str:
         element_markup = h(level, heading)
 
     return element_markup
+
 
 @cli.command(name='import-meetings')
 @click.argument('path', type=click.Path(exists=True, resolve_path=True))
@@ -1375,14 +1389,14 @@ def import_meetings(
                             desc = True
                         else:
                             desc = False
-                    
+
                     if element['type'] == 'Paragraph':
                         description += content_to_markup(element)
                     elif element['type'] == 'Heading':
                         break
 
                 added = meeting_collection.add(
-                    title="Sitzung des Stadtparlaments",
+                    title='Sitzung des Stadtparlaments',
                     type='generic',
                     address=location,
                     description=Markup(description),
@@ -1398,7 +1412,6 @@ def import_meetings(
         click.echo(f'{overwrite_counter} meetings overwritten')
 
     return create_meetings
-
 
 
 @cli.command(name='import-commissions')
@@ -1450,7 +1463,7 @@ def import_commissions(
                             id = link.split('/')[-1]
                             people_ids.append(id)
                         break
-                        
+
                 added = commission_collection.add(
                     name=commission['metadata']['title'],
                     content={'description': Markup(content)},
@@ -1514,7 +1527,7 @@ def import_parliamentary_groups(
                             id = link.split('/')[-1]
                             people_ids.append(id)
                         break
-                        
+
                 added = parliamentary_group_collection.add(
                     name=parliamentary_group['metadata']['title'],
                     content={'description': Markup(content)},
@@ -1529,19 +1542,32 @@ def import_parliamentary_groups(
     return create_parliamentary_groups
 
 
-@cli.command(name='import-parliamentarians')
+def handle_es_connection_error(func):
+    @wraps(func)
+    def wrapper(request, app):
+        try:
+            return func(request, app)
+        except ESConnectionError:
+            click.echo('Ignoring Elasticsearch Connection error.')
+    return wrapper
+
+
+@cli.command(name='import-political-business')
 @click.argument('path', type=click.Path(exists=True, resolve_path=True))
 @click.option('--dry-run', is_flag=True, default=False)
-def import_parliamentarians(
+def import_political_business(
     path: str,
     dry_run: bool,
 ) -> Callable[[OrgRequest, OrgApp], None]:
-    """ Imports parliamentarians from archive of json files
+    """ Imports political_businesses from archive of json files
 
     Example:
     .. code-block:: bash
 
-        onegov-org --select '/foo/bar' import-parliamentarians /path/to/items
+        onegov-org --select '/foo/bar' import-political_businesses ./json-path
+
+    Note this assumes the filename is named 'unknown_2416648.json' where the
+    number 2416648 can be used to find the object in the original url.
     """
 
     # Read all json files in the given directory
@@ -1551,107 +1577,142 @@ def import_parliamentarians(
                 with open(file) as f:
                     yield (json.load(f), file.name)
 
-    def create_parliamentarians(request: OrgRequest, app: OrgApp) -> None:
-        parliamentarian_collection = ParliamentarianCollection(request.session)
+    german_to_english_business_type_map: dict[str, str] = {
+        'Anfrage': 'inquiry',
+        'Antrag': 'proposal',
+        'Auftrag': 'mandate',
+        'Bericht': 'report',
+        'Bericht und Antrag': 'report and proposal',
+        'Beschluss': 'decision',
+        'Botschaft': 'message',
+        'Dringliche Interpellation': 'urgent interpellation',
+        'Einladung': 'invitation',
+        'Interpellation': 'interpelleation',  # Match existing enum typo
+        'Kommissionsbericht': 'commission report',
+        'Mitteilung': 'communication',
+        'Motion': 'motion',
+        'Postulat': 'postulate',
+        'Resolution': 'resolution',
+        'Verordnung': 'regulation',
+        'Verschiedenes': 'miscellaneous',
+        'Wahlen': 'elections',
+    }
 
-        parliamentarians = read_json_files(path)
+    german_to_english_status_map: dict[str, str] = {
+        'Abgeschrieben': 'written_off',
+        'Beantwortet': 'answered',
+        'Erheblich erklärt': 'declared_significant',
+        'Erledigt': 'completed',
+        'Nicht erheblich erklärt': 'declared_insignificant',
+        'Nicht zustandegekommen': 'not_realized',
+        'Pendent Exekutive': 'pending_executive',
+        'Pendent Legislative': 'pending legislative',
+        'Rückzug': 'withdrawn',
+        'Umgewandelt': 'converted',
+        'Zurückgewiesen': 'rejected',
+        'Überwiesen': 'referred',
+    }
+
+    def parse_german_date(date_str: str | None) -> date | None:
+        # Set locale to German for month parsing
+        locale.setlocale(locale.LC_TIME, 'de_CH.UTF-8')
+        return (datetime.strptime(date_str, '%d. %B %Y').date()
+                if date_str else None)
+
+    @handle_es_connection_error
+    def create_political_businesses(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        political_business_collection = PoliticalBusinessCollection(session)
+
+        political_businesses = read_json_files(path)
         import_counter = 0
         overwrite_counter = 0
 
-        for parliamentarian, article_name in parliamentarians:
-            content = ''
-
+        for political_business, article_name in political_businesses:
             click.echo(f'Importing {article_name}')
             import_counter += 1
-
             if not dry_run:
+                elements = political_business.get('elements', [])
+                data_fields: dict[str, str | None] = {
+                    'Nummer': None,
+                    'Geschäftsart': None,
+                    'Status': None,
+                    'Datum': None
+                }
+                people_ids: list[str] = []
 
-                polit_business_ids = []
-                name = parliamentarian['metadata']['title']
-                first_name, last_name = name.split(' ', 1)
-                contact = {}
-                address = True
-                for e, element in enumerate(parliamentarian['elements']):
-                    if element['type'] == 'Paragraph':
-                        for i, child in enumerate(element['children']):
-                            text = child.get('text', '')
-                            if text == 'Personalien' or not text:
-                                continue
-                            if address:
-                                if text.startswith('im Stadtparlament'):
-                                    click.secho(f'Found date: {text}', fg='green')
-                                    contact['date'] = text
-                                elif re.search(r'^[^\d\s]*[^\d]+.*\d', text):
-                                    click.secho(f'Found address: {text}', fg='green')
-                                    contact['address'] = text
-                                elif re.match(r'^\d{4}\s+.+', text):
-                                    click.secho(f'Found zip code: {text}', fg='green')
-                                    contact['zip_code'] = text.split(' ')[0]
-                                    contact['city'] = ' '.join(text.split(' ')[1:])
-                                elif '@' in text:
-                                    click.secho(f'Found email: {text}', fg='green')
-                                    contact['email'] = text
-                                elif text.startswith('Tel. P'):
-                                    text = element['children'][i+1].get('text', '')
-                                    click.secho(f'Found private phone: {text}', fg='green')
-                                    contact['phone_private'] = text
-                                elif text.startswith('Tel.'):
-                                    text = element['children'][i+1].get('text', '')
-                                    click.secho(f'Found private phone: {text}', fg='green')
-                                    contact['phone_business'] = text
-                                elif text.startswith('Mobile'):
-                                    text = element['children'][i+1].get('text', '')
-                                    click.secho(f'Found mobile: {text}', fg='green')
-                                    contact['phone_mobile'] = text
-                                elif text.startswith('Funktion'):
-                                    address = False
-                                    text = parliamentarian['elements'][e+1]['children'][0].get('text', '')
-                                    click.secho(f'Found function: {text}', fg='green')
-                                    contact['function'] = text
-                                elif re.match(r'^[^\d]*$', text):
-                                    if text not in name:
-                                        click.secho(f'Found addition: {text}', fg='green')
-                                        contact['addition'] = text
-                            else:
-                                if text.startswith('Partei'):
-                                    text = parliamentarian['elements'][e+1]['children'][0].get('text', '')
-                                    click.secho(f'Found party: {text}', fg='green')
-                                    contact['party'] = text
-                                elif text.startswith('Beruf'):
-                                    text = parliamentarian['elements'][e+1]['children'][0].get('text', '')
-                                    click.secho(f'Found profession: {text}', fg='green')
-                                    contact['profession'] = text
+                i = 0
+                while i < len(elements):
+                    element = elements[i]
+                    if element.get('type') == 'Paragraph' and \
+                            element.get('children'):
+                        child_text_element = element['children'][0]
+                        label_text = child_text_element.get('text', '').strip()
 
-                    if element['type'] == 'Table':
-                        for row in element['rows']:
-                            link = row['cells'][3]['url']
-                            id = link.split('/')[-1]
-                            polit_business_ids.append(id)
-                        break
-                        
-                added = parliamentarian_collection.add(
-                    first_name=first_name,
-                    last_name=last_name,
-                    phone_mobile=contact.get('phone_mobile', ''),
-                    phone_private=contact.get('phone_private', ''),
-                    phone_business=contact.get('phone_business', ''),
-                    email_primary=contact.get('email', ''),
-                    shipping_address=contact.get('address', ''),
-                    shipping_address_addition=contact.get('addition', ''),
-                    shipping_address_zip_code=contact.get('zip_code', ''),
-                    shipping_address_city=contact.get('city', ''),
-                    party=contact.get('party', ''),
-                    occupation=contact.get('profession', ''),
-                    function=contact.get('function', ''),
-                    meta={
-                        'parliamentarian_id': article_name.split('_')[1],
-                        'polit_business_ids': polit_business_ids},
-                    content={
-                        'info': contact.get('date', '')},
-                )
+                        if label_text in data_fields.keys():
+                            if i + 1 < len(elements):
+                                value_element = elements[i+1]
+                                if value_element.get('type') == 'Paragraph' \
+                                        and value_element.get('children'):
+                                    val_child = value_element['children'][0]
+                                    data_fields[label_text] = \
+                                        val_child.get('text', '').strip()
+                                i += 1  # Consumed value element
+                        elif label_text == 'Verfasser/Beteiligte':
+                            if i + 1 < len(elements):
+                                participants_el = elements[i+1]
+                                if participants_el.get('type') == 'Paragraph'\
+                                        and participants_el.get('children'):
+                                    for child in participants_el['children']:
+                                        if child.get('type') == 'Link' \
+                                                and 'url' in child:
+                                            url_parts = child['url'].split('/')
+                                            if url_parts:
+                                                people_ids.append(url_parts[-1])
+                                i += 1  # Consumed participants element
+                    i += 1
 
-        click.echo(f'{import_counter} parliamentarians imported')
+                german_business_type = data_fields.get('Geschäftsart')
+                english_business_type = None
+                if german_business_type:
+                    value = german_to_english_business_type_map.get(
+                        german_business_type
+                    )
+                    english_business_type = value
+                    if english_business_type is None:
+                        click.secho(f'Warning: Unknown business type '
+                                    f'"{german_business_type}" in '
+                                    f'{article_name}. Setting to None.',
+                                    fg='yellow')
 
-    return create_parliamentarians
+                german_status = data_fields.get('Status')
+                english_status = None
+                if german_status:
+                    english_status = german_to_english_status_map.get(
+                        german_status
+                    )
+                    if english_status is None:
+                        click.secho(f'Warning: Unknown status '
+                                    f'"{german_status}" in {article_name}. '
+                                    f'Setting to None.', fg='yellow')
+                try:
+                    political_business_collection.add(
+                        title=political_business['metadata']['title'],
+                        number=data_fields.get('Nummer'),
+                        political_business_type=english_business_type,
+                        status=english_status,
+                        entry_date=parse_german_date(data_fields.get('Datum')),
+                        content={},
+                        meta={
+                            'people_ids': people_ids,
+                            'source_filename': article_name,
+                            'self_id': article_name.split('.')[0]
+                        }
+                    )
+                except ESConnectionError:
+                    click.echo('Elasticsearch connection error')
 
+        click.echo(f'{import_counter} political_businesses imported')
+        click.echo(f'{overwrite_counter} political_businesses overwritten')
 
+    return create_political_businesses

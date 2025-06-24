@@ -19,5 +19,4 @@ class PoliticalBusinessCollection(GenericCollection[PoliticalBusiness]):
 
     def query(self) -> Query[PoliticalBusiness]:
         query = super().query()
-        # Assuming PoliticalBusiness has a 'title' attribute for default ordering
         return query.order_by(self.model_class.title)
