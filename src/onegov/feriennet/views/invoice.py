@@ -14,7 +14,7 @@ from onegov.feriennet.layout import DonationLayout
 from onegov.feriennet.layout import InvoiceLayout
 from onegov.feriennet.qrbill import generate_qr_bill
 from onegov.feriennet.views.shared import users_for_select_element
-from onegov.pay import process_payment, INSUFFICIENT_FUNDS
+from onegov.pay import process_payment, PaymentError, INSUFFICIENT_FUNDS
 from onegov.user import User
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm.exc import NoResultFound
@@ -224,9 +224,9 @@ def handle_payment(
     assert price is not None
     payment = process_payment('cc', price, provider, token)
 
-    if payment == INSUFFICIENT_FUNDS:
+    if payment is INSUFFICIENT_FUNDS:
         request.alert(_('Your card has insufficient funds'))
-    elif payment is None:
+    elif payment is None or isinstance(payment, PaymentError):
         request.alert(_('Your payment could not be processed'))
     else:
         for item in invoice.items:
