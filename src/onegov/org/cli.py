@@ -1696,6 +1696,8 @@ def import_political_business(
                                     f'"{german_status}" in {article_name}. '
                                     f'Setting to None.', fg='yellow')
                 try:
+                    breakpoint()
+                    pol_business_id = article_name.split('_')[1].split('.')[0]
                     political_business_collection.add(
                         title=political_business['metadata']['title'],
                         number=data_fields.get('Nummer'),
@@ -1706,7 +1708,7 @@ def import_political_business(
                         meta={
                             'people_ids': people_ids,
                             'source_filename': article_name,
-                            'self_id': article_name.split('.')[0]
+                            'self_id': pol_business_id
                         }
                     )
                 except ESConnectionError:
