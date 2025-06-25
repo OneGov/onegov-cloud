@@ -36,9 +36,6 @@ function setupXHREditPaymentStatus() {
                     alert(document.documentElement.lang === 'de-CH' ? 'Ein Fehler ist aufgetreten.' : 'An error occurred.');
                 }
             })
-            .then(data => {
-                window.location.reload();
-            })
             .catch(error => {
                 alert(document.documentElement.lang === 'de-CH' ? 'Ein Fehler ist aufgetreten.' : 'An error occurred.');
                 console.error('Error:', error);
