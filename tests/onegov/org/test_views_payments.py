@@ -102,6 +102,7 @@ def test_filter_by_ticket_date_in_payments(client):
         )
 
     payments = client.get('/payments')
+    payments .showbrowser()
     assert "RSV-" in payments
     assert "Manuell" in payments
     assert "info@example.org" in payments
