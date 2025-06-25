@@ -1,19 +1,8 @@
-
 import transaction
 from datetime import datetime
 from freezegun import freeze_time
 import textwrap
-from onegov.org.models import (
-    ResourceRecipientCollection)
-from onegov.org.models.ticket import ReservationHandler
-from onegov.ticket import Handler, Ticket, TicketCollection
-from onegov.user import UserCollection
 from onegov.reservation import ResourceCollection
-from sqlalchemy.orm import close_all_sessions
-from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
-from tests.shared import Client
-from tests.shared.utils import add_reservation
-
 
 
 
@@ -47,10 +36,8 @@ def test_filter_by_ticket_date_in_payments(client):
 
     # create a reservation
     reserve(quota=2, whole_day=True)
-
     page = client.get('/resource/tageskarte/form')
     page.form['email'] = 'info@example.org'
-
     page.form['donation'] = 'No'
     assert '30.00' in page.form.submit().follow()
 
@@ -83,6 +70,4 @@ def test_filter_by_ticket_date_in_payments(client):
     assert "40.00" in payments
     assert "Offen" in payments
 
-    # todo: add more than one and filter
-
-
+    # we have now a single payment created 09.07.2017 02:00 
