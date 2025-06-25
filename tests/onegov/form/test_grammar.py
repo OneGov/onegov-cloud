@@ -283,6 +283,14 @@ def test_checkbox():
     assert f.label == 'Swiss German'
     assert not f.checked
 
+    # non-latin1 character in label (en dash)
+    # FIXME: Long-term we want this to be an error, but not for
+    #        existing form code
+    f = field.parseString("[ ] Read–only")
+    assert f.type == 'checkbox'
+    assert f.label == 'Read'
+    assert not f.checked
+
 
 def test_fileinput():
 
