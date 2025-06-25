@@ -55,6 +55,9 @@ def _create_ticket_and_set_payment_state(
 @freeze_time("2017-07-09", tick=True)
 def test_filter_by_ticket_date_in_payments(client):
     # prepate the required data
+    # Login as editor once before any resource/scheduler interaction
+    client.login_editor()
+
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
     resource.pricing_method = 'per_item'
@@ -68,9 +71,6 @@ def test_filter_by_ticket_date_in_payments(client):
     """)
 
     scheduler = resource.get_scheduler(client.app.libres_context)
-
-    # Login as editor once before ticket creation and processing
-    client.login_editor()
 
     # First reservation (created on 2017-07-09)
     allocations_d1 = scheduler.allocate(
