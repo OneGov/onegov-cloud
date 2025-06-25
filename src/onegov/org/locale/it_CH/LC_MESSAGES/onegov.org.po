@@ -6243,7 +6243,7 @@ msgstr ""
 
 #, python-format
 msgid "${count} payments marked as invoiced."
-msgstr ""
+msgstr "${count} pagamenti contrassegnati come fatturati."
 
 msgid "The ticket was marked as paid"
 msgstr "Il biglietto è stato contrassegnato come pagato"

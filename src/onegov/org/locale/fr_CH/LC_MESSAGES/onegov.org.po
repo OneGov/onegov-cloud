@@ -6273,7 +6273,7 @@ msgstr "Créances"
 
 #, python-format
 msgid "${count} payments marked as invoiced."
-msgstr ""
+msgstr "${count} paiements marqués comme facturés."
 
 msgid "The ticket was marked as paid"
 msgstr "Le ticket a été marqué comme payé"
