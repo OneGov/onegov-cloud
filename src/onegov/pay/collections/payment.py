@@ -109,6 +109,10 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         elif self.payment_type == 'provider':
             query = query.filter(Payment.provider_id.isnot(None))
 
+        # Filter by payment status
+        if self.status:
+            query = query.filter(Payment.state == self.status)
+
         # Filter by ticket creation date - this is the complex part
         if self.ticket_start or self.ticket_end:
             # Join through reservations to tickets
