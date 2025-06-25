@@ -8,10 +8,24 @@ from onegov.org import _
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
     from onegov.pay import PaymentCollection
 
 
 class PaymentSearchForm(Form):
+
+    STATUS_CHOICES = [
+        ('', _('All')),
+        ('open', _('Open')),
+        ('paid', _('Paid')),
+        ('invoiced', _('Invoiced'))
+    ]
+
+    PAYMENT_TYPE_CHOICES = [
+        ('', _('All')),
+        ('manual', _('Manual')),
+        ('provider', _('Payment Provider'))
+    ]
 
     tz = 'Europe/Zurich'
 
@@ -50,14 +64,17 @@ class PaymentSearchForm(Form):
     status = SelectField(
         label=_('Status'),
         fieldset=_('Filter Payments'),
-        choices=[
-            ('', _('All')),
-            ('open', _('Open')),
-            ('paid', _('Paid')),
-            ('invoiced', _('Invoiced'))
-        ],
+        choices=[],  # To be populated in on_request
         default='',
     )
+
+    payment_type = SelectField(
+        label=_('Payment Type'),
+        fieldset=_('Filter Payments'),
+        choices=[],  # To be populated in on_request
+        default='',
+    )
+
 
     def apply_model(self, model: PaymentCollection) -> None:
         """Populate the form fields from the model's filter values."""
@@ -79,13 +96,13 @@ class PaymentSearchForm(Form):
         # Reset to the first page when filters change
         model.page = 0
 
-    payment_type = SelectField(
-        label=_('Payment Type'),
-        fieldset=_('Filter Payments'),
-        choices=[
-            ('', _('All')),
-            ('manual', _('Manual')),
-            ('provider', _('Payment Provider'))
+    def on_request(self) -> None:
+        # Translate choices on request
+        self.status.choices = [
+            (value, self.request.translate(label))
+            for value, label in self.STATUS_CHOICES
         ],
-        default='',
-    )
+        self.payment_type.choices = [
+            (value, self.request.translate(label))
+            for value, label in self.PAYMENT_TYPE_CHOICES
+        ]
