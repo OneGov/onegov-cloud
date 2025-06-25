@@ -13,10 +13,14 @@ def _create_ticket_and_set_payment_state(
     expected_price_donation
 ):
     """Helper function to create a reservation and process its ticket."""
-    reserve = client.bound_reserve(allocations_for_date[0])
+    # The allocation comes from a previous session that was committed.
+    # Merge it into the current session that libres will use.
+    allocation_to_reserve = allocations_for_date[0]
+    session_for_libres = client.app.libres_context.get_session()
+    merged_allocation = session_for_libres.merge(allocation_to_reserve)
+    reserve_callable = client.bound_reserve(merged_allocation)
 
-    # Create a reservation
-    reserve(quota=2, whole_day=True)  # Sets reservation in session
+    reserve_callable(quota=2, whole_day=True)  # Sets reservation in session
 
     initial_form_page = client.get('/resource/tageskarte/form')
     initial_form_page.form['email'] = email
