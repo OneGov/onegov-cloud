@@ -4675,11 +4675,11 @@ ul.recipients {
     }
 
     &.payment-state-invoiced {
-        border: 1px solid $secondary-color;
+        border: 1px solid get-color(info);
 
         &::before {
-            @include icon('\f570');
-            color: $warning-color;
+            @include icon('\f1ea');
+            color: get-color(info);
             margin-right: .75ex;
         }
     }

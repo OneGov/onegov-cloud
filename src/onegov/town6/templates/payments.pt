@@ -27,8 +27,4 @@
             collection layout.model; current_page layout.model; pagination_centered True" />
 
     </tal:b>
-    <tal:b>
-        <script type="text/javascript">
-        </script>
-    </tal:b>
 </div>

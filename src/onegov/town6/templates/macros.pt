@@ -1195,6 +1195,9 @@
     <div i18n:translate tal:condition="payment.state == 'cancelled'" class="payment-state payment-state-cancelled">
         Refunded
     </div>
+    <div i18n:translate tal:condition="payment.state == 'invoiced'" class="payment-state payment-state-invoiced">
+        Invoiced 
+    </div>
 </metal:payment_status>
 
 <metal:payment_status define-macro="payment_source" i18n:domain="onegov.town6">

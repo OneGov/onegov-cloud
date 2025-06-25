@@ -85,3 +85,4 @@ def test_view_payments_as_admin(client) -> None:
     assert '20.00' in filtered_page.text
     assert "No payments found." not in filtered_page.text
 
+

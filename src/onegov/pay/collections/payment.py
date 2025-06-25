@@ -112,7 +112,6 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         # Filter by ticket creation date - this is the complex part
         if self.ticket_start or self.ticket_end:
             # Join through reservations to tickets
-            # fixme: not sure why this is set... fi ticket_date not set in form
             breakpoint()
             query = query.join(
                 Reservation,

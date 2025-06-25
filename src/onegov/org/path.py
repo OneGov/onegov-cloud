@@ -880,7 +880,9 @@ def get_payment(app: OrgApp, id: UUID) -> Payment | None:
         'start': extended_date_converter,
         'end': extended_date_converter,
         'status': str,
-        'payment_type': str
+        'payment_type': str,
+        'ticket_start': extended_date_converter,
+        'ticket_end': extended_date_converter
     }
 )
 def get_payments(
@@ -890,11 +892,20 @@ def get_payments(
     start: date | None = None,
     end: date | None = None,
     status: str | None = None,
-    payment_type: str | None = None
+    payment_type: str | None = None,
+    ticket_start: date | None = None, 
+    ticket_end: date | None = None   
 ) -> PaymentCollection:
     return PaymentCollection(
-        app.session(), source, page, start, end, status,
-        payment_type
+        session=app.session(),
+        source=source,
+        page=page,
+        start=start,
+        end=end,
+        status=status,
+        payment_type=payment_type,
+        ticket_start=ticket_start,
+        ticket_end=ticket_end 
     )
 
 

@@ -230,11 +230,11 @@ footer {
         width: 100%;
 
         @include breakpoint(medium only) {
-            min-height: 18.75rem; /* 300px / 16px */
+            min-height: 18.75rem
         }
 
         @include breakpoint(small only) {
-            min-height: 12.5rem; /* 200px / 16px */
+            min-height: 200px;
         }
     }
 
@@ -609,7 +609,7 @@ $pageref-color-hover: $iron;
 
     &::after {
         @include icon-bold($pageref-icon);
-    }
+    };
 }
 
 /*
@@ -1390,11 +1390,11 @@ code {
     .form-buttons {
         margin-top: 1.5rem;
         display: flex;
-        gap: 0.5rem; /* Adjust spacing between buttons as needed */
+        gap: 0.5rem; /* Spacing between buttons as needed */
         align-items: center; /* Align items vertically if they have different heights */
 
         .button {
-            margin-top: 0; /* Override general form button top margin for side-by-side layout */
+            margin-top: 0;
         }
     }
 }
