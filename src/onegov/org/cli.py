@@ -43,7 +43,7 @@ from onegov.org.models.resource import Resource
 from onegov.page.collection import PageCollection
 from onegov.parliament.collections import MeetingCollection
 from onegov.parliament.models import ParliamentaryGroup, Commission, Meeting
-from onegov.pas.collections import CommissionCollection, ParliamentaryGroupCollection
+from onegov.pas.collections import CommissionCollection, ParliamentarianCollection, ParliamentaryGroupCollection
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
@@ -1302,7 +1302,7 @@ def import_meetings(
     Example:
     .. code-block:: bash
 
-        onegov-org --select '/foo/bar' import-meetings /path/to/news
+        onegov-org --select '/foo/bar' import-meetings /path/to/items
     """
 
     # Read all json files in the given directory
@@ -1413,7 +1413,7 @@ def import_commissions(
     Example:
     .. code-block:: bash
 
-        onegov-org --select '/foo/bar' import-commissions /path/to/news
+        onegov-org --select '/foo/bar' import-commissions /path/to/items
     """
 
     # Read all json files in the given directory
@@ -1424,7 +1424,6 @@ def import_commissions(
                     yield (json.load(f), file.name)
 
     def create_commissions(request: OrgRequest, app: OrgApp) -> None:
-        session = request.session
         commission_collection = CommissionCollection(request.session)
 
         commissions = read_json_files(path)
@@ -1455,7 +1454,9 @@ def import_commissions(
                 added = commission_collection.add(
                     name=commission['metadata']['title'],
                     content={'description': Markup(content)},
-                    meta={'people_ids': people_ids},
+                    meta={
+                        'commission_id': article_name.split('_')[1],
+                        'people_ids': people_ids},
                 )
 
         click.echo(f'{import_counter} commissions imported')
@@ -1476,7 +1477,7 @@ def import_parliamentary_groups(
     Example:
     .. code-block:: bash
 
-        onegov-org --select '/foo/bar' import-parliamentary_groups /path/to/news
+        onegov-org --select '/foo/bar' import-parliamentary_groups /path/to/items
     """
 
     # Read all json files in the given directory
@@ -1487,7 +1488,6 @@ def import_parliamentary_groups(
                     yield (json.load(f), file.name)
 
     def create_parliamentary_groups(request: OrgRequest, app: OrgApp) -> None:
-        session = request.session
         parliamentary_group_collection = ParliamentaryGroupCollection(request.session)
 
         parliamentary_groups = read_json_files(path)
@@ -1518,12 +1518,140 @@ def import_parliamentary_groups(
                 added = parliamentary_group_collection.add(
                     name=parliamentary_group['metadata']['title'],
                     content={'description': Markup(content)},
-                    meta={'people_ids': people_ids},
+                    meta={
+                        'parliamentary_group_id': article_name.split('_')[1],
+                        'people_ids': people_ids},
                 )
 
         click.echo(f'{import_counter} parliamentary_groups imported')
         click.echo(f'{overwrite_counter} parliamentary_groups overwritten')
 
     return create_parliamentary_groups
+
+
+@cli.command(name='import-parliamentarians')
+@click.argument('path', type=click.Path(exists=True, resolve_path=True))
+@click.option('--dry-run', is_flag=True, default=False)
+def import_parliamentarians(
+    path: str,
+    dry_run: bool,
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Imports parliamentarians from archive of json files
+
+    Example:
+    .. code-block:: bash
+
+        onegov-org --select '/foo/bar' import-parliamentarians /path/to/items
+    """
+
+    # Read all json files in the given directory
+    def read_json_files(path: str) -> Iterator[tuple[dict[str, Any], str]]:
+        for file in Path(path).iterdir():
+            if file.suffix == '.json':
+                with open(file) as f:
+                    yield (json.load(f), file.name)
+
+    def create_parliamentarians(request: OrgRequest, app: OrgApp) -> None:
+        parliamentarian_collection = ParliamentarianCollection(request.session)
+
+        parliamentarians = read_json_files(path)
+        import_counter = 0
+        overwrite_counter = 0
+
+        for parliamentarian, article_name in parliamentarians:
+            content = ''
+
+            click.echo(f'Importing {article_name}')
+            import_counter += 1
+
+            if not dry_run:
+
+                polit_business_ids = []
+                name = parliamentarian['metadata']['title']
+                first_name, last_name = name.split(' ', 1)
+                contact = {}
+                address = True
+                for e, element in enumerate(parliamentarian['elements']):
+                    if element['type'] == 'Paragraph':
+                        for i, child in enumerate(element['children']):
+                            text = child.get('text', '')
+                            if text == 'Personalien' or not text:
+                                continue
+                            if address:
+                                if text.startswith('im Stadtparlament'):
+                                    click.secho(f'Found date: {text}', fg='green')
+                                    contact['date'] = text
+                                elif re.search(r'^[^\d\s]*[^\d]+.*\d', text):
+                                    click.secho(f'Found address: {text}', fg='green')
+                                    contact['address'] = text
+                                elif re.match(r'^\d{4}\s+.+', text):
+                                    click.secho(f'Found zip code: {text}', fg='green')
+                                    contact['zip_code'] = text.split(' ')[0]
+                                    contact['city'] = ' '.join(text.split(' ')[1:])
+                                elif '@' in text:
+                                    click.secho(f'Found email: {text}', fg='green')
+                                    contact['email'] = text
+                                elif text.startswith('Tel. P'):
+                                    text = element['children'][i+1].get('text', '')
+                                    click.secho(f'Found private phone: {text}', fg='green')
+                                    contact['phone_private'] = text
+                                elif text.startswith('Tel.'):
+                                    text = element['children'][i+1].get('text', '')
+                                    click.secho(f'Found private phone: {text}', fg='green')
+                                    contact['phone_business'] = text
+                                elif text.startswith('Mobile'):
+                                    text = element['children'][i+1].get('text', '')
+                                    click.secho(f'Found mobile: {text}', fg='green')
+                                    contact['phone_mobile'] = text
+                                elif text.startswith('Funktion'):
+                                    address = False
+                                    text = parliamentarian['elements'][e+1]['children'][0].get('text', '')
+                                    click.secho(f'Found function: {text}', fg='green')
+                                    contact['function'] = text
+                                elif re.match(r'^[^\d]*$', text):
+                                    if text not in name:
+                                        click.secho(f'Found addition: {text}', fg='green')
+                                        contact['addition'] = text
+                            else:
+                                if text.startswith('Partei'):
+                                    text = parliamentarian['elements'][e+1]['children'][0].get('text', '')
+                                    click.secho(f'Found party: {text}', fg='green')
+                                    contact['party'] = text
+                                elif text.startswith('Beruf'):
+                                    text = parliamentarian['elements'][e+1]['children'][0].get('text', '')
+                                    click.secho(f'Found profession: {text}', fg='green')
+                                    contact['profession'] = text
+
+                    if element['type'] == 'Table':
+                        for row in element['rows']:
+                            link = row['cells'][3]['url']
+                            id = link.split('/')[-1]
+                            polit_business_ids.append(id)
+                        break
+                        
+                added = parliamentarian_collection.add(
+                    first_name=first_name,
+                    last_name=last_name,
+                    phone_mobile=contact.get('phone_mobile', ''),
+                    phone_private=contact.get('phone_private', ''),
+                    phone_business=contact.get('phone_business', ''),
+                    email_primary=contact.get('email', ''),
+                    shipping_address=contact.get('address', ''),
+                    shipping_address_addition=contact.get('addition', ''),
+                    shipping_address_zip_code=contact.get('zip_code', ''),
+                    shipping_address_city=contact.get('city', ''),
+                    party=contact.get('party', ''),
+                    occupation=contact.get('profession', ''),
+                    function=contact.get('function', ''),
+                    meta={
+                        'parliamentarian_id': article_name.split('_')[1],
+                        'polit_business_ids': polit_business_ids},
+                    content={
+                        'info': contact.get('date', '')},
+                )
+
+        click.echo(f'{import_counter} parliamentarians imported')
+
+    return create_parliamentarians
 
 
