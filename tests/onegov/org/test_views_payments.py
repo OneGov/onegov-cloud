@@ -73,6 +73,7 @@ def test_filter_by_ticket_date_in_payments(client):
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     # First reservation (created on 2017-07-09)
+    transaction.begin()
     allocations_d1 = scheduler.allocate(
         dates=(
             datetime(2017, 7, 9),
@@ -88,6 +89,7 @@ def test_filter_by_ticket_date_in_payments(client):
 
     # Second reservation (created on 2017-07-08)
     with freeze_time("2017-07-08", tick=True):
+        transaction.begin()
         allocations_d2 = scheduler.allocate(
             dates=(
                 datetime(2017, 7, 8),  # Reservation for July 8th
