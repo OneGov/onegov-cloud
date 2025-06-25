@@ -4,8 +4,8 @@ from onegov.pas.layouts.attendence import AttendenceLayout
 from onegov.pas.layouts.attendence import AttendenceCollectionLayout
 from onegov.pas.layouts.change import ChangeCollectionLayout
 from onegov.pas.layouts.change import ChangeLayout
-from onegov.pas.layouts.commission import CommissionCollectionLayout
-from onegov.pas.layouts.commission import CommissionLayout
+from onegov.pas.layouts.commission import PASCommissionCollectionLayout
+from onegov.pas.layouts.commission import PASCommissionLayout
 from onegov.pas.layouts.commission_membership import CommissionMembershipLayout
 from onegov.pas.layouts.default import DefaultLayout
 from onegov.pas.layouts.import_layout import ImportLayout
@@ -31,8 +31,8 @@ __all__ = (
     'AttendenceLayout',
     'ChangeCollectionLayout',
     'ChangeLayout',
-    'CommissionCollectionLayout',
-    'CommissionLayout',
+    'PASCommissionCollectionLayout',
+    'PASCommissionLayout',
     'CommissionMembershipLayout',
     'DefaultLayout',
     'ImportLayout',

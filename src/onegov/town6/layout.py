@@ -71,6 +71,11 @@ from onegov.org.models import PageMove
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.page import PageCollection
 from onegov.parliament.collections import RISPartyCollection
+from onegov.parliament.collections.commission import (
+    CommissionCollection,
+    RISCommissionCollection
+)
+from onegov.parliament.collections.party import PartyCollection
 from onegov.stepsequence import step_sequences
 from onegov.stepsequence.extension import StepsLayoutExtension
 from onegov.town6 import _
@@ -233,6 +238,10 @@ class DefaultLayout(OrgDefaultLayout, Layout):
                 }
             )
         )
+
+    @cached_property
+    def ris_settings_url(self) -> str:
+        return self.request.link(self.request.app.org, 'ris-settings')
 
 
 class DefaultMailLayout(OrgDefaultMailLayout, Layout):
@@ -1026,8 +1035,9 @@ class ArchivedChatsLayout(DefaultLayout):
 
         return bc
 
+
 class MeetingCollectionLayout(DefaultLayout):
-    
+
     @cached_property
     def title(self) -> str:
         return _('Meetings')
@@ -1060,8 +1070,9 @@ class MeetingCollectionLayout(DefaultLayout):
             ]
         return None
 
+
 class MeetingLayout(DefaultLayout):
-    
+
     @cached_property
     def title(self) -> str:
         return self.model.title
@@ -1110,7 +1121,7 @@ class RISPartyCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            # Link(_('Settings'), self.ris_settings_url),  # FIXME
+            Link(_('Settings'), self.ris_settings_url),
             Link(self.title, self.request.link(self.model)),
         ]
 
@@ -1133,11 +1144,12 @@ class RISPartyCollectionLayout(DefaultLayout):
 
 
 # FIXME create base class in onegov/parliament/layouts.py
+# e.g. DefaultParliamentLayout
 class RISPartyLayout(DefaultLayout):
 
     @cached_property
-    def collection(self) -> RISPartyCollection:
-        return RISPartyCollection(self.request.session)
+    def collection(self) -> PartyCollection:
+        return PartyCollection(self.request.session)
 
     @cached_property
     def title(self) -> str:
@@ -1151,8 +1163,8 @@ class RISPartyLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            # Link(_('Settings'), self.ris_settings_url),  # FIXME
-            Link(_('Parties'), self.request.link(self.collection)),
+            Link(_('Settings'), self.ris_settings_url),
+            Link(_('Parties'), self.request.class_link(RISPartyCollection)),
             Link(self.title, self.request.link(self.model)),
         ]
 
@@ -1178,9 +1190,114 @@ class RISPartyLayout(DefaultLayout):
                         ),
                         Intercooler(
                             request_method='DELETE',
-                            redirect_after=self.request.link(self.collection),
+                            redirect_after=self.request.class_link(RISPartyCollection)
                         ),
                     ),
                 ),
+            ]
+        return None
+
+
+class RISCommissionCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Commissions')
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Settings'), self.ris_settings_url),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Commission'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-commission'}
+                        ),
+                    ]
+                ),
+            ]
+        return None
+
+
+class RISCommissionLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self) -> CommissionCollection:
+        return CommissionCollection(self.request.session)
+
+    @cached_property
+    def title(self) -> str:
+        return self.model.name
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Settings'), self.ris_settings_url),
+            Link(_('Commissions'),
+                 self.request.class_link(RISCommissionCollection)),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Parliamentarian'),
+                            url=self.request.link(
+                                self.model,
+                                'new-membership'
+                            ),
+                            attrs={'class': 'new-parliamentarian'}
+                        ),
+                    ]
+                ),
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _('Do you really want to delete this commission?'),
+                            _('This cannot be undone.'),
+                            _('Delete commission'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(RISCommissionCollection)
+                        )
+                    )
+                )
             ]
         return None

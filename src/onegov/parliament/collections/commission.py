@@ -4,8 +4,7 @@ from datetime import date
 from sqlalchemy import or_
 
 from onegov.core.collection import GenericCollection
-from onegov.parliament.models import RISParty, Party
-
+from onegov.parliament.models import Commission, RISCommission
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -14,7 +13,7 @@ if TYPE_CHECKING:
     from typing import Self
 
 
-class PartyCollection(GenericCollection[Party]):
+class CommissionCollection(GenericCollection[Commission]):
 
     def __init__(
         self,
@@ -24,20 +23,25 @@ class PartyCollection(GenericCollection[Party]):
         super().__init__(session)
         self.active = active
 
-    def query(self) -> Query[Party]:
+    @property
+    def model_class(self) -> type[Commission]:
+        return Commission
+
+    def query(self) -> Query[Commission]:
         query = super().query()
-        model_class = self.model_class
+
         if self.active is not None:
             if self.active:
                 query = query.filter(
                     or_(
-                        self.model_class.end.is_(None),
-                        self.model_class.end >= date.today()
+                        Commission.end.is_(None),
+                        Commission.end >= date.today()
                     )
                 )
             else:
-                query = query.filter(model_class.end < date.today())
-        return query.order_by(model_class.name)
+                query = query.filter(Commission.end < date.today())
+
+        return query.order_by(Commission.name)
 
     def for_filter(
         self,
@@ -46,8 +50,8 @@ class PartyCollection(GenericCollection[Party]):
         return self.__class__(self.session, active)
 
 
-class RISPartyCollection(PartyCollection):
+class RISCommissionCollection(CommissionCollection):
 
     @property
-    def model_class(self) -> type[Party]:
-        return RISParty
+    def model_class(self) -> type[Commission]:
+        return RISCommission

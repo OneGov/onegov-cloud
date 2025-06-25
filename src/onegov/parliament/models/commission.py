@@ -141,3 +141,12 @@ class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     def __repr__(self) -> str:
         return f'<Commission {self.name}>'
+
+
+class RISCommission(Commission):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'ris_commission',
+    }
+
+    es_type_name = 'ris_commission'

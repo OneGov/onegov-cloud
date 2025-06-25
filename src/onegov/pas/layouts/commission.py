@@ -10,7 +10,7 @@ from onegov.pas.collections import CommissionCollection
 from onegov.pas.layouts.default import DefaultLayout
 
 
-class CommissionCollectionLayout(DefaultLayout):
+class PASCommissionCollectionLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
@@ -46,7 +46,7 @@ class CommissionCollectionLayout(DefaultLayout):
         return None
 
 
-class CommissionLayout(DefaultLayout):
+class PASCommissionLayout(DefaultLayout):
 
     @cached_property
     def collection(self) -> CommissionCollection:

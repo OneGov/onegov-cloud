@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from webob.exc import HTTPNotFound
+
 from onegov.core.security import Private, Public
 
 from onegov.parliament.collections import RISPartyCollection
@@ -33,6 +35,9 @@ def ris_view_parties(
     self: RISPartyCollection,
     request: TownRequest
 ) -> RenderData | Response:
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
+
     return view_parties(self, request, RISPartyCollectionLayout(self, request))
 
 
@@ -48,6 +53,9 @@ def ris_add_party(
     request: TownRequest,
     form: PartyForm
 ) -> RenderData | Response:
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
+
     return add_party(
         self,
         request,
@@ -65,6 +73,9 @@ def ris_view_party(
     self: RISParty,
     request: TownRequest
 ) -> RenderData:
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
+
     return view_party(self, request, RISPartyLayout(self, request))
 
 
@@ -76,10 +87,13 @@ def ris_view_party(
     form=PartyForm
 )
 def ris_edit_party(
-        self: RISParty,
-        request: TownRequest,
-        form: PartyForm
+    self: RISParty,
+    request: TownRequest,
+    form: PartyForm
 ) -> RenderData | Response:
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
+
     return edit_party(self, request, form, RISPartyLayout(self, request))
 
 
@@ -92,4 +106,7 @@ def ris_delete_party(
     self: RISParty,
     request: TownRequest
 ) -> None:
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
+
     return delete_party(self, request)

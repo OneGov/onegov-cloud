@@ -152,7 +152,6 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
                     ),
                 )
 
-
             links.append(
                 Link(
                     _('Link Check'),

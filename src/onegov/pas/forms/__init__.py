@@ -4,7 +4,7 @@ from onegov.pas.forms.attendence import AttendenceAddCommissionForm
 from onegov.pas.forms.attendence import AttendenceAddForm
 from onegov.pas.forms.attendence import AttendenceAddPlenaryForm
 from onegov.pas.forms.attendence import AttendenceForm
-from onegov.pas.forms.commission import CommissionForm
+from onegov.parliament.forms.commission import CommissionForm
 from onegov.pas.forms.commission_membership import CommissionMembershipAddForm
 from onegov.pas.forms.commission_membership import CommissionMembershipForm
 from onegov.pas.forms.legislative_period import LegislativePeriodForm

@@ -13,6 +13,7 @@ from onegov.pas.collections import PASPartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
 from onegov.pas.collections import ImportLogCollection
+from onegov.pas.collections.commission import PASCommissionCollection
 from onegov.pas.models import PASAttendence
 from onegov.pas.models import PASChange
 from onegov.pas.models import PASCommission
@@ -115,8 +116,8 @@ def get_change(
 def get_commissions(
     app: PasApp,
     active: bool = True
-) -> CommissionCollection:
-    return CommissionCollection(app.session(), active)
+) -> PASCommissionCollection:
+    return PASCommissionCollection(app.session(), active)
 
 
 @PasApp.path(
@@ -128,7 +129,7 @@ def get_commission(
     app: PasApp,
     id: UUID,
 ) -> PASCommission | None:
-    return CommissionCollection(app.session()).by_id(id)
+    return PASCommissionCollection(app.session()).by_id(id)
 
 
 @PasApp.path(
