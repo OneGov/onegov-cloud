@@ -28,8 +28,12 @@ function setupXHREditPaymentStatus() {
             .then(async response => {
                 const text = await response.text();
                 try {
-                    console.log(text)
-                    const data = JSON.parse(text);
+                    JSON.parse(text);
+                    // Many browsers cache and restore the state of form fields, that includes checkboxes
+                    // This doesn't make sense heren so we uncheck them.
+                    document.querySelectorAll('input[name="selected_payments"]:checked').forEach(function(checkbox) {
+                        checkbox.checked = false;
+                    });
                     window.location.reload();
                 } catch (e) {
                     console.error('Response was not JSON:', text);
