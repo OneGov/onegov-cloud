@@ -1,21 +1,23 @@
 from __future__ import annotations
 
 from collections import defaultdict
+
+from libres.db.models import Reservation
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.pay.models import Payment
-from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
-from sqlalchemy.orm import undefer
+from onegov.core.orm.types import UUID as onegovUUID
+from sqlalchemy.sql.expression import cast
 
 
 from typing import Any, TYPE_CHECKING
+from onegov.ticket.model import Ticket
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
     from datetime import datetime
     from decimal import Decimal
     from onegov.pay.types import AnyPayableBase, PaymentState
     from sqlalchemy.orm import Query, Session
-    from typing import Self
     from uuid import UUID
 
 
@@ -36,13 +38,21 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         source: str = '*',
         page: int = 0,
         start: datetime | None = None,
-        end: datetime | None = None
+        end: datetime | None = None,
+        ticket_start: datetime | None = None,
+        ticket_end: datetime | None =None,
+        status: str | None = None,
+        payment_type: str | None = None
     ):
         GenericCollection.__init__(self, session)
         Pagination.__init__(self, page)
         self.source = source
         self.start = start
         self.end = end
+        self.status = status
+        self.payment_type = payment_type
+        self.ticket_start = ticket_start
+        self.ticket_end = ticket_end
 
     @property
     def model_class(self) -> type[Payment]:
@@ -86,27 +96,54 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             and self.page == other.page
             and self.start == other.start
             and self.end == other.end
+            and self.status == other.status
+            and self.payment_type == other.payment_type
         )
 
     def subset(self) -> Query[Payment]:
-        q = self.query().order_by(desc(Payment.created))
+        query = self.query()
 
-        if self.start:
-            q = q.filter(self.start <= Payment.created)
+        # Filter by payment type
+        if self.payment_type == 'manual':
+            query = query.filter(Payment.provider_id.is_(None))
+        elif self.payment_type == 'provider':
+            query = query.filter(Payment.provider_id.isnot(None))
 
-        if self.end:
-            q = q.filter(Payment.created <= self.end)
+        # Filter by ticket creation date - this is the complex part
+        if self.ticket_start or self.ticket_end:
+            # Join through reservations to tickets
+            breakpoint()
+            query = query.join(
+                Reservation,
+                Payment.id == Reservation.payment_id
+            ).join(
+                Ticket,
+                cast(Reservation.token, onegovUUID) == Ticket.handler_id
+            )
 
-        q = q.options(joinedload(Payment.provider))  # type:ignore[misc]
-        q = q.options(undefer(Payment.created))
-        return q
+            if self.ticket_start:
+                query = query.filter(Ticket.created >= self.ticket_start)
+            if self.ticket_end:
+                query = query.filter(Ticket.created <= self.ticket_end)
+
+        return query.order_by(Payment.created.desc())
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> Self:
-        return self.__class__(self.session, self.source, index)
+    def page_by_index(self, index):
+        return self.__class__(
+            self.session,
+            page=index,
+            start=self.start,
+            end=self.end,
+            ticket_start=self.ticket_start,
+            ticket_end=self.ticket_end,
+            payment_type=self.payment_type,
+            source=self.source,
+            status=self.status
+        )
 
     def payment_links_for(
         self,

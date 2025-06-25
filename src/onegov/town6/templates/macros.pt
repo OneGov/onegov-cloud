@@ -1195,6 +1195,9 @@
     <div i18n:translate tal:condition="payment.state == 'cancelled'" class="payment-state payment-state-cancelled">
         Refunded
     </div>
+    <div i18n:translate tal:condition="payment.state == 'invoiced'" class="payment-state payment-state-invoiced">
+        Invoiced 
+    </div>
 </metal:payment_status>
 
 <metal:payment_status define-macro="payment_source" i18n:domain="onegov.town6">
@@ -2109,6 +2112,9 @@
     <table class="payments-table" tal:condition="payments">
         <thead>
             <tr>
+                <th class="select-all-checkbox-cell">
+                    <input type="checkbox" aria-label="Select all payments" />
+                </th>
                 <th i18n:translate tal:condition="payment_links|nothing">
                     Object
                 </th>
@@ -2135,6 +2141,9 @@
         </thead>
         <tbody>
             <tr tal:repeat="payment payments">
+                <td class="payment-checkbox-cell">
+                    <input type="checkbox" name="selected_payments" value="${payment.id}" aria-label="Select this payment" />
+                </td>
                 <td tal:condition="payment_links|nothing">
                     <tal:b repeat="link payment_links[payment.id]">
                         <tal:b switch="link.__tablename__">

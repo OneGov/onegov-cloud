@@ -21,7 +21,8 @@ PAYMENT_STATES: dict[PaymentState, str] = {
     'open': TICKET_STATES['open'],
     'paid': _('Paid'),
     'failed': _('Failed'),
-    'cancelled': _('Refunded')
+    'cancelled': _('Refunded'),
+    'invoiced': _('Invoiced')
 }
 
 PAYMENT_SOURCES = {

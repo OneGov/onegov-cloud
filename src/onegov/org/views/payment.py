@@ -8,6 +8,7 @@ from onegov.core.security import Private
 from onegov.form import merge_forms
 from onegov.org import OrgApp, _
 from onegov.org.forms import DateRangeForm, ExportForm
+from onegov.org.forms.payments_search_form import PaymentSearchForm
 from onegov.org.layout import PaymentCollectionLayout, DefaultLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import PaymentMessage, TicketMessage
@@ -22,12 +23,12 @@ from onegov.pay.models.payment_providers.stripe import StripePayment
 from onegov.pay.models.payment_providers.worldline_saferpay import (
     SaferpayPayment)
 from onegov.ticket import Ticket, TicketCollection
-from webob import exc
+from webob import exc, Response as WebobResponse
 
 
 from typing import Any, TYPE_CHECKING
-if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+if TYPE_CHECKING:  # pragma: no cover
+    from collections.abc import Callable, Sequence  # type: ignore[attr-defined]
     from datetime import datetime
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
@@ -102,34 +103,74 @@ def send_ticket_notifications(
         )
 
 
-@OrgApp.html(
+@OrgApp.form(
     model=PaymentCollection,
     template='payments.pt',
+    form=PaymentSearchForm,
     permission=Private
 )
 def view_payments(
     self: PaymentCollection,
     request: OrgRequest,
+    form: PaymentSearchForm,
     layout: PaymentCollectionLayout | None = None
-) -> RenderData:
+) -> RenderData | WebobResponse:
+    layout = layout or PaymentCollectionLayout(self, request)
+    request.include('invoicing')
+
+    if form.submitted(request):
+        form.update_model(self)
+        return request.redirect(request.link(self))
+
+    if not form.errors:
+        form.apply_model(self)
 
     tickets = TicketCollection(request.session)
-
     providers = {
         provider.id: provider
         for provider in PaymentProviderCollection(request.session).query()
     }
-
     payment_links = self.payment_links_by_batch()
 
     return {
-        'title': _('Payments'),
+        'title': _('Receivables'),
+        'form': form,
         'layout': layout or PaymentCollectionLayout(self, request),
         'payments': self.batch,
         'get_ticket': partial(ticket_by_link, tickets),
         'providers': providers,
         'payment_links': payment_links
     }
+
+
+@OrgApp.json(
+    model=PaymentCollection,
+    name='batch-mark-invoiced',
+    request_method='POST',
+    permission=Private
+)
+def handle_batch_mark_payments_invoiced(
+    self: PaymentCollection,
+    request: OrgRequest
+) -> JSON_ro:
+
+    request.assert_valid_csrf_token()
+    payment_ids = request.json_body.get('payment_ids', [])
+    payments_query = self.session.query(Payment).distinct().filter(
+        Payment.id.in_(payment_ids)
+    )
+    updated_count = 0
+    for payment in payments_query:
+        payment.state = 'invoiced'
+        updated_count += 1
+
+    if updated_count > 0:
+        request.success(_('${count} payments marked as invoiced.',
+                        mapping={'count': updated_count}))
+
+    ok_message = _(f'{updated_count} payments marked as invoiced.')
+    return {'status': 'success', 
+            'message': ok_message}
 
 
 @OrgApp.form(

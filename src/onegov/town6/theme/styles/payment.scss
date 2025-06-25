@@ -90,6 +90,16 @@
             margin-right: .75ex;
         }
     }
+
+    &.payment-state-invoiced {
+        border: 1px solid get-color(info);
+
+        &::before {
+            @include icon('\f1ea');
+            color: get-color(info);
+            margin-right: .75ex;
+        }
+    }
 }
 
 .tickets-table .payment-state {
