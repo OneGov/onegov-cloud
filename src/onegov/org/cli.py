@@ -1640,6 +1640,7 @@ def import_political_business(
                     'Datum': None
                 }
                 people_ids: list[str] = []
+                parliamentary_group_ids: list[str] = []
 
                 i = 0
                 while i < len(elements):
@@ -1670,6 +1671,18 @@ def import_political_business(
                                             if url_parts:
                                                 people_ids.append(url_parts[-1])
                                 i += 1  # Consumed participants element
+                        elif label_text == 'Fraktionen':
+                            if i + 1 < len(elements):
+                                fraktionen_el = elements[i+1]
+                                if fraktionen_el.get('type') == 'Paragraph' \
+                                        and fraktionen_el.get('children'):
+                                    for child in fraktionen_el['children']:
+                                        if child.get('type') == 'Link' \
+                                                and 'url' in child:
+                                            url_parts = child['url'].split('/')
+                                            if url_parts:
+                                                parliamentary_group_ids.append(url_parts[-1])
+                                i += 1  # Consumed fraktionen element
                     i += 1
 
                 german_business_type = data_fields.get('Geschäftsart')
@@ -1696,7 +1709,6 @@ def import_political_business(
                                     f'"{german_status}" in {article_name}. '
                                     f'Setting to None.', fg='yellow')
                 try:
-                    breakpoint()
                     pol_business_id = article_name.split('_')[1].split('.')[0]
                     political_business_collection.add(
                         title=political_business['metadata']['title'],
@@ -1707,7 +1719,7 @@ def import_political_business(
                         content={},
                         meta={
                             'people_ids': people_ids,
-                            'source_filename': article_name,
+                            'parliamentary_group_ids': parliamentary_group_ids,
                             'self_id': pol_business_id
                         }
                     )
