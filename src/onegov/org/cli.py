@@ -19,7 +19,9 @@ from io import BytesIO
 
 from markupsafe import Markup
 import pytz
+import requests
 from sedate import utcnow
+from onegov import file
 from onegov.core.orm.utils import QueryChain
 from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
 from onegov.chat import MessageCollection
@@ -31,6 +33,7 @@ from onegov.directory.models.directory import DirectoryFile
 from onegov.event import Event, Occurrence, EventCollection
 from onegov.event.collections.events import EventImportItem
 from onegov.file import File
+from onegov.file.collection import FileCollection
 from onegov.form import FormCollection, FormDefinition
 from onegov.org import log
 from onegov.org.formats import DigirezDB
@@ -74,6 +77,8 @@ if TYPE_CHECKING:
     from translationstring import TranslationString
     from uuid import UUID
 import locale
+import pytz
+import re
 
 
 cli = command_group()
@@ -1144,7 +1149,7 @@ def import_news(
             elif element['type'] == 'OrderedList':
                 element_markup = ol(children_markup)
 
-            elif element['type'] == 'EmbeddedImage':
+            elif element['type'] == 'EmbeddedImage' and element['content']:
                 base64_string = element['content']
                 base64_data = base64_string.split(',', 1)[1]
                 image_type = base64_string.split(';')[0].split(
@@ -1327,52 +1332,43 @@ def import_meetings(
                     yield (json.load(f), file.name)
 
     def create_meetings(request: OrgRequest, app: OrgApp) -> None:
-        session = request.session
         meeting_collection = MeetingCollection(request.session)
+        file_collection = FileCollection(request.session)
 
         meetings = read_json_files(path)
         import_counter = 0
         overwrite_counter = 0
 
         for meeting, article_name in meetings:
-            content = ''
-            # date = meeting['elements'][0]['children'][0]['text']
-            # # Set locale to German for month parsing
-            # try:
-            #     locale.setlocale(locale.LC_TIME, 'de_CH.UTF-8')
-            # except locale.Error:
-            #     # fallback for systems without de_CH
-            #     locale.setlocale(locale.LC_TIME, 'de_DE.UTF-8')
+            date = meeting['elements'][0]['children'][0]['text']
+            # Set locale to German for month parsing
+            try:
+                locale.setlocale(locale.LC_TIME, 'de_CH.UTF-8')
+            except locale.Error:
+                locale.setlocale(locale.LC_TIME, 'de_DE.UTF-8')
 
-            # # Remove "Uhr" and extra spaces
-            # date_str = date.replace('Uhr', '').strip()
+            date_str = date  # e.g. "7. Nov. 2024, 17.00 Uhr - 20.05 Uhr"
 
-            # # Some months may be abbreviated with a dot, e.g. "Sept."
-            # # Normalize known abbreviations to full month names for strptime
-            # month_map = {
-            #     'Jan.': 'Januar',
-            #     'Feb.': 'Februar',
-            #     'März': 'März',
-            #     'Apr.': 'April',
-            #     'Mai': 'Mai',
-            #     'Juni': 'Juni',
-            #     'Juli': 'Juli',
-            #     'Aug.': 'August',
-            #     'Sept.': 'September',
-            #     'Okt.': 'Oktober',
-            #     'Nov.': 'November',
-            #     'Dez.': 'Dezember'
-            # }
-            # for abbr, full in month_map.items():
-            #     if abbr in date_str:
-            #         date_str = date_str.replace(abbr, full)
-
-            # # Parse the date string
-            # dt = datetime.strptime(date_str, '%d. %B %Y, %H.%M')
-            # dt = dt.replace(tzinfo=pytz.timezone('Europe/Zurich'))
-            # date = dt
-            # click.echo(f'Parsed date: {date}')
-            date = utcnow()
+            # Regex to extract parts
+            match = re.match(
+                r'(\d{1,2})\. (\w+)\.? (\d{4}), (\d{1,2})\.(\d{2}) Uhr - (\d{1,2})\.(\d{2}) Uhr',
+                date_str
+            )
+            if match:
+                day, month_str, year, sh, sm, eh, em = match.groups()
+                # Parse month name to month number
+                month = datetime.strptime(month_str, '%b').month
+                start_dt = datetime(
+                    int(year), month, int(day), int(sh), int(sm)
+                )
+                end_dt = datetime(
+                    int(year), month, int(day), int(eh), int(em)
+                )
+                # Add timezone
+                start_dt = pytz.timezone('Europe/Zurich').localize(start_dt)
+                end_dt = pytz.timezone('Europe/Zurich').localize(end_dt)
+            else:
+                start_dt = end_dt = None  # type:ignore
 
             click.echo(f'Importing {article_name}')
             import_counter += 1
@@ -1380,33 +1376,55 @@ def import_meetings(
             if not dry_run:
                 location = Markup(
                     content_to_markup(meeting['elements'][1]))
-
+                documents = False
+                desc = False
+                description = ''
+                files = []
                 for element in meeting['elements']:
-                    desc = False
-                    description = ''
                     if element['type'] == 'Heading':
                         if element['text'] == 'Informationen':
                             desc = True
+                        elif element['text'] == 'Dokumente':
+                            documents = True
                         else:
                             desc = False
-
-                    if element['type'] == 'Paragraph':
-                        description += content_to_markup(element)
-                    elif element['type'] == 'Heading':
-                        break
+                            documents = False
+                    if desc:
+                        if element['type'] == 'Paragraph':
+                            if element.get('children') and (
+                                element['children'][0].get('text') != 'Beschreibung'):
+                                description += content_to_markup(element)
+                    if documents:
+                        if element['type'] == 'Table':
+                            for row in element['rows']:
+                                link = row['cells'][0]['url']
+                                resp = requests.get(link)
+                                if resp.status_code == 200:
+                                    if file_collection.by_content(
+                                        BytesIO(resp.content)
+                                    ):
+                                        click.echo(
+                                            f'File {row["cells"][0]["text"]} already exists, skipping.'
+                                    )
+                                    else:
+                                        file = file_collection.add(
+                                            filename=row['cells'][0]['text'],
+                                            content=BytesIO(resp.content)
+                                        )
+                                        files.append(file)
+                                        print(file.name)
 
                 added = meeting_collection.add(
                     title='Sitzung des Stadtparlaments',
                     type='generic',
+                    start_datetime=start_dt,
+                    end_datetime=end_dt,
                     address=location,
-                    description=Markup(description),
+                    # description=Markup(description),
                     # content={},
                 )
 
-                # for element in meeting['elements']:
-                #     content += content_to_markup(element, image_counter)
-
-                # added.content['text'] = Markup(content)
+                added.files = files
 
         click.echo(f'{import_counter} meetings imported')
         click.echo(f'{overwrite_counter} meetings overwritten')

@@ -8,8 +8,8 @@ from sqlalchemy.orm import RelationshipProperty, relationship
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID, MarkupText, UTCDateTime
+from onegov.file import AssociatedFiles
 from onegov.search import ORMSearchable
-from markupsafe import Markup
 
 from typing import TYPE_CHECKING
 
@@ -18,12 +18,13 @@ if TYPE_CHECKING:
 
     from datetime import datetime
 
+    from markupsafe import Markup
     from onegov.parliament.models.political_business import (
         PoliticalBusiness,
     )
 
 
-class Meeting(Base, ContentMixin, ORMSearchable):
+class Meeting(Base, ContentMixin, ORMSearchable, AssociatedFiles):
 
     __tablename__ = 'par_meetings'
 
@@ -59,9 +60,13 @@ class Meeting(Base, ContentMixin, ORMSearchable):
     #: The title of the meeting
     title: Column[str] = Column(Text, nullable=False)
 
-    #: date and time of the meeting
+    #: date and time of the meeting start
     start_datetime: Column[datetime | None]
     start_datetime = Column(UTCDateTime, nullable=True)
+
+    #: date and time of the meeting end
+    end_datetime: Column[datetime | None]
+    end_datetime = Column(UTCDateTime, nullable=True)
 
     #: location address of meeting
     address: Column[Markup] = Column(MarkupText, nullable=False)
