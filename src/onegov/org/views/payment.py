@@ -161,7 +161,8 @@ def handle_batch_mark_payments_invoiced(
     )
     updated_count = 0
     for payment in payments_query:
-        payment.state = 'invoiced'
+        if payment.state != 'invoiced':
+            payment.state = 'invoiced'
         updated_count += 1
 
     if updated_count > 0:
