@@ -16,7 +16,7 @@ def _create_ticket_and_set_payment_state(
     # The allocation comes from a previous session that was committed.
     # Merge it into the current session that libres will use.
     allocation_to_reserve = allocations_for_date[0]
-    session_for_libres = client.app.libres_context.get_session()
+    session_for_libres = client.app.libres_context.session_manager.session
     merged_allocation = session_for_libres.merge(allocation_to_reserve)
     reserve_callable = client.bound_reserve(merged_allocation)
 
