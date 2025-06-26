@@ -463,7 +463,9 @@ class TicketPdf(Pdf):
             locale=request.locale,
             layout=layout,
             qr_payload=request.link(
-                ticket, name=request.is_manager and None or 'status')
+                ticket,
+                name='' if request.is_manager_for_model(ticket) else 'status'
+            )
         )
         pdf.init_a4_portrait(
             page_fn=pdf.page_fn,

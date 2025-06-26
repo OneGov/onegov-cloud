@@ -216,6 +216,17 @@ class FormSubmissionHandler(Handler):
     def payment(self) -> Payment | None:
         return self.submission.payment if self.submission is not None else None
 
+    # FIXME: This should probably be cached on the ticket/submission
+    #        so it can't change throughout the ticket's lifespan
+    #        however this VAT stuff will probably still change quite
+    #        a bit, so for now this simple solution should be fine.
+    @property
+    def show_vat(self) -> bool:
+        return (
+            getattr(self.submission.form, 'show_vat', False)
+            if self.submission is not None else False
+        )
+
     @property
     def extra_data(self) -> list[str]:
         return [
@@ -250,6 +261,7 @@ class FormSubmissionHandler(Handler):
                 'form': self.form,
                 'layout': layout,
                 'price': self.submission.payment,
+                'show_vat': self.show_vat,
             })
         return Markup('')
 

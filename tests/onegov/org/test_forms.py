@@ -867,6 +867,7 @@ def test_price_submission_vat_not_set(client):
     Email *= @@@
     Betrag mit Preis = 0..8 (64 CHF)
     """
+    assert 'show_vat' not in page
     page = page.form.submit().follow()
     page.form['email'] = 'abbafan@swisscom.ch'
     page.form['betrag_mit_preis'] = '2'
@@ -887,9 +888,9 @@ def test_price_submission_vat_not_set(client):
     assert 'MwSt' not in confirm
 
     # test ticket
-    tickets = client.get('/tickets/ALL/open').click('FRM-')
+    ticket = client.get('/tickets/ALL/open').click('FRM-')
     for value in expected_values:
-        assert value in tickets
+        assert value in ticket
     assert 'MwSt' not in confirm
 
 
@@ -899,8 +900,7 @@ def test_price_submission_vat_set(client):
         '1',
         'Stück(e)',
         'Totalbetrag',
-        '99.00 CHF',
-        '(MwSt 8.1% enthalten: 7.42 CHF)'
+        '99.00 CHF'
     ]
 
     # set vat rate
@@ -915,6 +915,7 @@ def test_price_submission_vat_set(client):
     Email *= @@@
     Betrag mit Preis = 0..5 (99 CHF)
     """
+    page.form['show_vat'].checked = True
     page = page.form.submit().follow()
     page.form['email'] = 'black@bear.ch'
     page.form['betrag_mit_preis'] = '1'
@@ -922,6 +923,8 @@ def test_price_submission_vat_set(client):
 
     for value in expected_values:
         assert value in confirm
+    assert '8.1% enthalten' in confirm
+    assert '8.1% enthalten: 7.42 CHF' not in confirm
     confirm.form.submit().follow()
 
     # test confirmation mail
@@ -930,8 +933,10 @@ def test_price_submission_vat_set(client):
     assert 'Bio Teddybären: Ihre Anfrage wurde erfasst' in mail['Subject']
     for value in expected_values:
         assert value in mail['TextBody']
+    assert '8.1% enthalten: 7.42 CHF' in mail['TextBody']
 
     # test ticket
-    tickets = client.get('/tickets/ALL/open').click('FRM-')
+    ticket = client.get('/tickets/ALL/open').click('FRM-')
     for value in expected_values:
-        assert value in tickets
+        assert value in ticket
+    assert '8.1% enthalten: 7.42 CHF' in ticket
