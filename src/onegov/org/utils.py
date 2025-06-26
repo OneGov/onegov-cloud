@@ -28,7 +28,7 @@ from onegov.reservation import Resource
 from onegov.ticket import TicketCollection, TicketPermission
 from onegov.user import User, UserGroup
 from operator import add, attrgetter
-from sqlalchemy import nullsfirst  # type:ignore[attr-defined]
+from sqlalchemy import case, nullsfirst  # type:ignore[attr-defined]
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
@@ -1382,19 +1382,25 @@ def emails_for_new_ticket(
         general_condition | (TicketPermission.group == ticket.group)
     )
 
-    for username, realname in query.join(UserGroup.users).with_entities(
-        User.username,
-        User.realname,
+    for email, name in query.join(UserGroup.users).with_entities(
+        case([(
+            UserGroup.meta['shared_email'].isnot(None),
+            UserGroup.meta['shared_email'].astext,
+        )], else_=User.username),
+        case([(
+            UserGroup.meta['shared_email'].isnot(None),
+            UserGroup.name,
+        )], else_=User.realname),
     ).distinct():
 
-        if username in seen:
+        if email in seen:
             continue
 
-        seen.add(username)
+        seen.add(email)
         try:
             yield Address(
-                display_name=realname or '',
-                addr_spec=username
+                display_name=name or '',
+                addr_spec=email
             )
         except ValueError:
             # if it's not a valid address then skip it

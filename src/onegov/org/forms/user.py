@@ -201,7 +201,15 @@ class ManageUserGroupForm(Form):
         label=_(
             'Immediate e-mail notification to members upon ticket submission'
         ),
+        description=_(
+            'Also gives permission to these ticket categories, '
+            'but does not restrict access to other groups.'
+        ),
         choices=[],
+    )
+
+    shared_email = StringField(
+        label=_('Shared e-mail address for ticket submission notifications'),
     )
 
     def on_request(self) -> None:
@@ -340,6 +348,14 @@ class ManageUserGroupForm(Form):
 
         model.ticket_permissions = permissions
 
+        if getattr(self, 'shared_email', None):
+            if shared_email := self.shared_email.data:
+                if not model.meta:
+                    model.meta = {}
+                model.meta['shared_email'] = shared_email
+            elif model.meta and 'shared_email' in model.meta:
+                del model.meta['shared_email']
+
     def apply_model(self, model: UserGroup) -> None:
         self.name.data = model.name
         self.users.data = [str(u.id) for u in model.users]
@@ -358,3 +374,6 @@ class ManageUserGroupForm(Form):
                 for permission in model.ticket_permissions
                 if permission.immediate_notification
             ]
+
+        if getattr(self, 'shared_email', None) and model.meta:
+            self.shared_email.data = model.meta.get('shared_email')

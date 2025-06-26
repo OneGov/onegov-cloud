@@ -35,6 +35,9 @@ class UserGroupForm(ManageUserGroupForm):
         default='no'
     )
 
+    # NOTE: This settting is not supported in agency yet
+    shared_email = None  # type:ignore[assignment]
+
     def on_request(self) -> None:
         super().on_request()
         self.agencies.choices = [
