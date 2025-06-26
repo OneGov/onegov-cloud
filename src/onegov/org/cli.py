@@ -1703,7 +1703,8 @@ def import_political_business(
                                             if url_parts:
                                                 people_ids.append((url_parts[-1], type))
                                 i += 1  # Consumed participants element
-                        elif label_text == 'Fraktionen':
+                        elif (label_text == 'Fraktionen'
+                              or label_text == 'Fraktion'):
                             if i + 1 < len(elements):
                                 fraktionen_el = elements[i+1]
                                 if fraktionen_el.get('type') == 'Paragraph' \
