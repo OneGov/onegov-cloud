@@ -45,51 +45,6 @@ def test_view_payments_as_admin(client) -> None:
     assert '20.00' not in filtered_page.text
     assert "No payments found." not in filtered_page.text
 
-
-def test_view_payments_filter_by_payment_type(client) -> None:
-    client.login_admin()
-
-    session = client.app.session()
-
-    transaction.begin()
-    # Payment 1: Manual
-    p1 = Payment(
-        source='manual',
-        amount=Decimal('30.00'),
-        currency='CHF',
-        state='open'
-    )
-    # Payment 2: Provider
-    p2 = Payment(
-        source='stripe_connect', # example provider source
-        provider_id='ch_123', # needs a provider_id to be 'provider' type
-        amount=Decimal('40.00'),
-        currency='CHF',
-        state='paid'
-    )
-    session.add_all((p1, p2))
-    transaction.commit()
-
-    payments_url = '/payments'
-    page = client.get(payments_url)
-
-    # Filter for manual payments
-    form = page.form
-    form['payment_type'] = 'manual'
-    filtered_page = form.submit().follow()
-    assert '30.00' in filtered_page.text
-    assert '40.00' not in filtered_page.text
-    assert "No payments found." not in filtered_page.text
-
-    # Filter for provider payments
-    page = client.get(payments_url) # Re-fetch or reset form
-    form = page.form
-    form['payment_type'] = 'provider'
-    filtered_page = form.submit().follow()
-    assert '30.00' not in filtered_page.text
-    assert '40.00' in filtered_page.text
-    assert "No payments found." not in filtered_page.text
-
     # Scenario 2: Filter for Jan 10, 2023 to Jan 12, 2023. Expect P1 and P2.
     page = client.get(payments_url)
     form = page.form

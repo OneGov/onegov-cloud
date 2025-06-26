@@ -116,10 +116,9 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         # Filter by ticket creation date - this is the complex part
         if self.ticket_start or self.ticket_end:
             # Join through reservations to tickets
-            breakpoint()
             query = query.join(
                 Reservation,
-                Payment.id == Reservation.payment_id
+                Payment.id == Reservation.payment.id
             ).join(
                 Ticket,
                 cast(Reservation.token, onegovUUID) == Ticket.handler_id

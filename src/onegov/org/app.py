@@ -881,6 +881,11 @@ def mapbox_address_autofill() -> Iterator[str]:
     yield 'mapbox_address_autofill.js'
 
 
+@OrgApp.webasset('invoicing')
+def get_invoicing() -> Iterator[str]:
+    yield 'invoicing.js'
+
+
 def wrap_with_mtan_hook(
     func: Callable[[OrgApp, Any, OrgRequest], Any]
 ) -> Callable[[OrgApp, Any, OrgRequest], Any]:

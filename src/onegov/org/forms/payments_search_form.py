@@ -101,7 +101,7 @@ class PaymentSearchForm(Form):
         self.status.choices = [
             (value, self.request.translate(label))
             for value, label in self.STATUS_CHOICES
-        ],
+        ]
         self.payment_type.choices = [
             (value, self.request.translate(label))
             for value, label in self.PAYMENT_TYPE_CHOICES
