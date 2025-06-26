@@ -2,6 +2,7 @@
 from __future__ import annotations
 import base64
 import json
+from pyclbr import Function
 
 import click
 import html
@@ -46,7 +47,9 @@ from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.models.resource import Resource
 from onegov.page.collection import PageCollection
 from onegov.parliament.collections import MeetingCollection
-from onegov.parliament.collections import PoliticalBusinessCollection, CommissionMembershipCollection
+from onegov.parliament.collections import PoliticalBusinessCollection, RISCommissionMembershipCollection
+from onegov.parliament.models import CommissionMembership
+from onegov.parliament.models.parliamentarian import Parliamentarian
 from onegov.pas.collections import CommissionCollection, ParliamentarianCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.reservation import ResourceCollection
@@ -1478,8 +1481,9 @@ def import_commissions(
                     if element['type'] == 'Table':
                         for row in element['rows']:
                             link = row['cells'][0]['url']
+                            function = row['cells'][1]['text']
                             id = link.split('/')[-1]
-                            people_ids.append(id)
+                            people_ids.append((id, function))
                         break
 
                 added = commission_collection.add(
@@ -1487,7 +1491,9 @@ def import_commissions(
                     name=commission['metadata']['title'],
                     content={'description': Markup(content)},
                     meta={
-                        'commission_id': article_name.split('_')[1],
+                        'commission_id': article_name.split('_')[1].replace(
+                            '.json', ''
+                        ),
                         'people_ids': people_ids},
                 )
 
@@ -1794,6 +1800,10 @@ def import_parliamentarians(
                 first_name, last_name = name.split(' ', 1)
                 contact = {}
                 address = True
+                table_as_dict = {
+                    'headers': [],
+                    'rows': []
+                }
                 for e, element in enumerate(parliamentarian['elements']):
                     if element['type'] == 'Paragraph':
                         for i, child in enumerate(element['children']):
@@ -1802,55 +1812,60 @@ def import_parliamentarians(
                                 continue
                             if address:
                                 if text.startswith('im Stadtparlament'):
-                                    click.secho(f'Found date: {text}', fg='green')
                                     contact['date'] = text
                                 elif re.search(r'^[^\d\s]*[^\d]+.*\d', text):
-                                    click.secho(f'Found address: {text}', fg='green')
                                     contact['address'] = text
                                 elif re.match(r'^\d{4}\s+.+', text):
-                                    click.secho(f'Found zip code: {text}', fg='green')
                                     contact['zip_code'] = text.split(' ')[0]
                                     contact['city'] = ' '.join(text.split(' ')[1:])
                                 elif '@' in text:
-                                    click.secho(f'Found email: {text}', fg='green')
                                     contact['email'] = text
                                 elif text.startswith('Tel. P'):
                                     text = element['children'][i+1].get('text', '')
-                                    click.secho(f'Found private phone: {text}', fg='green')
                                     contact['phone_private'] = text
                                 elif text.startswith('Tel.'):
                                     text = element['children'][i+1].get('text', '')
-                                    click.secho(f'Found private phone: {text}', fg='green')
                                     contact['phone_business'] = text
                                 elif text.startswith('Mobile'):
                                     text = element['children'][i+1].get('text', '')
-                                    click.secho(f'Found mobile: {text}', fg='green')
                                     contact['phone_mobile'] = text
                                 elif text.startswith('Funktion'):
                                     address = False
                                     text = parliamentarian['elements'][e+1]['children'][0].get('text', '')
-                                    click.secho(f'Found function: {text}', fg='green')
                                     contact['function'] = text
                                 elif re.match(r'^[^\d]*$', text):
                                     if text not in name:
-                                        click.secho(f'Found addition: {text}', fg='green')
                                         contact['addition'] = text
                             else:
                                 if text.startswith('Partei'):
                                     text = parliamentarian['elements'][e+1]['children'][0].get('text', '')
-                                    click.secho(f'Found party: {text}', fg='green')
                                     contact['party'] = text
                                 elif text.startswith('Beruf'):
                                     text = parliamentarian['elements'][e+1]['children'][0].get('text', '')
-                                    click.secho(f'Found profession: {text}', fg='green')
                                     contact['profession'] = text
 
-                    if element['type'] == 'Table':
-                        for row in element['rows']:
-                            link = row['cells'][3]['url']
-                            id = link.split('/')[-1]
-                            polit_business_ids.append(id)
-                        break
+                    if element['type'] == 'Heading':
+                        if element['text'] == 'Politische Vorstösse':
+                            table = parliamentarian['elements'][e+1]
+                            if table['type'] == 'Table':
+                                for row in table['rows']:
+                                    link = row['cells'][3]['url']
+                                    id = link.split('/')[-1]
+                                    polit_business_ids.append(id)
+                        if element['text'] == 'Interessenbindungen':
+                            try:
+                                table = parliamentarian['elements'][e+1]
+                            except IndexError:
+                                click.secho('No table found for Interessenbindungen', fg='red')
+                                continue
+                            if table['type'] == 'Table':
+                                headers = [cell['text'] for cell in table['headers']]
+                                table_as_dict['headers'] = headers
+                                for row in table['rows']:
+                                    row_as_dict = {}
+                                    for i, cell in enumerate(row['cells']):
+                                        row_as_dict[headers[i]] = cell.get('text', '')
+                                    table_as_dict['rows'].append(row_as_dict)
                         
                 added = parliamentarian_collection.add(
                     first_name=first_name,
@@ -1867,10 +1882,12 @@ def import_parliamentarians(
                     occupation=contact.get('profession', ''),
                     function=contact.get('function', ''),
                     meta={
-                        'parliamentarian_id': article_name.split('_')[1],
+                        'parliamentarian_id': article_name.split('_')[1].replace('.json', ''),
                         'polit_business_ids': polit_business_ids},
                     content={
-                        'info': contact.get('date', '')},
+                        'info': contact.get('date', ''),
+                        'interests': table_as_dict
+                        },
                 )
 
         click.echo(f'{import_counter} parliamentarians imported')
@@ -1890,9 +1907,39 @@ def create_memberships(
     def connect_ids(request: OrgRequest, app: OrgApp) -> None:
 
         session = request.session
-        commission_memberships = CommissionMembershipCollection(session)
+        commission_memberships = RISCommissionMembershipCollection(session)
         people =  ParliamentarianCollection(session)
         commissions = CommissionCollection(session)
 
+        for commission in commissions.query():
+            connect_ids = {}
+            for person_id, function in commission.meta.get('people_ids', []):
+                for person in people.query():
+                    if person.meta.get('parliamentarian_id') == person_id:
+                        connect_ids[person.id] = function
+
+            if not connect_ids:
+                click.secho(f'No people found for commission {commission.name}', fg='yellow')
+                continue
+
+            # Check if membership already exists
+            existing_membership = commission_memberships.query().filter(
+                CommissionMembership.parliamentarian_id.in_(connect_ids.keys()),
+                CommissionMembership.commission_id == commission.id
+            ).first()
+
+            if existing_membership:
+                click.secho(f'Membership already exists for {commission.name}', fg='yellow')
+                continue
+
+            # Create new membership
+            for person_id, function in connect_ids.items():
+                membership = commission_memberships.add(
+                    parliamentarian_id=person_id,
+                    commission_id=commission.id,
+                    function= function,
+                    role='member'
+                )
+                click.echo(f'Created membership for {person_id} in {commission.name}')
 
     return connect_ids

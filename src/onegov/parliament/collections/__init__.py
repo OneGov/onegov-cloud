@@ -9,7 +9,7 @@ from onegov.parliament.collections.commission import (
     RISCommissionCollection,
 )
 from onegov.parliament.collections.commission_membership import (
-    CommissionMembershipCollection
+    RISCommissionMembershipCollection
 )
 from onegov.parliament.collections.meeting import (
     MeetingCollection
@@ -21,7 +21,7 @@ from onegov.parliament.collections.political_business import (
 
 __all__ = (
     'CommissionCollection',
-    'CommissionMembershipCollection',
+    'RISCommissionMembershipCollection',
     'RISCommissionCollection',
     'RISPartyCollection',
     'PoliticalBusinessCollection',

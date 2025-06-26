@@ -82,6 +82,13 @@ class CommissionMembership(Base, TimestampMixin):
         default='member'
     )
 
+    #: The function of the person in this commission
+    function: Column[str | None] = Column(
+        Text,
+        nullable=True,
+        default=None
+    )
+
     #: The role as translated text
     @property
     def role_label(self) -> str:
