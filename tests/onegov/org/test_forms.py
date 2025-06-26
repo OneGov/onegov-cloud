@@ -867,7 +867,7 @@ def test_price_submission_vat_not_set(client):
     Email *= @@@
     Betrag mit Preis = 0..8 (64 CHF)
     """
-    assert 'show_vat' not in page.form
+    assert 'show_vat' not in page
     page = page.form.submit().follow()
     page.form['email'] = 'abbafan@swisscom.ch'
     page.form['betrag_mit_preis'] = '2'
