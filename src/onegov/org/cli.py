@@ -49,9 +49,8 @@ from onegov.page.collection import PageCollection
 from onegov.parliament.collections import MeetingCollection, PoliticalBusinessParticipationCollection # noqa
 from onegov.parliament.collections import PoliticalBusinessCollection, RISCommissionMembershipCollection
 from onegov.parliament.models import CommissionMembership, PoliticalBusinessParticipation
-from onegov.parliament.models.parliamentarian import Parliamentarian
-from onegov.pas.collections import CommissionCollection, ParliamentarianCollection
 from onegov.parliament.models.parliamentarian import RISParliamentarian
+from onegov.pas.collections import CommissionCollection, ParliamentarianCollection, ParliamentarianRoleCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -1868,10 +1867,8 @@ def import_parliamentarians(
 
         parliamentarians = read_json_files(path)
         import_counter = 0
-        overwrite_counter = 0
 
         for parliamentarian, article_name in parliamentarians:
-            content = ''
 
             click.echo(f'Importing {article_name}')
             import_counter += 1
@@ -2075,5 +2072,54 @@ def create_polical_business_participants(
                     role='member'
                 )
                 click.echo(f'Created participation for {person_id} in {political_business.title}')
+
+    return connect_ids
+
+
+@cli.command(name='create-parliamentarian-roles')
+def create_parliamentarian_roles(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Creates Parliamentarian Roles
+
+        onegov-org --select '/foo/bar' create-parliamentarian-roles
+
+    """
+
+    def connect_ids(request: OrgRequest, app: OrgApp) -> None:
+
+        session = request.session
+        parliamentarian_roles = ParliamentarianRoleCollection(session)
+        people =  ParliamentarianCollection(session)
+        parliamentary_groups = ParliamentaryGroupCollection(session)
+
+        for parliamentary_group in parliamentary_groups.query():
+            connect_ids = []
+            for person_id in parliamentary_group.meta.get('people_ids', []):
+                for person in people.query():
+                    if person.meta.get('parliamentarian_id') == person_id:
+                        connect_ids.append(person.id)
+
+            if not connect_ids:
+                click.secho(f'No people found for parliamentary group {parliamentary_group.name}', fg='yellow')
+                continue
+
+            # Check if participation already exists
+            existing_membership = parliamentarian_roles.query().filter(
+                CommissionMembership.parliamentarian_id.in_(connect_ids),
+                CommissionMembership.commission_id == parliamentary_group.id
+            ).first()
+
+            if existing_membership:
+                click.secho(f'participation already exists for {parliamentary_group.name}', fg='yellow')
+                continue
+
+            # Create new participation
+            for person_id in connect_ids:
+                membership = parliamentarian_roles.add(
+                    parliamentarian_id=person_id,
+                    parliamentary_group_id=parliamentary_group.id,
+                    role='member'
+                )
+                click.echo(f'Created participation for {person_id} in {parliamentary_group.name}')
 
     return connect_ids
