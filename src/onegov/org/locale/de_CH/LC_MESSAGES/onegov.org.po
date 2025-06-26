@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-06-26 11:03+0200\n"
+"POT-Creation-Date: 2025-06-26 13:21+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -4035,11 +4035,14 @@ msgstr "Neuer Eintrag"
 msgid "Credit Card Fee"
 msgstr "Kreditkarten-Gebühr"
 
+msgid "${vat_rate}% included"
+msgstr "${vat_rate}% enthalten"
+
 msgid "VAT"
 msgstr "MwSt"
 
-msgid "${vat_rate}% included"
-msgstr "${vat_rate}% enthalten"
+msgid "Value Added Tax"
+msgstr "Mehrwertsteuer"
 
 msgid "Offline Payment"
 msgstr "Rechnung"
@@ -4172,7 +4175,7 @@ msgid "Pay Online Now"
 msgstr "Jetzt online bezahlen"
 
 msgid "Pay Offline later"
-msgstr "Später bezahlen"
+msgstr "Per Rechnung bezahlen"
 
 msgid "Show more"
 msgstr "Mehr anzeigen"
@@ -6649,9 +6652,6 @@ msgid ""
 msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
-
-msgid "Value Added Tax"
-msgstr "Mehrwertsteuer"
 
 msgid "Chat"
 msgstr "Chat"
