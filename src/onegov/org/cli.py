@@ -46,8 +46,8 @@ from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.models.resource import Resource
 from onegov.page.collection import PageCollection
 from onegov.parliament.collections import MeetingCollection
-from onegov.parliament.collections import PoliticalBusinessCollection
-from onegov.pas.collections import CommissionCollection, CommissionMembershipCollection, ParliamentarianCollection
+from onegov.parliament.collections import PoliticalBusinessCollection, CommissionMembershipCollection
+from onegov.pas.collections import CommissionCollection, ParliamentarianCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
