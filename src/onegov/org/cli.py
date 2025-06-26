@@ -46,9 +46,9 @@ from onegov.org.models import ExtendedDirectory
 from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.models.resource import Resource
 from onegov.page.collection import PageCollection
-from onegov.parliament.collections import MeetingCollection
+from onegov.parliament.collections import MeetingCollection, PoliticalBusinessParticipationCollection
 from onegov.parliament.collections import PoliticalBusinessCollection, RISCommissionMembershipCollection
-from onegov.parliament.models import CommissionMembership
+from onegov.parliament.models import CommissionMembership, PoliticalBusinessParticipation
 from onegov.parliament.models.parliamentarian import Parliamentarian
 from onegov.pas.collections import CommissionCollection, ParliamentarianCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
@@ -1664,7 +1664,7 @@ def import_political_business(
                     'Status': None,
                     'Datum': None
                 }
-                people_ids: list[str] = []
+                people_ids: list[tuple[str, str]] = []
                 parliamentary_group_ids: list[str] = []
 
                 i = 0
@@ -1689,12 +1689,15 @@ def import_political_business(
                                 participants_el = elements[i+1]
                                 if participants_el.get('type') == 'Paragraph'\
                                         and participants_el.get('children'):
-                                    for child in participants_el['children']:
+                                    for c, child in enumerate(
+                                        participants_el['children']):
                                         if child.get('type') == 'Link' \
                                                 and 'url' in child:
                                             url_parts = child['url'].split('/')
+                                            type = participants_el['children'][
+                                                c-1].get('text', '').strip()
                                             if url_parts:
-                                                people_ids.append(url_parts[-1])
+                                                people_ids.append((url_parts[-1], type))
                                 i += 1  # Consumed participants element
                         elif label_text == 'Fraktionen':
                             if i + 1 < len(elements):
@@ -1941,5 +1944,56 @@ def create_memberships(
                     role='member'
                 )
                 click.echo(f'Created membership for {person_id} in {commission.name}')
+
+    return connect_ids
+
+
+
+@cli.command(name='create-political-business-participants')
+def create_polical_business_participants(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Creates Political Business Participants
+
+        onegov-org --select '/foo/bar' create-political-business-participants
+
+    """
+
+    def connect_ids(request: OrgRequest, app: OrgApp) -> None:
+
+        session = request.session
+        business_participants = PoliticalBusinessParticipationCollection(session)
+        people =  ParliamentarianCollection(session)
+        political_business = PoliticalBusinessCollection(session)
+
+        for political_business in political_business.query():
+            connect_ids = {}
+            for person_id, function in political_business.meta.get('people_ids', []):
+                for person in people.query():
+                    if person.meta.get('parliamentarian_id') == person_id:
+                        connect_ids[person.id] = function
+
+            if not connect_ids:
+                click.secho(f'No people found for commission {political_business.name}', fg='yellow')
+                continue
+
+            # Check if participation already exists
+            existing_membership = business_participants.query().filter(
+                CommissionMembership.parliamentarian_id.in_(connect_ids.keys()),
+                CommissionMembership.commission_id == political_business.id
+            ).first()
+
+            if existing_membership:
+                click.secho(f'participation already exists for {political_business.name}', fg='yellow')
+                continue
+
+            # Create new participation
+            for person_id, function in connect_ids.items():
+                membership = business_participants.add(
+                    parliamentarian_id=person_id,
+                    political_business_id=political_business.id,
+                    function= function,
+                    role='member'
+                )
+                click.echo(f'Created participation for {person_id} in {political_business.name}')
 
     return connect_ids

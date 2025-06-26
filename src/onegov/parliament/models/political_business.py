@@ -104,18 +104,18 @@ class PoliticalBusiness(
 ):
 
     GERMAN_STATUS_NAME_TO_VALUE_MAP: dict[str, str] = {
-        'Abgeschrieben': 'abgeschrieben',
-        'Beantwortet': 'beantwortet',
-        'Erheblich erklärt': 'erheblich_erklaert',
-        'Erledigt': 'erledigt',
-        'Nicht erheblich erklärt': 'nicht_erheblich_erklaert',
-        'Nicht zustandegekommen': 'nicht_zustandegekommen',
-        'Pendent Exekutive': 'pendent_exekutive',
-        'Pendent Legislative': 'pendent_legislative',
-        'Rückzug': 'rueckzug',
-        'Umgewandelt': 'umgewandelt',
-        'Zurückgewiesen': 'zurueckgewiesen',
-        'Überwiesen': 'ueberwiesen',
+        'Abgeschrieben': 'written_off',
+        'Beantwortet': 'answered',
+        'Erheblich erklärt': 'declared_significant',
+        'Erledigt': 'completed',
+        'Nicht erheblich erklärt': 'declared_insignificant',
+        'Nicht zustandegekommen': 'not_realized',
+        'Pendent Exekutive': 'pending_executive',
+        'Pendent Legislative': 'pending legislative',
+        'Rückzug': 'withdrawn',
+        'Umgewandelt': 'converted',
+        'Zurückgewiesen': 'rejected',
+        'Überwiesen': 'referred',
     }
 
     # Politisches Geschäft
@@ -241,10 +241,11 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
         nullable=False,
     )
 
-    #:
-    participant_type: Column[str] = Column(
-        Enum('author', 'participant', name='par_participant_type'),
-        nullable=False,
+    #: the function of the parliamentarian in the political business
+    participant_type: Column[str|None] = Column(
+        Text,
+        nullable=True,
+        default=None
     )
 
     #: the related political business

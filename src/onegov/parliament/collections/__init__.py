@@ -17,7 +17,9 @@ from onegov.parliament.collections.meeting import (
 from onegov.parliament.collections.political_business import (
     PoliticalBusinessCollection
 )
-
+from onegov.parliament.collections.political_business_participant import (
+    PoliticalBusinessParticipationCollection
+)
 
 __all__ = (
     'CommissionCollection',
@@ -25,5 +27,6 @@ __all__ = (
     'RISCommissionCollection',
     'RISPartyCollection',
     'PoliticalBusinessCollection',
+    'PoliticalBusinessParticipationCollection',
     'MeetingCollection', 'PartyCollection',
 )
