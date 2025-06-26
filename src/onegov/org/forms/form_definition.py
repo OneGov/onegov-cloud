@@ -73,7 +73,7 @@ class FormDefinitionBaseForm(Form):
 
     def on_request(self) -> None:
         if not self.request.app.org.vat_rate:
-            self.delete_field('vat')
+            self.delete_field('show_vat')
 
 
 if TYPE_CHECKING:
