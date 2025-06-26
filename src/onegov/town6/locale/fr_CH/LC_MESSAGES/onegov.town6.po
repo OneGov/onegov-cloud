@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-06-11 11:26+0200\n"
+"POT-Creation-Date: 2025-06-26 09:59+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -706,23 +706,17 @@ msgstr "Nouvelle entrée"
 msgid "Directory"
 msgstr "Dossier"
 
-msgid "Organisation"
-msgstr "Organisation"
+msgid "Payment"
+msgstr "Paiement"
 
-msgid "Functions:"
-msgstr "Fonctions:"
+msgid "VAT"
+msgstr "TVA"
+
+msgid "State"
+msgstr "État"
 
 msgid "Open"
 msgstr "Ouvert"
-
-msgid "Pending"
-msgstr "En attente"
-
-msgid "Closed"
-msgstr "Fermé"
-
-msgid "Archived"
-msgstr "Archivé"
 
 msgid "Paid"
 msgstr "Payé"
@@ -733,8 +727,44 @@ msgstr "Échoué"
 msgid "Refunded"
 msgstr "Remboursé"
 
+msgid "Source"
+msgstr "Source"
+
+msgid "Offline Payment"
+msgstr "Facture"
+
+msgid "Online Payment"
+msgstr "Paiement en ligne"
+
 msgid "Manual"
 msgstr "Manuelle"
+
+msgid "Datatrans"
+msgstr "Datatrans"
+
+msgid "Stripe Connect"
+msgstr "Stripe Connect"
+
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
+
+msgid "Fee"
+msgstr "Tarif"
+
+msgid "Organisation"
+msgstr "Organisation"
+
+msgid "Functions:"
+msgstr "Fonctions:"
+
+msgid "Pending"
+msgstr "En attente"
+
+msgid "Closed"
+msgstr "Fermé"
+
+msgid "Archived"
+msgstr "Archivé"
 
 msgid "Ticket"
 msgstr "Ticket"
@@ -755,11 +785,11 @@ msgstr ""
 "Les personnes vivant en dehors des localités ayant les codes postaux "
 "suivants ne peuvent réserver cette allocation que le ${date} : ${zipcodes}"
 
+msgid "Occupancy"
+msgstr "Occupation"
+
 msgid "Quota"
 msgstr "Quota"
-
-msgid "State"
-msgstr "État"
 
 msgid "Initiated"
 msgstr "Initié"
@@ -926,9 +956,6 @@ msgstr "Confidentialité"
 msgid "Send me my entered data by e-mail."
 msgstr "M'envoyer mes données saisies par e-mail."
 
-msgid "Payment"
-msgstr "Paiement"
-
 msgid "Pay Online Now"
 msgstr "Payer en ligne maintenant"
 
@@ -946,9 +973,6 @@ msgstr "Objet"
 
 msgid "Net Amount"
 msgstr "Montant net"
-
-msgid "Fee"
-msgstr "Tarif"
 
 msgid "Payment Provider"
 msgstr "Opérateur de paiement"
@@ -1403,6 +1427,9 @@ msgstr ""
 msgid "Key Code"
 msgstr "Code clé"
 
+msgid "The following reservations have unfortunately been cancelled:"
+msgstr "Les réservations suivantes ont malheureusement été annulées:"
+
 msgid "Here's a summary of your reservations:"
 msgstr "Voici un résumé de vos réservations:"
 
@@ -1411,9 +1438,6 @@ msgstr "Les modifications apportées aux réservations que vous avez soumises:"
 
 msgid "Rejected"
 msgstr "Rejetée"
-
-msgid "The following reservations have unfortunately been cancelled:"
-msgstr "Les réservations suivantes ont malheureusement été annulées:"
 
 msgid "A message has been sent regarding ${ref}:"
 msgstr "Un message a été envoyé à propos de ${ref}:"
@@ -2030,9 +2054,6 @@ msgstr "${count} notes"
 msgid "Amount"
 msgstr "Montant"
 
-msgid "Source"
-msgstr "Source"
-
 msgid "Group"
 msgstr "Groupe"
 
@@ -2583,9 +2604,6 @@ msgstr "Nouveau commentaire"
 #~ msgid "Clean up"
 #~ msgstr "Nettoyer"
 
-#~ msgid "Occupancy"
-#~ msgstr "Occupation"
-
 #~ msgid "Rules"
 #~ msgstr "Règles"
 
@@ -2655,9 +2673,6 @@ msgstr "Nouveau commentaire"
 
 #~ msgid "Payments"
 #~ msgstr "Paiements"
-
-#~ msgid "Stripe Connect"
-#~ msgstr "Stripe Connect"
 
 #~ msgid "Synchronise"
 #~ msgstr "Synchroniser"

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-06-11 13:31+0200\n"
+"POT-Creation-Date: 2025-06-26 09:58+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -111,8 +111,14 @@ msgstr "Rückerstattet"
 msgid "Manual"
 msgstr "Manuell"
 
+msgid "Datatrans"
+msgstr "Datatrans"
+
 msgid "Stripe Connect"
 msgstr "Stripe Connect"
+
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
 
 #, python-format
 msgid "Daily Newsletter ${time}"
@@ -969,6 +975,14 @@ msgstr ""
 "Beschreibt, wie die Reservations-Resource abgeholt oder bezogen werden kann. "
 "Dieser Text wird auf Ticket-Status-Seite genutzt, um den Nutzer zu "
 "informieren"
+
+msgid "Show VAT"
+msgstr "MwSt anzeigen"
+
+msgid "By default VAT is not shown, even when configured in the VAT settings."
+msgstr ""
+"Standardmässig wird die MwSt nicht angezeigt, selbst wenn sie konfiguriert "
+"worden ist in den Einstellungen."
 
 msgid "Short description of the survey"
 msgstr "Kurze Beschreibung der Umfrage"
@@ -2660,8 +2674,9 @@ msgstr "Sporverein"
 msgid "all day"
 msgstr "den ganzen Tag"
 
-msgid "VAT"
-msgstr "MwSt"
+#, python-format
+msgid "${vat_rate}% included: ${var} ${currency}"
+msgstr "${vat_rate}% enthalten: ${var} ${currency}"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -2995,12 +3010,6 @@ msgstr "Exporte"
 
 msgid "Payment Providers"
 msgstr "Zahlungsanbieter"
-
-msgid "Datatrans"
-msgstr "Datatrans"
-
-msgid "Worldline Saferpay"
-msgstr "Worldline Saferpay"
 
 msgid "Synchronise"
 msgstr "Synchronisieren"
@@ -4027,6 +4036,18 @@ msgstr "Änderungsvorschlag"
 msgid "New Entry"
 msgstr "Neuer Eintrag"
 
+msgid "Credit Card Fee"
+msgstr "Kreditkarten-Gebühr"
+
+msgid "VAT"
+msgstr "MwSt"
+
+msgid "Offline Payment"
+msgstr "Rechnung"
+
+msgid "Online Payment"
+msgstr "Online-Zahlung"
+
 msgid "Previous Page"
 msgstr "Vorherige Seite"
 
@@ -4150,9 +4171,6 @@ msgstr "Versand meiner Eingaben an meine E-Mail Adresse."
 
 msgid "Pay Online Now"
 msgstr "Jetzt online bezahlen"
-
-msgid "Credit Card Fee"
-msgstr "Kreditkarten-Gebühr"
 
 msgid "Pay Offline later"
 msgstr "Später bezahlen"

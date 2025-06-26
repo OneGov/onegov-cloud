@@ -747,13 +747,58 @@
     <metal:b use-macro="layout.macros['display_form']" />
 </metal:directory_entry_submission>
 
-<metal:price define-macro="price">
-    ${layout.format_number(price.net_amount)} ${price.currency}
-    <tal:b condition="price.fee and show_fee|nothing">
-        (+ ${layout.format_number(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
+<metal:price define-macro="price" i18n:domain="onegov.org">
+    <tal:b tal:define="show_fee show_fee|False; show_vat show_vat|False">
+        ${layout.format_number(price.net_amount if show_fee else price.amount)} ${price.currency}
+        <tal:b tal:condition="show_fee and price.fee">
+            (+ ${layout.format_number(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
+        </tal:b>
+        <tal:b tal:condition="show_vat">
+            <br>
+            (<tal:b i18n:translate>VAT</tal:b> ${layout.format_vat(price.net_amount, price.currency)})
+        </tal:b>
     </tal:b>
-    <br>${layout.format_vat(price.net_amount, price.currency)}
 </metal:price>
+
+<metal:payment define-macro="payment" i18n:domain="onegov.org">
+    <tal:b tal:define="show_fee show_fee|False" tal:condition="payment|nothing">
+        <h3 i18n:translate>Payment</h3>
+        <dl class="field-display">
+            <dt i18n:translate>Total Amount</dt>
+            <dd>${layout.format_number(payment.amount)} ${payment.currency}</dd>
+        </dl>
+        <dl class="field-display" tal:condition="show_vat|nothing">
+            <dt i18n:translate>VAT</dt>
+            <dd>${layout.format_vat(price.net_amount, price.currency)}</dd>
+        </dl>
+        <dl class="field-display">
+            <dt i18n:translate>State</dt>
+            <dd tal:switch="payment.state">
+                <tal:b tal:case="'open'" i18n:translate>Open</tal:b>
+                <tal:b tal:case="'paid'" i18n:translate>Paid</tal:b>
+                <tal:b tal:case="'failed'" i18n:translate>Failed</tal:b>
+                <tal:b tal:case="'cancelled'" i18n:translate>Refunded</tal:b>
+            </dd>
+        </dl>
+        <dl class="field-display">
+            <dt i18n:translate>Source</dt>
+            <dd tal:condition="not:show_fee" tal:switch="payment.source">
+                <tal:b tal:case="'manual'" i18n:translate>Offline Payment</tal:b>
+                <tal:b tal:case="default" i18n:translate>Online Payment</tal:b>
+            </dd>
+            <dd tal:condition="show_fee" tal:switch="payment.source">
+                <tal:b tal:case="'manual'" i18n:translate>Manual</tal:b>
+                <tal:b tal:case="'datatrans'" i18n:translate>Datatrans</tal:b>
+                <tal:b tal:case="'stripe_connect'" i18n:translate>Stripe Connect</tal:b>
+                <tal:b tal:case="'worldline_saferpay'" i18n:translate>Worldline Saferpay</tal:b>
+            </dd>
+        </dl>
+        <dl tal:condition="show_fee and payment.fee" class="field-display">
+            <dt i18n:translate>Fee</dt>
+            <dd>${layout.format_number(payment.fee)</dd>
+        </dl>
+    </tal:b>
+</metal:payment>
 
 <metal:person_card define-macro="person_list_card" i18n:domain="onegov.org">
     <div class="person-card person-list-card" tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)">

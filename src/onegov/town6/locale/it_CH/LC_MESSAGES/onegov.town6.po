@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-06-11 11:26+0200\n"
+"POT-Creation-Date: 2025-06-26 09:59+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -703,24 +703,17 @@ msgstr "Nuovo elemento"
 msgid "Directory"
 msgstr "Cartella"
 
-msgid "Organisation"
-msgstr "Organizzazione"
+msgid "Payment"
+msgstr "Pagamento"
 
-msgid "Functions:"
-msgstr "Funzioni:"
+msgid "VAT"
+msgstr "IVA"
+
+msgid "State"
+msgstr "Stato"
 
 msgid "Open"
 msgstr "Aperto"
-
-msgid "Pending"
-msgstr "In attesa"
-
-msgid "Closed"
-msgstr "Chiuso"
-
-#, fuzzy
-msgid "Archived"
-msgstr "Fare Archivio"
 
 msgid "Paid"
 msgstr "Pagato"
@@ -731,8 +724,45 @@ msgstr "Fallito"
 msgid "Refunded"
 msgstr "Rimborsato"
 
+msgid "Source"
+msgstr "Fonte"
+
+msgid "Offline Payment"
+msgstr "Fattura"
+
+msgid "Online Payment"
+msgstr "Pagamento online"
+
 msgid "Manual"
 msgstr "Manuale"
+
+msgid "Datatrans"
+msgstr "Datatrans"
+
+msgid "Stripe Connect"
+msgstr "Stripe Connect"
+
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
+
+msgid "Fee"
+msgstr "Tariffa"
+
+msgid "Organisation"
+msgstr "Organizzazione"
+
+msgid "Functions:"
+msgstr "Funzioni:"
+
+msgid "Pending"
+msgstr "In attesa"
+
+msgid "Closed"
+msgstr "Chiuso"
+
+#, fuzzy
+msgid "Archived"
+msgstr "Fare Archivio"
 
 msgid "Ticket"
 msgstr "Biglietto"
@@ -753,11 +783,11 @@ msgstr ""
 "Le persone che vivono al di fuori dei seguenti codici postali possono "
 "prenotare questa allocazione solo il ${date}: ${zipcodes}"
 
+msgid "Occupancy"
+msgstr "Occupazione"
+
 msgid "Quota"
 msgstr "Quota"
-
-msgid "State"
-msgstr "Stato"
 
 msgid "Initiated"
 msgstr "Avviato"
@@ -926,9 +956,6 @@ msgstr "Privacy"
 msgid "Send me my entered data by e-mail."
 msgstr "Inviami i dati inseriti tramite e-mail."
 
-msgid "Payment"
-msgstr "Pagamento"
-
 msgid "Pay Online Now"
 msgstr "Paga ora online"
 
@@ -946,9 +973,6 @@ msgstr "Oggetto"
 
 msgid "Net Amount"
 msgstr "Importo netto"
-
-msgid "Fee"
-msgstr "Tariffa"
 
 msgid "Payment Provider"
 msgstr "Elaboratore dei pagamenti"
@@ -1395,6 +1419,9 @@ msgstr ""
 msgid "Key Code"
 msgstr "Codice chiave"
 
+msgid "The following reservations have unfortunately been cancelled:"
+msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
+
 msgid "Here's a summary of your reservations:"
 msgstr "Ecco un riepilogo delle vostre prenotazioni:"
 
@@ -1403,9 +1430,6 @@ msgstr "Modifiche alle prenotazioni inviate:"
 
 msgid "Rejected"
 msgstr "Rifiutata"
-
-msgid "The following reservations have unfortunately been cancelled:"
-msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
 
 msgid "A message has been sent regarding ${ref}:"
 msgstr "È stato inviato un messaggio relativo a ${ref}:"
@@ -2024,9 +2048,6 @@ msgstr "${count} note"
 msgid "Amount"
 msgstr "Importo"
 
-msgid "Source"
-msgstr "Fonte"
-
 msgid "Group"
 msgstr "Gruppo"
 
@@ -2581,9 +2602,6 @@ msgstr "Nuova nota"
 #~ msgid "Clean up"
 #~ msgstr "Ripulisci"
 
-#~ msgid "Occupancy"
-#~ msgstr "Occupazione"
-
 #~ msgid "Rules"
 #~ msgstr "Regole"
 
@@ -2653,9 +2671,6 @@ msgstr "Nuova nota"
 
 #~ msgid "Payments"
 #~ msgstr "Pagamenti"
-
-#~ msgid "Stripe Connect"
-#~ msgstr "Stripe Connect"
 
 #~ msgid "Synchronise"
 #~ msgstr "Sincronizza"

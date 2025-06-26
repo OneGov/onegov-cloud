@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-06-11 13:31+0200\n"
+"POT-Creation-Date: 2025-06-26 09:58+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -112,8 +112,14 @@ msgstr "Rimborsato"
 msgid "Manual"
 msgstr "Manuale"
 
+msgid "Datatrans"
+msgstr "Datatrans"
+
 msgid "Stripe Connect"
 msgstr "Stripe Connect"
+
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
 
 #, python-format
 msgid "Daily Newsletter ${time}"
@@ -972,6 +978,14 @@ msgid ""
 msgstr ""
 "Descrive il modo in cui questa risorsa può essere prelevata. Questo testo "
 "viene utilizzato nella pagina di stato del biglietto per informare l'utente"
+
+msgid "Show VAT"
+msgstr "Visualizza l'IVA"
+
+msgid "By default VAT is not shown, even when configured in the VAT settings."
+msgstr ""
+"Per impostazione predefinita, l'IVA non viene visualizzata, anche se "
+"configurata nelle impostazioni."
 
 msgid "Short description of the survey"
 msgstr "Breve descrizione del sondaggio"
@@ -2670,8 +2684,9 @@ msgstr "Associazione sportiva"
 msgid "all day"
 msgstr "tutto il giorno"
 
-msgid "VAT"
-msgstr "IVA"
+#, python-format
+msgid "${vat_rate}% included: ${var} ${currency}"
+msgstr "${vat_rate}% inclusa: ${var} ${currency}"
 
 msgid "Homepage"
 msgstr "Pagina principale"
@@ -3000,12 +3015,6 @@ msgstr "Esportazioni"
 
 msgid "Payment Providers"
 msgstr "Provider di servizi di pagamento"
-
-msgid "Datatrans"
-msgstr "Datatrans"
-
-msgid "Worldline Saferpay"
-msgstr "Worldline Saferpay"
 
 msgid "Synchronise"
 msgstr "Sincronizza"
@@ -4026,6 +4035,18 @@ msgstr "Richiesta di modifica"
 msgid "New Entry"
 msgstr "Nuovo elemento"
 
+msgid "Credit Card Fee"
+msgstr "Commissione sulla carta di credito"
+
+msgid "VAT"
+msgstr "IVA"
+
+msgid "Offline Payment"
+msgstr "Fattura"
+
+msgid "Online Payment"
+msgstr "Pagamento online"
+
 msgid "Previous Page"
 msgstr "Pagina precedente"
 
@@ -4149,9 +4170,6 @@ msgstr "Inviami i dati inseriti tramite e-mail."
 
 msgid "Pay Online Now"
 msgstr "Paga ora online"
-
-msgid "Credit Card Fee"
-msgstr "Commissione sulla carta di credito"
 
 msgid "Pay Offline later"
 msgstr "Paga offline successivamente"

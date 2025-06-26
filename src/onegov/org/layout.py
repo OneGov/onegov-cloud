@@ -643,8 +643,11 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def format_seconds(self, seconds: float) -> str:
         return self.format_timedelta(timedelta(seconds=seconds))
 
-    def format_vat(self, amount: numbers.Number | Decimal | float | None,
-                   currency: str = 'CHF') -> str:
+    def format_vat(
+        self,
+        amount: numbers.Number | Decimal | float | None,
+        currency: str = 'CHF'
+    ) -> str:
         """
         Takes the given amount and currency returning the VAT string if the
         VAT rate is set in the organization settings. The VAT string can be
@@ -659,10 +662,14 @@ class Layout(ChameleonLayout, OpenGraphMixin):
                 amount = Decimal(str(amount))
 
             vat = amount / (100 + vat_rate) * vat_rate
-            vat_name = self.request.translate(_('VAT'))
-            vat_str = (f'({vat_name} {self.format_number(vat_rate, 1)}%'
-                       f' enthalten: {self.format_number(vat)} {currency})')
-            return vat_str
+            return self.request.translate(_(
+                '${vat_rate}% included: ${var} ${currency}',
+                mapping={
+                    'vat_rate': self.format_number(vat_rate, 1),
+                    'vat': self.format_number(vat, 2),
+                    'currency': currency,
+                }
+            ))
 
         return ''
 

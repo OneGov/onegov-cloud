@@ -66,12 +66,12 @@
             <metal:b use-macro="layout.macros['display_fields']" tal:define="fields fields.values()" />
         </tal:b>
     </p>
-    <p>
-        <tal:b condition="price|nothing">
+    <p tal:condition="price|nothing">
+        <table class="field-display">
             <tr><td><b i18n:translate>Total Amount</b></td></tr>
             <tr><td><metal:b use-macro="layout.macros['price']" /></td></tr>
             <tr><td height="5"></td></tr>
-        </tal:b>
+        </table>
     </p>
 </metal:display_form>
 
@@ -99,12 +99,72 @@
 </metal:display_field>
 
 <metal:price define-macro="price" i18n:domain="onegov.town6">
-    ${layout.format_number(price.net_amount)} ${price.currency}
-    <tal:b condition="price.fee and show_fee|nothing">
-        (+ ${layout.format_number(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
+    <tal:b tal:define="show_fee show_fee|False; show_vat show_vat|False">
+        ${layout.format_number(price.net_amount)} ${price.currency}
+        <tal:b condition="show_fee and price.fee">
+            (+ ${layout.format_number(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
+        </tal:b>
+        <tal:b tal:condition="show_vat">
+            <br>
+            (<tal:b i18n:translate>VAT</tal:b> ${layout.format_vat(price.net_amount, price.currency)})
+        </tal:b>
     </tal:b>
-    <br>${layout.format_vat(price.net_amount, price.currency)}
 </metal:price>
+
+<metal:payment define-macro="payment" i18n:domain="onegov.town6">
+    <tal:b tal:define="show_fee show_fee|False" tal:condition="payment|nothing">
+        <p><b i18n:translate>Payment</b></p>
+        <p>
+            <table class="field-display">
+                <tr><td><b i18n:translate>Total Amount</b></td></tr>
+                <tr><td>${layout.format_number(payment.amount)} ${payment.currency}</td></tr>
+                <tr><td height="5"></td></tr>
+            </table>
+        </p>
+        <p tal:condition="show_vat|nothing">
+            <table class="field-display">
+                <tr><td><b i18n:translate>VAT</b></td></tr>
+                <tr><td>${layout.format_vat(price.net_amount, price.currency)}</td></tr>
+                <tr><td height="5"></td></tr>
+            </table>
+        </p>
+        <p>
+            <table class="field-display">
+                <tr><td><b i18n:translate>State</b></td></tr>
+                <tr tal:switch="payment.state">
+                    <td tal:case="'open'" i18n:translate>Open</td>
+                    <td tal:case="'paid'" i18n:translate>Paid</td>
+                    <td tal:case="'failed'" i18n:translate>Failed</td>
+                    <td tal:case="'cancelled'" i18n:translate>Refunded</td>
+                </tr>
+                <tr><td height="5"></td></tr>
+            </table>
+        </p>
+        <p>
+            <table class="field-display">
+                <tr><td><b i18n:translate>Source</b></td></tr>
+                <tr tal:condition="not:show_fee" tal:switch="payment.source">
+                    <td tal:case="'manual'" i18n:translate>Offline Payment</td>
+                    <td tal:case="default" i18n:translate>Online Payment</td>
+                </tr>
+                <tr tal:condition="show_fee" tal:switch="payment.source">
+                    <td tal:case="'manual'" i18n:translate>Manual</td>
+                    <td tal:case="'datatrans'" i18n:translate>Datatrans</td>
+                    <td tal:case="'stripe_connect'" i18n:translate>Stripe Connect</td>
+                    <td tal:case="'worldline_saferpay'" i18n:translate>Worldline Saferpay</td>
+                </tr>
+                <tr><td height="5"></td></tr>
+            </table>
+        </p>
+        <p tal:condition="show_fee and payment.fee">
+            <table class="field-display">
+                <tr><td><b i18n:translate>Fee</b></td></tr>
+                <tr><td>${layout.format_number(payment.fee)</td></tr>
+                <tr><td height="5"></td></tr>
+            </table>
+        </p>
+    </tal:b>
+</metal:payment>
 
 </body>
 </html>

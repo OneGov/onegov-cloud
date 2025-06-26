@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-06-11 11:26+0200\n"
+"POT-Creation-Date: 2025-06-26 09:59+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -706,23 +706,17 @@ msgstr "Neuer Eintrag"
 msgid "Directory"
 msgstr "Verzeichnis"
 
-msgid "Organisation"
-msgstr "Organisation"
+msgid "Payment"
+msgstr "Zahlung"
 
-msgid "Functions:"
-msgstr "Funktionen:"
+msgid "VAT"
+msgstr "MwSt"
+
+msgid "State"
+msgstr "Status"
 
 msgid "Open"
 msgstr "Offen"
-
-msgid "Pending"
-msgstr "In Bearbeitung"
-
-msgid "Closed"
-msgstr "Abgeschlossen"
-
-msgid "Archived"
-msgstr "Archiviert"
 
 msgid "Paid"
 msgstr "Bezahlt"
@@ -733,8 +727,44 @@ msgstr "Fehlgeschlagen"
 msgid "Refunded"
 msgstr "Rückerstattet"
 
+msgid "Source"
+msgstr "Herkunft"
+
+msgid "Offline Payment"
+msgstr "Rechnung"
+
+msgid "Online Payment"
+msgstr "Online-Zahlung"
+
 msgid "Manual"
 msgstr "Manuell"
+
+msgid "Datatrans"
+msgstr "Datatrans"
+
+msgid "Stripe Connect"
+msgstr "Stripe Connect"
+
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
+
+msgid "Fee"
+msgstr "Gebühr"
+
+msgid "Organisation"
+msgstr "Organisation"
+
+msgid "Functions:"
+msgstr "Funktionen:"
+
+msgid "Pending"
+msgstr "In Bearbeitung"
+
+msgid "Closed"
+msgstr "Abgeschlossen"
+
+msgid "Archived"
+msgstr "Archiviert"
 
 msgid "Ticket"
 msgstr "Ticket"
@@ -755,11 +785,11 @@ msgstr ""
 "Personen, die ausserhalb der folgenden Postleitzahlen leben, können diese "
 "Reservation erst am ${date} tätigen: ${zipcodes}"
 
+msgid "Occupancy"
+msgstr "Belegung"
+
 msgid "Quota"
 msgstr "Anzahl"
-
-msgid "State"
-msgstr "Status"
 
 msgid "Initiated"
 msgstr "Initiiert"
@@ -926,9 +956,6 @@ msgstr "Privatsphäre"
 msgid "Send me my entered data by e-mail."
 msgstr "Versand meiner Eingaben an meine E-Mail Adresse."
 
-msgid "Payment"
-msgstr "Zahlung"
-
 msgid "Pay Online Now"
 msgstr "Jetzt online bezahlen"
 
@@ -946,9 +973,6 @@ msgstr "Objekt"
 
 msgid "Net Amount"
 msgstr "Netto Betrag"
-
-msgid "Fee"
-msgstr "Gebühr"
 
 msgid "Payment Provider"
 msgstr "Zahlungsanbieter"
@@ -1406,6 +1430,9 @@ msgstr ""
 msgid "Key Code"
 msgstr "Schlüsselcode"
 
+msgid "The following reservations have unfortunately been cancelled:"
+msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
+
 msgid "Here's a summary of your reservations:"
 msgstr "Hier ist eine Zusammenfassung Ihrer Reservationen:"
 
@@ -1414,9 +1441,6 @@ msgstr "Änderungen an Ihren übermittelten Reservationen:"
 
 msgid "Rejected"
 msgstr "Abgelehnt"
-
-msgid "The following reservations have unfortunately been cancelled:"
-msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
 
 msgid "A message has been sent regarding ${ref}:"
 msgstr "Sie haben zu ${ref} eine Nachricht erhalten:"
@@ -2026,9 +2050,6 @@ msgstr "${count} Notizen"
 msgid "Amount"
 msgstr "Betrag"
 
-msgid "Source"
-msgstr "Herkunft"
-
 msgid "Group"
 msgstr "Gruppe"
 
@@ -2594,9 +2615,6 @@ msgstr "Neue Notiz"
 #~ msgid "Clean up"
 #~ msgstr "Aufräumen"
 
-#~ msgid "Occupancy"
-#~ msgstr "Belegung"
-
 #~ msgid "Rules"
 #~ msgstr "Regeln"
 
@@ -2666,9 +2684,6 @@ msgstr "Neue Notiz"
 
 #~ msgid "Payments"
 #~ msgstr "Zahlungen"
-
-#~ msgid "Stripe Connect"
-#~ msgstr "Stripe Connect"
 
 #~ msgid "Synchronise"
 #~ msgstr "Synchronisieren"

@@ -372,7 +372,6 @@ def handle_complete_submission(
                     'model': ticket,
                     'form': form,
                     'show_submission': self.meta['show_submission'],
-                    'price': submission.payment if submission else None
                 }
             )
             for email in emails_for_new_ticket(request, ticket):

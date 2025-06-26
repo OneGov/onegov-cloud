@@ -157,6 +157,11 @@ class Handler:
         return None
 
     @property
+    def show_vat(self) -> bool:
+        """ Whether or not to show VAT for this ticket. """
+        return False
+
+    @property
     def undecided(self) -> bool:
         """ Returns true if there has been no decision about the subject
         of this handler.
