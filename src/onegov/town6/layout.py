@@ -72,10 +72,11 @@ from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.page import PageCollection
 from onegov.parliament.collections import RISPartyCollection
 from onegov.parliament.collections.commission import (
-    CommissionCollection,
     RISCommissionCollection
 )
-from onegov.parliament.collections.party import PartyCollection
+from onegov.parliament.collections.parliamentary_group import (
+    RISParliamentaryGroupCollection
+)
 from onegov.stepsequence import step_sequences
 from onegov.stepsequence.extension import StepsLayoutExtension
 from onegov.town6 import _
@@ -1107,6 +1108,105 @@ class MeetingLayout(DefaultLayout):
         return None
 
 
+class RISParliamentaryGroupCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Parliamentary groups')
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Settings'), self.ris_settings_url),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Parliamentary group'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-parliamentary-group'}
+                        ),
+                    ]
+                ),
+            ]
+        return None
+
+
+class RISParliamentaryGroupLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self) -> RISParliamentaryGroupCollection:
+        return RISParliamentaryGroupCollection(self.request.session)
+
+    @cached_property
+    def title(self) -> str:
+        return self.model.name
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Settings'), self.ris_settings_url),
+            Link(
+                _('Parliamentary groups'),
+                self.request.link(self.collection)
+            ),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to delete this '
+                                'parliamentary group?'
+                            ),
+                            _('This cannot be undone.'),
+                            _('Delete parliamentary group'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(
+                                self.collection
+                            )
+                        )
+                    )
+                )
+            ]
+        return None
+
+
 class RISPartyCollectionLayout(DefaultLayout):
 
     @cached_property
@@ -1148,8 +1248,8 @@ class RISPartyCollectionLayout(DefaultLayout):
 class RISPartyLayout(DefaultLayout):
 
     @cached_property
-    def collection(self) -> PartyCollection:
-        return PartyCollection(self.request.session)
+    def collection(self) -> RISPartyCollection:
+        return RISPartyCollection(self.request.session)
 
     @cached_property
     def title(self) -> str:
@@ -1237,8 +1337,8 @@ class RISCommissionCollectionLayout(DefaultLayout):
 class RISCommissionLayout(DefaultLayout):
 
     @cached_property
-    def collection(self) -> CommissionCollection:
-        return CommissionCollection(self.request.session)
+    def collection(self) -> RISCommissionCollection:
+        return RISCommissionCollection(self.request.session)
 
     @cached_property
     def title(self) -> str:

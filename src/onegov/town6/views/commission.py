@@ -54,6 +54,9 @@ def ris_add_commission(
     request: TownRequest,
     form: CommissionForm
 ) -> RenderData | Response:
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
+
     return add_commission(
         self,
         request,

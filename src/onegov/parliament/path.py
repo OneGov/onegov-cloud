@@ -9,9 +9,40 @@ from onegov.parliament.collections.commission import (
     CommissionCollection,
     RISCommissionCollection
 )
+from onegov.parliament.collections.parliamentary_group import (
+    RISParliamentaryGroupCollection
+)
 from onegov.parliament.models import RISParty, Party, RISCommission, Commission
 from onegov.parliament.models.meeting import Meeting
+from onegov.parliament.models.parliamentary_group import (
+    RISParliamentaryGroup,
+    ParliamentaryGroup
+)
 from onegov.town6.app import TownApp
+
+
+@TownApp.path(
+    model=RISParliamentaryGroupCollection,
+    path='/parliamentary-groups',
+    converters={'active': bool}
+)
+def get_parliamentary_groups(
+    app: TownApp,
+    active: bool = True
+) -> RISParliamentaryGroupCollection:
+    return RISParliamentaryGroupCollection(app.session(), active)
+
+
+@TownApp.path(
+    model=RISParliamentaryGroup,
+    path='/parliamentary-group/{id}',
+    converters={'id': UUID}
+)
+def get_parliamentary_group(
+    app: TownApp,
+    id: UUID
+) -> ParliamentaryGroup | None:
+    return RISParliamentaryGroupCollection(app.session()).by_id(id)
 
 
 @TownApp.path(
@@ -47,7 +78,7 @@ def get_commissions(
     app: TownApp,
     active: bool = True
 ) -> CommissionCollection:
-    return RISCommissionCollection(app.session(), active=active)
+    return RISCommissionCollection(app.session(), active)
 
 
 @TownApp.path(
