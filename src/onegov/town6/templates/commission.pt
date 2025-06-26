@@ -13,12 +13,8 @@
                 <dt i18n:translate>End</dt>
                 <dd>${layout.format_date(commission.end, 'date')}</dd>
             </div>
-            <div tal:condition="commission.type">
-                <dt i18n:translate>Type</dt>
-                <dd>${commission.type_label}</dd>
-            </div>
             <div tal:condition="commission.description">
-                <dt i18n:translate>Description</dt>
+                <dt i18n:translate>Contact</dt>
                 <dd><div tal:content="commission.description"></div></dd>
             </div>
             <div tal:condition="commission.memberships">
