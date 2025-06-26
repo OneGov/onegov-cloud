@@ -46,11 +46,12 @@ from onegov.org.models import ExtendedDirectory
 from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.models.resource import Resource
 from onegov.page.collection import PageCollection
-from onegov.parliament.collections import MeetingCollection, PoliticalBusinessParticipationCollection
+from onegov.parliament.collections import MeetingCollection, PoliticalBusinessParticipationCollection # noqa
 from onegov.parliament.collections import PoliticalBusinessCollection, RISCommissionMembershipCollection
 from onegov.parliament.models import CommissionMembership, PoliticalBusinessParticipation
 from onegov.parliament.models.parliamentarian import Parliamentarian
 from onegov.pas.collections import CommissionCollection, ParliamentarianCollection
+from onegov.parliament.models.parliamentarian import RISParliamentarian
 from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -76,7 +77,8 @@ if TYPE_CHECKING:
     from onegov.org.app import OrgApp
     from onegov.org.request import OrgRequest
     from onegov.ticket import Ticket
-    from sqlalchemy.orm import Query, Session
+    from sqlalchemy.orm import Query, Session # noqa
+
     from translationstring import TranslationString
     from uuid import UUID
     from onegov.parliament.models.political_business import (
@@ -1087,6 +1089,7 @@ def import_news(
     # Read all json files in the given directory
     def read_json_files(path: str) -> Iterator[tuple[dict[str, Any], str]]:
         for file in Path(path).iterdir():
+
             if file.suffix == '.json':
                 with open(file) as f:
                     yield (json.load(f), file.name)
@@ -1334,6 +1337,7 @@ def import_meetings(
     # Read all json files in the given directory
     def read_json_files(path: str) -> Iterator[tuple[dict[str, Any], str]]:
         for file in Path(path).iterdir():
+
             if file.suffix == '.json':
                 with open(file) as f:
                     yield (json.load(f), file.name)
@@ -1457,6 +1461,7 @@ def import_commissions(
     # Read all json files in the given directory
     def read_json_files(path: str) -> Iterator[tuple[dict[str, Any], str]]:
         for file in Path(path).iterdir():
+
             if file.suffix == '.json':
                 with open(file) as f:
                     yield (json.load(f), file.name)
@@ -1525,6 +1530,7 @@ def import_parliamentary_groups(
     # Read all json files in the given directory
     def read_json_files(path: str) -> Iterator[tuple[dict[str, Any], str]]:
         for file in Path(path).iterdir():
+
             if file.suffix == '.json':
                 with open(file) as f:
                     yield (json.load(f), file.name)
@@ -1602,6 +1608,7 @@ def import_political_business(
     # Read all json files in the given directory
     def read_json_files(path: str) -> Iterator[tuple[dict[str, Any], str]]:
         for file in Path(path).iterdir():
+
             if file.suffix == '.json':
                 with open(file) as f:
                     yield (json.load(f), file.name)
@@ -1609,6 +1616,7 @@ def import_political_business(
     german_to_english_business_type_map: dict[str, str] = {
         'Anfrage': 'inquiry',
         'Antrag': 'proposal',
+
         'Auftrag': 'mandate',
         'Bericht': 'report',
         'Bericht und Antrag': 'report and proposal',
@@ -1616,7 +1624,7 @@ def import_political_business(
         'Botschaft': 'message',
         'Dringliche Interpellation': 'urgent interpellation',
         'Einladung': 'invitation',
-        'Interpellation': 'interpelleation',  # Match existing enum typo
+        'Interpellation': 'interpelleation',  # Match existing enum typo # noqa
         'Kommissionsbericht': 'commission report',
         'Mitteilung': 'communication',
         'Motion': 'motion',
@@ -1685,15 +1693,14 @@ def import_political_business(
                                 if value_element.get('type') == 'Paragraph' \
                                         and value_element.get('children'):
                                     val_child = value_element['children'][0]
-                                    data_fields[label_text] = \
-                                        val_child.get('text', '').strip()
+                                    data_fields[label_text] = val_child.get('text', '').strip()
                                 i += 1  # Consumed value element
                         elif label_text == 'Verfasser/Beteiligte':
                             if i + 1 < len(elements):
                                 participants_el = elements[i+1]
                                 if participants_el.get('type') == 'Paragraph'\
                                         and participants_el.get('children'):
-                                    for c, child in enumerate(
+                                    for c, child in enumerate( # noqa
                                         participants_el['children']):
                                         if child.get('type') == 'Link' \
                                                 and 'url' in child:
@@ -1716,6 +1723,71 @@ def import_political_business(
                                             if url_parts:
                                                 parliamentary_group_ids.append(url_parts[-1])
                                 i += 1  # Consumed fraktionen element
+                        else:
+                            # Check if elements[i] itself is an unlinked participant list
+                            is_unlinked_list = False
+                            if element.get('type') == 'Paragraph' and element.get('children'):
+                                all_children_are_unlinked_participants = True
+                                if not element['children']: # handle empty children list
+                                    all_children_are_unlinked_participants = False
+                                else:
+                                    for child_node_check in element['children']:
+                                        text_content_check = child_node_check.get('text', '')
+                                        last_paren_open_check = text_content_check.rfind('(')
+                                        last_paren_close_check = text_content_check.rfind(')')
+                                        is_valid_format = (
+                                            child_node_check.get('type') == 'Text' and
+                                            text_content_check and
+                                            last_paren_open_check != -1 and
+                                            last_paren_close_check == len(text_content_check) - 1 and
+                                            last_paren_open_check < last_paren_close_check - 1 and # role not empty
+                                            text_content_check[:last_paren_open_check].strip() # name not empty
+                                        )
+                                        if not is_valid_format:
+                                            all_children_are_unlinked_participants = False
+                                            break
+                                if all_children_are_unlinked_participants:
+                                    is_unlinked_list = True
+
+                            if is_unlinked_list:
+                                for child_node in element['children']:
+                                    text_content = child_node.get('text', '')
+                                    last_paren_open = text_content.rfind('(')
+                                    last_paren_close = text_content.rfind(')')
+
+                                    if last_paren_open != -1 and \
+                                       last_paren_close == len(text_content) - 1 and \
+                                       last_paren_open < last_paren_close:
+
+                                        full_name = text_content[:last_paren_open].strip()
+                                        role = text_content[last_paren_open+1:last_paren_close].strip()
+
+                                        name_parts = full_name.strip().split()
+                                        if not name_parts:
+                                            click.secho(f"Warning: Empty name found for role {role} in {article_name}. Skipping.", fg='yellow')
+                                            continue
+
+                                        last_name = name_parts[-1]
+                                        first_name = " ".join(name_parts[:-1])
+
+                                        if not first_name: # Handle single word name
+                                            first_name = last_name
+
+                                        click.echo(f"Creating new parliamentarian: {first_name} {last_name} for {article_name} (unlinked)")
+                                        parliamentarian = RISParliamentarian(first_name=first_name, last_name=last_name)
+                                        session.add(parliamentarian)
+                                        try:
+                                            with session.begin_nested(): # Ensure ID is available
+                                                session.flush()
+                                        except Exception as e:
+                                            click.secho(f"Error creating parliamentarian {first_name} {last_name}: {e}", fg='red')
+                                            parliamentarian = None # Failed to create
+
+                                        if parliamentarian and parliamentarian.id:
+                                            people_ids.append((str(parliamentarian.id), role))
+                                            if not parliamentarian.meta:
+                                                parliamentarian.meta = {}
+                                            parliamentarian.meta['parliamentarian_id'] = str(parliamentarian.id)
                     i += 1
 
                 german_business_type = data_fields.get('Geschäftsart')
@@ -1742,6 +1814,8 @@ def import_political_business(
                                     f'"{german_status}" in {article_name}. '
                                     f'Setting to None.', fg='yellow')
                 try:
+                    if not '_' in article_name:
+                        continue
                     pol_business_id = article_name.split('_')[1].split('.')[0]
                     political_business_collection.add(
                         title=political_business['metadata']['title'],
@@ -1784,6 +1858,7 @@ def import_parliamentarians(
     # Read all json files in the given directory
     def read_json_files(path: str) -> Iterator[tuple[dict[str, Any], str]]:
         for file in Path(path).iterdir():
+
             if file.suffix == '.json':
                 with open(file) as f:
                     yield (json.load(f), file.name)
