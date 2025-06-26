@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-06-26 09:58+0200\n"
+"POT-Creation-Date: 2025-06-26 11:03+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2684,10 +2684,6 @@ msgstr "Associazione sportiva"
 msgid "all day"
 msgstr "tutto il giorno"
 
-#, python-format
-msgid "${vat_rate}% included: ${var} ${currency}"
-msgstr "${vat_rate}% inclusa: ${var} ${currency}"
-
 msgid "Homepage"
 msgstr "Pagina principale"
 
@@ -4040,6 +4036,9 @@ msgstr "Commissione sulla carta di credito"
 
 msgid "VAT"
 msgstr "IVA"
+
+msgid "${vat_rate}% included"
+msgstr "${vat_rate}% inclusa"
 
 msgid "Offline Payment"
 msgstr "Fattura"

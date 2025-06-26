@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-06-26 09:58+0200\n"
+"POT-Creation-Date: 2025-06-26 11:03+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2674,10 +2674,6 @@ msgstr "Sporverein"
 msgid "all day"
 msgstr "den ganzen Tag"
 
-#, python-format
-msgid "${vat_rate}% included: ${var} ${currency}"
-msgstr "${vat_rate}% enthalten: ${var} ${currency}"
-
 msgid "Homepage"
 msgstr "Startseite"
 
@@ -4041,6 +4037,9 @@ msgstr "Kreditkarten-Gebühr"
 
 msgid "VAT"
 msgstr "MwSt"
+
+msgid "${vat_rate}% included"
+msgstr "${vat_rate}% enthalten"
 
 msgid "Offline Payment"
 msgstr "Rechnung"

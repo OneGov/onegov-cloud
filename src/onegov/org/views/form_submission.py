@@ -230,6 +230,10 @@ def handle_pending_submission(
         'complete_link': complete_url,
         'model': self,
         'price': price,
+        'show_vat': getattr(self.form, 'show_vat', False),
+        # NOTE: The VAT amount can be wrong in the fee is charged to
+        #       the customer. So it's better to not show it yet.
+        'hide_vat_amount': True,
         'checkout_button': checkout_button
     }
 
