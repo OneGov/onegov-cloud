@@ -9,8 +9,6 @@ from onegov.parliament.models import Meeting
 if TYPE_CHECKING:
     from uuid import UUID
     from sqlalchemy.orm import Query
-    from sqlalchemy.orm import Session
-    from typing import Self
 
 
 class MeetingCollection(GenericCollection[Meeting]):

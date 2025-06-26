@@ -48,8 +48,9 @@ from onegov.org.models.resource import Resource
 from onegov.page.collection import PageCollection
 from onegov.parliament.collections import MeetingCollection, PoliticalBusinessParticipationCollection # noqa
 from onegov.parliament.collections import PoliticalBusinessCollection, RISCommissionMembershipCollection
-from onegov.parliament.models import CommissionMembership, PoliticalBusinessParticipation
-from onegov.parliament.models.parliamentarian import RISParliamentarian
+from onegov.parliament.collections.meeting_item import MeetingItemCollection
+from onegov.parliament.models import CommissionMembership, PoliticalBusinessParticipation, RISParliamentarian, meeting_item, political_business
+from onegov.parliament.models.parliamentarian import Parliamentarian
 from onegov.pas.collections import CommissionCollection, ParliamentarianCollection, ParliamentarianRoleCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.reservation import ResourceCollection
@@ -1344,6 +1345,7 @@ def import_meetings(
     def create_meetings(request: OrgRequest, app: OrgApp) -> None:
         meeting_collection = MeetingCollection(request.session)
         file_collection = FileCollection(request.session)
+        meeting_item_collection = MeetingItemCollection(request.session)
 
         meetings = read_json_files(path)
         import_counter = 0
@@ -1388,7 +1390,10 @@ def import_meetings(
                     content_to_markup(meeting['elements'][1]))
                 documents = False
                 desc = False
+                meeting_items = False
+                meetings_items_list = []
                 description = ''
+
                 files = []
                 for element in meeting['elements']:
                     if element['type'] == 'Heading':
@@ -1396,9 +1401,16 @@ def import_meetings(
                             desc = True
                         elif element['text'] == 'Dokumente':
                             documents = True
+                            desc = False
+                        elif element['text'] == 'Traktanden':
+                            meeting_items = True
+                            desc = False
+                            documents = False
                         else:
                             desc = False
                             documents = False
+                            meeting_items = False
+
                     if desc:
                         if element['type'] == 'Paragraph':
                             if element.get('children') and (
@@ -1407,7 +1419,13 @@ def import_meetings(
                     if documents:
                         if element['type'] == 'Table':
                             for row in element['rows']:
-                                link = row['cells'][0]['url']
+                                try:
+                                    link = row['cells'][0]['url']
+                                except KeyError:
+                                    click.echo(
+                                        f'No link found in row {row["cells"][0]}'
+                                    )
+                                    continue
                                 resp = requests.get(link)
                                 if resp.status_code == 200:
                                     if file_collection.by_content(
@@ -1423,6 +1441,18 @@ def import_meetings(
                                         )
                                         files.append(file)
                                         print(file.name)
+                    if meeting_items:
+                        if element['type'] == 'Table':
+                            for row in element['rows']:
+                                cells = row['cells']
+                                political_business_id = cells[2]['url'].split('/')[-1]
+                                meetings_items_list.append(
+                                    {
+                                        'number': cells[0]['text'],
+                                        'title': cells[1]['text'],
+                                        'political_business_id': political_business_id
+                                    }
+                                )
 
                 added = meeting_collection.add(
                     title='Sitzung des Stadtparlaments',
@@ -1430,9 +1460,16 @@ def import_meetings(
                     start_datetime=start_dt,
                     end_datetime=end_dt,
                     address=location,
-                    # description=Markup(description),
-                    # content={},
                 )
+
+                for meeting in meetings_items_list:
+                    meeting_item = meeting_item_collection.add(
+                                    number=meeting['number'],
+                                    title=meeting['title'],
+                                    meeting_id=added.id,
+                                    political_business_link_id = meeting[
+                                            'political_business_id'],
+                                )
 
                 added.files = files
 

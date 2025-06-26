@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from onegov.parliament.models.political_business import (
         PoliticalBusiness,
     )
+    from onegov.parliament.models.meeting_item import MeetingItem
 
 
 class Meeting(Base, ContentMixin, ORMSearchable, AssociatedFiles):
@@ -79,7 +80,7 @@ class Meeting(Base, ContentMixin, ORMSearchable, AssociatedFiles):
         ForeignKey('par_political_businesses.id'),
     )
 
-    #: list of political businesses, "Traktanden"
+    #: list of political businesses"
     political_businesses: RelationshipProperty[PoliticalBusiness] = (
         relationship(
             'PoliticalBusiness',
@@ -90,5 +91,13 @@ class Meeting(Base, ContentMixin, ORMSearchable, AssociatedFiles):
         )
     )
 
+    #: The meeting items   
+    meeting_items: relationship[list[MeetingItem]]
+    meeting_items = relationship(
+        'MeetingItem',
+        cascade='all, delete-orphan',
+        back_populates='meeting',
+        order_by='desc(MeetingItem.number)'
+    )
     def __repr__(self) -> str:
         return f'<Meeting {self.title}, {self.start_datetime}>'
