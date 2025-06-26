@@ -48,6 +48,9 @@ from onegov.org.models.resource import Resource
 from onegov.page.collection import PageCollection
 from onegov.parliament.collections import MeetingCollection, PoliticalBusinessParticipationCollection
 from onegov.parliament.collections import PoliticalBusinessCollection, RISCommissionMembershipCollection
+from onegov.parliament.models.political_business import (
+    PoliticalBusinessStatus
+)
 from onegov.parliament.models import CommissionMembership, PoliticalBusinessParticipation
 from onegov.parliament.models.parliamentarian import Parliamentarian
 from onegov.pas.collections import CommissionCollection, ParliamentarianCollection
@@ -1623,19 +1626,19 @@ def import_political_business(
         'Wahlen': 'elections',
     }
 
-    german_to_english_status_map: dict[str, str] = {
-        'Abgeschrieben': 'written_off',
-        'Beantwortet': 'answered',
-        'Erheblich erklärt': 'declared_significant',
-        'Erledigt': 'completed',
-        'Nicht erheblich erklärt': 'declared_insignificant',
-        'Nicht zustandegekommen': 'not_realized',
-        'Pendent Exekutive': 'pending_executive',
-        'Pendent Legislative': 'pending legislative',
-        'Rückzug': 'withdrawn',
-        'Umgewandelt': 'converted',
-        'Zurückgewiesen': 'rejected',
-        'Überwiesen': 'referred',
+    german_to_english_status_map: dict[str, PoliticalBusinessStatus] = {
+        'Abgeschrieben': 'abgeschrieben',
+        'Beantwortet': 'beantwortet',
+        'Erheblich erklärt': 'erheblich_erklaert',
+        'Erledigt': 'erledigt',
+        'Nicht erheblich erklärt': 'nicht_erheblich_erklaert',
+        'Nicht zustandegekommen': 'nicht_zustandegekommen',
+        'Pendent Exekutive': 'pendent_exekutive',
+        'Pendent Legislative': 'pendent_legislative',
+        'Rückzug': 'rueckzug',
+        'Umgewandelt': 'umgewandelt',
+        'Zurückgewiesen': 'zurueckgewiesen',
+        'Überwiesen': 'ueberwiesen',
     }
 
     def parse_german_date(date_str: str | None) -> date | None:
