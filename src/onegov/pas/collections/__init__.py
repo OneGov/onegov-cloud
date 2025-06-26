@@ -4,7 +4,7 @@ from onegov.pas.collections.attendence import AttendenceCollection
 from onegov.pas.collections.change import ChangeCollection
 from onegov.pas.collections.commission import CommissionCollection
 from onegov.pas.collections.commission_membership import (
-    CommissionMembershipCollection)
+    PASCommissionMembershipCollection)
 from onegov.pas.collections.import_log import ImportLogCollection
 from onegov.pas.collections.legislative_period import (
     LegislativePeriodCollection)
@@ -21,7 +21,7 @@ __all__ = (
     'AttendenceCollection',
     'ChangeCollection',
     'CommissionCollection',
-    'CommissionMembershipCollection',
+    'PASCommissionMembershipCollection',
     'ImportLogCollection',
     'LegislativePeriodCollection',
     'ParliamentarianCollection',

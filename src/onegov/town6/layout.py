@@ -1248,8 +1248,8 @@ class RISPartyCollectionLayout(DefaultLayout):
 class RISPartyLayout(DefaultLayout):
 
     @cached_property
-    def collection(self) -> PartyCollection:
-        return PartyCollection(self.request.session)
+    def collection(self) -> RISPartyCollection:
+        return RISPartyCollection(self.request.session)
 
     @cached_property
     def title(self) -> str:
@@ -1337,8 +1337,8 @@ class RISCommissionCollectionLayout(DefaultLayout):
 class RISCommissionLayout(DefaultLayout):
 
     @cached_property
-    def collection(self) -> CommissionCollection:
-        return CommissionCollection(self.request.session)
+    def collection(self) -> RISCommissionCollection:
+        return RISCommissionCollection(self.request.session)
 
     @cached_property
     def title(self) -> str:

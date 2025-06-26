@@ -4,15 +4,12 @@ from onegov.core.security import Private
 from onegov.org.models import Organisation
 from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import CommissionCollection
 from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.collections import PASPartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
-from onegov.pas.collections.commission import (
-    PASCommissionCollection
-)
+from onegov.pas.collections.commission import PASCommissionCollection
 from onegov.pas.collections.parliamentary_group import (
     PASParliamentaryGroupCollection
 )
@@ -72,7 +69,7 @@ def view_pas_settings(
         {
             'name': 'commissions',
             'title': _('Commissions'),
-            'link': request.class_link(CommissionCollection),
+            'link': request.class_link(PASCommissionCollection),
             'icon': 'fa-user-friends'
         },
         {

@@ -2,7 +2,7 @@ from datetime import date
 from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.pas.collections import CommissionCollection
-from onegov.pas.collections import CommissionMembershipCollection
+from onegov.pas.collections import PASCommissionMembershipCollection
 from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.collections import ParliamentarianRoleCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
@@ -162,7 +162,7 @@ def test_attendence_forms(session, dummy_request):
     assert form.errors['commission_id'][0] == \
         'Parliamentarian is not in this commission.'
 
-    memberships = CommissionMembershipCollection(session)
+    memberships = PASCommissionMembershipCollection(session)
     memberships.add(
         commission_id=commission.id,
         parliamentarian_id=parliamentarian.id,
@@ -209,7 +209,7 @@ def test_add_commission_attendence_form(session, dummy_request):
     commissions = CommissionCollection(session)
     commission = commissions.add(name='x')
 
-    memberships = CommissionMembershipCollection(session)
+    memberships = PASCommissionMembershipCollection(session)
     memberships.add(
         commission_id=commission.id,
         parliamentarian_id=parliamentarian.id,

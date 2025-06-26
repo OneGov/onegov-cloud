@@ -4,7 +4,7 @@ from onegov.pas.collections import AttendenceCollection
 from onegov.pas.app import PasApp
 from onegov.pas.collections import ChangeCollection
 from onegov.pas.collections import CommissionCollection
-from onegov.pas.collections import CommissionMembershipCollection
+from onegov.pas.collections import PASCommissionMembershipCollection
 from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.collections import ParliamentarianRoleCollection
@@ -135,13 +135,13 @@ def get_commission(
 
 
 @PasApp.path(
-    model=CommissionMembershipCollection,
+    model=PASCommissionMembershipCollection,
     path='/commission-memberships'
 )
 def get_commission_memberships(
     app: PasApp
-) -> CommissionMembershipCollection:
-    return CommissionMembershipCollection(app.session())
+) -> PASCommissionMembershipCollection:
+    return PASCommissionMembershipCollection(app.session())
 
 
 @PasApp.path(
@@ -153,7 +153,7 @@ def get_commission_membership(
     app: PasApp,
     id: UUID
 ) -> PASCommissionMembership | None:
-    return CommissionMembershipCollection(app.session()).by_id(id)
+    return PASCommissionMembershipCollection(app.session()).by_id(id)
 
 
 @PasApp.path(

@@ -4,7 +4,7 @@ from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import CommissionMembershipCollection
+from onegov.pas.collections import PASCommissionMembershipCollection
 from onegov.pas.forms import CommissionMembershipForm
 from onegov.pas.layouts import CommissionMembershipLayout
 from onegov.pas.models import PASCommissionMembership
@@ -79,5 +79,5 @@ def delete_commission_membership(
 
     request.assert_valid_csrf_token()
 
-    collection = CommissionMembershipCollection(request.session)
+    collection = PASCommissionMembershipCollection(request.session)
     collection.delete(self)

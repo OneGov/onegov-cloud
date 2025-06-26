@@ -119,3 +119,11 @@ class CommissionMembership(Base, TimestampMixin):
             f'p={self.parliamentarian.title}, commission'
             f'={self.commission.name}'
         )
+
+
+class RISCommissionMembership(CommissionMembership):
+    __mapper_args__ = {
+        'polymorphic_identity': 'ris_commission_membership'
+    }
+
+    es_type_name = 'ris_commission_membership'
