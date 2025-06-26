@@ -1367,16 +1367,33 @@ def import_meetings(
             if match:
                 day, month_str, year, sh, sm, eh, em = match.groups()
                 # Parse month name to month number
-                month = datetime.strptime(month_str, '%b').month
-                start_dt = datetime(
-                    int(year), month, int(day), int(sh), int(sm)
-                )
-                end_dt = datetime(
-                    int(year), month, int(day), int(eh), int(em)
-                )
-                # Add timezone
-                start_dt = pytz.timezone('Europe/Zurich').localize(start_dt)
-                end_dt = pytz.timezone('Europe/Zurich').localize(end_dt)
+                # month string can be:
+                # month_str = month_str.strip('.')
+                if month_str == 'März':
+                    month_str = 'Mär'
+                elif month_str == 'Juni':
+                    month_str = 'Jun'
+                elif month_str == 'Juli':
+                    month_str = 'Jul'
+                elif month_str == 'Sept':
+                    month_str = 'Sep'
+    
+                try:
+                    month = datetime.strptime(month_str, '%b').month
+                    start_dt = datetime(
+                        int(year), month, int(day), int(sh), int(sm)
+                    )
+                    end_dt = datetime(
+                        int(year), month, int(day), int(eh), int(em)
+                    )
+                    # Add timezone
+                    start_dt = pytz.timezone('Europe/Zurich').localize(start_dt)
+                    end_dt = pytz.timezone('Europe/Zurich').localize(end_dt)
+                except ValueError as e:
+                    click.secho(f'Error parsing date: {e}', fg='red')
+                    start_dt = end_dt = None  # type:ignore
+                    meta_date = (f'{day} {month_str} {year} '
+                                  f'{sh}:{sm} - {eh}:{em}')
             else:
                 start_dt = end_dt = None  # type:ignore
 
@@ -1408,7 +1425,6 @@ def import_meetings(
                             desc = False
                             documents = False
                             meeting_items = False
-
                     if desc:
                         if element['type'] == 'Paragraph':
                             if element.get('children') and (
@@ -1439,11 +1455,12 @@ def import_meetings(
                                             content=BytesIO(resp.content)
                                         )
                                         files.append(file)
-                                        print(file.name)
                     if meeting_items:
                         if element['type'] == 'Table':
                             for row in element['rows']:
                                 cells = row['cells']
+                                if cells[1]['type'] != 'Link':
+                                    continue
                                 political_business_id = cells[2]['url'].split('/')[-1]
                                 meetings_items_list.append(
                                     {
@@ -1466,13 +1483,13 @@ def import_meetings(
                                     number=meeting['number'],
                                     title=meeting['title'],
                                     meeting_id=added.id,
+                                    meta={
+                                        'meta_date': meta_date,
+                                    },
                                     political_business_link_id = meeting[
                                             'political_business_id'],
                                 )
                 if files:
-                    click.secho(
-                        f'Adding {files} files to meeting {added.title}',
-                        fg='green')
                     added.files = files
 
         click.echo(f'{import_counter} meetings imported')
@@ -2153,11 +2170,12 @@ def create_parliamentarian_roles(
                 continue
 
             # Create new participation
-            for person_id in connect_ids:
+            for i, person_id in enumerate(connect_ids):
+                role = 'president' if i == 0 else 'member'
                 membership = parliamentarian_roles.add(
                     parliamentarian_id=person_id,
                     parliamentary_group_id=parliamentary_group.id,
-                    role='member'
+                    role=role
                 )
                 click.echo(f'Created participation for {person_id} in {parliamentary_group.name}')
 

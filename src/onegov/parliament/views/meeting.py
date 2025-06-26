@@ -51,6 +51,12 @@ def view_meeting(
 
     return {
         'layout': layout,
-        'meeting': self,
+        'page': self,
+        'text': '',
+        'lead': '',
+        'people': getattr(self, 'people', None),
+        'files': getattr(self, 'files', None),
+        'contact': getattr(self, 'contact_html', None),
+        'coordinates': None,
         'title': self.title,
     }

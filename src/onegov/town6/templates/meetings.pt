@@ -9,9 +9,18 @@
                 <ul tal:condition="meetings" class="more-list meeting-list">
                     <li tal:repeat="meeting meetings">
                         <a class="list-link" tal:attributes="href request.link(meeting)">
-                            <h5 class="list-title">${meeting.title}</h5>
+                            <span class="h5 list-title">
+                                ${meeting.title}
+                            </span>
+                        </a>
+                        
+                        <a tal:attributes="href request.link(meeting)">
+                            <p class="list-lead preview">
+                                <span>${layout.format_date(meeting.start_datetime, 'datetime')}</span>,
+                            </p>
                         </a>
                     </li>
+                    
                 </ul>
             </div>
         </div>
