@@ -16,8 +16,8 @@ from onegov.pas.layouts.parliamentarian import ParliamentarianCollectionLayout
 from onegov.pas.layouts.parliamentarian import ParliamentarianLayout
 from onegov.pas.layouts.parliamentarian_role import ParliamentarianRoleLayout
 from onegov.pas.layouts.parliamentary_group import (
-    ParliamentaryGroupCollectionLayout)
-from onegov.pas.layouts.parliamentary_group import ParliamentaryGroupLayout
+    PASParliamentaryGroupCollectionLayout)
+from onegov.pas.layouts.parliamentary_group import PASParliamentaryGroupLayout
 from onegov.pas.layouts.party import PASPartyCollectionLayout
 from onegov.pas.layouts.party import PASPartyLayout
 from onegov.pas.layouts.rate_set import RateSetCollectionLayout
@@ -41,8 +41,8 @@ __all__ = (
     'ParliamentarianCollectionLayout',
     'ParliamentarianLayout',
     'ParliamentarianRoleLayout',
-    'ParliamentaryGroupCollectionLayout',
-    'ParliamentaryGroupLayout',
+    'PASParliamentaryGroupCollectionLayout',
+    'PASParliamentaryGroupLayout',
     'PASPartyCollectionLayout',
     'PASPartyLayout',
     'RateSetCollectionLayout',

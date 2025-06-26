@@ -94,3 +94,12 @@ class ParliamentaryGroup(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     def __repr__(self) -> str:
         return f'<ParliamentaryGroup {self.name}>'
+
+
+class RISParliamentaryGroup(ParliamentaryGroup):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'ris_parliamentary_group',
+    }
+
+    es_type_name = 'ris_parliamentary_group'

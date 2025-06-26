@@ -3,6 +3,9 @@ from onegov.core.security import Private
 from onegov.org.models import Organisation
 from onegov.parliament.collections import RISPartyCollection
 from onegov.parliament.collections import RISCommissionCollection
+from onegov.parliament.collections.parliamentary_group import (
+    RISParliamentaryGroupCollection
+)
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import DefaultLayout
@@ -35,12 +38,12 @@ def view_ris_settings(
         #     'link': request.class_link(ParliamentarianCollection),
         #     'icon': 'fa-user-tie'
         # },
-        # {
-        #     'name': 'parliamentary-groups',
-        #     'title': _('Parliamentary groups'),
-        #     'link': request.class_link(ParliamentaryGroupCollection),
-        #     'icon': 'fa-handshake'
-        # },
+        {
+            'name': 'parliamentary-groups',
+            'title': _('Parliamentary groups'),
+            'link': request.class_link(RISParliamentaryGroupCollection),
+            'icon': 'fa-handshake'
+        },
         {
             'name': 'commissions',
             'title': _('Commissions'),
