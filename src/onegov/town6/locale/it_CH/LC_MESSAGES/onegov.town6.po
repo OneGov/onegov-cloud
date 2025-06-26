@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-06-26 11:02+0200\n"
+"POT-Creation-Date: 2025-06-26 13:21+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -706,8 +706,8 @@ msgstr "Cartella"
 msgid "Payment"
 msgstr "Pagamento"
 
-msgid "VAT"
-msgstr "IVA"
+msgid "Value Added Tax"
+msgstr "Imposta sul valore aggiunto"
 
 msgid "${vat_rate}% included"
 msgstr "${vat_rate}% inclusa"
@@ -715,26 +715,17 @@ msgstr "${vat_rate}% inclusa"
 msgid "State"
 msgstr "Stato"
 
-msgid "Open"
-msgstr "Aperto"
-
-msgid "Paid"
-msgstr "Pagato"
-
-msgid "Failed"
-msgstr "Fallito"
-
-msgid "Refunded"
-msgstr "Rimborsato"
-
-msgid "Source"
-msgstr "Fonte"
+msgid "Payment Method"
+msgstr "Modalità di pagamento"
 
 msgid "Offline Payment"
 msgstr "Fattura"
 
 msgid "Online Payment"
 msgstr "Pagamento online"
+
+msgid "Source"
+msgstr "Fonte"
 
 msgid "Manual"
 msgstr "Manuale"
@@ -757,6 +748,9 @@ msgstr "Organizzazione"
 msgid "Functions:"
 msgstr "Funzioni:"
 
+msgid "Open"
+msgstr "Aperto"
+
 msgid "Pending"
 msgstr "In attesa"
 
@@ -766,6 +760,15 @@ msgstr "Chiuso"
 #, fuzzy
 msgid "Archived"
 msgstr "Fare Archivio"
+
+msgid "Paid"
+msgstr "Pagato"
+
+msgid "Failed"
+msgstr "Fallito"
+
+msgid "Refunded"
+msgstr "Rimborsato"
 
 msgid "Ticket"
 msgstr "Biglietto"
@@ -1303,6 +1306,9 @@ msgstr ""
 
 msgid "Pending approval"
 msgstr "In attesa di approvazione"
+
+msgid "VAT"
+msgstr "IVA"
 
 msgid "A new entry has been added to the \"${directory}\" directory:"
 msgstr "Un nuovo elemento è stato aggiunto alla cartella \"${directory}\":"
@@ -2322,9 +2328,6 @@ msgstr ""
 
 msgid "Push Notification Overview"
 msgstr "Panoramica delle notifiche push"
-
-msgid "Value Added Tax"
-msgstr "Imposta sul valore aggiunto"
 
 msgid "New Note"
 msgstr "Nuova nota"

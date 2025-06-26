@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-06-26 11:02+0200\n"
+"POT-Creation-Date: 2025-06-26 13:21+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -709,8 +709,8 @@ msgstr "Dossier"
 msgid "Payment"
 msgstr "Paiement"
 
-msgid "VAT"
-msgstr "TVA"
+msgid "Value Added Tax"
+msgstr "Taxe sur la valeur ajoutée"
 
 msgid "${vat_rate}% included"
 msgstr "${vat_rate}% incluse"
@@ -718,26 +718,17 @@ msgstr "${vat_rate}% incluse"
 msgid "State"
 msgstr "État"
 
-msgid "Open"
-msgstr "Ouvert"
-
-msgid "Paid"
-msgstr "Payé"
-
-msgid "Failed"
-msgstr "Échoué"
-
-msgid "Refunded"
-msgstr "Remboursé"
-
-msgid "Source"
-msgstr "Source"
+msgid "Payment Method"
+msgstr "Méthode de paiement"
 
 msgid "Offline Payment"
 msgstr "Facture"
 
 msgid "Online Payment"
 msgstr "Paiement en ligne"
+
+msgid "Source"
+msgstr "Source"
 
 msgid "Manual"
 msgstr "Manuelle"
@@ -760,6 +751,9 @@ msgstr "Organisation"
 msgid "Functions:"
 msgstr "Fonctions:"
 
+msgid "Open"
+msgstr "Ouvert"
+
 msgid "Pending"
 msgstr "En attente"
 
@@ -768,6 +762,15 @@ msgstr "Fermé"
 
 msgid "Archived"
 msgstr "Archivé"
+
+msgid "Paid"
+msgstr "Payé"
+
+msgid "Failed"
+msgstr "Échoué"
+
+msgid "Refunded"
+msgstr "Remboursé"
 
 msgid "Ticket"
 msgstr "Ticket"
@@ -1303,6 +1306,9 @@ msgstr ""
 
 msgid "Pending approval"
 msgstr "En attente d'approbation"
+
+msgid "VAT"
+msgstr "TVA"
 
 msgid "A new entry has been added to the \"${directory}\" directory:"
 msgstr "Une nouvelle entrée a été ajoutée au répertoire \"${directory}\":"
@@ -2325,9 +2331,6 @@ msgstr ""
 
 msgid "Push Notification Overview"
 msgstr "Vue d'ensemble des notifications push"
-
-msgid "Value Added Tax"
-msgstr "Taxe sur la valeur ajoutée"
 
 msgid "New Note"
 msgstr "Nouveau commentaire"

@@ -123,7 +123,7 @@
         </p>
         <p tal:define="show_vat show_vat|False; vat_amount layout.get_vat_amount(payment.amount); hide_vat_amount hide_vat_amount|False" tal:condition="show_vat and layout.vat_rate and vat_amount">
             <table class="field-display">
-                <tr><td><b i18n:translate>VAT</b></td></tr>
+                <tr><td><b i18n:translate>Value Added Tax</b></td></tr>
                 <tr><td><tal:b i18n:translate><tal:b i18n:name="vat_rate">${layout.format_number(layout.vat_rate, 1)}</tal:b>% included</tal:b><tal:b tal:condition="not:hide_vat_amount">: ${layout.format_number(vat_amount, 2)} ${payment.currency}</tal:b></td></tr>
                 <tr><td height="5"></td></tr>
             </table>
