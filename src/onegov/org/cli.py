@@ -1426,11 +1426,12 @@ def import_meetings(
                                     continue
                                 resp = requests.get(link)
                                 if resp.status_code == 200:
-                                    if file_collection.by_content(
+                                    if existing_file:=file_collection.by_content(
                                         BytesIO(resp.content)
-                                    ):
+                                    ).first():
+                                        files.append(existing_file)
                                         click.echo(
-                                            f'File {row["cells"][0]["text"]} already exists, skipping.'
+                                            f'File {existing_file} already exists, skipping.'
                                     )
                                     else:
                                         file = file_collection.add(
@@ -1468,8 +1469,11 @@ def import_meetings(
                                     political_business_link_id = meeting[
                                             'political_business_id'],
                                 )
-
-                added.files = files
+                if files:
+                    click.secho(
+                        f'Adding {files} files to meeting {added.title}',
+                        fg='green')
+                    added.files = files
 
         click.echo(f'{import_counter} meetings imported')
         click.echo(f'{overwrite_counter} meetings overwritten')
