@@ -6,6 +6,7 @@ from onegov.parliament.models.commission import Commission, RISCommission
 from onegov.parliament.models.commission_membership import CommissionMembership
 from onegov.parliament.models.legislative_period import LegislativePeriod
 from onegov.parliament.models.meeting import Meeting
+from onegov.parliament.models.meeting_item import MeetingItem
 from onegov.parliament.models.parliamentarian import (
     Parliamentarian,
     RISParliamentarian
@@ -27,6 +28,7 @@ __all__ = (
     'CommissionMembership',
     'LegislativePeriod',
     'Meeting',
+    'MeetingItem',
     'Parliamentarian',
     'RISParliamentarian',
     'ParliamentarianRole',

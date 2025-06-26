@@ -2,7 +2,6 @@
 from __future__ import annotations
 import base64
 import json
-from pyclbr import Function
 
 import click
 import html
@@ -21,8 +20,7 @@ from io import BytesIO
 from markupsafe import Markup
 import pytz
 import requests
-from sedate import utcnow
-from onegov import file
+import transaction
 from onegov.core.orm.utils import QueryChain
 from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
 from onegov.chat import MessageCollection
@@ -49,8 +47,8 @@ from onegov.page.collection import PageCollection
 from onegov.parliament.collections import MeetingCollection, PoliticalBusinessParticipationCollection # noqa
 from onegov.parliament.collections import PoliticalBusinessCollection, RISCommissionMembershipCollection
 from onegov.parliament.collections.meeting_item import MeetingItemCollection
-from onegov.parliament.models import CommissionMembership, PoliticalBusinessParticipation, RISParliamentarian, meeting_item, political_business
-from onegov.parliament.models.parliamentarian import Parliamentarian
+from onegov.parliament.models import CommissionMembership, RISParliamentarian
+from onegov.parliament.models.meeting_item import MeetingItem
 from onegov.pas.collections import CommissionCollection, ParliamentarianCollection, ParliamentarianRoleCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.reservation import ResourceCollection
@@ -2159,4 +2157,33 @@ def create_parliamentarian_roles(
                 )
                 click.echo(f'Created participation for {person_id} in {parliamentary_group.name}')
 
+    return connect_ids
+
+
+@cli.command(name='connect-political-business-meeting-items')
+def connect_political_business_meeting_items(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Connects Political Business and Meeting Items
+
+        onegov-org --select '/foo/bar' connect-political-business-meeting-items
+
+    """
+
+    def connect_ids(request: OrgRequest, app: OrgApp) -> None:
+
+        session = request.session
+        meeting_items =  MeetingItemCollection(session)
+        political_businesses = PoliticalBusinessCollection(session)
+
+        for political_business in political_businesses.query():
+            self_id = political_business.meta.get('self_id')
+            if not self_id:
+                click.secho(f'No self_id found for political business {political_business.title}', fg='yellow')
+                continue
+            meeting_item = meeting_items.query().filter(
+                MeetingItem.political_business_link_id == self_id
+            ).first()
+            if meeting_item is not None:
+                meeting_item.political_business_id = political_business.id
+        transaction.commit()
     return connect_ids
