@@ -26,7 +26,7 @@ from onegov.people import Person
 from onegov.reservation import Resource
 from onegov.ticket import TicketPermission
 from onegov.user import User, UserGroup
-from sqlalchemy import Column, ForeignKey
+from sqlalchemy import Column, ForeignKey, Text
 from sqlalchemy.orm import undefer, selectinload, load_only
 
 
@@ -537,3 +537,17 @@ def set_default_extras_pricing_method(context: UpgradeContext) -> None:
         .filter(Resource.definition.isnot(None))
     ):
         resource.extras_pricing_method = 'one_off'
+
+
+@upgrade_task('Add party column to parliamentarians')
+def add_party_column_to_parliamentarians(context: UpgradeContext) -> None:
+    if not context.has_column('par_parliamentarians', 'party'):
+        context.add_column_with_defaults(
+            'par_parliamentarians',
+            Column(
+                'party',
+                Text,
+                nullable=True
+            ),
+            default=None
+        )

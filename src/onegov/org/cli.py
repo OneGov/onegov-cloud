@@ -1963,9 +1963,9 @@ def create_polical_business_participants(
         session = request.session
         business_participants = PoliticalBusinessParticipationCollection(session)
         people =  ParliamentarianCollection(session)
-        political_business = PoliticalBusinessCollection(session)
+        political_businesses = PoliticalBusinessCollection(session)
 
-        for political_business in political_business.query():
+        for political_business in political_businesses.query():
             connect_ids = {}
             for person_id, function in political_business.meta.get('people_ids', []):
                 for person in people.query():
@@ -1973,7 +1973,7 @@ def create_polical_business_participants(
                         connect_ids[person.id] = function
 
             if not connect_ids:
-                click.secho(f'No people found for commission {political_business.name}', fg='yellow')
+                click.secho(f'No people found for political business {political_business.title}', fg='yellow')
                 continue
 
             # Check if participation already exists
@@ -1983,7 +1983,7 @@ def create_polical_business_participants(
             ).first()
 
             if existing_membership:
-                click.secho(f'participation already exists for {political_business.name}', fg='yellow')
+                click.secho(f'participation already exists for {political_business.title}', fg='yellow')
                 continue
 
             # Create new participation
@@ -1991,9 +1991,9 @@ def create_polical_business_participants(
                 membership = business_participants.add(
                     parliamentarian_id=person_id,
                     political_business_id=political_business.id,
-                    function= function,
+                    participant_type= function,
                     role='member'
                 )
-                click.echo(f'Created participation for {person_id} in {political_business.name}')
+                click.echo(f'Created participation for {person_id} in {political_business.title}')
 
     return connect_ids
