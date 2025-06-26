@@ -140,14 +140,19 @@
                 <tr><td height="5"></td></tr>
             </table>
         </p>
-        <p>
+        <p tal:condition="not:show_fee">
             <table class="field-display">
-                <tr><td><b i18n:translate>Source</b></td></tr>
-                <tr tal:condition="not:show_fee" tal:switch="payment.source">
+                <tr><td><b i18n:translate>Payment Method</b></td></tr>
+                <tr tal:switch="payment.source">
                     <td tal:case="'manual'" i18n:translate>Offline Payment</td>
                     <td tal:case="default" i18n:translate>Online Payment</td>
                 </tr>
-                <tr tal:condition="show_fee" tal:switch="payment.source">
+            </table>
+        </p>
+        <p tal:condition="show_fee">
+            <table class="field-display">
+                <tr><td><b i18n:translate>Source</b></td></tr>
+                <tr tal:switch="payment.source">
                     <td tal:case="'manual'" i18n:translate>Manual</td>
                     <td tal:case="'datatrans'" i18n:translate>Datatrans</td>
                     <td tal:case="'stripe_connect'" i18n:translate>Stripe Connect</td>

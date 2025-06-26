@@ -1039,31 +1039,29 @@
 
 <metal:payment define-macro="payment" i18n:domain="onegov.town6">
     <tal:b tal:define="show_fee show_fee|False" tal:condition="payment|nothing">
-        <h3 i18n:translate>Payment</h3>
+        <h2 i18n:translate>Payment</h2>
         <dl class="field-display">
             <dt i18n:translate>Total Amount</dt>
             <dd>${layout.format_number(payment.amount)} ${payment.currency}</dd>
         </dl>
         <dl class="field-display" tal:define="show_vat show_vat|False; vat_amount layout.get_vat_amount(payment.amount); hide_vat_amount hide_vat_amount|False" tal:condition="show_vat and layout.vat_rate and vat_amount">
-            <dt i18n:translate>VAT</dt>
+            <dt i18n:translate>Value Added Tax</dt>
             <dd><tal:b i18n:translate><tal:b i18n:name="vat_rate">${layout.format_number(layout.vat_rate, 1)}</tal:b>% included</tal:b><tal:b tal:condition="not:hide_vat_amount">: ${layout.format_number(vat_amount, 2)} ${payment.currency}</tal:b></dd>
         </dl>
         <dl class="field-display">
             <dt i18n:translate>State</dt>
-            <dd tal:switch="payment.state">
-                <tal:b tal:case="'open'" i18n:translate>Open</tal:b>
-                <tal:b tal:case="'paid'" i18n:translate>Paid</tal:b>
-                <tal:b tal:case="'failed'" i18n:translate>Failed</tal:b>
-                <tal:b tal:case="'cancelled'" i18n:translate>Refunded</tal:b>
-            </dd>
+            <dd><tal:b metal:use-macro="layout.macros['payment_status']" /></dd>
         </dl>
-        <dl class="field-display">
-            <dt i18n:translate>Source</dt>
-            <dd tal:condition="not:show_fee" tal:switch="payment.source">
+        <dl class="field-display" tal:condition="not:show_fee">
+            <dt i18n:translate>Payment Method</dt>
+            <dd tal:switch="payment.source">
                 <tal:b tal:case="'manual'" i18n:translate>Offline Payment</tal:b>
                 <tal:b tal:case="default" i18n:translate>Online Payment</tal:b>
             </dd>
-            <dd tal:condition="show_fee" tal:switch="payment.source">
+        </dl>
+        <dl class="field-display" tal:condition="show_fee">
+            <dt i18n:translate>Source</dt>
+            <dd tal:switch="payment.source">
                 <tal:b tal:case="'manual'" i18n:translate>Manual</tal:b>
                 <tal:b tal:case="'datatrans'" i18n:translate>Datatrans</tal:b>
                 <tal:b tal:case="'stripe_connect'" i18n:translate>Stripe Connect</tal:b>
