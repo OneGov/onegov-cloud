@@ -14,9 +14,9 @@
 
         <p i18n:translate>Thank you for your request.</p>
 
-        <tal:b tal:condition="model.payment">
+        <tal:b tal:condition="model.handler.payment">
             <hr class="large">
-            <metal:b tal:define="payment model.payment; show_vat model.handler.show_vat" use-macro="layout.macros['payment']" />
+            <metal:b tal:define="payment model.handler.payment; show_vat model.handler.show_vat" use-macro="layout.macros['payment']" />
         </tal:b>
     </tal:b>
 </div>
