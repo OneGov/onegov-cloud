@@ -31,7 +31,7 @@ def add_external_id_for_api(context: UpgradeContext) -> None:
 
 
 @upgrade_task('Add party column to pas_parliamentarians')
-def add_party_column_to_parliamentarians(context: UpgradeContext) -> None:
+def add_party_column_to_pas_parliamentarians(context: UpgradeContext) -> None:
     if not context.has_column('pas_parliamentarians', 'party'):
         context.add_column_with_defaults(
             'pas_parliamentarians',

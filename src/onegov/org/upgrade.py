@@ -540,7 +540,7 @@ def set_default_extras_pricing_method(context: UpgradeContext) -> None:
 
 
 @upgrade_task('Add party column to par_parliamentarians')
-def add_party_column_to_parliamentarians(context: UpgradeContext) -> None:
+def add_party_column_to_par_parliamentarians(context: UpgradeContext) -> None:
     if not context.has_column('par_parliamentarians', 'party'):
         context.add_column_with_defaults(
             'par_parliamentarians',
