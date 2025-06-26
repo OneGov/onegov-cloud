@@ -48,9 +48,6 @@ from onegov.org.models.resource import Resource
 from onegov.page.collection import PageCollection
 from onegov.parliament.collections import MeetingCollection, PoliticalBusinessParticipationCollection
 from onegov.parliament.collections import PoliticalBusinessCollection, RISCommissionMembershipCollection
-from onegov.parliament.models.political_business import (
-    PoliticalBusinessStatus
-)
 from onegov.parliament.models import CommissionMembership, PoliticalBusinessParticipation
 from onegov.parliament.models.parliamentarian import Parliamentarian
 from onegov.pas.collections import CommissionCollection, ParliamentarianCollection
@@ -82,6 +79,10 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
     from translationstring import TranslationString
     from uuid import UUID
+    from onegov.parliament.models.political_business import (
+        PoliticalBusinessStatus
+    )
+
 import locale
 import pytz
 import re
