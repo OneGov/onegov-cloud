@@ -2433,7 +2433,9 @@ def import_parliamentarians(
                     shipping_address_city=contact.get('city', ''),
                     party=contact.get('party', ''),
                     occupation=contact.get('profession', ''),
-                    function=contact.get('function', ''),
+                    # FIXME: I don't think this was correct, but I'll
+                    #        leave it here just in case
+                    # function=contact.get('function', ''),
                     meta={
                         'parliamentarian_id': article_name.split(
                             '_')[1].replace('.json', ''),
@@ -2555,7 +2557,8 @@ def create_polical_business_participants(
                     parliamentarian_id=person_id,
                     political_business_id=political_business.id,
                     participant_type=function,
-                    role='member'
+                    # FIXME: I don't think this was correct
+                    # role='member'
                 )
                 click.echo(
                     f'Created participation for {person_id} in '
