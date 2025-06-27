@@ -1501,3 +1501,12 @@ def format_phone_number(phone_number: str) -> str:
         )
     except phonenumbers.phonenumberutil.NumberParseException:
         return phone_number
+
+
+def get_current_tickets_url(request: OrgRequest) -> str:
+    """ Get the tickets url with the parameters we last visited. """
+    state = request.browser_session.get('tickets_state')
+    return request.class_link(
+        TicketCollection,
+        state or {'handler': 'ALL', 'state': 'open', 'page': 0}
+    )

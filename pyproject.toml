@@ -307,6 +307,9 @@ keep-runtime-typing = true
 [tool.ruff.lint.ruff]
 extend-markup-names = ["chameleon.utils.Markup"]
 
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["attr.attrib"]
+
 [tool.ruff.format]
 quote-style = "single"
 indent-style = "space"
