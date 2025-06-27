@@ -1,17 +1,15 @@
 from __future__ import annotations
 
 from onegov.form import Form
-from onegov.form.fields import TranslatedSelectField
 from onegov.org.forms.fields import HtmlField
-from onegov.pas import _
-from onegov.parliament.models.commission import TYPES
+from onegov.parliament import _
 from wtforms.fields import DateField
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
 
 
-class CommissionForm(Form):
+class PartyForm(Form):
 
     name = StringField(
         label=_('Name'),
@@ -28,11 +26,8 @@ class CommissionForm(Form):
         validators=[Optional()],
     )
 
-    type = TranslatedSelectField(
-        label=_('Type'),
-        choices=list(TYPES.items()),
-        validators=[InputRequired()],
-        default='normal'
+    portrait = HtmlField(
+        label=_('Portrait'),
     )
 
     description = HtmlField(

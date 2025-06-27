@@ -1,14 +1,6 @@
 from __future__ import annotations
 
 from onegov.core.security import Private
-from onegov.parliament.views import (
-    add_commission_membership,
-    add_parliamentarian,
-    delete_parliamentarian,
-    edit_parliamentarian,
-    view_parliamentarian,
-    view_parliamentarians,
-)
 from onegov.pas import PasApp
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.forms import PASParliamentarianForm
@@ -16,9 +8,14 @@ from onegov.pas.forms import ParliamentarianRoleForm
 from onegov.pas.layouts import PASParliamentarianCollectionLayout
 from onegov.pas.layouts import PASParliamentarianLayout
 from onegov.pas.models import PASParliamentarian
+from onegov.town6.views.parliamentarian import add_commission_membership
+from onegov.town6.views.parliamentarian import add_parliamentarian
+from onegov.town6.views.parliamentarian import delete_parliamentarian
+from onegov.town6.views.parliamentarian import edit_parliamentarian
+from onegov.town6.views.parliamentarian import view_parliamentarian
+from onegov.town6.views.parliamentarian import view_parliamentarians
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest

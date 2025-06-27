@@ -2,17 +2,14 @@ from __future__ import annotations
 
 
 from onegov.core.security.permissions import Public
-from onegov.parliament import _
 
 from onegov.parliament.collections import MeetingCollection
 from onegov.parliament.models import Meeting
+from onegov.town6 import _
+from onegov.town6 import TownApp
 from onegov.town6.layout import MeetingCollectionLayout
 
-from onegov.town6 import TownApp
-
 from typing import TYPE_CHECKING
-
-
 if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
     from onegov.core.types import RenderData

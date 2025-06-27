@@ -4,16 +4,16 @@ from onegov.pas.forms.attendence import AttendenceAddCommissionForm
 from onegov.pas.forms.attendence import AttendenceAddForm
 from onegov.pas.forms.attendence import AttendenceAddPlenaryForm
 from onegov.pas.forms.attendence import AttendenceForm
-from onegov.parliament.forms.commission import CommissionForm
+from onegov.org.forms.commission import CommissionForm
 from onegov.pas.forms.commission_membership import CommissionMembershipAddForm
 from onegov.pas.forms.commission_membership import CommissionMembershipForm
 from onegov.pas.forms.legislative_period import LegislativePeriodForm
-from onegov.parliament.forms.parliamentarian import PASParliamentarianForm
-from onegov.parliament.forms.parliamentarian_role import (
+from onegov.org.forms.parliamentarian import PASParliamentarianForm
+from onegov.org.forms.parliamentarian_role import (
     ParliamentarianRoleForm
 )
-from onegov.parliament.forms.parliamentary_group import ParliamentaryGroupForm
-from onegov.parliament.forms.party import PartyForm
+from onegov.org.forms.parliamentary_group import ParliamentaryGroupForm
+from onegov.org.forms.party import PartyForm
 from onegov.pas.forms.rate_set import RateSetForm
 from onegov.pas.forms.settlement_run import SettlementRunForm
 

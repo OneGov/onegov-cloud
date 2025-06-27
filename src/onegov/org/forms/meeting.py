@@ -4,7 +4,7 @@ from wtforms import DateTimeField
 
 from onegov.form import Form
 from onegov.org.forms.fields import HtmlField
-from onegov.pas import _
+from onegov.parliament import _
 from wtforms.validators import Optional
 
 

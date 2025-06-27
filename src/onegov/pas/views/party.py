@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from onegov.core.security import Private
-from onegov.parliament.views.party import (
+from onegov.town6.views.party import (
     add_party,
     delete_party,
     edit_party,

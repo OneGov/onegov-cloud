@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from onegov.core.elements import Link
 from onegov.core.security import Private
-from onegov.parliament.views.commission import (
+from onegov.town6.views.commission import (
     view_commissions,
     add_commission,
     edit_commission,

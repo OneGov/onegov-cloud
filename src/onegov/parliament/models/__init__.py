@@ -10,13 +10,12 @@ from onegov.parliament.models.commission_membership import (
 from onegov.parliament.models.legislative_period import LegislativePeriod
 from onegov.parliament.models.meeting import Meeting
 from onegov.parliament.models.meeting_item import MeetingItem
-from onegov.parliament.models.parliamentarian import (
-    Parliamentarian,
-    RISParliamentarian
-)
+from onegov.parliament.models.parliamentarian import Parliamentarian
+from onegov.parliament.models.parliamentarian import RISParliamentarian
 from onegov.parliament.models.parliamentarian_role import (
     ParliamentarianRole,
-    RISParliamentarianRole
+    RISParliamentarianRole,
+    PARLIAMENTARIAN_ROLES
 )
 from onegov.parliament.models.parliamentary_group import (
     ParliamentaryGroup,
@@ -39,6 +38,7 @@ __all__ = (
     'MeetingItem',
     'Parliamentarian',
     'ParliamentarianRole',
+    'PARLIAMENTARIAN_ROLES',
     'RISParliamentarianRole',
     'ParliamentaryGroup',
     'RISParliamentaryGroup',

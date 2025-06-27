@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from onegov.core.security import Private
-from onegov.parliament.views.parliamentarian_role import (
+from onegov.town6.views.parliamentarian_role import (
     view_parliamentarian_role,
     edit_parliamentarian_role,
     delete_parliamentarian_role

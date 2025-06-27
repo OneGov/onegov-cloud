@@ -1,19 +1,19 @@
 from __future__ import annotations
 
 from onegov.core.security import Private
-from onegov.parliament.views import (
-    view_parliamentary_groups,
-    add_parliamentary_group,
-    view_parliamentary_group,
-    edit_parliamentary_group,
-    delete_parliamentary_group
-)
 from onegov.pas import PasApp
 from onegov.pas.collections import PASParliamentaryGroupCollection
 from onegov.pas.forms import ParliamentaryGroupForm
 from onegov.pas.layouts import PASParliamentaryGroupCollectionLayout
 from onegov.pas.layouts import PASParliamentaryGroupLayout
 from onegov.pas.models import PASParliamentaryGroup
+
+from onegov.town6.views.parliamentary_group import add_parliamentary_group
+from onegov.town6.views.parliamentary_group import delete_parliamentary_group
+from onegov.town6.views.parliamentary_group import edit_parliamentary_group
+from onegov.town6.views.parliamentary_group import view_parliamentary_group
+from onegov.town6.views.parliamentary_group import view_parliamentary_groups
+
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

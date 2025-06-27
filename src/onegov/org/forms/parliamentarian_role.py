@@ -10,9 +10,7 @@ from onegov.parliament.collections import (
     ParliamentaryGroupCollection,
     PartyCollection
 )
-from onegov.parliament.models.parliamentarian_role import (
-    PARLIAMENTARIAN_ROLES
-)
+from onegov.parliament.models import PARLIAMENTARIAN_ROLES
 from onegov.parliament.models.parliamentarian_role import (
     PARLIAMENTARY_GROUP_ROLES
 )
