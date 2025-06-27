@@ -1,5 +1,15 @@
 from __future__ import annotations
 
+from onegov.parliament.collections.parliamentarian import (
+    ParliamentarianCollection,
+    RISParliamentarianCollection,
+)
+from onegov.parliament.collections.parliamentarian_role import (
+    ParliamentarianRoleCollection
+)
+from onegov.parliament.collections.parliamentary_group import (
+    ParliamentaryGroupCollection, RISParliamentaryGroupCollection,
+)
 from onegov.parliament.collections.party import (
     PartyCollection,
     RISPartyCollection,
@@ -23,10 +33,16 @@ from onegov.parliament.collections.political_business_participant import (
 
 __all__ = (
     'CommissionCollection',
-    'RISCommissionMembershipCollection',
-    'RISCommissionCollection',
-    'RISPartyCollection',
+    'MeetingCollection',
+    'ParliamentarianCollection',
+    'ParliamentaryGroupCollection',
+    'RISParliamentaryGroupCollection',
+    'ParliamentarianRoleCollection',
+    'PartyCollection',
     'PoliticalBusinessCollection',
     'PoliticalBusinessParticipationCollection',
-    'MeetingCollection', 'PartyCollection',
+    'RISCommissionCollection',
+    'RISCommissionMembershipCollection',
+    'RISParliamentarianCollection',
+    'RISPartyCollection',
 )

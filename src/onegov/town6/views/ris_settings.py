@@ -3,6 +3,9 @@ from onegov.core.security import Private
 from onegov.org.models import Organisation
 from onegov.parliament.collections import RISPartyCollection
 from onegov.parliament.collections import RISCommissionCollection
+from onegov.parliament.collections.parliamentarian import (
+    RISParliamentarianCollection
+)
 from onegov.parliament.collections.parliamentary_group import (
     RISParliamentaryGroupCollection
 )
@@ -32,12 +35,12 @@ def view_ris_settings(
     layout = DefaultLayout(self, request)
 
     shortcuts = [
-        # {
-        #     'name': 'parliamentarians',
-        #     'title': _('Parliamentarians'),
-        #     'link': request.class_link(ParliamentarianCollection),
-        #     'icon': 'fa-user-tie'
-        # },
+        {
+            'name': 'parliamentarians',
+            'title': _('Parliamentarians'),
+            'link': request.class_link(RISParliamentarianCollection),
+            'icon': 'fa-user-tie'
+        },
         {
             'name': 'parliamentary-groups',
             'title': _('Parliamentary groups'),

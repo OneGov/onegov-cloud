@@ -56,6 +56,140 @@ class ParliamentarianForm(NamedFileForm):
         fieldset=_('Basic properties'),
     )
 
+    private_address = StringField(
+        label=_('Address'),
+        fieldset=_('Private address'),
+    )
+
+    private_address_addition = StringField(
+        label=_('Addition'),
+        fieldset=_('Private address'),
+    )
+
+    private_address_zip_code = StringField(
+        label=_('Zip code'),
+        fieldset=_('Private address'),
+    )
+
+    private_address_city = StringField(
+        label=_('City'),
+        fieldset=_('Private address'),
+    )
+
+    date_of_birth = DateField(
+        label=_('Date of birth'),
+        fieldset=_('Additional information'),
+        validators=[Optional()],
+    )
+
+    date_of_death = DateField(
+        label=_('Date of death'),
+        fieldset=_('Additional information'),
+        validators=[Optional()],
+    )
+
+    place_of_origin = StringField(
+        label=_('Place of origin'),
+        fieldset=_('Additional information'),
+    )
+
+    occupation = StringField(
+        label=_('Occupation'),
+        fieldset=_('Additional information'),
+    )
+
+    academic_title = StringField(
+        label=_('Academic title'),
+        fieldset=_('Additional information'),
+    )
+
+    salutation = StringField(
+        label=_('Salutation'),
+        fieldset=_('Additional information'),
+    )
+
+    phone_private = PhoneNumberField(
+        label=_('Private phone number'),
+        fieldset=_('Additional information'),
+        validators=[ValidPhoneNumber()],
+        render_kw={'autocomplete': 'tel'}
+    )
+
+    phone_mobile = PhoneNumberField(
+        label=_('Mobile phone number'),
+        fieldset=_('Additional information'),
+        validators=[ValidPhoneNumber()],
+        render_kw={'autocomplete': 'tel'}
+    )
+
+    phone_business = PhoneNumberField(
+        label=_('Business phone number'),
+        fieldset=_('Additional information'),
+        validators=[ValidPhoneNumber()],
+        render_kw={'autocomplete': 'tel'}
+    )
+
+    email_primary = EmailField(
+        label=_('Primary email address'),
+        fieldset=_('Additional information'),
+        validators=[InputRequired(), Email()]
+    )
+
+    email_secondary = EmailField(
+        label=_('Secondary email address'),
+        fieldset=_('Additional information'),
+        validators=[Optional(), Email()]
+    )
+
+    website = URLField(
+        label=_('Website'),
+        fieldset=_('Additional information'),
+        validators=[URL(), Optional()]
+    )
+
+    remarks = TextAreaField(
+        label=_('Remarks'),
+        fieldset=_('Additional information'),
+    )
+
+
+class PASParliamentarianForm(NamedFileForm):
+
+    personnel_number = StringField(
+        label=_('Personnel number'),
+        fieldset=_('Basic properties'),
+    )
+
+    contract_number = StringField(
+        label=_('Contract number'),
+        fieldset=_('Basic properties'),
+    )
+
+    gender = TranslatedSelectField(
+        label=_('Gender'),
+        fieldset=_('Basic properties'),
+        choices=list(GENDERS.items()),
+        validators=[InputRequired()],
+        default='male'
+    )
+
+    first_name = StringField(
+        label=_('First name'),
+        fieldset=_('Basic properties'),
+        validators=[InputRequired()],
+    )
+
+    last_name = StringField(
+        label=_('Last name'),
+        fieldset=_('Basic properties'),
+        validators=[InputRequired()],
+    )
+
+    picture = UploadField(
+        label=_('Picture'),
+        fieldset=_('Basic properties'),
+    )
+
     shipping_method = TranslatedSelectField(
         label=_('Shipping method'),
         fieldset=_('Shipping address'),

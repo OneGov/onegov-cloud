@@ -16,7 +16,7 @@ from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import (
     SettlementRunCollection,
     AttendenceCollection,
-    CommissionCollection
+    PASCommissionCollection
 )
 from onegov.pas.custom import get_current_rate_set
 from onegov.pas.export_single_parliamentarian import (
@@ -250,7 +250,7 @@ def view_settlement_run(
     parties = get_parties_with_settlements(session, self.start, self.end)
 
     # Get commissions active during settlement run period
-    commissions = CommissionCollection(session).query().order_by(
+    commissions = PASCommissionCollection(session).query().order_by(
         PASCommission.name
     )
 

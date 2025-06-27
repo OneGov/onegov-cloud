@@ -9,16 +9,67 @@ from onegov.parliament.collections.commission import (
     CommissionCollection,
     RISCommissionCollection
 )
-from onegov.parliament.collections.parliamentary_group import (
+from onegov.parliament.collections import RISParliamentarianCollection
+from onegov.parliament.collections import (
     RISParliamentaryGroupCollection
 )
-from onegov.parliament.models import RISParty, Party, RISCommission, Commission
-from onegov.parliament.models.meeting import Meeting
-from onegov.parliament.models.parliamentary_group import (
+from onegov.parliament.models import (
+    Commission,
+    Meeting,
+    ParliamentaryGroup,
+    Party,
+    RISCommission,
+    RISParliamentarian,
     RISParliamentaryGroup,
-    ParliamentaryGroup
+    RISParty,
 )
 from onegov.town6.app import TownApp
+
+
+@TownApp.path(
+    model=RISParliamentarianCollection,
+    path='/parliamentarians',
+    converters={'active': bool}
+)
+def get_parliamentarians(
+    app: TownApp,
+    active: bool = True
+) -> RISParliamentarianCollection:
+    return RISParliamentarianCollection(app.session(), active)
+
+
+@TownApp.path(
+    model=RISParliamentarian,
+    path='/parliamentarian/{id}',
+    converters={'id': UUID}
+)
+def get_parliamentarian(
+    app: TownApp,
+    id: UUID
+) -> RISParliamentarian | None:
+    return RISParliamentarianCollection(app.session()).by_id(id)
+
+
+# @TownApp.path(
+#     model=RISParliamentarianRoleCollection,
+#     path='/parliamentarian-roles',
+# )
+# def get_parliamentarian_roles(
+#     app: TownApp,
+# ) -> RISParliamentarianRoleCollection:
+#     return RISParliamentarianRoleCollection(app.session())
+#
+#
+# @TownApp.path(
+#     model=RISParliamentarianRole,
+#     path='/parliamentarian-role/{id}',
+#     converters={'id': UUID}
+# )
+# def get_parliamentarian_role(
+#     app: TownApp,
+#     id: UUID
+# ) -> RISParliamentarianRole | None:
+#     return RISParliamentarianCollection(app.session()).by_id(id)
 
 
 @TownApp.path(

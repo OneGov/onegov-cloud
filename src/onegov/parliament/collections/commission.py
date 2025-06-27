@@ -53,5 +53,5 @@ class CommissionCollection(GenericCollection[Commission]):
 class RISCommissionCollection(CommissionCollection):
 
     @property
-    def model_class(self) -> type[Commission]:
+    def model_class(self) -> type[RISCommission]:
         return RISCommission

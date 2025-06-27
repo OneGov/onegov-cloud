@@ -5,7 +5,7 @@ from onegov.org.models import Organisation
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import LegislativePeriodCollection
-from onegov.pas.collections import ParliamentarianCollection
+from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections import PASPartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
@@ -75,7 +75,7 @@ def view_pas_settings(
         {
             'name': 'parliamentarians',
             'title': _('Parliamentarians'),
-            'link': request.class_link(ParliamentarianCollection),
+            'link': request.class_link(PASParliamentarianCollection),
             'icon': 'fa-user-tie'
         },
         {

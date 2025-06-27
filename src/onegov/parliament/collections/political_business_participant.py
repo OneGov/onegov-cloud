@@ -1,23 +1,20 @@
 from __future__ import annotations
 
 from onegov.core.collection import GenericCollection
-from onegov.parliament.models.political_business import PoliticalBusinessParticipation
+from onegov.parliament.models import PoliticalBusinessParticipation
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing import Self
 
 
-class PoliticalBusinessParticipationCollection(GenericCollection[PoliticalBusinessParticipation]):
+class PoliticalBusinessParticipationCollection(
+    GenericCollection[PoliticalBusinessParticipation]
+):
 
-    def __init__(
-        self,
-        session: Session,
-        active: bool | None = None
-    ):
+    def __init__(self, session: Session, active: bool | None = None):
         super().__init__(session)
         self.active = active
 

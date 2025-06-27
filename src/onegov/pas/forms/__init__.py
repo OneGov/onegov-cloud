@@ -8,8 +8,10 @@ from onegov.parliament.forms.commission import CommissionForm
 from onegov.pas.forms.commission_membership import CommissionMembershipAddForm
 from onegov.pas.forms.commission_membership import CommissionMembershipForm
 from onegov.pas.forms.legislative_period import LegislativePeriodForm
-from onegov.pas.forms.parliamentarian import ParliamentarianForm
-from onegov.pas.forms.parliamentarian_role import ParliamentarianRoleForm
+from onegov.parliament.forms.parliamentarian import PASParliamentarianForm
+from onegov.parliament.forms.parliamentarian_role import (
+    ParliamentarianRoleForm
+)
 from onegov.parliament.forms.parliamentary_group import ParliamentaryGroupForm
 from onegov.parliament.forms.party import PartyForm
 from onegov.pas.forms.rate_set import RateSetForm
@@ -25,7 +27,7 @@ __all__ = (
     'CommissionMembershipAddForm',
     'CommissionMembershipForm',
     'LegislativePeriodForm',
-    'ParliamentarianForm',
+    'PASParliamentarianForm',
     'ParliamentarianRoleForm',
     'ParliamentaryGroupForm',
     'PartyForm',

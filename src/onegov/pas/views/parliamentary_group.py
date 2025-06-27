@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from onegov.core.security import Private
-from onegov.parliament.views.parliamentary_group import (
+from onegov.parliament.views import (
     view_parliamentary_groups,
     add_parliamentary_group,
     view_parliamentary_group,
@@ -9,10 +9,7 @@ from onegov.parliament.views.parliamentary_group import (
     delete_parliamentary_group
 )
 from onegov.pas import PasApp
-from onegov.pas.collections import ParliamentaryGroupCollection
-from onegov.pas.collections.parliamentary_group import (
-    PASParliamentaryGroupCollection
-)
+from onegov.pas.collections import PASParliamentaryGroupCollection
 from onegov.pas.forms import ParliamentaryGroupForm
 from onegov.pas.layouts import PASParliamentaryGroupCollectionLayout
 from onegov.pas.layouts import PASParliamentaryGroupLayout
@@ -27,14 +24,14 @@ if TYPE_CHECKING:
 
 
 @PasApp.html(
-    model=ParliamentaryGroupCollection,
+    model=PASParliamentaryGroupCollection,
     template='parliamentary_groups.pt',
     permission=Private
 )
 def pas_view_parliamentary_groups(
-    self: ParliamentaryGroupCollection,
+    self: PASParliamentaryGroupCollection,
     request: TownRequest
-) -> RenderData:
+) -> RenderData | Response:
 
     return view_parliamentary_groups(
         self, request, PASParliamentaryGroupCollectionLayout(self, request)
