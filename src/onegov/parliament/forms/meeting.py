@@ -5,9 +5,6 @@ from wtforms import DateTimeField
 from onegov.form import Form
 from onegov.org.forms.fields import HtmlField
 from onegov.pas import _
-from wtforms.fields import DateField
-from wtforms.fields import StringField
-from wtforms.validators import InputRequired
 from wtforms.validators import Optional
 
 

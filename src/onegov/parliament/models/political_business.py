@@ -242,7 +242,7 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
     )
 
     #: the function of the parliamentarian in the political business
-    participant_type: Column[str|None] = Column(
+    participant_type: Column[str | None] = Column(
         Text,
         nullable=True,
         default=None

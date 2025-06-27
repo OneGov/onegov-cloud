@@ -1,4 +1,7 @@
 from __future__ import annotations
+from datetime import datetime
+
+import pytz
 
 from onegov.form.fields import TagsField
 from onegov.form.fields import TimeField
@@ -163,7 +166,6 @@ class AgendaItemForm(NamedFileForm):
         self.request.include('redactor')
         self.request.include('editor')
         self.request.include('tags-input')
-        self.request.include('start_time')
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         data = super().get_useful_data(exclude={'calculated_timestamp'})
@@ -189,3 +191,7 @@ class AgendaItemForm(NamedFileForm):
 
     def populate_obj(self, obj: AgendaItem) -> None:  # type:ignore[override]
         super().populate_obj(obj, exclude={'calculated_timestamp'})
+        if not obj.start_time and self.state.data == 'ongoing':
+            tz = pytz.timezone('Europe/Zurich')
+            now = datetime.now(tz=tz).time()
+            obj.start_time = now

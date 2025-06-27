@@ -81,6 +81,9 @@ class Handler:
         if self.ticket.handler_data != self.data:
             self.ticket.handler_data = self.data
 
+        if self.ticket.ticket_email != self.email:
+            self.ticket.ticket_email = self.email
+
     @property
     def email(self) -> str | None:
         """ Returns the email address behind the ticket request. """
@@ -152,6 +155,11 @@ class Handler:
         """ An optional link to a onegov.pay payment record. """
 
         return None
+
+    @property
+    def show_vat(self) -> bool:
+        """ Whether or not to show VAT for this ticket. """
+        return False
 
     @property
     def undecided(self) -> bool:

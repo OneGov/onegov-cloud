@@ -703,12 +703,17 @@ def get_sortable_asset() -> Iterator[str]:
 
 @OrgApp.webasset('fullcalendar')
 def get_fullcalendar_asset() -> Iterator[str]:
-    yield 'fullcalendar.css'
     yield 'fullcalendar.js'
     yield 'fullcalendar.de.js'
     yield 'fullcalendar.fr.js'
     yield 'reservationcalendar.jsx'
     yield 'reservationcalendar_custom.js'
+
+
+@OrgApp.webasset('occupancycalendar')
+def get_occupancycalendar_asset() -> Iterator[str]:
+    yield 'occupancycalendar.jsx'
+    yield 'occupancycalendar_custom.js'
 
 
 @OrgApp.webasset('reservationlist')

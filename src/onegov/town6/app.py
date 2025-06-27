@@ -314,11 +314,17 @@ def get_editor_asset() -> Iterator[str]:
 
 @TownApp.webasset('fullcalendar')
 def get_fullcalendar_asset() -> Iterator[str]:
-    yield 'fullcalendar.css'
     yield 'fullcalendar.js'
     yield 'fullcalendar.de.js'
+    yield 'fullcalendar.fr.js'
     yield 'reservationcalendar.jsx'
     yield 'reservationcalendar_custom.js'
+
+
+@TownApp.webasset('occupancycalendar')
+def get_occupancycalendar_asset() -> Iterator[str]:
+    yield 'occupancycalendar.jsx'
+    yield 'occupancycalendar_custom.js'
 
 
 @TownApp.webasset('staff-chat')

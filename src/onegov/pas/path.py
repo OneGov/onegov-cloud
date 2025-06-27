@@ -3,7 +3,7 @@ from __future__ import annotations
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.app import PasApp
 from onegov.pas.collections import ChangeCollection
-from onegov.pas.collections import CommissionCollection
+from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.collections import PASCommissionMembershipCollection
 from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.collections import ParliamentarianCollection
@@ -12,7 +12,6 @@ from onegov.pas.collections import PASPartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
 from onegov.pas.collections import ImportLogCollection
-from onegov.pas.collections.commission import PASCommissionCollection
 from onegov.pas.collections.parliamentary_group import (
     PASParliamentaryGroupCollection
 )
@@ -111,7 +110,7 @@ def get_change(
 
 
 @PasApp.path(
-    model=CommissionCollection,
+    model=PASCommissionCollection,
     path='/commissions',
     converters={'active': bool}
 )

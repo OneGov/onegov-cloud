@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import isodate
 import morepath
 import pytz
 import sedate
@@ -33,7 +34,7 @@ from onegov.pay import PaymentError
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.ticket import TicketCollection
 from purl import URL
-from webob import exc
+from webob import exc, Response
 from wtforms import HiddenField
 
 
@@ -43,7 +44,7 @@ if TYPE_CHECKING:
     from onegov.core.types import EmailJsonDict, JSON_ro, RenderData
     from onegov.form import Form
     from onegov.org.request import OrgRequest
-    from webob import Response
+    from onegov.reservation import Reservation
 
 
 def assert_anonymous_access_only_temporary(
@@ -677,6 +678,7 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
                 ticket.tag = data.get('ticket_tag')
                 tag_meta = data.get('ticket_tag_meta', {})
                 key_code = tag_meta.pop('Kaba Code', None)
+                tag_meta.pop('Color', None)
                 if key_code and ticket.handler_data:
                     # set associated key code
                     ticket.handler_data['key_code'] = key_code
@@ -836,19 +838,22 @@ def accept_reservation(
             ticket.handler.refresh()
         else:
             code = None
+            lead_delta = timedelta(minutes=0)
 
         savepoint = transaction.savepoint()
 
+        now = sedate.utcnow()
         for reservation in reservations:
             data = reservation.data
             if data is None:
                 data = reservation.data = {}
             data['accepted'] = True
 
-            if client is not None:
+            # NOTE: We can only create future visits
+            start = reservation.display_start() - lead_delta
+            if client is not None and start > now:
                 assert code is not None
                 try:
-                    start = reservation.display_start() - lead_delta
                     end = reservation.display_end() + lag_delta
                     visit_id = client.create_visit(
                         code=code,
@@ -1060,7 +1065,8 @@ def accept_reservation_with_message_from_ticket(
         self.handler.reservations[0],
         request,
         form,
-        layout or TicketChatMessageLayout(self, request, internal=True)
+        layout or TicketChatMessageLayout(self, request, internal=True),
+        view_ticket=self
     )
 
 
@@ -1123,7 +1129,10 @@ def reject_reservation(
         return None
 
     # we need to delete the payment at the same time
-    if payment:
+    # FIXME: The price may need to be adjusted, should be handled
+    #        through the introduction of an invoice system with
+    #        individual invoice items that can be cancelled
+    if payment and len(excluded) == 0:
         request.session.delete(payment)
 
     ReservationMessage.create(targeted, ticket, request, 'rejected')
@@ -1211,10 +1220,21 @@ def reject_reservation(
 
     # create a snapshot of the ticket to keep the useful information
     if len(excluded) == 0:
+        # HACK: Set the ticket state to closed so we don't render
+        #       any links in the summary
+        orginal_state = ticket.state
+        ticket.state = 'closed'
         ticket.create_snapshot(request)
+        ticket.state = orginal_state
 
     failed_to_revoke = False
     for reservation in targeted:
+        if payment:
+            # remove the link to the payment
+            reservation.payment = None
+            # flush, just in case, otherwise `remove_reservation` may fail
+            request.session.flush()
+
         if client and (kaba := (reservation.data or {}).get('kaba')):
             try:
                 client.revoke_visit(kaba['visit_id'])
@@ -1333,6 +1353,58 @@ def reject_reservation_with_message_from_ticket(
     )
 
 
+@OrgApp.view(
+    model=ReservationTicket,
+    name='send-reservation-summary',
+    permission=Private
+)
+def send_reservation_summary(
+    self: ReservationTicket,
+    request: OrgRequest
+) -> Response | None:
+
+    if self.handler.deleted or not self.handler.reservations:
+        raise exc.HTTPNotFound()
+
+    recipient = self.handler.email
+    if recipient:
+        assert request.current_username
+        TicketChatMessage.create(
+            self,
+            request,
+            text=request.translate(_('Reservation summary')),
+            owner=request.current_username,
+            recipient=recipient,
+            notify=False,
+            origin='internal'
+        )
+        send_ticket_mail(
+            request=request,
+            template='mail_reservation_summary.pt',
+            subject=_('Reservation summary'),
+            receivers=(recipient, ),
+            ticket=self,
+            force=True,
+            content={
+                'model': self,
+                'resource': self.handler.resource,
+                'reservations': self.handler.reservations,
+                'code': self.handler.data.get('key_code'),
+                'changes': self.handler.get_changes(request),
+            }
+        )
+        request.success(_(
+            'Successfully sent ${count} emails',
+            mapping={'count': 1}
+        ))
+    else:
+        request.alert(_('The submitter email is not available'))
+
+    if request.headers.get('X-IC-Request'):
+        return None
+    return request.redirect(request.link(self))
+
+
 @OrgApp.form(
     model=Reservation,
     name='adjust',
@@ -1362,16 +1434,19 @@ def adjust_reservation(
         .filter(Reservation.id == reservation_id)
         .one_or_none()
     )
-    if reservation is None or not (
-        # is this reservation adjustable?
-        reservation.target_type == 'allocation'
-        and request.session.query(
-            reservation
-            ._target_allocations()
-            .filter(Allocation.partly_available.is_(True))
-            .exists()
-        ).scalar()
-    ):
+    if reservation is None or not reservation.is_adjustable:
+        if request.headers.get('X-IC-Request'):
+            error = request.translate(_('Reservation not adjustable'))
+            ic_data = {'message': error, 'success': False}
+
+            @request.after
+            def trigger(response: Response) -> None:
+                response.headers.add('X-IC-Trigger', 'oc-reservation-error')
+                response.headers.add(
+                    'X-IC-Trigger-Data',
+                    json.dumps(ic_data, ensure_ascii=True)
+                )
+            return Response(json=ic_data)
         raise exc.HTTPNotFound()
 
     tickets = TicketCollection(request.session)
@@ -1393,38 +1468,69 @@ def adjust_reservation(
             'form': form,
         }
 
-    if not form.submitted(request):
+    if intercooler := bool(request.headers.get('X-IC-Request')):
+        request.assert_valid_csrf_token()
+        new_start = isodate.parse_datetime(request.GET['start'])
+        new_end = isodate.parse_datetime(request.GET['end'])
+    elif not form.submitted(request):
         return show_form()
-
-    start_time = form.start_time.data
-    end_time = form.end_time.data
-    assert start_time is not None and end_time is not None
-    try:
-        new_start, new_end = sedate.get_date_range(
-            reservation.display_start(),
-            start_time,
-            end_time,
-            raise_non_existent=True
-        )
-    except pytz.NonExistentTimeError:
-        request.alert(_(
-            'The selected time does not exist on this date due to '
-            'the switch from standard time to daylight saving time.'
-        ))
-        return show_form()
+    else:
+        start_time = form.start_time.data
+        end_time = form.end_time.data
+        assert start_time is not None and end_time is not None
+        try:
+            new_start, new_end = sedate.get_date_range(
+                reservation.display_start(),
+                start_time,
+                end_time,
+                raise_non_existent=True
+            )
+        except pytz.NonExistentTimeError:
+            request.alert(_(
+                'The selected time does not exist on this date due to '
+                'the switch from standard time to daylight saving time.'
+            ))
+            return show_form()
 
     savepoint = transaction.savepoint()
     try:
+        payment = reservation.payment
+        # we need to temporarily un-link the payment, since change_reservation
+        # deletes the old reservation, which will fail, if there is a payment
+        reservation.payment = None
+        request.session.flush()
         new_reservation = resource.scheduler.change_reservation(
             token,
             reservation.id,
             new_start,
             new_end,
         )
+        if payment is None:
+            pass
+        elif new_reservation is not None:
+            # FIXME: The price may need to be adjusted, should be handled
+            #        through the introduction of an invoice system with
+            #        individual invoice items that can be cancelled
+            new_reservation.payment = payment  # type: ignore[attr-defined]
+        else:
+            # restore the payment link
+            reservation.payment = payment
     except LibresError as e:
         # rollback previous changes
         savepoint.rollback()
-        request.alert(utils.get_libres_error(e, request))
+        error = utils.get_libres_error(e, request)
+        if intercooler:
+            ic_data = {'message': error, 'success': False}
+
+            @request.after
+            def trigger(response: Response) -> None:
+                response.headers.add('X-IC-Trigger', 'oc-reservation-error')
+                response.headers.add(
+                    'X-IC-Trigger-Data',
+                    json.dumps(ic_data, ensure_ascii=True)
+                )
+            return Response(json=ic_data)
+        request.alert(error)
         return show_form()
 
     if new_reservation is not None:
@@ -1445,24 +1551,49 @@ def adjust_reservation(
                 )
                 start = new_reservation.display_start() - lead_delta
                 end = new_reservation.display_end() + lag_delta
-                client.revoke_visit(kaba['visit_id'])
-                visit_id = client.create_visit(
-                    code=code,
-                    name=ticket.number,
-                    message='Managed through OneGov Cloud',
-                    start=start,
-                    end=end,
-                    components=components,
-                )
+                # NOTE: We can only revoke existing future visits
+                if (old_visit_id := kaba.get('visit_id')) and (
+                    reservation.display_start() - lead_delta > sedate.utcnow()
+                ):
+                    client.revoke_visit(old_visit_id)
+                # NOTE: We can only create future visits
+                if start > sedate.utcnow():
+                    visit_id = client.create_visit(
+                        code=code,
+                        name=ticket.number,
+                        message='Managed through OneGov Cloud',
+                        start=start,
+                        end=end,
+                        components=components,
+                    )
+                else:
+                    visit_id = None
             except KabaApiError:
                 log.info('Kaba API error', exc_info=True)
 
                 # roll back previous changes
                 savepoint.rollback()
-                request.alert(_(
+                error = _(
                     'Failed to create visits using the dormakaba API '
                     'please make sure your credentials are still valid.'
-                ))
+                )
+                if intercooler:
+                    error = request.translate(error)
+                    ic_data = {'message': error, 'success': False}
+
+                    @request.after
+                    def trigger(response: Response) -> None:
+                        response.headers.add(
+                            'X-IC-Trigger',
+                            'oc-reservation-error'
+                        )
+                        response.headers.add(
+                            'X-IC-Trigger-Data',
+                            json.dumps(ic_data, ensure_ascii=True)
+                        )
+                    return Response(json=ic_data)
+
+                request.alert(error)
                 return show_form()
             else:
                 data['kaba'] = {
@@ -1476,9 +1607,17 @@ def adjust_reservation(
             ticket,
             request,
         )
-        request.success(_('The reservation was adjusted'))
-    else:
+        if not intercooler:
+            request.success(_('The reservation was adjusted'))
+    elif not intercooler:
         request.warning(_('The reservation was left unchanged'))
+
+    if intercooler:
+        @request.after
+        def trigger_calendar_update(response: Response) -> None:
+            response.headers.add('X-IC-Trigger', 'oc-reservations-changed')
+
+        return Response(json={'success': True})
 
     if view_ticket is not None:
         return request.redirect(request.link(view_ticket))
@@ -1553,11 +1692,14 @@ def edit_kaba(
 
     components = resource.kaba_components  # type: ignore[attr-defined]
 
+    old_lead_delta = timedelta(
+        minutes=ticket.handler.data.get('key_code_lead_time', 30)
+    )
     now = sedate.utcnow()
     future_reservations = [
         reservation
         for reservation in ticket.handler.reservations
-        if reservation.display_end() > now
+        if reservation.display_start() - old_lead_delta > now
     ]
 
     # if we don't have any future or ongoing reservations then
@@ -1607,11 +1749,11 @@ def edit_kaba(
             if not data.get('accepted'):
                 continue
 
-            kaba = data.get('kaba')
+            kaba = data.get('kaba') or {}
             try:
                 # if there is an old visit, revoke it
-                if kaba:
-                    client.revoke_visit(kaba['visit_id'])
+                if old_visit_id := kaba.get('visit_id'):
+                    client.revoke_visit(old_visit_id)
 
                 code = ticket.handler.data['key_code']
                 lead_delta = timedelta(
@@ -1620,11 +1762,12 @@ def edit_kaba(
                 lag_delta = timedelta(
                     minutes=ticket.handler.data['key_code_lag_time']
                 )
+                start = reservation.display_start() - lead_delta
                 visit_id = client.create_visit(
                     code=code,
                     name=ticket.number,
                     message='Managed through OneGov Cloud',
-                    start=reservation.display_start() - lead_delta,
+                    start=start,
                     end=reservation.display_end() + lag_delta,
                     components=components,
                 )

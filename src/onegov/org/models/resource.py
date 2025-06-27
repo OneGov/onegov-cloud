@@ -105,11 +105,19 @@ class SharedMethods:
         else:
             date = sedate.to_timezone(sedate.utcnow(), self.timezone)
 
-        if self.view == 'month':
+        if self.view in ('multiMonthYear', 'listYear'):
+            return sedate.replace_timezone(
+                datetime(date.year, 1, 1),
+                self.timezone
+            ), sedate.replace_timezone(
+                datetime(date.year, 12, 31, 23, 59, 59, 999999),
+                self.timezone
+            )
+        elif self.view in ('dayGridMonth', 'listMonth'):
             return sedate.align_range_to_month(date, date, self.timezone)
-        elif self.view == 'agendaWeek':
+        elif self.view in ('timeGridWeek', 'listWeek'):
             return sedate.align_range_to_week(date, date, self.timezone)
-        elif self.view == 'agendaDay':
+        elif self.view in ('timeGridDay', 'listDay'):
             return sedate.align_range_to_day(date, date, self.timezone)
         else:
             raise NotImplementedError()
@@ -218,7 +226,7 @@ class DaypassResource(Resource, AccessExtension, SearchableContent,
     es_type_name = 'daypasses'
 
     # the selected view
-    view = 'month'
+    view = 'dayGridMonth'
 
     # show or hide quota numbers in reports
     show_quota = True

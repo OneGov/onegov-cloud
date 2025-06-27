@@ -8,19 +8,23 @@ from onegov.parliament.models.commission_membership import (
     CommissionMembership
 )
 
+from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import Self
 
+MembershipT = TypeVar('MembershipT', bound=CommissionMembership)
 
-class CommissionMembershipCollection(GenericCollection[CommissionMembership]):
 
+class CommissionMembershipCollection(GenericCollection[MembershipT]):
     pass
 
 
-class RISCommissionMembershipCollection(CommissionMembershipCollection):
+class RISCommissionMembershipCollection(
+    CommissionMembershipCollection[RISCommissionMembership]
+):
 
     def __init__(
         self,
@@ -31,22 +35,24 @@ class RISCommissionMembershipCollection(CommissionMembershipCollection):
         self.active = active
 
     @property
-    def model_class(self) -> type[CommissionMembership]:
+    def model_class(self) -> type[RISCommissionMembership]:
         return RISCommissionMembership
 
-    def query(self) -> Query[CommissionMembership]:
+    def query(self) -> Query[RISCommissionMembership]:
         query = super().query()
 
         if self.active is not None:
             if self.active:
                 query = query.filter(
                     or_(
-                        CommissionMembership.end.is_(None),
-                        CommissionMembership.end >= date.today()
+                        RISCommissionMembership.end.is_(None),
+                        RISCommissionMembership.end >= date.today()
                     )
                 )
             else:
-                query = query.filter(CommissionMembership.end < date.today())
+                query = query.filter(
+                    RISCommissionMembership.end < date.today()
+                )
 
         return query
 

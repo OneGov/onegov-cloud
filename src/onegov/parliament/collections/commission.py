@@ -6,14 +6,17 @@ from sqlalchemy import or_
 from onegov.core.collection import GenericCollection
 from onegov.parliament.models import Commission, RISCommission
 
+from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import Self
 
+CommissionT = TypeVar('CommissionT', bound=Commission)
 
-class CommissionCollection(GenericCollection[Commission]):
+
+class CommissionCollection(GenericCollection[CommissionT]):
 
     def __init__(
         self,
@@ -23,13 +26,10 @@ class CommissionCollection(GenericCollection[Commission]):
         super().__init__(session)
         self.active = active
 
-    @property
-    def model_class(self) -> type[Commission]:
-        return Commission
-
-    def query(self) -> Query[Commission]:
+    def query(self) -> Query[CommissionT]:
         query = super().query()
 
+        Commission = self.model_class  # noqa: N806
         if self.active is not None:
             if self.active:
                 query = query.filter(
@@ -50,8 +50,8 @@ class CommissionCollection(GenericCollection[Commission]):
         return self.__class__(self.session, active)
 
 
-class RISCommissionCollection(CommissionCollection):
+class RISCommissionCollection(CommissionCollection[RISCommission]):
 
     @property
-    def model_class(self) -> type[Commission]:
+    def model_class(self) -> type[RISCommission]:
         return RISCommission

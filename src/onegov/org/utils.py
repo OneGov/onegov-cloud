@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import colorsys
-import re
-
+import hashlib
 import phonenumbers
+import re
 import sedate
 import pytz
 
@@ -28,7 +28,7 @@ from onegov.reservation import Resource
 from onegov.ticket import TicketCollection, TicketPermission
 from onegov.user import User, UserGroup
 from operator import add, attrgetter
-from sqlalchemy import nullsfirst  # type:ignore[attr-defined]
+from sqlalchemy import case, nullsfirst  # type:ignore[attr-defined]
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
@@ -66,6 +66,12 @@ EMPTY_PARAGRAPHS = re.compile(r'<p>\s*<br>\s*</p>')
 # additionally it is used in onegov.org's common.js in javascript variant
 HASHTAG = re.compile(r'(?<![\w/])#\w{3,}')
 IMG_URLS = re.compile(r'<img[^>]*?src="(.*?)"')
+
+# some sensible colors to be used for labels in calendars
+COLORS = [
+    '#d3e3fb', '#c69943', '#2c9f42', '#ffb100', '#ef969d', '#ffc800',
+    '#92baf6', '#d1d4d6', '#96cfa1', '#de2c3b', '#f8d5d8', '#ffe480',
+]
 
 
 def djb2_hash(text: str, size: int) -> int:
@@ -546,7 +552,7 @@ class AllocationEventInfo:
             {
                 'name': self.resource.name,
                 'date': self.allocation.display_start(),
-                'view': 'agendaDay'
+                'view': 'timeGridDay'
             },
             name='occupancy'
         )
@@ -614,11 +620,13 @@ class AllocationEventInfo:
             'start': self.event_start,
             'end': self.event_end,
             'title': self.event_title,
+            'classNames': list(self.event_classes),
+            'display': 'block',
+            # extended properties
             'wholeDay': self.allocation.whole_day,
             'partlyAvailable': self.allocation.partly_available,
             'quota': self.allocation.quota,
             'quotaLeft': self.quota_left,
-            'className': ' '.join(self.event_classes),
             'partitions': self.allocation.availability_partitions(),
             'actions': [
                 link(self.request)
@@ -626,6 +634,219 @@ class AllocationEventInfo:
             ],
             'editurl': self.request.link(self.allocation, name='edit'),
             'reserveurl': self.request.link(self.allocation, name='reserve')
+        }
+
+
+class AvailabilityEventInfo:
+
+    __slots__ = ('resource', 'allocation', 'request', 'translate')
+
+    def __init__(
+        self,
+        resource: Resource,
+        allocation: Allocation,
+        request: OrgRequest
+    ) -> None:
+
+        self.resource = resource
+        self.allocation = allocation
+        self.request = request
+        self.translate = request.translate
+
+    @classmethod
+    def from_allocations(
+        cls,
+        request: OrgRequest,
+        resource: Resource,
+        allocations: Iterable[Allocation]
+    ) -> list[Self]:
+
+        return [
+            cls(resource, allocation, request)
+            for allocation in allocations
+            if allocation.is_master
+        ]
+
+    @property
+    def event_start(self) -> str:
+        return self.allocation.display_start().isoformat()
+
+    @property
+    def event_end(self) -> str:
+        return self.allocation.display_end().isoformat()
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            'id': self.allocation.id,
+            'start': self.event_start,
+            'end': self.event_end,
+            'editable': False,
+            'display': 'background',
+        }
+
+
+@lru_cache(maxsize=64)
+def event_color(event_name: str) -> str:
+    # NOTE: We use sha256 for stability, we could also
+    #       use a different stable hash, but we can't use
+    #       the builtin Python hash, since it changes with
+    #       every run
+    h = hashlib.new('md5', event_name.encode('utf-8'), usedforsecurity=False)
+    # NOTE: Currently we only need to use the last two digits
+    #       but if we add more than 16 colors, then this would
+    #       change.
+    index = int(h.hexdigest()[-2:], base=16) % len(COLORS)
+    return COLORS[index]
+
+
+class ReservationEventInfo:
+
+    __slots__ = ('resource', 'reservation', 'ticket', 'request', 'translate')
+
+    def __init__(
+        self,
+        resource: Resource,
+        reservation: Reservation,
+        ticket: Ticket,
+        request: OrgRequest
+    ) -> None:
+
+        self.resource = resource
+        self.reservation = reservation
+        self.ticket = ticket
+        self.request = request
+        self.translate = request.translate
+
+    @classmethod
+    def from_reservations(
+        cls,
+        request: OrgRequest,
+        resource: Resource,
+        reservations: Iterable[tuple[Reservation, Ticket]]
+    ) -> list[Self]:
+
+        return [
+            cls(
+                resource,
+                reservation,
+                ticket,
+                request
+            )
+            for reservation, ticket in reservations
+        ]
+
+    @property
+    def event_start(self) -> str:
+        return self.reservation.display_start().isoformat()
+
+    @property
+    def event_end(self) -> str:
+        return self.reservation.display_end().isoformat()
+
+    @property
+    def event_identification(self) -> str:
+        return '{:%d.%m.%Y}: {}'.format(
+            self.reservation.display_start(),
+            self.event_time
+        )
+
+    @property
+    def whole_day(self) -> bool:
+        start = self.reservation.display_start()
+        end = self.reservation.display_end()
+        tz = self.reservation.timezone
+        assert tz is not None
+        return sedate.is_whole_day(start, end, tz)
+
+    @property
+    def event_time(self) -> str:
+        if self.whole_day:
+            return self.translate(_('Whole day'))
+        else:
+            return render_time_range(
+                self.reservation.display_start(),
+                self.reservation.display_end()
+            )
+
+    @property
+    def quota(self) -> int:
+        return self.reservation.quota
+
+    @property
+    def accepted(self) -> bool:
+        if self.reservation.data and self.reservation.data.get('accepted'):
+            return True
+        return False
+
+    @property
+    def event_title(self) -> str:
+        return '\n'.join(part for part in (
+            self.ticket.number,
+            self.event_time,
+            f'{self.translate(_("Quota"))}: {self.quota}'
+            if getattr(self.resource, 'show_quota', False) else '',
+            self.ticket.tag,
+            self.reservation.email,
+            self.translate(_('Pending approval')) if not self.accepted else '',
+        ) if part)
+
+    @property
+    def event_classes(self) -> Iterator[str]:
+        if self.accepted:
+            yield 'event-accepted'
+        else:
+            yield 'event-pending'
+
+        # HACK: Find event element by id, it would be better if fullcalendar
+        #       generated an element id we could use, but we'll work with
+        #       what we have.
+        yield f'event-{self.reservation.id}'
+
+    @property
+    def color(self) -> str | None:
+        tag = self.ticket.tag
+        if not tag:
+            return None
+
+        for tag_config in self.request.app.org.ticket_tags or ():
+            if not isinstance(tag_config, dict):
+                continue
+
+            meta = tag_config.get(tag)
+            if not meta:
+                continue
+
+            color = meta.get('Color')
+            if color is None:
+                break
+            return color
+        return event_color(tag)
+
+    @property
+    def editable(self) -> bool:
+        if self.reservation.display_start() < sedate.utcnow():
+            return False
+        return not self.accepted
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            'id': self.reservation.id,
+            'start': self.event_start,
+            'end': self.event_end,
+            'backgroundColor': self.color,
+            'title': self.event_title,
+            'classNames': list(self.event_classes),
+            'url': self.request.link(self.ticket),
+            'display': 'block',
+            # extended properties
+            'wholeDay': self.whole_day,
+            'quota': self.reservation.quota,
+            'editable': self.editable,
+            'editurl': self.request.csrf_protected_url(self.request.link(
+                self.ticket,
+                name='adjust-reservation',
+                query_params={'reservation-id': str(self.reservation.id)}
+            )),
         }
 
 
@@ -1161,19 +1382,25 @@ def emails_for_new_ticket(
         general_condition | (TicketPermission.group == ticket.group)
     )
 
-    for username, realname in query.join(UserGroup.users).with_entities(
-        User.username,
-        User.realname,
+    for email, name in query.join(UserGroup.users).with_entities(
+        case([(
+            UserGroup.meta['shared_email'].isnot(None),
+            UserGroup.meta['shared_email'].astext,
+        )], else_=User.username),
+        case([(
+            UserGroup.meta['shared_email'].isnot(None),
+            UserGroup.name,
+        )], else_=User.realname),
     ).distinct():
 
-        if username in seen:
+        if email in seen:
             continue
 
-        seen.add(username)
+        seen.add(email)
         try:
             yield Address(
-                display_name=realname or '',
-                addr_spec=username
+                display_name=name or '',
+                addr_spec=email
             )
         except ValueError:
             # if it's not a valid address then skip it
@@ -1274,3 +1501,12 @@ def format_phone_number(phone_number: str) -> str:
         )
     except phonenumbers.phonenumberutil.NumberParseException:
         return phone_number
+
+
+def get_current_tickets_url(request: OrgRequest) -> str:
+    """ Get the tickets url with the parameters we last visited. """
+    state = request.browser_session.get('tickets_state')
+    return request.class_link(
+        TicketCollection,
+        state or {'handler': 'ALL', 'state': 'open', 'page': 0}
+    )

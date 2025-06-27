@@ -1,11 +1,11 @@
 from datetime import date
 from freezegun import freeze_time
 from onegov.core.utils import Bunch
-from onegov.pas.collections import CommissionCollection
+from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.collections import PASCommissionMembershipCollection
 from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.collections import ParliamentarianRoleCollection
-from onegov.pas.collections import ParliamentaryGroupCollection
+from onegov.pas.collections import PASParliamentaryGroupCollection
 from onegov.pas.collections import PASPartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
@@ -62,7 +62,7 @@ def test_attendence_forms(session, dummy_request):
     roles = ParliamentarianRoleCollection(session)
     roles.add(parliamentarian_id=parliamentarian.id, end=date(2023, 1, 1))
 
-    commissions = CommissionCollection(session)
+    commissions = PASCommissionCollection(session)
     commission = commissions.add(name='x')
     commissions.add(name='y')
     commissions.add(name='z')
@@ -206,7 +206,7 @@ def test_add_commission_attendence_form(session, dummy_request):
     parliamentarian = parliamentarians.add(first_name='a', last_name='b')
     parliamentarians.add(first_name='p', last_name='q')
 
-    commissions = CommissionCollection(session)
+    commissions = PASCommissionCollection(session)
     commission = commissions.add(name='x')
 
     memberships = PASCommissionMembershipCollection(session)
@@ -246,7 +246,7 @@ def test_commission_membership_forms(session, dummy_request):
     roles = ParliamentarianRoleCollection(session)
     roles.add(parliamentarian_id=parliamentarian.id, end=date(2023, 1, 1))
 
-    commissions = CommissionCollection(session)
+    commissions = PASCommissionCollection(session)
     commissions.add(name='x')
     commissions.add(name='y')
     commissions.add(name='z')
@@ -271,7 +271,7 @@ def test_parliamentarian_role_form(session, dummy_request):
     parliamentarians = ParliamentarianCollection(session)
     parliamentarians.add(first_name='p', last_name='q')
 
-    groups = ParliamentaryGroupCollection(session)
+    groups = PASParliamentaryGroupCollection(session)
     groups.add(name='a')
     groups.add(name='b')
     groups.add(name='c')

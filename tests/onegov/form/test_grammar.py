@@ -283,6 +283,14 @@ def test_checkbox():
     assert f.label == 'Swiss German'
     assert not f.checked
 
+    # non-latin1 character in label (en dash)
+    # FIXME: Long-term we want this to be an error, but not for
+    #        existing form code
+    f = field.parseString("[ ] Read–only")
+    assert f.type == 'checkbox'
+    assert f.label == 'Read'
+    assert not f.checked
+
 
 def test_fileinput():
 
@@ -447,6 +455,21 @@ def test_discount():
     assert f.discount.amount == Decimal('33.3')
     assert not f.pricing
 
+    f = field.parseString("(x) Mail delivery (33.3%) (Local)")
+    assert f.type == 'radio'
+    assert f.label == 'Mail delivery'
+    assert f.checked
+    assert f.discount.amount == Decimal('33.3')
+    assert not f.pricing
+
+    # relaxed end line requirement
+    f = field.parseString("(x) Mail delivery (33.3%)   ")
+    assert f.type == 'radio'
+    assert f.label == 'Mail delivery'
+    assert f.checked
+    assert f.discount.amount == Decimal('33.3')
+    assert not f.pricing
+
     field = checkbox()
 
     f = field.parseString("[x] Extra Luggage (99.15%)")
@@ -479,9 +502,17 @@ def test_discount():
 
     f = field.parseString("[ ] Discount (50%) (For Kids)")
     assert f.type == 'checkbox'
-    assert f.label == 'Discount (50%) (For Kids)'
+    assert f.label == 'Discount'
     assert not f.checked
-    assert not f.discount
+    assert f.discount.amount == Decimal('50')
+    assert not f.pricing
+
+    # relaxed end line requirement
+    f = field.parseString("[ ] Discount (50%)    ")
+    assert f.type == 'checkbox'
+    assert f.label == 'Discount'
+    assert not f.checked
+    assert f.discount.amount == Decimal('50')
     assert not f.pricing
 
 

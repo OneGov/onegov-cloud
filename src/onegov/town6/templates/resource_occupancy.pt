@@ -3,60 +3,16 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="grid-x">
-            <div class="small-12 medium-8 cell date-range-selector-target">
-                <span class="page-lead h5">
-                    <tal:b condition="start != end">
-                        ${layout.format_date(start, 'date_long')} - ${layout.format_date(end, 'date_long')}
-                    </tal:b>
-                    <tal:b condition="start == end">
-                        ${layout.format_date(start, 'date_long')}
-                    </tal:b>
-                </span>
 
-                <div class="grid-x occupancy-block" tal:repeat="date occupancy">
-                    <tal:b define="entries occupancy[date]">
-                        <div class="cell medium-12 large-3">
-                            <metal:b use-macro="layout.macros['calendar-day']" />
-                        </div>
-                        <div class="cell medium-12 large-9">
-                            <ul class="occupancy-entry">
-                                <li tal:repeat="entry entries" tal:attributes="class 'reservation-pending' if entry.pending else None">
-                                    <tal:b tal:define="whole_day entry.start.time() != entry.end.time()">
-                                        <span class="date" tal:condition="whole_day">
-                                            ${layout.format_time_range(entry.start, entry.end)}
-                                        </span>
-                                        <span class="date" tal:condition="not:whole_day" i18n:translate>
-                                            Whole day
-                                        </span>
-                                        <span class="quota" tal:condition="resource.show_quota">
-                                            (${entry.quota})
-                                        </span>
-                                        <span class="approval-pending" tal:condition="entry.pending" i18n:attributes="title" data-tooltip aria-haspopup="true" title="Reservation is pending approval"><i class="fa fa-info" aria-hidden="true"></i></span>
-                                        <div class="title">
-                                            <a href="${entry.url}">${entry.title}</a>
-                                        </div>
-                                    </tal:b>
-                                </li>
-                            </ul>
-                        </div>
-                    </tal:b>
-                </div>
-            </div>
-            <div class="small-12 medium-4 cell">
-                <div class="date-range-selector-results">
-                    <div class="date-range-selector-result">
-                        <span>${count}</span>
-                        <span i18n:translate>Reservations</span>
-                        <span class="reservation-pending" tal:condition="pending_count" i18n:translate>(<tal:b i18n:name="num_pending">${pending_count}</tal:b> pending approval)</span>
-                    </div>
-                    <div class="date-range-selector-result">
-                        <span>${'{:.0f}'.format(utilisation)}%</span>
-                        <span i18n:translate>Utilised</span>
-                    </div>
-                </div>
-                <metal:b tal:define="start start.isoformat(); end end.isoformat()" use-macro="layout.macros['date-range-selector']" />
-            </div>
-        </div>
+        <div class="occupancy-calendar"
+            data-feed="${feed}"
+            data-type="${resource.type}"
+            data-editable="${request.is_manager and 'true' or 'false'}"
+            data-view="${resource.view or resource.default_view or 'timeGridWeek'}"
+            data-date="${resource.date and resource.date.isoformat() or ''}"
+            data-highlights-min="${resource.highlights_min or ''}"
+            data-highlights-max="${resource.highlights_max or ''}"
+        ></div>
+
     </tal:b>
 </div>

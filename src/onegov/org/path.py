@@ -526,7 +526,7 @@ def get_resource(
         resource.date = date
         resource.highlights_min = highlights_min
         resource.highlights_max = highlights_max
-        resource.view = view or resource.default_view or 'agendaWeek'
+        resource.view = view or resource.default_view or 'timeGridWeek'
 
     return resource
 

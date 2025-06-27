@@ -52,7 +52,7 @@ from onegov.org.models.external_link import ExternalLinkCollection
 from onegov.org.models.form import submission_deletable
 from onegov.org.open_graph import OpenGraphMixin
 from onegov.org.theme.org_theme import user_options
-from onegov.org.utils import IMG_URLS
+from onegov.org.utils import IMG_URLS, get_current_tickets_url
 from onegov.pay import PaymentCollection, PaymentProviderCollection
 from onegov.people import PersonCollection
 from onegov.qrcode import QrCode
@@ -372,6 +372,10 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def newsletter_url(self) -> str:
         return self.request.class_link(NewsletterCollection)
 
+    @cached_property
+    def vat_rate(self) -> Decimal:
+        return Decimal(self.app.org.vat_rate or 0.0)
+
     def login_to_url(self, to: str | None, skip: bool = False) -> str:
         auth = Auth.from_request(self.request, to=to, skip=skip)
         return self.request.link(auth, 'login')
@@ -643,28 +647,21 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def format_seconds(self, seconds: float) -> str:
         return self.format_timedelta(timedelta(seconds=seconds))
 
-    def format_vat(self, amount: numbers.Number | Decimal | float | None,
-                   currency: str = 'CHF') -> str:
+    def get_vat_amount(
+        self,
+        amount: numbers.Number | Decimal | float | None
+    ) -> Decimal | None:
         """
-        Takes the given amount and currency returning the VAT string if the
-        VAT rate is set in the organization settings. The VAT string can be
-        placed right after a price value.
+        Takes the given amount and currency returning the amount
+        of the paid price that is attributed to the VAT.
         """
-        vat_rate = Decimal(self.app.org.vat_rate or 0.0)
-
-        if amount is not None and vat_rate:
+        if amount is not None and self.vat_rate:
             if isinstance(amount, (Decimal, int, float, str)):
                 amount = Decimal(amount)
             else:
                 amount = Decimal(str(amount))
-
-            vat = amount / (100 + vat_rate) * vat_rate
-            vat_name = self.request.translate(_('VAT'))
-            vat_str = (f'({vat_name} {self.format_number(vat_rate, 1)}%'
-                       f' enthalten: {self.format_number(vat)} {currency})')
-            return vat_str
-
-        return ''
+            return amount / (100 + self.vat_rate) * self.vat_rate
+        return None
 
     def format_phone_number(self, phone_number: str) -> str:
         return utils.format_phone_number(phone_number)
@@ -1732,7 +1729,7 @@ class TicketLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Tickets'), self.request.link(self.collection)),
+            Link(_('Tickets'), get_current_tickets_url(self.request)),
             Link(self.model.number, '#')
         ]
 
@@ -1892,9 +1889,7 @@ class TicketNoteLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Tickets'), self.request.link(
-                TicketCollection(self.request.session)
-            )),
+            Link(_('Tickets'), get_current_tickets_url(self.request)),
             Link(self.ticket.number, self.request.link(self.ticket)),
             Link(self.title, '#')
         ]
@@ -1931,9 +1926,7 @@ class TicketChatMessageLayout(DefaultLayout):
     def internal_breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Tickets'), self.request.link(
-                TicketCollection(self.request.session)
-            )),
+            Link(_('Tickets'), get_current_tickets_url(self.request)),
             Link(self.model.number, self.request.link(self.model)),
             Link(_('New Message'), '#')
         ]
@@ -2204,7 +2197,11 @@ class ResourceLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(_('Reservations'), self.request.link(self.collection)),
-            Link(_(self.model.title), self.request.link(self.model))
+            Link(
+                _(self.model.title),
+                self.request.link(self.model),
+                {'class': 'calendar-dependent'}
+            )
         ]
 
     @cached_property

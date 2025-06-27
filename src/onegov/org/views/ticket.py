@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import morepath
+import os
+import zipfile
 
 from datetime import date
+from io import BytesIO
+from markupsafe import Markup
 from morepath import Response
 from onegov.chat import Message, MessageCollection
 from onegov.core.custom import json
@@ -13,10 +17,6 @@ from onegov.core.orm import as_selectable
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
 from onegov.core.utils import normalize_for_url
-import zipfile
-import os
-from io import BytesIO
-from markupsafe import Markup
 from onegov.form import Form
 from onegov.org import _, OrgApp
 from onegov.org.constants import TICKET_STATES
@@ -38,6 +38,7 @@ from onegov.org.models import (
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter, ReservationHandler
 from onegov.org.pdf.ticket import TicketPdf
+from onegov.org.utils import get_current_tickets_url
 from onegov.org.views.message import view_messages_feed
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import handlers as ticket_handlers
@@ -198,9 +199,7 @@ def delete_ticket(
 
         request.session.delete(self)
         request.success(_('Ticket successfully deleted'))
-        return morepath.redirect(
-            request.link(TicketCollection(request.session))
-        )
+        return morepath.redirect(get_current_tickets_url(request))
 
     return {
         'layout': layout,
@@ -636,8 +635,7 @@ def close_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
             if email_missing:
                 request.alert(_('The submitter email is not available'))
 
-    return morepath.redirect(
-        request.link(TicketCollection(request.session)))
+    return morepath.redirect(get_current_tickets_url(request))
 
 
 @OrgApp.view(model=Ticket, name='reopen', permission=Private)
@@ -1257,13 +1255,26 @@ def groups_by_handler_code(session: Session) -> dict[str, list[str]]:
     return groups
 
 
-@OrgApp.html(model=TicketCollection, template='tickets.pt',
-             permission=Private)
+@OrgApp.html(
+    model=TicketCollection,
+    template='tickets.pt',
+    permission=Private
+)
 def view_tickets(
     self: TicketCollection,
     request: OrgRequest,
     layout: TicketsLayout | None = None
 ) -> RenderData:
+
+    # remember where we last were in the tickets view
+    request.browser_session.tickets_state = {
+        'handler': self.handler,
+        'group': self.group,
+        'state': self.state,
+        'owner': self.owner,
+        'page': self.page,
+        'extra_parameters': self.extra_parameters,
+    }
 
     groups = groups_by_handler_code(request.session)
     handlers = tuple(get_handlers(self, request, groups))
@@ -1293,8 +1304,11 @@ def view_tickets(
     }
 
 
-@OrgApp.html(model=ArchivedTicketCollection, template='archived_tickets.pt',
-             permission=Private)
+@OrgApp.html(
+    model=ArchivedTicketCollection,
+    template='archived_tickets.pt',
+    permission=Private
+)
 def view_archived_tickets(
     self: ArchivedTicketCollection,
     request: OrgRequest,
@@ -1328,8 +1342,12 @@ def view_archived_tickets(
     }
 
 
-@OrgApp.html(model=ArchivedTicketCollection, name='delete',
-             request_method='DELETE', permission=Secret)
+@OrgApp.html(
+    model=ArchivedTicketCollection,
+    name='delete',
+    request_method='DELETE',
+    permission=Secret
+)
 def view_delete_all_archived_tickets(
     self: ArchivedTicketCollection,
     request: OrgRequest

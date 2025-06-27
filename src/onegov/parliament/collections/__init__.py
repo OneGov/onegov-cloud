@@ -11,8 +11,10 @@ from onegov.parliament.collections.commission import (
 from onegov.parliament.collections.commission_membership import (
     RISCommissionMembershipCollection
 )
-from onegov.parliament.collections.meeting import (
-    MeetingCollection
+from onegov.parliament.collections.meeting import MeetingCollection
+from onegov.parliament.collections.meeting_item import MeetingItemCollection
+from onegov.parliament.collections.parliamentary_group import (
+    RISParliamentaryGroupCollection
 )
 from onegov.parliament.collections.political_business import (
     PoliticalBusinessCollection
@@ -23,10 +25,13 @@ from onegov.parliament.collections.political_business_participant import (
 
 __all__ = (
     'CommissionCollection',
-    'RISCommissionMembershipCollection',
-    'RISCommissionCollection',
-    'RISPartyCollection',
+    'MeetingCollection',
+    'MeetingItemCollection',
     'PoliticalBusinessCollection',
     'PoliticalBusinessParticipationCollection',
-    'MeetingCollection', 'PartyCollection',
+    'PartyCollection',
+    'RISCommissionMembershipCollection',
+    'RISCommissionCollection',
+    'RISParliamentaryGroupCollection',
+    'RISPartyCollection',
 )

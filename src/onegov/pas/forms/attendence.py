@@ -6,7 +6,7 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import MultiCheckboxField
 from onegov.pas import _
-from onegov.pas.collections import CommissionCollection
+from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.models import SettlementRun
 from onegov.parliament.models.attendence import TYPES
@@ -135,7 +135,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
         self.commission_id.choices = [
             (commission.id, commission.title)
             for commission
-            in CommissionCollection(self.request.session).query()
+            in PASCommissionCollection(self.request.session).query()
         ]
         self.commission_id.choices.insert(0, ('', '-'))
 

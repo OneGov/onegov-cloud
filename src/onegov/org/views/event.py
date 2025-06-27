@@ -650,6 +650,10 @@ def view_latest_event(self: Event, request: OrgRequest) -> BaseResponse:
 
     """
 
+    if not self.occurrences:
+        # redirect to the event instead
+        return morepath.redirect(request.link(self))
+
     now = utcnow()
 
     for occurrence in self.occurrences:

@@ -12,15 +12,20 @@ from onegov.pay.models import Payment
 from onegov.pay.models import PaymentProvider
 from onegov.pay.collections import PaymentCollection, PayableCollection
 from onegov.pay.collections import PaymentProviderCollection
-from onegov.pay.integration import PayApp, process_payment
-from onegov.pay.integration import PaymentError, INSUFFICIENT_FUNDS
-from onegov.pay.utils import Price, payments_association_table_for
+from onegov.pay.integration import process_payment
+from onegov.pay.integration import PayApp
+from onegov.pay.integration import PaymentError
+from onegov.pay.integration import INSUFFICIENT_FUNDS
+from onegov.pay.integration import TRANSACTION_ABORTED
+from onegov.pay.utils import payments_association_table_for
+from onegov.pay.utils import Price
 
 
 __all__ = (
     'log',
     'CARD_ERRORS',
     'INSUFFICIENT_FUNDS',
+    'TRANSACTION_ABORTED',
     'ManualPayment',
     'Payable',
     'PayableManyTimes',

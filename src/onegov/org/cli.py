@@ -17,13 +17,15 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 from io import BytesIO
 
-from markupsafe import Markup
 import pytz
 import locale
 import requests
 import transaction
+import yaml
 from onegov.core.orm.utils import QueryChain
-from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
+from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
+                                   TimerangeTooLong)
+from markupsafe import Markup
 from onegov.chat import MessageCollection
 from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.core.crypto import random_token
@@ -46,23 +48,30 @@ from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.models.resource import Resource
 from onegov.page.collection import PageCollection
 from onegov.parliament.collections import (
-    MeetingCollection, 
-    PoliticalBusinessParticipationCollection)
-from onegov.parliament.collections import (
-    PoliticalBusinessCollection, RISCommissionMembershipCollection)
-from onegov.parliament.collections.meeting_item import MeetingItemCollection
-from onegov.parliament.models import CommissionMembership, RISParliamentarian
-from onegov.parliament.models.meeting_item import MeetingItem
+    MeetingCollection,
+    MeetingItemCollection,
+    PoliticalBusinessCollection,
+    PoliticalBusinessParticipationCollection,
+    RISCommissionCollection,
+    RISCommissionMembershipCollection,
+    RISParliamentaryGroupCollection,
+)
+from onegov.parliament.models import (
+    MeetingItem,
+    RISCommissionMembership,
+    RISParliamentarian,
+)
 from onegov.pas.collections import (
-    CommissionCollection, ParliamentarianCollection, 
-    ParliamentarianRoleCollection)
-from onegov.pas.collections import ParliamentaryGroupCollection
+    ParliamentarianCollection,
+    ParliamentarianRoleCollection,
+)
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
 from onegov.town6.upgrade import migrate_theme_options
 from onegov.user.models import TAN
 from onegov.user import UserCollection, User
+from openpyxl import load_workbook
 from operator import add as add_op
 from pathlib import Path
 from sqlalchemy import func, and_, or_
@@ -71,7 +80,7 @@ from uuid import uuid4
 from elasticsearch.exceptions import ConnectionError as ESConnectionError
 
 
-from typing import Any, TYPE_CHECKING
+from typing import IO, Any, TYPE_CHECKING, TypedDict
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from depot.fields.upload import UploadedFile
@@ -987,6 +996,331 @@ def delete_invisible_links() -> Callable[[OrgRequest, OrgApp], None]:
     return delete_invisible_links
 
 
+@cli.command(name='get-resources-and-forms')
+@click.argument('option_file', type=click.File('rb'))
+def get_resources_and_forms(
+    option_file: IO[bytes]
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Get the resources and forms from the option file. """
+
+    def print_resources_and_forms(request: OrgRequest, app: OrgApp) -> None:
+        book = load_workbook(option_file)
+        sheet = book['Reservationen']
+
+        class OptionDict(TypedDict):
+            options: set[str]
+            type: str
+
+        resources: dict[str, dict[str, OptionDict]] = {}
+        for index, row in enumerate(sheet.rows):
+            if index <= 3:
+                continue
+            for i, cell in enumerate(row):
+                value = str(cell.value)
+                if i == 0:
+                    resource_name = value
+                    if resource_name not in resources:
+                        resources[resource_name] = {}
+                if i == 13:  # Option name
+                    option = value
+                    if resources[resource_name].get(option) is None:
+                        resources[resource_name][option] = {
+                            'type': 'text',
+                            'options': set()
+                        }
+                if i == 14:  # Option answer
+                    answer = value
+                    resources[resource_name][option]['options'].add(answer)
+                if i == 15:  # Option price
+                    if int(value) > 0:
+                        resources[resource_name][option]['options'].remove(
+                            answer)
+                        answer = answer.replace(' (', ', ').replace(
+                            ')', '') + f' ({value} CHF)'
+                        resources[resource_name][option]['options'].add(
+                            answer)
+                        resources[resource_name][option]['type'] = 'radio'
+
+        for resource in resources.keys():
+            click.secho(resource, fg='blue')
+            for option in resources[resource]:
+                if resources[resource][option]['type'] == 'text':
+                    click.secho(f'{option} = ___', fg='cyan')
+                else:
+                    click.secho(f'{option} =', fg='cyan')
+                    for answer in resources[resource][option]['options']:
+                        click.echo(f'    ( ) {answer}',)
+
+    return print_resources_and_forms
+
+
+@cli.command(name='import-reservations', context_settings={'singular': True})
+@click.argument('reservation_file', type=click.File('rb'))
+@click.argument('option_file', type=click.File('rb'))
+@click.argument('mapping_yaml', type=click.File('rb'))
+@click.option('--dry-run', is_flag=True, default=False)
+def import_reservations(
+    reservation_file: IO[bytes],
+    option_file: IO[bytes],
+    mapping_yaml: IO[bytes],
+    dry_run: bool
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Imports reservations from a Excel file (needs to be .xlsx).
+    Creates no resources or allocations, so the availabilty periods need to
+    be set in the resource settings.
+    """
+
+    def import_reservations(request: OrgRequest, app: OrgApp) -> None:
+
+        class Reservation(TypedDict):
+            general: dict[str, Any]
+            fields: dict[str, Any]
+            dates: list[Any]
+
+        yaml_file = mapping_yaml.read()
+        yaml_dict = yaml.safe_load(yaml_file)
+        shared_fields = yaml_dict.get('shared_fields', {})
+        resource_options = yaml_dict.get('resource_options', {})
+
+        book = load_workbook(reservation_file)
+        sheet = book['Reservationsdaten']
+
+        book_options = load_workbook(option_file)
+        sheet_options = book_options['Reservationen']
+
+        reservations: dict[
+            str, dict[str, Reservation]] = {}
+        count = 0
+        last_reservation_id = ''
+        for index, row in enumerate(sheet.rows):
+            if index <= 3:  # Skip the first 3 rows, they are headers
+                continue
+
+            reservation: Reservation = {
+                'general': {},
+                'fields': {},
+                'dates': []
+            }
+            row_empty: bool = True
+            id = ''
+            resource_name = ''
+
+            for i, cell in enumerate(row):
+                value = cell.value
+                if i == 0:
+                    if value is None:
+                        continue
+                    row_empty = False
+                    resource_name = str(value)
+                elif i == 3:
+                    id = str(value)
+                    if last_reservation_id == id:
+                        reservation = reservations[resource_name][id]
+                elif i == 6 or i == 8:
+                    reservation['dates'].append(value)
+                elif i == 22:
+                    if value is None:
+                        value = 'info@seantis.ch'
+                    reservation['general']['email'] = value
+                elif i in shared_fields:
+                    value = str(value or '-')
+                    key = shared_fields[i]
+                    if reservation['fields'].get(key) is None:
+                        reservation['fields'][key] = value
+                    elif value not in reservation['fields'][key]:
+                        if i == 17 or i == 18:
+                            reservation['fields'][key] += f' {value}'
+                        else:
+                            reservation['fields'][key] += f', {value}'
+
+            if not row_empty:
+                # Check if the dates spread across multiple days
+                start = reservation['dates'][-2]
+                end = reservation['dates'][-1]
+                if start.day != end.day:
+                    days = (end - start).days + 1
+                    for day in range(days):
+                        reservation['dates'].insert(
+                            -1, start + timedelta(days=day)
+                        ) if day != 0 else None
+                        end_of_day = datetime.combine(
+                            start, end.time()
+                        )
+                        reservation['dates'].insert(
+                            -1, end_of_day + timedelta(days=day)
+                        ) if day != days - 1 else None
+                count += 1
+                if resource_name not in reservations:
+                    reservations[resource_name] = {}
+
+                if id not in reservations[resource_name] and (
+                    id != last_reservation_id
+                ):
+                    reservations[resource_name][id] = reservation
+                last_reservation_id = id or ''
+
+        options_count = 0
+        options_not_found = set()
+        for index, row in enumerate(sheet_options.rows):
+            row_empty = True
+            if index <= 3:
+                continue
+            for i, cell in enumerate(row):
+                value = cell.value
+                if value is None:
+                    continue
+                row_empty = False
+                options_count += 1
+                if i == 0:
+                    resource_name = str(value)
+                elif i == 2:
+                    id = str(value)
+                elif resource_name in reservations:
+                    if id in reservations[resource_name]:
+                        if i == 13:  # Option name
+                            key = resource_options[resource_name][
+                                'options'].get(value)
+                            if key is None:
+                                options_not_found.add(
+                                    f'{resource_name}: {value}')
+                        if i == 14:  # Option answer
+                            if key is not None:
+                                reservation = reservations[resource_name][id]
+                                if reservation['fields'].get(key) is None:
+                                    reservation['fields'][key] = value
+        for option in options_not_found:
+            click.secho(f'Option not found in the mapping file: {option}',
+                        fg='yellow')
+
+        if dry_run:
+            res_show = json.dumps(reservations, indent=4, default=str)
+            click.secho(f'Reservations: {res_show}', fg='green')
+
+        # Create reservations
+        if not dry_run:
+            resources = ResourceCollection(app.libres_context)
+            for resource_name in reservations.keys():
+
+                real_resource_name = resource_options[resource_name]['name']
+                resource = resources.by_name(real_resource_name.lower())
+
+                if not resource:
+                    click.echo(
+                        f'Resource {resource} not found in the database'
+                    )
+                    continue
+
+                click.echo(
+                    f'Importing reservations for {resource.title}'
+                )
+                scheduler = resource.scheduler
+
+                for id, reservation in reservations[resource_name].items():
+                    found_conflict = False
+                    session_id = uuid4()
+                    for n in range(int(len(reservation['dates'])/2)):
+                        email = reservation['general'].get('email')
+                        start = reservation['dates'][n*2]
+                        end = reservation['dates'][n*2+1]
+
+                        try:
+                            token_uuid = scheduler.reserve(
+                                email=str(email),
+                                dates=(start, end),
+                                session_id=session_id,
+                                single_token_per_session=True,
+                                data={'accepted': True}
+                            )
+                            token = token_uuid.hex
+                        except InvalidEmailAddress:
+                            abort(f'{email} is an invalid e-mail address')
+                        except AlreadyReservedError:
+                            found_conflict = True
+                            click.secho(
+                                f'Booking conflict in {resource.title} '
+                                f'at {start}', fg='red')
+                        except TimerangeTooLong:
+                            found_conflict = True
+                            click.secho(
+                                f'Timerange too long in {resource.title} '
+                                f'at {start} - {end}', fg='red')
+                            rules = resource.content['rules']
+                            relevant_rules = []
+                            for rule in rules:
+                                rule = rule['options']
+                                if rule['start'] <= start.date(
+                                ) and rule['end'] >= end.date(
+                                ) and start.weekday(
+                                ) not in rule['except_for'] and start.time(
+                                ) <= rule['start_time'] and end.time(
+                                ) >= rule['end_time']:
+                                    relevant_rules.append(rule)
+                            for i, rule in enumerate(relevant_rules):
+                                start = datetime.combine(
+                                    start.date(), rule['start_time'])
+                                end = datetime.combine(
+                                    end.date(), rule['end_time'])
+                                token_uuid = scheduler.reserve(
+                                    email=str(email),
+                                    dates=(start, end),
+                                    session_id=session_id,
+                                    single_token_per_session=True,
+                                    data={'accepted': True}
+                                )
+                                token = token_uuid.hex
+                            if not relevant_rules:
+                                click.secho(
+                                    f'No rules found for {resource.title} '
+                                    f'at {start}', fg='red')
+
+                    if found_conflict:
+                        continue
+
+                    assert resource.form_class is not None
+                    forms = FormCollection(app.session())
+
+                    form_data = {}
+                    for key, value in reservation['fields'].items():
+                        form_data[key] = str(value)
+
+                    form = resource.form_class(data=form_data)
+
+                    if not form.validate():
+                        abort(f'{form_data} failed the form check'
+                            f' with {form.errors}')
+
+                    submission = forms.submissions.add_external(
+                        form=form,
+                        state='pending',
+                        id=token_uuid
+                    )
+
+                    scheduler.queries.confirm_reservations_for_session(
+                        session_id)
+                    scheduler.approve_reservations(token_uuid)
+
+                    forms.submissions.complete_submission(submission)
+
+                    users = UserCollection(app.session())
+                    user = users.query().filter(
+                        User.username == 'info@seantis.ch').first()
+
+                    if not user:
+                        abort('info@seantis.ch not found in users')
+
+                    with forms.session.no_autoflush:
+                        ticket = TicketCollection(request.session).open_ticket(
+                            handler_code='RSV', handler_id=token
+                        )
+                        ticket.accept_ticket(user)
+                        ticket.close_ticket()
+
+                    click.secho(f'Sucessfully imported reservation {id}',
+                                fg='green')
+
+    return import_reservations
+
+
 @cli.command(context_settings={'default_selector': '*'})
 @click.argument('year', type=click.IntRange(1900, date.today().year))
 @click.argument('month', type=click.IntRange(1, 12))
@@ -1239,7 +1573,7 @@ def import_news(
                     for element in news_item['elements']:
                         content += content_to_markup(element, image_counter)
 
-                    added.content['text'] = Markup(content)
+                    added.content['text'] = Markup(content)  # nosec: B704
                     overwrite_counter += 1
                 else:
                     click.secho((f'Skipped {article_name} with '
@@ -1270,7 +1604,7 @@ def import_news(
                     for element in news_item['elements']:
                         content += content_to_markup(element, image_counter)
 
-                    added.content['text'] = Markup(content)
+                    added.content['text'] = Markup(content)  # nosec: B704
 
         click.echo(f'{import_counter} news items imported')
         click.echo(f'{overwrite_counter} news items overwritten')
@@ -1350,6 +1684,8 @@ def import_meetings(
         import_counter = 0
         overwrite_counter = 0
 
+        start_dt: datetime | None
+        end_dt: datetime | None
         for meeting, article_name in meetings:
             date = meeting['elements'][0]['children'][0]['text']
             # Set locale to German for month parsing
@@ -1363,7 +1699,7 @@ def import_meetings(
             # Regex to extract parts
             match = re.match(
                 r'(\d{1,2})\. (\w+)\.? (\d{4}), '
-                '(\d{1,2})\.(\d{2}) Uhr - (\d{1,2})\.(\d{2}) Uhr',
+                r'(\d{1,2})\.(\d{2}) Uhr - (\d{1,2})\.(\d{2}) Uhr',
                 date_str
             )
             if match:
@@ -1379,7 +1715,7 @@ def import_meetings(
                     month_str = 'Jul'
                 elif month_str == 'Sept':
                     month_str = 'Sep'
-    
+
                 try:
                     month = datetime.strptime(month_str, '%b').month
                     start_dt = datetime(
@@ -1394,17 +1730,17 @@ def import_meetings(
                     end_dt = pytz.timezone('Europe/Zurich').localize(end_dt)
                 except ValueError as e:
                     click.secho(f'Error parsing date: {e}', fg='red')
-                    start_dt = end_dt = None  # type:ignore
+                    start_dt = end_dt = None
                     meta_date = (f'{day} {month_str} {year} '
                                   f'{sh}:{sm} - {eh}:{em}')
             else:
-                start_dt = end_dt = None  # type:ignore
+                start_dt = end_dt = None
 
             click.echo(f'Importing {article_name}')
             import_counter += 1
 
             if not dry_run:
-                location = Markup(
+                location = Markup(  # nosec: B704
                     content_to_markup(meeting['elements'][1]))
                 documents = False
                 desc = False
@@ -1441,13 +1777,13 @@ def import_meetings(
                                     link = row['cells'][0]['url']
                                 except KeyError:
                                     click.echo(
-                                        f'No link found in row {row[
-                                            "cells"][0]}'
+                                        f'No link found in row'
+                                        f' {row["cells"][0]}'
                                     )
                                     continue
-                                resp = requests.get(link)
+                                resp = requests.get(link, timeout=(5, 10))
                                 if resp.status_code == 200:
-                                    if existing_file:=file_coll.by_content(
+                                    if existing_file := file_coll.by_content(
                                         BytesIO(resp.content)
                                     ).first():
                                         files.append(existing_file)
@@ -1473,7 +1809,7 @@ def import_meetings(
                                     {
                                         'number': cells[0]['text'],
                                         'title': cells[1]['text'],
-                                        'political_business_id': \
+                                        'political_business_id':
                                         political_business_id
                                     }
                                 )
@@ -1487,16 +1823,16 @@ def import_meetings(
                 )
 
                 for meeting in meetings_items_list:
-                    meeting_item = meeting_item_collection.add(
-                                    number=meeting['number'],
-                                    title=meeting['title'],
-                                    meeting_id=added.id,
-                                    meta={
-                                        'meta_date': meta_date,
-                                    },
-                                    political_business_link_id = meeting[
-                                            'political_business_id'],
-                                )
+                    meeting_item_collection.add(
+                        number=meeting['number'],
+                        title=meeting['title'],
+                        meeting_id=added.id,
+                        meta={
+                            'meta_date': meta_date,
+                        },
+                        political_business_link_id=meeting[
+                                'political_business_id'],
+                    )
                 if files:
                     added.files = files
 
@@ -1530,7 +1866,7 @@ def import_commissions(
                     yield (json.load(f), file.name)
 
     def create_commissions(request: OrgRequest, app: OrgApp) -> None:
-        commission_collection = CommissionCollection(request.session)
+        commission_collection = RISCommissionCollection(request.session)
 
         commissions = read_json_files(path)
         import_counter = 0
@@ -1558,10 +1894,10 @@ def import_commissions(
                             people_ids.append((id, function))
                         break
 
-                added = commission_collection.add(
+                commission_collection.add(
                     poly_type='ris_commission',
                     name=commission['metadata']['title'],
-                    content={'description': Markup(content)},
+                    content={'description': Markup(content)},  # nosec: B704
                     meta={
                         'commission_id': article_name.split('_')[1].replace(
                             '.json', ''
@@ -1599,7 +1935,7 @@ def import_parliamentary_groups(
                     yield (json.load(f), file.name)
 
     def create_parliamentary_groups(request: OrgRequest, app: OrgApp) -> None:
-        parliamentary_group_collection = ParliamentaryGroupCollection(
+        parliamentary_group_collection = RISParliamentaryGroupCollection(
             request.session)
 
         parliamentary_groups = read_json_files(path)
@@ -1627,9 +1963,9 @@ def import_parliamentary_groups(
                             people_ids.append(id)
                         break
 
-                added = parliamentary_group_collection.add(
+                parliamentary_group_collection.add(
                     name=parliamentary_group['metadata']['title'],
-                    content={'description': Markup(content)},
+                    content={'description': Markup(content)},  # nosec: B704
                     meta={
                         'parliamentary_group_id': article_name.split('_')[1],
                         'people_ids': people_ids},
@@ -1689,7 +2025,7 @@ def import_political_business(
         'Botschaft': 'message',
         'Dringliche Interpellation': 'urgent interpellation',
         'Einladung': 'invitation',
-        'Interpellation': 'interpelleation',  # Match existing enum typo # noqa
+        'Interpellation': 'interpelleation',  # Match existing enum typo
         'Kommissionsbericht': 'commission report',
         'Mitteilung': 'communication',
         'Motion': 'motion',
@@ -1729,7 +2065,7 @@ def import_political_business(
         political_businesses = read_json_files(path)
         import_counter = 0
         overwrite_counter = 0
-
+        parliamentarian: RISParliamentarian | None
         for political_business, article_name in political_businesses:
             click.echo(f'Importing {article_name}')
             import_counter += 1
@@ -1747,16 +2083,20 @@ def import_political_business(
                 i = 0
                 while i < len(elements):
                     element = elements[i]
-                    if element.get('type') == 'Paragraph' and \
-                            element.get('children'):
+                    if (
+                        element.get('type') == 'Paragraph'
+                        and element.get('children')
+                    ):
                         child_text_element = element['children'][0]
                         label_text = child_text_element.get('text', '').strip()
 
                         if label_text in data_fields.keys():
                             if i + 1 < len(elements):
                                 value_element = elements[i+1]
-                                if value_element.get('type') == 'Paragraph' \
-                                        and value_element.get('children'):
+                                if (
+                                    value_element.get('type') == 'Paragraph'
+                                    and value_element.get('children')
+                                ):
                                     val_child = value_element['children'][0]
                                     data_fields[label_text] = val_child.get(
                                         'text', '').strip()
@@ -1764,12 +2104,18 @@ def import_political_business(
                         elif label_text == 'Verfasser/Beteiligte':
                             if i + 1 < len(elements):
                                 participants_el = elements[i+1]
-                                if participants_el.get('type') == 'Paragraph'\
-                                        and participants_el.get('children'):
-                                    for c, child in enumerate( # noqa
-                                        participants_el['children']):
-                                        if child.get('type') == 'Link' \
-                                                and 'url' in child:
+                                if (
+                                    participants_el.get('type') == 'Paragraph'
+                                    and participants_el.get('children')
+                                ):
+                                    for c, child in enumerate(
+                                        participants_el['children']
+                                    ):
+                                        if (
+                                            child.get('type') == 'Link'
+                                            and 'url' in child
+                                            and c > 0
+                                        ):
                                             url_parts = child['url'].split('/')
                                             type = participants_el['children'][
                                                 c-1].get('text', '').strip()
@@ -1777,51 +2123,56 @@ def import_political_business(
                                                 people_ids.append(
                                                     (url_parts[-1], type))
                                 i += 1  # Consumed participants element
-                        elif (label_text == 'Fraktionen'
-                              or label_text == 'Fraktion'):
+                        elif (
+                            label_text == 'Fraktionen'
+                            or label_text == 'Fraktion'
+                        ):
                             if i + 1 < len(elements):
                                 fraktionen_el = elements[i+1]
-                                if fraktionen_el.get('type') == 'Paragraph' \
-                                        and fraktionen_el.get('children'):
+                                if (
+                                    fraktionen_el.get('type') == 'Paragraph'
+                                    and fraktionen_el.get('children')
+                                ):
                                     for child in fraktionen_el['children']:
-                                        if child.get('type') == 'Link' \
-                                                and 'url' in child:
+                                        if (
+                                            child.get('type') == 'Link'
+                                            and 'url' in child
+                                        ):
                                             url_parts = child['url'].split('/')
                                             if url_parts:
                                                 parliamentary_group_ids.append(
                                                     url_parts[-1])
                                 i += 1  # Consumed fraktionen element
                         else:
-                            # Check if elements[i] itself is an unlinked 
+                            # Check if elements[i] itself is an unlinked
                             # participant list
                             is_unlinked_list = False
                             if element.get('type') == 'Paragraph' and (
                                 element.get('children')):
                                 all_children_are_unlinked = True
                                 if not element['children']:
-                                    all_children_are_unlinked = \
-                                        False
+                                    all_children_are_unlinked = False
                                 else:
                                     for child_node_check in element[
                                         'children']:
-                                        text_content_check = \
-                                            child_node_check.get('text', '')
-                                        last_paren_open_check = \
-                                            text_content_check.rfind('(')
-                                        last_paren_close_check = \
-                                            text_content_check.rfind(')')
+                                        text_content_check = (
+                                            child_node_check.get('text', ''))
+                                        last_paren_open_check = (
+                                            text_content_check.rfind('('))
+                                        last_paren_close_check = (
+                                            text_content_check.rfind(')'))
                                         is_valid_format = (
-                                            child_node_check.get('type') == \
+                                            child_node_check.get('type') ==
                                                 'Text' and
                                             text_content_check and
                                             last_paren_open_check != -1 and
                                             last_paren_close_check == len(
                                                 text_content_check) - 1 and
-                                            last_paren_open_check < \
-                                                last_paren_close_check - 1 and 
+                                            last_paren_open_check <
+                                                last_paren_close_check - 1 and
                                                 # role not empty
                                             text_content_check[
-                                                :last_paren_open_check].strip() 
+                                                :last_paren_open_check].strip()
                                                 # name not empty
                                         )
                                         if not is_valid_format:
@@ -1836,10 +2187,13 @@ def import_political_business(
                                     last_paren_open = text_content.rfind('(')
                                     last_paren_close = text_content.rfind(')')
 
-                                    if last_paren_open != -1 and \
-                                       last_paren_close == len(text_content) \
-                                        - 1 and \
-                                       last_paren_open < last_paren_close:
+                                    if (
+                                        last_paren_open != -1
+                                        and last_paren_close == (
+                                            len(text_content) - 1
+                                        )
+                                        and last_paren_open < last_paren_close
+                                    ):
 
                                         full_name = text_content[
                                             :last_paren_open].strip()
@@ -1849,43 +2203,45 @@ def import_political_business(
 
                                         name_parts = full_name.strip().split()
                                         if not name_parts:
-                                            click.secho(f"Warning: Empty name "
-                                                        "found for role "
-                                                        f"{role} in "
-                                                        f"{article_name}. "
-                                                        "Skipping.",
+                                            click.secho(f'Warning: Empty name '
+                                                        'found for role '
+                                                        f'{role} in '
+                                                        f'{article_name}. '
+                                                        'Skipping.',
                                                         fg='yellow')
                                             continue
 
                                         last_name = name_parts[-1]
-                                        first_name = " ".join(name_parts[:-1])
+                                        first_name = ' '.join(name_parts[:-1])
 
-                                        if not first_name: 
+                                        if not first_name:
                                             # Handle single word name
                                             first_name = last_name
 
                                         click.echo(
-                                            "Creating new parliamentarian: " \
-                                            f"{first_name} {last_name} for " \
-                                            f"{article_name} (unlinked)")
+                                            'Creating new parliamentarian: '
+                                            f'{first_name} {last_name} for '
+                                            f'{article_name} (unlinked)')
                                         parliamentarian = RISParliamentarian(
                                             first_name=first_name,
                                             last_name=last_name)
                                         session.add(parliamentarian)
                                         try:
-                                            with session.begin_nested(): 
+                                            with session.begin_nested():
                                                 # Ensure ID is available
                                                 session.flush()
                                         except Exception as e:
                                             click.secho(
-                                                "Error creating "
-                                                f"parliamentarian {first_name}"
-                                                f" {last_name}: {e}", fg='red')
-                                            parliamentarian = None 
+                                                'Error creating '
+                                                f'parliamentarian {first_name}'
+                                                f' {last_name}: {e}', fg='red')
+                                            parliamentarian = None
                                             # Failed to create
 
-                                        if parliamentarian and \
-                                            parliamentarian.id:
+                                        if (
+                                            parliamentarian
+                                            and parliamentarian.id
+                                        ):
                                             people_ids.append(
                                                 (str(parliamentarian.id),
                                                  role))
@@ -1920,7 +2276,7 @@ def import_political_business(
                                     f'"{german_status}" in {article_name}. '
                                     f'Setting to None.', fg='yellow')
                 try:
-                    if not '_' in article_name:
+                    if '_' not in article_name:
                         continue
                     pol_business_id = article_name.split('_')[1].split('.')[0]
                     political_business_collection.add(
@@ -1943,7 +2299,6 @@ def import_political_business(
         click.echo(f'{overwrite_counter} political_businesses overwritten')
 
     return create_political_businesses
-
 
 
 @cli.command(name='import-parliamentarians')
@@ -1987,7 +2342,7 @@ def import_parliamentarians(
                 first_name, last_name = name.split(' ', 1)
                 contact = {}
                 address = True
-                table_as_dict = {
+                table_as_dict: dict[str, Any] = {
                     'headers': [],
                     'rows': []
                 }
@@ -2064,8 +2419,8 @@ def import_parliamentarians(
                                         row_as_dict[headers[i]] = cell.get(
                                             'text', '')
                                     table_as_dict['rows'].append(row_as_dict)
-                        
-                added = parliamentarian_collection.add(
+
+                parliamentarian_collection.add(
                     first_name=first_name,
                     last_name=last_name,
                     phone_mobile=contact.get('phone_mobile', ''),
@@ -2099,7 +2454,7 @@ def create_memberships(
 ) -> Callable[[OrgRequest, OrgApp], None]:
     """ Creates Commission Memberships
 
-        onegov-org --select '/foo/bar' create-commission-memberships
+    onegov-org --select '/foo/bar' create-commission-memberships
 
     """
 
@@ -2107,8 +2462,8 @@ def create_memberships(
 
         session = request.session
         commission_memberships = RISCommissionMembershipCollection(session)
-        people =  ParliamentarianCollection(session)
-        commissions = CommissionCollection(session)
+        people = ParliamentarianCollection(session)
+        commissions = RISCommissionCollection(session)
 
         for commission in commissions.query():
             connect_ids = {}
@@ -2125,10 +2480,10 @@ def create_memberships(
 
             # Check if membership already exists
             existing_membership = commission_memberships.query().filter(
-                CommissionMembership.parliamentarian_id.in_(connect_ids.keys(
+                RISCommissionMembership.parliamentarian_id.in_(connect_ids.keys(
 
                 )),
-                CommissionMembership.commission_id == commission.id
+                RISCommissionMembership.commission_id == commission.id
             ).first()
 
             if existing_membership:
@@ -2138,10 +2493,10 @@ def create_memberships(
 
             # Create new membership
             for person_id, function in connect_ids.items():
-                membership = commission_memberships.add(
+                commission_memberships.add(
                     parliamentarian_id=person_id,
                     commission_id=commission.id,
-                    function= function,
+                    function=function,
                     role='member'
                 )
                 click.echo(
@@ -2150,13 +2505,12 @@ def create_memberships(
     return connect_ids
 
 
-
 @cli.command(name='create-political-business-participants')
 def create_polical_business_participants(
 ) -> Callable[[OrgRequest, OrgApp], None]:
     """ Creates Political Business Participants
 
-        onegov-org --select '/foo/bar' create-political-business-participants
+    onegov-org --select '/foo/bar' create-political-business-participants
 
     """
 
@@ -2165,7 +2519,7 @@ def create_polical_business_participants(
         session = request.session
         business_participants = PoliticalBusinessParticipationCollection(
             session)
-        people =  ParliamentarianCollection(session)
+        people = ParliamentarianCollection(session)
         political_businesses = PoliticalBusinessCollection(session)
 
         for political_business in political_businesses.query():
@@ -2184,9 +2538,9 @@ def create_polical_business_participants(
 
             # Check if participation already exists
             existing_membership = business_participants.query().filter(
-                CommissionMembership.parliamentarian_id.in_(connect_ids.keys()
-                                                            ),
-                CommissionMembership.commission_id == political_business.id
+                RISCommissionMembership.parliamentarian_id.in_(
+                    connect_ids.keys()),
+                RISCommissionMembership.commission_id == political_business.id
             ).first()
 
             if existing_membership:
@@ -2197,10 +2551,10 @@ def create_polical_business_participants(
 
             # Create new participation
             for person_id, function in connect_ids.items():
-                membership = business_participants.add(
+                business_participants.add(
                     parliamentarian_id=person_id,
                     political_business_id=political_business.id,
-                    participant_type= function,
+                    participant_type=function,
                     role='member'
                 )
                 click.echo(
@@ -2215,7 +2569,7 @@ def create_parliamentarian_roles(
 ) -> Callable[[OrgRequest, OrgApp], None]:
     """ Creates Parliamentarian Roles
 
-        onegov-org --select '/foo/bar' create-parliamentarian-roles
+    onegov-org --select '/foo/bar' create-parliamentarian-roles
 
     """
 
@@ -2223,15 +2577,16 @@ def create_parliamentarian_roles(
 
         session = request.session
         parliamentarian_roles = ParliamentarianRoleCollection(session)
-        people =  ParliamentarianCollection(session)
-        parliamentary_groups = ParliamentaryGroupCollection(session)
+        people = ParliamentarianCollection(session)
+        parliamentary_groups = RISParliamentaryGroupCollection(session)
 
         for parliamentary_group in parliamentary_groups.query():
-            connect_ids = []
-            for person_id in parliamentary_group.meta.get('people_ids', []):
-                for person in people.query():
-                    if person.meta.get('parliamentarian_id') == person_id:
-                        connect_ids.append(person.id)
+            connect_ids = [
+                person.id
+                for person_id in parliamentary_group.meta.get('people_ids', [])
+                for person in people.query()
+                if person.meta.get('parliamentarian_id') == person_id
+            ]
 
             if not connect_ids:
                 click.secho(
@@ -2241,8 +2596,8 @@ def create_parliamentarian_roles(
 
             # Check if participation already exists
             existing_membership = parliamentarian_roles.query().filter(
-                CommissionMembership.parliamentarian_id.in_(connect_ids),
-                CommissionMembership.commission_id == parliamentary_group.id
+                RISCommissionMembership.parliamentarian_id.in_(connect_ids),
+                RISCommissionMembership.commission_id == parliamentary_group.id
             ).first()
 
             if existing_membership:
@@ -2254,7 +2609,7 @@ def create_parliamentarian_roles(
             # Create new participation
             for i, person_id in enumerate(connect_ids):
                 role = 'president' if i == 0 else 'member'
-                membership = parliamentarian_roles.add(
+                parliamentarian_roles.add(
                     parliamentarian_id=person_id,
                     parliamentary_group_id=parliamentary_group.id,
                     role=role
@@ -2271,14 +2626,14 @@ def connect_political_business_meeting_items(
 ) -> Callable[[OrgRequest, OrgApp], None]:
     """ Connects Political Business and Meeting Items
 
-        onegov-org --select '/foo/bar' connect-political-business-meeting-items
+    onegov-org --select '/foo/bar' connect-political-business-meeting-items
 
     """
 
     def connect_ids(request: OrgRequest, app: OrgApp) -> None:
 
         session = request.session
-        meeting_items =  MeetingItemCollection(session)
+        meeting_items = MeetingItemCollection(session)
         political_businesses = PoliticalBusinessCollection(session)
 
         for political_business in political_businesses.query():

@@ -42,6 +42,8 @@ printables = pyparsing_unicode.Latin1.printables
 text = Word(printables)
 numeric = Word(nums)
 word_re = rf'[{_collapse_string_to_ranges(printables)}]+'
+no_printable_or_whitespace_re = (
+    rf'[^{_collapse_string_to_ranges(printables + " ")}]')
 
 
 @lru_cache(maxsize=16)
@@ -601,11 +603,13 @@ def marker_box(characters: str) -> ParserElement:
     #       since the label will still fundamentally act greedily. I couldn't
     #       find any pyparsing native way to make it lazy instead.
     #       If pricing wasn't optional this would be easy...
+    pricing_re = r'*[(] *-?[0-9]+(?:\.[0-9]+)? *(?:%|[A-Za-z]{3}!?) *[)]'
     label = Regex(
         # a sequence of words (that can't start with brackets)
-        rf'(?P<label>{text_without_re(characters + "()")}(?: ?{word_re})*?) *'
-        # followed by optional pricing or discount followed by end of line
-        r'(?=$|[(] *-?[0-9]+(?:\.[0-9]+)? *(?:%|[A-Za-z]{3}!?) *[)] *$)'
+        rf'(?P<label>{text_without_re(characters + "()")}(?: ?{word_re})*?)'
+        # followed by optional pricing or discount followed by end of line or
+        # multiple spaces
+        rf'(?= *$| *{no_printable_or_whitespace_re}| {pricing_re}|  )'
     )
     return check + label + Optional(pricing_or_discount_parser)
 

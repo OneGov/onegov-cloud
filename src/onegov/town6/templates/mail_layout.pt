@@ -109,6 +109,20 @@
         width: 100% !important;
     }
 
+    table.fit-content {
+        width: auto !important;
+    }
+
+    table.fit-content td {
+        vertical-align: middle;
+    }
+
+    .arrow {
+        font-size: 22px;
+        font-weight: bold;
+        padding: 20px 40px;
+
+
     table.body-wrap {
         width: 100%;
         padding: 20px;

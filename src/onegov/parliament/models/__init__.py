@@ -3,7 +3,10 @@ from __future__ import annotations
 from onegov.parliament.models.attendence import Attendence
 from onegov.parliament.models.change import Change
 from onegov.parliament.models.commission import Commission, RISCommission
-from onegov.parliament.models.commission_membership import CommissionMembership
+from onegov.parliament.models.commission_membership import (
+    CommissionMembership,
+    RISCommissionMembership,
+)
 from onegov.parliament.models.legislative_period import LegislativePeriod
 from onegov.parliament.models.meeting import Meeting
 from onegov.parliament.models.meeting_item import MeetingItem
@@ -24,16 +27,17 @@ __all__ = (
     'Attendence',
     'Change',
     'Commission',
-    'RISCommission',
     'CommissionMembership',
     'LegislativePeriod',
     'Meeting',
     'MeetingItem',
     'Parliamentarian',
-    'RISParliamentarian',
     'ParliamentarianRole',
     'ParliamentaryGroup',
     'Party',
+    'RISCommission',
+    'RISCommissionMembership',
+    'RISParliamentarian',
     'RISParty',
     'PoliticalBusiness',
     'PoliticalBusinessParticipation',

@@ -126,10 +126,10 @@ class ChangelogCommit:
         if self.type_id == 'feature':
             return 0
 
-        if self.type_id != 'performance':
+        if self.type_id == 'bugfix':
             return 1
 
-        if self.type_id != 'bugfix':
+        if self.type_id == 'performance':
             return 2
 
         return 100

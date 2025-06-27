@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-05-27 16:02+0200\n"
+"POT-Creation-Date: 2025-06-26 15:55+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -111,8 +111,14 @@ msgstr "Rückerstattet"
 msgid "Manual"
 msgstr "Manuell"
 
+msgid "Datatrans"
+msgstr "Datatrans"
+
 msgid "Stripe Connect"
 msgstr "Stripe Connect"
+
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
 
 #, python-format
 msgid "Daily Newsletter ${time}"
@@ -969,6 +975,14 @@ msgstr ""
 "Beschreibt, wie die Reservations-Resource abgeholt oder bezogen werden kann. "
 "Dieser Text wird auf Ticket-Status-Seite genutzt, um den Nutzer zu "
 "informieren"
+
+msgid "Show VAT"
+msgstr "MwSt anzeigen"
+
+msgid "By default VAT is not shown, even when configured in the VAT settings."
+msgstr ""
+"Standardmässig wird die MwSt nicht angezeigt, selbst wenn sie konfiguriert "
+"worden ist in den Einstellungen."
 
 msgid "Short description of the survey"
 msgstr "Kurze Beschreibung der Umfrage"
@@ -2093,10 +2107,12 @@ msgstr ""
 "    E-Mail: fc@govikon.ch\n"
 "    PLZ / Ort: 1234 Govikon\n"
 "    Kaba Code: 123456\n"
+"    Color: '#ff0000'\n"
 "- HC Govikon:\n"
 "    E-Mail: hc@govikon.ch\n"
 "    PLZ / Ort: 1234 Govikon\n"
 "    Kaba Code: 654321\n"
+"    Color: '#00ff00'\n"
 "```"
 
 msgid "Categories restricted by user group settings"
@@ -2114,8 +2130,19 @@ msgstr ""
 "Ungültiges Format. Bitte definieren Sie die Schlagworte und Metadaten "
 "entsprechend dem gegebenen Beispiel."
 
-msgid "Invalid price, needs to be a non-negative number."
-msgstr "Ungültiger Preis, muss eine nicht-negative Zahl sein."
+#, python-format
+msgid "Invalid price \"${price}\", needs to be a non-negative number."
+msgstr "Ungültiger Preis \"${price}\", muss eine nicht-negative Zahl sein."
+
+#, python-format
+msgid ""
+"Invalid color \"${color}\", needs to be a 3 or 6 digit hex code, e.g. "
+"\"ff9000\" for orange. If you use a \"#\" prefix, make sure to enclose the "
+"value in quotation marks."
+msgstr ""
+"Ungültige Farbe \"${color}\", es muss eine 3- bis 6-stellige hexadezimal "
+"Zahl sein, z.B. \"ff9000\" für Orange. Wenn Sie \"#\" als Präfix verwenden, "
+"stellen Sie sicher, den Wert in Anführungszeichen einzuschliessen."
 
 msgid "Enable newsletter"
 msgstr "Newsletter aktivieren"
@@ -2541,6 +2568,17 @@ msgstr ""
 msgid "Immediate e-mail notification to members upon ticket submission"
 msgstr "Unmittelbare E-Mail-Benachrichtigung an Mitglieder bei Ticketeingang"
 
+msgid ""
+"Also gives permission to these ticket categories, but does not restrict "
+"access to other groups."
+msgstr ""
+"Erteilt zudem die Berechtigung für die ausgewählten Ticketkategorien, aber "
+"schränkt den Zugriff nicht ein."
+
+msgid "Shared e-mail address for ticket submission notifications"
+msgstr ""
+"Geteilte E-Mail Adresse für E-Mail-Benachrichtigungen beim Ticketeingang"
+
 msgid "Send a periodic status e-mail."
 msgstr "Ein periodisches Status E-Mail senden."
 
@@ -2646,9 +2684,6 @@ msgstr "Sporverein"
 
 msgid "all day"
 msgstr "den ganzen Tag"
-
-msgid "VAT"
-msgstr "MwSt"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -2982,12 +3017,6 @@ msgstr "Exporte"
 
 msgid "Payment Providers"
 msgstr "Zahlungsanbieter"
-
-msgid "Datatrans"
-msgstr "Datatrans"
-
-msgid "Worldline Saferpay"
-msgstr "Worldline Saferpay"
 
 msgid "Synchronise"
 msgstr "Synchronisieren"
@@ -3363,6 +3392,22 @@ msgstr "Anpassen"
 msgid "Accept all reservations"
 msgstr "Alle Reservationen annehmen"
 
+msgid "Send reservation summary"
+msgstr "Terminübersicht senden"
+
+msgid "Do you really want to send a reservation summary?"
+msgstr "Möchten Sie wirklich eine Terminübersicht versenden?"
+
+msgid ""
+"This will always be sent via e-mail, even when ticket updates have been "
+"disabled. Make sure to only use this to inform customers, when significant "
+"changes have been made to the reservations, they need to be aware of."
+msgstr ""
+"Diese Übersicht wird immer via E-Mail versendet, selbst wenn Ticket Updates "
+"deaktiviert sind. Bitte benutzen Sie diese Funktion nur, wenn signifikante "
+"Änderungen vorgenommen worden sind an den Reservationen und der Kunde "
+"unbedingt informiert werden muss über den aktuellen Zustand."
+
 msgid "Details about the reservation"
 msgstr "Details zu Ihrer Reservation"
 
@@ -3551,10 +3596,17 @@ msgstr "Eine Nachricht kann nicht als Thema eingefügt werden"
 msgid "A Topic cannot be pasted as News"
 msgstr "Ein Thema kann nicht als News eingefügt werden"
 
-msgid "Please note that this page has subpages which will also be deleted!"
+msgid ""
+"Please note that this page has the following subpages which will also be "
+"deleted:"
 msgstr ""
-"Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
-"werden!"
+"Bitte beachten Sie, dass dieses Thema die folgenden Unterthemen hat, welche "
+"ebenfalls gelöscht werden:"
+
+msgid "Please scroll to the bottom to enable the confirm button."
+msgstr ""
+"Bitte scrollen Sie bis zum Ende der Liste, um den Bestätigungsbutton zu "
+"aktivieren."
 
 msgid "This page can't be deleted."
 msgstr "Diese Seite kann nicht gelöscht werden."
@@ -3991,6 +4043,24 @@ msgstr "Änderungsvorschlag"
 msgid "New Entry"
 msgstr "Neuer Eintrag"
 
+msgid "Credit Card Fee"
+msgstr "Kreditkarten-Gebühr"
+
+msgid "${vat_rate}% included"
+msgstr "${vat_rate}% enthalten"
+
+msgid "VAT"
+msgstr "MwSt"
+
+msgid "Value Added Tax"
+msgstr "Mehrwertsteuer"
+
+msgid "Offline Payment"
+msgstr "Rechnung"
+
+msgid "Online Payment"
+msgstr "Online-Zahlung"
+
 msgid "Previous Page"
 msgstr "Vorherige Seite"
 
@@ -4115,11 +4185,8 @@ msgstr "Versand meiner Eingaben an meine E-Mail Adresse."
 msgid "Pay Online Now"
 msgstr "Jetzt online bezahlen"
 
-msgid "Credit Card Fee"
-msgstr "Kreditkarten-Gebühr"
-
 msgid "Pay Offline later"
-msgstr "Später bezahlen"
+msgstr "Per Rechnung bezahlen"
 
 msgid "Show more"
 msgstr "Mehr anzeigen"
@@ -4454,6 +4521,9 @@ msgstr ""
 "kontaktieren Sie bitte einen Administrator, damit er Sie aus der Liste "
 "entfernen kann."
 
+msgid "Pending approval"
+msgstr "Noch nicht akzeptiert"
+
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr ""
 "Folgendes ist während des letzten Monats auf der ${org} Webseite geschehen:"
@@ -4587,6 +4657,15 @@ msgstr ""
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
+
+msgid "Here's a summary of your reservations:"
+msgstr "Hier ist eine Zusammenfassung Ihrer Reservationen:"
+
+msgid "Changes to your submitted reservations:"
+msgstr "Änderungen an Ihren übermittelten Reservationen:"
+
+msgid "Rejected"
+msgstr "Abgelehnt"
 
 msgid "You have a new ticket"
 msgstr "Sie haben ein neues Ticket"
@@ -5005,15 +5084,6 @@ msgstr ""
 "Verfügbarkeitszeitraum erstellt wurden. Um diese Verfügbarkeiten wieder zu "
 "erstellen, klicken Sie auf \"Bearbeiten\" in der Verfügbarkeitszeitraum und "
 "danach auf \"Speichern\" ohne etwas zu ändern."
-
-msgid "Reservation is pending approval"
-msgstr "Diese Reservation wurde noch nicht akzeptiert"
-
-msgid "(${num_pending} pending approval)"
-msgstr "(${num_pending} noch nicht akzeptiert)"
-
-msgid "Utilised"
-msgstr "Ausgelastet"
 
 msgid "No recipients defined yet."
 msgstr "Es wurden noch keine Empfänger definiert."
@@ -6455,6 +6525,12 @@ msgstr ""
 msgid "Reject all reservations with message"
 msgstr "Alle Reservationen absagen mit Kommentar"
 
+msgid "Reservation summary"
+msgstr "Terminübersicht"
+
+msgid "Reservation not adjustable"
+msgstr "Diese Reservation ist nicht anpassbar"
+
 msgid "Adjust reservation"
 msgstr "Reservation Anpassen"
 
@@ -6587,9 +6663,6 @@ msgid ""
 msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
-
-msgid "Value Added Tax"
-msgstr "Mehrwertsteuer"
 
 msgid "Chat"
 msgstr "Chat"
@@ -6885,6 +6958,14 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "Please note that this page has subpages which will also be deleted!"
+#~ msgstr ""
+#~ "Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
+#~ "werden!"
+
+#~ msgid "One of your reservations was adjusted"
+#~ msgstr "Eine von Ihren Reservationen wurde angepasst"
 
 #~ msgid ""
 #~ "Select a free time span in the calendar below to create an availability "

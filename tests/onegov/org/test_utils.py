@@ -294,6 +294,35 @@ def test_emails_for_new_ticket(session):
     result = {a.addr_spec for a in emails_for_new_ticket(request, ticket3)}
     assert result == {'user1@example.org', 'user3@example.org'}
 
+    # set a shared email instead
+    group2.meta = {'shared_email': 'shared@example.org'}
+    session.flush()
+    request = Bunch(**{
+        'session': session,
+        'email_for_new_tickets': None,
+        'app.ticket_permissions': {
+            'DIR': {'Sports': [group1.id.hex]},
+        },
+    })
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket2)}
+    assert result == {'user1@example.org'}
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket3)}
+    assert result == {'user1@example.org', 'shared@example.org'}
+
+    request = Bunch(**{
+        'session': session,
+        'email_for_new_tickets': 'user3@example.org',
+        'app.ticket_permissions': {
+            'DIR': {'Sports': [group1.id.hex]},
+        },
+    })
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket2)}
+    assert result == {'user1@example.org', 'user3@example.org'}
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket3)}
+    assert result == {
+        'user1@example.org', 'user3@example.org', 'shared@example.org'
+    }
+
 
 def test_extract_categories_and_subcategories():
     result = utils.extract_categories_and_subcategories([])

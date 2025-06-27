@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-05-27 16:02+0200\n"
+"POT-Creation-Date: 2025-06-26 15:55+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -112,8 +112,14 @@ msgstr "Rimborsato"
 msgid "Manual"
 msgstr "Manuale"
 
+msgid "Datatrans"
+msgstr "Datatrans"
+
 msgid "Stripe Connect"
 msgstr "Stripe Connect"
+
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
 
 #, python-format
 msgid "Daily Newsletter ${time}"
@@ -972,6 +978,14 @@ msgid ""
 msgstr ""
 "Descrive il modo in cui questa risorsa può essere prelevata. Questo testo "
 "viene utilizzato nella pagina di stato del biglietto per informare l'utente"
+
+msgid "Show VAT"
+msgstr "Visualizza l'IVA"
+
+msgid "By default VAT is not shown, even when configured in the VAT settings."
+msgstr ""
+"Per impostazione predefinita, l'IVA non viene visualizzata, anche se "
+"configurata nelle impostazioni."
 
 msgid "Short description of the survey"
 msgstr "Breve descrizione del sondaggio"
@@ -2124,9 +2138,20 @@ msgid ""
 msgstr ""
 "Formato non valido. Definire i tag e i loro meta-dati secondo l'esempio."
 
-msgid "Invalid price, needs to be a non-negative number."
-msgstr "Prezzo non valido, deve essere un numero non negativo."
+#, python-format
+msgid "Invalid price \"${price}\", needs to be a non-negative number."
+msgstr "Prezzo non valido \"${price}\", deve essere un numero non negativo."
 
+#, python-format
+msgid ""
+"Invalid color \"${color}\", needs to be a 3 or 6 digit hex code, e.g. "
+"\"ff9000\" for orange. If you use a \"#\" prefix, make sure to enclose the "
+"value in quotation marks."
+msgstr ""
+"Colore non valido \"{color}\", deve essere un codice esadecimale di 3 o 6 "
+"cifre, ad esempio \"ff9000\" per l'arancione. Se si usa il prefisso "
+
+# ", assicurarsi di racchiudere il valore tra virgolette."
 msgid "Enable newsletter"
 msgstr "Attiva la newsletter"
 
@@ -2553,6 +2578,16 @@ msgid "Immediate e-mail notification to members upon ticket submission"
 msgstr ""
 "Notifica immediata via e-mail ai membri al momento dell'invio del ticket"
 
+msgid ""
+"Also gives permission to these ticket categories, but does not restrict "
+"access to other groups."
+msgstr ""
+"Fornisce l'autorizzazione anche a queste categorie di biglietti, ma non "
+"limita l'accesso ad altri gruppi."
+
+msgid "Shared e-mail address for ticket submission notifications"
+msgstr "Indirizzo e-mail condiviso per le notifiche di invio dei ticket"
+
 msgid "Send a periodic status e-mail."
 msgstr "Invia un'e-mail di stato periodica."
 
@@ -2658,9 +2693,6 @@ msgstr "Associazione sportiva"
 
 msgid "all day"
 msgstr "tutto il giorno"
-
-msgid "VAT"
-msgstr "IVA"
 
 msgid "Homepage"
 msgstr "Pagina principale"
@@ -2989,12 +3021,6 @@ msgstr "Esportazioni"
 
 msgid "Payment Providers"
 msgstr "Provider di servizi di pagamento"
-
-msgid "Datatrans"
-msgstr "Datatrans"
-
-msgid "Worldline Saferpay"
-msgstr "Worldline Saferpay"
 
 msgid "Synchronise"
 msgstr "Sincronizza"
@@ -3373,6 +3399,22 @@ msgstr "Regolare"
 msgid "Accept all reservations"
 msgstr "Accetta tutte le prenotazioni"
 
+msgid "Send reservation summary"
+msgstr "Invia il riepilogo della prenotazione"
+
+msgid "Do you really want to send a reservation summary?"
+msgstr "Volete davvero inviare un riepilogo della prenotazione?"
+
+msgid ""
+"This will always be sent via e-mail, even when ticket updates have been "
+"disabled. Make sure to only use this to inform customers, when significant "
+"changes have been made to the reservations, they need to be aware of."
+msgstr ""
+"Questo verrà sempre inviato via e-mail, anche quando gli aggiornamenti dei "
+"biglietti sono stati disattivati. Assicuratevi di usarlo solo per informare "
+"i clienti quando sono state apportate modifiche significative alle "
+"prenotazioni, di cui devono essere a conoscenza."
+
 msgid "Details about the reservation"
 msgstr "Dettagli sulla prenotazione"
 
@@ -3558,10 +3600,15 @@ msgstr "Una notizia non può essere incollata come argomento"
 msgid "A Topic cannot be pasted as News"
 msgstr "Un argomento non può essere incollato come notizia"
 
-msgid "Please note that this page has subpages which will also be deleted!"
+msgid ""
+"Please note that this page has the following subpages which will also be "
+"deleted:"
 msgstr ""
-"Nota che questa pagina contiene delle sottopagine che verranno anch'esse "
-"eliminate!"
+"Si noti che questa pagina ha le seguenti sottopagine che saranno anch'esse "
+"cancellate"
+
+msgid "Please scroll to the bottom to enable the confirm button."
+msgstr "Scorrere fino in fondo per abilitare il pulsante di conferma."
 
 msgid "This page can't be deleted."
 msgstr "Questa pagina non può essere eliminata."
@@ -3994,6 +4041,24 @@ msgstr "Richiesta di modifica"
 msgid "New Entry"
 msgstr "Nuovo elemento"
 
+msgid "Credit Card Fee"
+msgstr "Commissione sulla carta di credito"
+
+msgid "${vat_rate}% included"
+msgstr "${vat_rate}% inclusa"
+
+msgid "VAT"
+msgstr "IVA"
+
+msgid "Value Added Tax"
+msgstr "Imposta sul valore aggiunto"
+
+msgid "Offline Payment"
+msgstr "Fattura"
+
+msgid "Online Payment"
+msgstr "Pagamento online"
+
 msgid "Previous Page"
 msgstr "Pagina precedente"
 
@@ -4118,11 +4183,8 @@ msgstr "Inviami i dati inseriti tramite e-mail."
 msgid "Pay Online Now"
 msgstr "Paga ora online"
 
-msgid "Credit Card Fee"
-msgstr "Commissione sulla carta di credito"
-
 msgid "Pay Offline later"
-msgstr "Paga offline successivamente"
+msgstr "Pagare con fattura"
 
 msgid "Show more"
 msgstr "Mostra di più"
@@ -4454,6 +4516,9 @@ msgstr ""
 "elettronica si prega di contattare un amministratore in modo che possa "
 "rimuovervi dall'elenco dei destinatari lista"
 
+msgid "Pending approval"
+msgstr "In attesa di approvazione"
+
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr "Questo è quello che è successo sul sito web ${org} nell'ultimo mese:"
 
@@ -4580,6 +4645,15 @@ msgstr ""
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
+
+msgid "Here's a summary of your reservations:"
+msgstr "Ecco un riepilogo delle vostre prenotazioni:"
+
+msgid "Changes to your submitted reservations:"
+msgstr "Modifiche alle prenotazioni inviate:"
+
+msgid "Rejected"
+msgstr "Rifiutata"
 
 msgid "You have a new ticket"
 msgstr "Hai un nuovo biglietto"
@@ -5005,15 +5079,6 @@ msgstr ""
 "fine. Ciò include le allocazioni create utilizzando un periodo di "
 "disponibilità. Per ricreare queste allocazioni, fare clic su \"modifica\" "
 "nel periodo di disponibilità e quindi \"salva\" senza modificare nulla."
-
-msgid "Reservation is pending approval"
-msgstr "La prenotazione è in attesa di approvazione"
-
-msgid "(${num_pending} pending approval)"
-msgstr "(${num_pending} in attesa di approvazione)"
-
-msgid "Utilised"
-msgstr "Utilizzato"
 
 msgid "No recipients defined yet."
 msgstr "Nessun destinatario ancora definito."
@@ -6454,6 +6519,12 @@ msgstr ""
 msgid "Reject all reservations with message"
 msgstr "Rifiuta tutte le prenotazioni con messaggio"
 
+msgid "Reservation summary"
+msgstr "Riepilogo della prenotazione"
+
+msgid "Reservation not adjustable"
+msgstr "Prenotazione non regolabile"
+
 msgid "Adjust reservation"
 msgstr "Regolare la prenotazione"
 
@@ -6587,9 +6658,6 @@ msgid ""
 msgstr ""
 "Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
 "irrevocabilmente cancellati."
-
-msgid "Value Added Tax"
-msgstr "Imposta sul valore aggiunto"
 
 msgid "Chat"
 msgstr "Chat"
@@ -6883,6 +6951,14 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Please note that this page has subpages which will also be deleted!"
+#~ msgstr ""
+#~ "Nota che questa pagina contiene delle sottopagine che verranno anch'esse "
+#~ "eliminate!"
+
+#~ msgid "One of your reservations was adjusted"
+#~ msgstr "Una delle vostre prenotazioni è stata regolata"
 
 #~ msgid ""
 #~ "Select a free time span in the calendar below to create an allocation."

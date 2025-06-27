@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-05-14 12:57+0200\n"
+"POT-Creation-Date: 2025-06-26 13:21+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -706,6 +706,45 @@ msgstr "Neuer Eintrag"
 msgid "Directory"
 msgstr "Verzeichnis"
 
+msgid "Payment"
+msgstr "Zahlung"
+
+msgid "Value Added Tax"
+msgstr "Mehrwertsteuer"
+
+msgid "${vat_rate}% included"
+msgstr "${vat_rate}% enthalten"
+
+msgid "State"
+msgstr "Status"
+
+msgid "Payment Method"
+msgstr "Zahlungsmethode"
+
+msgid "Offline Payment"
+msgstr "Rechnung"
+
+msgid "Online Payment"
+msgstr "Online-Zahlung"
+
+msgid "Source"
+msgstr "Herkunft"
+
+msgid "Manual"
+msgstr "Manuell"
+
+msgid "Datatrans"
+msgstr "Datatrans"
+
+msgid "Stripe Connect"
+msgstr "Stripe Connect"
+
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
+
+msgid "Fee"
+msgstr "Gebühr"
+
 msgid "Organisation"
 msgstr "Organisation"
 
@@ -733,9 +772,6 @@ msgstr "Fehlgeschlagen"
 msgid "Refunded"
 msgstr "Rückerstattet"
 
-msgid "Manual"
-msgstr "Manuell"
-
 msgid "Ticket"
 msgstr "Ticket"
 
@@ -755,11 +791,11 @@ msgstr ""
 "Personen, die ausserhalb der folgenden Postleitzahlen leben, können diese "
 "Reservation erst am ${date} tätigen: ${zipcodes}"
 
+msgid "Occupancy"
+msgstr "Belegung"
+
 msgid "Quota"
 msgstr "Anzahl"
-
-msgid "State"
-msgstr "Status"
 
 msgid "Initiated"
 msgstr "Initiiert"
@@ -926,9 +962,6 @@ msgstr "Privatsphäre"
 msgid "Send me my entered data by e-mail."
 msgstr "Versand meiner Eingaben an meine E-Mail Adresse."
 
-msgid "Payment"
-msgstr "Zahlung"
-
 msgid "Pay Online Now"
 msgstr "Jetzt online bezahlen"
 
@@ -946,9 +979,6 @@ msgstr "Objekt"
 
 msgid "Net Amount"
 msgstr "Netto Betrag"
-
-msgid "Fee"
-msgstr "Gebühr"
 
 msgid "Payment Provider"
 msgstr "Zahlungsanbieter"
@@ -1278,6 +1308,12 @@ msgstr ""
 "kontaktieren Sie bitte einen Administrator, damit er Sie aus der Liste "
 "entfernen kann."
 
+msgid "Pending approval"
+msgstr "Noch nicht akzeptiert"
+
+msgid "VAT"
+msgstr "MwSt"
+
 msgid "A new entry has been added to the \"${directory}\" directory:"
 msgstr "Ein neuer Eintrag wurde im Verzeichnis \"${directory}\" hinzugefügt:"
 
@@ -1405,6 +1441,15 @@ msgstr "Schlüsselcode"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
+
+msgid "Here's a summary of your reservations:"
+msgstr "Hier ist eine Zusammenfassung Ihrer Reservationen:"
+
+msgid "Changes to your submitted reservations:"
+msgstr "Änderungen an Ihren übermittelten Reservationen:"
+
+msgid "Rejected"
+msgstr "Abgelehnt"
 
 msgid "A message has been sent regarding ${ref}:"
 msgstr "Sie haben zu ${ref} eine Nachricht erhalten:"
@@ -1834,15 +1879,6 @@ msgstr ""
 "erstellen, klicken Sie auf \"Bearbeiten\" in der Verfügbarkeitszeitraum und "
 "danach auf \"Speichern\" ohne etwas zu ändern."
 
-msgid "Reservation is pending approval"
-msgstr "Diese Reservation wurde noch nicht akzeptiert"
-
-msgid "(${num_pending} pending approval)"
-msgstr "(${num_pending} noch nicht akzeptiert)"
-
-msgid "Utilised"
-msgstr "Ausgelastet"
-
 msgid "No recipients defined yet."
 msgstr "Es wurden noch keine Empfänger definiert."
 
@@ -2022,9 +2058,6 @@ msgstr "${count} Notizen"
 
 msgid "Amount"
 msgstr "Betrag"
-
-msgid "Source"
-msgstr "Herkunft"
 
 msgid "Group"
 msgstr "Gruppe"
@@ -2293,9 +2326,6 @@ msgstr ""
 
 msgid "Push Notification Overview"
 msgstr "Übersicht Push-Benachrichtigungen"
-
-msgid "Value Added Tax"
-msgstr "Mehrwertsteuer"
 
 msgid "New Note"
 msgstr "Neue Notiz"
@@ -2591,9 +2621,6 @@ msgstr "Neue Notiz"
 #~ msgid "Clean up"
 #~ msgstr "Aufräumen"
 
-#~ msgid "Occupancy"
-#~ msgstr "Belegung"
-
 #~ msgid "Rules"
 #~ msgstr "Regeln"
 
@@ -2663,9 +2690,6 @@ msgstr "Neue Notiz"
 
 #~ msgid "Payments"
 #~ msgstr "Zahlungen"
-
-#~ msgid "Stripe Connect"
-#~ msgstr "Stripe Connect"
 
 #~ msgid "Synchronise"
 #~ msgstr "Synchronisieren"

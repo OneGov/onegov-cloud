@@ -15,10 +15,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
 
+
 class MeetingItem(Base, ORMSearchable):
 
     __tablename__ = 'par_meeting_items'
-
 
     es_public = True
     es_properties = {

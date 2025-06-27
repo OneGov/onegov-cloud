@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-05-14 12:57+0200\n"
+"POT-Creation-Date: 2025-06-26 13:21+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -703,6 +703,45 @@ msgstr "Nuovo elemento"
 msgid "Directory"
 msgstr "Cartella"
 
+msgid "Payment"
+msgstr "Pagamento"
+
+msgid "Value Added Tax"
+msgstr "Imposta sul valore aggiunto"
+
+msgid "${vat_rate}% included"
+msgstr "${vat_rate}% inclusa"
+
+msgid "State"
+msgstr "Stato"
+
+msgid "Payment Method"
+msgstr "Modalità di pagamento"
+
+msgid "Offline Payment"
+msgstr "Fattura"
+
+msgid "Online Payment"
+msgstr "Pagamento online"
+
+msgid "Source"
+msgstr "Fonte"
+
+msgid "Manual"
+msgstr "Manuale"
+
+msgid "Datatrans"
+msgstr "Datatrans"
+
+msgid "Stripe Connect"
+msgstr "Stripe Connect"
+
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
+
+msgid "Fee"
+msgstr "Tariffa"
+
 msgid "Organisation"
 msgstr "Organizzazione"
 
@@ -731,9 +770,6 @@ msgstr "Fallito"
 msgid "Refunded"
 msgstr "Rimborsato"
 
-msgid "Manual"
-msgstr "Manuale"
-
 msgid "Ticket"
 msgstr "Biglietto"
 
@@ -753,11 +789,11 @@ msgstr ""
 "Le persone che vivono al di fuori dei seguenti codici postali possono "
 "prenotare questa allocazione solo il ${date}: ${zipcodes}"
 
+msgid "Occupancy"
+msgstr "Occupazione"
+
 msgid "Quota"
 msgstr "Quota"
-
-msgid "State"
-msgstr "Stato"
 
 msgid "Initiated"
 msgstr "Avviato"
@@ -926,9 +962,6 @@ msgstr "Privacy"
 msgid "Send me my entered data by e-mail."
 msgstr "Inviami i dati inseriti tramite e-mail."
 
-msgid "Payment"
-msgstr "Pagamento"
-
 msgid "Pay Online Now"
 msgstr "Paga ora online"
 
@@ -946,9 +979,6 @@ msgstr "Oggetto"
 
 msgid "Net Amount"
 msgstr "Importo netto"
-
-msgid "Fee"
-msgstr "Tariffa"
 
 msgid "Payment Provider"
 msgstr "Elaboratore dei pagamenti"
@@ -1274,6 +1304,12 @@ msgstr ""
 "org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, kontaktieren "
 "Sie bitte einen Administrator, damit dieser Sie aus der Liste entfernen kann."
 
+msgid "Pending approval"
+msgstr "In attesa di approvazione"
+
+msgid "VAT"
+msgstr "IVA"
+
 msgid "A new entry has been added to the \"${directory}\" directory:"
 msgstr "Un nuovo elemento è stato aggiunto alla cartella \"${directory}\":"
 
@@ -1394,6 +1430,15 @@ msgstr "Codice chiave"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
+
+msgid "Here's a summary of your reservations:"
+msgstr "Ecco un riepilogo delle vostre prenotazioni:"
+
+msgid "Changes to your submitted reservations:"
+msgstr "Modifiche alle prenotazioni inviate:"
+
+msgid "Rejected"
+msgstr "Rifiutata"
 
 msgid "A message has been sent regarding ${ref}:"
 msgstr "È stato inviato un messaggio relativo a ${ref}:"
@@ -1831,15 +1876,6 @@ msgstr ""
 "disponibilità. Per ricreare queste allocazioni, fare clic su \"modifica\" "
 "nel periodo di disponibilità e quindi \"salva\" senza modificare nulla."
 
-msgid "Reservation is pending approval"
-msgstr "La prenotazione è in attesa di approvazione"
-
-msgid "(${num_pending} pending approval)"
-msgstr "(${num_pending} in attesa di approvazione)"
-
-msgid "Utilised"
-msgstr "Utilizzato"
-
 msgid "No recipients defined yet."
 msgstr "Nessun destinatario ancora definito."
 
@@ -2020,9 +2056,6 @@ msgstr "${count} note"
 
 msgid "Amount"
 msgstr "Importo"
-
-msgid "Source"
-msgstr "Fonte"
 
 msgid "Group"
 msgstr "Gruppo"
@@ -2295,9 +2328,6 @@ msgstr ""
 
 msgid "Push Notification Overview"
 msgstr "Panoramica delle notifiche push"
-
-msgid "Value Added Tax"
-msgstr "Imposta sul valore aggiunto"
 
 msgid "New Note"
 msgstr "Nuova nota"
@@ -2578,9 +2608,6 @@ msgstr "Nuova nota"
 #~ msgid "Clean up"
 #~ msgstr "Ripulisci"
 
-#~ msgid "Occupancy"
-#~ msgstr "Occupazione"
-
 #~ msgid "Rules"
 #~ msgstr "Regole"
 
@@ -2650,9 +2677,6 @@ msgstr "Nuova nota"
 
 #~ msgid "Payments"
 #~ msgstr "Pagamenti"
-
-#~ msgid "Stripe Connect"
-#~ msgstr "Stripe Connect"
 
 #~ msgid "Synchronise"
 #~ msgstr "Sincronizza"

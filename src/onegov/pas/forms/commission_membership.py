@@ -5,7 +5,7 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import TranslatedSelectField
 from onegov.pas import _
-from onegov.pas.collections import CommissionCollection
+from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.collections import ParliamentarianCollection
 from onegov.parliament.models.commission_membership import ROLES
 from wtforms.fields import DateField
@@ -47,7 +47,7 @@ class CommissionMembershipForm(Form):
         self.commission_id.choices = [
             (commission.id, commission.title)
             for commission
-            in CommissionCollection(self.request.session).query()
+            in PASCommissionCollection(self.request.session).query()
         ]
         self.parliamentarian_id.choices = [
             (parliamentarian.id, parliamentarian.title)

@@ -13,7 +13,6 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     import uuid
     from datetime import date

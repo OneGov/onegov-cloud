@@ -300,7 +300,7 @@ def test_calendar_date_range():
     resource.date = None
     resource.timezone = utc
 
-    resource.view = 'month'
+    resource.view = 'dayGridMonth'
     with freeze_time(datetime(2016, 5, 14, tzinfo=utc)):
         assert resource.calendar_date_range == (
             datetime(2016, 5, 1, tzinfo=utc),
@@ -313,13 +313,13 @@ def test_calendar_date_range():
         datetime(2016, 5, 31, 23, 59, 59, 999999, tzinfo=utc)
     )
 
-    resource.view = 'agendaWeek'
+    resource.view = 'timeGridWeek'
     assert resource.calendar_date_range == (
         datetime(2016, 5, 9, tzinfo=utc),
         datetime(2016, 5, 15, 23, 59, 59, 999999, tzinfo=utc)
     )
 
-    resource.view = 'agendaDay'
+    resource.view = 'timeGridDay'
     assert resource.calendar_date_range == (
         datetime(2016, 5, 14, tzinfo=utc),
         datetime(2016, 5, 14, 23, 59, 59, 999999, tzinfo=utc)

@@ -61,19 +61,19 @@ def test_resource_slots(client):
 
     assert result[0]['start'] == '2015-08-04T00:00:00+02:00'
     assert result[0]['end'] == '2015-08-05T00:00:00+02:00'
-    assert result[0]['className'] == 'event-in-past event-available'
+    assert result[0]['classNames'] == ['event-in-past', 'event-available']
     assert result[0]['title'] == "Ganztägig \nVerfügbar"
 
     assert result[1]['start'] == '2015-08-05T00:00:00+02:00'
     assert result[1]['end'] == '2015-08-06T00:00:00+02:00'
-    assert result[1]['className'] == 'event-in-past event-available'
+    assert result[1]['classNames'] == ['event-in-past', 'event-available']
     assert result[1]['title'] == "Ganztägig \nVerfügbar"
 
     url = '/resource/foo/slots?start=2015-08-06&end=2015-08-06'
     result = client.get(url).json
 
     assert len(result) == 1
-    assert result[0]['className'] == 'event-in-past event-unavailable'
+    assert result[0]['classNames'] == ['event-in-past', 'event-unavailable']
     assert result[0]['title'] == "12:00 - 16:00 \nBesetzt"
 
 
@@ -1326,26 +1326,84 @@ def test_reserve_allocation_adjustment_post_acceptance(client):
     # accept it
     ticket = ticket.click('Alle Reservationen annehmen').follow()
 
-    # adjust it
+    # it can't be adjusted
+    assert 'Anpassen' not in ticket
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_send_reservation_summary(client):
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(
+            (datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+            (datetime(2015, 8, 29, 10), datetime(2015, 8, 29, 14)),
+        ),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve1 = client.bound_reserve(allocations[0])
+    reserve2 = client.bound_reserve(allocations[1])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve1('10:00', '12:00').json == {'success': True}
+    assert reserve2('10:30', '12:00').json == {'success': True}
+
+    # fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+
+    ticket = formular.form.submit().follow().form.submit().follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # open the created ticket
+    client.login_admin()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    assert "info@example.org" in ticket
+    assert "28. August 2015" in ticket
+    assert "29. August 2015" in ticket
+    assert "10:00" in ticket
+    assert "12:00" in ticket
+    assert "Anpassen" in ticket
+
+    # adjust the first reservation
     adjust = ticket.click('Anpassen', index=0)
+    adjust.form['start_time'] = '10:00'
     adjust.form['end_time'] = '11:00'
     ticket = adjust.form.submit().follow()
     assert "10:00" in ticket
     assert "11:00" in ticket
 
-    # the mail went out before so it still shows the old time
-    # TODO: Do we send a notification in this case or do we rely
-    #       on supporters to do that?
-    message = client.get_email(1)['TextBody']
-    assert "Tageskarte" in message
-    assert "28. August 2015" in message
-    assert "10:00" in message
-    assert "12:00" in message
+    # then adjust it back to the original state
+    adjust = ticket.click('Anpassen', index=0)
+    adjust.form['start_time'] = '10:00'
+    adjust.form['end_time'] = '12:00'
+    ticket = adjust.form.submit().follow()
 
-    # see if the slots are partitioned correctly
-    url = '/resource/tageskarte/slots?start=2015-08-01&end=2015-08-30'
-    slots = client.get(url).json
-    assert slots[0]['partitions'] == [[25.0, True], [75.0, False]]
+    # reject the second reservation
+    ticket = ticket.click('Absagen', index=1).follow()
+    assert len(os.listdir(client.app.maildir)) == 2
+
+    # send a summary
+    ticket = client.get(
+        ticket.pyquery('a.envelope')[0].attrib['ic-get-from']
+    ).follow()
+    assert 'Erfolgreich 1 E-Mails gesendet' in ticket
+    assert len(os.listdir(client.app.maildir)) == 3
+
+    message = client.get_email(2)['TextBody']
+    assert "Tageskarte" in message
+    assert "10:00 - 12:00  | → |" not in message
+    assert "10:30 - 12:00  | → | Abgelehnt" in message
 
 
 @freeze_time("2015-08-28", tick=True)
@@ -1683,21 +1741,12 @@ def test_occupancy_view(client):
 
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
-    # at this point, the reservation will show up, but it should be
-    # marked pending
     occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
-    assert len(occupancy.pyquery('.occupancy-block')) == 1
-    assert len(occupancy.pyquery('.occupancy-block .reservation-pending')) == 1
-    assert (len(occupancy.pyquery('.occupancy-block .reservation-pending '
-                                  '.approval-pending')) == 1)
-
-    # ..until we accept it
-    ticket.click('Alle Reservationen annehmen')
-    occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
-    assert len(occupancy.pyquery('.occupancy-block')) == 1
-    assert len(occupancy.pyquery('.occupancy-block .reservation-pending')) == 0
-    assert (len(occupancy.pyquery('.occupancy-block .reservation-pending '
-                                  '.approval-pending')) == 0)
+    assert occupancy.status_code == 200
+    occupancy = client.get(
+        '/resource/tageskarte/occupancy-json?start=2015-08-28&end=2015-08-29'
+    )
+    assert occupancy.status_code == 200
 
 
 def test_occupancy_view_member_access(client):
@@ -1724,6 +1773,9 @@ def test_occupancy_view_member_access(client):
     # now members should be able to access it
     client.login_member()
     occupancy = client.get('/resource/test/occupancy')
+    assert occupancy.status_code == 200
+
+    occupancy = client.get('/resource/test/occupancy-json')
     assert occupancy.status_code == 200
 
 

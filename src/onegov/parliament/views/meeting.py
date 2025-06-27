@@ -14,9 +14,9 @@ from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
-
     from onegov.town6.request import TownRequest
     from onegov.core.types import RenderData
+
 
 @TownApp.html(
     model=MeetingCollection,
@@ -37,7 +37,7 @@ def view_meetings(
 
 
 @TownApp.html(
-    model=Meeting, 
+    model=Meeting,
     template='meeting.pt',
     permission=Public,
 )
@@ -46,9 +46,8 @@ def view_meeting(
     request: TownRequest,
 ) -> RenderData:
 
-    layout = MeetingCollectionLayout(MeetingCollection(request.session),
-                                     request)
-
+    collection = MeetingCollection(request.session)
+    layout = MeetingCollectionLayout(collection, request)
     return {
         'layout': layout,
         'page': self,

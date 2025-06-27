@@ -11,8 +11,7 @@ from onegov.parliament.views.commission import (
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import AttendenceCollection
-from onegov.pas.collections import CommissionCollection
-from onegov.pas.collections.commission import PASCommissionCollection
+from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.forms import AttendenceAddCommissionForm
 from onegov.pas.forms import CommissionMembershipAddForm
 from onegov.pas.forms import CommissionForm
@@ -30,7 +29,7 @@ if TYPE_CHECKING:
 
 
 @PasApp.html(
-    model=CommissionCollection,
+    model=PASCommissionCollection,
     template='commissions.pt',
     permission=Private
 )

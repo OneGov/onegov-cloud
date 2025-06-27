@@ -80,7 +80,7 @@ class Meeting(Base, ContentMixin, ORMSearchable, AssociatedFiles):
         ForeignKey('par_political_businesses.id'),
     )
 
-    #: list of political businesses"
+    #: list of political businesses, "Traktanden"
     political_businesses: RelationshipProperty[PoliticalBusiness] = (
         relationship(
             'PoliticalBusiness',
@@ -91,7 +91,7 @@ class Meeting(Base, ContentMixin, ORMSearchable, AssociatedFiles):
         )
     )
 
-    #: The meeting items   
+    #: The meeting items
     meeting_items: relationship[list[MeetingItem]]
     meeting_items = relationship(
         'MeetingItem',
@@ -99,5 +99,6 @@ class Meeting(Base, ContentMixin, ORMSearchable, AssociatedFiles):
         back_populates='meeting',
         order_by='desc(MeetingItem.number)'
     )
+
     def __repr__(self) -> str:
         return f'<Meeting {self.title}, {self.start_datetime}>'
