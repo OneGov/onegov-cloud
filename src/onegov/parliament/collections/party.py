@@ -7,14 +7,22 @@ from onegov.core.collection import GenericCollection
 from onegov.parliament.models import RISParty, Party
 
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
+from typing_extensions import TypeVar
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import Self
 
 
-class PartyCollection(GenericCollection[Party]):
+PartyT = TypeVar(
+    'PartyT',
+    bound=Party,
+    default=Any
+)
+
+
+class PartyCollection(GenericCollection[PartyT]):
 
     def __init__(
         self,
@@ -24,7 +32,11 @@ class PartyCollection(GenericCollection[Party]):
         super().__init__(session)
         self.active = active
 
-    def query(self) -> Query[Party]:
+    @property
+    def model_class(self) -> type[PartyT]:
+        return Party  # type: ignore[return-value]
+
+    def query(self) -> Query[PartyT]:
         query = super().query()
         model_class = self.model_class
         if self.active is not None:
