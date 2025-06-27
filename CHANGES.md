@@ -1,8 +1,78 @@
 # Changes
 
+## 2025.27
+
+`2025-06-27` | [b4b7a8fd28...320dcacc27](https://github.com/OneGov/onegov-cloud/compare/b4b7a8fd28^...320dcacc27)
+
+### Form
+
+##### Fixes another small regression in formcode related to pricing
+
+`Bugfix` | [OGC-2349](https://linear.app/onegovcloud/issue/OGC-2349) | [fdd2ad3be7](https://github.com/onegov/onegov-cloud/commit/fdd2ad3be761dfeb7243cc3d5289969a1fa8e800)
+
+### Org
+
+##### Adds icon to date picker in calendar views to make it more obvious
+
+This also ensures picked dates are added to the browser history
+
+`Feature` | [OGC-2330](https://linear.app/onegovcloud/issue/OGC-2330) | [5abe2b07f9](https://github.com/onegov/onegov-cloud/commit/5abe2b07f931a95c67b6f2c696927af37883df4c)
+
+##### Only display VAT for forms that have it enabled
+
+This also includes a payment summary in the ticket opened/closed mails
+which replaces the price display and a payment summary in the ticket
+status page.
+
+`Feature` | [OGC-2341](https://linear.app/onegovcloud/issue/OGC-2341) | [987e72bcb6](https://github.com/onegov/onegov-cloud/commit/987e72bcb60a243582127a7add0543c3c2b3a536)
+
+##### Make it more obvious that pay later means pay by invoice
+
+`Feature` | [OGC-2340](https://linear.app/onegovcloud/issue/OGC-2340) | [c714a4aa3c](https://github.com/onegov/onegov-cloud/commit/c714a4aa3c13c5a614e2d851c788bfff3cff7deb)
+
+##### Allows setting a shared e-mail for immediate ticket notifications
+
+`Feature` | [OGC-2360](https://linear.app/onegovcloud/issue/OGC-2360) | [5d80af7c0e](https://github.com/onegov/onegov-cloud/commit/5d80af7c0e5576fb1cae0bc37774a4bcc89800ad)
+
+##### Keeps track of which tickets view was visited last
+
+This applies to the link in the breadcrumbs and where we redirect to
+after closing/deleting a ticket.
+
+This also fixes an unrelated bug with the stored ticket summary for RSV
+tickets.
+
+`Feature` | [OGC-2362](https://linear.app/onegovcloud/issue/OGC-2362) | [d239ca03bc](https://github.com/onegov/onegov-cloud/commit/d239ca03bc560105e5b079d95215f16de70474f1)
+
+##### Fixes crash in ticket PDF for Worldline Saferpay payments
+
+`Bugfix` | [OGC-2345](https://linear.app/onegovcloud/issue/OGC-2345) | [00054ff0bf](https://github.com/onegov/onegov-cloud/commit/00054ff0bf62c1d0ecc3b3dc8f8e2fb508d25f89)
+
+##### Avoid crash in latest occurrence view if there are no occurrences
+
+`Bugfix` | [d4135bb209](https://github.com/onegov/onegov-cloud/commit/d4135bb2095c10d99177ae7e15c965293ef834d6)
+
+### Pay
+
+##### Avoid logging exception for aborted Saferpay transactions
+
+`Bugfix` | [OGC-2239](https://linear.app/onegovcloud/issue/OGC-2239) | [fcba01085d](https://github.com/onegov/onegov-cloud/commit/fcba01085ddd1f274f64c5e7234ec513bb156330)
+
+### Ris
+
+##### Adding views
+
+`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [dfee5bf84f](https://github.com/onegov/onegov-cloud/commit/dfee5bf84fbff5f997a816d43a273c01673b5a2c)
+
+### User
+
+##### Fixes signature/digest configuration for SAML2 provider
+
+`Bugfix` | [OGC-2248](https://linear.app/onegovcloud/issue/OGC-2248) | [78c9317dcc](https://github.com/onegov/onegov-cloud/commit/78c9317dcc7e27824f6feafcac1e3b22eaacaca9)
+
 ## 2025.26
 
-`2025-06-21` | [52b383bcf1...e58e584a2e](https://github.com/OneGov/onegov-cloud/compare/52b383bcf1^...e58e584a2e)
+`2025-06-21` | [52b383bcf1...3d7684c5ae](https://github.com/OneGov/onegov-cloud/compare/52b383bcf1^...3d7684c5ae)
 
 ### Form
 
@@ -2154,8 +2224,4 @@ Remove field if there are no TicketPermissions
 ##### Roadwork show title
 
 `Bugfix` | [OGC-1706](https://linear.app/onegovcloud/issue/OGC-1706) | [7eca0726c1](https://github.com/onegov/onegov-cloud/commit/7eca0726c1f28b6a55fa38055601873fdf2b811c)
-
-## 2024.46
-
-`2024-08-30` | [9346ca33c7...bdcf6b6ed8](https://github.com/OneGov/onegov-cloud/compare/9346ca33c7^...bdcf6b6ed8)
 
