@@ -4,13 +4,13 @@ from datetime import date
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import TranslatedSelectField
-from onegov.pas import _
-from onegov.pas.collections import ParliamentarianCollection
-from onegov.pas.collections import ParliamentaryGroupCollection
-from onegov.pas.collections import PartyCollection
-from onegov.parliament.models.parliamentarian_role import (
-    PARLIAMENTARIAN_ROLES
+from onegov.parliament import _
+from onegov.parliament.collections import (
+    ParliamentarianCollection,
+    ParliamentaryGroupCollection,
+    PartyCollection
 )
+from onegov.parliament.models import PARLIAMENTARIAN_ROLES
 from onegov.parliament.models.parliamentarian_role import (
     PARLIAMENTARY_GROUP_ROLES
 )

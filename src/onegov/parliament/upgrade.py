@@ -73,3 +73,14 @@ def add_type_column_to_parliament_models(
             context.operations.execute(
                 f'ALTER TABLE {table} ALTER COLUMN {type_name} SET NOT NULL'
             )
+
+
+@upgrade_task('Add function column to commission memberships')
+def add_function_column_to_commission_memberships(
+    context: UpgradeContext
+) -> None:
+    if not context.has_column('par_commission_memberships', 'function'):
+        context.operations.add_column(
+            'par_commission_memberships',
+            Column('function', Text, nullable=True, default=None)
+        )

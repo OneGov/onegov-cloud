@@ -6,11 +6,11 @@ from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.pas import _
-from onegov.pas.collections import PartyCollection
+from onegov.pas.collections import PASPartyCollection
 from onegov.pas.layouts.default import DefaultLayout
 
 
-class PartyCollectionLayout(DefaultLayout):
+class PASPartyCollectionLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
@@ -46,11 +46,12 @@ class PartyCollectionLayout(DefaultLayout):
         return None
 
 
-class PartyLayout(DefaultLayout):
+# FIXME create base class in onegov/parliament/layouts.py
+class PASPartyLayout(DefaultLayout):
 
     @cached_property
-    def collection(self) -> PartyCollection:
-        return PartyCollection(self.request.session)
+    def collection(self) -> PASPartyCollection:
+        return PASPartyCollection(self.request.session)
 
     @cached_property
     def title(self) -> str:

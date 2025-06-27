@@ -184,6 +184,7 @@ $settings-icon: '\f1de';
     .timeline::before { @include icon('\f017'); }
     .no-tickets::before { @include icon('\f145'); }
     .link-check::before { @include icon-bold('\f0fa'); }
+    .ris-settings::before { @include icon-bold('\f66f'); }
     .ticket-archive::before { @include icon-bold('\f1c6'); }
     .text-modules::before { @include icon('\f249'); }
     .forms::before { @include icon-bold('\f570'); }

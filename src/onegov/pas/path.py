@@ -3,16 +3,16 @@ from __future__ import annotations
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.app import PasApp
 from onegov.pas.collections import ChangeCollection
-from onegov.pas.collections import CommissionCollection
-from onegov.pas.collections import CommissionMembershipCollection
+from onegov.pas.collections import ImportLogCollection
 from onegov.pas.collections import LegislativePeriodCollection
-from onegov.pas.collections import ParliamentarianCollection
-from onegov.pas.collections import ParliamentarianRoleCollection
-from onegov.pas.collections import ParliamentaryGroupCollection
-from onegov.pas.collections import PartyCollection
+from onegov.pas.collections import PASCommissionCollection
+from onegov.pas.collections import PASCommissionMembershipCollection
+from onegov.pas.collections import PASParliamentarianCollection
+from onegov.pas.collections import PASParliamentarianRoleCollection
+from onegov.pas.collections import PASParliamentaryGroupCollection
+from onegov.pas.collections import PASPartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
-from onegov.pas.collections import ImportLogCollection
 from onegov.pas.models import PASAttendence
 from onegov.pas.models import PASChange
 from onegov.pas.models import PASCommission
@@ -34,7 +34,6 @@ if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
 
     from onegov.parliament.models import (
-        ParliamentarianRole,
         Party,
         ParliamentaryGroup
     )
@@ -108,15 +107,15 @@ def get_change(
 
 
 @PasApp.path(
-    model=CommissionCollection,
+    model=PASCommissionCollection,
     path='/commissions',
     converters={'active': bool}
 )
 def get_commissions(
     app: PasApp,
     active: bool = True
-) -> CommissionCollection:
-    return CommissionCollection(app.session(), active)
+) -> PASCommissionCollection:
+    return PASCommissionCollection(app.session(), active)
 
 
 @PasApp.path(
@@ -128,17 +127,17 @@ def get_commission(
     app: PasApp,
     id: UUID,
 ) -> PASCommission | None:
-    return CommissionCollection(app.session()).by_id(id)
+    return PASCommissionCollection(app.session()).by_id(id)
 
 
 @PasApp.path(
-    model=CommissionMembershipCollection,
+    model=PASCommissionMembershipCollection,
     path='/commission-memberships'
 )
 def get_commission_memberships(
     app: PasApp
-) -> CommissionMembershipCollection:
-    return CommissionMembershipCollection(app.session())
+) -> PASCommissionMembershipCollection:
+    return PASCommissionMembershipCollection(app.session())
 
 
 @PasApp.path(
@@ -150,7 +149,7 @@ def get_commission_membership(
     app: PasApp,
     id: UUID
 ) -> PASCommissionMembership | None:
-    return CommissionMembershipCollection(app.session()).by_id(id)
+    return PASCommissionMembershipCollection(app.session()).by_id(id)
 
 
 @PasApp.path(
@@ -178,85 +177,85 @@ def get_legislative_period(
 
 
 @PasApp.path(
-    model=ParliamentarianCollection,
-    path='/parliamenarians',
+    model=PASParliamentarianCollection,
+    path='/parliamentarians',
     converters={'active': bool}
 )
 def get_parliamentarians(
     app: PasApp,
     active: bool = True
-) -> ParliamentarianCollection:
-    return ParliamentarianCollection(app.session(), active)
+) -> PASParliamentarianCollection:
+    return PASParliamentarianCollection(app.session(), active)
 
 
 @PasApp.path(
     model=PASParliamentarian,
-    path='/parliamenarian/{id}',
+    path='/parliamentarian/{id}',
     converters={'id': UUID}
 )
 def get_parliamentarian(
     app: PasApp,
     id: UUID
 ) -> PASParliamentarian | None:
-    return ParliamentarianCollection(app.session()).by_id(id)
+    return PASParliamentarianCollection(app.session()).by_id(id)
 
 
 @PasApp.path(
-    model=ParliamentarianRoleCollection,
-    path='/parliamenarian-roles'
+    model=PASParliamentarianRoleCollection,
+    path='/parliamentarian-roles'
 )
 def get_parliamentarian_roles(
     app: PasApp
-) -> ParliamentarianRoleCollection:
-    return ParliamentarianRoleCollection(app.session())
+) -> PASParliamentarianRoleCollection:
+    return PASParliamentarianRoleCollection(app.session())
 
 
 @PasApp.path(
     model=PASParliamentarianRole,
-    path='/parliamenarian-role/{id}',
+    path='/parliamentarian-role/{id}',
     converters={'id': UUID}
 )
 def get_parliamentarian_role(
     app: PasApp,
     id: UUID
-) -> ParliamentarianRole | None:
-    return ParliamentarianRoleCollection(app.session()).by_id(id)
+) -> PASParliamentarianRole | None:
+    return PASParliamentarianRoleCollection(app.session()).by_id(id)
 
 
 @PasApp.path(
-    model=ParliamentaryGroupCollection,
-    path='/parliamenary-groups',
+    model=PASParliamentaryGroupCollection,
+    path='/parliamentary-groups',
     converters={'active': bool}
 )
 def get_parliamentary_groups(
     app: PasApp,
     active: bool = True,
-) -> ParliamentaryGroupCollection:
-    return ParliamentaryGroupCollection(app.session(), active)
+) -> PASParliamentaryGroupCollection:
+    return PASParliamentaryGroupCollection(app.session(), active)
 
 
 @PasApp.path(
     model=PASParliamentaryGroup,
-    path='/parliamenary-group/{id}',
+    path='/parliamentary-group/{id}',
     converters={'id': UUID}
 )
 def get_parliamentary_group(
     app: PasApp,
     id: UUID
 ) -> ParliamentaryGroup | None:
-    return ParliamentaryGroupCollection(app.session()).by_id(id)
+    return PASParliamentaryGroupCollection(app.session()).by_id(id)
 
 
 @PasApp.path(
-    model=PartyCollection,
+    model=PASPartyCollection,
     path='/parties',
     converters={'active': bool}
 )
 def get_parties(
     app: PasApp,
     active: bool = True,
-) -> PartyCollection:
-    return PartyCollection(app.session(), active)
+) -> PASPartyCollection:
+    return PASPartyCollection(app.session(), active)
 
 
 @PasApp.path(
@@ -268,7 +267,7 @@ def get_party(
     app: PasApp,
     id: UUID
 ) -> Party | None:
-    return PartyCollection(app.session()).by_id(id)
+    return PASPartyCollection(app.session()).by_id(id)
 
 
 @PasApp.path(

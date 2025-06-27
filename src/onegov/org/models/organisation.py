@@ -254,6 +254,9 @@ class Organisation(Base, TimestampMixin):
     # vat
     vat_rate: dict_property[float | None] = meta_property(default=0.0)
 
+    # RIS settings
+    ris_enabled: dict_property[bool] = meta_property(default=False)
+
     # MTAN Settings
     mtan_access_window_seconds: dict_property[int | None] = meta_property()
     mtan_access_window_requests: dict_property[int | None] = meta_property()

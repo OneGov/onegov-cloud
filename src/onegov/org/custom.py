@@ -143,6 +143,15 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
                 )
             )
 
+            if request.app.org.ris_enabled:
+                links.append(
+                    Link(
+                        _('RIS Settings'),
+                        request.link(request.app.org, 'ris-settings'),
+                        attrs={'class': 'ris-settings'}
+                    ),
+                )
+
             links.append(
                 Link(
                     _('Link Check'),
