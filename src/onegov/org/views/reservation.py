@@ -1220,7 +1220,12 @@ def reject_reservation(
 
     # create a snapshot of the ticket to keep the useful information
     if len(excluded) == 0:
+        # HACK: Set the ticket state to closed so we don't render
+        #       any links in the summary
+        orginal_state = ticket.state
+        ticket.state = 'closed'
         ticket.create_snapshot(request)
+        ticket.state = orginal_state
 
     failed_to_revoke = False
     for reservation in targeted:

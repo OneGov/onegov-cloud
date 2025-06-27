@@ -52,7 +52,7 @@ from onegov.org.models.external_link import ExternalLinkCollection
 from onegov.org.models.form import submission_deletable
 from onegov.org.open_graph import OpenGraphMixin
 from onegov.org.theme.org_theme import user_options
-from onegov.org.utils import IMG_URLS
+from onegov.org.utils import IMG_URLS, get_current_tickets_url
 from onegov.pay import PaymentCollection, PaymentProviderCollection
 from onegov.people import PersonCollection
 from onegov.qrcode import QrCode
@@ -1729,7 +1729,7 @@ class TicketLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Tickets'), self.request.link(self.collection)),
+            Link(_('Tickets'), get_current_tickets_url(self.request)),
             Link(self.model.number, '#')
         ]
 
@@ -1889,9 +1889,7 @@ class TicketNoteLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Tickets'), self.request.link(
-                TicketCollection(self.request.session)
-            )),
+            Link(_('Tickets'), get_current_tickets_url(self.request)),
             Link(self.ticket.number, self.request.link(self.ticket)),
             Link(self.title, '#')
         ]
@@ -1928,9 +1926,7 @@ class TicketChatMessageLayout(DefaultLayout):
     def internal_breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Tickets'), self.request.link(
-                TicketCollection(self.request.session)
-            )),
+            Link(_('Tickets'), get_current_tickets_url(self.request)),
             Link(self.model.number, self.request.link(self.model)),
             Link(_('New Message'), '#')
         ]
