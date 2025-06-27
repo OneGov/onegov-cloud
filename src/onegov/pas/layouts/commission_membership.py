@@ -9,7 +9,7 @@ from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.layouts.default import DefaultLayout
 
 
-class CommissionMembershipLayout(DefaultLayout):
+class PASCommissionMembershipLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:

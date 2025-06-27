@@ -54,16 +54,14 @@ from onegov.parliament.collections import (
     PoliticalBusinessParticipationCollection,
     RISCommissionCollection,
     RISCommissionMembershipCollection,
+    RISParliamentarianCollection,
+    RISParliamentarianRoleCollection,
     RISParliamentaryGroupCollection,
 )
 from onegov.parliament.models import (
     MeetingItem,
     RISCommissionMembership,
     RISParliamentarian,
-)
-from onegov.pas.collections import (
-    ParliamentarianCollection,
-    ParliamentarianRoleCollection,
 )
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -2325,7 +2323,9 @@ def import_parliamentarians(
                     yield (json.load(f), file.name)
 
     def create_parliamentarians(request: OrgRequest, app: OrgApp) -> None:
-        parliamentarian_collection = ParliamentarianCollection(request.session)
+        parliamentarian_collection = RISParliamentarianCollection(
+            request.session
+        )
 
         parliamentarians = read_json_files(path)
         import_counter = 0
@@ -2462,7 +2462,7 @@ def create_memberships(
 
         session = request.session
         commission_memberships = RISCommissionMembershipCollection(session)
-        people = ParliamentarianCollection(session)
+        people = RISParliamentarianCollection(session)
         commissions = RISCommissionCollection(session)
 
         for commission in commissions.query():
@@ -2519,7 +2519,7 @@ def create_polical_business_participants(
         session = request.session
         business_participants = PoliticalBusinessParticipationCollection(
             session)
-        people = ParliamentarianCollection(session)
+        people = RISParliamentarianCollection(session)
         political_businesses = PoliticalBusinessCollection(session)
 
         for political_business in political_businesses.query():
@@ -2576,8 +2576,8 @@ def create_parliamentarian_roles(
     def connect_ids(request: OrgRequest, app: OrgApp) -> None:
 
         session = request.session
-        parliamentarian_roles = ParliamentarianRoleCollection(session)
-        people = ParliamentarianCollection(session)
+        parliamentarian_roles = RISParliamentarianRoleCollection(session)
+        people = RISParliamentarianCollection(session)
         parliamentary_groups = RISParliamentaryGroupCollection(session)
 
         for parliamentary_group in parliamentary_groups.query():

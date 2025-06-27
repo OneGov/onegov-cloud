@@ -14,8 +14,14 @@ from onegov.parliament.models.parliamentarian import (
     Parliamentarian,
     RISParliamentarian
 )
-from onegov.parliament.models.parliamentarian_role import ParliamentarianRole
-from onegov.parliament.models.parliamentary_group import ParliamentaryGroup
+from onegov.parliament.models.parliamentarian_role import (
+    ParliamentarianRole,
+    RISParliamentarianRole
+)
+from onegov.parliament.models.parliamentary_group import (
+    ParliamentaryGroup,
+    RISParliamentaryGroup
+)
 from onegov.parliament.models.party import Party, RISParty
 from onegov.parliament.models.political_business import (
     PoliticalBusiness,
@@ -33,7 +39,9 @@ __all__ = (
     'MeetingItem',
     'Parliamentarian',
     'ParliamentarianRole',
+    'RISParliamentarianRole',
     'ParliamentaryGroup',
+    'RISParliamentaryGroup',
     'Party',
     'RISCommission',
     'RISCommissionMembership',

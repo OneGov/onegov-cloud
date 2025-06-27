@@ -3,7 +3,7 @@ from __future__ import annotations
 from onegov.core.elements import Link
 
 from onegov.parliament import _
-from onegov.parliament.collections.commission import CommissionCollection
+from onegov.parliament.collections import CommissionCollection
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

@@ -3,8 +3,8 @@ from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.collections import PASCommissionMembershipCollection
-from onegov.pas.collections import ParliamentarianCollection
-from onegov.pas.collections import ParliamentarianRoleCollection
+from onegov.pas.collections import PASParliamentarianCollection
+from onegov.pas.collections import PASParliamentarianRoleCollection
 from onegov.pas.collections import PASParliamentaryGroupCollection
 from onegov.pas.collections import PASPartyCollection
 from onegov.pas.collections import RateSetCollection
@@ -55,11 +55,11 @@ def dummy_request(session):
 
 @freeze_time('2024-01-01')
 def test_attendence_forms(session, dummy_request):
-    parliamentarians = ParliamentarianCollection(session)
+    parliamentarians = PASParliamentarianCollection(session)
     parliamentarian = parliamentarians.add(first_name='a', last_name='b')
     parliamentarians.add(first_name='p', last_name='q')
 
-    roles = ParliamentarianRoleCollection(session)
+    roles = PASParliamentarianRoleCollection(session)
     roles.add(parliamentarian_id=parliamentarian.id, end=date(2023, 1, 1))
 
     commissions = PASCommissionCollection(session)
@@ -174,11 +174,11 @@ def test_attendence_forms(session, dummy_request):
 
 @freeze_time('2024-01-01')
 def test_add_plenary_attendence_form(session, dummy_request):
-    parliamentarians = ParliamentarianCollection(session)
+    parliamentarians = PASParliamentarianCollection(session)
     parliamentarian = parliamentarians.add(first_name='a', last_name='b')
     parliamentarians.add(first_name='p', last_name='q')
 
-    roles = ParliamentarianRoleCollection(session)
+    roles = PASParliamentarianRoleCollection(session)
     roles.add(parliamentarian_id=parliamentarian.id, end=date(2023, 1, 1))
 
     # on request
@@ -202,7 +202,7 @@ def test_add_plenary_attendence_form(session, dummy_request):
 
 @freeze_time('2024-01-01')
 def test_add_commission_attendence_form(session, dummy_request):
-    parliamentarians = ParliamentarianCollection(session)
+    parliamentarians = PASParliamentarianCollection(session)
     parliamentarian = parliamentarians.add(first_name='a', last_name='b')
     parliamentarians.add(first_name='p', last_name='q')
 
@@ -239,11 +239,11 @@ def test_add_commission_attendence_form(session, dummy_request):
 
 @freeze_time('2024-01-01')
 def test_commission_membership_forms(session, dummy_request):
-    parliamentarians = ParliamentarianCollection(session)
+    parliamentarians = PASParliamentarianCollection(session)
     parliamentarian = parliamentarians.add(first_name='a', last_name='b')
     parliamentarians.add(first_name='p', last_name='q')
 
-    roles = ParliamentarianRoleCollection(session)
+    roles = PASParliamentarianRoleCollection(session)
     roles.add(parliamentarian_id=parliamentarian.id, end=date(2023, 1, 1))
 
     commissions = PASCommissionCollection(session)
@@ -268,7 +268,7 @@ def test_commission_membership_forms(session, dummy_request):
 
 
 def test_parliamentarian_role_form(session, dummy_request):
-    parliamentarians = ParliamentarianCollection(session)
+    parliamentarians = PASParliamentarianCollection(session)
     parliamentarians.add(first_name='p', last_name='q')
 
     groups = PASParliamentaryGroupCollection(session)

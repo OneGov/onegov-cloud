@@ -7,7 +7,7 @@ from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import MultiCheckboxField
 from onegov.pas import _
 from onegov.pas.collections import PASCommissionCollection
-from onegov.pas.collections import ParliamentarianCollection
+from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.models import SettlementRun
 from onegov.parliament.models.attendence import TYPES
 from wtforms.fields import DateField
@@ -86,7 +86,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
             and self.commission_id.data
             and self.parliamentarian_id.data
         ):
-            collection = ParliamentarianCollection(self.request.session)
+            collection = PASParliamentarianCollection(self.request.session)
             parliamentarian = collection.by_id(self.parliamentarian_id.data)
             if parliamentarian:
                 commission_ids = [
@@ -130,7 +130,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
         self.parliamentarian_id.choices = [
             (str(parliamentarian.id), parliamentarian.title)
             for parliamentarian
-            in ParliamentarianCollection(self.request.session).query()
+            in PASParliamentarianCollection(self.request.session).query()
         ]
         self.commission_id.choices = [
             (commission.id, commission.title)
@@ -147,7 +147,7 @@ class AttendenceAddForm(AttendenceForm):
         self.parliamentarian_id.choices = [
             (str(parliamentarian.id), parliamentarian.title)
             for parliamentarian
-            in ParliamentarianCollection(self.request.session, True).query()
+            in PASParliamentarianCollection(self.request.session, True).query()
         ]
 
 
@@ -178,7 +178,7 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
         self.parliamentarian_id.choices = [
             (str(parliamentarian.id), parliamentarian.title)
             for parliamentarian
-            in ParliamentarianCollection(self.request.session, True).query()
+            in PASParliamentarianCollection(self.request.session, True).query()
         ]
         self.parliamentarian_id.data = [
             choice[0] for choice in self.parliamentarian_id.choices

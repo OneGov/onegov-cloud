@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from onegov.core.security import Private
-from onegov.parliament.views.parliamentary_group import (
+from onegov.parliament.views import (
     view_parliamentary_groups,
     add_parliamentary_group,
     view_parliamentary_group,

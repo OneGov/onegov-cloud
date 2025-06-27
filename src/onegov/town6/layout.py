@@ -74,7 +74,8 @@ from onegov.parliament.collections import RISPartyCollection
 from onegov.parliament.collections.commission import (
     RISCommissionCollection
 )
-from onegov.parliament.collections.parliamentary_group import (
+from onegov.parliament.collections import RISParliamentarianCollection
+from onegov.parliament.collections import (
     RISParliamentaryGroupCollection
 )
 from onegov.stepsequence import step_sequences
@@ -1108,6 +1109,178 @@ class MeetingLayout(DefaultLayout):
         return None
 
 
+class RISParliamentarianCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Parliamentarians')
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Parliamentarian'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-parliamentarian'},
+                        ),
+                    ],
+                ),
+            ]
+        return None
+
+
+class RISParliamentarianLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self) -> RISParliamentarianCollection:
+        return RISParliamentarianCollection(self.request.session)
+
+    @cached_property
+    def title(self) -> str:
+        return f'{self.model.first_name} {self.model.last_name}'
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(
+                _('Parliamentarians'),
+                self.request.link(self.collection)
+            ),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                # LinkGroup(
+                #     title=_('Add'),
+                #     links=[
+                #         Link(
+                #             text=_('Role (as a party or group member)'),
+                #             url=self.request.link(self.model, 'new-role'),
+                #             attrs={'class': 'new-role'}
+                #         ),
+                #     ]
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to delete this '
+                                'parliamentarian?'
+                            ),
+                            _('This cannot be undone.'),
+                            _('Delete parliamentarian'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(
+                                self.collection
+                            )
+                        )
+                    )
+                ),
+            ]
+        return None
+
+
+# class RISParliamentarianRoleLayout(DefaultLayout):
+#
+#     @cached_property
+#     def title(self) -> str:
+#         return self.model.role_label
+#
+#     @cached_property
+#     def og_description(self) -> str:
+#         return self.request.translate(self.title)
+#
+#     @cached_property
+#     def parliamentarian_collection(self) -> RISParliamentarianCollection:
+#         return RISParliamentarianCollection(self.request.session)
+#
+#     @cached_property
+#     def breadcrumbs(self) -> list[Link]:
+#         return [
+#             Link(_('Homepage'), self.homepage_url),
+#             Link(_('RIS Settings'), self.ris_settings_url),
+#             Link(
+#                 _('Parliamentarians'),
+#                 self.request.link(self.parliamentarian_collection)
+#             ),
+#             Link(
+#                 self.model.parliamentarian.title,
+#                 self.request.link(self.model.parliamentarian)
+#             ),
+#             Link(self.title, self.request.link(self.model))
+#         ]
+#
+#     @cached_property
+#     def editbar_links(self) -> list[Link] | None:
+#         if self.request.is_manager:
+#             return [
+#                 Link(
+#                     text=_('Edit'),
+#                     url=self.request.link(self.model, 'edit'),
+#                     attrs={'class': 'edit-link'}
+#                 ),
+#                 Link(
+#                     text=_('Remove'),
+#                     url=self.csrf_protected_url(
+#                         self.request.link(self.model)
+#                     ),
+#                     attrs={'class': 'delete-link'},
+#                     traits=(
+#                         Confirm(
+#                             _('Do you really want to remove this role?'),
+#                             _('This cannot be undone.'),
+#                             _('Remove role'),
+#                             _('Cancel')
+#                         ),
+#                         Intercooler(
+#                             request_method='DELETE',
+#                             redirect_after=self.request.link(
+#                                 self.model.parliamentarian
+#                             )
+#                         )
+#                     )
+#                 )
+#             ]
+#         return None
+
+
 class RISParliamentaryGroupCollectionLayout(DefaultLayout):
 
     @cached_property
@@ -1122,7 +1295,7 @@ class RISParliamentaryGroupCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_settings_url),
             Link(self.title, self.request.link(self.model))
         ]
 
@@ -1162,7 +1335,7 @@ class RISParliamentaryGroupLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_settings_url),
             Link(
                 _('Parliamentary groups'),
                 self.request.link(self.collection)
@@ -1221,7 +1394,7 @@ class RISPartyCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_settings_url),
             Link(self.title, self.request.link(self.model)),
         ]
 
@@ -1263,7 +1436,7 @@ class RISPartyLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_settings_url),
             Link(_('Parties'), self.request.class_link(RISPartyCollection)),
             Link(self.title, self.request.link(self.model)),
         ]
@@ -1312,7 +1485,7 @@ class RISCommissionCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_settings_url),
             Link(self.title, self.request.link(self.model))
         ]
 
@@ -1352,7 +1525,7 @@ class RISCommissionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_settings_url),
             Link(_('Commissions'),
                  self.request.class_link(RISCommissionCollection)),
             Link(self.title, self.request.link(self.model))

@@ -49,5 +49,5 @@ class PartyCollection(GenericCollection[Party]):
 class RISPartyCollection(PartyCollection):
 
     @property
-    def model_class(self) -> type[Party]:
+    def model_class(self) -> type[RISParty]:
         return RISParty

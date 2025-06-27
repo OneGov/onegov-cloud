@@ -3,8 +3,8 @@ from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import ChangeCollection
 from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.collections import LegislativePeriodCollection
-from onegov.pas.collections import ParliamentarianCollection
-from onegov.pas.collections import ParliamentarianRoleCollection
+from onegov.pas.collections import PASParliamentarianCollection
+from onegov.pas.collections import PASParliamentarianRoleCollection
 from onegov.pas.collections import PASParliamentaryGroupCollection
 from onegov.pas.collections import PASPartyCollection
 from onegov.pas.collections import RateSetCollection
@@ -15,7 +15,7 @@ from datetime import date
 
 @freeze_time('2024-01-01')
 def test_attendence_collection(session):
-    parliamentarians = ParliamentarianCollection(session)
+    parliamentarians = PASParliamentarianCollection(session)
     parliamentarian1 = parliamentarians.add(
         first_name='John', last_name='Doe'
     )
@@ -156,7 +156,7 @@ def test_legiaslative_period_collection(session):
 
 @freeze_time('2024-01-01')
 def test_parliamentarian_collection(session):
-    parliamentarians = ParliamentarianCollection(session)
+    parliamentarians = PASParliamentarianCollection(session)
     a = parliamentarians.add(
         first_name='a',
         last_name='b'
@@ -170,7 +170,7 @@ def test_parliamentarian_collection(session):
         last_name='c'
     )
 
-    roles = ParliamentarianRoleCollection(session)
+    roles = PASParliamentarianRoleCollection(session)
     roles.add(parliamentarian_id=a.id)
     roles.add(parliamentarian_id=b.id, end=date(2023, 1, 1))
 

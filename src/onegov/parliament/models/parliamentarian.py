@@ -242,11 +242,6 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles,
         nullable=True
     )
 
-    function: Column[str | None] = Column(
-        Text,
-        nullable=True
-    )
-
     party: Column[str | None] = Column(
         Text,
         nullable=True

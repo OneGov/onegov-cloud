@@ -4,10 +4,12 @@ from datetime import date
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import TranslatedSelectField
-from onegov.pas import _
-from onegov.pas.collections import ParliamentarianCollection
-from onegov.pas.collections import PASParliamentaryGroupCollection
-from onegov.pas.collections import PASPartyCollection
+from onegov.parliament import _
+from onegov.parliament.collections import (
+    ParliamentarianCollection,
+    ParliamentaryGroupCollection,
+    PartyCollection
+)
 from onegov.parliament.models.parliamentarian_role import (
     PARLIAMENTARIAN_ROLES
 )
@@ -82,13 +84,13 @@ class ParliamentarianRoleForm(Form):
         self.parliamentary_group_id.choices = [
             (str(parliamentary_group.id), parliamentary_group.title)
             for parliamentary_group
-            in PASParliamentaryGroupCollection(self.request.session).query()
+            in ParliamentaryGroupCollection(self.request.session).query()
         ]
         self.parliamentary_group_id.choices.insert(0, ('', '-'))
         self.party_id.choices = [
             (str(party.id), party.title)
             for party
-            in PASPartyCollection(self.request.session).query()
+            in PartyCollection(self.request.session).query()
         ]
         self.party_id.choices.insert(0, ('', '-'))
 
