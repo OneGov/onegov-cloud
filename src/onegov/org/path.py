@@ -83,6 +83,23 @@ from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.page import PageCollection
+from onegov.parliament.collections import (
+    RISPartyCollection,
+    MeetingCollection,
+    RISCommissionCollection,
+    RISParliamentarianCollection,
+    RISParliamentarianRoleCollection,
+    RISParliamentaryGroupCollection
+)
+from onegov.parliament.models import (
+    Meeting,
+    Party,
+    RISCommission,
+    RISParliamentarian,
+    RISParliamentarianRole,
+    RISParliamentaryGroup,
+    RISParty,
+)
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.people import Person, PersonCollection
@@ -1127,3 +1144,144 @@ def get_sent_notification_collection(
     request: OrgRequest,
 ) -> PushNotificationCollection:
     return PushNotificationCollection(request.session)
+
+
+# RIS paths
+@OrgApp.path(
+    model=RISParliamentarianCollection,
+    path='/parliamentarians',
+    converters={'active': bool}
+)
+def get_parliamentarians(
+    app: OrgApp,
+    active: bool = True
+) -> RISParliamentarianCollection:
+    return RISParliamentarianCollection(app.session(), active)
+
+
+@OrgApp.path(
+    model=RISParliamentarian,
+    path='/parliamentarian/{id}',
+    converters={'id': UUID}
+)
+def get_parliamentarian(
+    app: OrgApp,
+    id: UUID
+) -> RISParliamentarian | None:
+    return RISParliamentarianCollection(app.session()).by_id(id)
+
+
+@OrgApp.path(
+    model=RISParliamentarianRoleCollection,
+    path='/parliamentarian-roles',
+)
+def get_parliamentarian_roles(
+    app: OrgApp,
+) -> RISParliamentarianRoleCollection:
+    return RISParliamentarianRoleCollection(app.session())
+
+
+@OrgApp.path(
+    model=RISParliamentarianRole,
+    path='/parliamentarian-role/{id}',
+    converters={'id': UUID}
+)
+def get_parliamentarian_role(
+    app: OrgApp,
+    id: UUID
+) -> RISParliamentarianRole | None:
+    return RISParliamentarianRoleCollection(app.session()).by_id(id)
+
+
+@OrgApp.path(
+    model=RISParliamentaryGroupCollection,
+    path='/parliamentary-groups',
+    converters={'active': bool}
+)
+def get_parliamentary_groups(
+    app: OrgApp,
+    active: bool = True
+) -> RISParliamentaryGroupCollection:
+    return RISParliamentaryGroupCollection(app.session(), active)
+
+
+@OrgApp.path(
+    model=RISParliamentaryGroup,
+    path='/parliamentary-group/{id}',
+    converters={'id': UUID}
+)
+def get_parliamentary_group(
+    app: OrgApp,
+    id: UUID
+) -> RISParliamentaryGroup | None:
+    return RISParliamentaryGroupCollection(app.session()).by_id(id)
+
+
+@OrgApp.path(
+    model=RISPartyCollection,
+    path='/parties',
+    converters={'active': bool}
+)
+def get_parties(
+    app: OrgApp,
+    active: bool = True,
+) -> RISPartyCollection:
+    return RISPartyCollection(app.session(), active)
+
+
+@OrgApp.path(
+    model=RISParty,
+    path='/party/{id}',
+    converters={'id': UUID}
+)
+def get_party(
+    app: OrgApp,
+    id: UUID
+) -> Party | None:
+    return RISPartyCollection(app.session()).by_id(id)
+
+
+@OrgApp.path(
+    model=RISCommissionCollection,
+    path='/commissions',
+    converters={'active': bool}
+)
+def get_commissions(
+    app: OrgApp,
+    active: bool = True
+) -> RISCommissionCollection:
+    return RISCommissionCollection(app.session(), active)
+
+
+@OrgApp.path(
+    model=RISCommission,
+    path='/commission/{id}',
+    converters={'id': UUID}
+)
+def get_commission(
+    app: OrgApp,
+    id: UUID
+) -> RISCommission | None:
+    return RISCommissionCollection(app.session()).by_id(id)
+
+
+@OrgApp.path(
+    model=MeetingCollection,
+    path='/meetings',
+)
+def get_meetings(
+    app: OrgApp,
+) -> MeetingCollection:
+    return MeetingCollection(app.session())
+
+
+@OrgApp.path(
+    model=Meeting,
+    path='/meeting/{id}',
+    converters={'id': UUID}
+)
+def get_meeting(
+    app: OrgApp,
+    id: UUID
+) -> Meeting | None:
+    return MeetingCollection(app.session()).by_id(id)
