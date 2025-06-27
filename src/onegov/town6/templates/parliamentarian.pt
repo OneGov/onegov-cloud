@@ -147,7 +147,7 @@
                         <li tal:repeat="membership parliamentarian.commission_memberships">
                             <span>
                                 <a href="${request.link(membership.commission)}">${membership.commission.title}</a>
-                                (<a href="${request.link(membership)}">${membership.role_label}</a>)
+                                (${membership.role_label})
                             </span>
                             <span tal:condition="membership.start">
                                 <br>${layout.format_date(membership.start, 'date')}

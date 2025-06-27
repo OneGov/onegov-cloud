@@ -525,6 +525,42 @@ class UpgradeContext:
         inspector = Inspector(self.operations_connection)
         return table in inspector.get_table_names(schema=self.schema)
 
+    def get_enum_values(self, enum_name: str) -> set[str]:
+        result = self.operations_connection.execute(
+            text("""
+            SELECT pg_enum.enumlabel AS value
+              FROM pg_enum
+              JOIN pg_type
+                ON pg_type.oid = pg_enum.enumtypid
+             WHERE pg_type.typname = :enum_name
+             GROUP BY pg_enum.enumlabel
+            """),
+            {'enum_name': enum_name}
+        )
+        return {value for (value,) in result}
+
+    def update_enum_values(
+        self,
+        enum_name: str,
+        enum_values: Iterable[str]
+    ) -> bool:
+        existing = self.get_enum_values(enum_name)
+        missing = set(enum_values) - existing
+        if not missing:
+            return False
+
+        # HACK: ALTER TYPE has to be run outside transaction
+        self.operations.execute('COMMIT')
+        for value in missing:
+            # NOTE: This should be safe just by virtue of naming
+            #       restrictions on classes and enum members
+            self.operations.execute(
+                f"ALTER TYPE {enum_name} ADD VALUE '{value}'"
+            )
+        # start a new transaction
+        self.operations.execute('BEGIN')
+        return True
+
     def models(self, table: str) -> Iterator[Any]:
         def has_matching_tablename(model: Any) -> bool:
             if not hasattr(model, '__tablename__'):
