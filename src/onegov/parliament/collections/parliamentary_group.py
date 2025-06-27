@@ -7,14 +7,21 @@ from onegov.core.collection import GenericCollection
 from onegov.parliament.models import ParliamentaryGroup
 from onegov.parliament.models import RISParliamentaryGroup
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
+from typing_extensions import TypeVar
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import Self
 
+GroupT = TypeVar(
+    'GroupT',
+    bound=ParliamentaryGroup,
+    default=Any
+)
 
-class ParliamentaryGroupCollection(GenericCollection[ParliamentaryGroup]):
+
+class ParliamentaryGroupCollection(GenericCollection[GroupT]):
 
     def __init__(
         self,
@@ -25,12 +32,13 @@ class ParliamentaryGroupCollection(GenericCollection[ParliamentaryGroup]):
         self.active = active
 
     @property
-    def model_class(self) -> type[ParliamentaryGroup]:
-        return ParliamentaryGroup
+    def model_class(self) -> type[GroupT]:
+        return ParliamentaryGroup  # type: ignore[return-value]
 
-    def query(self) -> Query[ParliamentaryGroup]:
+    def query(self) -> Query[GroupT]:
         query = super().query()
 
+        ParliamentaryGroup = self.model_class  # noqa: N806
         if self.active is not None:
             if self.active:
                 query = query.filter(
@@ -51,7 +59,9 @@ class ParliamentaryGroupCollection(GenericCollection[ParliamentaryGroup]):
         return self.__class__(self.session, active)
 
 
-class RISParliamentaryGroupCollection(ParliamentaryGroupCollection):
+class RISParliamentaryGroupCollection(
+    ParliamentaryGroupCollection[RISParliamentaryGroup]
+):
 
     @property
     def model_class(self) -> type[RISParliamentaryGroup]:
