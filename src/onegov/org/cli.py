@@ -19,6 +19,7 @@ from io import BytesIO
 
 from markupsafe import Markup
 import pytz
+import locale
 import requests
 import transaction
 from onegov.core.orm.utils import QueryChain
@@ -44,12 +45,17 @@ from onegov.org.models import ExtendedDirectory
 from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.models.resource import Resource
 from onegov.page.collection import PageCollection
-from onegov.parliament.collections import MeetingCollection, PoliticalBusinessParticipationCollection # noqa
-from onegov.parliament.collections import PoliticalBusinessCollection, RISCommissionMembershipCollection
+from onegov.parliament.collections import (
+    MeetingCollection, 
+    PoliticalBusinessParticipationCollection)
+from onegov.parliament.collections import (
+    PoliticalBusinessCollection, RISCommissionMembershipCollection)
 from onegov.parliament.collections.meeting_item import MeetingItemCollection
 from onegov.parliament.models import CommissionMembership, RISParliamentarian
 from onegov.parliament.models.meeting_item import MeetingItem
-from onegov.pas.collections import CommissionCollection, ParliamentarianCollection, ParliamentarianRoleCollection
+from onegov.pas.collections import (
+    CommissionCollection, ParliamentarianCollection, 
+    ParliamentarianRoleCollection)
 from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -75,18 +81,13 @@ if TYPE_CHECKING:
     from onegov.org.app import OrgApp
     from onegov.org.request import OrgRequest
     from onegov.ticket import Ticket
-    from sqlalchemy.orm import Query, Session # noqa
+    from sqlalchemy.orm import Query, Session
 
     from translationstring import TranslationString
     from uuid import UUID
     from onegov.parliament.models.political_business import (
         PoliticalBusinessStatus
     )
-
-import locale
-import pytz
-import re
-
 
 cli = command_group()
 
@@ -1342,7 +1343,7 @@ def import_meetings(
 
     def create_meetings(request: OrgRequest, app: OrgApp) -> None:
         meeting_collection = MeetingCollection(request.session)
-        file_collection = FileCollection(request.session)
+        file_coll = FileCollection(request.session)
         meeting_item_collection = MeetingItemCollection(request.session)
 
         meetings = read_json_files(path)
@@ -1361,7 +1362,8 @@ def import_meetings(
 
             # Regex to extract parts
             match = re.match(
-                r'(\d{1,2})\. (\w+)\.? (\d{4}), (\d{1,2})\.(\d{2}) Uhr - (\d{1,2})\.(\d{2}) Uhr',
+                r'(\d{1,2})\. (\w+)\.? (\d{4}), '
+                '(\d{1,2})\.(\d{2}) Uhr - (\d{1,2})\.(\d{2}) Uhr',
                 date_str
             )
             if match:
@@ -1387,7 +1389,8 @@ def import_meetings(
                         int(year), month, int(day), int(eh), int(em)
                     )
                     # Add timezone
-                    start_dt = pytz.timezone('Europe/Zurich').localize(start_dt)
+                    start_dt = pytz.timezone('Europe/Zurich').localize(
+                        start_dt)
                     end_dt = pytz.timezone('Europe/Zurich').localize(end_dt)
                 except ValueError as e:
                     click.secho(f'Error parsing date: {e}', fg='red')
@@ -1428,7 +1431,8 @@ def import_meetings(
                     if desc:
                         if element['type'] == 'Paragraph':
                             if element.get('children') and (
-                                element['children'][0].get('text') != 'Beschreibung'):
+                                element['children'][0].get(
+                                    'text') != 'Beschreibung'):
                                 description += content_to_markup(element)
                     if documents:
                         if element['type'] == 'Table':
@@ -1437,20 +1441,22 @@ def import_meetings(
                                     link = row['cells'][0]['url']
                                 except KeyError:
                                     click.echo(
-                                        f'No link found in row {row["cells"][0]}'
+                                        f'No link found in row {row[
+                                            "cells"][0]}'
                                     )
                                     continue
                                 resp = requests.get(link)
                                 if resp.status_code == 200:
-                                    if existing_file:=file_collection.by_content(
+                                    if existing_file:=file_coll.by_content(
                                         BytesIO(resp.content)
                                     ).first():
                                         files.append(existing_file)
                                         click.echo(
-                                            f'File {existing_file} already exists, skipping.'
+                                            f'File {existing_file} already '
+                                            'exists, skipping.'
                                     )
                                     else:
-                                        file = file_collection.add(
+                                        file = file_coll.add(
                                             filename=row['cells'][0]['text'],
                                             content=BytesIO(resp.content)
                                         )
@@ -1461,12 +1467,14 @@ def import_meetings(
                                 cells = row['cells']
                                 if cells[1]['type'] != 'Link':
                                     continue
-                                political_business_id = cells[2]['url'].split('/')[-1]
+                                political_business_id = cells[2]['url'].split(
+                                    '/')[-1]
                                 meetings_items_list.append(
                                     {
                                         'number': cells[0]['text'],
                                         'title': cells[1]['text'],
-                                        'political_business_id': political_business_id
+                                        'political_business_id': \
+                                        political_business_id
                                     }
                                 )
 
@@ -1579,7 +1587,7 @@ def import_parliamentary_groups(
     Example:
     .. code-block:: bash
 
-        onegov-org --select '/foo/bar' import-parliamentary_groups /path/to/items
+        onegov-org --select '/foo/bar' import-parliamentary_groups /path
     """
 
     # Read all json files in the given directory
@@ -1591,7 +1599,8 @@ def import_parliamentary_groups(
                     yield (json.load(f), file.name)
 
     def create_parliamentary_groups(request: OrgRequest, app: OrgApp) -> None:
-        parliamentary_group_collection = ParliamentaryGroupCollection(request.session)
+        parliamentary_group_collection = ParliamentaryGroupCollection(
+            request.session)
 
         parliamentary_groups = read_json_files(path)
         import_counter = 0
@@ -1632,7 +1641,8 @@ def import_parliamentary_groups(
     return create_parliamentary_groups
 
 
-def handle_es_connection_error(func: Any) -> Callable[[OrgRequest, OrgApp], None]:
+def handle_es_connection_error(func: Any) -> Callable[[OrgRequest, OrgApp],
+                                                      None]:
     @wraps(func)
     def wrapper(request: OrgRequest, app: OrgApp) -> None:
         try:
@@ -1748,7 +1758,8 @@ def import_political_business(
                                 if value_element.get('type') == 'Paragraph' \
                                         and value_element.get('children'):
                                     val_child = value_element['children'][0]
-                                    data_fields[label_text] = val_child.get('text', '').strip()
+                                    data_fields[label_text] = val_child.get(
+                                        'text', '').strip()
                                 i += 1  # Consumed value element
                         elif label_text == 'Verfasser/Beteiligte':
                             if i + 1 < len(elements):
@@ -1763,7 +1774,8 @@ def import_political_business(
                                             type = participants_el['children'][
                                                 c-1].get('text', '').strip()
                                             if url_parts:
-                                                people_ids.append((url_parts[-1], type))
+                                                people_ids.append(
+                                                    (url_parts[-1], type))
                                 i += 1  # Consumed participants element
                         elif (label_text == 'Fraktionen'
                               or label_text == 'Fraktion'):
@@ -1776,32 +1788,46 @@ def import_political_business(
                                                 and 'url' in child:
                                             url_parts = child['url'].split('/')
                                             if url_parts:
-                                                parliamentary_group_ids.append(url_parts[-1])
+                                                parliamentary_group_ids.append(
+                                                    url_parts[-1])
                                 i += 1  # Consumed fraktionen element
                         else:
-                            # Check if elements[i] itself is an unlinked participant list
+                            # Check if elements[i] itself is an unlinked 
+                            # participant list
                             is_unlinked_list = False
-                            if element.get('type') == 'Paragraph' and element.get('children'):
-                                all_children_are_unlinked_participants = True
-                                if not element['children']: # handle empty children list
-                                    all_children_are_unlinked_participants = False
+                            if element.get('type') == 'Paragraph' and (
+                                element.get('children')):
+                                all_children_are_unlinked = True
+                                if not element['children']:
+                                    all_children_are_unlinked = \
+                                        False
                                 else:
-                                    for child_node_check in element['children']:
-                                        text_content_check = child_node_check.get('text', '')
-                                        last_paren_open_check = text_content_check.rfind('(')
-                                        last_paren_close_check = text_content_check.rfind(')')
+                                    for child_node_check in element[
+                                        'children']:
+                                        text_content_check = \
+                                            child_node_check.get('text', '')
+                                        last_paren_open_check = \
+                                            text_content_check.rfind('(')
+                                        last_paren_close_check = \
+                                            text_content_check.rfind(')')
                                         is_valid_format = (
-                                            child_node_check.get('type') == 'Text' and
+                                            child_node_check.get('type') == \
+                                                'Text' and
                                             text_content_check and
                                             last_paren_open_check != -1 and
-                                            last_paren_close_check == len(text_content_check) - 1 and
-                                            last_paren_open_check < last_paren_close_check - 1 and # role not empty
-                                            text_content_check[:last_paren_open_check].strip() # name not empty
+                                            last_paren_close_check == len(
+                                                text_content_check) - 1 and
+                                            last_paren_open_check < \
+                                                last_paren_close_check - 1 and 
+                                                # role not empty
+                                            text_content_check[
+                                                :last_paren_open_check].strip() 
+                                                # name not empty
                                         )
                                         if not is_valid_format:
-                                            all_children_are_unlinked_participants = False
+                                            all_children_are_unlinked = False
                                             break
-                                if all_children_are_unlinked_participants:
+                                if all_children_are_unlinked:
                                     is_unlinked_list = True
 
                             if is_unlinked_list:
@@ -1811,38 +1837,63 @@ def import_political_business(
                                     last_paren_close = text_content.rfind(')')
 
                                     if last_paren_open != -1 and \
-                                       last_paren_close == len(text_content) - 1 and \
+                                       last_paren_close == len(text_content) \
+                                        - 1 and \
                                        last_paren_open < last_paren_close:
 
-                                        full_name = text_content[:last_paren_open].strip()
-                                        role = text_content[last_paren_open+1:last_paren_close].strip()
+                                        full_name = text_content[
+                                            :last_paren_open].strip()
+                                        role = text_content[
+                                            last_paren_open+1:last_paren_close
+                                            ].strip()
 
                                         name_parts = full_name.strip().split()
                                         if not name_parts:
-                                            click.secho(f"Warning: Empty name found for role {role} in {article_name}. Skipping.", fg='yellow')
+                                            click.secho(f"Warning: Empty name "
+                                                        "found for role "
+                                                        f"{role} in "
+                                                        f"{article_name}. "
+                                                        "Skipping.",
+                                                        fg='yellow')
                                             continue
 
                                         last_name = name_parts[-1]
                                         first_name = " ".join(name_parts[:-1])
 
-                                        if not first_name: # Handle single word name
+                                        if not first_name: 
+                                            # Handle single word name
                                             first_name = last_name
 
-                                        click.echo(f"Creating new parliamentarian: {first_name} {last_name} for {article_name} (unlinked)")
-                                        parliamentarian = RISParliamentarian(first_name=first_name, last_name=last_name)
+                                        click.echo(
+                                            "Creating new parliamentarian: " \
+                                            f"{first_name} {last_name} for " \
+                                            f"{article_name} (unlinked)")
+                                        parliamentarian = RISParliamentarian(
+                                            first_name=first_name,
+                                            last_name=last_name)
                                         session.add(parliamentarian)
                                         try:
-                                            with session.begin_nested(): # Ensure ID is available
+                                            with session.begin_nested(): 
+                                                # Ensure ID is available
                                                 session.flush()
                                         except Exception as e:
-                                            click.secho(f"Error creating parliamentarian {first_name} {last_name}: {e}", fg='red')
-                                            parliamentarian = None # Failed to create
+                                            click.secho(
+                                                "Error creating "
+                                                f"parliamentarian {first_name}"
+                                                f" {last_name}: {e}", fg='red')
+                                            parliamentarian = None 
+                                            # Failed to create
 
-                                        if parliamentarian and parliamentarian.id:
-                                            people_ids.append((str(parliamentarian.id), role))
+                                        if parliamentarian and \
+                                            parliamentarian.id:
+                                            people_ids.append(
+                                                (str(parliamentarian.id),
+                                                 role))
                                             if not parliamentarian.meta:
                                                 parliamentarian.meta = {}
-                                            parliamentarian.meta['parliamentarian_id'] = str(parliamentarian.id)
+                                            parliamentarian.meta[
+                                                'parliamentarian_id'] = str(
+                                                    parliamentarian.id)
                     i += 1
 
                 german_business_type = data_fields.get('Geschäftsart')
@@ -1953,31 +2004,38 @@ def import_parliamentarians(
                                     contact['address'] = text
                                 elif re.match(r'^\d{4}\s+.+', text):
                                     contact['zip_code'] = text.split(' ')[0]
-                                    contact['city'] = ' '.join(text.split(' ')[1:])
+                                    contact['city'] = ' '.join(text.split(
+                                        ' ')[1:])
                                 elif '@' in text:
                                     contact['email'] = text
                                 elif text.startswith('Tel. P'):
-                                    text = element['children'][i+1].get('text', '')
+                                    text = element['children'][i+1].get(
+                                        'text', '')
                                     contact['phone_private'] = text
                                 elif text.startswith('Tel.'):
-                                    text = element['children'][i+1].get('text', '')
+                                    text = element['children'][i+1].get(
+                                        'text', '')
                                     contact['phone_business'] = text
                                 elif text.startswith('Mobile'):
-                                    text = element['children'][i+1].get('text', '')
+                                    text = element['children'][i+1].get(
+                                        'text', '')
                                     contact['phone_mobile'] = text
                                 elif text.startswith('Funktion'):
                                     address = False
-                                    text = parliamentarian['elements'][e+1]['children'][0].get('text', '')
+                                    text = parliamentarian['elements'][e+1][
+                                        'children'][0].get('text', '')
                                     contact['function'] = text
                                 elif re.match(r'^[^\d]*$', text):
                                     if text not in name:
                                         contact['addition'] = text
                             else:
                                 if text.startswith('Partei'):
-                                    text = parliamentarian['elements'][e+1]['children'][0].get('text', '')
+                                    text = parliamentarian['elements'][e+1][
+                                        'children'][0].get('text', '')
                                     contact['party'] = text
                                 elif text.startswith('Beruf'):
-                                    text = parliamentarian['elements'][e+1]['children'][0].get('text', '')
+                                    text = parliamentarian['elements'][e+1][
+                                        'children'][0].get('text', '')
                                     contact['profession'] = text
 
                     if element['type'] == 'Heading':
@@ -1992,15 +2050,19 @@ def import_parliamentarians(
                             try:
                                 table = parliamentarian['elements'][e+1]
                             except IndexError:
-                                click.secho('No table found for Interessenbindungen', fg='red')
+                                click.secho(
+                                    'No table found for Interessenbindungen',
+                                    fg='red')
                                 continue
                             if table['type'] == 'Table':
-                                headers = [cell['text'] for cell in table['headers']]
+                                headers = [cell['text'] for cell in table[
+                                    'headers']]
                                 table_as_dict['headers'] = headers
                                 for row in table['rows']:
                                     row_as_dict = {}
                                     for i, cell in enumerate(row['cells']):
-                                        row_as_dict[headers[i]] = cell.get('text', '')
+                                        row_as_dict[headers[i]] = cell.get(
+                                            'text', '')
                                     table_as_dict['rows'].append(row_as_dict)
                         
                 added = parliamentarian_collection.add(
@@ -2018,7 +2080,8 @@ def import_parliamentarians(
                     occupation=contact.get('profession', ''),
                     function=contact.get('function', ''),
                     meta={
-                        'parliamentarian_id': article_name.split('_')[1].replace('.json', ''),
+                        'parliamentarian_id': article_name.split(
+                            '_')[1].replace('.json', ''),
                         'polit_business_ids': polit_business_ids},
                     content={
                         'info': contact.get('date', ''),
@@ -2055,17 +2118,22 @@ def create_memberships(
                         connect_ids[person.id] = function
 
             if not connect_ids:
-                click.secho(f'No people found for commission {commission.name}', fg='yellow')
+                click.secho(
+                    f'No people found for commission {commission.name}',
+                     fg='yellow')
                 continue
 
             # Check if membership already exists
             existing_membership = commission_memberships.query().filter(
-                CommissionMembership.parliamentarian_id.in_(connect_ids.keys()),
+                CommissionMembership.parliamentarian_id.in_(connect_ids.keys(
+
+                )),
                 CommissionMembership.commission_id == commission.id
             ).first()
 
             if existing_membership:
-                click.secho(f'Membership already exists for {commission.name}', fg='yellow')
+                click.secho(f'Membership already exists for {commission.name}',
+                            fg='yellow')
                 continue
 
             # Create new membership
@@ -2076,7 +2144,8 @@ def create_memberships(
                     function= function,
                     role='member'
                 )
-                click.echo(f'Created membership for {person_id} in {commission.name}')
+                click.echo(
+                    f'Created membership for {person_id} in {commission.name}')
 
     return connect_ids
 
@@ -2094,29 +2163,36 @@ def create_polical_business_participants(
     def connect_ids(request: OrgRequest, app: OrgApp) -> None:
 
         session = request.session
-        business_participants = PoliticalBusinessParticipationCollection(session)
+        business_participants = PoliticalBusinessParticipationCollection(
+            session)
         people =  ParliamentarianCollection(session)
         political_businesses = PoliticalBusinessCollection(session)
 
         for political_business in political_businesses.query():
             connect_ids = {}
-            for person_id, function in political_business.meta.get('people_ids', []):
+            for person_id, function in political_business.meta.get(
+                'people_ids', []):
                 for person in people.query():
                     if person.meta.get('parliamentarian_id') == person_id:
                         connect_ids[person.id] = function
 
             if not connect_ids:
-                click.secho(f'No people found for political business {political_business.title}', fg='yellow')
+                click.secho(
+                    'No people found for political business '
+                    f'{political_business.title}', fg='yellow')
                 continue
 
             # Check if participation already exists
             existing_membership = business_participants.query().filter(
-                CommissionMembership.parliamentarian_id.in_(connect_ids.keys()),
+                CommissionMembership.parliamentarian_id.in_(connect_ids.keys()
+                                                            ),
                 CommissionMembership.commission_id == political_business.id
             ).first()
 
             if existing_membership:
-                click.secho(f'participation already exists for {political_business.title}', fg='yellow')
+                click.secho(
+                    'participation already exists for '
+                    f'{political_business.title}', fg='yellow')
                 continue
 
             # Create new participation
@@ -2127,7 +2203,9 @@ def create_polical_business_participants(
                     participant_type= function,
                     role='member'
                 )
-                click.echo(f'Created participation for {person_id} in {political_business.title}')
+                click.echo(
+                    f'Created participation for {person_id} in '
+                    f'{political_business.title}')
 
     return connect_ids
 
@@ -2156,7 +2234,9 @@ def create_parliamentarian_roles(
                         connect_ids.append(person.id)
 
             if not connect_ids:
-                click.secho(f'No people found for parliamentary group {parliamentary_group.name}', fg='yellow')
+                click.secho(
+                    'No people found for parliamentary group '
+                    f'{parliamentary_group.name}', fg='yellow')
                 continue
 
             # Check if participation already exists
@@ -2166,7 +2246,9 @@ def create_parliamentarian_roles(
             ).first()
 
             if existing_membership:
-                click.secho(f'participation already exists for {parliamentary_group.name}', fg='yellow')
+                click.secho(
+                    'participation already exists for '
+                    f'{parliamentary_group.name}', fg='yellow')
                 continue
 
             # Create new participation
@@ -2177,7 +2259,9 @@ def create_parliamentarian_roles(
                     parliamentary_group_id=parliamentary_group.id,
                     role=role
                 )
-                click.echo(f'Created participation for {person_id} in {parliamentary_group.name}')
+                click.echo(
+                    f'Created participation for {person_id} in '
+                    f'{parliamentary_group.name}')
 
     return connect_ids
 
@@ -2200,7 +2284,9 @@ def connect_political_business_meeting_items(
         for political_business in political_businesses.query():
             self_id = political_business.meta.get('self_id')
             if not self_id:
-                click.secho(f'No self_id found for political business {political_business.title}', fg='yellow')
+                click.secho(
+                    'No self_id found for political business '
+                    f'{political_business.title}', fg='yellow')
                 continue
             meeting_item = meeting_items.query().filter(
                 MeetingItem.political_business_link_id == self_id
