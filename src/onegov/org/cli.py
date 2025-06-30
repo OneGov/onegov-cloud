@@ -2059,6 +2059,7 @@ def import_political_business(
     def create_political_businesses(request: OrgRequest, app: OrgApp) -> None:
         session = request.session
         political_business_collection = PoliticalBusinessCollection(session)
+        file_coll = FileCollection(request.session)
 
         political_businesses = read_json_files(path)
         import_counter = 0
@@ -2079,6 +2080,7 @@ def import_political_business(
                 parliamentary_group_ids: list[str] = []
 
                 i = 0
+                files = []
                 while i < len(elements):
                     element = elements[i]
                     if (
@@ -2248,6 +2250,40 @@ def import_political_business(
                                             parliamentarian.meta[
                                                 'parliamentarian_id'] = str(
                                                     parliamentarian.id)
+                                                    
+                    elif element['type'] == 'Heading':
+                        if element:
+                            if element['text'] == 'Dokument' or \
+                            element['text'] == 'Dokumente':
+                                click.secho(
+                                    f'Warning: Document section found in {article_name}. ')
+                                element = elements[i+1] if i + 1 < len(elements) else None
+                                if element['type'] == 'Table':
+                                    for row in element['rows']:
+                                        try:
+                                            link = row['cells'][0]['url']
+                                        except KeyError:
+                                            click.echo(
+                                                f'No link found in row'
+                                                f' {row["cells"][0]}'
+                                            )
+                                            continue
+                                        resp = requests.get(link, timeout=(5, 10))
+                                        if resp.status_code == 200:
+                                            if existing_file := file_coll.by_content(
+                                                BytesIO(resp.content)
+                                            ).first():
+                                                files.append(existing_file)
+                                                click.echo(
+                                                    f'File {existing_file} already '
+                                                    'exists, skipping.'
+                                            )
+                                            else:
+                                                file = file_coll.add(
+                                                    filename=row['cells'][0]['text'],
+                                                    content=BytesIO(resp.content)
+                                                )
+                                                files.append(file)
                     i += 1
 
                 german_business_type = data_fields.get('Geschäftsart')
@@ -2277,7 +2313,7 @@ def import_political_business(
                     if '_' not in article_name:
                         continue
                     pol_business_id = article_name.split('_')[1].split('.')[0]
-                    political_business_collection.add(
+                    added = political_business_collection.add(
                         title=political_business['metadata']['title'],
                         number=data_fields.get('Nummer'),
                         political_business_type=english_business_type,
@@ -2290,6 +2326,8 @@ def import_political_business(
                             'self_id': pol_business_id
                         }
                     )
+                    if files:
+                        added.files = files 
                 except ESConnectionError:
                     click.echo('Elasticsearch connection error')
 
