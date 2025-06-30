@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING, TypeAlias, Literal
 if TYPE_CHECKING:
     import uuid
 
+    from onegov.parliament.models.meeting_item import MeetingItem
     from datetime import date
 
     from onegov.parliament.models import RISParliamentarian
@@ -197,6 +198,10 @@ class PoliticalBusiness(
         back_populates='political_businesses',
         order_by=Meeting.start_datetime,
         lazy='joined',
+    )
+    meeting_items: relationship[list[MeetingItem]] = relationship(
+        'MeetingItem',
+        back_populates='political_business'
     )
 
     def __repr__(self) -> str:

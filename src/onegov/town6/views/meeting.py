@@ -50,6 +50,20 @@ def view_meeting(
         else self.title
     )
 
+    # Construct meeting items with political business links
+    meeting_items_with_links = []
+    for item in self.meeting_items or []:
+        item_data = {
+            'number': item.number,
+            'title': item.title,
+            'political_business_link': None
+        }
+        if item.political_business:
+            item_data['political_business_link'] = request.link(
+                item.political_business
+            )
+        meeting_items_with_links.append(item_data)
+
     return {
         'layout': layout,
         'page': self,
@@ -60,4 +74,6 @@ def view_meeting(
         'contact': getattr(self, 'contact_html', None),
         'coordinates': None,
         'title': title,
+        'title': self.title,
+        'meeting_items_with_links': meeting_items_with_links,
     }
