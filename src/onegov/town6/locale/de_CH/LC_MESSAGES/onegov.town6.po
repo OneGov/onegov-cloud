@@ -2534,6 +2534,9 @@ msgstr ""
 msgid "Ratsinformationssystem (RIS)"
 msgstr ""
 
+msgid "Participants"
+msgstr "Beteiligte/Unterzeichnende"
+
 msgid "New Note"
 msgstr "Neue Notiz"
 
