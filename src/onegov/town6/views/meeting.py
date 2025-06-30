@@ -45,7 +45,7 @@ def view_meeting(
     collection = MeetingCollection(request.session)
     layout = MeetingCollectionLayout(collection, request)
     title = (
-        self.title + " - " + layout.format_date(self.start_datetime, "date")
+        self.title + ' - ' + layout.format_date(self.start_datetime, 'date')
         if self.start_datetime
         else self.title
     )
