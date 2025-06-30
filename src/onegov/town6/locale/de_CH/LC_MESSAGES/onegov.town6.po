@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-06-26 13:21+0200\n"
+"POT-Creation-Date: 2025-06-30 11:16+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -154,6 +154,12 @@ msgstr "Sa"
 msgid "Su"
 msgstr "So"
 
+msgid "Enable RIS"
+msgstr "RIS aktivieren"
+
+msgid "Enables the RIS integration for this organisation."
+msgstr "Aktiviert die RIS-Integration für diese Organisation."
+
 msgid "Events"
 msgstr "Veranstaltungen"
 
@@ -280,6 +286,78 @@ msgstr "Startseite"
 msgid "Chat Archive"
 msgstr "Chat-Archiv"
 
+msgid "Meetings"
+msgstr "Sitzungen"
+
+msgid "Meeting"
+msgstr "Sitzung"
+
+msgid "Parliamentarians"
+msgstr "Parlamentarier:innen"
+
+msgid "RIS Settings"
+msgstr "Ratsinformationssystem"
+
+msgid "Parliamentarian"
+msgstr "Parlamentarier:in"
+
+msgid "Role (as a party or group member)"
+msgstr "Rolle (als Partei- oder Fraktionsmitglied)"
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "Do you really want to delete this parliamentarian?"
+msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
+
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgängig gemacht werden."
+
+msgid "Delete parliamentarian"
+msgstr "Parlamentarier:in löschen"
+
+msgid "Do you really want to remove this role?"
+msgstr "Rolle wirklich entfernen?"
+
+msgid "Remove role"
+msgstr "Rolle entfernen"
+
+msgid "Parliamentary groups"
+msgstr "Fraktionen"
+
+msgid "Parliamentary group"
+msgstr "Fraktion"
+
+msgid "Do you really want to delete this parliamentary group?"
+msgstr "Möchten Sie diese Fraktion wirklich löschen?"
+
+msgid "Delete parliamentary group"
+msgstr "Fraktion löschen"
+
+msgid "Parties"
+msgstr "Parteien"
+
+msgid "Party"
+msgstr "Partei"
+
+msgid "Do you really want to delete this party?"
+msgstr "Möchten Sie diese Partei wirklich löschen?"
+
+msgid "Delete party"
+msgstr "Partei löschen"
+
+msgid "Commissions"
+msgstr "Kommissionen"
+
+msgid "Commission"
+msgstr "Kommission"
+
+msgid "Do you really want to delete this commission?"
+msgstr "Möchten Sie die Kommission wirklich löschen?"
+
+msgid "Delete commission"
+msgstr "Kommission löschen"
+
 msgid "No availability periods defined."
 msgstr "Keine Verfügbarkeitszeiträume definiert."
 
@@ -347,6 +425,15 @@ msgstr "Aktive Chats"
 
 msgid "No active chats."
 msgstr "Keine aktiven Chats."
+
+msgid "Contact"
+msgstr "Kontakt"
+
+msgid "No active commissions."
+msgstr "Keine aktiven Kommissionen."
+
+msgid "Filters"
+msgstr "Filter"
 
 msgid "No directories defined yet."
 msgstr "Noch keine Verzeichnisse definiert."
@@ -509,9 +596,6 @@ msgstr ""
 msgid "Complete"
 msgstr "Abschliessen"
 
-msgid "Edit"
-msgstr "Bearbeiten"
-
 msgid "No exports available."
 msgstr "Keine Exporte verfügbar."
 
@@ -613,9 +697,6 @@ msgstr "Anmelden"
 
 msgid "About"
 msgstr "Impressum"
-
-msgid "Contact"
-msgstr "Kontakt"
 
 msgid "more"
 msgstr "mehr"
@@ -844,9 +925,6 @@ msgstr "Organisator Telefonnummer"
 
 msgid "Tags"
 msgstr "Schlagworte"
-
-msgid "Filters"
-msgstr "Filter"
 
 msgid "Date and time"
 msgstr "Datum und Zeit"
@@ -1501,6 +1579,12 @@ msgstr "Ihre Anfrage wurde wieder eröffnet"
 msgid "You can see the current status of your ticket at any time here:"
 msgstr "Sie sehen den aktuellen Status Ihrer Anfrage jederzeit hier:"
 
+msgid "Agenda"
+msgstr "Traktanden"
+
+msgid "No meetings defined yet."
+msgstr "Noch keine Sitzungen definiert."
+
 msgid "Directory entry adopted."
 msgstr "Verzeichniseintrag übernommen."
 
@@ -1743,6 +1827,90 @@ msgstr "Diese Termine exportieren"
 
 msgid "Submit your event"
 msgstr "Veranstaltung vorschlagen"
+
+msgid "Personnel number"
+msgstr "Personalnummer"
+
+msgid "Contract number"
+msgstr "Vertragsnummer"
+
+msgid "Picture"
+msgstr "Bild"
+
+msgid "Private address"
+msgstr "Privatadresse"
+
+msgid "Date of birth"
+msgstr "Geburtsdatum"
+
+msgid "Date of death"
+msgstr "Sterbedatum"
+
+msgid "Place of origin"
+msgstr "Bürgerort"
+
+msgid "Occupation"
+msgstr "Beruf"
+
+msgid "Academic title"
+msgstr "Akademischer Titel"
+
+msgid "Salutation"
+msgstr "Anrede"
+
+msgid "Salutation used in the address"
+msgstr "Anrede in der Adresse"
+
+msgid "Salutation used for letters"
+msgstr "Anrede in Briefen"
+
+msgid "How bills should be delivered"
+msgstr "Rechnungszustellung"
+
+msgid "Private phone number"
+msgstr "Telefon Privat"
+
+msgid "Mobile phone number"
+msgstr "Telefon Mobile"
+
+msgid "Business phone number"
+msgstr "Telefon Geschäft"
+
+msgid "Primary email address"
+msgstr "E-Mail"
+
+msgid "Secondary email address"
+msgstr "Weitere E-Mail"
+
+msgid "Website"
+msgstr "Webseite"
+
+msgid "Remarks"
+msgstr "Bemerkungen"
+
+msgid "Roles"
+msgstr "Mitgliedschaften"
+
+msgid "Parliament"
+msgstr "Parlament"
+
+msgid "Interests"
+msgstr "Interessensbindungen"
+
+msgid "Role"
+msgstr "Rolle"
+
+msgid "No parliamentarians defined yet."
+msgstr "Noch keine Parlamentarier:innen erfasst."
+
+msgid "No parliamentary groups defined yet."
+msgstr "Noch keine Fraktionen erfasst."
+
+msgid "No parties defined yet."
+msgstr "Noch keine Parteien erfasst."
+
+msgid "Portrait"
+msgstr ""
 
 msgid "No payment providers defined."
 msgstr "Keine Zahlungsanbieter definiert."
@@ -2157,9 +2325,6 @@ msgstr "Aktiv"
 msgid "Inactive"
 msgstr "Inaktiv"
 
-msgid "Role"
-msgstr "Rolle"
-
 msgid "User group"
 msgstr "Benutzergruppe"
 
@@ -2224,8 +2389,44 @@ msgstr "Neues Ticket"
 msgid "Chat Customer"
 msgstr "Kundenchat  "
 
+msgid "Added a new commission"
+msgstr "Kommission hinzugefügt"
+
+msgid "New"
+msgstr "Neu"
+
+msgid "New commission"
+msgstr "Neue Kommission"
+
+msgid "Your changes were saved"
+msgstr ""
+
 msgid "Sort"
 msgstr "Sortieren"
+
+msgid "Added a new parliamentarian"
+msgstr "Parlamentarier:in hinzugefügt"
+
+msgid "New parliamentarian"
+msgstr "Neue:r Parlamentarier:in"
+
+msgid "Added a new role"
+msgstr "Neue Rolle hinzugefügt"
+
+msgid "New role"
+msgstr "Neue Rolle"
+
+msgid "Added a new parliamentary group"
+msgstr "Fraktion hinzugefügt"
+
+msgid "New parliamentary group"
+msgstr "Neue Fraktion"
+
+msgid "Added a new party"
+msgstr "Partei hinzugefügt"
+
+msgid "New party"
+msgstr "Neue Partei"
 
 msgid "New Recipient"
 msgstr "Neuer Empfänger"
@@ -2327,269 +2528,101 @@ msgstr ""
 msgid "Push Notification Overview"
 msgstr "Übersicht Push-Benachrichtigungen"
 
+msgid "Ratsinformationssystem"
+msgstr ""
+
+msgid "Ratsinformationssystem (RIS)"
+msgstr ""
+
 msgid "New Note"
 msgstr "Neue Notiz"
 
-msgid "Parliamentarian"
-msgstr "Parlamentarier:in"
+#~ msgid "Parliamentarian is not in this commission."
+#~ msgstr "Parlamentarier:in ist nicht in dieser Kommission."
 
-msgid "Commission"
-msgstr "Kommission"
+#~ msgid "Basic properties"
+#~ msgstr "Grundeigenschaften"
 
-msgid "Parliamentarian is not in this commission."
-msgstr "Parlamentarier:in ist nicht in dieser Kommission."
+#~ msgid "Gender"
+#~ msgstr "Geschlecht"
 
-msgid "Personnel number"
-msgstr "Personalnummer"
+#~ msgid "Additional information"
+#~ msgstr "Zusatzinformationen"
 
-msgid "Basic properties"
-msgstr "Grundeigenschaften"
+#~ msgid "Party role"
+#~ msgstr "Rolle in der Partei"
 
-msgid "Contract number"
-msgstr "Vertragsnummer"
+#~ msgid "Parliamentary group role"
+#~ msgstr "Rolle in der Fraktion"
 
-msgid "Gender"
-msgstr "Geschlecht"
+#~ msgid "President"
+#~ msgstr "Präsident:in"
 
-msgid "Additional information"
-msgstr "Zusatzinformationen"
+#~ msgid "Commission meeting"
+#~ msgstr "Kommissionsitzung"
 
-msgid "Date of birth"
-msgstr "Geburtsdatum"
+#~ msgid "intercantonal commission"
+#~ msgstr "interkantonale Kommission"
 
-msgid "Date of death"
-msgstr "Sterbedatum"
+#~ msgid "Vice president"
+#~ msgstr "Vize-Präsident:in"
 
-msgid "Place of origin"
-msgstr "Bürgerort"
+#~ msgid "End must be after start"
+#~ msgstr "Ende muss nach dem Start liegen"
 
-msgid "Occupation"
-msgstr "Beruf"
+#~ msgid "Do you really want to delete this meeting?"
+#~ msgstr "Diese Sitzung wirklich löschen?"
 
-msgid "Academic title"
-msgstr "Akademischer Titel"
+#~ msgid "Delete meeting"
+#~ msgstr "Sitzung löschen"
 
-msgid "Salutation"
-msgstr "Anrede"
+#~ msgid "Do you really want to remove this parliamentarian?"
+#~ msgstr "Diese:n Parlamentarier:in wirklich entfernen?"
 
-msgid "Private phone number"
-msgstr "Telefon Privat"
+#~ msgid "Remove parliamentarian"
+#~ msgstr "Parlamentarier:in entfernen"
 
-msgid "Mobile phone number"
-msgstr "Telefon Mobile"
+#~ msgid "Extended Member"
+#~ msgstr "erweitertes Mitglied"
 
-msgid "Business phone number"
-msgstr "Telefon Geschäft"
+#~ msgid "male"
+#~ msgstr "männlich"
 
-msgid "Primary email address"
-msgstr "E-Mail"
+#~ msgid "female"
+#~ msgstr "weiblich"
 
-msgid "Secondary email address"
-msgstr "Weitere E-Mail"
+#~ msgid "Vote counter"
+#~ msgstr "Stimmenzähler"
 
-msgid "Remarks"
-msgstr "Bemerkungen"
+#~ msgid "Media Manager"
+#~ msgstr "Leiter Medien und Kampagnen"
 
-msgid "Role"
-msgstr "Rolle"
+#~ msgid "President of the parliamentary group"
+#~ msgstr "Fraktionsschef"
 
-msgid "Party"
-msgstr "Partei"
+#~ msgid "No meeting defined yet."
+#~ msgstr "Noch keine Sitzung erfasst."
 
-msgid "Party role"
-msgstr "Rolle in der Partei"
+#~ msgid "Comission"
+#~ msgstr "Kommission"
 
-msgid "Parliamentary group"
-msgstr "Fraktion"
+#~ msgid "Added commission meeting"
+#~ msgstr "Kommissionsitzung hinzugefügt"
 
-msgid "Parliamentary group role"
-msgstr "Rolle in der Fraktion"
+#~ msgid "New commission meeting"
+#~ msgstr "Neue Kommissionsitzung"
 
-msgid "President"
-msgstr "Präsident:in"
+#~ msgid "All Parties"
+#~ msgstr "Alle Parteien"
 
-msgid "Member"
-msgstr "Mitglied"
+#~ msgid "Addition"
+#~ msgstr "Adresszusatz"
 
-msgid "Commission meeting"
-msgstr "Kommissionsitzung"
+#~ msgid "Zip code"
+#~ msgstr "PLZ"
 
-msgid "intercantonal commission"
-msgstr "interkantonale Kommission"
-
-msgid "Vice president"
-msgstr "Vize-Präsident:in"
-
-msgid "End must be after start"
-msgstr "Ende muss nach dem Start liegen"
-
-msgid "Do you really want to delete this meeting?"
-msgstr "Diese Sitzung wirklich löschen?"
-
-msgid "This cannot be undone."
-msgstr "Dies kann nicht rückgängig gemacht werden."
-
-msgid "Delete meeting"
-msgstr "Sitzung löschen"
-
-msgid "Cancel"
-msgstr "Abbrechen"
-
-msgid "Commissions"
-msgstr "Kommissionen"
-
-msgid "Do you really want to delete this commission?"
-msgstr "Möchten Sie die Kommission wirklich löschen?"
-
-msgid "Delete commission"
-msgstr "Kommission löschen"
-
-msgid "Remove"
-msgstr "Entfernen"
-
-msgid "Do you really want to remove this parliamentarian?"
-msgstr "Diese:n Parlamentarier:in wirklich entfernen?"
-
-msgid "Remove parliamentarian"
-msgstr "Parlamentarier:in entfernen"
-
-msgid "Parliamentarians"
-msgstr "Parlamentarier:innen"
-
-msgid "Role (as a party or group member)"
-msgstr "Rolle (als Partei- oder Fraktionsmitglied)"
-
-msgid "Do you really want to delete this parliamentarian?"
-msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
-
-msgid "Delete parliamentarian"
-msgstr "Parlamentarier:in löschen"
-
-msgid "Do you really want to remove this role?"
-msgstr "Rolle wirklich entfernen?"
-
-msgid "Remove role"
-msgstr "Rolle entfernen"
-
-msgid "Parliamentary groups"
-msgstr "Fraktionen"
-
-msgid "Do you really want to delete this parliamentary group?"
-msgstr "Möchten Sie diese Fraktion wirklich löschen?"
-
-msgid "Delete parliamentary group"
-msgstr "Fraktion löschen"
-
-msgid "Parties"
-msgstr "Parteien"
-
-msgid "Do you really want to delete this party?"
-msgstr "Möchten Sie diese Partei wirklich löschen?"
-
-msgid "Delete party"
-msgstr "Partei löschen"
-
-msgid "Extended Member"
-msgstr "erweitertes Mitglied"
-
-msgid "male"
-msgstr "männlich"
-
-msgid "female"
-msgstr "weiblich"
-
-msgid "Vote counter"
-msgstr "Stimmenzähler"
-
-msgid "Media Manager"
-msgstr "Leiter Medien und Kampagnen"
-
-msgid "President of the parliamentary group"
-msgstr "Fraktionsschef"
-
-msgid "No meeting defined yet."
-msgstr "Noch keine Sitzung erfasst."
-
-msgid "Comission"
-msgstr "Kommission"
-
-msgid "No active commissions."
-msgstr "Keine aktiven Kommissionen."
-
-msgid "Roles"
-msgstr "Mitgliedschaften"
-
-msgid "Parliament"
-msgstr "Parlament"
-
-msgid "No parliamentarians defined yet."
-msgstr "Noch keine Parlamentarier:innen erfasst."
-
-msgid "No parliamentary groups defined yet."
-msgstr "Noch keine Fraktionen erfasst."
-
-msgid "No parties defined yet."
-msgstr "Noch keine Parteien erfasst."
-
-msgid "Added a new commission"
-msgstr "Kommission hinzugefügt"
-
-msgid "New commission"
-msgstr "Neue Kommission"
-
-msgid "Added a new parliamentarian"
-msgstr "Parlamentarier:in hinzugefügt"
-
-msgid "New parliamentarian"
-msgstr "Neue:r Parlamentarier:in"
-
-msgid "Added commission meeting"
-msgstr "Kommissionsitzung hinzugefügt"
-
-msgid "New commission meeting"
-msgstr "Neue Kommissionsitzung"
-
-msgid "Added a new role"
-msgstr "Neue Rolle hinzugefügt"
-
-msgid "New role"
-msgstr "Neue Rolle"
-
-msgid "Added a new parliamentary group"
-msgstr "Fraktion hinzugefügt"
-
-msgid "New parliamentary group"
-msgstr "Neue Fraktion"
-
-msgid "Added a new party"
-msgstr "Partei hinzugefügt"
-
-msgid "New party"
-msgstr "Neue Partei"
-
-msgid "All Parties"
-msgstr "Alle Parteien"
-
-msgid "RIS Settings"
-msgstr "Ratsinformationssystem"
-
-msgid "Agenda"
-msgstr "Traktanden"
-
-msgid "Meetings"
-msgstr "Sitzungen"
-
-msgid "Meeting"
-msgstr "Sitzung"
-
-msgid "Addition"
-msgstr "Adresszusatz"
-
-msgid "Zip code"
-msgstr "PLZ"
-
-msgid "City"
-msgstr "Ort"
+#~ msgid "City"
+#~ msgstr "Ort"
 
 #~ msgid "Sign up"
 #~ msgstr "Anmelden"
@@ -2718,12 +2751,6 @@ msgstr "Ort"
 
 #~ msgid "Do you really want to delete this event?"
 #~ msgstr "Möchten Sie die Veranstaltung wirklich löschen?"
-
-#~ msgid "This cannot be undone."
-#~ msgstr "Dies kann nicht rückgängig gemacht werden."
-
-#~ msgid "Delete event"
-#~ msgstr "Veranstaltung löschen"
 
 #~ msgid "This event can't be deleted."
 #~ msgstr "Diese Veranstaltung kann nicht gelöscht werden."
@@ -2900,9 +2927,6 @@ msgstr "Ort"
 #, python-format
 #~ msgid "Every ${days} until ${end}"
 #~ msgstr "Jeden ${days} bis zum ${end}."
-
-#~ msgid "New"
-#~ msgstr "Neu"
 
 #~ msgid "Subscribers"
 #~ msgstr "Abonnenten"
