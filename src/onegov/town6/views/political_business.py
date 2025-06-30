@@ -3,7 +3,10 @@ from __future__ import annotations
 from onegov.core.security import Public
 from onegov.parliament.collections import PoliticalBusinessCollection
 from onegov.parliament.models import PoliticalBusiness
-from onegov.parliament.models.political_business import POLITICAL_BUSINESS_TYPE
+from onegov.parliament.models.political_business import (
+    POLITICAL_BUSINESS_STATUS)
+from onegov.parliament.models.political_business import (
+    POLITICAL_BUSINESS_TYPE)
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import PoliticalBusinessCollectionLayout
@@ -35,6 +38,7 @@ def view_political_businesses(
         'businesses': self.query().all(),
         'title': _('Political Businesses'),
         'type_map': POLITICAL_BUSINESS_TYPE,
+        'status_map': POLITICAL_BUSINESS_STATUS,
     }
 
 
@@ -54,4 +58,6 @@ def view_political_business(
         'layout': layout,
         'business': self,
         'title': self.title,
+        'type_map': POLITICAL_BUSINESS_TYPE,
+        'status_map': POLITICAL_BUSINESS_STATUS,
     }

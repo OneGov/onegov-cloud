@@ -11,11 +11,11 @@
             </div>
             <div tal:condition="business.political_business_type">
                 <dt i18n:translate>Type</dt>
-                <dd><div tal:content="business.political_business_type"></div></dd>
+                <dd><div tal:content="type_map[business.political_business_type]"></div></dd>
             </div>
             <div tal:condition="business.status">
                 <dt i18n:translate>Status</dt>
-                <dd><div tal:content="business.status"> </div></dd>
+                <dd><div tal:content="status_map[business.status]"> </div></dd>
             </div>
             <div tal:condition="business.entry_date">
                 <dt i18n:translate>Date</dt>
