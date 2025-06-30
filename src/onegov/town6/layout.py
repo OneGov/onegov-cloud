@@ -71,6 +71,7 @@ from onegov.org.models import PageMove
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.page import PageCollection
 from onegov.parliament.collections import RISPartyCollection
+from onegov.parliament.collections import PoliticalBusinessCollection
 from onegov.parliament.collections.commission import (
     RISCommissionCollection
 )
@@ -1573,5 +1574,100 @@ class RISCommissionLayout(DefaultLayout):
                         )
                     )
                 )
+            ]
+        return None
+
+
+class PoliticalBusinessCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Political Businesses')
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                # LinkGroup(
+                #     title=_('Add'),
+                #     links=[
+                #         Link(
+                #             text=_('Political Business'),
+                #             url=self.request.link(self.model, 'new'),
+                #             attrs={'class': 'new-political-business'}
+                #         ),
+                #     ]
+                # ),
+            ]
+        return None
+
+
+class PoliticalBusinessLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self) -> PoliticalBusinessCollection:
+        return PoliticalBusinessCollection(self.request.session)
+
+    @cached_property
+    def title(self) -> str:
+        return self.model.name
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('Political Businesses'),
+                 self.request.class_link(PoliticalBusinessCollection)),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                # Link(
+                #     text=_('Edit'),
+                #     url=self.request.link(self.model, 'edit'),
+                #     attrs={'class': 'edit-link'}
+                # ),
+                # Link(
+                #     text=_('Delete'),
+                #     url=self.csrf_protected_url(
+                #         self.request.link(self.model)
+                #     ),
+                #     attrs={'class': 'delete-link'},
+                #     traits=(
+                #         Confirm(
+                #             _('Do you really want to delete this
+                #             political business?'),
+                #             _('This cannot be undone.'),
+                #             _('Delete political business'),
+                #             _('Cancel')
+                #         ),
+                #         Intercooler(
+                #             request_method='DELETE',
+                #             redirect_after=
+                #             self.request.class_link(
+                #               PoliticalBusinessCollection)
+                #         )
+                #     )
+                # )
             ]
         return None

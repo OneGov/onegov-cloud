@@ -185,6 +185,7 @@ class PoliticalBusiness(
     )
 
     #: parliamentary group (Fraktion)
+    # FIXME: make multiple groups possible
     parliamentary_group_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('par_parliamentary_groups.id'),

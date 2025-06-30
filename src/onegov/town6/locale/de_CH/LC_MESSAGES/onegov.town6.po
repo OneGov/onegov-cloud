@@ -2591,6 +2591,13 @@ msgstr "PLZ"
 msgid "City"
 msgstr "Ort"
 
+msgid "Political Business"
+msgstr "Politisches Geschäft"
+
+msgid "No political businesses defined yet."
+msgstr "Es wurden noch keine politischen Geschäfte erfasst."
+
+
 #~ msgid "Sign up"
 #~ msgstr "Anmelden"
 
