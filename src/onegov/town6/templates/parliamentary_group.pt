@@ -22,10 +22,15 @@
                 <dd>
                     <ul>
                         <li tal:repeat="role parliamentary_group.roles">
-                            <span>
+                            <span tal:condition="request.is_manager">
                                 <a href="${request.link(role.parliamentarian)}">${role.parliamentarian.title}</a>
                                 (<a href="${request.link(role)}">${role.parliamentary_group_role_label}</a>)
                             </span>
+                            <span tal:condition="not request.is_manager">
+                                <a href="${request.link(role.parliamentarian)}">${role.parliamentarian.title}</a>
+                                (${role.parliamentary_group_role_label})
+                            </span>
+
                             <span>
                                 <br>${layout.format_date(role.start, 'date')}
                             </span>

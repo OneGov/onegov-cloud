@@ -13,14 +13,14 @@
                                 ${meeting.title}
                             </span>
                         </a>
-                        
+
                         <a tal:attributes="href request.link(meeting)">
                             <p class="list-lead preview">
-                                <span>${layout.format_date(meeting.start_datetime, 'datetime')}</span>,
+                                <span>${layout.format_date(meeting.start_datetime, 'datetime')}</span>
                             </p>
                         </a>
                     </li>
-                    
+
                 </ul>
             </div>
         </div>
