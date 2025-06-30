@@ -25,10 +25,12 @@ def view_meetings(
     request: TownRequest,
     layout: MeetingCollectionLayout | None = None
 ) -> RenderData:
+    
+    meetings = self.query().filter(Meeting.start_datetime!=None).all()
 
     return {
         'layout': layout or MeetingCollectionLayout(self, request),
-        'meetings': self.query().all(),
+        'meetings': meetings,
         'title': _('Meetings'),
     }
 
