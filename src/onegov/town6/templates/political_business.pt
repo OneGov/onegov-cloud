@@ -19,7 +19,7 @@
             </div>
             <div tal:condition="business.entry_date">
                 <dt i18n:translate>Date</dt>
-                <dd><div tal:content="business.entry_date"></div></dd>
+                <dd><div tal:content="layout.format_date(business.entry_date, 'date')"></div></dd>
             </div>
             <div tal:condition="business.participants">
                 <dt i18n:translate>Participants</dt>
