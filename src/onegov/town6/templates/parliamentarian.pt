@@ -104,7 +104,11 @@
                 <dd>
                     <ul>
                         <li tal:repeat="role parliamentarian.roles">
-                            <a href="${request.link(role)}">${role.role_label} <tal:block i18n:translate>Parliament</tal:block></a>
+                            <a tal:condition="request.is_manager" href="${request.link(role)}"> ${role.role_label} <tal:block i18n:translate>Parliament</tal:block></a>
+                            <span tal:condition="not request.is_manager">
+                                ${role.role_label} <tal:block i18n:translate>Parliament</tal:block>
+                            </span>
+
                             <span tal:condition="role.party">
                                 /
                                 ${role.party_role_label}
@@ -147,6 +151,22 @@
                         </li>
                     </ul>
                 </dd>
+            </div>
+            <div tal:define="interests parliamentarian.content.get('interests')" tal:condition="parliamentarian.content.get('interests')">
+                <tal:b define="headers parliamentarian.content['interests']['headers']; rows parliamentarian.content['interests']['rows']">
+                    <b i18n:translate>Interests</b>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th tal:repeat="header headers" tal:content="header">${header}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr tal:repeat="row rows">
+                                <td tal:repeat="header headers" >${row[header]}</td>
+                            </tr>
+                    </table>
+                </tal:b>
             </div>
         </dl>
     </tal:b>
