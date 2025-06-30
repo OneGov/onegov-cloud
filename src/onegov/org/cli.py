@@ -2221,56 +2221,120 @@ def import_political_business(
                                         role = text_content[
                                             last_paren_open+1:last_paren_close
                                             ].strip()
+                                        click.secho(f'Role {role}', fg='green')
+                                        if '(' in full_name or ')' in full_name:
+                                            full_name = full_name \
+                                            + f' ({role})'
+                                            full_name = full_name.replace('(',
+                                                                          '')
+                                            names = full_name.split(')')
+                                            for name in names:
+                                                if not name:
+                                                    continue
+                                                click.secho(
+                                                    'name:'
+                                                    f'{name.strip()}', fg='yellow'
+                                                )
+                                                name_parts = name.strip().split()
+                                                if not name_parts:
+                                                    click.secho(f'Warning: Empty name '
+                                                                'found for role '
+                                                                f'{role} in '
+                                                                f'{article_name}. '
+                                                                'Skipping.',
+                                                                fg='yellow')
+                                                    continue
 
-                                        name_parts = full_name.strip().split()
-                                        if not name_parts:
-                                            click.secho(f'Warning: Empty name '
-                                                        'found for role '
-                                                        f'{role} in '
-                                                        f'{article_name}. '
-                                                        'Skipping.',
-                                                        fg='yellow')
-                                            continue
+                                                last_name = name_parts[-1]
+                                                first_name = ' '.join(name_parts[:-1])
 
-                                        last_name = name_parts[-1]
-                                        first_name = ' '.join(name_parts[:-1])
+                                                if not first_name:
+                                                    # Handle single word name
+                                                    first_name = last_name
 
-                                        if not first_name:
-                                            # Handle single word name
-                                            first_name = last_name
+                                                click.echo(
+                                                    'Creating new parliamentarian: '
+                                                    f'{first_name} {last_name} for '
+                                                    f'{article_name} (unlinked)')
+                                                parliamentarian = RISParliamentarian(
+                                                    first_name=first_name,
+                                                    last_name=last_name)
+                                                session.add(parliamentarian)
+                                                try:
+                                                    with session.begin_nested():
+                                                        # Ensure ID is available
+                                                        session.flush()
+                                                except Exception as e:
+                                                    click.secho(
+                                                        'Error creating '
+                                                        f'parliamentarian {first_name}'
+                                                        f' {last_name}: {e}', fg='red')
+                                                    parliamentarian = None
+                                                    # Failed to create
 
-                                        click.echo(
-                                            'Creating new parliamentarian: '
-                                            f'{first_name} {last_name} for '
-                                            f'{article_name} (unlinked)')
-                                        parliamentarian = RISParliamentarian(
-                                            first_name=first_name,
-                                            last_name=last_name)
-                                        session.add(parliamentarian)
-                                        try:
-                                            with session.begin_nested():
-                                                # Ensure ID is available
-                                                session.flush()
-                                        except Exception as e:
-                                            click.secho(
-                                                'Error creating '
-                                                f'parliamentarian {first_name}'
-                                                f' {last_name}: {e}', fg='red')
-                                            parliamentarian = None
-                                            # Failed to create
+                                                if (
+                                                    parliamentarian
+                                                    and parliamentarian.id
+                                                ):
+                                                    people_ids.append(
+                                                        (str(parliamentarian.id),
+                                                        role))
+                                                    if not parliamentarian.meta:
+                                                        parliamentarian.meta = {}
+                                                    parliamentarian.meta[
+                                                        'parliamentarian_id'] = str(
+                                                            parliamentarian.id)
+                                        else:
+                                            
+                                            name_parts = full_name.strip().split()
+                                            if not name_parts:
+                                                click.secho(f'Warning: Empty name '
+                                                            'found for role '
+                                                            f'{role} in '
+                                                            f'{article_name}. '
+                                                            'Skipping.',
+                                                            fg='yellow')
+                                                continue
 
-                                        if (
-                                            parliamentarian
-                                            and parliamentarian.id
-                                        ):
-                                            people_ids.append(
-                                                (str(parliamentarian.id),
-                                                 role))
-                                            if not parliamentarian.meta:
-                                                parliamentarian.meta = {}
-                                            parliamentarian.meta[
-                                                'parliamentarian_id'] = str(
-                                                    parliamentarian.id)
+                                            last_name = name_parts[-1]
+                                            first_name = ' '.join(name_parts[:-1])
+
+                                            if not first_name:
+                                                # Handle single word name
+                                                first_name = last_name
+
+                                            click.echo(
+                                                'Creating new parliamentarian: '
+                                                f'{first_name} {last_name} for '
+                                                f'{article_name} (unlinked)')
+                                            parliamentarian = RISParliamentarian(
+                                                first_name=first_name,
+                                                last_name=last_name)
+                                            session.add(parliamentarian)
+                                            try:
+                                                with session.begin_nested():
+                                                    # Ensure ID is available
+                                                    session.flush()
+                                            except Exception as e:
+                                                click.secho(
+                                                    'Error creating '
+                                                    f'parliamentarian {first_name}'
+                                                    f' {last_name}: {e}', fg='red')
+                                                parliamentarian = None
+                                                # Failed to create
+
+                                            if (
+                                                parliamentarian
+                                                and parliamentarian.id
+                                            ):
+                                                people_ids.append(
+                                                    (str(parliamentarian.id),
+                                                    role))
+                                                if not parliamentarian.meta:
+                                                    parliamentarian.meta = {}
+                                                parliamentarian.meta[
+                                                    'parliamentarian_id'] = str(
+                                                        parliamentarian.id)
                     i += 1
 
                 german_business_type = data_fields.get('Geschäftsart')
@@ -2300,7 +2364,6 @@ def import_political_business(
                     if '_' not in article_name:
                         continue
                     pol_business_id = article_name.split('_')[1].split('.')[0]
-                    click.secho(data_fields.get('Datum'), fg='green')
                     datum = data_fields.get('Datum')
                     if datum:
                         day, month_str, year = datum.split(' ')
@@ -2311,7 +2374,6 @@ def import_political_business(
                             month=month,
                             day=int(day)
                         ) if month else None
-                        click.secho(f'Parsed date: {parsed_date}', fg='cyan')
                     political_business_collection.add(
                         title=political_business['metadata']['title'],
                         number=data_fields.get('Nummer'),
