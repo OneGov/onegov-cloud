@@ -116,7 +116,11 @@
                 <dd>
                     <ul>
                         <li tal:repeat="role parliamentarian.roles">
-                            <a href="${request.link(role)}">${role.role_label} <tal:block i18n:translate>Parliament</tal:block></a>
+                            <a tal:condition="request.is_manager" href="${request.link(role)}"> ${role.role_label} <tal:block i18n:translate>Parliament</tal:block></a>
+                            <span tal:condition="not request.is_manager">
+                                ${role.role_label} <tal:block i18n:translate>Parliament</tal:block>
+                            </span>
+
                             <span tal:condition="role.party">
                                 /
                                 ${role.party_role_label}
