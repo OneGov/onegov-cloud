@@ -1,18 +1,21 @@
 from __future__ import annotations
 
+from more.transaction.main import morepath
+
 from onegov.core.security.permissions import Public
 
 from onegov.parliament.collections import MeetingCollection
 from onegov.parliament.models import Meeting
+from onegov.parliament.models.meeting_item import MeetingItem
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import MeetingCollectionLayout
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
     from onegov.core.types import RenderData
+    from onegov.core.request import CoreRequest
 
 
 @TownApp.html(
@@ -74,6 +77,15 @@ def view_meeting(
         'contact': getattr(self, 'contact_html', None),
         'coordinates': None,
         'title': title,
-        'title': self.title,
         'meeting_items_with_links': meeting_items_with_links,
     }
+
+
+@TownApp.view(model=MeetingItem, permission=Public)
+def view_redirect_meeting_item_to_meeting(
+        self: MeetingItem, request: CoreRequest
+):
+    """
+    Redirect for search results, if we link to MeetingItem we show the Meeting
+    """
+    return morepath.redirect(request.link(self.meeting))
