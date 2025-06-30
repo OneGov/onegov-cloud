@@ -2537,6 +2537,61 @@ msgstr ""
 msgid "New Note"
 msgstr "Neue Notiz"
 
+msgid "Inquiry"
+msgstr "Anfrage"
+
+msgid "Proposal"
+msgstr "Antrag"
+
+msgid "Mandate"
+msgstr "Auftrag"
+
+msgid "Report"
+msgstr "Bericht"
+
+msgid "Report and Proposal"
+msgstr "Bericht und Antrag"
+
+msgid "Decision"
+msgstr "Beschluss"
+
+msgid "Message"
+msgstr "Botschaft"
+
+msgid "Urgent Interpellation"
+msgstr "Dringliche Interpellation"
+
+msgid "Invitation"
+msgstr "Einladung"
+
+msgid "Interpellation"
+msgstr "Interpellation"
+
+msgid "Commission Report"
+msgstr "Kommissionsbericht"
+
+msgid "Communication"
+msgstr "Mitteilung"
+
+msgid "Motion"
+msgstr "Motion"
+
+msgid "Postulate"
+msgstr "Postulat"
+
+msgid "Resolution"
+msgstr "Resolution"
+
+msgid "Regulation"
+msgstr "Verordnung"
+
+msgid "Miscellaneous"
+msgstr "Verschiedenes"
+
+msgid "Elections"
+msgstr "Wahlen"
+
+
 #~ msgid "Parliamentarian is not in this commission."
 #~ msgstr "Parlamentarier:in ist nicht in dieser Kommission."
 
@@ -2623,6 +2678,16 @@ msgstr "Neue Notiz"
 
 #~ msgid "City"
 #~ msgstr "Ort"
+
+msgid "Political Business"
+msgstr "Politisches Geschäft"
+
+msgid "Political Businesses"
+msgstr "Politische Geschäfte"
+
+msgid "No political businesses defined yet."
+msgstr "Es wurden noch keine politischen Geschäfte erfasst."
+
 
 #~ msgid "Sign up"
 #~ msgstr "Anmelden"

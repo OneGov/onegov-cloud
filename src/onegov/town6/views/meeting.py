@@ -39,8 +39,8 @@ def view_meetings(
     permission=Public,
 )
 def view_meeting(
-        self: Meeting,
-        request: TownRequest,
+    self: Meeting,
+    request: TownRequest,
 ) -> RenderData:
     collection = MeetingCollection(request.session)
     layout = MeetingCollectionLayout(collection, request)

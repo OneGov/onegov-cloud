@@ -34,6 +34,7 @@ if TYPE_CHECKING:
         'urgent interpellation',  # Dringliche Interpellation
         'invitation',  # Einladung
         'interpelleation',  # Interpellation
+        'interpellation',  # Interpellation
         'commission report',  # Kommissionsbericht
         'communication',  # Mitteilung
         'motion',  # Motion
@@ -71,6 +72,7 @@ POLITICAL_BUSINESS_TYPE: dict[PoliticalBusinessType, str] = {
     'urgent interpellation': _('Urgent Interpellation'),
     'invitation': _('Invitation'),
     'interpelleation': _('Interpellation'),
+    'interpellation': _('Interpellation'),
     'commission report': _('Commission Report'),
     'communication': _('Communication'),
     'motion': _('Motion'),
@@ -186,6 +188,7 @@ class PoliticalBusiness(
     )
 
     #: parliamentary group (Fraktion)
+    # FIXME: make multiple groups possible
     parliamentary_group_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('par_parliamentary_groups.id'),
@@ -207,6 +210,15 @@ class PoliticalBusiness(
     def __repr__(self) -> str:
         return (f'<Political Business {self.number}, '
                 f'{self.title}, {self.political_business_type}>')
+
+
+class RISPoliticalBusiness(PoliticalBusiness):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'ris_political_business',
+    }
+
+    es_type_name = 'ris_political_business'
 
 
 class PoliticalBusinessParticipation(Base, ContentMixin):
@@ -265,3 +277,14 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
         'RISParliamentarian',
         back_populates='political_businesses',
     )
+
+
+class RISPoliticalBusinessParticipation(
+    PoliticalBusinessParticipation
+):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'ris_political_business_participation',
+    }
+
+    es_type_name = 'ris_political_business_participation'

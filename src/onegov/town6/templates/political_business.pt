@@ -1,0 +1,63 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+
+    <tal:b metal:fill-slot="content">
+        <dl class="field-display">
+            <div tal:condition="business.number">
+                <dt i18n:translate>Number</dt>
+                <dd><div tal:content="business.number"></div></dd>
+            </div>
+            <div tal:condition="business.political_business_type">
+                <dt i18n:translate>Type</dt>
+                <dd><div tal:content="type_map[business.political_business_type]"></div></dd>
+            </div>
+            <div tal:condition="business.status">
+                <dt i18n:translate>Status</dt>
+                <dd><div tal:content="status_map[business.status]"> </div></dd>
+            </div>
+            <div tal:condition="business.entry_date">
+                <dt i18n:translate>Date</dt>
+                <dd><div tal:content="layout.format_date(business.entry_date, 'date')"></div></dd>
+            </div>
+            <div tal:condition="business.participants">
+                <dt i18n:translate>Participants</dt>
+                <dd>
+                    <ul tal:repeat="participant business.participants">
+                        <li><a tal:attributes="href request.link(participant)">${participant.name}</a> (${participant.participant_type})</li>
+                    </ul>
+                </dd>
+            </div>
+            <div tal:condition="business.parliamentary_group_id">
+                <dt i18n:translate>Parliamentary Group</dt>
+                <dd><div tal:content="business.parliamentary_group_id"></div></dd>
+            </div>
+
+            <div tal:condition="business.files">
+                <dt i18n:translate>Documents</dt>
+                <dd>
+                    <ul tal:repeat="file business.files">
+                        <li>
+                            <a tal:attributes="href request.link(file)">${file.title}</a>
+                            <span tal:condition="file.description">(${file.description})</span>
+                        </li>
+                    </ul>
+                </dd>
+            </div>
+
+            <div tal:condition="business.meetings">
+                <dt i18n:translate>Meetings</dt>
+                <dd>
+                    <ul tal:repeat="meeting business.meetings">
+                        <li>
+                            <a tal:attributes="href request.link(meeting)">${meeting.title}</a>
+                            <span tal:condition="meeting.date">(${layout.format_date(meeting.date, 'date')})</span>
+<!--?                            <span tal:condition="meeting.date">(${layout.format_date(meeting.date, 'datetime')})</span>-->
+                        </li>
+                    </ul>
+                </dd>
+            </div>
+        </dl>
+    </tal:b>
+</div>

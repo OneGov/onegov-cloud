@@ -89,7 +89,7 @@ from onegov.parliament.collections import (
     RISCommissionCollection,
     RISParliamentarianCollection,
     RISParliamentarianRoleCollection,
-    RISParliamentaryGroupCollection
+    RISParliamentaryGroupCollection, PoliticalBusinessCollection
 )
 from onegov.parliament.models import (
     Meeting,
@@ -98,7 +98,7 @@ from onegov.parliament.models import (
     RISParliamentarian,
     RISParliamentarianRole,
     RISParliamentaryGroup,
-    RISParty,
+    RISParty, PoliticalBusiness,
 )
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection
@@ -1285,3 +1285,25 @@ def get_meeting(
     id: UUID
 ) -> Meeting | None:
     return MeetingCollection(app.session()).by_id(id)
+
+
+@OrgApp.path(
+    model=PoliticalBusinessCollection,
+    path='/political-businesses',
+)
+def get_political_businesses(
+    app: OrgApp,
+) -> PoliticalBusinessCollection:
+    return PoliticalBusinessCollection(app.session())
+
+
+@OrgApp.path(
+    model=PoliticalBusiness,
+    path='/political-business/{id}',
+    converters={'id': UUID}
+)
+def get_political_business(
+    app: OrgApp,
+    id: UUID
+) -> PoliticalBusiness | None:
+    return PoliticalBusinessCollection(app.session()).by_id(id)
