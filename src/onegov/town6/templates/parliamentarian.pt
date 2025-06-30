@@ -27,18 +27,6 @@
                     </div>
                 </dd>
             </div>
-            <div tal:condition="parliamentarian.shipping_method">
-                <dt i18n:translate>Shipping method</dt>
-                <dd>${parliamentarian.shipping_method_label}</dd>
-            </div>
-            <div>
-                <dt i18n:translate>Shipping address</dt>
-                <dd>
-                    <span tal:condition="parliamentarian.shipping_address">${parliamentarian.shipping_address}<br></span>
-                    <span tal:condition="parliamentarian.shipping_address_addition">${parliamentarian.shipping_address_addition}<br></span>
-                    <span tal:condition="parliamentarian.shipping_address_zip_code">${parliamentarian.shipping_address_zip_code} ${parliamentarian.shipping_address_city}</span>
-                </dd>
-            </div>
             <div tal:condition="parliamentarian.private_address">
                 <dt i18n:translate>Private address</dt>
                 <dd>
