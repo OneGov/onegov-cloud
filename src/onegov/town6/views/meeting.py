@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 from onegov.core.security.permissions import Public
 
 from onegov.parliament.collections import MeetingCollection
@@ -10,6 +9,7 @@ from onegov.town6 import TownApp
 from onegov.town6.layout import MeetingCollectionLayout
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
     from onegov.core.types import RenderData
@@ -39,12 +39,17 @@ def view_meetings(
     permission=Public,
 )
 def view_meeting(
-    self: Meeting,
-    request: TownRequest,
+        self: Meeting,
+        request: TownRequest,
 ) -> RenderData:
-
     collection = MeetingCollection(request.session)
     layout = MeetingCollectionLayout(collection, request)
+    title = (
+        self.title + " - " + layout.format_date(self.start_datetime, "date")
+        if self.start_datetime
+        else self.title
+    )
+
     return {
         'layout': layout,
         'page': self,
@@ -54,5 +59,5 @@ def view_meeting(
         'files': getattr(self, 'files', None),
         'contact': getattr(self, 'contact_html', None),
         'coordinates': None,
-        'title': self.title,
+        'title': title,
     }
