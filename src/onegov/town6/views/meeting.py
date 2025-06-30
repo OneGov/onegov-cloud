@@ -7,6 +7,7 @@ from onegov.core.security.permissions import Public
 from onegov.parliament.collections import MeetingCollection
 from onegov.parliament.models import Meeting
 from onegov.parliament.models.meeting_item import MeetingItem
+from onegov.parliament.models.political_business import PoliticalBusiness
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import MeetingCollectionLayout
@@ -62,10 +63,13 @@ def view_meeting(
             'title': item.title,
             'political_business_link': None
         }
-        if item.political_business:
-            item_data['political_business_link'] = request.link(
-                item.political_business
-            )
+        if item.political_business_link_id:
+            business = request.session.query(PoliticalBusiness).filter(
+                PoliticalBusiness.meta['self_id'].astext ==
+                item.political_business_link_id
+            ).first()
+            if business is not None:
+                item_data['political_business_link'] = request.link(business)
         meeting_items_with_links.append(item_data)
 
     return {
