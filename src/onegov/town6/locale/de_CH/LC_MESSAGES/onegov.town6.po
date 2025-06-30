@@ -2535,7 +2535,7 @@ msgid "Ratsinformationssystem (RIS)"
 msgstr ""
 
 msgid "Participants"
-msgstr "Beteiligte/Unterzeichnende"
+msgstr "Verfasser/Beteiligte"
 
 msgid "New Note"
 msgstr "Neue Notiz"
@@ -2594,8 +2594,8 @@ msgstr "Verschiedenes"
 msgid "Elections"
 msgstr "Wahlen"
 
-msgid "Type"
-msgstr "Typ"
+msgid "Business Type"
+msgstr "Geschäftsart"
 
 #~ msgid "Parliamentarian is not in this commission."
 #~ msgstr "Parlamentarier:in ist nicht in dieser Kommission."

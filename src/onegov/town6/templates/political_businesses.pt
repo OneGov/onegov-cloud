@@ -12,7 +12,7 @@
                         <tr>
                             <th i18n:translate>Number</th>
                             <th i18n:translate>Datum</th>
-                            <th i18n:translate>Type</th>
+                            <th i18n:translate>Business Type</th>
                             <th i18n:translate>Status</th>
                             <th i18n:translate>Political Business</th>
                         </tr>
