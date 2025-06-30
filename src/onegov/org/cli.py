@@ -1682,15 +1682,26 @@ def import_meetings(
         import_counter = 0
         overwrite_counter = 0
 
+        german_month_map: dict[str, int] = {
+            'Jan': 1,
+            'Feb': 2,
+            'März': 3,
+            'Apr': 4,
+            'Mai': 5,
+            'Juni': 6,
+            'Juli': 7,
+            'Aug': 8,
+            'Sept': 9,
+            'Okt': 10,
+            'Nov': 11,
+            'Dez': 12
+    }
+
+
         start_dt: datetime | None
         end_dt: datetime | None
         for meeting, article_name in meetings:
             date = meeting['elements'][0]['children'][0]['text']
-            # Set locale to German for month parsing
-            try:
-                locale.setlocale(locale.LC_TIME, 'de_CH.UTF-8')
-            except locale.Error:
-                locale.setlocale(locale.LC_TIME, 'de_DE.UTF-8')
 
             date_str = date  # e.g. "7. Nov. 2024, 17.00 Uhr - 20.05 Uhr"
 
@@ -1702,20 +1713,15 @@ def import_meetings(
             )
             if match:
                 day, month_str, year, sh, sm, eh, em = match.groups()
-                # Parse month name to month number
-                # month string can be:
-                # month_str = month_str.strip('.')
-                if month_str == 'März':
-                    month_str = 'Mär'
-                elif month_str == 'Juni':
-                    month_str = 'Jun'
-                elif month_str == 'Juli':
-                    month_str = 'Jul'
-                elif month_str == 'Sept':
-                    month_str = 'Sep'
+                
+                month_str = month_str.strip()
+                if month_str in german_month_map:
+                    month = german_month_map[month_str]
+                else:
+                    click.secho(f'Unknown month: {month_str}', fg='red')
+                    continue
 
                 try:
-                    month = datetime.strptime(month_str, '%b').month
                     start_dt = datetime(
                         int(year), month, int(day), int(sh), int(sm)
                     )
@@ -1781,6 +1787,9 @@ def import_meetings(
                                     continue
                                 resp = requests.get(link, timeout=(5, 10))
                                 if resp.status_code == 200:
+                                    filename = row['cells'][0]['text']
+                                    filename = filename.replace(
+                                            '. ', '_').replace(' ', '_')
                                     if existing_file := file_coll.by_content(
                                         BytesIO(resp.content)
                                     ).first():
@@ -1791,7 +1800,7 @@ def import_meetings(
                                     )
                                     else:
                                         file = file_coll.add(
-                                            filename=row['cells'][0]['text'],
+                                            filename=filename,
                                             content=BytesIO(resp.content)
                                         )
                                         files.append(file)
@@ -1799,7 +1808,7 @@ def import_meetings(
                         if element['type'] == 'Table':
                             for row in element['rows']:
                                 cells = row['cells']
-                                if cells[1]['type'] != 'Link':
+                                if cells[2]['type'] != 'Link':
                                     continue
                                 political_business_id = cells[2]['url'].split(
                                     '/')[-1]
@@ -1825,9 +1834,6 @@ def import_meetings(
                         number=meeting['number'],
                         title=meeting['title'],
                         meeting_id=added.id,
-                        meta={
-                            'meta_date': meta_date,
-                        },
                         political_business_link_id=meeting[
                                 'political_business_id'],
                     )
@@ -1986,6 +1992,7 @@ def handle_es_connection_error(func: Any) -> Callable[[OrgRequest, OrgApp],
     return wrapper
 
 
+
 @cli.command(name='import-political-business')
 @click.argument('path', type=click.Path(exists=True, resolve_path=True))
 @click.option('--dry-run', is_flag=True, default=False)
@@ -2049,9 +2056,25 @@ def import_political_business(
         'Überwiesen': 'ueberwiesen',
     }
 
+    german_month_map: dict[str, int] = {
+        'Januar': 1,
+        'Februar': 2,
+        'März': 3,
+        'April': 4,
+        'Mai': 5,
+        'Juni': 6,
+        'Juli': 7,
+        'August': 8,
+        'September': 9,
+        'Oktober': 10,
+        'November': 11,
+        'Dezember': 12
+    }
+
     def parse_german_date(date_str: str | None) -> date | None:
         # Set locale to German for month parsing
         locale.setlocale(locale.LC_TIME, 'de_CH.UTF-8')
+
         return (datetime.strptime(date_str, '%d. %B %Y').date()
                 if date_str else None)
 
@@ -2277,12 +2300,24 @@ def import_political_business(
                     if '_' not in article_name:
                         continue
                     pol_business_id = article_name.split('_')[1].split('.')[0]
+                    click.secho(data_fields.get('Datum'), fg='green')
+                    datum = data_fields.get('Datum')
+                    if datum:
+                        day, month_str, year = datum.split(' ')
+                        day = int(day.strip('.'))  # type: ignore
+                        month = german_month_map.get(month_str, None)
+                        parsed_date = datetime(
+                            year=int(year),
+                            month=month,
+                            day=int(day)
+                        ) if month else None
+                        click.secho(f'Parsed date: {parsed_date}', fg='cyan')
                     political_business_collection.add(
                         title=political_business['metadata']['title'],
                         number=data_fields.get('Nummer'),
                         political_business_type=english_business_type,
                         status=english_status,
-                        entry_date=parse_german_date(data_fields.get('Datum')),
+                        entry_date=parsed_date,
                         content={},
                         meta={
                             'people_ids': people_ids,
