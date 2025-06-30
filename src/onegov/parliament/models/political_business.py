@@ -205,6 +205,15 @@ class PoliticalBusiness(
                 f'{self.title}, {self.political_business_type}>')
 
 
+class RISPoliticalBusiness(PoliticalBusiness):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'ris_political_business',
+    }
+
+    es_type_name = 'ris_political_business'
+
+
 class PoliticalBusinessParticipation(Base, ContentMixin):
     """ A participant of a political business, e.g. a parliamentarian. """
 

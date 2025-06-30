@@ -1622,7 +1622,7 @@ class PoliticalBusinessLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return self.model.name
+        return self.model.title
 
     @cached_property
     def og_description(self) -> str:

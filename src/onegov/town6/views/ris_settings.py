@@ -62,7 +62,7 @@ def view_ris_settings(
         # },
         {
             'name': 'political-businesses',
-            'title': _('Political businesses'),
+            'title': _('Political Businesses'),
             'link': request.class_link(PoliticalBusinessCollection),
             'icon': 'fa-file-contract'
         },

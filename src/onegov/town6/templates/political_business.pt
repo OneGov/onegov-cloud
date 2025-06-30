@@ -29,9 +29,9 @@
                     </ul>
                 </dd>
             </div>
-            <div tal:condition="business.parliamentary_group">
+            <div tal:condition="business.parliamentary_group_id">
                 <dt i18n:translate>Parliamentary Group</dt>
-                <dd><div tal:content="business.parliamentary_group"></div></dd>
+                <dd><div tal:content="business.parliamentary_group_id"></div></dd>
             </div>
 
             <div tal:condition="business.files">
@@ -53,6 +53,7 @@
                         <li>
                             <a tal:attributes="href request.link(meeting)">${meeting.title}</a>
                             <span tal:condition="meeting.date">(${layout.format_date(meeting.date, 'date')})</span>
+<!--?                            <span tal:condition="meeting.date">(${layout.format_date(meeting.date, 'datetime')})</span>-->
                         </li>
                     </ul>
                 </dd>
