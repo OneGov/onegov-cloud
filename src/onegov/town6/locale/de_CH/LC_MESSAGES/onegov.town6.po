@@ -2354,6 +2354,9 @@ msgstr "Geschlecht"
 msgid "Additional information"
 msgstr "Zusatzinformationen"
 
+msgid "Date of birth"
+msgstr "Geburtsdatum"
+
 msgid "Date of death"
 msgstr "Sterbedatum"
 
@@ -2379,10 +2382,13 @@ msgid "Business phone number"
 msgstr "Telefon Geschäft"
 
 msgid "Primary email address"
-msgstr "1. E-Mail"
+msgstr "E-Mail"
 
 msgid "Secondary email address"
-msgstr "2. E-Mail"
+msgstr "Weitere E-Mail"
+
+msgid "Remarks"
+msgstr "Bemerkungen"
 
 msgid "Role"
 msgstr "Rolle"
@@ -2511,7 +2517,7 @@ msgid "No active commissions."
 msgstr "Keine aktiven Kommissionen."
 
 msgid "Roles"
-msgstr "Rollen"
+msgstr "Mitgliedschaften"
 
 msgid "Parliament"
 msgstr "Parlament"
@@ -2566,6 +2572,24 @@ msgstr "Alle Parteien"
 
 msgid "RIS Settings"
 msgstr "Ratsinformationssystem"
+
+msgid "Agenda"
+msgstr "Traktanden"
+
+msgid "Meetings"
+msgstr "Sitzungen"
+
+msgid "Meeting"
+msgstr "Sitzung"
+
+msgid "Addition"
+msgstr "Adresszusatz"
+
+msgid "Zip code"
+msgstr "PLZ"
+
+msgid "City"
+msgstr "Ort"
 
 #~ msgid "Sign up"
 #~ msgstr "Anmelden"
