@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
     from onegov.core.types import RenderData
     from onegov.core.request import CoreRequest
+    from webob import Response
 
 
 @TownApp.html(
@@ -84,7 +85,7 @@ def view_meeting(
 @TownApp.view(model=MeetingItem, permission=Public)
 def view_redirect_meeting_item_to_meeting(
         self: MeetingItem, request: CoreRequest
-) -> None:
+) -> Response:
     """
     Redirect for search results, if we link to MeetingItem we show the Meeting
     """
