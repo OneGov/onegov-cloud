@@ -39,8 +39,8 @@
                 <dd>
                     <ul tal:repeat="file business.files">
                         <li>
-                            <a tal:attributes="href request.link(file)">${file.title}</a>
-                            <span tal:condition="file.description">(${file.description})</span>
+                            <a tal:attributes="href request.link(file)">${file.name}</a>
+                            <span tal:condition="file.description|None">(${file.description})</span>
                         </li>
                     </ul>
                 </dd>
@@ -52,8 +52,8 @@
                     <ul tal:repeat="meeting business.meetings">
                         <li>
                             <a tal:attributes="href request.link(meeting)">${meeting.title}</a>
-                            <span tal:condition="meeting.date">(${layout.format_date(meeting.date, 'date')})</span>
-<!--?                            <span tal:condition="meeting.date">(${layout.format_date(meeting.date, 'datetime')})</span>-->
+                            <span tal:condition="meeting.start_datetime|None">(${layout.format_date(meeting.start_datetime, 'datetime')})</span>
+                            <span tal:condition="meeting.end_datetime|None">(${layout.format_date(meeting.end_datetime, 'datetime')})</span>
                         </li>
                     </ul>
                 </dd>
