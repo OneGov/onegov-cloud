@@ -368,8 +368,6 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles,
 
     @property
     def active(self) -> bool:
-        if not self.roles:
-            return True
         for role in self.roles:
             if role.end is None or role.end >= date.today():
                 return True
