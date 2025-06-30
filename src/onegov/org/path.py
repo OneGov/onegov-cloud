@@ -411,7 +411,7 @@ def get_people(app: OrgApp) -> PersonCollection:
 
 @OrgApp.path(model=Person, path='/person/{id}', converters={'id': UUID})
 def get_person(app: OrgApp, id: UUID) -> Person | None:
-    return PersonCollection(app.session()).by_id(id)
+    return PersonCollection(app.session()).bmpory_id(id)
 
 
 @OrgApp.path(model=ChatCollection, path='/chats')

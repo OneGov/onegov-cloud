@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from more.transaction.main import morepath
+import morepath
 
 from onegov.core.security.permissions import Public
 
@@ -84,7 +84,7 @@ def view_meeting(
 @TownApp.view(model=MeetingItem, permission=Public)
 def view_redirect_meeting_item_to_meeting(
         self: MeetingItem, request: CoreRequest
-):
+) -> None:
     """
     Redirect for search results, if we link to MeetingItem we show the Meeting
     """
