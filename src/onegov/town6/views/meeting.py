@@ -74,6 +74,5 @@ def view_meeting(
         'contact': getattr(self, 'contact_html', None),
         'coordinates': None,
         'title': title,
-        'title': self.title,
         'meeting_items_with_links': meeting_items_with_links,
     }
