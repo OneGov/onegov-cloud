@@ -2594,6 +2594,8 @@ msgstr "Verschiedenes"
 msgid "Elections"
 msgstr "Wahlen"
 
+msgid "Type"
+msgstr "Typ"
 
 #~ msgid "Parliamentarian is not in this commission."
 #~ msgstr "Parlamentarier:in ist nicht in dieser Kommission."
