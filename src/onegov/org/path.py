@@ -100,6 +100,7 @@ from onegov.parliament.models import (
     RISParliamentaryGroup,
     RISParty, PoliticalBusiness,
 )
+from onegov.parliament.models.meeting_item import MeetingItem
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.people import Person, PersonCollection
@@ -1307,3 +1308,17 @@ def get_political_business(
     id: UUID
 ) -> PoliticalBusiness | None:
     return PoliticalBusinessCollection(app.session()).by_id(id)
+
+
+@OrgApp.path(
+    model=MeetingItem,
+    path='/meeting-item/{id}',
+    converters={'id': UUID}
+)
+def get_meeting_item(
+    app: OrgApp,
+    id: UUID
+) -> MeetingItem | None:
+    session = app.session()
+    res = session.query(MeetingItem).filter(MeetingItem.id == id).first()
+    return res

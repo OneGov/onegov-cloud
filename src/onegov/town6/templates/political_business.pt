@@ -24,8 +24,8 @@
             <div tal:condition="business.participants">
                 <dt i18n:translate>Participants</dt>
                 <dd>
-                    <ul tal:repeat="participant business.participants">
-                        <li><a tal:attributes="href request.link(participant)">${participant.name}</a> (${participant.participant_type})</li>
+                    <ul tal:repeat="participantions business.participants">
+                        <li><a tal:attributes="href request.link(participantions.parliamentarian)">${participantions.parliamentarian.first_name} ${participantions.parliamentarian.last_name}</a> (${participantions.participant_type})</li>
                     </ul>
                 </dd>
             </div>
@@ -51,8 +51,8 @@
                     <ul tal:repeat="meeting business.meetings">
                         <li>
                             <a tal:attributes="href request.link(meeting)">${meeting.title}</a>
-                            <span tal:condition="meeting.date">(${layout.format_date(meeting.date, 'date')})</span>
-<!--?                            <span tal:condition="meeting.date">(${layout.format_date(meeting.date, 'datetime')})</span>-->
+                            <span tal:condition="meeting.start_datetime|None">(${layout.format_date(meeting.start_datetime, 'datetime')})</span>
+                            <span tal:condition="meeting.end_datetime|None">(${layout.format_date(meeting.end_datetime, 'datetime')})</span>
                         </li>
                     </ul>
                 </dd>

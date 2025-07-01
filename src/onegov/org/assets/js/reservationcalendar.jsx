@@ -637,11 +637,11 @@ rc.setupReservationSelect = function(options) {
                 if (event.length !== 0) {
                     target = event;
                 } else {
-                    target = calendar.find('.fc-view');
+                    target = view;
                 }
             }
 
-            target = target || calendar.find('.has-popup') || calendar.find('.fc-view');
+            target = target || $(element).find('.has-popup') || view;
             rc.showErrorPopup(calendar, target, data.message);
         });
 
