@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-06-26 15:55+0200\n"
+"POT-Creation-Date: 2025-07-01 09:10+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -189,6 +189,9 @@ msgstr "Utenti"
 
 msgid "User groups"
 msgstr "Gruppi di utenti"
+
+msgid "RIS Settings"
+msgstr "Impostazioni RIS"
 
 msgid "Link Check"
 msgstr "Controllo del collegamento"
@@ -391,6 +394,15 @@ msgstr "Slot per prenotazione"
 
 msgid "Start time before end time"
 msgstr "Ora di inizio precedente l'ora di fine"
+
+msgid "Name"
+msgstr "Nome"
+
+msgid "Type"
+msgstr "Tipo"
+
+msgid "Description"
+msgstr "Descrizione"
 
 msgid "Lead"
 msgstr "Principale"
@@ -599,9 +611,6 @@ msgstr "Date di pubblicazione obbligatorie"
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Informazioni da fornire in aggiunta all'e-mail"
 
-msgid "Name"
-msgstr "Nome"
-
 msgid "Phone"
 msgstr "Telefono"
 
@@ -803,9 +812,6 @@ msgstr "Do"
 
 msgid "Concerto in the castle garden"
 msgstr "Concerto nel giardino del castello"
-
-msgid "Description"
-msgstr "Descrizione"
 
 msgid "Enjoy a concerto in the castle garden."
 msgstr "Goditi un concerto nel giardino del castello."
@@ -1149,6 +1155,9 @@ msgstr "Per didascalia"
 msgid "By last change"
 msgstr "Per data dell'ultima modifica"
 
+msgid "Portrait"
+msgstr "Ritratto"
+
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilizzato nella panoramica e nell'oggetto dell'e-mail"
 
@@ -1277,17 +1286,113 @@ msgstr "- Principale -"
 msgid "Invalid destination selected"
 msgstr "Destinazione non valida selezionata"
 
-msgid "Salutation"
-msgstr "Formula di saluto"
+msgid "Personnel number"
+msgstr "Numero del personale"
 
-msgid "Academic Title"
-msgstr "Titolo accademico"
+msgid "Basic properties"
+msgstr "Proprietà di base"
+
+msgid "Contract number"
+msgstr "Numero del contratto"
+
+msgid "Gender"
+msgstr "Genere"
 
 msgid "First name"
 msgstr "Nome"
 
 msgid "Last name"
 msgstr "Cognome"
+
+msgid "Picture"
+msgstr "Immagine"
+
+msgid "Private address"
+msgstr "Indirizzo privato"
+
+msgid "Addition"
+msgstr "Suffisso"
+
+msgid "Zip code"
+msgstr "Codice postale"
+
+msgid "City"
+msgstr "Città"
+
+msgid "Date of birth"
+msgstr "Data di nascita"
+
+msgid "Additional information"
+msgstr "Informazioni aggiuntive"
+
+msgid "Date of death"
+msgstr "Data di morte"
+
+msgid "Place of origin"
+msgstr "Luogo di origine"
+
+msgid "Occupation"
+msgstr "Occupazione"
+
+msgid "Academic title"
+msgstr "Titolo acc"
+
+msgid "Salutation"
+msgstr "Formula di saluto"
+
+msgid "Private phone number"
+msgstr "Numero di telefono privato"
+
+msgid "Mobile phone number"
+msgstr "Numero di cellulare"
+
+msgid "Business phone number"
+msgstr "Numero di telefono aziendale"
+
+msgid "Primary email address"
+msgstr "Indirizzo e-mail primario"
+
+msgid "Secondary email address"
+msgstr "Indirizzo e-mail secondario"
+
+msgid "Website"
+msgstr "Sito web"
+
+msgid "Remarks"
+msgstr "Osservazioni"
+
+msgid "Shipping method"
+msgstr "Metodo di spedizione"
+
+msgid "Shipping address"
+msgstr "Indirizzo di spedizione"
+
+msgid "Salutation used in the address"
+msgstr "Saluto utilizzato nell'indirizzo"
+
+msgid "Salutation used for letters"
+msgstr "Saluto utilizzato per le lettere"
+
+msgid "How bills should be delivered"
+msgstr "Come le fatture devono essere consegnate"
+
+msgid "Parliamentarian"
+msgstr "Parlamentare"
+
+msgid "Role"
+msgstr "Ruolo"
+
+msgid "Party role"
+msgstr "Ruolo nel partito"
+
+msgid "Parliamentary group"
+msgstr "Gruppo parlamentare"
+
+msgid "Parliamentary group role"
+msgstr "Ruolo nel gruppo parlamentare"
+
+msgid "Academic Title"
+msgstr "Titolo accademico"
 
 msgid "Function"
 msgstr "Funzione"
@@ -1313,9 +1418,6 @@ msgstr "Partito politico"
 msgid "Parliamentary Group"
 msgstr "Gruppo parlamentare"
 
-msgid "Website"
-msgstr "Sito web"
-
 msgid "Website 2"
 msgstr "Sito web 2"
 
@@ -1330,9 +1432,6 @@ msgstr "Indirizzo postale"
 
 msgid "Postal Code and City"
 msgstr "Codice postale e città"
-
-msgid "Picture"
-msgstr "Immagine"
 
 msgid "URL pointing to the picture"
 msgstr "URL che punta all'immagine"
@@ -2537,9 +2636,6 @@ msgstr "Attivo"
 msgid "Inactive"
 msgstr "Inattivo"
 
-msgid "Role"
-msgstr "Ruolo"
-
 #, fuzzy
 msgid "Yubikey"
 msgstr "Yubikey"
@@ -2587,6 +2683,15 @@ msgstr ""
 
 msgid "Shared e-mail address for ticket submission notifications"
 msgstr "Indirizzo e-mail condiviso per le notifiche di invio dei ticket"
+
+msgid ""
+"When specified, notifications for new tickets will be sent to this e-mail "
+"address, instead of to individual members. Requires that immediate e-mail "
+"notifications are turned on for at least one kind of ticket."
+msgstr ""
+"Se specificato, le notifiche dei nuovi ticket saranno inviate a questo "
+"indirizzo e-mail, invece che ai singoli membri. Richiede che le notifiche "
+"immediate via e-mail siano attivate per almeno un tipo di ticket."
 
 msgid "Send a periodic status e-mail."
 msgstr "Invia un'e-mail di stato periodica."

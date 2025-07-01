@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-06-26 15:55+0200\n"
+"POT-Creation-Date: 2025-07-01 09:10+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -188,6 +188,9 @@ msgstr "Benutzer"
 
 msgid "User groups"
 msgstr "Benutzergruppen"
+
+msgid "RIS Settings"
+msgstr "Ratsinformationssystem"
 
 msgid "Link Check"
 msgstr "Link-Prüfung"
@@ -390,6 +393,15 @@ msgstr "Kontingent per Reservation"
 
 msgid "Start time before end time"
 msgstr "Start-Zeit vor End-Zeit"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Type"
+msgstr "Typ"
+
+msgid "Description"
+msgstr "Beschreibung"
 
 msgid "Lead"
 msgstr "Einleitung"
@@ -597,9 +609,6 @@ msgstr "Publikationsdaten erforderlich"
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Zusätzliche zur E-Mail benötigte Informationen des Antragstellers"
 
-msgid "Name"
-msgstr "Name"
-
 msgid "Phone"
 msgstr "Telefon"
 
@@ -800,9 +809,6 @@ msgstr "So"
 
 msgid "Concerto in the castle garden"
 msgstr "Konzert im Schlossgarten"
-
-msgid "Description"
-msgstr "Beschreibung"
 
 msgid "Enjoy a concerto in the castle garden."
 msgstr "Freuen Sie sich auf ein klassisches Konzert im Schlossgarten."
@@ -1146,6 +1152,9 @@ msgstr "Nach Beschreibung"
 msgid "By last change"
 msgstr "Nach Zeitpunkt der letzten Änderung"
 
+msgid "Portrait"
+msgstr "Portrait"
+
 msgid "Used in the overview and the e-mail subject"
 msgstr "Wird in der Übersicht und als E-Mail Subjekt verwendet"
 
@@ -1274,17 +1283,113 @@ msgstr "- Oberste Ebene -"
 msgid "Invalid destination selected"
 msgstr "Ungültiger Zielort gewählt"
 
-msgid "Salutation"
-msgstr "Anrede"
+msgid "Personnel number"
+msgstr "Personalnummer"
 
-msgid "Academic Title"
-msgstr "Akademischer Titel"
+msgid "Basic properties"
+msgstr "Basis-Eigenschaften"
+
+msgid "Contract number"
+msgstr "Vertragsnummer"
+
+msgid "Gender"
+msgstr "Geschlecht"
 
 msgid "First name"
 msgstr "Vorname"
 
 msgid "Last name"
 msgstr "Nachname"
+
+msgid "Picture"
+msgstr "Bild"
+
+msgid "Private address"
+msgstr "Privatadresse"
+
+msgid "Addition"
+msgstr "Zusatz"
+
+msgid "Zip code"
+msgstr "PLZ"
+
+msgid "City"
+msgstr "Ort"
+
+msgid "Date of birth"
+msgstr "Geburtsdatum"
+
+msgid "Additional information"
+msgstr "Zusätzliche Informationen"
+
+msgid "Date of death"
+msgstr "Sterbedatum"
+
+msgid "Place of origin"
+msgstr "Bürgerort"
+
+msgid "Occupation"
+msgstr "Beruf"
+
+msgid "Academic title"
+msgstr "Akademischer Titel"
+
+msgid "Salutation"
+msgstr "Anrede"
+
+msgid "Private phone number"
+msgstr "Telefon Privat"
+
+msgid "Mobile phone number"
+msgstr "Telefon Mobile"
+
+msgid "Business phone number"
+msgstr "Telefon Geschäft"
+
+msgid "Primary email address"
+msgstr "E-Mail"
+
+msgid "Secondary email address"
+msgstr "Weitere E-Mail"
+
+msgid "Website"
+msgstr "Webseite"
+
+msgid "Remarks"
+msgstr "Bemerkungen"
+
+msgid "Shipping method"
+msgstr "Versandart"
+
+msgid "Shipping address"
+msgstr "Lieferadresse"
+
+msgid "Salutation used in the address"
+msgstr "Anrede in der Adresse"
+
+msgid "Salutation used for letters"
+msgstr "Anrede in Briefen"
+
+msgid "How bills should be delivered"
+msgstr "Rechnungszustellung"
+
+msgid "Parliamentarian"
+msgstr "Parlamentarier:in"
+
+msgid "Role"
+msgstr "Rolle"
+
+msgid "Party role"
+msgstr "Rolle in der Partei"
+
+msgid "Parliamentary group"
+msgstr "Fraktion"
+
+msgid "Parliamentary group role"
+msgstr "Rolle in der Fraktion"
+
+msgid "Academic Title"
+msgstr "Akademischer Titel"
 
 msgid "Function"
 msgstr "Funktion"
@@ -1310,9 +1415,6 @@ msgstr "Politische Partei"
 msgid "Parliamentary Group"
 msgstr "Fraktion"
 
-msgid "Website"
-msgstr "Webseite"
-
 msgid "Website 2"
 msgstr "Webseite 2"
 
@@ -1327,9 +1429,6 @@ msgstr "Postadresse"
 
 msgid "Postal Code and City"
 msgstr "Postleitzahl und Ort"
-
-msgid "Picture"
-msgstr "Bild"
 
 msgid "URL pointing to the picture"
 msgstr "Link zum Bild"
@@ -2529,9 +2628,6 @@ msgstr "Aktiv"
 msgid "Inactive"
 msgstr "Inaktiv"
 
-msgid "Role"
-msgstr "Rolle"
-
 msgid "Yubikey"
 msgstr "YubiKey"
 
@@ -2578,6 +2674,16 @@ msgstr ""
 msgid "Shared e-mail address for ticket submission notifications"
 msgstr ""
 "Geteilte E-Mail Adresse für E-Mail-Benachrichtigungen beim Ticketeingang"
+
+msgid ""
+"When specified, notifications for new tickets will be sent to this e-mail "
+"address, instead of to individual members. Requires that immediate e-mail "
+"notifications are turned on for at least one kind of ticket."
+msgstr ""
+"Falls gesetzt, werden E-Mail-Benachrichtigungen beim Ticketeingang nur an "
+"diese E-Mail Adresse versendet, anstatt an alle Mitglieder individuell. "
+"Setzt voraus, dass mindestens eine Ticket-Art ausgewählt ist für "
+"unmittelbare E-Mail-Benachrichtigungen."
 
 msgid "Send a periodic status e-mail."
 msgstr "Ein periodisches Status E-Mail senden."

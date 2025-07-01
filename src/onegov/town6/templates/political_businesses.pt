@@ -21,8 +21,8 @@
                         <tr>
                             <td><span>${business.number}</span></td>
                             <td><span>${layout.format_date(business.entry_date, 'date')}</span></td>
-                            <td i18n:translate><span>${type_map[business.political_business_type]}</span></td>
-                            <td i18n:translate><span>${status_map[business.status]}</span></td>
+                            <td><span>${type_map[business.political_business_type]}</span></td>
+                            <td><span>${status_map[business.status]}</span></td>
                             <td>
                                 <a tal:attributes="href request.link(business)">${business.title}</a>
                             </td>
