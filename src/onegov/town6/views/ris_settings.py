@@ -4,7 +4,6 @@ from onegov.org.models import Organisation
 from onegov.parliament.collections import PoliticalBusinessCollection
 from onegov.parliament.collections import MeetingCollection
 from onegov.parliament.collections import RISCommissionCollection
-from onegov.parliament.collections import RISPartyCollection
 from onegov.parliament.collections.parliamentarian import (
     RISParliamentarianCollection
 )
@@ -68,12 +67,6 @@ def view_ris_settings(
             'icon': 'fa-file-contract'
         },
         # delegations
-        {
-            'name': 'parties',
-            'title': _('Parties'),
-            'link': request.class_link(RISPartyCollection),
-            'icon': 'fa-users'
-        },
     ]
 
     return {
