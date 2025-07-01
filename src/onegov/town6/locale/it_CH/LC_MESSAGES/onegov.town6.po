@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-06-11 11:26+0200\n"
+"POT-Creation-Date: 2025-07-01 13:38+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -731,6 +731,9 @@ msgstr "Fallito"
 msgid "Refunded"
 msgstr "Rimborsato"
 
+msgid "Invoiced"
+msgstr ""
+
 msgid "Manual"
 msgstr "Manuale"
 
@@ -1395,6 +1398,9 @@ msgstr ""
 msgid "Key Code"
 msgstr "Codice chiave"
 
+msgid "The following reservations have unfortunately been cancelled:"
+msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
+
 msgid "Here's a summary of your reservations:"
 msgstr "Ecco un riepilogo delle vostre prenotazioni:"
 
@@ -1403,9 +1409,6 @@ msgstr "Modifiche alle prenotazioni inviate:"
 
 msgid "Rejected"
 msgstr "Rifiutata"
-
-msgid "The following reservations have unfortunately been cancelled:"
-msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
 
 msgid "A message has been sent regarding ${ref}:"
 msgstr "È stato inviato un messaggio relativo a ${ref}:"
@@ -1718,6 +1721,12 @@ msgstr "Abilitato:"
 
 msgid "Fee:"
 msgstr "Imposta:"
+
+msgid "Export Bill run as PDF"
+msgstr "Esportazione della fattura in formato PDF"
+
+msgid "Ausgewählte als fakturiert markieren"
+msgstr "Contrassegnare il selezionato come fatturato"
 
 msgid "No payments yet."
 msgstr "Nessun pagamento ancora."

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-06-11 11:26+0200\n"
+"POT-Creation-Date: 2025-07-01 13:38+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -496,8 +496,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -732,6 +732,9 @@ msgstr "Échoué"
 
 msgid "Refunded"
 msgstr "Remboursé"
+
+msgid "Invoiced"
+msgstr ""
 
 msgid "Manual"
 msgstr "Manuelle"
@@ -1403,6 +1406,9 @@ msgstr ""
 msgid "Key Code"
 msgstr "Code clé"
 
+msgid "The following reservations have unfortunately been cancelled:"
+msgstr "Les réservations suivantes ont malheureusement été annulées:"
+
 msgid "Here's a summary of your reservations:"
 msgstr "Voici un résumé de vos réservations:"
 
@@ -1411,9 +1417,6 @@ msgstr "Les modifications apportées aux réservations que vous avez soumises:"
 
 msgid "Rejected"
 msgstr "Rejetée"
-
-msgid "The following reservations have unfortunately been cancelled:"
-msgstr "Les réservations suivantes ont malheureusement été annulées:"
 
 msgid "A message has been sent regarding ${ref}:"
 msgstr "Un message a été envoyé à propos de ${ref}:"
@@ -1724,6 +1727,12 @@ msgstr "Activé :"
 
 msgid "Fee:"
 msgstr "Tarif :"
+
+msgid "Export Bill run as PDF"
+msgstr "Exporter l'exécution de la facture au format PDF"
+
+msgid "Ausgewählte als fakturiert markieren"
+msgstr "Marquer la sélection comme facturée"
 
 msgid "No payments yet."
 msgstr "Pas de paiements pour le moment."

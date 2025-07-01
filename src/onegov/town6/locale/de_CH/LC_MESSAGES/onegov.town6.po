@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-06-11 11:26+0200\n"
+"POT-Creation-Date: 2025-07-01 13:38+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -733,6 +733,9 @@ msgstr "Fehlgeschlagen"
 msgid "Refunded"
 msgstr "Rückerstattet"
 
+msgid "Invoiced"
+msgstr ""
+
 msgid "Manual"
 msgstr "Manuell"
 
@@ -1406,6 +1409,9 @@ msgstr ""
 msgid "Key Code"
 msgstr "Schlüsselcode"
 
+msgid "The following reservations have unfortunately been cancelled:"
+msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
+
 msgid "Here's a summary of your reservations:"
 msgstr "Hier ist eine Zusammenfassung Ihrer Reservationen:"
 
@@ -1414,9 +1420,6 @@ msgstr "Änderungen an Ihren übermittelten Reservationen:"
 
 msgid "Rejected"
 msgstr "Abgelehnt"
-
-msgid "The following reservations have unfortunately been cancelled:"
-msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
 
 msgid "A message has been sent regarding ${ref}:"
 msgstr "Sie haben zu ${ref} eine Nachricht erhalten:"
@@ -1725,6 +1728,12 @@ msgstr "Aktiviert:"
 
 msgid "Fee:"
 msgstr "Gebühr:"
+
+msgid "Export Bill run as PDF"
+msgstr "Rechnungslauf als PDF exportieren"
+
+msgid "Ausgewählte als fakturiert markieren"
+msgstr ""
 
 msgid "No payments yet."
 msgstr "Noch keine Zahlungen."
