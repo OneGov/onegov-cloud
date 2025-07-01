@@ -84,6 +84,11 @@ class Handler:
         if self.ticket.ticket_email != self.email:
             self.ticket.ticket_email = self.email
 
+        payment = self.payment
+        payment_id = payment.id if payment else None
+        if self.ticket.payment_id != payment_id:
+            self.ticket.payment_id = payment_id
+
     @property
     def email(self) -> str | None:
         """ Returns the email address behind the ticket request. """

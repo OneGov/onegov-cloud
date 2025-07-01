@@ -4,11 +4,11 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from __future__ import annotations
 
-from onegov.core.orm.types import JSON, UTCDateTime
+from onegov.core.orm.types import JSON, UTCDateTime, UUID
 from onegov.core.upgrade import upgrade_task
 from onegov.ticket import Ticket
 from sqlalchemy import Boolean, Column, Integer, Text, Enum
-from sqlalchemy import column, update, func, and_, true, false
+from sqlalchemy import column, update, func, and_, true, false, text
 from sqlalchemy.orm import load_only
 from sqlalchemy.dialects.postgresql import HSTORE
 
@@ -272,3 +272,39 @@ def add_ticket_email_column_and_index(context: UpgradeContext) -> None:
     ):
         if (email := ticket.handler.email) is not None:
             ticket.ticket_email = email
+
+
+@upgrade_task('Add redundant payment_id to ticket')
+def add_payment_id_to_ticket(context: UpgradeContext) -> None:
+    if context.has_column('tickets', 'payment_id'):
+        return
+
+    context.operations.add_column(
+        'tickets', Column('payment_id', UUID, nullable=True)
+    )
+
+    context.operations.create_index(
+        'ix_ticket_payment_id', 'tickets', ['payment_id']
+    )
+
+    # There is no fast path for this, since payment_id is not stored
+    # in the snapshot.
+
+    # Slow upgrade path for all tickets that might have a payment.
+    for ticket in (
+        context.session.query(Ticket)
+        .options(load_only(
+            Ticket.id,
+            Ticket.handler_code,
+            Ticket.handler_id,
+        ))
+    ):
+        if (payment := ticket.handler.payment) is not None:
+            stmt = update(Ticket.__table__).where(
+                Ticket.__table__.c.id == ticket.id
+            ).values(
+                payment_id=payment.id
+            )
+            context.session.execute(stmt)
+
+    context.session.flush()
