@@ -39,8 +39,7 @@
                 <dd>
                     <ul tal:repeat="file business.files">
                         <li>
-                            <a tal:attributes="href request.link(file)">${file.title}</a>
-                            <span tal:condition="file.description">(${file.description})</span>
+                            <a tal:attributes="href request.link(file)">${file.name}</a>
                         </li>
                     </ul>
                 </dd>

@@ -20,6 +20,7 @@ from io import BytesIO
 import pytz
 import locale
 import requests
+from requests.auth import HTTPBasicAuth
 import transaction
 import yaml
 from onegov.core.orm.utils import QueryChain
@@ -62,6 +63,7 @@ from onegov.parliament.models import (
     MeetingItem,
     RISCommissionMembership,
     RISParliamentarian,
+    political_business,
 )
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -2255,8 +2257,6 @@ def import_political_business(
                         if element:
                             if element['text'] == 'Dokument' or \
                             element['text'] == 'Dokumente':
-                                click.secho(
-                                    f'Warning: Document section found in {article_name}. ')
                                 element = elements[i+1] if i + 1 < len(elements) else None
                                 if element['type'] == 'Table':
                                     for row in element['rows']:
@@ -2268,7 +2268,14 @@ def import_political_business(
                                                 f' {row["cells"][0]}'
                                             )
                                             continue
-                                        resp = requests.get(link, timeout=(5, 10))
+                                        filenumber = link.split('/')[-1]
+                                        new_link = 'https://g553-preview.i-cms.ch/_doc/' + filenumber
+                                        click.secho(new_link, fg='cyan')
+                                        request_session = requests.Session()
+                                        request_session.auth = ('preview', 'preview')
+                                        auth = HTTPBasicAuth('preview', 'preview')
+                                        resp = requests.get(new_link, auth=auth, timeout=(5, 10))
+                                        click.secho(f'Status code: {resp.status_code}', fg='yellow')
                                         if resp.status_code == 200:
                                             if existing_file := file_coll.by_content(
                                                 BytesIO(resp.content)
@@ -2279,6 +2286,9 @@ def import_political_business(
                                                     'exists, skipping.'
                                             )
                                             else:
+                                                click.echo(
+                                                    f'Adding file {row["cells"][0]["text"]} '
+                                                    f'to {article_name}.')
                                                 file = file_coll.add(
                                                     filename=row['cells'][0]['text'],
                                                     content=BytesIO(resp.content)
@@ -2688,6 +2698,98 @@ def connect_political_business_meeting_items(
                 MeetingItem.political_business_link_id == self_id
             ).first()
             if meeting_item is not None:
-                meeting_item.political_business_id = political_business.id
-        transaction.commit()
+                with meeting_items.session.no_autoflush:
+                    print(f'Connecting {political_business.title} ')
+                    meeting_item.political_business_id = political_business.id
     return connect_ids
+
+
+
+@cli.command(name='add-files-to-political-businesses')
+@click.argument('path', type=click.Path(exists=True, resolve_path=True))
+def add_files_to_political_businesses(
+    path: str,
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Adds files to Political Businesses
+
+    onegov-org --select '/foo/bar' add-files-to-political-businesses /path
+
+    """
+
+    def read_json_files(path: str) -> Iterator[tuple[dict[str, Any], str]]:
+        for file in Path(path).iterdir():
+
+            if file.suffix == '.json':
+                with open(file) as f:
+                    yield (json.load(f), file.name)
+
+    def add_files(request: OrgRequest, app: OrgApp) -> None:
+        political_businesses = PoliticalBusinessCollection(request.session)
+        pb_dict = {
+            pb.meta.get('self_id'): pb
+            for pb in political_businesses.query()
+        }
+        file_coll = FileCollection(request.session)
+
+        pb_json = read_json_files(path)
+        for pb, article_name in pb_json:
+            click.echo(f'Adding files to {article_name}')
+            files = []
+            political_business = pb_dict.get(
+                article_name.split('_')[1].replace('.json', ''))
+            click.secho(f'Found political business: {political_business.id}',
+                        fg='green')
+            elements = pb.get('elements', [])
+            for i, element in enumerate(elements):
+                if element['type'] == 'Heading':
+                    if element:
+                        if element['text'] == 'Dokument' or \
+                        element['text'] == 'Dokumente':
+                            element = elements[i+1] if i + 1 < len(elements) else None
+                            if element['type'] == 'Table':
+                                for row in element['rows']:
+                                    try:
+                                        link = row['cells'][0]['url']
+                                    except KeyError:
+                                        click.echo(
+                                            f'No link found in row'
+                                            f' {row["cells"][0]}'
+                                        )
+                                        continue
+                                    filenumber = link.split('/')[-1]
+                                    new_link = 'https://g553-preview.i-cms.ch/_doc/' + filenumber
+                                    request_session = requests.Session()
+                                    request_session.auth = ('preview', 'preview')
+                                    auth = HTTPBasicAuth('preview', 'preview')
+                                    resp = requests.get(new_link, auth=auth, timeout=(5, 10))
+                                    if resp.status_code == 200:
+                                        if existing_file := file_coll.by_content(
+                                            BytesIO(resp.content)
+                                        ).first():
+                                            files.append(existing_file)
+                                            click.echo(
+                                                f'File {existing_file} already '
+                                                'exists, skipping.'
+                                        )
+                                        else:
+                                            filename = row["cells"][0]["text"]
+                                            filename = filename.replace(
+                                                    '. ', '_'
+                                                ).replace('.', '_')
+                                            click.echo(
+                                                f'Adding file {filename} '
+                                                f'to {article_name}.')
+                                            file = file_coll.add(
+                                                filename=filename,
+                                                content=BytesIO(resp.content)
+                                            )
+                                            files.append(file)
+
+            if files and political_business:
+                click.echo(f'Adding files to {political_business.title}')
+                political_business.files = files
+                request.session.flush()
+
+    return add_files
+
+
