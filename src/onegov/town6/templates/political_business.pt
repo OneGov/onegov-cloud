@@ -10,7 +10,7 @@
                 <dd><div tal:content="business.number"></div></dd>
             </div>
             <div tal:condition="business.political_business_type">
-                <dt i18n:translate>Type</dt>
+                <dt i18n:translate>Business Type</dt>
                 <dd><div tal:content="type_map[business.political_business_type]"></div></dd>
             </div>
             <div tal:condition="business.status">
@@ -24,8 +24,8 @@
             <div tal:condition="business.participants">
                 <dt i18n:translate>Participants</dt>
                 <dd>
-                    <ul tal:repeat="participantions business.participants">
-                        <li><a tal:attributes="href request.link(participantions.parliamentarian)">${participantions.parliamentarian.first_name} ${participantions.parliamentarian.last_name}</a> (${participantions.participant_type})</li>
+                    <ul tal:repeat="participations business.participants" class="business-participants">
+                        <li><a tal:attributes="href request.link(participations.parliamentarian)">${participations.parliamentarian.first_name} ${participations.parliamentarian.last_name}</a> (${participations.participant_type})</li>
                     </ul>
                 </dd>
             </div>

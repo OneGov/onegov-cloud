@@ -2,6 +2,7 @@ from __future__ import annotations
 from onegov.core.security import Private
 from onegov.org.models import Organisation
 from onegov.parliament.collections import PoliticalBusinessCollection
+from onegov.parliament.collections import MeetingCollection
 from onegov.parliament.collections import RISCommissionCollection
 from onegov.parliament.collections import RISPartyCollection
 from onegov.parliament.collections.parliamentarian import (
@@ -54,12 +55,12 @@ def view_ris_settings(
             'link': request.class_link(RISCommissionCollection),
             'icon': 'fa-user-friends'
         },
-        # {
-        #     'name': 'meetings',
-        #     'title': _('Meetings'),
-        #     'link': request.class_link(MeetingCollection),
-        #     'icon': 'fa-chair'
-        # },
+        {
+            'name': 'meetings',
+            'title': _('Meetings'),
+            'link': request.class_link(MeetingCollection),
+            'icon': 'fa-chair'
+        },
         {
             'name': 'political-businesses',
             'title': _('Political Businesses'),
