@@ -61,7 +61,7 @@ from onegov.parliament.collections import (
 from onegov.parliament.models import (
     MeetingItem,
     RISCommissionMembership,
-    RISParliamentarian,
+    RISParliamentarian, RISParliamentarianRole,
 )
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -2653,3 +2653,64 @@ def connect_political_business_meeting_items(
                 meeting_item.political_business_id = political_business.id
         transaction.commit()
     return connect_ids
+
+
+@cli.command(name='ris-shipping-to-private-address')
+def ris_shipping_to_private_address(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Sets the RIS shipping address to the private address
+
+    onegov-org --select /foo/bar ris-shipping-to-private-address
+
+    """
+
+    def set_private_address(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        parliamentarians = RISParliamentarianCollection(session)
+
+        for p in parliamentarians.query():
+
+            if not p.private_address and p.shipping_address:
+                p.private_address = p.shipping_address
+                p.shipping_address = None
+            if not p.private_address_addition and p.shipping_address_addition:
+                p.private_address_addition = p.shipping_address_addition
+                p.shipping_address_addition = None
+            if not p.private_address_zip_code and p.shipping_address_zip_code:
+                p.private_address_zip_code = p.shipping_address_zip_code
+                p.shipping_address_zip_code = None
+            if not p.private_address_city and p.shipping_address_city:
+                p.private_address_city = p.shipping_address_city
+                p.shipping_address_city = None
+
+        transaction.commit()
+
+    return set_private_address
+
+
+@cli.command(name='ris-set-end-date-for-inactive-parliamentarians')
+def ris_set_end_date_for_inactive_parliamentarians(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Sets the end date for inactive parliamentarians
+
+    onegov-org --select /foo/bar ris-set-end-date-for-inactive-parliamentarians
+
+    """
+
+    def set_end_date(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        parliamentarians = RISParliamentarianCollection(session)
+
+        for p in parliamentarians.query():
+            if p.active:
+                continue
+
+            p.roles.append(RISParliamentarianRole(
+                end=date(2024, 12, 31),
+                parliamentarian_id=p.id,
+                role='member'
+            ))
+
+        transaction.commit()
+
+    return set_end_date
