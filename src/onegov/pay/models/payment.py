@@ -17,8 +17,10 @@ from uuid import uuid4
 
 
 from typing import Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     import uuid
+    from onegov.ticket.model import Ticket
     from onegov.pay.models import PaymentProvider
     from onegov.pay.types import PaymentState
     from typing import Self
@@ -75,6 +77,11 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
     provider: relationship[PaymentProvider[Self] | None] = relationship(
         'PaymentProvider',
         back_populates='payments'
+    )
+
+    tickets: relationship[list[Ticket]] = relationship(
+        'Ticket',
+        back_populates='payment'
     )
 
     __mapper_args__ = {

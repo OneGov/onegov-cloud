@@ -22,6 +22,7 @@ from uuid import uuid4
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
+    from onegov.pay.models.payment import Payment
     from collections.abc import Sequence
     from datetime import datetime
     from onegov.core.request import CoreRequest
@@ -107,7 +108,13 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     payment_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('payments.id'),
-        nullable=True
+        nullable=True,
+        index=True
+    )
+
+    payment: relationship[Payment | None] = relationship(
+        'Payment',
+        back_populates='tickets'
     )
 
     #: a snapshot of the ticket containing the last summary that made any sense

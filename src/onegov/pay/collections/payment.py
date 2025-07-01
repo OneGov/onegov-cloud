@@ -2,12 +2,9 @@ from __future__ import annotations
 
 from collections import defaultdict
 
-from libres.db.models import Reservation
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.pay.models import Payment
 from sqlalchemy.orm import joinedload
-from onegov.core.orm.types import UUID as onegovUUID
-from sqlalchemy.sql.expression import cast
 
 
 from typing import Any, TYPE_CHECKING
@@ -40,7 +37,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         start: datetime | None = None,
         end: datetime | None = None,
         ticket_start: datetime | None = None,
-        ticket_end: datetime | None =None,
+        ticket_end: datetime | None = None,
         status: str | None = None,
         payment_type: str | None = None
     ):
@@ -113,16 +110,13 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         if self.status:
             query = query.filter(Payment.state == self.status)
 
-        # Filter by ticket creation date - this is the complex part
+        # Filter by payments by each associated ticket creation date
         if self.ticket_start or self.ticket_end:
-            # Join through reservations to tickets
-            query = query.join(
-                Reservation,
-                Payment.id == Reservation.payment.id
-            ).join(
-                Ticket,
-                cast(Reservation.token, onegovUUID) == Ticket.handler_id
-            )
+            query = query.join(Ticket, Payment.id == Ticket.payment_id)
+            if self.ticket_start:
+                query = query.filter(Ticket.created >= self.ticket_start)
+            if self.ticket_end:
+                query = query.filter(Ticket.created <= self.ticket_end)
 
             if self.ticket_start:
                 query = query.filter(Ticket.created >= self.ticket_start)

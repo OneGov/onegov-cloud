@@ -74,7 +74,6 @@ class PaymentSearchForm(Form):
         default='',
     )
 
-
     def apply_model(self, model: PaymentCollection) -> None:
         """Populate the form fields from the model's filter values."""
         self.start_date.data = model.start
