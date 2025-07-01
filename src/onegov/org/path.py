@@ -1291,11 +1291,15 @@ def get_meeting(
 @OrgApp.path(
     model=PoliticalBusinessCollection,
     path='/political-businesses',
+    converters={
+        'page': int,
+    }
 )
 def get_political_businesses(
     app: OrgApp,
+    page: int = 0,
 ) -> PoliticalBusinessCollection:
-    return PoliticalBusinessCollection(app.session())
+    return PoliticalBusinessCollection(app.session(), page=page)
 
 
 @OrgApp.path(

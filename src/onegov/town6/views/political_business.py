@@ -35,7 +35,7 @@ def view_political_businesses(
     return {
         # 'add_link': request.link(self, name='new'),
         'layout': layout or PoliticalBusinessCollectionLayout(self, request),
-        'businesses': self.query().all(),
+        'businesses': self.batch,
         'title': _('Political Businesses'),
         'type_map': POLITICAL_BUSINESS_TYPE,
         'status_map': POLITICAL_BUSINESS_STATUS,
