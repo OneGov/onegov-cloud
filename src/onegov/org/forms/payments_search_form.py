@@ -8,7 +8,6 @@ from onegov.org import _
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.request import CoreRequest
     from onegov.pay import PaymentCollection
 
 

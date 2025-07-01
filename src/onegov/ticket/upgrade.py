@@ -8,7 +8,7 @@ from onegov.core.orm.types import JSON, UTCDateTime, UUID
 from onegov.core.upgrade import upgrade_task
 from onegov.ticket import Ticket
 from sqlalchemy import Boolean, Column, Integer, Text, Enum
-from sqlalchemy import column, update, func, and_, true, false, text
+from sqlalchemy import column, update, func, and_, true, false
 from sqlalchemy.orm import load_only
 from sqlalchemy.dialects.postgresql import HSTORE
 

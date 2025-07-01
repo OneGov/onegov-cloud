@@ -110,10 +110,6 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         nullable=True
     )
 
-
-    #: redundant storage 
-    ticket_: Column[str | None] = Column(Text, nullable=True, index=True)
-
     #: a snapshot of the ticket containing the last summary that made any sense
     #: use this before deleting the model behind a ticket, lest your ticket
     #: becomes nothing more than a number.
