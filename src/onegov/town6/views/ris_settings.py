@@ -1,8 +1,9 @@
 from __future__ import annotations
 from onegov.core.security import Private
 from onegov.org.models import Organisation
-from onegov.parliament.collections import RISPartyCollection
+from onegov.parliament.collections import PoliticalBusinessCollection
 from onegov.parliament.collections import RISCommissionCollection
+from onegov.parliament.collections import RISPartyCollection
 from onegov.parliament.collections.parliamentarian import (
     RISParliamentarianCollection
 )
@@ -56,15 +57,15 @@ def view_ris_settings(
         # {
         #     'name': 'meetings',
         #     'title': _('Meetings'),
-        #     'link': request.class_link(MeetingsCollection),
+        #     'link': request.class_link(MeetingCollection),
         #     'icon': 'fa-chair'
         # },
-        # {
-        #     'name': 'political-businesses',
-        #     'title': _('Political businesses'),
-        #     'link': request.class_link(PoliticalBusinessesCollection),
-        #     'icon': 'fa-file-contract'
-        # },
+        {
+            'name': 'political-businesses',
+            'title': _('Political Businesses'),
+            'link': request.class_link(PoliticalBusinessCollection),
+            'icon': 'fa-file-contract'
+        },
         # delegations
         {
             'name': 'parties',

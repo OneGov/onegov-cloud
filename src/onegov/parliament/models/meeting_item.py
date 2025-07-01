@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     import uuid
+    from onegov.parliament.models.political_business import PoliticalBusiness
 
 
 class MeetingItem(Base, ORMSearchable):
@@ -47,6 +48,10 @@ class MeetingItem(Base, ORMSearchable):
     political_business_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('par_political_businesses.id'),
+    )
+    political_business: relationship[PoliticalBusiness | None] = relationship(
+        'PoliticalBusiness',
+        foreign_keys=[political_business_id]
     )
 
     #: link ID only used for mapping after import

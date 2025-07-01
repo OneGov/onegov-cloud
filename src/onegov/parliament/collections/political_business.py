@@ -19,4 +19,4 @@ class PoliticalBusinessCollection(GenericCollection[PoliticalBusiness]):
 
     def query(self) -> Query[PoliticalBusiness]:
         query = super().query()
-        return query.order_by(self.model_class.title)
+        return query.order_by(self.model_class.entry_date.desc())

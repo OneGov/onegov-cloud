@@ -12,5 +12,19 @@
         <h2 tal:condition="page.description" i18n:translate="">Description</h2>
         <div tal:content="page.description"></div>
         <h2 i18n:translate="">Agenda</h2>
+
+        <ul tal:condition="meeting_items_with_links" class="meeting-items">
+            <li tal:repeat="item meeting_items_with_links">
+                <span tal:condition="item.number"
+                      tal:content="string:${item.number}. " />
+                <a tal:condition="item.political_business_link"
+                   tal:attributes="href item.political_business_link"
+                   tal:content="item.title" />
+                <span tal:condition="not: item.political_business_link"
+                      tal:content="item.title" />
+            </li>
+        </ul>
     </tal:b>
+
 </div>
+

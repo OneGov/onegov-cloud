@@ -1,0 +1,36 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x">
+            <div class="medium-7 cell main-content">
+                <p tal:condition="not:businesses" i18n:translate="">No political businesses defined yet.</p>
+
+                <table tal:condition="businesses">
+                    <thead>
+                        <tr>
+                            <th i18n:translate>Number</th>
+                            <th i18n:translate>Datum</th>
+                            <th i18n:translate>Type</th>
+                            <th i18n:translate>Status</th>
+                            <th i18n:translate>Political Business</th>
+                        </tr>
+                    </thead>
+                    <tbody tal:repeat="business businesses">
+                        <tr>
+                            <td><span>${business.number}</span></td>
+                            <td><span>${layout.format_date(business.entry_date, 'date')}</span></td>
+                            <td i18n:translate><span>${type_map[business.political_business_type]}</span></td>
+                            <td i18n:translate><span>${status_map[business.status]}</span></td>
+                            <td>
+                                <a tal:attributes="href request.link(business)">${business.title}</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </tal:b>
+</div>
