@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-06-30 11:16+0200\n"
+"POT-Creation-Date: 2025-07-01 09:08+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -293,7 +293,7 @@ msgid "Meeting"
 msgstr "Sitzung"
 
 msgid "Parliamentarians"
-msgstr "Parlamentarier:innen"
+msgstr "Parlamentarierinnen und Parlamentarier"
 
 msgid "RIS Settings"
 msgstr "Ratsinformationssystem"
@@ -357,6 +357,9 @@ msgstr "Möchten Sie die Kommission wirklich löschen?"
 
 msgid "Delete commission"
 msgstr "Kommission löschen"
+
+msgid "Political Businesses"
+msgstr "Politische Geschäfte"
 
 msgid "No availability periods defined."
 msgstr "Keine Verfügbarkeitszeiträume definiert."
@@ -1901,7 +1904,7 @@ msgid "Role"
 msgstr "Rolle"
 
 msgid "No parliamentarians defined yet."
-msgstr "Noch keine Parlamentarier:innen erfasst."
+msgstr "Noch keine Parlamentarier erfasst."
 
 msgid "No parliamentary groups defined yet."
 msgstr "Noch keine Fraktionen erfasst."
@@ -1910,7 +1913,7 @@ msgid "No parties defined yet."
 msgstr "Noch keine Parteien erfasst."
 
 msgid "Portrait"
-msgstr ""
+msgstr "Portrait"
 
 msgid "No payment providers defined."
 msgstr "Keine Zahlungsanbieter definiert."
@@ -1944,6 +1947,30 @@ msgstr "Filter zurücksetzen"
 
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
+
+msgid "Number"
+msgstr "Nummer"
+
+msgid "Type"
+msgstr "Typ"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Participants"
+msgstr "Teilnehmer"
+
+msgid "Parliamentary Group"
+msgstr "Fraktion"
+
+msgid "No political businesses defined yet."
+msgstr "Es wurden noch keine politischen Geschäfte erfasst."
+
+msgid "Datum"
+msgstr "Datum"
+
+msgid "Political Business"
+msgstr "Politisches Geschäft"
 
 msgid "No publications"
 msgstr "Keine Publikationen"
@@ -2399,7 +2426,7 @@ msgid "New commission"
 msgstr "Neue Kommission"
 
 msgid "Your changes were saved"
-msgstr ""
+msgstr "Ihre Änderungen wurden gespeichert"
 
 msgid "Sort"
 msgstr "Sortieren"
@@ -2529,10 +2556,10 @@ msgid "Push Notification Overview"
 msgstr "Übersicht Push-Benachrichtigungen"
 
 msgid "Ratsinformationssystem"
-msgstr ""
+msgstr "Ratsinformationssystem"
 
 msgid "Ratsinformationssystem (RIS)"
-msgstr ""
+msgstr "Ratsinformationssystem (RIS)"
 
 msgid "Participants"
 msgstr "Verfasser/Beteiligte"

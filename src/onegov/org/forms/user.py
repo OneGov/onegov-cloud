@@ -210,6 +210,12 @@ class ManageUserGroupForm(Form):
 
     shared_email = StringField(
         label=_('Shared e-mail address for ticket submission notifications'),
+        description=_(
+            'When specified, notifications for new tickets will be sent to '
+            'this e-mail address, instead of to individual members. Requires '
+            'that immediate e-mail notifications are turned on for at least '
+            'one kind of ticket.'
+        )
     )
 
     def on_request(self) -> None:
