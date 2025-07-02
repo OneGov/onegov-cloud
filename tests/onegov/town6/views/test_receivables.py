@@ -1,6 +1,6 @@
 from decimal import Decimal
 import transaction
-from onegov.pay import Payment
+from onegov.pay import Payment, PaymentProvider
 from datetime import datetime, timezone
 
 
@@ -104,9 +104,12 @@ def test_view_payments_filter_by_payment_type(client) -> None:
         state='open'
     )
     # Payment 2: Provider
+    provider = PaymentProvider(type='stripe_connect')
+    session.add(provider)
+    session.flush()
     p2 = Payment(
-        source='stripe_connect', # example provider source
-        provider_id='ch_123', # needs a provider_id to be 'provider' type
+        source='stripe_connect',  # example provider source
+        provider_id=provider.id,  # needs a provider_id to be 'provider' type
         amount=Decimal('40.00'),
         currency='CHF',
         state='paid'
