@@ -95,6 +95,7 @@ from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, User, UserCollection
 from onegov.user import UserGroup, UserGroupCollection
+from onegov.core.converters import datetime_converter
 from uuid import UUID
 from webob import exc, Response
 
@@ -877,12 +878,12 @@ def get_payment(app: OrgApp, id: UUID) -> Payment | None:
     path='/payments',
     converters={
         'page': int,
-        'start': extended_date_converter,
-        'end': extended_date_converter,
+        'start': datetime_converter,
+        'end': datetime_converter,
         'status': str,
         'payment_type': str,
-        'ticket_start': extended_date_converter,
-        'ticket_end': extended_date_converter
+        'ticket_start': datetime_converter,
+        'ticket_end': datetime_converter
     }
 )
 def get_payments(
