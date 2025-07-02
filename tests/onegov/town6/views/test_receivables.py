@@ -133,7 +133,8 @@ def test_view_payments_filter_by_payment_type(client) -> None:
     form = page.form
     form['payment_type'] = 'provider'
     filtered_page = form.submit().follow()
+
     assert '30.00' not in filtered_page.text
-    assert '40.00' in filtered_page.text
+    assert 'Stripe Connect' in filtered_page.text
     assert "No payments found." not in filtered_page.text
 
