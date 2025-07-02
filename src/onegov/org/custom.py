@@ -7,6 +7,7 @@ from onegov.org import _, OrgApp
 from onegov.org.models import (
     GeneralFileCollection, ImageFileCollection, Organisation, Dashboard)
 from onegov.pay import PaymentProviderCollection, PaymentCollection
+from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
@@ -55,6 +56,16 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
                 Auth.from_request_path(request), name='login'
             ), attrs={'class': 'login'}
         )
+
+        if not request.authenticated_email:
+            yield Link(
+                _('Citizen Login'), request.link(
+                    Auth.from_request_path(request), name='citizen-login'
+                ), attrs={
+                    'class': 'login',
+                    'title': _('No registration necessary')
+                }
+            )
 
         if request.app.enable_user_registration:
             yield Link(
@@ -262,4 +273,44 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
             classes=('with-count', css),
             links=links,
             attributes={'data-count': str(screen_count)}
+        )
+
+    if request.authenticated_email:
+        # This logout link is specific to citizens, if we're logged
+        # in as another user, then we don't need this additional
+        # logout link
+        if not request.is_logged_in:
+            yield Link(
+                _('Logout'),
+                request.link(
+                    Auth.from_request(request, to=logout_path(request)),
+                    name='citizen-logout'
+                ),
+                attrs={'class': 'logout'}
+            )
+
+        yield Link(
+            _('My Requests'),
+            request.class_link(
+                TicketCollection,
+                {
+                    'handler': 'ALL',
+                    'state': 'all',
+                },
+                name='my-tickets'
+            ),
+            attrs={
+                'class': ('citizen-tickets'),
+            }
+        )
+
+        yield Link(
+            _('My Reservations'),
+            request.class_link(
+                ResourceCollection,
+                name='my-reservations'
+            ),
+            attrs={
+                'class': ('citizen-reservations'),
+            }
         )

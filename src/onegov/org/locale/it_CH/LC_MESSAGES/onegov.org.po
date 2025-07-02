@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-01 09:10+0200\n"
+"POT-Creation-Date: 2025-07-02 14:11+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -157,6 +157,12 @@ msgstr "Esci"
 msgid "Login"
 msgstr "Accedi"
 
+msgid "Citizen Login"
+msgstr "Accesso cittadino"
+
+msgid "No registration necessary"
+msgstr "Non è necessaria la registrazione"
+
 msgid "Register"
 msgstr "Registrati"
 
@@ -216,6 +222,12 @@ msgstr "Biglietti chiusi"
 
 msgid "Ticket"
 msgstr "Biglietto"
+
+msgid "My Requests"
+msgstr "Le mie richieste"
+
+msgid "My Reservations"
+msgstr "Le mie prenotazioni"
 
 msgid "This site is private"
 msgstr "Questo sito è privato"
@@ -394,6 +406,12 @@ msgstr "Slot per prenotazione"
 
 msgid "Start time before end time"
 msgstr "Ora di inizio precedente l'ora di fine"
+
+msgid "E-Mail"
+msgstr "E-mail"
+
+msgid "Token"
+msgstr "Token"
 
 msgid "Name"
 msgstr "Nome"
@@ -677,9 +695,6 @@ msgstr "Nome non valido. Un suggerimento valido è: ${name}"
 
 msgid "An entry with the same name exists"
 msgstr "Esiste già un elemento con lo stesso nome"
-
-msgid "E-Mail"
-msgstr "E-mail"
 
 msgid "Describes briefly what this form is about"
 msgstr "Descrive brevemente il contenuto di questo modulo"
@@ -4436,6 +4451,18 @@ msgstr ""
 "Se ritieni che si tratti di un errore, ignora questo messaggio e non ti "
 "disturberemo mai più."
 
+msgid "Your e-mail address was just used to send a login link to ${homepage}."
+msgstr ""
+"Il vostro indirizzo e-mail è stato appena utilizzato per inviare un link di "
+"accesso a ${homepage}."
+
+msgid "Use the token below or click on the link to complete your login."
+msgstr ""
+"Utilizzare il token sottostante o fare clic sul link per completare il login."
+
+msgid "Complete Login"
+msgstr "Accesso completo"
+
 msgid "Hello"
 msgstr "Ciao"
 
@@ -5736,6 +5763,16 @@ msgstr ""
 
 msgid "Successfully authenticated via mTAN."
 msgstr "Autenticazione tramite mTAN riuscita."
+
+#, python-format
+msgid "Login Token for ${organisation}"
+msgstr "Token di accesso per ${organizzazione}"
+
+msgid "Invalid or expired login token provided."
+msgstr "È stato fornito un token di accesso non valido o scaduto."
+
+msgid "Confirm Citizen Login"
+msgstr "Confermare l'accesso del cittadino"
 
 msgid "A link was added to the clipboard"
 msgstr "È stato aggiunto un collegamento agli appunti"
@@ -7056,6 +7093,9 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+msgid "Please enter your e-mail address in order to continue"
+msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 
 #~ msgid "Please note that this page has subpages which will also be deleted!"
 #~ msgstr ""

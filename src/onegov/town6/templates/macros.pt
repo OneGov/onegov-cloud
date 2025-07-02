@@ -234,6 +234,7 @@
         <span>
             <a href="https://www.admin.digital">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
         </span>
+        <br/>
         <span>
             <a href="https://www.admin.digital/datenschutz" i18n:translate>
                 Privacy Protection
@@ -243,6 +244,11 @@
     <span tal:condition="not request.is_logged_in">
         <a href="${layout.login_from_path()}" i18n:translate>
             Login
+        </a>
+    </span>
+    <span tal:condition="not request.authenticated_email">
+        <a href="${layout.citizen_login_from_path()}" i18n:translate>
+            Citizen Login
         </a>
     </span>
     <span tal:define="about_url layout.org.meta.about_url|nothing" tal:condition="about_url">

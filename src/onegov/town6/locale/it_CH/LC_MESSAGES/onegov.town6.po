@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-07-01 09:08+0200\n"
+"POT-Creation-Date: 2025-07-02 14:13+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -697,6 +697,9 @@ msgstr "Tutela della privacy"
 msgid "Login"
 msgstr "Accedi"
 
+msgid "Citizen Login"
+msgstr "Accesso cittadino"
+
 msgid "About"
 msgstr "Chi Siamo"
 
@@ -1225,6 +1228,18 @@ msgstr "Di seguito potete vedere la vostra conversazione in chat:"
 
 msgid "Have a great day!"
 msgstr "Ti auguro una buona giornata!"
+
+msgid "Your e-mail address was just used to send a login link to ${homepage}."
+msgstr ""
+"Il vostro indirizzo e-mail è stato appena utilizzato per inviare un link di "
+"accesso a ${homepage}."
+
+msgid "Use the token below or click on the link to complete your login."
+msgstr ""
+"Utilizzare il token sottostante o fare clic sul link per completare il login."
+
+msgid "Complete Login"
+msgstr "Accesso completo"
 
 msgid "Hello"
 msgstr "Ciao"
@@ -1944,8 +1959,8 @@ msgstr "Esporta una vCard di questa persona"
 msgid "Number"
 msgstr "Numero"
 
-msgid "Type"
-msgstr "Tipo"
+msgid "Business Type"
+msgstr "Tipo di attività"
 
 msgid "Status"
 msgstr "Stato"

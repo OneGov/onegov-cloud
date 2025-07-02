@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+from onegov.chat.collections import ChatCollection
 from onegov.core.elements import Link, LinkGroup
 from onegov.org.custom import get_global_tools as get_global_tools_base
 from onegov.town6 import _
-from onegov.chat.collections import ChatCollection
 
 
 from typing import TYPE_CHECKING

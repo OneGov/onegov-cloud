@@ -267,6 +267,10 @@ class TicketCollection(TicketCollectionPagination):
         return self.query().filter(
             Ticket.handler_data['handler_data']['id'] == str(handler_data_id))
 
+    def by_ticket_email(self, ticket_email: str) -> Query[Ticket]:
+        return self.query().filter(
+            Ticket.ticket_email == ticket_email)
+
 
 # FIXME: Why is this its own subclass? shouldn't this at least override
 #        __init__ to pin state to 'archived'?!

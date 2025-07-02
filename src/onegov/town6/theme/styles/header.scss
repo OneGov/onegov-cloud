@@ -189,6 +189,8 @@ $settings-icon: '\f1de';
     .text-modules::before { @include icon('\f249'); }
     .forms::before { @include icon-bold('\f570'); }
     .surveys::before { @include icon-bold('\f681'); }
+    .citizen-tickets::before { @include icon-bold('\f3ff'); }
+    .citizen-reservations::before { @include icon('\f073'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;

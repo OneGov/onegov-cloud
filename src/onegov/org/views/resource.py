@@ -12,8 +12,9 @@ from itertools import islice
 from libres.modules.errors import LibresError
 from morepath.request import Response
 from onegov.core.security import Public, Private, Personal
-from onegov.core.utils import module_path
+from onegov.core.utils import module_path, Bunch
 from onegov.core.orm import as_selectable_from_path
+from onegov.core.orm.types import UUID as UUIDType
 from onegov.form import FormSubmission
 from onegov.org.cli import close_ticket
 from onegov.org.forms.resource import AllResourcesExportForm
@@ -22,19 +23,20 @@ from onegov.org.elements import Link
 from onegov.org.forms import (
     FindYourSpotForm, ResourceForm, ResourceCleanupForm, ResourceExportForm)
 from onegov.org.layout import (
-    FindYourSpotLayout, ResourcesLayout, ResourceLayout)
+    DefaultLayout, FindYourSpotLayout, ResourcesLayout, ResourceLayout)
 from onegov.org.models.resource import (
     DaypassResource, FindYourSpotCollection, RoomResource, ItemResource)
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
 from onegov.org.utils import group_by_column, keywords_first
+from onegov.org.views.utils import assert_citizen_logged_in
 from onegov.reservation import ResourceCollection, Resource, Reservation
 from onegov.ticket import Ticket, TicketCollection
 from onegov.pay import PaymentCollection
 from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
-from sqlalchemy import and_, select
+from sqlalchemy import and_, select, cast as sa_cast
 from sqlalchemy.orm import object_session, undefer
 from webob import exc
 
@@ -1176,6 +1178,100 @@ def view_occupancy(
         'resource': self,
         'layout': layout or ResourceLayout(self, request),
         'feed': request.link(self, name='occupancy-json'),
+    }
+
+
+@OrgApp.json(
+    model=ResourceCollection,
+    name='my-reservations-json',
+    permission=Public
+)
+def view_my_reservations_json(
+    self: ResourceCollection,
+    request: OrgRequest
+) -> JSON_ro:
+    """ Returns the reservations in a fullcalendar compatible events feed.
+
+    See `<https://fullcalendar.io/docs/event_data/events_json_feed/>`_ for
+    more information.
+
+    """
+    if not request.authenticated_email:
+        raise exc.HTTPForbidden()
+
+    start, end = utils.parse_fullcalendar_request(request, 'Europe/Zurich')
+
+    if not (start and end):
+        return ()
+
+    # get all reservations for the authenticated email
+    query = request.session.query(Reservation)
+    query = query.filter(Reservation.email == request.authenticated_email)
+    query = query.filter(Reservation.status == 'approved')
+    query = query.join(
+        Ticket, Reservation.token == sa_cast(Ticket.handler_id, UUIDType)
+    )
+    query = query.join(Resource, Reservation.resource == Resource.id)
+
+    if start:
+        query = query.filter(start <= Reservation.start)
+    if end:
+        query = query.filter(Reservation.end <= end)
+    query = query.options(undefer(Reservation.data))
+
+    return [
+        res.as_dict()
+        for res in utils.ReservationEventInfo.from_resources(
+            request,
+            query.with_entities(Resource, Reservation, Ticket)
+        )
+    ]
+
+
+@OrgApp.html(
+    model=ResourceCollection,
+    permission=Public,
+    name='my-reservations',
+    template='resource_occupancy.pt'
+)
+def view_my_reservations(
+    self: ResourceCollection,
+    request: OrgRequest,
+    layout: DefaultLayout | None = None
+) -> RenderData:
+
+    assert_citizen_logged_in(request)
+
+    # NOTE: For some reason we need to manually include common
+    #       and fullcalendar in addition to occupancycalendar
+    #       here. Maybe because we use DefaultLayout?
+    request.include('common')
+    request.include('fullcalendar')
+    request.include('occupancycalendar')
+
+    layout = layout or DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('My Reservations'), '#')
+    ]
+
+    try:
+        date = date_t.fromisoformat(request.GET.get('date', ''))
+    except Exception:
+        date = None
+
+    return {
+        'title': _('My Reservations'),
+        'resource': Bunch(
+            type='room',
+            date=date,
+            view=request.GET.get('view'),
+            highlights_min=request.GET.get('highlights_min'),
+            highlights_max=request.GET.get('highlights_max'),
+            default_view='timeGridWeek'
+        ),
+        'layout': layout,
+        'feed': request.link(self, name='my-reservations-json'),
     }
 
 

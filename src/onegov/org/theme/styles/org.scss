@@ -348,6 +348,8 @@ $globals-height: 2.5rem;
     .ticket-archive::before { @include icon('\f1c6'); }
     .forms::before { @include icon('\f15c'); }
     .surveys::before { @include icon('\f080'); }
+    .citizen-tickets::before { @include icon('\f145'); }
+    .citizen-reservations::before { @include icon('\f133'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;
@@ -3110,6 +3112,7 @@ button {
         z-index: 2;
         padding: 2px 4px;
         border-top-right-radius: 1.2rem;
+        white-space: nowrap;
 
         &::first-line {
             font-weight: bold;
