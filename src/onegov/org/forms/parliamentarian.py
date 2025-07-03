@@ -21,16 +21,6 @@ from wtforms.validators import URL
 
 class ParliamentarianForm(NamedFileForm):
 
-    personnel_number = StringField(
-        label=_('Personnel number'),
-        fieldset=_('Basic properties'),
-    )
-
-    contract_number = StringField(
-        label=_('Contract number'),
-        fieldset=_('Basic properties'),
-    )
-
     gender = TranslatedSelectField(
         label=_('Gender'),
         fieldset=_('Basic properties'),
