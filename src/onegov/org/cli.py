@@ -2759,12 +2759,17 @@ def ris_resolve_parliamentarian_doublette(
         business = businesses.query().filter(
             PoliticalBusiness.id == business_id).first()
 
-        for participation in business.participants:
-            if str(participation.parliamentarian_id) == id_1:
-                click.echo('replace {participation.parliamentarian_id} '
-                           'with {parliamentarian.id}')
-                participation.parliamentarian_id = id
-                changed = True
+        if not business:
+            click.echo(f'Business with id {business_id} not found')
+            return
+
+        if business.participants:
+            for participation in business.participants:  # type: ignore[attr-defined]
+                if str(participation.parliamentarian_id) == id_1:
+                    click.echo(f'replace {participation.parliamentarian_id} '
+                               f'with {parliamentarian.id}')
+                    participation.parliamentarian_id = id
+                    changed = True
 
         transaction.commit()
 
