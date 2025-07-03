@@ -15,7 +15,8 @@ if TYPE_CHECKING:
 def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
     for item in get_global_tools_base(request):
 
-        if getattr(item, 'attrs', {}).get('class') == {'login'}:
+        classes = getattr(item, 'attrs', {}).get('class')
+        if classes == {'login'} or classes == {'citizen-login'}:
             continue
 
         yield item

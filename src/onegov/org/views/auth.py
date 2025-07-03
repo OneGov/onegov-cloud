@@ -738,6 +738,9 @@ def handle_citizen_login(
     layout: Layout | None = None
 ) -> RenderData | Response:
 
+    if not request.app.org.citizen_login_enabled:
+        raise exc.HTTPNotFound()
+
     if form.submitted(request):
         assert form.email.data is not None
         collection = TANCollection(request.session, scope='citizen-login')
@@ -795,6 +798,9 @@ def handle_confirm_citizen_login(
     layout: Layout | None = None
 ) -> RenderData | Response:
 
+    if not request.app.org.citizen_login_enabled:
+        raise exc.HTTPNotFound()
+
     if request.authenticated_email:
         return self.redirect(request, self.to)
 
@@ -840,6 +846,9 @@ def handle_citizen_logout(
     self: Auth,
     request: OrgRequest
 ) -> Response:
+
+    if not request.app.org.citizen_login_enabled:
+        raise exc.HTTPNotFound()
 
     if request.authenticated_email:
         del request.browser_session['authenticated_email']

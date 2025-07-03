@@ -16,6 +16,7 @@ class DummyRequest():
     is_supporter = False
     root_pages = ()
     current_user = Bunch(id=Bunch(hex='abcd'))
+    authenticated_email = None
     path = ''
     url = ''
 

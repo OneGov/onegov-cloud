@@ -230,7 +230,7 @@
 <metal:footer_links define-macro="footer_links" i18n:domain="onegov.town6">
 <div class="medium-4 cell"></div>
 <div class="small-12 medium-4 cell footer-links">
-    <tal:b condition="not request.app.org.hide_onegov_footer|True">
+    <tal:b tal:condition="not request.app.org.hide_onegov_footer|True">
         <span>
             <a href="https://www.admin.digital">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
         </span>
@@ -246,7 +246,7 @@
             Login
         </a>
     </span>
-    <span tal:condition="not request.authenticated_email">
+    <span tal:condition="request.app.org.citizen_login_enabled and not request.authenticated_email">
         <a href="${layout.citizen_login_from_path()}" i18n:translate>
             Citizen Login
         </a>

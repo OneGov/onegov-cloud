@@ -613,6 +613,11 @@ def get_disabled_extensions() -> Collection[str]:
     return ()
 
 
+@OrgApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return True
+
+
 @OrgApp.setting(section='org', name='render_mtan_access_limit_exceeded')
 def get_render_mtan_access_limit_exceeded(
 ) -> Callable[[MTANAccessLimitExceeded, OrgRequest], Response]:
