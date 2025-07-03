@@ -10,6 +10,7 @@ from onegov.core.orm.types import UUID
 from onegov.file import MultiAssociatedFiles
 from onegov.parliament import _
 from onegov.parliament.models.meeting import Meeting
+from onegov.parliament.models.parliamentary_group import RISParliamentaryGroup
 from onegov.search import ORMSearchable
 
 
@@ -21,7 +22,7 @@ if TYPE_CHECKING:
     from onegov.parliament.models.meeting_item import MeetingItem
     from datetime import date
 
-    from onegov.parliament.models import RISParliamentarian
+    from onegov.parliament.models import RISParliamentarian, RISParliamentaryGroup
 
     PoliticalBusinessType: TypeAlias = Literal[
         'inquiry',  # Anfrage
