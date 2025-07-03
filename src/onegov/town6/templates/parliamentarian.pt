@@ -137,8 +137,8 @@
                 <dd>
                     <ul class="more-list">
                         <li tal:repeat="membership parliamentarian.commission_memberships">
-                            <span>
-                                <a href="${request.link(membership.commission)}" class="list-link">${membership.commission.title}</a>
+                            <a href="${request.link(membership.commission)}" class="list-link">${membership.commission.title}</a>
+                            <span class="list-lead preview">
                                 ${membership.role_label}
                             </span>
                             <span tal:condition="membership.start">
