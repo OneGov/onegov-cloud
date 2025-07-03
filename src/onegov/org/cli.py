@@ -61,7 +61,9 @@ from onegov.parliament.collections import (
 from onegov.parliament.models import (
     MeetingItem,
     RISCommissionMembership,
-    RISParliamentarian, RISParliamentarianRole,
+    RISParliamentarian,
+    RISParliamentarianRole,
+    PoliticalBusiness,
 )
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -93,7 +95,8 @@ if TYPE_CHECKING:
     from translationstring import TranslationString
     from uuid import UUID
     from onegov.parliament.models.political_business import (
-        PoliticalBusinessStatus
+        PoliticalBusinessStatus,
+        PoliticalBusiness
     )
 
 cli = command_group()
@@ -2714,3 +2717,61 @@ def ris_set_end_date_for_inactive_parliamentarians(
         transaction.commit()
 
     return set_end_date
+
+
+@cli.command(name='ris-resolve-parliamentarian-doublette')
+def ris_resolve_parliamentarian_doublette(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    ogc-2394
+    replace participants reference for business and delete
+    parliamentarian (id_1)
+    """
+
+    def resolve_doublette(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        parliamentarians = RISParliamentarianCollection(session)
+        businesses = PoliticalBusinessCollection(session)
+        id = 'c0293891-7694-4da8-b846-844c7d1c7378'
+        id_1 = 'dc83ffc4-2683-490f-ae30-1a0ab95fc0cc'
+        business_id = '61964b73-f92e-40b4-8157-23c5048ca0d6'
+        changed = False
+
+        parliamentarian = (
+            parliamentarians.query()
+            .filter(RISParliamentarian.id == id).first())
+
+        if not parliamentarian:
+            return
+
+        click.echo(f'parliamentarian: {parliamentarian.last_name} '
+                   f'{parliamentarian.first_name} {parliamentarian.active}')
+        parliamentarian_1 = (
+            parliamentarians.query()
+            .filter(RISParliamentarian.id == id_1).first())
+
+        if not parliamentarian_1:
+            return
+
+        click.echo(f'parliamentarian_1: {parliamentarian_1.last_name} '
+                   f'{parliamentarian_1.first_name} '
+                   f'{parliamentarian_1.active}')
+        business = businesses.query().filter(
+            PoliticalBusiness.id == business_id).first()
+
+        if business and isinstance(business.participants, list):
+            for participation in business.participants:
+                if str(participation.parliamentarian_id) == id_1:
+                    click.echo('replace {participation.parliamentarian_id} '
+                               'with {parliamentarian.id}')
+                    participation.parliamentarian_id = id
+                    changed = True
+
+            transaction.commit()
+
+            if changed:
+                click.echo(f'delete {id_1}')
+                session.delete(parliamentarian_1)
+                transaction.commit()
+
+    return resolve_doublette
