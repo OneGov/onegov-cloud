@@ -152,6 +152,20 @@
                     </ul>
                 </dd>
             </div>
+            <div>
+                <dt i18n:translate>Political Businesses</dt>
+                <dd>
+                    <ul class="more-list">
+                        <li tal:repeat="participation parliamentarian.political_businesses">
+                            <a tal:attributes="href request.link(participation.political_business)" class="list-link">
+                                <span class="list-title">
+                                    ${participation.political_business.number|None} ${participation.political_business.title}
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </dd>
+            </div>
             <div tal:define="interests parliamentarian.content.get('interests')" tal:condition="parliamentarian.content.get('interests')">
                 <tal:b define="headers parliamentarian.content['interests']['headers']; rows parliamentarian.content['interests']['rows']">
                     <b i18n:translate>Interests</b>
