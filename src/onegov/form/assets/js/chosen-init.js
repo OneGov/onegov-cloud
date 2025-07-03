@@ -11,9 +11,11 @@ $(document).ready(function() {
         if (data !== undefined) {
             $.each(data, function(id, value) {
                 $('#' + id).val(value).trigger('change');
-                $('#' + id).find(
-                    'input[value="' + value.replace(/"/g, '\\"') + '"]'
-                ).not(':checked').trigger('click');
+                if (value !== null) {
+                    $('#' + id).find(
+                        'input[value="' + String(value).replace(/"/g, '\\"') + '"]'
+                    ).not(':checked').trigger('click');
+                }
             });
         }
     });

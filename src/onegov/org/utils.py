@@ -708,7 +708,7 @@ class ReservationEventInfo:
         resource: Resource,
         reservation: Reservation,
         ticket: Ticket,
-        request: OrgRequest
+        request: OrgRequest,
     ) -> None:
 
         self.resource = resource
@@ -733,6 +733,23 @@ class ReservationEventInfo:
                 request
             )
             for reservation, ticket in reservations
+        ]
+
+    @classmethod
+    def from_resources(
+        cls,
+        request: OrgRequest,
+        reservations: Iterable[tuple[Resource, Reservation, Ticket]]
+    ) -> list[Self]:
+
+        return [
+            cls(
+                resource,
+                reservation,
+                ticket,
+                request
+            )
+            for resource, reservation, ticket in reservations
         ]
 
     @property
@@ -780,13 +797,15 @@ class ReservationEventInfo:
 
     @property
     def event_title(self) -> str:
+        is_my_reservations = 'my-reservations-json' in self.request.url
         return '\n'.join(part for part in (
-            self.ticket.number,
+            '' if is_my_reservations else self.ticket.number,
+            self.resource.title if is_my_reservations else '',
             self.event_time,
             f'{self.translate(_("Quota"))}: {self.quota}'
             if getattr(self.resource, 'show_quota', False) else '',
-            self.ticket.tag,
-            self.reservation.email,
+            '' if is_my_reservations else self.ticket.tag,
+            '' if is_my_reservations else self.reservation.email,
             self.translate(_('Pending approval')) if not self.accepted else '',
         ) if part)
 
@@ -804,6 +823,9 @@ class ReservationEventInfo:
 
     @property
     def color(self) -> str | None:
+        if 'my-reservations-json' in self.request.url:
+            return None
+
         tag = self.ticket.tag
         if not tag:
             return None
@@ -829,6 +851,7 @@ class ReservationEventInfo:
         return not self.accepted
 
     def as_dict(self) -> dict[str, Any]:
+        is_manager = self.request.is_manager
         return {
             'id': self.reservation.id,
             'start': self.event_start,
@@ -836,17 +859,18 @@ class ReservationEventInfo:
             'backgroundColor': self.color,
             'title': self.event_title,
             'classNames': list(self.event_classes),
-            'url': self.request.link(self.ticket),
+            'url': self.request.link(self.ticket)
+            if is_manager else self.request.link(self.ticket, name='status'),
             'display': 'block',
             # extended properties
             'wholeDay': self.whole_day,
             'quota': self.reservation.quota,
-            'editable': self.editable,
+            'editable': is_manager and self.editable,
             'editurl': self.request.csrf_protected_url(self.request.link(
                 self.ticket,
                 name='adjust-reservation',
                 query_params={'reservation-id': str(self.reservation.id)}
-            )),
+            )) if is_manager else None,
         }
 
 

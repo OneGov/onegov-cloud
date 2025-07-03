@@ -2084,3 +2084,11 @@ class VATSettingsForm(Form):
                       'apply to all prices in the forms.'),
         validators=[InputRequired(), NumberRange(0, 100)],
     )
+
+
+class CitizenLoginSettingsForm(Form):
+
+    citizen_login_enabled = BooleanField(
+        label=_('Enable Citizen Login'),
+        default=False,
+    )

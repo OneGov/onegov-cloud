@@ -316,6 +316,12 @@ def get_is_complete_userprofile_handler(
     return is_complete_userprofile
 
 
+# NOTE: Feriennet doesn't need a citizen login
+@FeriennetApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return False
+
+
 @FeriennetApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     return [

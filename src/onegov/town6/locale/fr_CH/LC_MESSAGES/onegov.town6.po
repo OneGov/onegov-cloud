@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-01 09:08+0200\n"
+"POT-Creation-Date: 2025-07-03 09:15+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -700,6 +700,9 @@ msgstr "Protection des données"
 msgid "Login"
 msgstr "Connexion"
 
+msgid "Citizen Login"
+msgstr "Connexion citoyen"
+
 msgid "About"
 msgstr "Impressum"
 
@@ -1224,6 +1227,18 @@ msgstr "Vous pouvez voir ci-dessous votre conversation de chat :"
 
 msgid "Have a great day!"
 msgstr "Passez une bonne journée!"
+
+msgid "Your e-mail address was just used to send a login link to ${homepage}."
+msgstr ""
+"Votre adresse e-mail vient d'être utilisée pour envoyer un lien de connexion "
+"à ${homepage}."
+
+msgid "Use the token below or click on the link to complete your login."
+msgstr ""
+"Utilisez le code ci-dessous ou cliquez sur le lien pour vous connecter."
+
+msgid "Complete Login"
+msgstr "Connexion complète"
 
 msgid "Hello"
 msgstr "Bonjour"
@@ -1950,8 +1965,8 @@ msgstr "Exporter une vCard de cette personne"
 msgid "Number"
 msgstr "Numéro"
 
-msgid "Type"
-msgstr "Type"
+msgid "Business Type"
+msgstr "Type d'activité"
 
 msgid "Status"
 msgstr "Statut"

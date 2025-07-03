@@ -72,6 +72,12 @@ def get_theme() -> LandsgemeindeTheme:
     return LandsgemeindeTheme()
 
 
+# NOTE: Landsgemeinde doesn't need a citizen login
+@LandsgemeindeApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return False
+
+
 @LandsgemeindeApp.webasset('ticker')
 def get_backend_ticker() -> Iterator[str]:
     yield 'ticker.js'

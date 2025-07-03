@@ -96,7 +96,7 @@
             <main>
                 <header id="header" tal:define="header_options request.app.org.header_options or {}">
                     <div id="sticky-header-area">
-                        <div id="globals" class="globals" tal:define="toolbox global_tools|False" tal:condition="request.is_logged_in">
+                        <div id="globals" class="globals" tal:define="toolbox global_tools|False" tal:condition="request.is_logged_in or request.authenticated_email">
                             <div class="grid-container">
                             <div class="grid-x grid-padding-x">
                                 <div class="cell small-12">

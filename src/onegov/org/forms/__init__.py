@@ -5,6 +5,8 @@ from onegov.org.forms.allocation import DaypassAllocationEditForm
 from onegov.org.forms.allocation import DaypassAllocationForm
 from onegov.org.forms.allocation import RoomAllocationEditForm
 from onegov.org.forms.allocation import RoomAllocationForm
+from onegov.org.forms.citizen_login import CitizenLoginForm
+from onegov.org.forms.citizen_login import ConfirmCitizenLoginForm
 from onegov.org.forms.commission import CommissionForm
 from onegov.org.forms.directory import DirectoryForm
 from onegov.org.forms.directory import DirectoryImportForm
@@ -60,6 +62,8 @@ from onegov.org.forms.userprofile import UserProfileForm
 __all__ = (
     'AllocationRuleForm',
     'AnalyticsSettingsForm',
+    'CitizenLoginForm',
+    'ConfirmCitizenLoginForm',
     'CommissionForm',
     'DateRangeForm',
     'DaypassAllocationEditForm',

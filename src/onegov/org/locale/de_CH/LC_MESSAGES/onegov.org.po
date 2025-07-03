@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-01 09:10+0200\n"
+"POT-Creation-Date: 2025-07-03 09:16+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -156,6 +156,12 @@ msgstr "Abmelden"
 msgid "Login"
 msgstr "Anmelden"
 
+msgid "Citizen Login"
+msgstr "Kunden-Login"
+
+msgid "No registration necessary"
+msgstr "Keine Registrierung erforderlich"
+
 msgid "Register"
 msgstr "Registrierung"
 
@@ -215,6 +221,12 @@ msgstr "Abgeschlossene Tickets"
 
 msgid "Ticket"
 msgstr "Ticket"
+
+msgid "My Requests"
+msgstr "Meine Anfragen"
+
+msgid "My Reservations"
+msgstr "Meine Reservationen"
 
 msgid "This site is private"
 msgstr "Diese Seite ist privat"
@@ -393,6 +405,12 @@ msgstr "Kontingent per Reservation"
 
 msgid "Start time before end time"
 msgstr "Start-Zeit vor End-Zeit"
+
+msgid "E-Mail"
+msgstr "E-Mail"
+
+msgid "Token"
+msgstr "Login Code"
 
 msgid "Name"
 msgstr "Name"
@@ -674,9 +692,6 @@ msgstr "Ungültiger Name. Ein gültiger Vorschlag ist: ${name}"
 
 msgid "An entry with the same name exists"
 msgstr "Ein Eintrag mit diesem Namen existiert bereits"
-
-msgid "E-Mail"
-msgstr "E-Mail"
 
 msgid "Describes briefly what this form is about"
 msgstr "Beschreibt kurz um was es bei diesem Formular geht"
@@ -2530,6 +2545,9 @@ msgid ""
 msgstr ""
 "Mehrwertsteuersatz in Prozent. Der Mehrwertsteuersatz wird auf alle Preise "
 "in den Formularen angewendet."
+
+msgid "Enable Citizen Login"
+msgstr "Kunden-Login aktivieren"
 
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
@@ -4442,6 +4460,19 @@ msgstr ""
 "Falls Sie sich nicht bei dieser Seite angemeldet haben, können Sie diese "
 "Nachricht ignorieren. Sie erhalten dann keine weiteren E-Mails von uns."
 
+msgid "Your e-mail address was just used to send a login link to ${homepage}."
+msgstr ""
+"Ihre E-Mail Adresse wurde soeben zum Senden eines Anmeldelinks auf "
+"${homepage} verwendet."
+
+msgid "Use the token below or click on the link to complete your login."
+msgstr ""
+"Verwenden Sie den untenstehenden Login-Code oder klicken Sie auf den Link, "
+"um Ihre Anmeldung abzuschliessen."
+
+msgid "Complete Login"
+msgstr "Anmeldung abschliessen"
+
 msgid "Hello"
 msgstr "Grüezi"
 
@@ -5743,6 +5774,16 @@ msgstr ""
 
 msgid "Successfully authenticated via mTAN."
 msgstr "Erfolgreich per mTAN authentifiziert."
+
+#, python-format
+msgid "Login Token for ${organisation}"
+msgstr "Login-Code für ${organisation}"
+
+msgid "Invalid or expired login token provided."
+msgstr "Ungültiger oder abgelaufener Login-Code eingegeben."
+
+msgid "Confirm Citizen Login"
+msgstr "Kunden-Login bestätigen"
 
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
@@ -7064,6 +7105,9 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+msgid "Please enter your e-mail address in order to continue"
+msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
 
 #~ msgid "Please note that this page has subpages which will also be deleted!"
 #~ msgstr ""

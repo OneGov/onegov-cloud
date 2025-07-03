@@ -8,6 +8,7 @@ import os
 
 import pytest
 import transaction
+from freezegun import freeze_time
 from webtest import Upload
 
 from onegov.chat import MessageCollection
@@ -1032,3 +1033,40 @@ def test_hide_personal_mail_in_tickets(client):
 
     assert 'info@organisation.org' in mails[2]['TextBody']
     assert 'admin@example' not in mails[2]['TextBody']
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_my_tickets_view(client):
+    admin = client.spawn()
+    admin.login_admin()
+
+    # create a form
+    form_page = admin.get('/forms/new')
+    form_page.form['title'] = "Newsletter"
+    form_page.form['definition'] = "E-Mail *= @@@"
+    form_page = form_page.form.submit()
+
+    # create a submission
+    form_page = client.get('/form/newsletter')
+    form_page.form['e_mail'] = 'info@seantis.ch'
+    status_page = form_page.form.submit().follow().form.submit().follow()
+
+    # by default this view is disabled
+    client.get('/tickets/ALL/all/my-tickets', status=404)
+
+    # let's enable it
+    settings = admin.get('/').click('Einstellungen').click('Kunden-Login')
+    settings.form['citizen_login_enabled'].checked = True
+    settings.form.submit().follow()
+
+    # now we don't have access yet
+    login = client.get('/tickets/ALL/all/my-tickets').follow()
+    login.form['email'] = 'info@seantis.ch'
+    confirm = login.form.submit().follow()
+    assert len(os.listdir(client.app.maildir)) == 2
+    message = client.get_email(1)['TextBody']
+    token = re.search(r'&token=([^)]+)', message).group(1)
+    confirm.form['token'] = token
+    tickets = confirm.form.submit().follow()
+    assert tickets.request.path_qs == '/tickets/ALL/all/my-tickets'
+    assert 'Offen' in tickets
