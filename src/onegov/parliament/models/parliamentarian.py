@@ -368,6 +368,8 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles,
 
     @property
     def active(self) -> bool:
+        if not self.roles:
+            return True
         for role in self.roles:
             if role.end is None or role.end >= date.today():
                 return True
@@ -434,3 +436,12 @@ class RISParliamentarian(Parliamentarian):
         back_populates='parliamentarian',
         lazy='joined'
     )
+
+    @property
+    def active(self) -> bool:
+        # Wil: every parliamentarian is active if in a parliamentary
+        # group, which leads to a role
+        for role in self.roles:
+            if role.end is None or role.end >= date.today():
+                return True
+        return False
