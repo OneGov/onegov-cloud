@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-03 09:03+0200\n"
+"POT-Creation-Date: 2025-07-03 09:16+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -157,7 +157,7 @@ msgid "Login"
 msgstr "Connexion"
 
 msgid "Citizen Login"
-msgstr "Connexion citoyen"
+msgstr "Connexion client"
 
 msgid "No registration necessary"
 msgstr "Aucune inscription n'est nécessaire"
@@ -2557,7 +2557,7 @@ msgstr ""
 "les prix dans les formulaires."
 
 msgid "Enable Citizen Login"
-msgstr "Activer la connexion des citoyens"
+msgstr "Activer la connexion des clients"
 
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
@@ -5799,7 +5799,7 @@ msgid "Invalid or expired login token provided."
 msgstr "Le code de connexion fourni n'est pas valide ou a expiré."
 
 msgid "Confirm Citizen Login"
-msgstr "Confirmer la connexion du citoyen"
+msgstr "Confirmer la connexion du client"
 
 msgid "A link was added to the clipboard"
 msgstr "Un lien a été ajouté au presse-papiers"

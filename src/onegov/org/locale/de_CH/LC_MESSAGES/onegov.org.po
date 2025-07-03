@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-03 09:03+0200\n"
+"POT-Creation-Date: 2025-07-03 09:16+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -157,7 +157,7 @@ msgid "Login"
 msgstr "Anmelden"
 
 msgid "Citizen Login"
-msgstr "Bürger-Login"
+msgstr "Kunden-Login"
 
 msgid "No registration necessary"
 msgstr "Keine Registrierung erforderlich"
@@ -2547,7 +2547,7 @@ msgstr ""
 "in den Formularen angewendet."
 
 msgid "Enable Citizen Login"
-msgstr "Bürger-Login aktivieren"
+msgstr "Kunden-Login aktivieren"
 
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
@@ -5783,7 +5783,7 @@ msgid "Invalid or expired login token provided."
 msgstr "Ungültiger oder abgelaufener Login-Code eingegeben."
 
 msgid "Confirm Citizen Login"
-msgstr "Bürger-Login bestätigen"
+msgstr "Kunden-Login bestätigen"
 
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"

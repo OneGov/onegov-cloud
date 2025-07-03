@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-03 09:03+0200\n"
+"POT-Creation-Date: 2025-07-03 09:16+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -158,7 +158,7 @@ msgid "Login"
 msgstr "Accedi"
 
 msgid "Citizen Login"
-msgstr "Accesso cittadino"
+msgstr "Accesso cliente"
 
 msgid "No registration necessary"
 msgstr "Non è necessaria la registrazione"
@@ -2556,7 +2556,7 @@ msgstr ""
 "tutti i prezzi nei moduli."
 
 msgid "Enable Citizen Login"
-msgstr "Abilitare l'accesso del cittadino"
+msgstr "Abilitare l'accesso del cliente"
 
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
@@ -5775,7 +5775,7 @@ msgid "Invalid or expired login token provided."
 msgstr "È stato fornito un token di accesso non valido o scaduto."
 
 msgid "Confirm Citizen Login"
-msgstr "Confermare l'accesso del cittadino"
+msgstr "Confermare l'accesso del cliente"
 
 msgid "A link was added to the clipboard"
 msgstr "È stato aggiunto un collegamento agli appunti"
