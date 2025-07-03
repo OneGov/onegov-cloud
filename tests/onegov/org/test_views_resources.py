@@ -3432,6 +3432,11 @@ def test_my_reservations_view(client):
     ical_url = re.search(
         r'webcal://localhost(/[^"]+)', subscribe.text
     ).group(1)
+
+    # accept the reservation so the ical file contains an event
+    ticket = admin.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket.click('Alle Reservationen annehmen')
+
     assert client.get(ical_url).status_code == 200
 
     # someone else can open the same ical link without authentication
