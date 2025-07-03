@@ -17,7 +17,7 @@
                 out of date. Use it at your own risk.
             </p>
 
-            <i class="fa fa-link" aria-hidden="true"></i> <b><a href="${url}">${url}</a></b>
+            <i class="fa fa-link" aria-hidden="true"></i> <b><a href="${url}" style="word-break:break-all">${url}</a></b>
         </div>
     </tal:b>
 </div>

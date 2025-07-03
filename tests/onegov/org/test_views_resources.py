@@ -3395,9 +3395,13 @@ def test_my_reservations_view(client):
     formular.form['email'] = 'info@example.org'
     formular.form.submit().follow().form.submit()
 
+    client2 = client.spawn()
+
     # by default this view is disabled
     client.get('/resources/my-reservations', status=404)
     client.get('/resources/my-reservations-json', status=404)
+    client.get('/resources/my-reservations-subscribe', status=404)
+    client.get('/resources/my-reservations-ical', status=403)
 
     # let's enable it
     admin = client.spawn()
@@ -3423,3 +3427,17 @@ def test_my_reservations_view(client):
         '/resources/my-reservations-json?start=2015-08-28&end=2015-08-29'
     )
     assert reservations.status_code == 200
+    subscribe = client.get('/resources/my-reservations-subscribe')
+    assert 'webcal://' in subscribe
+    ical_url = re.search(
+        r'webcal://localhost(/[^"]+)', subscribe.text
+    ).group(1)
+
+    # accept the reservation so the ical file contains an event
+    ticket = admin.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket.click('Alle Reservationen annehmen')
+
+    assert client.get(ical_url).status_code == 200
+
+    # someone else can open the same ical link without authentication
+    assert client2.get(ical_url).status_code == 200

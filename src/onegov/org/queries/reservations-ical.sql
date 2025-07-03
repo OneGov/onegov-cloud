@@ -1,16 +1,19 @@
 SELECT
     reservations.id as id,                -- Integer
     token,                                -- UUID
-    resource,                             -- UUID
-    tickets.subtitle as title,            -- Text
+    resources.title as resource,          -- UUID
     tickets.number as description,        -- Text
     start,                                -- UTCDateTime
     "end",                                -- UTCDateTime
     tickets.id as ticket_id,              -- UUID
-    tickets.handler_code as handler_code  -- Text
+    tickets.handler_code as handler_code, -- Text
+    email                                 -- Text
 
 FROM
     reservations
+
+JOIN resources
+ON reservations.resource = resources.id
 
 LEFT JOIN tickets
 ON reservations.token = tickets.handler_id::uuid

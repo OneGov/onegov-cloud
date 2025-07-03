@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import collections
+import hashlib
 import icalendar
 import morepath
+import secrets
 import sedate
-import collections
 
 from collections import OrderedDict
 from datetime import date as date_t, datetime, time, timedelta
@@ -1258,6 +1260,14 @@ def view_my_reservations(
         Link(_('My Reservations'), '#')
     ]
 
+    layout.editbar_links = [
+        Link(
+            _('Subscribe'),
+            request.link(self, 'my-reservations-subscribe'),
+            classes={'subscribe-link'}
+        )
+    ]
+
     try:
         date = date_t.fromisoformat(request.GET.get('date', ''))
     except Exception:
@@ -1276,6 +1286,113 @@ def view_my_reservations(
         'layout': layout,
         'feed': request.link(self, name='my-reservations-json'),
     }
+
+
+@OrgApp.html(
+    model=ResourceCollection,
+    template='resource-subscribe.pt',
+    permission=Public,
+    name='my-reservations-subscribe'
+)
+def view_my_reservations_subscribe(
+    self: ResourceCollection,
+    request: OrgRequest,
+    layout: DefaultLayout | None = None
+) -> RenderData:
+
+    assert_citizen_logged_in(request)
+
+    salt = secrets.token_urlsafe(16)
+    url_obj = URL(request.link(self, 'my-reservations-ical'))
+    url_obj = url_obj.scheme('webcal')
+    token = request.new_url_safe_token(request.authenticated_email, salt)
+    url_obj = url_obj.query_param('token', token)
+    url_obj = url_obj.query_param('salt', salt)
+    url = url_obj.as_string()
+
+    layout = layout or DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('My Reservations'), request.url.replace('-subscribe', '')),
+        Link(_('Subscribe'), '#')
+    ]
+
+    return {
+        'title': _('Subscribe'),
+        'resource': self,
+        'layout': layout,
+        'url': url
+    }
+
+
+@OrgApp.view(
+    model=ResourceCollection,
+    permission=Public,
+    name='my-reservations-ical'
+)
+def view_my_reservations_ical(
+    self: ResourceCollection,
+    request: OrgRequest
+) -> Response:
+
+    token = request.GET.get('token')
+    salt = request.GET.get('salt')
+    email = request.load_url_safe_token(token, salt, None)
+    if email is None:
+        raise exc.HTTPForbidden()
+
+    s = utcnow() - timedelta(days=30)
+    e = utcnow() + timedelta(days=365)
+
+    cal = icalendar.Calendar()
+    cal.add('prodid', '-//OneGov//onegov.org//')
+    cal.add('version', '2.0')
+    cal.add('method', 'PUBLISH')
+
+    prefix = request.translate(_('My Reservations'))
+    cal.add('x-wr-calname', f'{prefix} {request.app.org.title}')
+    # generate a unique id for this calendar
+    sha1 = hashlib.new('sha1', usedforsecurity=False)
+    sha1.update(email.encode('utf-8'))
+    sha1.update(request.app.application_id.encode('utf-8'))
+    cal.add('x-wr-relcalid', sha1.hexdigest())
+
+    # refresh every 120 minutes by default (Outlook and maybe others)
+    cal.add('x-published-ttl', 'PT120M')
+
+    # add allocations/reservations
+    date = utcnow()
+    path = module_path('onegov.org', 'queries/reservations-ical.sql')
+    stmt = as_selectable_from_path(path)
+
+    records = request.session.execute(select(stmt.c).where(and_(
+        stmt.c.email == email, s <= stmt.c.start, stmt.c.start <= e
+    )))
+
+    for r in records:
+        start = r.start
+        end = r.end + timedelta(microseconds=1)
+
+        evt = icalendar.Event()
+        evt.add('uid', f'{r.token}-{r.id}')
+        evt.add('summary', r.resource)
+        evt.add('location', r.resource)
+        evt.add('description', r.description)
+        evt.add('dtstart', standardize_date(start, 'UTC'))
+        evt.add('dtend', standardize_date(end, 'UTC'))
+        evt.add('dtstamp', date)
+        evt.add('url', request.class_link(Ticket, {
+            'handler_code': r.handler_code,
+            'id': r.ticket_id
+        }, name='status'))
+
+        cal.add_component(evt)
+
+    return Response(
+        cal.to_ical(),
+        content_type='text/calendar',
+        content_disposition=f'inline; filename=my-reservations-{email}.ics'
+    )
 
 
 @OrgApp.html(
@@ -1346,7 +1463,7 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
         end = r.end + timedelta(microseconds=1)
 
         evt = icalendar.Event()
-        evt.add('uid', r.token)
+        evt.add('uid', f'{r.token}-{r.id}')
         evt.add('summary', r.title)
         evt.add('location', self.title)
         evt.add('description', r.description)
