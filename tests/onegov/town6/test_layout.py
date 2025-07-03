@@ -176,6 +176,7 @@ def test_template_layout(postgres_dsn, redis_url):
         org.open_files_target_blank = True
         org.header_options = header_options
         org.always_show_partners = False
+        org.citizen_login_enabled = False
 
         # disable LibresIntegration for this test
         def configure_libres(self, **cfg):

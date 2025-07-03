@@ -1196,6 +1196,9 @@ def view_my_reservations_json(
     more information.
 
     """
+    if not request.app.org.citizen_login_enabled:
+        raise exc.HTTPNotFound()
+
     if not request.authenticated_email:
         raise exc.HTTPForbidden()
 

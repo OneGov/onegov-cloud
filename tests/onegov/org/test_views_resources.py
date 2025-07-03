@@ -1,6 +1,7 @@
 import json
 import os
 import pytest
+import re
 import tempfile
 import textwrap
 import transaction
@@ -3371,3 +3372,54 @@ def test_reserve_fractions_of_hours_total_correct_in_price(client):
     reservations_data = client.get(reservations_url).json['reservations']
     assert len(reservations_data) == 1
     assert reservations_data[0]['price']['amount'] == 15.00
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_my_reservations_view(client):
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve().json == {'success': True}
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+    formular.form.submit().follow().form.submit()
+
+    # by default this view is disabled
+    client.get('/resources/my-reservations', status=404)
+    client.get('/resources/my-reservations-json', status=404)
+
+    # let's enable it
+    admin = client.spawn()
+    admin.login_admin()
+    settings = admin.get('/').click('Einstellungen').click('Kunden-Login')
+    settings.form['citizen_login_enabled'].checked = True
+    settings.form.submit().follow()
+
+    # now we don't have access yet
+    client.get('/resources/my-reservations-json', status=403)
+    login = client.get('/resources/my-reservations?date=20150828').follow()
+    login.form['email'] = 'info@example.org'
+    confirm = login.form.submit().follow()
+    assert len(os.listdir(client.app.maildir)) == 2
+    message = client.get_email(1)['TextBody']
+    token = re.search(r'&token=([^)]+)', message).group(1)
+    confirm.form['token'] = token
+    reservations = confirm.form.submit().follow()
+    assert reservations.request.path_qs == (
+        '/resources/my-reservations?date=20150828'
+    )
+    reservations = client.get(
+        '/resources/my-reservations-json?start=2015-08-28&end=2015-08-29'
+    )
+    assert reservations.status_code == 200

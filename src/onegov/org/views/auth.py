@@ -741,6 +741,9 @@ def handle_citizen_login(
     if not request.app.org.citizen_login_enabled:
         raise exc.HTTPNotFound()
 
+    if request.authenticated_email:
+        return self.redirect(request, self.to)
+
     if form.submitted(request):
         assert form.email.data is not None
         collection = TANCollection(request.session, scope='citizen-login')
@@ -815,6 +818,7 @@ def handle_confirm_citizen_login(
         else:
             request.browser_session['authenticated_email'] = (
                 tan_obj.meta['email'])
+            tan_obj.expire()
             return self.redirect(
                 request,
                 tan_obj.meta.get('redirect_to', self.to)
