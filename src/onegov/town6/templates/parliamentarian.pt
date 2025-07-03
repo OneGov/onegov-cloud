@@ -135,11 +135,11 @@
             <div tal:condition="parliamentarian.commission_memberships">
                 <dt i18n:translate>Commissions</dt>
                 <dd>
-                    <ul>
+                    <ul class="more-list">
                         <li tal:repeat="membership parliamentarian.commission_memberships">
-                            <span>
-                                <a href="${request.link(membership.commission)}">${membership.commission.title}</a>
-                                (${membership.role_label})
+                            <a href="${request.link(membership.commission)}" class="list-link">${membership.commission.title}</a>
+                            <span class="list-lead preview">
+                                ${membership.role_label}
                             </span>
                             <span tal:condition="membership.start">
                                 <br>${layout.format_date(membership.start, 'date')}
@@ -148,6 +148,20 @@
                                 -
                                 ${layout.format_date(membership.end, 'date')}
                             </span>
+                        </li>
+                    </ul>
+                </dd>
+            </div>
+            <div>
+                <dt i18n:translate>Political Businesses</dt>
+                <dd>
+                    <ul class="more-list">
+                        <li tal:repeat="participation parliamentarian.political_businesses">
+                            <a tal:attributes="href request.link(participation.political_business)" class="list-link">
+                                <span class="list-title">
+                                    ${participation.political_business.number|None} ${participation.political_business.title}
+                                </span>
+                            </a>
                         </li>
                     </ul>
                 </dd>

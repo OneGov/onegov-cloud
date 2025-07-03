@@ -7,25 +7,30 @@
         <tal:b metal:use-macro="layout.macros.page_content" />
     </tal:b>
     <tal:b metal:fill-slot="after-text">
-        <h2 i18n:translate="">Location</h2>
-        <div tal:content="page.address"></div>
-        <h2 tal:condition="page.description" i18n:translate="">Description</h2>
-        <div tal:content="page.description"></div>
+        <dl class="field-display">
+            <div tal:condition="page.address">
+                <dt i18n:translate>Location</dt>
+                <dd><div tal:content="page.address"></div></dd>
+            </div>
+            <div tal:condition="page.description">
+                <dt i18n:translate>Description</dt>
+                <dd><div tal:content="page.description"></div></dd>
+            </div>
 
-        <h2 i18n:translate="">Agenda</h2>
-        <dd>
-            <ul class="more-list">
-                <li tal:repeat="item meeting_items_with_links">
-                    <a tal:condition="item.political_business_link"
-                       tal:attributes="href item.political_business_link" class="list-link">
-                        <span tal:content="string:${item.number|None} ${item.title}" class="list-title"/>
-                    </a>
-                    <span tal:condition="not: item.political_business_link"
-                          tal:content="string:${item.number|None} ${item.title}" class="list-link"/>
-                </li>
-            </ul>
-        </dd>
+            <dt i18n:translate>Agenda</dt>
+            <dd>
+                <ul class="more-list">
+                    <li tal:repeat="item meeting_items_with_links">
+                        <a tal:condition="item.political_business_link"
+                           tal:attributes="href item.political_business_link" class="list-link">
+                            <span tal:content="string:${item.number|None} ${item.title}" class="list-title"/>
+                        </a>
+                        <span tal:condition="not: item.political_business_link"
+                              tal:content="string:${item.number|None} ${item.title}" class="list-link"/>
+                    </li>
+                </ul>
+            </dd>
+        </dl>
     </tal:b>
-
 </div>
 

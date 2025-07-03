@@ -20,19 +20,16 @@
             <div tal:condition="commission.memberships">
                 <dt i18n:translate>Parliamentarians</dt>
                 <dd>
-                    <ul>
+                    <ul class="more-list">
                         <li tal:repeat="membership commission.memberships">
-                            <span>
-                                <a href="${request.link(membership.parliamentarian)}">${membership.parliamentarian.title}</a>
-                                (${membership.role_label})
-                            <span>
-                            <span tal:condition="membership.start">
-                                <br>${layout.format_date(membership.start, 'date')}
+
+                            <a href="${request.link(membership.parliamentarian)}" class="list-link">
+                                <span tal:content="membership.parliamentarian.title" class="list-title"></span>
+                            </a>
+                            <span class="list-lead preview">
+                                ${membership.role_label}
                             </span>
-                            <span tal:condition="membership.end">
-                                -
-                                ${layout.format_date(membership.end, 'date')}
-                            </span>
+
                         </li>
                     </ul>
                 </dd>
