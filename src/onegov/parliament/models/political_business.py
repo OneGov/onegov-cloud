@@ -185,6 +185,7 @@ class PoliticalBusiness(
         'PoliticalBusinessParticipation',
         back_populates='political_business',
         lazy='joined',
+        order_by='PoliticalBusinessParticipation.participant_type',
     )
 
     #: parliamentary group (Fraktion)
