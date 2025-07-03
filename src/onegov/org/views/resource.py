@@ -1374,7 +1374,7 @@ def view_my_reservations_ical(
         end = r.end + timedelta(microseconds=1)
 
         evt = icalendar.Event()
-        evt.add('uid', r.token)
+        evt.add('uid', f'{r.token}-{r.id}')
         evt.add('summary', r.resource)
         evt.add('location', r.resource)
         evt.add('description', r.description)
@@ -1463,7 +1463,7 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
         end = r.end + timedelta(microseconds=1)
 
         evt = icalendar.Event()
-        evt.add('uid', r.token)
+        evt.add('uid', f'{r.token}-{r.id}')
         evt.add('summary', r.title)
         evt.add('location', self.title)
         evt.add('description', r.description)

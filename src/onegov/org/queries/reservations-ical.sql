@@ -1,4 +1,5 @@
 SELECT
+    reservations.id as id,                -- Integer
     token,                                -- UUID
     resources.title as resource,          -- UUID
     tickets.number as description,        -- Text
@@ -19,6 +20,6 @@ ON reservations.token = tickets.handler_id::uuid
 
 WHERE
     "status" = 'approved'
-    AND (("data"::jsonb)->>'accepted')::boolean = TRUE
+    AND ("data"->'accepted')::boolean IS TRUE
 
 ORDER BY start
