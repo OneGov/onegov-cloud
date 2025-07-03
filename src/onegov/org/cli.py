@@ -1270,8 +1270,8 @@ def import_reservations(
                                 end = datetime.combine(
                                     end.date(), rule['end_time'])
                                 click.secho(
-                                    f'{id}: Trying to reserve {resource.title} '
-                                    f'at {start} - {end} with rule {i+1}',
+                                    f'{id}: Trying to reserve {resource.title}'
+                                    f' at {start} - {end} with rule {i+1}',
                                     fg='cyan')
                                 try:
                                     token_uuid = scheduler.reserve(
@@ -1284,8 +1284,9 @@ def import_reservations(
                                     token = token_uuid.hex
                                 except Exception as e:
                                     click.secho(
-                                        f'{id}: Error reserving {resource.title} '
-                                        f'at {start} - {end} - {e}', fg='red')
+                                        f'{id}: Error reserving '
+                                        f'{resource.title} at {start} - {end} '
+                                        f'- {e}', fg='red')
                                     found_conflict = True
                             if not relevant_rules:
                                 click.secho(
@@ -1293,8 +1294,8 @@ def import_reservations(
                                     f'{resource.title} at {start}', fg='red')
                         except Exception as e:
                             click.secho(
-                                f'{id}: Error reserving {resource.title} at '
-                                f'{start} - {end} outside of availability'
+                                f'{id}: Error {e} reserving {resource.title} '
+                                f'at {start} - {end} outside of availability'
                                 'period', fg='red')
                             continue
 
@@ -1341,7 +1342,8 @@ def import_reservations(
                             handler_code='RSV', handler_id=token
                         )
                         ticket.accept_ticket(user)
-                        ticket.close_ticket()
+                        if reservation['state'] != 'unbestätigt':
+                            ticket.close_ticket()
 
                     click.secho(f'{id}: Sucessfully imported reservation '
                                 f'at {start} - {end}',
