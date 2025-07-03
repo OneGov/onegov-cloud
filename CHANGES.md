@@ -1,8 +1,24 @@
 # Changes
 
+## 2025.30
+
+`2025-07-03` | [5fb710d69d...92d3e8da7f](https://github.com/OneGov/onegov-cloud/compare/5fb710d69d^...92d3e8da7f)
+
+### Org
+
+##### Allows subscription to confirmed personal reservations via iCal
+
+`Feature` | [OGC-2399](https://linear.app/onegovcloud/issue/OGC-2399) | [5fb710d69d](https://github.com/onegov/onegov-cloud/commit/5fb710d69d4b6df8476c6021c5e74a8ae2f94796)
+
+### Pay
+
+##### Silences 3D-Secure Verification errors
+
+`Bugfix` | [92d3e8da7f](https://github.com/onegov/onegov-cloud/commit/92d3e8da7fd1b41ae6949bbbd26670136ed81903)
+
 ## 2025.29
 
-`2025-07-03` | [93a736507d...eaadff40a5](https://github.com/OneGov/onegov-cloud/compare/93a736507d^...eaadff40a5)
+`2025-07-03` | [93a736507d...bb698f8fd3](https://github.com/OneGov/onegov-cloud/compare/93a736507d^...bb698f8fd3)
 
 **Upgrade hints**
 - onegov-org --select /onegov_town6/wil ris-resolve-parliamentarian-doublette
@@ -2135,48 +2151,4 @@ Some style improvements of the newsletter and added images of events if there ar
 ##### Actually allows multiple providers of the same type to coexist
 
 `Bugfix` | [OGC-1750](https://linear.app/onegovcloud/issue/OGC-1750) | [59474454b8](https://github.com/onegov/onegov-cloud/commit/59474454b89a4ad3ac5cc7c1bc9c2c66a11d7285)
-
-## 2024.49
-
-`2024-10-07` | [4b2186bb38...1b5993f16a](https://github.com/OneGov/onegov-cloud/compare/4b2186bb38^...1b5993f16a)
-
-### Feriennet
-
-##### Fix definition of "overfull"
-
-Attendees, who are blocked aren't counted for an occasion to be "overfull"
-
-`Bugfix` | [OGC-1312](https://linear.app/onegovcloud/issue/OGC-1312) | [d17ab4d9a9](https://github.com/onegov/onegov-cloud/commit/d17ab4d9a907f5e892261302b9cf4ce26185f228)
-
-### Form
-
-##### Fixes `ExpectedExtensions` not working with `.mp3` file ending
-
-`Bugfix` | [OGC-1795](https://linear.app/onegovcloud/issue/OGC-1795) | [223b0fbea2](https://github.com/onegov/onegov-cloud/commit/223b0fbea20717fa0d89f14f8918c2aedfeb2fb3)
-
-### Org
-
-##### Add `analytics` subdomain to child src content policy.
-
-`Feature` | [OGC-1787](https://linear.app/onegovcloud/issue/OGC-1787) | [4c05f081ac](https://github.com/onegov/onegov-cloud/commit/4c05f081ac6c2a2ea89fcd343e6e8d53d75c2d6f)
-
-##### Change message text newsletter.
-
-`Bugfix` | [OGC-1828](https://linear.app/onegovcloud/issue/OGC-1828) | [943685c2d2](https://github.com/onegov/onegov-cloud/commit/943685c2d2012a9e9af1a07916deec0494f44694)
-
-##### Render markup of survey text correctly
-
-`Bugfix` | [OGC-1844](https://linear.app/onegovcloud/issue/OGC-1844) | [49113d3823](https://github.com/onegov/onegov-cloud/commit/49113d3823ef753e7928008b465d4fd34f5a1276)
-
-### Town6
-
-##### Don't linkify the leads in the form and survey overview
-
-`Bugfix` | [OGC-1818](https://linear.app/onegovcloud/issue/OGC-1818) | [e455e2c0c8](https://github.com/onegov/onegov-cloud/commit/e455e2c0c89b26986215b051bd2473f9a57e86f2)
-
-### User
-
-##### Allows configuring more than one instance of the same provider
-
-`Feature` | [OGC-1856](https://linear.app/onegovcloud/issue/OGC-1856) | [3004111e8b](https://github.com/onegov/onegov-cloud/commit/3004111e8bb57161c1476a7ae2529e80f29b4a72)
 
