@@ -6,8 +6,9 @@
         <div class="grid-x grid-padding-x">
             <div class="medium-7 cell main-content">
                 <p tal:condition="not:meetings" i18n:translate="">No meetings defined yet.</p>
-                <ul tal:condition="meetings" class="more-list meeting-list">
-                    <li tal:repeat="meeting meetings">
+
+                <ul tal:condition="future_meetings" class="more-list meeting-list">
+                    <li tal:repeat="meeting future_meetings">
                         <a class="list-link" tal:attributes="href request.link(meeting)">
                             <span class="h5 list-title">
                                 ${meeting.title}
@@ -20,8 +21,26 @@
                             </p>
                         </a>
                     </li>
-
                 </ul>
+
+                <p></p>
+                <h1>Past Meetings</h1>
+                <ul tal:condition="past_meetings" class="more-list meeting-list">
+                    <li tal:repeat="meeting past_meetings">
+                        <a class="list-link" tal:attributes="href request.link(meeting)">
+                            <span class="h5 list-title">
+                                    ${meeting.title}
+                            </span>
+                        </a>
+
+                        <a tal:attributes="href request.link(meeting)">
+                            <p class="list-lead preview">
+                                <span>${layout.format_date(meeting.start_datetime, 'datetime')}</span>
+                            </p>
+                        </a>
+                    </li>
+                </ul>
+<!--?                <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model; pagination_centered True" />-->
             </div>
         </div>
     </tal:b>

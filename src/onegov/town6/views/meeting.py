@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+
 import morepath
 
 from onegov.core.security.permissions import Public
@@ -33,8 +34,10 @@ def view_meetings(
 
     return {
         'layout': layout or MeetingCollectionLayout(self, request),
-        'meetings': self.query().all(),
-        'title': _('Meetings'),
+        'meetings': self.batch,
+        'past_meetings': self.query_past_meetings(),
+        'future_meetings': self.query_future_meetings(),
+        'title': _('Future Meetings'),
     }
 
 

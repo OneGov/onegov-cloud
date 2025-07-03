@@ -1269,11 +1269,24 @@ def get_commission(
 @OrgApp.path(
     model=MeetingCollection,
     path='/meetings',
+    converters={
+        'page': int,
+        # 'tags': [],
+        # 'filter_keywords': keywords_converter,
+    }
 )
 def get_meetings(
     app: OrgApp,
+    page: int = 0,
+    # tags: list[str] | None = None,
+    # filter_keywords: dict[str, list[str]] | None = None,
 ) -> MeetingCollection:
-    return MeetingCollection(app.session())
+    return MeetingCollection(
+        app.session(),
+        page=page,
+        # tags=tags,
+        # filter_keywords=filter_keywords,
+    )
 
 
 @OrgApp.path(
