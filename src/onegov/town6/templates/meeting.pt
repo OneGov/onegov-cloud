@@ -6,6 +6,15 @@
     <tal:b metal:fill-slot="content">
         <tal:b metal:use-macro="layout.macros.page_content" />
     </tal:b>
+    <div metal:fill-slot="after-lead">
+        <p>
+            <strong>
+                <span tal:condition="page.start_datetime">${layout.format_date(page.start_datetime, 'datetime')}</span>
+                <span tal:condition="page.end_datetime"> - ${layout.format_date(page.end_datetime, 'datetime')}</span>
+            </strong>
+        </p>
+
+    </div>
     <tal:b metal:fill-slot="after-text">
         <h2 i18n:translate="">Location</h2>
         <div tal:content="page.address"></div>
