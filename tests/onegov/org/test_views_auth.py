@@ -710,3 +710,40 @@ def test_mtan_access_unauthorized_resource(org_app, client, smsdir):
     unauth_page = anonymous.get(page_url, expect_errors=True)
     assert "Zugriff verweigert" in unauth_page.text
     assert "folgen Sie diesem Link um sich anzumelden" in unauth_page.text
+
+
+def test_citizen_login(client):
+    # by default it is off
+    links = client.get('/').pyquery('.globals a.citizen-login')
+    assert not list(links.items())
+
+    # let's enable it
+    admin = client.spawn()
+    admin.login_admin()
+    settings = admin.get('/').click('Einstellungen').click('Kunden-Login')
+    settings.form['citizen_login_enabled'].checked = True
+    settings.form.submit().follow()
+
+    # now it should be there
+    links = client.get('/').pyquery('.globals a.citizen-login')
+    assert links.text() == 'Kunden-Login'
+
+    login_page = client.get(links.attr('href'))
+    login_page.form['email'] = 'citizen@example.org'
+    confirm_page = login_page.form.submit().follow()
+    assert "Kunden-Login bestätigen" in confirm_page.text
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)['TextBody']
+    assert 'confirm-citizen-login' in message
+    token = re.search(r'&token=([^)]+)', message).group(1)
+
+    # finish login with the token
+    confirm_page.form['token'] = token
+    index_page = confirm_page.form.submit().follow()
+
+    links = index_page.pyquery('.globals a.logout')
+    assert links.text() == 'Abmelden'
+
+    index_page = client.get(links.attr('href')).follow()
+    links = index_page.pyquery('.globals a.citizen-login')
+    assert links.text() == 'Kunden-Login'
