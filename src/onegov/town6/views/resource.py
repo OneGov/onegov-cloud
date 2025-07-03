@@ -9,7 +9,8 @@ from onegov.org.views.resource import (
     get_resource_form, handle_edit_resource, view_resource,
     handle_cleanup_allocations, view_occupancy,
     view_resource_subscribe, view_export_all, get_item_form,
-    handle_new_resource_item, view_export, view_my_reservations
+    handle_new_resource_item, view_export, view_my_reservations,
+    view_my_reservations_subscribe
 )
 from onegov.reservation import ResourceCollection, Resource
 from onegov.org.forms import (
@@ -165,6 +166,20 @@ def town_view_my_reservations(
     request: TownRequest
 ) -> RenderData:
     return view_my_reservations(self, request, DefaultLayout(self, request))
+
+
+@TownApp.html(
+    model=ResourceCollection,
+    template='resource-subscribe.pt',
+    permission=Public,
+    name='my-reservations-subscribe'
+)
+def town_view_my_reservations_subscribe(
+    self: ResourceCollection,
+    request: TownRequest
+) -> RenderData:
+    return view_my_reservations_subscribe(
+        self, request, DefaultLayout(self, request))
 
 
 @TownApp.html(
