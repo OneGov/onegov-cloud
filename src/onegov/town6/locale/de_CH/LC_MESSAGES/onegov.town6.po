@@ -2580,6 +2580,9 @@ msgstr "Ratsinformationssystem (RIS)"
 msgid "New Note"
 msgstr "Neue Notiz"
 
+msgid "Date/Time"
+msgstr "Datum/Zeit"
+
 #~ msgid "Parliamentarian is not in this commission."
 #~ msgstr "Parlamentarier:in ist nicht in dieser Kommission."
 

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-03 09:16+0200\n"
+"POT-Creation-Date: 2025-07-03 14:52+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1298,17 +1298,11 @@ msgstr "- Oberste Ebene -"
 msgid "Invalid destination selected"
 msgstr "Ungültiger Zielort gewählt"
 
-msgid "Personnel number"
-msgstr "Personalnummer"
+msgid "Gender"
+msgstr "Geschlecht"
 
 msgid "Basic properties"
 msgstr "Basis-Eigenschaften"
-
-msgid "Contract number"
-msgstr "Vertragsnummer"
-
-msgid "Gender"
-msgstr "Geschlecht"
 
 msgid "First name"
 msgstr "Vorname"
@@ -1372,6 +1366,12 @@ msgstr "Webseite"
 
 msgid "Remarks"
 msgstr "Bemerkungen"
+
+msgid "Personnel number"
+msgstr "Personalnummer"
+
+msgid "Contract number"
+msgstr "Vertragsnummer"
 
 msgid "Shipping method"
 msgstr "Versandart"
@@ -3559,8 +3559,8 @@ msgstr "Reservationen absagen"
 msgid "Reject all with message"
 msgstr "Alle absagen mit Kommentar"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-03 09:16+0200\n"
+"POT-Creation-Date: 2025-07-03 14:52+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1297,17 +1297,11 @@ msgstr "- Page de base-"
 msgid "Invalid destination selected"
 msgstr "Destination non valide sélectionnée"
 
-msgid "Personnel number"
-msgstr "Numéro de personnel"
+msgid "Gender"
+msgstr "Sexe"
 
 msgid "Basic properties"
 msgstr "Propriétés fondamentales"
-
-msgid "Contract number"
-msgstr "Numéro de contrat"
-
-msgid "Gender"
-msgstr "Sexe"
 
 msgid "First name"
 msgstr "Prénom"
@@ -1371,6 +1365,12 @@ msgstr "Site Web"
 
 msgid "Remarks"
 msgstr "Remarques"
+
+msgid "Personnel number"
+msgstr "Numéro de personnel"
+
+msgid "Contract number"
+msgstr "Numéro de contrat"
 
 msgid "Shipping method"
 msgstr "Mode d'expédition"
@@ -3565,8 +3565,8 @@ msgstr "Refuser les réservations"
 msgid "Reject all with message"
 msgstr "Tout refuser avec message"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3959,8 +3959,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "

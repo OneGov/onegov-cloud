@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-03 09:16+0200\n"
+"POT-Creation-Date: 2025-07-03 14:52+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1301,17 +1301,11 @@ msgstr "- Principale -"
 msgid "Invalid destination selected"
 msgstr "Destinazione non valida selezionata"
 
-msgid "Personnel number"
-msgstr "Numero del personale"
+msgid "Gender"
+msgstr "Genere"
 
 msgid "Basic properties"
 msgstr "Proprietà di base"
-
-msgid "Contract number"
-msgstr "Numero del contratto"
-
-msgid "Gender"
-msgstr "Genere"
 
 msgid "First name"
 msgstr "Nome"
@@ -1375,6 +1369,12 @@ msgstr "Sito web"
 
 msgid "Remarks"
 msgstr "Osservazioni"
+
+msgid "Personnel number"
+msgstr "Numero del personale"
+
+msgid "Contract number"
+msgstr "Numero del contratto"
 
 msgid "Shipping method"
 msgstr "Metodo di spedizione"
@@ -3565,8 +3565,8 @@ msgstr "Rifiuta le prenotazioni"
 msgid "Reject all with message"
 msgstr "Rifiuta tutto con messaggio"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
