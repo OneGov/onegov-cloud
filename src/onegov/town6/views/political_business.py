@@ -35,7 +35,6 @@ def view_political_businesses(
     return {
         # 'add_link': request.link(self, name='new'),
         'layout': layout or PoliticalBusinessCollectionLayout(self, request),
-        'files': getattr(self, 'files', None),
         'title': _('Political Businesses'),
         'businesses': self.batch,
         'type_map': POLITICAL_BUSINESS_TYPE,
@@ -61,4 +60,5 @@ def view_political_business(
         'title': self.title,
         'type_map': POLITICAL_BUSINESS_TYPE,
         'status_map': POLITICAL_BUSINESS_STATUS,
+        'files': getattr(self, 'files', None),
     }
