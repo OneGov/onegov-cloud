@@ -2809,41 +2809,6 @@ def ris_wil_adds_missing_parliamentarians() -> (
 
         wil_parliamentarians = [
             {
-                'first_name': 'Manuel',
-                'last_name': 'Nick',
-                'party': 'SP',
-                'gender': 'male',
-                'group': 'SP Fraktion',
-            },
-            {
-                'first_name': 'Andreas',
-                'last_name': 'Breitenmoser',
-                'party': 'Die Mitte',
-                'gender': 'male',
-                'group': 'Fraktion Die Mitte',
-            },
-            {
-                'first_name': 'Hans',
-                'last_name': 'Mäder',
-                'party': 'Die Mitte',
-                'gender': 'male',
-                'group': 'Fraktion Die Mitte',
-            },
-            {
-                'first_name': 'Cornelia',
-                'last_name': 'Kunz',
-                'party': 'FDP',
-                'gender': 'female',
-                'group': 'FDP-GLP-Fraktion',
-            },
-            {
-                'first_name': 'Jigme',
-                'last_name': 'Shitsetsang',
-                'party': 'FDP',
-                'gender': 'male',
-                'group': 'FDP-GLP-Fraktion',
-            },
-            {
                 'first_name': 'Beat',
                 'last_name': 'Ruckstuhl',
                 'party': 'Die Mitte',
@@ -2864,11 +2829,14 @@ def ris_wil_adds_missing_parliamentarians() -> (
                 f'{parliamentarian.last_name} ({parliamentarian.party})'
             )
 
+            # inactive since Jund 2nd 2025,
+            # https://g553-preview.i-cms.ch/aktuellesinformationen/2459626
             roles.add(
                 parliamentarian=parliamentarian,
                 parliamentarian_id=parliamentarian.id,
                 parliamentary_group_id=parliamentary_group_map[p['group']],
                 role=p.get('role', None) or 'member',
+                end=date(2025, 6, 2)
             )
             click.echo(
                 f'Added role for {parliamentarian.first_name} '
