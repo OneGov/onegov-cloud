@@ -152,7 +152,7 @@
                     </ul>
                 </dd>
             </div>
-            <div>
+            <div tal:condition="parliamentarian.political_businesses">
                 <dt i18n:translate>Political Businesses</dt>
                 <dd>
                     <ul class="more-list">

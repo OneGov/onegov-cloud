@@ -63,7 +63,7 @@ from onegov.parliament.models import (
     RISCommissionMembership,
     RISParliamentarian,
     RISParliamentarianRole,
-    PoliticalBusiness,
+    PoliticalBusiness, RISParliamentaryGroup,
 )
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -79,8 +79,8 @@ from sqlalchemy.dialects.postgresql import array
 from uuid import uuid4
 from elasticsearch.exceptions import ConnectionError as ESConnectionError
 
-
 from typing import IO, Any, TYPE_CHECKING, TypedDict
+
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from depot.fields.upload import UploadedFile
@@ -2779,3 +2779,101 @@ def ris_resolve_parliamentarian_doublette(
             transaction.commit()
 
     return resolve_doublette
+
+
+@cli.command(name='ris-wil-adds-missing-parliamentarians')
+def ris_wil_adds_missing_parliamentarians() -> (
+    Callable[[OrgRequest, OrgApp], None]
+):
+    """Adds missing parliamentarians from WIL
+
+    onegov-org --select /foo/bar ris-wil-adds-missing-parliamentarians
+
+    """
+
+    def add_missing_parliamentarians(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        parliamentarians = RISParliamentarianCollection(session)
+        roles = RISParliamentarianRoleCollection(session)
+        # mapping parliamentary group name to ids
+        parliamentary_groups = RISParliamentaryGroupCollection(session)
+        parliamentary_group_map = {
+            name: str(id)
+            for name, id in parliamentary_groups.query().with_entities(
+                RISParliamentaryGroup.name,
+                RISParliamentaryGroup.id
+            )
+        }
+        click.echo(f'Parliamentary groups map: '
+                   f'{parliamentary_group_map.keys()}')
+
+        wil_parliamentarians = [
+            {
+                'first_name': 'Manuel',
+                'last_name': 'Nick',
+                'party': 'SP',
+                'gender': 'male',
+                'group': 'SP Fraktion',
+            },
+            {
+                'first_name': 'Andreas',
+                'last_name': 'Breitenmoser',
+                'party': 'Die Mitte',
+                'gender': 'male',
+                'group': 'Fraktion Die Mitte',
+            },
+            {
+                'first_name': 'Hans',
+                'last_name': 'Mäder',
+                'party': 'Die Mitte',
+                'gender': 'male',
+                'group': 'Fraktion Die Mitte',
+            },
+            {
+                'first_name': 'Cornelia',
+                'last_name': 'Kunz',
+                'party': 'FDP',
+                'gender': 'female',
+                'group': 'FDP-GLP-Fraktion',
+            },
+            {
+                'first_name': 'Jigme',
+                'last_name': 'Shitsetsang',
+                'party': 'FDP',
+                'gender': 'male',
+                'group': 'FDP-GLP-Fraktion',
+            },
+            {
+                'first_name': 'Beat',
+                'last_name': 'Ruckstuhl',
+                'party': 'Die Mitte',
+                'gender': 'male',
+                'group': 'FDP-GLP-Fraktion',
+            },
+        ]
+
+        for p in wil_parliamentarians:
+            parliamentarian = parliamentarians.add(
+                first_name=p['first_name'],
+                last_name=p['last_name'],
+                party=p['party'],
+                gender=p['gender'],
+            )
+            click.echo(
+                f'Added parliamentarian: {parliamentarian.first_name} '
+                f'{parliamentarian.last_name} ({parliamentarian.party})'
+            )
+
+            roles.add(
+                parliamentarian=parliamentarian,
+                parliamentarian_id=parliamentarian.id,
+                parliamentary_group_id=parliamentary_group_map[p['group']],
+                role=p.get('role', None) or 'member',
+            )
+            click.echo(
+                f'Added role for {parliamentarian.first_name} '
+            )
+
+        transaction.commit()
+
+    return add_missing_parliamentarians
