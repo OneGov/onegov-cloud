@@ -1600,16 +1600,16 @@ class PoliticalBusinessCollectionLayout(DefaultLayout):
     def editbar_links(self) -> list[LinkGroup] | None:
         if self.request.is_manager:
             return [
-                # LinkGroup(
-                #     title=_('Add'),
-                #     links=[
-                #         Link(
-                #             text=_('Political Business'),
-                #             url=self.request.link(self.model, 'new'),
-                #             attrs={'class': 'new-political-business'}
-                #         ),
-                #     ]
-                # ),
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Political Business'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-political-business'}
+                        ),
+                    ]
+                ),
             ]
         return None
 
@@ -1642,32 +1642,44 @@ class PoliticalBusinessLayout(DefaultLayout):
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
-                # Link(
-                #     text=_('Edit'),
-                #     url=self.request.link(self.model, 'edit'),
-                #     attrs={'class': 'edit-link'}
-                # ),
-                # Link(
-                #     text=_('Delete'),
-                #     url=self.csrf_protected_url(
-                #         self.request.link(self.model)
-                #     ),
-                #     attrs={'class': 'delete-link'},
-                #     traits=(
-                #         Confirm(
-                #             _('Do you really want to delete this
-                #             political business?'),
-                #             _('This cannot be undone.'),
-                #             _('Delete political business'),
-                #             _('Cancel')
+                # LinkGroup(
+                #     title=_('Add'),
+                #     links=[
+                #         Link(
+                #             text=_('Political Business'),
+                #             url=self.request.link(
+                #                 self.model,
+                #                 'new'
+                #             ),
+                #             attrs={'class': 'new-political-business'}
                 #         ),
-                #         Intercooler(
-                #             request_method='DELETE',
-                #             redirect_after=
-                #             self.request.class_link(
-                #               PoliticalBusinessCollection)
-                #         )
-                #     )
-                # )
+                #     ]
+                # ),
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _('Do you really want to delete this '
+                              'political business?'),
+                            _('This cannot be undone.'),
+                            _('Delete political business'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(
+                              PoliticalBusinessCollection)
+                        )
+                    )
+                )
             ]
         return None

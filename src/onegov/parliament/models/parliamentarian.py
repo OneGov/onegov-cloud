@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from datetime import date
+
+from sqlalchemy import and_, exists
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -13,6 +15,7 @@ from sqlalchemy import Column, or_
 from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import Text
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -437,7 +440,7 @@ class RISParliamentarian(Parliamentarian):
         lazy='joined'
     )
 
-    @property
+    @hybrid_property
     def active(self) -> bool:
         # Wil: every parliamentarian is active if in a parliamentary
         # group, which leads to a role
@@ -445,3 +448,19 @@ class RISParliamentarian(Parliamentarian):
             if role.end is None or role.end >= date.today():
                 return True
         return False
+
+    @active.expression  # type:ignore[no-redef]
+    def active(cls):
+        from onegov.parliament.models.parliamentarian_role import (
+            ParliamentarianRole
+        )
+
+        return exists().where(
+            and_(
+                ParliamentarianRole.parliamentarian_id == cls.id,
+                or_(
+                    ParliamentarianRole.end.is_(None),
+                    ParliamentarianRole.end >= date.today()
+                )
+            )
+        )
