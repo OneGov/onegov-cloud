@@ -2821,7 +2821,7 @@ msgid "Homepage"
 msgstr "Pagina principale"
 
 msgid "Save"
-msgstr "Risparmiare"
+msgstr "Salvare"
 
 msgid "Edit"
 msgstr "Modifica"
