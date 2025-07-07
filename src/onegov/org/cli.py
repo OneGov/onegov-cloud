@@ -1127,9 +1127,9 @@ def import_reservations(
                 elif i == 37:
                     reservation['state'] = str(value)
                 elif i in shared_fields:
-                    value = str(value or '-')
+                    value = str(value or '')
                     key = shared_fields[i]
-                    if reservation['fields'].get(key) is None:
+                    if reservation['fields'].get(key) is None or '':
                         reservation['fields'][key] = value
                     elif value not in reservation['fields'][key]:
                         if i == 17 or i == 18:
@@ -1205,7 +1205,14 @@ def import_reservations(
             resources = ResourceCollection(app.libres_context)
             for resource_name in reservations.keys():
 
-                real_resource_name = resource_options[resource_name]['name']
+                real_resource_name = resource_options.get(resource_name, '')
+                if not real_resource_name:
+                    click.echo(
+                        f'Resource {resource_name} not found in the mapping '
+                        'file'
+                    )
+                    continue
+                real_resource_name = real_resource_name.get('name', '')
                 resource = resources.by_name(real_resource_name.lower())
 
                 if not resource:
