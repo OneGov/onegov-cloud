@@ -68,6 +68,8 @@ def delete_parliamentarian_role(
     collection = ParliamentarianRoleCollection(request.session)
     collection.delete(self)
 
+    request.success(_('The parliamentarian role has been deleted.'))
+
 
 @TownApp.html(
     model=RISParliamentarianRole,

@@ -30,10 +30,10 @@
                     <li tal:repeat="item meeting_items_with_links">
                         <a tal:condition="item.political_business_link"
                            tal:attributes="href item.political_business_link" class="list-link">
-                            <span tal:content="string:${item.number|None} ${item.title}" class="list-title"/>
+                            <span tal:content="string:${item.number} ${item.title}" class="list-title"/>
                         </a>
                         <span tal:condition="not: item.political_business_link"
-                              tal:content="string:${item.number|None} ${item.title}" class="list-link"/>
+                              tal:content="string:${item.number} ${item.title}" class="list-link"/>
                     </li>
                 </ul>
             </dd>

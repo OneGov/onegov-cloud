@@ -122,6 +122,8 @@ def delete_commission(
     collection = CommissionCollection(request.session)
     collection.delete(self)
 
+    request.success(_('The commission has been deleted.'))
+
 
 @TownApp.html(
     model=RISCommissionCollection,

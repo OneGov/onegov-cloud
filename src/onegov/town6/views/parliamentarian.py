@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
 from onegov.parliament.collections import RISParliamentarianCollection
@@ -125,6 +126,8 @@ def delete_parliamentarian(
 
     collection = ParliamentarianCollection(request.session)
     collection.delete(self)
+
+    request.success(_('The parliamentarian has been deleted.'))
 
 
 def add_commission_membership(

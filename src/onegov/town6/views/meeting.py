@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import morepath
+from webob.exc import HTTPNotFound
 
-from onegov.core.security.permissions import Public
+from onegov.core.elements import Link
+from onegov.core.security.permissions import Public, Private
+from onegov.org.forms import MeetingForm
 
 from onegov.parliament.collections import MeetingCollection
 from onegov.parliament.models import Meeting
@@ -14,6 +17,7 @@ from onegov.town6.layout import MeetingCollectionLayout
 from onegov.town6.layout import MeetingLayout
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
     from onegov.core.types import RenderData
@@ -29,13 +33,47 @@ if TYPE_CHECKING:
 def view_meetings(
     self: MeetingCollection,
     request: TownRequest,
-    layout: MeetingCollectionLayout | None = None
+    layout: MeetingCollectionLayout | None = None,
 ) -> RenderData:
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
 
     return {
         'layout': layout or MeetingCollectionLayout(self, request),
         'meetings': self.query().all(),
         'title': _('Meetings'),
+    }
+
+
+@TownApp.form(
+    model=MeetingCollection,
+    name='new',
+    template='form.pt',
+    permission=Private,
+    form=MeetingForm,
+)
+def add_meeting(
+    self: MeetingCollection,
+    request: TownRequest,
+    form: MeetingForm,
+) -> RenderData | Response:
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
+
+    layout = MeetingCollectionLayout(self, request)
+
+    if form.submitted(request):
+        meeting = self.add(**form.get_useful_data())
+        request.success(_('Added a new meeting.'))
+        return request.redirect(request.link(meeting))
+
+    layout.breadcrumbs.append(Link(_('New'), '#'))
+
+    return {
+        'layout': layout,
+        'form': form,
+        'title': _('New Meeting'),
+        'form_width': 'large',
     }
 
 
@@ -48,6 +86,9 @@ def view_meeting(
     self: Meeting,
     request: TownRequest,
 ) -> RenderData:
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
+
     layout = MeetingLayout(self, request)
     title = (
         self.title + ' - ' + layout.format_date(self.start_datetime, 'date')
@@ -61,13 +102,17 @@ def view_meeting(
         item_data = {
             'number': item.number,
             'title': item.title,
-            'political_business_link': None
+            'political_business_link': None,
         }
         if item.political_business_link_id:
-            business = request.session.query(PoliticalBusiness).filter(
-                PoliticalBusiness.meta['self_id'].astext ==
-                item.political_business_link_id
-            ).first()
+            business = (
+                request.session.query(PoliticalBusiness)
+                .filter(
+                    PoliticalBusiness.meta['self_id'].astext
+                    == item.political_business_link_id
+                )
+                .first()
+            )
             if business is not None:
                 item_data['political_business_link'] = request.link(business)
         meeting_items_with_links.append(item_data)
@@ -86,9 +131,64 @@ def view_meeting(
     }
 
 
+@TownApp.form(
+    model=Meeting,
+    name='edit',
+    template='form.pt',
+    permission=Private,
+    form=MeetingForm,
+)
+def edit_meeting(
+    self: Meeting,
+    request: TownRequest,
+    form: MeetingForm,
+) -> RenderData | Response:
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
+
+    layout = MeetingLayout(self, request)
+
+    if form.submitted(request):
+        form.populate_obj(self)
+        request.success(_('Your changes were saved.'))
+        return request.redirect(request.link(self))
+
+    form.process(obj=self)
+
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
+    layout.editbar_links = []
+
+    return {
+        'layout': layout,
+        'form': form,
+        'title': _('Edit Meeting'),
+        'form_width': 'large',
+    }
+
+
+@TownApp.view(
+    model=Meeting,
+    request_method='DELETE',
+    permission=Private,
+)
+def delete_meeting(
+    self: Meeting,
+    request: TownRequest,
+) -> None:
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
+
+    request.assert_valid_csrf_token()
+
+    collection = MeetingCollection(request.session)
+    collection.delete(self)
+
+    request.success(_('The meeting has been deleted.'))
+
+
 @TownApp.view(model=MeetingItem, permission=Public)
 def view_redirect_meeting_item_to_meeting(
-        self: MeetingItem, request: CoreRequest
+    self: MeetingItem, request: CoreRequest
 ) -> Response:
     """
     Redirect for search results, if we link to MeetingItem we show the Meeting

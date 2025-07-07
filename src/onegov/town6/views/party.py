@@ -126,6 +126,8 @@ def delete_party(
     collection = RISPartyCollection(request.session)
     collection.delete(self)
 
+    request.success(_('The party has been deleted.'))
+
 
 @TownApp.html(
     model=RISPartyCollection,
