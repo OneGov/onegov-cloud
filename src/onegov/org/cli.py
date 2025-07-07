@@ -1060,11 +1060,13 @@ def get_resources_and_forms(
 @click.argument('option_file', type=click.File('rb'))
 @click.argument('mapping_yaml', type=click.File('rb'))
 @click.option('--dry-run', is_flag=True, default=False)
+@click.option('--masked', is_flag=True, default=False)
 def import_reservations(
     reservation_file: IO[bytes],
     option_file: IO[bytes],
     mapping_yaml: IO[bytes],
-    dry_run: bool
+    dry_run: bool,
+    masked: bool
 ) -> Callable[[OrgRequest, OrgApp], None]:
     """ Imports reservations from a Excel file (needs to be .xlsx).
     Creates no resources or allocations, so the availabilty periods need to
@@ -1074,6 +1076,7 @@ def import_reservations(
     def import_reservations(request: OrgRequest, app: OrgApp) -> None:
 
         class Reservation(TypedDict):
+            state: str
             general: dict[str, Any]
             fields: dict[str, Any]
             dates: list[Any]
@@ -1098,6 +1101,7 @@ def import_reservations(
                 continue
 
             reservation: Reservation = {
+                'state': '',
                 'general': {},
                 'fields': {},
                 'dates': []
@@ -1123,10 +1127,12 @@ def import_reservations(
                     if value is None:
                         value = 'info@seantis.ch'
                     reservation['general']['email'] = value
+                elif i == 37:
+                    reservation['state'] = str(value)
                 elif i in shared_fields:
-                    value = str(value or '-')
+                    value = str(value or '')
                     key = shared_fields[i]
-                    if reservation['fields'].get(key) is None:
+                    if reservation['fields'].get(key) is None or '':
                         reservation['fields'][key] = value
                     elif value not in reservation['fields'][key]:
                         if i == 17 or i == 18:
@@ -1202,7 +1208,14 @@ def import_reservations(
             resources = ResourceCollection(app.libres_context)
             for resource_name in reservations.keys():
 
-                real_resource_name = resource_options[resource_name]['name']
+                real_resource_name = resource_options.get(resource_name, '')
+                if not real_resource_name:
+                    click.echo(
+                        f'Resource {resource_name} not found in the mapping '
+                        'file'
+                    )
+                    continue
+                real_resource_name = real_resource_name.get('name', '')
                 resource = resources.by_name(real_resource_name.lower())
 
                 if not resource:
@@ -1217,6 +1230,11 @@ def import_reservations(
                 scheduler = resource.scheduler
 
                 for id, reservation in reservations[resource_name].items():
+                    if reservation['state'] == 'annulliert':
+                        click.secho(
+                            f'{id}: Reservation state is deleted, '
+                            f'skipping {resource.title}', fg='yellow')
+                        continue
                     found_conflict = False
                     session_id = uuid4()
                     for n in range(int(len(reservation['dates'])/2)):
@@ -1234,17 +1252,17 @@ def import_reservations(
                             )
                             token = token_uuid.hex
                         except InvalidEmailAddress:
-                            abort(f'{email} is an invalid e-mail address')
+                            click.secho(f'{id}: {email} is an invalid e-mail '
+                                        'address')
                         except AlreadyReservedError:
                             found_conflict = True
                             click.secho(
-                                f'Booking conflict in {resource.title} '
-                                f'at {start}', fg='red')
-                        except TimerangeTooLong:
-                            found_conflict = True
-                            click.secho(
-                                f'Timerange too long in {resource.title} '
+                                f'{id}: Booking conflict in {resource.title} '
                                 f'at {start} - {end}', fg='red')
+                        except TimerangeTooLong:
+                            click.secho(
+                                f'{id}: Timerange too long: {start} - {end}',
+                                fg='yellow')
                             rules = resource.content['rules']
                             relevant_rules = []
                             for rule in rules:
@@ -1261,18 +1279,35 @@ def import_reservations(
                                     start.date(), rule['start_time'])
                                 end = datetime.combine(
                                     end.date(), rule['end_time'])
-                                token_uuid = scheduler.reserve(
-                                    email=str(email),
-                                    dates=(start, end),
-                                    session_id=session_id,
-                                    single_token_per_session=True,
-                                    data={'accepted': True}
-                                )
-                                token = token_uuid.hex
+                                click.secho(
+                                    f'{id}: Trying to reserve {resource.title}'
+                                    f' at {start} - {end} with rule {i+1}',
+                                    fg='cyan')
+                                try:
+                                    token_uuid = scheduler.reserve(
+                                        email=str(email),
+                                        dates=(start, end),
+                                        session_id=session_id,
+                                        single_token_per_session=True,
+                                        data={'accepted': True}
+                                    )
+                                    token = token_uuid.hex
+                                except Exception as e:
+                                    click.secho(
+                                        f'{id}: Error reserving '
+                                        f'{resource.title} at {start} - {end} '
+                                        f'- {e}', fg='red')
+                                    found_conflict = True
                             if not relevant_rules:
                                 click.secho(
-                                    f'No rules found for {resource.title} '
-                                    f'at {start}', fg='red')
+                                    f'{id}: No rules found for '
+                                    f'{resource.title} at {start}', fg='red')
+                        except Exception as e:
+                            click.secho(
+                                f'{id}: Error {e} reserving {resource.title} '
+                                f'at {start} - {end} outside of availability'
+                                'period', fg='red')
+                            continue
 
                     if found_conflict:
                         continue
@@ -1287,8 +1322,11 @@ def import_reservations(
                     form = resource.form_class(data=form_data)
 
                     if not form.validate():
-                        abort(f'{form_data} failed the form check'
-                            f' with {form.errors}')
+                        form_data_show = json.dumps(
+                            form_data, indent=4, default=str)
+                        click.secho(f'{id}: {form_data_show} failed the form '
+                            f'check with {form.errors}', fg='red')
+                        continue
 
                     submission = forms.submissions.add_external(
                         form=form,
@@ -1314,9 +1352,11 @@ def import_reservations(
                             handler_code='RSV', handler_id=token
                         )
                         ticket.accept_ticket(user)
-                        ticket.close_ticket()
+                        if reservation['state'] != 'unbestätigt':
+                            ticket.close_ticket()
 
-                    click.secho(f'Sucessfully imported reservation {id}',
+                    click.secho(f'{id}: Sucessfully imported reservation '
+                                f'at {start} - {end}',
                                 fg='green')
 
     return import_reservations
