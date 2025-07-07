@@ -1,8 +1,28 @@
 # Changes
 
+## 2025.31
+
+`2025-07-07` | [fe887383ec...1fec99e1b9](https://github.com/OneGov/onegov-cloud/compare/fe887383ec^...1fec99e1b9)
+
+### Org
+
+##### Vimeo unlisted videos
+
+`Feature` | [OGC-2412](https://linear.app/onegovcloud/issue/OGC-2412) | [1fec99e1b9](https://github.com/onegov/onegov-cloud/commit/1fec99e1b9505559e6e07930a55511c151367dc6)
+
+### Ris
+
+##### Show date and time of meeting
+
+`Feature` | [OGC-2254](https://linear.app/onegovcloud/issue/OGC-2254) | [7b7a5861b4](https://github.com/onegov/onegov-cloud/commit/7b7a5861b45e8ff8d8128ff0c07a565b3dbf3c67)
+
+##### Provide files to political business template
+
+`Bugfix` | [OGC-2419](https://linear.app/onegovcloud/issue/OGC-2419) | [fe887383ec](https://github.com/onegov/onegov-cloud/commit/fe887383ecd1a1210577e62541f4c28f83868d2d)
+
 ## 2025.30
 
-`2025-07-03` | [5fb710d69d...92d3e8da7f](https://github.com/OneGov/onegov-cloud/compare/5fb710d69d^...92d3e8da7f)
+`2025-07-03` | [5fb710d69d...5725423a04](https://github.com/OneGov/onegov-cloud/compare/5fb710d69d^...5725423a04)
 
 ### Org
 
@@ -2096,59 +2116,4 @@ onegov-translator --select /translator_directory/schaffhausen force-delete-langu
 ```
 
 `Feature` | [OGC-1873](https://linear.app/onegovcloud/issue/OGC-1873) | [b2870a79a1](https://github.com/onegov/onegov-cloud/commit/b2870a79a113533ec17cdd43a192c30d27759941)
-
-## 2024.50
-
-`2024-10-11` | [3f9655c562...6d17e690a8](https://github.com/OneGov/onegov-cloud/compare/3f9655c562^...6d17e690a8)
-
-### Fsi
-
-##### Survey improvements
-
--    Exports can be made for single or multiple submission windows
--    Submissions can now be deleted
--    Changes to the survey are now prevented if there are any submissions
--    Once the submission is made it is automatically confirmed, but can still be edited
-
-`Feature` | [OGC-1821](https://linear.app/onegovcloud/issue/OGC-1821) | [eb0d0926ed](https://github.com/onegov/onegov-cloud/commit/eb0d0926edc51eb841747b8f31c16861628bc843)
-
-### Newsletter
-
-##### Move update subscription from edit bar to a link
-
-`Feature` | [NONE](#NONE) | [7a76ef78e9](https://github.com/onegov/onegov-cloud/commit/7a76ef78e976d3aac3247179ab5cf16c152ac0ce)
-
-### Org
-
-##### Make editing rule for allocations possible.
-
-`Feature` | [OGC-1397](https://linear.app/onegovcloud/issue/OGC-1397) | [3f9655c562](https://github.com/onegov/onegov-cloud/commit/3f9655c5627815d44a323795329c8c26114851b8)
-
-##### Pins ancestor choices in contact inheritance select
-
-`Feature` | [OGC-1853](https://linear.app/onegovcloud/issue/OGC-1853) | [5e97e3ee40](https://github.com/onegov/onegov-cloud/commit/5e97e3ee40cb61ecc22864cfc597262aa78c1d29)
-
-##### Fixes regression in `login.pt` due to different providers shape
-
-`Bugfix` | [5ab94875f5](https://github.com/onegov/onegov-cloud/commit/5ab94875f515ef8b36d62394c474f5863b3e8db6)
-
-### Swissvotes
-
-##### Update column name
-
-`Bugfix` | [SWI-50](https://linear.app/swissvotes/issue/SWI-50) | [3b733fb1ad](https://github.com/onegov/onegov-cloud/commit/3b733fb1adfe54add16c829bd4951b859de3c292)
-
-### Town6
-
-##### Restyling of newsletter
-
-Some style improvements of the newsletter and added images of events if there are any
-
-`Feature` | [OGC-1788](https://linear.app/onegovcloud/issue/OGC-1788) | [981242fcfa](https://github.com/onegov/onegov-cloud/commit/981242fcfa871e767bdfaa068bb300edc4d49939)
-
-### User
-
-##### Actually allows multiple providers of the same type to coexist
-
-`Bugfix` | [OGC-1750](https://linear.app/onegovcloud/issue/OGC-1750) | [59474454b8](https://github.com/onegov/onegov-cloud/commit/59474454b89a4ad3ac5cc7c1bc9c2c66a11d7285)
 
