@@ -124,8 +124,7 @@ def view_payments(
     }
     # foo = as_tuples(self.subset())
 
-    bar = self.with_reservations_and_tickets()
-    breakpoint()
+    # bar = self.with_reservations_and_tickets()
     payment_links = self.payment_links_by_batch()
 
     all_payments_included_in_filter = tuple(
@@ -197,8 +196,6 @@ def generate_payments_pdf(
     base_url = request.url.split("/pdf")[0]
     cache_key = f'payment_filter_{normalize_for_url(base_url)}'
     filter_params = request.app.cache.get(cache_key, None)
-    # todo: check this is retrieved corretly
-    breakpoint()
 
     if filter_params:
         # Recreate collection with cached filter parameters
