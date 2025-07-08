@@ -66,6 +66,7 @@ class MeetingItem(Base, ORMSearchable):
     )
 
     #: The meeting
+    meeting: relationship[Meeting] = relationship(
         'Meeting',
         back_populates='meeting_items'
     )

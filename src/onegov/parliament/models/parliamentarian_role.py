@@ -116,6 +116,7 @@ class ParliamentarianRole(Base, TimestampMixin):
     )
 
     #: The parliamentarian
+    parliamentarian: relationship[Parliamentarian] = relationship(
         'Parliamentarian',
         back_populates='roles'
     )
@@ -143,6 +144,7 @@ class ParliamentarianRole(Base, TimestampMixin):
     )
 
     #: The party
+    party: relationship[Party | None] = relationship(
         'Party',
         back_populates='roles'
     )
