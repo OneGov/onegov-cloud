@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-03 14:52+0200\n"
+"POT-Creation-Date: 2025-07-08 16:04+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2399,14 +2399,26 @@ msgstr "Webseiten-Adresse inklusive https://"
 msgid "Site ID"
 msgstr "ID der Anlage"
 
+msgid "Kaba Sites"
+msgstr "Anlagen"
+
 msgid "Default Lead Time"
 msgstr "Standard Vorlaufszeit"
 
 msgid "Default Lag Time"
 msgstr "Standard Nachlaufszeit"
 
-msgid "Invalid credentials or site id"
-msgstr "Ungültige API Credentials oder ID der Anlage"
+#, python-format
+msgid "Duplicate site ID ${site_id}"
+msgstr "ID der Anlage ${site_id} ist doppelt aufgeführt"
+
+#, python-format
+msgid "${field} for site ID ${site_id} is required"
+msgstr "${field} für ID ${site_id} muss ausgefüllt werden"
+
+#, python-format
+msgid "Invalid credentials for site ID ${site_id}"
+msgstr "Ungültige API Zugangsdaten für ID ${site_id}"
 
 msgid "Unexpected error encountered, please try again."
 msgstr "Unerwarteter Fehler aufgetreten, bitte versuchen Sie es erneut."
@@ -3559,8 +3571,8 @@ msgstr "Reservationen absagen"
 msgid "Reject all with message"
 msgstr "Alle absagen mit Kommentar"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -6610,13 +6622,14 @@ msgstr ""
 "Ihre Reservation für ${room} wurde eingereicht. Bitte fahren Sie fort mit "
 "Ihrer Reservation für ${next_room}."
 
+#, python-format
 msgid ""
-"Failed to create visits using the dormakaba API please make sure your "
-"credentials are still valid."
+"Failed to create visits using the dormakaba API for site ID ${site_id} "
+"please make sure your credentials are still valid."
 msgstr ""
-"Das Delegieren der Entriegelung der Türen via dormakaba API ist "
-"fehlgeschlagen. Bitte stellen Sie sicher, dass die hinterlegten Zugangsdaten "
-"immer noch gültig sind."
+"Das Delegieren der Entriegelung der Türen via dormakaba API für Anlage "
+"${site_id} ist fehlgeschlagen. Bitte stellen Sie sicher, dass die "
+"hinterlegten Zugangsdaten immer noch gültig sind."
 
 msgid "Your reservations were accepted"
 msgstr "Ihre Reservationen wurden angenommen"

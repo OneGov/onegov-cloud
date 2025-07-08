@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-03 14:52+0200\n"
+"POT-Creation-Date: 2025-07-08 16:04+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2403,14 +2403,26 @@ msgstr "Adresse du site internet avec https://"
 msgid "Site ID"
 msgstr "ID du site"
 
+msgid "Kaba Sites"
+msgstr "Sites"
+
 msgid "Default Lead Time"
 msgstr "Délai par défaut"
 
 msgid "Default Lag Time"
 msgstr "Délai d'arrêt par défaut"
 
-msgid "Invalid credentials or site id"
-msgstr "Informations d'identification ou ID de site invalides"
+#, python-format
+msgid "Duplicate site ID ${site_id}"
+msgstr "Duplicata de l'ID du site ${site_id}"
+
+#, python-format
+msgid "${field} for site ID ${site_id} is required"
+msgstr "${field} pour l'ID du site ${site_id} est obligatoire"
+
+#, python-format
+msgid "Invalid credentials for site ID ${site_id}"
+msgstr "Informations d'identification invalides pour l'ID du site ${site_id}"
 
 msgid "Unexpected error encountered, please try again."
 msgstr "Erreur inattendue rencontrée, veuillez réessayer."
@@ -3565,8 +3577,8 @@ msgstr "Refuser les réservations"
 msgid "Reject all with message"
 msgstr "Tout refuser avec message"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Événement"
 
@@ -3959,8 +3971,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
-"Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
+"« Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -6625,12 +6637,14 @@ msgstr ""
 "Votre réservation pour ${room} a été soumise. Veuillez poursuivre votre "
 "réservation pour ${next_room}."
 
+#, python-format
 msgid ""
-"Failed to create visits using the dormakaba API please make sure your "
-"credentials are still valid."
+"Failed to create visits using the dormakaba API for site ID ${site_id} "
+"please make sure your credentials are still valid."
 msgstr ""
-"Échec de la création de visites à l'aide de l'API dormakaba. Veuillez vous "
-"assurer que vos informations d'identification sont toujours valides."
+"Échec de la création de visites à l'aide de l'API dormakaba pour l'ID du "
+"site ${site_id}. Veuillez vous assurer que vos informations d'identification "
+"sont toujours valides."
 
 msgid "Your reservations were accepted"
 msgstr "Vos réservations ont été acceptées"

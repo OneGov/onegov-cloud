@@ -551,3 +551,50 @@ def add_party_column_to_par_parliamentarians(context: UpgradeContext) -> None:
             ),
             default=None
         )
+
+
+@upgrade_task('Migrate Kaba config to new format')
+def migrate_kaba_config_to_new_format(context: UpgradeContext) -> None:
+    org = context.session.query(Organisation).first()
+    if org is None:
+        return
+
+    site_id = org.meta.pop('kaba_site_id', None)
+    api_key = org.meta.pop('kaba_api_key', None)
+    api_secret = org.meta.pop('kaba_api_secret', None)
+    if not (site_id and api_key and api_secret):
+        return
+
+    org.meta['kaba_configurations'] = [{
+        'site_id': site_id,
+        'api_key': api_key,
+        'api_secret': api_secret,
+    }]
+
+    if context.has_table('resources'):
+        # update kaba_components to new format
+        context.session.execute("""
+            UPDATE resources
+               SET meta = jsonb_set(
+                   meta,
+                   '{kaba_components}',
+                   to_jsonb(ARRAY(
+                       SELECT jsonb_build_array(:site_id, value)
+                         FROM jsonb_array_elements(meta->'kaba_components')
+                   ))
+                )
+             WHERE meta ? 'kaba_components'
+        """, {'site_id': site_id})
+
+    if context.has_table('reservations'):
+        # update visits to new format
+        context.session.execute("""
+            UPDATE reservations
+               SET data = jsonb_set(
+                   data,
+                   '{kaba,visit_ids}',
+                   jsonb_build_object(:site_id, data->'kaba'->'visit_id')
+                ) #- '{kaba,visit_id}'
+             WHERE data ? 'kaba'
+               AND data->'kaba' ? 'visit_id'
+        """, {'site_id': site_id})

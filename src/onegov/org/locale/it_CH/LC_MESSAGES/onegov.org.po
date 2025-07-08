@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-03 14:52+0200\n"
+"POT-Creation-Date: 2025-07-08 16:04+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2407,14 +2407,26 @@ msgstr "Indirizzo del sito web incluso https://"
 msgid "Site ID"
 msgstr "ID del sito"
 
+msgid "Kaba Sites"
+msgstr "Siti"
+
 msgid "Default Lead Time"
 msgstr "Tempi di consegna standard"
 
 msgid "Default Lag Time"
 msgstr "Tempo di funzionamento standard"
 
-msgid "Invalid credentials or site id"
-msgstr "Credenziali o ID sito non validi"
+#, python-format
+msgid "Duplicate site ID ${site_id}"
+msgstr "ID sito duplicato ${site_id}"
+
+#, python-format
+msgid "${field} for site ID ${site_id} is required"
+msgstr "${field} per l'ID del sito ${site_id} è obbligatorio"
+
+#, python-format
+msgid "Invalid credentials for site ID ${site_id}"
+msgstr "Credenziali non valide per l'ID sito ${site_id}"
 
 msgid "Unexpected error encountered, please try again."
 msgstr "Si è verificato un errore inatteso, riprovare."
@@ -3565,8 +3577,8 @@ msgstr "Rifiuta le prenotazioni"
 msgid "Reject all with message"
 msgstr "Rifiuta tutto con messaggio"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -6603,12 +6615,13 @@ msgstr ""
 "La tua prenotazione per ${room} è stata inviata. Continua con la tua "
 "prenotazione per ${next_room}."
 
+#, python-format
 msgid ""
-"Failed to create visits using the dormakaba API please make sure your "
-"credentials are still valid."
+"Failed to create visits using the dormakaba API for site ID ${site_id} "
+"please make sure your credentials are still valid."
 msgstr ""
-"Impossibile creare visite con l'API di dormakaba. Assicurarsi che le "
-"credenziali siano ancora valide."
+"Impossibile creare visite con l'API di dormakaba per l'ID del sito "
+"${site_id}. Assicurarsi che le credenziali siano ancora valide."
 
 msgid "Your reservations were accepted"
 msgstr "Le tue prenotazioni sono state accettate"
