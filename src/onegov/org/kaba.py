@@ -92,7 +92,7 @@ class KabaClient:
 
     @staticmethod
     def random_code() -> str:
-        return ''.join(secrets.choice(string.digits) for _ in range(6))
+        return ''.join(secrets.choice(string.digits) for _ in range(4))
 
     def create_visit(
         self,
