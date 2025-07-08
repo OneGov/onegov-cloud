@@ -149,17 +149,6 @@ def view_payments(
     # bar = self.with_reservations_and_tickets()
     payment_links = self.payment_links_by_batch()
 
-    all_payments_included_in_filter = tuple(
-        payment_id for payment_id, in self.subset().with_entities(
-            func.cast(Payment.id, String)
-        )
-    )
-
-    request.app.cache.set(
-        f'payment_filter_{normalize_for_url(request.url)}', 
-        all_payments_included_in_filter
-    )
-
     return {
         'title': _('Receivables'),
         'form': form,
