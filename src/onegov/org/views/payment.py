@@ -16,9 +16,9 @@ from onegov.org.forms.payments_search_form import PaymentSearchForm
 from onegov.org.layout import PaymentCollectionLayout, DefaultLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import PaymentMessage, TicketMessage
-from onegov.org.pdf.payment import PaymentsPdf, ticket_by_link
 from onegov.core.elements import Link
 from sedate import align_range_to_day, standardize_date, as_datetime
+from onegov.org.pdf.ticket import TicketsPdf
 from onegov.pay import Payment
 from onegov.pay import PaymentCollection
 from onegov.pay import PaymentProviderCollection
@@ -34,6 +34,7 @@ from webob import exc, Response as WebobResponse
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
+    from collections.abc import Iterator
     from collections.abc import Callable, Sequence  # type: ignore[attr-defined]
     from sqlalchemy.orm import Query
     from datetime import datetime
@@ -54,6 +55,22 @@ EMAIL_SUBJECTS = {
     'marked-as-unpaid': _('Your payment has been withdrawn'),
     'refunded': _('Your payment has been refunded')
 }
+
+
+def ticket_by_link(
+    tickets: TicketCollection,
+    link: Any
+) -> Ticket | None:
+
+    # FIXME: We should probably do isinstance checks so type checkers
+    #        can understand that a Reservation has a token and a
+    #        FormSubmission has a id...
+    if link.__tablename__ == 'reservations':
+        return tickets.by_handler_id(link.token.hex)
+    elif link.__tablename__ == 'submissions':
+        return tickets.by_handler_id(link.id.hex)
+    return None
+
 
 
 def send_ticket_notifications(
@@ -107,6 +124,7 @@ def view_payments(
     form: PaymentSearchForm,
     layout: PaymentCollectionLayout | None = None
 ) -> RenderData | WebobResponse:
+    session = request.session
     request.include('invoicing')
     layout = layout or PaymentCollectionLayout(self, request)
 
@@ -117,24 +135,64 @@ def view_payments(
     if not form.errors:
         form.apply_model(self)
 
+    def get_tickets(payments: list[Payment]) -> Iterator[Ticket]:
+        """ Gets all tickets for  alist of payments """
+
+        # FIXME: Do we care for the order here?
+        for payment in payments:
+            for link in payment.links:
+                yield ticket_by_link(TicketCollection(session), link)
+
     if request.params.get('format') == 'pdf':
+
+        # Handle multiple pages of results
         payments = list(self.subset())
+        print(payments)
+        payment_links = self.payment_links_for(payments)
+
+        tickets = TicketCollection(request.session)
+        get_ticket_for_link = partial(ticket_by_link, tickets)
+
+        def get_tickets_for_pdf(payments: list[Payment]) -> Iterator[Ticket]:
+            """
+            Gets all tickets for a list of payments, applying the same filtering 
+            logic as the payments macro.
+            """
+            print('get_tickets_f_pdf')
+            for payment in payments:
+                # Use the pre-fetched links for this payment, same as the template
+                links_for_payment = payment_links.get(payment.id, [])
+
+                for link in links_for_payment:
+                    # Case 1: The link is a 'submission'
+                    if getattr(link, '__tablename__', None) == 'submissions':
+                        ticket = get_ticket_for_link(link)
+                        if ticket:
+                            yield ticket
+
+                    # Case 2: The link is a 'reservation' AND has a 'start' date
+                    elif getattr(link, '__tablename__', None) == 'reservations':
+                        if getattr(link, 'start', None): # This is the crucial condition
+                            ticket = get_ticket_for_link(link)
+                            if ticket:
+                                yield ticket
+
         if not payments:
             request.warning(_('No payments found for PDF generation'))
-            return request.redirect(request.exclude_params('format').url)
+            return request.redirect(request.class_link(PaymentCollection))
 
         filename = 'payments.pdf'
         if self.status:
             filename = f'payments_{self.status}.pdf'
 
-        pdf = PaymentsPdf.from_payments(
-            payments=payments,
-            session=request.session,
-            title=_('Payments')
+        foo = list(get_tickets_for_pdf(payments))
+        breakpoint()
+        multi_pdf = TicketsPdf.from_tickets(
+            request,
+            foo
         )
-
         return Response(
-            pdf,
+            multi_pdf.read(),
             content_type='application/pdf',
             content_disposition=f'inline; filename={filename}'
         )
@@ -144,10 +202,6 @@ def view_payments(
         provider.id: provider
         for provider in PaymentProviderCollection(request.session).query()
     }
-    # foo = as_tuples(self.subset())
-
-    # bar = self.with_reservations_and_tickets()
-    payment_links = self.payment_links_by_batch()
 
     return {
         'title': _('Receivables'),
@@ -156,7 +210,7 @@ def view_payments(
         'payments': self.batch,
         'get_ticket': partial(ticket_by_link, tickets),
         'providers': providers,
-        'payment_links': payment_links
+        'payment_links': self.payment_links_by_batch()
     }
 
 
