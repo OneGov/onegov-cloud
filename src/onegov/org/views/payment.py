@@ -112,6 +112,68 @@ def send_ticket_notifications(
         )
 
 
+def handle_pdf_response(
+    self: PaymentCollection,
+    request: OrgRequest
+) -> WebobResponse:
+    """
+    Handles the PDF export of payments.
+    """
+    # Handle multiple pages of results
+    payments = list(self.subset())
+    print(payments)
+    payment_links = self.payment_links_for(payments)
+
+    tickets = TicketCollection(request.session)
+    get_ticket_for_link = partial(ticket_by_link, tickets)
+
+    def get_tickets_for_pdf(payments: list[Payment]) -> Iterator[Ticket]:
+        """
+        Gets all tickets for a list of payments, applying the same
+        filtering logic as the payments macro.
+        """
+        print('get_tickets_f_pdf')
+        for payment in payments:
+            # Use the pre-fetched links for this payment, same as the
+            # template
+            links_for_payment = payment_links.get(payment.id, [])
+
+            for link in links_for_payment:
+                # Case 1: The link is a 'submission'
+                if getattr(link, '__tablename__', None) == 'submissions':
+                    ticket = get_ticket_for_link(link)
+                    if ticket:
+                        yield ticket
+
+                # Case 2: The link is a 'reservation' AND has a 'start' date
+                elif getattr(link, '__tablename__', None) == 'reservations':
+                    # This is the crucial condition
+                    if getattr(link, 'start', None):
+                        ticket = get_ticket_for_link(link)
+                        if ticket:
+                            yield ticket
+
+    if not payments:
+        request.warning(_('No payments found for PDF generation'))
+        return request.redirect(request.class_link(PaymentCollection))
+
+    filename = 'payments.pdf'
+    if self.status:
+        filename = f'payments_{self.status}.pdf'
+
+    foo = list(get_tickets_for_pdf(payments))
+    breakpoint()
+    multi_pdf = TicketsPdf.from_tickets(
+        request,
+        foo
+    )
+    return Response(
+        multi_pdf.read(),
+        content_type='application/pdf',
+        content_disposition=f'inline; filename={filename}'
+    )
+
+
 @OrgApp.form(
     model=PaymentCollection,
     template='payments.pt',
@@ -144,58 +206,7 @@ def view_payments(
                 yield ticket_by_link(TicketCollection(session), link)
 
     if request.params.get('format') == 'pdf':
-
-        # Handle multiple pages of results
-        payments = list(self.subset())
-        print(payments)
-        payment_links = self.payment_links_for(payments)
-
-        tickets = TicketCollection(request.session)
-        get_ticket_for_link = partial(ticket_by_link, tickets)
-
-        def get_tickets_for_pdf(payments: list[Payment]) -> Iterator[Ticket]:
-            """
-            Gets all tickets for a list of payments, applying the same filtering 
-            logic as the payments macro.
-            """
-            print('get_tickets_f_pdf')
-            for payment in payments:
-                # Use the pre-fetched links for this payment, same as the template
-                links_for_payment = payment_links.get(payment.id, [])
-
-                for link in links_for_payment:
-                    # Case 1: The link is a 'submission'
-                    if getattr(link, '__tablename__', None) == 'submissions':
-                        ticket = get_ticket_for_link(link)
-                        if ticket:
-                            yield ticket
-
-                    # Case 2: The link is a 'reservation' AND has a 'start' date
-                    elif getattr(link, '__tablename__', None) == 'reservations':
-                        if getattr(link, 'start', None): # This is the crucial condition
-                            ticket = get_ticket_for_link(link)
-                            if ticket:
-                                yield ticket
-
-        if not payments:
-            request.warning(_('No payments found for PDF generation'))
-            return request.redirect(request.class_link(PaymentCollection))
-
-        filename = 'payments.pdf'
-        if self.status:
-            filename = f'payments_{self.status}.pdf'
-
-        foo = list(get_tickets_for_pdf(payments))
-        breakpoint()
-        multi_pdf = TicketsPdf.from_tickets(
-            request,
-            foo
-        )
-        return Response(
-            multi_pdf.read(),
-            content_type='application/pdf',
-            content_disposition=f'inline; filename={filename}'
-        )
+        return handle_pdf_response(self, request)
 
     tickets = TicketCollection(request.session)
     providers = {
