@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from onegov.core.security import Private
 from onegov.form import merge_forms
-from onegov.org.views.payment import generate_payments_pdf, handle_batch_mark_payments_invoiced
-from onegov.org.views.payment import view_payments
-from onegov.org.views.payment import export_payments
+from onegov.org.views.payment import (
+    export_payments, handle_batch_mark_payments_invoiced, view_payments)
 from onegov.town6 import TownApp
 from onegov.org.forms.payments_search_form import PaymentSearchForm
 from onegov.org.forms import DateRangeForm, ExportForm
@@ -32,9 +31,20 @@ def town_view_payments(
     self: PaymentCollection,
     request: TownRequest,
     form: PaymentSearchForm
-) -> RenderData:
-    return view_payments(self, request, form,
-                         PaymentCollectionLayout(self, request))
+) -> RenderData | Response:
+    layout = PaymentCollectionLayout(self, request)
+    result = view_payments(self, request, form, layout)
+
+    # if a pdf is rendered, we get a response
+    if isinstance(result, Response):
+        return result
+
+    # otherwise we get the render data and add the pdf link
+    params = request.current_params.copy()
+    params['format'] = 'pdf'
+    result['pdf_export_link'] = request.class_link(
+        self.__class__, name=request.view_name, **params)
+    return result
 
 
 @TownApp.json(
@@ -48,18 +58,6 @@ def town_handle_batch_mark_payments_invoiced(
     request: TownRequest
 ) -> JSON_ro:
     return handle_batch_mark_payments_invoiced(self, request)
-
-
-@TownApp.view(
-    model=PaymentCollection,
-    name='generate-payments-pdf',
-    permission=Private
-)
-def town_generate_payments_pdf(
-    self: PaymentCollection,
-    request: TownRequest
-) -> Response:
-    return generate_payments_pdf(self, request)
 
 
 @TownApp.form(

@@ -7,13 +7,10 @@
             <div class="filter-grid">
                 <div class="form-buttons">
                     <tal:block tal:condition="payments" >
-                        <button type="button"
-                                id="exportPaymentsButton"
-                                class="button hollow pdf-generation-button"
+                        <a href="${pdf_export_link}"
+                                class="button hollow"
                                 i18n:translate=""
-                                data-action-url="${layout.csrf_protected_url(request.link(layout.model, 'pdf'))}">
-                                Export Bill run as PDF</button>
-
+                                >Export Bill run as PDF</a>
                         <button type="button"
                                 class="button hollow batch-action-button"
                                 i18n:translate=""

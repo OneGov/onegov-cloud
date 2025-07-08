@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
     setupXHREditPaymentStatus();
-    setupPdfGeneration();
 });
 
 function setupXHREditPaymentStatus() {
@@ -40,29 +39,6 @@ function setupXHREditPaymentStatus() {
                     console.error('Response was not JSON:', text);
                     alert(document.documentElement.lang === 'de-CH' ? 'Ein Fehler ist aufgetreten.' : 'An error occurred.');
                 }
-            })
-            .catch(error => {
-                alert(document.documentElement.lang === 'de-CH' ? 'Ein Fehler ist aufgetreten.' : 'An error occurred.');
-                console.error('Error:', error);
-            });
-        });
-    }
-}
-
-function setupPdfGeneration() {
-    const pdfButton = document.querySelector('.pdf-generation-button');
-    if (pdfButton) {
-        pdfButton.addEventListener('click', function() {
-            const actionUrl = window.location.href; 
-            fetch(actionUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ url: actionUrl })
-            })
-            .then(async response => {
-                const text = await response.text();
             })
             .catch(error => {
                 alert(document.documentElement.lang === 'de-CH' ? 'Ein Fehler ist aufgetreten.' : 'An error occurred.');

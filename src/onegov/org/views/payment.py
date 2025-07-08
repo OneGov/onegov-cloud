@@ -117,6 +117,28 @@ def view_payments(
     if not form.errors:
         form.apply_model(self)
 
+    if request.params.get('format') == 'pdf':
+        payments = list(self.subset())
+        if not payments:
+            request.warning(_('No payments found for PDF generation'))
+            return request.redirect(request.exclude_params('format').url)
+
+        filename = 'payments.pdf'
+        if self.status:
+            filename = f'payments_{self.status}.pdf'
+
+        pdf = PaymentsPdf.from_payments(
+            payments=payments,
+            session=request.session,
+            title=_('Payments')
+        )
+
+        return Response(
+            pdf,
+            content_type='application/pdf',
+            content_disposition=f'inline; filename={filename}'
+        )
+
     tickets = TicketCollection(request.session)
     providers = {
         provider.id: provider
@@ -178,55 +200,6 @@ def handle_batch_mark_payments_invoiced(
     ok_message = _(f'{updated_count} payments marked as invoiced.')
     return {'status': 'success', 
             'message': ok_message}
-
-
-@OrgApp.view(
-    model=PaymentCollection,
-    name='generate-payments-pdf',
-    permission=Private
-)
-def generate_payments_pdf(
-    self: PaymentCollection,
-    request: OrgRequest
-) -> Response:
-    """Generate a PDF with all filtered payments."""
-    request.assert_valid_csrf_token()
-
-    # Get the current filter from cache or use the current model
-    base_url = request.url.split("/pdf")[0]
-    cache_key = f'payment_filter_{normalize_for_url(base_url)}'
-    filter_params = request.app.cache.get(cache_key, None)
-
-    if filter_params:
-        # Recreate collection with cached filter parameters
-        filtered_collection = PaymentCollection(
-            session=request.session,
-            source=filter_params.get('source', '*'),
-            page=0,  # We want all results, not just the current page
-            **{k: v for k, v in filter_params.items() if k not in ['source', 'page']}
-        )
-    else:
-        filtered_collection = self
-
-    # Get all payments from the filter (not just the current page)
-    payments = list(filtered_collection.subset())
-
-    if not payments:
-        request.warning(_('No payments found for PDF generation'))
-        return request.redirect(request.link(self))
-
-    filename = 'payments.pdf'
-    if filtered_collection.status:
-        filename = f'payments_{filtered_collection.status}.pdf'
-
-    pdf = PaymentsPdf.from_payments(
-        payments=payments,
-        session=request.session,
-        title=_('Payments')
-    )
-
-    return Response(pdf, content_type='application/pdf',
-                   content_disposition=f'inline; filename={filename}')
 
 
 @OrgApp.form(
