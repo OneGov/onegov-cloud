@@ -879,6 +879,11 @@ def people_select_asset() -> Iterator[str]:
     yield 'people-select.js'
 
 
+@OrgApp.webasset('kaba-configurations')
+def kaba_configurations_asset() -> Iterator[str]:
+    yield 'kaba-configurations.js'
+
+
 @OrgApp.webasset('mapbox_address_autofill')
 def mapbox_address_autofill() -> Iterator[str]:
     yield 'mapbox-search-web.js'  # implicit dependency

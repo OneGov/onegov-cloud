@@ -16,6 +16,7 @@ from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.filters import as_float
 from onegov.form.validators import ValidFormDefinition
+from onegov.form.widgets import ChosenSelectWidget
 from onegov.org import _, log
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import DateRangeForm
@@ -29,8 +30,36 @@ from onegov.org.kaba import KabaApiError, KabaClient
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
+    from markupsafe import Markup
     from onegov.org.request import OrgRequest
     from onegov.reservation import Resource
+
+
+def coerce_component_tuple(value: Any) -> tuple[str, str] | None:
+    if not value:
+        return None
+
+    if isinstance(value, str):
+        value = value.rsplit(':', 1)
+
+    site_id, component = value
+    return site_id, component
+
+
+class ComponentSelectWidget(ChosenSelectWidget):
+    @classmethod
+    def render_option(
+        cls,
+        value: Any,
+        label: str,
+        selected: bool,
+        **kwargs: Any
+    ) -> Markup:
+        if value:
+            value = ':'.join(value)
+        else:
+            value = ''
+        return super().render_option(value, label, selected, **kwargs)
 
 
 class ResourceBaseForm(Form):
@@ -166,7 +195,9 @@ class ResourceBaseForm(Form):
     kaba_components = ChosenSelectMultipleField(
         label=_('Doors'),
         choices=(),
+        coerce=coerce_component_tuple,
         fieldset='dormakaba',
+        widget=ComponentSelectWidget(multiple=True)
     )
 
     pricing_method = RadioField(
@@ -233,13 +264,17 @@ class ResourceBaseForm(Form):
                 self.delete_field('kaba_components')
                 return
 
-        client = KabaClient.from_app(self.request.app)
-        if client is None:
+        clients = KabaClient.from_app(self.request.app)
+        if not clients:
             self.delete_field('kaba_components')
             return
 
         try:
-            self.kaba_components.choices = client.component_choices()
+            self.kaba_components.choices = [
+                choice
+                for client in clients.values()
+                for choice in client.component_choices()
+            ]
         except KabaApiError:
             log.info('Kaba API error', exc_info=True)
             self.request.alert(_(
