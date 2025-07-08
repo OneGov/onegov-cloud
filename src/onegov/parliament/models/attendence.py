@@ -24,7 +24,8 @@ if TYPE_CHECKING:
     from typing import Literal
     from typing import TypeAlias
 
-    from onegov.parliament.models import Parliamentarian, Commission
+    from onegov.parliament.models import Commission
+    from onegov.parliament.models import Parliamentarian
 
     AttendenceType: TypeAlias = Literal[
         'plenary',

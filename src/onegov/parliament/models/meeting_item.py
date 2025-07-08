@@ -7,14 +7,14 @@ from sqlalchemy.orm import relationship
 
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
-from onegov.parliament.models import Meeting
 from onegov.search import ORMSearchable
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     import uuid
-    from onegov.parliament.models.political_business import PoliticalBusiness
+    from onegov.parliament.models import PoliticalBusiness
+    from onegov.parliament.models import Meeting
 
 
 class MeetingItem(Base, ORMSearchable):
@@ -66,8 +66,7 @@ class MeetingItem(Base, ORMSearchable):
     )
 
     #: The meeting
-    meeting: relationship[Meeting] = relationship(
-        Meeting,
+        'Meeting',
         back_populates='meeting_items'
     )
 

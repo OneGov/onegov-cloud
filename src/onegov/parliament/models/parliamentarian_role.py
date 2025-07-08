@@ -12,9 +12,6 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.parliament import _
-from onegov.parliament.models.parliamentarian import Parliamentarian
-from onegov.parliament.models.parliamentary_group import ParliamentaryGroup
-from onegov.parliament.models.party import Party
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -22,6 +19,10 @@ if TYPE_CHECKING:
     from datetime import date
     from typing import Literal
     from typing import TypeAlias
+
+    from onegov.parliament.models import Parliamentarian
+    from onegov.parliament.models import ParliamentaryGroup
+    from onegov.parliament.models import Party
 
     Role: TypeAlias = Literal[
         'none',
@@ -115,8 +116,7 @@ class ParliamentarianRole(Base, TimestampMixin):
     )
 
     #: The parliamentarian
-    parliamentarian: relationship[Parliamentarian] = relationship(
-        Parliamentarian,
+        'Parliamentarian',
         back_populates='roles'
     )
 
@@ -143,8 +143,7 @@ class ParliamentarianRole(Base, TimestampMixin):
     )
 
     #: The party
-    party: relationship[Party | None] = relationship(
-        Party,
+        'Party',
         back_populates='roles'
     )
 
@@ -171,9 +170,8 @@ class ParliamentarianRole(Base, TimestampMixin):
     )
 
     #: The parliamentary group
-    parliamentary_group: relationship[ParliamentaryGroup | None]
     parliamentary_group = relationship(
-        ParliamentaryGroup,
+        'ParliamentaryGroup',
         back_populates='roles'
     )
 

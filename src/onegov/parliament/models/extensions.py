@@ -1,3 +1,4 @@
+from __future__ import annotations
 from sqlalchemy.orm import object_session
 from wtforms.fields.form import FormField
 from wtforms.fields.list import FieldList
@@ -11,13 +12,13 @@ from onegov.form.types import FormT
 from onegov.org.models import ContentExtension
 from onegov.org.request import OrgRequest
 
-from typing import TYPE_CHECKING, TypeVar, Any, Sequence
+from typing import TYPE_CHECKING, TypeVar, Any
+from collections.abc import Sequence
 
 from wtforms.fields import TextAreaField
 from wtforms.fields import BooleanField
 
 from onegov.parliament import _
-from onegov.parliament.models import PoliticalBusinessParticipation
 from onegov.parliament.models import RISParliamentarian
 
 if TYPE_CHECKING:
@@ -214,7 +215,7 @@ class PoliticalBusinessParticipationExtension(ContentExtension):
             )
 
         # FIXME: verify if still needed
-        class PeoplePageForm(form_class): # type:ignore
+        class PeoplePageForm(form_class):  # type:ignore
 
             people = PeopleField(
                 FormField(
