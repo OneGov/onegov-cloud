@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     setupXHREditPaymentStatus();
+    setupPdfGeneration();
 });
 
 function setupXHREditPaymentStatus() {
@@ -44,6 +45,25 @@ function setupXHREditPaymentStatus() {
                 alert(document.documentElement.lang === 'de-CH' ? 'Ein Fehler ist aufgetreten.' : 'An error occurred.');
                 console.error('Error:', error);
             });
+        });
+    }
+}
+
+function setupPdfGeneration() {
+    const pdfButton = document.querySelector('.pdf-generation-button');
+    if (pdfButton) {
+        pdfButton.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Create a form to submit with CSRF token
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = pdfButton.getAttribute('href');
+
+            // Add CSRF token
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            form.innerHTML = `<input type="hidden" name="csrf-token" value="${csrfToken}">`;
+            document.body.appendChild(form).submit();
         });
     }
 }

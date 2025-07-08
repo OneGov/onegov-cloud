@@ -5,6 +5,7 @@ from collections import OrderedDict
 from decimal import Decimal
 from functools import partial
 from onegov.core.security import Private
+from onegov.core.utils import normalize_for_url
 from onegov.form import merge_forms
 from onegov.org import OrgApp, _
 from onegov.org.forms import DateRangeForm, ExportForm
@@ -12,6 +13,7 @@ from onegov.org.forms.payments_search_form import PaymentSearchForm
 from onegov.org.layout import PaymentCollectionLayout, DefaultLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import PaymentMessage, TicketMessage
+from onegov.org.pdf.payment import PaymentsPdf
 from onegov.core.elements import Link
 from sedate import align_range_to_day, standardize_date, as_datetime
 from onegov.pay import Payment
@@ -23,6 +25,7 @@ from onegov.pay.models.payment_providers.stripe import StripePayment
 from onegov.pay.models.payment_providers.worldline_saferpay import (
     SaferpayPayment)
 from onegov.ticket import Ticket, TicketCollection
+from webob.response import Response
 from webob import exc, Response as WebobResponse
 
 
@@ -115,8 +118,8 @@ def view_payments(
     form: PaymentSearchForm,
     layout: PaymentCollectionLayout | None = None
 ) -> RenderData | WebobResponse:
-    layout = layout or PaymentCollectionLayout(self, request)
     request.include('invoicing')
+    layout = layout or PaymentCollectionLayout(self, request)
 
     if form.submitted(request):
         form.update_model(self)
@@ -131,6 +134,19 @@ def view_payments(
         for provider in PaymentProviderCollection(request.session).query()
     }
     payment_links = self.payment_links_by_batch()
+
+    # Store the current filter state in the cache
+    filter_params = {
+        'source': self.source,
+        'page': self.page,
+        'start': self.start,
+        'end': self.end,
+        'status': self.status,
+        'payment_type': self.payment_type,
+        'ticket_start': self.ticket_start,
+        'ticket_end': self.ticket_end
+    }
+    request.app.cache.set(f'payment_filter_{normalize_for_url(request.url)}', filter_params)
 
     return {
         'title': _('Receivables'),
@@ -172,6 +188,57 @@ def handle_batch_mark_payments_invoiced(
     ok_message = _(f'{updated_count} payments marked as invoiced.')
     return {'status': 'success', 
             'message': ok_message}
+
+
+@OrgApp.view(
+    model=PaymentCollection,
+    name='generate-payments-pdf',
+    permission=Private
+)
+def generate_payments_pdf(
+    self: PaymentCollection,
+    request: OrgRequest
+) -> Response:
+    """Generate a PDF with all filtered payments."""
+    request.assert_valid_csrf_token()
+
+    # Get the current filter from cache or use the current model
+    base_url = request.url.split("/pdf")[0]
+    cache_key = f'payment_filter_{normalize_for_url(base_url)}'
+    filter_params = request.app.cache.get(cache_key, None)
+    # c
+    breakpoint()
+
+    if filter_params:
+        # Recreate collection with cached filter parameters
+        filtered_collection = PaymentCollection(
+            session=request.session,
+            source=filter_params.get('source', '*'),
+            page=0,  # We want all results, not just the current page
+            **{k: v for k, v in filter_params.items() if k not in ['source', 'page']}
+        )
+    else:
+        filtered_collection = self
+
+    # Get all payments from the filter (not just the current page)
+    payments = list(filtered_collection.subset())
+
+    if not payments:
+        request.warning(_('No payments found for PDF generation'))
+        return request.redirect(request.link(self))
+
+    filename = 'payments.pdf'
+    if filtered_collection.status:
+        filename = f'payments_{filtered_collection.status}.pdf'
+
+    pdf = PaymentsPdf.from_payments(
+        payments=payments,
+        session=request.session,
+        title=_('Payments')
+    )
+
+    return Response(pdf, content_type='application/pdf',
+                   content_disposition=f'inline; filename={filename}')
 
 
 @OrgApp.form(

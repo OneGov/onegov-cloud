@@ -6,8 +6,14 @@
         <div metal:use-macro="layout.macros['form']" tal:define="form_two_columns True"/>
             <div class="filter-grid">
                 <div class="form-buttons">
-                    <button type="button" id="exportPaymentsButton" class="button" i18n:translate="">Export Bill run as PDF</button>
                     <tal:block tal:condition="payments" >
+                        <button type="button"
+                                id="exportPaymentsButton"
+                                class="button hollow"
+                                i18n:translate=""
+                                data-action-url="${layout.csrf_protected_url(request.link(layout.model, 'generate-payments-pdf'))}">
+                                Export Bill run as PDF</button>
+
                         <button type="button"
                                 class="button hollow batch-action-button"
                                 i18n:translate=""
