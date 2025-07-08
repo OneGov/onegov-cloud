@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from onegov.core.security import Private
 from onegov.form import merge_forms
-from onegov.org.views.payment import handle_batch_mark_payments_invoiced
+from onegov.org.views.payment import generate_payments_pdf, handle_batch_mark_payments_invoiced
 from onegov.org.views.payment import view_payments
 from onegov.org.views.payment import export_payments
 from onegov.town6 import TownApp
@@ -48,6 +48,18 @@ def town_handle_batch_mark_payments_invoiced(
     request: TownRequest
 ) -> JSON_ro:
     return handle_batch_mark_payments_invoiced(self, request)
+
+
+@TownApp.view(
+    model=PaymentCollection,
+    name='generate-payments-pdf',
+    permission=Private
+)
+def town_generate_payments_pdf(
+    self: PaymentCollection,
+    request: TownRequest
+) -> Response:
+    return generate_payments_pdf(self, request)
 
 
 @TownApp.form(

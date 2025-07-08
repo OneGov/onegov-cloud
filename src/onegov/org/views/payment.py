@@ -4,6 +4,9 @@ import decimal
 from collections import OrderedDict
 from decimal import Decimal
 from functools import partial
+from libres.db.models import Reservation
+from sqlalchemy import func
+from sqlalchemy import String
 from onegov.core.security import Private
 from onegov.core.utils import normalize_for_url
 from onegov.form import merge_forms
@@ -32,6 +35,7 @@ from webob import exc, Response as WebobResponse
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Callable, Sequence  # type: ignore[attr-defined]
+    from sqlalchemy.orm import Query
     from datetime import datetime
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
@@ -118,20 +122,22 @@ def view_payments(
         provider.id: provider
         for provider in PaymentProviderCollection(request.session).query()
     }
+    # foo = as_tuples(self.subset())
+
+    bar = self.with_reservations_and_tickets()
+    breakpoint()
     payment_links = self.payment_links_by_batch()
 
-    # Store the current filter state in the cache
-    filter_params = {
-        'source': self.source,
-        'page': self.page,
-        'start': self.start,
-        'end': self.end,
-        'status': self.status,
-        'payment_type': self.payment_type,
-        'ticket_start': self.ticket_start,
-        'ticket_end': self.ticket_end
-    }
-    request.app.cache.set(f'payment_filter_{normalize_for_url(request.url)}', filter_params)
+    all_payments_included_in_filter = tuple(
+        payment_id for payment_id, in self.subset().with_entities(
+            func.cast(Payment.id, String)
+        )
+    )
+
+    request.app.cache.set(
+        f'payment_filter_{normalize_for_url(request.url)}', 
+        all_payments_included_in_filter
+    )
 
     return {
         'title': _('Receivables'),

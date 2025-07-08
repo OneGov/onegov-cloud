@@ -5,9 +5,12 @@ from collections import defaultdict
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.pay.models import Payment
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql.expression import cast
+from onegov.core.orm.types import UUID as onegovUUID
 
 
 from typing import Any, TYPE_CHECKING
+from typing import Any as Incomplete
 from onegov.ticket.model import Ticket
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
@@ -122,6 +125,57 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
                 query = query.filter(Ticket.created >= self.ticket_start)
             if self.ticket_end:
                 query = query.filter(Ticket.created <= self.ticket_end)
+
+        return query.order_by(Payment.created.desc())
+
+    def with_reservations_and_tickets(
+        self
+    ) -> Query[tuple[Incomplete]]:
+
+        from onegov.reservation import Reservation
+        """
+        Returns a query that yields (Payment, Reservation, Ticket) tuples,
+        filtered by the same criteria as the collection.
+
+        This is useful for views that need to display information from
+        all three models together, avoiding N+1 query problems.
+
+        """
+
+        # Start with a query for the tuple.
+        query = self.session.query(Payment, Reservation, Ticket)
+
+        # Join Reservation -> Ticket. The handler_id on the ticket is a
+        # string representation of the reservation token (UUID).
+        query = query.join(Ticket, cast(Ticket.handler_id, onegovUUID) == Reservation.token)
+
+        # Join Payment -> Reservation 
+        query = query.join(Reservation, Reservation.payment)
+
+        # Filters on Payment
+        if self.source != '*':
+            model = Payment.get_polymorphic_class(self.source, Payment)
+            if model is not Payment:
+                query = query.filter(Payment.source == self.source)
+
+        if self.start:
+            query = query.filter(Payment.created >= self.start)
+        if self.end:
+            query = query.filter(Payment.created <= self.end)
+
+        if self.payment_type == 'manual':
+            query = query.filter(Payment.provider_id.is_(None))
+        elif self.payment_type == 'provider':
+            query = query.filter(Payment.provider_id.isnot(None))
+
+        if self.status:
+            query = query.filter(Payment.state == self.status)
+
+        # Filters on Ticket
+        if self.ticket_start:
+            query = query.filter(Ticket.created >= self.ticket_start)
+        if self.ticket_end:
+            query = query.filter(Ticket.created <= self.ticket_end)
 
         return query.order_by(Payment.created.desc())
 
