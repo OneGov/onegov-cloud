@@ -13,7 +13,7 @@ from onegov.org.forms.payments_search_form import PaymentSearchForm
 from onegov.org.layout import PaymentCollectionLayout, DefaultLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import PaymentMessage, TicketMessage
-from onegov.org.pdf.payment import PaymentsPdf
+from onegov.org.pdf.payment import PaymentsPdf, ticket_by_link
 from onegov.core.elements import Link
 from sedate import align_range_to_day, standardize_date, as_datetime
 from onegov.pay import Payment
@@ -50,21 +50,6 @@ EMAIL_SUBJECTS = {
     'marked-as-unpaid': _('Your payment has been withdrawn'),
     'refunded': _('Your payment has been refunded')
 }
-
-
-def ticket_by_link(
-    tickets: TicketCollection,
-    link: Any
-) -> Ticket | None:
-
-    # FIXME: We should probably do isinstance checks so type checkers
-    #        can understand that a Reservation has a token and a
-    #        FormSubmission has a id...
-    if link.__tablename__ == 'reservations':
-        return tickets.by_handler_id(link.token.hex)
-    elif link.__tablename__ == 'submissions':
-        return tickets.by_handler_id(link.id.hex)
-    return None
 
 
 def send_ticket_notifications(
@@ -206,7 +191,7 @@ def generate_payments_pdf(
     base_url = request.url.split("/pdf")[0]
     cache_key = f'payment_filter_{normalize_for_url(base_url)}'
     filter_params = request.app.cache.get(cache_key, None)
-    # c
+    # todo: check this is retrieved corretly
     breakpoint()
 
     if filter_params:

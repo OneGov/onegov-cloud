@@ -3,14 +3,30 @@ from __future__ import annotations
 from io import BytesIO
 from onegov.core.utils import module_path
 from onegov.org.pdf.ticket import TicketPdf
-from onegov.ticket import TicketCollection
+from onegov.ticket import Ticket, TicketCollection
 from pdfdocument.document import PDFDocument
 
 
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    from onegov.ticket import Ticket
     from onegov.pay import Payment
+
+
+def ticket_by_link(
+    tickets: TicketCollection,
+    link: Any
+) -> Ticket | None:
+
+    # FIXME: We should probably do isinstance checks so type checkers
+    #        can understand that a Reservation has a token and a
+    #        FormSubmission has a id...
+    if link.__tablename__ == 'reservations':
+        return tickets.by_handler_id(link.token.hex)
+    elif link.__tablename__ == 'submissions':
+        return tickets.by_handler_id(link.id.hex)
+    return None
 
 
 class PaymentsPdf(PDFDocument):
@@ -34,8 +50,6 @@ class PaymentsPdf(PDFDocument):
         # Get all tickets from payments
         for payment in payments:
             for link in payment.links:
-                from onegov.org.views.payment import ticket_by_link
-
                 ticket = ticket_by_link(tickets, link)
                 if ticket:
                     # Add a page break between tickets

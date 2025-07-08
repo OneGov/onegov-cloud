@@ -58,7 +58,7 @@ function setupPdfGeneration() {
             // Create a form to submit with CSRF token
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = pdfButton.getAttribute('href');
+            form.action = pdfButton.dataset.actionUrl;
 
             // Add CSRF token
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');

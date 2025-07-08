@@ -9,9 +9,9 @@
                     <tal:block tal:condition="payments" >
                         <button type="button"
                                 id="exportPaymentsButton"
-                                class="button hollow"
+                                class="button hollow pdf-generation-button"
                                 i18n:translate=""
-                                data-action-url="${layout.csrf_protected_url(request.link(layout.model, 'generate-payments-pdf'))}">
+                                data-action-url="${layout.csrf_protected_url(request.link(layout.model, 'pdf'))}">
                                 Export Bill run as PDF</button>
 
                         <button type="button"
