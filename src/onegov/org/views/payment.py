@@ -132,7 +132,6 @@ def handle_pdf_response(
         Gets all tickets for a list of payments, applying the same
         filtering logic as the payments macro.
         """
-        print('get_tickets_f_pdf')
         for payment in payments:
             # Use the pre-fetched links for this payment, same as the
             # template
