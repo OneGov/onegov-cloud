@@ -9,7 +9,7 @@ from bleach import Cleaner
 from bleach.linkifier import LinkifyFilter
 from lxml import etree
 from pdfdocument.document import MarkupParagraph
-from reportlab.platypus import Paragraph
+from reportlab.platypus import PageBreak, Paragraph
 
 from onegov.chat import MessageCollection
 from onegov.org.constants import TICKET_STATES, PAYMENT_STATES, PAYMENT_SOURCES
@@ -48,18 +48,16 @@ class TicketPdf(Pdf):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         locale = kwargs.pop('locale', None)
         translations = kwargs.pop('translations', None)
-        ticket = kwargs.pop('ticket')
-        layout = kwargs.pop('layout')
-        qr_payload = kwargs.pop('qr_payload')
+        self.ticket: Ticket | None = kwargs.pop('ticket', None)
+        self.layout: DefaultLayout | None = kwargs.pop('layout', None)
+        qr_payload: str | None = kwargs.pop('qr_payload', None)
         super().__init__(*args, **kwargs)
-        self.ticket: Ticket = ticket
         self.locale: str | None = locale
         self.translations: dict[str, GNUTranslations] = translations
-        self.layout: DefaultLayout = layout
 
         # Modification for the footer left on all pages
         self.doc.author = self.translate(_('Source')) + f': {self.doc.author}'
-        self.doc.qr_payload = qr_payload  # type:ignore[attr-defined]
+        self.doc.qr_payload = qr_payload or ''  # type:ignore[attr-defined]
 
     def translate(self, text: str) -> str:
         """ Translates the given string. """
@@ -136,7 +134,7 @@ class TicketPdf(Pdf):
 
     @property
     def page_fn(self) -> Callable[[Canvas, Template], None]:
-        """ First page the same as later except Qr-Code ..."""
+        """ First page the same as later except Qr-Code. """
         return self.page_fn_header_and_footer_qr
 
     @property
@@ -302,6 +300,8 @@ class TicketPdf(Pdf):
                 self.table(items, 'even')
 
     def ticket_metadata(self) -> None:
+        assert self.ticket is not None
+        assert self.layout is not None
         layout = self.layout
         handler = self.ticket.handler
         group = handler.group or self.ticket.group
@@ -354,6 +354,7 @@ class TicketPdf(Pdf):
         self.table(data, 'even')
 
     def ticket_payment(self) -> None:
+        assert self.ticket is not None
         price = self.ticket.handler.payment
         if not price:
             return
@@ -436,6 +437,45 @@ class TicketPdf(Pdf):
                     data[1] = TicketPdf.inner_html(el)
         return data
 
+    def add_ticket(self, ticket: Ticket, request: OrgRequest) -> None:
+        """ Adds a ticket to the story. """
+
+        self.ticket = ticket
+        self.layout = TicketLayout(ticket, request)
+        handler = ticket.handler
+
+        self.h(f'{request.translate(_("Ticket"))} {ticket.number}')
+        self.spacer()
+
+        deleted_message = None
+        if handler.deleted:
+            summary = ticket.snapshot.get('summary')
+            deleted_message = _('The record behind this ticket was removed. '
+                                'The following information is a snapshot '
+                                'kept for future reference.')
+        else:
+            summary = handler.get_summary(request)
+
+        self.ticket_metadata()
+
+        self.h1(_('Summary'))
+        if deleted_message:
+            self.p(self.translate(deleted_message))
+            self.spacer()
+        self.ticket_summary(summary)
+        self.ticket_payment()
+
+        # If used for the user instead of the manager...
+        messages = MessageCollection(
+            request.session,
+            channel_id=ticket.number
+        )
+        if not request.is_manager:
+            messages.type = request.app.settings.org.public_ticket_messages
+
+        self.h1(request.translate(_('Timeline')))
+        self.ticket_timeline(view_messages_feed(messages, request))
+
     @classmethod
     def from_ticket(
         cls,
@@ -449,8 +489,6 @@ class TicketPdf(Pdf):
         summaries are supported.
         """
         result = BytesIO()
-        handler = ticket.handler
-        layout = TicketLayout(ticket, request)
         pdf = cls(
             result,
             title=ticket.number,
@@ -458,10 +496,8 @@ class TicketPdf(Pdf):
             link_color='#00538c',
             underline_links=True,
             author=request.host_url,
-            ticket=ticket,
             translations=request.app.translations,
             locale=request.locale,
-            layout=layout,
             qr_payload=request.link(
                 ticket, name=request.is_manager and None or 'status')
         )
@@ -469,37 +505,47 @@ class TicketPdf(Pdf):
             page_fn=pdf.page_fn,
             page_fn_later=pdf.page_fn_later
         )
-        pdf.h(f'{request.translate(_("Ticket"))} {ticket.number}')
-        pdf.spacer()
+        pdf.add_ticket(ticket, request)
 
-        deleted_message = None
-        if handler.deleted:
-            summary = ticket.snapshot.get('summary')
-            deleted_message = _('The record behind this ticket was removed. '
-                                'The following information is a snapshot '
-                                'kept for future reference.')
-        else:
-            summary = handler.get_summary(request)
+        pdf.generate()
+        result.seek(0)
+        return result
 
-        pdf.ticket_metadata()
 
-        pdf.h1(_('Summary'))
-        if deleted_message:
-            pdf.p(pdf.translate(deleted_message))
-            pdf.spacer()
-        pdf.ticket_summary(summary)
-        pdf.ticket_payment()
+class TicketsPdf(TicketPdf):
 
-        # If used for the user instead of the manager...
-        messages = MessageCollection(
-            request.session,
-            channel_id=ticket.number
+    @classmethod
+    def from_tickets(
+        cls,
+        request: OrgRequest,
+        tickets: Sequence[Ticket]
+    ) -> BytesIO:
+        """
+        Creates a PDF representation of the tickets. It is sensible to the
+        templates used to render the message feed and the summary of the ticket
+        coming from ticket handler. With this approach, snapshotted
+        summaries are supported.
+        """
+        result = BytesIO()
+        title = request.translate(_("Tickets"))
+        pdf = cls(
+            result,
+            title=title,
+            created=f'{date.today():%d.%m.%Y}',
+            link_color='#00538c',
+            underline_links=True,
+            author=request.host_url,
+            translations=request.app.translations,
+            locale=request.locale
         )
-        if not request.is_manager:
-            messages.type = request.app.settings.org.public_ticket_messages
 
-        pdf.h1(request.translate(_('Timeline')))
-        pdf.ticket_timeline(view_messages_feed(messages, request))
+        pdf.init_a4_portrait(
+            page_fn=pdf.page_fn_later, page_fn_later=pdf.page_fn_later
+        )
+
+        for ticket in tickets:
+            pdf.story.append(PageBreak())
+            pdf.add_ticket(ticket, request)
 
         pdf.generate()
         result.seek(0)
