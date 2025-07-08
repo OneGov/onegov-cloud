@@ -9,7 +9,9 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID
 from onegov.file import MultiAssociatedFiles
 from onegov.parliament import _
-from onegov.parliament.models.meeting import Meeting
+from onegov.parliament.models.extensions import (
+    PoliticalBusinessParticipationExtension
+)
 from onegov.search import ORMSearchable
 
 
@@ -17,11 +19,11 @@ from typing import TYPE_CHECKING, TypeAlias, Literal
 
 if TYPE_CHECKING:
     import uuid
-
-    from onegov.parliament.models.meeting_item import MeetingItem
     from datetime import date
-
+    from onegov.parliament.models import MeetingItem
+    from onegov.parliament.models import Meeting
     from onegov.parliament.models import RISParliamentarian
+
 
     PoliticalBusinessType: TypeAlias = Literal[
         'inquiry',  # Anfrage
@@ -103,7 +105,8 @@ class PoliticalBusiness(
     Base,
     MultiAssociatedFiles,
     ContentMixin,
-    ORMSearchable
+    ORMSearchable,
+    PoliticalBusinessParticipationExtension
 ):
 
     GERMAN_STATUS_NAME_TO_VALUE_MAP: dict[str, str] = {
@@ -114,7 +117,7 @@ class PoliticalBusiness(
         'Nicht erheblich erklärt': 'declared_insignificant',
         'Nicht zustandegekommen': 'not_realized',
         'Pendent Exekutive': 'pending_executive',
-        'Pendent Legislative': 'pending legislative',
+        'Pendent Legislative': 'pending_legislative',
         'Rückzug': 'withdrawn',
         'Umgewandelt': 'converted',
         'Zurückgewiesen': 'rejected',
@@ -197,13 +200,13 @@ class PoliticalBusiness(
     )
 
     #: The meetings this agenda item was discussed in
-    meetings: RelationshipProperty[Meeting] = relationship(
+    meetings: RelationshipProperty['Meeting'] = relationship(
         'Meeting',
         back_populates='political_businesses',
         order_by=Meeting.start_datetime,
         lazy='joined',
     )
-    meeting_items: relationship[list[MeetingItem]] = relationship(
+    meeting_items: relationship[list['MeetingItem']] = relationship(
         'MeetingItem',
         back_populates='political_business'
     )
@@ -259,7 +262,7 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
         nullable=False,
     )
 
-    #: the function of the parliamentarian in the political business
+    #: the role of the parliamentarian in the political business
     participant_type: Column[str | None] = Column(
         Text,
         nullable=True,
@@ -278,6 +281,10 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
         'RISParliamentarian',
         back_populates='political_businesses',
     )
+
+    def __repr__(self) -> str:
+        return (f'<Political Business Participation {self.parliamentarian.title}, '
+                f'{self.political_business.title}, {self.participant_type}>')
 
 
 class RISPoliticalBusinessParticipation(

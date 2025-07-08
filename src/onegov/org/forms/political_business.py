@@ -30,26 +30,22 @@ if TYPE_CHECKING:
 class PoliticalBusinessForm(Form):
     title = StringField(
         label=_('Title'),
-        fieldset=_('A'),
         validators=[InputRequired()],
     )
 
     number = StringField(
         label=_('Number'),
-        fieldset=_('A'),
         validators=[Optional()],
     )
 
     political_business_type = TranslatedSelectField(
         label=_('Type'),
-        fieldset=_('A'),
         choices=sorted(POLITICAL_BUSINESS_TYPE.items()),
         validators=[InputRequired()],
     )
 
     status = TranslatedSelectField(
         label=_('Business Status'),
-        fieldset=_('A'),
         choices=sorted(POLITICAL_BUSINESS_STATUS.items()),
         validators=[Optional()],
         default='-',
@@ -57,37 +53,13 @@ class PoliticalBusinessForm(Form):
 
     entry_date = DateField(
         label=_('Entry Date'),
-        fieldset=_('A'),
         validators=[InputRequired()],
         default=date.today,
-    )
-
-    selected_participants = ChosenSelectMultipleField(
-        label=_('Participants'),
-        fieldset=_('A'),
-        validators=[Optional()],
-        choices=[],
-    )
-
-    # depending on selected_participants, for each individual i need to
-    # specify the participation type
-    participation_type = ChosenSelectField(
-        label=_('Participation Type'),
-        fieldset=_('A'),
-        validators=[Optional()],
-        choices=[
-            ('', '-'),
-            ('first_signatory', _('First Signatory')),
-            ('co_signatory', _('Co-Signatory')),
-        ],
-        default='co_signatory',
-        depends_on=('selected_participants', 'choices')
     )
 
     # FIXME : make multiple groups possible ChosenSelectMultipleField
     selected_parliamentary_group_id = ChosenSelectField(
         label=_('Parliamentary Group'),
-        fieldset=_('A'),
         validators=[Optional()],
         choices=[],
     )
@@ -96,13 +68,13 @@ class PoliticalBusinessForm(Form):
     def participants(self) -> list[RISParliamentarian]:
         """ Returns the selected parliamentarians. """
 
-        if not self.selected_participants.data:
+        if not self.people.data:
             return []
 
         result = (
             self.request.session.query(RISParliamentarian)
             .filter(
-                RISParliamentarian.id.in_(self.selected_participants.data)
+                RISParliamentarian.id.in_(self.people.data)
             )
             .all()
         )
@@ -134,16 +106,6 @@ class PoliticalBusinessForm(Form):
     def on_request(self) -> None:
         self.political_business_type.choices.insert(0, ('', '-'))  # type:ignore[union-attr]
         self.status.choices.insert(0, ('', '-'))  # type:ignore[union-attr]
-
-        parliamentarians = (
-            self.request.session.query(RISParliamentarian)
-            .filter(RISParliamentarian.active)
-            .order_by(Parliamentarian.last_name, Parliamentarian.first_name)
-            .all()
-        )
-        self.selected_participants.choices = [
-            (str(p.id.hex), p.display_name) for p in parliamentarians
-        ]
 
         groups = (
             self.request.session.query(RISParliamentaryGroup)
