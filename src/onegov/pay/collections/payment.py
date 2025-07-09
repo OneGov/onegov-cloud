@@ -2,9 +2,13 @@ from __future__ import annotations
 
 from collections import defaultdict
 
+from sedate import utcnow, to_timezone
+
 from onegov.core.collection import GenericCollection, Pagination
+from onegov.reservation import Reservation
 from onegov.pay.models import Payment
 from sqlalchemy.orm import joinedload
+from sqlalchemy import func
 from sqlalchemy.sql.expression import cast
 from onegov.core.orm.types import UUID as onegovUUID
 
@@ -12,6 +16,7 @@ from onegov.core.orm.types import UUID as onegovUUID
 from typing import Any, TYPE_CHECKING
 from onegov.ticket.model import Ticket
 if TYPE_CHECKING:
+    from datetime import date
     from collections.abc import Collection, Iterable
     from datetime import datetime
     from decimal import Decimal
@@ -115,6 +120,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         # Filter by payments by each associated ticket creation date
         if self.ticket_start or self.ticket_end:
             query = query.join(Ticket, Payment.id == Ticket.payment_id)
+
             if self.ticket_start:
                 query = query.filter(Ticket.created >= self.ticket_start)
             if self.ticket_end:
@@ -126,52 +132,6 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
                 query = query.filter(Ticket.created <= self.ticket_end)
 
         return query.order_by(Payment.created.desc())
-
-    def with_reservations_and_tickets(self) -> list[tuple[Any]]:
-        # DEBUG FUNCTION WILL BE REMOVED
-        from onegov.reservation import Reservation
-
-        # Get reservations that have payments
-        reservations = self.session.query(Reservation).filter(
-            Reservation.payment.isnot(None)
-        ).all()
-
-        results = []
-        for reservation in reservations:
-            payment = reservation.payment
-
-            # Apply payment filters
-            if self.source != '*':
-                model = Payment.get_polymorphic_class(self.source, Payment)
-                if model is not Payment and payment.source != self.source:
-                    continue
-
-            if self.start and payment.created < self.start:
-                continue
-            if self.end and payment.created > self.end:
-                continue
-            if (self.payment_type == 'manual' and payment.provider_id
-                    is not None or self.payment_type == 'provider'
-                    and payment.provider_id is None):
-                continue
-            if self.status and payment.state != self.status:
-                continue
-
-            # Get ticket
-            ticket = self.session.query(Ticket).filter(
-                cast(Ticket.handler_id, onegovUUID) == reservation.token
-            ).first()
-
-            if ticket:
-                # Apply ticket filters
-                if self.ticket_start and ticket.created < self.ticket_start:
-                    continue
-                if self.ticket_end and ticket.created > self.ticket_end:
-                    continue
-
-                results.append((payment, reservation, ticket))
-
-        return sorted(results, key=lambda x: x[0].created, reverse=True)
 
     @property
     def page_index(self) -> int:
@@ -190,9 +150,25 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             status=self.status
         )
 
+    def tickets_by_batch(self) -> dict[UUID, Ticket]:
+        session = self.session
+        return {ticket.payment_id: ticket  # type:ignore[union-attr]
+            for ticket in session.query(Ticket).filter(
+            Ticket.payment_id.in_([el.id for el in self.batch]))
+        }
+
+    def reservation_dates_by_batch(self) -> dict[UUID, tuple[date, date]]:
+        session = self.session
+
+        return {ticket_id: (to_timezone(start_date, 'Europe/Zurich').date, to_timezone(end_date, 'Europe/Zurich').date)
+            for ticket_id, start_date, end_date in session.query(Reservation).join(Ticket)
+            .filter(Ticket.payment_id.in_([el.id for el in self.batch])).
+            group_by(Ticket.id).with_entities(Ticket.id, func.min(Reservation.start), func.max(Reservation.end))
+        }
+
     def payment_links_for(
         self,
-        items: Iterable[Payment]
+        items: Collection[Payment]
     ) -> dict[UUID, list[AnyPayableBase]]:
         """ A more efficient way of loading all links of the given batch
         (compared to loading payment.links one by one).

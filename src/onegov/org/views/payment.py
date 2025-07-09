@@ -176,7 +176,6 @@ def view_payments(
     form: PaymentSearchForm,
     layout: PaymentCollectionLayout | None = None
 ) -> RenderData | WebobResponse:
-    session = request.session
     request.include('invoicing')
     layout = layout or PaymentCollectionLayout(self, request)
 
@@ -201,7 +200,7 @@ def view_payments(
         'form': form,
         'layout': layout or PaymentCollectionLayout(self, request),
         'payments': self.batch,
-        'get_ticket': partial(ticket_by_link, tickets),
+        'tickets': self.tickets_by_batch(),
         'providers': providers,
         'payment_links': self.payment_links_by_batch()
     }
