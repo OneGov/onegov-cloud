@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-09 13:15+0200\n"
+"POT-Creation-Date: 2025-07-09 13:44+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1397,6 +1397,9 @@ msgstr "Parlamentare"
 msgid "Role"
 msgstr "Ruolo"
 
+msgid "Political Party"
+msgstr "Partito"
+
 msgid "Party role"
 msgstr "Ruolo nel partito"
 
@@ -1426,9 +1429,6 @@ msgstr "Cognome da nubile"
 
 msgid "Profession"
 msgstr "Professione"
-
-msgid "Political Party"
-msgstr "Partito politico"
 
 msgid "Parliamentary Group"
 msgstr "Gruppo parlamentare"

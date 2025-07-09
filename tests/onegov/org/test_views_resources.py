@@ -959,7 +959,7 @@ def test_auto_accept_reservations(client):
     assert 'Die Reservationen wurden angenommen' in page
     assert len(os.listdir(client.app.maildir)) == 1
     message = client.get_email(0)
-    assert 'Ihre Reservationen wurden angenommen' in message['Subject']
+    assert 'Ihre Reservationen wurden bestätigt' in message['Subject']
     assert 'Foobar' in message['TextBody']
 
     # close the ticket and check not email is sent
@@ -2356,7 +2356,7 @@ def test_reserve_and_deny_multiple_dates(client):
     assert resource.scheduler.managed_reserved_slots().count() == 2
 
     message = client.get_email(2)['TextBody']
-    assert "angenommen" in message
+    assert "bestätigt" in message
     assert "27. April 2016" in message
     assert "28. April 2016" in message
 

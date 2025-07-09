@@ -431,10 +431,10 @@ def test_views_hidden_by_publication(client):
     assert "Aeschi Thomas" in hidden
 
     # Test hints
-    assert 'nicht publiziert' in client.get(person.request.url)
-    assert 'nicht publiziert' in client.get(child.request.url)
-    assert 'nicht publiziert' in client.get(root_membership.request.url)
-    assert 'nicht publiziert' in client.get(child_membership.request.url)
+    assert 'nicht veröffentlicht' in client.get(person.request.url)
+    assert 'nicht veröffentlicht' in client.get(child.request.url)
+    assert 'nicht veröffentlicht' in client.get(root_membership.request.url)
+    assert 'nicht veröffentlicht' in client.get(child_membership.request.url)
 
     # Test forbidden views
     client.logout()
@@ -452,7 +452,7 @@ def test_views_hidden_by_publication(client):
     manage = client.get(bund.request.url).click('Bearbeiten')
     manage.form['publication_start'] = next_week.isoformat()
     manage.form.submit()
-    assert 'nicht publiziert' in client.get(bund.request.url)
+    assert 'nicht veröffentlicht' in client.get(bund.request.url)
     client.logout()
     client.get(bund.request.url, status=403)
     assert "Bundesrat" not in client.get('/organizations')

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-09 13:15+0200\n"
+"POT-Creation-Date: 2025-07-09 13:44+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -767,7 +767,7 @@ msgid "Music"
 msgstr "Musique"
 
 msgid "Party"
-msgstr "Parti"
+msgstr "Fête"
 
 msgid "Politics"
 msgstr "Politique"
@@ -1393,6 +1393,9 @@ msgstr "Parlementaire"
 msgid "Role"
 msgstr "Rôle"
 
+msgid "Political Party"
+msgstr "Parti"
+
 msgid "Party role"
 msgstr "Rôle dans le parti"
 
@@ -1422,9 +1425,6 @@ msgstr "Naissance"
 
 msgid "Profession"
 msgstr "Profession"
-
-msgid "Political Party"
-msgstr "Parti politique"
 
 msgid "Parliamentary Group"
 msgstr "Groupe parlementaire"
