@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-07-03 09:15+0200\n"
+"POT-Creation-Date: 2025-07-09 10:28+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -285,14 +285,14 @@ msgstr "Archivio chat"
 msgid "Meetings"
 msgstr "Riunioni"
 
+msgid "RIS Settings"
+msgstr "Impostazioni RIS"
+
 msgid "Meeting"
 msgstr "Riunione"
 
 msgid "Parliamentarians"
 msgstr "Parlamentari"
-
-msgid "RIS Settings"
-msgstr "Impostazioni RIS"
 
 msgid "Parliamentarian"
 msgstr "Parlamentare"
@@ -1589,6 +1589,9 @@ msgid "You can see the current status of your ticket at any time here:"
 msgstr ""
 "Qui potete vedere lo stato attuale del vostro biglietto in qualsiasi momento:"
 
+msgid "Date/Time"
+msgstr "Data/Ora"
+
 msgid "Agenda"
 msgstr "Agenda"
 
@@ -2052,6 +2055,15 @@ msgstr ""
 "applicazioni di calendario aggiornano i calendari a cui sono iscritte (né "
 "sul fatto che si aggiornino). Pertanto, le informazioni mostrate nel "
 "calendario potrebbero essere errate o non aggiornate. Usale tuo rischio."
+
+msgid ""
+"If you want key codes to be included in the event's description then you may "
+"use the following link instead. Please note however that anyone you share "
+"this link with will have permanent access to this information."
+msgstr ""
+"Se volete che i codici chiave siano inclusi nella descrizione dell'evento, "
+"potete utilizzare il seguente link. Si noti tuttavia che chiunque condivida "
+"questo link avrà accesso permanente a queste informazioni."
 
 msgid "Reservations must be made at least one day in advance."
 msgstr ""
