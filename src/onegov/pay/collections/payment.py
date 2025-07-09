@@ -5,7 +5,6 @@ from collections import defaultdict
 from sedate import to_timezone
 
 from onegov.core.collection import GenericCollection, Pagination
-from onegov.reservation import Reservation
 from onegov.pay.models import Payment
 from sqlalchemy.orm import joinedload
 from sqlalchemy import func
@@ -161,14 +160,17 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         }
 
     def reservation_dates_by_batch(self) -> dict[UUID, tuple[date, date]]:
+        from onegov.reservation import Reservation
         session = self.session
         return {
             ticket_id: (
-                to_timezone(start_date, 'Europe/Zurich').date,
-                to_timezone(end_date, 'Europe/Zurich').date
+                to_timezone(start_date, 'Europe/Zurich').date(),
+                to_timezone(end_date, 'Europe/Zurich').date()
             )
             for ticket_id, start_date, end_date in session.query(Reservation)
-            .join(Ticket)
+            # .join(Ticket) didn't work
+            .join(Reservation.payment)
+            .join(Payment.tickets)
             .filter(Ticket.payment_id.in_([el.id for el in self.batch]))
             .group_by(Ticket.id)
             .with_entities(
