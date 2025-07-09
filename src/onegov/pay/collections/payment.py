@@ -150,7 +150,6 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
                 conditions.append(
                     Reservation.start <= self.reservation_end
                 )
-            breakpoint()
             query = query.filter(
                 Payment.linked_reservations.any(and_(*conditions)))
 
@@ -185,23 +184,20 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
     def reservation_dates_by_batch(self) -> dict[UUID, tuple[date, date]]:
         from onegov.reservation import Reservation
         session = self.session
-        query = (
-            session.query(
-                Ticket.id,
-                func.min(Reservation.start),
-                func.max(Reservation.end)
-            )
-            .join(Ticket.payment)
-            .join(Payment.linked_reservations)
-            .filter(Ticket.payment_id.in_([p.id for p in self.batch]))
-            .group_by(Ticket.id)
-        )
         return {
-            ticket_id: (
+            payment_id: (
                 to_timezone(start_date, 'Europe/Zurich').date(),
                 to_timezone(end_date, 'Europe/Zurich').date()
             )
-            for ticket_id, start_date, end_date in query
+            for payment_id, start_date, end_date in session.query(Reservation)
+            .join(Reservation.payment)
+            .filter(Payment.id.in_([el.id for el in self.batch]))
+            .group_by(Payment.id)
+            .with_entities(
+                Payment.id,
+                func.min(Reservation.start),
+                func.max(Reservation.end)
+            )
         }
 
     def payment_links_for(

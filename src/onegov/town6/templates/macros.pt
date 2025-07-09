@@ -2233,22 +2233,18 @@
                 </td>
                 <!-- Cells for Reservation Start Date -->
                 <td tal:condition="reservation_dates|nothing">
-                    <tal:b define="ticket tickets[payment.id] | nothing">
-                        <tal:b define="dates reservation_dates[ticket.id] | nothing" tal:condition="ticket">
-                            <span tal:condition="dates">
-                                ${layout.format_date(dates[0], 'date')}
-                            </span>
-                        </tal:b>
+                    <tal:b define="dates reservation_dates[payment.id] | nothing" tal:condition="dates">
+                        <span tal:condition="dates">
+                            ${layout.format_date(dates[0], 'date')}
+                        </span>
                     </tal:b>
                 </td>
                 <!-- Cells for Reservation End Date -->
                 <td tal:condition="reservation_dates|nothing">
-                    <tal:b define="ticket tickets[payment.id] | nothing">
-                        <tal:b define="dates reservation_dates[ticket.id] | nothing" tal:condition="ticket">
-                            <span tal:condition="dates">
-                                ${layout.format_date(dates[1], 'date')}
-                            </span>
-                        </tal:b>
+                    <tal:b define="dates reservation_dates[payment.id] | nothing" tal:condition="dates">
+                        <span tal:condition="dates">
+                            ${layout.format_date(dates[1], 'date')}
+                        </span>
                     </tal:b>
                 </td>
                 <td>${'{0:.2f}'.format(payment.net_amount)} ${payment.currency}</td>

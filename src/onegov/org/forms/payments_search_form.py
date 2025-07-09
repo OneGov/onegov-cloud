@@ -104,3 +104,4 @@ class PaymentSearchForm(Form):
             (value, self.request.translate(label))
             for value, label in self.PAYMENT_TYPE_CHOICES
         ]
+        self.css_class = 'resettable'
