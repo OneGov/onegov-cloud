@@ -3219,7 +3219,7 @@ class PaymentCollectionLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(_('Payments'), self.request.class_link(
-                PaymentProviderCollection
+                PaymentCollection
             ))
         ]
 

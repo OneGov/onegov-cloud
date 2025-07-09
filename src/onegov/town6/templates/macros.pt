@@ -1245,7 +1245,7 @@
         Refunded
     </div>
     <div i18n:translate tal:condition="payment.state == 'invoiced'" class="payment-state payment-state-invoiced">
-        Invoiced 
+        Invoiced
     </div>
 </metal:payment_status>
 
@@ -2201,7 +2201,6 @@
                     <input type="checkbox" name="selected_payments" value="${payment.id}" aria-label="Select this payment" />
                 </td>
                 <td tal:condition="payment_links|nothing">
-                    <!-- Define ticket once for the payment, outside the link loop -->
                     <tal:b define="ticket tickets[payment.id] | nothing">
                         <tal:b repeat="link payment_links[payment.id]">
                             <tal:b switch="link.__tablename__">
@@ -2232,7 +2231,7 @@
                         </tal:b>
                     </tal:b>
                 </td>
-                <!-- New cells for Reservation Start Date -->
+                <!-- Cells for Reservation Start Date -->
                 <td tal:condition="reservation_dates|nothing">
                     <tal:b define="ticket tickets[payment.id] | nothing">
                         <tal:b define="dates reservation_dates[ticket.id] | nothing" tal:condition="ticket">
@@ -2242,7 +2241,7 @@
                         </tal:b>
                     </tal:b>
                 </td>
-                <!-- New cells for Reservation End Date -->
+                <!-- Cells for Reservation End Date -->
                 <td tal:condition="reservation_dates|nothing">
                     <tal:b define="ticket tickets[payment.id] | nothing">
                         <tal:b define="dates reservation_dates[ticket.id] | nothing" tal:condition="ticket">
