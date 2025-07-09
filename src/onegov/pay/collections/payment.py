@@ -122,7 +122,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         if self.status:
             query = query.filter(Payment.state == self.status)
 
-        # Filter by payments by each associated ticket creation date
+        # Filter payments by each associated ticket creation date
         if self.ticket_start or self.ticket_end:
             query = query.join(Ticket, Payment.id == Ticket.payment_id)
 
@@ -130,6 +130,8 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
                 query = query.filter(Ticket.created >= self.ticket_start)
             if self.ticket_end:
                 query = query.filter(Ticket.created <= self.ticket_end)
+
+        # todo: Filter payments by the reservation dates it belongs to 
 
         return query.order_by(Payment.created.desc())
 
