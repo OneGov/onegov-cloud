@@ -106,9 +106,11 @@ def get_pay_assets() -> Iterator[str]:
 
 class PaymentError(IntEnum):
     INSUFFICIENT_FUNDS = 1
+    TRANSACTION_ABORTED = 2
 
 
 INSUFFICIENT_FUNDS = PaymentError.INSUFFICIENT_FUNDS
+TRANSACTION_ABORTED = PaymentError.TRANSACTION_ABORTED
 
 
 def process_payment(
@@ -168,8 +170,16 @@ def process_payment(
             )
         except CARD_ERRORS as e:
 
-            if 'insufficient funds' in str(e):
+            err = str(e)
+
+            if 'insufficient funds' in err:
                 return INSUFFICIENT_FUNDS
+
+            if (
+                'Transaction aborted' in err
+                or '3D-Secure authentication failed' in err
+            ):
+                return TRANSACTION_ABORTED
 
             log.exception(
                 f'Processing {price} through {provider.title} '

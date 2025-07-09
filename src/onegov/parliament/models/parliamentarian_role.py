@@ -209,3 +209,12 @@ class ParliamentarianRole(Base, TimestampMixin):
             f'<ParliamentarianRole role={self.role} '
             f'party={self.party}'
         )
+
+
+class RISParliamentarianRole(ParliamentarianRole):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'ris_parliamentarian_role',
+    }
+
+    es_type_name = 'ris_parliamentarian_role'

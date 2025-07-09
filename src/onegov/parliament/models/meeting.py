@@ -8,6 +8,7 @@ from sqlalchemy.orm import RelationshipProperty, relationship
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID, MarkupText, UTCDateTime
+from onegov.file import AssociatedFiles
 from onegov.search import ORMSearchable
 
 from typing import TYPE_CHECKING
@@ -15,15 +16,16 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
 
-    from markupsafe import Markup
     from datetime import datetime
 
+    from markupsafe import Markup
     from onegov.parliament.models.political_business import (
         PoliticalBusiness,
     )
+    from onegov.parliament.models.meeting_item import MeetingItem
 
 
-class Meeting(Base, ContentMixin, ORMSearchable):
+class Meeting(Base, ContentMixin, ORMSearchable, AssociatedFiles):
 
     __tablename__ = 'par_meetings'
 
@@ -59,12 +61,16 @@ class Meeting(Base, ContentMixin, ORMSearchable):
     #: The title of the meeting
     title: Column[str] = Column(Text, nullable=False)
 
-    #: date and time of the meeting
+    #: date and time of the meeting start
     start_datetime: Column[datetime | None]
     start_datetime = Column(UTCDateTime, nullable=True)
 
+    #: date and time of the meeting end
+    end_datetime: Column[datetime | None]
+    end_datetime = Column(UTCDateTime, nullable=True)
+
     #: location address of meeting
-    address: Column[str] = Column(Text, nullable=False)
+    address: Column[Markup] = Column(MarkupText, nullable=False)
 
     description: Column[Markup | None] = Column(MarkupText, nullable=True)
 
@@ -83,6 +89,15 @@ class Meeting(Base, ContentMixin, ORMSearchable):
             primaryjoin='Meeting.political_business_id == '
             'PoliticalBusiness.id',
         )
+    )
+
+    #: The meeting items
+    meeting_items: relationship[list[MeetingItem]]
+    meeting_items = relationship(
+        'MeetingItem',
+        cascade='all, delete-orphan',
+        back_populates='meeting',
+        order_by='desc(MeetingItem.number)'
     )
 
     def __repr__(self) -> str:

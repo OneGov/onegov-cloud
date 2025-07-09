@@ -233,6 +233,14 @@ class SAML2Client:
                 if self.client_key_file and self.client_cert_file:
                     saml_settings['key_file'] = self.client_key_file
                     saml_settings['cert_file'] = self.client_cert_file
+                    saml_settings['signing_algorithm'] = (
+                        'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512')
+                    saml_settings['digest_algorithm'] = (
+                        'http://www.w3.org/2001/04/xmlenc#sha512')
+                    sp_settings = saml_settings['service']['sp']
+                    sp_settings['authn_requests_signed'] = True
+                    sp_settings['logout_requests_signed'] = True
+                    sp_settings['logout_responses_signed'] = True
 
                 config = Config()
                 config.load(saml_settings)

@@ -26,6 +26,12 @@ def get_create_new_organisation_factory(
     return create_new_organisation
 
 
+# NOTE: Feriennet doesn't need a citizen login
+@PasApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return False
+
+
 @PasApp.template_variables()
 def get_template_variables(request: TownRequest) -> RenderData:
     return {

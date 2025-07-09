@@ -13,7 +13,7 @@ from requests_oauthlib import OAuth2Session
 from secrets import compare_digest
 
 
-from typing import Any, Self, TYPE_CHECKING
+from typing import Any, ClassVar, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.user.auth.provider import (
@@ -81,7 +81,10 @@ class OIDCClient:
     # Override/amend discovered metadata
     fixed_metadata: dict[str, Any] = attrib(factory=dict)
 
-    _provider_metadata: dict[str, dict[str, Any]] = {}
+    # FIXME: This is a little questionable if there's more than one
+    #        OIDC provider for the same application. We should make
+    #        this more robust
+    _provider_metadata: ClassVar[dict[str, dict[str, Any]]] = {}
 
     def session(
         self,

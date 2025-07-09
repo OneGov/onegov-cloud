@@ -8,7 +8,12 @@ from __future__ import annotations
 from sqlalchemy import Column
 from sqlalchemy import Text
 
+from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
+from onegov.parliament.models.political_business import (
+    POLITICAL_BUSINESS_STATUS,
+    POLITICAL_BUSINESS_TYPE,
+)
 
 
 @upgrade_task('Introduce parliament module: rename pas tables')
@@ -73,3 +78,61 @@ def add_type_column_to_parliament_models(
             context.operations.execute(
                 f'ALTER TABLE {table} ALTER COLUMN {type_name} SET NOT NULL'
             )
+
+
+@upgrade_task('Add function column to commission memberships')
+def add_function_column_to_commission_memberships(
+    context: UpgradeContext
+) -> None:
+    if not context.has_column('par_commission_memberships', 'function'):
+        context.operations.add_column(
+            'par_commission_memberships',
+            Column('function', Text, nullable=True, default=None)
+        )
+
+
+@upgrade_task('Add start/end columns to meetings')
+def add_start_end_columns_to_meetings(
+    context: UpgradeContext
+) -> None:
+    if not context.has_column('par_meetings', 'start_datetime'):
+        context.operations.add_column(
+            'par_meetings',
+            Column('start_datetime', UTCDateTime, nullable=True)
+        )
+    if not context.has_column('par_meetings', 'end_datetime'):
+        context.operations.add_column(
+            'par_meetings',
+            Column('end_datetime', UTCDateTime, nullable=True)
+        )
+
+
+@upgrade_task('Update political business enum values')
+def update_political_business_enum_values(
+    context: UpgradeContext
+) -> None:
+    if context.has_enum('par_political_business_type'):
+        context.update_enum_values(
+            'par_political_business_type',
+            POLITICAL_BUSINESS_TYPE.keys()
+        )
+    if context.has_enum('par_political_business_status'):
+        context.update_enum_values(
+            'par_political_business_status',
+            POLITICAL_BUSINESS_STATUS.keys()
+        )
+
+
+@upgrade_task('Change political business participation type column type')
+def change_political_business_participation_type_column_type(
+    context: UpgradeContext
+) -> None:
+    if context.has_column(
+        'par_political_business_participants',
+        'participant_type'
+    ):
+        context.operations.alter_column(
+            'par_political_business_participants',
+            'participant_type',
+            type_=Text,
+        )

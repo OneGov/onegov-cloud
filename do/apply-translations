@@ -20,9 +20,10 @@ def open_file(path: str, mode: str = 'r') -> str:
     return file
 
 
-def parse_entry(block: str) -> tuple[str, str]:
-    parts = block.split('msgstr ')
-    return parts[0].replace('msgid ', ''), parts[1]
+def parse_entry(block: str) -> tuple[str, str, str]:
+    head, msgstr = block.split('msgstr ', 1)
+    comments, msgid = head.split('msgid ', 1)
+    return comments, msgid, msgstr
 
 
 def blocks_from_file(src: str, lang: str) -> list[str]:
@@ -32,7 +33,7 @@ def blocks_from_file(src: str, lang: str) -> list[str]:
 def parse_file(src: str, lang: str) -> dict[str, str]:
     src_dict = {}
     for block in blocks_from_file(src, lang):
-        id_, value = parse_entry(block)
+        _, id_, value = parse_entry(block)
         src_dict[id_] = value
     return src_dict
 
@@ -53,7 +54,7 @@ def fusion_po(
 
     new_blocks = []
     for block in blocks_from_file(target, lang):
-        msgid, value = parse_entry(block)
+        comments, msgid, value = parse_entry(block)
         new_val = src_parsed.get(msgid)
 
         if not new_val or emtpy_value(new_val):
@@ -61,7 +62,7 @@ def fusion_po(
             continue
 
         if emtpy_value(value) or overwrite:
-            new_blocks.append(f'msgid {msgid}msgstr {new_val}')
+            new_blocks.append(f'{comments}msgid {msgid}msgstr {new_val}')
         else:
             new_blocks.append(block)
 

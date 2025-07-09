@@ -1,13 +1,18 @@
 from __future__ import annotations
 
-from onegov.core.elements import Link
 from onegov.core.security import Private
-from onegov.pas import _
+from onegov.town6.views.party import (
+    add_party,
+    delete_party,
+    edit_party,
+    view_parties,
+    view_party,
+)
 from onegov.pas import PasApp
-from onegov.pas.collections import PartyCollection
+from onegov.pas.collections import PASPartyCollection
 from onegov.pas.forms import PartyForm
-from onegov.pas.layouts import PartyCollectionLayout
-from onegov.pas.layouts import PartyLayout
+from onegov.pas.layouts import PASPartyCollectionLayout
+from onegov.pas.layouts import PASPartyLayout
 from onegov.pas.models import PASParty
 
 from typing import TYPE_CHECKING
@@ -18,67 +23,35 @@ if TYPE_CHECKING:
 
 
 @PasApp.html(
-    model=PartyCollection,
+    model=PASPartyCollection,
     template='parties.pt',
     permission=Private
 )
-def view_parties(
-    self: PartyCollection,
+def pas_view_parties(
+    self: PASPartyCollection,
     request: TownRequest
 ) -> RenderData:
-
-    layout = PartyCollectionLayout(self, request)
-
-    filters = {}
-    filters['active'] = [
-        Link(
-            text=request.translate(title),
-            active=self.active == value,
-            url=request.link(self.for_filter(active=value))
-        ) for title, value in (
-            (_('Active'), True),
-            (_('Inactive'), False)
-        )
-    ]
-
-    return {
-        'add_link': request.link(self, name='new'),
-        'filters': filters,
-        'layout': layout,
-        'parties': self.query().all(),
-        'title': layout.title,
-    }
+    return view_parties(self, request, PASPartyCollectionLayout(self, request))
 
 
 @PasApp.form(
-    model=PartyCollection,
+    model=PASPartyCollection,
     name='new',
     template='form.pt',
     permission=Private,
     form=PartyForm
 )
-def add_party(
-    self: PartyCollection,
+def pas_add_party(
+    self: PASPartyCollection,
     request: TownRequest,
     form: PartyForm
 ) -> RenderData | Response:
-
-    if form.submitted(request):
-        party = self.add(**form.get_useful_data())
-        request.success(_('Added a new party'))
-
-        return request.redirect(request.link(party))
-
-    layout = PartyCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_('New'), '#'))
-    layout.include_editor()
-
-    return {
-        'layout': layout,
-        'title': _('New party'),
-        'form': form,
-        'form_width': 'large'
-    }
+    return add_party(
+        self,
+        request,
+        form,
+        PASPartyCollectionLayout(self, request)
+    )
 
 
 @PasApp.html(
@@ -86,18 +59,11 @@ def add_party(
     template='party.pt',
     permission=Private
 )
-def view_party(
+def pas_view_party(
     self: PASParty,
     request: TownRequest
 ) -> RenderData:
-
-    layout = PartyLayout(self, request)
-
-    return {
-        'layout': layout,
-        'party': self,
-        'title': layout.title,
-    }
+    return view_party(self, request, PASPartyLayout(self, request))
 
 
 @PasApp.form(
@@ -107,30 +73,13 @@ def view_party(
     permission=Private,
     form=PartyForm
 )
-def edit_party(
+def pas_edit_party(
     self: PASParty,
     request: TownRequest,
     form: PartyForm
 ) -> RenderData | Response:
 
-    if form.submitted(request):
-        form.populate_obj(self)
-        request.success(_('Your changes were saved'))
-        return request.redirect(request.link(self))
-
-    form.process(obj=self)
-
-    layout = PartyLayout(self, request)
-    layout.breadcrumbs.append(Link(_('Edit'), '#'))
-    layout.editbar_links = []
-    layout.include_editor()
-
-    return {
-        'layout': layout,
-        'title': layout.title,
-        'form': form,
-        'form_width': 'large'
-    }
+    return edit_party(self, request, form, PASPartyLayout(self, request))
 
 
 @PasApp.view(
@@ -138,12 +87,9 @@ def edit_party(
     request_method='DELETE',
     permission=Private
 )
-def delete_party(
+def pas_delete_party(
     self: PASParty,
     request: TownRequest
 ) -> None:
 
-    request.assert_valid_csrf_token()
-
-    collection = PartyCollection(request.session)
-    collection.delete(self)
+    return delete_party(self, request)

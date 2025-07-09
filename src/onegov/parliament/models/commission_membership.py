@@ -82,6 +82,13 @@ class CommissionMembership(Base, TimestampMixin):
         default='member'
     )
 
+    #: The function of the person in this commission
+    function: Column[str | None] = Column(
+        Text,
+        nullable=True,
+        default=None
+    )
+
     #: The role as translated text
     @property
     def role_label(self) -> str:
@@ -119,3 +126,11 @@ class CommissionMembership(Base, TimestampMixin):
             f'p={self.parliamentarian.title}, commission'
             f'={self.commission.name}'
         )
+
+
+class RISCommissionMembership(CommissionMembership):
+    __mapper_args__ = {
+        'polymorphic_identity': 'ris_commission_membership'
+    }
+
+    es_type_name = 'ris_commission_membership'

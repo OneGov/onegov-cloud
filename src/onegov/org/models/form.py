@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.core.orm.mixins import dict_property, meta_property
 from onegov.form.models import FormDefinition
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import ContactExtension
@@ -27,6 +28,8 @@ class BuiltinFormDefinition(FormDefinition, AccessExtension,
     es_type_name = 'builtin_forms'
     es_id = 'name'
 
+    show_vat: dict_property[bool] = meta_property(default=False)
+
     # FIXME: should this have a setter?
     @property
     def extensions(self) -> tuple[str, ...]:  # type:ignore[override]
@@ -42,6 +45,8 @@ class CustomFormDefinition(FormDefinition, AccessExtension,
     es_type_name = 'custom_forms'
     es_id = 'name'
     default_extensions = ['honeypot']
+
+    show_vat: dict_property[bool] = meta_property(default=False)
 
     # FIXME: should this have a setter?
     @property

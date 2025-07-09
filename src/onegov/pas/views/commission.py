@@ -2,15 +2,21 @@ from __future__ import annotations
 
 from onegov.core.elements import Link
 from onegov.core.security import Private
+from onegov.town6.views.commission import (
+    view_commissions,
+    add_commission,
+    edit_commission,
+    delete_commission
+)
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import AttendenceCollection
-from onegov.pas.collections import CommissionCollection
+from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.forms import AttendenceAddCommissionForm
 from onegov.pas.forms import CommissionMembershipAddForm
 from onegov.pas.forms import CommissionForm
-from onegov.pas.layouts import CommissionCollectionLayout
-from onegov.pas.layouts import CommissionLayout
+from onegov.pas.layouts import PASCommissionCollectionLayout
+from onegov.pas.layouts import PASCommissionLayout
 from onegov.pas.models import PASChange
 from onegov.pas.models import PASCommission
 from onegov.pas.models import PASCommissionMembership
@@ -23,67 +29,32 @@ if TYPE_CHECKING:
 
 
 @PasApp.html(
-    model=CommissionCollection,
+    model=PASCommissionCollection,
     template='commissions.pt',
     permission=Private
 )
-def view_commissions(
-    self: CommissionCollection,
+def pas_view_commissions(
+    self: PASCommissionCollection,
     request: TownRequest
-) -> RenderData:
-
-    layout = CommissionCollectionLayout(self, request)
-
-    filters = {}
-    filters['active'] = [
-        Link(
-            text=request.translate(title),
-            active=self.active == value,
-            url=request.link(self.for_filter(active=value))
-        ) for title, value in (
-            (_('Active'), True),
-            (_('Inactive'), False)
-        )
-    ]
-
-    return {
-        'add_link': request.link(self, name='new'),
-        'filters': filters,
-        'layout': layout,
-        'commissions': self.query().all(),
-        'title': layout.title,
-    }
+) -> RenderData | Response:
+    return view_commissions(
+        self, request, PASCommissionCollectionLayout(self, request))
 
 
 @PasApp.form(
-    model=CommissionCollection,
+    model=PASCommissionCollection,
     name='new',
     template='form.pt',
     permission=Private,
     form=CommissionForm
 )
-def add_commission(
-    self: CommissionCollection,
+def pas_add_commission(
+    self: PASCommissionCollection,
     request: TownRequest,
     form: CommissionForm
 ) -> RenderData | Response:
-
-    if form.submitted(request):
-        commission = self.add(**form.get_useful_data())
-        request.success(_('Added a new commission'))
-
-        return request.redirect(request.link(commission))
-
-    layout = CommissionCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_('New'), '#'))
-    layout.include_editor()
-
-    return {
-        'layout': layout,
-        'title': _('New commission'),
-        'form': form,
-        'form_width': 'large'
-    }
+    return add_commission(
+        self, request, form, PASCommissionCollectionLayout(self, request))
 
 
 @PasApp.html(
@@ -91,12 +62,12 @@ def add_commission(
     template='commission.pt',
     permission=Private
 )
-def view_commission(
+def pas_view_commission(
     self: PASCommission,
     request: TownRequest
 ) -> RenderData:
 
-    layout = CommissionLayout(self, request)
+    layout = PASCommissionLayout(self, request)
 
     return {
         'layout': layout,
@@ -112,30 +83,13 @@ def view_commission(
     permission=Private,
     form=CommissionForm
 )
-def edit_commission(
+def pas_edit_commission(
     self: PASCommission,
     request: TownRequest,
     form: CommissionForm
 ) -> RenderData | Response:
-
-    if form.submitted(request):
-        form.populate_obj(self)
-        request.success(_('Your changes were saved'))
-        return request.redirect(request.link(self))
-
-    form.process(obj=self)
-
-    layout = CommissionLayout(self, request)
-    layout.breadcrumbs.append(Link(_('Edit'), '#'))
-    layout.editbar_links = []
-    layout.include_editor()
-
-    return {
-        'layout': layout,
-        'title': layout.title,
-        'form': form,
-        'form_width': 'large'
-    }
+    return edit_commission(
+        self, request, form, PASCommissionLayout(self, request))
 
 
 @PasApp.view(
@@ -143,15 +97,11 @@ def edit_commission(
     request_method='DELETE',
     permission=Private
 )
-def delete_commission(
+def pas_delete_commission(
     self: PASCommission,
     request: TownRequest
 ) -> None:
-
-    request.assert_valid_csrf_token()
-
-    collection = CommissionCollection(request.session)
-    collection.delete(self)
+    return delete_commission(self, request)
 
 
 @PasApp.form(
@@ -161,7 +111,7 @@ def delete_commission(
     permission=Private,
     form=CommissionMembershipAddForm
 )
-def add_commission_membership(
+def pas_add_commission_membership(
     self: PASCommission,
     request: TownRequest,
     form: CommissionMembershipAddForm
@@ -174,7 +124,7 @@ def add_commission_membership(
         request.success(_('Added a new parliamentarian'))
         return request.redirect(request.link(self))
 
-    layout = CommissionLayout(self, request)
+    layout = PASCommissionLayout(self, request)
     layout.breadcrumbs.append(Link(_('New parliamentarian'), '#'))
     layout.include_editor()
 
@@ -193,7 +143,7 @@ def add_commission_membership(
     permission=Private,
     form=AttendenceAddCommissionForm
 )
-def add_plenary_attendence(
+def pas_add_plenary_attendence(
     self: PASCommission,
     request: TownRequest,
     form: AttendenceAddCommissionForm
@@ -213,7 +163,7 @@ def add_plenary_attendence(
 
         return request.redirect(request.link(self))
 
-    layout = CommissionLayout(self, request)
+    layout = PASCommissionLayout(self, request)
     layout.breadcrumbs.append(Link(_('New commission meeting'), '#'))
 
     return {

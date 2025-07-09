@@ -4,9 +4,9 @@ from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import CommissionMembershipCollection
+from onegov.pas.collections import PASCommissionMembershipCollection
 from onegov.pas.forms import CommissionMembershipForm
-from onegov.pas.layouts import CommissionMembershipLayout
+from onegov.pas.layouts import PASCommissionMembershipLayout
 from onegov.pas.models import PASCommissionMembership
 
 from typing import TYPE_CHECKING
@@ -26,7 +26,7 @@ def view_commission_membership(
     request: TownRequest
 ) -> RenderData:
 
-    layout = CommissionMembershipLayout(self, request)
+    layout = PASCommissionMembershipLayout(self, request)
 
     return {
         'layout': layout,
@@ -55,7 +55,7 @@ def edit_commission_membership(
 
     form.process(obj=self)
 
-    layout = CommissionMembershipLayout(self, request)
+    layout = PASCommissionMembershipLayout(self, request)
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
 
@@ -79,5 +79,5 @@ def delete_commission_membership(
 
     request.assert_valid_csrf_token()
 
-    collection = CommissionMembershipCollection(request.session)
+    collection = PASCommissionMembershipCollection(request.session)
     collection.delete(self)

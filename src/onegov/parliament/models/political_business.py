@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING, TypeAlias, Literal
 if TYPE_CHECKING:
     import uuid
 
+    from onegov.parliament.models.meeting_item import MeetingItem
     from datetime import date
 
     from onegov.parliament.models import RISParliamentarian
@@ -33,6 +34,7 @@ if TYPE_CHECKING:
         'urgent interpellation',  # Dringliche Interpellation
         'invitation',  # Einladung
         'interpelleation',  # Interpellation
+        'interpellation',  # Interpellation
         'commission report',  # Kommissionsbericht
         'communication',  # Mitteilung
         'motion',  # Motion
@@ -44,11 +46,20 @@ if TYPE_CHECKING:
     ]
 
     PoliticalBusinessStatus: TypeAlias = Literal[
-        'pending legislative',
-        'pending executive',
-        'substantial',
-        'converted',
+        'abgeschrieben',
+        'beantwortet',
+        'erheblich_erklaert',
+        'erledigt',
+        'nicht_erheblich_erklaert',
+        'nicht_zustandegekommen',
+        'pendent_exekutive',
+        'pendent_legislative',
+        'rueckzug',
+        'umgewandelt',
+        'zurueckgewiesen',
+        'ueberwiesen',
     ]
+
 
 POLITICAL_BUSINESS_TYPE: dict[PoliticalBusinessType, str] = {
     'inquiry': _('Inquiry'),
@@ -61,6 +72,7 @@ POLITICAL_BUSINESS_TYPE: dict[PoliticalBusinessType, str] = {
     'urgent interpellation': _('Urgent Interpellation'),
     'invitation': _('Invitation'),
     'interpelleation': _('Interpellation'),
+    'interpellation': _('Interpellation'),
     'commission report': _('Commission Report'),
     'communication': _('Communication'),
     'motion': _('Motion'),
@@ -72,10 +84,18 @@ POLITICAL_BUSINESS_TYPE: dict[PoliticalBusinessType, str] = {
 }
 
 POLITICAL_BUSINESS_STATUS: dict[PoliticalBusinessStatus, str] = {
-    'pending legislative': _('Pending legislative'),
-    'pending executive': _('Pending executive'),
-    'substantial': _('Substantial'),
-    'converted': _('Converted'),
+    'abgeschrieben': _('Abgeschrieben'),
+    'beantwortet': _('Beantwortet'),
+    'erheblich_erklaert': _('Erheblich erklärt'),
+    'erledigt': _('Erledigt'),
+    'nicht_erheblich_erklaert': _('Nicht erheblich erklärt'),
+    'nicht_zustandegekommen': _('Nicht zustandegekommen'),
+    'pendent_exekutive': _('Pendent Exekutive'),
+    'pendent_legislative': _('Pendent Legislative'),
+    'rueckzug': _('Rückzug'),
+    'umgewandelt': _('Umgewandelt'),
+    'zurueckgewiesen': _('Zurückgewiesen'),
+    'ueberwiesen': _('Überwiesen'),
 }
 
 
@@ -85,6 +105,22 @@ class PoliticalBusiness(
     ContentMixin,
     ORMSearchable
 ):
+
+    GERMAN_STATUS_NAME_TO_VALUE_MAP: dict[str, str] = {
+        'Abgeschrieben': 'written_off',
+        'Beantwortet': 'answered',
+        'Erheblich erklärt': 'declared_significant',
+        'Erledigt': 'completed',
+        'Nicht erheblich erklärt': 'declared_insignificant',
+        'Nicht zustandegekommen': 'not_realized',
+        'Pendent Exekutive': 'pending_executive',
+        'Pendent Legislative': 'pending legislative',
+        'Rückzug': 'withdrawn',
+        'Umgewandelt': 'converted',
+        'Zurückgewiesen': 'rejected',
+        'Überwiesen': 'referred',
+    }
+
     # Politisches Geschäft
 
     __tablename__ = 'par_political_businesses'
@@ -149,9 +185,11 @@ class PoliticalBusiness(
         'PoliticalBusinessParticipation',
         back_populates='political_business',
         lazy='joined',
+        order_by='PoliticalBusinessParticipation.participant_type',
     )
 
     #: parliamentary group (Fraktion)
+    # FIXME: make multiple groups possible
     parliamentary_group_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('par_parliamentary_groups.id'),
@@ -165,10 +203,23 @@ class PoliticalBusiness(
         order_by=Meeting.start_datetime,
         lazy='joined',
     )
+    meeting_items: relationship[list[MeetingItem]] = relationship(
+        'MeetingItem',
+        back_populates='political_business'
+    )
 
     def __repr__(self) -> str:
         return (f'<Political Business {self.number}, '
                 f'{self.title}, {self.political_business_type}>')
+
+
+class RISPoliticalBusiness(PoliticalBusiness):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'ris_political_business',
+    }
+
+    es_type_name = 'ris_political_business'
 
 
 class PoliticalBusinessParticipation(Base, ContentMixin):
@@ -208,10 +259,11 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
         nullable=False,
     )
 
-    #:
-    participant_type: Column[str] = Column(
-        Enum('author', 'participant', name='par_participant_type'),
-        nullable=False,
+    #: the function of the parliamentarian in the political business
+    participant_type: Column[str | None] = Column(
+        Text,
+        nullable=True,
+        default=None
     )
 
     #: the related political business
@@ -226,3 +278,14 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
         'RISParliamentarian',
         back_populates='political_businesses',
     )
+
+
+class RISPoliticalBusinessParticipation(
+    PoliticalBusinessParticipation
+):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'ris_political_business_participation',
+    }
+
+    es_type_name = 'ris_political_business_participation'

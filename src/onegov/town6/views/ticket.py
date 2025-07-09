@@ -6,7 +6,8 @@ from onegov.org.views.ticket import (
     view_ticket, handle_new_note, handle_edit_note, message_to_submitter,
     view_ticket_status, view_tickets, view_archived_tickets,
     view_pending_tickets, assign_ticket, view_send_to_gever,
-    view_delete_all_archived_tickets, delete_ticket, change_tag)
+    view_delete_all_archived_tickets, delete_ticket, change_tag,
+    view_my_tickets)
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.town6 import TownApp
 from onegov.org.forms import (
@@ -15,11 +16,11 @@ from onegov.org.forms import (
 from onegov.org.forms import TicketChatMessageForm
 from onegov.org.models import TicketNote
 from onegov.org.models.resource import FindYourSpotCollection
-from onegov.town6 import _
 from onegov.ticket import Ticket
 from onegov.ticket.collection import TicketCollection
+from onegov.town6 import _
 from onegov.town6.layout import (
-    FindYourSpotLayout, TicketLayout, TicketNoteLayout,
+    DefaultLayout, FindYourSpotLayout, TicketLayout, TicketNoteLayout,
     TicketChatMessageLayout, TicketsLayout, ArchivedTicketsLayout)
 
 
@@ -188,3 +189,17 @@ def town_delete_ticket(
 ) -> RenderData | Response:
     return delete_ticket(
         self, request, form=form, layout=TicketLayout(self, request))
+
+
+@TownApp.html(
+    model=TicketCollection,
+    name='my-tickets',
+    template='pending_tickets.pt',
+    permission=Public
+)
+def town_view_my_tickets(
+    self: TicketCollection,
+    request: TownRequest,
+    layout: DefaultLayout | None = None
+) -> RenderData:
+    return view_my_tickets(self, request, DefaultLayout(self, request))

@@ -27,6 +27,7 @@ from onegov.org.forms import TicketChatMessageForm
 from onegov.org.forms import TicketNoteForm
 from onegov.org.layout import (
     FindYourSpotLayout, DefaultMailLayout, ArchivedTicketsLayout)
+from onegov.org.layout import DefaultLayout
 from onegov.org.layout import TicketChatMessageLayout
 from onegov.org.layout import TicketNoteLayout
 from onegov.org.layout import TicketsLayout
@@ -38,7 +39,9 @@ from onegov.org.models import (
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter, ReservationHandler
 from onegov.org.pdf.ticket import TicketPdf
+from onegov.org.utils import get_current_tickets_url
 from onegov.org.views.message import view_messages_feed
+from onegov.org.views.utils import assert_citizen_logged_in
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
@@ -198,9 +201,7 @@ def delete_ticket(
 
         request.session.delete(self)
         request.success(_('Ticket successfully deleted'))
-        return morepath.redirect(
-            request.link(TicketCollection(request.session))
-        )
+        return morepath.redirect(get_current_tickets_url(request))
 
     return {
         'layout': layout,
@@ -636,8 +637,7 @@ def close_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
             if email_missing:
                 request.alert(_('The submitter email is not available'))
 
-    return morepath.redirect(
-        request.link(TicketCollection(request.session)))
+    return morepath.redirect(get_current_tickets_url(request))
 
 
 @OrgApp.view(model=Ticket, name='reopen', permission=Private)
@@ -1257,13 +1257,26 @@ def groups_by_handler_code(session: Session) -> dict[str, list[str]]:
     return groups
 
 
-@OrgApp.html(model=TicketCollection, template='tickets.pt',
-             permission=Private)
+@OrgApp.html(
+    model=TicketCollection,
+    template='tickets.pt',
+    permission=Private
+)
 def view_tickets(
     self: TicketCollection,
     request: OrgRequest,
     layout: TicketsLayout | None = None
 ) -> RenderData:
+
+    # remember where we last were in the tickets view
+    request.browser_session.tickets_state = {
+        'handler': self.handler,
+        'group': self.group,
+        'state': self.state,
+        'owner': self.owner,
+        'page': self.page,
+        'extra_parameters': self.extra_parameters,
+    }
 
     groups = groups_by_handler_code(request.session)
     handlers = tuple(get_handlers(self, request, groups))
@@ -1293,8 +1306,11 @@ def view_tickets(
     }
 
 
-@OrgApp.html(model=ArchivedTicketCollection, template='archived_tickets.pt',
-             permission=Private)
+@OrgApp.html(
+    model=ArchivedTicketCollection,
+    template='archived_tickets.pt',
+    permission=Private
+)
 def view_archived_tickets(
     self: ArchivedTicketCollection,
     request: OrgRequest,
@@ -1328,8 +1344,12 @@ def view_archived_tickets(
     }
 
 
-@OrgApp.html(model=ArchivedTicketCollection, name='delete',
-             request_method='DELETE', permission=Secret)
+@OrgApp.html(
+    model=ArchivedTicketCollection,
+    name='delete',
+    request_method='DELETE',
+    permission=Secret
+)
 def view_delete_all_archived_tickets(
     self: ArchivedTicketCollection,
     request: OrgRequest
@@ -1408,5 +1428,39 @@ def view_pending_tickets(
     return {
         'title': _('Submitted Requests'),
         'layout': layout or FindYourSpotLayout(self, request),
+        'tickets': tickets,
+    }
+
+
+@OrgApp.html(
+    model=TicketCollection,
+    name='my-tickets',
+    template='pending_tickets.pt',
+    permission=Public
+)
+def view_my_tickets(
+    self: TicketCollection,
+    request: OrgRequest,
+    layout: DefaultLayout | None = None
+) -> RenderData:
+
+    assert_citizen_logged_in(request)
+    assert request.authenticated_email
+
+    tickets = (
+        self.by_ticket_email(request.authenticated_email)
+        .order_by(Ticket.created.desc())
+        .all()
+    )
+
+    layout = layout or DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Submitted Requests'), '#')
+    ]
+
+    return {
+        'title': _('Submitted Requests'),
+        'layout': layout,
         'tickets': tickets,
     }

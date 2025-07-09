@@ -25,10 +25,10 @@ from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
 from onegov.reservation import Resource
-from onegov.ticket import TicketCollection, TicketPermission
+from onegov.ticket import Ticket, TicketCollection, TicketPermission
 from onegov.user import User, UserGroup
 from operator import add, attrgetter
-from sqlalchemy import nullsfirst  # type:ignore[attr-defined]
+from sqlalchemy import case, nullsfirst  # type:ignore[attr-defined]
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
@@ -42,11 +42,11 @@ if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
     from onegov.pay.types import PriceDict
     from onegov.reservation import Allocation, Reservation
-    from onegov.ticket import Ticket
     from pytz.tzinfo import DstTzInfo, StaticTzInfo
     from sqlalchemy.orm import Query
     from sqlalchemy import Column
     from typing import Self, TypeAlias, TypeVar
+    from uuid import UUID
 
     _T = TypeVar('_T')
     _DeltaT = TypeVar('_DeltaT')
@@ -552,7 +552,7 @@ class AllocationEventInfo:
             {
                 'name': self.resource.name,
                 'date': self.allocation.display_start(),
-                'view': 'agendaDay'
+                'view': 'timeGridDay'
             },
             name='occupancy'
         )
@@ -620,11 +620,13 @@ class AllocationEventInfo:
             'start': self.event_start,
             'end': self.event_end,
             'title': self.event_title,
+            'classNames': list(self.event_classes),
+            'display': 'block',
+            # extended properties
             'wholeDay': self.allocation.whole_day,
             'partlyAvailable': self.allocation.partly_available,
             'quota': self.allocation.quota,
             'quotaLeft': self.quota_left,
-            'className': ' '.join(self.event_classes),
             'partitions': self.allocation.availability_partitions(),
             'actions': [
                 link(self.request)
@@ -679,7 +681,7 @@ class AvailabilityEventInfo:
             'start': self.event_start,
             'end': self.event_end,
             'editable': False,
-            'rendering': 'background',
+            'display': 'background',
         }
 
 
@@ -706,7 +708,7 @@ class ReservationEventInfo:
         resource: Resource,
         reservation: Reservation,
         ticket: Ticket,
-        request: OrgRequest
+        request: OrgRequest,
     ) -> None:
 
         self.resource = resource
@@ -733,6 +735,23 @@ class ReservationEventInfo:
             for reservation, ticket in reservations
         ]
 
+    @classmethod
+    def from_resources(
+        cls,
+        request: OrgRequest,
+        reservations: Iterable[tuple[Resource, Reservation, Ticket]]
+    ) -> list[Self]:
+
+        return [
+            cls(
+                resource,
+                reservation,
+                ticket,
+                request
+            )
+            for resource, reservation, ticket in reservations
+        ]
+
     @property
     def event_start(self) -> str:
         return self.reservation.display_start().isoformat()
@@ -740,13 +759,6 @@ class ReservationEventInfo:
     @property
     def event_end(self) -> str:
         return self.reservation.display_end().isoformat()
-
-    @property
-    def event_identification(self) -> str:
-        return '{:%d.%m.%Y}: {}'.format(
-            self.reservation.display_start(),
-            self.event_time
-        )
 
     @property
     def whole_day(self) -> bool:
@@ -827,22 +839,143 @@ class ReservationEventInfo:
         return not self.accepted
 
     def as_dict(self) -> dict[str, Any]:
+        is_manager = self.request.is_manager
         return {
             'id': self.reservation.id,
             'start': self.event_start,
             'end': self.event_end,
-            'color': self.color,
+            'backgroundColor': self.color,
             'title': self.event_title,
+            'classNames': list(self.event_classes),
+            'url': self.request.link(self.ticket)
+            if is_manager else self.request.link(self.ticket, name='status'),
+            'display': 'block',
+            # extended properties
             'wholeDay': self.whole_day,
-            'quota': self.reservation.quota,
-            'className': ' '.join(self.event_classes),
-            'url': self.request.link(self.ticket),
-            'editable': self.editable,
+            'editable': is_manager and self.editable,
             'editurl': self.request.csrf_protected_url(self.request.link(
                 self.ticket,
                 name='adjust-reservation',
                 query_params={'reservation-id': str(self.reservation.id)}
-            )),
+            )) if is_manager else None,
+        }
+
+
+class MyReservationEventInfo:
+
+    __slots__ = (
+        'id',
+        'token',
+        'start',
+        'end',
+        'timezone',
+        'accepted',
+        'resource',
+        'ticket_id',
+        'handler_code',
+        'ticket_number',
+        'key_code',
+        'request',
+        'translate',
+    )
+
+    def __init__(
+        self,
+        id: int,
+        token: str,
+        start: datetime,
+        end: datetime,
+        accepted: bool,
+        timezone: str,
+        resource: str,
+        ticket_id: UUID,
+        handler_code: str,
+        ticket_number: str,
+        key_code: str | None,
+        request: OrgRequest,
+    ) -> None:
+
+        self.id = id
+        self.token = token
+        self.start = sedate.to_timezone(start, timezone)
+        self.end = sedate.to_timezone(
+            end + timedelta(microseconds=1),
+            timezone
+        )
+        self.timezone = timezone
+        self.accepted = accepted
+        self.resource = resource
+        self.ticket_id = ticket_id
+        self.handler_code = handler_code
+        self.key_code = key_code
+        self.request = request
+        self.translate = request.translate
+
+    @property
+    def event_start(self) -> str:
+        return self.start.isoformat()
+
+    @property
+    def event_end(self) -> str:
+        return self.end.isoformat()
+
+    @property
+    def whole_day(self) -> bool:
+        start = self.start
+        end = self.end
+        tz = self.timezone
+        return sedate.is_whole_day(start, end, tz)
+
+    @property
+    def event_time(self) -> str:
+        if self.whole_day:
+            return self.translate(_('Whole day'))
+        else:
+            return render_time_range(self.start, self.end)
+
+    @property
+    def event_title(self) -> str:
+        return '\n'.join(part for part in (
+            self.resource,
+            self.event_time,
+            f'{self.translate(_("Key Code"))}: {self.key_code}'
+            if self.key_code else '',
+            self.translate(_('Pending approval')) if not self.accepted else '',
+        ) if part)
+
+    @property
+    def event_classes(self) -> Iterator[str]:
+        if self.accepted:
+            yield 'event-accepted'
+        else:
+            yield 'event-pending'
+
+        # HACK: Find event element by id, it would be better if fullcalendar
+        #       generated an element id we could use, but we'll work with
+        #       what we have.
+        yield f'event-{self.id}'
+
+    def as_dict(self) -> dict[str, Any]:
+        is_manager = self.request.is_manager
+        return {
+            'id': self.id,
+            'start': self.event_start,
+            'end': self.event_end,
+            'title': self.event_title,
+            'classNames': list(self.event_classes),
+            'url': self.request.class_link(
+                Ticket,
+                {
+                    'handler_code': self.handler_code,
+                    'id': self.ticket_id
+                },
+                name='' if is_manager else 'status'
+            ),
+            'display': 'block',
+            # extended properties
+            'wholeDay': self.whole_day,
+            'editable': False,
+            'editurl': None,
         }
 
 
@@ -1378,19 +1511,25 @@ def emails_for_new_ticket(
         general_condition | (TicketPermission.group == ticket.group)
     )
 
-    for username, realname in query.join(UserGroup.users).with_entities(
-        User.username,
-        User.realname,
+    for email, name in query.join(UserGroup.users).with_entities(
+        case([(
+            UserGroup.meta['shared_email'].isnot(None),
+            UserGroup.meta['shared_email'].astext,
+        )], else_=User.username),
+        case([(
+            UserGroup.meta['shared_email'].isnot(None),
+            UserGroup.name,
+        )], else_=User.realname),
     ).distinct():
 
-        if username in seen:
+        if email in seen:
             continue
 
-        seen.add(username)
+        seen.add(email)
         try:
             yield Address(
-                display_name=realname or '',
-                addr_spec=username
+                display_name=name or '',
+                addr_spec=email
             )
         except ValueError:
             # if it's not a valid address then skip it
@@ -1491,3 +1630,12 @@ def format_phone_number(phone_number: str) -> str:
         )
     except phonenumbers.phonenumberutil.NumberParseException:
         return phone_number
+
+
+def get_current_tickets_url(request: OrgRequest) -> str:
+    """ Get the tickets url with the parameters we last visited. """
+    state = request.browser_session.get('tickets_state')
+    return request.class_link(
+        TicketCollection,
+        state or {'handler': 'ALL', 'state': 'open', 'page': 0}
+    )

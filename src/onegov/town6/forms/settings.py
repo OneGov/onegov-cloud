@@ -277,3 +277,12 @@ class ChatSettingsForm(Form):
 
     def on_request(self) -> None:
         self.populate_chat_staff()
+
+
+class RISEnableForm(Form):
+
+    ris_enabled = BooleanField(
+        label=_('Enable RIS'),
+        description=_('Enables the RIS integration for this organisation.'),
+        default=False
+    )

@@ -216,6 +216,17 @@ class FormSubmissionHandler(Handler):
     def payment(self) -> Payment | None:
         return self.submission.payment if self.submission is not None else None
 
+    # FIXME: This should probably be cached on the ticket/submission
+    #        so it can't change throughout the ticket's lifespan
+    #        however this VAT stuff will probably still change quite
+    #        a bit, so for now this simple solution should be fine.
+    @property
+    def show_vat(self) -> bool:
+        return (
+            getattr(self.submission.form, 'show_vat', False)
+            if self.submission is not None else False
+        )
+
     @property
     def extra_data(self) -> list[str]:
         return [
@@ -250,6 +261,7 @@ class FormSubmissionHandler(Handler):
                 'form': self.form,
                 'layout': layout,
                 'price': self.submission.payment,
+                'show_vat': self.show_vat,
             })
         return Markup('')
 
@@ -535,6 +547,7 @@ class ReservationHandler(Handler):
                 'reservations': self.reservations,
                 'get_links': self.get_reservation_links
                 if self.ticket.state == 'pending' else None,
+                'get_occupancy_url': self.get_occupancy_url,
                 'layout': layout
             })
         )
@@ -672,6 +685,26 @@ class ReservationHandler(Handler):
             ))
 
         return links
+
+    def get_occupancy_url(
+        self,
+        reservation: Reservation,
+        request: OrgRequest
+    ) -> str | None:
+
+        if self.deleted:
+            return None
+
+        assert self.resource is not None
+        return request.class_link(
+            Resource,
+            {
+                'name': self.resource.name,
+                'date': reservation.display_start(),
+                'view': 'timeGridDay'
+            },
+            name='occupancy'
+        )
 
     def get_links(  # type:ignore[override]
         self,

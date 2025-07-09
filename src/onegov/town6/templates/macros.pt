@@ -230,10 +230,11 @@
 <metal:footer_links define-macro="footer_links" i18n:domain="onegov.town6">
 <div class="medium-4 cell"></div>
 <div class="small-12 medium-4 cell footer-links">
-    <tal:b condition="not request.app.org.hide_onegov_footer|True">
+    <tal:b tal:condition="not request.app.org.hide_onegov_footer|True">
         <span>
             <a href="https://www.admin.digital">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
         </span>
+        <br/>
         <span>
             <a href="https://www.admin.digital/datenschutz" i18n:translate>
                 Privacy Protection
@@ -243,6 +244,11 @@
     <span tal:condition="not request.is_logged_in">
         <a href="${layout.login_from_path()}" i18n:translate>
             Login
+        </a>
+    </span>
+    <span tal:condition="request.app.org.citizen_login_enabled and not request.authenticated_email">
+        <a href="${layout.citizen_login_from_path()}" i18n:translate>
+            Citizen Login
         </a>
     </span>
     <span tal:define="about_url layout.org.meta.about_url|nothing" tal:condition="about_url">
@@ -1025,12 +1031,55 @@
 </metal:directory_entry_submission>
 
 <metal:price define-macro="price">
-    ${layout.format_number(price.net_amount)} ${price.currency}
-    <tal:b condition="price.fee and show_fee|nothing">
-        (+ ${layout.format_number(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
+    <tal:b tal:define="show_fee show_fee|False; show_vat show_vat|False">
+        ${layout.format_number(price.net_amount if show_fee else price.amount)} ${price.currency}
+        <tal:b condition="show_fee and price.fee">
+            (+ ${layout.format_number(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
+        </tal:b>
+        <tal:b tal:define="vat_amount layout.get_vat_amount(price.amount); hide_vat_amount hide_vat_amount|False" tal:condition="show_vat and layout.vat_rate and vat_amount">
+            <br>
+            (<tal:b i18n:translate>VAT</tal:b> <tal:b i18n:translate><tal:b i18n:name="vat_rate">${layout.format_number(layout.vat_rate, 1)}</tal:b>% included</tal:b><tal:b tal:condition="not:hide_vat_amount">: ${layout.format_number(vat_amount, 2)} ${price.currency}</tal:b>)
+        </tal:b>
     </tal:b>
-    <br>${layout.format_vat(price.net_amount, price.currency)}
 </metal:price>
+
+<metal:payment define-macro="payment" i18n:domain="onegov.town6">
+    <tal:b tal:define="show_fee show_fee|False" tal:condition="payment|nothing">
+        <h2 i18n:translate>Payment</h2>
+        <dl class="field-display">
+            <dt i18n:translate>Total Amount</dt>
+            <dd>${layout.format_number(payment.amount)} ${payment.currency}</dd>
+        </dl>
+        <dl class="field-display" tal:define="show_vat show_vat|False; vat_amount layout.get_vat_amount(payment.amount); hide_vat_amount hide_vat_amount|False" tal:condition="show_vat and layout.vat_rate and vat_amount">
+            <dt i18n:translate>Value Added Tax</dt>
+            <dd><tal:b i18n:translate><tal:b i18n:name="vat_rate">${layout.format_number(layout.vat_rate, 1)}</tal:b>% included</tal:b><tal:b tal:condition="not:hide_vat_amount">: ${layout.format_number(vat_amount, 2)} ${payment.currency}</tal:b></dd>
+        </dl>
+        <dl class="field-display">
+            <dt i18n:translate>State</dt>
+            <dd><tal:b metal:use-macro="layout.macros['payment_status']" /></dd>
+        </dl>
+        <dl class="field-display" tal:condition="not:show_fee">
+            <dt i18n:translate>Payment Method</dt>
+            <dd tal:switch="payment.source">
+                <tal:b tal:case="'manual'" i18n:translate>Offline Payment</tal:b>
+                <tal:b tal:case="default" i18n:translate>Online Payment</tal:b>
+            </dd>
+        </dl>
+        <dl class="field-display" tal:condition="show_fee">
+            <dt i18n:translate>Source</dt>
+            <dd tal:switch="payment.source">
+                <tal:b tal:case="'manual'" i18n:translate>Manual</tal:b>
+                <tal:b tal:case="'datatrans'" i18n:translate>Datatrans</tal:b>
+                <tal:b tal:case="'stripe_connect'" i18n:translate>Stripe Connect</tal:b>
+                <tal:b tal:case="'worldline_saferpay'" i18n:translate>Worldline Saferpay</tal:b>
+            </dd>
+        </dl>
+        <dl tal:condition="show_fee and payment.fee" class="field-display">
+            <dt i18n:translate>Fee</dt>
+            <dd>${layout.format_number(payment.fee)</dd>
+        </dl>
+    </tal:b>
+</metal:payment>
 
 <metal:person_card define-macro="person_list_card" i18n:domain="onegov.town6">
     <div class="person-card person-list-card card-section" tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)">
@@ -1294,14 +1343,16 @@
 </metal:reservations>
 
 <metal:reservations define-macro="reservations" i18n:domain="onegov.town6">
-    <ul tal:condition="reservations" tal:define="get_links get_links|None" class="reservations">
+    <ul tal:condition="reservations" tal:define="get_links get_links|None; get_occupancy_url get_occupancy_url|None" class="reservations">
         <li tal:repeat="reservation reservations" tal:attributes="class 'reservation' if get_links else None">
-            <tal:b define="start reservation.display_start(); end reservation.display_end(); links get_links(reservation, request) if get_links else []">
+            <tal:b define="start reservation.display_start(); end reservation.display_end(); links get_links(reservation, request) if get_links else []; url get_occupancy_url(reservation, request) if get_occupancy_url else None">
                 <div class="reservation-details" tal:omit-tag="not:links">
-                    <strong>
-                        ${layout.format_date(start, 'weekday_long')},
-                        ${layout.format_date(start, 'date_long')}
-                    </strong>
+                    <a href="${url}" title="Occupancy" tal:omit-tag="not:url" i18n:attributes="title">
+                        <strong>
+                            ${layout.format_date(start, 'weekday_long')},
+                            ${layout.format_date(start, 'date_long')}
+                        </strong>
+                    </a>
                     <!--! simple whole day check: -->
                     <span tal:condition="start.time() != end.time()">
                         <br>
@@ -2249,9 +2300,9 @@
                 <span class="h5 list-title">${record.title}</span>
                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
         </a>
-        <a tal:attributes="href link_func(record); target link">
-            <p class="list-lead preview" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
+        <a tal:attributes="href link_func(record); target link" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
                 tal:content="lead" tal:condition="lead">
+            <p class="list-lead preview" >
             </p>
             <div class="list-hint hints" tal:define="hint hint(record)|False"
                 tal:content="hint" tal:condition="hint">

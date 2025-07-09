@@ -613,6 +613,11 @@ def get_disabled_extensions() -> Collection[str]:
     return ()
 
 
+@OrgApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return True
+
+
 @OrgApp.setting(section='org', name='render_mtan_access_limit_exceeded')
 def get_render_mtan_access_limit_exceeded(
 ) -> Callable[[MTANAccessLimitExceeded, OrgRequest], Response]:
@@ -703,7 +708,6 @@ def get_sortable_asset() -> Iterator[str]:
 
 @OrgApp.webasset('fullcalendar')
 def get_fullcalendar_asset() -> Iterator[str]:
-    yield 'fullcalendar.css'
     yield 'fullcalendar.js'
     yield 'fullcalendar.de.js'
     yield 'fullcalendar.fr.js'
@@ -873,6 +877,11 @@ def get_all_blank_asset() -> Iterator[str]:
 @OrgApp.webasset('people-select')
 def people_select_asset() -> Iterator[str]:
     yield 'people-select.js'
+
+
+@OrgApp.webasset('kaba-configurations')
+def kaba_configurations_asset() -> Iterator[str]:
+    yield 'kaba-configurations.js'
 
 
 @OrgApp.webasset('mapbox_address_autofill')

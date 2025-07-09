@@ -73,6 +73,8 @@ class ReservationForm(Form):
 
         choices.insert(0, ('', ''))
 
+        self.css_class = 'resettable'
+
         auto_fill_data = {
             tag: filtered_meta
             for item in self.request.app.org.ticket_tags
