@@ -28,15 +28,15 @@ class PaymentSearchForm(Form):
 
     tz = 'Europe/Zurich'
 
-    start_date = TimezoneDateTimeField(
-        label=_('From date'),
+    reservation_start_date = TimezoneDateTimeField(
+        label=_('From reservation date'),
                 timezone=tz,
         fieldset=_('Filter Payments'),
                 validators=[StrictOptional()]
     )
 
-    end_date = TimezoneDateTimeField(
-        label=_('To date'),
+    reservation_end_date = TimezoneDateTimeField(
+        label=_('To reservation date'),
         timezone=tz,
         fieldset=_('Filter Payments'),
                 validators=[StrictOptional()]
@@ -76,8 +76,8 @@ class PaymentSearchForm(Form):
 
     def apply_model(self, model: PaymentCollection) -> None:
         """Populate the form fields from the model's filter values."""
-        self.start_date.data = model.start
-        self.end_date.data = model.end
+        self.reservation_start_date.data = model.start
+        self.reservation_end_date.data = model.end
         self.status.data = model.status or ''
         self.ticket_start_date.data = model.ticket_start
         self.ticket_end_date.data = model.ticket_end
@@ -85,8 +85,8 @@ class PaymentSearchForm(Form):
 
     def update_model(self, model: PaymentCollection) -> None:
         """Update the model's filter values from the form's data."""
-        model.start = self.start_date.data
-        model.end = self.end_date.data
+        model.start = self.reservation_start_date.data
+        model.end = self.reservation_end_date.data
         model.status = self.status.data or None
         model.ticket_start = self.ticket_start_date.data
         model.ticket_end = self.ticket_end_date.data

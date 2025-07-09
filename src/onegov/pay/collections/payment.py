@@ -45,6 +45,8 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         end: datetime | None = None,
         ticket_start: datetime | None = None,
         ticket_end: datetime | None = None,
+        reservation_start: datetime | None = None,
+        reservation_end: datetime | None = None,
         status: str | None = None,
         payment_type: str | None = None
     ):
@@ -57,6 +59,8 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         self.payment_type = payment_type
         self.ticket_start = ticket_start
         self.ticket_end = ticket_end
+        self.reservation_start = reservation_start
+        self.reservation_end = reservation_end
 
     @property
     def model_class(self) -> type[Payment]:
@@ -100,6 +104,10 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             and self.page == other.page
             and self.start == other.start
             and self.end == other.end
+            and self.ticket_start == other.ticket_start
+            and self.ticket_end == other.ticket_end
+            and self.reservation_start == other.reservation_start
+            and self.reservation_end == other.reservation_end
             and self.status == other.status
             and self.payment_type == other.payment_type
         )
@@ -140,6 +148,8 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             end=self.end,
             ticket_start=self.ticket_start,
             ticket_end=self.ticket_end,
+            reservation_start=self.reservation_start,
+            reservation_end=self.reservation_end,
             payment_type=self.payment_type,
             source=self.source,
             status=self.status
