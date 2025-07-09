@@ -139,7 +139,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
                 Ticket.payment_id.label('payment_id'),
                 func.min(Reservation.start).label('min_start'),
                 func.max(Reservation.end).label('max_end')
-            ).select_from(Reservation).join(Reservation.payment).group_by(
+            ).join(Ticket.reservations).group_by(
                 Ticket.payment_id
             ).subquery()
 
@@ -149,11 +149,9 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             )
 
             if self.reservation_start:
-                print('reservation_start')
                 query = query.filter(
                     reservation_dates.c.max_end >= self.reservation_start)
             if self.reservation_end:
-                print('reservation_end')
                 query = query.filter(
                     reservation_dates.c.min_start <= self.reservation_end)
 
