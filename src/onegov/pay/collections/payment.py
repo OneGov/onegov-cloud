@@ -126,11 +126,6 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             if self.ticket_end:
                 query = query.filter(Ticket.created <= self.ticket_end)
 
-            if self.ticket_start:
-                query = query.filter(Ticket.created >= self.ticket_start)
-            if self.ticket_end:
-                query = query.filter(Ticket.created <= self.ticket_end)
-
         return query.order_by(Payment.created.desc())
 
     @property
@@ -159,11 +154,20 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
 
     def reservation_dates_by_batch(self) -> dict[UUID, tuple[date, date]]:
         session = self.session
-
-        return {ticket_id: (to_timezone(start_date, 'Europe/Zurich').date, to_timezone(end_date, 'Europe/Zurich').date)
-            for ticket_id, start_date, end_date in session.query(Reservation).join(Ticket)
-            .filter(Ticket.payment_id.in_([el.id for el in self.batch])).
-            group_by(Ticket.id).with_entities(Ticket.id, func.min(Reservation.start), func.max(Reservation.end))
+        return {
+            ticket_id: (
+                to_timezone(start_date, 'Europe/Zurich').date,
+                to_timezone(end_date, 'Europe/Zurich').date
+            )
+            for ticket_id, start_date, end_date in session.query(Reservation)
+            .join(Ticket)
+            .filter(Ticket.payment_id.in_([el.id for el in self.batch]))
+            .group_by(Ticket.id)
+            .with_entities(
+                Ticket.id,
+                func.min(Reservation.start),
+                func.max(Reservation.end)
+            )
         }
 
     def payment_links_for(
