@@ -7,7 +7,7 @@ from sedate import to_timezone
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.pay.models import Payment
 from sqlalchemy.orm import joinedload
-from sqlalchemy import func
+from sqlalchemy import and_, func
 
 
 from typing import Any, TYPE_CHECKING
@@ -135,25 +135,17 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         if self.reservation_start or self.reservation_end:
             from onegov.reservation import Reservation
 
-            reservation_dates = self.session.query(
-                Ticket.payment_id.label('payment_id'),
-                func.min(Reservation.start).label('min_start'),
-                func.max(Reservation.end).label('max_end')
-            ).join(Ticket.reservations).group_by(
-                Ticket.payment_id
-            ).subquery()
-
-            query = query.join(
-                reservation_dates,
-                Payment.id == reservation_dates.c.payment_id
-            )
-
+            conditions = []
             if self.reservation_start:
-                query = query.filter(
-                    reservation_dates.c.max_end >= self.reservation_start)
+                conditions.append(
+                    Reservation.end >= self.reservation_start
+                )
             if self.reservation_end:
-                query = query.filter(
-                    reservation_dates.c.min_start <= self.reservation_end)
+                conditions.append(
+                    Reservation.start <= self.reservation_end
+                )
+            query = query.filter(
+                Payment.linked_reservations.any(and_(*conditions)))
 
         return query.order_by(Payment.created.desc())
 
