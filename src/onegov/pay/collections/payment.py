@@ -149,9 +149,11 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             )
 
             if self.reservation_start:
+                print('reservation_start')
                 query = query.filter(
                     reservation_dates.c.max_end >= self.reservation_start)
             if self.reservation_end:
+                print('reservation_end')
                 query = query.filter(
                     reservation_dates.c.min_start <= self.reservation_end)
 
@@ -192,9 +194,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
                 to_timezone(end_date, 'Europe/Zurich').date()
             )
             for ticket_id, start_date, end_date in session.query(Reservation)
-            # .join(Ticket) didn't work
             .join(Reservation.payment)
-            .join(Payment.tickets)
             .filter(Ticket.payment_id.in_([el.id for el in self.batch]))
             .group_by(Ticket.id)
             .with_entities(
