@@ -990,6 +990,7 @@ def accept_reservation(
                 'title': title,
                 'form': form,
                 'model': self,
+                'ticket': ticket,
                 'resource': resource,
                 'reservations': reservations,
                 'show_submission': show_submission,
