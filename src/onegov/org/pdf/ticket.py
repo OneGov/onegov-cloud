@@ -545,8 +545,11 @@ class TicketsPdf(TicketPdf):
             page_fn=pdf.page_fn_later, page_fn_later=pdf.page_fn_later
         )
 
-        for ticket in tickets:
-            pdf.story.append(PageBreak())
+        for i, ticket in enumerate(tickets):
+            # Only add page break after the first ticket
+            if i > 0:
+                pdf.story.append(PageBreak())
+
             pdf.add_ticket(ticket, request)
 
         pdf.generate()
