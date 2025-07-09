@@ -27,6 +27,7 @@ from reportlab.lib.utils import ImageReader
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Mapping, Sequence
+    from collections.abc import Collection
     from bleach.callbacks import _HTMLAttrs
     from bleach.sanitizer import _Filter
     from gettext import GNUTranslations
@@ -518,7 +519,7 @@ class TicketsPdf(TicketPdf):
     def from_tickets(
         cls,
         request: OrgRequest,
-        tickets: Sequence[Ticket]
+        tickets: Collection[Ticket]
     ) -> BytesIO:
         """
         Creates a PDF representation of the tickets. It is sensible to the
@@ -526,8 +527,9 @@ class TicketsPdf(TicketPdf):
         coming from ticket handler. With this approach, snapshotted
         summaries are supported.
         """
+
         result = BytesIO()
-        title = request.translate(_("Tickets"))
+        title = request.translate(_('Tickets'))
         pdf = cls(
             result,
             title=title,
