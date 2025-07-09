@@ -6,6 +6,16 @@ function setupXHREditPaymentStatus() {
 
     const markInvoicedButton = document.querySelector('.batch-action-button');
     if (markInvoicedButton) {
+        markInvoicedButton.disabled = true;
+
+        const updateButtonState = function() {
+            markInvoicedButton.disabled = document.querySelectorAll('input[name="selected_payments"]:checked').length === 0;
+        };
+
+        document.querySelectorAll('input[name="selected_payments"]').forEach(function(checkbox) {
+            checkbox.addEventListener('change', updateButtonState);
+        });
+
         markInvoicedButton.addEventListener('click', function() {
             const selectedPayments = [];
             document.querySelectorAll('input[name="selected_payments"]:checked').forEach(function(checkbox) {
