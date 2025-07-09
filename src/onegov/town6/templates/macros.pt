@@ -2167,6 +2167,13 @@
                 <th i18n:translate tal:condition="payment_links|nothing">
                     Object
                 </th>
+                <!-- New columns for Reservation Dates -->
+                <th i18n:translate tal:condition="reservation_dates|nothing">
+                    Reservation Start
+                </th>
+                <th i18n:translate tal:condition="reservation_dates|nothing">
+                    Reservation End
+                </th>
                 <th i18n:translate>
                     Net Amount
                 </th>
@@ -2194,12 +2201,13 @@
                     <input type="checkbox" name="selected_payments" value="${payment.id}" aria-label="Select this payment" />
                 </td>
                 <td tal:condition="payment_links|nothing">
-                    <tal:b repeat="link payment_links[payment.id]">
-                        <tal:b switch="link.__tablename__">
-                            <tal:b case="'submissions'">
-                                <tal:b define="ticket get_ticket(link)">
+                    <!-- Define ticket once for the payment, outside the link loop -->
+                    <tal:b define="ticket tickets[payment.id] | nothing">
+                        <tal:b repeat="link payment_links[payment.id]">
+                            <tal:b switch="link.__tablename__">
+                                <tal:b case="'submissions'">
                                     <div>
-                                        <a href="${request.link(ticket)}">
+                                        <a tal:condition="ticket" href="${request.link(ticket)}">
                                             <strong>${ticket.number}</strong> - ${ticket.group}
                                         </a>
                                         <div>
@@ -2207,11 +2215,9 @@
                                         </div>
                                     </div>
                                 </tal:b>
-                            </tal:b>
-                            <tal:b case="'reservations'" condition="repeat.link.start">
-                                <tal:b define="ticket get_ticket(link)">
+                                <tal:b case="'reservations'" condition="repeat.link.start">
                                     <div>
-                                        <a href="${request.link(ticket)}">
+                                        <a tal:condition="ticket" href="${request.link(ticket)}">
                                             <strong>${ticket.number}</strong> - ${ticket.group}
                                         </a>
                                         <div>
@@ -2219,10 +2225,30 @@
                                         </div>
                                     </div>
                                 </tal:b>
+                                <tal:b case="default">
+                                    <metal:b use-macro="layout.macros['payment_link_fallback']" />
+                                </tal:b>
                             </tal:b>
-                            <tal:b case="default">
-                                <metal:b use-macro="layout.macros['payment_link_fallback']" />
-                            </tal:b>
+                        </tal:b>
+                    </tal:b>
+                </td>
+                <!-- New cells for Reservation Start Date -->
+                <td tal:condition="reservation_dates|nothing">
+                    <tal:b define="ticket tickets[payment.id] | nothing">
+                        <tal:b define="dates reservation_dates[ticket.id] | nothing" tal:condition="ticket">
+                            <span tal:condition="dates">
+                                ${layout.format_date(dates[0], 'date')}
+                            </span>
+                        </tal:b>
+                    </tal:b>
+                </td>
+                <!-- New cells for Reservation End Date -->
+                <td tal:condition="reservation_dates|nothing">
+                    <tal:b define="ticket tickets[payment.id] | nothing">
+                        <tal:b define="dates reservation_dates[ticket.id] | nothing" tal:condition="ticket">
+                            <span tal:condition="dates">
+                                ${layout.format_date(dates[1], 'date')}
+                            </span>
                         </tal:b>
                     </tal:b>
                 </td>

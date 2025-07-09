@@ -115,6 +115,8 @@ def handle_pdf_response(
     Handles the PDF export of payments.
     """
     # Handle multiple pages of results
+    # Export a pdf with the same items as the current filter is set,
+    # But excluding pagination
     payments = list(self.subset())
     payment_links = self.payment_links_for(payments)
 
@@ -189,7 +191,6 @@ def view_payments(
     if request.params.get('format') == 'pdf':
         return handle_pdf_response(self, request)
 
-    tickets = TicketCollection(request.session)
     providers = {
         provider.id: provider
         for provider in PaymentProviderCollection(request.session).query()
@@ -201,6 +202,7 @@ def view_payments(
         'layout': layout or PaymentCollectionLayout(self, request),
         'payments': self.batch,
         'tickets': self.tickets_by_batch(),
+        'reservation_dates': self.reservation_dates_by_batch(),
         'providers': providers,
         'payment_links': self.payment_links_by_batch()
     }

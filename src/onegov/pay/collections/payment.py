@@ -2,15 +2,13 @@ from __future__ import annotations
 
 from collections import defaultdict
 
-from sedate import utcnow, to_timezone
+from sedate import to_timezone
 
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.reservation import Reservation
 from onegov.pay.models import Payment
 from sqlalchemy.orm import joinedload
 from sqlalchemy import func
-from sqlalchemy.sql.expression import cast
-from onegov.core.orm.types import UUID as onegovUUID
 
 
 from typing import Any, TYPE_CHECKING
