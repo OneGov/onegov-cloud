@@ -761,13 +761,6 @@ class ReservationEventInfo:
         return self.reservation.display_end().isoformat()
 
     @property
-    def event_identification(self) -> str:
-        return '{:%d.%m.%Y}: {}'.format(
-            self.reservation.display_start(),
-            self.event_time
-        )
-
-    @property
     def whole_day(self) -> bool:
         start = self.reservation.display_start()
         end = self.reservation.display_end()
@@ -925,13 +918,6 @@ class MyReservationEventInfo:
     @property
     def event_end(self) -> str:
         return self.end.isoformat()
-
-    @property
-    def event_identification(self) -> str:
-        return '{:%d.%m.%Y}: {}'.format(
-            self.start,
-            self.event_time
-        )
 
     @property
     def whole_day(self) -> bool:
