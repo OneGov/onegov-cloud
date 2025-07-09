@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-09 10:28+0200\n"
+"POT-Creation-Date: 2025-07-09 13:44+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -123,7 +123,7 @@ msgid "day"
 msgstr "jour"
 
 msgid "Start"
-msgstr "Démarrage"
+msgstr "Début"
 
 msgid "End"
 msgstr "Fin"
@@ -132,7 +132,7 @@ msgid "Add"
 msgstr "Ajouter"
 
 msgid "Remove"
-msgstr "Retirer"
+msgstr "Supprimer"
 
 msgid "Mo"
 msgstr "Lu"
@@ -337,7 +337,7 @@ msgstr "Supprimer ce groupe parlementaire"
 msgid "Parties"
 msgstr "Partis"
 
-msgid "Party"
+msgid "Political Party"
 msgstr "Parti"
 
 msgid "Do you really want to delete this party?"
@@ -701,7 +701,7 @@ msgid "Login"
 msgstr "Connexion"
 
 msgid "Citizen Login"
-msgstr "Connexion citoyen"
+msgstr "Connexion client"
 
 msgid "About"
 msgstr "Impressum"
@@ -842,7 +842,7 @@ msgid "Open"
 msgstr "Ouvert"
 
 msgid "Pending"
-msgstr "En attente"
+msgstr "En traitement"
 
 msgid "Closed"
 msgstr "Fermé"
@@ -1034,8 +1034,9 @@ msgid ""
 "Your request will be processed shortly. To see the state of your process "
 "your may return to this page at any time."
 msgstr ""
-"Votre demande sera traitée sous peu. Pour connaître l'état d'avancement de "
-"votre demande, vous pouvez revenir à tout moment sur cette page."
+"Votre demande sera traitée sous peu. Pour connaître l'état d'avancement du "
+"traitement de votre demande, vous pouvez revenir sur cette page à tout "
+"moment."
 
 msgid "Your request has been completed."
 msgstr "Votre demande a été traitée."
@@ -1053,7 +1054,7 @@ msgid "Credit Card Fee"
 msgstr "Frais de carte de crédit"
 
 msgid "Pay Offline later"
-msgstr "Payer hors ligne plus tard"
+msgstr "Payer par facture"
 
 msgid "at ${time}"
 msgstr "à ${time}"
@@ -1104,7 +1105,7 @@ msgid "Not a publication"
 msgstr "Pas une publication"
 
 msgid "Digital seal"
-msgstr "Sceau digital"
+msgstr "Sceau électronique"
 
 msgid "Content"
 msgstr "Contenu"
@@ -1373,7 +1374,7 @@ msgid "Your change request has been applied:"
 msgstr "Votre demande de modification a été effectuée:"
 
 msgid "Your directory submission has unfortunately been rejected:"
-msgstr "Votre proposition de répertoire a malheureusement été rejetée :"
+msgstr "Votre proposition de répertoire a malheureusement été rejetée:"
 
 msgid "The rejection of your directory application has been withdrawn:"
 msgstr "Le refus de votre inscription à l'annuaire a été retiré:"
@@ -1464,7 +1465,7 @@ msgid "Click here to view web version."
 msgstr "Cliquer ici pour voir la version internet."
 
 msgid "You no longer wish to receive the newsletter?"
-msgstr "Vous ne souhaitez plus recevoir la lettre d'informations ?"
+msgstr "Vous ne souhaitez plus recevoir la lettre d'informations?"
 
 msgid ""
 "The user with the address ${address} just unsubscribed from the newsletter "
@@ -1531,6 +1532,9 @@ msgstr ""
 
 msgid "Key Code"
 msgstr "Code clé"
+
+msgid "See all your reservations"
+msgstr "Voir toutes vos réservations"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Les réservations suivantes ont malheureusement été annulées:"
@@ -2354,7 +2358,7 @@ msgstr ""
 "lorsque l'on est connecté et que le navigateur avec le site est ouvert."
 
 msgid "Archive all selected tickets?"
-msgstr "Archiver tous les billets sélectionnés ?"
+msgstr "Archiver tous les billets sélectionnés?"
 
 msgid "Do Archive"
 msgstr "Archiver"
@@ -2561,7 +2565,7 @@ msgid "Analytics"
 msgstr "Analytics"
 
 msgid "Holidays"
-msgstr "Jours fériés"
+msgstr "Jours fériés / Vacances scolaires"
 
 msgid "Tickets"
 msgstr "Tickets"

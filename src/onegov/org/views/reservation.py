@@ -32,7 +32,10 @@ from onegov.org.models.ticket import ReservationTicket
 from onegov.org.utils import emails_for_new_ticket
 from onegov.pay import PaymentError
 from onegov.reservation import Allocation, Reservation, Resource
+from onegov.reservation.collection import ResourceCollection
 from onegov.ticket import TicketCollection
+from onegov.user import Auth
+from onegov.user.collections import TANCollection
 from purl import URL
 from webob import exc, Response
 from wtforms import HiddenField
@@ -784,6 +787,30 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
         return morepath.redirect(url)
 
 
+def get_my_reservations_url(request: OrgRequest, email: str) -> str | None:
+    if not request.app.org.citizen_login_enabled:
+        return None
+
+    auth = Auth.from_request(
+        request,
+        to=request.class_link(
+            ResourceCollection,
+            name='my-reservations'
+        )
+    )
+    tans = TANCollection(request.session, scope='citizen-login')
+    tan_obj = tans.add(
+        client='unknown',
+        email=email,
+        redirect_to=auth.to,
+    )
+    return request.link(
+        auth,
+        name='confirm-citizen-login',
+        query_params={'token': tan_obj.tan}
+    )
+
+
 @OrgApp.view(model=Reservation, name='accept', permission=Private)
 def accept_reservation(
     self: Reservation,
@@ -925,6 +952,9 @@ def accept_reservation(
                 'code': code,
                 'form': form,
                 'message': message,
+                'my_reservations_url': get_my_reservations_url(
+                    request, self.email
+                ),
             },
         )
 
@@ -944,8 +974,11 @@ def accept_reservation(
 
         title = request.translate(
             _(
-                '${org} New Reservation(s)',
-                mapping={'org': request.app.org.title},
+                'Reservation(s) confirmed ${org} ${resource}',
+                mapping={
+                    'org': request.app.org.title,
+                    'resource': resource.title,
+                },
             )
         )
 
@@ -1408,6 +1441,9 @@ def send_reservation_summary(
                 'reservations': self.handler.reservations,
                 'code': self.handler.data.get('key_code'),
                 'changes': self.handler.get_changes(request),
+                'my_reservations_url': get_my_reservations_url(
+                    request, recipient
+                ),
             }
         )
         request.success(_(
