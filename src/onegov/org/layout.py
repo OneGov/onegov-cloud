@@ -12,6 +12,7 @@ from dateutil.rrule import rrulestr
 from decimal import Decimal
 from functools import cached_property
 from markupsafe import Markup
+from onegov.org.exports.base import OrgExport
 from onegov.chat import TextModuleCollection
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
@@ -3247,13 +3248,15 @@ class PaymentCollectionLayout(DefaultLayout):
                     attrs={'class': 'sync'}
                 )
             )
+            links.append(
+                Link(
+                    text=_('Export'),
+                    url=self.request.class_link(OrgExport, {'id': 'payments'}),
+                    attrs={'class': 'export-link'}
+                )
+            )
 
         return links
-
-    @cached_property
-    def payments_export_url(self) -> str:
-        """ Returns the base URL for the payments export. """
-        return self.request.class_link(ExportCollection, name='payments')
 
 
 class MessageCollectionLayout(DefaultLayout):
