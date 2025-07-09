@@ -132,6 +132,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
                 query = query.filter(Ticket.created <= self.ticket_end)
 
         # Filter payments by the reservation dates it belongs to
+        breakpoint()
         if self.reservation_start or self.reservation_end:
             from onegov.reservation import Reservation
 
@@ -144,6 +145,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
                 conditions.append(
                     Reservation.start <= self.reservation_end
                 )
+            breakpoint()
             query = query.filter(
                 Payment.linked_reservations.any(and_(*conditions)))
 
