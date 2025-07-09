@@ -10,7 +10,6 @@ from onegov.core.orm.types import UUID as onegovUUID
 
 
 from typing import Any, TYPE_CHECKING
-from typing import Any as Incomplete
 from onegov.ticket.model import Ticket
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
@@ -128,56 +127,51 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
 
         return query.order_by(Payment.created.desc())
 
-    def with_reservations_and_tickets(
-        self
-    ) -> Query[tuple[Incomplete]]:
-
+    def with_reservations_and_tickets(self) -> list[tuple[Any]]:
+        # DEBUG FUNCTION WILL BE REMOVED
         from onegov.reservation import Reservation
-        """
-        Returns a query that yields (Payment, Reservation, Ticket) tuples,
-        filtered by the same criteria as the collection.
 
-        This is useful for views that need to display information from
-        all three models together, avoiding N+1 query problems.
+        # Get reservations that have payments
+        reservations = self.session.query(Reservation).filter(
+            Reservation.payment.isnot(None)
+        ).all()
 
-        """
+        results = []
+        for reservation in reservations:
+            payment = reservation.payment
 
-        # Start with a query for the tuple.
-        query = self.session.query(Payment, Reservation, Ticket)
+            # Apply payment filters
+            if self.source != '*':
+                model = Payment.get_polymorphic_class(self.source, Payment)
+                if model is not Payment and payment.source != self.source:
+                    continue
 
-        # Join Reservation -> Ticket. The handler_id on the ticket is a
-        # string representation of the reservation token (UUID).
-        query = query.join(Ticket, cast(Ticket.handler_id, onegovUUID) == Reservation.token)
+            if self.start and payment.created < self.start:
+                continue
+            if self.end and payment.created > self.end:
+                continue
+            if (self.payment_type == 'manual' and payment.provider_id
+                    is not None or self.payment_type == 'provider'
+                    and payment.provider_id is None):
+                continue
+            if self.status and payment.state != self.status:
+                continue
 
-        # Join Payment -> Reservation 
-        query = query.join(Reservation, Reservation.payment)
+            # Get ticket
+            ticket = self.session.query(Ticket).filter(
+                cast(Ticket.handler_id, onegovUUID) == reservation.token
+            ).first()
 
-        # Filters on Payment
-        if self.source != '*':
-            model = Payment.get_polymorphic_class(self.source, Payment)
-            if model is not Payment:
-                query = query.filter(Payment.source == self.source)
+            if ticket:
+                # Apply ticket filters
+                if self.ticket_start and ticket.created < self.ticket_start:
+                    continue
+                if self.ticket_end and ticket.created > self.ticket_end:
+                    continue
 
-        if self.start:
-            query = query.filter(Payment.created >= self.start)
-        if self.end:
-            query = query.filter(Payment.created <= self.end)
+                results.append((payment, reservation, ticket))
 
-        if self.payment_type == 'manual':
-            query = query.filter(Payment.provider_id.is_(None))
-        elif self.payment_type == 'provider':
-            query = query.filter(Payment.provider_id.isnot(None))
-
-        if self.status:
-            query = query.filter(Payment.state == self.status)
-
-        # Filters on Ticket
-        if self.ticket_start:
-            query = query.filter(Ticket.created >= self.ticket_start)
-        if self.ticket_end:
-            query = query.filter(Ticket.created <= self.ticket_end)
-
-        return query.order_by(Payment.created.desc())
+        return sorted(results, key=lambda x: x[0].created, reverse=True)
 
     @property
     def page_index(self) -> int:

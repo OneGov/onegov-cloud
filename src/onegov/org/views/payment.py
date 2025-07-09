@@ -4,11 +4,7 @@ import decimal
 from collections import OrderedDict
 from decimal import Decimal
 from functools import partial
-from libres.db.models import Reservation
-from sqlalchemy import func
-from sqlalchemy import String
 from onegov.core.security import Private
-from onegov.core.utils import normalize_for_url
 from onegov.form import merge_forms
 from onegov.org import OrgApp, _
 from onegov.org.forms import DateRangeForm, ExportForm
@@ -36,13 +32,13 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Iterator
     from collections.abc import Callable, Sequence  # type: ignore[attr-defined]
-    from sqlalchemy.orm import Query
     from datetime import datetime
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
     from onegov.pay.types import AnyPayableBase
     from sqlalchemy.orm import Session
     from typing import type_check_only
+    from uuid import UUID
     from webob import Response
 
     @type_check_only
@@ -70,7 +66,6 @@ def ticket_by_link(
     elif link.__tablename__ == 'submissions':
         return tickets.by_handler_id(link.id.hex)
     return None
-
 
 
 def send_ticket_notifications(
@@ -121,7 +116,6 @@ def handle_pdf_response(
     """
     # Handle multiple pages of results
     payments = list(self.subset())
-    print(payments)
     payment_links = self.payment_links_for(payments)
 
     tickets = TicketCollection(request.session)
@@ -131,27 +125,25 @@ def handle_pdf_response(
         """
         Gets all tickets for a list of payments, applying the same
         filtering logic as the payments macro.
+
         """
+        seen_ticket_ids: set[UUID] = set()
+
         for payment in payments:
-            # Use the pre-fetched links for this payment, same as the
-            # template
             links_for_payment = payment_links.get(payment.id, [])
 
             for link in links_for_payment:
-                # Case 1: The link is a 'submission'
+                ticket = None
                 if getattr(link, '__tablename__', None) == 'submissions':
                     ticket = get_ticket_for_link(link)
-                    if ticket:
-                        yield ticket
 
-                # Case 2: The link is a 'reservation' AND has a 'start' date
                 elif getattr(link, '__tablename__', None) == 'reservations':
-                    # This is the crucial condition
                     if getattr(link, 'start', None):
                         ticket = get_ticket_for_link(link)
-                        if ticket:
-                            yield ticket
 
+                if ticket and ticket.id not in seen_ticket_ids:
+                    seen_ticket_ids.add(ticket.id)
+                    yield ticket
     if not payments:
         request.warning(_('No payments found for PDF generation'))
         return request.redirect(request.class_link(PaymentCollection))
@@ -160,11 +152,10 @@ def handle_pdf_response(
     if self.status:
         filename = f'payments_{self.status}.pdf'
 
-    foo = list(get_tickets_for_pdf(payments))
-    breakpoint()
+    deduplicated_tickets = set(get_tickets_for_pdf(payments))
     multi_pdf = TicketsPdf.from_tickets(
         request,
-        foo
+        deduplicated_tickets
     )
     return Response(
         multi_pdf.read(),
@@ -251,7 +242,7 @@ def handle_batch_mark_payments_invoiced(
                         mapping={'count': updated_count}))
 
     ok_message = _(f'{updated_count} payments marked as invoiced.')
-    return {'status': 'success', 
+    return {'status': 'success',
             'message': ok_message}
 
 

@@ -894,8 +894,8 @@ def get_payments(
     end: date | None = None,
     status: str | None = None,
     payment_type: str | None = None,
-    ticket_start: date | None = None, 
-    ticket_end: date | None = None   
+    ticket_start: date | None = None,
+    ticket_end: date | None = None
 ) -> PaymentCollection:
     return PaymentCollection(
         session=app.session(),
@@ -906,7 +906,7 @@ def get_payments(
         status=status,
         payment_type=payment_type,
         ticket_start=ticket_start,
-        ticket_end=ticket_end 
+        ticket_end=ticket_end
     )
 
 
