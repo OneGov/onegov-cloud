@@ -135,18 +135,25 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         if self.reservation_start or self.reservation_end:
             from onegov.reservation import Reservation
 
-            reservation_query = self.session.query(Reservation.id).join(
-                Reservation.ticket
-            ).filter(Ticket.payment_id == Payment.id)
+            reservation_dates = self.session.query(
+                Ticket.payment_id.label('payment_id'),
+                func.min(Reservation.start).label('min_start'),
+                func.max(Reservation.end).label('max_end')
+            ).join(Ticket.reservations).group_by(
+                Ticket.payment_id
+            ).subquery()
+
+            query = query.join(
+                reservation_dates,
+                Payment.id == reservation_dates.c.payment_id
+            )
 
             if self.reservation_start:
-                reservation_query = reservation_query.filter(
-                    Reservation.end >= self.reservation_start)
+                query = query.filter(
+                    reservation_dates.c.max_end >= self.reservation_start)
             if self.reservation_end:
-                reservation_query = reservation_query.filter(
-                    Reservation.start <= self.reservation_end)
-
-            query = query.filter(reservation_query.exists())
+                query = query.filter(
+                    reservation_dates.c.min_start <= self.reservation_end)
 
         return query.order_by(Payment.created.desc())
 
