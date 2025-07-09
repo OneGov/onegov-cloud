@@ -187,14 +187,6 @@ def view_payments(
     if not form.errors:
         form.apply_model(self)
 
-    def get_tickets(payments: list[Payment]) -> Iterator[Ticket]:
-        """ Gets all tickets for  alist of payments """
-
-        # FIXME: Do we care for the order here?
-        for payment in payments:
-            for link in payment.links:
-                yield ticket_by_link(TicketCollection(session), link)
-
     if request.params.get('format') == 'pdf':
         return handle_pdf_response(self, request)
 
