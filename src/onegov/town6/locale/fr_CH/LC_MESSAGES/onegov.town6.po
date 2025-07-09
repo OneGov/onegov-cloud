@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-03 09:15+0200\n"
+"POT-Creation-Date: 2025-07-09 10:28+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -289,14 +289,14 @@ msgstr "Archives des chats"
 msgid "Meetings"
 msgstr "Réunions"
 
+msgid "RIS Settings"
+msgstr "Paramètres RIS"
+
 msgid "Meeting"
 msgstr "Réunion"
 
 msgid "Parliamentarians"
 msgstr "Parlementaires"
-
-msgid "RIS Settings"
-msgstr "Paramètres RIS"
 
 msgid "Parliamentarian"
 msgstr "Parlementaire"
@@ -1596,6 +1596,9 @@ msgid "You can see the current status of your ticket at any time here:"
 msgstr ""
 "Vous pouvez consulter le statut actuel de votre billet à tout moment ici:"
 
+msgid "Date/Time"
+msgstr "Date/Heure"
+
 msgid "Agenda"
 msgstr "Agenda"
 
@@ -2058,6 +2061,16 @@ msgstr ""
 "sont abonnées (si elles le font). Par conséquent, les informations affichées "
 "dans le calendrier peuvent être incorrectes ou obsolètes. Utilisez-le à vos "
 "risques et périls."
+
+msgid ""
+"If you want key codes to be included in the event's description then you may "
+"use the following link instead. Please note however that anyone you share "
+"this link with will have permanent access to this information."
+msgstr ""
+"Si vous souhaitez que les codes clés soient inclus dans la description de "
+"l'événement, vous pouvez utiliser le lien suivant. Notez toutefois que toute "
+"personne avec laquelle vous partagerez ce lien aura un accès permanent à ces "
+"informations."
 
 msgid "Reservations must be made at least one day in advance."
 msgstr ""
