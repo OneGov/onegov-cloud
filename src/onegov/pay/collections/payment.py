@@ -112,6 +112,12 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
     def subset(self) -> Query[Payment]:
         query = self.query()
 
+        if self.start:
+            query = query.filter(Payment.created >= self.start)
+
+        if self.end:
+            query = query.filter(Payment.created <= self.end)
+
         # Filter by payment type
         if self.payment_type == 'manual':
             query = query.filter(Payment.provider_id.is_(None))
