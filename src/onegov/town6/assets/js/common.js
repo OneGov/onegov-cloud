@@ -322,3 +322,24 @@ if ($('.header-image .page-image').length) {
 $('a[data-back-link]').on('click', function(e) {
     if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;
 });
+
+// Find all headings in #content and add an anchor link to them
+$('#content').find('h1, h2, h3, h4, h5, h6').each(function() {
+    console.log('Adding anchor link to heading:', this);
+    var id = this.textContent
+    id = id.trim().toLowerCase()
+    // replace ä, ö, ü with ae, oe, ue
+    id = id.replace(/ä/g, 'ae');
+    id = id.replace(/ö/g, 'oe');
+    id = id.replace(/ü/g, 'ue');
+    id = id.replace(/[^a-z0-9]+/g, '-');
+    console.log('Generated ID:', id);
+    var heading = this;
+    if (id) {
+        var link = $('<a class="anchor-link" href="#' + id + '"><i class="fa fa-link"></i></a>');
+        $(heading).append(link);
+        var anchor = $('<a class="category-anchor"></a>');
+        anchor.attr('id', id);
+        $(heading).prepend(anchor);
+    }
+});

@@ -1389,7 +1389,24 @@ p.full-text-width {
 /* RIS */
 
 .business-participants {
-    margin-bottom: 0rem;
+    margin-bottom: 0;
+}
+
+.anchor-link {
+    display: none !important;
+}
+
+.main-content .anchor-link {
+    color: $aluminum;
+    display: inline !important;
+    opacity: .4;
+    padding-left: .5rem;
+    position: absolute;
+    font-size: 80%;
+
+    &:hover {
+        opacity: 1;
+    }
 }
 
 .absolute {
