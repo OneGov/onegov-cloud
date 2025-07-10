@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-10 13:38+0200\n"
+"POT-Creation-Date: 2025-07-10 14:11+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -125,6 +125,9 @@ msgstr "Fehlgeschlagen"
 
 msgid "Refunded"
 msgstr "Rückerstattet"
+
+msgid "Invoiced"
+msgstr "Fakturiert"
 
 msgid "Manual"
 msgstr "Manuell"
@@ -1414,6 +1417,30 @@ msgstr "Fraktion"
 
 msgid "Parliamentary group role"
 msgstr "Rolle in der Fraktion"
+
+msgid "From reservation date"
+msgstr "Von Datum — Reservation"
+
+msgid "Filter Payments"
+msgstr "Zahlungen filtern"
+
+msgid "To reservation date"
+msgstr "Bis Datum — Reservation"
+
+msgid "Ticket created from date"
+msgstr "Von Datum — Ticket erstellt"
+
+msgid "Filter by Ticket Date"
+msgstr "Nach Ticketdatum filtern"
+
+msgid "Filters payments by the creation date of their associated ticket."
+msgstr "Filtert Zahlungen nach dem Erstellungsdatum des zugehörigen Tickets."
+
+msgid "Ticket created to date"
+msgstr "Bis Datum — Ticket erstellt"
+
+msgid "Payment Type"
+msgstr "Zahlungsart"
 
 msgid "Academic Title"
 msgstr "Akademischer Titel"
@@ -4343,6 +4370,9 @@ msgstr "um ${time}"
 msgid "Object"
 msgstr "Objekt"
 
+msgid "Reservation"
+msgstr "Reservation"
+
 msgid "Disbursed"
 msgstr "Ausbezahlt"
 
@@ -5121,8 +5151,26 @@ msgstr "Aktiviert:"
 msgid "Fee:"
 msgstr "Gebühr:"
 
+msgid "Export Bill run as PDF"
+msgstr "Fakturierte Belege als PDF exportieren"
+
 msgid "No payments yet."
 msgstr "Noch keine Zahlungen."
+
+msgid "Batch Action"
+msgstr "Massenbearbeitung"
+
+msgid "Mark as Invoiced"
+msgstr "Als fakturiert markieren"
+
+msgid "Mark as Paid"
+msgstr "Als bezahlt markieren"
+
+msgid "Mark as Unpaid"
+msgstr "Als offen markieren"
+
+msgid "Apply to selected"
+msgstr "Auf Auswahl anwenden"
 
 msgid ""
 "The following requests have been submitted. To see the state of process you "
@@ -6436,6 +6484,27 @@ msgstr "Ihre Zahlung wurde rückgängig gemacht"
 
 msgid "Your payment has been refunded"
 msgstr "Ihre Zahlung wurde rückerstattet"
+
+msgid "No payments found for PDF generation"
+msgstr "Keine Zahlungen gefunden für die PDF Erstellung"
+
+msgid "No tickets found for PDF generation"
+msgstr "Keine Tickets gefunden für die PDF Erstellung"
+
+msgid "Receivables"
+msgstr "Belege"
+
+#, python-format
+msgid "${count} payments marked as invoiced."
+msgstr "${count} Zahlungen als fakturiert markiert."
+
+#, python-format
+msgid "${count} payments marked as paid."
+msgstr "${count} Zahlungen als bezahlt markiert."
+
+#, python-format
+msgid "${count} payments marked as unpaid."
+msgstr "${count} Zahlungen als unbezahlt markiert."
 
 msgid "The ticket was marked as paid"
 msgstr "Das Ticket wurde als bezahlt markiert"

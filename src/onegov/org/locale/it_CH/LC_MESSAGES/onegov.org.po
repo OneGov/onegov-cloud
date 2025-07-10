@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-10 13:38+0200\n"
+"POT-Creation-Date: 2025-07-10 14:11+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -126,6 +126,9 @@ msgstr "Fallito"
 
 msgid "Refunded"
 msgstr "Rimborsato"
+
+msgid "Invoiced"
+msgstr "Fatturato"
 
 msgid "Manual"
 msgstr "Manuale"
@@ -1417,6 +1420,31 @@ msgstr "Gruppo parlamentare"
 
 msgid "Parliamentary group role"
 msgstr "Ruolo nel gruppo parlamentare"
+
+msgid "From reservation date"
+msgstr "Dalla data di prenotazione"
+
+msgid "Filter Payments"
+msgstr "Filtra pagamenti"
+
+msgid "To reservation date"
+msgstr "Alla data di prenotazione"
+
+msgid "Ticket created from date"
+msgstr "Ticket creato dalla data"
+
+msgid "Filter by Ticket Date"
+msgstr "Filtra per data del ticket"
+
+msgid "Filters payments by the creation date of their associated ticket."
+msgstr ""
+"Filtra i pagamenti in base alla data di creazione del ticket associato."
+
+msgid "Ticket created to date"
+msgstr "Ticket creato fino ad oggi"
+
+msgid "Payment Type"
+msgstr "Tipo di pagamento"
 
 msgid "Academic Title"
 msgstr "Titolo accademico"
@@ -4340,6 +4368,9 @@ msgstr "alle ${time}"
 msgid "Object"
 msgstr "Oggetto"
 
+msgid "Reservation"
+msgstr "Prenotazione"
+
 msgid "Disbursed"
 msgstr "Erogato"
 
@@ -5109,8 +5140,26 @@ msgstr "Abilitato:"
 msgid "Fee:"
 msgstr "Imposta:"
 
+msgid "Export Bill run as PDF"
+msgstr "Esporta l'esecuzione della fattura come PDF"
+
 msgid "No payments yet."
 msgstr "Nessun pagamento ancora."
+
+msgid "Batch Action"
+msgstr "Azione di gruppo"
+
+msgid "Mark as Invoiced"
+msgstr "Contrassegna come fatturato"
+
+msgid "Mark as Paid"
+msgstr "Contrassegna come pagato"
+
+msgid "Mark as Unpaid"
+msgstr "Contrassegna come non pagato"
+
+msgid "Apply to selected"
+msgstr "Applica ai selezionati"
 
 msgid ""
 "The following requests have been submitted. To see the state of process you "
@@ -6428,6 +6477,27 @@ msgstr "Il tuo pagamento è stato ritirato"
 
 msgid "Your payment has been refunded"
 msgstr "Il tuo pagamento è stato rimborsato"
+
+msgid "No payments found for PDF generation"
+msgstr "Nessun pagamento trovato per la generazione di PDF"
+
+msgid "No tickets found for PDF generation"
+msgstr "Nessun biglietto trovato per la generazione di PDF"
+
+msgid "Receivables"
+msgstr "Crediti"
+
+#, python-format
+msgid "${count} payments marked as invoiced."
+msgstr "${count} pagamenti contrassegnati come fatturati."
+
+#, python-format
+msgid "${count} payments marked as paid."
+msgstr "${count} pagamenti contrassegnati come pagati."
+
+#, python-format
+msgid "${count} payments marked as unpaid."
+msgstr "${count} pagamenti contrassegnati come non pagati."
 
 msgid "The ticket was marked as paid"
 msgstr "Il biglietto è stato contrassegnato come pagato"

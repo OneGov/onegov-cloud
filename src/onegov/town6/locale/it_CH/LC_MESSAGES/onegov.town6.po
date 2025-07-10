@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-07-09 13:44+0200\n"
+"POT-Creation-Date: 2025-07-10 13:50+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -857,6 +857,9 @@ msgstr "Fallito"
 msgid "Refunded"
 msgstr "Rimborsato"
 
+msgid "Invoiced"
+msgstr "Fatturato"
+
 msgid "Ticket"
 msgstr "Biglietto"
 
@@ -1060,6 +1063,9 @@ msgstr "alle ${time}"
 
 msgid "Object"
 msgstr "Oggetto"
+
+msgid "Reservation"
+msgstr "Prenotazione"
 
 msgid "Net Amount"
 msgstr "Importo netto"
@@ -1945,8 +1951,26 @@ msgstr "Abilitato:"
 msgid "Fee:"
 msgstr "Imposta:"
 
+msgid "Export Bill run as PDF"
+msgstr "Esporta l'esecuzione della fattura come PDF"
+
 msgid "No payments yet."
 msgstr "Nessun pagamento ancora."
+
+msgid "Batch Action"
+msgstr "Azione di gruppo"
+
+msgid "Mark as Invoiced"
+msgstr "Contrassegna come fatturato"
+
+msgid "Mark as Paid"
+msgstr "Contrassegna come pagato"
+
+msgid "Mark as Unpaid"
+msgstr "Contrassegna come non pagato"
+
+msgid "Apply to selected"
+msgstr "Applica ai selezionati"
 
 msgid "Select organisation"
 msgstr "Selezionare l'organizzazione"
