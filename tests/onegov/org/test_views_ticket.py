@@ -893,7 +893,7 @@ def test_bcc_field_in_ticket_message(client):
     status_link = extract_link(body)
 
     status_page = client.get(status_link)
-    assert 'Fügen Sie der Anfrage eine Nachricht hinzu' in status_page.text
+    assert 'fügen Sie der Anfrage eine Nachricht hinzu' in status_page.text
 
     # test the reply feature now
     msg = 'Hello from the other side, or should I say, Bcc-side?'

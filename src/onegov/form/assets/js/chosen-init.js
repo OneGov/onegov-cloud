@@ -42,7 +42,7 @@ $(document).ready(function() {
             ).prop('checked', false).trigger('change');
             $(element).find('select').val('').filter('.chosen-select').trigger('chosen:updated');
             $(element).find('input').not(
-                '[type="submit"], [type="radio"], [type="checkbox"]'
+                '[type="submit"], [type="radio"], [type="checkbox"], [name="csrf_token"]'
             ).val('').trigger('change');
             return false;
         });

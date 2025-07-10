@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-03 14:52+0200\n"
+"POT-Creation-Date: 2025-07-09 13:44+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1394,6 +1394,9 @@ msgstr "Parlamentarier:in"
 msgid "Role"
 msgstr "Rolle"
 
+msgid "Political Party"
+msgstr "Partei"
+
 msgid "Party role"
 msgstr "Rolle in der Partei"
 
@@ -1423,9 +1426,6 @@ msgstr "Geboren"
 
 msgid "Profession"
 msgstr "Beruf"
-
-msgid "Political Party"
-msgstr "Politische Partei"
 
 msgid "Parliamentary Group"
 msgstr "Fraktion"
@@ -2399,14 +2399,26 @@ msgstr "Webseiten-Adresse inklusive https://"
 msgid "Site ID"
 msgstr "ID der Anlage"
 
+msgid "Kaba Sites"
+msgstr "Anlagen"
+
 msgid "Default Lead Time"
 msgstr "Standard Vorlaufszeit"
 
 msgid "Default Lag Time"
 msgstr "Standard Nachlaufszeit"
 
-msgid "Invalid credentials or site id"
-msgstr "Ungültige API Credentials oder ID der Anlage"
+#, python-format
+msgid "Duplicate site ID ${site_id}"
+msgstr "ID der Anlage ${site_id} ist doppelt aufgeführt"
+
+#, python-format
+msgid "${field} for site ID ${site_id} is required"
+msgstr "${field} für ID ${site_id} muss ausgefüllt werden"
+
+#, python-format
+msgid "Invalid credentials for site ID ${site_id}"
+msgstr "Ungültige API Zugangsdaten für ID ${site_id}"
 
 msgid "Unexpected error encountered, please try again."
 msgstr "Unerwarteter Fehler aufgetreten, bitte versuchen Sie es erneut."
@@ -3559,8 +3571,8 @@ msgstr "Reservationen absagen"
 msgid "Reject all with message"
 msgstr "Alle absagen mit Kommentar"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3930,7 +3942,8 @@ msgstr "iFrame einbetten"
 
 msgid "You can copy the following code to embed this page as an iFrame:"
 msgstr ""
-"Sie können den folgenden Code kopieren um diese Seite als iFrame einzubetten:"
+"Sie können den folgenden Code kopieren, um diese Seite als iFrame "
+"einzubetten:"
 
 msgid ""
 "To display the breadcrumbs you can add ${bc_level} as a parameter to the "
@@ -4139,7 +4152,7 @@ msgid "This site is secret and requires submitting an mTAN"
 msgstr "Diese Seite ist geheim und erfordert die Eingabe eines mTANs"
 
 msgid "This site is not published."
-msgstr "Diese Seite ist nicht publiziert."
+msgstr "Diese Seite ist nicht veröffentlicht."
 
 msgid "This site is not public."
 msgstr "Diese Seite ist nicht öffentlich."
@@ -4195,7 +4208,7 @@ msgid ""
 "Persons living outside the following zipcodes may only reserve this "
 "allocation on the ${date}: ${zipcodes}"
 msgstr ""
-"Personen die ausserhalb der folgenden Postleitzahlen leben können diese "
+"Personen, die ausserhalb der folgenden Postleitzahlen leben, können diese "
 "Reservation erst am ${date} tätigen: ${zipcodes}"
 
 msgid "Quota"
@@ -4683,7 +4696,7 @@ msgid "Do you no longer wish to receive these notifications?"
 msgstr "Möchten Sie diese Benachrichtigungen nicht mehr erhalten?"
 
 msgid "The following reservations have been accepted:"
-msgstr "Die folgenden Reservationen wurden angenommen:"
+msgstr "Die folgenden Reservationen wurden bestätigt:"
 
 msgid ""
 "This is the notification for reservations for ${request.app.org.title}. If "
@@ -4780,7 +4793,7 @@ msgid "The ticket number is"
 msgstr "Ihre Ticket Referenz"
 
 msgid "The following reservations have been rejected:"
-msgstr "Folgende Reservationen wurden abgelehnt:"
+msgstr "Folgende Reservationen sind abgelehnt worden:"
 
 msgid ""
 "This is a notification for the rejected reservations for ${organisation}. If "
@@ -4791,6 +4804,9 @@ msgstr ""
 "${Organisation}. Wenn Sie diese Benachrichtigungen nicht mehr erhalten "
 "möchten, kontaktieren Sie bitte einen Administrator, damit er Sie aus der "
 "Empfängerliste entfernen kann."
+
+msgid "See all your reservations"
+msgstr "Alle Ihre Reservationen einsehen"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
@@ -4862,7 +4878,7 @@ msgstr ""
 "kümmern und uns bei Ihnen melden, sobald neue Informationen verfügbar sind."
 
 msgid "Below you can see your chat conversation:"
-msgstr "Unten sehen Sie Ihr Chat-Gespräch:"
+msgstr "Nachfolgend sehen Sie Ihre Chat-Konversation:"
 
 msgid "This is what happend on the ${org} website over the past week:"
 msgstr ""
@@ -5192,6 +5208,16 @@ msgstr ""
 "geschieht). Deshalb ist die Information in der Kalender-Applikation mit "
 "Vorsicht zu geniessen."
 
+msgid ""
+"If you want key codes to be included in the event's description then you may "
+"use the following link instead. Please note however that anyone you share "
+"this link with will have permanent access to this information."
+msgstr ""
+"Falls Sie die Schlüsselcodes in der Termin-Beschreibung sehen möchten, "
+"können Sie stattdessen den folgenden Link verwenden. Beachten Sie jedoch, "
+"dass jeder, der diesen Link kennt, einen permanenten Zugriff auf diese "
+"Information hat."
+
 msgid "Reservations must be made at least one day in advance."
 msgstr "Reservationen müsen mindestens ein Tag im Voraus gemacht werden."
 
@@ -5326,8 +5352,8 @@ msgid ""
 "Thank you for filling out this survey. If there's anything you'd like to "
 "change, click on the \"Edit\"-Button below."
 msgstr ""
-"Vielen Dank für das Ausfüllen dieser Umfrage. Falls Sie noch etwas ändern "
-"möchten, klicken Sie auf den \"Bearbeiten\"-Button unten."
+"Vielen Dank für Ihre Teilnahme an dieser Umfrage. Falls Sie noch etwas "
+"ändern möchten, klicken Sie auf den \"Bearbeiten\"-Button unten."
 
 msgid "No surveys defined yet."
 msgstr "Es wurden noch keine Umfragen definiert."
@@ -5405,7 +5431,7 @@ msgid "Forgot something or have a special request?"
 msgstr "Haben Sie ein besonderes Anliegen oder haben Sie etwas vergessen?"
 
 msgid "Add a message to the ticket."
-msgstr "Fügen Sie der Anfrage eine Nachricht hinzu."
+msgstr "Dann fügen Sie der Anfrage eine Nachricht hinzu."
 
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Nachrichten wurden deaktiviert, da das Ticket geschlossen wurde."
@@ -6610,20 +6636,21 @@ msgstr ""
 "Ihre Reservation für ${room} wurde eingereicht. Bitte fahren Sie fort mit "
 "Ihrer Reservation für ${next_room}."
 
+#, python-format
 msgid ""
-"Failed to create visits using the dormakaba API please make sure your "
-"credentials are still valid."
+"Failed to create visits using the dormakaba API for site ID ${site_id} "
+"please make sure your credentials are still valid."
 msgstr ""
-"Das Delegieren der Entriegelung der Türen via dormakaba API ist "
-"fehlgeschlagen. Bitte stellen Sie sicher, dass die hinterlegten Zugangsdaten "
-"immer noch gültig sind."
+"Das Delegieren der Entriegelung der Türen via dormakaba API für Anlage "
+"${site_id} ist fehlgeschlagen. Bitte stellen Sie sicher, dass die "
+"hinterlegten Zugangsdaten immer noch gültig sind."
 
 msgid "Your reservations were accepted"
-msgstr "Ihre Reservationen wurden angenommen"
+msgstr "Ihre Reservationen wurden bestätigt"
 
 #, python-format
-msgid "${org} New Reservation(s)"
-msgstr "${org} Neue Reservation(en)"
+msgid "Reservation(s) confirmed ${org} ${resource}"
+msgstr "Bestätigung Reservation(en) ${org} ${resource}"
 
 msgid "The reservations were accepted"
 msgstr "Die Reservationen wurden angenommen"

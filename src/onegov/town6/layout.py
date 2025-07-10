@@ -1443,7 +1443,7 @@ class RISPartyCollectionLayout(DefaultLayout):
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_('Party'),
+                            text=_('Political Party'),
                             url=self.request.link(self.model, 'new'),
                             attrs={'class': 'new-party'},
                         ),

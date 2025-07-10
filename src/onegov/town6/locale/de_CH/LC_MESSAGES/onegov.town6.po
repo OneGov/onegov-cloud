@@ -122,10 +122,10 @@ msgid "day"
 msgstr "Tag"
 
 msgid "Start"
-msgstr "Start"
+msgstr "Von"
 
 msgid "End"
-msgstr "Ende"
+msgstr "Bis"
 
 msgid "Add"
 msgstr "Hinzufügen"
@@ -295,6 +295,9 @@ msgstr "Ratsinformationssystem"
 msgid "Meeting"
 msgstr "Sitzung"
 
+msgid "Parliamentarians"
+msgstr "Parlamentarierinnen und Parlamentarier"
+
 msgid "Parliamentarian"
 msgstr "Parlamentarier:in"
 
@@ -343,7 +346,7 @@ msgstr "Fraktion löschen"
 msgid "Parties"
 msgstr "Parteien"
 
-msgid "Party"
+msgid "Political Party"
 msgstr "Partei"
 
 msgid "Do you really want to delete this party?"
@@ -1059,7 +1062,7 @@ msgid "Credit Card Fee"
 msgstr "Kreditkarten-Gebühr"
 
 msgid "Pay Offline later"
-msgstr "Später bezahlen"
+msgstr "Per Rechnung bezahlen"
 
 msgid "at ${time}"
 msgstr "um ${time}"
@@ -1424,7 +1427,7 @@ msgid "Do you no longer wish to receive these notifications?"
 msgstr "Möchten Sie diese Benachrichtigungen nicht mehr erhalten?"
 
 msgid "The following reservations have been accepted:"
-msgstr "Die folgenden Reservationen wurden angenommen:"
+msgstr "Die folgenden Reservationen wurden bestätigt:"
 
 msgid ""
 "This is a notification for the new reservations for ${organisation}. If you "
@@ -1541,6 +1544,9 @@ msgstr ""
 
 msgid "Key Code"
 msgstr "Schlüsselcode"
+
+msgid "See all your reservations"
+msgstr "Alle Ihre Reservationen einsehen"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
@@ -2041,7 +2047,7 @@ msgid "Subscribed on"
 msgstr "Abonniert am"
 
 msgid "submitted"
-msgstr "angemeldet"
+msgstr "gemeldet"
 
 msgid "No dates found, please select dates in the calendar first"
 msgstr "Keine Termine gefunden, bitte wählen Sie erst Termine im Kalender aus"
@@ -2068,6 +2074,16 @@ msgstr ""
 "Kalender-Applikation das Abonnoment aktualisiert (sofern das überhaupt "
 "geschieht). Deshalb ist die Information in der Kalender-Applikation mit "
 "Vorsicht zu geniessen."
+
+msgid ""
+"If you want key codes to be included in the event's description then you may "
+"use the following link instead. Please note however that anyone you share "
+"this link with will have permanent access to this information."
+msgstr ""
+"Falls Sie die Schlüsselcodes in der Termin-Beschreibung sehen möchten, "
+"können Sie stattdessen den folgenden Link verwenden. Beachten Sie jedoch, "
+"dass jeder, der diesen Link kennt, einen permanenten Zugriff auf diese "
+"Information hat."
 
 msgid "Reservations must be made at least one day in advance."
 msgstr "Reservationen müsen mindestens ein Tag im Voraus gemacht werden."
@@ -2583,7 +2599,7 @@ msgid "Analytics"
 msgstr "Web-Statistik"
 
 msgid "Holidays"
-msgstr "Feiertage"
+msgstr "Feiertage / Schulferien"
 
 msgid "Tickets"
 msgstr "Tickets"

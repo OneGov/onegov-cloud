@@ -2291,9 +2291,9 @@
                 <span class="h5 list-title">${record.title}</span>
                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
         </a>
-        <a tal:attributes="href link_func(record); target link">
-            <p class="list-lead preview" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
+        <a tal:attributes="href link_func(record); target link" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
                 tal:content="lead" tal:condition="lead">
+            <p class="list-lead preview" >
             </p>
             <div class="list-hint hints" tal:define="hint hint(record)|False"
                 tal:content="hint" tal:condition="hint">

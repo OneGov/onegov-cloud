@@ -761,8 +761,9 @@ def test_citizen_login(client):
     # a second user can't use the same token to login as well
     confirm_page = client.get('/auth/confirm-citizen-login')
     confirm_page.form['token'] = token
-    confirm_page = confirm_page.form.submit()
-    assert 'Ungültiger oder abgelaufener Login-Code' in confirm_page
+    login_page = confirm_page.form.submit().follow()
+    assert login_page.request.path == '/auth/citizen-login'
+    assert 'Ungültiger oder abgelaufener Login-Code' in login_page
 
 
 def test_citizen_login_via_confirm_url(client):

@@ -113,7 +113,7 @@
                                 <span tal:condition="role.party">
                                     /
                                     ${role.party_role_label}
-                                    <tal:block i18n:translate>Party</tal:block>
+                                    <tal:block i18n:translate>Political Party</tal:block>
                                     <a href="${request.link(role.party)}">${role.party.title}</a>
                                 </span>
                                 <span tal:condition="role.parliamentary_group">
