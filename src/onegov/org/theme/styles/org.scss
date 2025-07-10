@@ -4701,6 +4701,7 @@ ul.recipients {
     padding: 2px 8px;
 
     &.payment-state-open {
+        white-space:nowrap;
         border: 1px solid $info-color;
 
         &::before {
@@ -4711,6 +4712,7 @@ ul.recipients {
     }
 
     &.payment-state-paid {
+        white-space:nowrap;
         border: 1px solid $success-color;
 
         &::before {
@@ -4721,6 +4723,7 @@ ul.recipients {
     }
 
     &.payment-state-failed {
+        white-space:nowrap;
         border: 1px solid $alert-color;
 
         &::before {
@@ -4731,6 +4734,7 @@ ul.recipients {
     }
 
     &.payment-state-cancelled {
+        white-space:nowrap;
         border: 1px solid $warning-color;
 
         &::before {
@@ -4741,6 +4745,7 @@ ul.recipients {
     }
 
     &.payment-state-invoiced {
+        white-space:nowrap;
         border: 1px solid get-color(info);
 
         &::before {

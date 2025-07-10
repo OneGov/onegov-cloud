@@ -52,6 +52,7 @@
     padding: 2px 8px;
 
     &.payment-state-open {
+        white-space:nowrap;
         border: 1px solid get-color(info);
 
         &::before {
@@ -62,6 +63,7 @@
     }
 
     &.payment-state-paid {
+        white-space:nowrap;
         border: 1px solid get-color(success);
 
         &::before {
@@ -72,6 +74,7 @@
     }
 
     &.payment-state-failed {
+        white-space:nowrap;
         border: 1px solid $alert-color;
 
         &::before {
@@ -82,6 +85,7 @@
     }
 
     &.payment-state-cancelled {
+        white-space:nowrap;
         border: 1px solid get-color(warning);
 
         &::before {
@@ -92,6 +96,7 @@
     }
 
     &.payment-state-invoiced {
+        white-space:nowrap;
         border: 1px solid get-color(info);
 
         &::before {
