@@ -118,17 +118,16 @@ def handle_pdf_response(
         return request.redirect(request.class_link(PaymentCollection))
 
     payment_ids = [p.id for p in all_payments]
-    tickets_query = self.session.query(Ticket).filter(
+    tickets = self.session.query(Ticket).filter(
         Ticket.payment_id.in_(payment_ids)
-    )
-    deduplicated_tickets = list({t.id: t for t in tickets_query}.values())
+    ).all()
 
-    if not deduplicated_tickets:
+    if not tickets:
         request.warning(_('No tickets found for PDF generation'))
         return request.redirect(request.class_link(PaymentCollection))
 
     filename = 'Payments.pdf'
-    multi_pdf = TicketsPdf.from_tickets(request, deduplicated_tickets)
+    multi_pdf = TicketsPdf.from_tickets(request, tickets)
     return Response(
         multi_pdf.read(),
         content_type='application/pdf',
@@ -216,9 +215,15 @@ def handle_batch_set_payment_state(
         if not isinstance(payment, ManualPayment):
             continue
         if payment.state != state:
-            if payment.state == 'open':
+            if payment.state == 'open' and state == 'invoiced':
                 payment.state = state
-            # other states should not accidentally reach 'invoiced' state
+            if payment.state == 'invoiced' and state == 'paid':
+                payment.state = state
+            # backwards
+            if payment.state == 'invoiced' and state == 'open':
+                payment.state = state
+            if payment.state == 'paid' and state == 'invoiced':
+                payment.state = state
 
         updated_count += 1
 
