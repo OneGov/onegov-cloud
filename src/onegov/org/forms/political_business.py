@@ -8,11 +8,9 @@ from wtforms.validators import Optional
 
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
-from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import TranslatedSelectField
 from wtforms.fields import DateField
 from onegov.org import _
-from onegov.org.models import Parliamentarian
 from onegov.org.models import PoliticalBusiness
 from onegov.org.models import RISParliamentarian
 from onegov.org.models import RISParliamentaryGroup
