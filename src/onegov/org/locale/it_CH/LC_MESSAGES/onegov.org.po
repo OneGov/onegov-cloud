@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-10 13:49+0200\n"
+"POT-Creation-Date: 2025-07-10 14:11+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -84,6 +84,24 @@ msgstr "Nessun dato disponibile"
 
 msgid "Most Popular Pages"
 msgstr "Pagine più popolari"
+
+msgid "My Requests"
+msgstr "Le mie richieste"
+
+msgid "Closed Tickets"
+msgstr "Biglietti chiusi"
+
+msgid "My Reservations"
+msgstr "Le mie prenotazioni"
+
+msgid "Pending Future Reservations"
+msgstr "Prenotazioni future in attesa"
+
+msgid "Confirmed Future Reservations"
+msgstr "Prenotazioni future confermate"
+
+msgid "Past Reservations"
+msgstr "Prenotazioni passate"
 
 msgid "Open"
 msgstr "Aperto"
@@ -220,17 +238,8 @@ msgstr "Gestione"
 msgid "My Tickets"
 msgstr "I miei biglietti"
 
-msgid "Closed Tickets"
-msgstr "Biglietti chiusi"
-
 msgid "Ticket"
 msgstr "Biglietto"
-
-msgid "My Requests"
-msgstr "Le mie richieste"
-
-msgid "My Reservations"
-msgstr "Le mie prenotazioni"
 
 msgid "This site is private"
 msgstr "Questo sito è privato"
@@ -3605,8 +3614,8 @@ msgstr "Rifiuta le prenotazioni"
 msgid "Reject all with message"
 msgstr "Rifiuta tutto con messaggio"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 

@@ -45,8 +45,8 @@ from onegov.org.app import OrgApp
 from onegov.org.auth import MTANAuth
 from onegov.org.converters import keywords_converter
 from onegov.org.models import AtoZPages, PushNotificationCollection
+from onegov.org.models import CitizenDashboard, Dashboard
 from onegov.org.models import Clipboard
-from onegov.org.models import Dashboard
 from onegov.org.models import DirectorySubmissionAction
 from onegov.org.models import Editor
 from onegov.org.models import Export
@@ -1103,6 +1103,17 @@ def get_publication_collection(
     path='/dashboard')
 def get_dashboard(request: OrgRequest) -> Dashboard | None:
     dashboard = Dashboard(request)
+
+    if dashboard.is_available:
+        return dashboard
+    return None
+
+
+@OrgApp.path(
+    model=CitizenDashboard,
+    path='/citizen-dashboard')
+def get_citizen_dashboard(request: OrgRequest) -> CitizenDashboard | None:
+    dashboard = CitizenDashboard(request)
 
     if dashboard.is_available:
         return dashboard
