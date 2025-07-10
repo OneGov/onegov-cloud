@@ -48,15 +48,15 @@ class TicketPdf(Pdf):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         locale = kwargs.pop('locale', None)
+        self.locale: str = locale or 'en'
         translations = kwargs.pop('translations', None)
-        ticket = kwargs.pop('ticket')
-        layout = kwargs.pop('layout')
         qr_payload = kwargs.pop('qr_payload')
         super().__init__(*args, **kwargs)
-        self.ticket: Ticket = ticket
-        self.locale: str | None = locale
         self.translations: dict[str, GNUTranslations] = translations
-        self.layout: DefaultLayout = layout
+
+        # These are set in from_ticket
+        self.ticket: Ticket | None = None
+        self.layout: DefaultLayout | None = None
 
         # Modification for the footer left on all pages
         self.doc.author = self.translate(_('Source')) + f': {self.doc.author}'
