@@ -297,6 +297,7 @@ def add_payment_id_to_ticket(context: UpgradeContext) -> None:
             Ticket.id,
             Ticket.handler_code,
             Ticket.handler_id,
+            Ticket.handler_data,
         ))
     ):
         if (payment := ticket.handler.payment) is not None:
