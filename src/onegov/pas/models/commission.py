@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.parliament.models import Commission
+from onegov.org.models import Commission
 
 
 class PASCommission(Commission):

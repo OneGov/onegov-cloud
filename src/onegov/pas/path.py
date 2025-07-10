@@ -33,7 +33,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
 
-    from onegov.parliament.models import (
+    from onegov.org.models import (
         Party,
         ParliamentaryGroup
     )

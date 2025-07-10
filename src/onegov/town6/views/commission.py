@@ -6,9 +6,9 @@ from onegov.core.elements import Link
 from onegov.core.security import Private, Public
 from onegov.org.forms.commission import CommissionForm
 from onegov.org import _
-from onegov.parliament.collections.commission import RISCommissionCollection
-from onegov.parliament.collections.commission import CommissionCollection
-from onegov.parliament.models import RISCommission, Commission
+from onegov.org.collections.commission import RISCommissionCollection
+from onegov.org.collections.commission import CommissionCollection
+from onegov.org.models import RISCommission, Commission
 from onegov.town6 import TownApp
 from onegov.town6.layout import RISCommissionCollectionLayout
 from onegov.town6.layout import RISCommissionLayout

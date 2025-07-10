@@ -47,18 +47,30 @@ from onegov.org.models import ExtendedDirectory
 from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.models.resource import Resource
 from onegov.page.collection import PageCollection
-from onegov.parliament.collections import (
-    MeetingCollection,
-    MeetingItemCollection,
-    PoliticalBusinessCollection,
-    PoliticalBusinessParticipationCollection,
-    RISCommissionCollection,
-    RISCommissionMembershipCollection,
-    RISParliamentarianCollection,
-    RISParliamentarianRoleCollection,
-    RISParliamentaryGroupCollection,
+from onegov.org.collections.meeting import MeetingCollection
+from onegov.org.collections.meeting_item import MeetingItemCollection
+from onegov.org.collections.political_business import (
+    PoliticalBusinessCollection
 )
-from onegov.parliament.models import (
+from onegov.org.collections.political_business_participant import (
+    PoliticalBusinessParticipationCollection
+)
+from onegov.org.collections.commission import (
+    RISCommissionCollection,
+)
+from onegov.org.collections.commission_membership import (
+    RISCommissionMembershipCollection
+)
+from onegov.org.collections.parliamentarian import (
+    RISParliamentarianCollection,
+)
+from onegov.org.collections.parliamentary_group import (
+    RISParliamentaryGroupCollection
+)
+from onegov.org.collections.parliamentarian_role import (
+    RISParliamentarianRoleCollection
+)
+from onegov.org.models import (
     MeetingItem,
     RISCommissionMembership,
     RISParliamentarian,
@@ -94,7 +106,7 @@ if TYPE_CHECKING:
 
     from translationstring import TranslationString
     from uuid import UUID
-    from onegov.parliament.models.political_business import (
+    from onegov.org.models.political_business import (
         PoliticalBusinessStatus,
         PoliticalBusiness
     )

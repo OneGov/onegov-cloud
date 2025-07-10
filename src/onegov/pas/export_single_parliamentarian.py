@@ -11,7 +11,7 @@ from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration,
 )
-from onegov.parliament.models.attendence import TYPES
+from onegov.org.models.attendence import TYPES
 from onegov.pas.models.attendence import PASAttendence
 from datetime import date  # noqa: TC003
 from onegov.pas.utils import format_swiss_number

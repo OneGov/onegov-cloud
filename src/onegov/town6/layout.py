@@ -70,13 +70,13 @@ from onegov.org.layout import (
 from onegov.org.models import PageMove
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.page import PageCollection
-from onegov.parliament.collections import RISPartyCollection
-from onegov.parliament.collections import PoliticalBusinessCollection
-from onegov.parliament.collections.commission import (
+from onegov.org.collections.party import RISPartyCollection
+from onegov.org.collections.political_business import PoliticalBusinessCollection
+from onegov.org.collections.commission import (
     RISCommissionCollection
 )
-from onegov.parliament.collections import RISParliamentarianCollection
-from onegov.parliament.collections import (
+from onegov.org.collections.parliamentarian import RISParliamentarianCollection
+from onegov.org.collections.parliamentary_group import (
     RISParliamentaryGroupCollection
 )
 from onegov.stepsequence import step_sequences

@@ -83,15 +83,22 @@ from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.page import PageCollection
-from onegov.parliament.collections import (
-    RISPartyCollection,
-    MeetingCollection,
-    RISCommissionCollection,
-    RISParliamentarianCollection,
-    RISParliamentarianRoleCollection,
-    RISParliamentaryGroupCollection, PoliticalBusinessCollection
+from onegov.org.collections.party import RISPartyCollection
+from onegov.org.collections.meeting import MeetingCollection
+from onegov.org.collections.commission import RISCommissionCollection
+from onegov.org.collections.parliamentarian import (
+    RISParliamentarianCollection
 )
-from onegov.parliament.models import (
+from onegov.org.collections.parliamentarian_role import (
+    RISParliamentarianRoleCollection
+)
+from onegov.org.collections.parliamentary_group import (
+    RISParliamentaryGroupCollection
+)
+from onegov.org.collections.political_business import (
+    PoliticalBusinessCollection,
+)
+from onegov.org.models import (
     Meeting,
     Party,
     RISCommission,
@@ -100,7 +107,7 @@ from onegov.parliament.models import (
     RISParliamentaryGroup,
     RISParty, PoliticalBusiness,
 )
-from onegov.parliament.models.meeting_item import MeetingItem
+from onegov.org.models.meeting_item import MeetingItem
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.people import Person, PersonCollection

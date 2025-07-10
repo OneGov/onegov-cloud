@@ -9,7 +9,7 @@ from onegov.pas import _
 from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.models import SettlementRun
-from onegov.parliament.models.attendence import TYPES
+from onegov.org.models.attendence import TYPES
 from wtforms.fields import DateField
 from wtforms.fields import FloatField
 from wtforms.fields import RadioField

@@ -1,4 +1,30 @@
 from __future__ import annotations
+from onegov.org.models.attendence import Attendence
+from onegov.org.models.change import Change
+from onegov.org.models.commission import Commission, RISCommission
+from onegov.org.models.commission_membership import (
+    CommissionMembership,
+    RISCommissionMembership,
+)
+from onegov.org.models.legislative_period import LegislativePeriod
+from onegov.org.models.meeting import Meeting
+from onegov.org.models.meeting_item import MeetingItem
+from onegov.org.models.parliamentarian import Parliamentarian
+from onegov.org.models.parliamentarian import RISParliamentarian
+from onegov.org.models.parliamentarian_role import (
+    ParliamentarianRole,
+    RISParliamentarianRole,
+    PARLIAMENTARIAN_ROLES
+)
+from onegov.org.models.parliamentary_group import (
+    ParliamentaryGroup,
+    RISParliamentaryGroup
+)
+from onegov.org.models.party import Party, RISParty
+from onegov.org.models.political_business import (
+    PoliticalBusiness,
+    PoliticalBusinessParticipation,
+)
 
 from onegov.org.models.atoz import AtoZ
 from onegov.org.models.clipboard import Clipboard
@@ -120,5 +146,26 @@ __all__ = (
     'TicketNote',
     'Topic',
     'TraitInfo',
-    'VisibleOnHomepageExtension'
+    'VisibleOnHomepageExtension',
+    'Attendence',
+    'Change',
+    'Commission',
+    'CommissionMembership',
+    'LegislativePeriod',
+    'Meeting',
+    'MeetingItem',
+    'Parliamentarian',
+    'RISParliamentarian',
+    'ParliamentarianRole',
+    'PARLIAMENTARIAN_ROLES',
+    'RISParliamentarianRole',
+    'ParliamentaryGroup',
+    'RISParliamentaryGroup',
+    'Party',
+    'RISCommission',
+    'RISCommissionMembership',
+    'RISParliamentarian',
+    'RISParty',
+    'PoliticalBusiness',
+    'PoliticalBusinessParticipation',
 )

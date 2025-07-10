@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.parliament.models import Party
+from onegov.org.models import Party
 
 
 class PASParty(Party):

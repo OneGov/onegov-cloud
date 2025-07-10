@@ -9,7 +9,7 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
 
 from onegov.core.elements import Link
 from onegov.core.security import Private
-from onegov.parliament.models.attendence import TYPES
+from onegov.org.models.attendence import TYPES
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.calculate_pay import calculate_rate
@@ -46,7 +46,7 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
 
-    from onegov.parliament.models import Commission, Parliamentarian
+    from onegov.org.models import Commission, Parliamentarian
 
     SettlementDataRow = tuple[
         'date', Parliamentarian, str, Decimal, Decimal, Decimal

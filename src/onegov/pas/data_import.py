@@ -32,7 +32,7 @@ P = ParamSpec('P')
 from typing import Any as Incomplete
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.parliament.models.commission_membership import MembershipRole
+    from onegov.org.models.commission_membership import MembershipRole
     from collections.abc import Callable
     from sqlalchemy.orm import Session
     from types import TracebackType

@@ -5,10 +5,10 @@ from webob.exc import HTTPNotFound
 from onegov.core.elements import Link
 from onegov.core.security import Private, Public
 
-from onegov.parliament.collections import RISPartyCollection
-from onegov.parliament.collections import PartyCollection
+from onegov.org.collections.party import RISPartyCollection
+from onegov.org.collections.party import PartyCollection
 from onegov.org.forms.party import PartyForm
-from onegov.parliament.models import RISParty, Party
+from onegov.org.models import RISParty, Party
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import RISPartyCollectionLayout

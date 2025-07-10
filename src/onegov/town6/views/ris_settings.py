@@ -1,13 +1,13 @@
 from __future__ import annotations
 from onegov.core.security import Private
 from onegov.org.models import Organisation
-from onegov.parliament.collections import PoliticalBusinessCollection
-from onegov.parliament.collections import MeetingCollection
-from onegov.parliament.collections import RISCommissionCollection
-from onegov.parliament.collections.parliamentarian import (
+from onegov.org.collections.political_business import PoliticalBusinessCollection
+from onegov.org.collections.meeting import MeetingCollection
+from onegov.org.collections.commission import RISCommissionCollection
+from onegov.org.collections.parliamentarian import (
     RISParliamentarianCollection
 )
-from onegov.parliament.collections.parliamentary_group import (
+from onegov.org.collections.parliamentary_group import (
     RISParliamentaryGroupCollection
 )
 from onegov.town6 import _

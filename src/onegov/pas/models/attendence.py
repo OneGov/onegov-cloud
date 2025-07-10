@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.parliament.models import Attendence
+from onegov.org.models import Attendence
 
 
 class PASAttendence(Attendence):

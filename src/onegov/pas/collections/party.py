@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.parliament.collections.party import PartyCollection
+from onegov.org.collections.party import PartyCollection
 from onegov.pas.models import PASParty
 
 

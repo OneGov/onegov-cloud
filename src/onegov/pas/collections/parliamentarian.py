@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.parliament.collections import ParliamentarianCollection
+from onegov.org.collections.parliamentarian import ParliamentarianCollection
 from onegov.pas.models import PASParliamentarian
 
 

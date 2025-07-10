@@ -5,7 +5,7 @@ from onegov.core.utils import dictionary_to_binary
 from onegov.form import Form
 from onegov.form.fields import UploadMultipleField
 from wtforms.fields import BooleanField
-from onegov.parliament import _
+from onegov.org import _
 from onegov.pas.importer.json_import import (
     MembershipData,
     OrganizationData,

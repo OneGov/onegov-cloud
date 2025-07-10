@@ -172,11 +172,11 @@ class MembershipData(TypedDict):
 
 from typing import TYPE_CHECKING, TypedDict
 if TYPE_CHECKING:
-    from onegov.parliament.models.parliamentarian_role import (
+    from onegov.org.models.parliamentarian_role import (
         ParliamentaryGroupRole, ParliamentarianRole
 )
-    from onegov.parliament.models.parliamentarian_role import PartyRole
-    from onegov.parliament.models.parliamentarian_role import Role
+    from onegov.org.models.parliamentarian_role import PartyRole
+    from onegov.org.models.parliamentarian_role import Role
     from collections.abc import Sequence
     from sqlalchemy.orm import Session
 

@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 from onegov.core.elements import Link
 from onegov.org.forms import ParliamentarianRoleForm
 from onegov.org.security import Private, Public
-from onegov.parliament.collections import ParliamentarianRoleCollection
-from onegov.parliament.models import RISParliamentarianRole
+from onegov.org.collections.parliamentarian_role import ParliamentarianRoleCollection
+from onegov.org.models import RISParliamentarianRole
 from onegov.town6 import _
 from onegov.town6.app import TownApp
 from onegov.town6.layout import RISParliamentarianRoleLayout
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from webob.response import Response
 
     from onegov.core.types import RenderData
-    from onegov.parliament.models import ParliamentarianRole
+    from onegov.org.models import ParliamentarianRole
     from onegov.pas.layouts import PASParliamentarianRoleLayout
     from onegov.town6.request import TownRequest
 

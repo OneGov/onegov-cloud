@@ -4,7 +4,7 @@ from webob.exc import HTTPNotFound
 
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
-from onegov.parliament.collections.parliamentary_group import (
+from onegov.org.collections.parliamentary_group import (
     RISParliamentaryGroupCollection,
     RISParliamentaryGroup,
     ParliamentaryGroupCollection
@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from webob.response import Response
 
     from onegov.core.types import RenderData
-    from onegov.parliament.models import ParliamentaryGroup
+    from onegov.org.models import ParliamentaryGroup
     from onegov.pas.layouts import PASParliamentaryGroupLayout
     from onegov.pas.layouts import PASParliamentaryGroupCollectionLayout
     from onegov.town6.request import TownRequest

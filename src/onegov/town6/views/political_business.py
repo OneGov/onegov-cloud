@@ -3,16 +3,16 @@ from __future__ import annotations
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
 from onegov.org.forms.political_business import PoliticalBusinessForm
-from onegov.parliament.collections import ParliamentaryGroupCollection
-from onegov.parliament.collections import (
+from onegov.org.collections.parliamentary_group import ParliamentaryGroupCollection
+from onegov.org.collections.political_business_participant import (
     PoliticalBusinessParticipationCollection
 )
-from onegov.parliament.collections import PoliticalBusinessCollection
-from onegov.parliament.models import PoliticalBusiness, ParliamentaryGroup
-from onegov.parliament.models import PoliticalBusinessParticipation
-from onegov.parliament.models.political_business import (
+from onegov.org.collections.political_business import PoliticalBusinessCollection
+from onegov.org.models import PoliticalBusiness, ParliamentaryGroup
+from onegov.org.models import PoliticalBusinessParticipation
+from onegov.org.models.political_business import (
     POLITICAL_BUSINESS_STATUS)
-from onegov.parliament.models.political_business import (
+from onegov.org.models.political_business import (
     POLITICAL_BUSINESS_TYPE)
 from onegov.town6 import _
 from onegov.town6 import TownApp

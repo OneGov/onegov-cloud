@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.parliament.models import ParliamentaryGroup
+from onegov.org.models import ParliamentaryGroup
 
 
 class PASParliamentaryGroup(ParliamentaryGroup):

@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from onegov.parliament.models import Change
+from onegov.org.models import Change
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from onegov.parliament.models import Attendence
-    from onegov.parliament.models.change import Action
+    from onegov.org.models import Attendence
+    from onegov.org.models.change import Action
     from onegov.town6.request import TownRequest
 
 

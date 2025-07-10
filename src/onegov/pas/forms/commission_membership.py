@@ -7,7 +7,7 @@ from onegov.form.fields import TranslatedSelectField
 from onegov.pas import _
 from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.collections import PASParliamentarianCollection
-from onegov.parliament.models.commission_membership import ROLES
+from onegov.org.models.commission_membership import ROLES
 from wtforms.fields import DateField
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional

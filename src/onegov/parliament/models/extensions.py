@@ -18,8 +18,8 @@ from collections.abc import Sequence
 from wtforms.fields import TextAreaField
 from wtforms.fields import BooleanField
 
-from onegov.parliament import _
-from onegov.parliament.models import RISParliamentarian
+from onegov.org import _
+from onegov.org.models import RISParliamentarian
 
 if TYPE_CHECKING:
     from wtforms.fields.choices import _Choice

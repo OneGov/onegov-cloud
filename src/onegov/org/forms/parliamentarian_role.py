@@ -4,17 +4,16 @@ from datetime import date
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import TranslatedSelectField
-from onegov.parliament import _
-from onegov.parliament.collections import (
-    ParliamentarianCollection,
-    ParliamentaryGroupCollection,
-    PartyCollection
-)
-from onegov.parliament.models import PARLIAMENTARIAN_ROLES
-from onegov.parliament.models.parliamentarian_role import (
+from onegov.org import _
+from onegov.org.collections.parliamentarian import ParliamentarianCollection
+from onegov.org.collections.parliamentary_group import ParliamentaryGroupCollection
+from onegov.org.collections.party import PartyCollection
+
+from onegov.org.models import PARLIAMENTARIAN_ROLES
+from onegov.org.models.parliamentarian_role import (
     PARLIAMENTARY_GROUP_ROLES
 )
-from onegov.parliament.models.parliamentarian_role import (
+from onegov.org.models.parliamentarian_role import (
     PARTY_ROLES
 )
 from wtforms.fields import DateField
@@ -24,7 +23,7 @@ from wtforms.validators import Optional
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from onegov.parliament.models import ParliamentarianRole
+    from onegov.org.models import ParliamentarianRole
     from typing import Any
 
 

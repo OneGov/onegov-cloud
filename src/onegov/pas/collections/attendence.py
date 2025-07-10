@@ -3,7 +3,7 @@ from __future__ import annotations
 from sqlalchemy import desc, or_
 
 from onegov.core.collection import GenericCollection
-from onegov.parliament.models import (
+from onegov.org.models import (
     ParliamentarianRole,
 )
 from onegov.pas.models import (

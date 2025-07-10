@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
-from onegov.parliament.collections import RISParliamentarianCollection
-from onegov.parliament.collections import ParliamentarianCollection
+from onegov.org.collections.parliamentarian import RISParliamentarianCollection
+from onegov.org.collections.parliamentarian import ParliamentarianCollection
 from onegov.org.forms import ParliamentarianForm
 from onegov.org.forms import ParliamentarianRoleForm
-from onegov.parliament.models import RISParliamentarian
-from onegov.parliament.models import RISParliamentarianRole
+from onegov.org.models import RISParliamentarian
+from onegov.org.models import RISParliamentarianRole
 from onegov.pas.models import PASParliamentarian, PASParliamentarianRole
 from onegov.town6 import _
 from onegov.town6 import TownApp

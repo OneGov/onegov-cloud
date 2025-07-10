@@ -11,12 +11,12 @@ from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import TranslatedSelectField
 from wtforms.fields import DateField
-from onegov.parliament import _
-from onegov.parliament.models import Parliamentarian
-from onegov.parliament.models import PoliticalBusiness
-from onegov.parliament.models import RISParliamentarian
-from onegov.parliament.models import RISParliamentaryGroup
-from onegov.parliament.models.political_business import (
+from onegov.org import _
+from onegov.org.models import Parliamentarian
+from onegov.org.models import PoliticalBusiness
+from onegov.org.models import RISParliamentarian
+from onegov.org.models import RISParliamentaryGroup
+from onegov.org.models.political_business import (
     POLITICAL_BUSINESS_TYPE,
     POLITICAL_BUSINESS_STATUS
 )

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.parliament.models import LegislativePeriod
+from onegov.org.models import LegislativePeriod
 
 
 class PASLegislativePeriod(LegislativePeriod):
