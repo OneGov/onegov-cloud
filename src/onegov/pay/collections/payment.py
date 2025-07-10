@@ -151,7 +151,9 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
                     Reservation.start <= self.reservation_end
                 )
             query = query.filter(
-                Payment.linked_reservations.any(and_(*conditions)))
+                Payment.linked_reservations.isnot(None),  # type: ignore[attr-defined]
+                Payment.linked_reservations.any(and_(*conditions))  # type: ignore[attr-defined]
+            )
 
         return query.order_by(Payment.created.desc())
 
@@ -159,7 +161,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index):
+    def page_by_index(self, index: int) -> PaymentCollection:
         return self.__class__(
             self.session,
             page=index,
@@ -176,7 +178,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
 
     def tickets_by_batch(self) -> dict[UUID, Ticket]:
         session = self.session
-        return {ticket.payment_id: ticket  # type:ignore[union-attr]
+        return {ticket.payment_id: ticket  # type: ignore[misc]
             for ticket in session.query(Ticket).filter(
             Ticket.payment_id.in_([el.id for el in self.batch]))
         }
@@ -240,8 +242,8 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         self,
         subset: Iterable[Payment] | None = None
     ) -> dict[UUID, list[AnyPayableBase]]:
-        subset = subset or self.subset()
-        return self.payment_links_for(subset)
+        subset_iterable = subset or self.subset()
+        return self.payment_links_for(list(subset_iterable))
 
     def payment_links_by_batch(
         self,
