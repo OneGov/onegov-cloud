@@ -3228,8 +3228,7 @@ class PaymentCollectionLayout(DefaultLayout):
     def editbar_links(self) -> list[Link | LinkGroup]:
         links: list[Link | LinkGroup] = []
 
-        # FIXME: Temporary! For testing
-        if not self.app.payment_providers_enabled:
+        if self.app.payment_providers_enabled:
             if self.request.is_admin:
                 links.append(
                     Link(
