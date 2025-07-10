@@ -80,6 +80,7 @@ class Meeting(Base, ContentMixin, ORMSearchable, AssociatedFiles):
         ForeignKey('par_political_businesses.id'),
     )
 
+    # FIXME: is this used or covered by meeting_items?
     #: list of political businesses, "Traktanden"
     political_businesses: RelationshipProperty[PoliticalBusiness] = (
         relationship(
@@ -97,7 +98,7 @@ class Meeting(Base, ContentMixin, ORMSearchable, AssociatedFiles):
         'MeetingItem',
         cascade='all, delete-orphan',
         back_populates='meeting',
-        order_by='desc(MeetingItem.number)'
+        order_by='asc(MeetingItem.number)'
     )
 
     def __repr__(self) -> str:

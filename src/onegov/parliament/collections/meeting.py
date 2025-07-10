@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from functools import cached_property
+
 from onegov.core.collection import GenericCollection
+from onegov.parliament.models import Meeting
+from onegov.town6 import _
 
 from typing import TYPE_CHECKING
-
-from onegov.parliament.models import Meeting
 
 if TYPE_CHECKING:
     from uuid import UUID
@@ -12,6 +14,10 @@ if TYPE_CHECKING:
 
 
 class MeetingCollection(GenericCollection[Meeting]):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Meeting')
 
     @property
     def model_class(self) -> type[Meeting]:

@@ -297,17 +297,26 @@ msgstr "Parlamentari"
 msgid "Parliamentarian"
 msgstr "Parlamentare"
 
-msgid "Role (as a party or group member)"
-msgstr "Ruolo (come membro di un partito o di un gruppo)"
-
 msgid "Edit"
 msgstr "Modifica"
 
-msgid "Do you really want to delete this parliamentarian?"
-msgstr "Vuole davvero cancellare questo parlamentare?"
+msgid "Do you really want to delete this meeting?"
+msgstr "Vuoi davvero cancellare questa riunione?"
 
 msgid "This cannot be undone."
 msgstr "L'operazione non può essere annullata."
+
+msgid "Delete meeting"
+msgstr "Elimina riunione"
+
+msgid "Parliamentarians"
+msgstr "Parlamentari"
+
+msgid "Role (as a party or group member)"
+msgstr "Ruolo (come membro di un partito o di un gruppo)"
+
+msgid "Do you really want to delete this parliamentarian?"
+msgstr "Vuole davvero cancellare questo parlamentare?"
 
 msgid "Delete parliamentarian"
 msgstr "Elimina parlamentare"
@@ -2460,8 +2469,26 @@ msgstr "Nuova commissione"
 msgid "Your changes were saved"
 msgstr "Le modifiche sono state salvate"
 
+msgid "The commission has been deleted."
+msgstr "La commissione è stata eliminata."
+
 msgid "Sort"
 msgstr "Ordinare"
+
+msgid "Added a new meeting."
+msgstr "Aggiunta una nuova riunione."
+
+msgid "New Meeting"
+msgstr "Nuova riunione"
+
+msgid "Your changes were saved."
+msgstr "Le modifiche sono state salvate."
+
+msgid "Edit Meeting"
+msgstr "Modifica la riunione"
+
+msgid "The meeting has been deleted."
+msgstr "La riunione è stata eliminata."
 
 msgid "Added a new parliamentarian"
 msgstr "Aggiunto un nuovo parlamentare"
@@ -2469,11 +2496,17 @@ msgstr "Aggiunto un nuovo parlamentare"
 msgid "New parliamentarian"
 msgstr "Nuovo parlamentare"
 
+msgid "The parliamentarian has been deleted."
+msgstr "Il parlamentare è stato eliminato."
+
 msgid "Added a new role"
 msgstr "Aggiunto un nuovo ruolo"
 
 msgid "New role"
 msgstr "Nuovo ruolo"
+
+msgid "The parliamentarian role has been deleted."
+msgstr "Il ruolo del parlamentare è stato eliminato."
 
 msgid "Added a new parliamentary group"
 msgstr "Aggiunto un nuovo gruppo parlamentare"
@@ -2481,11 +2514,17 @@ msgstr "Aggiunto un nuovo gruppo parlamentare"
 msgid "New parliamentary group"
 msgstr "Nuovo gruppo parlamentare"
 
+msgid "The parliamentary group has been deleted."
+msgstr "Il gruppo parlamentare è stato eliminato."
+
 msgid "Added a new party"
 msgstr "Aggiunto un nuovo partito"
 
 msgid "New party"
 msgstr "Nuovo partito"
+
+msgid "The party has been deleted."
+msgstr "Il partito è stato eliminato."
 
 msgid "New Recipient"
 msgstr "Nuovo destinatario"

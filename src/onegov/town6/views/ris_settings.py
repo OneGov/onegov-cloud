@@ -1,4 +1,7 @@
 from __future__ import annotations
+
+from webob.exc import HTTPNotFound
+
 from onegov.core.security import Private
 from onegov.org.models import Organisation
 from onegov.parliament.collections import PoliticalBusinessCollection
@@ -32,6 +35,9 @@ def view_ris_settings(
     self: Organisation,
     request: TownRequest
 ) -> RenderData:
+
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
 
     layout = DefaultLayout(self, request)
 

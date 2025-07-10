@@ -71,5 +71,8 @@ class MeetingItem(Base, ORMSearchable):
         back_populates='meeting_items'
     )
 
+    def display_name(self) -> str:
+        return f'{self.number} {self.title}' if self.number else self.title
+
     def __repr__(self) -> str:
         return f'<Meeting Item {self.number} {self.title}>'

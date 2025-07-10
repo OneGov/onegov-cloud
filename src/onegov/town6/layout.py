@@ -1079,6 +1079,10 @@ class MeetingCollectionLayout(DefaultLayout):
 class MeetingLayout(DefaultLayout):
 
     @cached_property
+    def collection(self) -> MeetingCollection:
+        return MeetingCollection(self.request.session)
+
+    @cached_property
     def title(self) -> str:
         return self.model.title
 
@@ -1096,20 +1100,48 @@ class MeetingLayout(DefaultLayout):
         ]
 
     @cached_property
-    def editbar_links(self) -> list[LinkGroup] | None:
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
                 LinkGroup(
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_('Meeting'),
+                            text=_('Parliamentarian'),
                             url=self.request.link(self.model, 'new'),
-                            attrs={'class': 'new-meeting'},
+                            attrs={'class': 'new-parliamentarian'},
                         ),
                     ],
                 ),
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-meeting'}
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-meeting'},
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to delete this meeting?'
+                            ),
+                            _('This cannot be undone.'),
+                            _('Delete meeting'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(
+                                self.collection)
+                        )
+                    )
+                )
             ]
+
         return None
 
 

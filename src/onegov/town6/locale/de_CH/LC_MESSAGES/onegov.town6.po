@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-09 13:44+0200\n"
+"POT-Creation-Date: 2025-07-07 15:20+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -301,17 +301,26 @@ msgstr "Parlamentarierinnen und Parlamentarier"
 msgid "Parliamentarian"
 msgstr "Parlamentarier:in"
 
-msgid "Role (as a party or group member)"
-msgstr "Rolle (als Partei- oder Fraktionsmitglied)"
-
 msgid "Edit"
 msgstr "Bearbeiten"
 
-msgid "Do you really want to delete this parliamentarian?"
-msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
+msgid "Do you really want to delete this meeting?"
+msgstr "Diese Sitzung wirklich löschen?"
 
 msgid "This cannot be undone."
 msgstr "Dies kann nicht rückgängig gemacht werden."
+
+msgid "Delete meeting"
+msgstr "Sitzung löschen"
+
+msgid "Parliamentarians"
+msgstr "Parlamentarierinnen und Parlamentarier"
+
+msgid "Role (as a party or group member)"
+msgstr "Rolle (als Partei- oder Fraktionsmitglied)"
+
+msgid "Do you really want to delete this parliamentarian?"
+msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
 
 msgid "Delete parliamentarian"
 msgstr "Parlamentarier:in löschen"
@@ -2460,8 +2469,26 @@ msgstr "Neue Kommission"
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
+msgid "The commission has been deleted."
+msgstr "Die Kommission wurde gelöscht."
+
 msgid "Sort"
 msgstr "Sortieren"
+
+msgid "Added a new meeting."
+msgstr "Neue Sitzung hinzugefügt"
+
+msgid "New Meeting"
+msgstr "Neue Sitzung"
+
+msgid "Your changes were saved."
+msgstr "Ihre Änderungen wurden gespeichert."
+
+msgid "Edit Meeting"
+msgstr "Sitzung bearbeiten"
+
+msgid "The meeting has been deleted."
+msgstr "Die Sitzung wurde gelöscht."
 
 msgid "Added a new parliamentarian"
 msgstr "Parlamentarier:in hinzugefügt"
@@ -2469,11 +2496,17 @@ msgstr "Parlamentarier:in hinzugefügt"
 msgid "New parliamentarian"
 msgstr "Neue:r Parlamentarier:in"
 
+msgid "The parliamentarian has been deleted."
+msgstr "Der/die Parlamentarier:in wurde gelöscht."
+
 msgid "Added a new role"
 msgstr "Neue Rolle hinzugefügt"
 
 msgid "New role"
 msgstr "Neue Rolle"
+
+msgid "The parliamentarian role has been deleted."
+msgstr "Die Rolle des/der Parlamentarier:in wurde gelöscht."
 
 msgid "Added a new parliamentary group"
 msgstr "Fraktion hinzugefügt"
@@ -2481,11 +2514,17 @@ msgstr "Fraktion hinzugefügt"
 msgid "New parliamentary group"
 msgstr "Neue Fraktion"
 
+msgid "The parliamentary group has been deleted."
+msgstr "Die Fraktion wurde gelöscht."
+
 msgid "Added a new party"
 msgstr "Partei hinzugefügt"
 
 msgid "New party"
 msgstr "Neue Partei"
+
+msgid "The party has been deleted."
+msgstr "Die Partei wurde gelöscht."
 
 msgid "New Recipient"
 msgstr "Neuer Empfänger"
@@ -2596,6 +2635,12 @@ msgstr "Ratsinformationssystem (RIS)"
 msgid "New Note"
 msgstr "Neue Notiz"
 
+#~ msgid "The political business has been deleted."
+#~ msgstr "Das politische Geschäft wurde gelöscht."
+
+#~ msgid "Agenda Items"
+#~ msgstr "Traktanden"
+
 #~ msgid "Parliamentarian is not in this commission."
 #~ msgstr "Parlamentarier:in ist nicht in dieser Kommission."
 
@@ -2628,12 +2673,6 @@ msgstr "Neue Notiz"
 
 #~ msgid "End must be after start"
 #~ msgstr "Ende muss nach dem Start liegen"
-
-#~ msgid "Do you really want to delete this meeting?"
-#~ msgstr "Diese Sitzung wirklich löschen?"
-
-#~ msgid "Delete meeting"
-#~ msgstr "Sitzung löschen"
 
 #~ msgid "Do you really want to remove this parliamentarian?"
 #~ msgstr "Diese:n Parlamentarier:in wirklich entfernen?"
