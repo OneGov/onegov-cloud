@@ -720,7 +720,7 @@ def test_sidebar_contact_extension(session):
     ]
 
 
-def test_inline_photo_album_extension():
+def test_inline_photo_album_extension(session):
     class Topic(InlinePhotoAlbumExtension):
         meta = {}
         content = {}
@@ -728,20 +728,11 @@ def test_inline_photo_album_extension():
     class TopicForm(Form):
         pass
 
-    # Mock database-related classes
-    class MockQuery:
-        def all(self):
-            return []
-
-    class MockSession:
-        def query(self, *args):
-            return MockQuery()
-
     topic = Topic()
     assert topic.photo_album_id is None
 
     request = Bunch(
-        session=MockSession(),
+        session=session,
         app=Bunch(**{'settings.org.disabled_extensions': []}),
         translate=lambda text: text
     )
