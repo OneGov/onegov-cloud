@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from onegov.core.security import Private
-from onegov.core.utils import append_query_param
 from onegov.form import merge_forms
 from onegov.org.views.payment import (
     export_payments, handle_batch_set_payment_state, view_payments)
@@ -11,11 +10,11 @@ from onegov.org.forms import DateRangeForm, ExportForm
 
 from onegov.pay import PaymentCollection
 from onegov.town6.layout import PaymentCollectionLayout
-from webob import Response
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from webob import Response
     from onegov.core.types import RenderData
     from onegov.org.views.payment import PaymentExportForm
     from onegov.server.types import JSON_ro
@@ -34,16 +33,7 @@ def town_view_payments(
     form: PaymentSearchForm
 ) -> RenderData | Response:
     layout = PaymentCollectionLayout(self, request)
-    result = view_payments(self, request, form, layout)
-
-    # if a pdf is rendered, we get a response
-    if isinstance(result, Response):
-        return result
-
-    result['pdf_export_link'] = append_query_param(
-        request.url, 'format', 'pdf'
-    )
-    return result
+    return view_payments(self, request, form, layout)
 
 
 @TownApp.json(

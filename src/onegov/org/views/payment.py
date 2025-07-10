@@ -5,6 +5,7 @@ from collections import OrderedDict
 from decimal import Decimal
 from functools import partial
 from onegov.core.security import Private
+from onegov.core.utils import append_query_param
 from onegov.form import merge_forms
 from onegov.org import OrgApp, _
 from onegov.org.forms import DateRangeForm, ExportForm
@@ -31,7 +32,7 @@ from webob import exc, Response as WebobResponse
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Iterator
-    from collections.abc import Callable, Sequence  # type: ignore[attr-defined]
+    from collections.abc import Callable, Sequence
     from datetime import datetime
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
@@ -193,7 +194,8 @@ def view_payments(
         'tickets': self.tickets_by_batch(),
         'reservation_dates': self.reservation_dates_by_batch(),
         'providers': providers,
-        'payment_links': self.payment_links_by_batch()
+        'payment_links': self.payment_links_by_batch(),
+        'pdf_export_link': append_query_param(request.url, 'format', 'pdf')
     }
 
 

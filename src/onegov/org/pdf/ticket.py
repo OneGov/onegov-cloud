@@ -49,16 +49,18 @@ class TicketPdf(Pdf):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         locale = kwargs.pop('locale', None)
         translations = kwargs.pop('translations', None)
-        self.ticket: Ticket | None = kwargs.pop('ticket', None)
-        self.layout: DefaultLayout | None = kwargs.pop('layout', None)
-        qr_payload: str | None = kwargs.pop('qr_payload', None)
+        ticket = kwargs.pop('ticket')
+        layout = kwargs.pop('layout')
+        qr_payload = kwargs.pop('qr_payload')
         super().__init__(*args, **kwargs)
+        self.ticket: Ticket = ticket
         self.locale: str | None = locale
         self.translations: dict[str, GNUTranslations] = translations
+        self.layout: DefaultLayout = layout
 
         # Modification for the footer left on all pages
         self.doc.author = self.translate(_('Source')) + f': {self.doc.author}'
-        self.doc.qr_payload = qr_payload or ''  # type:ignore[attr-defined]
+        self.doc.qr_payload = qr_payload  # type:ignore[attr-defined]
 
     def translate(self, text: str) -> str:
         """ Translates the given string. """
@@ -320,7 +322,8 @@ class TicketPdf(Pdf):
         owner = self.ticket.user.username if self.ticket.user else ''
 
         def seconds(time: float | None) -> str:
-            return self.layout.format_seconds(time) if time else ''
+            assert layout is not None
+            return layout.format_seconds(time) if time else ''
 
         meta_fields = {
             'submitter_name': _('Name'),
@@ -356,6 +359,7 @@ class TicketPdf(Pdf):
 
     def ticket_payment(self) -> None:
         assert self.ticket is not None
+        assert self.layout is not None
         price = self.ticket.handler.payment
         if not price:
             return

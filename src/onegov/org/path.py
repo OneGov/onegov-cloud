@@ -4,7 +4,7 @@ from __future__ import annotations
 from onegov.form.models.definition import SurveyDefinition
 import sedate
 
-from datetime import date
+from datetime import date, datetime
 
 from onegov.api.models import ApiKey
 from onegov.chat import MessageCollection
@@ -910,14 +910,14 @@ def get_payments(
     app: OrgApp,
     source: str = '*',
     page: int = 0,
-    start: date | None = None,
-    end: date | None = None,
+    start: datetime | None = None,
+    end: datetime | None = None,
     status: str | None = None,
     payment_type: str | None = None,
-    ticket_start: date | None = None,
-    ticket_end: date | None = None,
-    reservation_start: date | None = None,
-    reservation_end: date | None = None
+    ticket_start: datetime | None = None,
+    ticket_end: datetime | None = None,
+    reservation_start: datetime | None = None,
+    reservation_end: datetime | None = None
 ) -> PaymentCollection:
     return PaymentCollection(
         session=app.session(),
