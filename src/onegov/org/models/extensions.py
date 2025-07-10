@@ -1251,9 +1251,7 @@ class InlinePhotoAlbumExtension(ContentExtension):
         from onegov.org.models import ImageSet
         albums: list[ImageSet] = (  # noqa: TC201
             ImageSetCollection(request.session).query().order_by(
-                desc(ImageSet.last_change), ImageSet.title
-            ).all()
-        )
+                desc(ImageSet.last_change), ImageSet.title).all())
         if not albums:
             return form_class
 
