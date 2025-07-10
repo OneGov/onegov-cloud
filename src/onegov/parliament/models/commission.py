@@ -24,7 +24,8 @@ if TYPE_CHECKING:
     from typing import Literal
     from typing import TypeAlias
 
-    from onegov.parliament.models import CommissionMembership, Attendence
+    from onegov.parliament.models import CommissionMembership
+    from onegov.parliament.models import Attendence
 
     CommissionType: TypeAlias = Literal[
         'normal',

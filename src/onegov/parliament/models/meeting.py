@@ -19,10 +19,10 @@ if TYPE_CHECKING:
     from datetime import datetime
 
     from markupsafe import Markup
-    from onegov.parliament.models.political_business import (
+    from onegov.parliament.models import (
         PoliticalBusiness,
     )
-    from onegov.parliament.models.meeting_item import MeetingItem
+    from onegov.parliament.models import MeetingItem
 
 
 class Meeting(Base, ContentMixin, ORMSearchable, AssociatedFiles):

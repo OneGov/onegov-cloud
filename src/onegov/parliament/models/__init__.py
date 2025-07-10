@@ -37,6 +37,7 @@ __all__ = (
     'Meeting',
     'MeetingItem',
     'Parliamentarian',
+    'RISParliamentarian',
     'ParliamentarianRole',
     'PARLIAMENTARIAN_ROLES',
     'RISParliamentarianRole',
