@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-09 13:44+0200\n"
+"POT-Creation-Date: 2025-07-10 02:37+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -155,6 +155,12 @@ msgstr "Sa"
 msgid "Su"
 msgstr "Di"
 
+msgid "Enable RIS"
+msgstr "Activer RIS"
+
+msgid "Enables the RIS integration for this organisation."
+msgstr "Active l'intégration RIS pour cette organisation."
+
 msgid "Events"
 msgstr "Événements"
 
@@ -280,6 +286,81 @@ msgstr "Page d'accueil"
 msgid "Chat Archive"
 msgstr "Archives des chats"
 
+msgid "Meetings"
+msgstr "Réunions"
+
+msgid "RIS Settings"
+msgstr "Paramètres RIS"
+
+msgid "Meeting"
+msgstr "Réunion"
+
+msgid "Parliamentarians"
+msgstr "Parlementaires"
+
+msgid "Parliamentarian"
+msgstr "Parlementaire"
+
+msgid "Role (as a party or group member)"
+msgstr "Rôle (en tant que membre d'un parti ou d'un groupe)"
+
+msgid "Edit"
+msgstr "Modifier"
+
+msgid "Do you really want to delete this parliamentarian?"
+msgstr "Voulez-vous vraiment supprimer ce parlementaire ?"
+
+msgid "This cannot be undone."
+msgstr "Cela ne peut être effectué."
+
+msgid "Delete parliamentarian"
+msgstr "Supprimer le parlementaire"
+
+msgid "Do you really want to remove this role?"
+msgstr "Voulez-vous vraiment supprimer ce rôle ?"
+
+msgid "Remove role"
+msgstr "Supprimer le rôle"
+
+msgid "Parliamentary groups"
+msgstr "Groupes Parlementaires"
+
+msgid "Parliamentary group"
+msgstr "Groupe Parlementaire"
+
+msgid "Do you really want to delete this parliamentary group?"
+msgstr "Voulez-vous vraiment supprimer ce groupe parlementaire?"
+
+msgid "Delete parliamentary group"
+msgstr "Supprimer ce groupe parlementaire"
+
+msgid "Parties"
+msgstr "Partis"
+
+msgid "Political Party"
+msgstr "Parti"
+
+msgid "Do you really want to delete this party?"
+msgstr "Voulez-vous vraiment supprimer ce parti ?"
+
+msgid "Delete party"
+msgstr "Supprimer le parti"
+
+msgid "Commissions"
+msgstr "Commissions"
+
+msgid "Commission"
+msgstr "Commission"
+
+msgid "Do you really want to delete this commission?"
+msgstr "Voulez-vous vraiment supprimer cette commission ?"
+
+msgid "Delete commission"
+msgstr "Supprimer la commission"
+
+msgid "Political Businesses"
+msgstr "Affaires politiques"
+
 msgid "No availability periods defined."
 msgstr "Aucune période de disponibilité définie."
 
@@ -347,6 +428,15 @@ msgstr "Chats actifs"
 
 msgid "No active chats."
 msgstr "Aucun chat actif."
+
+msgid "Contact"
+msgstr "Contact"
+
+msgid "No active commissions."
+msgstr "Aucune commission active."
+
+msgid "Filters"
+msgstr "Filtres"
 
 msgid "No directories defined yet."
 msgstr "Aucun dossier défini pour l'instant."
@@ -509,9 +599,6 @@ msgstr ""
 msgid "Complete"
 msgstr "Complet"
 
-msgid "Edit"
-msgstr "Modifier"
-
 msgid "No exports available."
 msgstr "Aucune exportation disponible."
 
@@ -613,11 +700,11 @@ msgstr "Protection des données"
 msgid "Login"
 msgstr "Connexion"
 
+msgid "Citizen Login"
+msgstr "Connexion client"
+
 msgid "About"
 msgstr "Impressum"
-
-msgid "Contact"
-msgstr "Contact"
 
 msgid "more"
 msgstr "plus"
@@ -706,6 +793,45 @@ msgstr "Nouvelle entrée"
 msgid "Directory"
 msgstr "Dossier"
 
+msgid "Payment"
+msgstr "Paiement"
+
+msgid "Value Added Tax"
+msgstr "Taxe sur la valeur ajoutée"
+
+msgid "${vat_rate}% included"
+msgstr "${vat_rate}% incluse"
+
+msgid "State"
+msgstr "État"
+
+msgid "Payment Method"
+msgstr "Méthode de paiement"
+
+msgid "Offline Payment"
+msgstr "Facture"
+
+msgid "Online Payment"
+msgstr "Paiement en ligne"
+
+msgid "Source"
+msgstr "Source"
+
+msgid "Manual"
+msgstr "Manuelle"
+
+msgid "Datatrans"
+msgstr "Datatrans"
+
+msgid "Stripe Connect"
+msgstr "Stripe Connect"
+
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
+
+msgid "Fee"
+msgstr "Tarif"
+
 msgid "Organisation"
 msgstr "Organisation"
 
@@ -734,10 +860,7 @@ msgid "Refunded"
 msgstr "Remboursé"
 
 msgid "Invoiced"
-msgstr ""
-
-msgid "Manual"
-msgstr "Manuelle"
+msgstr "Facturé"
 
 msgid "Ticket"
 msgstr "Ticket"
@@ -758,11 +881,11 @@ msgstr ""
 "Les personnes vivant en dehors des localités ayant les codes postaux "
 "suivants ne peuvent réserver cette allocation que le ${date} : ${zipcodes}"
 
+msgid "Occupancy"
+msgstr "Occupation"
+
 msgid "Quota"
 msgstr "Quota"
-
-msgid "State"
-msgstr "État"
 
 msgid "Initiated"
 msgstr "Initié"
@@ -811,9 +934,6 @@ msgstr "Numéro de téléphone de l'organisateur"
 
 msgid "Tags"
 msgstr "Étiquettes"
-
-msgid "Filters"
-msgstr "Filtres"
 
 msgid "Date and time"
 msgstr "Date et heure"
@@ -929,9 +1049,6 @@ msgstr "Confidentialité"
 msgid "Send me my entered data by e-mail."
 msgstr "M'envoyer mes données saisies par e-mail."
 
-msgid "Payment"
-msgstr "Paiement"
-
 msgid "Pay Online Now"
 msgstr "Payer en ligne maintenant"
 
@@ -947,11 +1064,14 @@ msgstr "à ${time}"
 msgid "Object"
 msgstr "Objet"
 
+msgid "Reservation Start"
+msgstr "Début de la réservation"
+
+msgid "Reservation End"
+msgstr "Fin de la réservation"
+
 msgid "Net Amount"
 msgstr "Montant net"
-
-msgid "Fee"
-msgstr "Tarif"
 
 msgid "Payment Provider"
 msgstr "Opérateur de paiement"
@@ -1117,6 +1237,18 @@ msgstr "Vous pouvez voir ci-dessous votre conversation de chat :"
 msgid "Have a great day!"
 msgstr "Passez une bonne journée!"
 
+msgid "Your e-mail address was just used to send a login link to ${homepage}."
+msgstr ""
+"Votre adresse e-mail vient d'être utilisée pour envoyer un lien de connexion "
+"à ${homepage}."
+
+msgid "Use the token below or click on the link to complete your login."
+msgstr ""
+"Utilisez le code ci-dessous ou cliquez sur le lien pour vous connecter."
+
+msgid "Complete Login"
+msgstr "Connexion complète"
+
 msgid "Hello"
 msgstr "Bonjour"
 
@@ -1280,6 +1412,9 @@ msgstr ""
 msgid "Pending approval"
 msgstr "En attente d'approbation"
 
+msgid "VAT"
+msgstr "TVA"
+
 msgid "A new entry has been added to the \"${directory}\" directory:"
 msgstr "Une nouvelle entrée a été ajoutée au répertoire \"${directory}\":"
 
@@ -1406,6 +1541,9 @@ msgstr ""
 msgid "Key Code"
 msgstr "Code clé"
 
+msgid "See all your reservations"
+msgstr "Voir toutes vos réservations"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Les réservations suivantes ont malheureusement été annulées:"
 
@@ -1469,6 +1607,15 @@ msgstr "Votre demande a été ré-ouverte"
 msgid "You can see the current status of your ticket at any time here:"
 msgstr ""
 "Vous pouvez consulter le statut actuel de votre billet à tout moment ici:"
+
+msgid "Date/Time"
+msgstr "Date/Heure"
+
+msgid "Agenda"
+msgstr "Agenda"
+
+msgid "No meetings defined yet."
+msgstr "Aucune réunion définie pour le moment."
 
 msgid "Directory entry adopted."
 msgstr "L'entrée de répertoire a été adoptée."
@@ -1713,6 +1860,90 @@ msgstr "Exporter ces événements"
 msgid "Submit your event"
 msgstr "Soumettez votre événement"
 
+msgid "Personnel number"
+msgstr "Numéro de personnel"
+
+msgid "Contract number"
+msgstr "Numéro de contrat"
+
+msgid "Picture"
+msgstr "Photo"
+
+msgid "Private address"
+msgstr "Adresse privée"
+
+msgid "Date of birth"
+msgstr "Date de naissance"
+
+msgid "Date of death"
+msgstr "Date de décès"
+
+msgid "Place of origin"
+msgstr "Lieu d'origine"
+
+msgid "Occupation"
+msgstr "Profession"
+
+msgid "Academic title"
+msgstr "Titre académique"
+
+msgid "Salutation"
+msgstr "Civilité"
+
+msgid "Salutation used in the address"
+msgstr "Civilité utilisée dans l'adresse"
+
+msgid "Salutation used for letters"
+msgstr "Civilité utilisée dans l'adresse"
+
+msgid "How bills should be delivered"
+msgstr "Comment les factures doivent être livrées"
+
+msgid "Private phone number"
+msgstr "Numéro de téléphone privé"
+
+msgid "Mobile phone number"
+msgstr "Numéro de téléphone mobile"
+
+msgid "Business phone number"
+msgstr "Numéro de téléphone professionnel"
+
+msgid "Primary email address"
+msgstr "Adresse e-mail principale"
+
+msgid "Secondary email address"
+msgstr "Adresse e-mail secondaire"
+
+msgid "Website"
+msgstr "Site Web"
+
+msgid "Remarks"
+msgstr "Remarques"
+
+msgid "Roles"
+msgstr "Rôles"
+
+msgid "Parliament"
+msgstr "Parlement"
+
+msgid "Interests"
+msgstr "Intérêts"
+
+msgid "Role"
+msgstr "Rôle"
+
+msgid "No parliamentarians defined yet."
+msgstr "Aucun parlementaire n'a été défini pour le moment."
+
+msgid "No parliamentary groups defined yet."
+msgstr "Aucun groupe parlementaire n'a été défini pour le moment."
+
+msgid "No parties defined yet."
+msgstr "Aucun parti n'a été défini pour le moment."
+
+msgid "Portrait"
+msgstr "Portrait"
+
 msgid "No payment providers defined."
 msgstr "Aucun fournisseur de paiement n'a été défini."
 
@@ -1731,11 +1962,23 @@ msgstr "Tarif :"
 msgid "Export Bill run as PDF"
 msgstr "Exporter l'exécution de la facture au format PDF"
 
-msgid "Ausgewählte als fakturiert markieren"
-msgstr "Marquer la sélection comme facturée"
-
 msgid "No payments yet."
 msgstr "Pas de paiements pour le moment."
+
+msgid "Batch Action"
+msgstr "Action par lot"
+
+msgid "Mark as Invoiced"
+msgstr "Marquer comme facturé"
+
+msgid "Mark as Paid"
+msgstr "Marquer comme payé"
+
+msgid "Mark as Unpaid"
+msgstr "Marquer comme non payé"
+
+msgid "Apply to selected"
+msgstr "Appliquer aux sélectionnés"
 
 msgid "Select organisation"
 msgstr "Sélectionner une organisation"
@@ -1751,6 +1994,30 @@ msgstr "Réinitialiser le filtre"
 
 msgid "Export a vCard of this person"
 msgstr "Exporter une vCard de cette personne"
+
+msgid "Number"
+msgstr "Numéro"
+
+msgid "Business Type"
+msgstr "Type d'activité"
+
+msgid "Status"
+msgstr "Statut"
+
+msgid "Participants"
+msgstr "Participants"
+
+msgid "Parliamentary Group"
+msgstr "Groupe parlementaire"
+
+msgid "No political businesses defined yet."
+msgstr "Aucun business politique n'a été défini pour le moment."
+
+msgid "Datum"
+msgstr "Date"
+
+msgid "Political Business"
+msgstr "Business politique"
 
 msgid "No publications"
 msgstr "Aucune publication"
@@ -1824,6 +2091,16 @@ msgstr ""
 "sont abonnées (si elles le font). Par conséquent, les informations affichées "
 "dans le calendrier peuvent être incorrectes ou obsolètes. Utilisez-le à vos "
 "risques et périls."
+
+msgid ""
+"If you want key codes to be included in the event's description then you may "
+"use the following link instead. Please note however that anyone you share "
+"this link with will have permanent access to this information."
+msgstr ""
+"Si vous souhaitez que les codes clés soient inclus dans la description de "
+"l'événement, vous pouvez utiliser le lien suivant. Notez toutefois que toute "
+"personne avec laquelle vous partagerez ce lien aura un accès permanent à ces "
+"informations."
 
 msgid "Reservations must be made at least one day in advance."
 msgstr ""
@@ -2039,9 +2316,6 @@ msgstr "${count} notes"
 msgid "Amount"
 msgstr "Montant"
 
-msgid "Source"
-msgstr "Source"
-
 msgid "Group"
 msgstr "Groupe"
 
@@ -2141,9 +2415,6 @@ msgstr "Actif"
 msgid "Inactive"
 msgstr "Inactif"
 
-msgid "Role"
-msgstr "Rôle"
-
 msgid "User group"
 msgstr "Groupe d'utilisateurs"
 
@@ -2208,8 +2479,44 @@ msgstr "Nouveau billet"
 msgid "Chat Customer"
 msgstr "Chat avec les clients"
 
+msgid "Added a new commission"
+msgstr "Ajout d'une nouvelle commission"
+
+msgid "New"
+msgstr "Nouveau"
+
+msgid "New commission"
+msgstr "Nouvelle commission"
+
+msgid "Your changes were saved"
+msgstr "Vos modifications ont été enregistrées"
+
 msgid "Sort"
 msgstr "Trier"
+
+msgid "Added a new parliamentarian"
+msgstr "Ajout d'un nouveau parlementaire"
+
+msgid "New parliamentarian"
+msgstr "Nouveau parlementaire"
+
+msgid "Added a new role"
+msgstr "Ajout d'un nouveau rôle"
+
+msgid "New role"
+msgstr "Nouveau rôle"
+
+msgid "Added a new parliamentary group"
+msgstr "Ajout d'un nouveau groupe parlementaire"
+
+msgid "New parliamentary group"
+msgstr "Nouveau groupe parlementaire"
+
+msgid "Added a new party"
+msgstr "Ajout d'un nouveau parti"
+
+msgid "New party"
+msgstr "Nouveau parti"
 
 msgid "New Recipient"
 msgstr "Nouveau destinataire"
@@ -2311,11 +2618,17 @@ msgstr ""
 msgid "Push Notification Overview"
 msgstr "Vue d'ensemble des notifications push"
 
-msgid "Value Added Tax"
-msgstr "Taxe sur la valeur ajoutée"
+msgid "Ratsinformationssystem"
+msgstr "Ratsinformationssystem"
+
+msgid "Ratsinformationssystem (RIS)"
+msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Nouveau commentaire"
+
+#~ msgid "Ausgewählte als fakturiert markieren"
+#~ msgstr "Marquer la sélection comme facturée"
 
 #~ msgid "Sign up"
 #~ msgstr "S'inscrire"
@@ -2432,9 +2745,6 @@ msgstr "Nouveau commentaire"
 
 #~ msgid "Do you really want to delete this event?"
 #~ msgstr "Voulez-vous vraiment supprimer cet événement ?"
-
-#~ msgid "This cannot be undone."
-#~ msgstr "Cela ne peut être effectué."
 
 #~ msgid "Delete event"
 #~ msgstr "Supprimer l'événement"
@@ -2592,9 +2902,6 @@ msgstr "Nouveau commentaire"
 #~ msgid "Clean up"
 #~ msgstr "Nettoyer"
 
-#~ msgid "Occupancy"
-#~ msgstr "Occupation"
-
 #~ msgid "Rules"
 #~ msgstr "Règles"
 
@@ -2613,9 +2920,6 @@ msgstr "Nouveau commentaire"
 #, python-format
 #~ msgid "Every ${days} until ${end}"
 #~ msgstr "Tous les ${days} jusqu'à ${end}"
-
-#~ msgid "New"
-#~ msgstr "Nouveau"
 
 #~ msgid "Subscribers"
 #~ msgstr "Abonnés"
@@ -2664,9 +2968,6 @@ msgstr "Nouveau commentaire"
 
 #~ msgid "Payments"
 #~ msgstr "Paiements"
-
-#~ msgid "Stripe Connect"
-#~ msgstr "Stripe Connect"
 
 #~ msgid "Synchronise"
 #~ msgstr "Synchroniser"
@@ -2725,3 +3026,4 @@ msgstr "Nouveau commentaire"
 
 #~ msgid "Perform Search"
 #~ msgstr "Rechercher"
+

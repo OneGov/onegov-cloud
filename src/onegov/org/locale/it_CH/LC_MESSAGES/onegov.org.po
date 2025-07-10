@@ -7277,3 +7277,4 @@ msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 #~ msgstr ""
 #~ "Se non sono state ancora prenotate, tutte le allocazioni create dalla regola"
 #~ " verranno rimosse."
+
