@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-09 13:44+0200\n"
+"POT-Creation-Date: 2025-07-10 13:49+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -4361,6 +4361,9 @@ msgstr "um ${time}"
 msgid "Object"
 msgstr "Objekt"
 
+msgid "Reservation"
+msgstr "Reservation"
+
 msgid "Disbursed"
 msgstr "Ausbezahlt"
 
@@ -5139,8 +5142,26 @@ msgstr "Aktiviert:"
 msgid "Fee:"
 msgstr "Gebühr:"
 
+msgid "Export Bill run as PDF"
+msgstr "Fakturierte Belege als PDF exportieren"
+
 msgid "No payments yet."
 msgstr "Noch keine Zahlungen."
+
+msgid "Batch Action"
+msgstr "Massenbearbeitung"
+
+msgid "Mark as Invoiced"
+msgstr "Als fakturiert markieren"
+
+msgid "Mark as Paid"
+msgstr "Als bezahlt markieren"
+
+msgid "Mark as Unpaid"
+msgstr "Als offen markieren"
+
+msgid "Apply to selected"
+msgstr "Auf Auswahl anwenden"
 
 msgid ""
 "The following requests have been submitted. To see the state of process you "
@@ -6458,12 +6479,23 @@ msgstr "Ihre Zahlung wurde rückerstattet"
 msgid "No payments found for PDF generation"
 msgstr "Keine Zahlungen gefunden für die PDF Erstellung"
 
+msgid "No tickets found for PDF generation"
+msgstr "Keine Tickets gefunden für die PDF Erstellung"
+
 msgid "Receivables"
 msgstr "Belege"
 
 #, python-format
 msgid "${count} payments marked as invoiced."
-msgstr "${count} Zahlungen als fakturiert markiert"
+msgstr "${count} Zahlungen als fakturiert markiert."
+
+#, python-format
+msgid "${count} payments marked as paid."
+msgstr "${count} Zahlungen als bezahlt markiert."
+
+#, python-format
+msgid "${count} payments marked as unpaid."
+msgstr "${count} Zahlungen als unbezahlt markiert."
 
 msgid "The ticket was marked as paid"
 msgstr "Das Ticket wurde als bezahlt markiert"
@@ -7173,43 +7205,13 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
 
-#~ msgid "From date"
-#~ msgstr "Ab Datum"
-
-#~ msgid "To date"
-#~ msgstr "Bis Datum"
-
-#~ msgid "Invalid credentials or site id"
-#~ msgstr "Ungültige API Credentials oder ID der Anlage"
-
-#~ msgid ""
-#~ "Failed to create visits using the dormakaba API please make sure your "
-#~ "credentials are still valid."
-#~ msgstr ""
-#~ "Das Delegieren der Entriegelung der Türen via dormakaba API ist "
-#~ "fehlgeschlagen. Bitte stellen Sie sicher, dass die hinterlegten "
-#~ "Zugangsdaten immer noch gültig sind."
-
-#, python-format
-#~ msgid "${org} New Reservation(s)"
-#~ msgstr "${org} Neue Reservation(en)"
-
-#~ msgid "Invalid price, needs to be a non-negative number."
-#~ msgstr "Ungültiger Preis, muss eine nicht-negative Zahl sein."
-
 #~ msgid "Please note that this page has subpages which will also be deleted!"
 #~ msgstr ""
 #~ "Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
 #~ "werden!"
 
-#~ msgid "Reservation is pending approval"
-#~ msgstr "Diese Reservation wurde noch nicht akzeptiert"
-
-#~ msgid "(${num_pending} pending approval)"
-#~ msgstr "(${num_pending} noch nicht akzeptiert)"
-
-#~ msgid "Utilised"
-#~ msgstr "Ausgelastet"
+#~ msgid "One of your reservations was adjusted"
+#~ msgstr "Eine von Ihren Reservationen wurde angepasst"
 
 #~ msgid ""
 #~ "Select a free time span in the calendar below to create an availability "

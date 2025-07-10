@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-10 02:37+0200\n"
+"POT-Creation-Date: 2025-07-10 13:50+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -122,10 +122,10 @@ msgid "day"
 msgstr "Tag"
 
 msgid "Start"
-msgstr "Start"
+msgstr "Von"
 
 msgid "End"
-msgstr "Ende"
+msgstr "Bis"
 
 msgid "Add"
 msgstr "Hinzufügen"
@@ -1056,7 +1056,7 @@ msgid "Credit Card Fee"
 msgstr "Kreditkarten-Gebühr"
 
 msgid "Pay Offline later"
-msgstr "Später bezahlen"
+msgstr "Per Rechnung bezahlen"
 
 msgid "at ${time}"
 msgstr "um ${time}"
@@ -1064,11 +1064,8 @@ msgstr "um ${time}"
 msgid "Object"
 msgstr "Objekt"
 
-msgid "Reservation Start"
-msgstr "Reservation Start"
-
-msgid "Reservation End"
-msgstr "Reservation Ende"
+msgid "Reservation"
+msgstr "Reservation"
 
 msgid "Net Amount"
 msgstr "Netto Betrag"
@@ -1427,7 +1424,7 @@ msgid "Do you no longer wish to receive these notifications?"
 msgstr "Möchten Sie diese Benachrichtigungen nicht mehr erhalten?"
 
 msgid "The following reservations have been accepted:"
-msgstr "Die folgenden Reservationen wurden angenommen:"
+msgstr "Die folgenden Reservationen wurden bestätigt:"
 
 msgid ""
 "This is a notification for the new reservations for ${organisation}. If you "
@@ -2065,7 +2062,7 @@ msgid "Subscribed on"
 msgstr "Abonniert am"
 
 msgid "submitted"
-msgstr "angemeldet"
+msgstr "gemeldet"
 
 msgid "No dates found, please select dates in the calendar first"
 msgstr "Keine Termine gefunden, bitte wählen Sie erst Termine im Kalender aus"
@@ -2587,7 +2584,7 @@ msgid "Analytics"
 msgstr "Web-Statistik"
 
 msgid "Holidays"
-msgstr "Feiertage"
+msgstr "Feiertage / Schulferien"
 
 msgid "Tickets"
 msgstr "Tickets"
@@ -2623,8 +2620,92 @@ msgstr "Ratsinformationssystem (RIS)"
 msgid "New Note"
 msgstr "Neue Notiz"
 
-#~ msgid "Mark selected as invoiced"
-#~ msgstr "Ausgewählte als fakturiert markieren"
+#~ msgid "Parliamentarian is not in this commission."
+#~ msgstr "Parlamentarier:in ist nicht in dieser Kommission."
+
+#~ msgid "Basic properties"
+#~ msgstr "Grundeigenschaften"
+
+#~ msgid "Gender"
+#~ msgstr "Geschlecht"
+
+#~ msgid "Additional information"
+#~ msgstr "Zusatzinformationen"
+
+#~ msgid "Party role"
+#~ msgstr "Rolle in der Partei"
+
+#~ msgid "Parliamentary group role"
+#~ msgstr "Rolle in der Fraktion"
+
+#~ msgid "President"
+#~ msgstr "Präsident:in"
+
+#~ msgid "Commission meeting"
+#~ msgstr "Kommissionsitzung"
+
+#~ msgid "intercantonal commission"
+#~ msgstr "interkantonale Kommission"
+
+#~ msgid "Vice president"
+#~ msgstr "Vize-Präsident:in"
+
+#~ msgid "End must be after start"
+#~ msgstr "Ende muss nach dem Start liegen"
+
+#~ msgid "Do you really want to delete this meeting?"
+#~ msgstr "Diese Sitzung wirklich löschen?"
+
+#~ msgid "Delete meeting"
+#~ msgstr "Sitzung löschen"
+
+#~ msgid "Do you really want to remove this parliamentarian?"
+#~ msgstr "Diese:n Parlamentarier:in wirklich entfernen?"
+
+#~ msgid "Remove parliamentarian"
+#~ msgstr "Parlamentarier:in entfernen"
+
+#~ msgid "Extended Member"
+#~ msgstr "erweitertes Mitglied"
+
+#~ msgid "male"
+#~ msgstr "männlich"
+
+#~ msgid "female"
+#~ msgstr "weiblich"
+
+#~ msgid "Vote counter"
+#~ msgstr "Stimmenzähler"
+
+#~ msgid "Media Manager"
+#~ msgstr "Leiter Medien und Kampagnen"
+
+#~ msgid "President of the parliamentary group"
+#~ msgstr "Fraktionsschef"
+
+#~ msgid "No meeting defined yet."
+#~ msgstr "Noch keine Sitzung erfasst."
+
+#~ msgid "Comission"
+#~ msgstr "Kommission"
+
+#~ msgid "Added commission meeting"
+#~ msgstr "Kommissionsitzung hinzugefügt"
+
+#~ msgid "New commission meeting"
+#~ msgstr "Neue Kommissionsitzung"
+
+#~ msgid "All Parties"
+#~ msgstr "Alle Parteien"
+
+#~ msgid "Addition"
+#~ msgstr "Adresszusatz"
+
+#~ msgid "Zip code"
+#~ msgstr "PLZ"
+
+#~ msgid "City"
+#~ msgstr "Ort"
 
 #~ msgid "Sign up"
 #~ msgstr "Anmelden"
@@ -2753,9 +2834,6 @@ msgstr "Neue Notiz"
 
 #~ msgid "Do you really want to delete this event?"
 #~ msgstr "Möchten Sie die Veranstaltung wirklich löschen?"
-
-#~ msgid "Delete event"
-#~ msgstr "Veranstaltung löschen"
 
 #~ msgid "This event can't be deleted."
 #~ msgstr "Diese Veranstaltung kann nicht gelöscht werden."
@@ -3040,4 +3118,3 @@ msgstr "Neue Notiz"
 
 #~ msgid "Perform Search"
 #~ msgstr "Suchen"
-
