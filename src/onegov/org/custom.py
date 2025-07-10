@@ -304,6 +304,12 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
                 attrs={'class': 'logout'}
             )
 
+            yield Link(
+                _('Dashboard'),
+                request.class_link(CitizenDashboard),
+                attrs={'class': 'dashboard'}
+            )
+
         # NOTE: Only show this if we have at least one reservation
         #       this way we don't need a setting to signal whether
         #       or not this instance even accepts reservations.
