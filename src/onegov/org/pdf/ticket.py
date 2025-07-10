@@ -303,7 +303,6 @@ class TicketPdf(Pdf):
         created_dt = layout.to_timezone(ticket.created, layout.timezone)
         created = layout.format_date(created_dt, 'datetime')
 
-        # Ticket meta infygit checkout --theirs .  # Take stash version
         if hasattr(ticket, 'reference_group'):
             subject = ticket.reference_group(layout.request)
         else:
