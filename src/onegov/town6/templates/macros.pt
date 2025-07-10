@@ -247,7 +247,7 @@
         </a>
     </span>
     <span tal:condition="request.app.org.citizen_login_enabled and not request.authenticated_email">
-        <a href="${layout.citizen_login_from_path()}" i18n:translate>
+        <a href="${layout.citizen_login()}" i18n:translate>
             Citizen Login
         </a>
     </span>

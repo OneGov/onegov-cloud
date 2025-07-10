@@ -5,7 +5,12 @@ from onegov.core.elements import Link, LinkGroup
 from onegov.form.collection import FormCollection, SurveyCollection
 from onegov.org import _, OrgApp
 from onegov.org.models import (
-    GeneralFileCollection, ImageFileCollection, Organisation, Dashboard)
+    CitizenDashboard,
+    Dashboard,
+    GeneralFileCollection,
+    ImageFileCollection,
+    Organisation,
+)
 from onegov.pay import PaymentProviderCollection, PaymentCollection
 from onegov.reservation import Reservation, ResourceCollection
 from onegov.ticket import TicketCollection
@@ -60,9 +65,17 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
         )
 
         if citizen_login_enabled and not request.authenticated_email:
+            dashboard = CitizenDashboard(request)
+            if dashboard.is_available:
+                auth = Auth.from_request(
+                    request,
+                    request.link(dashboard)
+                )
+            else:
+                auth = Auth.from_request_path(request)
             yield Link(
                 _('Citizen Login'), request.link(
-                    Auth.from_request_path(request), name='citizen-login'
+                    auth, name='citizen-login'
                 ), attrs={
                     'class': 'citizen-login',
                     'title': _('No registration necessary')
@@ -291,21 +304,6 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
                 attrs={'class': 'logout'}
             )
 
-        yield Link(
-            _('My Requests'),
-            request.class_link(
-                TicketCollection,
-                {
-                    'handler': 'ALL',
-                    'state': 'all',
-                },
-                name='my-tickets'
-            ),
-            attrs={
-                'class': ('citizen-tickets'),
-            }
-        )
-
         # NOTE: Only show this if we have at least one reservation
         #       this way we don't need a setting to signal whether
         #       or not this instance even accepts reservations.
@@ -325,3 +323,18 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
                     'class': ('citizen-reservations'),
                 }
             )
+
+        yield Link(
+            _('My Requests'),
+            request.class_link(
+                TicketCollection,
+                {
+                    'handler': 'ALL',
+                    'state': 'all',
+                },
+                name='my-tickets'
+            ),
+            attrs={
+                'class': ('citizen-tickets'),
+            }
+        )

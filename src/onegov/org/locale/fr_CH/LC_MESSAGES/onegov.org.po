@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-09 13:44+0200\n"
+"POT-Creation-Date: 2025-07-10 13:38+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -83,6 +83,24 @@ msgstr "Aucune donnée disponible"
 
 msgid "Most Popular Pages"
 msgstr "Pages les plus populaires"
+
+msgid "My Requests"
+msgstr "Mes demandes"
+
+msgid "Closed Tickets"
+msgstr "Tickets clôturés"
+
+msgid "My Reservations"
+msgstr "Mes réservations"
+
+msgid "Pending Future Reservations"
+msgstr "Réservations futures en attente"
+
+msgid "Confirmed Future Reservations"
+msgstr "Réservations futures confirmées"
+
+msgid "Past Reservations"
+msgstr "Réservations antérieures"
 
 msgid "Open"
 msgstr "Ouvert"
@@ -216,17 +234,8 @@ msgstr "Gestion"
 msgid "My Tickets"
 msgstr "Mes tickets"
 
-msgid "Closed Tickets"
-msgstr "Tickets clôturés"
-
 msgid "Ticket"
 msgstr "Ticket"
-
-msgid "My Requests"
-msgstr "Mes demandes"
-
-msgid "My Reservations"
-msgstr "Mes réservations"
 
 msgid "This site is private"
 msgstr "Ce site est privé"

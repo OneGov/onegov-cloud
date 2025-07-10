@@ -34,6 +34,7 @@ from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
 from onegov.org.exports.base import OrgExport
+from onegov.org.models import CitizenDashboard
 from onegov.org.models import ExportCollection, Editor
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile
@@ -384,8 +385,15 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         auth = Auth.from_request_path(self.request)
         return self.request.link(auth, name='login')
 
-    def citizen_login_from_path(self) -> str:
-        auth = Auth.from_request_path(self.request)
+    def citizen_login(self) -> str:
+        dashboard = CitizenDashboard(self.request)
+        if dashboard.is_available:
+            auth = Auth.from_request(
+                self.request,
+                self.request.link(dashboard)
+            )
+        else:
+            auth = Auth.from_request_path(self.request)
         return self.request.link(auth, name='citizen-login')
 
     def export_formatter(self, format: str) -> Callable[[object], Any]:

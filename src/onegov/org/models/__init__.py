@@ -4,6 +4,7 @@ from onegov.org.models.atoz import AtoZ
 from onegov.org.models.clipboard import Clipboard
 from onegov.org.models.dashboard import Boardlet
 from onegov.org.models.dashboard import BoardletFact
+from onegov.org.models.dashboard import CitizenDashboard
 from onegov.org.models.dashboard import Dashboard
 from onegov.org.models.directory import DirectorySubmissionAction
 from onegov.org.models.directory import ExtendedDirectory
@@ -64,6 +65,7 @@ __all__ = (
     'Boardlet',
     'BoardletFact',
     'BuiltinFormDefinition',
+    'CitizenDashboard',
     'Clipboard',
     'ContactExtension',
     'ContentExtension',

@@ -4,7 +4,7 @@ from dectate import Action
 from itertools import count
 
 
-from typing import cast, Any, ClassVar, TYPE_CHECKING
+from typing import cast, Any, ClassVar, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.elements import LinkGroup
@@ -26,6 +26,7 @@ if TYPE_CHECKING:
         type['RegisteredEventSearchWidget']
     ]
     LinkGroupFactory: TypeAlias = Callable[[OrgRequest, User], LinkGroup]
+    BoardletKind: TypeAlias = Literal['user', 'citizen']
 
     class HomepageWidget(Protocol):
         @property
@@ -226,8 +227,7 @@ class SettingsView(Action):
         name: str,
         title: str,
         order: int = 0,
-        icon: str =
-        'fa-cogs'
+        icon: str = 'fa-cogs'
     ) -> None:
 
         self.name = name
@@ -256,14 +256,15 @@ class Boardlet(Action):
     """ Registers a boardlet on the Dashboard. """
 
     config = {
-        'boardlets_registry': dict
+        'boardlets_registry': lambda: {'user': {}, 'citizen': {}}
     }
 
     def __init__(
         self,
         name: str,
         order: tuple[int, int],
-        icon: str = ''
+        icon: str = '',
+        kind: Literal['user', 'citizen'] = 'user'
     ) -> None:
 
         assert isinstance(order, tuple) and len(order) == 2, """
@@ -274,19 +275,20 @@ class Boardlet(Action):
         self.name = name
         self.order = order
         self.icon = icon
+        self.kind = kind
 
     def identifier(  # type:ignore[override]
         self,
-        boardlets_registry: dict[str, BoardletConfig]
+        boardlets_registry: dict[BoardletKind, dict[str, BoardletConfig]]
     ) -> str:
-        return self.name
+        return f'{self.kind}-{self.name}'
 
     def perform(  # type:ignore[override]
         self,
         func: type[_Boardlet],
-        boardlets_registry: dict[str, BoardletConfig]
+        boardlets_registry: dict[BoardletKind, dict[str, BoardletConfig]]
     ) -> None:
-        boardlets_registry[self.name] = {
+        boardlets_registry[self.kind][self.name] = {
             'cls': func,
             'order': self.order,
             'icon': self.icon,
