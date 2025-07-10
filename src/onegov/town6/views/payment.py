@@ -4,7 +4,7 @@ from onegov.core.security import Private
 from onegov.core.utils import append_query_param
 from onegov.form import merge_forms
 from onegov.org.views.payment import (
-    export_payments, handle_batch_mark_payments_invoiced, view_payments)
+    export_payments, handle_batch_set_payment_state, view_payments)
 from onegov.town6 import TownApp
 from onegov.org.forms.payments_search_form import PaymentSearchForm
 from onegov.org.forms import DateRangeForm, ExportForm
@@ -48,15 +48,15 @@ def town_view_payments(
 
 @TownApp.json(
     model=PaymentCollection,
-    name='batch-mark-invoiced',
+    name='batch-set-payment-state',
     request_method='POST',
     permission=Private
 )
-def town_handle_batch_mark_payments_invoiced(
+def town_handle_batch_set_payment_state(
     self: PaymentCollection,
     request: TownRequest
 ) -> JSON_ro:
-    return handle_batch_mark_payments_invoiced(self, request)
+    return handle_batch_set_payment_state(self, request)
 
 
 @TownApp.form(

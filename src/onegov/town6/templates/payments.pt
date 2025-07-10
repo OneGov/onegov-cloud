@@ -11,11 +11,6 @@
                                 class="button hollow"
                                 i18n:translate=""
                                 >Export Bill run as PDF</a>
-                        <button type="button"
-                                class="button hollow batch-action-button"
-                                i18n:translate=""
-                                data-action-url="${layout.csrf_protected_url(request.link(layout.model, 'batch-mark-invoiced'))}">
-                                Ausgewählte als fakturiert markieren</button>
                     </tal:block>
                 </div>
             </div>
@@ -25,6 +20,24 @@
         </p>
 
         <metal:b use-macro="layout.macros['payments']" />
+
+        <div class="batch-actions callout" tal:condition="payments">
+            <div class="grid-x grid-margin-x align-middle">
+                <div class="cell medium-4">
+                    <label for="batch-payment-state" i18n:translate="">Batch Action</label>
+                    <select id="batch-payment-state" name="batch-payment-state">
+                        <option value="invoiced" i18n:translate="">Mark as Invoiced</option>
+                        <option value="paid" i18n:translate="">Mark as Paid</option>
+                        <option value="open" i18n:translate="">Mark as Unpaid</option>
+                    </select>
+                </div>
+                <div class="cell medium-8">
+                    <button class="button batch-action-button" data-action-url="${layout.csrf_protected_url(request.link(layout.model, name='batch-set-payment-state'))}">
+                        <span i18n:translate="">Apply to selected</span>
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <div metal:use-macro="layout.macros['pagination']" tal:define="
             collection layout.model; current_page layout.model; pagination_centered True" />

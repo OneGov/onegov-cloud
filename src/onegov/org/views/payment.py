@@ -210,33 +210,43 @@ def view_payments(
 
 @OrgApp.json(
     model=PaymentCollection,
-    name='batch-mark-invoiced',
+    name='batch-set-payment-state',
     request_method='POST',
     permission=Private
 )
-def handle_batch_mark_payments_invoiced(
+def handle_batch_set_payment_state(
     self: PaymentCollection,
     request: OrgRequest
 ) -> JSON_ro:
 
     request.assert_valid_csrf_token()
     payment_ids = request.json_body.get('payment_ids', [])
+    state = request.json_body.get('state')
+
+    if state not in ('invoiced', 'paid', 'open'):
+        raise exc.HTTPBadRequest()
+
     payments_query = self.session.query(Payment).distinct().filter(
         Payment.id.in_(payment_ids)
     )
     updated_count = 0
     for payment in payments_query:
-        if payment.state != 'invoiced':
-            payment.state = 'invoiced'
+        if payment.state != state:
+            payment.state = state
         updated_count += 1
 
     if updated_count > 0:
-        request.success(_('${count} payments marked as invoiced.',
-                        mapping={'count': updated_count}))
+        messages = {
+            'invoiced': _('${count} payments marked as invoiced.',
+                          mapping={'count': updated_count}),
+            'paid': _('${count} payments marked as paid.',
+                      mapping={'count': updated_count}),
+            'open': _('${count} payments marked as unpaid.',
+                      mapping={'count': updated_count}),
+        }
+        request.success(messages[state])
 
-    ok_message = _(f'{updated_count} payments marked as invoiced.')
-    return {'status': 'success',
-            'message': ok_message}
+    return {'status': 'success', 'message': 'OK'}
 
 
 @OrgApp.form(

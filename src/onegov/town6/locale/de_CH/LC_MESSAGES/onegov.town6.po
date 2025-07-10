@@ -1731,10 +1731,10 @@ msgid "Fee:"
 msgstr "Gebühr:"
 
 msgid "Export Bill run as PDF"
-msgstr "Rechnungslauf als PDF exportieren"
+msgstr "PDF mit aktuellem Filter generieren"
 
-msgid "Ausgewählte als fakturiert markieren"
-msgstr ""
+msgid "Mark selected as invoiced"
+msgstr "Ausgewählte als fakturiert markieren"
 
 msgid "No payments yet."
 msgstr "Noch keine Zahlungen."
