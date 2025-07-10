@@ -8,13 +8,29 @@ function setupXHREditPaymentStatus() {
     if (markInvoicedButton) {
         markInvoicedButton.disabled = true;
 
-        const updateButtonState = function() {
-            markInvoicedButton.disabled = document.querySelectorAll('input[name="selected_payments"]:checked').length === 0;
+        const selectAllCheckbox = document.querySelector('.select-all-checkbox-cell input[type="checkbox"]');
+        const paymentCheckboxes = document.querySelectorAll('input[name="selected_payments"]');
+
+        const updateButtonAndSelectAllState = function() {
+            const checkedCount = document.querySelectorAll('input[name="selected_payments"]:checked').length;
+            markInvoicedButton.disabled = checkedCount === 0;
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = paymentCheckboxes.length > 0 && checkedCount === paymentCheckboxes.length;
+            }
         };
 
-        document.querySelectorAll('input[name="selected_payments"]').forEach(function(checkbox) {
-            checkbox.addEventListener('change', updateButtonState);
+        paymentCheckboxes.forEach(function(checkbox) {
+            checkbox.addEventListener('change', updateButtonAndSelectAllState);
         });
+
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                paymentCheckboxes.forEach(function(checkbox) {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+                updateButtonAndSelectAllState();
+            });
+        }
 
         markInvoicedButton.addEventListener('click', function() {
             const selectedPayments = [];
