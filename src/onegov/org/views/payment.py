@@ -111,13 +111,8 @@ def handle_pdf_response(
     self: PaymentCollection,
     request: OrgRequest
 ) -> WebobResponse:
-    """
-    Handles the PDF export of payments.
-    """
-    # Handle multiple pages of results
-    # Export a pdf with the same items as the current filter is set,
-    # But excluding pagination
-    payments = list(self.subset())
+    # Export a pdf of all invoiced, without pagination limit
+    payments = list(self.by_state('invoiced').subset())
     payment_links = self.payment_links_for(payments)
 
     tickets = TicketCollection(request.session)
@@ -150,15 +145,9 @@ def handle_pdf_response(
         request.warning(_('No payments found for PDF generation'))
         return request.redirect(request.class_link(PaymentCollection))
 
-    filename = 'payments.pdf'
-    if self.status:
-        filename = f'payments_{self.status}.pdf'
-
+    filename = 'Payments.pdf'
     deduplicated_tickets = set(get_tickets_for_pdf(payments))
-    multi_pdf = TicketsPdf.from_tickets(
-        request,
-        deduplicated_tickets
-    )
+    multi_pdf = TicketsPdf.from_tickets(request, deduplicated_tickets)
     return Response(
         multi_pdf.read(),
         content_type='application/pdf',

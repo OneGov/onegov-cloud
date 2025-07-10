@@ -1962,7 +1962,7 @@ msgid "Fee:"
 msgstr "Gebühr:"
 
 msgid "Export Bill run as PDF"
-msgstr "PDF mit aktuellem Filter generieren"
+msgstr "Fakturierte Belege als PDF exportieren"
 
 msgid "No payments yet."
 msgstr "Noch keine Zahlungen."
