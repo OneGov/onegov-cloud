@@ -2167,12 +2167,8 @@
                 <th i18n:translate tal:condition="payment_links|nothing">
                     Object
                 </th>
-                <!-- New columns for Reservation Dates -->
-                <th i18n:translate tal:condition="reservation_dates|nothing">
-                    Reservation Start
-                </th>
-                <th i18n:translate tal:condition="reservation_dates|nothing">
-                    Reservation End
+                <th i18n:translate tal:condition="reservation_dates_formatted|nothing">
+                    Reservation
                 </th>
                 <th i18n:translate>
                     Net Amount
@@ -2231,21 +2227,9 @@
                         </tal:b>
                     </tal:b>
                 </td>
-                <!-- Cells for Reservation Start Date -->
-                <td tal:condition="reservation_dates|nothing">
-                    <tal:b define="dates reservation_dates[payment.id] | nothing" tal:condition="dates">
-                        <span tal:condition="dates">
-                            ${layout.format_date(dates[0], 'date')}
-                        </span>
-                    </tal:b>
-                </td>
-                <!-- Cells for Reservation End Date -->
-                <td tal:condition="reservation_dates|nothing">
-                    <tal:b define="dates reservation_dates[payment.id] | nothing" tal:condition="dates">
-                        <span tal:condition="dates">
-                            ${layout.format_date(dates[1], 'date')}
-                        </span>
-                    </tal:b>
+                <!-- Cell for Reservation Dates -->
+                <td tal:condition="reservation_dates_formatted|nothing">
+                    <span tal:replace="reservation_dates_formatted.get(payment.id, '')" />
                 </td>
                 <td>${'{0:.2f}'.format(payment.net_amount)} ${payment.currency}</td>
                 <td>

@@ -3,7 +3,6 @@ from __future__ import annotations
 import decimal
 from collections import OrderedDict
 from decimal import Decimal
-from functools import partial
 from onegov.core.security import Private
 from onegov.core.utils import append_query_param
 from onegov.form import merge_forms
@@ -20,6 +19,7 @@ from onegov.pay import Payment
 from onegov.pay import PaymentCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.pay.errors import DatatransApiError, SaferpayApiError
+from onegov.pay.models.payment import ManualPayment
 from onegov.pay.models.payment_providers.datatrans import DatatransPayment
 from onegov.pay.models.payment_providers.stripe import StripePayment
 from onegov.pay.models.payment_providers.worldline_saferpay import (
@@ -30,8 +30,7 @@ from webob import exc, Response as WebobResponse
 
 
 from typing import Any, TYPE_CHECKING
-if TYPE_CHECKING:  # pragma: no cover
-    from collections.abc import Iterator
+if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from datetime import datetime
     from onegov.core.types import JSON_ro, RenderData
@@ -39,7 +38,6 @@ if TYPE_CHECKING:  # pragma: no cover
     from onegov.pay.types import AnyPayableBase
     from sqlalchemy.orm import Session
     from typing import type_check_only
-    from uuid import UUID
     from webob import Response
 
     @type_check_only
@@ -113,41 +111,23 @@ def handle_pdf_response(
     request: OrgRequest
 ) -> WebobResponse:
     # Export a pdf of all invoiced, without pagination limit
-    payments = list(self.by_state('invoiced').subset())
-    payment_links = self.payment_links_for(payments)
+    all_payments = list(self.by_state('invoiced').subset())
 
-    tickets = TicketCollection(request.session)
-    get_ticket_for_link = partial(ticket_by_link, tickets)
-
-    def get_tickets_for_pdf(payments: list[Payment]) -> Iterator[Ticket]:
-        """
-        Gets all tickets for a list of payments, applying the same
-        filtering logic as the payments macro.
-
-        """
-        seen_ticket_ids: set[UUID] = set()
-
-        for payment in payments:
-            links_for_payment = payment_links.get(payment.id, [])
-
-            for link in links_for_payment:
-                ticket = None
-                if getattr(link, '__tablename__', None) == 'submissions':
-                    ticket = get_ticket_for_link(link)
-
-                elif getattr(link, '__tablename__', None) == 'reservations':
-                    if getattr(link, 'start', None):
-                        ticket = get_ticket_for_link(link)
-
-                if ticket and ticket.id not in seen_ticket_ids:
-                    seen_ticket_ids.add(ticket.id)
-                    yield ticket
-    if not payments:
+    if not all_payments:
         request.warning(_('No payments found for PDF generation'))
         return request.redirect(request.class_link(PaymentCollection))
 
+    payment_ids = [p.id for p in all_payments]
+    tickets_query = self.session.query(Ticket).filter(
+        Ticket.payment_id.in_(payment_ids)
+    )
+    deduplicated_tickets = list({t.id: t for t in tickets_query}.values())
+
+    if not deduplicated_tickets:
+        request.warning(_('No tickets found for PDF generation'))
+        return request.redirect(request.class_link(PaymentCollection))
+
     filename = 'Payments.pdf'
-    deduplicated_tickets = set(get_tickets_for_pdf(payments))
     multi_pdf = TicketsPdf.from_tickets(request, deduplicated_tickets)
     return Response(
         multi_pdf.read(),
@@ -186,13 +166,23 @@ def view_payments(
         for provider in PaymentProviderCollection(request.session).query()
     }
 
+    # Process reservation dates into a display-ready format
+    reservation_dates = self.reservation_dates_by_batch()
+    reservation_dates_formatted = {
+        payment_id: (
+            f"{layout.format_date(start, 'date')} - "
+            f"{layout.format_date(end, 'date')}"
+        ) if start != end else layout.format_date(start, 'date')
+        for payment_id, (start, end) in reservation_dates.items()
+    }
+
     return {
         'title': _('Receivables'),
         'form': form,
         'layout': layout or PaymentCollectionLayout(self, request),
         'payments': self.batch,
         'tickets': self.tickets_by_batch(),
-        'reservation_dates': self.reservation_dates_by_batch(),
+        'reservation_dates_formatted': reservation_dates_formatted,
         'providers': providers,
         'payment_links': self.payment_links_by_batch(),
         'pdf_export_link': append_query_param(request.url, 'format', 'pdf')
@@ -220,10 +210,16 @@ def handle_batch_set_payment_state(
     payments_query = self.session.query(Payment).distinct().filter(
         Payment.id.in_(payment_ids)
     )
+    # State sequence is assumed to be: 'open' -> 'invoiced' - 'paid'
     updated_count = 0
     for payment in payments_query:
+        if not isinstance(payment, ManualPayment):
+            continue
         if payment.state != state:
-            payment.state = state
+            if payment.state == 'open':
+                payment.state = state
+            # other states should not accidentally reach 'invoiced' state
+
         updated_count += 1
 
     if updated_count > 0:

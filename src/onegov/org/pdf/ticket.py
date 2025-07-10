@@ -31,7 +31,6 @@ if TYPE_CHECKING:
     from bleach.callbacks import _HTMLAttrs
     from bleach.sanitizer import _Filter
     from gettext import GNUTranslations
-    from onegov.org.layout import DefaultLayout
     from onegov.org.request import OrgRequest
     from onegov.pdf.templates import Template
     from onegov.ticket import Ticket
@@ -50,13 +49,9 @@ class TicketPdf(Pdf):
         locale = kwargs.pop('locale', None)
         self.locale: str = locale or 'en'
         translations = kwargs.pop('translations', None)
-        qr_payload = kwargs.pop('qr_payload')
+        qr_payload = kwargs.pop('qr_payload', None)
         super().__init__(*args, **kwargs)
         self.translations: dict[str, GNUTranslations] = translations
-
-        # These are set in from_ticket
-        self.ticket: Ticket | None = None
-        self.layout: DefaultLayout | None = None
 
         # Modification for the footer left on all pages
         self.doc.author = self.translate(_('Source')) + f': {self.doc.author}'
@@ -302,27 +297,23 @@ class TicketPdf(Pdf):
                 ]
                 self.table(items, 'even')
 
-    def ticket_metadata(self) -> None:
-        assert self.ticket is not None
-        assert self.layout is not None
-        layout = self.layout
-        handler = self.ticket.handler
-        group = handler.group or self.ticket.group
-        created_dt = layout.to_timezone(self.ticket.created, layout.timezone)
+    def ticket_metadata(self, ticket: Ticket, layout: TicketLayout) -> None:
+        handler = ticket.handler
+        group = handler.group or ticket.group
+        created_dt = layout.to_timezone(ticket.created, layout.timezone)
         created = layout.format_date(created_dt, 'datetime')
 
-        # Ticket meta info
-        if hasattr(self.ticket, 'reference_group'):
-            subject = self.ticket.reference_group(layout.request)
+        # Ticket meta infygit checkout --theirs .  # Take stash version
+        if hasattr(ticket, 'reference_group'):
+            subject = ticket.reference_group(layout.request)
         else:
-            subject = self.ticket.title
+            subject = ticket.title
 
-        submitter = ticket_submitter(self.ticket)
-        ticket_state = self.translate(TICKET_STATES[self.ticket.state])
-        owner = self.ticket.user.username if self.ticket.user else ''
+        submitter = ticket_submitter(ticket)
+        ticket_state = self.translate(TICKET_STATES[ticket.state])
+        owner = ticket.user.username if ticket.user else ''
 
         def seconds(time: float | None) -> str:
-            assert layout is not None
             return layout.format_seconds(time) if time else ''
 
         meta_fields = {
@@ -346,32 +337,30 @@ class TicketPdf(Pdf):
             [_('Group'), group],
             [_('Owner'), owner],
             [_('Created'), created],
-            [_('Reaction Time'), seconds(self.ticket.reaction_time)],
-            [_('Process Time'), seconds(self.ticket.process_time)],
+            [_('Reaction Time'), seconds(ticket.reaction_time)],
+            [_('Process Time'), seconds(ticket.process_time)],
         ]
 
         # In case of imported events..
         event_source = handler.data.get('source')
-        if event_source and self.layout.request.is_manager:
+        if event_source and layout.request.is_manager:
             data.append([self.translate(_('Event Source')), event_source])
 
         self.table(data, 'even')
 
-    def ticket_payment(self) -> None:
-        assert self.ticket is not None
-        assert self.layout is not None
-        price = self.ticket.handler.payment
+    def ticket_payment(self, ticket: Ticket, layout: TicketLayout) -> None:
+        price = ticket.handler.payment
         if not price:
             return
         state = self.translate(PAYMENT_STATES[price.state])
         # credit card
         self.h2(_('Payment'))
-        amount = f'{self.layout.format_number(price.net_amount)}'
+        amount = f'{layout.format_number(price.net_amount)}'
         self.table([
             [_('Total Amount'), f'{amount} {price.currency}'],
             [_('State'), state],
             [_('Source'), self.translate(PAYMENT_SOURCES[price.source])],
-            [_('Fee'), f'{self.layout.format_number(price.fee)}'],
+            [_('Fee'), f'{layout.format_number(price.fee)}'],
         ], 'even')
 
     def p_markup(
@@ -445,8 +434,7 @@ class TicketPdf(Pdf):
     def add_ticket(self, ticket: Ticket, request: OrgRequest) -> None:
         """ Adds a ticket to the story. """
 
-        self.ticket = ticket
-        self.layout = TicketLayout(ticket, request)
+        layout = TicketLayout(ticket, request)
         handler = ticket.handler
 
         self.h(f'{request.translate(_("Ticket"))} {ticket.number}')
@@ -461,14 +449,14 @@ class TicketPdf(Pdf):
         else:
             summary = handler.get_summary(request)
 
-        self.ticket_metadata()
+        self.ticket_metadata(ticket, layout)
 
         self.h1(_('Summary'))
         if deleted_message:
             self.p(self.translate(deleted_message))
             self.spacer()
         self.ticket_summary(summary)
-        self.ticket_payment()
+        self.ticket_payment(ticket, layout)
 
         # If used for the user instead of the manager...
         messages = MessageCollection(

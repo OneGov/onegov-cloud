@@ -151,7 +151,6 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
                     Reservation.start <= self.reservation_end
                 )
             query = query.filter(
-                Payment.linked_reservations.isnot(None),  # type: ignore[attr-defined]
                 Payment.linked_reservations.any(and_(*conditions))  # type: ignore[attr-defined]
             )
 
@@ -177,6 +176,8 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         )
 
     def tickets_by_batch(self) -> dict[UUID, Ticket]:
+        if not self.batch:
+            return {}
         session = self.session
         return {ticket.payment_id: ticket  # type: ignore[misc]
             for ticket in session.query(Ticket).filter(
@@ -184,6 +185,8 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         }
 
     def reservation_dates_by_batch(self) -> dict[UUID, tuple[date, date]]:
+        if not self.batch:
+            return {}
         from onegov.reservation import Reservation
         session = self.session
         return {
