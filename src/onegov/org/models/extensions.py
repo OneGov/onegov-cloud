@@ -28,7 +28,7 @@ from onegov.org.observer import observes
 from onegov.page import Page, PageCollection
 from onegov.people import Person, PersonCollection
 from onegov.reservation import Resource
-from sqlalchemy import inspect
+from sqlalchemy import desc, inspect
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import object_session
 from urlextract import URLExtract
@@ -1248,8 +1248,11 @@ class InlinePhotoAlbumExtension(ContentExtension):
     ) -> type[FormT]:
 
         from onegov.org.models import ImageSetCollection
+        from onegov.org.models import ImageSet
         albums: list[ImageSet] = (  # noqa: TC201
-            ImageSetCollection(request.session).query().all()
+            ImageSetCollection(request.session).query().order_by(
+                desc(ImageSet.last_change), ImageSet.title
+            ).all()
         )
         if not albums:
             return form_class
