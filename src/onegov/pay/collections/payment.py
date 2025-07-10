@@ -253,3 +253,17 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             return None
 
         return self.payment_links_for(batch)
+
+    def by_state(self, state: PaymentState) -> PaymentCollection:
+        """ Returns a new collection that only contains payments with the
+        given state. Resets all other filters.
+        """
+        return self.__class__(
+            self.session,
+            page=0,
+            start=None,
+            end=None,
+            ticket_start=None,
+            ticket_end=None,
+            source=self.source,
+            status=state)
