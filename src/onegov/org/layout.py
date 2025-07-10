@@ -12,6 +12,7 @@ from dateutil.rrule import rrulestr
 from decimal import Decimal
 from functools import cached_property
 from markupsafe import Markup
+from onegov.org.exports.base import OrgExport
 from onegov.chat import TextModuleCollection
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
@@ -33,7 +34,6 @@ from onegov.org.models.document_form import (
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
-from onegov.org.exports.base import OrgExport
 from onegov.org.models import ExportCollection, Editor
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile
@@ -3220,7 +3220,7 @@ class PaymentCollectionLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(_('Payments'), self.request.class_link(
-                PaymentProviderCollection
+                PaymentCollection
             ))
         ]
 
@@ -3247,7 +3247,6 @@ class PaymentCollectionLayout(DefaultLayout):
                     attrs={'class': 'sync'}
                 )
             )
-
             links.append(
                 Link(
                     text=_('Export'),

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-09 13:44+0200\n"
+"POT-Creation-Date: 2025-07-10 13:49+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -107,6 +107,9 @@ msgstr "Échoué"
 
 msgid "Refunded"
 msgstr "Remboursé"
+
+msgid "Invoiced"
+msgstr "Facturé"
 
 msgid "Manual"
 msgstr "Manuelle"
@@ -1404,6 +1407,30 @@ msgstr "Groupe Parlementaire"
 
 msgid "Parliamentary group role"
 msgstr "Rôle dans le groupe parlementaire"
+
+msgid "From reservation date"
+msgstr "À partir de la date de réservation"
+
+msgid "Filter Payments"
+msgstr "Filtrer les paiements"
+
+msgid "To reservation date"
+msgstr "À la date de réservation"
+
+msgid "Ticket created from date"
+msgstr "Ticket créé à partir de la date"
+
+msgid "Filter by Ticket Date"
+msgstr "Filtrer par date de ticket"
+
+msgid "Filters payments by the creation date of their associated ticket."
+msgstr "Filtre les paiements par date de création de leur ticket associé."
+
+msgid "Ticket created to date"
+msgstr "Ticket créé à ce jour"
+
+msgid "Payment Type"
+msgstr "Type de paiement"
 
 msgid "Academic Title"
 msgstr "Diplôme"
@@ -3577,8 +3604,8 @@ msgstr "Refuser les réservations"
 msgid "Reject all with message"
 msgstr "Tout refuser avec message"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3970,8 +3997,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -4341,6 +4368,9 @@ msgstr "à ${time}"
 
 msgid "Object"
 msgstr "Objet"
+
+msgid "Reservation"
+msgstr "Réservation"
 
 msgid "Disbursed"
 msgstr "Décaissé"
@@ -5119,8 +5149,26 @@ msgstr "Activé :"
 msgid "Fee:"
 msgstr "Tarif :"
 
+msgid "Export Bill run as PDF"
+msgstr "Exporter l'exécution de la facture au format PDF"
+
 msgid "No payments yet."
 msgstr "Pas de paiements pour le moment."
+
+msgid "Batch Action"
+msgstr "Action par lot"
+
+msgid "Mark as Invoiced"
+msgstr "Marquer comme facturé"
+
+msgid "Mark as Paid"
+msgstr "Marquer comme payé"
+
+msgid "Mark as Unpaid"
+msgstr "Marquer comme non payé"
+
+msgid "Apply to selected"
+msgstr "Appliquer aux sélectionnés"
 
 msgid ""
 "The following requests have been submitted. To see the state of process you "
@@ -6441,6 +6489,27 @@ msgstr "Votre paiement a été retiré"
 
 msgid "Your payment has been refunded"
 msgstr "Votre paiement a été remboursé"
+
+msgid "No payments found for PDF generation"
+msgstr "Aucun paiement trouvé pour la génération PDF"
+
+msgid "No tickets found for PDF generation"
+msgstr "Aucun ticket trouvé pour la génération PDF"
+
+msgid "Receivables"
+msgstr "Créances"
+
+#, python-format
+msgid "${count} payments marked as invoiced."
+msgstr "${count} paiements marqués comme facturés."
+
+#, python-format
+msgid "${count} payments marked as paid."
+msgstr "${count} paiements marqués comme payés."
+
+#, python-format
+msgid "${count} payments marked as unpaid."
+msgstr "${count} paiements marqués comme non payés."
 
 msgid "The ticket was marked as paid"
 msgstr "Le ticket a été marqué comme payé"

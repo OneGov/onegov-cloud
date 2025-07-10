@@ -9,6 +9,12 @@ from sqlalchemy import Column
 from sqlalchemy import Text
 from sqlalchemy.ext.declarative import declarative_base
 from uuid import uuid4
+
+# NOTE:
+# fixes psycopg2.errors.UndefinedTable relation "reservations" does not exist
+from libres.db.models import ORMBase as LibresORMBase
+_libres_db_models_ORMBase = LibresORMBase
+
 from sqlalchemy.exc import IntegrityError
 
 
@@ -30,6 +36,13 @@ def test_payment_with_different_bases(postgres_dsn):
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.bases.append(MyBase)
+
+    # Explicitly add libres.db.models.ORMBase to the session manager's bases
+    # if it was successfully imported. This ensures tables for models on
+    # this base (like libres.db.models.Reservation) are created.
+    if _libres_db_models_ORMBase:
+        if _libres_db_models_ORMBase not in mgr.bases:
+            mgr.bases.append(_libres_db_models_ORMBase)
     mgr.set_current_schema('foobar')
     session = mgr.session()
 
@@ -65,7 +78,6 @@ def test_payment_with_different_bases(postgres_dsn):
     mgr.dispose()
 
 
-@pytest.mark.skip("Analyze missing reservations table")
 def test_payment_referential_integrity(postgres_dsn):
 
     MyBase = declarative_base()
@@ -78,6 +90,13 @@ def test_payment_referential_integrity(postgres_dsn):
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.bases.append(MyBase)
+
+    # Explicitly add libres.db.models.ORMBase to the session manager's bases
+    # if it was successfully imported. This ensures tables for models on
+    # this base (like libres.db.models.Reservation) are created.
+    if _libres_db_models_ORMBase:
+        if _libres_db_models_ORMBase not in mgr.bases:
+            mgr.bases.append(_libres_db_models_ORMBase)
     mgr.set_current_schema('foobar')
     session = mgr.session()
 
@@ -119,7 +138,6 @@ def test_payment_referential_integrity(postgres_dsn):
     mgr.dispose()
 
 
-@pytest.mark.skip('Fails locally and on CI')
 def test_backref(postgres_dsn):
 
     MyBase = declarative_base()
@@ -138,6 +156,13 @@ def test_backref(postgres_dsn):
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.bases.append(MyBase)
+
+    # Explicitly add libres.db.models.ORMBase to the session manager's bases
+    # if it was successfully imported. This ensures tables for models on
+    # this base (like libres.db.models.Reservation) are created.
+    if _libres_db_models_ORMBase:
+        if _libres_db_models_ORMBase not in mgr.bases:
+            mgr.bases.append(_libres_db_models_ORMBase)
     mgr.set_current_schema('foobar')
     session = mgr.session()
 
@@ -193,6 +218,13 @@ def test_manual_payment(postgres_dsn):
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.bases.append(MyBase)
+
+    # Explicitly add libres.db.models.ORMBase to the session manager's bases
+    # if it was successfully imported. This ensures tables for models on
+    # this base (like libres.db.models.Reservation) are created.
+    if _libres_db_models_ORMBase:
+        if _libres_db_models_ORMBase not in mgr.bases:
+            mgr.bases.append(_libres_db_models_ORMBase)
     mgr.set_current_schema('foobar')
     session = mgr.session()
 
