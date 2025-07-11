@@ -63,23 +63,6 @@ class PoliticalBusinessForm(Form):
     )
 
     @property
-    def participants(self) -> list[RISParliamentarian]:
-        """ Returns the selected parliamentarians. """
-
-        if not self.people.data:
-            return []
-
-        result = (
-            self.request.session.query(RISParliamentarian)
-            .filter(
-                RISParliamentarian.id.in_(self.people.data)
-            )
-            .all()
-        )
-
-        return result
-
-    @property
     def parliamentary_group_id(self) -> str | None:
         """ Returns the selected parliamentary group id. """
         if self.selected_parliamentary_group_id.data:
@@ -118,10 +101,10 @@ class PoliticalBusinessForm(Form):
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()
-        result['participants'] = self.participants
         result['parliamentary_group_id'] = self.parliamentary_group_id
         result.pop('selected_participants', None)
         result.pop('selected_parliamentary_group_id', None)
+        print('*** tschupre get_useful_data', result)
         return result
 
     def populate_obj(

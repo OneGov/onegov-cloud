@@ -24,6 +24,7 @@ from onegov.org.forms.extensions import CoordinatesFormExtension,\
     PushNotificationFormExtension
 from onegov.org.forms.extensions import PublicationFormExtension
 from onegov.org.forms.fields import UploadOrSelectExistingMultipleFilesField
+from onegov.org.models.parliamentarian import RISParliamentarian
 from onegov.org.observer import observes
 from onegov.page import Page, PageCollection
 from onegov.people import Person, PersonCollection
@@ -1281,3 +1282,208 @@ class InlinePhotoAlbumExtension(ContentExtension):
                 obj.photo_album_id = self.photo_album_id.data or None
 
         return PhotoAlbumForm
+
+
+class PoliticalBusinessParticipationExtension(ContentExtension):
+    """ Extends any class that has a content dictionary field with the ability
+    to reference people from :class:`onegov.people.PersonCollection`.
+
+    """
+
+    @property
+    def participations(self) -> list[Any] | None:
+        """ Returns the people linked/selected to this content or None."""
+        selected_people = {
+            p.parliamentarian: p.participant_type
+            for p in self.participants
+        }
+
+        result = []
+        person: PersonWithFunction
+        for person, role in selected_people.items():
+            person.person = person.id.hex
+            person.role = role
+            result.append(person)
+
+        print('*** tschupre PoliticalBusinessParticipationExtension people', result)
+        return result
+
+    def get_selectable_people(self, request: OrgRequest) -> list[RISParliamentarian]:
+        """ Returns a list of people that are not yet selected as participants. """
+        query = request.session.query(RISParliamentarian)
+        query = query.filter(RISParliamentarian.active == True)
+        query = query.order_by(RISParliamentarian.last_name, RISParliamentarian.first_name)
+        return query.all()
+
+    # def get_person_function_by_id(self, id: str) -> tuple[str, bool]:
+    #     for _id, (function, show_func) in self.content.get('people', []):
+    #         if id == _id:
+    #             return function, show_func
+    #     raise KeyError(id)
+
+    def extend_form(
+        # self: _ExtendedWithParticipationT,
+        self,
+        form_class: type[FormT],
+        request: OrgRequest
+    ) -> type[FormT]:
+
+        selectable_people = self.get_selectable_people(request)
+        if not selectable_people:
+            # no need to extend the form
+            return form_class
+
+        selected = {
+            participant.parliamentarian_id: participant.participant_type
+            for participant in self.participants
+        }
+
+        def choice(person: RISParliamentarian) -> _Choice:
+            render_kw = {}
+
+            # prioritize participants?
+            if role := selected.get(person.id):
+                render_kw['data-role'] = role
+                render_kw['data-show'] = 'true'
+            else:
+                render_kw['data-role'] = ''
+
+            # print('*** tschupre extend_form choice', person.id.hex, person.display_name, render_kw)
+            return person.id.hex, person.display_name, render_kw
+
+        # choices: list[_Choice] = [(p.id, p.display_name) for p in selectable_people]
+        choices: list[_Choice] = [choice(p) for p in selectable_people]
+        choices.insert(0, ('', ''))
+
+        class PersonForm(Form):
+            person = SelectField(
+                label='',
+                choices=choices,
+                render_kw={
+                    'class_': 'people-select',
+                    'data-placeholder': request.translate(
+                        _('Select additional person')
+                    ),
+                    'data-no_results_text': request.translate(
+                        _('No results match')
+                    ),
+                }
+            )
+            role = SelectField(
+                label=_('Role'),
+                depends_on=('person', '!'),
+                render_kw={'class_': 'indent-form-field'},
+                choices=[
+                    ('', ''),
+                    ('first-signatory', _('First signatory')),
+                    ('co-signatory', _('Co-signatory')),
+                ]
+            )
+
+        # HACK: Get translations working in FormField
+        #       We should probably make our own FormField, that doesn't
+        #       need this workaround
+        meta = get_translation_bound_meta(
+            PersonForm.Meta,
+            request.get_translate(for_chameleon=False)
+        )
+        meta.locales = [request.locale, 'en'] if request.locale else []
+        PersonForm.Meta = meta
+
+        if TYPE_CHECKING:
+            FieldBase = FieldList[FormField[PersonForm]]  # noqa: N806
+        else:
+            FieldBase = FieldList  # noqa: N806
+
+        class BusinessParticipationField(FieldBase):   # rename to BusinessParticipationField
+            # def is_ordered_people(self, people: list[tuple[str, Any]]) -> bool:
+            #     people_dict = dict(people)
+            #     return [
+            #         person.id.hex
+            #         for person in selectable_people
+            #         if person.id.hex in people_dict
+            #     ] == list(people_dict.keys())
+
+            def process(
+                self,
+                formdata: _MultiDictLikeWithGetlist | None,
+                data: Any = unset_value,
+                extra_filters: Sequence[_Filter] | None = None
+            ) -> None:
+
+                print('*** tschupre PeopleField process data')
+                # FIXME: I'm not quite sure why we need to do this
+                #        but it looks like the last_index gets updated
+                #        to 0 by something, so we start counting at 1
+                #        instead of 0, which breaks the field
+                self.last_index = -1
+                super().process(formdata, data, extra_filters)
+
+                # always have an empty extra entry
+                if formdata is None and self[-1].form.person.data is not None:
+                    self.append_entry()
+
+            def populate_obj(self, obj: object, name: str) -> None:
+                current = obj.participants or []
+                new = [item for item in self.data if item['person']]
+                if new:
+                    from onegov.org.models.political_business import PoliticalBusinessParticipation
+
+                    for n in new:
+                        participant = PoliticalBusinessParticipation(
+                            political_business_id=obj.id,
+                            parliamentarian_id=n['person'],
+                            participant_type=n['role'],
+                        )
+                        obj.participants.append(participant)
+
+                # FIXME: handle a person gets deselected
+
+                # print(f'*** tschupre PeopleField populate_obj, current {[c for c in current]}, new {new}')
+
+        field_macro = request.template_loader.macros['field']
+        # FIXME: It is not ideal that we have to pass a dummy form along to
+        #        the field render macro, we should try to move the description
+        #        rendering either into the form meta, so it can be accessed
+        #        from the field or move it to the request, since it doesn't
+        #        actually depend on the specific form
+        dummy_form = request.get_form(Form, csrf_support=False)
+
+        def people_widget(field: FieldBase, **kwargs: Any) -> Markup:
+            request.include('people-select')
+            return Markup('<br>').join(
+                Markup('<div id="{}">{}</div>').format(f.id, f())
+                for f in field
+            )
+
+        class PeoplePageForm(form_class): # type:ignore
+
+            participations = BusinessParticipationField(
+                FormField(
+                    PersonForm,
+                    widget=lambda field, **kw: Markup('').join(
+                        Markup('<div><label>{}</label></div>').format(render_macro(
+                            field_macro,
+                            request,
+                            {
+                                'field': f,
+                                # FIXME: only used for rendering descriptions
+                                #        we should probably move this logic
+                                #        into a template macro or a method on
+                                #        CoreRequest, this doesn't really need
+                                #        to be part of Form, we could also move
+                                #        it to the form meta and access it
+                                #        through the field instead
+                                'form': dummy_form
+                            }
+                        )) for f in field
+                    )
+                ),
+                label=_('Participations'),
+                fieldset=_('Participations'),
+                # we always have at least one empty entry
+                min_entries=1,
+                widget=people_widget,
+            )
+
+        return PeoplePageForm

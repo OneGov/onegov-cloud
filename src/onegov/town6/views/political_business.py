@@ -14,6 +14,7 @@ from onegov.org.models.political_business import (
     POLITICAL_BUSINESS_STATUS)
 from onegov.org.models.political_business import (
     POLITICAL_BUSINESS_TYPE)
+from onegov.org.request import OrgRequest
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import PoliticalBusinessCollectionLayout
@@ -28,6 +29,17 @@ if TYPE_CHECKING:
 
     from onegov.town6.request import TownRequest
 
+
+def get_political_business_form_class(
+    model: object,
+    request: OrgRequest
+) -> type[PoliticalBusinessForm]:
+
+    if isinstance(model, PoliticalBusiness):
+        return model.with_content_extensions(PoliticalBusinessForm, request)
+    return PoliticalBusiness(title='title').with_content_extensions(
+        PoliticalBusinessForm, request
+    )
 
 @TownApp.html(
     model=PoliticalBusinessCollection,
@@ -55,17 +67,38 @@ def view_political_businesses(
     name='new',
     template='form.pt',
     permission=Private,
-    form=PoliticalBusinessForm
+    form=get_political_business_form_class
 )
 def view_add_political_business(
-        self: PoliticalBusinessCollection,
-        request: TownRequest,
-        form: PoliticalBusinessForm,
+    self: PoliticalBusinessCollection,
+    request: TownRequest,
+    form: PoliticalBusinessForm,
 ) -> RenderData | Response:
     layout = PoliticalBusinessCollectionLayout(self, request)
 
     if form.submitted(request):
-        political_business = self.add(**form.get_useful_data())
+        data = form.get_useful_data()
+        people = data.pop('people', [])
+        political_business = self.add(**data)
+
+        # extract participants
+        collection = PoliticalBusinessParticipationCollection(request.session)
+        participants = []
+
+        for p in people:
+            id = p.get('person')
+            role = p.get('role')
+            if id and role:
+                participant = collection.add(
+                    political_business_id=political_business.id,
+                    parliamentarian_id=id,
+                    participant_type=role,
+                )
+                participants.append(participant)
+
+        political_business.participants = participants
+        print('*** tschupre participants', political_business.participants)
+
         request.success(_('Added a new political business'))
 
         return request.redirect(request.link(political_business))
@@ -85,7 +118,7 @@ def view_add_political_business(
     name='edit',
     template='form.pt',
     permission=Private,
-    form=PoliticalBusinessForm
+    form=get_political_business_form_class
 )
 def edit_political_business(
     self: PoliticalBusiness,

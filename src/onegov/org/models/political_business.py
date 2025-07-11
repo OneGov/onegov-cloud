@@ -7,15 +7,10 @@ from uuid import uuid4
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID
-from onegov.file import MultiAssociatedFiles
 from onegov.org import _
-# from onegov.org.models.extensions import (
-#     PoliticalBusinessParticipationExtension
-# )
-from onegov.org.models.extensions import InlinePhotoAlbumExtension
+from onegov.org.models.extensions import PoliticalBusinessParticipationExtension
 from onegov.search import ORMSearchable
 from onegov.org.models import Meeting
-
 
 from typing import TYPE_CHECKING, TypeAlias, Literal
 
@@ -103,11 +98,12 @@ POLITICAL_BUSINESS_STATUS: dict[PoliticalBusinessStatus, str] = {
 
 
 class PoliticalBusiness(
+    # AccessLinkExtension,
     Base,
-    MultiAssociatedFiles,
     ContentMixin,
+    # GeneralFileLinkExtension,
     ORMSearchable,
-    InlinePhotoAlbumExtension
+    PoliticalBusinessParticipationExtension
 ):
 
     GERMAN_STATUS_NAME_TO_VALUE_MAP: dict[str, str] = {
