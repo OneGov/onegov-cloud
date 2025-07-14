@@ -7,8 +7,10 @@ from uuid import uuid4
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID
+from onegov.file import AssociatedFiles, MultiAssociatedFiles
 from onegov.org import _
-from onegov.org.models.extensions import PoliticalBusinessParticipationExtension
+from onegov.org.models.extensions import PoliticalBusinessParticipationExtension, GeneralFileLinkExtension, \
+    AccessExtension
 from onegov.search import ORMSearchable
 from onegov.org.models import Meeting
 
@@ -98,10 +100,11 @@ POLITICAL_BUSINESS_STATUS: dict[PoliticalBusinessStatus, str] = {
 
 
 class PoliticalBusiness(
-    # AccessLinkExtension,
+    AccessExtension,
+    MultiAssociatedFiles,
     Base,
     ContentMixin,
-    # GeneralFileLinkExtension,
+    GeneralFileLinkExtension,
     ORMSearchable,
     PoliticalBusinessParticipationExtension
 ):
@@ -185,7 +188,7 @@ class PoliticalBusiness(
         'PoliticalBusinessParticipation',
         back_populates='political_business',
         lazy='joined',
-        order_by='PoliticalBusinessParticipation.participant_type',
+        order_by='desc(PoliticalBusinessParticipation.participant_type)',
     )
 
     #: parliamentary group (Fraktion)

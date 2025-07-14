@@ -2637,11 +2637,17 @@ msgstr "Verschiedenes"
 msgid "Elections"
 msgstr "Wahlen"
 
-msgid "first-signatory"
-msgstr "Erstunterzeichner:in"
+msgid "First signatory"
+msgstr "Erstunterzeichner/in"
 
-msgid "co-signatory"
-msgstr "Mitunterzeichner:in"
+msgid "Co-signatory"
+msgstr "Mitunterzeichner/in"
+
+msgid "Select additional person"
+msgstr "Zusätzliche Person auswählen"
+
+msgid "Participations"
+msgstr "Verfasser / Beteiligte"
 
 #~ msgid "Parliamentarian is not in this commission."
 #~ msgstr "Parlamentarier:in ist nicht in dieser Kommission."

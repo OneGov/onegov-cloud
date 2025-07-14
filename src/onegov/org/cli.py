@@ -2791,3 +2791,34 @@ def ris_resolve_parliamentarian_doublette(
             transaction.commit()
 
     return resolve_doublette
+
+
+@cli.command(name='ris-rename-imported-participation-types-to-english')
+def ris_rename_imported_participation_types_to_english(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Renames imported participation types to English
+
+    onegov-org --select /foo/bar ris-rename-imported-participation-types-to-english
+    """
+    map = {
+        'Erstunterzeichner/-in': 'First signatory',
+        'Mitunterzeichner/-in': 'Co-signatory',
+        'Erstunterzeichner/in': 'First signatory',
+        'Mitunterzeichner/in': 'Co-signatory',
+        'Vorstösser/in': 'First signatory',
+    }
+
+
+    def rename_participation_types(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        collection = PoliticalBusinessParticipationCollection(session)
+
+        for participation in collection.query():
+            if participation.participant_type in map:
+                old_type = participation.participant_type
+                participation.participant_type = map[old_type]
+                click.echo(f'Renamed {old_type} to {participation.participant_type}')
+
+        transaction.commit()
+
+    return rename_participation_types

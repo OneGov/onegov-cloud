@@ -1379,27 +1379,21 @@ class PoliticalBusinessParticipationExtension(ContentExtension):
                 render_kw={'class_': 'indent-form-field'},
                 choices=[
                     ('', ''),
-                    ('first-signatory', _('First signatory')),
-                    ('co-signatory', _('Co-signatory')),
+                    ('First signatory', request.translate(
+                        _('First signatory')
+                    )),
+                    ('Co-signatory', request.translate(
+                        _('Co-signatory')
+                    )),
                 ]
             )
-
-        # HACK: Get translations working in FormField
-        #       We should probably make our own FormField, that doesn't
-        #       need this workaround
-        meta = get_translation_bound_meta(
-            PersonForm.Meta,
-            request.get_translate(for_chameleon=False)
-        )
-        meta.locales = [request.locale, 'en'] if request.locale else []
-        PersonForm.Meta = meta
 
         if TYPE_CHECKING:
             FieldBase = FieldList[FormField[PersonForm]]  # noqa: N806
         else:
             FieldBase = FieldList  # noqa: N806
 
-        class BusinessParticipationField(FieldBase):   # rename to BusinessParticipationField
+        class BusinessParticipationField(FieldBase):
 
             def process(
                 self,
@@ -1422,7 +1416,6 @@ class PoliticalBusinessParticipationExtension(ContentExtension):
 
             def populate_obj(self, obj: object, name: str) -> None:
                 print('*** tschupre PeopleField populate_obj')
-                pass
 
         field_macro = request.template_loader.macros['field']
         # FIXME: It is not ideal that we have to pass a dummy form along to
@@ -1439,7 +1432,7 @@ class PoliticalBusinessParticipationExtension(ContentExtension):
                 for f in field
             )
 
-        class PeoplePageForm(form_class): # type:ignore
+        class PeoplePageForm(form_class):  # type:ignore
 
             participations = BusinessParticipationField(
                 FormField(

@@ -41,6 +41,7 @@ def get_political_business_form_class(
         PoliticalBusinessForm, request
     )
 
+
 @TownApp.html(
     model=PoliticalBusinessCollection,
     template='political_businesses.pt',

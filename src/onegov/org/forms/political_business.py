@@ -50,7 +50,7 @@ class PoliticalBusinessForm(Form):
     status = TranslatedSelectField(
         label=_('Business Status'),
         choices=sorted(POLITICAL_BUSINESS_STATUS.items()),
-        validators=[Optional()],
+        validators=[InputRequired()],
         default='-',
     )
 
@@ -154,7 +154,7 @@ class PoliticalBusinessForm(Form):
                     PoliticalBusinessParticipation(
                         political_business_id=obj.id,
                         parliamentarian_id=parliamentarian.id,
-                        participant_type = role,
+                        participant_type=role,
                     )
                 )
 
@@ -165,7 +165,6 @@ class PoliticalBusinessForm(Form):
 
             if id in previous_ids_hex and id not in data_ids_hex:
                 collection.delete(participation)
-
 
     def process_obj(self, model: PoliticalBusiness) -> None:  # type:ignore[override]
         print('*** tschupre process_obj ***')
