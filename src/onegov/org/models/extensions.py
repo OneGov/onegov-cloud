@@ -7,6 +7,7 @@ from collections import OrderedDict
 from functools import cached_property
 
 from markupsafe import Markup
+
 from onegov.core.i18n import get_translation_bound_meta
 from onegov.core.orm.abstract import MoveDirection
 from onegov.core.orm.mixins import (
@@ -1285,10 +1286,6 @@ class InlinePhotoAlbumExtension(ContentExtension):
 
 
 class PoliticalBusinessParticipationExtension(ContentExtension):
-    """ Extends any class that has a content dictionary field with the ability
-    to reference people from :class:`onegov.people.PersonCollection`.
-
-    """
 
     @property
     def participations(self) -> list[Any] | None:
@@ -1305,21 +1302,30 @@ class PoliticalBusinessParticipationExtension(ContentExtension):
             person.role = role
             result.append(person)
 
-        print('*** tschupre PoliticalBusinessParticipationExtension people', result)
         return result
 
+    @participations.setter
+    def participations(self, value: list[Any]) -> None:
+        """ Sets the people linked/selected to this content. """
+        if not value or not self.id:
+            self.participants = []
+            return
+
+        from onegov.org.models.political_business import PoliticalBusinessParticipation
+        self.participants = [
+            PoliticalBusinessParticipation(
+                political_business_id=self.id,
+                parliamentarian_id=person.get('person'),
+                participant_type=person.get('role')
+            ) for person in value
+        ]
+
     def get_selectable_people(self, request: OrgRequest) -> list[RISParliamentarian]:
-        """ Returns a list of people that are not yet selected as participants. """
+        """ Returns a list of active parliamentarians. """
         query = request.session.query(RISParliamentarian)
         query = query.filter(RISParliamentarian.active == True)
         query = query.order_by(RISParliamentarian.last_name, RISParliamentarian.first_name)
         return query.all()
-
-    # def get_person_function_by_id(self, id: str) -> tuple[str, bool]:
-    #     for _id, (function, show_func) in self.content.get('people', []):
-    #         if id == _id:
-    #             return function, show_func
-    #     raise KeyError(id)
 
     def extend_form(
         # self: _ExtendedWithParticipationT,
@@ -1348,10 +1354,8 @@ class PoliticalBusinessParticipationExtension(ContentExtension):
             else:
                 render_kw['data-role'] = ''
 
-            # print('*** tschupre extend_form choice', person.id.hex, person.display_name, render_kw)
             return person.id.hex, person.display_name, render_kw
 
-        # choices: list[_Choice] = [(p.id, p.display_name) for p in selectable_people]
         choices: list[_Choice] = [choice(p) for p in selectable_people]
         choices.insert(0, ('', ''))
 
@@ -1396,13 +1400,6 @@ class PoliticalBusinessParticipationExtension(ContentExtension):
             FieldBase = FieldList  # noqa: N806
 
         class BusinessParticipationField(FieldBase):   # rename to BusinessParticipationField
-            # def is_ordered_people(self, people: list[tuple[str, Any]]) -> bool:
-            #     people_dict = dict(people)
-            #     return [
-            #         person.id.hex
-            #         for person in selectable_people
-            #         if person.id.hex in people_dict
-            #     ] == list(people_dict.keys())
 
             def process(
                 self,
@@ -1424,22 +1421,8 @@ class PoliticalBusinessParticipationExtension(ContentExtension):
                     self.append_entry()
 
             def populate_obj(self, obj: object, name: str) -> None:
-                current = obj.participants or []
-                new = [item for item in self.data if item['person']]
-                if new:
-                    from onegov.org.models.political_business import PoliticalBusinessParticipation
-
-                    for n in new:
-                        participant = PoliticalBusinessParticipation(
-                            political_business_id=obj.id,
-                            parliamentarian_id=n['person'],
-                            participant_type=n['role'],
-                        )
-                        obj.participants.append(participant)
-
-                # FIXME: handle a person gets deselected
-
-                # print(f'*** tschupre PeopleField populate_obj, current {[c for c in current]}, new {new}')
+                print('*** tschupre PeopleField populate_obj')
+                pass
 
         field_macro = request.template_loader.macros['field']
         # FIXME: It is not ideal that we have to pass a dummy form along to

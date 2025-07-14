@@ -11,7 +11,12 @@ from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import TranslatedSelectField
 from wtforms.fields import DateField
 from onegov.org import _
+from onegov.org.collections.political_business_participant import (
+    PoliticalBusinessParticipationCollection
+)
+from onegov.org.models import Parliamentarian
 from onegov.org.models import PoliticalBusiness
+from onegov.org.models import PoliticalBusinessParticipation
 from onegov.org.models import RISParliamentarian
 from onegov.org.models import RISParliamentaryGroup
 from onegov.org.models.political_business import (
@@ -117,13 +122,50 @@ class PoliticalBusinessForm(Form):
         super().populate_obj(
             obj,
             exclude={
-                'selected_participants',
                 'parliamentary_group_id'
             },
             include=include
         )
 
         obj.parliamentary_group_id = self.parliamentary_group_id  # type:ignore[union-attr]
+
+        previous_ids_hex = [
+            participation.parliamentarian_id.hex
+            for participation in obj.participants
+        ]
+        data_ids_hex = []
+
+        # handle selection of participants of participants
+        parliamentarians = self.request.session.query(RISParliamentarian)
+        for participation in self.data.get('participations', []):
+            person_id_hex = participation.get('person')
+            role = participation.get('role')
+
+            if person_id_hex:
+                data_ids_hex.append(person_id_hex)
+
+            if person_id_hex and person_id_hex not in previous_ids_hex:
+                parliamentarian = (
+                    parliamentarians
+                    .filter(Parliamentarian.id == person_id_hex)
+                    .first()
+                )
+                obj.participants.append(
+                    PoliticalBusinessParticipation(
+                        political_business_id=obj.id,
+                        parliamentarian_id=parliamentarian.id,
+                        participant_type = role,
+                    )
+                )
+
+        # handle deselection of participants
+        collection = PoliticalBusinessParticipationCollection(self.request.session)
+        for participation in obj.participants:
+            id = participation.parliamentarian_id.hex
+
+            if id in previous_ids_hex and id not in data_ids_hex:
+                collection.delete(participation)
+
 
     def process_obj(self, model: PoliticalBusiness) -> None:  # type:ignore[override]
         print('*** tschupre process_obj ***')

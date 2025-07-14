@@ -78,14 +78,14 @@ def view_add_political_business(
 
     if form.submitted(request):
         data = form.get_useful_data()
-        people = data.pop('people', [])
+        participations = data.pop('participations', [])
         political_business = self.add(**data)
 
         # extract participants
         collection = PoliticalBusinessParticipationCollection(request.session)
         participants = []
 
-        for p in people:
+        for p in participations:
             id = p.get('person')
             role = p.get('role')
             if id and role:
@@ -97,8 +97,6 @@ def view_add_political_business(
                 participants.append(participant)
 
         political_business.participants = participants
-        print('*** tschupre participants', political_business.participants)
-
         request.success(_('Added a new political business'))
 
         return request.redirect(request.link(political_business))
