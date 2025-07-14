@@ -1353,12 +1353,13 @@ class PoliticalBusinessParticipationExtension(ContentExtension):
         def choice(person: RISParliamentarian) -> _Choice:
             render_kw = {}
 
-            # prioritize participants?
             if role := selected.get(person.id):
+                render_kw['data-function'] = role
                 render_kw['data-role'] = role
                 render_kw['data-show'] = 'true'
             else:
                 render_kw['data-role'] = ''
+                render_kw['data-function'] = ''
 
             return person.id.hex, person.display_name, render_kw
 
@@ -1399,6 +1400,7 @@ class PoliticalBusinessParticipationExtension(ContentExtension):
         else:
             FieldBase = FieldList  # noqa: N806
 
+
         class BusinessParticipationField(FieldBase):
 
             def process(
@@ -1408,7 +1410,7 @@ class PoliticalBusinessParticipationExtension(ContentExtension):
                 extra_filters: Sequence[_Filter] | None = None
             ) -> None:
 
-                print('*** tschupre PeopleField process data')
+                print('*** tschupre PeopleField process data', data)
                 # FIXME: I'm not quite sure why we need to do this
                 #        but it looks like the last_index gets updated
                 #        to 0 by something, so we start counting at 1
@@ -1416,12 +1418,25 @@ class PoliticalBusinessParticipationExtension(ContentExtension):
                 self.last_index = -1
                 super().process(formdata, data, extra_filters)
 
+                if data:
+                    self.data = [
+                        {
+                            'person': str(participant.id),
+                            'role': participant.role
+                        }
+                        for participant in data
+                    ]
+
                 # always have an empty extra entry
                 if formdata is None and self[-1].form.person.data is not None:
                     self.append_entry()
 
             def populate_obj(self, obj: object, name: str) -> None:
                 print('*** tschupre PeopleField populate_obj')
+
+            def process_obj(self, obj):
+                super().process_obj(obj)
+                print('*** tschupre PeopleField process_obj', obj)
 
         field_macro = request.template_loader.macros['field']
         # FIXME: It is not ideal that we have to pass a dummy form along to
@@ -1432,6 +1447,7 @@ class PoliticalBusinessParticipationExtension(ContentExtension):
         dummy_form = request.get_form(Form, csrf_support=False)
 
         def people_widget(field: FieldBase, **kwargs: Any) -> Markup:
+            print('*** tschupre PeopleField load people-select')
             request.include('people-select')
             return Markup('<br>').join(
                 Markup('<div id="{}">{}</div>').format(f.id, f())

@@ -118,7 +118,7 @@ class PoliticalBusinessForm(Form):
         exclude: Collection[str] | None = None,
         include: Collection[str] | None = None
     ) -> None:
-        print('*** tschupre populate_obj ***')
+        print('*** tschupre populate_obj PoliticalBusinessForm', obj)
         super().populate_obj(
             obj,
             exclude={
@@ -137,7 +137,7 @@ class PoliticalBusinessForm(Form):
 
         # handle selection of participants of participants
         parliamentarians = self.request.session.query(RISParliamentarian)
-        for participation in self.data.get('participations', []):
+        for participation in self.data.get('participants', []):
             person_id_hex = participation.get('person')
             role = participation.get('role')
 
@@ -168,7 +168,17 @@ class PoliticalBusinessForm(Form):
                 collection.delete(participation)
 
     def process_obj(self, model: PoliticalBusiness) -> None:  # type:ignore[override]
-        print('*** tschupre process_obj ***')
+        print('*** tschupre process_obj PoliticalBusinessForm')
         super().process_obj(model)
 
         self.parliamentary_group_id = model.parliamentary_group_id
+
+        ## moved to BusinessParticipationField::process
+        # self.people = [
+        #     {
+        #         'person': str(participant.id),
+        #         'role': participant.role
+        #     }
+        #     for participant in model.participations
+        # ]
+        # print('*** tschupre process_obj people', self.data['people'])
