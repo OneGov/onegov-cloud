@@ -2798,7 +2798,8 @@ def ris_rename_imported_participation_types_to_english(
 ) -> Callable[[OrgRequest, OrgApp], None]:
     """ Renames imported participation types to English
 
-    onegov-org --select /foo/bar ris-rename-imported-participation-types-to-english
+    onegov-org --select /foo/bar
+        ris-rename-imported-participation-types-to-english
     """
     map = {
         'Erstunterzeichner/-in': 'First signatory',
@@ -2817,7 +2818,8 @@ def ris_rename_imported_participation_types_to_english(
             if participation.participant_type in map:
                 old_type = participation.participant_type
                 participation.participant_type = map[old_type]
-                click.echo(f'Renamed {old_type} to {participation.participant_type}')
+                click.echo(
+                    f'Renamed {old_type} to {participation.participant_type}')
 
         transaction.commit()
 

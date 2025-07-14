@@ -71,7 +71,9 @@ from onegov.org.models import PageMove
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.page import PageCollection
 from onegov.org.collections.party import RISPartyCollection
-from onegov.org.collections.political_business import PoliticalBusinessCollection
+from onegov.org.collections.political_business import (
+    PoliticalBusinessCollection
+)
 from onegov.org.collections.commission import (
     RISCommissionCollection
 )

@@ -1311,7 +1311,9 @@ class PoliticalBusinessParticipationExtension(ContentExtension):
             self.participants = []
             return
 
-        from onegov.org.models.political_business import PoliticalBusinessParticipation
+        from onegov.org.models.political_business import (
+            PoliticalBusinessParticipation
+        )
         self.participants = [
             PoliticalBusinessParticipation(
                 political_business_id=self.id,
@@ -1320,11 +1322,15 @@ class PoliticalBusinessParticipationExtension(ContentExtension):
             ) for person in value
         ]
 
-    def get_selectable_people(self, request: OrgRequest) -> list[RISParliamentarian]:
+    def get_selectable_people(
+        self,
+        request: OrgRequest
+    ) -> list[RISParliamentarian]:
         """ Returns a list of active parliamentarians. """
         query = request.session.query(RISParliamentarian)
         query = query.filter(RISParliamentarian.active == True)
-        query = query.order_by(RISParliamentarian.last_name, RISParliamentarian.first_name)
+        query = query.order_by(
+            RISParliamentarian.last_name, RISParliamentarian.first_name)
         return query.all()
 
     def extend_form(

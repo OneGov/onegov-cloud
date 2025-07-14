@@ -21,7 +21,6 @@ if TYPE_CHECKING:
     from typing import TypeAlias
 
     from onegov.org.models import Parliamentarian
-    from onegov.org.models import ParliamentaryGroup
     from onegov.org.models import Party
 
     Role: TypeAlias = Literal[

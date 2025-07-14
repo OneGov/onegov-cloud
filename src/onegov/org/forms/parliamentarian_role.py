@@ -6,7 +6,9 @@ from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import TranslatedSelectField
 from onegov.org import _
 from onegov.org.collections.parliamentarian import ParliamentarianCollection
-from onegov.org.collections.parliamentary_group import ParliamentaryGroupCollection
+from onegov.org.collections.parliamentary_group import (
+    ParliamentaryGroupCollection
+)
 from onegov.org.collections.party import PartyCollection
 
 from onegov.org.models import PARLIAMENTARIAN_ROLES

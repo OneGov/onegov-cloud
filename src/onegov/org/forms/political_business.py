@@ -159,7 +159,8 @@ class PoliticalBusinessForm(Form):
                 )
 
         # handle deselection of participants
-        collection = PoliticalBusinessParticipationCollection(self.request.session)
+        collection = (
+            PoliticalBusinessParticipationCollection(self.request.session))
         for participation in obj.participants:
             id = participation.parliamentarian_id.hex
 

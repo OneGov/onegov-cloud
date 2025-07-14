@@ -7,10 +7,13 @@ from uuid import uuid4
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID
-from onegov.file import AssociatedFiles, MultiAssociatedFiles
+from onegov.file import MultiAssociatedFiles
 from onegov.org import _
-from onegov.org.models.extensions import PoliticalBusinessParticipationExtension, GeneralFileLinkExtension, \
-    AccessExtension
+from onegov.org.models.extensions import AccessExtension
+from onegov.org.models.extensions import GeneralFileLinkExtension
+from onegov.org.models.extensions import (
+    PoliticalBusinessParticipationExtension
+)
 from onegov.search import ORMSearchable
 from onegov.org.models import Meeting
 
@@ -21,7 +24,6 @@ if TYPE_CHECKING:
     from datetime import date
     from onegov.org.models import MeetingItem
     from onegov.org.models import RISParliamentarian
-
 
     PoliticalBusinessType: TypeAlias = Literal[
         'inquiry',  # Anfrage
@@ -200,13 +202,13 @@ class PoliticalBusiness(
     )
 
     #: The meetings this agenda item was discussed in
-    meetings: RelationshipProperty['Meeting'] = relationship(
+    meetings: RelationshipProperty[Meeting] = relationship(
         'Meeting',
         back_populates='political_businesses',
         order_by=Meeting.start_datetime,
         lazy='joined',
     )
-    meeting_items: relationship[list['MeetingItem']] = relationship(
+    meeting_items: relationship[list[MeetingItem]] = relationship(
         'MeetingItem',
         back_populates='political_business'
     )
@@ -283,8 +285,10 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
     )
 
     def __repr__(self) -> str:
-        return (f'<Political Business Participation {self.parliamentarian.title}, '
-                f'{self.political_business.title}, {self.participant_type}>')
+        return (f'<Political Business Participation '
+                f'{self.parliamentarian.title}, '
+                f'{self.political_business.title}, '
+                f'{self.participant_type}>')
 
 
 class RISPoliticalBusinessParticipation(

@@ -5,7 +5,9 @@ from typing import TYPE_CHECKING
 from onegov.core.elements import Link
 from onegov.org.forms import ParliamentarianRoleForm
 from onegov.org.security import Private, Public
-from onegov.org.collections.parliamentarian_role import ParliamentarianRoleCollection
+from onegov.org.collections.parliamentarian_role import (
+    ParliamentarianRoleCollection
+)
 from onegov.org.models import RISParliamentarianRole
 from onegov.town6 import _
 from onegov.town6.app import TownApp
