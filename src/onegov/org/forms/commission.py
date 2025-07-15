@@ -4,7 +4,7 @@ from onegov.form import Form
 from onegov.form.fields import TranslatedSelectField
 from onegov.org.forms.fields import HtmlField
 from onegov.org import _
-from onegov.org.models.commission import TYPES
+from onegov.parliament.models.commission import TYPES
 from wtforms.fields import DateField
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired

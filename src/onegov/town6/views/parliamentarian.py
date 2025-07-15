@@ -2,13 +2,12 @@ from __future__ import annotations
 
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
-from onegov.org.collections.parliamentarian import RISParliamentarianCollection
-from onegov.org.collections.parliamentarian import ParliamentarianCollection
 from onegov.org.forms import ParliamentarianForm
 from onegov.org.forms import ParliamentarianRoleForm
 from onegov.org.models import RISParliamentarian
-from onegov.org.models import RISParliamentarianRole
-from onegov.pas.models import PASParliamentarian, PASParliamentarianRole
+from onegov.org.models import RISParliamentarianCollection
+from onegov.parliament.collections import ParliamentarianCollection
+from onegov.parliament.models import ParliamentarianRole
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import (
@@ -20,7 +19,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from webob.response import Response
     from onegov.core.types import RenderData
-    from onegov.org.forms.parliamentarian import PASParliamentarianForm
+    from onegov.pas.forms.parliamentarian import PASParliamentarianForm
+    from onegov.parliament.models import Parliamentarian
     from onegov.pas.layouts import PASParliamentarianCollectionLayout
     from onegov.pas.layouts import PASParliamentarianLayout
     from onegov.town6.request import TownRequest
@@ -29,8 +29,8 @@ if TYPE_CHECKING:
 def view_parliamentarians(
     self: ParliamentarianCollection,
     request: TownRequest,
-    layout: RISParliamentarianCollectionLayout |
-            PASParliamentarianCollectionLayout
+    layout: RISParliamentarianCollectionLayout
+            | PASParliamentarianCollectionLayout
 ) -> RenderData | Response:
 
     filters = {}
@@ -58,8 +58,8 @@ def add_parliamentarian(
     self: ParliamentarianCollection,
     request: TownRequest,
     form: ParliamentarianForm | PASParliamentarianForm,
-    layout: RISParliamentarianCollectionLayout |
-            PASParliamentarianCollectionLayout
+    layout: RISParliamentarianCollectionLayout
+            | PASParliamentarianCollectionLayout
 ) -> RenderData | Response:
 
     if form.submitted(request):
@@ -79,7 +79,7 @@ def add_parliamentarian(
 
 
 def view_parliamentarian(
-    self: RISParliamentarian | PASParliamentarian,
+    self: Parliamentarian,
     request: TownRequest,
     layout: RISParliamentarianLayout | PASParliamentarianLayout
 ) -> RenderData | Response:
@@ -92,7 +92,7 @@ def view_parliamentarian(
 
 
 def edit_parliamentarian(
-    self: RISParliamentarian | PASParliamentarian,
+    self: Parliamentarian,
     request: TownRequest,
     form: ParliamentarianForm | PASParliamentarianForm,
     layout: RISParliamentarianLayout | PASParliamentarianLayout
@@ -117,7 +117,7 @@ def edit_parliamentarian(
 
 
 def delete_parliamentarian(
-    self: RISParliamentarian | PASParliamentarian,
+    self: Parliamentarian,
     request: TownRequest,
 ) -> None:
 
@@ -128,7 +128,7 @@ def delete_parliamentarian(
 
 
 def add_commission_membership(
-    self: RISParliamentarian | PASParliamentarian,
+    self: Parliamentarian,
     request: TownRequest,
     form: ParliamentarianRoleForm,
     layout: RISParliamentarianLayout | PASParliamentarianLayout
@@ -137,18 +137,15 @@ def add_commission_membership(
     form.delete_field('parliamentarian_id')
 
     if form.submitted(request):
-        if isinstance(self, RISParliamentarian):
-            self.roles.append(
-                RISParliamentarianRole(**form.get_useful_data())
-            )
-        elif isinstance(self, PASParliamentarian):
-            self.roles.append(
-                PASParliamentarianRole(**form.get_useful_data())
-            )
-        else:
-            raise NotImplementedError(
-                'Unknown parliamentarian type: {}'.format(type(self))
-            )
+        self.roles.append(
+            ParliamentarianRole.get_polymorphic_class(
+                # FIXME: We should probably just use `ris` and `pas`
+                #        as the polymorphic types on every model
+                #        then we can directly use them
+                f'{self.type}_role',
+                ParliamentarianRole
+            )(**form.get_useful_data())
+        )
         request.success(_('Added a new role'))
         return request.redirect(request.link(self))
 

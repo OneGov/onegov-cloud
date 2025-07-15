@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-15 14:08+0200\n"
+"POT-Creation-Date: 2025-07-15 17:05+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -340,12 +340,6 @@ msgstr "Partis"
 msgid "Political Party"
 msgstr "Parti"
 
-msgid "Do you really want to delete this party?"
-msgstr "Voulez-vous vraiment supprimer ce parti ?"
-
-msgid "Delete party"
-msgstr "Supprimer le parti"
-
 msgid "Commissions"
 msgstr "Commissions"
 
@@ -595,8 +589,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
-"Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
+"« Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -2515,12 +2509,6 @@ msgstr "Ajout d'un nouveau groupe parlementaire"
 
 msgid "New parliamentary group"
 msgstr "Nouveau groupe parlementaire"
-
-msgid "Added a new party"
-msgstr "Ajout d'un nouveau parti"
-
-msgid "New party"
-msgstr "Nouveau parti"
 
 msgid "Added a new political business"
 msgstr "Ajout d' un nouveau business politique"

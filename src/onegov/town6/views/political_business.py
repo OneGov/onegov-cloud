@@ -3,40 +3,28 @@ from __future__ import annotations
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
 from onegov.org.forms.political_business import PoliticalBusinessForm
-from onegov.org.collections.parliamentary_group import (
-    ParliamentaryGroupCollection
-)
-from onegov.org.collections.political_business_participant import (
-    PoliticalBusinessParticipationCollection
-)
-from onegov.org.collections.political_business import (
-    PoliticalBusinessCollection
-)
-from onegov.org.models import PoliticalBusiness, ParliamentaryGroup
+from onegov.org.models import PoliticalBusiness
+from onegov.org.models import PoliticalBusinessCollection
+from onegov.org.models import PoliticalBusinessParticipationCollection
 from onegov.org.models import PoliticalBusinessParticipation
-from onegov.org.models.political_business import (
-    POLITICAL_BUSINESS_STATUS)
-from onegov.org.models.political_business import (
-    POLITICAL_BUSINESS_TYPE)
-from onegov.org.request import OrgRequest
+from onegov.org.models.political_business import POLITICAL_BUSINESS_STATUS
+from onegov.org.models.political_business import POLITICAL_BUSINESS_TYPE
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import PoliticalBusinessCollectionLayout
 from onegov.town6.layout import PoliticalBusinessLayout
 
+
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
-    from webob.response import Response
-
     from onegov.core.types import RenderData
-
     from onegov.town6.request import TownRequest
+    from webob.response import Response
 
 
 def get_political_business_form_class(
     model: object,
-    request: OrgRequest
+    request: TownRequest
 ) -> type[PoliticalBusinessForm]:
 
     if isinstance(model, PoliticalBusiness):
@@ -158,14 +146,8 @@ def view_political_business(
     self: PoliticalBusiness,
     request: TownRequest,
 ) -> RenderData | Response:
-    layout = PoliticalBusinessLayout(self, request)
 
-    political_groups = (
-        ParliamentaryGroupCollection(request.session).query()
-        .filter(ParliamentaryGroup.id == self.parliamentary_group_id)
-        .order_by(ParliamentaryGroup.name)
-        .all()
-    )
+    layout = PoliticalBusinessLayout(self, request)
 
     return {
         'layout': layout,
@@ -174,7 +156,7 @@ def view_political_business(
         'type_map': POLITICAL_BUSINESS_TYPE,
         'status_map': POLITICAL_BUSINESS_STATUS,
         'files': getattr(self, 'files', None),
-        'political_groups': political_groups,
+        'political_groups': [self.parliamentary_group],
     }
 
 

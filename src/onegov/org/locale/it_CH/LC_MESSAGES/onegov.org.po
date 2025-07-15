@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-15 14:08+0200\n"
+"POT-Creation-Date: 2025-07-15 17:05+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1382,35 +1382,11 @@ msgstr "Sito web"
 msgid "Remarks"
 msgstr "Osservazioni"
 
-msgid "Personnel number"
-msgstr "Numero del personale"
-
-msgid "Contract number"
-msgstr "Numero del contratto"
-
-msgid "Shipping method"
-msgstr "Metodo di spedizione"
-
-msgid "Shipping address"
-msgstr "Indirizzo di spedizione"
-
-msgid "Salutation used in the address"
-msgstr "Saluto utilizzato nell'indirizzo"
-
-msgid "Salutation used for letters"
-msgstr "Saluto utilizzato per le lettere"
-
-msgid "How bills should be delivered"
-msgstr "Come le fatture devono essere consegnate"
-
 msgid "Parliamentarian"
 msgstr "Parlamentare"
 
 msgid "Role"
 msgstr "Ruolo"
-
-msgid "Political Party"
-msgstr "Partito"
 
 msgid "Party role"
 msgstr "Ruolo nel partito"
@@ -1467,6 +1443,9 @@ msgstr "Cognome da nubile"
 msgid "Profession"
 msgstr "Professione"
 
+msgid "Political Party"
+msgstr "Partito"
+
 msgid "Parliamentary Group"
 msgstr "Gruppo parlamentare"
 
@@ -1494,6 +1473,18 @@ msgstr "Note"
 msgid "Public extra information about this person"
 msgstr "Informazioni pubbliche aggiuntive su questa persona"
 
+msgid "Select additional participant"
+msgstr ""
+
+msgid "No results match"
+msgstr "Nessun risultato corrisponde"
+
+msgid "First signatory"
+msgstr "Primo firmatario"
+
+msgid "Co-signatory"
+msgstr "Cofirmatario"
+
 msgid "Number"
 msgstr "Numero"
 
@@ -1502,6 +1493,9 @@ msgstr ""
 
 msgid "Entry Date"
 msgstr ""
+
+msgid "Participations"
+msgstr "Partecipanti"
 
 msgid "Tag"
 msgstr "Tag"
@@ -3246,45 +3240,6 @@ msgstr "Elimina collegamento esterno"
 msgid "Sort"
 msgstr "Ordinare"
 
-msgid "Plenary session"
-msgstr ""
-
-msgid "Commission meeting"
-msgstr ""
-
-msgid "File study"
-msgstr ""
-
-msgid "Shortest meeting"
-msgstr ""
-
-msgid "Attendence added"
-msgstr ""
-
-msgid "Attendence modified"
-msgstr ""
-
-msgid "Attendence removed"
-msgstr ""
-
-msgid "normal"
-msgstr ""
-
-msgid "intercantonal"
-msgstr ""
-
-msgid "official mission"
-msgstr ""
-
-msgid "Guest"
-msgstr ""
-
-msgid "Extended Member"
-msgstr ""
-
-msgid "President"
-msgstr ""
-
 msgid "The submission was adopted"
 msgstr "L'iscrizione è stata adottata"
 
@@ -3390,9 +3345,6 @@ msgstr "Usa il testo invece dell'estratto nella newsletter"
 msgid "Select additional person"
 msgstr "Selezionare una persona aggiuntiva"
 
-msgid "No results match"
-msgstr "Nessun risultato corrisponde"
-
 msgid "List this function in the page of this person"
 msgstr "Mostra questa funzione nella pagina di questa persona"
 
@@ -3469,15 +3421,6 @@ msgstr "Cancellare il contenuto"
 msgid "Photo album"
 msgstr "Album fotografico"
 
-msgid "First signatory"
-msgstr "Primo firmatario"
-
-msgid "Co-signatory"
-msgstr "Cofirmatario"
-
-msgid "Participations"
-msgstr "Partecipanti"
-
 msgid "In future"
 msgstr "in futuro"
 
@@ -3504,42 +3447,6 @@ msgstr "Elimina nota"
 
 msgid "Always visible on homepage"
 msgstr "Sempre visibile sulla pagina principale"
-
-msgid "male"
-msgstr "maschile"
-
-msgid "female"
-msgstr "femminile"
-
-msgid "A mail"
-msgstr "Posta A"
-
-msgid "A mail plus"
-msgstr "Posta A plus"
-
-msgid "registered"
-msgstr "raccomandata"
-
-msgid "confidential"
-msgstr "riservata"
-
-msgid "personal / confidential"
-msgstr "personale / riservata"
-
-msgid "none"
-msgstr "nessuno"
-
-msgid "Vote counter"
-msgstr "Contatore di voti"
-
-msgid "Vice president"
-msgstr "Vice presidente"
-
-msgid "Media Manager"
-msgstr "Responsabile Media e Campagne"
-
-msgid "President of the parliamentary group"
-msgstr "Capogruppo parlamentare"
 
 msgid "Inquiry"
 msgstr "Richiesta"
@@ -3758,8 +3665,8 @@ msgstr "Rifiuta le prenotazioni"
 msgid "Reject all with message"
 msgstr "Rifiuta tutto con messaggio"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 

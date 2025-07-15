@@ -20,6 +20,8 @@ from onegov.file import File
 from onegov.form import FormDefinition
 from onegov.org.models import (
     Organisation, Topic, News, ExtendedDirectory, PushNotification)
+from onegov.org.models.political_business import (
+    POLITICAL_BUSINESS_STATUS, POLITICAL_BUSINESS_TYPE)
 from onegov.org.utils import annotate_html
 from onegov.page import Page, PageCollection
 from onegov.people import Person
@@ -598,3 +600,49 @@ def migrate_kaba_config_to_new_format(context: UpgradeContext) -> None:
              WHERE data ? 'kaba'
                AND data->'kaba' ? 'visit_id'
         """, {'site_id': site_id})
+
+
+@upgrade_task('Update political business enum values')
+def update_political_business_enum_values(
+    context: UpgradeContext
+) -> None:
+    if context.has_enum('par_political_business_type'):
+        context.update_enum_values(
+            'par_political_business_type',
+            POLITICAL_BUSINESS_TYPE.keys()
+        )
+    if context.has_enum('par_political_business_status'):
+        context.update_enum_values(
+            'par_political_business_status',
+            POLITICAL_BUSINESS_STATUS.keys()
+        )
+
+
+@upgrade_task('Change political business participation type column type')
+def change_political_business_participation_type_column_type(
+    context: UpgradeContext
+) -> None:
+    if context.has_column(
+        'par_political_business_participants',
+        'participant_type'
+    ):
+        context.operations.alter_column(
+            'par_political_business_participants',
+            'participant_type',
+            type_=Text,
+        )
+
+
+@upgrade_task('Remove obsolete polymorphic type columns')
+def remove_obsolete_polymorphic_type_columns(context: UpgradeContext) -> None:
+    for table in (
+        'par_attendence',
+        'par_parties',
+        'par_changes',
+        'par_legislative_periods',
+        'par_political_businesses',
+        'par_political_business_participation',
+    ):
+        column = 'poly_type' if table == 'par_attendence' else 'type'
+        if context.has_table(table) and context.has_column(table, column):
+            context.operations.drop_column(table, column)

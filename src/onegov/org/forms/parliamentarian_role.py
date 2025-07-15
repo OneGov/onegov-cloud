@@ -5,28 +5,21 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import TranslatedSelectField
 from onegov.org import _
-from onegov.org.collections.parliamentarian import ParliamentarianCollection
-from onegov.org.collections.parliamentary_group import (
-    ParliamentaryGroupCollection
-)
-from onegov.org.collections.party import PartyCollection
-
-from onegov.org.models import PARLIAMENTARIAN_ROLES
-from onegov.org.models.parliamentarian_role import (
-    PARLIAMENTARY_GROUP_ROLES
-)
-from onegov.org.models.parliamentarian_role import (
+from onegov.parliament.collections import ParliamentarianCollection
+from onegov.parliament.collections import ParliamentaryGroupCollection
+from onegov.parliament.models.parliamentarian_role import (
+    PARLIAMENTARY_GROUP_ROLES,
+    PARLIAMENTARIAN_ROLES,
     PARTY_ROLES
 )
 from wtforms.fields import DateField
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from onegov.org.models import ParliamentarianRole
-    from typing import Any
+    from onegov.parliament.models import ParliamentarianRole
 
 
 class ParliamentarianRoleForm(Form):
@@ -52,10 +45,6 @@ class ParliamentarianRoleForm(Form):
     end = DateField(
         label=_('End'),
         validators=[Optional()],
-    )
-
-    party_id = ChosenSelectField(
-        label=_('Political Party'),
     )
 
     party_role = TranslatedSelectField(
@@ -86,12 +75,6 @@ class ParliamentarianRoleForm(Form):
             in ParliamentaryGroupCollection(self.request.session).query()
         ]
         self.parliamentary_group_id.choices.insert(0, ('', '-'))
-        self.party_id.choices = [
-            (str(party.id), party.title)
-            for party
-            in PartyCollection(self.request.session).query()
-        ]
-        self.party_id.choices.insert(0, ('', '-'))
 
     def populate_obj(  # type: ignore[override]
         self,
@@ -99,13 +82,15 @@ class ParliamentarianRoleForm(Form):
         exclude: Collection[str] | None = None,
         include: Collection[str] | None = None
     ) -> None:
-        super().populate_obj(obj, exclude, include)
+        super().populate_obj(
+            obj,
+            {'parliamentary_group_id', *(exclude or ())},
+            include
+        )
         obj.parliamentary_group_id = obj.parliamentary_group_id or None
-        obj.party_id = obj.party_id or None
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()
         result['parliamentary_group_id'] = result.get(
             'parliamentary_group_id') or None
-        result['party_id'] = result.get('party_id') or None
         return result

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-15 14:08+0200\n"
+"POT-Creation-Date: 2025-07-15 17:05+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1378,35 +1378,11 @@ msgstr "Site Web"
 msgid "Remarks"
 msgstr "Remarques"
 
-msgid "Personnel number"
-msgstr "Numéro de personnel"
-
-msgid "Contract number"
-msgstr "Numéro de contrat"
-
-msgid "Shipping method"
-msgstr "Mode d'expédition"
-
-msgid "Shipping address"
-msgstr "Adresse de livraison"
-
-msgid "Salutation used in the address"
-msgstr "Civilité utilisée dans l'adresse"
-
-msgid "Salutation used for letters"
-msgstr "Civilité utilisée dans l'adresse"
-
-msgid "How bills should be delivered"
-msgstr "Comment les factures doivent être livrées"
-
 msgid "Parliamentarian"
 msgstr "Parlementaire"
 
 msgid "Role"
 msgstr "Rôle"
-
-msgid "Political Party"
-msgstr "Parti"
 
 msgid "Party role"
 msgstr "Rôle dans le parti"
@@ -1462,6 +1438,9 @@ msgstr "Naissance"
 msgid "Profession"
 msgstr "Profession"
 
+msgid "Political Party"
+msgstr "Parti"
+
 msgid "Parliamentary Group"
 msgstr "Groupe parlementaire"
 
@@ -1489,6 +1468,18 @@ msgstr "Notes"
 msgid "Public extra information about this person"
 msgstr "Informations publiques supplémentaires à propos de cette semaine"
 
+msgid "Select additional participant"
+msgstr ""
+
+msgid "No results match"
+msgstr "Aucun résultat ne correspond"
+
+msgid "First signatory"
+msgstr "Premier signataire"
+
+msgid "Co-signatory"
+msgstr "Co-signataire"
+
 msgid "Number"
 msgstr "Numéro"
 
@@ -1497,6 +1488,9 @@ msgstr "Statut"
 
 msgid "Entry Date"
 msgstr "Date"
+
+msgid "Participations"
+msgstr "Auteur / Participants"
 
 msgid "Tag"
 msgstr "Étiquette"
@@ -3246,45 +3240,6 @@ msgstr "Supprimer lien externe"
 msgid "Sort"
 msgstr "Trier"
 
-msgid "Plenary session"
-msgstr ""
-
-msgid "Commission meeting"
-msgstr ""
-
-msgid "File study"
-msgstr ""
-
-msgid "Shortest meeting"
-msgstr ""
-
-msgid "Attendence added"
-msgstr ""
-
-msgid "Attendence modified"
-msgstr ""
-
-msgid "Attendence removed"
-msgstr ""
-
-msgid "normal"
-msgstr ""
-
-msgid "intercantonal"
-msgstr ""
-
-msgid "official mission"
-msgstr ""
-
-msgid "Guest"
-msgstr ""
-
-msgid "Extended Member"
-msgstr ""
-
-msgid "President"
-msgstr ""
-
 msgid "The submission was adopted"
 msgstr "La proposition a été adoptée"
 
@@ -3391,9 +3346,6 @@ msgstr "Utiliser le texte au lieu de l'introduction dans le newsletter"
 msgid "Select additional person"
 msgstr "Sélectionnez une personne supplémentaire"
 
-msgid "No results match"
-msgstr "Aucun résultat ne correspond"
-
 msgid "List this function in the page of this person"
 msgstr "Afficher cette fonction sur la page de cette personne"
 
@@ -3468,15 +3420,6 @@ msgstr "Supprimer le contenu"
 msgid "Photo album"
 msgstr "Album photo"
 
-msgid "First signatory"
-msgstr "Premier signataire"
-
-msgid "Co-signatory"
-msgstr "Co-signataire"
-
-msgid "Participations"
-msgstr "Auteur / Participants"
-
 msgid "In future"
 msgstr "Dans le futur"
 
@@ -3503,42 +3446,6 @@ msgstr "Supprimer la note"
 
 msgid "Always visible on homepage"
 msgstr "Toujours visible sur la page d'accueil"
-
-msgid "male"
-msgstr "homme"
-
-msgid "female"
-msgstr "femelle"
-
-msgid "A mail"
-msgstr "Courrier A"
-
-msgid "A mail plus"
-msgstr "Courrier A Plus"
-
-msgid "registered"
-msgstr "Recommandé"
-
-msgid "confidential"
-msgstr "confidentiel"
-
-msgid "personal / confidential"
-msgstr "personnel / confidentiel"
-
-msgid "none"
-msgstr "aucun"
-
-msgid "Vote counter"
-msgstr "Scrutateur"
-
-msgid "Vice president"
-msgstr "Vice-président"
-
-msgid "Media Manager"
-msgstr "Directeur des médias et des campagnes"
-
-msgid "President of the parliamentary group"
-msgstr "Président du groupe parlementaire"
 
 msgid "Inquiry"
 msgstr "Demande"
@@ -3757,8 +3664,8 @@ msgstr "Refuser les réservations"
 msgid "Reject all with message"
 msgstr "Tout refuser avec message"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Événement"
 
@@ -4150,8 +4057,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
-"Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
+"« Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "

@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from onegov.pas import log
 from onegov.pas.collections import AttendenceCollection
-from onegov.pas.models.party import PASParty
+from onegov.pas.models.attendence import Attendence
+from onegov.pas.models.party import Party
 from onegov.pas.models.parliamentarian import PASParliamentarian
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
-from onegov.pas.models.attendence import PASAttendence
 from decimal import Decimal
 from babel.numbers import format_decimal
 
@@ -61,9 +61,9 @@ def get_parliamentarians_with_settlements(
     # Get all parliamentarians with attendances in one query
     parliamentarians_with_attendances = {
         pid[0] for pid in
-        session.query(PASAttendence.parliamentarian_id).filter(
-            PASAttendence.date >= start_date,
-            PASAttendence.date <= end_date
+        session.query(Attendence.parliamentarian_id).filter(
+            Attendence.date >= start_date,
+            Attendence.date <= end_date
         ).distinct()
     }
     log.info(f'Parli with attendances: {parliamentarians_with_attendances}')
@@ -79,7 +79,7 @@ def get_parties_with_settlements(
     session: Session,
     start_date: date,
     end_date: date
-) -> list[PASParty]:
+) -> list[Party]:
     """
     Get all parties that had active members with attendances during the
     specified period.
@@ -92,32 +92,32 @@ def get_parties_with_settlements(
     """
 
     return (
-        session.query(PASParty)
+        session.query(Party)
         .filter(
-            PASParty.id.in_(
+            Party.id.in_(
                 session.query(PASParliamentarianRole.party_id)
                 .join(PASParliamentarian)
                 .join(
-                    PASAttendence,
-                    PASParliamentarian.id == PASAttendence.parliamentarian_id,
+                    Attendence,
+                    PASParliamentarian.id == Attendence.parliamentarian_id,
                 )
                 .filter(
-                    PASAttendence.date >= start_date,
-                    PASAttendence.date <= end_date,
+                    Attendence.date >= start_date,
+                    Attendence.date <= end_date,
                     PASParliamentarianRole.party_id.isnot(None),
                     (
                         PASParliamentarianRole.start.is_(None)
-                        | (PASParliamentarianRole.start <= PASAttendence.date)
+                        | (PASParliamentarianRole.start <= Attendence.date)
                     ),
                     (
                         PASParliamentarianRole.end.is_(None)
-                        | (PASParliamentarianRole.end >= PASAttendence.date)
+                        | (PASParliamentarianRole.end >= Attendence.date)
                     ),
                 )
                 .distinct()
             )
         )
-        .order_by(PASParty.name)
+        .order_by(Party.name)
         .all()
     )
 
@@ -127,7 +127,7 @@ def get_parties_with_settlements(
 def debug_party_export(
     settlement_run: SettlementRun,
     request: TownRequest,
-    party: PASParty
+    party: Party
 ) -> None:
     """Debug function to trace party export data retrieval"""
     session = request.session
@@ -143,8 +143,8 @@ def debug_party_export(
         AttendenceCollection(session)
         .query()
         .filter(
-            PASAttendence.date >= settlement_run.start,
-            PASAttendence.date <= settlement_run.end
+            Attendence.date >= settlement_run.start,
+            Attendence.date <= settlement_run.end
         )
         .all()
     )
@@ -189,10 +189,10 @@ def debug_party_export(
 
 def debug_party_export2(
     request: TownRequest,
-    party: PASParty
+    party: Party
 ) -> None:
     session = request.session
-    print(f'PASParty ID: {party.id}')  # noqa: T201
+    print(f'Party ID: {party.id}')  # noqa: T201
 
     # Check roles directly
     all_roles = session.query(PASParliamentarianRole).filter(
@@ -203,7 +203,7 @@ def debug_party_export2(
         print(f'Role: {role.party_id} -> {role.parliamentarian_id}')  # noqa: T201
 
     # Check all parties
-    all_parties = session.query(PASParty).all()
+    all_parties = session.query(Party).all()
     print('\nAll parties:')  # noqa: T201
     for p in all_parties:
         print(f'ID: {p.id}, Name: {p.name}')  # noqa: T201

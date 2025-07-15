@@ -46,37 +46,23 @@ from onegov.org.models.page import Page
 from onegov.org.models import ExtendedDirectory
 from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.models.resource import Resource
-from onegov.page.collection import PageCollection
-from onegov.org.collections.meeting import MeetingCollection
-from onegov.org.collections.meeting_item import MeetingItemCollection
-from onegov.org.collections.political_business import (
-    PoliticalBusinessCollection
-)
-from onegov.org.collections.political_business_participant import (
-    PoliticalBusinessParticipationCollection
-)
-from onegov.org.collections.commission import (
-    RISCommissionCollection,
-)
-from onegov.org.collections.commission_membership import (
-    RISCommissionMembershipCollection
-)
-from onegov.org.collections.parliamentarian import (
-    RISParliamentarianCollection,
-)
-from onegov.org.collections.parliamentary_group import (
-    RISParliamentaryGroupCollection
-)
-from onegov.org.collections.parliamentarian_role import (
-    RISParliamentarianRoleCollection
-)
 from onegov.org.models import (
+    MeetingCollection,
     MeetingItem,
-    RISCommissionMembership,
-    RISParliamentarian,
-    RISParliamentarianRole,
+    MeetingItemCollection,
     PoliticalBusiness,
+    PoliticalBusinessCollection,
+    PoliticalBusinessParticipationCollection,
+    RISCommissionCollection,
+    RISCommissionMembership,
+    RISCommissionMembershipCollection,
+    RISParliamentarian,
+    RISParliamentarianCollection,
+    RISParliamentarianRole,
+    RISParliamentarianRoleCollection,
+    RISParliamentaryGroupCollection,
 )
+from onegov.page.collection import PageCollection
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
@@ -2816,11 +2802,11 @@ def ris_resolve_parliamentarian_doublette(
             return
 
         if business.participants:
-            for participation in business.participants:  # type: ignore[attr-defined]
+            for participation in business.participants:
                 if str(participation.parliamentarian_id) == id_1:
                     click.echo(f'replace {participation.parliamentarian_id} '
                                f'with {parliamentarian.id}')
-                    participation.parliamentarian_id = id
+                    participation.parliamentarian_id = id  # type: ignore[assignment]
                     changed = True
 
         transaction.commit()
