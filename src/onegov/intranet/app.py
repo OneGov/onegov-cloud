@@ -36,3 +36,9 @@ def get_template_variables(request: TownRequest) -> RenderData:
         'global_tools': tuple(get_global_tools(request)),
         'hide_search_header': not request.is_logged_in
     }
+
+
+# NOTE: Intranet doesn't need a citizen login
+@IntranetApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return False

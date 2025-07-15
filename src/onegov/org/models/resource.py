@@ -252,7 +252,8 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
     # used to render the reservation title
     title_template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M}'
 
-    kaba_components: dict_property[list[str]] = meta_property(default=list)
+    kaba_components: dict_property[list[tuple[str, str]]]
+    kaba_components = meta_property(default=list)
 
     @property
     def deletable(self) -> bool:
@@ -280,4 +281,5 @@ class ItemResource(Resource, AccessExtension, SearchableContent,
 
     title_template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M} ({quota})'
 
-    kaba_components: dict_property[list[str]] = meta_property(default=list)
+    kaba_components: dict_property[list[tuple[str, str]]]
+    kaba_components = meta_property(default=list)

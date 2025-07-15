@@ -20,15 +20,15 @@ from onegov.form.fields import ChosenSelectField
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
 from onegov.org.forms import ResourceForm
-from onegov.org.forms.extensions import CoordinatesFormExtension,\
-    PushNotificationFormExtension
+from onegov.org.forms.extensions import (
+    CoordinatesFormExtension, PushNotificationFormExtension)
 from onegov.org.forms.extensions import PublicationFormExtension
 from onegov.org.forms.fields import UploadOrSelectExistingMultipleFilesField
 from onegov.org.observer import observes
 from onegov.page import Page, PageCollection
 from onegov.people import Person, PersonCollection
 from onegov.reservation import Resource
-from sqlalchemy import inspect
+from sqlalchemy import desc, inspect
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import object_session
 from urlextract import URLExtract
@@ -55,9 +55,9 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import relationship
     from typing import type_check_only, Protocol
     from wtforms import Field
+    from wtforms.fields.choices import _Choice
     from wtforms.fields.core import _Filter
     from wtforms.meta import _MultiDictLikeWithGetlist
-    from wtforms.fields.choices import _Choice
 
     class SupportsExtendForm(Protocol):
         def extend_form(
@@ -1248,9 +1248,10 @@ class InlinePhotoAlbumExtension(ContentExtension):
     ) -> type[FormT]:
 
         from onegov.org.models import ImageSetCollection
+        from onegov.org.models import ImageSet
         albums: list[ImageSet] = (  # noqa: TC201
-            ImageSetCollection(request.session).query().all()
-        )
+            ImageSetCollection(request.session).query().order_by(
+                desc(ImageSet.last_change), ImageSet.title).all())
         if not albums:
             return form_class
 

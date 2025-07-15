@@ -32,7 +32,10 @@ from onegov.org.models.ticket import ReservationTicket
 from onegov.org.utils import emails_for_new_ticket
 from onegov.pay import PaymentError
 from onegov.reservation import Allocation, Reservation, Resource
+from onegov.reservation.collection import ResourceCollection
 from onegov.ticket import TicketCollection
+from onegov.user import Auth
+from onegov.user.collections import TANCollection
 from purl import URL
 from webob import exc, Response
 from wtforms import HiddenField
@@ -784,6 +787,30 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
         return morepath.redirect(url)
 
 
+def get_my_reservations_url(request: OrgRequest, email: str) -> str | None:
+    if not request.app.org.citizen_login_enabled:
+        return None
+
+    auth = Auth.from_request(
+        request,
+        to=request.class_link(
+            ResourceCollection,
+            name='my-reservations'
+        )
+    )
+    tans = TANCollection(request.session, scope='citizen-login')
+    tan_obj = tans.add(
+        client='unknown',
+        email=email,
+        redirect_to=auth.to,
+    )
+    return request.link(
+        auth,
+        name='confirm-citizen-login',
+        query_params={'token': tan_obj.tan}
+    )
+
+
 @OrgApp.view(model=Reservation, name='accept', permission=Private)
 def accept_reservation(
     self: Reservation,
@@ -820,12 +847,14 @@ def accept_reservation(
         # Include all the forms details to be able to print it out
         show_submission = True
 
-        client = KabaClient.from_resource(resource, request.app)
-        if client is not None:
+        clients = KabaClient.from_resource(resource, request.app)
+        if clients:
             # compute the things we need inside the loop once
-            components = resource.kaba_components  # type: ignore[attr-defined]
+            components: dict[str, list[str]] = {}
+            for site_id, component in resource.kaba_components:  # type: ignore[attr-defined]
+                components.setdefault(site_id, []).append(component)
             code = ticket.handler.data.setdefault(
-                'key_code', client.random_code()
+                'key_code', next(iter(clients.values())).random_code()
             )
             lead_delta = timedelta(minutes=ticket.handler.data.setdefault(
                 'key_code_lead_time',
@@ -851,36 +880,43 @@ def accept_reservation(
 
             # NOTE: We can only create future visits
             start = reservation.display_start() - lead_delta
-            if client is not None and start > now:
-                assert code is not None
-                try:
-                    end = reservation.display_end() + lag_delta
-                    visit_id = client.create_visit(
-                        code=code,
-                        name=ticket.number,
-                        message='Managed through OneGov Cloud',
-                        start=start,
-                        end=end,
-                        components=components,
-                    )
-                except KabaApiError:
-                    log.info('Kaba API error', exc_info=True)
+            if clients and start > now:
+                visit_ids = {}
+                end = reservation.display_end() + lag_delta
+                for site_id, group in components.items():
+                    assert code is not None
+                    try:
+                        visit_id = clients[site_id].create_visit(
+                            code=code,
+                            name=ticket.number,
+                            message='Managed through OneGov Cloud',
+                            start=start,
+                            end=end,
+                            components=group,
+                        )
+                    except (KeyError, KabaApiError) as exc:
+                        if isinstance(exc, KabaApiError):
+                            log.info('Kaba API error', exc_info=True)
 
-                    # roll back previous changes
-                    savepoint.rollback()
-                    request.alert(_(
-                        'Failed to create visits using the dormakaba API '
-                        'please make sure your credentials are still valid.'
-                    ))
-                    if view_ticket is not None:
-                        return request.redirect(request.link(view_ticket))
+                        # roll back previous changes
+                        savepoint.rollback()
+                        request.alert(_(
+                            'Failed to create visits using the dormakaba API '
+                            'for site ID ${site_id} please make sure your '
+                            'credentials are still valid.',
+                            mapping={'site_id': site_id}
+                        ))
+                        if view_ticket is not None:
+                            return request.redirect(request.link(view_ticket))
 
-                    return request.redirect(request.link(self))
-                else:
-                    data['kaba'] = {
-                        'code': code,
-                        'visit_id': visit_id,
-                    }
+                        return request.redirect(request.link(self))
+                    else:
+                        visit_ids[site_id] = visit_id
+
+                data['kaba'] = {
+                    'code': code,
+                    'visit_ids': visit_ids,
+                }
 
         ReservationMessage.create(
             reservations,
@@ -916,6 +952,9 @@ def accept_reservation(
                 'code': code,
                 'form': form,
                 'message': message,
+                'my_reservations_url': get_my_reservations_url(
+                    request, self.email
+                ),
             },
         )
 
@@ -935,8 +974,11 @@ def accept_reservation(
 
         title = request.translate(
             _(
-                '${org} New Reservation(s)',
-                mapping={'org': request.app.org.title},
+                'Reservation(s) confirmed ${org} ${resource}',
+                mapping={
+                    'org': request.app.org.title,
+                    'resource': resource.title,
+                },
             )
         )
 
@@ -948,6 +990,7 @@ def accept_reservation(
                 'title': title,
                 'form': form,
                 'model': self,
+                'ticket': ticket,
                 'resource': resource,
                 'reservations': reservations,
                 'show_submission': show_submission,
@@ -1111,7 +1154,7 @@ def reject_reservation(
     if view_ticket is not None and view_ticket != ticket:
         raise exc.HTTPNotFound()
 
-    client = KabaClient.from_resource(resource, request.app)
+    clients = KabaClient.from_resource(resource, request.app)
 
     # if there's a captured payment we cannot continue
     payment = ticket.handler.payment
@@ -1235,12 +1278,20 @@ def reject_reservation(
             # flush, just in case, otherwise `remove_reservation` may fail
             request.session.flush()
 
-        if client and (kaba := (reservation.data or {}).get('kaba')):
-            try:
-                client.revoke_visit(kaba['visit_id'])
-            except KabaApiError:
-                log.info('Kaba API error', exc_info=True)
-                failed_to_revoke = True
+        if clients and (kaba := (reservation.data or {}).get('kaba')):
+            lead_delta = timedelta(
+                minutes=ticket.handler.data['key_code_lead_time']
+            )
+            start = reservation.display_start() - lead_delta
+            # we can only revoke future visits
+            if start > sedate.utcnow():
+                for site_id, visit_id in kaba['visit_ids'].items():
+                    try:
+                        clients[site_id].revoke_visit(visit_id)
+                    except (KeyError, KabaApiError) as exc:
+                        if isinstance(exc, KabaApiError):
+                            log.info('Kaba API error', exc_info=True)
+                        failed_to_revoke = True
         resource.scheduler.remove_reservation(token, reservation.id)
 
     if len(excluded) == 0 and submission:
@@ -1391,6 +1442,9 @@ def send_reservation_summary(
                 'reservations': self.handler.reservations,
                 'code': self.handler.data.get('key_code'),
                 'changes': self.handler.get_changes(request),
+                'my_reservations_url': get_my_reservations_url(
+                    request, recipient
+                ),
             }
         )
         request.success(_(
@@ -1534,71 +1588,79 @@ def adjust_reservation(
         return show_form()
 
     if new_reservation is not None:
-        client = KabaClient.from_resource(resource, request.app)
+        clients = KabaClient.from_resource(resource, request.app)
         data = reservation.data
         if data is None:
             data = reservation.data = {}
-        if client and (kaba := data.get('kaba')):
+        if clients and (kaba := data.get('kaba')):
             # adjust visit
-            components = resource.kaba_components  # type: ignore[attr-defined]
-            try:
-                code = kaba['code']
-                lead_delta = timedelta(
-                    minutes=ticket.handler.data['key_code_lead_time']
-                )
-                lag_delta = timedelta(
-                    minutes=ticket.handler.data['key_code_lag_time']
-                )
-                start = new_reservation.display_start() - lead_delta
-                end = new_reservation.display_end() + lag_delta
-                # NOTE: We can only revoke existing future visits
-                if (old_visit_id := kaba.get('visit_id')) and (
-                    reservation.display_start() - lead_delta > sedate.utcnow()
-                ):
-                    client.revoke_visit(old_visit_id)
-                # NOTE: We can only create future visits
-                if start > sedate.utcnow():
-                    visit_id = client.create_visit(
-                        code=code,
-                        name=ticket.number,
-                        message='Managed through OneGov Cloud',
-                        start=start,
-                        end=end,
-                        components=components,
+            components: dict[str, list[str]] = {}
+            for site_id, component in resource.kaba_components:  # type: ignore[attr-defined]
+                components.setdefault(site_id, []).append(component)
+
+            lead_delta = timedelta(
+                minutes=ticket.handler.data['key_code_lead_time']
+            )
+            lag_delta = timedelta(
+                minutes=ticket.handler.data['key_code_lag_time']
+            )
+            old_start = reservation.display_start() - lead_delta
+            start = new_reservation.display_start() - lead_delta
+            end = new_reservation.display_end() + lag_delta
+            old_visit_ids = kaba.get('visit_ids')
+            now = sedate.utcnow()
+            visit_ids = {}
+            for site_id, group in components.items():
+                try:
+                    code = kaba['code']
+                    # NOTE: We can only revoke existing future visits
+                    old_visit_id = old_visit_ids.get(site_id)
+                    if old_visit_id and old_start > now:
+                        clients[site_id].revoke_visit(old_visit_id)
+                    # NOTE: We can only create future visits
+                    if start > now:
+                        visit_ids[site_id] = clients[site_id].create_visit(
+                            code=code,
+                            name=ticket.number,
+                            message='Managed through OneGov Cloud',
+                            start=start,
+                            end=end,
+                            components=group,
+                        )
+                except (KeyError, KabaApiError) as e:
+                    if isinstance(e, KabaApiError):
+                        log.info('Kaba API error', exc_info=True)
+
+                    # roll back previous changes
+                    savepoint.rollback()
+                    error = _(
+                        'Failed to create visits using the dormakaba API '
+                        'for site ID ${site_id} please make sure your '
+                        'credentials are still valid.',
+                        mapping={'site_id': site_id}
                     )
-                else:
-                    visit_id = None
-            except KabaApiError:
-                log.info('Kaba API error', exc_info=True)
+                    if intercooler:
+                        error = request.translate(error)
+                        ic_data = {'message': error, 'success': False}
 
-                # roll back previous changes
-                savepoint.rollback()
-                error = _(
-                    'Failed to create visits using the dormakaba API '
-                    'please make sure your credentials are still valid.'
-                )
-                if intercooler:
-                    error = request.translate(error)
-                    ic_data = {'message': error, 'success': False}
+                        @request.after
+                        def trigger(response: Response) -> None:
+                            response.headers.add(
+                                'X-IC-Trigger',
+                                'oc-reservation-error'
+                            )
+                            response.headers.add(
+                                'X-IC-Trigger-Data',
+                                json.dumps(ic_data, ensure_ascii=True)  # noqa: B023
+                            )
+                        return Response(json=ic_data)
 
-                    @request.after
-                    def trigger(response: Response) -> None:
-                        response.headers.add(
-                            'X-IC-Trigger',
-                            'oc-reservation-error'
-                        )
-                        response.headers.add(
-                            'X-IC-Trigger-Data',
-                            json.dumps(ic_data, ensure_ascii=True)
-                        )
-                    return Response(json=ic_data)
+                    request.alert(error)
+                    return show_form()
 
-                request.alert(error)
-                return show_form()
-            else:
                 data['kaba'] = {
                     'code': code,
-                    'visit_id': visit_id,
+                    'visit_ids': visit_ids,
                 }
 
         ReservationAdjustedMessage.create(
@@ -1686,11 +1748,13 @@ def edit_kaba(
         raise exc.HTTPNotFound()
 
     # we only can make kaba changes if we have a connection
-    client = KabaClient.from_resource(resource, request.app)
-    if client is None:
+    clients = KabaClient.from_resource(resource, request.app)
+    if not clients:
         raise exc.HTTPNotFound()
 
-    components = resource.kaba_components  # type: ignore[attr-defined]
+    components: dict[str, list[str]] = {}
+    for site_id, component in resource.kaba_components:  # type: ignore[attr-defined]
+        components.setdefault(site_id, []).append(component)
 
     old_lead_delta = timedelta(
         minutes=ticket.handler.data.get('key_code_lead_time', 30)
@@ -1736,6 +1800,10 @@ def edit_kaba(
         name: ticket.handler_data.get(name)
         for name in field_names
     }:
+
+        old_lead_delta = timedelta(
+            minutes=ticket.handler.data['key_code_lead_time']
+        )
         ticket.handler.data.update(form.data)
         ticket.handler.refresh()
 
@@ -1749,42 +1817,52 @@ def edit_kaba(
             if not data.get('accepted'):
                 continue
 
+            code = ticket.handler.data['key_code']
+            lead_delta = timedelta(
+                minutes=ticket.handler.data['key_code_lead_time']
+            )
+            lag_delta = timedelta(
+                minutes=ticket.handler.data['key_code_lag_time']
+            )
+            old_start = reservation.display_start() - old_lead_delta
+            start = reservation.display_start() - lead_delta
+            end = reservation.display_end() + lag_delta
             kaba = data.get('kaba') or {}
-            try:
-                # if there is an old visit, revoke it
-                if old_visit_id := kaba.get('visit_id'):
-                    client.revoke_visit(old_visit_id)
+            old_visit_ids = kaba.get('visit_ids', {})
+            visit_ids = {}
+            for site_id, group in components.items():
+                try:
+                    # if there is an old visit, revoke it
+                    old_visit_id = old_visit_ids.get(site_id)
+                    if old_visit_id and old_start > now:
+                        clients[site_id].revoke_visit(old_visit_id)
 
-                code = ticket.handler.data['key_code']
-                lead_delta = timedelta(
-                    minutes=ticket.handler.data['key_code_lead_time']
-                )
-                lag_delta = timedelta(
-                    minutes=ticket.handler.data['key_code_lag_time']
-                )
-                start = reservation.display_start() - lead_delta
-                visit_id = client.create_visit(
-                    code=code,
-                    name=ticket.number,
-                    message='Managed through OneGov Cloud',
-                    start=start,
-                    end=reservation.display_end() + lag_delta,
-                    components=components,
-                )
-            except KabaApiError:
-                log.info('Kaba API error', exc_info=True)
+                    if start > now:
+                        visit_ids[site_id] = clients[site_id].create_visit(
+                            code=code,
+                            name=ticket.number,
+                            message='Managed through OneGov Cloud',
+                            start=start,
+                            end=end,
+                            components=group,
+                        )
+                except (KeyError, KabaApiError) as e:
+                    if isinstance(e, KabaApiError):
+                        log.info('Kaba API error', exc_info=True)
 
-                # roll back previous changes
-                savepoint.rollback()
-                request.alert(_(
-                    'Failed to create visits using the dormakaba API '
-                    'please make sure your credentials are still valid.'
-                ))
-                return show_form()
-            else:
+                    # roll back previous changes
+                    savepoint.rollback()
+                    request.alert(_(
+                        'Failed to create visits using the dormakaba API '
+                        'for site ID ${site_id} please make sure your '
+                        'credentials are still valid.',
+                        mapping={'site_id': site_id}
+                    ))
+                    return show_form()
+
                 data['kaba'] = {
                     'code': code,
-                    'visit_id': visit_id,
+                    'visit_ids': visit_ids,
                 }
 
     request.success(_('Your changes were saved'))

@@ -170,10 +170,15 @@ def process_payment(
             )
         except CARD_ERRORS as e:
 
-            if 'insufficient funds' in str(e):
+            err = str(e)
+
+            if 'insufficient funds' in err:
                 return INSUFFICIENT_FUNDS
 
-            if 'Transaction aborted' in str(e):
+            if (
+                'Transaction aborted' in err
+                or '3D-Secure authentication failed' in err
+            ):
                 return TRANSACTION_ABORTED
 
             log.exception(

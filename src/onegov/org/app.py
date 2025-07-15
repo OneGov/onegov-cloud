@@ -613,6 +613,11 @@ def get_disabled_extensions() -> Collection[str]:
     return ()
 
 
+@OrgApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return True
+
+
 @OrgApp.setting(section='org', name='render_mtan_access_limit_exceeded')
 def get_render_mtan_access_limit_exceeded(
 ) -> Callable[[MTANAccessLimitExceeded, OrgRequest], Response]:
@@ -874,10 +879,20 @@ def people_select_asset() -> Iterator[str]:
     yield 'people-select.js'
 
 
+@OrgApp.webasset('kaba-configurations')
+def kaba_configurations_asset() -> Iterator[str]:
+    yield 'kaba-configurations.js'
+
+
 @OrgApp.webasset('mapbox_address_autofill')
 def mapbox_address_autofill() -> Iterator[str]:
     yield 'mapbox-search-web.js'  # implicit dependency
     yield 'mapbox_address_autofill.js'
+
+
+@OrgApp.webasset('invoicing')
+def get_invoicing() -> Iterator[str]:
+    yield 'invoicing.js'
 
 
 def wrap_with_mtan_hook(

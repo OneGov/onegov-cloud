@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-01 09:10+0200\n"
+"POT-Creation-Date: 2025-07-10 14:11+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -85,6 +85,24 @@ msgstr "Nessun dato disponibile"
 msgid "Most Popular Pages"
 msgstr "Pagine più popolari"
 
+msgid "My Requests"
+msgstr "Le mie richieste"
+
+msgid "Closed Tickets"
+msgstr "Biglietti chiusi"
+
+msgid "My Reservations"
+msgstr "Le mie prenotazioni"
+
+msgid "Pending Future Reservations"
+msgstr "Prenotazioni future in attesa"
+
+msgid "Confirmed Future Reservations"
+msgstr "Prenotazioni future confermate"
+
+msgid "Past Reservations"
+msgstr "Prenotazioni passate"
+
 msgid "Open"
 msgstr "Aperto"
 
@@ -95,7 +113,7 @@ msgid "Closed"
 msgstr "Chiuso"
 
 msgid "Archived"
-msgstr "Archiviato"
+msgstr "Fare Archivio"
 
 msgid "All"
 msgstr "Tutti"
@@ -108,6 +126,9 @@ msgstr "Fallito"
 
 msgid "Refunded"
 msgstr "Rimborsato"
+
+msgid "Invoiced"
+msgstr "Fatturato"
 
 msgid "Manual"
 msgstr "Manuale"
@@ -156,6 +177,12 @@ msgstr "Esci"
 
 msgid "Login"
 msgstr "Accedi"
+
+msgid "Citizen Login"
+msgstr "Accesso cliente"
+
+msgid "No registration necessary"
+msgstr "Non è necessaria la registrazione"
 
 msgid "Register"
 msgstr "Registrati"
@@ -210,9 +237,6 @@ msgstr "Gestione"
 
 msgid "My Tickets"
 msgstr "I miei biglietti"
-
-msgid "Closed Tickets"
-msgstr "Biglietti chiusi"
 
 msgid "Ticket"
 msgstr "Biglietto"
@@ -394,6 +418,12 @@ msgstr "Slot per prenotazione"
 
 msgid "Start time before end time"
 msgstr "Ora di inizio precedente l'ora di fine"
+
+msgid "E-Mail"
+msgstr "E-mail"
+
+msgid "Token"
+msgstr "Token"
 
 msgid "Name"
 msgstr "Nome"
@@ -677,9 +707,6 @@ msgstr "Nome non valido. Un suggerimento valido è: ${name}"
 
 msgid "An entry with the same name exists"
 msgstr "Esiste già un elemento con lo stesso nome"
-
-msgid "E-Mail"
-msgstr "E-mail"
 
 msgid "Describes briefly what this form is about"
 msgstr "Descrive brevemente il contenuto di questo modulo"
@@ -1187,7 +1214,7 @@ msgstr ""
 "Altrimenti, i notizie sono elencati per intero."
 
 msgid "Events"
-msgstr "Eventi"
+msgstr "Evento"
 
 msgid "Publications"
 msgstr "Pubblicazioni"
@@ -1286,17 +1313,11 @@ msgstr "- Principale -"
 msgid "Invalid destination selected"
 msgstr "Destinazione non valida selezionata"
 
-msgid "Personnel number"
-msgstr "Numero del personale"
+msgid "Gender"
+msgstr "Genere"
 
 msgid "Basic properties"
 msgstr "Proprietà di base"
-
-msgid "Contract number"
-msgstr "Numero del contratto"
-
-msgid "Gender"
-msgstr "Genere"
 
 msgid "First name"
 msgstr "Nome"
@@ -1361,6 +1382,12 @@ msgstr "Sito web"
 msgid "Remarks"
 msgstr "Osservazioni"
 
+msgid "Personnel number"
+msgstr "Numero del personale"
+
+msgid "Contract number"
+msgstr "Numero del contratto"
+
 msgid "Shipping method"
 msgstr "Metodo di spedizione"
 
@@ -1382,6 +1409,9 @@ msgstr "Parlamentare"
 msgid "Role"
 msgstr "Ruolo"
 
+msgid "Political Party"
+msgstr "Partito"
+
 msgid "Party role"
 msgstr "Ruolo nel partito"
 
@@ -1390,6 +1420,31 @@ msgstr "Gruppo parlamentare"
 
 msgid "Parliamentary group role"
 msgstr "Ruolo nel gruppo parlamentare"
+
+msgid "From reservation date"
+msgstr "Dalla data di prenotazione"
+
+msgid "Filter Payments"
+msgstr "Filtra pagamenti"
+
+msgid "To reservation date"
+msgstr "Alla data di prenotazione"
+
+msgid "Ticket created from date"
+msgstr "Ticket creato dalla data"
+
+msgid "Filter by Ticket Date"
+msgstr "Filtra per data del ticket"
+
+msgid "Filters payments by the creation date of their associated ticket."
+msgstr ""
+"Filtra i pagamenti in base alla data di creazione del ticket associato."
+
+msgid "Ticket created to date"
+msgstr "Ticket creato fino ad oggi"
+
+msgid "Payment Type"
+msgstr "Tipo di pagamento"
 
 msgid "Academic Title"
 msgstr "Titolo accademico"
@@ -1411,9 +1466,6 @@ msgstr "Cognome da nubile"
 
 msgid "Profession"
 msgstr "Professione"
-
-msgid "Political Party"
-msgstr "Partito politico"
 
 msgid "Parliamentary Group"
 msgstr "Gruppo parlamentare"
@@ -1716,13 +1768,13 @@ msgid "Column width right side"
 msgstr "Larghezza colonna lato destro"
 
 msgid "Contact"
-msgstr "Contatto"
+msgstr "Contatti"
 
 msgid "The address and phone number of the municipality"
 msgstr "L'indirizzo e il numero di telefono del comune"
 
 msgid "Information"
-msgstr "Informazioni"
+msgstr "Conferma"
 
 msgid "Contact Link"
 msgstr "Collegamento ai contatti"
@@ -2392,14 +2444,26 @@ msgstr "Indirizzo del sito web incluso https://"
 msgid "Site ID"
 msgstr "ID del sito"
 
+msgid "Kaba Sites"
+msgstr "Siti"
+
 msgid "Default Lead Time"
 msgstr "Tempi di consegna standard"
 
 msgid "Default Lag Time"
 msgstr "Tempo di funzionamento standard"
 
-msgid "Invalid credentials or site id"
-msgstr "Credenziali o ID sito non validi"
+#, python-format
+msgid "Duplicate site ID ${site_id}"
+msgstr "ID sito duplicato ${site_id}"
+
+#, python-format
+msgid "${field} for site ID ${site_id} is required"
+msgstr "${field} per l'ID del sito ${site_id} è obbligatorio"
+
+#, python-format
+msgid "Invalid credentials for site ID ${site_id}"
+msgstr "Credenziali non valide per l'ID sito ${site_id}"
 
 msgid "Unexpected error encountered, please try again."
 msgstr "Si è verificato un errore inatteso, riprovare."
@@ -2539,6 +2603,9 @@ msgid ""
 msgstr ""
 "Si tratta del tasso di IVA in percentuale. Il tasso di IVA si applicherà a "
 "tutti i prezzi nei moduli."
+
+msgid "Enable Citizen Login"
+msgstr "Abilitare l'accesso del cliente"
 
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
@@ -2803,7 +2870,7 @@ msgid "Homepage"
 msgstr "Pagina principale"
 
 msgid "Save"
-msgstr "Risparmiare"
+msgstr "Salvare"
 
 msgid "Edit"
 msgstr "Modifica"
@@ -3077,7 +3144,7 @@ msgid "Re-publish event"
 msgstr "Ripubblica l'evento"
 
 msgid "Newsletter"
-msgstr "Newsletter"
+msgstr "Abbonamento alla newsletter"
 
 msgid "New"
 msgstr "Nuovo"
@@ -3817,7 +3884,7 @@ msgid "External link"
 msgstr "Collegamento esterno"
 
 msgid "More information"
-msgstr "Ulteriori informazioni"
+msgstr "Conferma"
 
 msgid "Change Request"
 msgstr "Richiesta di modifica"
@@ -3905,14 +3972,15 @@ msgid "There was an error while importing your directory!"
 msgstr "Si è verificato un errore durante l'importazione della cartella!"
 
 msgid "Download Form"
-msgstr "Scarica modulo"
+msgstr "Scarica il modulo"
 
 msgid "Embed iFrame"
-msgstr "Incorpora iFrame"
+msgstr "Incorporare iFrame"
 
 msgid "You can copy the following code to embed this page as an iFrame:"
 msgstr ""
-"Puoi copiare il seguente codice per incorporare questa pagina come iFrame:"
+"È possibile copiare il seguente codice per incorporare questa pagina come "
+"iFrame:"
 
 msgid ""
 "To display the breadcrumbs you can add ${bc_level} as a parameter to the "
@@ -3965,13 +4033,13 @@ msgid "Upload Date"
 msgstr "Data di caricamento"
 
 msgid "All Files"
-msgstr "Tutti i file"
+msgstr "Tutti gli articoli"
 
 msgid "No files uploaded yet"
 msgstr "Nessun file caricato"
 
 msgid "All dates"
-msgstr "Tutte le date"
+msgstr "Tutti gli articoli"
 
 msgid ""
 "By default we assume that you only want to select a single time slot and "
@@ -4039,7 +4107,7 @@ msgid "No photo albums defined yet."
 msgstr "Nessun album fotografico ancora definito."
 
 msgid "Skip navigation"
-msgstr "Ignora navigazione"
+msgstr "Migrazione dei link"
 
 msgid "Straight to ..."
 msgstr "Direttamente a ..."
@@ -4196,7 +4264,7 @@ msgid "Additional Information"
 msgstr "Informazioni aggiuntive"
 
 msgid "Location"
-msgstr "Luogo"
+msgstr "Conferma"
 
 msgid "Date and time"
 msgstr "Data e ora"
@@ -4300,6 +4368,9 @@ msgstr "alle ${time}"
 msgid "Object"
 msgstr "Oggetto"
 
+msgid "Reservation"
+msgstr "Prenotazione"
+
 msgid "Disbursed"
 msgstr "Erogato"
 
@@ -4322,7 +4393,7 @@ msgid "Not a publication"
 msgstr "Non una pubblicazione"
 
 msgid "Content"
-msgstr "Contenuto"
+msgstr "Contatti"
 
 msgid "1 page"
 msgstr "1 pagina"
@@ -4427,7 +4498,7 @@ msgid "To activate your account, click confirm below:"
 msgstr "Per attivare il tuo account, fai clic su conferma qui di seguito:"
 
 msgid "Confirm my account"
-msgstr "Conferma il mio account"
+msgstr "Conferma"
 
 msgid ""
 "If you believe this is an error, ignore this message and we'll never bother "
@@ -4435,6 +4506,18 @@ msgid ""
 msgstr ""
 "Se ritieni che si tratti di un errore, ignora questo messaggio e non ti "
 "disturberemo mai più."
+
+msgid "Your e-mail address was just used to send a login link to ${homepage}."
+msgstr ""
+"Il vostro indirizzo e-mail è stato appena utilizzato per inviare un link di "
+"accesso a ${homepage}."
+
+msgid "Use the token below or click on the link to complete your login."
+msgstr ""
+"Utilizzare il token sottostante o fare clic sul link per completare il login."
+
+msgid "Complete Login"
+msgstr "Accesso completo"
 
 msgid "Hello"
 msgstr "Ciao"
@@ -4676,8 +4759,7 @@ msgstr ""
 #, fuzzy
 msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""
-"Per utilizzare il tuo account hai bisogno della Yubikey con il numero di "
-"serie ${number}"
+"Per utilizzare il tuo account hai bisogno di Yubikey con il seriale ${number}"
 
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
@@ -4747,6 +4829,9 @@ msgstr ""
 "Questa è una notifica per le prenotazioni rifiutate per ${organization}. Se "
 "non desideri più ricevere queste notifiche, contatta un amministratore in "
 "modo che possa rimuoverti dall'elenco dei destinatari."
+
+msgid "See all your reservations"
+msgstr "Vedere tutte le prenotazioni"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
@@ -4968,10 +5053,10 @@ msgstr ""
 "fatto il login."
 
 msgid "To update your subscription, please use this ${Link}"
-msgstr "Per aggiornare la tua iscrizione, utilizza questo ${Link}"
+msgstr "Per aggiornare l'abbonamento, utilizzare questo ${Link}"
 
 msgid "Archive"
-msgstr "Archivia"
+msgstr "Fare Archivio"
 
 msgid "No newsletters yet."
 msgstr "Ancora nessuna newsletter."
@@ -5055,8 +5140,26 @@ msgstr "Abilitato:"
 msgid "Fee:"
 msgstr "Imposta:"
 
+msgid "Export Bill run as PDF"
+msgstr "Esporta l'esecuzione della fattura come PDF"
+
 msgid "No payments yet."
 msgstr "Nessun pagamento ancora."
+
+msgid "Batch Action"
+msgstr "Azione di gruppo"
+
+msgid "Mark as Invoiced"
+msgstr "Contrassegna come fatturato"
+
+msgid "Mark as Paid"
+msgstr "Contrassegna come pagato"
+
+msgid "Mark as Unpaid"
+msgstr "Contrassegna come non pagato"
+
+msgid "Apply to selected"
+msgstr "Applica ai selezionati"
 
 msgid ""
 "The following requests have been submitted. To see the state of process you "
@@ -5152,6 +5255,15 @@ msgstr ""
 "sul fatto che si aggiornino). Pertanto, le informazioni mostrate nel "
 "calendario potrebbero essere errate o non aggiornate. Usale tuo rischio."
 
+msgid ""
+"If you want key codes to be included in the event's description then you may "
+"use the following link instead. Please note however that anyone you share "
+"this link with will have permanent access to this information."
+msgstr ""
+"Se volete che i codici chiave siano inclusi nella descrizione dell'evento, "
+"potete utilizzare il seguente link. Si noti tuttavia che chiunque condivida "
+"questo link avrà accesso permanente a queste informazioni."
+
 msgid "Reservations must be made at least one day in advance."
 msgstr ""
 "Le prenotazioni devono essere effettuate con almeno un giorno di anticipo."
@@ -5224,7 +5336,7 @@ msgstr ""
 "album."
 
 msgid "Confirm selection"
-msgstr "Conferma la selezione"
+msgstr "Conferma"
 
 msgid "This newsletter has not been sent yet."
 msgstr "Questa newsletter non è stata ancora inviata."
@@ -5290,7 +5402,7 @@ msgid ""
 "change, click on the \"Edit\"-Button below."
 msgstr ""
 "Grazie per aver compilato questo sondaggio. Se c'è qualcosa che desideri "
-"cambiare, fai clic sul pulsante \"Modifica\" qui sotto."
+"cambiare, fai clic su \"Modifica\" qui sotto."
 
 msgid "No surveys defined yet."
 msgstr "Ancora nessun sondaggio definito."
@@ -5736,6 +5848,16 @@ msgstr ""
 
 msgid "Successfully authenticated via mTAN."
 msgstr "Autenticazione tramite mTAN riuscita."
+
+#, python-format
+msgid "Login Token for ${organisation}"
+msgstr "Token di accesso per ${organizzazione}"
+
+msgid "Invalid or expired login token provided."
+msgstr "È stato fornito un token di accesso non valido o scaduto."
+
+msgid "Confirm Citizen Login"
+msgstr "Confermare l'accesso del cliente"
 
 msgid "A link was added to the clipboard"
 msgstr "È stato aggiunto un collegamento agli appunti"
@@ -6356,6 +6478,27 @@ msgstr "Il tuo pagamento è stato ritirato"
 msgid "Your payment has been refunded"
 msgstr "Il tuo pagamento è stato rimborsato"
 
+msgid "No payments found for PDF generation"
+msgstr "Nessun pagamento trovato per la generazione di PDF"
+
+msgid "No tickets found for PDF generation"
+msgstr "Nessun biglietto trovato per la generazione di PDF"
+
+msgid "Receivables"
+msgstr "Crediti"
+
+#, python-format
+msgid "${count} payments marked as invoiced."
+msgstr "${count} pagamenti contrassegnati come fatturati."
+
+#, python-format
+msgid "${count} payments marked as paid."
+msgstr "${count} pagamenti contrassegnati come pagati."
+
+#, python-format
+msgid "${count} payments marked as unpaid."
+msgstr "${count} pagamenti contrassegnati come non pagati."
+
 msgid "The ticket was marked as paid"
 msgstr "Il biglietto è stato contrassegnato come pagato"
 
@@ -6563,19 +6706,20 @@ msgstr ""
 "La tua prenotazione per ${room} è stata inviata. Continua con la tua "
 "prenotazione per ${next_room}."
 
+#, python-format
 msgid ""
-"Failed to create visits using the dormakaba API please make sure your "
-"credentials are still valid."
+"Failed to create visits using the dormakaba API for site ID ${site_id} "
+"please make sure your credentials are still valid."
 msgstr ""
-"Impossibile creare visite con l'API di dormakaba. Assicurarsi che le "
-"credenziali siano ancora valide."
+"Impossibile creare visite con l'API di dormakaba per l'ID del sito "
+"${site_id}. Assicurarsi che le credenziali siano ancora valide."
 
 msgid "Your reservations were accepted"
 msgstr "Le tue prenotazioni sono state accettate"
 
 #, python-format
-msgid "${org} New Reservation(s)"
-msgstr "${org} Nuova/e prenotazione/i"
+msgid "Reservation(s) confirmed ${org} ${resource}"
+msgstr "Prenotazione/i confermata/e ${org} ${resource}"
 
 msgid "The reservations were accepted"
 msgstr "Le prenotazioni sono state accettate"
@@ -6722,7 +6866,7 @@ msgid "No holidays defined"
 msgstr "Nessuna festività definita"
 
 msgid "Link Migration"
-msgstr "Migrazione dei collegamenti"
+msgstr "Migrazione dei link"
 
 msgid "Migrate"
 msgstr "Migra"
@@ -7056,6 +7200,9 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+msgid "Please enter your e-mail address in order to continue"
+msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 
 #~ msgid "Please note that this page has subpages which will also be deleted!"
 #~ msgstr ""

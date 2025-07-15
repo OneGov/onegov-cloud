@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-01 09:08+0200\n"
+"POT-Creation-Date: 2025-07-10 13:50+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -123,7 +123,7 @@ msgid "day"
 msgstr "jour"
 
 msgid "Start"
-msgstr "Démarrage"
+msgstr "Début"
 
 msgid "End"
 msgstr "Fin"
@@ -132,7 +132,7 @@ msgid "Add"
 msgstr "Ajouter"
 
 msgid "Remove"
-msgstr "Retirer"
+msgstr "Supprimer"
 
 msgid "Mo"
 msgstr "Lu"
@@ -289,14 +289,14 @@ msgstr "Archives des chats"
 msgid "Meetings"
 msgstr "Réunions"
 
+msgid "RIS Settings"
+msgstr "Paramètres RIS"
+
 msgid "Meeting"
 msgstr "Réunion"
 
 msgid "Parliamentarians"
 msgstr "Parlementaires"
-
-msgid "RIS Settings"
-msgstr "Paramètres RIS"
 
 msgid "Parliamentarian"
 msgstr "Parlementaire"
@@ -337,7 +337,7 @@ msgstr "Supprimer ce groupe parlementaire"
 msgid "Parties"
 msgstr "Partis"
 
-msgid "Party"
+msgid "Political Party"
 msgstr "Parti"
 
 msgid "Do you really want to delete this party?"
@@ -586,8 +586,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -699,6 +699,9 @@ msgstr "Protection des données"
 
 msgid "Login"
 msgstr "Connexion"
+
+msgid "Citizen Login"
+msgstr "Connexion client"
 
 msgid "About"
 msgstr "Impressum"
@@ -839,7 +842,7 @@ msgid "Open"
 msgstr "Ouvert"
 
 msgid "Pending"
-msgstr "En attente"
+msgstr "En traitement"
 
 msgid "Closed"
 msgstr "Fermé"
@@ -855,6 +858,9 @@ msgstr "Échoué"
 
 msgid "Refunded"
 msgstr "Remboursé"
+
+msgid "Invoiced"
+msgstr "Facturé"
 
 msgid "Ticket"
 msgstr "Ticket"
@@ -1031,8 +1037,9 @@ msgid ""
 "Your request will be processed shortly. To see the state of your process "
 "your may return to this page at any time."
 msgstr ""
-"Votre demande sera traitée sous peu. Pour connaître l'état d'avancement de "
-"votre demande, vous pouvez revenir à tout moment sur cette page."
+"Votre demande sera traitée sous peu. Pour connaître l'état d'avancement du "
+"traitement de votre demande, vous pouvez revenir sur cette page à tout "
+"moment."
 
 msgid "Your request has been completed."
 msgstr "Votre demande a été traitée."
@@ -1050,13 +1057,16 @@ msgid "Credit Card Fee"
 msgstr "Frais de carte de crédit"
 
 msgid "Pay Offline later"
-msgstr "Payer hors ligne plus tard"
+msgstr "Payer par facture"
 
 msgid "at ${time}"
 msgstr "à ${time}"
 
 msgid "Object"
 msgstr "Objet"
+
+msgid "Reservation"
+msgstr "Réservation"
 
 msgid "Net Amount"
 msgstr "Montant net"
@@ -1101,7 +1111,7 @@ msgid "Not a publication"
 msgstr "Pas une publication"
 
 msgid "Digital seal"
-msgstr "Sceau digital"
+msgstr "Sceau électronique"
 
 msgid "Content"
 msgstr "Contenu"
@@ -1224,6 +1234,18 @@ msgstr "Vous pouvez voir ci-dessous votre conversation de chat :"
 
 msgid "Have a great day!"
 msgstr "Passez une bonne journée!"
+
+msgid "Your e-mail address was just used to send a login link to ${homepage}."
+msgstr ""
+"Votre adresse e-mail vient d'être utilisée pour envoyer un lien de connexion "
+"à ${homepage}."
+
+msgid "Use the token below or click on the link to complete your login."
+msgstr ""
+"Utilisez le code ci-dessous ou cliquez sur le lien pour vous connecter."
+
+msgid "Complete Login"
+msgstr "Connexion complète"
 
 msgid "Hello"
 msgstr "Bonjour"
@@ -1358,7 +1380,7 @@ msgid "Your change request has been applied:"
 msgstr "Votre demande de modification a été effectuée:"
 
 msgid "Your directory submission has unfortunately been rejected:"
-msgstr "Votre proposition de répertoire a malheureusement été rejetée :"
+msgstr "Votre proposition de répertoire a malheureusement été rejetée:"
 
 msgid "The rejection of your directory application has been withdrawn:"
 msgstr "Le refus de votre inscription à l'annuaire a été retiré:"
@@ -1449,7 +1471,7 @@ msgid "Click here to view web version."
 msgstr "Cliquer ici pour voir la version internet."
 
 msgid "You no longer wish to receive the newsletter?"
-msgstr "Vous ne souhaitez plus recevoir la lettre d'informations ?"
+msgstr "Vous ne souhaitez plus recevoir la lettre d'informations?"
 
 msgid ""
 "The user with the address ${address} just unsubscribed from the newsletter "
@@ -1517,6 +1539,9 @@ msgstr ""
 msgid "Key Code"
 msgstr "Code clé"
 
+msgid "See all your reservations"
+msgstr "Voir toutes vos réservations"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Les réservations suivantes ont malheureusement été annulées:"
 
@@ -1580,6 +1605,9 @@ msgstr "Votre demande a été ré-ouverte"
 msgid "You can see the current status of your ticket at any time here:"
 msgstr ""
 "Vous pouvez consulter le statut actuel de votre billet à tout moment ici:"
+
+msgid "Date/Time"
+msgstr "Date/Heure"
 
 msgid "Agenda"
 msgstr "Agenda"
@@ -1929,8 +1957,26 @@ msgstr "Activé :"
 msgid "Fee:"
 msgstr "Tarif :"
 
+msgid "Export Bill run as PDF"
+msgstr "Exporter l'exécution de la facture au format PDF"
+
 msgid "No payments yet."
 msgstr "Pas de paiements pour le moment."
+
+msgid "Batch Action"
+msgstr "Action par lot"
+
+msgid "Mark as Invoiced"
+msgstr "Marquer comme facturé"
+
+msgid "Mark as Paid"
+msgstr "Marquer comme payé"
+
+msgid "Mark as Unpaid"
+msgstr "Marquer comme non payé"
+
+msgid "Apply to selected"
+msgstr "Appliquer aux sélectionnés"
 
 msgid "Select organisation"
 msgstr "Sélectionner une organisation"
@@ -1950,8 +1996,8 @@ msgstr "Exporter une vCard de cette personne"
 msgid "Number"
 msgstr "Numéro"
 
-msgid "Type"
-msgstr "Type"
+msgid "Business Type"
+msgstr "Type d'activité"
 
 msgid "Status"
 msgstr "Statut"
@@ -2043,6 +2089,16 @@ msgstr ""
 "sont abonnées (si elles le font). Par conséquent, les informations affichées "
 "dans le calendrier peuvent être incorrectes ou obsolètes. Utilisez-le à vos "
 "risques et périls."
+
+msgid ""
+"If you want key codes to be included in the event's description then you may "
+"use the following link instead. Please note however that anyone you share "
+"this link with will have permanent access to this information."
+msgstr ""
+"Si vous souhaitez que les codes clés soient inclus dans la description de "
+"l'événement, vous pouvez utiliser le lien suivant. Notez toutefois que toute "
+"personne avec laquelle vous partagerez ce lien aura un accès permanent à ces "
+"informations."
 
 msgid "Reservations must be made at least one day in advance."
 msgstr ""
@@ -2326,7 +2382,7 @@ msgstr ""
 "lorsque l'on est connecté et que le navigateur avec le site est ouvert."
 
 msgid "Archive all selected tickets?"
-msgstr "Archiver tous les billets sélectionnés ?"
+msgstr "Archiver tous les billets sélectionnés?"
 
 msgid "Do Archive"
 msgstr "Archiver"
@@ -2533,7 +2589,7 @@ msgid "Analytics"
 msgstr "Analytics"
 
 msgid "Holidays"
-msgstr "Jours fériés"
+msgstr "Jours fériés / Vacances scolaires"
 
 msgid "Tickets"
 msgstr "Tickets"

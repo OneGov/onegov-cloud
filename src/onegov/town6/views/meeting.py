@@ -11,6 +11,7 @@ from onegov.parliament.models.political_business import PoliticalBusiness
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import MeetingCollectionLayout
+from onegov.town6.layout import MeetingLayout
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -47,8 +48,7 @@ def view_meeting(
     self: Meeting,
     request: TownRequest,
 ) -> RenderData:
-    collection = MeetingCollection(request.session)
-    layout = MeetingCollectionLayout(collection, request)
+    layout = MeetingLayout(self, request)
     title = (
         self.title + ' - ' + layout.format_date(self.start_datetime, 'date')
         if self.start_datetime

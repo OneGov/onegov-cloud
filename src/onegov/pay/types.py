@@ -8,7 +8,8 @@ if TYPE_CHECKING:
     from typing import type_check_only, Literal, Protocol, TypeAlias, TypedDict
 
     PaymentMethod: TypeAlias = Literal['free', 'cc', 'manual']
-    PaymentState: TypeAlias = Literal['open', 'paid', 'failed', 'cancelled']
+    PaymentState: TypeAlias = Literal[
+    'open', 'paid', 'failed', 'cancelled', 'invoiced']
 
     class PriceDict(TypedDict):
         amount: float

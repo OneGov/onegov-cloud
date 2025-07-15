@@ -4,7 +4,7 @@ from __future__ import annotations
 from onegov.form.models.definition import SurveyDefinition
 import sedate
 
-from datetime import date
+from datetime import date, datetime
 
 from onegov.api.models import ApiKey
 from onegov.chat import MessageCollection
@@ -45,8 +45,8 @@ from onegov.org.app import OrgApp
 from onegov.org.auth import MTANAuth
 from onegov.org.converters import keywords_converter
 from onegov.org.models import AtoZPages, PushNotificationCollection
+from onegov.org.models import CitizenDashboard, Dashboard
 from onegov.org.models import Clipboard
-from onegov.org.models import Dashboard
 from onegov.org.models import DirectorySubmissionAction
 from onegov.org.models import Editor
 from onegov.org.models import Export
@@ -113,6 +113,7 @@ from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, User, UserCollection
 from onegov.user import UserGroup, UserGroupCollection
+from onegov.core.converters import datetime_converter
 from uuid import UUID
 from webob import exc, Response
 
@@ -893,14 +894,44 @@ def get_payment(app: OrgApp, id: UUID) -> Payment | None:
 @OrgApp.path(
     model=PaymentCollection,
     path='/payments',
-    converters={'page': int}
+    converters={
+        'page': int,
+        'start': datetime_converter,
+        'end': datetime_converter,
+        'status': str,
+        'payment_type': str,
+        'ticket_start': datetime_converter,
+        'ticket_end': datetime_converter,
+        'reservation_start': datetime_converter,
+        'reservation_end': datetime_converter
+    }
 )
 def get_payments(
     app: OrgApp,
     source: str = '*',
-    page: int = 0
+    page: int = 0,
+    start: datetime | None = None,
+    end: datetime | None = None,
+    status: str | None = None,
+    payment_type: str | None = None,
+    ticket_start: datetime | None = None,
+    ticket_end: datetime | None = None,
+    reservation_start: datetime | None = None,
+    reservation_end: datetime | None = None
 ) -> PaymentCollection:
-    return PaymentCollection(app.session(), source, page)
+    return PaymentCollection(
+        session=app.session(),
+        source=source,
+        page=page,
+        start=start,
+        end=end,
+        status=status,
+        payment_type=payment_type,
+        ticket_start=ticket_start,
+        ticket_end=ticket_end,
+        reservation_start=reservation_start,
+        reservation_end=reservation_end
+    )
 
 
 @OrgApp.path(
@@ -1072,6 +1103,17 @@ def get_publication_collection(
     path='/dashboard')
 def get_dashboard(request: OrgRequest) -> Dashboard | None:
     dashboard = Dashboard(request)
+
+    if dashboard.is_available:
+        return dashboard
+    return None
+
+
+@OrgApp.path(
+    model=CitizenDashboard,
+    path='/citizen-dashboard')
+def get_citizen_dashboard(request: OrgRequest) -> CitizenDashboard | None:
+    dashboard = CitizenDashboard(request)
 
     if dashboard.is_available:
         return dashboard

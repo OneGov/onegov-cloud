@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-01 09:10+0200\n"
+"POT-Creation-Date: 2025-07-10 14:11+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -84,6 +84,24 @@ msgstr "Aucune donnée disponible"
 msgid "Most Popular Pages"
 msgstr "Pages les plus populaires"
 
+msgid "My Requests"
+msgstr "Mes demandes"
+
+msgid "Closed Tickets"
+msgstr "Tickets clôturés"
+
+msgid "My Reservations"
+msgstr "Mes réservations"
+
+msgid "Pending Future Reservations"
+msgstr "Réservations futures en attente"
+
+msgid "Confirmed Future Reservations"
+msgstr "Réservations futures confirmées"
+
+msgid "Past Reservations"
+msgstr "Réservations antérieures"
+
 msgid "Open"
 msgstr "Ouvert"
 
@@ -107,6 +125,9 @@ msgstr "Échoué"
 
 msgid "Refunded"
 msgstr "Remboursé"
+
+msgid "Invoiced"
+msgstr "Facturé"
 
 msgid "Manual"
 msgstr "Manuelle"
@@ -155,6 +176,12 @@ msgstr "Se déconnecter"
 
 msgid "Login"
 msgstr "Connexion"
+
+msgid "Citizen Login"
+msgstr "Connexion client"
+
+msgid "No registration necessary"
+msgstr "Aucune inscription n'est nécessaire"
 
 msgid "Register"
 msgstr "S'inscrire"
@@ -209,9 +236,6 @@ msgstr "Gestion"
 
 msgid "My Tickets"
 msgstr "Mes tickets"
-
-msgid "Closed Tickets"
-msgstr "Tickets clôturés"
 
 msgid "Ticket"
 msgstr "Ticket"
@@ -393,6 +417,12 @@ msgstr "Limit des reservations"
 
 msgid "Start time before end time"
 msgstr "Heure de début avant l'heure de fin"
+
+msgid "E-Mail"
+msgstr "E-mail"
+
+msgid "Token"
+msgstr "Code"
 
 msgid "Name"
 msgstr "Nom"
@@ -675,9 +705,6 @@ msgstr "Nom invalide. Une suggestion valid est: ${name}"
 
 msgid "An entry with the same name exists"
 msgstr "Une entrée avec le même nom existe"
-
-msgid "E-Mail"
-msgstr "E-mail"
 
 msgid "Describes briefly what this form is about"
 msgstr "Décrit brièvement ce formulaire"
@@ -1282,17 +1309,11 @@ msgstr "- Page de base-"
 msgid "Invalid destination selected"
 msgstr "Destination non valide sélectionnée"
 
-msgid "Personnel number"
-msgstr "Numéro de personnel"
+msgid "Gender"
+msgstr "Sexe"
 
 msgid "Basic properties"
 msgstr "Propriétés fondamentales"
-
-msgid "Contract number"
-msgstr "Numéro de contrat"
-
-msgid "Gender"
-msgstr "Sexe"
 
 msgid "First name"
 msgstr "Prénom"
@@ -1357,6 +1378,12 @@ msgstr "Site Web"
 msgid "Remarks"
 msgstr "Remarques"
 
+msgid "Personnel number"
+msgstr "Numéro de personnel"
+
+msgid "Contract number"
+msgstr "Numéro de contrat"
+
 msgid "Shipping method"
 msgstr "Mode d'expédition"
 
@@ -1378,6 +1405,9 @@ msgstr "Parlementaire"
 msgid "Role"
 msgstr "Rôle"
 
+msgid "Political Party"
+msgstr "Parti"
+
 msgid "Party role"
 msgstr "Rôle dans le parti"
 
@@ -1386,6 +1416,30 @@ msgstr "Groupe Parlementaire"
 
 msgid "Parliamentary group role"
 msgstr "Rôle dans le groupe parlementaire"
+
+msgid "From reservation date"
+msgstr "À partir de la date de réservation"
+
+msgid "Filter Payments"
+msgstr "Filtrer les paiements"
+
+msgid "To reservation date"
+msgstr "À la date de réservation"
+
+msgid "Ticket created from date"
+msgstr "Ticket créé à partir de la date"
+
+msgid "Filter by Ticket Date"
+msgstr "Filtrer par date de ticket"
+
+msgid "Filters payments by the creation date of their associated ticket."
+msgstr "Filtre les paiements par date de création de leur ticket associé."
+
+msgid "Ticket created to date"
+msgstr "Ticket créé à ce jour"
+
+msgid "Payment Type"
+msgstr "Type de paiement"
 
 msgid "Academic Title"
 msgstr "Diplôme"
@@ -1407,9 +1461,6 @@ msgstr "Naissance"
 
 msgid "Profession"
 msgstr "Profession"
-
-msgid "Political Party"
-msgstr "Parti politique"
 
 msgid "Parliamentary Group"
 msgstr "Groupe parlementaire"
@@ -2388,14 +2439,26 @@ msgstr "Adresse du site internet avec https://"
 msgid "Site ID"
 msgstr "ID du site"
 
+msgid "Kaba Sites"
+msgstr "Sites"
+
 msgid "Default Lead Time"
 msgstr "Délai par défaut"
 
 msgid "Default Lag Time"
 msgstr "Délai d'arrêt par défaut"
 
-msgid "Invalid credentials or site id"
-msgstr "Informations d'identification ou ID de site invalides"
+#, python-format
+msgid "Duplicate site ID ${site_id}"
+msgstr "Duplicata de l'ID du site ${site_id}"
+
+#, python-format
+msgid "${field} for site ID ${site_id} is required"
+msgstr "${field} pour l'ID du site ${site_id} est obligatoire"
+
+#, python-format
+msgid "Invalid credentials for site ID ${site_id}"
+msgstr "Informations d'identification invalides pour l'ID du site ${site_id}"
 
 msgid "Unexpected error encountered, please try again."
 msgstr "Erreur inattendue rencontrée, veuillez réessayer."
@@ -2540,6 +2603,9 @@ msgid ""
 msgstr ""
 "Il s'agit du taux de TVA en pourcentage. Le taux de TVA s'appliquera à tous "
 "les prix dans les formulaires."
+
+msgid "Enable Citizen Login"
+msgstr "Activer la connexion des clients"
 
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
@@ -3136,7 +3202,7 @@ msgstr "Dossier"
 
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
-msgstr "Voulez-vous vraiment supprimer « ${title} » ?"
+msgstr "Voulez-vous vraiment supprimer «${title}»?"
 
 msgid "All entries will be deleted as well!"
 msgstr "Toutes les entrées seront également supprimées !"
@@ -3916,12 +3982,11 @@ msgid "Download Form"
 msgstr "Télécharger le formulaire"
 
 msgid "Embed iFrame"
-msgstr "Intégrer l'iFrame"
+msgstr "Intégrer une iFrame"
 
 msgid "You can copy the following code to embed this page as an iFrame:"
 msgstr ""
-"Vous pouvez copier le code suivant pour intégrer cette page en tant qu' "
-"iFrame:"
+"Vous pouvez copier le code suivant pour intégrer cette page dans une iFrame:"
 
 msgid ""
 "To display the breadcrumbs you can add ${bc_level} as a parameter to the "
@@ -4313,6 +4378,9 @@ msgstr "à ${time}"
 msgid "Object"
 msgstr "Objet"
 
+msgid "Reservation"
+msgstr "Réservation"
+
 msgid "Disbursed"
 msgstr "Décaissé"
 
@@ -4438,7 +4506,7 @@ msgstr ""
 "${homepage}."
 
 msgid "To activate your account, click confirm below:"
-msgstr "Pour activer votre compte, cliquer sur confirmer ci-dessous :"
+msgstr "Pour activer votre compte, cliquer sur confirmer ci-dessous:"
 
 msgid "Confirm my account"
 msgstr "Confirmer mon compte"
@@ -4449,6 +4517,18 @@ msgid ""
 msgstr ""
 "Si vous pensez que c'est une erreur, ignorez ce message et nous ne vous "
 "importunerons plus jamais."
+
+msgid "Your e-mail address was just used to send a login link to ${homepage}."
+msgstr ""
+"Votre adresse e-mail vient d'être utilisée pour envoyer un lien de connexion "
+"à ${homepage}."
+
+msgid "Use the token below or click on the link to complete your login."
+msgstr ""
+"Utilisez le code ci-dessous ou cliquez sur le lien pour vous connecter."
+
+msgid "Complete Login"
+msgstr "Connexion complète"
 
 msgid "Hello"
 msgstr "Bonjour"
@@ -4522,10 +4602,10 @@ msgstr ""
 "pour qu'il vous enlève de la liste des destinataires."
 
 msgid "This is what happend on the ${org} website yesterday:"
-msgstr "Voici ce qui s'est passé aujourd'hui sur le site web de ${org} :"
+msgstr "Voici ce qui s'est passé aujourd'hui sur le site web de ${org}:"
 
 msgid "This is what happend on the ${org} website over the weekend:"
-msgstr "Voici ce qui s'est passé ce week-end sur le site web de ${org} :"
+msgstr "Voici ce qui s'est passé ce week-end sur le site web de ${org}:"
 
 msgid "tickets were opened."
 msgstr "tickets ouverts."
@@ -4583,7 +4663,7 @@ msgid "1 ticket is ${pending_1}."
 msgstr "1 tickets en ${pending_1}."
 
 msgid "Have a great week!"
-msgstr "Bonne semaine !"
+msgstr "Bonne semaine!"
 
 msgid ""
 "This is the daily OneGov Cloud status e-mail. If you don't want to receive "
@@ -4606,7 +4686,7 @@ msgid "Check request status"
 msgstr "Vérifier l'état de la demande"
 
 msgid "Your change request has been applied:"
-msgstr "Votre demande de modification a été effectuée :"
+msgstr "Votre demande de modification a été effectuée:"
 
 msgid "Your directory submission has unfortunately been rejected:"
 msgstr "Votre proposition de répertoire a malheureusement été rejetée:"
@@ -4615,10 +4695,10 @@ msgid "The rejection of your directory application has been withdrawn:"
 msgstr "Le refus de votre inscription à l'annuaire a été retiré:"
 
 msgid "Your event has been accepted:"
-msgstr "Votre événement a été accepté :"
+msgstr "Votre événement a été accepté:"
 
 msgid "Your event has unfortunately been rejected:"
-msgstr "Votre événement a malheureusement été rejeté :"
+msgstr "Votre événement a malheureusement été rejeté:"
 
 msgid "New note in Ticket ${link}"
 msgstr "Nouvelle note dans le billet ${link}"
@@ -4654,13 +4734,13 @@ msgid "Or by changing the settings in your user profile."
 msgstr "Ou en changeant les réglages dans votre profil d'utilisateur."
 
 msgid "A new entry has been added to the \"${directory}\" directory:"
-msgstr "Une nouvelle entrée a été ajoutée au répertoire \"${directory}\" :"
+msgstr "Une nouvelle entrée a été ajoutée au répertoire \"${directory}\":"
 
 msgid "Do you no longer wish to receive these notifications?"
-msgstr "Ne souhaitez-vous plus recevoir ces notifications ?"
+msgstr "Ne souhaitez-vous plus recevoir ces notifications ?"
 
 msgid "The following reservations have been accepted:"
-msgstr "Les réservations suivantes ont été acceptées :"
+msgstr "Les réservations suivantes ont été acceptées:"
 
 msgid ""
 "This is the notification for reservations for ${request.app.org.title}. If "
@@ -4681,7 +4761,7 @@ msgstr "Votre nom d'utilisateur est ${email}."
 
 msgid "Click on the following link to set your account password:"
 msgstr ""
-"Cliquer sur le lien suivant pour définir le mot de passe de votre compte :"
+"Cliquer sur le lien suivant pour définir le mot de passe de votre compte:"
 
 msgid "Set Account Password"
 msgstr "Définir le mot de passe du compte"
@@ -4708,7 +4788,7 @@ msgid "Click here to view web version."
 msgstr "Cliquer ici pour voir la version internet."
 
 msgid "You no longer wish to receive the newsletter?"
-msgstr "Vous ne souhaitez plus recevoir la lettre d'informations ?"
+msgstr "Vous ne souhaitez plus recevoir la lettre d'informations?"
 
 msgid ""
 "The user with the address ${address} just unsubscribed from the newsletter "
@@ -4718,7 +4798,7 @@ msgstr ""
 "liste des abonnés à la lettre d'information."
 
 msgid "Click the following link to set a new password:"
-msgstr "Cliquer sur le lien suivant pour définir un nouveau mot de passe :"
+msgstr "Cliquer sur le lien suivant pour définir un nouveau mot de passe:"
 
 msgid "If you don't want to change your password, you can ignore this email."
 msgstr ""
@@ -4740,7 +4820,7 @@ msgstr ""
 "relevé de carte de crédit."
 
 msgid "Amount:"
-msgstr "Montant :"
+msgstr "Montant:"
 
 msgid "Your registration for \"${title}\" has been confirmed."
 msgstr "Votre inscription pour \"${title}\" a été confirmée."
@@ -4758,7 +4838,7 @@ msgid "The ticket number is"
 msgstr "Le numéro du ticket est"
 
 msgid "The following reservations have been rejected:"
-msgstr "Les réservations suivantes ont été rejetées:"
+msgstr "Les réservations suivantes ont été rejetées :"
 
 msgid ""
 "This is a notification for the rejected reservations for ${organisation}. If "
@@ -4769,6 +4849,9 @@ msgstr ""
 "${organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
 "veuillez contacter un administrateur afin qu'il vous retire de la liste des "
 "destinataires."
+
+msgid "See all your reservations"
+msgstr "Voir toutes vos réservations"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Les réservations suivantes ont malheureusement été annulées:"
@@ -4786,7 +4869,7 @@ msgid "You have a new ticket"
 msgstr "Vous avez un nouveau ticket"
 
 msgid "A message has been sent regarding ${ref}:"
-msgstr "Un message a été envoyé à propos de ${ref} :"
+msgstr "Un message a été envoyé à propos de ${ref}:"
 
 #. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
@@ -4806,7 +4889,7 @@ msgstr "Votre demande a été complétée."
 
 msgid "Your requests's timeline has been archived for future reference:"
 msgstr ""
-"L'historique de votre demande a été archivé pour des références futures :"
+"L'historique de votre demande a été archivé pour des références futures:"
 
 msgid "Request Timeline"
 msgstr "Historique de la demande"
@@ -4822,7 +4905,7 @@ msgid ""
 "meantime you can check the status of your ticket at any time:"
 msgstr ""
 "Nous vous enverrons un autre e-mail dès que votre demande aura été traité. "
-"Entre-temps, vous pouvez aller voir l'état de votre demande à tout moment :"
+"Entre-temps, vous pouvez aller voir l'état de votre demande à tout moment:"
 
 msgid "The following ticket has just been opened:"
 msgstr "Le ticket suivant vient d'être ouvert:"
@@ -4842,10 +4925,10 @@ msgstr ""
 "disponibles."
 
 msgid "Below you can see your chat conversation:"
-msgstr "Ci-dessous, vous pouvez voir votre conversation de chat:"
+msgstr "Vous pouvez voir ci-dessous votre conversation de chat :"
 
 msgid "This is what happend on the ${org} website over the past week:"
-msgstr "Voici ce qui s'est passé le mois dernier sur le site web de ${org} :"
+msgstr "Voici ce qui s'est passé le mois dernier sur le site web de ${org}:"
 
 msgid ""
 "This is the weekly OneGov Cloud status e-mail. If you don't want to receive "
@@ -5004,10 +5087,10 @@ msgid ""
 "password, as it won't be shown to you again:"
 msgstr ""
 "Création de l'utilisateur ${username} réussie. Veuillez conserver ce mot de "
-"passe d'utilisateur, car il ne vous sera plus montré à nouveau : "
+"passe d'utilisateur, car il ne vous sera plus montré à nouveau:"
 
 msgid "Password:"
-msgstr "Mot de passe :"
+msgstr "Mot de passe:"
 
 msgid ""
 "The user ${username} was created successfully. An e-mail has been sent to "
@@ -5075,8 +5158,26 @@ msgstr "Activé :"
 msgid "Fee:"
 msgstr "Tarif :"
 
+msgid "Export Bill run as PDF"
+msgstr "Exporter l'exécution de la facture au format PDF"
+
 msgid "No payments yet."
 msgstr "Pas de paiements pour le moment."
+
+msgid "Batch Action"
+msgstr "Action par lot"
+
+msgid "Mark as Invoiced"
+msgstr "Marquer comme facturé"
+
+msgid "Mark as Paid"
+msgstr "Marquer comme payé"
+
+msgid "Mark as Unpaid"
+msgstr "Marquer comme non payé"
+
+msgid "Apply to selected"
+msgstr "Appliquer aux sélectionnés"
 
 msgid ""
 "The following requests have been submitted. To see the state of process you "
@@ -5171,6 +5272,16 @@ msgstr ""
 "sont abonnées (si elles le font). Par conséquent, les informations affichées "
 "dans le calendrier peuvent être incorrectes ou obsolètes. Utilisez-le à vos "
 "risques et périls."
+
+msgid ""
+"If you want key codes to be included in the event's description then you may "
+"use the following link instead. Please note however that anyone you share "
+"this link with will have permanent access to this information."
+msgstr ""
+"Si vous souhaitez que les codes clés soient inclus dans la description de "
+"l'événement, vous pouvez utiliser le lien suivant. Notez toutefois que toute "
+"personne avec laquelle vous partagerez ce lien aura un accès permanent à ces "
+"informations."
 
 msgid "Reservations must be made at least one day in advance."
 msgstr ""
@@ -5289,7 +5400,7 @@ msgid ""
 "continuing, it won't be shown to you again:"
 msgstr ""
 "Votre lien d'inscription a été créé comme suit. Copiez-le avant de "
-"continuer, il ne vous sera pas montré à nouveau :"
+"continuer, il ne vous sera pas montré à nouveau:"
 
 msgid ""
 "Sort the items using drag and drop. The new positions are automatically "
@@ -5309,7 +5420,7 @@ msgid ""
 "change, click on the \"Edit\"-Button below."
 msgstr ""
 "Merci d'avoir rempli ce sondage. Si vous souhaitez apporter des "
-"modifications, cliquez sur le bouton \"Modifier\" ci-dessous."
+"modifications, cliquez sur \"Modifier\" ci-dessous."
 
 msgid "No surveys defined yet."
 msgstr "Aucun sondage n'est encore défini."
@@ -5760,6 +5871,16 @@ msgstr ""
 
 msgid "Successfully authenticated via mTAN."
 msgstr "Authentification via mTAN réussie."
+
+#, python-format
+msgid "Login Token for ${organisation}"
+msgstr "Code de connexion pour ${organisation}"
+
+msgid "Invalid or expired login token provided."
+msgstr "Le code de connexion fourni n'est pas valide ou a expiré."
+
+msgid "Confirm Citizen Login"
+msgstr "Confirmer la connexion du client"
 
 msgid "A link was added to the clipboard"
 msgstr "Un lien a été ajouté au presse-papiers"
@@ -6378,6 +6499,27 @@ msgstr "Votre paiement a été retiré"
 msgid "Your payment has been refunded"
 msgstr "Votre paiement a été remboursé"
 
+msgid "No payments found for PDF generation"
+msgstr "Aucun paiement trouvé pour la génération PDF"
+
+msgid "No tickets found for PDF generation"
+msgstr "Aucun ticket trouvé pour la génération PDF"
+
+msgid "Receivables"
+msgstr "Créances"
+
+#, python-format
+msgid "${count} payments marked as invoiced."
+msgstr "${count} paiements marqués comme facturés."
+
+#, python-format
+msgid "${count} payments marked as paid."
+msgstr "${count} paiements marqués comme payés."
+
+#, python-format
+msgid "${count} payments marked as unpaid."
+msgstr "${count} paiements marqués comme non payés."
+
 msgid "The ticket was marked as paid"
 msgstr "Le ticket a été marqué comme payé"
 
@@ -6585,19 +6727,21 @@ msgstr ""
 "Votre réservation pour ${room} a été soumise. Veuillez poursuivre votre "
 "réservation pour ${next_room}."
 
+#, python-format
 msgid ""
-"Failed to create visits using the dormakaba API please make sure your "
-"credentials are still valid."
+"Failed to create visits using the dormakaba API for site ID ${site_id} "
+"please make sure your credentials are still valid."
 msgstr ""
-"Échec de la création de visites à l'aide de l'API dormakaba. Veuillez vous "
-"assurer que vos informations d'identification sont toujours valides."
+"Échec de la création de visites à l'aide de l'API dormakaba pour l'ID du "
+"site ${site_id}. Veuillez vous assurer que vos informations d'identification "
+"sont toujours valides."
 
 msgid "Your reservations were accepted"
 msgstr "Vos réservations ont été acceptées"
 
 #, python-format
-msgid "${org} New Reservation(s)"
-msgstr "${org} Nouvelle(s) réservation(s)"
+msgid "Reservation(s) confirmed ${org} ${resource}"
+msgstr "Réservation(s) confirmée(s) ${org} ${resource}"
 
 msgid "The reservations were accepted"
 msgstr "Les réservations ont été acceptées"
@@ -6786,7 +6930,7 @@ msgstr ""
 "peuvent être irrévocablement supprimés."
 
 msgid "Chat"
-msgstr "Chat"
+msgstr "Discussion"
 
 #, python-format
 msgid "You have successfully unsubscribed from the newsletter at ${address}"
@@ -7078,6 +7222,9 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+msgid "Please enter your e-mail address in order to continue"
+msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 
 #~ msgid "Please note that this page has subpages which will also be deleted!"
 #~ msgstr ""

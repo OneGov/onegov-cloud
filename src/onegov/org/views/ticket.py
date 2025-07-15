@@ -27,19 +27,21 @@ from onegov.org.forms import TicketChatMessageForm
 from onegov.org.forms import TicketNoteForm
 from onegov.org.layout import (
     FindYourSpotLayout, DefaultMailLayout, ArchivedTicketsLayout)
+from onegov.org.layout import DefaultLayout
 from onegov.org.layout import TicketChatMessageLayout
 from onegov.org.layout import TicketNoteLayout
 from onegov.org.layout import TicketsLayout
 from onegov.org.layout import TicketLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
-    TicketChatMessage, TicketMessage, TicketNote,
+    CitizenDashboard, TicketChatMessage, TicketMessage, TicketNote,
     ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter, ReservationHandler
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.utils import get_current_tickets_url
 from onegov.org.views.message import view_messages_feed
+from onegov.org.views.utils import assert_citizen_logged_in
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
@@ -1426,5 +1428,40 @@ def view_pending_tickets(
     return {
         'title': _('Submitted Requests'),
         'layout': layout or FindYourSpotLayout(self, request),
+        'tickets': tickets,
+    }
+
+
+@OrgApp.html(
+    model=TicketCollection,
+    name='my-tickets',
+    template='pending_tickets.pt',
+    permission=Public
+)
+def view_my_tickets(
+    self: TicketCollection,
+    request: OrgRequest,
+    layout: DefaultLayout | None = None
+) -> RenderData:
+
+    assert_citizen_logged_in(request)
+    assert request.authenticated_email
+
+    tickets = (
+        self.by_ticket_email(request.authenticated_email)
+        .order_by(Ticket.created.desc())
+        .all()
+    )
+
+    layout = layout or DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Dashboard'), request.class_link(CitizenDashboard)),
+        Link(_('Submitted Requests'), '#')
+    ]
+
+    return {
+        'title': _('Submitted Requests'),
+        'layout': layout,
         'tickets': tickets,
     }

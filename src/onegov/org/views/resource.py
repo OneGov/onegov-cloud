@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import collections
+import hashlib
 import icalendar
 import morepath
+import secrets
 import sedate
-import collections
 
 from collections import OrderedDict
 from datetime import date as date_t, datetime, time, timedelta
@@ -12,7 +14,7 @@ from itertools import islice
 from libres.modules.errors import LibresError
 from morepath.request import Response
 from onegov.core.security import Public, Private, Personal
-from onegov.core.utils import module_path
+from onegov.core.utils import module_path, Bunch
 from onegov.core.orm import as_selectable_from_path
 from onegov.form import FormSubmission
 from onegov.org.cli import close_ticket
@@ -22,12 +24,14 @@ from onegov.org.elements import Link
 from onegov.org.forms import (
     FindYourSpotForm, ResourceForm, ResourceCleanupForm, ResourceExportForm)
 from onegov.org.layout import (
-    FindYourSpotLayout, ResourcesLayout, ResourceLayout)
+    DefaultLayout, FindYourSpotLayout, ResourcesLayout, ResourceLayout)
+from onegov.org.models.dashboard import CitizenDashboard
 from onegov.org.models.resource import (
     DaypassResource, FindYourSpotCollection, RoomResource, ItemResource)
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
 from onegov.org.utils import group_by_column, keywords_first
+from onegov.org.views.utils import assert_citizen_logged_in
 from onegov.reservation import ResourceCollection, Resource, Reservation
 from onegov.ticket import Ticket, TicketCollection
 from onegov.pay import PaymentCollection
@@ -1179,6 +1183,253 @@ def view_occupancy(
     }
 
 
+@OrgApp.json(
+    model=ResourceCollection,
+    name='my-reservations-json',
+    permission=Public
+)
+def view_my_reservations_json(
+    self: ResourceCollection,
+    request: OrgRequest
+) -> JSON_ro:
+    """ Returns the reservations in a fullcalendar compatible events feed.
+
+    See `<https://fullcalendar.io/docs/event_data/events_json_feed/>`_ for
+    more information.
+
+    """
+    if not request.app.org.citizen_login_enabled:
+        raise exc.HTTPNotFound()
+
+    if not request.authenticated_email:
+        raise exc.HTTPForbidden()
+
+    start, end = utils.parse_fullcalendar_request(request, 'Europe/Zurich')
+
+    if not (start and end):
+        return ()
+
+    path = module_path('onegov.org', 'queries/my-reservations.sql')
+    stmt = as_selectable_from_path(path)
+
+    records = request.session.execute(select(stmt.c).where(and_(
+        stmt.c.email == request.authenticated_email,
+        start <= stmt.c.start,
+        stmt.c.start <= end
+    )))
+
+    return [
+        utils.MyReservationEventInfo(
+            id=r.id,
+            token=r.token,
+            start=r.start,
+            end=r.end,
+            accepted=r.accepted,
+            timezone=r.timezone,
+            resource=r.resource,
+            ticket_id=r.ticket_id,
+            handler_code=r.handler_code,
+            ticket_number=r.ticket_number,
+            key_code=r.key_code,
+            request=request
+        ).as_dict() for r in records
+    ]
+
+
+@OrgApp.html(
+    model=ResourceCollection,
+    permission=Public,
+    name='my-reservations',
+    template='resource_occupancy.pt'
+)
+def view_my_reservations(
+    self: ResourceCollection,
+    request: OrgRequest,
+    layout: DefaultLayout | None = None
+) -> RenderData:
+
+    assert_citizen_logged_in(request)
+
+    # NOTE: For some reason we need to manually include common
+    #       and fullcalendar in addition to occupancycalendar
+    #       here. Maybe because we use DefaultLayout?
+    request.include('common')
+    request.include('fullcalendar')
+    request.include('occupancycalendar')
+
+    layout = layout or DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Dashboard'), request.class_link(CitizenDashboard)),
+        Link(_('My Reservations'), '#')
+    ]
+
+    layout.editbar_links = [
+        Link(
+            _('Subscribe'),
+            request.link(self, 'my-reservations-subscribe'),
+            classes={'subscribe-link'}
+        )
+    ]
+
+    try:
+        date = date_t.fromisoformat(request.GET.get('date', ''))
+    except Exception:
+        date = None
+
+    return {
+        'title': _('My Reservations'),
+        'resource': Bunch(
+            type='room',
+            date=date,
+            view=request.GET.get('view'),
+            highlights_min=request.GET.get('highlights_min'),
+            highlights_max=request.GET.get('highlights_max'),
+            default_view='timeGridWeek'
+        ),
+        'layout': layout,
+        'feed': request.link(self, name='my-reservations-json'),
+    }
+
+
+@OrgApp.html(
+    model=ResourceCollection,
+    template='resource-subscribe.pt',
+    permission=Public,
+    name='my-reservations-subscribe'
+)
+def view_my_reservations_subscribe(
+    self: ResourceCollection,
+    request: OrgRequest,
+    layout: DefaultLayout | None = None
+) -> RenderData:
+
+    assert_citizen_logged_in(request)
+
+    salt = secrets.token_urlsafe(16)
+    url_obj = URL(request.link(self, 'my-reservations-ical'))
+    url_obj = url_obj.scheme('webcal')
+    token = request.new_url_safe_token(request.authenticated_email, salt)
+    url_obj = url_obj.query_param('token', token)
+    url_obj = url_obj.query_param('salt', salt)
+    url = url_obj.as_string()
+
+    layout = layout or DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Dashboard'), request.class_link(CitizenDashboard)),
+        Link(_('My Reservations'), request.url.replace('-subscribe', '')),
+        Link(_('Subscribe'), '#')
+    ]
+
+    # generate a second url which includes key codes
+    if request.app.org.kaba_configurations:
+        salt = secrets.token_urlsafe(16)
+        url_obj = URL(request.link(self, 'my-reservations-ical'))
+        url_obj = url_obj.scheme('webcal')
+        token = request.new_url_safe_token(
+            [request.authenticated_email, True],
+            salt
+        )
+        url_obj = url_obj.query_param('token', token)
+        url_obj = url_obj.query_param('salt', salt)
+        key_code_url = url_obj.as_string()
+    else:
+        key_code_url = None
+
+    return {
+        'title': _('Subscribe'),
+        'resource': self,
+        'layout': layout,
+        'url': url,
+        'key_code_url': key_code_url,
+    }
+
+
+@OrgApp.view(
+    model=ResourceCollection,
+    permission=Public,
+    name='my-reservations-ical'
+)
+def view_my_reservations_ical(
+    self: ResourceCollection,
+    request: OrgRequest
+) -> Response:
+
+    token = request.GET.get('token')
+    salt = request.GET.get('salt')
+    email = request.load_url_safe_token(token, salt, None)
+    include_key_code = False
+    if email is None:
+        raise exc.HTTPForbidden()
+    elif isinstance(email, list):
+        email, include_key_code = email
+
+    s = utcnow() - timedelta(days=30)
+    e = utcnow() + timedelta(days=365)
+
+    cal = icalendar.Calendar()
+    cal.add('prodid', '-//OneGov//onegov.org//')
+    cal.add('version', '2.0')
+    cal.add('method', 'PUBLISH')
+
+    prefix = request.translate(_('My Reservations'))
+    cal.add('x-wr-calname', f'{prefix} {request.app.org.title}')
+    # generate a unique id for this calendar
+    sha1 = hashlib.new('sha1', usedforsecurity=False)
+    sha1.update(email.encode('utf-8'))
+    sha1.update(request.app.application_id.encode('utf-8'))
+    cal.add('x-wr-relcalid', sha1.hexdigest())
+
+    # refresh every 120 minutes by default (Outlook and maybe others)
+    cal.add('x-published-ttl', 'PT120M')
+
+    # add allocations/reservations
+    date = utcnow()
+    path = module_path('onegov.org', 'queries/my-reservations.sql')
+    stmt = as_selectable_from_path(path)
+
+    records = request.session.execute(select(stmt.c).where(and_(
+        stmt.c.email == email,
+        s <= stmt.c.start, stmt.c.start <= e,
+        # only include accepted reservations in ICS file
+        stmt.c.accepted.is_(True)
+    )))
+
+    key_code_label = request.translate(_('Key Code'))
+
+    for r in records:
+        start = r.start
+        end = r.end + timedelta(microseconds=1)
+
+        description = r.ticket_number
+        if include_key_code and r.key_code:
+            description = f'{description}\n{key_code_label}: {r.key_code}'
+
+        evt = icalendar.Event()
+        evt.add('uid', f'{r.token}-{r.id}')
+        evt.add('summary', r.resource)
+        evt.add('location', r.resource)
+        evt.add('description', description)
+        evt.add('dtstart', standardize_date(start, 'UTC'))
+        evt.add('dtend', standardize_date(end, 'UTC'))
+        evt.add('dtstamp', date)
+        evt.add('url', request.class_link(Ticket, {
+            'handler_code': r.handler_code,
+            'id': r.ticket_id
+        }, name='status'))
+
+        cal.add_component(evt)
+
+    suffix = '-with-key-codes' if include_key_code else ''
+    filename = f'inline; filename=my-reservations-{email}{suffix}.ics'
+    return Response(
+        cal.to_ical(),
+        content_type='text/calendar',
+        content_disposition=filename,
+    )
+
+
 @OrgApp.html(
     model=Resource,
     template='resource-subscribe.pt',
@@ -1247,7 +1498,7 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
         end = r.end + timedelta(microseconds=1)
 
         evt = icalendar.Event()
-        evt.add('uid', r.token)
+        evt.add('uid', f'{r.token}-{r.id}')
         evt.add('summary', r.title)
         evt.add('location', self.title)
         evt.add('description', r.description)

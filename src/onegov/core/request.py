@@ -854,7 +854,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         self,
         data: str | bytes | None,
         salt: str | bytes | None = None,
-        max_age: int = 3600
+        max_age: int | None = 3600
     ) -> Any | None:
         """ Deserialize a token created by :meth:`new_url_safe_token`.
 

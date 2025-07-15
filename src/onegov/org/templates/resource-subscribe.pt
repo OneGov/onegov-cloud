@@ -3,7 +3,7 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="panel limit-line-width">
+        <div tal:define="key_code_url key_code_url|None" class="panel limit-line-width">
             <p i18n:translate>
                 The following link can be used to subscribe to the reservations
                 of this calendar. It can be used by anyone that knows the link
@@ -17,7 +17,20 @@
                 out of date. Use it at your own risk.
             </p>
 
-            <i class="fa fa-link" aria-hidden="true"></i> <b><a href="${url}">${url}</a></b>
+            <p tal:omit-tag="not:key_code_url">
+                <i class="fa fa-link" aria-hidden="true"></i> <b><a href="${url}" style="word-break:break-all">${url}</a></b>
+            </p>
+
+            <tal:b tal:condition="key_code_url">
+                <p i18n:translate>
+                    If you want key codes to be included in the event's description
+                    then you may use the following link instead. Please note
+                    however that anyone you share this link with will have
+                    permanent access to this information.
+                </p>
+
+                <i class="fa fa-link" aria-hidden="true"></i> <b><a href="${key_code_url}" style="word-break:break-all">${key_code_url}</a></b>
+            </tal:b>
         </div>
     </tal:b>
 </div>

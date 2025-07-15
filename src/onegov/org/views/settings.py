@@ -22,7 +22,8 @@ from onegov.org.forms.settings import (
     LinksSettingsForm, NewsletterSettingsForm, LinkMigrationForm,
     LinkHealthCheckForm, PeopleSettingsForm, SocialMediaSettingsForm,
     GeverSettingsForm, OneGovApiSettingsForm, DataRetentionPolicyForm,
-    VATSettingsForm, EventSettingsForm, KabaSettingsForm)
+    VATSettingsForm, EventSettingsForm, KabaSettingsForm,
+    CitizenLoginSettingsForm)
 from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
@@ -32,6 +33,7 @@ from onegov.org.models import SwissHolidays
 from onegov.api.models import ApiKey
 from onegov.org.app import OrgApp
 from uuid import uuid4
+from webob.exc import HTTPNotFound
 
 
 from typing import Any, TYPE_CHECKING
@@ -67,6 +69,12 @@ def view_settings(
         for action, fn in q(request.app):
             if 'setting' in action.predicates:
                 setting = copy(action.predicates)
+                # exclude this setting view if it's disabled for the app
+                if (
+                    setting['name'] == 'citizen-login-settings'
+                    and not request.app.settings.org.citizen_login_enabled
+                ):
+                    continue
                 setting['title'] = setting['setting']
                 setting['link'] = request.link(self, name=setting['name'])
 
@@ -587,7 +595,28 @@ def handle_people_settings(
     form: PeopleSettingsForm,
     layout: SettingsLayout | None = None
 ) -> RenderData | Response:
-    layout = layout or SettingsLayout(self, request, 'People')
+    layout = layout or SettingsLayout(self, request, _('People'))
     return handle_generic_settings(
         self, request, form, _('People'), layout
+    )
+
+
+@OrgApp.form(
+    model=Organisation, name='citizen-login-settings', template='form.pt',
+    permission=Secret, form=CitizenLoginSettingsForm,
+    setting=_('Citizen Login'), icon='fa-id-card', order=480,
+)
+def handle_citizen_login_settings(
+    self: Organisation,
+    request: OrgRequest,
+    form: CitizenLoginSettingsForm,
+    layout: SettingsLayout | None = None
+) -> RenderData | Response:
+
+    if not request.app.settings.org.citizen_login_enabled:
+        raise HTTPNotFound()
+
+    layout = layout or SettingsLayout(self, request, _('Citizen Login'))
+    return handle_generic_settings(
+        self, request, form, _('Citizen Login'), layout
     )

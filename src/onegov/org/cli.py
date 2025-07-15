@@ -62,6 +62,8 @@ from onegov.parliament.models import (
     MeetingItem,
     RISCommissionMembership,
     RISParliamentarian,
+    RISParliamentarianRole,
+    PoliticalBusiness,
 )
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -93,7 +95,8 @@ if TYPE_CHECKING:
     from translationstring import TranslationString
     from uuid import UUID
     from onegov.parliament.models.political_business import (
-        PoliticalBusinessStatus
+        PoliticalBusinessStatus,
+        PoliticalBusiness
     )
 
 cli = command_group()
@@ -2694,3 +2697,126 @@ def connect_political_business_meeting_items(
                 meeting_item.political_business_id = political_business.id
         transaction.commit()
     return connect_ids
+
+
+@cli.command(name='ris-shipping-to-private-address')
+def ris_shipping_to_private_address(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Sets the RIS shipping address to the private address
+
+    onegov-org --select /foo/bar ris-shipping-to-private-address
+
+    """
+
+    def set_private_address(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        parliamentarians = RISParliamentarianCollection(session)
+
+        for p in parliamentarians.query():
+
+            if not p.private_address and p.shipping_address:
+                p.private_address = p.shipping_address
+                p.shipping_address = None
+            if not p.private_address_addition and p.shipping_address_addition:
+                p.private_address_addition = p.shipping_address_addition
+                p.shipping_address_addition = None
+            if not p.private_address_zip_code and p.shipping_address_zip_code:
+                p.private_address_zip_code = p.shipping_address_zip_code
+                p.shipping_address_zip_code = None
+            if not p.private_address_city and p.shipping_address_city:
+                p.private_address_city = p.shipping_address_city
+                p.shipping_address_city = None
+
+        transaction.commit()
+
+    return set_private_address
+
+
+@cli.command(name='ris-set-end-date-for-inactive-parliamentarians')
+def ris_set_end_date_for_inactive_parliamentarians(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Sets the end date for inactive parliamentarians
+
+    onegov-org --select /foo/bar ris-set-end-date-for-inactive-parliamentarians
+
+    """
+
+    def set_end_date(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        parliamentarians = RISParliamentarianCollection(session)
+
+        for p in parliamentarians.query():
+            if p.active:
+                continue
+
+            p.roles.append(RISParliamentarianRole(
+                end=date(2024, 12, 31),
+                parliamentarian_id=p.id,
+                role='member'
+            ))
+
+        transaction.commit()
+
+    return set_end_date
+
+
+@cli.command(name='ris-resolve-parliamentarian-doublette')
+def ris_resolve_parliamentarian_doublette(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    ogc-2394
+    replace participants reference for business and delete
+    parliamentarian (id_1)
+    """
+
+    def resolve_doublette(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        parliamentarians = RISParliamentarianCollection(session)
+        businesses = PoliticalBusinessCollection(session)
+        id = 'c0293891-7694-4da8-b846-844c7d1c7378'
+        id_1 = 'dc83ffc4-2683-490f-ae30-1a0ab95fc0cc'
+        business_id = '61964b73-f92e-40b4-8157-23c5048ca0d6'
+        changed = False
+
+        parliamentarian = (
+            parliamentarians.query()
+            .filter(RISParliamentarian.id == id).first())
+
+        if not parliamentarian:
+            return
+
+        click.echo(f'parliamentarian: {parliamentarian.last_name} '
+                   f'{parliamentarian.first_name} {parliamentarian.active}')
+        parliamentarian_1 = (
+            parliamentarians.query()
+            .filter(RISParliamentarian.id == id_1).first())
+
+        if not parliamentarian_1:
+            return
+
+        click.echo(f'parliamentarian_1: {parliamentarian_1.last_name} '
+                   f'{parliamentarian_1.first_name} '
+                   f'{parliamentarian_1.active}')
+        business = businesses.query().filter(
+            PoliticalBusiness.id == business_id).first()
+
+        if not business:
+            click.echo(f'Business with id {business_id} not found')
+            return
+
+        if business.participants:
+            for participation in business.participants:  # type: ignore[attr-defined]
+                if str(participation.parliamentarian_id) == id_1:
+                    click.echo(f'replace {participation.parliamentarian_id} '
+                               f'with {parliamentarian.id}')
+                    participation.parliamentarian_id = id
+                    changed = True
+
+        transaction.commit()
+
+        if changed:
+            click.echo(f'delete {id_1}')
+            session.delete(parliamentarian_1)
+            transaction.commit()
+
+    return resolve_doublette
