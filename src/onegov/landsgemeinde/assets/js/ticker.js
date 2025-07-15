@@ -36,12 +36,21 @@ document.addEventListener("DOMContentLoaded", function() {
                     content.innerHTML = message.content;
                     agendaItem.replaceWith(content.firstChild);
                 }
+                if (message.state === 'draft') {
+                    agendaListItem.classList.remove('completed',
+                        'ongoing', 'scheduled');
+                    agendaListItem.classList.add('draft');
+                    agendaListItem.id = '';
+                }
                 if (message.state === 'scheduled') {
                     agendaListItem.classList.add('scheduled');
+                    agendaListItem.classList.remove('draft', 'ongoing',
+                        'completed');
                     agendaListItem.id = '';
                 }
                 if (message.state === 'ongoing') {
-                    agendaListItem.classList.remove('scheduled');
+                    agendaListItem.classList.remove('scheduled',
+                        'draft', 'completed');
                     if (currentAgendaListItem) {
                         currentAgendaListItem.id = '';
                     }
@@ -50,7 +59,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     scrollToCurrentItem();
                 }
                 if (message.state === 'completed') {
-                    agendaListItem.classList.remove('scheduled');
+                    agendaListItem.classList.remove('scheduled',
+                        'draft', 'ongoing');
                     agendaListItem.id = '';
                 }
             }

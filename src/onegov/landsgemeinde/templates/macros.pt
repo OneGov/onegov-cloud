@@ -26,20 +26,22 @@
     <div class="side-panel assembly-agenda-items" tal:condition="agenda_items" tal:define="agenda_item agenda_item|None">
         <h3 i18n:translate="">Agenda items</h3>
         <ul class="more-list agenda-item-list ${'with-current' if agenda_item else ''}">
-            <li tal:repeat="current_agenda_item agenda_items">
-                <a class="list-link" id="${'current' if current else ''}" tal:attributes="href request.link(current_agenda_item)" tal:define="current agenda_item == current_agenda_item">
-                    <div class="timeline">
-                        <div class="line"></div>
-                        <div class="circle">
-                            <span class="number">${current_agenda_item.number}</span>
+            <tal:b tal:repeat="current_agenda_item agenda_items">
+                <li tal:condition="current_agenda_item.state != 'draft' or request.is_logged_in">
+                    <a class="list-link" id="${'current' if current else ''}" tal:attributes="href request.link(current_agenda_item)" tal:define="current agenda_item == current_agenda_item">
+                        <div class="timeline">
+                            <div class="line"></div>
+                            <div class="circle">
+                                <span class="number">${current_agenda_item.number}</span>
+                            </div>
+                            <div class="line"></div>
                         </div>
-                        <div class="line"></div>
-                    </div>
-                    <div class="title">
-                        <tal:block metal:use-macro="layout.macros['agenda-item-title-in-list']" tal:define="agenda_item current_agenda_item"/>
-                    </div>
-                </a>
-            </li>
+                        <div class="title">
+                            <tal:block metal:use-macro="layout.macros['agenda-item-title-in-list']" tal:define="agenda_item current_agenda_item"/>
+                        </div>
+                    </a>
+                </li>
+            </tal:b>
         </ul>
     </div>
 </metal:agenda-item-list>
@@ -72,6 +74,7 @@
 
 <metal:state define-macro="state">
     <tal:block tal:switch="state">
+        <span class="label draft" tal:case="'draft'" i18n:translate="">${state}</span>
         <span class="label secondary" tal:case="'scheduled'" i18n:translate="">${state}</span>
         <span class="label warning" tal:case="'ongoing'" i18n:translate="">${state}</span>
         <span class="label success" tal:case="'completed'" i18n:translate="">${state}</span>
