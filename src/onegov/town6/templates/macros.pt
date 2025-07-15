@@ -247,7 +247,7 @@
         </a>
     </span>
     <span tal:condition="request.app.org.citizen_login_enabled and not request.authenticated_email">
-        <a href="${layout.citizen_login_from_path()}" i18n:translate>
+        <a href="${layout.citizen_login()}" i18n:translate>
             Citizen Login
         </a>
     </span>
@@ -1244,6 +1244,9 @@
     <div i18n:translate tal:condition="payment.state == 'cancelled'" class="payment-state payment-state-cancelled">
         Refunded
     </div>
+    <div i18n:translate tal:condition="payment.state == 'invoiced'" class="payment-state payment-state-invoiced">
+        Invoiced
+    </div>
 </metal:payment_status>
 
 <metal:payment_status define-macro="payment_source" i18n:domain="onegov.town6">
@@ -2158,8 +2161,14 @@
     <table class="payments-table" tal:condition="payments">
         <thead>
             <tr>
+                <th class="select-all-checkbox-cell">
+                    <input type="checkbox" aria-label="Select all payments" />
+                </th>
                 <th i18n:translate tal:condition="payment_links|nothing">
                     Object
+                </th>
+                <th i18n:translate tal:condition="reservation_dates_formatted|nothing">
+                    Reservation
                 </th>
                 <th i18n:translate>
                     Net Amount
@@ -2184,13 +2193,16 @@
         </thead>
         <tbody>
             <tr tal:repeat="payment payments">
+                <td class="payment-checkbox-cell">
+                    <input type="checkbox" name="selected_payments" value="${payment.id}" aria-label="Select this payment" />
+                </td>
                 <td tal:condition="payment_links|nothing">
-                    <tal:b repeat="link payment_links[payment.id]">
-                        <tal:b switch="link.__tablename__">
-                            <tal:b case="'submissions'">
-                                <tal:b define="ticket get_ticket(link)">
+                    <tal:b define="ticket tickets[payment.id] | nothing">
+                        <tal:b repeat="link payment_links[payment.id]">
+                            <tal:b switch="link.__tablename__">
+                                <tal:b case="'submissions'">
                                     <div>
-                                        <a href="${request.link(ticket)}">
+                                        <a tal:condition="ticket" href="${request.link(ticket)}">
                                             <strong>${ticket.number}</strong> - ${ticket.group}
                                         </a>
                                         <div>
@@ -2198,11 +2210,9 @@
                                         </div>
                                     </div>
                                 </tal:b>
-                            </tal:b>
-                            <tal:b case="'reservations'" condition="repeat.link.start">
-                                <tal:b define="ticket get_ticket(link)">
+                                <tal:b case="'reservations'" condition="repeat.link.start">
                                     <div>
-                                        <a href="${request.link(ticket)}">
+                                        <a tal:condition="ticket" href="${request.link(ticket)}">
                                             <strong>${ticket.number}</strong> - ${ticket.group}
                                         </a>
                                         <div>
@@ -2210,12 +2220,16 @@
                                         </div>
                                     </div>
                                 </tal:b>
-                            </tal:b>
-                            <tal:b case="default">
-                                <metal:b use-macro="layout.macros['payment_link_fallback']" />
+                                <tal:b case="default">
+                                    <metal:b use-macro="layout.macros['payment_link_fallback']" />
+                                </tal:b>
                             </tal:b>
                         </tal:b>
                     </tal:b>
+                </td>
+                <!-- Cell for Reservation Dates -->
+                <td tal:condition="reservation_dates_formatted|nothing">
+                    <span tal:replace="reservation_dates_formatted.get(payment.id, '')" />
                 </td>
                 <td>${'{0:.2f}'.format(payment.net_amount)} ${payment.currency}</td>
                 <td>
@@ -2291,9 +2305,9 @@
                 <span class="h5 list-title">${record.title}</span>
                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
         </a>
-        <a tal:attributes="href link_func(record); target link">
-            <p class="list-lead preview" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
+        <a tal:attributes="href link_func(record); target link" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
                 tal:content="lead" tal:condition="lead">
+            <p class="list-lead preview" >
             </p>
             <div class="list-hint hints" tal:define="hint hint(record)|False"
                 tal:content="hint" tal:condition="hint">

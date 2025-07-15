@@ -302,7 +302,7 @@
     .logo svg {
         display: block;
         height: 6em;
-        margin: 0 auto;
+        Margin: 0 auto;
         padding-bottom: 20px;
     }
     </style>

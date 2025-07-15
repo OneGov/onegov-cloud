@@ -91,7 +91,10 @@
             display: block;
             float: none;
             margin-bottom: 1rem;
+            max-width: 0;
+            overflow: visible;
             text-align: left;
+            white-space: nowrap;
 
             &:hover .fa {
                 color: $primary-color;

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-03 09:15+0200\n"
+"POT-Creation-Date: 2025-07-15 08:56+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -122,10 +122,10 @@ msgid "day"
 msgstr "Tag"
 
 msgid "Start"
-msgstr "Start"
+msgstr "Von"
 
 msgid "End"
-msgstr "Ende"
+msgstr "Bis"
 
 msgid "Add"
 msgstr "Hinzufügen"
@@ -289,14 +289,14 @@ msgstr "Chat-Archiv"
 msgid "Meetings"
 msgstr "Sitzungen"
 
+msgid "RIS Settings"
+msgstr "Ratsinformationssystem"
+
 msgid "Meeting"
 msgstr "Sitzung"
 
 msgid "Parliamentarians"
 msgstr "Parlamentarierinnen und Parlamentarier"
-
-msgid "RIS Settings"
-msgstr "Ratsinformationssystem"
 
 msgid "Parliamentarian"
 msgstr "Parlamentarier:in"
@@ -337,7 +337,7 @@ msgstr "Fraktion löschen"
 msgid "Parties"
 msgstr "Parteien"
 
-msgid "Party"
+msgid "Political Party"
 msgstr "Partei"
 
 msgid "Do you really want to delete this party?"
@@ -360,6 +360,15 @@ msgstr "Kommission löschen"
 
 msgid "Political Businesses"
 msgstr "Politische Geschäfte"
+
+msgid "Political Business"
+msgstr "Politisches Geschäft"
+
+msgid "Do you really want to delete this political business?"
+msgstr ""
+
+msgid "Delete political business"
+msgstr ""
 
 msgid "No availability periods defined."
 msgstr "Keine Verfügbarkeitszeiträume definiert."
@@ -859,6 +868,9 @@ msgstr "Fehlgeschlagen"
 msgid "Refunded"
 msgstr "Rückerstattet"
 
+msgid "Invoiced"
+msgstr "Fakturiert"
+
 msgid "Ticket"
 msgstr "Ticket"
 
@@ -1053,13 +1065,16 @@ msgid "Credit Card Fee"
 msgstr "Kreditkarten-Gebühr"
 
 msgid "Pay Offline later"
-msgstr "Später bezahlen"
+msgstr "Per Rechnung bezahlen"
 
 msgid "at ${time}"
 msgstr "um ${time}"
 
 msgid "Object"
 msgstr "Objekt"
+
+msgid "Reservation"
+msgstr "Reservation"
 
 msgid "Net Amount"
 msgstr "Netto Betrag"
@@ -1418,7 +1433,7 @@ msgid "Do you no longer wish to receive these notifications?"
 msgstr "Möchten Sie diese Benachrichtigungen nicht mehr erhalten?"
 
 msgid "The following reservations have been accepted:"
-msgstr "Die folgenden Reservationen wurden angenommen:"
+msgstr "Die folgenden Reservationen wurden bestätigt:"
 
 msgid ""
 "This is a notification for the new reservations for ${organisation}. If you "
@@ -1536,6 +1551,9 @@ msgstr ""
 msgid "Key Code"
 msgstr "Schlüsselcode"
 
+msgid "See all your reservations"
+msgstr "Alle Ihre Reservationen einsehen"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
 
@@ -1597,6 +1615,9 @@ msgstr "Ihre Anfrage wurde wieder eröffnet"
 
 msgid "You can see the current status of your ticket at any time here:"
 msgstr "Sie sehen den aktuellen Status Ihrer Anfrage jederzeit hier:"
+
+msgid "Date/Time"
+msgstr "Datum/Zeit"
 
 msgid "Agenda"
 msgstr "Traktanden"
@@ -1946,8 +1967,26 @@ msgstr "Aktiviert:"
 msgid "Fee:"
 msgstr "Gebühr:"
 
+msgid "Export Bill run as PDF"
+msgstr "Fakturierte Belege als PDF exportieren"
+
 msgid "No payments yet."
 msgstr "Noch keine Zahlungen."
+
+msgid "Batch Action"
+msgstr "Massenbearbeitung"
+
+msgid "Mark as Invoiced"
+msgstr "Als fakturiert markieren"
+
+msgid "Mark as Paid"
+msgstr "Als bezahlt markieren"
+
+msgid "Mark as Unpaid"
+msgstr "Als offen markieren"
+
+msgid "Apply to selected"
+msgstr "Auf Auswahl anwenden"
 
 msgid "Select organisation"
 msgstr "Organisation wählen"
@@ -1984,9 +2023,6 @@ msgstr "Es wurden noch keine politischen Geschäfte erfasst."
 
 msgid "Datum"
 msgstr "Datum"
-
-msgid "Political Business"
-msgstr "Politisches Geschäft"
 
 msgid "No publications"
 msgstr "Keine Publikationen"
@@ -2032,7 +2068,7 @@ msgid "Subscribed on"
 msgstr "Abonniert am"
 
 msgid "submitted"
-msgstr "angemeldet"
+msgstr "gemeldet"
 
 msgid "No dates found, please select dates in the calendar first"
 msgstr "Keine Termine gefunden, bitte wählen Sie erst Termine im Kalender aus"
@@ -2059,6 +2095,16 @@ msgstr ""
 "Kalender-Applikation das Abonnoment aktualisiert (sofern das überhaupt "
 "geschieht). Deshalb ist die Information in der Kalender-Applikation mit "
 "Vorsicht zu geniessen."
+
+msgid ""
+"If you want key codes to be included in the event's description then you may "
+"use the following link instead. Please note however that anyone you share "
+"this link with will have permanent access to this information."
+msgstr ""
+"Falls Sie die Schlüsselcodes in der Termin-Beschreibung sehen möchten, "
+"können Sie stattdessen den folgenden Link verwenden. Beachten Sie jedoch, "
+"dass jeder, der diesen Link kennt, einen permanenten Zugriff auf diese "
+"Information hat."
 
 msgid "Reservations must be made at least one day in advance."
 msgstr "Reservationen müsen mindestens ein Tag im Voraus gemacht werden."
@@ -2471,6 +2517,12 @@ msgstr "Partei hinzugefügt"
 msgid "New party"
 msgstr "Neue Partei"
 
+msgid "Added a new political business"
+msgstr ""
+
+msgid "New political business"
+msgstr ""
+
 msgid "New Recipient"
 msgstr "Neuer Empfänger"
 
@@ -2544,7 +2596,7 @@ msgid "Analytics"
 msgstr "Web-Statistik"
 
 msgid "Holidays"
-msgstr "Feiertage"
+msgstr "Feiertage / Schulferien"
 
 msgid "Tickets"
 msgstr "Tickets"

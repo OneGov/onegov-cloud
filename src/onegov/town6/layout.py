@@ -70,6 +70,7 @@ from onegov.org.layout import (
 from onegov.org.models import PageMove
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.page import PageCollection
+from onegov.org.collections.meeting import MeetingCollection
 from onegov.org.collections.party import RISPartyCollection
 from onegov.org.collections.political_business import (
     PoliticalBusinessCollection
@@ -1055,6 +1056,7 @@ class MeetingCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_settings_url),
             Link(self.title, self.request.link(self.model)),
         ]
 
@@ -1090,8 +1092,9 @@ class MeetingLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Meetings'), self.request.link(self.model)),
-            Link(self.model.title, self.request.link(self.model)),
+            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('Meetings'), self.request.class_link(MeetingCollection)),
+            Link(self.title, self.request.link(self.model)),
         ]
 
     @cached_property
@@ -1410,7 +1413,7 @@ class RISPartyCollectionLayout(DefaultLayout):
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_('Party'),
+                            text=_('Political Party'),
                             url=self.request.link(self.model, 'new'),
                             attrs={'class': 'new-party'},
                         ),

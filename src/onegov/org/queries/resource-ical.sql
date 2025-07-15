@@ -4,7 +4,7 @@ SELECT
     resource,                             -- UUID
     tickets.subtitle as title,            -- Text
     tickets.number as description,        -- Text
-    start,                                -- UTCDateTime
+    "start",                              -- UTCDateTime
     "end",                                -- UTCDateTime
     tickets.id as ticket_id,              -- UUID
     tickets.handler_code as handler_code  -- Text
@@ -19,4 +19,4 @@ WHERE
     "status" = 'approved'
     AND ("data"->'accepted')::boolean IS TRUE
 
-ORDER BY start
+ORDER BY "start"

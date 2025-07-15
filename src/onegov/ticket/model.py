@@ -22,6 +22,7 @@ from uuid import uuid4
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
+    from onegov.pay.models.payment import Payment
     from collections.abc import Sequence
     from datetime import datetime
     from onegov.core.request import CoreRequest
@@ -103,6 +104,19 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     #: tickets. This can be missing, once the ticket has been redacted.
     ticket_email: Column[str | None] = Column(Text, nullable=True, index=True)
 
+    #: an optional link to the payment record, if there is one
+    payment_id: Column[uuid.UUID | None] = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey('payments.id'),
+        nullable=True,
+        index=True
+    )
+
+    payment: relationship[Payment | None] = relationship(
+        'Payment',
+        back_populates='tickets'
+    )
+
     #: a snapshot of the ticket containing the last summary that made any sense
     #: use this before deleting the model behind a ticket, lest your ticket
     #: becomes nothing more than a number.
@@ -170,6 +184,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
     __table_args__ = (
         Index('ix_tickets_tags', _tags, postgresql_using='gin'),
+        Index('ix_ticket_payment_id', 'payment_id'),
     )
 
     # limit the search to the ticket number -> the rest can be found

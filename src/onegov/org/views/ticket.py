@@ -34,7 +34,7 @@ from onegov.org.layout import TicketsLayout
 from onegov.org.layout import TicketLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
-    TicketChatMessage, TicketMessage, TicketNote,
+    CitizenDashboard, TicketChatMessage, TicketMessage, TicketNote,
     ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter, ReservationHandler
@@ -1456,6 +1456,7 @@ def view_my_tickets(
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_('Homepage'), layout.homepage_url),
+        Link(_('Dashboard'), request.class_link(CitizenDashboard)),
         Link(_('Submitted Requests'), '#')
     ]
 

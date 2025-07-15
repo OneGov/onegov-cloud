@@ -325,7 +325,7 @@ rc.setupDatePicker = function(calendar, element) {
         }
     });
     var icon = $(
-        '<span class="fa fa-calendar fa-calendar-alt"></span>'
+        '<span class="fa fa-calendar fa-calendar-alt absolute"></span>'
     ).css('margin-left', '.5rem');
     input.unbind();
     title.append(icon);

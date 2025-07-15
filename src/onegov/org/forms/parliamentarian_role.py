@@ -55,7 +55,7 @@ class ParliamentarianRoleForm(Form):
     )
 
     party_id = ChosenSelectField(
-        label=_('Party'),
+        label=_('Political Party'),
     )
 
     party_role = TranslatedSelectField(

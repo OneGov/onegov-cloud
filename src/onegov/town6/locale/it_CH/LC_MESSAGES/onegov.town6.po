@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-07-03 09:15+0200\n"
+"POT-Creation-Date: 2025-07-15 08:56+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -127,7 +127,7 @@ msgid "Add"
 msgstr "Aggiungi"
 
 msgid "Remove"
-msgstr "Rimuovere"
+msgstr "Rimuovi"
 
 msgid "Mo"
 msgstr "Lu"
@@ -285,14 +285,14 @@ msgstr "Archivio chat"
 msgid "Meetings"
 msgstr "Riunioni"
 
+msgid "RIS Settings"
+msgstr "Impostazioni RIS"
+
 msgid "Meeting"
 msgstr "Riunione"
 
 msgid "Parliamentarians"
 msgstr "Parlamentari"
-
-msgid "RIS Settings"
-msgstr "Impostazioni RIS"
 
 msgid "Parliamentarian"
 msgstr "Parlamentare"
@@ -333,8 +333,8 @@ msgstr "Elimina gruppo parlamentare"
 msgid "Parties"
 msgstr "Partiti"
 
-msgid "Party"
-msgstr "Festa"
+msgid "Political Party"
+msgstr "Partito"
 
 msgid "Do you really want to delete this party?"
 msgstr "Vuoi davvero cancellare questo partito?"
@@ -356,6 +356,15 @@ msgstr "Elimina commissione"
 
 msgid "Political Businesses"
 msgstr "Affari politici"
+
+msgid "Political Business"
+msgstr "Affare politico"
+
+msgid "Do you really want to delete this political business?"
+msgstr ""
+
+msgid "Delete political business"
+msgstr ""
 
 msgid "No availability periods defined."
 msgstr "Nessun periodo di disponibilità definito."
@@ -698,7 +707,7 @@ msgid "Login"
 msgstr "Accedi"
 
 msgid "Citizen Login"
-msgstr "Accesso cittadino"
+msgstr "Accesso cliente"
 
 msgid "About"
 msgstr "Chi Siamo"
@@ -856,6 +865,9 @@ msgstr "Fallito"
 
 msgid "Refunded"
 msgstr "Rimborsato"
+
+msgid "Invoiced"
+msgstr "Fatturato"
 
 msgid "Ticket"
 msgstr "Biglietto"
@@ -1053,13 +1065,16 @@ msgid "Credit Card Fee"
 msgstr "Commissione sulla carta di credito"
 
 msgid "Pay Offline later"
-msgstr "Paga offline successivamente"
+msgstr "Pagare con fattura"
 
 msgid "at ${time}"
 msgstr "alle ${time}"
 
 msgid "Object"
 msgstr "Oggetto"
+
+msgid "Reservation"
+msgstr "Prenotazione"
 
 msgid "Net Amount"
 msgstr "Importo netto"
@@ -1224,7 +1239,7 @@ msgstr ""
 "disturberemo mai più."
 
 msgid "Below you can see your chat conversation:"
-msgstr "Di seguito potete vedere la vostra conversazione in chat:"
+msgstr "Qui di seguito potete vedere la vostra conversazione in chat:"
 
 msgid "Have a great day!"
 msgstr "Ti auguro una buona giornata!"
@@ -1279,7 +1294,7 @@ msgid ""
 "You are receiving this mail because you subscribed to getting notifications "
 "on new entries in the following directory:"
 msgstr ""
-"Ricevi questa mail perché sei iscritto a ricevere notifiche su nuovi "
+"Ricevi questa mail perché ti sei iscritto a ricevere notifiche su nuovi "
 "elementi nella seguente cartella:"
 
 msgid ""
@@ -1396,9 +1411,10 @@ msgid ""
 "title}. If you no longer want to receive this e-mail please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Dies ist die Benachrichtigung für Notiz zu Reservierungen für ${request.app."
-"org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, kontaktieren "
-"Sie bitte einen Administrator, damit dieser Sie aus der Liste entfernen kann."
+"Questa è la notifica per le note sulle prenotazioni per ${request.app.org."
+"title}. Se non si desidera più ricevere questo messaggio di posta "
+"elettronica si prega di contattare un amministratore in modo che possa "
+"rimuovervi dall'elenco dei destinatari lista"
 
 msgid "Pending approval"
 msgstr "In attesa di approvazione"
@@ -1524,6 +1540,9 @@ msgstr ""
 msgid "Key Code"
 msgstr "Codice chiave"
 
+msgid "See all your reservations"
+msgstr "Vedere tutte le prenotazioni"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
 
@@ -1588,6 +1607,9 @@ msgstr "La tua richiesta è stata riaperta"
 msgid "You can see the current status of your ticket at any time here:"
 msgstr ""
 "Qui potete vedere lo stato attuale del vostro biglietto in qualsiasi momento:"
+
+msgid "Date/Time"
+msgstr "Data/Ora"
 
 msgid "Agenda"
 msgstr "Agenda"
@@ -1938,8 +1960,26 @@ msgstr "Abilitato:"
 msgid "Fee:"
 msgstr "Imposta:"
 
+msgid "Export Bill run as PDF"
+msgstr "Esporta l'esecuzione della fattura come PDF"
+
 msgid "No payments yet."
 msgstr "Nessun pagamento ancora."
+
+msgid "Batch Action"
+msgstr "Azione di gruppo"
+
+msgid "Mark as Invoiced"
+msgstr "Contrassegna come fatturato"
+
+msgid "Mark as Paid"
+msgstr "Contrassegna come pagato"
+
+msgid "Mark as Unpaid"
+msgstr "Contrassegna come non pagato"
+
+msgid "Apply to selected"
+msgstr "Applica ai selezionati"
 
 msgid "Select organisation"
 msgstr "Selezionare l'organizzazione"
@@ -1976,9 +2016,6 @@ msgstr "Nessun affare politico ancora definito."
 
 msgid "Datum"
 msgstr "Data"
-
-msgid "Political Business"
-msgstr "Affare politico"
 
 msgid "No publications"
 msgstr "Nessuna pubblicazione"
@@ -2052,6 +2089,15 @@ msgstr ""
 "applicazioni di calendario aggiornano i calendari a cui sono iscritte (né "
 "sul fatto che si aggiornino). Pertanto, le informazioni mostrate nel "
 "calendario potrebbero essere errate o non aggiornate. Usale tuo rischio."
+
+msgid ""
+"If you want key codes to be included in the event's description then you may "
+"use the following link instead. Please note however that anyone you share "
+"this link with will have permanent access to this information."
+msgstr ""
+"Se volete che i codici chiave siano inclusi nella descrizione dell'evento, "
+"potete utilizzare il seguente link. Si noti tuttavia che chiunque condivida "
+"questo link avrà accesso permanente a queste informazioni."
 
 msgid "Reservations must be made at least one day in advance."
 msgstr ""
@@ -2471,6 +2517,12 @@ msgstr "Aggiunto un nuovo partito"
 msgid "New party"
 msgstr "Nuovo partito"
 
+msgid "Added a new political business"
+msgstr ""
+
+msgid "New political business"
+msgstr ""
+
 msgid "New Recipient"
 msgstr "Nuovo destinatario"
 
@@ -2544,7 +2596,7 @@ msgid "Analytics"
 msgstr "Analitica"
 
 msgid "Holidays"
-msgstr "Festività"
+msgstr "Festività / Vacanze scolastiche"
 
 msgid "Tickets"
 msgstr "Biglietti"

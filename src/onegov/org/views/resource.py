@@ -16,7 +16,6 @@ from morepath.request import Response
 from onegov.core.security import Public, Private, Personal
 from onegov.core.utils import module_path, Bunch
 from onegov.core.orm import as_selectable_from_path
-from onegov.core.orm.types import UUID as UUIDType
 from onegov.form import FormSubmission
 from onegov.org.cli import close_ticket
 from onegov.org.forms.resource import AllResourcesExportForm
@@ -26,6 +25,7 @@ from onegov.org.forms import (
     FindYourSpotForm, ResourceForm, ResourceCleanupForm, ResourceExportForm)
 from onegov.org.layout import (
     DefaultLayout, FindYourSpotLayout, ResourcesLayout, ResourceLayout)
+from onegov.org.models.dashboard import CitizenDashboard
 from onegov.org.models.resource import (
     DaypassResource, FindYourSpotCollection, RoomResource, ItemResource)
 from onegov.org.models.external_link import (
@@ -38,7 +38,7 @@ from onegov.pay import PaymentCollection
 from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
-from sqlalchemy import and_, select, cast as sa_cast
+from sqlalchemy import and_, select
 from sqlalchemy.orm import object_session, undefer
 from webob import exc
 
@@ -1209,27 +1209,30 @@ def view_my_reservations_json(
     if not (start and end):
         return ()
 
-    # get all reservations for the authenticated email
-    query = request.session.query(Reservation)
-    query = query.filter(Reservation.email == request.authenticated_email)
-    query = query.filter(Reservation.status == 'approved')
-    query = query.join(
-        Ticket, Reservation.token == sa_cast(Ticket.handler_id, UUIDType)
-    )
-    query = query.join(Resource, Reservation.resource == Resource.id)
+    path = module_path('onegov.org', 'queries/my-reservations.sql')
+    stmt = as_selectable_from_path(path)
 
-    if start:
-        query = query.filter(start <= Reservation.start)
-    if end:
-        query = query.filter(Reservation.end <= end)
-    query = query.options(undefer(Reservation.data))
+    records = request.session.execute(select(stmt.c).where(and_(
+        stmt.c.email == request.authenticated_email,
+        start <= stmt.c.start,
+        stmt.c.start <= end
+    )))
 
     return [
-        res.as_dict()
-        for res in utils.ReservationEventInfo.from_resources(
-            request,
-            query.with_entities(Resource, Reservation, Ticket)
-        )
+        utils.MyReservationEventInfo(
+            id=r.id,
+            token=r.token,
+            start=r.start,
+            end=r.end,
+            accepted=r.accepted,
+            timezone=r.timezone,
+            resource=r.resource,
+            ticket_id=r.ticket_id,
+            handler_code=r.handler_code,
+            ticket_number=r.ticket_number,
+            key_code=r.key_code,
+            request=request
+        ).as_dict() for r in records
     ]
 
 
@@ -1257,6 +1260,7 @@ def view_my_reservations(
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_('Homepage'), layout.homepage_url),
+        Link(_('Dashboard'), request.class_link(CitizenDashboard)),
         Link(_('My Reservations'), '#')
     ]
 
@@ -1313,15 +1317,32 @@ def view_my_reservations_subscribe(
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_('Homepage'), layout.homepage_url),
+        Link(_('Dashboard'), request.class_link(CitizenDashboard)),
         Link(_('My Reservations'), request.url.replace('-subscribe', '')),
         Link(_('Subscribe'), '#')
     ]
+
+    # generate a second url which includes key codes
+    if request.app.org.kaba_configurations:
+        salt = secrets.token_urlsafe(16)
+        url_obj = URL(request.link(self, 'my-reservations-ical'))
+        url_obj = url_obj.scheme('webcal')
+        token = request.new_url_safe_token(
+            [request.authenticated_email, True],
+            salt
+        )
+        url_obj = url_obj.query_param('token', token)
+        url_obj = url_obj.query_param('salt', salt)
+        key_code_url = url_obj.as_string()
+    else:
+        key_code_url = None
 
     return {
         'title': _('Subscribe'),
         'resource': self,
         'layout': layout,
-        'url': url
+        'url': url,
+        'key_code_url': key_code_url,
     }
 
 
@@ -1338,8 +1359,11 @@ def view_my_reservations_ical(
     token = request.GET.get('token')
     salt = request.GET.get('salt')
     email = request.load_url_safe_token(token, salt, None)
+    include_key_code = False
     if email is None:
         raise exc.HTTPForbidden()
+    elif isinstance(email, list):
+        email, include_key_code = email
 
     s = utcnow() - timedelta(days=30)
     e = utcnow() + timedelta(days=365)
@@ -1362,22 +1386,31 @@ def view_my_reservations_ical(
 
     # add allocations/reservations
     date = utcnow()
-    path = module_path('onegov.org', 'queries/reservations-ical.sql')
+    path = module_path('onegov.org', 'queries/my-reservations.sql')
     stmt = as_selectable_from_path(path)
 
     records = request.session.execute(select(stmt.c).where(and_(
-        stmt.c.email == email, s <= stmt.c.start, stmt.c.start <= e
+        stmt.c.email == email,
+        s <= stmt.c.start, stmt.c.start <= e,
+        # only include accepted reservations in ICS file
+        stmt.c.accepted.is_(True)
     )))
+
+    key_code_label = request.translate(_('Key Code'))
 
     for r in records:
         start = r.start
         end = r.end + timedelta(microseconds=1)
 
+        description = r.ticket_number
+        if include_key_code and r.key_code:
+            description = f'{description}\n{key_code_label}: {r.key_code}'
+
         evt = icalendar.Event()
         evt.add('uid', f'{r.token}-{r.id}')
         evt.add('summary', r.resource)
         evt.add('location', r.resource)
-        evt.add('description', r.description)
+        evt.add('description', description)
         evt.add('dtstart', standardize_date(start, 'UTC'))
         evt.add('dtend', standardize_date(end, 'UTC'))
         evt.add('dtstamp', date)
@@ -1388,10 +1421,12 @@ def view_my_reservations_ical(
 
         cal.add_component(evt)
 
+    suffix = '-with-key-codes' if include_key_code else ''
+    filename = f'inline; filename=my-reservations-{email}{suffix}.ics'
     return Response(
         cal.to_ical(),
         content_type='text/calendar',
-        content_disposition=f'inline; filename=my-reservations-{email}.ics'
+        content_disposition=filename,
     )
 
 

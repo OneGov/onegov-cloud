@@ -703,7 +703,7 @@ def handle_authenticate_mtan(
 
     if form.submitted(request):
         assert form.tan.data is not None
-        redirect_to = self.authenticate(request, form.tan.data)
+        redirect_to = self.authenticate(request, form.tan.data.strip())
         if redirect_to is not None:
             request.success(_('Successfully authenticated via mTAN.'))
             return morepath.redirect(request.transform(redirect_to))
@@ -810,11 +810,12 @@ def handle_confirm_citizen_login(
     if form.submitted(request):
         assert form.token.data is not None
         collection = TANCollection(request.session, scope='citizen-login')
-        tan_obj = collection.by_tan(form.token.data)
+        tan_obj = collection.by_tan(form.token.data.strip())
         if tan_obj is None or 'email' not in tan_obj.meta:
             client = request.client_addr or 'unknown'
             log.info(f'Failed login by {client} (Citizen Login)')
             request.alert(_('Invalid or expired login token provided.'))
+            return morepath.redirect(request.link(self, 'citizen-login'))
         else:
             request.browser_session['authenticated_email'] = (
                 tan_obj.meta['email'])

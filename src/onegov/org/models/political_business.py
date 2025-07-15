@@ -85,19 +85,20 @@ POLITICAL_BUSINESS_TYPE: dict[PoliticalBusinessType, str] = {
     'elections': _('Elections'),
 }
 
+# FIXME: i18n
 POLITICAL_BUSINESS_STATUS: dict[PoliticalBusinessStatus, str] = {
-    'abgeschrieben': _('Abgeschrieben'),
-    'beantwortet': _('Beantwortet'),
-    'erheblich_erklaert': _('Erheblich erklärt'),
-    'erledigt': _('Erledigt'),
-    'nicht_erheblich_erklaert': _('Nicht erheblich erklärt'),
-    'nicht_zustandegekommen': _('Nicht zustandegekommen'),
-    'pendent_exekutive': _('Pendent Exekutive'),
-    'pendent_legislative': _('Pendent Legislative'),
-    'rueckzug': _('Rückzug'),
-    'umgewandelt': _('Umgewandelt'),
-    'zurueckgewiesen': _('Zurückgewiesen'),
-    'ueberwiesen': _('Überwiesen'),
+    'abgeschrieben': 'Abgeschrieben',
+    'beantwortet': 'Beantwortet',
+    'erheblich_erklaert': 'Erheblich erklärt',
+    'erledigt': 'Erledigt',
+    'nicht_erheblich_erklaert': 'Nicht erheblich erklärt',
+    'nicht_zustandegekommen': 'Nicht zustandegekommen',
+    'pendent_exekutive': 'Pendent Exekutive',
+    'pendent_legislative': 'Pendent Legislative',
+    'rueckzug': 'Rückzug',
+    'umgewandelt': 'Umgewandelt',
+    'zurueckgewiesen': 'Zurückgewiesen',
+    'ueberwiesen': 'Überwiesen',
 }
 
 
