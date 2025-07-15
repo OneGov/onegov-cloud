@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-15 09:49+0200\n"
+"POT-Creation-Date: 2025-07-15 14:08+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1493,10 +1493,10 @@ msgid "Number"
 msgstr "Numéro"
 
 msgid "Business Status"
-msgstr ""
+msgstr "Statut"
 
 msgid "Entry Date"
-msgstr ""
+msgstr "Date"
 
 msgid "Tag"
 msgstr "Étiquette"
@@ -3469,13 +3469,13 @@ msgid "Photo album"
 msgstr "Album photo"
 
 msgid "First signatory"
-msgstr ""
+msgstr "Premier signataire"
 
 msgid "Co-signatory"
-msgstr ""
+msgstr "Co-signataire"
 
 msgid "Participations"
-msgstr ""
+msgstr "Auteur / Participants"
 
 msgid "In future"
 msgstr "Dans le futur"
@@ -3511,82 +3511,82 @@ msgid "female"
 msgstr "femelle"
 
 msgid "A mail"
-msgstr ""
+msgstr "Courrier A"
 
 msgid "A mail plus"
-msgstr ""
+msgstr "Courrier A Plus"
 
 msgid "registered"
-msgstr ""
+msgstr "Recommandé"
 
 msgid "confidential"
-msgstr ""
+msgstr "confidentiel"
 
 msgid "personal / confidential"
-msgstr ""
+msgstr "personnel / confidentiel"
 
 msgid "none"
-msgstr ""
+msgstr "aucun"
 
 msgid "Vote counter"
-msgstr ""
+msgstr "Scrutateur"
 
 msgid "Vice president"
-msgstr ""
+msgstr "Vice-président"
 
 msgid "Media Manager"
-msgstr ""
+msgstr "Directeur des médias et des campagnes"
 
 msgid "President of the parliamentary group"
-msgstr ""
+msgstr "Président du groupe parlementaire"
 
 msgid "Inquiry"
-msgstr ""
+msgstr "Demande"
 
 msgid "Proposal"
-msgstr "Objet de la votation"
+msgstr "Proposition"
 
 msgid "Mandate"
-msgstr ""
+msgstr "Mandat"
 
 msgid "Report"
-msgstr ""
+msgstr "Rapport"
 
 msgid "Report and Proposal"
-msgstr ""
+msgstr "Rapport et proposition"
 
 msgid "Decision"
-msgstr ""
+msgstr "Décision"
 
 msgid "Urgent Interpellation"
-msgstr ""
+msgstr "Interpellation urgente"
 
 msgid "Invitation"
-msgstr ""
+msgstr "Invitation"
 
 msgid "Interpellation"
-msgstr ""
+msgstr "Interpellation"
 
 msgid "Commission Report"
-msgstr ""
+msgstr "Rapport de commission"
 
 msgid "Communication"
-msgstr ""
+msgstr "Communication"
 
 msgid "Motion"
-msgstr ""
+msgstr "Motion"
 
 msgid "Postulate"
-msgstr ""
+msgstr "Postulat"
 
 msgid "Resolution"
-msgstr ""
+msgstr "Résolution"
 
 msgid "Regulation"
-msgstr ""
+msgstr "Règlement"
 
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Divers"
 
 msgid "Elections"
 msgstr "Elections"

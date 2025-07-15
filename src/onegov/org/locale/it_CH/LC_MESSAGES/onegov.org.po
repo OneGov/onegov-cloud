@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-15 09:49+0200\n"
+"POT-Creation-Date: 2025-07-15 14:08+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3470,13 +3470,13 @@ msgid "Photo album"
 msgstr "Album fotografico"
 
 msgid "First signatory"
-msgstr ""
+msgstr "Primo firmatario"
 
 msgid "Co-signatory"
-msgstr ""
+msgstr "Cofirmatario"
 
 msgid "Participations"
-msgstr ""
+msgstr "Partecipanti"
 
 msgid "In future"
 msgstr "in futuro"
@@ -3512,82 +3512,82 @@ msgid "female"
 msgstr "femminile"
 
 msgid "A mail"
-msgstr ""
+msgstr "Posta A"
 
 msgid "A mail plus"
-msgstr ""
+msgstr "Posta A plus"
 
 msgid "registered"
-msgstr ""
+msgstr "raccomandata"
 
 msgid "confidential"
-msgstr ""
+msgstr "riservata"
 
 msgid "personal / confidential"
-msgstr ""
+msgstr "personale / riservata"
 
 msgid "none"
-msgstr ""
+msgstr "nessuno"
 
 msgid "Vote counter"
-msgstr ""
+msgstr "Contatore di voti"
 
 msgid "Vice president"
-msgstr ""
+msgstr "Vice presidente"
 
 msgid "Media Manager"
-msgstr ""
+msgstr "Responsabile Media e Campagne"
 
 msgid "President of the parliamentary group"
-msgstr ""
+msgstr "Capogruppo parlamentare"
 
 msgid "Inquiry"
-msgstr ""
+msgstr "Richiesta"
 
 msgid "Proposal"
 msgstr "Oggetto della votazione"
 
 msgid "Mandate"
-msgstr ""
+msgstr "Mandato"
 
 msgid "Report"
-msgstr ""
+msgstr "Rapporto"
 
 msgid "Report and Proposal"
-msgstr ""
+msgstr "Rapporto e proposta"
 
 msgid "Decision"
-msgstr ""
+msgstr "Decisione"
 
 msgid "Urgent Interpellation"
-msgstr ""
+msgstr "Interpellanza urgente"
 
 msgid "Invitation"
-msgstr ""
+msgstr "Invito"
 
 msgid "Interpellation"
-msgstr ""
+msgstr "Interpellanza"
 
 msgid "Commission Report"
-msgstr ""
+msgstr "Rapporto della commissione"
 
 msgid "Communication"
-msgstr ""
+msgstr "Comunicazione"
 
 msgid "Motion"
-msgstr ""
+msgstr "Mozione"
 
 msgid "Postulate"
-msgstr ""
+msgstr "Postulato"
 
 msgid "Resolution"
-msgstr ""
+msgstr "Risoluzione"
 
 msgid "Regulation"
-msgstr ""
+msgstr "Regolamento"
 
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Varie"
 
 msgid "Elections"
 msgstr "Elezioni"

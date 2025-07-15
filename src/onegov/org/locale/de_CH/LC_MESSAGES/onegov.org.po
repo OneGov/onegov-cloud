@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-15 09:49+0200\n"
+"POT-Creation-Date: 2025-07-15 14:08+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1494,10 +1494,10 @@ msgid "Number"
 msgstr "Nummer"
 
 msgid "Business Status"
-msgstr ""
+msgstr "Status"
 
 msgid "Entry Date"
-msgstr ""
+msgstr "Datum"
 
 msgid "Tag"
 msgstr "Schlagwort"
@@ -3243,43 +3243,43 @@ msgid "Sort"
 msgstr "Sortieren"
 
 msgid "Plenary session"
-msgstr ""
+msgstr "Pleanarsitzung"
 
 msgid "Commission meeting"
-msgstr ""
+msgstr "Kommissionssitzung"
 
 msgid "File study"
-msgstr ""
+msgstr "Aktenstudium"
 
 msgid "Shortest meeting"
-msgstr ""
+msgstr "Kürzestsitzung"
 
 msgid "Attendence added"
-msgstr ""
+msgstr "Anwesenheit hinzugefügt"
 
 msgid "Attendence modified"
-msgstr ""
+msgstr "Anwesenheit geändert"
 
 msgid "Attendence removed"
-msgstr ""
+msgstr "Anwesenheit entfernt"
 
 msgid "normal"
-msgstr ""
+msgstr "normal"
 
 msgid "intercantonal"
-msgstr ""
+msgstr "interkantonal"
 
 msgid "official mission"
-msgstr ""
+msgstr "amtliche Mission"
 
 msgid "Guest"
-msgstr ""
+msgstr "Gast"
 
 msgid "Extended Member"
-msgstr ""
+msgstr "erweitertes Mitglied"
 
 msgid "President"
-msgstr ""
+msgstr "Präsident"
 
 msgid "The submission was adopted"
 msgstr "Der Eintrag wurde übernommen"
@@ -3508,31 +3508,31 @@ msgid "A mail"
 msgstr ""
 
 msgid "A mail plus"
-msgstr ""
+msgstr "A-Post Plus"
 
 msgid "registered"
-msgstr ""
+msgstr "eingeschrieben"
 
 msgid "confidential"
-msgstr ""
+msgstr "vertraulich"
 
 msgid "personal / confidential"
-msgstr ""
+msgstr "persönlich / vertraulich"
 
 msgid "none"
-msgstr ""
+msgstr "keine"
 
 msgid "Vote counter"
-msgstr ""
+msgstr "Stimmzähler"
 
 msgid "Vice president"
-msgstr ""
+msgstr "Vizepräsident"
 
 msgid "Media Manager"
-msgstr ""
+msgstr "Leiter Medien und Kampagnen"
 
 msgid "President of the parliamentary group"
-msgstr ""
+msgstr "Fraktionschef"
 
 msgid "Inquiry"
 msgstr "Anfrage"

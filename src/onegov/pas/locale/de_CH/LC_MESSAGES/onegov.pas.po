@@ -490,7 +490,7 @@ msgid "Media Manager"
 msgstr "Leiter Medien und Kampagnen"
 
 msgid "President of the parliamentary group"
-msgstr "Fraktionsschef"
+msgstr "Fraktionschef"
 
 msgid "Duration"
 msgstr "Dauer"
