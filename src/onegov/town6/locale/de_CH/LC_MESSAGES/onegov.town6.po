@@ -365,10 +365,10 @@ msgid "Political Business"
 msgstr "Politisches Geschäft"
 
 msgid "Do you really want to delete this political business?"
-msgstr ""
+msgstr "Möchten Sie das politische Geschäft wirklich löschen?"
 
 msgid "Delete political business"
-msgstr ""
+msgstr "Politisches Geschäft löschen"
 
 msgid "No availability periods defined."
 msgstr "Keine Verfügbarkeitszeiträume definiert."
@@ -2518,10 +2518,10 @@ msgid "New party"
 msgstr "Neue Partei"
 
 msgid "Added a new political business"
-msgstr ""
+msgstr "Politisches Geschäft hinzugefügt"
 
 msgid "New political business"
-msgstr ""
+msgstr "Neues politisches Geschäft"
 
 msgid "New Recipient"
 msgstr "Neuer Empfänger"

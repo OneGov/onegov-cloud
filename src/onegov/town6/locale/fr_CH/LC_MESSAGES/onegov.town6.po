@@ -2523,10 +2523,10 @@ msgid "New party"
 msgstr "Nouveau parti"
 
 msgid "Added a new political business"
-msgstr ""
+msgstr "Ajout d' un nouveau business politique"
 
 msgid "New political business"
-msgstr ""
+msgstr "Nouveau business politique"
 
 msgid "New Recipient"
 msgstr "Nouveau destinataire"

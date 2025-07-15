@@ -355,16 +355,16 @@ msgid "Delete commission"
 msgstr "Elimina commissione"
 
 msgid "Political Businesses"
-msgstr "Affari politici"
+msgstr "Attività politico"
 
 msgid "Political Business"
-msgstr "Affare politico"
+msgstr "Attività politico"
 
 msgid "Do you really want to delete this political business?"
-msgstr ""
+msgstr "Vuoi davvero cancellare questo attività politico?"
 
 msgid "Delete political business"
-msgstr ""
+msgstr "Elimina affare politico"
 
 msgid "No availability periods defined."
 msgstr "Nessun periodo di disponibilità definito."
@@ -2518,10 +2518,10 @@ msgid "New party"
 msgstr "Nuovo partito"
 
 msgid "Added a new political business"
-msgstr ""
+msgstr "Aggiunta di una nuova attività politica"
 
 msgid "New political business"
-msgstr ""
+msgstr "Nuova attività politica"
 
 msgid "New Recipient"
 msgstr "Nuovo destinatario"
