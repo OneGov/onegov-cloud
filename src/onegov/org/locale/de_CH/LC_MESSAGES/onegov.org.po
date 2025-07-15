@@ -2466,7 +2466,7 @@ msgid "Read only"
 msgstr "Nur Lesezugriff"
 
 msgid "Submit your event"
-msgstr "Veranstaltung vorschlagen"
+msgstr "Veranstaltung erfassen"
 
 msgid "Enables website visitors to submit their own events"
 msgstr ""
@@ -6097,7 +6097,7 @@ msgid "Your event was accepted"
 msgstr "Ihre Veranstaltung wurde angenommen"
 
 msgid "Submit an event"
-msgstr "Veranstaltung vorschlagen"
+msgstr "Veranstaltung erfassen"
 
 msgid ""
 "Only events taking place inside the town or events related to town societies "

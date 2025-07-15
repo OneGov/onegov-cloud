@@ -1857,7 +1857,7 @@ msgid "Export these events"
 msgstr "Diese Termine exportieren"
 
 msgid "Submit your event"
-msgstr "Veranstaltung vorschlagen"
+msgstr "Veranstaltung erfassen"
 
 msgid "Personnel number"
 msgstr "Personalnummer"
