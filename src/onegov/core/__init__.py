@@ -38,7 +38,7 @@ LEVELS = (
         'onegov.newsletter',
         'onegov.notice',
         'onegov.page',
-        'onegov.org',
+        'onegov.parliament',
         'onegov.pay',
         'onegov.pdf',
         'onegov.people',
