@@ -151,7 +151,7 @@
                 <dt i18n:translate>Political Businesses</dt>
                 <dd>
                     <ul class="more-list">
-                        <li tal:repeat="participation parliamentarian.political_businesses">
+                        <li tal:repeat="participation sorted(parliamentarian.political_businesses, key=lambda p: p.political_business.entry_date or layout.now(), reverse=True)">
                             <a tal:attributes="href request.link(participation.political_business)" class="list-link">
                                 <span class="list-title">
                                     ${participation.political_business.number|None} ${participation.political_business.title}
