@@ -87,7 +87,7 @@ class ParliamentarianRoleForm(Form):
             {'parliamentary_group_id', *(exclude or ())},
             include
         )
-        obj.parliamentary_group_id = obj.parliamentary_group_id or None
+        obj.parliamentary_group_id = self.parliamentary_group_id.data or None
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()

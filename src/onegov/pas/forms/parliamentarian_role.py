@@ -39,7 +39,7 @@ class PASParliamentarianRoleForm(ParliamentarianRoleForm):
             {'party_id', *(exclude or ())},
             include
         )
-        obj.party_id = obj.party_id or None
+        obj.party_id = self.party_id.data or None
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()
