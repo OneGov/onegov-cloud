@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from onegov.parliament.models import ParliamentaryGroup
+from onegov.search import ORMSearchable
 
 
-class PASParliamentaryGroup(ParliamentaryGroup):
+class PASParliamentaryGroup(ParliamentaryGroup, ORMSearchable):
 
     __mapper_args__ = {
         'polymorphic_identity': 'pas_parliamentary_group',
