@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-15 17:05+0200\n"
+"POT-Creation-Date: 2025-07-16 11:39+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1939,12 +1939,6 @@ msgstr "Noch keine Parlamentarier erfasst."
 
 msgid "No parliamentary groups defined yet."
 msgstr "Noch keine Fraktionen erfasst."
-
-msgid "No parties defined yet."
-msgstr "Noch keine Parteien erfasst."
-
-msgid "Portrait"
-msgstr "Portrait"
 
 msgid "No payment providers defined."
 msgstr "Keine Zahlungsanbieter definiert."

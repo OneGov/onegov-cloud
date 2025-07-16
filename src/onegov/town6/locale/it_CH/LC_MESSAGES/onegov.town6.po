@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-07-15 17:05+0200\n"
+"POT-Creation-Date: 2025-07-16 11:39+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1932,12 +1932,6 @@ msgstr "Nessun parlamentare ancora definito."
 
 msgid "No parliamentary groups defined yet."
 msgstr "Nessun gruppo parlamentare ancora definito."
-
-msgid "No parties defined yet."
-msgstr "Nessun partito ancora definito."
-
-msgid "Portrait"
-msgstr "Ritratto"
 
 msgid "No payment providers defined."
 msgstr "Nessun fornitore di servizi di pagamento definito."

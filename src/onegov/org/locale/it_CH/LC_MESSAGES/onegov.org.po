@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-15 17:05+0200\n"
+"POT-Creation-Date: 2025-07-16 11:38+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1474,7 +1474,7 @@ msgid "Public extra information about this person"
 msgstr "Informazioni pubbliche aggiuntive su questa persona"
 
 msgid "Select additional participant"
-msgstr ""
+msgstr "Selezionare un altro partecipante"
 
 msgid "No results match"
 msgstr "Nessun risultato corrisponde"
@@ -1489,10 +1489,10 @@ msgid "Number"
 msgstr "Numero"
 
 msgid "Business Status"
-msgstr ""
+msgstr "Stato"
 
 msgid "Entry Date"
-msgstr ""
+msgstr "Data"
 
 msgid "Participations"
 msgstr "Partecipanti"

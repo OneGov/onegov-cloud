@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-15 17:05+0200\n"
+"POT-Creation-Date: 2025-07-16 11:38+0200\n"
 "PO-Revision-Date: 2025-07-15 16:51+0200\n"
 "Last-Translator: David Salvisberg <david@seantis-dave>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -18,25 +18,25 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "normal"
-msgstr ""
+msgstr "normal"
 
 msgid "intercantonal"
-msgstr ""
+msgstr "intercantonal"
 
 msgid "official mission"
-msgstr ""
+msgstr "mission officielle"
 
 msgid "Guest"
-msgstr ""
+msgstr "Invité"
 
 msgid "Member"
 msgstr "Membres"
 
 msgid "Extended Member"
-msgstr ""
+msgstr "Membre élargi"
 
 msgid "President"
-msgstr ""
+msgstr "Président"
 
 msgid "male"
 msgstr "homme"
@@ -72,4 +72,4 @@ msgid "Media Manager"
 msgstr "Directeur des médias et des campagnes"
 
 msgid "President of the parliamentary group"
-msgstr ""
+msgstr "Président du groupe parlementaire"
