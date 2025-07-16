@@ -4,10 +4,10 @@ import morepath
 
 from onegov.core.security.permissions import Public
 
-from onegov.parliament.collections import MeetingCollection
-from onegov.parliament.models import Meeting
-from onegov.parliament.models.meeting_item import MeetingItem
-from onegov.parliament.models.political_business import PoliticalBusiness
+from onegov.org.models import Meeting
+from onegov.org.models import MeetingCollection
+from onegov.org.models import MeetingItem
+from onegov.org.models import PoliticalBusiness
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import MeetingCollectionLayout

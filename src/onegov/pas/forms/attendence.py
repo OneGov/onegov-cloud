@@ -9,7 +9,7 @@ from onegov.pas import _
 from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.models import SettlementRun
-from onegov.parliament.models.attendence import TYPES
+from onegov.pas.models.attendence import TYPES
 from wtforms.fields import DateField
 from wtforms.fields import FloatField
 from wtforms.fields import RadioField
@@ -19,7 +19,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
     from onegov.core.request import CoreRequest
-    from onegov.pas.models import PASAttendence
+    from onegov.pas.models import Attendence
     from typing import Any
 
 
@@ -102,13 +102,13 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
 
         return True
 
-    def process_obj(self, obj: PASAttendence) -> None:  # type:ignore
+    def process_obj(self, obj: Attendence) -> None:  # type:ignore
         super().process_obj(obj)
         self.duration.data = obj.duration / 60
 
     def populate_obj(  # type: ignore[override]
         self,
-        obj: PASAttendence,  # type: ignore[override]
+        obj: Attendence,  # type: ignore[override]
         exclude: Collection[str] | None = None,
         include: Collection[str] | None = None
     ) -> None:

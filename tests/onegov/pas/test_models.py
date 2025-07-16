@@ -2,15 +2,15 @@ from freezegun import freeze_time
 from datetime import date
 from onegov.core.utils import Bunch
 from onegov.pas.models import (
-    PASAttendence,
-    PASChange,
+    Attendence,
+    Change,
+    LegislativePeriod,
     PASCommission,
     PASCommissionMembership,
     PASParliamentarian,
     PASParliamentarianRole,
     PASParliamentaryGroup,
-    PASParty,
-    PASLegislativePeriod,
+    Party,
     RateSet,
     SettlementRun
 )
@@ -19,7 +19,7 @@ from onegov.pas.models import (
 @freeze_time('2022-06-06')
 def test_models(session):
     rate_set = RateSet(year=2022)
-    legislative_period = PASLegislativePeriod(
+    legislative_period = LegislativePeriod(
         name='2022-2024',
         start=date(2022, 1, 1),
         end=date(2022, 12, 31)
@@ -31,7 +31,7 @@ def test_models(session):
         active=True
     )
     parliamentary_group = PASParliamentaryGroup(name='Group')
-    party = PASParty(name='Party')
+    party = Party(name='Party')
     commission = PASCommission(
         name='Official Commission',
         type='official'
@@ -64,7 +64,7 @@ def test_models(session):
         commission_id=commission.id,
         parliamentarian_id=parliamentarian.id
     )
-    attendence = PASAttendence(
+    attendence = Attendence(
         date=date(2022, 1, 1),
         duration=30,
         type='commission',
@@ -76,7 +76,7 @@ def test_models(session):
     session.add(attendence)
     session.flush()
 
-    change = PASChange.add(
+    change = Change.add(
         request=Bunch(
             current_username='user@example.org',
             current_user=Bunch(title='User'),

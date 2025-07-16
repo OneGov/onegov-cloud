@@ -109,13 +109,6 @@
                                 <span tal:condition="not request.is_manager">
                                     ${role.role_label} <tal:block i18n:translate>Parliament</tal:block>
                                 </span>
-
-                                <span tal:condition="role.party">
-                                    /
-                                    ${role.party_role_label}
-                                    <tal:block i18n:translate>Political Party</tal:block>
-                                    <a href="${request.link(role.party)}">${role.party.title}</a>
-                                </span>
                                 <span tal:condition="role.parliamentary_group">
                                     /
                                     ${role.parliamentary_group_role_label}

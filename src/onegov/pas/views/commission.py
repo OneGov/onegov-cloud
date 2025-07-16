@@ -17,7 +17,7 @@ from onegov.pas.forms import CommissionMembershipAddForm
 from onegov.pas.forms import CommissionForm
 from onegov.pas.layouts import PASCommissionCollectionLayout
 from onegov.pas.layouts import PASCommissionLayout
-from onegov.pas.models import PASChange
+from onegov.pas.models import Change
 from onegov.pas.models import PASCommission
 from onegov.pas.models import PASCommissionMembership
 
@@ -158,7 +158,7 @@ def pas_add_plenary_attendence(
                 parliamentarian_id=parliamentarian_id,
                 **data
             )
-            PASChange.add(request, 'add', attendence)
+            Change.add(request, 'add', attendence)
         request.success(_('Added commission meeting'))
 
         return request.redirect(request.link(self))

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-10 13:50+0200\n"
+"POT-Creation-Date: 2025-07-16 13:06+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -301,8 +301,8 @@ msgstr "Parlamentarierinnen und Parlamentarier"
 msgid "Parliamentarian"
 msgstr "Parlamentarier:in"
 
-msgid "Role (as a party or group member)"
-msgstr "Rolle (als Partei- oder Fraktionsmitglied)"
+msgid "Role (as a group member)"
+msgstr "Rolle (als Fraktionsmitglied)"
 
 msgid "Edit"
 msgstr "Bearbeiten"
@@ -340,12 +340,6 @@ msgstr "Parteien"
 msgid "Political Party"
 msgstr "Partei"
 
-msgid "Do you really want to delete this party?"
-msgstr "Möchten Sie diese Partei wirklich löschen?"
-
-msgid "Delete party"
-msgstr "Partei löschen"
-
 msgid "Commissions"
 msgstr "Kommissionen"
 
@@ -360,6 +354,15 @@ msgstr "Kommission löschen"
 
 msgid "Political Businesses"
 msgstr "Politische Geschäfte"
+
+msgid "Political Business"
+msgstr "Politisches Geschäft"
+
+msgid "Do you really want to delete this political business?"
+msgstr "Möchten Sie das politische Geschäft wirklich löschen?"
+
+msgid "Delete political business"
+msgstr "Politisches Geschäft löschen"
 
 msgid "No availability periods defined."
 msgstr "Keine Verfügbarkeitszeiträume definiert."
@@ -1937,12 +1940,6 @@ msgstr "Noch keine Parlamentarier erfasst."
 msgid "No parliamentary groups defined yet."
 msgstr "Noch keine Fraktionen erfasst."
 
-msgid "No parties defined yet."
-msgstr "Noch keine Parteien erfasst."
-
-msgid "Portrait"
-msgstr "Portrait"
-
 msgid "No payment providers defined."
 msgstr "Keine Zahlungsanbieter definiert."
 
@@ -2014,9 +2011,6 @@ msgstr "Es wurden noch keine politischen Geschäfte erfasst."
 
 msgid "Datum"
 msgstr "Datum"
-
-msgid "Political Business"
-msgstr "Politisches Geschäft"
 
 msgid "No publications"
 msgstr "Keine Publikationen"
@@ -2505,11 +2499,11 @@ msgstr "Fraktion hinzugefügt"
 msgid "New parliamentary group"
 msgstr "Neue Fraktion"
 
-msgid "Added a new party"
-msgstr "Partei hinzugefügt"
+msgid "Added a new political business"
+msgstr "Politisches Geschäft hinzugefügt"
 
-msgid "New party"
-msgstr "Neue Partei"
+msgid "New political business"
+msgstr "Neues politisches Geschäft"
 
 msgid "New Recipient"
 msgstr "Neuer Empfänger"
@@ -2619,6 +2613,72 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid "Inquiry"
+#~ msgstr "Anfrage"
+
+#~ msgid "Proposal"
+#~ msgstr "Vorschlag"
+
+#~ msgid "Mandate"
+#~ msgstr "Mandat"
+
+#~ msgid "Report"
+#~ msgstr "Bericht"
+
+#~ msgid "Report and Proposal"
+#~ msgstr "Bericht und Vorschlag"
+
+#~ msgid "Decision"
+#~ msgstr "Entscheid"
+
+#~ msgid "Message"
+#~ msgstr "Botschaft"
+
+#~ msgid "Urgent Interpellation"
+#~ msgstr "Dringliche Interpellation"
+
+#~ msgid "Invitation"
+#~ msgstr "Einladung"
+
+#~ msgid "Interpellation"
+#~ msgstr "Interpellation"
+
+#~ msgid "Commission Report"
+#~ msgstr "Kommissionsbericht"
+
+#~ msgid "Communication"
+#~ msgstr "Mitteilung"
+
+#~ msgid "Motion"
+#~ msgstr "Motion"
+
+#~ msgid "Postulate"
+#~ msgstr "Postulat"
+
+#~ msgid "Resolution"
+#~ msgstr "Resolution"
+
+#~ msgid "Regulation"
+#~ msgstr "Verordnung"
+
+#~ msgid "Miscellaneous"
+#~ msgstr "Verschiedenes"
+
+#~ msgid "Elections"
+#~ msgstr "Wahlen"
+
+#~ msgid "First signatory"
+#~ msgstr "Erstunterzeichner/in"
+
+#~ msgid "Co-signatory"
+#~ msgstr "Mitunterzeichner/in"
+
+#~ msgid "Select additional person"
+#~ msgstr "Zusätzliche Person auswählen"
+
+#~ msgid "Participations"
+#~ msgstr "Verfasser / Beteiligte"
 
 #~ msgid "Parliamentarian is not in this commission."
 #~ msgstr "Parlamentarier:in ist nicht in dieser Kommission."
