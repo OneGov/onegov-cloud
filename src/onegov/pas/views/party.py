@@ -101,7 +101,8 @@ def pas_view_party(
     name='edit',
     template='form.pt',
     permission=Private,
-    form=PartyForm
+    form=PartyForm,
+    pass_model=True
 )
 def pas_edit_party(
     self: Party,
