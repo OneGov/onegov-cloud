@@ -131,6 +131,38 @@ def edit_rate_set(
     }
 
 
+@PasApp.form(
+    model=RateSet,
+    name='copy-rate-set',
+    permission=Private,
+    form=RateSetForm
+)
+def copy_specific_rate_set(
+    self: RateSet,
+    request: TownRequest,
+    form: RateSetForm
+) -> Response:
+    """ Create a new rate set based on a specific existing one."""
+
+    if form.submitted(request):
+        form.populate_obj(self)
+        request.success(_('Your changes were saved'))
+        return request.redirect(request.link(self))
+
+    form.process(obj=self)
+
+    layout = RateSetLayout(self, request)
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
+    layout.editbar_links = []
+
+    return {
+        'layout': layout,
+        'title': layout.title,
+        'form': form,
+        'form_width': 'large'
+    }
+
+
 @PasApp.view(
     model=RateSet,
     request_method='DELETE',
