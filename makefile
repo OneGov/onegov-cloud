@@ -28,11 +28,8 @@ lint: ensure_uv
 		--quiet \
 		--recursive \
 		--configfile pyproject.toml \
-		--format custom \
-		--msg-template '::error file={abspath},line={line},col={col},title=Bandit ({test_id})::{msg}' \
 		src/ 2> /dev/null & \
 	flake8 \
-		--format '::error file=%(path)s,line=%(row)s,col=%(col)s,title=Flake8 (%(code)s)::%(text)s' \
 		src/ & \
 	wait
 
