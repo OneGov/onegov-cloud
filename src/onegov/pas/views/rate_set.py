@@ -135,29 +135,31 @@ def edit_rate_set(
     model=RateSet,
     name='copy-rate-set',
     permission=Private,
-    form=RateSetForm
+    form=RateSetForm,
+    template='form.pt'
 )
 def copy_specific_rate_set(
     self: RateSet,
     request: TownRequest,
     form: RateSetForm
-) -> Response:
+) -> RenderData | Response:
     """ Create a new rate set based on a specific existing one."""
 
     if form.submitted(request):
-        form.populate_obj(self)
-        request.success(_('Your changes were saved'))
-        return request.redirect(request.link(self))
+        collection = RateSetCollection(request.session)
+        rate_set = collection.add(**form.get_useful_data())
+        request.success(_('The rate set was copied.'))
+        return request.redirect(request.link(rate_set))
 
     form.process(obj=self)
 
     layout = RateSetLayout(self, request)
-    layout.breadcrumbs.append(Link(_('Edit'), '#'))
+    layout.breadcrumbs.append(Link(_('Copy'), '#'))
     layout.editbar_links = []
 
     return {
         'layout': layout,
-        'title': layout.title,
+        'title': _('Copy Rate Set'),
         'form': form,
         'form_width': 'large'
     }
