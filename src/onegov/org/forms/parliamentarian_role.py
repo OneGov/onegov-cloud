@@ -9,8 +9,7 @@ from onegov.parliament.collections import ParliamentarianCollection
 from onegov.parliament.collections import ParliamentaryGroupCollection
 from onegov.parliament.models.parliamentarian_role import (
     PARLIAMENTARY_GROUP_ROLES,
-    PARLIAMENTARIAN_ROLES,
-    PARTY_ROLES
+    PARLIAMENTARIAN_ROLES
 )
 from wtforms.fields import DateField
 from wtforms.validators import InputRequired
@@ -45,12 +44,6 @@ class ParliamentarianRoleForm(Form):
     end = DateField(
         label=_('End'),
         validators=[Optional()],
-    )
-
-    party_role = TranslatedSelectField(
-        label=_('Party role'),
-        choices=list(PARTY_ROLES.items()),
-        default='none'
     )
 
     parliamentary_group_id = ChosenSelectField(
