@@ -12,6 +12,30 @@ install: ensure_uv
 	rm -rf ./eggs
 	scrambler --target eggs
 
+lint: ensure_uv
+    # Run linters in parallel with proper cleanup on exit/interrupt
+	@set -e; \
+	cleanup() { \
+		pkill -P $$ 2>/dev/null || true; \
+		kill $$(jobs -p) 2>/dev/null || true; \
+		pkill -f "mypy\|ruff\|bandit\|flake8" 2>/dev/null || true; \
+		exit 130; \
+	}; \
+	trap cleanup INT TERM; \
+	bash ./mypy.sh & \
+	ruff check src/ tests/ stubs/ & \
+	bandit \
+		--quiet \
+		--recursive \
+		--configfile pyproject.toml \
+		--format custom \
+		--msg-template '::error file={abspath},line={line},col={col},title=Bandit ({test_id})::{msg}' \
+		src/ 2> /dev/null & \
+	flake8 \
+		--format '::error file=%(path)s,line=%(row)s,col=%(col)s,title=Flake8 (%(code)s)::%(text)s' \
+		src/ & \
+	wait
+
 update: ensure_uv
 	# update all dependencies
 	uv pip compile setup.cfg -U --all-extras | uv pip install -U -r /dev/stdin
