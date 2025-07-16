@@ -622,8 +622,9 @@ def update_political_business_enum_values(
 def change_political_business_participation_type_column_type(
     context: UpgradeContext
 ) -> None:
-    if context.has_column(
-        'par_political_business_participants',
+    table = 'par_political_business_participants'
+    if context.has_table(table) and context.has_column(
+        table,
         'participant_type'
     ):
         context.operations.alter_column(
@@ -641,8 +642,24 @@ def remove_obsolete_polymorphic_type_columns(context: UpgradeContext) -> None:
         'par_changes',
         'par_legislative_periods',
         'par_political_businesses',
-        'par_political_business_participation',
+        'par_political_business_participants',
     ):
         column = 'poly_type' if table == 'par_attendence' else 'type'
         if context.has_table(table) and context.has_column(table, column):
             context.operations.drop_column(table, column)
+
+
+@upgrade_task('Make political business participation type column nullable')
+def make_political_business_participation_type_column_nullable(
+    context: UpgradeContext
+) -> None:
+    table = 'par_political_business_participants'
+    if context.has_table(table) and context.has_column(
+        table,
+        'participant_type'
+    ):
+        context.operations.alter_column(
+            table,
+            'participant_type',
+            nullable=True,
+        )

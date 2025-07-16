@@ -10,6 +10,7 @@ from onegov.form.fields import TranslatedSelectField
 from onegov.org import _
 from onegov.org.models import PoliticalBusiness
 from onegov.org.models import PoliticalBusinessParticipation
+from onegov.org.models import PoliticalBusinessParticipationCollection
 from onegov.org.models import RISParliamentarian
 from onegov.org.models import RISParliamentaryGroup
 from onegov.org.models.political_business import (
@@ -46,7 +47,7 @@ class ParticipantForm(Form):
             'data-no_results_text': _('No results match'),
         }
     )
-    role = SelectField(
+    participant_type = SelectField(
         label=_('Role'),
         depends_on=('parliamentarian_id', '!'),
         render_kw={'class_': 'indent-form-field'},
@@ -95,8 +96,12 @@ class BusinessParticipationField(FieldBase):
         ):
             self.append_entry()
 
-    def populate_obj(self, obj: object, name: str) -> None:
-        participants = getattr(obj, name, ())
+    def populate_obj(self, obj: PoliticalBusiness, name: str) -> None:  # type: ignore[override]
+        assert name == 'participants'
+        collection = PoliticalBusinessParticipationCollection(
+            self.meta.request.session
+        )
+        participants = obj.participants
         output: list[PoliticalBusinessParticipation] = []
         for field, participant in zip_longest(self.entries, participants):
             if field is None:
@@ -106,22 +111,27 @@ class BusinessParticipationField(FieldBase):
                 break
 
             participant_id = field.form.parliamentarian_id.data
-            if participant_id is None:
+            participant_type = field.form.participant_type.data
+            if not participant_id:
                 if participant is not None:
-                    self.meta.request.session.delete(participant)
+                    collection.delete(participant)
                 continue
             elif participant is None:
-                participant = PoliticalBusinessParticipation(
-                    parliamentarian_id=participant_id
+                participant = collection.add(
+                    political_business_id=obj.id,
+                    parliamentarian_id=participant_id,
+                    participant_type=participant_type
+                )
+            elif str(participant.id) != participant_id:
+                collection.delete(participant)
+                participant = collection.add(
+                    political_business_id=obj.id,
+                    parliamentarian_id=participant_id,
+                    participant_type=participant_type
                 )
             else:
-                if participant.id.hex != participant_id:
-                    self.meta.request.session.delete(participant)
-                    participant = PoliticalBusinessParticipation(
-                        parliamentarian_id=participant_id
-                    )
+                participant.participant_type = participant_type
 
-            participant.role = field.form.role.data
             output.append(participant)
 
         setattr(obj, name, output)
@@ -164,7 +174,7 @@ class PoliticalBusinessForm(Form):
         choices=[],
     )
 
-    participations = BusinessParticipationField(
+    participants = BusinessParticipationField(
         FormField(
             ParticipantForm,
             widget=lambda field, **kw: Markup('').join(
@@ -207,10 +217,10 @@ class PoliticalBusinessForm(Form):
             selected = {
                 participant.parliamentarian_id: participant.participant_type
                 for participant in self.model.participants
-            }
+            } if isinstance(self.model, PoliticalBusiness) else {}
             choices: list[_Choice] = [
                 (
-                    participant.id.hex,
+                    str(participant.id),
                     participant.display_name,
                     {'data-role': selected.get(participant.id) or ''}
                 )
@@ -219,19 +229,24 @@ class PoliticalBusinessForm(Form):
             choices.insert(0, ('', ''))
 
             # NOTE: Ensures translations work in FormField
-            for field in self.participations:
+            for field in self.participants:
                 field.form.meta = self.meta
-                for subfield in field.form:
-                    subfield.meta = self.meta
 
+                field.form.parliamentarian_id.meta = self.meta
                 field.form.parliamentarian_id.choices = choices
                 render_kw = field.form.parliamentarian_id.render_kw
                 render_kw['data-placeholder'] = self.request.translate(
                     render_kw['data-placeholder'])
                 render_kw['data-no_results_text'] = self.request.translate(
                     render_kw['data-no_results_text'])
+
+                field.form.participant_type.meta = self.meta
+                field.form.participant_type.choices = [  # type: ignore[misc]
+                    (value, self.request.translate(label) if label else label)
+                    for value, label in field.form.participant_type.choices
+                ]
         else:
-            self.delete_field('participations')
+            self.delete_field('participants')
 
         self.political_business_type.choices.insert(0, ('', '-'))  # type:ignore[union-attr]
         self.status.choices.insert(0, ('', '-'))  # type:ignore[union-attr]
@@ -249,6 +264,7 @@ class PoliticalBusinessForm(Form):
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()
+        result.pop('participants', None)
         result['parliamentary_group_id'] = (
             result.get('parliamentary_group_id') or None)
         return result

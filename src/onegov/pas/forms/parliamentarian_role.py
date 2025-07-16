@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from onegov.form import move_fields
 from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import TranslatedSelectField
 from onegov.org.forms import ParliamentarianRoleForm
+from onegov.parliament.models.parliamentarian_role import PARTY_ROLES
 from onegov.pas import _
 from onegov.pas.collections import PartyCollection
 
@@ -17,6 +19,12 @@ class PASParliamentarianRoleForm(ParliamentarianRoleForm):
 
     party_id = ChosenSelectField(
         label=_('Political Party'),
+    )
+
+    party_role = TranslatedSelectField(
+        label=_('Party role'),
+        choices=list(PARTY_ROLES.items()),
+        default='none'
     )
 
     def on_request(self) -> None:
@@ -51,6 +59,6 @@ if not TYPE_CHECKING:
     # Move party field to correct location
     PASParliamentarianRoleForm = move_fields(
         PASParliamentarianRoleForm,
-        ('party_id', ),
-        before='party_role'
+        ('party_id', 'party_role'),
+        before='parliamentary_group_id'
     )

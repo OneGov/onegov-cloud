@@ -71,25 +71,8 @@ def view_add_political_business(
 
     if form.submitted(request):
         data = form.get_useful_data()
-        participations = data.pop('participations', [])
         political_business = self.add(**data)
-
-        # extract participants
-        collection = PoliticalBusinessParticipationCollection(request.session)
-        participants = []
-
-        for p in participations:
-            id = p.get('person')
-            role = p.get('role')
-            if id and role:
-                participant = collection.add(
-                    political_business_id=political_business.id,
-                    parliamentarian_id=id,
-                    participant_type=role,
-                )
-                participants.append(participant)
-
-        political_business.participants = participants
+        form.populate_obj(political_business)
         request.success(_('Added a new political business'))
 
         return request.redirect(request.link(political_business))
@@ -109,7 +92,8 @@ def view_add_political_business(
     name='edit',
     template='form.pt',
     permission=Private,
-    form=get_political_business_form_class
+    form=get_political_business_form_class,
+    pass_model=True
 )
 def edit_political_business(
     self: PoliticalBusiness,
@@ -123,8 +107,6 @@ def edit_political_business(
         request.success(_('Your changes were saved'))
 
         return request.redirect(request.link(self))
-
-    form.process(obj=self)
 
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
@@ -148,6 +130,7 @@ def view_political_business(
 ) -> RenderData | Response:
 
     layout = PoliticalBusinessLayout(self, request)
+    groups = [self.parliamentary_group] if self.parliamentary_group else []
 
     return {
         'layout': layout,
@@ -156,7 +139,7 @@ def view_political_business(
         'type_map': POLITICAL_BUSINESS_TYPE,
         'status_map': POLITICAL_BUSINESS_STATUS,
         'files': getattr(self, 'files', None),
-        'political_groups': [self.parliamentary_group],
+        'political_groups': groups,
     }
 
 

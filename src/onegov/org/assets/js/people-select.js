@@ -8,21 +8,20 @@ function init_people_field(row) {
     }).on('show', function() {
         $(this).hide();
     }).on('change', function() {
-        // var rows = $('div[id^="people-"]');
-        var rows = $('div[id^="participations-"]');
+        var rows = $('div[id^="people-"]');
         var person_id = $(this).val();
         var person_fun = '';
         var fun_show = false;
         if (person_id) {
             var option = $(this).find('option[value="' + person_id + '"]');
-            person_fun = option.data('function') || option.data('role') || null;
+            person_fun = option.data('function') || null;
             fun_show = option.data('show');
             if (fun_show === undefined) {
                 fun_show = person_fun && true;
             }
         }
         var this_row = $(this).parent().parent().parent();
-        var fun_field = this_row.find('input[name$="context_specific_function"], input[name$="role"]');
+        var fun_field = this_row.find('input[name$="context_specific_function"]');
         var show_field = this_row.find('input[name$="in_person_directory"]');
 
         fun_field.val(person_fun);
@@ -40,17 +39,13 @@ function init_people_field(row) {
 }
 
 function add_row() {
-    console.log('add_row');
-    // var rows = $('div[id^="people-"]');
-    var rows = $('div[id^="participations-"]');
+    var rows = $('div[id^="people-"]');
     var row = people_row_template.clone();
-    // row.attr('id', 'people-' + rows.length);
-    row.attr('id', 'participants-' + rows.length);
+    row.attr('id', 'people-' + rows.length);
 
     // also update the ids of all the contained elements
     var html = row.html();
-    // html = html.replace(/people-0/g, 'people-' + rows.length);
-    html = html.replace(/participations-0/g, 'participations-' + rows.length);
+    html = html.replace(/people-0/g, 'people-' + rows.length);
     row.html(html);
 
     rows.first().parent().append('<br>', row);
@@ -60,9 +55,7 @@ function add_row() {
 }
 
 $(document).ready(function() {
-    console.log('people-select.js loaded');
-    // var rows = $('div[id^="people-"]');
-    var rows = $('div[id^="participations-"]');
+    var rows = $('div[id^="people-"]');
     people_row_template = rows.first().clone();
     // make the template blank
     people_row_template.find('option:selected').removeAttr('selected');
