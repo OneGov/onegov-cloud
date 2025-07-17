@@ -128,6 +128,8 @@ def delete_parliamentary_group(
     collection = ParliamentaryGroupCollection(request.session)
     collection.delete(self)
 
+    request.success(_('The parliamentary group has been deleted.'))
+
 
 @TownApp.html(
     model=RISParliamentaryGroupCollection,

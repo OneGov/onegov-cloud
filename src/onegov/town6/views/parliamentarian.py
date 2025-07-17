@@ -126,6 +126,8 @@ def delete_parliamentarian(
     collection = ParliamentarianCollection(request.session)
     collection.delete(self)
 
+    request.success(_('The parliamentarian has been deleted.'))
+
 
 def add_commission_membership(
     self: Parliamentarian,
