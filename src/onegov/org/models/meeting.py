@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import uuid
+from functools import cached_property
+
 from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID, MarkupText, UTCDateTime
 from onegov.file import AssociatedFiles
+from onegov.org import _
 from onegov.search import ORMSearchable
 from sqlalchemy import Column, Text, ForeignKey
 from sqlalchemy.orm import RelationshipProperty, relationship
@@ -101,6 +104,10 @@ class Meeting(Base, ContentMixin, ORMSearchable, AssociatedFiles):
 
 
 class MeetingCollection(GenericCollection[Meeting]):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Meeting')
 
     @property
     def model_class(self) -> type[Meeting]:
