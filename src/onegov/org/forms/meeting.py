@@ -8,7 +8,8 @@ from onegov.form.fields import TimezoneDateTimeField, ChosenSelectMultipleField
 from onegov.org.forms.fields import HtmlField
 from onegov.org import _
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
+
 if TYPE_CHECKING:
     from onegov.org.models import Meeting
 
@@ -63,12 +64,13 @@ class MeetingForm(Form):
             for item in meetings
         ]
 
-    def populate_obj(self, obj: Meeting, *args, **kwargs) -> None:
+    def populate_obj(self, obj: object, *args: Any, **kwargs: Any) -> None:
         from onegov.org.models import MeetingItem
 
-        super().populate_obj(obj, *args, exclude={'meeting_items'})
+        super().populate_obj(obj, exclude={'meeting_items'})
 
-        meeting_item_ids = {item.id.hex for item in obj.meeting_items}
+        meeting: Meeting = obj  # type:ignore[assignment]
+        meeting_item_ids = {item.id.hex for item in meeting.meeting_items}
         new_item_ids = set(self.meeting_items.data or [])
 
         items_to_add = new_item_ids - meeting_item_ids
@@ -79,7 +81,7 @@ class MeetingForm(Form):
                 .one()
             )
             if item is not None:
-                obj.meeting_items.append(item)
+                meeting.meeting_items.append(item)
 
         items_to_remove = meeting_item_ids - new_item_ids
         for current_id in items_to_remove:
@@ -89,11 +91,12 @@ class MeetingForm(Form):
                 .one()
             )
             if item is not None:
-                obj.meeting_items.remove(item)
+                meeting.meeting_items.remove(item)
 
-    def process_obj(self, obj: Meeting) -> None:
+    def process_obj(self, obj: object) -> None:
         super().process_obj(obj)
 
+        meeting: Meeting = obj  # type:ignore[assignment]
         self.meeting_items.data = [
-            item.id.hex for item in obj.meeting_items
+            item.id.hex for item in meeting.meeting_items
         ]
