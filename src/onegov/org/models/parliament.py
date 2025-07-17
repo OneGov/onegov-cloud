@@ -127,7 +127,7 @@ class RISParliamentarian(Parliamentarian, ORMSearchable):
         # Wil: every parliamentarian is active if in a parliamentary
         # group, which leads to a role
         for role in self.roles:
-            if role.end is None or role.end >= utcnow():
+            if role.end is None or role.end >= utcnow().date():
                 return True
         return False
 
