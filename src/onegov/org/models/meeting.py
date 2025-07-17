@@ -3,6 +3,10 @@ from __future__ import annotations
 import uuid
 from functools import cached_property
 
+from sqlalchemy import exists, func
+from sqlalchemy.ext.hybrid import hybrid_property
+from sedate import utcnow
+
 from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
@@ -15,14 +19,17 @@ from onegov.search import ORMSearchable
 from sqlalchemy import Column, Text, ForeignKey
 from sqlalchemy.orm import RelationshipProperty, relationship
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 if TYPE_CHECKING:
     import uuid
     from datetime import datetime
     from markupsafe import Markup
+
+    from sqlalchemy.orm import Query
+    from sqlalchemy.orm import Session
+
     from onegov.org.models import PoliticalBusiness
     from onegov.org.models import MeetingItem
-    from sqlalchemy.orm import Query
 
 
 class Meeting(
@@ -107,11 +114,27 @@ class Meeting(
         order_by='desc(MeetingItem.number)'
     )
 
+    @hybrid_property
+    def past(self):
+        return self.start_datetime < utcnow() if self.start_datetime else False
+
+    @past.expression  # type:ignore[no-redef]
+    def past(cls):
+        return exists.where(cls.start_datetime < func.now())
+
     def __repr__(self) -> str:
         return f'<Meeting {self.title}, {self.start_datetime}>'
 
 
 class MeetingCollection(GenericCollection[Meeting]):
+
+    def __init__(
+        self,
+        session: Session,
+        past: bool | None = None
+    ) -> None:
+        super().__init__(session)
+        self.past = past
 
     @cached_property
     def title(self) -> str:
@@ -123,4 +146,17 @@ class MeetingCollection(GenericCollection[Meeting]):
 
     def query(self) -> Query[Meeting]:
         query = super().query()
-        return query.order_by(self.model_class.start_datetime.desc())
+
+        Meeting = self.model_class  # noqa: N806
+        if self.past is not None:
+            if self.past:
+                query = query.filter(Meeting.start_datetime < utcnow())
+                query = query.order_by(Meeting.start_datetime.desc())
+            else:
+                query = query.filter(Meeting.start_datetime >= utcnow())
+                query = query.order_by(Meeting.start_datetime.asc())
+
+        return query
+
+    def for_filter(self, past: bool | None = None) -> Self:
+        return self.__class__(self.session, past=past)
