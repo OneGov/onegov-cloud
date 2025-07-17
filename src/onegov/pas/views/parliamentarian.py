@@ -4,7 +4,7 @@ from onegov.core.security import Private
 from onegov.pas import PasApp
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.forms import PASParliamentarianForm
-from onegov.pas.forms import ParliamentarianRoleForm
+from onegov.pas.forms import PASParliamentarianRoleForm
 from onegov.pas.layouts import PASParliamentarianCollectionLayout
 from onegov.pas.layouts import PASParliamentarianLayout
 from onegov.pas.models import PASParliamentarian
@@ -99,12 +99,12 @@ def pas_delete_parliamentarian(
     name='new-role',
     template='form.pt',
     permission=Private,
-    form=ParliamentarianRoleForm
+    form=PASParliamentarianRoleForm
 )
 def pas_add_commission_membership(
     self: PASParliamentarian,
     request: TownRequest,
-    form: ParliamentarianRoleForm
+    form: PASParliamentarianRoleForm
 ) -> RenderData | Response:
 
     layout = PASParliamentarianLayout(self, request)

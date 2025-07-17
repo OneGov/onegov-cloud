@@ -7,7 +7,7 @@ from onegov.town6.views.parliamentarian_role import (
     delete_parliamentarian_role
 )
 from onegov.pas import PasApp
-from onegov.pas.forms import ParliamentarianRoleForm
+from onegov.pas.forms import PASParliamentarianRoleForm
 from onegov.pas.layouts import PASParliamentarianRoleLayout
 from onegov.pas.models import PASParliamentarianRole
 
@@ -37,12 +37,12 @@ def pas_view_parliamentarian_role(
     name='edit',
     template='form.pt',
     permission=Private,
-    form=ParliamentarianRoleForm
+    form=PASParliamentarianRoleForm
 )
 def pas_edit_parliamentarian_role(
     self: PASParliamentarianRole,
     request: TownRequest,
-    form: ParliamentarianRoleForm
+    form: PASParliamentarianRoleForm
 ) -> RenderData | Response:
 
     layout = PASParliamentarianRoleLayout(self, request)

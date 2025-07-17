@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from onegov.core.elements import Link
 from onegov.org.forms import ParliamentarianRoleForm
 from onegov.org.security import Private, Public
+from onegov.org.models import RISParliamentarianRole
 from onegov.parliament.collections import ParliamentarianRoleCollection
-from onegov.parliament.models import RISParliamentarianRole
 from onegov.town6 import _
 from onegov.town6.app import TownApp
 from onegov.town6.layout import RISParliamentarianRoleLayout
 
+
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from webob.response import Response
 
@@ -67,6 +67,8 @@ def delete_parliamentarian_role(
 
     collection = ParliamentarianRoleCollection(request.session)
     collection.delete(self)
+
+    request.success(_('The parliamentarian role has been deleted.'))
 
 
 @TownApp.html(

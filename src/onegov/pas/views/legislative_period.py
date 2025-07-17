@@ -8,7 +8,7 @@ from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.forms import LegislativePeriodForm
 from onegov.pas.layouts import LegislativePeriodCollectionLayout
 from onegov.pas.layouts import LegislativePeriodLayout
-from onegov.pas.models import PASLegislativePeriod
+from onegov.pas.models import LegislativePeriod
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -81,12 +81,12 @@ def add_legislative_period(
 
 
 @PasApp.html(
-    model=PASLegislativePeriod,
+    model=LegislativePeriod,
     template='legislative_period.pt',
     permission=Private
 )
 def view_legislative_period(
-    self: PASLegislativePeriod,
+    self: LegislativePeriod,
     request: TownRequest
 ) -> RenderData:
 
@@ -100,14 +100,14 @@ def view_legislative_period(
 
 
 @PasApp.form(
-    model=PASLegislativePeriod,
+    model=LegislativePeriod,
     name='edit',
     template='form.pt',
     permission=Private,
     form=LegislativePeriodForm
 )
 def edit_legislative_period(
-    self: PASLegislativePeriod,
+    self: LegislativePeriod,
     request: TownRequest,
     form: LegislativePeriodForm
 ) -> RenderData | Response:
@@ -132,12 +132,12 @@ def edit_legislative_period(
 
 
 @PasApp.view(
-    model=PASLegislativePeriod,
+    model=LegislativePeriod,
     request_method='DELETE',
     permission=Private
 )
 def delete_legislative_period(
-    self: PASLegislativePeriod,
+    self: LegislativePeriod,
     request: TownRequest
 ) -> None:
 

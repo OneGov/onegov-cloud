@@ -1,20 +1,20 @@
 from __future__ import annotations
 
 import uuid
-
+from onegov.core.collection import GenericCollection
+from onegov.core.orm import Base
+from onegov.core.orm.types import UUID
+from onegov.search import ORMSearchable
 from sqlalchemy import Column, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
-from onegov.core.orm import Base
-from onegov.core.orm.types import UUID
-from onegov.parliament.models import Meeting
-from onegov.search import ORMSearchable
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     import uuid
-    from onegov.parliament.models.political_business import PoliticalBusiness
+    from onegov.org.models import PoliticalBusiness
+    from onegov.org.models import Meeting
+    from sqlalchemy.orm import Query
 
 
 class MeetingItem(Base, ORMSearchable):
@@ -67,9 +67,24 @@ class MeetingItem(Base, ORMSearchable):
 
     #: The meeting
     meeting: relationship[Meeting] = relationship(
-        Meeting,
+        'Meeting',
         back_populates='meeting_items'
     )
 
+    @property
+    def display_name(self) -> str:
+        return f'{self.number} {self.title}' if self.number else self.title
+
     def __repr__(self) -> str:
         return f'<Meeting Item {self.number} {self.title}>'
+
+
+class MeetingItemCollection(GenericCollection[MeetingItem]):
+
+    @property
+    def model_class(self) -> type[MeetingItem]:
+        return MeetingItem
+
+    def query(self) -> Query[MeetingItem]:
+        query = super().query()
+        return query.order_by(self.model_class.number)
