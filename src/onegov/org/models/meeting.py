@@ -1,31 +1,38 @@
 from __future__ import annotations
 
 import uuid
+from functools import cached_property
 
-from sqlalchemy import Column, Text, ForeignKey
-from sqlalchemy.orm import RelationshipProperty, relationship
-
+from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID, MarkupText, UTCDateTime
-from onegov.file import AssociatedFiles
+from onegov.file import MultiAssociatedFiles
+from onegov.org import _
+from onegov.org.models.extensions import AccessExtension
+from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.search import ORMSearchable
+from sqlalchemy import Column, Text, ForeignKey
+from sqlalchemy.orm import RelationshipProperty, relationship
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     import uuid
-
     from datetime import datetime
-
     from markupsafe import Markup
-    from onegov.parliament.models.political_business import (
-        PoliticalBusiness,
-    )
-    from onegov.parliament.models.meeting_item import MeetingItem
+    from onegov.org.models import PoliticalBusiness
+    from onegov.org.models import MeetingItem
+    from sqlalchemy.orm import Query
 
 
-class Meeting(Base, ContentMixin, ORMSearchable, AssociatedFiles):
+class Meeting(
+    AccessExtension,  # required??
+    MultiAssociatedFiles,
+    Base,
+    ContentMixin,
+    GeneralFileLinkExtension,
+    ORMSearchable,
+):
 
     __tablename__ = 'par_meetings'
 
@@ -102,3 +109,18 @@ class Meeting(Base, ContentMixin, ORMSearchable, AssociatedFiles):
 
     def __repr__(self) -> str:
         return f'<Meeting {self.title}, {self.start_datetime}>'
+
+
+class MeetingCollection(GenericCollection[Meeting]):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Meeting')
+
+    @property
+    def model_class(self) -> type[Meeting]:
+        return Meeting
+
+    def query(self) -> Query[Meeting]:
+        query = super().query()
+        return query.order_by(self.model_class.start_datetime.desc())

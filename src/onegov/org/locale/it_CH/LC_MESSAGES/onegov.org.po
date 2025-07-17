@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-10 14:11+0200\n"
+"POT-Creation-Date: 2025-07-16 13:05+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1382,38 +1382,11 @@ msgstr "Sito web"
 msgid "Remarks"
 msgstr "Osservazioni"
 
-msgid "Personnel number"
-msgstr "Numero del personale"
-
-msgid "Contract number"
-msgstr "Numero del contratto"
-
-msgid "Shipping method"
-msgstr "Metodo di spedizione"
-
-msgid "Shipping address"
-msgstr "Indirizzo di spedizione"
-
-msgid "Salutation used in the address"
-msgstr "Saluto utilizzato nell'indirizzo"
-
-msgid "Salutation used for letters"
-msgstr "Saluto utilizzato per le lettere"
-
-msgid "How bills should be delivered"
-msgstr "Come le fatture devono essere consegnate"
-
 msgid "Parliamentarian"
 msgstr "Parlamentare"
 
 msgid "Role"
 msgstr "Ruolo"
-
-msgid "Political Party"
-msgstr "Partito"
-
-msgid "Party role"
-msgstr "Ruolo nel partito"
 
 msgid "Parliamentary group"
 msgstr "Gruppo parlamentare"
@@ -1467,6 +1440,9 @@ msgstr "Cognome da nubile"
 msgid "Profession"
 msgstr "Professione"
 
+msgid "Political Party"
+msgstr "Partito"
+
 msgid "Parliamentary Group"
 msgstr "Gruppo parlamentare"
 
@@ -1493,6 +1469,30 @@ msgstr "Note"
 
 msgid "Public extra information about this person"
 msgstr "Informazioni pubbliche aggiuntive su questa persona"
+
+msgid "Select additional participant"
+msgstr "Selezionare un altro partecipante"
+
+msgid "No results match"
+msgstr "Nessun risultato corrisponde"
+
+msgid "First signatory"
+msgstr "Primo firmatario"
+
+msgid "Co-signatory"
+msgstr "Cofirmatario"
+
+msgid "Number"
+msgstr "Numero"
+
+msgid "Business Status"
+msgstr "Stato"
+
+msgid "Entry Date"
+msgstr "Data"
+
+msgid "Participations"
+msgstr "Partecipanti"
 
 msgid "Tag"
 msgstr "Tag"
@@ -3342,9 +3342,6 @@ msgstr "Usa il testo invece dell'estratto nella newsletter"
 msgid "Select additional person"
 msgstr "Selezionare una persona aggiuntiva"
 
-msgid "No results match"
-msgstr "Nessun risultato corrisponde"
-
 msgid "List this function in the page of this person"
 msgstr "Mostra questa funzione nella pagina di questa persona"
 
@@ -3447,6 +3444,57 @@ msgstr "Elimina nota"
 
 msgid "Always visible on homepage"
 msgstr "Sempre visibile sulla pagina principale"
+
+msgid "Inquiry"
+msgstr "Richiesta"
+
+msgid "Proposal"
+msgstr "Oggetto della votazione"
+
+msgid "Mandate"
+msgstr "Mandato"
+
+msgid "Report"
+msgstr "Rapporto"
+
+msgid "Report and Proposal"
+msgstr "Rapporto e proposta"
+
+msgid "Decision"
+msgstr "Decisione"
+
+msgid "Urgent Interpellation"
+msgstr "Interpellanza urgente"
+
+msgid "Invitation"
+msgstr "Invito"
+
+msgid "Interpellation"
+msgstr "Interpellanza"
+
+msgid "Commission Report"
+msgstr "Rapporto della commissione"
+
+msgid "Communication"
+msgstr "Comunicazione"
+
+msgid "Motion"
+msgstr "Mozione"
+
+msgid "Postulate"
+msgstr "Postulato"
+
+msgid "Resolution"
+msgstr "Risoluzione"
+
+msgid "Regulation"
+msgstr "Regolamento"
+
+msgid "Miscellaneous"
+msgstr "Varie"
+
+msgid "Elections"
+msgstr "Elezioni"
 
 msgid "Neujahrestag"
 msgstr "Neujahrestag"

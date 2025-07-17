@@ -10,8 +10,8 @@ from onegov.pas.forms import AttendenceAddPlenaryForm
 from onegov.pas.forms import AttendenceForm
 from onegov.pas.layouts import AttendenceCollectionLayout
 from onegov.pas.layouts import AttendenceLayout
-from onegov.pas.models import PASAttendence
-from onegov.pas.models import PASChange
+from onegov.pas.models import Attendence
+from onegov.pas.models import Change
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -55,7 +55,7 @@ def add_attendence(
 
     if form.submitted(request):
         attendence = self.add(**form.get_useful_data())
-        PASChange.add(request, 'add', attendence)
+        Change.add(request, 'add', attendence)
         request.success(_('Added a new attendence'))
 
         return request.redirect(request.link(attendence))
@@ -91,7 +91,7 @@ def add_plenary_attendence(
             attendence = self.add(
                 parliamentarian_id=parliamentarian_id, **data
             )
-            PASChange.add(request, 'add', attendence)
+            Change.add(request, 'add', attendence)
         request.success(_('Added plenary session'))
 
         return request.redirect(request.link(self))
@@ -108,12 +108,12 @@ def add_plenary_attendence(
 
 
 @PasApp.html(
-    model=PASAttendence,
+    model=Attendence,
     template='attendence.pt',
     permission=Private
 )
 def view_attendence(
-    self: PASAttendence,
+    self: Attendence,
     request: TownRequest
 ) -> RenderData:
 
@@ -127,21 +127,21 @@ def view_attendence(
 
 
 @PasApp.form(
-    model=PASAttendence,
+    model=Attendence,
     name='edit',
     template='form.pt',
     permission=Private,
     form=AttendenceForm
 )
 def edit_attendence(
-    self: PASAttendence,
+    self: Attendence,
     request: TownRequest,
     form: AttendenceForm
 ) -> RenderData | Response:
 
     if form.submitted(request):
         form.populate_obj(self)
-        PASChange.add(request, 'edit', self)
+        Change.add(request, 'edit', self)
         request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
@@ -160,17 +160,17 @@ def edit_attendence(
 
 
 @PasApp.view(
-    model=PASAttendence,
+    model=Attendence,
     request_method='DELETE',
     permission=Private
 )
 def delete_attendence(
-    self: PASAttendence,
+    self: Attendence,
     request: TownRequest
 ) -> None:
 
     request.assert_valid_csrf_token()
 
-    PASChange.add(request, 'delete', self)
+    Change.add(request, 'delete', self)
     collection = AttendenceCollection(request.session)
     collection.delete(self)

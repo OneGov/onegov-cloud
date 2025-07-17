@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-07-10 13:50+0200\n"
+"POT-Creation-Date: 2025-07-16 13:06+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -297,8 +297,8 @@ msgstr "Parlamentari"
 msgid "Parliamentarian"
 msgstr "Parlamentare"
 
-msgid "Role (as a party or group member)"
-msgstr "Ruolo (come membro di un partito o di un gruppo)"
+msgid "Role (as a group member)"
+msgstr "Ruolo (come membro di un gruppo)"
 
 msgid "Edit"
 msgstr "Modifica"
@@ -336,12 +336,6 @@ msgstr "Partiti"
 msgid "Political Party"
 msgstr "Partito"
 
-msgid "Do you really want to delete this party?"
-msgstr "Vuoi davvero cancellare questo partito?"
-
-msgid "Delete party"
-msgstr "Elimina partito"
-
 msgid "Commissions"
 msgstr "Commissioni"
 
@@ -355,7 +349,16 @@ msgid "Delete commission"
 msgstr "Elimina commissione"
 
 msgid "Political Businesses"
-msgstr "Affari politici"
+msgstr "Attività politico"
+
+msgid "Political Business"
+msgstr "Attività politico"
+
+msgid "Do you really want to delete this political business?"
+msgstr "Vuoi davvero cancellare questo attività politico?"
+
+msgid "Delete political business"
+msgstr "Elimina affare politico"
 
 msgid "No availability periods defined."
 msgstr "Nessun periodo di disponibilità definito."
@@ -1930,12 +1933,6 @@ msgstr "Nessun parlamentare ancora definito."
 msgid "No parliamentary groups defined yet."
 msgstr "Nessun gruppo parlamentare ancora definito."
 
-msgid "No parties defined yet."
-msgstr "Nessun partito ancora definito."
-
-msgid "Portrait"
-msgstr "Ritratto"
-
 msgid "No payment providers defined."
 msgstr "Nessun fornitore di servizi di pagamento definito."
 
@@ -1997,7 +1994,7 @@ msgid "Status"
 msgstr "Stato"
 
 msgid "Participants"
-msgstr "Partecipanti"
+msgstr "Autore / Partecipanti"
 
 msgid "Parliamentary Group"
 msgstr "Gruppo parlamentare"
@@ -2007,9 +2004,6 @@ msgstr "Nessun affare politico ancora definito."
 
 msgid "Datum"
 msgstr "Data"
-
-msgid "Political Business"
-msgstr "Affare politico"
 
 msgid "No publications"
 msgstr "Nessuna pubblicazione"
@@ -2505,11 +2499,11 @@ msgstr "Aggiunto un nuovo gruppo parlamentare"
 msgid "New parliamentary group"
 msgstr "Nuovo gruppo parlamentare"
 
-msgid "Added a new party"
-msgstr "Aggiunto un nuovo partito"
+msgid "Added a new political business"
+msgstr "Aggiunta di una nuova attività politica"
 
-msgid "New party"
-msgstr "Nuovo partito"
+msgid "New political business"
+msgstr "Nuova attività politica"
 
 msgid "New Recipient"
 msgstr "Nuovo destinatario"

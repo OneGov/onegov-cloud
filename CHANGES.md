@@ -1,8 +1,46 @@
 # Changes
 
+## 2025.33
+
+`2025-07-16` | [32fb87a343...0879bb37dd](https://github.com/OneGov/onegov-cloud/compare/32fb87a343^...0879bb37dd)
+
+### Org
+
+##### Fixes attribute error in KABA settings
+
+`Bugfix` | [OGC-2444](https://linear.app/onegovcloud/issue/OGC-2444) | [32fb87a343](https://github.com/onegov/onegov-cloud/commit/32fb87a34341370667cbc6db9bf4f67f61efc019)
+
+##### Decodes bytes in KABA settings
+
+`Bugfix` | [OGC-2444](https://linear.app/onegovcloud/issue/OGC-2444) | [b97a5413ca](https://github.com/onegov/onegov-cloud/commit/b97a5413ca6dbcb65eb202a9beb8b77c5ef7acd1)
+
+##### Checks whether KABA visit has already been revoked.
+
+`Bugfix` | [OGC-2444](https://linear.app/onegovcloud/issue/OGC-2444) | [917dcf5439](https://github.com/onegov/onegov-cloud/commit/917dcf54391ff020a5b17106daa3f9c66814eb1a)
+
+##### Replace label for submit event
+
+Replace Veranstaltung vorschlagen with Veranstaltung erfassen
+
+`Other` | [3bda867ff2](https://github.com/onegov/onegov-cloud/commit/3bda867ff202787bedc0bc7ac4033645b6d3ddad)
+
+### Ris
+
+##### Refactor project structure and add political business management views
+
+RIS: Adds political business management views
+
+Refactors project structure
+
+`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [41133c87fa](https://github.com/onegov/onegov-cloud/commit/41133c87fa3bdac94e2bf1c5f93fa6b7e5fe6ac4)
+
+##### Comments out broken management link
+
+`Bugfix` | [bceaa64103](https://github.com/onegov/onegov-cloud/commit/bceaa64103d0307699b7cc79d98d0dbfe37de058)
+
 ## 2025.32
 
-`2025-07-10` | [0b7c2f2ec8...a5306bc2e9](https://github.com/OneGov/onegov-cloud/compare/0b7c2f2ec8^...a5306bc2e9)
+`2025-07-10` | [0b7c2f2ec8...a72b0244a5](https://github.com/OneGov/onegov-cloud/compare/0b7c2f2ec8^...a72b0244a5)
 
 ### Feriennet
 
@@ -2060,74 +2098,4 @@ Make sure all relevant buttons are in the edit bar.
 ##### Ensure a failing pdf file access does not crash application
 
 `Bugfix` | [OGC-1906](https://linear.app/onegovcloud/issue/OGC-1906) | [c85c47ea7e](https://github.com/onegov/onegov-cloud/commit/c85c47ea7ecda50b85c4a26cd24377a7f1c637bc)
-
-## 2024.52
-
-`2024-11-07` | [057ee170cf...b896c374ce](https://github.com/OneGov/onegov-cloud/compare/057ee170cf^...b896c374ce)
-
-### Core
-
-##### Reviews silenced bandit errors and increases robustness
-
-`Bugfix` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [aac58babb9](https://github.com/onegov/onegov-cloud/commit/aac58babb93843cc99bebf245db3bb95764c487b)
-
-### Directory
-
-##### Ensure all values can be displayed in accordion layout
-
-`Bugfix` | [OGC-1895](https://linear.app/onegovcloud/issue/OGC-1895) | [3d6aa4d218](https://github.com/onegov/onegov-cloud/commit/3d6aa4d218a53c3246ebf1c7a02847d969c083fe)
-
-### Feriennet
-
-##### Add piwik to the feriennet CSP
-
-`Feature` | [PRO-1264](https://linear.app/projuventute/issue/PRO-1264) | [48163dd50a](https://github.com/onegov/onegov-cloud/commit/48163dd50aa321067717fc978f85c4d9d2b6391a)
-
-### Fsi
-
-##### Remove invalid state filter for survey export
-
-`Bugfix` | [OGC-1889](https://linear.app/onegovcloud/issue/OGC-1889) | [5d8df83efb](https://github.com/onegov/onegov-cloud/commit/5d8df83efb88918c5743b6ded5f0f08910310729)
-
-##### Make Survey Submission Public
-
-The SurveySubmission is finished, but it can still be edited.
-
-`Bugfix` | [OGC-1850](https://linear.app/onegovcloud/issue/OGC-1850) | [612b2af593](https://github.com/onegov/onegov-cloud/commit/612b2af5932f72bb28c8a8d3ec0de9e2c38e8111)
-
-### Landsgemeinde
-
-##### Update timestamp in iframe via js
-
-We now update the timestamp in the iframe video via js, which enables us to turn on autoplay without muting in certrain browsers.
-
-`Feature` | [OGC-1668](https://linear.app/onegovcloud/issue/OGC-1668) | [403b5285c4](https://github.com/onegov/onegov-cloud/commit/403b5285c4f0c8909ad5d4e170900ddd77cfa7c3)
-
-### Org
-
-##### Only managers can add newsletters and see subscribers
-
-`Bugfix` | [OGC-1890](https://linear.app/onegovcloud/issue/OGC-1890) | [a117d6bcc6](https://github.com/onegov/onegov-cloud/commit/a117d6bcc626f02a5eb702967950a5940b52b23e)
-
-### Town6
-
-##### Remove equalizer from cards
-
-`Feature` | [476538ed18](https://github.com/onegov/onegov-cloud/commit/476538ed1801bb4f5efdfdde827db17cfe220d2f)
-
-##### Reduce Export title size for person
-
-`Bugfix` | [OGC-1887](https://linear.app/onegovcloud/issue/OGC-1887) | [5cce1360de](https://github.com/onegov/onegov-cloud/commit/5cce1360de7af9f76c3848ec5ae4d06831d61b26)
-
-### Translator
-
-##### Remove nationality column after migrating to meta
-
-`Feature` | [OGC-1805](https://linear.app/onegovcloud/issue/OGC-1805) | [057ee170cf](https://github.com/onegov/onegov-cloud/commit/057ee170cf44f0768eff6a864aee9e3b0773b081)
-
-### Wtfs
-
-##### Remove wtfs application from code base
-
-`Feature` | [OGC-1792](https://linear.app/onegovcloud/issue/OGC-1792) | [1154c6c0e9](https://github.com/onegov/onegov-cloud/commit/1154c6c0e932e680829e582ae14df54e87474647)
 

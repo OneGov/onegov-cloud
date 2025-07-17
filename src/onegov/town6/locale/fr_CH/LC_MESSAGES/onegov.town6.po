@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-10 13:50+0200\n"
+"POT-Creation-Date: 2025-07-16 13:06+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -301,8 +301,8 @@ msgstr "Parlementaires"
 msgid "Parliamentarian"
 msgstr "Parlementaire"
 
-msgid "Role (as a party or group member)"
-msgstr "Rôle (en tant que membre d'un parti ou d'un groupe)"
+msgid "Role (as a group member)"
+msgstr "Rôle (en tant que membre d'un groupe)"
 
 msgid "Edit"
 msgstr "Modifier"
@@ -340,12 +340,6 @@ msgstr "Partis"
 msgid "Political Party"
 msgstr "Parti"
 
-msgid "Do you really want to delete this party?"
-msgstr "Voulez-vous vraiment supprimer ce parti ?"
-
-msgid "Delete party"
-msgstr "Supprimer le parti"
-
 msgid "Commissions"
 msgstr "Commissions"
 
@@ -361,17 +355,26 @@ msgstr "Supprimer la commission"
 msgid "Political Businesses"
 msgstr "Affaires politiques"
 
+msgid "Political Business"
+msgstr "Business politique"
+
+msgid "Do you really want to delete this political business?"
+msgstr "Voulez-vous vraiment supprimer cette affaire politique?"
+
+msgid "Delete political business"
+msgstr "Supprimer les affaires politiques"
+
 msgid "No availability periods defined."
 msgstr "Aucune période de disponibilité définie."
 
 msgid "State:"
-msgstr "État :"
+msgstr "État:"
 
 msgid "Owner:"
-msgstr "Propriétaire :"
+msgstr "Propriétaire:"
 
 msgid "Kind:"
-msgstr "Type :"
+msgstr "Type:"
 
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "The chat request got accepted."
@@ -586,8 +589,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
-"Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
+"« Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -1936,12 +1939,6 @@ msgstr "Aucun parlementaire n'a été défini pour le moment."
 msgid "No parliamentary groups defined yet."
 msgstr "Aucun groupe parlementaire n'a été défini pour le moment."
 
-msgid "No parties defined yet."
-msgstr "Aucun parti n'a été défini pour le moment."
-
-msgid "Portrait"
-msgstr "Portrait"
-
 msgid "No payment providers defined."
 msgstr "Aucun fournisseur de paiement n'a été défini."
 
@@ -2013,9 +2010,6 @@ msgstr "Aucun business politique n'a été défini pour le moment."
 
 msgid "Datum"
 msgstr "Date"
-
-msgid "Political Business"
-msgstr "Business politique"
 
 msgid "No publications"
 msgstr "Aucune publication"
@@ -2510,11 +2504,11 @@ msgstr "Ajout d'un nouveau groupe parlementaire"
 msgid "New parliamentary group"
 msgstr "Nouveau groupe parlementaire"
 
-msgid "Added a new party"
-msgstr "Ajout d'un nouveau parti"
+msgid "Added a new political business"
+msgstr "Ajout d' un nouveau business politique"
 
-msgid "New party"
-msgstr "Nouveau parti"
+msgid "New political business"
+msgstr "Nouveau business politique"
 
 msgid "New Recipient"
 msgstr "Nouveau destinataire"
