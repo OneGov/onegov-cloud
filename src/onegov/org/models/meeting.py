@@ -7,12 +7,13 @@ from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID, MarkupText, UTCDateTime
-from onegov.file import AssociatedFiles
+from onegov.file import MultiAssociatedFiles
 from onegov.org import _
+from onegov.org.models.extensions import AccessExtension
+from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.search import ORMSearchable
 from sqlalchemy import Column, Text, ForeignKey
 from sqlalchemy.orm import RelationshipProperty, relationship
-
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -24,7 +25,14 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
 
 
-class Meeting(Base, ContentMixin, ORMSearchable, AssociatedFiles):
+class Meeting(
+    AccessExtension,  # required??
+    MultiAssociatedFiles,
+    Base,
+    ContentMixin,
+    GeneralFileLinkExtension,
+    ORMSearchable,
+):
 
     __tablename__ = 'par_meetings'
 

@@ -24,6 +24,18 @@ if TYPE_CHECKING:
     from webob import Response
 
 
+def get_meeting_form_class(
+    model: object,
+    request: TownRequest
+) -> type[MeetingForm]:
+
+    if isinstance(model, Meeting):
+        return model.with_content_extensions(MeetingForm, request)
+    return Meeting(title='title').with_content_extensions(
+        MeetingForm, request
+    )
+
+
 @TownApp.html(
     model=MeetingCollection,
     template='meetings.pt',
@@ -134,7 +146,8 @@ def view_meeting(
     name='edit',
     template='form.pt',
     permission=Private,
-    form=MeetingForm
+    form=get_meeting_form_class,
+    pass_model=True
 )
 def edit_meeting(
     self: Meeting,

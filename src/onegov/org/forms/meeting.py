@@ -73,7 +73,14 @@ class MeetingForm(Form):
     ) -> None:
         from onegov.org.models import MeetingItem
 
-        super().populate_obj(obj, exclude={'meeting_items', *(exclude or ())})
+        super().populate_obj(
+            obj,
+            exclude={
+                'meeting_items',
+                *(exclude or ())
+            },
+            include=include
+        )
 
         meeting: Meeting = obj
         meeting_item_ids = {item.id.hex for item in meeting.meeting_items}
