@@ -34,7 +34,6 @@ if TYPE_CHECKING:
         'message',   # Botschaft
         'urgent interpellation',  # Dringliche Interpellation
         'invitation',  # Einladung
-        'interpelleation',  # Interpellation
         'interpellation',  # Interpellation
         'commission report',  # Kommissionsbericht
         'communication',  # Mitteilung
@@ -72,7 +71,6 @@ POLITICAL_BUSINESS_TYPE: dict[PoliticalBusinessType, str] = {
     'message': _('Message'),
     'urgent interpellation': _('Urgent Interpellation'),
     'invitation': _('Invitation'),
-    'interpelleation': _('Interpellation'),
     'interpellation': _('Interpellation'),
     'commission report': _('Commission Report'),
     'communication': _('Communication'),

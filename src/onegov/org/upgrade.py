@@ -663,3 +663,35 @@ def make_political_business_participation_type_column_nullable(
             'participant_type',
             nullable=True,
         )
+
+
+@upgrade_task('Add missing political business type')
+def add_missing_political_business_type(context: UpgradeContext) -> None:
+    table = 'par_political_businesses'
+    if context.has_table(table) and context.has_column(
+            table, 'political_business_type'
+    ):
+        context.operations.execute(
+            """
+            ALTER TYPE par_political_business_type 
+            ADD VALUE IF NOT EXISTS 'interpellation';
+            """
+        )
+
+
+@upgrade_task(
+    'Switch political business type due to typo',
+    requires='onegov.org:Add missing political business type',
+)
+def switch_political_business_type_due_to_typo(context: UpgradeContext) -> None:
+    table = 'par_political_businesses'
+    if context.has_table(table) and context.has_column(
+            table, 'political_business_type'
+    ):
+        context.operations.execute(
+            f"""
+            UPDATE {table}
+            SET political_business_type = 'interpellation'
+            WHERE political_business_type = 'interpelleation';
+            """
+        )
