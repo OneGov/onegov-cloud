@@ -41,11 +41,13 @@ from onegov.org import log
 from onegov.org.formats import DigirezDB
 from onegov.org.forms.event import TAGS
 from onegov.org.management import LinkMigration
+from onegov.pay.models.payment import ManualPayment
 from onegov.org.models.file import ImageFileCollection
 from onegov.org.models.page import Page
 from onegov.org.models import ExtendedDirectory
 from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.models.resource import Resource
+from onegov.org.models.ticket import ReservationHandler
 from onegov.page.collection import PageCollection
 from onegov.parliament.collections import (
     MeetingCollection,
@@ -2819,3 +2821,110 @@ def ris_resolve_parliamentarian_doublette(
             transaction.commit()
 
     return resolve_doublette
+
+
+@cli.command(name='add-price-to-ticket')
+@click.argument('reservation_file', type=click.File('rb'))
+def add_price_to_ticket(
+    reservation_file: IO[bytes],
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    Adds the price of a reservation to the ticket
+    """
+
+    def add_price(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+
+        book = load_workbook(reservation_file)
+        sheet = book['Reservationsdaten']
+
+        reservations: dict[str, dict[str, Any]] = {}
+        last_reservation_id = ''
+        for index, row in enumerate(sheet.rows):
+            if index <= 3:  # Skip the first 3 rows, they are headers
+                continue
+
+            reservation: dict[str, Any] = {
+                'email': '',
+                'resource_name': '',
+                'start_date': None,
+                'price': 0,
+            }
+            row_empty: bool = True
+            id = ''
+            resource_name = ''
+
+            for i, cell in enumerate(row):
+                value = cell.value
+                if i == 0:
+                    if value is None:
+                        continue
+                    row_empty = False
+                    resource_name = str(value)
+                elif i == 3:
+                    id = str(value)
+                    if last_reservation_id == id:
+                        reservation = reservations[id]
+                elif i == 6:
+                    reservation['start_date'] = value
+                elif i == 22:
+                    if value is None:
+                        value = 'info@seantis.ch'
+                    reservation['email'] = value
+                elif i == 32:
+                    if value is None:
+                        value = 0
+                    reservation['price'] += float(value)  # type: ignore
+                elif i == 37:
+                    reservation['state'] = str(value)
+            if not row_empty:
+                reservation['resource_name'] = resource_name
+                reservations[id] = reservation
+            last_reservation_id = id or ''
+
+        # res_show = json.dumps(reservations, indent=4, default=str)
+        # click.secho(f'Reservations: {res_show}', fg='green')
+
+        ids = list(reservations.keys())
+
+        for id, reservation in reservations.items():
+            if reservation['state'] == 'annuliert':
+                click.secho(
+                    f'Reservation {id} is canceled, skipping',
+                    fg='yellow'
+                )
+                continue
+            tickets = TicketCollection(session).by_ticket_email(
+                reservation['email']
+            )
+
+            for ticket in tickets.all():
+                if isinstance(ticket.handler, ReservationHandler):
+                    if reservation['resource_name'].lower(
+
+                    ) == ticket.handler.resource.name:  # type: ignore
+                        start_date = reservation['start_date']
+                        dt = pytz.timezone('Europe/Zurich').localize(
+                            start_date)
+
+                        reservation_dates = [
+                            h.start for h in ticket.handler.reservations]
+
+                        if dt in reservation_dates:
+
+                            payment = ManualPayment(
+                                amount=reservation['price'],
+                                currency='CHF',
+                            )
+                            for res in ticket.handler.reservations:
+                                res.payment = payment
+                            ticket.handler.refresh()
+                            click.secho(
+                                f'Adding price {reservation["price"]} to '
+                                f'ticket {ticket.number} for reservation {id}',
+                                fg='green'
+                            )
+                            ids.remove(id)
+        click.secho(f'Remaining IDs: {ids}', fg='yellow')
+
+    return add_price
