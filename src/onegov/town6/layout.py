@@ -1480,19 +1480,20 @@ class RISCommissionLayout(DefaultLayout):
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
-                LinkGroup(
-                    title=_('Add'),
-                    links=[
-                        Link(
-                            text=_('Parliamentarian'),
-                            url=self.request.link(
-                                self.model,
-                                'new-membership'
-                            ),
-                            attrs={'class': 'new-parliamentarian'}
-                        ),
-                    ]
-                ),
+                # TODO: OGC-2461
+                # LinkGroup(
+                #     title=_('Add'),
+                #     links=[
+                #         Link(
+                #             text=_('Parliamentarian'),
+                #             url=self.request.link(
+                #                 self.model,
+                #                 'new-membership'
+                #             ),
+                #             attrs={'class': 'new-parliamentarian'}
+                #         ),
+                #     ]
+                # ),
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
