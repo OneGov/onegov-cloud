@@ -1282,11 +1282,13 @@ def get_commission(
 @OrgApp.path(
     model=MeetingCollection,
     path='/meetings',
+    converters={'past': bool}
 )
 def get_meetings(
     app: OrgApp,
+    past: bool = True  # show past meetings by default
 ) -> MeetingCollection:
-    return MeetingCollection(app.session())
+    return MeetingCollection(app.session(), past)
 
 
 @OrgApp.path(

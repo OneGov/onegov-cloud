@@ -17,6 +17,7 @@ from onegov.town6.layout import MeetingCollectionLayout
 from onegov.town6.layout import MeetingLayout
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
     from onegov.core.types import RenderData
@@ -46,11 +47,23 @@ def view_meetings(
     request: TownRequest,
     layout: MeetingCollectionLayout | None = None
 ) -> RenderData:
-
     if not request.app.org.ris_enabled:
         raise HTTPNotFound()
 
+    filters = {}
+    filters['past'] = [
+        Link(
+            text=request.translate(title),
+            active=self.past == value,
+            url=request.link(self.for_filter(past=value))
+        ) for title, value in (
+            (_('Past Meetings'), True),
+            (_('Upcoming Meetings'), False)
+        )
+    ]
+
     return {
+        'filters': filters,
         'layout': layout or MeetingCollectionLayout(self, request),
         'meetings': self.query().all(),
         'title': _('Meetings'),
