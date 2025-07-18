@@ -52,7 +52,6 @@ def view_political_businesses(
             text=request.translate(text),
             active=s in self.status,
             url=request.link(self.for_filter(s=s)),
-            rounded=True,
         )
         for s, text in POLITICAL_BUSINESS_STATUS.items()
     ]
@@ -62,7 +61,6 @@ def view_political_businesses(
             text=request.translate(text),
             active=type in self.types,
             url=request.link(self.for_filter(type=type)),
-            rounded=True,
         )
         for type, text in POLITICAL_BUSINESS_TYPE.items()
     ]
