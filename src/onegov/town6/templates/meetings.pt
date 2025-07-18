@@ -4,11 +4,10 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
-            <div class="medium-7 cell main-content"
-                 tal:define="shown_meetings python:[m for m in meetings if m.meeting_items]">
-                <p tal:condition="not:shown_meetings" i18n:translate="">No meetings defined yet.</p>
-                <ul tal:condition="shown_meetings" class="more-list meeting-list">
-                    <li tal:repeat="meeting shown_meetings">
+            <div class="medium-6 cell main-content">
+                <p tal:condition="not:meetings" i18n:translate="">No meetings defined yet.</p>
+                <ul tal:condition="meetings" class="more-list meeting-list">
+                    <li tal:repeat="meeting meetings">
                         <a class="list-link" tal:attributes="href request.link(meeting)">
                             <span class="h5 list-title">
                                 ${meeting.title}
@@ -21,6 +20,15 @@
                         </a>
                     </li>
                 </ul>
+            </div>
+
+            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+                <div class="sidebar-wrapper">
+                    <div class="side-panel">
+                        <h3 i18n:translate="">Filters</h3>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['past']" />
+                    </div>
+                </div>
             </div>
         </div>
     </tal:b>

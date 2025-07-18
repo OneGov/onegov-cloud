@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-16 13:05+0200\n"
+"POT-Creation-Date: 2025-07-17 14:55+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1182,8 +1182,8 @@ msgstr "Per didascalia"
 msgid "By last change"
 msgstr "Per data dell'ultima modifica"
 
-msgid "Portrait"
-msgstr "Ritratto"
+msgid "Agenda Items"
+msgstr "Elementi dell'agenda"
 
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilizzato nella panoramica e nell'oggetto dell'e-mail"
@@ -3436,6 +3436,9 @@ msgstr "Lo scorso anno"
 msgid "Older"
 msgstr "Più vecchia"
 
+msgid "Meeting"
+msgstr "Riunione"
+
 msgid "Do you really want to delete this note?"
 msgstr "Vuoi davvero eliminare questa nota?"
 
@@ -3662,8 +3665,8 @@ msgstr "Rifiuta le prenotazioni"
 msgid "Reject all with message"
 msgstr "Rifiuta tutto con messaggio"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -7251,6 +7254,9 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid "Portrait"
+#~ msgstr "Ritratto"
 
 #~ msgid "Please note that this page has subpages which will also be deleted!"
 #~ msgstr ""
