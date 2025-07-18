@@ -33,6 +33,21 @@
                     <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model; pagination_centered True" />
                 </div>
             </div>
+
+            <div class="large-4 medium-4 cell sidebar">
+                <div class="sidebar-wrapper">
+                    <div class="side-panel">
+                        <div tal:condition="business_types">
+                            <h3 i18n:translate="">Business Type</h3>
+                            <div metal:use-macro="layout.macros['tags']" tal:define="tags business_types" />
+                        </div>
+                        <div tal:condition="business_status">
+                            <h3 i18n:translate="">Status</h3>
+                            <div metal:use-macro="layout.macros['tags']" tal:define="tags business_status" />
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </tal:b>
 </div>

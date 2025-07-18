@@ -14,8 +14,8 @@ from onegov.town6 import TownApp
 from onegov.town6.layout import PoliticalBusinessCollectionLayout
 from onegov.town6.layout import PoliticalBusinessLayout
 
-
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
@@ -44,6 +44,28 @@ def view_political_businesses(
     request: TownRequest,
     layout: PoliticalBusinessCollectionLayout | None = None
 ) -> RenderData | Response:
+    status = []
+    types = []
+
+    status = [
+        Link(
+            text=request.translate(text),
+            active=s in self.status,
+            url=request.link(self.for_filter(s=s)),
+            rounded=True,
+        )
+        for s, text in POLITICAL_BUSINESS_STATUS.items()
+    ]
+
+    types = [
+        Link(
+            text=request.translate(text),
+            active=type in self.types,
+            url=request.link(self.for_filter(type=type)),
+            rounded=True,
+        )
+        for type, text in POLITICAL_BUSINESS_TYPE.items()
+    ]
 
     return {
         # 'add_link': request.link(self, name='new'),
@@ -52,6 +74,8 @@ def view_political_businesses(
         'businesses': self.batch,
         'type_map': POLITICAL_BUSINESS_TYPE,
         'status_map': POLITICAL_BUSINESS_STATUS,
+        'business_status': status,
+        'business_types': types,
     }
 
 
