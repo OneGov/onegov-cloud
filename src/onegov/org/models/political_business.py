@@ -15,14 +15,18 @@ from uuid import uuid4
 
 
 from typing import Literal, Self, TypeAlias, TYPE_CHECKING
+
+
 if TYPE_CHECKING:
     import uuid
+    from collections.abc import Sequence
     from datetime import date
+    from sqlalchemy.orm import Query, Session
+
     from onegov.org.models import Meeting
     from onegov.org.models import MeetingItem
     from onegov.org.models import RISParliamentarian
     from onegov.org.models import RISParliamentaryGroup
-    from sqlalchemy.orm import Query, Session
 
     PoliticalBusinessType: TypeAlias = Literal[
         'inquiry',  # Anfrage
@@ -274,10 +278,14 @@ class PoliticalBusinessCollection(
     def __init__(
         self,
         session: Session,
-        page: int = 0
+        page: int = 0,
+        status: PoliticalBusinessStatus | None = None,
+        types: PoliticalBusinessType | None = None,
     ) -> None:
         super().__init__(session)
         self.page = page
+        self.status = status if status is not None else []
+        self.types = types if types is not None else []
         self.batch_size = 20
 
     @property
@@ -292,17 +300,62 @@ class PoliticalBusinessCollection(
 
     def query(self) -> Query[PoliticalBusiness]:
         query = super().query()
+
+        if self.status:
+            query = query.filter(
+                PoliticalBusiness.status.in_(self.status)
+            )
+
+        if self.types:
+            query = query.filter(
+                PoliticalBusiness.political_business_type.in_(self.types)
+            )
+
         return query.order_by(self.model_class.entry_date.desc())
 
     def subset(self) -> Query[PoliticalBusiness]:
         return self.query()
 
     def page_by_index(self, index: int) -> Self:
-        return self.__class__(self.session, page=index)
+        return self.__class__(
+            self.session,
+            page=index,
+            status=self.status,
+            types=self.types,
+        )
 
     @property
     def page_index(self) -> int:
         return self.page
+
+    def for_filter(
+        self,
+        status: Sequence[str] | None = None,
+        s: str | None = None,
+        types: Sequence[str] | None = None,
+        type: str | None = None,
+    ) -> Self:
+
+        status = list(self.status if status is None else status)
+        if s is not None:
+            if s in status:
+                status.remove(s)
+            else:
+                status.append(s)
+
+        types = list(self.types if types is None else types)
+        if type is not None:
+            if type in types:
+                types.remove(type)
+            else:
+                types.append(type)
+
+        return self.__class__(
+            self.session,
+            page=self.page,
+            status=status,
+            types=types
+        )
 
 
 class PoliticalBusinessParticipationCollection(
