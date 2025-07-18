@@ -1,8 +1,22 @@
 # Changes
 
+## 2025.34
+
+`2025-07-18` | [86456cadbf...4fea222a0b](https://github.com/OneGov/onegov-cloud/compare/86456cadbf^...4fea222a0b)
+
+### Ris
+
+##### Menu to add, edit and remove meetings
+
+`Feature` | [OGC-2453](https://linear.app/onegovcloud/issue/OGC-2453) | [7990d46167](https://github.com/onegov/onegov-cloud/commit/7990d461674eaff84f1dc5e342c4b7e54296f4e5)
+
+##### Adds filter for future/past meetings (#1913)
+
+`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [4fea222a0b](https://github.com/onegov/onegov-cloud/commit/4fea222a0b0eb79b7b5cf4123352b38df154280b)
+
 ## 2025.33
 
-`2025-07-16` | [32fb87a343...0879bb37dd](https://github.com/OneGov/onegov-cloud/compare/32fb87a343^...0879bb37dd)
+`2025-07-16` | [32fb87a343...83af613185](https://github.com/OneGov/onegov-cloud/compare/32fb87a343^...83af613185)
 
 ### Org
 
@@ -2088,14 +2102,4 @@ Make sure all relevant buttons are in the edit bar.
 ##### Adds open data description for mission reports
 
 `Feature` | [OGC-1908](https://linear.app/onegovcloud/issue/OGC-1908) | [04d072f339](https://github.com/onegov/onegov-cloud/commit/04d072f339a572ae4bda06c65bb47e7090802407)
-
-## 1
-
-`2024-11-21` | [9c3aee5da3...e14871c0ba](https://github.com/OneGov/onegov-cloud/compare/9c3aee5da3^...e14871c0ba)
-
-### Agency
-
-##### Ensure a failing pdf file access does not crash application
-
-`Bugfix` | [OGC-1906](https://linear.app/onegovcloud/issue/OGC-1906) | [c85c47ea7e](https://github.com/onegov/onegov-cloud/commit/c85c47ea7ecda50b85c4a26cd24377a7f1c637bc)
 
