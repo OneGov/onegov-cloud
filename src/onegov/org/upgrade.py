@@ -9,6 +9,8 @@ from itertools import chain
 import pytz
 import yaml
 
+from sqlalchemy import Enum
+
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base, find_models
 from onegov.core.orm.types import JSON, UTCDateTime, UUID
@@ -665,35 +667,51 @@ def make_political_business_participation_type_column_nullable(
         )
 
 
-@upgrade_task('Add missing political business type')
-def add_missing_political_business_type(context: UpgradeContext) -> None:
-    table = 'par_political_businesses'
-    if context.has_table(table) and context.has_column(
-            table, 'political_business_type'
-    ):
-        context.operations.execute(
-            """
-            ALTER TYPE par_political_business_type
-            ADD VALUE IF NOT EXISTS 'interpellation';
-            """
-        )
-
-
-@upgrade_task(
-    'Switch political business type due to typo',
-    requires='onegov.org:Add missing political business type',
-)
-def switch_political_business_type_due_to_typo(
+@upgrade_task('Update political business type enum values')
+def update_political_business_type_enum_values(
     context: UpgradeContext
 ) -> None:
-    table = 'par_political_businesses'
-    if context.has_table(table) and context.has_column(
-            table, 'political_business_type'
-    ):
-        context.operations.execute(
-            f"""
-            UPDATE {table}
+
+    new_business_type = Enum(
+        *POLITICAL_BUSINESS_TYPE.keys(),
+        name='par_political_business_type',
+    )
+
+    if context.has_enum('par_political_business_type'):
+        op = context.operations
+
+        op.execute("""
+            ALTER TABLE par_political_businesses
+            ALTER COLUMN political_business_type TYPE Text;
+            UPDATE par_political_businesses
             SET political_business_type = 'interpellation'
             WHERE political_business_type = 'interpelleation';
-            """
-        )
+            UPDATE par_political_businesses
+            SET political_business_type = 'election'
+            WHERE political_business_type = 'elections';
+            UPDATE par_political_businesses
+            SET political_business_type = 'inquiry'
+            WHERE political_business_type = 'proposal';
+            UPDATE par_political_businesses
+            SET political_business_type = 'inquiry'
+            WHERE political_business_type = 'mandate';
+            UPDATE par_political_businesses
+            SET political_business_type = 'inquiry'
+            WHERE political_business_type = 'communication';
+            UPDATE par_political_businesses
+            SET political_business_type = 'inquiry'
+            WHERE political_business_type = 'miscellaneous';
+            UPDATE par_political_businesses
+            SET political_business_type = 'inquiry'
+            WHERE political_business_type = 'report';
+            DROP TYPE par_political_business_type;
+        """)
+
+        new_business_type.create(op.get_bind())
+
+        op.execute("""
+            ALTER TABLE par_political_businesses
+            ALTER COLUMN political_business_type
+            TYPE par_political_business_type
+            USING political_business_type::text::par_political_business_type;
+        """)
