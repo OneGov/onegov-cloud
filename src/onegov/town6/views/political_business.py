@@ -43,7 +43,7 @@ def count_political_businesses_by_type(request):
         func.count(PoliticalBusiness.id).label('count')
     ).group_by(PoliticalBusiness.political_business_type).all()
 
-    return result
+    return dict(result)
 
 
 @TownApp.html(
