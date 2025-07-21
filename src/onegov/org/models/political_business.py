@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+from datetime import date
+from sqlalchemy import and_, or_, func
+from sqlalchemy import Column, Date, Enum, ForeignKey, Text
+from sqlalchemy.orm import relationship
+from uuid import uuid4
+
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
@@ -9,29 +15,28 @@ from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.search import ORMSearchable
-from sqlalchemy import Column, Date, Enum, ForeignKey, Text
-from sqlalchemy.orm import relationship
-from uuid import uuid4
-
 
 from typing import Literal, Self, TypeAlias, TYPE_CHECKING
+
 if TYPE_CHECKING:
     import uuid
-    from datetime import date
+
+    from collections.abc import Sequence
+    from sqlalchemy.orm import Query, Session
+
     from onegov.org.models import Meeting
     from onegov.org.models import MeetingItem
     from onegov.org.models import RISParliamentarian
     from onegov.org.models import RISParliamentaryGroup
-    from sqlalchemy.orm import Query, Session
 
     PoliticalBusinessType: TypeAlias = Literal[
         'inquiry',  # Anfrage
         'proposal',  # Antrag
         'mandate',  # Auftrag
-        'report',   # Bericht
+        'report',  # Bericht
         'report and proposal',  # Bericht und Antrag
         'decision',  # Beschluss
-        'message',   # Botschaft
+        'message',  # Botschaft
         'urgent interpellation',  # Dringliche Interpellation
         'invitation',  # Einladung
         'interpelleation',  # Interpellation
@@ -60,7 +65,6 @@ if TYPE_CHECKING:
         'zurueckgewiesen',
         'ueberwiesen',
     ]
-
 
 POLITICAL_BUSINESS_TYPE: dict[PoliticalBusinessType, str] = {
     'inquiry': _('Inquiry'),
@@ -109,7 +113,6 @@ class PoliticalBusiness(
     GeneralFileLinkExtension,
     ORMSearchable
 ):
-
     GERMAN_STATUS_NAME_TO_VALUE_MAP: dict[str, str] = {
         'Abgeschrieben': 'written_off',
         'Beantwortet': 'answered',
@@ -274,10 +277,16 @@ class PoliticalBusinessCollection(
     def __init__(
         self,
         session: Session,
-        page: int = 0
+        page: int = 0,
+        status: PoliticalBusinessStatus | Sequence[str] | None = None,
+        types: PoliticalBusinessType | Sequence[str] | None = None,
+        years: Sequence[int] | None = None,
     ) -> None:
         super().__init__(session)
         self.page = page
+        self.status = status if status is not None else []
+        self.types = types if types is not None else []
+        self.years = years if years is not None else []
         self.batch_size = 20
 
     @property
@@ -292,17 +301,106 @@ class PoliticalBusinessCollection(
 
     def query(self) -> Query[PoliticalBusiness]:
         query = super().query()
+
+        if self.types:
+            query = query.filter(
+                PoliticalBusiness.political_business_type.in_(self.types)
+            )
+
+        if self.status:
+            query = query.filter(
+                PoliticalBusiness.status.in_(self.status)
+            )
+
+        if self.years:
+            query = query.filter(
+                or_(*[
+                    and_(
+                        PoliticalBusiness.entry_date.isnot(None),
+                        PoliticalBusiness.entry_date >= date(year, 1, 1),
+                        PoliticalBusiness.entry_date < date(year + 1, 1, 1),
+                    )
+                    for year in self.years
+                ])
+            )
+
         return query.order_by(self.model_class.entry_date.desc())
+
+    def query_all(self) -> Query[PoliticalBusiness]:
+        """
+        Returns a query for all political businesses, ignoring the page,
+        status, types, and years filters.
+        """
+        return super().query().order_by(self.model_class.entry_date.desc())
 
     def subset(self) -> Query[PoliticalBusiness]:
         return self.query()
 
     def page_by_index(self, index: int) -> Self:
-        return self.__class__(self.session, page=index)
+        return self.__class__(
+            self.session,
+            page=index,
+            status=self.status,
+            types=self.types,
+            years=self.years,
+        )
 
     @property
     def page_index(self) -> int:
         return self.page
+
+    def for_filter(
+        self,
+        status: Sequence[str] | None = None,
+        s: str | None = None,
+        types: Sequence[str] | None = None,
+        type: str | None = None,
+        years: Sequence[int] | None = None,
+        year: int | None = None,
+    ) -> Self:
+
+        status = list(self.status if status is None else status)
+        if s is not None:
+            if s in status:
+                status.remove(s)
+            else:
+                status.append(s)
+
+        types = list(self.types if types is None else types)
+        if type is not None:
+            if type in types:
+                types.remove(type)
+            else:
+                types.append(type)
+
+        years = list(self.years if years is None else years)
+        if year is not None:
+            if year in years:
+                years.remove(year)
+            else:
+                years.append(year)
+
+        return self.__class__(
+            self.session,
+            page=self.page,
+            status=status,
+            types=types,
+            years=years,
+        )
+
+    def years_for_entries(self) -> list[int]:
+        """ Returns a list of years for which there are entries in the db """
+
+        years = self.query_all().with_entities(
+            func.extract('year', PoliticalBusiness.entry_date).label('year')
+        ).filter(
+            PoliticalBusiness.entry_date.isnot(None)
+        ).distinct().order_by(
+            PoliticalBusiness.entry_date.desc()
+        )
+
+        # convert to a list of integers, remove duplicates, and sort
+        return sorted({int(year[0]) for year in years}, reverse=True)
 
 
 class PoliticalBusinessParticipationCollection(
