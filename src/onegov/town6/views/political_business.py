@@ -36,7 +36,9 @@ def get_political_business_form_class(
     )
 
 
-def count_political_businesses_by_type(request: TownRequest) -> dict[str, int]:
+def count_political_businesses_by_type(
+    request: TownRequest
+) -> dict[str, int]:
     session = request.session
     result = session.query(
         PoliticalBusiness.political_business_type,
@@ -44,6 +46,33 @@ def count_political_businesses_by_type(request: TownRequest) -> dict[str, int]:
     ).group_by(PoliticalBusiness.political_business_type).all()
 
     return dict(result)
+
+
+def count_political_businesses_by_status(
+    request: TownRequest
+) -> dict[str, int]:
+    session = request.session
+    result = session.query(
+        PoliticalBusiness.status,
+        func.count(PoliticalBusiness.id).label('count')
+    ).group_by(PoliticalBusiness.status).all()
+
+    return dict(result)
+
+
+def count_political_businesses_by_year(
+    request: TownRequest
+) -> dict[str, int]:
+    session = request.session
+    result = session.query(
+        func.extract('year', PoliticalBusiness.entry_date).label('year'),
+        func.count(PoliticalBusiness.id).label('count')
+    ).group_by(func.extract('year', PoliticalBusiness.entry_date)).all()
+
+    # convert decimal to string
+    return {
+        str(int(year)): count for year, count in result
+    }
 
 
 @TownApp.html(
@@ -73,22 +102,28 @@ def view_political_businesses(
             count_per_business_type[type] > 0)
     ], key=lambda x: x.text.lower() if x.text else '')
 
+    count_per_status = count_political_businesses_by_status(request)
     status = sorted([
         Link(
-            text=request.translate(text),
-            active=s in self.status,
-            url=request.link(self.for_filter(s=s)),
+            text=request.translate(text) +
+                f' ({count_per_status[status]})',
+            active=status in self.status,
+            url=request.link(self.for_filter(s=status)),
         )
-        for s, text in POLITICAL_BUSINESS_STATUS.items()
+        for status, text in POLITICAL_BUSINESS_STATUS.items()
+        if (status in count_per_status and count_per_status[status] > 0)
     ], key=lambda x: x.text.lower() if x.text else '')
 
+    count_per_year = count_political_businesses_by_year(request)
     years = [
         Link(
-            text=str(year),
-            active=year in self.years,
-            url=request.link(self.for_filter(year=year)),
+            text=str(year_int) + f' ({count_per_year[str(year_int)]})',
+            active=year_int in self.years,
+            url=request.link(self.for_filter(year=year_int)),
         )
-        for year in self.years_for_entries()
+        for year_int in self.years_for_entries()
+        if (str(year_int) in count_per_year and
+            count_per_year[str(year_int)] > 0)
     ]
 
     return {
