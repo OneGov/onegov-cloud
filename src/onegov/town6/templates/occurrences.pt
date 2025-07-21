@@ -5,6 +5,10 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x wrapper">
 
+            <div tal:condition="header_html|nothing" class="medium-8 large-7 cell event-header">
+                ${header_html}
+            </div>
+
             <div class="medium-8 large-7 cell date-range-selector-target content">
                 <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model; pagination_centered True" />
                 <div class="grid-x">
@@ -106,6 +110,10 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div tal:condition="footer_html|nothing" class="medium-8 large-7 cell event-header">
+                ${footer_html}
             </div>
         </div>
     </tal:b>
