@@ -44,6 +44,10 @@
                         <h3 i18n:translate="">Status</h3>
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags business_status" />
                     </div>
+                    <div tal:condition="years" class="side-panel filter-business-years">
+                        <h3 i18n:translate="">Year</h3>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags years" />
+                    </div>
                 </div>
             </div>
         </div>

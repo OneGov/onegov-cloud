@@ -36,7 +36,7 @@ def get_political_business_form_class(
     )
 
 
-def count_political_businesses_by_type(request):
+def count_political_businesses_by_type(request: TownRequest) -> dict[str, int]:
     session = request.session
     result = session.query(
         PoliticalBusiness.political_business_type,
@@ -58,6 +58,7 @@ def view_political_businesses(
 ) -> RenderData | Response:
     types = []
     status = []
+    years = []
 
     count_per_business_type = count_political_businesses_by_type(request)
     types = sorted([
@@ -70,7 +71,7 @@ def view_political_businesses(
         for type, text in POLITICAL_BUSINESS_TYPE.items()
         if (type in count_per_business_type and
             count_per_business_type[type] > 0)
-    ], key=lambda x: x.text.lower())
+    ], key=lambda x: x.text.lower() if x.text else '')
 
     status = sorted([
         Link(
@@ -79,7 +80,16 @@ def view_political_businesses(
             url=request.link(self.for_filter(s=s)),
         )
         for s, text in POLITICAL_BUSINESS_STATUS.items()
-    ], key=lambda x: x.text.lower())
+    ], key=lambda x: x.text.lower() if x.text else '')
+
+    years = [
+        Link(
+            text=str(year),
+            active=year in self.years,
+            url=request.link(self.for_filter(year=year)),
+        )
+        for year in self.years_for_entries()
+    ]
 
     return {
         # 'add_link': request.link(self, name='new'),
@@ -90,6 +100,7 @@ def view_political_businesses(
         'status_map': POLITICAL_BUSINESS_STATUS,
         'business_types': types,
         'business_status': status,
+        'years': years,
     }
 
 
