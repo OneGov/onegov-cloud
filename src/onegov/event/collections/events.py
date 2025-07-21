@@ -577,6 +577,7 @@ class EventCollection(Pagination[Event]):
             }
 
         for event in root.xpath('//ns:event', namespaces=ns):
+            event_id = find_element_text(event, 'uuid7')
             title = find_element_text(event, 'title')
             abstract = find_element_text(event, 'abstract')
             description = find_element_text(event, 'description')
@@ -683,7 +684,7 @@ class EventCollection(Pagination[Event]):
                             external_event_url=event_url or provider_url,
                             tags=tags,
                             filter_keywords=None,
-                            source=schedule_id,
+                            source=event_id,
                         ),
                         image=event_image,
                         image_filename=event_image_name,
