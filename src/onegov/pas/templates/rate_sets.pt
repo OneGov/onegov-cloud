@@ -5,12 +5,14 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
             <div class="medium-7 cell main-content">
-                <p tal:condition="not:rate_sets" i18n:translate="">No rate sets defined yet.</p>
-                <ul tal:condition="rate_sets" class="more-list rate-set-list">
+                <p tal:condition="not:rate_sets" i18n:translate="">No rate sets defined yet.</p> <ul tal:condition="rate_sets" class="more-list rate-set-list">
                     <li tal:repeat="rate_set rate_sets">
-                        <a class="list-link" tal:attributes="href request.link(rate_set)">
+                        <div class="list-link-container">
+                          <a class="list-link" tal:attributes="href request.link(rate_set)">
                             <h5 class="list-title">${rate_set.year}</h5>
-                        </a>
+                          </a>
+                            <a class="copy-icon" title="Copy this rate set" i18n:attributes="title" tal:attributes="href request.link(rate_set, 'copy-rate-set')"><i class="fas fa-copy"></i></a>
+                        </div>
                     </li>
                 </ul>
             </div>

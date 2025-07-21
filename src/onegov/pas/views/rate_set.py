@@ -10,6 +10,7 @@ from onegov.pas.layouts import RateSetCollectionLayout
 from onegov.pas.layouts import RateSetLayout
 from onegov.pas.models import RateSet
 
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
