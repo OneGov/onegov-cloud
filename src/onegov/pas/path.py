@@ -10,19 +10,19 @@ from onegov.pas.collections import PASCommissionMembershipCollection
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections import PASParliamentarianRoleCollection
 from onegov.pas.collections import PASParliamentaryGroupCollection
-from onegov.pas.collections import PASPartyCollection
+from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
-from onegov.pas.models import PASAttendence
-from onegov.pas.models import PASChange
+from onegov.pas.models import Attendence
+from onegov.pas.models import Change
+from onegov.pas.models import ImportLog
+from onegov.pas.models import LegislativePeriod
 from onegov.pas.models import PASCommission
 from onegov.pas.models import PASCommissionMembership
-from onegov.pas.models import ImportLog
-from onegov.pas.models import PASLegislativePeriod
 from onegov.pas.models import PASParliamentarian
 from onegov.pas.models import PASParliamentarianRole
 from onegov.pas.models import PASParliamentaryGroup
-from onegov.pas.models import PASParty
+from onegov.pas.models import Party
 from onegov.pas.models import RateSet
 from onegov.pas.models import SettlementRun
 from uuid import UUID
@@ -32,11 +32,6 @@ from datetime import date
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
-
-    from onegov.parliament.models import (
-        Party,
-        ParliamentaryGroup
-    )
 
 
 @PasApp.path(
@@ -73,14 +68,14 @@ def get_attendences(
 
 
 @PasApp.path(
-    model=PASAttendence,
+    model=Attendence,
     path='/attendence/{id}',
     converters={'id': UUID}
 )
 def get_attendence(
     app: PasApp,
     id: UUID
-) -> PASAttendence | None:
+) -> Attendence | None:
     return AttendenceCollection(app.session()).by_id(id)
 
 
@@ -95,14 +90,14 @@ def get_changes(
 
 
 @PasApp.path(
-    model=PASChange,
+    model=Change,
     path='/change/{id}',
     converters={'id': UUID}
 )
 def get_change(
     app: PasApp,
     id: UUID
-) -> PASChange | None:
+) -> Change | None:
     return ChangeCollection(app.session()).by_id(id)
 
 
@@ -165,14 +160,14 @@ def get_legislative_periods(
 
 
 @PasApp.path(
-    model=PASLegislativePeriod,
+    model=LegislativePeriod,
     path='/legislative-period/{id}',
     converters={'id': UUID}
 )
 def get_legislative_period(
     app: PasApp,
     id: UUID
-) -> PASLegislativePeriod | None:
+) -> LegislativePeriod | None:
     return LegislativePeriodCollection(app.session()).by_id(id)
 
 
@@ -242,24 +237,24 @@ def get_parliamentary_groups(
 def get_parliamentary_group(
     app: PasApp,
     id: UUID
-) -> ParliamentaryGroup | None:
+) -> PASParliamentaryGroup | None:
     return PASParliamentaryGroupCollection(app.session()).by_id(id)
 
 
 @PasApp.path(
-    model=PASPartyCollection,
+    model=PartyCollection,
     path='/parties',
     converters={'active': bool}
 )
 def get_parties(
     app: PasApp,
     active: bool = True,
-) -> PASPartyCollection:
-    return PASPartyCollection(app.session(), active)
+) -> PartyCollection:
+    return PartyCollection(app.session(), active)
 
 
 @PasApp.path(
-    model=PASParty,
+    model=Party,
     path='/party/{id}',
     converters={'id': UUID}
 )
@@ -267,7 +262,7 @@ def get_party(
     app: PasApp,
     id: UUID
 ) -> Party | None:
-    return PASPartyCollection(app.session()).by_id(id)
+    return PartyCollection(app.session()).by_id(id)
 
 
 @PasApp.path(
@@ -327,7 +322,7 @@ class SettlementRunExport:
     def __init__(
         self,
         settlement_run: SettlementRun,
-        entity: PASParty | PASCommission | PASParliamentarian,
+        entity: Party | PASCommission | PASParliamentarian,
         category: str | None = None
     ):
         self.settlement_run = settlement_run
@@ -368,7 +363,7 @@ def get_settlement_run_export(
         return None
 
     model_map: dict[str, type] = {
-        'Party': PASParty,
+        'Party': Party,
         'Commission': PASCommission,
         'Parliamentarian': PASParliamentarian,
     }

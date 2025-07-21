@@ -7,6 +7,7 @@ from collections import OrderedDict
 from functools import cached_property
 
 from markupsafe import Markup
+
 from onegov.core.i18n import get_translation_bound_meta
 from onegov.core.orm.abstract import MoveDirection
 from onegov.core.orm.mixins import (

@@ -6,7 +6,7 @@ from onegov.pas.collections import PASCommissionMembershipCollection
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections import PASParliamentarianRoleCollection
 from onegov.pas.collections import PASParliamentaryGroupCollection
-from onegov.pas.collections import PASPartyCollection
+from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
 from onegov.pas.forms import AttendenceAddCommissionForm
@@ -15,7 +15,7 @@ from onegov.pas.forms import AttendenceAddPlenaryForm
 from onegov.pas.forms import AttendenceForm
 from onegov.pas.forms import CommissionMembershipAddForm
 from onegov.pas.forms import CommissionMembershipForm
-from onegov.pas.forms import ParliamentarianRoleForm
+from onegov.pas.forms import PASParliamentarianRoleForm
 from onegov.pas.forms import RateSetForm
 from onegov.pas.forms import SettlementRunForm
 from onegov.pas.models import RateSet
@@ -276,12 +276,12 @@ def test_parliamentarian_role_form(session, dummy_request):
     groups.add(name='b')
     groups.add(name='c')
 
-    parties = PASPartyCollection(session)
+    parties = PartyCollection(session)
     parties.add(name='x')
     parties.add(name='y')
 
     # on request
-    form = ParliamentarianRoleForm()
+    form = PASParliamentarianRoleForm()
     form.request = dummy_request
     form.on_request()
 
@@ -290,7 +290,7 @@ def test_parliamentarian_role_form(session, dummy_request):
     assert len(form.party_id.choices) == 3
 
     # populate / get useful data
-    form = ParliamentarianRoleForm(DummyPostData({
+    form = PASParliamentarianRoleForm(DummyPostData({
         'parliamentary_group_id': '',
         'party_id': ''
     }))

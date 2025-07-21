@@ -1,5 +1,5 @@
 from onegov.pas.models import (
-    PASAttendence,
+    Attendence,
     PASCommission,
     PASParliamentarian,
     RateSet,
@@ -42,14 +42,14 @@ def test_generate_parliamentarian_export(session):
     # Create some test attendances
     attendances = [
         # 2 hour plenary session
-        PASAttendence(
+        Attendence(
             parliamentarian=parliamentarian,
             date=date(2023, 10, 15),
             duration=120,  # minutes
             type='plenary',
         ),
         # 1.5 hour commission meeting
-        PASAttendence(
+        Attendence(
             parliamentarian=parliamentarian,
             date=date(2023, 11, 15),
             duration=90,  # minutes
@@ -57,7 +57,7 @@ def test_generate_parliamentarian_export(session):
             commission=commission,
         ),
         # 1 hour study time
-        PASAttendence(
+        Attendence(
             parliamentarian=parliamentarian,
             date=date(2023, 12, 15),
             duration=60,  # minutes

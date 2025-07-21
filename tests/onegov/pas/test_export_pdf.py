@@ -4,13 +4,13 @@ import transaction
 from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.models import (
-    PASParty,
+    Party,
     PASParliamentarian,
     PASParliamentarianRole,
     RateSet,
     PASCommission,
     SettlementRun,
-    PASAttendence,
+    Attendence,
 )
 
 
@@ -39,7 +39,7 @@ def test_parliamentarian_settlement_calculations(session):
             last_name='President',
             gender='female'
         )
-        party = PASParty(name='Test Party')
+        party = Party(name='Test Party')
         role = PASParliamentarianRole(
             parliamentarian=parliamentarian,
             role='president',
@@ -55,7 +55,7 @@ def test_parliamentarian_settlement_calculations(session):
         # Create various attendances to test different scenarios
         attendences = [
             # Plenary session (always counts as half day)
-            PASAttendence(
+            Attendence(
                 parliamentarian=parliamentarian,
                 date=date(2024, 1, 15),
                 duration=240,  # 4 hours - should still count as half day
@@ -63,14 +63,14 @@ def test_parliamentarian_settlement_calculations(session):
             ),
 
             # Commission meetings
-            PASAttendence(
+            Attendence(
                 parliamentarian=parliamentarian,
                 date=date(2024, 1, 20),
                 duration=120,  # 2 hours - initial rate only
                 type='commission',
                 commission=commission
             ),
-            PASAttendence(
+            Attendence(
                 parliamentarian=parliamentarian,
                 date=date(2024, 1, 21),
                 duration=180,  # 3 hours - initial + additional rate
@@ -79,14 +79,14 @@ def test_parliamentarian_settlement_calculations(session):
             ),
 
             # Study sessions
-            PASAttendence(
+            Attendence(
                 parliamentarian=parliamentarian,
                 date=date(2024, 2, 1),
                 duration=60,  # 1 hour
                 type='study',
                 commission=commission
             ),
-            PASAttendence(
+            Attendence(
                 parliamentarian=parliamentarian,
                 date=date(2024, 2, 2),
                 duration=90,  # 1.5 hours

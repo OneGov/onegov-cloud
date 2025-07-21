@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from datetime import date
+from onegov.core.collection import GenericCollection
+from onegov.parliament.models import Commission
 from sqlalchemy import or_
 
-from onegov.core.collection import GenericCollection
-from onegov.parliament.models import Commission, RISCommission
 
 from typing import Any, TYPE_CHECKING
 from typing_extensions import TypeVar
@@ -52,10 +52,3 @@ class CommissionCollection(GenericCollection[CommissionT]):
         active: bool | None = None
     ) -> Self:
         return self.__class__(self.session, active)
-
-
-class RISCommissionCollection(CommissionCollection[RISCommission]):
-
-    @property
-    def model_class(self) -> type[RISCommission]:
-        return RISCommission

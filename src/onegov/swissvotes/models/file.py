@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     FileT = TypeVar('FileT', bound=File)
 
     class HasFiles(Protocol[FileT]):
-        files: relationship[list[FileT]]
+        files: list[FileT]
 
     class HasFilesAndSessionManager(HasFiles[FileT], Protocol):
         @property
@@ -62,18 +62,18 @@ class TranslatablePageFile(File):
 class FileSubCollection:
     """ A subset of files prefixed by the descriptor's name. """
 
-    def __set_name__(self, owner: type[HasFiles[FileT]], name: str) -> None:
+    def __set_name__(self, owner: type[object], name: str) -> None:
         self.name = name
 
     def __get__(
         self,
         instance: HasFiles[FileT] | None,
-        owner: type[HasFiles[FileT]]
+        owner: type[object]
     ) -> list[FileT]:
 
         if instance:
             return sorted((
-                file for file in instance.files  # type: ignore[attr-defined]
+                file for file in instance.files
                 if file.name.startswith(self.name)
             ), key=attrgetter('name'))
         return []
@@ -104,7 +104,7 @@ class LocalizedFile:
         self.label = label
         self.static_views = static_views or {}
 
-    def __set_name__(self, owner: type[HasFiles[FileT]], name: str) -> None:
+    def __set_name__(self, owner: type[object], name: str) -> None:
         self.name = name
 
     def __get_localized_name__(
@@ -127,7 +127,7 @@ class LocalizedFile:
         if instance:
             name = self.__get_localized_name__(instance, locale)
             file: FileT
-            for file in instance.files:  # type: ignore[attr-defined]
+            for file in instance.files:
                 if file.name == name:
                     return file
         return None
@@ -135,7 +135,7 @@ class LocalizedFile:
     def __get__(
         self,
         instance: HasFilesAndSessionManager[FileT] | None,
-        owner: type[HasFilesAndSessionManager[FileT]]
+        owner: type[object]
     ) -> FileT | None:
         return self.__get_by_locale__(instance)
 

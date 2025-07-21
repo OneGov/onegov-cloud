@@ -468,6 +468,7 @@ def get_i18n_localedirs() -> list[str]:
     return [
         utils.module_path('onegov.org', 'locale'),
         utils.module_path('onegov.form', 'locale'),
+        utils.module_path('onegov.parliament', 'locale'),
         utils.module_path('onegov.user', 'locale')
     ]
 
@@ -877,6 +878,11 @@ def get_all_blank_asset() -> Iterator[str]:
 @OrgApp.webasset('people-select')
 def people_select_asset() -> Iterator[str]:
     yield 'people-select.js'
+
+
+@OrgApp.webasset('participant-select')
+def particpant_select_asset() -> Iterator[str]:
+    yield 'participant-select.js'
 
 
 @OrgApp.webasset('kaba-configurations')

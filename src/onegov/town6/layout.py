@@ -67,19 +67,14 @@ from onegov.org.layout import (
     UserGroupLayout as OrgUserGroupLayout,
     UserGroupCollectionLayout as OrgUserGroupCollectionLayout,
     UserManagementLayout as OrgUserManagementLayout)
+from onegov.org.models import MeetingCollection
 from onegov.org.models import PageMove
+from onegov.org.models import PoliticalBusinessCollection
+from onegov.org.models import RISCommissionCollection
+from onegov.org.models import RISParliamentarianCollection
+from onegov.org.models import RISParliamentaryGroupCollection
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.page import PageCollection
-from onegov.parliament.collections import RISPartyCollection
-from onegov.parliament.collections import MeetingCollection
-from onegov.parliament.collections import PoliticalBusinessCollection
-from onegov.parliament.collections.commission import (
-    RISCommissionCollection
-)
-from onegov.parliament.collections import RISParliamentarianCollection
-from onegov.parliament.collections import (
-    RISParliamentaryGroupCollection
-)
 from onegov.stepsequence import step_sequences
 from onegov.stepsequence.extension import StepsLayoutExtension
 from onegov.town6 import _
@@ -1079,6 +1074,10 @@ class MeetingCollectionLayout(DefaultLayout):
 class MeetingLayout(DefaultLayout):
 
     @cached_property
+    def collection(self) -> MeetingCollection:
+        return MeetingCollection(self.request.session)
+
+    @cached_property
     def title(self) -> str:
         return self.model.title
 
@@ -1096,7 +1095,7 @@ class MeetingLayout(DefaultLayout):
         ]
 
     @cached_property
-    def editbar_links(self) -> list[LinkGroup] | None:
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
                 LinkGroup(
@@ -1109,6 +1108,32 @@ class MeetingLayout(DefaultLayout):
                         ),
                     ],
                 ),
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-meeting'},
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(self.request.link(self.model)),
+                    attrs={'class': 'delete-meeting'},
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to delete this meeting?'
+                            ),
+                            _('This cannot be undone.'),
+                            _('Delete meeting'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(
+                                self.collection
+                            )
+                        )
+                    )
+                )
             ]
         return None
 
@@ -1183,7 +1208,7 @@ class RISParliamentarianLayout(DefaultLayout):
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_('Role (as a party or group member)'),
+                            text=_('Role (as a group member)'),
                             url=self.request.link(self.model, 'new-role'),
                             attrs={'class': 'new-role'}
                         ),
@@ -1421,61 +1446,6 @@ class RISPartyCollectionLayout(DefaultLayout):
         return None
 
 
-# FIXME create base class in onegov/parliament/layouts.py
-# e.g. DefaultParliamentLayout
-class RISPartyLayout(DefaultLayout):
-
-    @cached_property
-    def collection(self) -> RISPartyCollection:
-        return RISPartyCollection(self.request.session)
-
-    @cached_property
-    def title(self) -> str:
-        return self.model.name
-
-    @cached_property
-    def og_description(self) -> str:
-        return self.request.translate(self.title)
-
-    @cached_property
-    def breadcrumbs(self) -> list[Link]:
-        return [
-            Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
-            Link(_('Parties'), self.request.class_link(RISPartyCollection)),
-            Link(self.title, self.request.link(self.model)),
-        ]
-
-    @cached_property
-    def editbar_links(self) -> list[Link] | None:
-        if self.request.is_manager:
-            return [
-                Link(
-                    text=_('Edit'),
-                    url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'},
-                ),
-                Link(
-                    text=_('Delete'),
-                    url=self.csrf_protected_url(self.request.link(self.model)),
-                    attrs={'class': 'delete-link'},
-                    traits=(
-                        Confirm(
-                            _('Do you really want to delete this party?'),
-                            _('This cannot be undone.'),
-                            _('Delete party'),
-                            _('Cancel'),
-                        ),
-                        Intercooler(
-                            request_method='DELETE',
-                            redirect_after=self.request.class_link(RISPartyCollection)
-                        ),
-                    ),
-                ),
-            ]
-        return None
-
-
 class RISCommissionCollectionLayout(DefaultLayout):
 
     @cached_property
@@ -1540,19 +1510,20 @@ class RISCommissionLayout(DefaultLayout):
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
-                LinkGroup(
-                    title=_('Add'),
-                    links=[
-                        Link(
-                            text=_('Parliamentarian'),
-                            url=self.request.link(
-                                self.model,
-                                'new-membership'
-                            ),
-                            attrs={'class': 'new-parliamentarian'}
-                        ),
-                    ]
-                ),
+                # TODO: OGC-2461
+                # LinkGroup(
+                #     title=_('Add'),
+                #     links=[
+                #         Link(
+                #             text=_('Parliamentarian'),
+                #             url=self.request.link(
+                #                 self.model,
+                #                 'new-membership'
+                #             ),
+                #             attrs={'class': 'new-parliamentarian'}
+                #         ),
+                #     ]
+                # ),
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
@@ -1603,16 +1574,16 @@ class PoliticalBusinessCollectionLayout(DefaultLayout):
     def editbar_links(self) -> list[LinkGroup] | None:
         if self.request.is_manager:
             return [
-                # LinkGroup(
-                #     title=_('Add'),
-                #     links=[
-                #         Link(
-                #             text=_('Political Business'),
-                #             url=self.request.link(self.model, 'new'),
-                #             attrs={'class': 'new-political-business'}
-                #         ),
-                #     ]
-                # ),
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Political Business'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-political-business'}
+                        ),
+                    ]
+                ),
             ]
         return None
 
@@ -1645,32 +1616,31 @@ class PoliticalBusinessLayout(DefaultLayout):
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
-                # Link(
-                #     text=_('Edit'),
-                #     url=self.request.link(self.model, 'edit'),
-                #     attrs={'class': 'edit-link'}
-                # ),
-                # Link(
-                #     text=_('Delete'),
-                #     url=self.csrf_protected_url(
-                #         self.request.link(self.model)
-                #     ),
-                #     attrs={'class': 'delete-link'},
-                #     traits=(
-                #         Confirm(
-                #             _('Do you really want to delete this
-                #             political business?'),
-                #             _('This cannot be undone.'),
-                #             _('Delete political business'),
-                #             _('Cancel')
-                #         ),
-                #         Intercooler(
-                #             request_method='DELETE',
-                #             redirect_after=
-                #             self.request.class_link(
-                #               PoliticalBusinessCollection)
-                #         )
-                #     )
-                # )
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _('Do you really want to delete this '
+                              'political business?'),
+                            _('This cannot be undone.'),
+                            _('Delete political business'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(
+                              PoliticalBusinessCollection)
+                        )
+                    )
+                )
             ]
         return None

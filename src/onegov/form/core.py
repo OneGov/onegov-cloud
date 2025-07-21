@@ -1043,27 +1043,31 @@ def enforce_order(
 def move_fields(
     form_class: type[_FormT],
     fields: Collection[str],
-    after: str | None
+    after: str | None = None,
+    before: str | None = None,
 ) -> type[_FormT]:
     """ Reorders the given fields (given by name) by inserting them directly
     after the given field.
 
-    If ``after`` is None, the fields are moved to the end.
+    If ``after`` and ``before`` are ``None``, the fields are moved to the end.
 
     """
 
-    fields_in_order = []
+    fields_in_order: list[str] = []
 
     for name, _ in utils.get_fields_from_class(form_class):
         if name in fields:
             continue
+
+        if name == before:
+            fields_in_order.extend(fields)
 
         fields_in_order.append(name)
 
         if name == after:
             fields_in_order.extend(fields)
 
-    if after is None:
+    if after is None and before is None:
         fields_in_order.extend(fields)
 
     return enforce_order(form_class, fields_in_order)

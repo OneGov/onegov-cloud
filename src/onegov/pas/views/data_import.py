@@ -9,14 +9,15 @@ from onegov.core.utils import dictionary_to_binary
 from onegov.org.models import Organisation
 from onegov.pas import _, PasApp
 from onegov.pas.forms.data_import import DataImportForm
-from onegov.pas.importer.json_import import (
-    import_zug_kub_data,
+from onegov.pas.importer.json_import import import_zug_kub_data
+from onegov.pas.layouts import ImportLayout
+from onegov.pas.models import (
+    PASCommission,
+    PASCommissionMembership,
     PASParliamentarian,
     PASParliamentarianRole,
-    PASParty,
+    Party,
 )
-from onegov.pas.layouts import ImportLayout
-from onegov.pas.models import PASCommission, PASCommissionMembership
 
 
 from typing import Any, TYPE_CHECKING, TypedDict
@@ -109,7 +110,7 @@ def handle_data_import(
     def get_item_display_title(item: Any) -> str:
         if isinstance(item, PASParliamentarian):
             return item.title  # Already includes first/last name etc.
-        elif isinstance(item, (PASCommission, PASParty)):
+        elif isinstance(item, (PASCommission, Party)):
             return item.name
         elif isinstance(item, PASCommissionMembership):
             # Ensure related objects are loaded or handle potential errors

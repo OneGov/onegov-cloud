@@ -39,13 +39,32 @@ from onegov.org.models.message import SubmissionMessage
 from onegov.org.models.message import TicketChatMessage
 from onegov.org.models.message import TicketMessage
 from onegov.org.models.message import TicketNote
+from onegov.org.models.meeting import Meeting
+from onegov.org.models.meeting import MeetingCollection
+from onegov.org.models.meeting_item import MeetingItem
+from onegov.org.models.meeting_item import MeetingItemCollection
 from onegov.org.models.organisation import Organisation
 from onegov.org.models.page import AtoZPages, News, NewsCollection, Topic
 from onegov.org.models.page_move import PageMove
+from onegov.org.models.parliament import RISCommission
+from onegov.org.models.parliament import RISCommissionCollection
+from onegov.org.models.parliament import RISCommissionMembership
+from onegov.org.models.parliament import RISCommissionMembershipCollection
+from onegov.org.models.parliament import RISParliamentarian
+from onegov.org.models.parliament import RISParliamentarianCollection
+from onegov.org.models.parliament import RISParliamentarianRole
+from onegov.org.models.parliament import RISParliamentarianRoleCollection
+from onegov.org.models.parliament import RISParliamentaryGroup
+from onegov.org.models.parliament import RISParliamentaryGroupCollection
 from onegov.org.models.person_move import FormPersonMove
 from onegov.org.models.person_move import PagePersonMove
 from onegov.org.models.person_move import PersonMove
 from onegov.org.models.person_move import ResourcePersonMove
+from onegov.org.models.political_business import PoliticalBusiness
+from onegov.org.models.political_business import PoliticalBusinessCollection
+from onegov.org.models.political_business import PoliticalBusinessParticipation
+from onegov.org.models.political_business import (
+    PoliticalBusinessParticipationCollection)
 from onegov.org.models.publication import PublicationCollection
 from onegov.org.models.recipient import ResourceRecipient
 from onegov.org.models.recipient import ResourceRecipientCollection
@@ -95,6 +114,10 @@ __all__ = (
     'LegacyFileCollection',
     'LegacyImage',
     'LegacyImageCollection',
+    'Meeting',
+    'MeetingCollection',
+    'MeetingItem',
+    'MeetingItemCollection',
     'News',
     'NewsCollection',
     'Organisation',
@@ -103,7 +126,21 @@ __all__ = (
     'PaymentMessage',
     'PersonLinkExtension',
     'PersonMove',
+    'PoliticalBusiness',
+    'PoliticalBusinessCollection',
+    'PoliticalBusinessParticipation',
+    'PoliticalBusinessParticipationCollection',
     'PublicationCollection',
+    'RISCommission',
+    'RISCommissionCollection',
+    'RISCommissionMembership',
+    'RISCommissionMembershipCollection',
+    'RISParliamentarian',
+    'RISParliamentarianCollection',
+    'RISParliamentarianRole',
+    'RISParliamentarianRoleCollection',
+    'RISParliamentaryGroup',
+    'RISParliamentaryGroupCollection',
     'ReservationMessage',
     'ReservationAdjustedMessage',
     'ResourcePersonMove',
@@ -122,5 +159,5 @@ __all__ = (
     'TicketNote',
     'Topic',
     'TraitInfo',
-    'VisibleOnHomepageExtension'
+    'VisibleOnHomepageExtension',
 )

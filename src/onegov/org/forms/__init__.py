@@ -27,7 +27,6 @@ from onegov.org.forms.page import LinkForm, PageForm, IframeForm
 from onegov.org.forms.parliamentarian import ParliamentarianForm
 from onegov.org.forms.parliamentarian_role import ParliamentarianRoleForm
 from onegov.org.forms.parliamentary_group import ParliamentaryGroupForm
-from onegov.org.forms.party import PartyForm
 from onegov.org.forms.person import PersonForm
 from onegov.org.forms.reservation import FindYourSpotForm
 from onegov.org.forms.reservation import KabaEditForm
@@ -81,6 +80,7 @@ __all__ = (
     'GeneralSettingsForm',
     'HolidaySettingsForm',
     'HomepageSettingsForm',
+    'IframeForm',
     'ImageSetForm',
     'InternalTicketChatMessageForm',
     'ExtendedInternalTicketChatMessageForm',
@@ -99,7 +99,6 @@ __all__ = (
     'ParliamentarianForm',
     'ParliamentarianRoleForm',
     'ParliamentaryGroupForm',
-    'PartyForm',
     'PersonForm',
     'PublicMTANForm',
     'PublicRequestMTANForm',
@@ -119,5 +118,4 @@ __all__ = (
     'TicketChatMessageForm',
     'TicketNoteForm',
     'UserProfileForm',
-    'IframeForm', 'ParliamentarianRoleForm', 'ParliamentaryGroupForm',
 )

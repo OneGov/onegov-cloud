@@ -1,39 +1,37 @@
 from __future__ import annotations
 
-from webob.exc import HTTPNotFound
-
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
-from onegov.parliament.collections.parliamentary_group import (
-    RISParliamentaryGroupCollection,
+from onegov.org.models import (
     RISParliamentaryGroup,
-    ParliamentaryGroupCollection
+    RISParliamentaryGroupCollection
 )
 from onegov.org.forms.parliamentary_group import ParliamentaryGroupForm
+from onegov.parliament.collections import ParliamentaryGroupCollection
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import (
     RISParliamentaryGroupCollectionLayout,
     RISParliamentaryGroupLayout
 )
+from webob.exc import HTTPNotFound
+
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
-    from webob.response import Response
-
     from onegov.core.types import RenderData
     from onegov.parliament.models import ParliamentaryGroup
     from onegov.pas.layouts import PASParliamentaryGroupLayout
     from onegov.pas.layouts import PASParliamentaryGroupCollectionLayout
     from onegov.town6.request import TownRequest
+    from webob.response import Response
 
 
 def view_parliamentary_groups(
     self: ParliamentaryGroupCollection,
     request: TownRequest,
-    layout: RISParliamentaryGroupCollectionLayout |
-            PASParliamentaryGroupCollectionLayout
+    layout: RISParliamentaryGroupCollectionLayout
+            | PASParliamentaryGroupCollectionLayout
 ) -> RenderData | Response:
     filters = {}
     filters['active'] = [
@@ -60,8 +58,8 @@ def add_parliamentary_group(
     self: ParliamentaryGroupCollection,
     request: TownRequest,
     form: ParliamentaryGroupForm,
-    layout: RISParliamentaryGroupCollectionLayout |
-            PASParliamentaryGroupCollectionLayout
+    layout: RISParliamentaryGroupCollectionLayout
+            | PASParliamentaryGroupCollectionLayout
 ) -> RenderData | Response:
 
     if form.submitted(request):
@@ -129,6 +127,8 @@ def delete_parliamentary_group(
 
     collection = ParliamentaryGroupCollection(request.session)
     collection.delete(self)
+
+    request.success(_('The parliamentary group has been deleted.'))
 
 
 @TownApp.html(

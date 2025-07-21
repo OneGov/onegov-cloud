@@ -5,23 +5,21 @@ from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Text
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import date
-    from onegov.parliament.models.parliamentarian_role import (
-        ParliamentarianRole
-    )
+    from onegov.parliament.models import ParliamentarianRole
 
 
-class ParliamentaryGroup(Base, ContentMixin, TimestampMixin, ORMSearchable):
+class ParliamentaryGroup(Base, ContentMixin, TimestampMixin):
     """ Fraktion """
 
     __tablename__ = 'par_parliamentary_groups'
@@ -36,13 +34,6 @@ class ParliamentaryGroup(Base, ContentMixin, TimestampMixin, ORMSearchable):
         'polymorphic_on': type,
         'polymorphic_identity': 'generic',
     }
-
-    es_public = True
-    es_properties = {'name': {'type': 'text'}}
-
-    @property
-    def es_suggestion(self) -> str:
-        return self.name
 
     @property
     def title(self) -> str:
@@ -94,12 +85,3 @@ class ParliamentaryGroup(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     def __repr__(self) -> str:
         return f'<ParliamentaryGroup {self.name}>'
-
-
-class RISParliamentaryGroup(ParliamentaryGroup):
-
-    __mapper_args__ = {
-        'polymorphic_identity': 'ris_parliamentary_group',
-    }
-
-    es_type_name = 'ris_parliamentary_group'

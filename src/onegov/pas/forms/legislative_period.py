@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 from onegov.form import Form
-from onegov.parliament import _
+from onegov.pas import _
 from wtforms.fields import StringField
 from wtforms.fields import DateField
 from wtforms.validators import InputRequired

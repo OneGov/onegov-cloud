@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from onegov.core.orm import Base
+from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import UUID
+from onegov.parliament import _
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
@@ -8,18 +12,11 @@ from sqlalchemy import Text
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
-from onegov.core.orm import Base
-from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
-from onegov.parliament import _
 
-from typing import TYPE_CHECKING
-
+from typing import Literal, TypeAlias, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import date
-    from typing import Literal
-    from typing import TypeAlias
 
     from onegov.parliament.models import Commission, Parliamentarian
 
@@ -126,11 +123,3 @@ class CommissionMembership(Base, TimestampMixin):
             f'p={self.parliamentarian.title}, commission'
             f'={self.commission.name}'
         )
-
-
-class RISCommissionMembership(CommissionMembership):
-    __mapper_args__ = {
-        'polymorphic_identity': 'ris_commission_membership'
-    }
-
-    es_type_name = 'ris_commission_membership'

@@ -1,26 +1,25 @@
 from __future__ import annotations
 
-from webob.exc import HTTPNotFound
-
 from onegov.core.elements import Link
 from onegov.core.security import Private, Public
 from onegov.org.forms.commission import CommissionForm
 from onegov.org import _
-from onegov.parliament.collections.commission import RISCommissionCollection
-from onegov.parliament.collections.commission import CommissionCollection
-from onegov.parliament.models import RISCommission, Commission
+from onegov.org.models import RISCommission, RISCommissionCollection
+from onegov.parliament.collections import CommissionCollection
 from onegov.town6 import TownApp
 from onegov.town6.layout import RISCommissionCollectionLayout
 from onegov.town6.layout import RISCommissionLayout
+from webob.exc import HTTPNotFound
+
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from webob import Response
-
     from onegov.core.types import RenderData
+    from onegov.parliament.models import Commission
     from onegov.pas.layouts import PASCommissionCollectionLayout
     from onegov.pas.layouts import PASCommissionLayout
     from onegov.town6.request import TownRequest
+    from webob import Response
 
 
 def view_commissions(
@@ -121,6 +120,8 @@ def delete_commission(
 
     collection = CommissionCollection(request.session)
     collection.delete(self)
+
+    request.success(_('The commission has been deleted.'))
 
 
 @TownApp.html(

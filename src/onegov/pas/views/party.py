@@ -1,19 +1,14 @@
 from __future__ import annotations
 
+from onegov.core.elements import Link
 from onegov.core.security import Private
-from onegov.town6.views.party import (
-    add_party,
-    delete_party,
-    edit_party,
-    view_parties,
-    view_party,
-)
+from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import PASPartyCollection
+from onegov.pas.collections import PartyCollection
 from onegov.pas.forms import PartyForm
-from onegov.pas.layouts import PASPartyCollectionLayout
-from onegov.pas.layouts import PASPartyLayout
-from onegov.pas.models import PASParty
+from onegov.pas.layouts import PartyCollectionLayout
+from onegov.pas.layouts import PartyLayout
+from onegov.pas.models import Party
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -23,73 +18,125 @@ if TYPE_CHECKING:
 
 
 @PasApp.html(
-    model=PASPartyCollection,
+    model=PartyCollection,
     template='parties.pt',
     permission=Private
 )
 def pas_view_parties(
-    self: PASPartyCollection,
+    self: PartyCollection,
     request: TownRequest
 ) -> RenderData:
-    return view_parties(self, request, PASPartyCollectionLayout(self, request))
+    filters = {}
+    filters['active'] = [
+        Link(
+            text=request.translate(title),
+            active=self.active == value,
+            url=request.link(self.for_filter(active=value))
+        ) for title, value in (
+            (_('Active'), True),
+            (_('Inactive'), False)
+        )
+    ]
+
+    layout = PartyCollectionLayout(self, request)
+    return {
+        'add_link': request.link(self, name='new'),
+        'filters': filters,
+        'layout': layout,
+        'parties': self.query().all(),
+        'title': layout.title,
+    }
 
 
 @PasApp.form(
-    model=PASPartyCollection,
+    model=PartyCollection,
     name='new',
     template='form.pt',
     permission=Private,
     form=PartyForm
 )
 def pas_add_party(
-    self: PASPartyCollection,
+    self: PartyCollection,
     request: TownRequest,
     form: PartyForm
 ) -> RenderData | Response:
-    return add_party(
-        self,
-        request,
-        form,
-        PASPartyCollectionLayout(self, request)
-    )
+    if form.submitted(request):
+        party = self.add(**form.get_useful_data())
+        request.success(_('Added a new party'))
+
+        return request.redirect(request.link(party))
+
+    layout = PartyCollectionLayout(self, request)
+    layout.breadcrumbs.append(Link(_('New'), '#'))
+    layout.include_editor()
+
+    return {
+        'layout': layout,
+        'title': _('New party'),
+        'form': form,
+        'form_width': 'large'
+    }
 
 
 @PasApp.html(
-    model=PASParty,
+    model=Party,
     template='party.pt',
     permission=Private
 )
 def pas_view_party(
-    self: PASParty,
+    self: Party,
     request: TownRequest
 ) -> RenderData:
-    return view_party(self, request, PASPartyLayout(self, request))
+
+    layout = PartyLayout(self, request)
+    return {
+        'layout': layout,
+        'party': self,
+        'title': layout.title,
+    }
 
 
 @PasApp.form(
-    model=PASParty,
+    model=Party,
     name='edit',
     template='form.pt',
     permission=Private,
-    form=PartyForm
+    form=PartyForm,
+    pass_model=True
 )
 def pas_edit_party(
-    self: PASParty,
+    self: Party,
     request: TownRequest,
     form: PartyForm
 ) -> RenderData | Response:
 
-    return edit_party(self, request, form, PASPartyLayout(self, request))
+    if form.submitted(request):
+        form.populate_obj(self)
+        request.success(_('Your changes were saved'))
+        return request.redirect(request.link(self))
+
+    layout = PartyLayout(self, request)
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
+    layout.editbar_links = []
+    layout.include_editor()
+
+    return {
+        'layout': layout,
+        'title': layout.title,
+        'form': form,
+        'form_width': 'large'
+    }
 
 
 @PasApp.view(
-    model=PASParty,
+    model=Party,
     request_method='DELETE',
     permission=Private
 )
 def pas_delete_party(
-    self: PASParty,
+    self: Party,
     request: TownRequest
 ) -> None:
 
-    return delete_party(self, request)
+    collection = PartyCollection(request.session)
+    collection.delete(self)
