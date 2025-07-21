@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from sqlalchemy import func
+
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
 from onegov.org.forms.political_business import PoliticalBusinessForm
@@ -34,6 +36,16 @@ def get_political_business_form_class(
     )
 
 
+def count_political_businesses_by_type(request):
+    session = request.session
+    result = session.query(
+        PoliticalBusiness.political_business_type,
+        func.count(PoliticalBusiness.id).label('count')
+    ).group_by(PoliticalBusiness.political_business_type).all()
+
+    return result
+
+
 @TownApp.html(
     model=PoliticalBusinessCollection,
     template='political_businesses.pt',
@@ -44,26 +56,30 @@ def view_political_businesses(
     request: TownRequest,
     layout: PoliticalBusinessCollectionLayout | None = None
 ) -> RenderData | Response:
-    status = []
     types = []
+    status = []
 
-    status = [
+    count_per_business_type = count_political_businesses_by_type(request)
+    types = sorted([
+        Link(
+            text=request.translate(text) +
+                 f' ({count_per_business_type[type]})',
+            active=type in self.types,
+            url=request.link(self.for_filter(type=type)),
+        )
+        for type, text in POLITICAL_BUSINESS_TYPE.items()
+        if (type in count_per_business_type and
+            count_per_business_type[type] > 0)
+    ], key=lambda x: x.text.lower())
+
+    status = sorted([
         Link(
             text=request.translate(text),
             active=s in self.status,
             url=request.link(self.for_filter(s=s)),
         )
         for s, text in POLITICAL_BUSINESS_STATUS.items()
-    ]
-
-    types = [
-        Link(
-            text=request.translate(text),
-            active=type in self.types,
-            url=request.link(self.for_filter(type=type)),
-        )
-        for type, text in POLITICAL_BUSINESS_TYPE.items()
-    ]
+    ], key=lambda x: x.text.lower())
 
     return {
         # 'add_link': request.link(self, name='new'),
@@ -72,8 +88,8 @@ def view_political_businesses(
         'businesses': self.batch,
         'type_map': POLITICAL_BUSINESS_TYPE,
         'status_map': POLITICAL_BUSINESS_STATUS,
-        'business_status': status,
         'business_types': types,
+        'business_status': status,
     }
 
 
