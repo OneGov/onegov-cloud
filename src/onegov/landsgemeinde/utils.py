@@ -112,17 +112,19 @@ def ensure_states(
         if all(x.state == 'draft' for x in children):
             set_state(parent, 'draft')
         elif all(x.state == 'scheduled' for x in children):
-            set_state(parent, 'scheduled')
+            if not isinstance(parent, Assembly):
+                set_state(parent, 'scheduled')
         elif all(x.state == 'completed' for x in children):
             set_state(parent, 'completed')
-        else:
+        elif any(x.state in ('ongoing', 'completed') for x in children):
             set_state(parent, 'ongoing')
             if isinstance(parent, AgendaItem):
                 parent.start()
 
     def set_vota(vota: Iterable[Votum], state: VotumState) -> None:
         for votum in vota:
-            set_state(votum, state)
+            if votum.state != 'draft':
+                set_state(votum, state)
 
     def clear_start_time(agenda_item: AgendaItem) -> None:
         if agenda_item.start_time:
@@ -140,10 +142,11 @@ def ensure_states(
     ) -> None:
 
         for agenda_item in agenda_items:
-            set_state(agenda_item, state)
-            set_vota(agenda_item.vota, state)
-            if state == 'scheduled':
-                clear_start_time(agenda_item)
+            if agenda_item.state != 'draft':
+                set_state(agenda_item, state)
+                set_vota(agenda_item.vota, state)
+                if state == 'scheduled' or state == 'draft':
+                    clear_start_time(agenda_item)
 
     if isinstance(item, Assembly):
         if item.state in ('draft', 'scheduled', 'completed'):
@@ -161,10 +164,13 @@ def ensure_states(
             set_by_children(assembly, assembly.agenda_items)
             clear_start_time(item)
         if item.state == 'scheduled':
+            set_vota(item.vota, 'scheduled')
+            set_agenda_items(next, 'scheduled')
             set_by_children(assembly, assembly.agenda_items)
             clear_start_time(item)
         elif item.state == 'ongoing':
             set_agenda_items(prev, 'completed')
+            set_agenda_items(next, 'scheduled')
             set_state(assembly, 'ongoing')
             set_start_time(item)
         elif item.state == 'completed':
@@ -189,11 +195,15 @@ def ensure_states(
             set_by_children(agenda_item, agenda_item.vota)
             set_by_children(assembly, assembly.agenda_items)
         if item.state == 'scheduled':
+            set_vota(next_v, 'scheduled')
+            set_agenda_items(next_a, 'scheduled')
             set_by_children(agenda_item, agenda_item.vota)
             set_by_children(assembly, assembly.agenda_items)
         elif item.state == 'ongoing':
             set_vota(prev_v, 'completed')
+            set_vota(next_v, 'scheduled')
             set_agenda_items(prev_a, 'completed')
+            set_agenda_items(next_a, 'scheduled')
             set_state(agenda_item, 'ongoing')
             set_state(assembly, 'ongoing')
             set_start_time(item)
