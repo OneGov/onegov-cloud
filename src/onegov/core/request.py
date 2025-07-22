@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+import arrow
+import babel.dates
+import babel.numbers
 import morepath
+import numbers
+
+import pytz
 import ua_parser
 
-from datetime import timedelta
-from functools import cached_property
+from datetime import timedelta, datetime, date
+from functools import cached_property, lru_cache
 from onegov.core.cache import instance_lru_cache
 from onegov.core.custom import msgpack
 from onegov.core.utils import append_query_param
@@ -29,6 +35,7 @@ from typing import overload, Any, NamedTuple, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsItems
     from collections.abc import Callable, Iterable, Iterator, Sequence
+    from decimal import Decimal
     from dectate import Sentinel
     from gettext import GNUTranslations
     from markupsafe import Markup
@@ -881,3 +888,79 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         """ Returns the chameleon template loader. """
         registry = self.app.config.template_engine_registry
         return registry._template_loaders['.pt']
+
+    def format_date(
+        self,
+        dt: datetime | date | None,
+        fmt: str,
+        timezone: pytz.BaseTzInfo | None = None
+    ) -> str:
+        """ Takes a datetime and formats it according to local timezone and
+        the given format.
+        """
+        if dt is None:
+            return ''
+
+        if getattr(dt, 'tzinfo', None) is not None:
+            timezone = timezone or pytz.timezone('Europe/Zurich')
+            dt = timezone.normalize(
+                dt.astimezone(timezone)  # type:ignore[attr-defined]
+            )
+
+        locale = self.locale
+        assert locale is not None, 'Cannot format date without a locale'
+        if fmt == 'relative':
+            adt = arrow.get(dt)
+
+            try:
+                return adt.humanize(locale=locale)
+            except ValueError:
+                return adt.humanize(locale=locale.split('_')[0])
+
+        if fmt.startswith('skeleton:'):
+            return babel.dates.format_skeleton(
+                fmt.replace('skeleton:', ''),
+                datetime=dt,
+                fuzzy=False,
+                locale=locale
+            )
+        elif hasattr(dt, 'hour'):
+            return babel.dates.format_datetime(dt, format=fmt, locale=locale)
+        else:
+            return babel.dates.format_date(dt, format=fmt, locale=locale)
+
+    def format_number(
+        self,
+        number: numbers.Number | Decimal | float | str | None,
+        decimal_places: int | None = None,
+        padding: str = ''
+    ) -> str:
+        """ Takes the given numer and formats it according to locale.
+        If the number is an integer, the default decimal places are 0,
+        otherwise 2.
+        """
+        if isinstance(number, str):
+            return number
+
+        if number is None:
+            return ''
+
+        if decimal_places is None:
+            if isinstance(number, numbers.Integral):
+                decimal_places = 0
+            else:
+                decimal_places = 2
+
+        decimal, group = self.number_symbols(self.locale)
+        result = '{{:{},.{}f}}'.format(padding, decimal_places).format(number)
+        return result.translate({ord(','): group, ord('.'): decimal})
+
+    @staticmethod
+    @lru_cache(maxsize=8)
+    def number_symbols(locale: str) -> tuple[str, str]:
+        """ Returns the locale specific number symbols. """
+
+        return (
+            babel.numbers.get_decimal_symbol(locale),
+            babel.numbers.get_group_symbol(locale)
+        )
