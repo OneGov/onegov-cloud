@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from enum import Enum
 import inspect
+from operator import itemgetter
+
 import phonenumbers
 import sedate
 
@@ -233,7 +235,7 @@ class TranslatedSelectField(SelectField):
                 yield tuple(result)
 
         if self.choices_sorted:
-            choices.sort(key=lambda x: x[1])
+            choices.sort(key=itemgetter(1))
             for choice in choices:
                 yield choice
 
