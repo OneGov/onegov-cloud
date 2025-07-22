@@ -1125,6 +1125,7 @@ def import_reservations(
                     if value is None:
                         value = 'info@seantis.ch'
                     reservation['general']['email'] = value
+                    reservation['fields']['email'] = value
                 elif i == 37:
                     reservation['state'] = str(value)
                 elif i in shared_fields:

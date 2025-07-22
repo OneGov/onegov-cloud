@@ -6,6 +6,7 @@ from onegov.org.forms import ParliamentarianForm
 from onegov.org.forms import ParliamentarianRoleForm
 from onegov.org.models import RISParliamentarian
 from onegov.org.models import RISParliamentarianCollection
+from onegov.org.models import PoliticalBusinessParticipationCollection
 from onegov.parliament.collections import ParliamentarianCollection
 from onegov.parliament.models import ParliamentarianRole
 from onegov.town6 import _
@@ -123,8 +124,11 @@ def delete_parliamentarian(
 
     request.assert_valid_csrf_token()
 
-    collection = ParliamentarianCollection(request.session)
-    collection.delete(self)
+    businesses = PoliticalBusinessParticipationCollection(request.session)
+    businesses.by_parliamentarian_id(self.id).delete()
+
+    parliamentarians = ParliamentarianCollection(request.session)
+    parliamentarians.delete(self)
 
     request.success(_('The parliamentarian has been deleted.'))
 

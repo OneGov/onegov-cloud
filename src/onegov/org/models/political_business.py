@@ -300,3 +300,10 @@ class PoliticalBusinessParticipationCollection(
     @property
     def model_class(self) -> type[PoliticalBusinessParticipation]:
         return PoliticalBusinessParticipation
+
+    def by_parliamentarian_id(
+        self,
+        parliamentarian_id: uuid.UUID
+    ) -> Query[PoliticalBusinessParticipation]:
+        query = super().query()
+        return query.filter_by(parliamentarian_id=parliamentarian_id)
