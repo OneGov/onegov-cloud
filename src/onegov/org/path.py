@@ -1282,11 +1282,13 @@ def get_commission(
 @OrgApp.path(
     model=MeetingCollection,
     path='/meetings',
+    converters={'past': bool}
 )
 def get_meetings(
     app: OrgApp,
+    past: bool = True  # show past meetings by default
 ) -> MeetingCollection:
-    return MeetingCollection(app.session())
+    return MeetingCollection(app.session(), past)
 
 
 @OrgApp.path(
@@ -1306,13 +1308,25 @@ def get_meeting(
     path='/political-businesses',
     converters={
         'page': int,
+        'status': [str],
+        'types': [str],
+        'years': [int],
     }
 )
 def get_political_businesses(
     app: OrgApp,
     page: int = 0,
+    status: list[str] | None = None,
+    types: list[str] | None = None,
+    years: list[int] | None = None,
 ) -> PoliticalBusinessCollection:
-    return PoliticalBusinessCollection(app.session(), page=page)
+    return PoliticalBusinessCollection(
+        app.session(),
+        page=page,
+        status=status,
+        types=types,
+        years=years,
+    )
 
 
 @OrgApp.path(

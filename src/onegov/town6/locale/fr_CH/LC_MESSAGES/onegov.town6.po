@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-16 13:06+0200\n"
+"POT-Creation-Date: 2025-07-21 08:00+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -295,6 +295,18 @@ msgstr "Paramètres RIS"
 msgid "Meeting"
 msgstr "Réunion"
 
+msgid "Edit"
+msgstr "Modifier"
+
+msgid "Do you really want to delete this meeting?"
+msgstr "Voulez-vous vraiment supprimer cette réunion?"
+
+msgid "This cannot be undone."
+msgstr "Cela ne peut être effectué."
+
+msgid "Delete meeting"
+msgstr "Supprimer la réunion"
+
 msgid "Parliamentarians"
 msgstr "Parlementaires"
 
@@ -304,14 +316,8 @@ msgstr "Parlementaire"
 msgid "Role (as a group member)"
 msgstr "Rôle (en tant que membre d'un groupe)"
 
-msgid "Edit"
-msgstr "Modifier"
-
 msgid "Do you really want to delete this parliamentarian?"
 msgstr "Voulez-vous vraiment supprimer ce parlementaire ?"
-
-msgid "This cannot be undone."
-msgstr "Cela ne peut être effectué."
 
 msgid "Delete parliamentarian"
 msgstr "Supprimer le parlementaire"
@@ -589,8 +595,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -1752,6 +1758,9 @@ msgstr "Souscrire à la lettre d'informations"
 msgid "Receive the newsletter by email"
 msgstr "Recevoir la lettre d'informations par e-mail"
 
+msgid "Year"
+msgstr "Année"
+
 msgid "Years"
 msgstr "Années"
 
@@ -2483,8 +2492,29 @@ msgstr "Nouvelle commission"
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
 
+msgid "The commission has been deleted."
+msgstr "La commission a été supprimée."
+
 msgid "Sort"
 msgstr "Trier"
+
+msgid "Past Meetings"
+msgstr "Passées"
+
+msgid "Upcoming Meetings"
+msgstr "A venir"
+
+msgid "Added a new meeting"
+msgstr "Ajout d'une nouvelle réunion"
+
+msgid "New meeting"
+msgstr "Nouvelle réunion"
+
+msgid "Edit meeting"
+msgstr "Éditer la réunion"
+
+msgid "The meeting has been deleted."
+msgstr "La réunion a été supprimée."
 
 msgid "Added a new parliamentarian"
 msgstr "Ajout d'un nouveau parlementaire"
@@ -2492,17 +2522,26 @@ msgstr "Ajout d'un nouveau parlementaire"
 msgid "New parliamentarian"
 msgstr "Nouveau parlementaire"
 
+msgid "The parliamentarian has been deleted."
+msgstr "Le parlementaire a été supprimé."
+
 msgid "Added a new role"
 msgstr "Ajout d'un nouveau rôle"
 
 msgid "New role"
 msgstr "Nouveau rôle"
 
+msgid "The parliamentarian role has been deleted."
+msgstr "Le rôle du parlementaire a été supprimé."
+
 msgid "Added a new parliamentary group"
 msgstr "Ajout d'un nouveau groupe parlementaire"
 
 msgid "New parliamentary group"
 msgstr "Nouveau groupe parlementaire"
+
+msgid "The parliamentary group has been deleted."
+msgstr "Le groupe parlementaire a été supprimé."
 
 msgid "Added a new political business"
 msgstr "Ajout d' un nouveau business politique"

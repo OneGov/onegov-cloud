@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-16 13:05+0200\n"
+"POT-Creation-Date: 2025-07-21 08:00+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1178,8 +1178,8 @@ msgstr "Par légende"
 msgid "By last change"
 msgstr "Par date de dernière modification"
 
-msgid "Portrait"
-msgstr "Portrait"
+msgid "Agenda Items"
+msgstr "Éléments d'agenda"
 
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilisé dans l'aperçu et le sujet de l'e-mail"
@@ -3435,6 +3435,9 @@ msgstr "L'an dernier"
 msgid "Older"
 msgstr "Plus âgés"
 
+msgid "Meeting"
+msgstr "Réunion"
+
 msgid "Do you really want to delete this note?"
 msgstr "Voulez-vous vraiment supprimer cette note ?"
 
@@ -3447,20 +3450,8 @@ msgstr "Toujours visible sur la page d'accueil"
 msgid "Inquiry"
 msgstr "Demande"
 
-msgid "Proposal"
-msgstr "Proposition"
-
-msgid "Mandate"
-msgstr "Mandat"
-
-msgid "Report"
-msgstr "Rapport"
-
 msgid "Report and Proposal"
 msgstr "Rapport et proposition"
-
-msgid "Decision"
-msgstr "Décision"
 
 msgid "Urgent Interpellation"
 msgstr "Interpellation urgente"
@@ -3474,9 +3465,6 @@ msgstr "Interpellation"
 msgid "Commission Report"
 msgstr "Rapport de commission"
 
-msgid "Communication"
-msgstr "Communication"
-
 msgid "Motion"
 msgstr "Motion"
 
@@ -3486,14 +3474,14 @@ msgstr "Postulat"
 msgid "Resolution"
 msgstr "Résolution"
 
-msgid "Regulation"
-msgstr "Règlement"
+msgid "Election"
+msgstr "Election"
+
+msgid "Parliamentary Statement"
+msgstr "Déclaration parlementaire"
 
 msgid "Miscellaneous"
 msgstr "Divers"
-
-msgid "Elections"
-msgstr "Elections"
 
 msgid "Neujahrestag"
 msgstr "Nouvel an"
@@ -3661,8 +3649,8 @@ msgstr "Refuser les réservations"
 msgid "Reject all with message"
 msgstr "Tout refuser avec message"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -4054,8 +4042,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -7273,6 +7261,9 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
+
+#~ msgid "Portrait"
+#~ msgstr "Portrait"
 
 #~ msgid "Please note that this page has subpages which will also be deleted!"
 #~ msgstr ""
