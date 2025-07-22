@@ -31,24 +31,17 @@ if TYPE_CHECKING:
 
     PoliticalBusinessType: TypeAlias = Literal[
         'inquiry',  # Anfrage
-        'proposal',  # Antrag
-        'mandate',  # Auftrag
-        'report',  # Bericht
         'report and proposal',  # Bericht und Antrag
-        'decision',  # Beschluss
-        'message',  # Botschaft
         'urgent interpellation',  # Dringliche Interpellation
         'invitation',  # Einladung
-        'interpelleation',  # Interpellation
         'interpellation',  # Interpellation
         'commission report',  # Kommissionsbericht
-        'communication',  # Mitteilung
         'motion',  # Motion
         'postulate',  # Postulat
         'resolution',  # Resolution
-        'regulation',  # Verordnung
+        'election',  # Wahl
+        'parliamentary statement',  # Parlamentarische Erklärung
         'miscellaneous',  # Verschiedenes
-        'elections'  # Wahlen
     ]
 
     PoliticalBusinessStatus: TypeAlias = Literal[
@@ -68,24 +61,17 @@ if TYPE_CHECKING:
 
 POLITICAL_BUSINESS_TYPE: dict[PoliticalBusinessType, str] = {
     'inquiry': _('Inquiry'),
-    'proposal': _('Proposal'),
-    'mandate': _('Mandate'),
-    'report': _('Report'),
     'report and proposal': _('Report and Proposal'),
-    'decision': _('Decision'),
-    'message': _('Message'),
     'urgent interpellation': _('Urgent Interpellation'),
     'invitation': _('Invitation'),
-    'interpelleation': _('Interpellation'),
     'interpellation': _('Interpellation'),
     'commission report': _('Commission Report'),
-    'communication': _('Communication'),
     'motion': _('Motion'),
     'postulate': _('Postulate'),
     'resolution': _('Resolution'),
-    'regulation': _('Regulation'),
+    'election': _('Election'),
+    'parliamentary statement': _('Parliamentary Statement'),
     'miscellaneous': _('Miscellaneous'),
-    'elections': _('Elections'),
 }
 
 # FIXME: i18n

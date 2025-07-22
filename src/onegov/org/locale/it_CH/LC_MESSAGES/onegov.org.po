@@ -3451,20 +3451,8 @@ msgstr "Sempre visibile sulla pagina principale"
 msgid "Inquiry"
 msgstr "Richiesta"
 
-msgid "Proposal"
-msgstr "Oggetto della votazione"
-
-msgid "Mandate"
-msgstr "Mandato"
-
-msgid "Report"
-msgstr "Rapporto"
-
 msgid "Report and Proposal"
 msgstr "Rapporto e proposta"
-
-msgid "Decision"
-msgstr "Decisione"
 
 msgid "Urgent Interpellation"
 msgstr "Interpellanza urgente"
@@ -3478,9 +3466,6 @@ msgstr "Interpellanza"
 msgid "Commission Report"
 msgstr "Rapporto della commissione"
 
-msgid "Communication"
-msgstr "Comunicazione"
-
 msgid "Motion"
 msgstr "Mozione"
 
@@ -3490,14 +3475,14 @@ msgstr "Postulato"
 msgid "Resolution"
 msgstr "Risoluzione"
 
-msgid "Regulation"
-msgstr "Regolamento"
+msgid "Election"
+msgstr "Elezione"
+
+msgid "Parliamentary Statement"
+msgstr "Dichiarazione parlamentare"
 
 msgid "Miscellaneous"
 msgstr "Varie"
-
-msgid "Elections"
-msgstr "Elezioni"
 
 msgid "Neujahrestag"
 msgstr "Neujahrestag"
