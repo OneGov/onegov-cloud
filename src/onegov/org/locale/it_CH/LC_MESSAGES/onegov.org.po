@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-10 14:11+0200\n"
+"POT-Creation-Date: 2025-07-22 09:51+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2505,6 +2505,15 @@ msgstr "Filtri configurabili manualmente"
 msgid "Both, predefined tags as well as configurable filters"
 msgstr "Entrambi, tag predefiniti e filtri configurabili"
 
+msgid "Information above the event list"
+msgstr "Informazioni sopra l'elenco degli eventi"
+
+msgid "General event information"
+msgstr "Informazioni generali sugli eventi"
+
+msgid "Information below the event list"
+msgstr "Informazioni sotto l'elenco degli eventi"
+
 msgid "Documents"
 msgstr "Documenti"
 
@@ -3614,8 +3623,8 @@ msgstr "Rifiuta le prenotazioni"
 msgid "Reject all with message"
 msgstr "Rifiuta tutto con messaggio"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
