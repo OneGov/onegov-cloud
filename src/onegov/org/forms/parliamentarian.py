@@ -71,11 +71,12 @@ class ParliamentarianForm(NamedFileForm):
         validators=[Optional()],
     )
 
-    date_of_death = DateField(
-        label=_('Date of death'),
-        fieldset=_('Additional information'),
-        validators=[Optional()],
-    )
+    # just commented as not used but still as column in the database
+    # date_of_death = DateField(
+    #     label=_('Date of death'),
+    #     fieldset=_('Additional information'),
+    #     validators=[Optional()],
+    # )
 
     place_of_origin = StringField(
         label=_('Place of origin'),
