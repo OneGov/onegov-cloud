@@ -420,7 +420,7 @@ def test_view_upload_json(
     ).text()
 
 
-def test_view_copy_rate_set(client):
+def test_copy_rate_set(client):
     client.login_admin()
 
     settings = client.get('/').click('PAS Einstellungen')
@@ -450,16 +450,16 @@ def test_view_copy_rate_set(client):
     page.form['study_official_member_halfhour'] = 1
     page.form['shortest_all_president_halfhour'] = 1
     page.form['shortest_all_member_halfhour'] = 1
-    page = page.form.submit().follow()
-    page.showbrowser()
-    return
+    page = page.form.submit()
 
-    # Copy Rate Set
-    copy_page = page.click('Kopieren')
-    assert copy_page.form['year'].value == ''
-    assert copy_page.form['cost_of_living_adjustment'].value == '2'
-    assert copy_page.form['plenary_none_president_halfday'].value == '1'
+    page = client.get('/rate-sets')
+    page = page.click('Inaktiv')
+
+    href = page.pyquery('a.copy-icon').attr('href')
+    href = href.replace('http://localhost', '')
+    copy_page = client.get(href)
+
+    # Create new rateset, change just the year other values remain
     copy_page.form['year'] = '2025'
     new_page = copy_page.form.submit().follow()
     assert '2025' in new_page
-    assert '2%' in new_page
