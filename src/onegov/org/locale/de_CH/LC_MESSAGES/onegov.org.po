@@ -3474,6 +3474,9 @@ msgstr "Wahl"
 msgid "Parliamentary Statement"
 msgstr "Parlamentarische Erklärung"
 
+msgid "Miscellaneous"
+msgstr "Verschiedenes"
+
 msgid "Neujahrestag"
 msgstr "Neujahrestag"
 

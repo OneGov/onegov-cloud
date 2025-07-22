@@ -3480,6 +3480,9 @@ msgstr "Election"
 msgid "Parliamentary Statement"
 msgstr "Déclaration parlementaire"
 
+msgid "Miscellaneous"
+msgstr "Divers"
+
 msgid "Neujahrestag"
 msgstr "Nouvel an"
 

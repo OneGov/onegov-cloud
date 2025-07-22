@@ -3481,6 +3481,9 @@ msgstr "Elezione"
 msgid "Parliamentary Statement"
 msgstr "Dichiarazione parlamentare"
 
+msgid "Miscellaneous"
+msgstr "Varie"
+
 msgid "Neujahrestag"
 msgstr "Neujahrestag"
 

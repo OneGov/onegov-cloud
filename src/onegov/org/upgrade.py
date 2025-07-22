@@ -690,19 +690,16 @@ def update_political_business_type_enum_values(
             SET political_business_type = 'election'
             WHERE political_business_type = 'elections';
             UPDATE par_political_businesses
-            SET political_business_type = 'inquiry'
+            SET political_business_type = 'miscellaneous'
             WHERE political_business_type = 'proposal';
             UPDATE par_political_businesses
-            SET political_business_type = 'inquiry'
+            SET political_business_type = 'miscellaneous'
             WHERE political_business_type = 'mandate';
             UPDATE par_political_businesses
-            SET political_business_type = 'inquiry'
+            SET political_business_type = 'miscellaneous'
             WHERE political_business_type = 'communication';
             UPDATE par_political_businesses
-            SET political_business_type = 'inquiry'
-            WHERE political_business_type = 'miscellaneous';
-            UPDATE par_political_businesses
-            SET political_business_type = 'inquiry'
+            SET political_business_type = 'miscellaneous'
             WHERE political_business_type = 'report';
             DROP TYPE par_political_business_type;
         """)

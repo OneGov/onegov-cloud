@@ -41,6 +41,7 @@ if TYPE_CHECKING:
         'resolution',  # Resolution
         'election',  # Wahl
         'parliamentary statement',  # Parlamentarische Erklärung
+        'miscellaneous',  # Verschiedenes
     ]
 
     PoliticalBusinessStatus: TypeAlias = Literal[
@@ -70,6 +71,7 @@ POLITICAL_BUSINESS_TYPE: dict[PoliticalBusinessType, str] = {
     'resolution': _('Resolution'),
     'election': _('Election'),
     'parliamentary statement': _('Parliamentary Statement'),
+    'miscellaneous': _('Miscellaneous'),
 }
 
 # FIXME: i18n
