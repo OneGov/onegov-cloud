@@ -1859,13 +1859,13 @@ class EventSettingsForm(Form):
     )
 
     event_header_html = HtmlField(
-        label=_('Information on top of the event list'),
+        label=_('Information above the event list'),
         fieldset=_('General event information')
 
     )
 
     event_footer_html = HtmlField(
-        label=_('Information on bottom of the event list'),
+        label=_('Information below the event list'),
         fieldset=_('General event information')
     )
 
