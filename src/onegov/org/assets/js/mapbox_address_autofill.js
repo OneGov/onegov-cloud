@@ -54,8 +54,12 @@
 
         // Sync the value from the MapboxSearchBox back to the hidden original input
         searchBoxElement.addEventListener('retrieve', (event) => {
+            console.log('retrieve');
+            console.log(event);
             const selectedItem = event.detail;
-            console.log('Retrieve event fired with detail:', selectedItem);
+            // console.log('Retrieve event fired with detail:', selectedItem);
+        
+
             if (selectedItem && selectedItem.features && selectedItem.features.length > 0) {
                 const feature = selectedItem.features[0];
                 const placeName = feature.place_name || feature.text || '';
@@ -66,12 +70,6 @@
             }
         });
 
-        // Remove the change event listener that was still present
-        searchBoxElement.removeEventListener('change', () => { inputElement.value = searchBoxElement.value; });
-        // Remove the change event listener as it sets the wrong value
-        // Only set the value when an item is actually selected from the dropdown
-
-        searchBoxElement.addEventListener('change', () => { inputElement.value = searchBoxElement.value; });
 
     });
 })();
