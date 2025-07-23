@@ -68,6 +68,14 @@
             }
         });
 
+        // Handle manual edits in the search box
+        searchBoxElement.addEventListener('input', () => {
+            // Sync the manually entered value back to the original input
+            if (searchBoxElement.value) {
+                inputElement.value = searchBoxElement.value;
+            }
+        });
+
 
     });
 })();
