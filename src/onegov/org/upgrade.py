@@ -9,6 +9,8 @@ from itertools import chain
 import pytz
 import yaml
 
+from sqlalchemy import Enum
+
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base, find_models
 from onegov.core.orm.types import JSON, UTCDateTime, UUID
@@ -20,6 +22,8 @@ from onegov.file import File
 from onegov.form import FormDefinition
 from onegov.org.models import (
     Organisation, Topic, News, ExtendedDirectory, PushNotification)
+from onegov.org.models.political_business import (
+    POLITICAL_BUSINESS_STATUS, POLITICAL_BUSINESS_TYPE)
 from onegov.org.utils import annotate_html
 from onegov.page import Page, PageCollection
 from onegov.people import Person
@@ -598,3 +602,113 @@ def migrate_kaba_config_to_new_format(context: UpgradeContext) -> None:
              WHERE data ? 'kaba'
                AND data->'kaba' ? 'visit_id'
         """, {'site_id': site_id})
+
+
+@upgrade_task('Update political business enum values')
+def update_political_business_enum_values(
+    context: UpgradeContext
+) -> None:
+    if context.has_enum('par_political_business_type'):
+        context.update_enum_values(
+            'par_political_business_type',
+            POLITICAL_BUSINESS_TYPE.keys()
+        )
+    if context.has_enum('par_political_business_status'):
+        context.update_enum_values(
+            'par_political_business_status',
+            POLITICAL_BUSINESS_STATUS.keys()
+        )
+
+
+@upgrade_task('Change political business participation type column type')
+def change_political_business_participation_type_column_type(
+    context: UpgradeContext
+) -> None:
+    table = 'par_political_business_participants'
+    if context.has_table(table) and context.has_column(
+        table,
+        'participant_type'
+    ):
+        context.operations.alter_column(
+            'par_political_business_participants',
+            'participant_type',
+            type_=Text,
+        )
+
+
+@upgrade_task('Remove obsolete polymorphic type columns')
+def remove_obsolete_polymorphic_type_columns(context: UpgradeContext) -> None:
+    for table in (
+        'par_attendence',
+        'par_parties',
+        'par_changes',
+        'par_legislative_periods',
+        'par_political_businesses',
+        'par_political_business_participants',
+    ):
+        column = 'poly_type' if table == 'par_attendence' else 'type'
+        if context.has_table(table) and context.has_column(table, column):
+            context.operations.drop_column(table, column)
+
+
+@upgrade_task('Make political business participation type column nullable')
+def make_political_business_participation_type_column_nullable(
+    context: UpgradeContext
+) -> None:
+    table = 'par_political_business_participants'
+    if context.has_table(table) and context.has_column(
+        table,
+        'participant_type'
+    ):
+        context.operations.alter_column(
+            table,
+            'participant_type',
+            nullable=True,
+        )
+
+
+@upgrade_task('Update political business type enum values')
+def update_political_business_type_enum_values(
+    context: UpgradeContext
+) -> None:
+
+    new_business_type = Enum(
+        *POLITICAL_BUSINESS_TYPE.keys(),
+        name='par_political_business_type',
+    )
+
+    if context.has_enum('par_political_business_type'):
+        op = context.operations
+
+        op.execute("""
+            ALTER TABLE par_political_businesses
+            ALTER COLUMN political_business_type TYPE Text;
+            UPDATE par_political_businesses
+            SET political_business_type = 'interpellation'
+            WHERE political_business_type = 'interpelleation';
+            UPDATE par_political_businesses
+            SET political_business_type = 'election'
+            WHERE political_business_type = 'elections';
+            UPDATE par_political_businesses
+            SET political_business_type = 'miscellaneous'
+            WHERE political_business_type = 'proposal';
+            UPDATE par_political_businesses
+            SET political_business_type = 'miscellaneous'
+            WHERE political_business_type = 'mandate';
+            UPDATE par_political_businesses
+            SET political_business_type = 'miscellaneous'
+            WHERE political_business_type = 'communication';
+            UPDATE par_political_businesses
+            SET political_business_type = 'miscellaneous'
+            WHERE political_business_type = 'report';
+            DROP TYPE par_political_business_type;
+        """)
+
+        new_business_type.create(op.get_bind())
+
+        op.execute("""
+            ALTER TABLE par_political_businesses
+            ALTER COLUMN political_business_type
+            TYPE par_political_business_type
+            USING political_business_type::text::par_political_business_type;
+        """)

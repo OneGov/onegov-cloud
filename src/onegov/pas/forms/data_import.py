@@ -4,13 +4,13 @@ import json
 from onegov.core.utils import dictionary_to_binary
 from onegov.form import Form
 from onegov.form.fields import UploadMultipleField
-from wtforms.fields import BooleanField
-from onegov.parliament import _
+from onegov.pas import _
 from onegov.pas.importer.json_import import (
     MembershipData,
     OrganizationData,
     PersonData
 )
+from wtforms.fields import BooleanField
 
 
 from typing import get_type_hints, TYPE_CHECKING

@@ -1808,8 +1808,8 @@ def test_online_payment(client, scenario):
         assert ">Bezahlt<" in page
 
         page = client.get('/payments')
-        assert ">Offen<" not in page
-        assert ">Bezahlt<" in page
+        assert "Offen" not in page.pyquery('tbody tr').text()
+        assert "Bezahlt" in page.pyquery('tbody tr').text()
 
     page = client.get('/payments')
     assert "Ferienpass 2017" in page
@@ -1832,10 +1832,10 @@ def test_online_payment(client, scenario):
         # client.post(get_post_url(page, 'payment-refund'))
 
     page = client.get('/billing?expand=1&state=all')
-    assert ">Unbezahlt<" in page
+    assert "Unbezahlt" in page.pyquery('tbody tr').text()
 
     page = client.get('/payments')
-    assert ">Rückerstattet<" in page
+    assert "Rückerstattet" in page.pyquery('tbody tr').text()
 
     page = client.get('/my-bills')
     assert 'checkout-button' in page
@@ -1867,8 +1867,9 @@ def test_online_payment(client, scenario):
         page.form.submit().follow()
 
     page = client.get('/payments')
-    assert ">Offen<" in page
-    assert ">Rückerstattet<" in page
+
+    assert "Offen" in page.pyquery('tbody tr').text()
+    assert "Rückerstattet" in page.pyquery('tbody tr').text()
 
 
 def test_icalendar_subscription(client, scenario):

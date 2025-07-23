@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-07-09 13:44+0200\n"
+"POT-Creation-Date: 2025-07-21 08:00+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -291,23 +291,29 @@ msgstr "Impostazioni RIS"
 msgid "Meeting"
 msgstr "Riunione"
 
+msgid "Edit"
+msgstr "Modifica"
+
+msgid "Do you really want to delete this meeting?"
+msgstr "Vuoi davvero cancellare questa riunione?"
+
+msgid "This cannot be undone."
+msgstr "L'operazione non può essere annullata."
+
+msgid "Delete meeting"
+msgstr "Elimina riunione"
+
 msgid "Parliamentarians"
 msgstr "Parlamentari"
 
 msgid "Parliamentarian"
 msgstr "Parlamentare"
 
-msgid "Role (as a party or group member)"
-msgstr "Ruolo (come membro di un partito o di un gruppo)"
-
-msgid "Edit"
-msgstr "Modifica"
+msgid "Role (as a group member)"
+msgstr "Ruolo (come membro di un gruppo)"
 
 msgid "Do you really want to delete this parliamentarian?"
 msgstr "Vuole davvero cancellare questo parlamentare?"
-
-msgid "This cannot be undone."
-msgstr "L'operazione non può essere annullata."
 
 msgid "Delete parliamentarian"
 msgstr "Elimina parlamentare"
@@ -336,12 +342,6 @@ msgstr "Partiti"
 msgid "Political Party"
 msgstr "Partito"
 
-msgid "Do you really want to delete this party?"
-msgstr "Vuoi davvero cancellare questo partito?"
-
-msgid "Delete party"
-msgstr "Elimina partito"
-
 msgid "Commissions"
 msgstr "Commissioni"
 
@@ -355,7 +355,16 @@ msgid "Delete commission"
 msgstr "Elimina commissione"
 
 msgid "Political Businesses"
-msgstr "Affari politici"
+msgstr "Attività politico"
+
+msgid "Political Business"
+msgstr "Attività politico"
+
+msgid "Do you really want to delete this political business?"
+msgstr "Vuoi davvero cancellare questo attività politico?"
+
+msgid "Delete political business"
+msgstr "Elimina affare politico"
 
 msgid "No availability periods defined."
 msgstr "Nessun periodo di disponibilità definito."
@@ -857,6 +866,9 @@ msgstr "Fallito"
 msgid "Refunded"
 msgstr "Rimborsato"
 
+msgid "Invoiced"
+msgstr "Fatturato"
+
 msgid "Ticket"
 msgstr "Biglietto"
 
@@ -1060,6 +1072,9 @@ msgstr "alle ${time}"
 
 msgid "Object"
 msgstr "Oggetto"
+
+msgid "Reservation"
+msgstr "Prenotazione"
 
 msgid "Net Amount"
 msgstr "Importo netto"
@@ -1736,6 +1751,9 @@ msgstr "Iscriviti alla newsletter"
 msgid "Receive the newsletter by email"
 msgstr "Ricevi la newsletter via e-mail"
 
+msgid "Year"
+msgstr "Anno"
+
 msgid "Years"
 msgstr "Anni"
 
@@ -1924,12 +1942,6 @@ msgstr "Nessun parlamentare ancora definito."
 msgid "No parliamentary groups defined yet."
 msgstr "Nessun gruppo parlamentare ancora definito."
 
-msgid "No parties defined yet."
-msgstr "Nessun partito ancora definito."
-
-msgid "Portrait"
-msgstr "Ritratto"
-
 msgid "No payment providers defined."
 msgstr "Nessun fornitore di servizi di pagamento definito."
 
@@ -1945,8 +1957,26 @@ msgstr "Abilitato:"
 msgid "Fee:"
 msgstr "Imposta:"
 
+msgid "Export Bill run as PDF"
+msgstr "Esporta l'esecuzione della fattura come PDF"
+
 msgid "No payments yet."
 msgstr "Nessun pagamento ancora."
+
+msgid "Batch Action"
+msgstr "Azione di gruppo"
+
+msgid "Mark as Invoiced"
+msgstr "Contrassegna come fatturato"
+
+msgid "Mark as Paid"
+msgstr "Contrassegna come pagato"
+
+msgid "Mark as Unpaid"
+msgstr "Contrassegna come non pagato"
+
+msgid "Apply to selected"
+msgstr "Applica ai selezionati"
 
 msgid "Select organisation"
 msgstr "Selezionare l'organizzazione"
@@ -1973,7 +2003,7 @@ msgid "Status"
 msgstr "Stato"
 
 msgid "Participants"
-msgstr "Partecipanti"
+msgstr "Autore / Partecipanti"
 
 msgid "Parliamentary Group"
 msgstr "Gruppo parlamentare"
@@ -1983,9 +2013,6 @@ msgstr "Nessun affare politico ancora definito."
 
 msgid "Datum"
 msgstr "Data"
-
-msgid "Political Business"
-msgstr "Affare politico"
 
 msgid "No publications"
 msgstr "Nessuna pubblicazione"
@@ -2460,8 +2487,29 @@ msgstr "Nuova commissione"
 msgid "Your changes were saved"
 msgstr "Le modifiche sono state salvate"
 
+msgid "The commission has been deleted."
+msgstr "La commissione è stata eliminata."
+
 msgid "Sort"
 msgstr "Ordinare"
+
+msgid "Past Meetings"
+msgstr "Passate"
+
+msgid "Upcoming Meetings"
+msgstr "Prossime"
+
+msgid "Added a new meeting"
+msgstr "Aggiunta di una nuova riunione"
+
+msgid "New meeting"
+msgstr "Nuova riunione"
+
+msgid "Edit meeting"
+msgstr "Modifica riunione"
+
+msgid "The meeting has been deleted."
+msgstr "La riunione è stata eliminata."
 
 msgid "Added a new parliamentarian"
 msgstr "Aggiunto un nuovo parlamentare"
@@ -2469,11 +2517,17 @@ msgstr "Aggiunto un nuovo parlamentare"
 msgid "New parliamentarian"
 msgstr "Nuovo parlamentare"
 
+msgid "The parliamentarian has been deleted."
+msgstr "Il parlamentare è stato eliminato."
+
 msgid "Added a new role"
 msgstr "Aggiunto un nuovo ruolo"
 
 msgid "New role"
 msgstr "Nuovo ruolo"
+
+msgid "The parliamentarian role has been deleted."
+msgstr "Il ruolo del parlamentare è stato eliminato."
 
 msgid "Added a new parliamentary group"
 msgstr "Aggiunto un nuovo gruppo parlamentare"
@@ -2481,11 +2535,14 @@ msgstr "Aggiunto un nuovo gruppo parlamentare"
 msgid "New parliamentary group"
 msgstr "Nuovo gruppo parlamentare"
 
-msgid "Added a new party"
-msgstr "Aggiunto un nuovo partito"
+msgid "The parliamentary group has been deleted."
+msgstr "Il gruppo parlamentare è stato eliminato."
 
-msgid "New party"
-msgstr "Nuovo partito"
+msgid "Added a new political business"
+msgstr "Aggiunta di una nuova attività politica"
+
+msgid "New political business"
+msgstr "Nuova attività politica"
 
 msgid "New Recipient"
 msgstr "Nuovo destinatario"

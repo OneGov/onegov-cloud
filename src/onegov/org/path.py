@@ -1,15 +1,14 @@
 """ Contains the paths to the different models served by onegov.org. """
 from __future__ import annotations
 
-from onegov.form.models.definition import SurveyDefinition
 import sedate
-
-from datetime import date
-
+from datetime import date, datetime
 from onegov.api.models import ApiKey
 from onegov.chat import MessageCollection
 from onegov.chat import TextModule
 from onegov.chat import TextModuleCollection
+from onegov.chat.collections import ChatCollection
+from onegov.chat.models import Chat
 from onegov.core.converters import extended_date_converter
 from onegov.core.converters import datetime_year_converter
 from onegov.core.converters import json_converter
@@ -36,6 +35,7 @@ from onegov.form.collection import SurveyCollection
 from onegov.org.models.document_form import (
     FormDocumentCollection, FormDocument)
 from onegov.form.models.submission import SurveySubmission
+from onegov.form.models.definition import SurveyDefinition
 from onegov.form.models.survey_window import SurveySubmissionWindow
 from onegov.newsletter import Newsletter
 from onegov.newsletter import NewsletterCollection
@@ -45,8 +45,8 @@ from onegov.org.app import OrgApp
 from onegov.org.auth import MTANAuth
 from onegov.org.converters import keywords_converter
 from onegov.org.models import AtoZPages, PushNotificationCollection
+from onegov.org.models import CitizenDashboard, Dashboard
 from onegov.org.models import Clipboard
-from onegov.org.models import Dashboard
 from onegov.org.models import DirectorySubmissionAction
 from onegov.org.models import Editor
 from onegov.org.models import Export
@@ -75,32 +75,27 @@ from onegov.org.models import SiteCollection
 from onegov.org.models import TicketNote
 from onegov.org.models import Topic
 from onegov.org.models import TraitInfo
+from onegov.org.models import (
+    Meeting,
+    MeetingItem,
+    MeetingCollection,
+    RISCommission,
+    RISCommissionCollection,
+    RISParliamentarian,
+    RISParliamentarianCollection,
+    RISParliamentarianRole,
+    RISParliamentarianRoleCollection,
+    RISParliamentaryGroup,
+    RISParliamentaryGroupCollection,
+    PoliticalBusiness,
+    PoliticalBusinessCollection,
+)
 from onegov.org.models.extensions import PersonLinkExtension
-from onegov.chat.collections import ChatCollection
-from onegov.chat.models import Chat
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.page import PageCollection
-from onegov.parliament.collections import (
-    RISPartyCollection,
-    MeetingCollection,
-    RISCommissionCollection,
-    RISParliamentarianCollection,
-    RISParliamentarianRoleCollection,
-    RISParliamentaryGroupCollection, PoliticalBusinessCollection
-)
-from onegov.parliament.models import (
-    Meeting,
-    Party,
-    RISCommission,
-    RISParliamentarian,
-    RISParliamentarianRole,
-    RISParliamentaryGroup,
-    RISParty, PoliticalBusiness,
-)
-from onegov.parliament.models.meeting_item import MeetingItem
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.people import Person, PersonCollection
@@ -113,6 +108,7 @@ from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, User, UserCollection
 from onegov.user import UserGroup, UserGroupCollection
+from onegov.core.converters import datetime_converter
 from uuid import UUID
 from webob import exc, Response
 
@@ -893,14 +889,44 @@ def get_payment(app: OrgApp, id: UUID) -> Payment | None:
 @OrgApp.path(
     model=PaymentCollection,
     path='/payments',
-    converters={'page': int}
+    converters={
+        'page': int,
+        'start': datetime_converter,
+        'end': datetime_converter,
+        'status': str,
+        'payment_type': str,
+        'ticket_start': datetime_converter,
+        'ticket_end': datetime_converter,
+        'reservation_start': datetime_converter,
+        'reservation_end': datetime_converter
+    }
 )
 def get_payments(
     app: OrgApp,
     source: str = '*',
-    page: int = 0
+    page: int = 0,
+    start: datetime | None = None,
+    end: datetime | None = None,
+    status: str | None = None,
+    payment_type: str | None = None,
+    ticket_start: datetime | None = None,
+    ticket_end: datetime | None = None,
+    reservation_start: datetime | None = None,
+    reservation_end: datetime | None = None
 ) -> PaymentCollection:
-    return PaymentCollection(app.session(), source, page)
+    return PaymentCollection(
+        session=app.session(),
+        source=source,
+        page=page,
+        start=start,
+        end=end,
+        status=status,
+        payment_type=payment_type,
+        ticket_start=ticket_start,
+        ticket_end=ticket_end,
+        reservation_start=reservation_start,
+        reservation_end=reservation_end
+    )
 
 
 @OrgApp.path(
@@ -1078,6 +1104,17 @@ def get_dashboard(request: OrgRequest) -> Dashboard | None:
     return None
 
 
+@OrgApp.path(
+    model=CitizenDashboard,
+    path='/citizen-dashboard')
+def get_citizen_dashboard(request: OrgRequest) -> CitizenDashboard | None:
+    dashboard = CitizenDashboard(request)
+
+    if dashboard.is_available:
+        return dashboard
+    return None
+
+
 @OrgApp.path(model=ExternalLinkCollection, path='/external-links')
 def get_external_link_collection(
     request: OrgRequest,
@@ -1219,30 +1256,6 @@ def get_parliamentary_group(
 
 
 @OrgApp.path(
-    model=RISPartyCollection,
-    path='/parties',
-    converters={'active': bool}
-)
-def get_parties(
-    app: OrgApp,
-    active: bool = True,
-) -> RISPartyCollection:
-    return RISPartyCollection(app.session(), active)
-
-
-@OrgApp.path(
-    model=RISParty,
-    path='/party/{id}',
-    converters={'id': UUID}
-)
-def get_party(
-    app: OrgApp,
-    id: UUID
-) -> Party | None:
-    return RISPartyCollection(app.session()).by_id(id)
-
-
-@OrgApp.path(
     model=RISCommissionCollection,
     path='/commissions',
     converters={'active': bool}
@@ -1269,11 +1282,13 @@ def get_commission(
 @OrgApp.path(
     model=MeetingCollection,
     path='/meetings',
+    converters={'past': bool}
 )
 def get_meetings(
     app: OrgApp,
+    past: bool = True  # show past meetings by default
 ) -> MeetingCollection:
-    return MeetingCollection(app.session())
+    return MeetingCollection(app.session(), past)
 
 
 @OrgApp.path(
@@ -1293,13 +1308,25 @@ def get_meeting(
     path='/political-businesses',
     converters={
         'page': int,
+        'status': [str],
+        'types': [str],
+        'years': [int],
     }
 )
 def get_political_businesses(
     app: OrgApp,
     page: int = 0,
+    status: list[str] | None = None,
+    types: list[str] | None = None,
+    years: list[int] | None = None,
 ) -> PoliticalBusinessCollection:
-    return PoliticalBusinessCollection(app.session(), page=page)
+    return PoliticalBusinessCollection(
+        app.session(),
+        page=page,
+        status=status,
+        types=types,
+        years=years,
+    )
 
 
 @OrgApp.path(

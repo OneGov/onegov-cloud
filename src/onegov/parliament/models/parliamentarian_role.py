@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from onegov.core.orm import Base
+from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import UUID
+from onegov.parliament import _
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
@@ -8,20 +12,14 @@ from sqlalchemy import Text
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
-from onegov.core.orm import Base
-from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
-from onegov.parliament import _
-from onegov.parliament.models.parliamentarian import Parliamentarian
-from onegov.parliament.models.parliamentary_group import ParliamentaryGroup
-from onegov.parliament.models.party import Party
 
-from typing import TYPE_CHECKING
+from typing import Literal, TypeAlias, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import date
-    from typing import Literal
-    from typing import TypeAlias
+
+    from onegov.parliament.models import Parliamentarian
+    from onegov.parliament.models import ParliamentaryGroup
 
     Role: TypeAlias = Literal[
         'none',
@@ -116,7 +114,7 @@ class ParliamentarianRole(Base, TimestampMixin):
 
     #: The parliamentarian
     parliamentarian: relationship[Parliamentarian] = relationship(
-        Parliamentarian,
+        'Parliamentarian',
         back_populates='roles'
     )
 
@@ -134,19 +132,6 @@ class ParliamentarianRole(Base, TimestampMixin):
     @property
     def role_label(self) -> str:
         return PARLIAMENTARIAN_ROLES.get(self.role, '')
-
-    #: The id of the party
-    party_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('par_parties.id'),
-        nullable=True
-    )
-
-    #: The party
-    party: relationship[Party | None] = relationship(
-        Party,
-        back_populates='roles'
-    )
 
     #: The party role value
     party_role: Column[PartyRole] = Column(
@@ -173,7 +158,7 @@ class ParliamentarianRole(Base, TimestampMixin):
     #: The parliamentary group
     parliamentary_group: relationship[ParliamentaryGroup | None]
     parliamentary_group = relationship(
-        ParliamentaryGroup,
+        'ParliamentaryGroup',
         back_populates='roles'
     )
 
@@ -205,16 +190,4 @@ class ParliamentarianRole(Base, TimestampMixin):
     )
 
     def __repr__(self) -> str:
-        return (
-            f'<ParliamentarianRole role={self.role} '
-            f'party={self.party}'
-        )
-
-
-class RISParliamentarianRole(ParliamentarianRole):
-
-    __mapper_args__ = {
-        'polymorphic_identity': 'ris_parliamentarian_role',
-    }
-
-    es_type_name = 'ris_parliamentarian_role'
+        return f'<{self.__class__.__name__} role={self.role}>'

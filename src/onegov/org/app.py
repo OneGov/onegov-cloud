@@ -468,6 +468,7 @@ def get_i18n_localedirs() -> list[str]:
     return [
         utils.module_path('onegov.org', 'locale'),
         utils.module_path('onegov.form', 'locale'),
+        utils.module_path('onegov.parliament', 'locale'),
         utils.module_path('onegov.user', 'locale')
     ]
 
@@ -879,6 +880,11 @@ def people_select_asset() -> Iterator[str]:
     yield 'people-select.js'
 
 
+@OrgApp.webasset('participant-select')
+def particpant_select_asset() -> Iterator[str]:
+    yield 'participant-select.js'
+
+
 @OrgApp.webasset('kaba-configurations')
 def kaba_configurations_asset() -> Iterator[str]:
     yield 'kaba-configurations.js'
@@ -888,6 +894,11 @@ def kaba_configurations_asset() -> Iterator[str]:
 def mapbox_address_autofill() -> Iterator[str]:
     yield 'mapbox-search-web.js'  # implicit dependency
     yield 'mapbox_address_autofill.js'
+
+
+@OrgApp.webasset('invoicing')
+def get_invoicing() -> Iterator[str]:
+    yield 'invoicing.js'
 
 
 def wrap_with_mtan_hook(
