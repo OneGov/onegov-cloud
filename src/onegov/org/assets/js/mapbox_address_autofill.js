@@ -56,12 +56,18 @@
         searchBoxElement.addEventListener('retrieve', (event) => {
             const selectedItem = event.detail;
             console.log('Retrieve event fired with detail:', selectedItem);
-            if (selectedItem && selectedItem.name) {
-                inputElement.value = selectedItem.name;
-                searchBoxElement.value = selectedItem.name;
+            if (selectedItem && selectedItem.features && selectedItem.features.length > 0) {
+                const feature = selectedItem.features[0];
+                const placeName = feature.place_name || feature.text || '';
+                console.log('Selected place:', placeName);
+                inputElement.value = placeName;
+                searchBoxElement.value = placeName;
                 console.log('Set input value to:', inputElement.value);
             }
         });
+
+        // Remove the change event listener that was still present
+        searchBoxElement.removeEventListener('change', () => { inputElement.value = searchBoxElement.value; });
         // Remove the change event listener as it sets the wrong value
         // Only set the value when an item is actually selected from the dropdown
 
