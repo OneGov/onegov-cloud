@@ -59,13 +59,15 @@
 
             if (selectedItem && selectedItem.features && selectedItem.features.length > 0) {
                 const feature = selectedItem.features[0];
-                const full = feature.properties.full_address
-                const placeName = (feature.properties && feature.properties.name)) || '';
+                const placeName = (feature.properties && feature.properties.name) || '';
+
                 if (placeName) {
                     inputElement.value = placeName;
                     searchBoxElement.value = placeName;
                 }
             }
         });
+
+
     });
 })();
