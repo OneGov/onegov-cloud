@@ -119,6 +119,7 @@ class EventForm(Form):
 
     image = UploadFileWithORMSupport(
         label=_('Image'),
+        description=_('Ideal size: 700 x 420 px (5:3)'),
         file_class=EventFile,
         validators=[
             Optional(),
