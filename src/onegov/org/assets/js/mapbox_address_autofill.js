@@ -52,8 +52,12 @@
         searchBoxElement.value = inputElement.value;
 
         // Sync the value from the MapboxSearchBox back to the hidden original input
-        searchBoxElement.addEventListener('retrieve', (e) => {
-            inputElement.value = searchBoxElement.value;
+        searchBoxElement.addEventListener('retrieve', (event) => {
+            const selectedItem = event.detail;
+            if (selectedItem && selectedItem.name) {
+                inputElement.value = selectedItem.name;
+                searchBoxElement.value = selectedItem.name;
+            }
         });
         searchBoxElement.addEventListener('change', () => { inputElement.value = searchBoxElement.value; });
     });
