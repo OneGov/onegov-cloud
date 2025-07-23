@@ -41,7 +41,8 @@
         searchBoxElement.style.paddingTop = '0.5em!important';
         searchBoxElement.style.paddingBottom = '0.5em!important';
 
-        // Hide the original input element
+        // Hide the original input element because the searchBoxElement is the one capbable of search
+        // We use the stategy where we basically overlayed on that
         inputElement.style.display = 'none';
 
         // Insert the MapboxSearchBox element after the original input
@@ -54,22 +55,17 @@
 
         // Sync the value from the MapboxSearchBox back to the hidden original input
         searchBoxElement.addEventListener('retrieve', (event) => {
-            console.log('retrieve');
-            console.log(event);
             const selectedItem = event.detail;
-            // console.log('Retrieve event fired with detail:', selectedItem);
-        
 
             if (selectedItem && selectedItem.features && selectedItem.features.length > 0) {
                 const feature = selectedItem.features[0];
-                const placeName = feature.place_name || feature.text || '';
-                console.log('Selected place:', placeName);
-                inputElement.value = placeName;
-                searchBoxElement.value = placeName;
-                console.log('Set input value to:', inputElement.value);
+                const full = feature.properties.full_address
+                const placeName = (feature.properties && feature.properties.name)) || '';
+                if (placeName) {
+                    inputElement.value = placeName;
+                    searchBoxElement.value = placeName;
+                }
             }
         });
-
-
     });
 })();
