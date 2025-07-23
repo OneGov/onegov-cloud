@@ -53,10 +53,7 @@
 
         // Sync the value from the MapboxSearchBox back to the hidden original input
         searchBoxElement.addEventListener('retrieve', (e) => {
-            const feature = e.detail.features[0];
-            if (feature) {
-                inputElement.value = feature.place_name;
-            }
+            inputElement.value = searchBoxElement.value;
         });
         searchBoxElement.addEventListener('change', () => { inputElement.value = searchBoxElement.value; });
     });
