@@ -1399,10 +1399,11 @@ p.full-text-width {
 .main-content .anchor-link {
     color: $aluminum;
     display: inline !important;
-    opacity: .4;
+    opacity: 0;
     padding-left: .5rem;
     position: absolute;
     font-size: 80%;
+    transition: opacity 200ms linear;
 
     &:hover {
         opacity: 1;
@@ -1411,4 +1412,16 @@ p.full-text-width {
 
 .absolute {
     position: absolute;
+}
+
+a.category-anchor {
+    display: block;
+    position: relative;
+    top: -115px;
+    visibility: hidden;
+}
+
+.content-panel .level-3 {
+    font-weight: normal !important;
+    padding-left: .5rem;
 }
