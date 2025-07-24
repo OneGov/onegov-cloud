@@ -96,8 +96,7 @@ def get_directory_entry_form_class(
             if model.directory.enable_map == 'no':
                 self.delete_field('coordinates')
 
-            if (not model.directory.enable_publication and
-                    not request.is_manager):
+            if not model.directory.enable_publication and not request.is_admin:
                 self.delete_field('publication_start')
                 self.delete_field('publication_end')
             elif model.directory.required_publication:
