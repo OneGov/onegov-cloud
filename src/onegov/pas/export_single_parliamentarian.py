@@ -1,24 +1,24 @@
 from __future__ import annotations
 
-from onegov.pas.calculate_pay import calculate_rate
 from dataclasses import dataclass
+from decimal import Decimal
+from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import (
     AttendenceCollection,
 )
 from onegov.pas.custom import get_current_rate_set
-from decimal import Decimal
+from onegov.pas.models.attendence import Attendence
+from onegov.pas.models.attendence import TYPES
+from onegov.pas.utils import format_swiss_number
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration,
 )
-from onegov.parliament.models.attendence import TYPES
-from onegov.pas.models.attendence import PASAttendence
-from datetime import date  # noqa: TC003
-from onegov.pas.utils import format_swiss_number
 
 
 from typing import TYPE_CHECKING, Literal, TypedDict
 if TYPE_CHECKING:
+    from datetime import date
     from onegov.pas.models import PASParliamentarian, RateSet
     from onegov.pas.models.settlement_run import SettlementRun
 
@@ -295,7 +295,7 @@ def _get_parliamentarian_settlement_data(
             date_to=settlement_run.end,
         )
         .query()
-        .filter(PASAttendence.parliamentarian_id == parliamentarian.id)
+        .filter(Attendence.parliamentarian_id == parliamentarian.id)
     )
 
     result = []

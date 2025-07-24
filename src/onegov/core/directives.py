@@ -63,9 +63,11 @@ class HtmlHandleFormAction(HtmlAction):
         load: Callable[[_RequestT], Any] | str | None = None,
         permission: object | str | None = None,
         internal: bool = False,
+        pass_model: bool = False,
         **predicates: Any
     ):
         self.form = form
+        self.pass_model = pass_model
         super().__init__(model, render, template, load, permission, internal,
                          **predicates)
 
@@ -76,7 +78,11 @@ class HtmlHandleFormAction(HtmlAction):
         **kwargs: Any
     ) -> None:
 
-        wrapped = wrap_with_generic_form_handler(obj, self.form)
+        wrapped = wrap_with_generic_form_handler(
+            obj,
+            self.form,
+            pass_model=self.pass_model
+        )
 
         # if a request method is given explicitly, we honor it
         if 'request_method' in self.predicates:
@@ -146,7 +152,8 @@ def query_form_class(
 
 def wrap_with_generic_form_handler(
     obj: Callable[[_T, _RequestT, _FormT], Any],
-    form_class: type[_FormT] | Callable[[_T, _RequestT], type[_FormT]]
+    form_class: type[_FormT] | Callable[[_T, _RequestT], type[_FormT]],
+    pass_model: bool,
 ) -> Callable[[_T, _RequestT], Any]:
     """ Wraps a view handler with generic form handling.
 
@@ -160,7 +167,7 @@ def wrap_with_generic_form_handler(
         _class = fetch_form_class(form_class, self, request)
 
         if _class:
-            form = request.get_form(_class, model=self)
+            form = request.get_form(_class, model=self, pass_model=pass_model)
             form.action = request.url  # type: ignore[attr-defined]
         else:
             # FIXME: This seems potentially bad, do we actually ever want

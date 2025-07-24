@@ -3,7 +3,7 @@ from __future__ import annotations
 from onegov.form import Form
 from onegov.form.fields import TranslatedSelectField
 from onegov.org.forms.fields import HtmlField
-from onegov.parliament import _
+from onegov.org import _
 from onegov.parliament.models.commission import TYPES
 from wtforms.fields import DateField
 from wtforms.fields import StringField
