@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-22 09:51+0200\n"
+"POT-Creation-Date: 2025-07-24 13:36+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2505,14 +2505,11 @@ msgstr "Filtri configurabili manualmente"
 msgid "Both, predefined tags as well as configurable filters"
 msgstr "Entrambi, tag predefiniti e filtri configurabili"
 
-msgid "Information above the event list"
-msgstr "Informazioni sopra l'elenco degli eventi"
+msgid "General information above the event list"
+msgstr "Informazioni generali sopra l'elenco degli eventi"
 
-msgid "General event information"
-msgstr "Informazioni generali sugli eventi"
-
-msgid "Information below the event list"
-msgstr "Informazioni sotto l'elenco degli eventi"
+msgid "General information below the event list"
+msgstr "Informazioni generali sotto l'elenco degli eventi"
 
 msgid "Documents"
 msgstr "Documenti"
@@ -7212,6 +7209,15 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid "Information above the event list"
+#~ msgstr "Informazioni sopra l'elenco degli eventi"
+
+#~ msgid "General event information"
+#~ msgstr "Informazioni generali sugli eventi"
+
+#~ msgid "Information below the event list"
+#~ msgstr "Informazioni sotto l'elenco degli eventi"
 
 #~ msgid "Please note that this page has subpages which will also be deleted!"
 #~ msgstr ""

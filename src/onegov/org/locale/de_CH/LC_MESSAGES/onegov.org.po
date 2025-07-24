@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-22 09:51+0200\n"
+"POT-Creation-Date: 2025-07-24 13:36+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2494,14 +2494,11 @@ msgstr "Manuell konfigurierbare Filter"
 msgid "Both, predefined tags as well as configurable filters"
 msgstr "Sowohl vordefinierte Tags als auch konfigurierbare Filter"
 
-msgid "Information above the event list"
-msgstr "Informationen über der Veranstaltungs-Liste"
+msgid "General information above the event list"
+msgstr "Allgemeine Informationen über der Veranstaltungs-Liste"
 
-msgid "General event information"
-msgstr "Allgemeine Veranstaltungsinformationen"
-
-msgid "Information below the event list"
-msgstr "Informationen unter der Veranstaltungs-Liste"
+msgid "General information below the event list"
+msgstr "allgemeine informationen unterhalb der Veranstaltungs-Liste"
 
 msgid "Documents"
 msgstr "Dokumente"
@@ -7222,6 +7219,9 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid "General information about the event calendar"
+#~ msgstr "Allgemeine Informationen zum Veranstaltungskalender"
 
 #~ msgid "Please note that this page has subpages which will also be deleted!"
 #~ msgstr ""
