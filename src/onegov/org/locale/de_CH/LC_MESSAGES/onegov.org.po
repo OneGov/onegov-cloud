@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-21 08:00+0200\n"
+"POT-Creation-Date: 2025-07-24 13:54+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1343,9 +1343,6 @@ msgstr "Geburtsdatum"
 msgid "Additional information"
 msgstr "Zusätzliche Informationen"
 
-msgid "Date of death"
-msgstr "Sterbedatum"
-
 msgid "Place of origin"
 msgstr "Bürgerort"
 
@@ -2493,6 +2490,12 @@ msgstr "Manuell konfigurierbare Filter"
 
 msgid "Both, predefined tags as well as configurable filters"
 msgstr "Sowohl vordefinierte Tags als auch konfigurierbare Filter"
+
+msgid "General information above the event list"
+msgstr "Allgemeine Informationen über der Veranstaltungs-Liste"
+
+msgid "General information below the event list"
+msgstr "Allgemeine Informationen unterhalb der Veranstaltungs-Liste"
 
 msgid "Documents"
 msgstr "Dokumente"
@@ -7249,6 +7252,9 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid "Date of death"
+#~ msgstr "Sterbedatum"
 
 #~ msgid "Portrait"
 #~ msgstr "Portrait"

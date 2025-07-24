@@ -219,6 +219,8 @@ def view_occurrences(
         'no_event_link': request.link(
             self.for_filter(range='past', start=None, end=None)
         ),
+        'header_html': request.app.org.event_header_html,
+        'footer_html': request.app.org.event_footer_html,
     }
 
 

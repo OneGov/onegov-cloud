@@ -1858,6 +1858,15 @@ class EventSettingsForm(Form):
         default='tags'
     )
 
+    event_header_html = HtmlField(
+        label=_('General information above the event list'),
+
+    )
+
+    event_footer_html = HtmlField(
+        label=_('General information below the event list'),
+    )
+
     event_files = UploadOrSelectExistingMultipleFilesField(
         label=_('Documents'),
         fieldset=_('General event documents')
