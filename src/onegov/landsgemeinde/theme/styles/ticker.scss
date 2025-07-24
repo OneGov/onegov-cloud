@@ -2,4 +2,8 @@
     &.scheduled {
         display: none;
     }
+
+    &.draft {
+        display: none;
+    }
 }
