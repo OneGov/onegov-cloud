@@ -1859,14 +1859,12 @@ class EventSettingsForm(Form):
     )
 
     event_header_html = HtmlField(
-        label=_('Information above the event list'),
-        fieldset=_('General event information')
+        label=_('General information above the event list'),
 
     )
 
     event_footer_html = HtmlField(
-        label=_('Information below the event list'),
-        fieldset=_('General event information')
+        label=_('General information below the event list'),
     )
 
     event_files = UploadOrSelectExistingMultipleFilesField(
