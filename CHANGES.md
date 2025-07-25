@@ -1,8 +1,42 @@
 # Changes
 
+## 2025.36
+
+`2025-07-25` | [93fd541297...867117fc85](https://github.com/OneGov/onegov-cloud/compare/93fd541297^...867117fc85)
+
+### Directories
+
+##### Give access to publication dates to editor role
+
+`Feature` | [OGC-2474](https://linear.app/onegovcloud/issue/OGC-2474) | [1cceecd334](https://github.com/onegov/onegov-cloud/commit/1cceecd33464402cda501b787fb31cfa784e4e41)
+
+### Events
+
+##### Allow header and footer information for event list
+
+`Feature` | [OGC-2415](https://linear.app/onegovcloud/issue/OGC-2415) | [029b2c80a8](https://github.com/onegov/onegov-cloud/commit/029b2c80a878fd77a3d558c4d571388f0aa396bd)
+
+### Org
+
+##### Avoids invalid ticket `state` parameter propagating to the view
+
+`Bugfix` | [93fd541297](https://github.com/onegov/onegov-cloud/commit/93fd5412978bf00b8963c28d56fc7a738322f04a)
+
+### Pay
+
+##### Properly filters our expected Worldline Saferpay payment errors
+
+`Bugfix` | [8ef5f37124](https://github.com/onegov/onegov-cloud/commit/8ef5f37124fd4e56b3f3ab730d181aa05e6cf1db)
+
+### Wil
+
+##### Event import - prevent setting coordiantes to invalid values
+
+`Bugfix` | [OGC-2380](https://linear.app/onegovcloud/issue/OGC-2380) | [867117fc85](https://github.com/onegov/onegov-cloud/commit/867117fc8565efa154eb5e82849ba6aba8d26aa8)
+
 ## 2025.35
 
-`2025-07-22` | [bc20e0010f...7cc9da50d2](https://github.com/OneGov/onegov-cloud/compare/bc20e0010f^...7cc9da50d2)
+`2025-07-22` | [bc20e0010f...df94f48648](https://github.com/OneGov/onegov-cloud/compare/bc20e0010f^...df94f48648)
 
 ### Org
 
@@ -2062,22 +2096,4 @@ Create variable for enable_update_notifications and use it for the condition.
 ## 2024.55
 
 `2024-11-26` | [75d4cff3cf...0121dbe21d](https://github.com/OneGov/onegov-cloud/compare/75d4cff3cf^...0121dbe21d)
-
-## 2024.54
-
-`2024-11-26` | [896b8619c2...d7b7a777f5](https://github.com/OneGov/onegov-cloud/compare/896b8619c2^...d7b7a777f5)
-
-### Org
-
-##### External link form editbar buttons
-
-Make sure all relevant buttons are in the edit bar.
-
-`Bugfix` | [OGC-1917](https://linear.app/onegovcloud/issue/OGC-1917) | [1531f9b8a5](https://github.com/onegov/onegov-cloud/commit/1531f9b8a5dce12e59b8ff6230f64b166521fa80)
-
-### Town6
-
-##### Add option for inline photo album
-
-`Feature` | [OGC-1886](https://linear.app/onegovcloud/issue/OGC-1886) | [9f34f2ced5](https://github.com/onegov/onegov-cloud/commit/9f34f2ced52007fee7d7b70d3c43842cdb7633a4)
 
