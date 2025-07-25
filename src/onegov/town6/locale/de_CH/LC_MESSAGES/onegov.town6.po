@@ -308,19 +308,19 @@ msgid "Delete meeting"
 msgstr "Sitzung löschen"
 
 msgid "Parliamentarians"
-msgstr "Parlamentarierinnen und Parlamentarier"
+msgstr "Parlamentsmitglieder"
 
 msgid "Parliamentarian"
-msgstr "Parlamentarier:in"
+msgstr "Parlamentsmitglied"
 
 msgid "Role (as a group member)"
 msgstr "Rolle (als Fraktionsmitglied)"
 
 msgid "Do you really want to delete this parliamentarian?"
-msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
+msgstr "Möchten Sie dieses Parlamentsmitglied wirklich löschen?"
 
 msgid "Delete parliamentarian"
-msgstr "Parlamentarier:in löschen"
+msgstr "Parlamentsmitglied löschen"
 
 msgid "Do you really want to remove this role?"
 msgstr "Rolle wirklich entfernen?"
@@ -2515,13 +2515,13 @@ msgid "The meeting has been deleted."
 msgstr "Die Sitzung wurde gelöscht."
 
 msgid "Added a new parliamentarian"
-msgstr "Parlamentarier:in hinzugefügt"
+msgstr "Parlamentsmitglied hinzugefügt"
 
 msgid "New parliamentarian"
-msgstr "Neue/r Parlamentarier/in"
+msgstr "Neues Parlamentsmitglied"
 
 msgid "The parliamentarian has been deleted."
-msgstr "Der Parlamentarier/in wurde gelöscht."
+msgstr "Das Parlamentsmitglied wurde gelöscht."
 
 msgid "Added a new role"
 msgstr "Neue Rolle hinzugefügt"
