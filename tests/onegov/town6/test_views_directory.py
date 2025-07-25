@@ -210,3 +210,117 @@ def test_create_directory_accordion_layout(client):
     q2 = q2.form.submit().follow()
     assert question in q2
     assert answer not in q2
+
+
+def test_new_edit_submit_directory_entry_with_publication(client):
+    # submissions and creation of directory entries shall be handled
+    # the same regarding publication
+
+    # activate submission and enable publication for directory entries
+    client.login_admin()
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Trainers"
+    page.form['structure'] = """
+        Name *= ___
+        Description = ___
+    """
+    page.form['title_format'] = '[Name]'
+    page.form['enable_submissions'] = True
+    page.form['enable_publication'] = True
+    page.form['lead_format'] = '[Description]'
+    page.form['content_fields'] = "Name"
+    page = page.form.submit()
+    client.logout()
+
+    # now submit a new entry
+    page = client.get('/directories/trainers').click('Neuen Eintrag vorschlagen')
+    assert 'Publikation' in page
+    assert 'Von' in page
+    assert 'Bis' in page
+
+    # editor creates a new entry
+    page = client.login_editor()
+    page = client.get('/directories/trainers').click('Eintrag', index=0)
+    assert 'Publikation' in page
+    assert 'Von' in page
+    assert 'Bis' in page
+
+    page.form['name'] = 'Emily Larlham'
+    page.form['description'] = 'Dog training expert'
+    page = page.form.submit().follow()
+
+    page = page.click('Bearbeiten')
+    assert 'Publikation' in page
+    assert 'Von' in page
+    assert 'Bis' in page
+
+    # admin creates a new entry
+    page = client.login_admin()
+    page = client.get('/directories/trainers').click('Eintrag', index=0)
+    assert 'Publikation' in page
+    assert 'Von' in page
+    assert 'Bis' in page
+
+    page.form['name'] = 'Susan Light'
+    page.form['description'] = 'Cat training master'
+    page = page.form.submit().follow()
+
+    page = page.click('Bearbeiten')
+    assert 'Publikation' in page
+    assert 'Von' in page
+    assert 'Bis' in page
+
+    # now create a new directory with publication disabled
+    page = client.login_admin()
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Clubs"
+    page.form['structure'] = """
+        Name *= ___
+        Description = ___
+    """
+    page.form['title_format'] = '[Name]'
+    page.form['enable_submissions'] = True
+    page.form['enable_publication'] = False
+    page.form['lead_format'] = '[Description]'
+    page.form['content_fields'] = "Name"
+    page = page.form.submit().follow()
+    client.logout()
+
+    # now submit a new entry
+    page = (client.get('/directories/clubs')
+            .click('Neuen Eintrag vorschlagen'))
+    assert 'Publikation' not in page
+    assert 'Von' not in page
+    assert 'Bis' not in page
+
+    # create a new entry as editor
+    page = client.login_editor()
+    page = client.get('/directories/clubs').click('Eintrag', index=0)
+    assert 'Publikation' not in page
+    assert 'Von' not in page
+    assert 'Bis' not in page
+
+    page.form['name'] = 'Soccer Club'
+    page.form['description'] = 'Football club'
+    page = page.form.submit().follow()
+
+    page = page.click('Bearbeiten')
+    assert 'Publikation' not in page
+    assert 'Von' not in page
+    assert 'Bis' not in page
+
+    # admin creates a new entry
+    page = client.login_admin()
+    page = client.get('/directories/clubs').click('Eintrag', index=0)
+    assert 'Publikation' not in page
+    assert 'Von' not in page
+    assert 'Bis' not in page
+
+    page.form['name'] = 'Basketball Club'
+    page.form['description'] = 'Basketball club'
+    page = page.form.submit().follow()
+
+    page = page.click('Bearbeiten')
+    assert 'Publikation' not in page
+    assert 'Von' not in page
+    assert 'Bis' not in page
