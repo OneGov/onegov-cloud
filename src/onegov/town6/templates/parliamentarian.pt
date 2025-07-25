@@ -35,6 +35,12 @@
                     <span tal:condition="parliamentarian.private_address_zip_code">${parliamentarian.private_address_zip_code} ${parliamentarian.private_address_city}</span>
                 </dd>
             </div>
+            <div tal:condition="not: parliamentarian.private_address">
+                <dt i18n:translate>Place of residence</dt>
+                <dd>
+                    <span tal:condition="parliamentarian.private_address_zip_code">${parliamentarian.private_address_zip_code} ${parliamentarian.private_address_city}</span>
+                </dd>
+            </div>
             <div tal:condition="parliamentarian.date_of_birth">
                 <dt i18n:translate>Date of birth</dt>
                 <dd>${layout.format_date(parliamentarian.date_of_birth, 'date')}</dd>
