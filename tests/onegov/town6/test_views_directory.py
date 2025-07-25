@@ -233,7 +233,8 @@ def test_new_edit_submit_directory_entry_with_publication(client):
     client.logout()
 
     # now submit a new entry
-    page = client.get('/directories/trainers').click('Neuen Eintrag vorschlagen')
+    page = (client.get('/directories/trainers')
+            .click('Neuen Eintrag vorschlagen'))
     assert 'Publikation' in page
     assert 'Von' in page
     assert 'Bis' in page
