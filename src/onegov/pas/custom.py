@@ -56,6 +56,11 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
                         attrs={'class': 'pas-settings'}
                     ),
                     Link(
+                        _('Files'),
+                        request.link(request.app.org, 'files'),
+                        attrs={'class': 'files'}
+                    ),
+                    Link(
                         _('More settings'),
                         request.link(request.app.org, 'settings'),
                         attrs={'class': 'settings'}
