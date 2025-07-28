@@ -593,12 +593,13 @@ class EventCollection(Pagination[Event]):
                 location_data[i] for i in ['title', 'street', 'zip', 'city']
                 if location_data[i]
             )
-            coordinates = Coordinates(
-                lat=float(
-                    location_data['lat']) if location_data.get('lat') else 0.0,
-                lon=float(
-                    location_data['lon']) if location_data.get('lon') else 0.0
-            )
+            coordinates = None
+            if (location_data.get('lat', None) and
+                    location_data.get('lon', None)):
+                coordinates = Coordinates(
+                    lat=float(location_data['lat']),
+                    lon=float(location_data['lon'])
+                )
             event_image, event_image_name = get_event_image(event)
 
             ticket_price = find_element_text(event, 'ticketPrice')

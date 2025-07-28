@@ -3,9 +3,9 @@ from __future__ import annotations
 import pytest
 
 from onegov.pas.models import (
-    PASParliamentarian,
-    PASParty,
     PASCommission,
+    PASParliamentarian,
+    Party,
 )
 from onegov.pas.importer.json_import import (
     PeopleImporter,
@@ -134,7 +134,7 @@ def test_organization_importer_existing(session,
         type='normal',
     )
     # Fraktion maps to Party
-    existing_party = PASParty(
+    existing_party = Party(
         external_kub_id=UUID(fraktion_data['id']),  # Convert to UUID
         name='Old Party Name',
     )
@@ -179,7 +179,7 @@ def test_organization_importer_existing(session,
 
     # 2. Check Party Update (from Fraktion)
     updated_party = (
-        session.query(PASParty)
+        session.query(Party)
         .filter_by(external_kub_id=UUID(fraktion_data['id']))  # Use UUID
         .one_or_none()
     )
@@ -190,7 +190,7 @@ def test_organization_importer_existing(session,
 
     # Check Party Count (ensure no duplicates)
     party_count = (
-        session.query(PASParty)
+        session.query(Party)
         .filter_by(external_kub_id=UUID(fraktion_data['id']))  # Use UUID
         .count()
     )

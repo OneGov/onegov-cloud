@@ -7,12 +7,11 @@ from onegov.file.utils import as_fileintent
 
 from typing import overload, IO, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from sqlalchemy.orm import relationship
     from typing import Protocol
     from typing import Self
 
     class HasFiles(Protocol):
-        files: relationship[list[File]]
+        files: list[File]
 
 
 _F = TypeVar('_F', bound=File)
@@ -50,27 +49,27 @@ class NamedFile:
     def __get__(
         self,
         instance: None,
-        owner: type[HasFiles] | None = None
+        owner: type[object] | None = None
     ) -> Self: ...
 
     @overload
     def __get__(
         self,
         instance: HasFiles,
-        owner: type[HasFiles] | None = None
+        owner: type[object] | None = None
     ) -> File | None: ...
 
     def __get__(
         self,
         instance: HasFiles | None,
-        owner: type[HasFiles] | None = None
+        owner: type[object] | None = None
     ) -> Self | File | None:
 
         if instance is None:
             return None
 
         file: File
-        for file in instance.files:  # type: ignore[attr-defined]
+        for file in instance.files:
             if file.name == self.name:
                 return file
 

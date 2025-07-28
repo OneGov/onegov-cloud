@@ -6,7 +6,6 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.parliament import _
-from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Text
@@ -17,14 +16,13 @@ from sqlalchemy.orm import relationship
 
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     import uuid
     from datetime import date
     from typing import Literal
     from typing import TypeAlias
 
-    from onegov.parliament.models import CommissionMembership, Attendence
+    from onegov.parliament.models import CommissionMembership
 
     CommissionType: TypeAlias = Literal[
         'normal',
@@ -40,7 +38,7 @@ TYPES: dict[CommissionType, str] = {
 }
 
 
-class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
+class Commission(Base, ContentMixin, TimestampMixin):
 
     __tablename__ = 'par_commissions'
 
@@ -54,13 +52,6 @@ class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
         'polymorphic_on': poly_type,
         'polymorphic_identity': 'generic',
     }
-
-    es_public = True
-    es_properties = {'name': {'type': 'text'}}
-
-    @property
-    def es_suggestion(self) -> str:
-        return self.name
 
     @property
     def title(self) -> str:
@@ -125,13 +116,6 @@ class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
         back_populates='commission'
     )
 
-    #: A commission may hold meetings (only used in PAS)
-    attendences: relationship[list[Attendence]] = relationship(
-        'Attendence',
-        cascade='all, delete-orphan',
-        back_populates='commission'
-    )
-
     @observes('end')
     def end_observer(self, end: date | None) -> None:
         if end:
@@ -141,12 +125,3 @@ class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     def __repr__(self) -> str:
         return f'<Commission {self.name}>'
-
-
-class RISCommission(Commission):
-
-    __mapper_args__ = {
-        'polymorphic_identity': 'ris_commission',
-    }
-
-    es_type_name = 'ris_commission'

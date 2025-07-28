@@ -102,6 +102,9 @@ prof
 # chamelon cache
 .chameleon_cache
 
+# redis
+dump.rdb
+
 .codebuddy/
 
 .aider*

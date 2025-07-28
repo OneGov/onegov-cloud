@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-22 11:30+0200\n"
+"POT-Creation-Date: 2025-07-28 14:29+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -83,11 +83,11 @@ msgstr ""
 "JSON-Datei mit Mitgliedschaftsdaten (wer ist Mitglied welcher Organisation)."
 
 msgid "Validate JSON Schema"
-msgstr "JSON Validieren"
+msgstr "JSON-Schema validieren"
 
 msgid "Check if the uploaded JSON files match the expected structure."
 msgstr ""
-"Überprüfen, ob die hochgeladenen JSON-Dateien der erwarteten Struktur "
+"Überprüft ob die hochgeladenen JSON-Dateien der erwarteten Struktur "
 "entsprechen."
 
 #, python-format
@@ -112,6 +112,111 @@ msgstr "Unerwarteter Fehler bei der Verarbeitung der Datei ${name}: ${error}"
 
 msgid "Name"
 msgstr "Name"
+
+msgid "Personnel number"
+msgstr "Personalnummer"
+
+msgid "Basic properties"
+msgstr "Grundeigenschaften"
+
+msgid "Contract number"
+msgstr "Vertragsnummer"
+
+msgid "Gender"
+msgstr "Geschlecht"
+
+msgid "First name"
+msgstr "Vorname"
+
+msgid "Last name"
+msgstr "Nachname"
+
+msgid "Picture"
+msgstr "Bild"
+
+msgid "Shipping method"
+msgstr "Versandart"
+
+msgid "Shipping address"
+msgstr "Versandadresse"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Addition"
+msgstr "Adresszusatz"
+
+msgid "Zip code"
+msgstr "PLZ"
+
+msgid "City"
+msgstr "Stadt"
+
+msgid "Private address"
+msgstr "Privatadresse"
+
+msgid "Date of birth"
+msgstr "Geburtsdatum"
+
+msgid "Additional information"
+msgstr "Zusatzinformationen"
+
+msgid "Date of death"
+msgstr "Sterbedatum"
+
+msgid "Place of origin"
+msgstr "Bürgerort"
+
+msgid "Occupation"
+msgstr "Beruf"
+
+msgid "Academic title"
+msgstr "Akademischer Titel"
+
+msgid "Salutation"
+msgstr "Anrede"
+
+msgid "Salutation used in the address"
+msgstr "Adress-Anrede"
+
+msgid "Salutation used for letters"
+msgstr "Brief-Anrede"
+
+msgid "How bills should be delivered"
+msgstr "Spedition Vorlagen"
+
+msgid "Private phone number"
+msgstr "Telefon Privat"
+
+msgid "Mobile phone number"
+msgstr "Telefon Mobile"
+
+msgid "Business phone number"
+msgstr "Telefon Geschäft"
+
+msgid "Primary email address"
+msgstr "1. E-Mail"
+
+msgid "Secondary email address"
+msgstr "2. E-Mail"
+
+msgid "Website"
+msgstr "Webseite"
+
+msgid "Remarks"
+msgstr "Bemerkungen"
+
+msgid "Political Party"
+msgstr "Partei"
+
+msgid "Party role"
+msgstr "Rolle in der Partei"
+
+msgid "Portrait"
+msgstr "Portrait"
+
+msgid "Description"
+msgstr "Beschreibung"
 
 msgid "Year"
 msgstr "Jahr"
@@ -179,9 +284,6 @@ msgstr "Sätze für ${year} bereits erfasst"
 
 msgid "Active"
 msgstr "Aktiv"
-
-msgid "Description"
-msgstr "Beschreibung"
 
 msgid "End must be after start"
 msgstr "Ende muss nach dem Start liegen"
@@ -338,6 +440,18 @@ msgstr "Möchten Sie diesen Abrechnungslauf wirklich löschen?"
 msgid "Delete settlement run"
 msgstr "Abrechnungslauf löschen"
 
+msgid "File study"
+msgstr "Aktenstudium"
+
+msgid "Attendence added"
+msgstr "Anwesenheit hinzugefügt"
+
+msgid "Attendence modified"
+msgstr "Anwesenheit bearbeitet"
+
+msgid "Attendence removed"
+msgstr "Anwesenheit gelöscht"
+
 msgid "Duration"
 msgstr "Dauer"
 
@@ -440,75 +554,6 @@ msgstr "In die Zwischenablage kopiert!"
 msgid "No legislative periods defined yet."
 msgstr "Noch keine Legislaturen erfasst."
 
-msgid "Personnel number"
-msgstr "Personalnummer"
-
-msgid "Contract number"
-msgstr "Vertragsnummer"
-
-msgid "Gender"
-msgstr "Geschlecht"
-
-msgid "Picture"
-msgstr "Bild"
-
-msgid "Shipping method"
-msgstr "Versandart"
-
-msgid "Shipping address"
-msgstr "Versandadresse"
-
-msgid "Private address"
-msgstr "Privatadresse"
-
-msgid "Date of birth"
-msgstr "Geburtsdatum"
-
-msgid "Date of death"
-msgstr "Sterbedatum"
-
-msgid "Place of origin"
-msgstr "Bürgerort"
-
-msgid "Occupation"
-msgstr "Beruf"
-
-msgid "Academic title"
-msgstr "Akademischer Titel"
-
-msgid "Salutation"
-msgstr "Anrede"
-
-msgid "Salutation used in the address"
-msgstr "Adress-Anrede"
-
-msgid "Salutation used for letters"
-msgstr "Brief-Anrede"
-
-msgid "How bills should be delivered"
-msgstr "Spedition Vorlagen"
-
-msgid "Private phone number"
-msgstr "Telefon Privat"
-
-msgid "Mobile phone number"
-msgstr "Telefon Mobile"
-
-msgid "Business phone number"
-msgstr "Telefon Geschäft"
-
-msgid "Primary email address"
-msgstr "1. E-Mail"
-
-msgid "Secondary email address"
-msgstr "2. E-Mail"
-
-msgid "Website"
-msgstr "Webseite"
-
-msgid "Remarks"
-msgstr "Bemerkungen"
-
 msgid "Roles"
 msgstr "Rollen"
 
@@ -527,14 +572,8 @@ msgstr "Noch keine Fraktionen erfasst."
 msgid "No parties defined yet."
 msgstr "Noch keine Parteien erfasst."
 
-msgid "Portrait"
-msgstr "Portrait"
-
 msgid "Amount"
 msgstr "Betrag"
-
-msgid "File study"
-msgstr "Aktenstudium"
 
 msgid "No rate sets defined yet."
 msgstr "Noch keine Sätze erfasst."
@@ -631,6 +670,12 @@ msgstr "Legislatur hinzugefügt"
 msgid "New legislative period"
 msgstr "Neue Legislatur"
 
+msgid "Added a new party"
+msgstr "Partei hinzugefügt"
+
+msgid "New party"
+msgstr "Neue Partei"
+
 msgid "Added a new rate set"
 msgstr "Neue Sätze hinzugefügt"
 
@@ -642,6 +687,9 @@ msgstr "Der Satz wurde kopiert"
 
 msgid "Copy"
 msgstr "Kopieren"
+
+msgid "Copy rate set"
+msgstr "Satz kopieren"
 
 msgid "Added a new settlement run"
 msgstr "Neuer Abrechnungslauf hinzugefügt"
@@ -666,135 +714,3 @@ msgstr "Abrechnungen nach Parlamentarier:in"
 
 msgid "Total all parties"
 msgstr "Total Alle Parteien"
-
-#~ msgid "Clone this rate set"
-#~ msgstr "Diesen Satz klonen (kopieren)"
-
-#~ msgid "Added a new rate set based on a copy."
-#~ msgstr "Neuer Satz aus Kopie erstellt"
-
-#~ msgid "Clone"
-#~ msgstr "Klonen"
-
-msgid "Copy rate set"
-msgstr "Satz kopieren"
-
-#~ msgid "Basic properties"
-#~ msgstr "Grundeigenschaften"
-
-#~ msgid "First name"
-#~ msgstr "Vorname"
-
-#~ msgid "Last name"
-#~ msgstr "Nachname"
-
-#~ msgid "Address"
-#~ msgstr "Adresse"
-
-#~ msgid "Addition"
-#~ msgstr "Adresszusatz"
-
-#~ msgid "Zip code"
-#~ msgstr "PLZ"
-
-#~ msgid "City"
-#~ msgstr "Stadt"
-
-#~ msgid "Additional information"
-#~ msgstr "Zusatzinformationen"
-
-#~ msgid "Party role"
-#~ msgstr "Rolle in der Partei"
-
-#~ msgid "Parliamentary group role"
-#~ msgstr "Rolle in der Fraktion"
-
-#~ msgid "Attendence added"
-#~ msgstr "Anwesenheit hinzugefügt"
-
-#~ msgid "Attendence modified"
-#~ msgstr "Anwesenheit bearbeitet"
-
-#~ msgid "Attendence removed"
-#~ msgstr "Anwesenheit gelöscht"
-
-#~ msgid "normal"
-#~ msgstr "normal"
-
-#~ msgid "intercantonal"
-#~ msgstr "interkantonal"
-
-#~ msgid "Guest"
-#~ msgstr "Gast"
-
-#~ msgid "Extended Member"
-#~ msgstr "erweitertes Mitglied"
-
-#~ msgid "male"
-#~ msgstr "männlich"
-
-#~ msgid "female"
-#~ msgstr "weiblich"
-
-#~ msgid "A mail"
-#~ msgstr "A-Post"
-
-#~ msgid "A mail plus"
-#~ msgstr "A-Post Plus"
-
-#~ msgid "registered"
-#~ msgstr "eingeschrieben"
-
-#~ msgid "confidential"
-#~ msgstr "vertraulich"
-
-#~ msgid "personal / confidential"
-#~ msgstr "persönlich / vertraulich"
-
-#~ msgid "none"
-#~ msgstr "keine"
-
-#~ msgid "Vote counter"
-#~ msgstr "Stimmenzähler"
-
-#~ msgid "Media Manager"
-#~ msgstr "Leiter Medien und Kampagnen"
-
-#~ msgid "President of the parliamentary group"
-#~ msgstr "Fraktionsschef"
-
-#~ msgid "msg_import_summary"
-#~ msgstr ""
-#~ "Insgesamt ${total_processed} Elemente verarbeitet: ${total_created} "
-#~ "erstellt, ${total_updated} aktualisiert."
-
-#~ msgid ""
-#~ "No items were processed. The uploaded files might be empty or incorrectly "
-#~ "formatted."
-#~ msgstr ""
-#~ "Es wurden keine Elemente verarbeitet. Die hochgeladenen Dateien könnten "
-#~ "leer oder falsch formatiert sein."
-
-#~ msgid "Added a new commission"
-#~ msgstr "Kommission hinzugefügt"
-
-#~ msgid "New commission"
-#~ msgstr "Neue Kommission"
-
-#~ msgid "Added a new role"
-#~ msgstr "Neue Rolle hinzugefügt"
-
-#~ msgid "New role"
-#~ msgstr "Neue Rolle"
-
-#~ msgid "Added a new parliamentary group"
-#~ msgstr "Fraktion hinzugefügt"
-
-#~ msgid "New parliamentary group"
-#~ msgstr "Neue Fraktion"
-
-#~ msgid "Added a new party"
-#~ msgstr "Partei hinzugefügt"
-
-#~ msgid "New party"
-#~ msgstr "Neue Partei"

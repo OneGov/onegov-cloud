@@ -1658,7 +1658,8 @@ class KabaConfigurationsField(FieldBase):
                 'api_key': item['api_key'],
                 # if we already submitted this then just use the existing
                 # key, unless we specified a new one
-                'api_secret': self.meta.request.encrypt(item['api_secret'])
+                'api_secret':
+                    self.meta.request.app.encrypt(item['api_secret']).hex()
                     if item['api_secret'] else previous_secrets[site_id]
             }
             for item in self.data
@@ -1855,6 +1856,15 @@ class EventSettingsForm(Form):
                                    'configurable filters')),
         ),
         default='tags'
+    )
+
+    event_header_html = HtmlField(
+        label=_('General information above the event list'),
+
+    )
+
+    event_footer_html = HtmlField(
+        label=_('General information below the event list'),
     )
 
     event_files = UploadOrSelectExistingMultipleFilesField(

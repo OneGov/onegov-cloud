@@ -8,8 +8,7 @@ from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
 from onegov.parliament import _
-from onegov.search import ORMSearchable
-from sqlalchemy import Column, or_
+from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import Text
@@ -17,20 +16,11 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-from typing import TYPE_CHECKING
-
+from typing import Literal, TypeAlias, TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import Literal
-    from typing import TypeAlias
-
-    from sqlalchemy.orm import Session
     import uuid
-
     from onegov.parliament.models import (
-        Attendence,
         CommissionMembership,
-        PoliticalBusinessParticipation,
-        Party,
         ParliamentarianRole,
     )
 
@@ -62,8 +52,7 @@ SHIPPING_METHODS: dict[ShippingMethod, str] = {
 }
 
 
-class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles,
-                      ORMSearchable):
+class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
 
     __tablename__ = 'par_parliamentarians'
 
@@ -77,19 +66,6 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles,
         'polymorphic_on': type,
         'polymorphic_identity': 'generic',
     }
-
-    es_public = False
-    es_properties = {
-        'first_name': {'type': 'text'},
-        'last_name': {'type': 'text'},
-    }
-
-    @property
-    def es_suggestion(self) -> tuple[str, ...]:
-        return (
-            f'{self.first_name} {self.last_name}',
-            f'{self.last_name} {self.first_name}'
-        )
 
     @property
     def title(self) -> str:
@@ -337,35 +313,6 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles,
         order_by='desc(ParliamentarianRole.start)'
     )
 
-    def get_party_during_period(
-        self, start_date: date, end_date: date, session: Session
-    ) -> Party | None:
-        """Get the party this parliamentarian belonged to during a specific
-        period."""
-
-        from onegov.parliament.models.parliamentarian_role import (
-            ParliamentarianRole
-        )
-        role = (
-            session.query(ParliamentarianRole)
-            .filter(
-                ParliamentarianRole.parliamentarian_id == self.id,
-                ParliamentarianRole.party_id.isnot(
-                    None
-                ),
-                or_(
-                    ParliamentarianRole.end.is_(None),
-                    ParliamentarianRole.end >= start_date,
-                ),
-                ParliamentarianRole.start
-                <= end_date,
-            )
-            .order_by(ParliamentarianRole.start.desc())
-            .first()
-        )
-
-        return role.party if role else None
-
     @property
     def active(self) -> bool:
         if not self.roles:
@@ -397,13 +344,6 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles,
         back_populates='parliamentarian'
     )
 
-    #: A parliamentarian may attend meetings
-    attendences: relationship[list[Attendence]] = relationship(
-        'Attendence',
-        cascade='all, delete-orphan',
-        back_populates='parliamentarian'
-    )
-
     def __repr__(self) -> str:
         info = [
             f'id={self.id}',
@@ -419,29 +359,3 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles,
                 f"email='{self.email_primary}'")
 
         return f"<Parliamentarian {', '.join(info)}>"
-
-
-class RISParliamentarian(Parliamentarian):
-
-    __mapper_args__ = {
-        'polymorphic_identity': 'ris_parliamentarian',
-    }
-
-    es_type_name = 'ris_parliamentarian'
-
-    #: political businesses participations [0..n]
-    political_businesses: relationship[list[PoliticalBusinessParticipation]]
-    political_businesses = relationship(
-        'PoliticalBusinessParticipation',
-        back_populates='parliamentarian',
-        lazy='joined'
-    )
-
-    @property
-    def active(self) -> bool:
-        # Wil: every parliamentarian is active if in a parliamentary
-        # group, which leads to a role
-        for role in self.roles:
-            if role.end is None or role.end >= date.today():
-                return True
-        return False

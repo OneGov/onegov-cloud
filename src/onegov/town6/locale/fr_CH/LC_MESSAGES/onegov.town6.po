@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-10 13:50+0200\n"
+"POT-Creation-Date: 2025-07-25 12:05+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -295,23 +295,29 @@ msgstr "Paramètres RIS"
 msgid "Meeting"
 msgstr "Réunion"
 
+msgid "Edit"
+msgstr "Modifier"
+
+msgid "Do you really want to delete this meeting?"
+msgstr "Voulez-vous vraiment supprimer cette réunion?"
+
+msgid "This cannot be undone."
+msgstr "Cela ne peut être effectué."
+
+msgid "Delete meeting"
+msgstr "Supprimer la réunion"
+
 msgid "Parliamentarians"
 msgstr "Parlementaires"
 
 msgid "Parliamentarian"
 msgstr "Parlementaire"
 
-msgid "Role (as a party or group member)"
-msgstr "Rôle (en tant que membre d'un parti ou d'un groupe)"
-
-msgid "Edit"
-msgstr "Modifier"
+msgid "Role (as a group member)"
+msgstr "Rôle (en tant que membre d'un groupe)"
 
 msgid "Do you really want to delete this parliamentarian?"
 msgstr "Voulez-vous vraiment supprimer ce parlementaire ?"
-
-msgid "This cannot be undone."
-msgstr "Cela ne peut être effectué."
 
 msgid "Delete parliamentarian"
 msgstr "Supprimer le parlementaire"
@@ -340,12 +346,6 @@ msgstr "Partis"
 msgid "Political Party"
 msgstr "Parti"
 
-msgid "Do you really want to delete this party?"
-msgstr "Voulez-vous vraiment supprimer ce parti ?"
-
-msgid "Delete party"
-msgstr "Supprimer le parti"
-
 msgid "Commissions"
 msgstr "Commissions"
 
@@ -361,17 +361,26 @@ msgstr "Supprimer la commission"
 msgid "Political Businesses"
 msgstr "Affaires politiques"
 
+msgid "Political Business"
+msgstr "Business politique"
+
+msgid "Do you really want to delete this political business?"
+msgstr "Voulez-vous vraiment supprimer cette affaire politique?"
+
+msgid "Delete political business"
+msgstr "Supprimer les affaires politiques"
+
 msgid "No availability periods defined."
 msgstr "Aucune période de disponibilité définie."
 
 msgid "State:"
-msgstr "État :"
+msgstr "État:"
 
 msgid "Owner:"
-msgstr "Propriétaire :"
+msgstr "Propriétaire:"
 
 msgid "Kind:"
-msgstr "Type :"
+msgstr "Type:"
 
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "The chat request got accepted."
@@ -1846,6 +1855,9 @@ msgstr "Origine"
 msgid "This is an imported event"
 msgstr "Il s'agit d'un événement importé"
 
+msgid "General information about the event calendar"
+msgstr "Informations générales sur le calendrier des événements"
+
 msgid "Tag"
 msgstr "Étiquette"
 
@@ -1869,6 +1881,9 @@ msgstr "Photo"
 
 msgid "Private address"
 msgstr "Adresse privée"
+
+msgid "Place of residence"
+msgstr "Lieu de résidence"
 
 msgid "Date of birth"
 msgstr "Date de naissance"
@@ -1935,12 +1950,6 @@ msgstr "Aucun parlementaire n'a été défini pour le moment."
 
 msgid "No parliamentary groups defined yet."
 msgstr "Aucun groupe parlementaire n'a été défini pour le moment."
-
-msgid "No parties defined yet."
-msgstr "Aucun parti n'a été défini pour le moment."
-
-msgid "Portrait"
-msgstr "Portrait"
 
 msgid "No payment providers defined."
 msgstr "Aucun fournisseur de paiement n'a été défini."
@@ -2014,8 +2023,8 @@ msgstr "Aucun business politique n'a été défini pour le moment."
 msgid "Datum"
 msgstr "Date"
 
-msgid "Political Business"
-msgstr "Business politique"
+msgid "Year"
+msgstr "Année"
 
 msgid "No publications"
 msgstr "Aucune publication"
@@ -2489,8 +2498,29 @@ msgstr "Nouvelle commission"
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
 
+msgid "The commission has been deleted."
+msgstr "La commission a été supprimée."
+
 msgid "Sort"
 msgstr "Trier"
+
+msgid "Past Meetings"
+msgstr "Passées"
+
+msgid "Upcoming Meetings"
+msgstr "A venir"
+
+msgid "Added a new meeting"
+msgstr "Ajout d'une nouvelle réunion"
+
+msgid "New meeting"
+msgstr "Nouvelle réunion"
+
+msgid "Edit meeting"
+msgstr "Éditer la réunion"
+
+msgid "The meeting has been deleted."
+msgstr "La réunion a été supprimée."
 
 msgid "Added a new parliamentarian"
 msgstr "Ajout d'un nouveau parlementaire"
@@ -2498,11 +2528,17 @@ msgstr "Ajout d'un nouveau parlementaire"
 msgid "New parliamentarian"
 msgstr "Nouveau parlementaire"
 
+msgid "The parliamentarian has been deleted."
+msgstr "Le parlementaire a été supprimé."
+
 msgid "Added a new role"
 msgstr "Ajout d'un nouveau rôle"
 
 msgid "New role"
 msgstr "Nouveau rôle"
+
+msgid "The parliamentarian role has been deleted."
+msgstr "Le rôle du parlementaire a été supprimé."
 
 msgid "Added a new parliamentary group"
 msgstr "Ajout d'un nouveau groupe parlementaire"
@@ -2510,11 +2546,14 @@ msgstr "Ajout d'un nouveau groupe parlementaire"
 msgid "New parliamentary group"
 msgstr "Nouveau groupe parlementaire"
 
-msgid "Added a new party"
-msgstr "Ajout d'un nouveau parti"
+msgid "The parliamentary group has been deleted."
+msgstr "Le groupe parlementaire a été supprimé."
 
-msgid "New party"
-msgstr "Nouveau parti"
+msgid "Added a new political business"
+msgstr "Ajout d' un nouveau business politique"
+
+msgid "New political business"
+msgstr "Nouveau business politique"
 
 msgid "New Recipient"
 msgstr "Nouveau destinataire"

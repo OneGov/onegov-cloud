@@ -46,25 +46,23 @@ from onegov.org.models.page import Page
 from onegov.org.models import ExtendedDirectory
 from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.models.resource import Resource
-from onegov.page.collection import PageCollection
-from onegov.parliament.collections import (
+from onegov.org.models import (
     MeetingCollection,
+    MeetingItem,
     MeetingItemCollection,
+    PoliticalBusiness,
     PoliticalBusinessCollection,
     PoliticalBusinessParticipationCollection,
     RISCommissionCollection,
+    RISCommissionMembership,
     RISCommissionMembershipCollection,
+    RISParliamentarian,
     RISParliamentarianCollection,
+    RISParliamentarianRole,
     RISParliamentarianRoleCollection,
     RISParliamentaryGroupCollection,
 )
-from onegov.parliament.models import (
-    MeetingItem,
-    RISCommissionMembership,
-    RISParliamentarian,
-    RISParliamentarianRole,
-    PoliticalBusiness,
-)
+from onegov.page.collection import PageCollection
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
@@ -94,7 +92,7 @@ if TYPE_CHECKING:
 
     from translationstring import TranslationString
     from uuid import UUID
-    from onegov.parliament.models.political_business import (
+    from onegov.org.models.political_business import (
         PoliticalBusinessStatus,
         PoliticalBusiness
     )
@@ -1127,6 +1125,7 @@ def import_reservations(
                     if value is None:
                         value = 'info@seantis.ch'
                     reservation['general']['email'] = value
+                    reservation['fields']['email'] = value
                 elif i == 37:
                     reservation['state'] = str(value)
                 elif i in shared_fields:
@@ -2804,11 +2803,11 @@ def ris_resolve_parliamentarian_doublette(
             return
 
         if business.participants:
-            for participation in business.participants:  # type: ignore[attr-defined]
+            for participation in business.participants:
                 if str(participation.parliamentarian_id) == id_1:
                     click.echo(f'replace {participation.parliamentarian_id} '
                                f'with {parliamentarian.id}')
-                    participation.parliamentarian_id = id
+                    participation.parliamentarian_id = id  # type: ignore[assignment]
                     changed = True
 
         transaction.commit()
@@ -2819,3 +2818,35 @@ def ris_resolve_parliamentarian_doublette(
             transaction.commit()
 
     return resolve_doublette
+
+
+@cli.command(name='ris-rename-imported-participation-types-to-english')
+def ris_rename_imported_participation_types_to_english(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Renames imported participation types to English
+
+    onegov-org --select /foo/bar
+        ris-rename-imported-participation-types-to-english
+    """
+    map = {
+        'Erstunterzeichner/-in': 'First signatory',
+        'Mitunterzeichner/-in': 'Co-signatory',
+        'Erstunterzeichner/in': 'First signatory',
+        'Mitunterzeichner/in': 'Co-signatory',
+        'Vorstösser/in': 'First signatory',
+    }
+
+    def rename_participation_types(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        collection = PoliticalBusinessParticipationCollection(session)
+
+        for participation in collection.query():
+            if participation.participant_type in map:
+                old_type = participation.participant_type
+                participation.participant_type = map[old_type]
+                click.echo(
+                    f'Renamed {old_type} to {participation.participant_type}')
+
+        transaction.commit()
+
+    return rename_participation_types

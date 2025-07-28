@@ -3,12 +3,10 @@ from __future__ import annotations
 from sqlalchemy import desc, or_
 
 from onegov.core.collection import GenericCollection
-from onegov.parliament.models import (
-    ParliamentarianRole,
-)
 from onegov.pas.models import (
-    PASAttendence,
+    Attendence,
     PASParliamentarian,
+    PASParliamentarianRole,
     SettlementRun,
 )
 
@@ -19,7 +17,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
 
 
-class AttendenceCollection(GenericCollection[PASAttendence]):
+class AttendenceCollection(GenericCollection[Attendence]):
     def __init__(
         self,
         session: Session,
@@ -41,10 +39,10 @@ class AttendenceCollection(GenericCollection[PASAttendence]):
         self.party_id = party_id
 
     @property
-    def model_class(self) -> type[PASAttendence]:
-        return PASAttendence
+    def model_class(self) -> type[Attendence]:
+        return Attendence
 
-    def query(self) -> Query[PASAttendence]:
+    def query(self) -> Query[Attendence]:
         query = super().query()
 
         if self.settlement_run_id:
@@ -53,44 +51,44 @@ class AttendenceCollection(GenericCollection[PASAttendence]):
             )
             if settlement_run:
                 query = query.filter(
-                    PASAttendence.date >= settlement_run.start,
-                    PASAttendence.date <= settlement_run.end,
+                    Attendence.date >= settlement_run.start,
+                    Attendence.date <= settlement_run.end,
                     )
 
         if self.date_from:
-            query = query.filter(PASAttendence.date >= self.date_from)
+            query = query.filter(Attendence.date >= self.date_from)
         if self.date_to:
-            query = query.filter(PASAttendence.date <= self.date_to)
+            query = query.filter(Attendence.date <= self.date_to)
         if self.type:
-            query = query.filter(PASAttendence.type == self.type)
+            query = query.filter(Attendence.type == self.type)
         if self.parliamentarian_id:
             query = query.filter(
-                PASAttendence.parliamentarian_id == self.parliamentarian_id
+                Attendence.parliamentarian_id == self.parliamentarian_id
             )
         if self.commission_id:
             query = query.filter(
-                PASAttendence.commission_id == self.commission_id
+                Attendence.commission_id == self.commission_id
             )
 
         # Check for any overlap in party membership period
         if self.party_id:
             query = (
-                query.join(PASAttendence.parliamentarian)
+                query.join(Attendence.parliamentarian)
                 .join(PASParliamentarian.roles)
                 .filter(
-                    ParliamentarianRole.party_id == self.party_id,
+                    PASParliamentarianRole.party_id == self.party_id,
                     or_(
-                        ParliamentarianRole.start.is_(None),
-                        ParliamentarianRole.start <= PASAttendence.date
+                        PASParliamentarianRole.start.is_(None),
+                        PASParliamentarianRole.start <= Attendence.date
                     ),
                     or_(
-                        ParliamentarianRole.end.is_(None),
-                        ParliamentarianRole.end >= PASAttendence.date
+                        PASParliamentarianRole.end.is_(None),
+                        PASParliamentarianRole.end >= Attendence.date
                     )
                 )
             )
 
-        return query.order_by(desc(PASAttendence.date))
+        return query.order_by(desc(Attendence.date))
 
     def for_filter(
         self,

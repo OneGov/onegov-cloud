@@ -1,11 +1,10 @@
 from datetime import date
 from onegov.pas.models import (
-    PASAttendence,
+    Attendence,
     PASParliamentarian,
     PASParliamentarianRole,
-    PASParty,
+    Party,
 )
-
 from onegov.pas.utils import get_parties_with_settlements
 from onegov.pas.utils import get_parliamentarians_with_settlements
 from uuid import uuid4
@@ -74,7 +73,7 @@ def test_get_parliamentarians_with_settlements(session):
     session.flush()
 
     # Create attendances
-    attendance1 = PASAttendence(
+    attendance1 = Attendence(
         id=uuid4(),
         parliamentarian_id=parl1.id,
         date=date(2024, 6, 1),
@@ -86,7 +85,7 @@ def test_get_parliamentarians_with_settlements(session):
 
     # Parl3 has attendance but the role does not fall within the date range
     # of the attendance
-    attendance3 = PASAttendence(
+    attendance3 = Attendence(
         id=uuid4(),
         parliamentarian_id=parl3.id,
         date=date(2024, 6, 1),
@@ -107,7 +106,7 @@ def test_get_parliamentarians_with_settlements(session):
     assert result[0].id == parl1.id
 
     # Add attendance for parl2 and test again
-    attendance2 = PASAttendence(
+    attendance2 = Attendence(
         id=uuid4(),
         parliamentarian_id=parl2.id,
         date=date(2024, 6, 1),
@@ -140,21 +139,21 @@ def test_get_parties_with_settlements(session):
     end_date = date(2024, 12, 31)
 
     # Create parties
-    party_a = PASParty(
+    party_a = Party(
         id=uuid4(),
-        name='PASParty A',
+        name='Party A',
         start=date(2020, 1, 1),
         end=date(2026, 12, 31),
     )
-    party_b = PASParty(
+    party_b = Party(
         id=uuid4(),
-        name='PASParty B',
+        name='Party B',
         start=date(2020, 1, 1),
         end=date(2026, 12, 31),
     )
-    party_c = PASParty(
+    party_c = Party(
         id=uuid4(),
-        name='PASParty C',
+        name='Party C',
         start=date(2020, 1, 1),
         end=date(2026, 12, 31),
     )
@@ -240,7 +239,7 @@ def test_get_parties_with_settlements(session):
     # Create attendances
     # PASParl1 has attendance during their party membership - one in first
     # half, one in second half
-    attendance1a = PASAttendence(
+    attendance1a = Attendence(
         id=uuid4(),
         parliamentarian_id=parl1.id,
         date=date(2024, 3, 15),  # During party A membership
@@ -249,7 +248,7 @@ def test_get_parties_with_settlements(session):
         type='plenary',
     )
 
-    attendance1b = PASAttendence(
+    attendance1b = Attendence(
         id=uuid4(),
         parliamentarian_id=parl1.id,
         date=date(2024, 9, 15),
@@ -259,7 +258,7 @@ def test_get_parties_with_settlements(session):
     )
 
     # Parl2 has attendances during both party memberships
-    attendance2a = PASAttendence(
+    attendance2a = Attendence(
         id=uuid4(),
         parliamentarian_id=parl2.id,
         date=date(2024, 3, 15),  # During party B membership
@@ -267,7 +266,7 @@ def test_get_parties_with_settlements(session):
         type='plenary',
     )
 
-    attendance2b = PASAttendence(
+    attendance2b = Attendence(
         id=uuid4(),
         parliamentarian_id=parl2.id,
         date=date(2024, 9, 15),  # During party C membership
@@ -276,7 +275,7 @@ def test_get_parties_with_settlements(session):
     )
 
     # Parl3 has attendance but was no longer in Party C
-    attendance3 = PASAttendence(
+    attendance3 = Attendence(
         id=uuid4(),
         parliamentarian_id=parl3.id,
         date=date(2024, 3, 15),

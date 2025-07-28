@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from datetime import date
-from sqlalchemy import or_
-
 from onegov.core.collection import GenericCollection
 from onegov.parliament.models import ParliamentaryGroup
-from onegov.parliament.models import RISParliamentaryGroup
+from sqlalchemy import or_
+
 
 from typing import Any, TYPE_CHECKING
 from typing_extensions import TypeVar
@@ -57,12 +56,3 @@ class ParliamentaryGroupCollection(GenericCollection[GroupT]):
         active: bool | None = None
     ) -> Self:
         return self.__class__(self.session, active)
-
-
-class RISParliamentaryGroupCollection(
-    ParliamentaryGroupCollection[RISParliamentaryGroup]
-):
-
-    @property
-    def model_class(self) -> type[RISParliamentaryGroup]:
-        return RISParliamentaryGroup

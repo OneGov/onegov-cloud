@@ -1,20 +1,9 @@
 from __future__ import annotations
 
 import csv
+import openpyxl
 from dataclasses import dataclass
 from datetime import datetime, date
-from pathlib import Path
-from tempfile import NamedTemporaryFile
-from typing import (
-    TypeVar,
-    BinaryIO,
-    cast,
-    Protocol,
-    ParamSpec, Self, Any,
-)
-
-import openpyxl
-
 from onegov.core.csv import CSVFile, convert_excel_to_csv, detect_encoding
 from onegov.pas.models import (
     PASCommission,
@@ -22,21 +11,29 @@ from onegov.pas.models import (
     PASParliamentarian,
     PASParliamentarianRole,
     PASParliamentaryGroup,
-    PASParty,
+    Party,
 )
+from pathlib import Path
+from tempfile import NamedTemporaryFile
 
-T = TypeVar('T')
-P = ParamSpec('P')
 
-
-from typing import Any as Incomplete
+from typing import (
+    Any,
+    Any as Incomplete,
+    TypeVar,
+    BinaryIO,
+    cast,
+    Protocol,
+    ParamSpec,
+    Self,
+)
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.parliament.models.commission_membership import MembershipRole
+    from _typeshed import StrOrBytesPath
     from collections.abc import Callable
+    from onegov.parliament.models.commission_membership import MembershipRole
     from sqlalchemy.orm import Session
     from types import TracebackType
-    from _typeshed import StrOrBytesPath
 
     class Row(Protocol):
         adress_anrede: str
@@ -79,6 +76,9 @@ if TYPE_CHECKING:
         wahlkreis: str
         webseite: str
         zusatzinformationen: str
+
+T = TypeVar('T')
+P = ParamSpec('P')
 
 # For commission import, Callable keys on the Row object of CSV files.
 EXPECTED_HEADERS = [
@@ -389,9 +389,9 @@ def import_commissions(
     # First pass - create parties and parliamentary groups
     for row in import_file.rows:
         # Create party if needed
-        party = session.query(PASParty).filter_by(name=row.partei).first()
+        party = session.query(Party).filter_by(name=row.partei).first()
         if not party:
-            party = PASParty(name=row.partei)
+            party = Party(name=row.partei)
             session.add(party)
 
         # Create parliamentary group if needed
@@ -407,7 +407,7 @@ def import_commissions(
     # Second pass - create parliamentarians and memberships
     for row in import_file.rows:
         # Get party and group
-        party = session.query(PASParty).filter_by(name=row.partei).one()
+        party = session.query(Party).filter_by(name=row.partei).one()
         group = session.query(PASParliamentaryGroup).filter_by(
             name=row.fraktion
         ).one()

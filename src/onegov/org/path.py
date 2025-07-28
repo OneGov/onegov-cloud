@@ -1,15 +1,14 @@
 """ Contains the paths to the different models served by onegov.org. """
 from __future__ import annotations
 
-from onegov.form.models.definition import SurveyDefinition
 import sedate
-
 from datetime import date, datetime
-
 from onegov.api.models import ApiKey
 from onegov.chat import MessageCollection
 from onegov.chat import TextModule
 from onegov.chat import TextModuleCollection
+from onegov.chat.collections import ChatCollection
+from onegov.chat.models import Chat
 from onegov.core.converters import extended_date_converter
 from onegov.core.converters import datetime_year_converter
 from onegov.core.converters import json_converter
@@ -36,6 +35,7 @@ from onegov.form.collection import SurveyCollection
 from onegov.org.models.document_form import (
     FormDocumentCollection, FormDocument)
 from onegov.form.models.submission import SurveySubmission
+from onegov.form.models.definition import SurveyDefinition
 from onegov.form.models.survey_window import SurveySubmissionWindow
 from onegov.newsletter import Newsletter
 from onegov.newsletter import NewsletterCollection
@@ -75,32 +75,27 @@ from onegov.org.models import SiteCollection
 from onegov.org.models import TicketNote
 from onegov.org.models import Topic
 from onegov.org.models import TraitInfo
+from onegov.org.models import (
+    Meeting,
+    MeetingItem,
+    MeetingCollection,
+    RISCommission,
+    RISCommissionCollection,
+    RISParliamentarian,
+    RISParliamentarianCollection,
+    RISParliamentarianRole,
+    RISParliamentarianRoleCollection,
+    RISParliamentaryGroup,
+    RISParliamentaryGroupCollection,
+    PoliticalBusiness,
+    PoliticalBusinessCollection,
+)
 from onegov.org.models.extensions import PersonLinkExtension
-from onegov.chat.collections import ChatCollection
-from onegov.chat.models import Chat
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.page import PageCollection
-from onegov.parliament.collections import (
-    RISPartyCollection,
-    MeetingCollection,
-    RISCommissionCollection,
-    RISParliamentarianCollection,
-    RISParliamentarianRoleCollection,
-    RISParliamentaryGroupCollection, PoliticalBusinessCollection
-)
-from onegov.parliament.models import (
-    Meeting,
-    Party,
-    RISCommission,
-    RISParliamentarian,
-    RISParliamentarianRole,
-    RISParliamentaryGroup,
-    RISParty, PoliticalBusiness,
-)
-from onegov.parliament.models.meeting_item import MeetingItem
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.people import Person, PersonCollection
@@ -455,12 +450,16 @@ def get_ticket(app: OrgApp, handler_code: str, id: UUID) -> Ticket | None:
 def get_tickets(
     app: OrgApp,
     handler: str = 'ALL',
-    state: ExtendedTicketState = 'open',
+    state: ExtendedTicketState | None = 'open',
     page: int = 0,
     group: str | None = None,
     owner: str | None = None,
     extra_parameters: dict[str, str] | None = None
-) -> TicketCollection:
+) -> TicketCollection | None:
+
+    if state is None:
+        return None
+
     return TicketCollection(
         app.session(),
         handler=handler,
@@ -1261,30 +1260,6 @@ def get_parliamentary_group(
 
 
 @OrgApp.path(
-    model=RISPartyCollection,
-    path='/parties',
-    converters={'active': bool}
-)
-def get_parties(
-    app: OrgApp,
-    active: bool = True,
-) -> RISPartyCollection:
-    return RISPartyCollection(app.session(), active)
-
-
-@OrgApp.path(
-    model=RISParty,
-    path='/party/{id}',
-    converters={'id': UUID}
-)
-def get_party(
-    app: OrgApp,
-    id: UUID
-) -> Party | None:
-    return RISPartyCollection(app.session()).by_id(id)
-
-
-@OrgApp.path(
     model=RISCommissionCollection,
     path='/commissions',
     converters={'active': bool}
@@ -1311,11 +1286,13 @@ def get_commission(
 @OrgApp.path(
     model=MeetingCollection,
     path='/meetings',
+    converters={'past': bool}
 )
 def get_meetings(
     app: OrgApp,
+    past: bool = True  # show past meetings by default
 ) -> MeetingCollection:
-    return MeetingCollection(app.session())
+    return MeetingCollection(app.session(), past)
 
 
 @OrgApp.path(
@@ -1335,13 +1312,25 @@ def get_meeting(
     path='/political-businesses',
     converters={
         'page': int,
+        'status': [str],
+        'types': [str],
+        'years': [int],
     }
 )
 def get_political_businesses(
     app: OrgApp,
     page: int = 0,
+    status: list[str] | None = None,
+    types: list[str] | None = None,
+    years: list[int] | None = None,
 ) -> PoliticalBusinessCollection:
-    return PoliticalBusinessCollection(app.session(), page=page)
+    return PoliticalBusinessCollection(
+        app.session(),
+        page=page,
+        status=status,
+        types=types,
+        years=years,
+    )
 
 
 @OrgApp.path(

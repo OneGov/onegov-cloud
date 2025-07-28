@@ -14,7 +14,7 @@ from onegov.pas.collections.parliamentarian_role import (
 )
 from onegov.pas.collections.parliamentary_group import (
     PASParliamentaryGroupCollection)
-from onegov.pas.collections.party import PASPartyCollection
+from onegov.pas.collections.party import PartyCollection
 from onegov.pas.collections.rate_set import RateSetCollection
 from onegov.pas.collections.settlement_run import SettlementRunCollection
 
@@ -28,7 +28,7 @@ __all__ = (
     'PASParliamentarianCollection',
     'PASParliamentarianRoleCollection',
     'PASParliamentaryGroupCollection',
-    'PASPartyCollection',
+    'PartyCollection',
     'RateSetCollection',
     'SettlementRunCollection'
 )

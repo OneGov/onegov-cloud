@@ -9,7 +9,7 @@ from onegov.org.cli import cli as org_cli
 from onegov.pas.cli import cli
 from onegov.pas.models import (
     PASCommission,
-    PASParty,
+    Party,
     PASParliamentaryGroup,
     PASParliamentarian,
     PASCommissionMembership
@@ -72,7 +72,7 @@ def test_import_commission_data(
         assert commission.type == 'normal'
 
         # Check parties
-        parties = session.query(PASParty).all()
+        parties = session.query(Party).all()
         party_names = {p.name for p in parties}
         expected_parties = {'ALG', 'Die Mitte'}
         assert party_names == expected_parties

@@ -128,6 +128,14 @@ class KabaClient:
         return data['id']
 
     def revoke_visit(self, visit_id: str) -> None:
+        res = self.session.get(
+            f'{self.base_url}/{self.site_id}/visit/{visit_id}',
+            timeout=(5, 10)
+        )
+        self.raise_for_status(res)
+        if res.json()['revoked'] is True:
+            return
+
         res = self.session.post(
             f'{self.base_url}/{self.site_id}/visit/{visit_id}/revoke',
             json={},

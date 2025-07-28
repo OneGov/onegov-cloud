@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-10 14:11+0200\n"
+"POT-Creation-Date: 2025-07-24 13:54+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1179,8 +1179,8 @@ msgstr "Nach Beschreibung"
 msgid "By last change"
 msgstr "Nach Zeitpunkt der letzten Änderung"
 
-msgid "Portrait"
-msgstr "Portrait"
+msgid "Agenda Items"
+msgstr "Traktanden"
 
 msgid "Used in the overview and the e-mail subject"
 msgstr "Wird in der Übersicht und als E-Mail Subjekt verwendet"
@@ -1343,9 +1343,6 @@ msgstr "Geburtsdatum"
 msgid "Additional information"
 msgstr "Zusätzliche Informationen"
 
-msgid "Date of death"
-msgstr "Sterbedatum"
-
 msgid "Place of origin"
 msgstr "Bürgerort"
 
@@ -1379,38 +1376,11 @@ msgstr "Webseite"
 msgid "Remarks"
 msgstr "Bemerkungen"
 
-msgid "Personnel number"
-msgstr "Personalnummer"
-
-msgid "Contract number"
-msgstr "Vertragsnummer"
-
-msgid "Shipping method"
-msgstr "Versandart"
-
-msgid "Shipping address"
-msgstr "Lieferadresse"
-
-msgid "Salutation used in the address"
-msgstr "Anrede in der Adresse"
-
-msgid "Salutation used for letters"
-msgstr "Anrede in Briefen"
-
-msgid "How bills should be delivered"
-msgstr "Rechnungszustellung"
-
 msgid "Parliamentarian"
 msgstr "Parlamentarier:in"
 
 msgid "Role"
 msgstr "Rolle"
-
-msgid "Political Party"
-msgstr "Partei"
-
-msgid "Party role"
-msgstr "Rolle in der Partei"
 
 msgid "Parliamentary group"
 msgstr "Fraktion"
@@ -1463,6 +1433,9 @@ msgstr "Geboren"
 msgid "Profession"
 msgstr "Beruf"
 
+msgid "Political Party"
+msgstr "Partei"
+
 msgid "Parliamentary Group"
 msgstr "Fraktion"
 
@@ -1489,6 +1462,30 @@ msgstr "Notizen"
 
 msgid "Public extra information about this person"
 msgstr "Öffentliche Extra Informationen zu dieser Person"
+
+msgid "Select additional participant"
+msgstr "Zusätzlichen Verfasser / Beteiligter auswählen"
+
+msgid "No results match"
+msgstr "Keine Ergebnisse gefunden:"
+
+msgid "First signatory"
+msgstr "Erstunterzeichner/in"
+
+msgid "Co-signatory"
+msgstr "Mitunterzeichner/in"
+
+msgid "Number"
+msgstr "Nummer"
+
+msgid "Business Status"
+msgstr "Status"
+
+msgid "Entry Date"
+msgstr "Datum"
+
+msgid "Participations"
+msgstr "Verfasser / Beteiligte"
 
 msgid "Tag"
 msgstr "Schlagwort"
@@ -2466,7 +2463,7 @@ msgid "Read only"
 msgstr "Nur Lesezugriff"
 
 msgid "Submit your event"
-msgstr "Veranstaltung vorschlagen"
+msgstr "Veranstaltung erfassen"
 
 msgid "Enables website visitors to submit their own events"
 msgstr ""
@@ -2493,6 +2490,12 @@ msgstr "Manuell konfigurierbare Filter"
 
 msgid "Both, predefined tags as well as configurable filters"
 msgstr "Sowohl vordefinierte Tags als auch konfigurierbare Filter"
+
+msgid "General information above the event list"
+msgstr "Allgemeine Informationen über der Veranstaltungs-Liste"
+
+msgid "General information below the event list"
+msgstr "Allgemeine Informationen unterhalb der Veranstaltungs-Liste"
 
 msgid "Documents"
 msgstr "Dokumente"
@@ -3336,9 +3339,6 @@ msgstr "Text statt Einleitung im Newsletter benutzen"
 msgid "Select additional person"
 msgstr "Zusätzliche Person auswählen"
 
-msgid "No results match"
-msgstr "Keine Ergebnisse gefunden:"
-
 msgid "List this function in the page of this person"
 msgstr "Diese Funktion anzeigen auf der Seite von dieser Person"
 
@@ -3432,6 +3432,9 @@ msgstr "Letztes Jahr"
 msgid "Older"
 msgstr "Älter"
 
+msgid "Meeting"
+msgstr "Sitzung"
+
 msgid "Do you really want to delete this note?"
 msgstr "Möchten Sie diese Notiz wirklich löschen?"
 
@@ -3440,6 +3443,42 @@ msgstr "Notiz löschen"
 
 msgid "Always visible on homepage"
 msgstr "Immer auf der Startseite anzeigen"
+
+msgid "Inquiry"
+msgstr "Anfrage"
+
+msgid "Report and Proposal"
+msgstr "Bericht und Antrag"
+
+msgid "Urgent Interpellation"
+msgstr "Dringliche Interpellation"
+
+msgid "Invitation"
+msgstr "Einladung"
+
+msgid "Interpellation"
+msgstr "Interpellation"
+
+msgid "Commission Report"
+msgstr "Kommissionsbericht"
+
+msgid "Motion"
+msgstr "Motion"
+
+msgid "Postulate"
+msgstr "Postulat"
+
+msgid "Resolution"
+msgstr "Resolution"
+
+msgid "Election"
+msgstr "Wahl"
+
+msgid "Parliamentary Statement"
+msgstr "Parlamentarische Erklärung"
+
+msgid "Miscellaneous"
+msgstr "Verschiedenes"
 
 msgid "Neujahrestag"
 msgstr "Neujahrestag"
@@ -3607,8 +3646,8 @@ msgstr "Reservationen absagen"
 msgid "Reject all with message"
 msgstr "Alle absagen mit Kommentar"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -6097,7 +6136,7 @@ msgid "Your event was accepted"
 msgstr "Ihre Veranstaltung wurde angenommen"
 
 msgid "Submit an event"
-msgstr "Veranstaltung vorschlagen"
+msgstr "Veranstaltung erfassen"
 
 msgid ""
 "Only events taking place inside the town or events related to town societies "
@@ -7213,6 +7252,12 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid "Date of death"
+#~ msgstr "Sterbedatum"
+
+#~ msgid "Portrait"
+#~ msgstr "Portrait"
 
 #~ msgid "Please note that this page has subpages which will also be deleted!"
 #~ msgstr ""

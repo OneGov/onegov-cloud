@@ -36,16 +36,26 @@
                                 ${participations.parliamentarian.first_name} ${participations.parliamentarian.last_name}
                                 </span>
                             </a>
-                            <span class="list-lead preview">
-                                (${participations.participant_type})
+                            <span tal:condition="participations.participant_type" class="list-lead preview">
+                                (<span i18n:translate>${participations.participant_type}</span>)
                             </span>
                         </li>
                     </ul>
                 </dd>
             </div>
-            <div tal:condition="business.parliamentary_group_id">
+            <div tal:condition="political_groups">
                 <dt i18n:translate>Parliamentary Group</dt>
-                <dd><div tal:content="business.parliamentary_group_id"></div></dd>
+                <dd>
+                    <ul class="more-list">
+                        <li tal:repeat="group political_groups">
+                            <a tal:attributes="href request.link(group)" class="list-link">
+                                <span class="list-title">
+                                    ${group.name}
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </dd>
             </div>
 
             <div tal:condition="business.meetings">

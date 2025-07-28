@@ -9,7 +9,6 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
 
 from onegov.core.elements import Link
 from onegov.core.security import Private
-from onegov.parliament.models.attendence import TYPES
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.calculate_pay import calculate_rate
@@ -26,12 +25,13 @@ from onegov.pas.forms import SettlementRunForm
 from onegov.pas.layouts import SettlementRunCollectionLayout
 from onegov.pas.layouts import SettlementRunLayout
 from onegov.pas.models import (
-    PASAttendence,
-    PASParliamentarian,
-    PASParty,
+    Attendence,
     PASCommission,
+    PASParliamentarian,
+    Party,
     SettlementRun,
 )
+from onegov.pas.models.attendence import TYPES
 from onegov.pas.path import SettlementRunExport, SettlementRunAllExport
 from onegov.pas.utils import (
     format_swiss_number,
@@ -39,19 +39,19 @@ from onegov.pas.utils import (
     get_parties_with_settlements,
 )
 
-from typing import TYPE_CHECKING, Literal
 
+from typing import Literal, TypeAlias, TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import date
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
 
-    from onegov.parliament.models import Commission, Parliamentarian
-
-    SettlementDataRow = tuple[
-        'date', Parliamentarian, str, Decimal, Decimal, Decimal
+    SettlementDataRow: TypeAlias = tuple[
+        'date', PASParliamentarian, str, Decimal, Decimal, Decimal
     ]
-    TotalRow = tuple[str, Decimal, Decimal, Decimal, Decimal, Decimal]
+    TotalRow: TypeAlias = tuple[
+        str, Decimal, Decimal, Decimal, Decimal, Decimal
+    ]
 
 
 PDF_CSS = """
@@ -545,7 +545,7 @@ def generate_settlement_pdf(
     settlement_run: SettlementRun,
     request: TownRequest,
     entity_type: Literal['all', 'commission', 'party', 'parliamentarian'],
-    entity: PASCommission | PASParty | PASParliamentarian | None = None,
+    entity: PASCommission | Party | PASParliamentarian | None = None,
 ) -> bytes:
     """ Entry point for almost all settlement PDF generations. """
     font_config = FontConfiguration()
@@ -557,7 +557,7 @@ def generate_settlement_pdf(
         )
         totals = _get_commission_totals(settlement_run, request, entity)
 
-    elif entity_type == 'party' and isinstance(entity, PASParty):
+    elif entity_type == 'party' and isinstance(entity, Party):
         settlement_data = _get_party_settlement_data(
             settlement_run, request, entity
         )
@@ -584,7 +584,7 @@ def generate_settlement_pdf(
 def _get_commission_settlement_data(
     settlement_run: SettlementRun,
     request: TownRequest,
-    commission: Commission
+    commission: PASCommission
 ) -> list[SettlementDataRow]:
     """Get settlement data for a specific commission."""
     session = request.session
@@ -598,7 +598,7 @@ def _get_commission_settlement_data(
         date_from=settlement_run.start,
         date_to=settlement_run.end
     ).query().filter(
-        PASAttendence.commission_id == commission.id
+        Attendence.commission_id == commission.id
     )
     cola_multiplier = Decimal(
         str(1 + (rate_set.cost_of_living_adjustment / 100))
@@ -808,7 +808,7 @@ def _get_data_export_all(
 
 
 def get_party_specific_totals(
-    settlement_run: SettlementRun, request: TownRequest, party: PASParty
+    settlement_run: SettlementRun, request: TownRequest, party: Party
 ) -> list[TotalRow]:
     """Get totals for a specific party."""
     session = request.session
@@ -909,7 +909,7 @@ def get_party_specific_totals(
 def _get_party_settlement_data(
     settlement_run: SettlementRun,
     request: TownRequest,
-    party: PASParty
+    party: Party
 ) -> list[SettlementDataRow]:
     """Get settlement data for a specific party."""
 
@@ -1017,7 +1017,7 @@ def view_settlement_run_export(
     parliamentarian) in a settlement run."""
 
     if self.category == 'party':
-        assert isinstance(self.entity, PASParty)
+        assert isinstance(self.entity, Party)
 
         pdf_bytes = generate_settlement_pdf(
             settlement_run=self.settlement_run,

@@ -1,11 +1,9 @@
 import pytest
 import json
 from webtest import Upload
-from onegov.pas import _
-from typing import TYPE_CHECKING, Any
 
-if TYPE_CHECKING:
-    pass
+
+from typing import Any
 
 
 @pytest.mark.flaky(reruns=5, only_rerun=None)
@@ -393,7 +391,7 @@ def test_view_upload_json(
     assert logs_page.status_code == 200
     assert 'completed' in logs_page  # Check if the status is shown
     log_detail_page = logs_page.click(
-        _('Details anzeigen'), index=0
+        'Details anzeigen', index=0
     ).maybe_follow()
 
     assert log_detail_page.status_code == 200

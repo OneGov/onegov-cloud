@@ -6,7 +6,7 @@ from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections import PASParliamentarianRoleCollection
 from onegov.pas.collections import PASParliamentaryGroupCollection
-from onegov.pas.collections import PASPartyCollection
+from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
 from datetime import date
@@ -199,7 +199,7 @@ def test_parliamentarian_group_collection(session):
 
 @freeze_time('2024-01-01')
 def test_party_collection(session):
-    parties = PASPartyCollection(session)
+    parties = PartyCollection(session)
     parties.add(name='c')
     parties.add(name='b', end=date(2025, 1, 1))
     parties.add(name='a', end=date(2023, 1, 1))

@@ -10,10 +10,6 @@ from sqlalchemy import Text
 
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
-from onegov.parliament.models.political_business import (
-    POLITICAL_BUSINESS_STATUS,
-    POLITICAL_BUSINESS_TYPE,
-)
 
 
 @upgrade_task('Introduce parliament module: rename pas tables')
@@ -43,9 +39,7 @@ def introduce_parliament_module_rename_pas_tables(
                 current_name, target_name)
 
 
-@upgrade_task('Add type column to parliament models',
-              requires='onegov.parliament:Introduce parliament module: '
-                       'rename pas tables')
+@upgrade_task('Add type column to parliament models')
 def add_type_column_to_parliament_models(
     context: UpgradeContext
 ) -> None:
@@ -104,35 +98,4 @@ def add_start_end_columns_to_meetings(
         context.operations.add_column(
             'par_meetings',
             Column('end_datetime', UTCDateTime, nullable=True)
-        )
-
-
-@upgrade_task('Update political business enum values')
-def update_political_business_enum_values(
-    context: UpgradeContext
-) -> None:
-    if context.has_enum('par_political_business_type'):
-        context.update_enum_values(
-            'par_political_business_type',
-            POLITICAL_BUSINESS_TYPE.keys()
-        )
-    if context.has_enum('par_political_business_status'):
-        context.update_enum_values(
-            'par_political_business_status',
-            POLITICAL_BUSINESS_STATUS.keys()
-        )
-
-
-@upgrade_task('Change political business participation type column type')
-def change_political_business_participation_type_column_type(
-    context: UpgradeContext
-) -> None:
-    if context.has_column(
-        'par_political_business_participants',
-        'participant_type'
-    ):
-        context.operations.alter_column(
-            'par_political_business_participants',
-            'participant_type',
-            type_=Text,
         )

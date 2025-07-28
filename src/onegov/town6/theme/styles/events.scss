@@ -162,3 +162,11 @@ $event-image-max-height: 150px;
 .card:hover .event-more-link.button.hollow {
     border: 1px solid $primary-color;
 }
+
+.event-header {
+    margin-bottom: 2rem;
+}
+
+.event-footer {
+    margin-top: 2rem;
+}

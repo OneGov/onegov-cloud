@@ -5,13 +5,13 @@ from uuid import UUID
 
 from onegov.pas import log
 from onegov.pas.models import (
+    ImportLog,
+    PASCommission,
     PASCommissionMembership,
     PASParliamentarian,
-    PASCommission,
-    PASParliamentaryGroup,
-    PASParty,
     PASParliamentarianRole,
-    ImportLog,
+    PASParliamentaryGroup,
+    Party,
 )
 from sqlalchemy.orm import selectinload
 
@@ -173,10 +173,7 @@ class MembershipData(TypedDict):
 from typing import TYPE_CHECKING, TypedDict
 if TYPE_CHECKING:
     from onegov.parliament.models.parliamentarian_role import (
-        ParliamentaryGroupRole, ParliamentarianRole
-)
-    from onegov.parliament.models.parliamentarian_role import PartyRole
-    from onegov.parliament.models.parliamentarian_role import Role
+        ParliamentaryGroupRole, PartyRole, Role)
     from collections.abc import Sequence
     from sqlalchemy.orm import Session
 
@@ -423,9 +420,9 @@ class OrganizationImporter(DataImporter):
         dict[str, PASCommission],
         dict[str, PASParliamentaryGroup],  # Currently unused, but kept for
         # structure
-        dict[str, PASParty],
+        dict[str, Party],
         dict[str, Any],  # Other orgs
-        dict[str, dict[str, list[PASCommission | PASParty]]],  # Details
+        dict[str, dict[str, list[PASCommission | Party]]],  # Details
         dict[str, int],  # Processed counts per type
     ]:
         """
@@ -442,11 +439,11 @@ class OrganizationImporter(DataImporter):
         """
         commissions_to_create: list[PASCommission] = []
         commissions_to_update: list[PASCommission] = []
-        parties_to_create: list[PASParty] = []
-        parties_to_update: list[PASParty] = []
+        parties_to_create: list[Party] = []
+        parties_to_update: list[Party] = []
 
         # Details structure to return
-        details: dict[str, dict[str, list[PASCommission | PASParty]]] = {
+        details: dict[str, dict[str, list[PASCommission | Party]]] = {
             'commissions': {'created': [], 'updated': []},
             'parliamentary_groups': {'created': [], 'updated': []},
             'parties': {'created': [], 'updated': []},
@@ -462,7 +459,7 @@ class OrganizationImporter(DataImporter):
         # Maps to return (will contain both existing and new objects)
         commission_map: dict[str, PASCommission] = {}
         parliamentary_group_map: dict[str, PASParliamentaryGroup] = {}
-        party_map: dict[str, PASParty] = {}
+        party_map: dict[str, Party] = {}
         # Not ORM objects, no update needed
         other_organizations: dict[str, Any] = {}
 
@@ -474,8 +471,8 @@ class OrganizationImporter(DataImporter):
             .all()
         )
         existing_parties = (
-            self.session.query(PASParty)
-            .filter(PASParty.external_kub_id.in_(existing_ids))
+            self.session.query(Party)
+            .filter(Party.external_kub_id.in_(existing_ids))
             .all()
         )
 
@@ -567,7 +564,7 @@ class OrganizationImporter(DataImporter):
                     else:
                         # Create new party (since not found in initial map)
                         party = (
-                            PASParty(external_kub_id=org_uuid, name=org_name))
+                            Party(external_kub_id=org_uuid, name=org_name))
                         log.debug(
                             f'Creating party (from Fraktion): {org_id}'
                         )
@@ -680,7 +677,7 @@ class MembershipImporter(DataImporter):
         self.commission_map: dict[str, PASCommission] = {}
         self.parliamentary_group_map: dict[str, PASParliamentaryGroup] = {}
         # party_map now keyed by external_kub_id for consistency
-        self.party_map: dict[str, PASParty] = {}
+        self.party_map: dict[str, Party] = {}
         self.other_organization_map: dict[str, Any] = {}
 
     def init(
@@ -689,7 +686,7 @@ class MembershipImporter(DataImporter):
         parliamentarian_map: dict[str, PASParliamentarian],
         commission_map: dict[str, PASCommission],
         parliamentary_group_map: dict[str, PASParliamentaryGroup],
-        party_map: dict[str, PASParty],
+        party_map: dict[str, Party],
         other_organization_map: dict[str, Any],
     ) -> None:
         """Initialize the importer with maps of objects by their external KUB
@@ -986,8 +983,8 @@ class MembershipImporter(DataImporter):
         """
         commission_memberships_to_create: list[PASCommissionMembership] = []
         commission_memberships_to_update: list[PASCommissionMembership] = []
-        parliamentarian_roles_to_create: list[ParliamentarianRole] = []
-        parliamentarian_roles_to_update: list[ParliamentarianRole] = []
+        parliamentarian_roles_to_create: list[PASParliamentarianRole] = []
+        parliamentarian_roles_to_update: list[PASParliamentarianRole] = []
 
         # Details structure to return - Use the new TypedDict where applicable
         details: dict[str, ImportCategoryResult | dict[str, Any]] = {
@@ -1617,7 +1614,7 @@ class MembershipImporter(DataImporter):
         role: Role,
         parliamentary_group: PASParliamentaryGroup | None = None,
         parliamentary_group_role: ParliamentaryGroupRole | None = None,
-        party: PASParty | None = None,
+        party: Party | None = None,
         party_role: PartyRole | None = None,
         additional_information: str | None = None,
         start_date: str | None = None,
@@ -1655,11 +1652,11 @@ class MembershipImporter(DataImporter):
 
     def _update_parliamentarian_role(
         self,
-        role_obj: ParliamentarianRole,
+        role_obj: PASParliamentarianRole,
         role: Role,
         parliamentary_group: PASParliamentaryGroup | None = None,
         parliamentary_group_role: ParliamentaryGroupRole | None = None,
-        party: PASParty | None = None,
+        party: Party | None = None,
         party_role: PartyRole | None = None,
         additional_information: str | None = None,
         start_date: str | None = None,

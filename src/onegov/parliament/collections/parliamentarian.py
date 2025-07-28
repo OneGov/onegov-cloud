@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from onegov.core.collection import GenericCollection
-from onegov.parliament.models import Parliamentarian, RISParliamentarian
+from onegov.parliament.models import Parliamentarian
 
 from typing import Any, TYPE_CHECKING
 from typing_extensions import TypeVar
@@ -56,12 +56,3 @@ class ParliamentarianCollection(GenericCollection[ParliamentarianT]):
         active: bool | None = None
     ) -> Self:
         return self.__class__(self.session, active)
-
-
-class RISParliamentarianCollection(
-    ParliamentarianCollection[RISParliamentarian]
-):
-
-    @property
-    def model_class(self) -> type[RISParliamentarian]:
-        return RISParliamentarian

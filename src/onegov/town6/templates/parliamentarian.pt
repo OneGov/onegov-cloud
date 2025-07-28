@@ -35,6 +35,12 @@
                     <span tal:condition="parliamentarian.private_address_zip_code">${parliamentarian.private_address_zip_code} ${parliamentarian.private_address_city}</span>
                 </dd>
             </div>
+            <div tal:condition="not: parliamentarian.private_address">
+                <dt i18n:translate>Place of residence</dt>
+                <dd>
+                    <span tal:condition="parliamentarian.private_address_zip_code">${parliamentarian.private_address_zip_code} ${parliamentarian.private_address_city}</span>
+                </dd>
+            </div>
             <div tal:condition="parliamentarian.date_of_birth">
                 <dt i18n:translate>Date of birth</dt>
                 <dd>${layout.format_date(parliamentarian.date_of_birth, 'date')}</dd>
@@ -109,13 +115,6 @@
                                 <span tal:condition="not request.is_manager">
                                     ${role.role_label} <tal:block i18n:translate>Parliament</tal:block>
                                 </span>
-
-                                <span tal:condition="role.party">
-                                    /
-                                    ${role.party_role_label}
-                                    <tal:block i18n:translate>Political Party</tal:block>
-                                    <a href="${request.link(role.party)}">${role.party.title}</a>
-                                </span>
                                 <span tal:condition="role.parliamentary_group">
                                     /
                                     ${role.parliamentary_group_role_label}
@@ -154,11 +153,11 @@
                     </ul>
                 </dd>
             </div>
-            <div>
+            <div tal:condition="parliamentarian.political_businesses">
                 <dt i18n:translate>Political Businesses</dt>
                 <dd>
                     <ul class="more-list">
-                        <li tal:repeat="participation parliamentarian.political_businesses">
+                        <li tal:repeat="participation sorted(parliamentarian.political_businesses, key=lambda p: p.political_business.entry_date or layout.now(), reverse=True)">
                             <a tal:attributes="href request.link(participation.political_business)" class="list-link">
                                 <span class="list-title">
                                     ${participation.political_business.number|None} ${participation.political_business.title}

@@ -8,12 +8,12 @@ from onegov.form.extensions import FormExtension
 from onegov.form.fields import HoneyPotField
 from onegov.form.fields import TimezoneDateTimeField
 from onegov.form.fields import UploadField
-from wtforms.fields import BooleanField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.submissions import prepare_for_submission
 from onegov.form.validators import StrictOptional, ValidPhoneNumber
 from onegov.gis import CoordinatesField
 from onegov.org import _
+from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
