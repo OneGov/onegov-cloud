@@ -5,6 +5,7 @@ import sqlalchemy
 import transaction
 
 from datetime import datetime, date, timedelta
+from decimal import Decimal
 from freezegun import freeze_time
 from markupsafe import Markup
 from sedate import standardize_date
@@ -2042,53 +2043,55 @@ def test_invoices(session, owner, prebooking_period, inactive_period):
     assert invoices.paid_amount == 0
 
     i1 = invoices.add(period_id=p1.id)
-    i1.add("Malcolm", "Camp", 100.0, 1.0)
-    i1.add("Malcolm", "Pass", 25.0, 1.0)
-    i1.add("Dewey", "Football", 100.0, 1.0)
-    i1.add("Dewey", "Pass", 25.0, 1.0)
-    i1.add("Discount", "8%", 250, -0.05)
+    i1.add("Malcolm", "Camp", Decimal('100'), Decimal('1'))
+    i1.add("Malcolm", "Pass", Decimal('25'), Decimal('1'))
+    i1.add("Dewey", "Football", Decimal('100'), Decimal('1'))
+    i1.add("Dewey", "Pass", Decimal('25'), Decimal('1'))
+    i1.add("Discount", "8%", Decimal('250'), Decimal('-0.05'))
 
-    assert i1.total_amount == 237.5
-    assert i1.outstanding_amount == 237.5
+    assert i1.total_amount == Decimal('237.5')
+    assert i1.outstanding_amount == Decimal('237.5')
     assert i1.paid_amount == 0
-    assert BookingPeriodInvoiceCollection(session).total_amount == 237.5
+    assert BookingPeriodInvoiceCollection(
+        session).total_amount == Decimal('237.5')
 
     i2 = invoices.add(period_id=p2.id)
-    i2.add("Malcolm", "Camp", 100, 1 / 3)
+    i2.add("Malcolm", "Camp", Decimal('100'), Decimal('1') / Decimal('3'))
 
     # this is 33, not 33.33 because both unit and quantity are truncated
     # to two decimals after the point. So when we added 1 / 3 above, we really
     # added 0.33 to the database (100 * 0.33 = 33)
     assert BookingPeriodInvoiceCollection(
-        session, period_id=p2.id).total_amount == 33
-    assert i2.total_amount == 33
-    assert i2.outstanding_amount == 33
-    assert i2.paid_amount == 0
+        session, period_id=p2.id).total_amount == Decimal('33')
+    assert i2.total_amount == Decimal('33')
+    assert i2.outstanding_amount == Decimal('33')
+    assert i2.paid_amount == Decimal('0')
 
     assert BookingPeriodInvoiceCollection(session, period_id=p1.id
-        ).total_amount == 237.5
+        ).total_amount == Decimal('237.5')
     assert BookingPeriodInvoiceCollection(session, period_id=p2.id
-        ).total_amount == 33
-    assert BookingPeriodInvoiceCollection(session).total_amount == 270.5
+        ).total_amount == Decimal('33')
+    assert BookingPeriodInvoiceCollection(
+        session).total_amount == Decimal('270.5')
 
     # pay part of the first invoice
     i1.items[0].paid = True
-    assert i1.total_amount == 237.5
-    assert i1.outstanding_amount == 137.5
-    assert i1.paid_amount == 100.0
+    assert i1.total_amount == Decimal('237.5')
+    assert i1.outstanding_amount == Decimal('137.5')
+    assert i1.paid_amount == Decimal('100.0')
     assert i1.paid == False
 
     assert session.query(func.sum(BookingPeriodInvoice.total_amount)
-        ).first()[0] == 270.5
+        ).first()[0] == Decimal('270.5')
     assert session.query(func.sum(BookingPeriodInvoice.outstanding_amount)
-        ).first()[0] == 170.5
+        ).first()[0] == Decimal('170.5')
     assert session.query(func.sum(BookingPeriodInvoice.paid_amount)
-        ).first()[0] == 100
+        ).first()[0] == Decimal('100')
 
     assert BookingPeriodInvoiceCollection(session, period_id=p1.id
-        ).outstanding_amount == 137.5
+        ).outstanding_amount == Decimal('137.5')
     assert BookingPeriodInvoiceCollection(session, period_id=p2.id
-        ).outstanding_amount == 33
+        ).outstanding_amount == Decimal('33')
 
     assert BookingPeriodInvoiceCollection(session).unpaid_count() == 2
     assert BookingPeriodInvoiceCollection(session).unpaid_count(
@@ -2096,9 +2099,9 @@ def test_invoices(session, owner, prebooking_period, inactive_period):
 
     # pay all of the second invoice
     i2.items[0].paid = True
-    assert i2.total_amount == 33
-    assert i2.outstanding_amount == 0
-    assert i2.paid_amount == 33
+    assert i2.total_amount == Decimal('33')
+    assert i2.outstanding_amount == Decimal('0')
+    assert i2.paid_amount == Decimal('33')
     assert i2.paid == True
 
     assert BookingPeriodInvoiceCollection(session).unpaid_count() == 1
