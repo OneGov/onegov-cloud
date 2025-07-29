@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from onegov.core.collection import GenericCollection
-from onegov.pay.models import Payment, PaymentProvider
+from onegov.pay.models import PaymentProvider
 
 
-from typing import Any
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.pay.models import Payment
 
 
 class PaymentProviderCollection(GenericCollection[PaymentProvider['Payment']]):
@@ -22,7 +24,9 @@ class PaymentProviderCollection(GenericCollection[PaymentProvider['Payment']]):
         provider.default = True
 
     def sync(self) -> None:
-        """ Syncs all payments with the related payment providers. """
+        """ Syncs all payments with the related payment providers.
+
+        """
 
         for provider in self.query():
             provider.sync()
