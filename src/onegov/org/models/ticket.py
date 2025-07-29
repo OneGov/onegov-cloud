@@ -131,11 +131,7 @@ def refresh_submission_invoice_items(
             continue
 
         # update the existing item if necessary
-        if existing.unit != meta.unit:
-            existing.unit = meta.unit
-
-        if existing.quantity != meta.quantity:
-            existing.quantity = meta.quantity
+        meta.refresh_item(existing)
 
         unused.discard(existing)
         new_items.append(existing)
@@ -669,11 +665,7 @@ class ReservationHandler(Handler):
                 continue
 
             # update the existing item if necessary
-            if existing.unit != meta.unit:
-                existing.unit = meta.unit
-
-            if existing.quantity != meta.quantity:
-                existing.quantity = meta.quantity
+            meta.refresh_item(existing)
 
             unused.discard(existing)
             new_items.append(existing)

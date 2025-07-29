@@ -154,6 +154,21 @@ class InvoiceItemMeta(_InvoiceItemMetaBase):
             **(self.extra or {})
         )
 
+    def refresh_item(self, item: InvoiceItem) -> None:
+        assert item.group == self.group
+        assert item.family == self.family
+        if item.text != self.text:
+            item.text = self.text
+        if item.unit != self.unit:
+            item.unit = self.unit
+        if item.quantity != self.quantity:
+            item.quantity = self.quantity
+        if item.vat_rate != self.vat_rate:
+            item.vat_rate = self.vat_rate
+        for attr, value in (self.extra or {}).items():
+            if hasattr(item, attr) and getattr(item, attr) != value:
+                setattr(item, attr, value)
+
 
 class _InvoiceDiscountMetaBase(NamedTuple):
     text: str
