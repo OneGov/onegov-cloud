@@ -748,7 +748,7 @@ def send_monthly_mtan_statistics(request: OrgRequest) -> None:
 
     today = to_timezone(utcnow(), 'Europe/Zurich')
 
-    if today.weekday() != MON or today.day >= 7:
+    if today.weekday() != MON or today.day > 7:
         return
 
     year = today.year
