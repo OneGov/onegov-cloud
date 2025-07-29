@@ -832,6 +832,11 @@ var SelectField = React.createClass({
     },
     componentDidMount: function() {
         this.renderStringInput();
+
+        // chosen-select: forward jquery change event to React onChange
+        $(`#${this.id}`).on('change', (e) => {
+            this.props.onChange(e);
+        });
     },
     componentDidUpdate: function() {
         this.renderStringInput();
@@ -842,8 +847,8 @@ var SelectField = React.createClass({
 
     render: function() {
         const options = this.props.options
-        // const className = this.props.size + " chosen-select";  // chosen-select prevents onChange from working
-        const className = this.props.size;
+        const className = this.props.size + " chosen-select";
+
         return (
             <label>
                 <span className="label-text">{this.props.label}</span>
