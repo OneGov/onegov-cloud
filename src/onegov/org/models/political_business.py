@@ -197,6 +197,10 @@ class PoliticalBusiness(
         back_populates='political_business'
     )
 
+    @property
+    def display_name(self) -> str:
+        return f'{self.number} {self.title}' if self.number else self.title
+
     def __repr__(self) -> str:
         return (f'<Political Business {self.number}, '
                 f'{self.title}, {self.political_business_type}>')

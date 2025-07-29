@@ -842,7 +842,8 @@ var SelectField = React.createClass({
 
     render: function() {
         const options = this.props.options
-        const className = this.props.size + " chosen-select";
+        // const className = this.props.size + " chosen-select";  // chosen-select prevents onChange from working
+        const className = this.props.size;
         return (
             <label>
                 <span className="label-text">{this.props.label}</span>

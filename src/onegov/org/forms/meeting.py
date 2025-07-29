@@ -1,22 +1,27 @@
 from __future__ import annotations
 
+import json
+
 from wtforms.validators import Optional, InputRequired
 from wtforms import StringField
 
 from onegov.form import Form
-from onegov.form.fields import TimezoneDateTimeField, ChosenSelectMultipleField
+from onegov.form.fields import TimezoneDateTimeField
 from onegov.org.forms.fields import HtmlField
 from onegov.org import _
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Collection
+    from collections.abc import Sequence
+
     from onegov.org.models import Meeting
+    from onegov.org.models import MeetingItem
+    from onegov.org.models import PoliticalBusiness
 
 
 class MeetingForm(Form):
-
     title = StringField(
         label=_('Title'),
         validators=[InputRequired()],
@@ -35,81 +40,168 @@ class MeetingForm(Form):
     )
 
     address = HtmlField(
-        label=_('Address'),
-        validators=[InputRequired()],
-        render_kw={'rows': 3}
+        label=_("Address"), validators=[InputRequired()], render_kw={"rows": 3}
     )
 
     description = HtmlField(
-        label=_('Description'),
-        validators=[Optional()],
-        render_kw={'rows': 5}
+        label=_("Description"), validators=[Optional()], render_kw={"rows": 5}
     )
 
-    meeting_items = ChosenSelectMultipleField(
-        label=_('Agenda Items'),
-        choices=[],
-        validators=[Optional()]
+    meeting_items = StringField(
+        label=_('New Agenda Item'),
+        fieldset=_('Agenda Items'),
+        render_kw={'class_': 'many many-meeting-items'},
     )
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.agenda_items_errors: dict[int, str] = {}
 
     def on_request(self) -> None:
-        from onegov.org.models import MeetingItem
-
-        meetings = (
-            self.request.session.query(MeetingItem)
-            .order_by(MeetingItem.number, MeetingItem.title)
-            .all()
-        )
-        self.meeting_items.choices = [
-            (item.id.hex, item.display_name)
-            for item in meetings
-        ]
+        pass
 
     def populate_obj(  # type:ignore[override]
         self,
         obj: Meeting,  # type:ignore[override]
         exclude: Collection[str] | None = None,
-        include: Collection[str] | None = None
+        include: Collection[str] | None = None,
     ) -> None:
         from onegov.org.models import MeetingItem
+        from onegov.org.models import MeetingItemCollection
+        from onegov.org.models import PoliticalBusinessCollection
 
         super().populate_obj(
             obj,
-            exclude={
-                'meeting_items',
-                *(exclude or ())
-            },
-            include=include
+            exclude={'meeting_items', 'meeting_items_neu', *(exclude or ())},
+            include=include,
         )
 
         meeting: Meeting = obj
-        meeting_item_ids = {item.id.hex for item in meeting.meeting_items}
-        new_item_ids = set(self.meeting_items.data or [])
+        collection = MeetingItemCollection(self.request.session)
+        businesses = PoliticalBusinessCollection(self.request.session)
 
-        items_to_add = new_item_ids - meeting_item_ids
-        for new_id in items_to_add:
-            item = (
-                self.request.session.query(MeetingItem)
-                .filter(MeetingItem.id == new_id)
-                .one()
-            )
-            if item is not None:
-                meeting.meeting_items.append(item)
+        # new_items = self.json_to_items(self.meeting_items_neu.data)
+        new_items = self.json_to_items(self.meeting_items.raw_data[0])
+        print("*** tschupre MeetingForm.populate_obj new items", new_items)
+        if not new_items:
+            # clear all meeting items for this meeting
+            for item in meeting.meeting_items:
+                collection.delete(item)
+            obj.meeting_items = []
+            return
 
-        items_to_remove = meeting_item_ids - new_item_ids
-        for current_id in items_to_remove:
-            item = (
-                self.request.session.query(MeetingItem)
-                .filter(MeetingItem.id == current_id)
-                .one()
-            )
-            if item is not None:
-                meeting.meeting_items.remove(item)
+        current_items = {item.title: item for item in meeting.meeting_items}
+        new = []
+        for item in new_items:
+            title = item.get('title')
+            item_name = item.get('agenda_item')
+
+            if title == '' and item_name == '':
+                # skip empty items
+                print('*** tschupre populate skip empty item')
+                continue
+
+            if (title in current_items and item_name in
+                    [i.display_name for i in current_items.values()]):
+                # keep unchanged items
+                print('*** tschupre populate keep unchanged item')
+                new.append(current_items[title])
+                continue
+
+            if title == '' and item_name != '':
+                # if only the item_name is given, use it as title
+                print('*** tschupre populate set title from item_name')
+                title = item_name
+
+            business = next(
+                (b for b in businesses.query().all()
+                 if b.display_name == item_name), None)
+
+            if business is None:
+                new_item = MeetingItem(
+                    title=title,
+                    number=None,
+                    political_business_id=None,
+                    political_business=None,
+                    meeting_id=obj.id,
+                    meeting=obj,
+                )
+                print('*** tschupre populate new item without business', new_item)
+            else:
+                new_item = MeetingItem(
+                    title=business.title,
+                    number=business.number,
+                    political_business_id=business.id,
+                    political_business=business,
+                    meeting_id=obj.id,
+                    meeting=obj,
+                )
+                print('*** tschupre populate new item with business', new_item)
+            self.request.session.add(new_item)
+            new.append(new_item)
+
+        print("*** tschupre MeetingForm.populate_obj new items", new)
+        meeting.meeting_items = new
 
     def process_obj(self, obj: Meeting) -> None:  # type:ignore[override]
+        from onegov.org.models import PoliticalBusiness
+
         super().process_obj(obj)
 
         meeting: Meeting = obj
-        self.meeting_items.data = [
-            item.id.hex for item in meeting.meeting_items
-        ]
+
+        businesses = (
+            self.meta.request.session.query(PoliticalBusiness)
+            .order_by(PoliticalBusiness.number, PoliticalBusiness.title)
+            .all()
+        )
+
+        if not meeting.meeting_items:
+            self.meeting_items.data = self.items_to_json([], businesses)
+        else:
+            self.meeting_items.data = self.items_to_json(
+                meeting.meeting_items, meeting.meeting_items + businesses
+            )
+
+    def json_to_items(self, text: str | None) -> list[str]:
+        if not text:
+            return []
+
+        return list(json.loads(text).get('values', []))
+
+    def items_to_json(
+        self,
+        values: Sequence[MeetingItem],
+        options: Sequence[PoliticalBusiness],
+    ) -> str:
+        values = values or []
+        options = options or []
+
+        request = self.meta.request
+        return json.dumps(
+            {
+                # labels for many-meeting-items
+                'labels': {
+                    'title': request.translate(_('Title')),
+                    'agenda_item': request.translate(_('Agenda Item')),
+                    'add': request.translate(_('Add')),
+                    'remove': request.translate(_('Remove')),
+                },
+                # StringField: list of agenda items attached to this meeting
+                'values': [
+                    {
+                        'title': agenda_item.title,
+                        'agenda_item': agenda_item.display_name,
+                        'error': '',
+                        # 'error': self.agenda_items_errors.get(ix, ''),
+                    }
+                    for ix, agenda_item in enumerate(sorted(
+                        values, key=lambda x: (x.number or '', x.title)))
+                ],
+                # SelectField: list of agenda items and businesses
+                'agenda_items': {
+                    option.display_name: option.display_name
+                    for option in options
+                },
+            }
+        )
