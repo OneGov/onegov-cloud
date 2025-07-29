@@ -3,10 +3,8 @@ from __future__ import annotations
 from decimal import Decimal
 from onegov.core.collection import GenericCollection
 from onegov.pay.models.invoice import Invoice
-from onegov.pay.models.invoice import sync_invoice_items
 from onegov.pay.models.invoice_item import InvoiceItem
 from sqlalchemy import func, and_
-from sqlalchemy.orm import joinedload
 from uuid import uuid4, UUID
 
 
@@ -123,19 +121,6 @@ class InvoiceCollection(GenericCollection[InvoiceT], Generic[InvoiceT, ItemT]):
         query = self.query().with_entities(func.count(Invoice.id))
         query = query.filter(Invoice.paid == False)
         return query.scalar() or 0
-
-    def sync(self) -> None:
-        Invoice = self.model_class  # noqa: N806
-        InvoiceItem = self.item_model_class  # noqa: N806
-        items = self.session.query(InvoiceItem).filter(and_(
-            InvoiceItem.source != None,
-            InvoiceItem.source != 'xml',
-            InvoiceItem.invoice_id.in_(
-                self.query().with_entities(Invoice.id).subquery()
-            )
-        )).options(joinedload(InvoiceItem.payments))
-
-        sync_invoice_items(items, capture=False)
 
     def add(
         self,

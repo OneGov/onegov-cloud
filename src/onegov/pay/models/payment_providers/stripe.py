@@ -176,27 +176,31 @@ class StripePayment(Payment):
             self.state = 'cancelled'
             return refund
 
-    def sync(
+    def _sync_state(
         self,
         remote_obj: stripe.Charge | None = None,
         capture: bool = False,
-    ) -> None:
+    ) -> bool:
         charge = remote_obj or self.charge
 
         if capture and not charge.captured:
             charge.capture()
 
+        new_state = self.state
         if not charge.captured:
-            self.state = 'open'
-
+            new_state = 'open'
         elif charge.refunded:
-            self.state = 'cancelled'
-
+            new_state = 'cancelled'
         elif charge.status == 'failed':
-            self.state = 'failed'
-
+            new_state = 'failed'
         elif charge.captured and charge.paid:
-            self.state = 'paid'
+            new_state = 'paid'
+
+        if self.state != new_state:
+            self.state = new_state
+            return True
+        else:
+            return False
 
 
 class StripeConnect(PaymentProvider[StripePayment]):

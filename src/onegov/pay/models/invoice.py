@@ -25,6 +25,9 @@ if TYPE_CHECKING:
     from sqlalchemy.sql import ColumnElement
 
 
+# TODO: We may no longer need this, since `Payment.sync` should already
+#       keep the invoice items updated. But we'll keep it for now just
+#       in case.
 def sync_invoice_items(
     items: Iterable[InvoiceItem],
     capture: bool = True
@@ -40,7 +43,7 @@ def sync_invoice_items(
                 # though it should be fairly rare, it's possible for
                 # charges not to be captured yet
                 if payment.state == 'open':
-                    payment.sync(capture=True)
+                    payment.sync(capture=True, update_invoice_items=False)
 
         # the last payment is the relevant one
         item.paid = item.payments[-1].state == 'paid'
