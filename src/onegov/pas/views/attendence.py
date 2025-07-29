@@ -5,7 +5,7 @@ from onegov.core.security import Private
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import AttendenceCollection
-from onegov.pas.forms import AttendenceAddForm
+from onegov.pas.forms import AttendenceAddCommissionBulkForm, AttendenceAddForm
 from onegov.pas.forms import AttendenceAddPlenaryForm
 from onegov.pas.forms import AttendenceForm
 from onegov.pas.layouts import AttendenceCollectionLayout
@@ -76,12 +76,12 @@ def add_attendence(
     name='new-commission-bulk',
     template='form.pt',
     permission=Private,
-    form=AttendenceAddPlenaryForm
+    form=AttendenceAddCommissionBulkForm
 )
 def add_bulk_attendence(
     self: AttendenceCollection,
     request: TownRequest,
-    form: AttendenceAddPlenaryForm
+    form: AttendenceAddCommissionBulkForm
 ) -> RenderData | Response:
 
     if form.submitted(request):
@@ -92,16 +92,16 @@ def add_bulk_attendence(
                 parliamentarian_id=parliamentarian_id, **data
             )
             Change.add(request, 'add', attendence)
-        request.success(_('Added plenary session'))
+        request.success(_('Added commission session'))
 
         return request.redirect(request.link(self))
 
     layout = AttendenceCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_('New plenary session'), '#'))
+    layout.breadcrumbs.append(Link(_('New commission session'), '#'))
 
     return {
         'layout': layout,
-        'title': _('New plenary session'),
+        'title': _('New commission session'),
         'form': form,
         'form_width': 'large'
     }
