@@ -199,15 +199,6 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
         validators=[InputRequired()],
     )
 
-    type = RadioField(
-        label=_('Type'),
-        choices=[
-            (key, value) for key, value in TYPES.items() if key != 'plenary'
-        ],
-        validators=[InputRequired()],
-        default='commission'
-    )
-
     commission_id = ChosenSelectField(
         label=_('Commission'),
         validators=[InputRequired()],
@@ -221,6 +212,7 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()
         result['duration'] = int(60 * (result.get('duration') or 0))
+        result['type'] = 'commission'
         return result
 
     def on_request(self) -> None:
