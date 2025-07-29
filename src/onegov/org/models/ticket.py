@@ -108,7 +108,7 @@ def refresh_submission_invoice_items(
             if item.group != meta.group:
                 continue
 
-            if meta.group in ('extra', 'discount'):
+            if meta.group == 'form':
                 assert meta.extra is not None
                 assert meta.extra['submission_id'] == item.submission_id
                 if meta.family == item.family:
@@ -171,6 +171,10 @@ def refresh_submission_invoice_items(
             self.ticket.payment = payment
     elif total <= 0:
         # we need to delete the payment
+        # TODO: We may allow deleting non-manual payments in the future
+        #       but for now we assert we didn't delete a non-open
+        #       non-manual payment
+        assert payment.source == 'manual' and payment.state == 'open'
         if self.submission:
             self.submission.payment = None
         for item in invoice.items:
@@ -180,6 +184,10 @@ def refresh_submission_invoice_items(
         request.session.delete(payment)
     elif total != payment.amount:
         # we need to update the payment
+        # TODO: We may allow changing non-manual payments in the future
+        #       but for now we assert we didn't change a non-open
+        #       non-manual payment
+        assert payment.source == 'manual' and payment.state == 'open'
         payment.amount = total
     request.session.flush()
 
@@ -643,7 +651,7 @@ class ReservationHandler(Handler):
                     if meta.extra['reservation_id'] == item.reservation_id:
                         existing = item
                         break
-                elif meta.group in ('extra', 'discount'):
+                elif meta.group == 'form':
                     assert meta.extra is not None
                     assert meta.extra['submission_id'] == item.submission_id
                     if meta.family == item.family:
