@@ -40,11 +40,15 @@ class MeetingForm(Form):
     )
 
     address = HtmlField(
-        label=_("Address"), validators=[InputRequired()], render_kw={"rows": 3}
+        label=_('Address'),
+        validators=[InputRequired()],
+        render_kw={'rows': 3}
     )
 
     description = HtmlField(
-        label=_("Description"), validators=[Optional()], render_kw={"rows": 5}
+        label=_('Description'),
+        validators=[Optional()],
+        render_kw={'rows': 5}
     )
 
     meeting_items = StringField(
@@ -64,7 +68,7 @@ class MeetingForm(Form):
         self,
         obj: Meeting,  # type:ignore[override]
         exclude: Collection[str] | None = None,
-        include: Collection[str] | None = None,
+        include: Collection[str] | None = None
     ) -> None:
         from onegov.org.models import MeetingItem
         from onegov.org.models import MeetingItemCollection
@@ -72,7 +76,10 @@ class MeetingForm(Form):
 
         super().populate_obj(
             obj,
-            exclude={'meeting_items', 'meeting_items_neu', *(exclude or ())},
+            exclude={
+                'meeting_items',
+                *(exclude or ())
+            },
             include=include,
         )
 
