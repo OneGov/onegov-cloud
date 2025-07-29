@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-21 08:00+0200\n"
+"POT-Creation-Date: 2025-07-29 16:41+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1621,6 +1621,9 @@ msgstr "Date/Heure"
 msgid "Agenda"
 msgstr "Agenda"
 
+msgid "No agenda items defined yet."
+msgstr "Aucun point d'ordre du jour défini pour le moment."
+
 msgid "No meetings defined yet."
 msgstr "Aucune réunion définie pour le moment."
 
@@ -1757,9 +1760,6 @@ msgstr "Souscrire à la lettre d'informations"
 
 msgid "Receive the newsletter by email"
 msgstr "Recevoir la lettre d'informations par e-mail"
-
-msgid "Year"
-msgstr "Année"
 
 msgid "Years"
 msgstr "Années"
@@ -2019,6 +2019,9 @@ msgstr "Aucun business politique n'a été défini pour le moment."
 
 msgid "Datum"
 msgstr "Date"
+
+msgid "Year"
+msgstr "Année"
 
 msgid "No publications"
 msgstr "Aucune publication"
