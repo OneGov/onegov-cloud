@@ -31,10 +31,12 @@ if TYPE_CHECKING:
     from translationstring import TranslationString
     from typing import TypeAlias
 
-    AssemblyState: TypeAlias = Literal['scheduled', 'ongoing', 'completed']
+    AssemblyState: TypeAlias = Literal[
+        'draft', 'scheduled', 'ongoing', 'completed']
 
 
 STATES: dict[AssemblyState, TranslationString] = {
+    'draft': _('draft'),
     'scheduled': _('scheduled'),
     'ongoing': _('ongoing'),
     'completed': _('completed')
