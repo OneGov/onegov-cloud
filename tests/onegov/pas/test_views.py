@@ -461,3 +461,80 @@ def test_copy_rate_set(client):
     copy_page.form['year'] = '2025'
     new_page = copy_page.form.submit().follow()
     assert '2025' in new_page
+
+
+def test_view_add_commission_bulk_attendence(client_with_es):
+    client = client_with_es
+    client.login_admin()
+
+    settings = client.get('/').click('PAS Einstellungen')
+
+    # Settlement Runs
+    page = settings.click('Abrechnungsläufe')
+    page = page.click(href='new')
+    page.form['name'] = 'Q1'
+    page.form['start'] = '2024-01-01'
+    page.form['end'] = '2024-03-31'
+    page.form['active'] = True
+    page.form.submit()
+
+    # Commission
+    page = settings.click('Kommissionen')
+    page = page.click(href='new')
+    page.form['name'] = 'Test Commission'
+    page.form.submit()
+
+    # Parliamentarian 1
+    page = settings.click('Parlamentarier:innen')
+    page = page.click(href='new')
+    page.form['gender'] = 'male'
+    page.form['first_name'] = 'Peter'
+    page.form['last_name'] = 'Muster'
+    page.form['shipping_method'] = 'a'
+    page.form['shipping_address'] = 'Address'
+    page.form['shipping_address_zip_code'] = 'ZIP'
+    page.form['shipping_address_city'] = 'City'
+    page.form['email_primary'] = 'peter.muster@example.org'
+    page = page.form.submit().follow()
+    page = page.click(href='new')
+    page.form['role'] = 'member'
+    page.form['start'] = '2024-01-01'
+    page.form.submit()
+
+    # Parliamentarian 2
+    page = settings.click('Parlamentarier:innen')
+    page = page.click(href='new')
+    page.form['gender'] = 'female'
+    page.form['first_name'] = 'Petra'
+    page.form['last_name'] = 'Muster'
+    page.form['shipping_method'] = 'a'
+    page.form['shipping_address'] = 'Address'
+    page.form['shipping_address_zip_code'] = 'ZIP'
+    page.form['shipping_address_city'] = 'City'
+    page.form['email_primary'] = 'petra.muster@example.org'
+    page = page.form.submit().follow()
+    page = page.click(href='new')
+    page.form['role'] = 'member'
+    page.form['start'] = '2024-01-01'
+    page.form.submit()
+
+    # Go to bulk add view and add attendences
+    page = client.get('/attendences/new-commission-bulk')
+    assert 'Neue Kommissionssitzung' in page
+
+    page.form['date'] = '2024-02-15'
+    page.form['duration'] = '2.5'
+    page.form['commission_id'].select(text='Test Commission')
+    page.form['parliamentarian_id'].select_multiple(
+        texts=['Peter Muster', 'Petra Muster']
+    )
+    page = page.form.submit().follow()
+
+    assert 'Kommissionssitzung hinzugefügt' in page
+    page = client.get('/attendences')
+    assert '15.02.2024' in page
+    assert 'Peter Muster' in page
+    assert 'Petra Muster' in page
+    assert 'Test Commission' in page
+    assert page.text.count('15.02.2024') == 2
+    assert page.text.count('2.50h') == 2
