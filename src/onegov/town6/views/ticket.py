@@ -7,7 +7,7 @@ from onegov.org.views.ticket import (
     view_ticket_status, view_tickets, view_archived_tickets,
     view_pending_tickets, assign_ticket, view_send_to_gever,
     view_delete_all_archived_tickets, delete_ticket, change_tag,
-    view_my_tickets)
+    view_my_tickets, view_ticket_invoice)
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.town6 import TownApp
 from onegov.org.forms import (
@@ -20,8 +20,9 @@ from onegov.ticket import Ticket
 from onegov.ticket.collection import TicketCollection
 from onegov.town6 import _
 from onegov.town6.layout import (
-    DefaultLayout, FindYourSpotLayout, TicketLayout, TicketNoteLayout,
-    TicketChatMessageLayout, TicketsLayout, ArchivedTicketsLayout)
+    ArchivedTicketsLayout, DefaultLayout, FindYourSpotLayout,
+    TicketInvoiceLayout, TicketLayout, TicketNoteLayout,
+    TicketChatMessageLayout, TicketsLayout)
 
 
 from typing import TYPE_CHECKING
@@ -116,6 +117,17 @@ def town_view_ticket_status(
 ) -> RenderData | Response:
     return view_ticket_status(
         self, request, form, TicketChatMessageLayout(self, request))
+
+
+@TownApp.html(
+    model=Ticket,
+    name='invoice',
+    template='ticket_invoice.pt',
+    permission=Private
+)
+def town_view_ticket_invoice(self: Ticket, request: TownRequest) -> RenderData:
+    return view_ticket_invoice(
+        self, request, TicketInvoiceLayout(self, request))
 
 
 @TownApp.html(

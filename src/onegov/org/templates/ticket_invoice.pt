@@ -1,0 +1,93 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+
+        <div class="row" tal:define="show_vat any(item.vat for item in invoice.items); show_quantity any(item.quantity != 1.0 for item in invoice.items)">
+            <div class="columns small-12 medium-8">
+                <table class="invoice-items">
+                    <thead class="show-for-sr">
+                        <tr>
+                            <th i18n:translate>Booking Text</th>
+                            <th tal:condition="show_quantity" i18n:translate>Unit</th>
+                            <th tal:condition="show_quantity" i18n:translate>Quantity</th>
+                            <th tal:condition="show_vat" i18n:translate>VAT Rate</th>
+                            <th tal:condition="show_vat" i18n:translate>VAT</th>
+                            <th i18n:translate>Amount</th>
+                            <th i18n:translate>Paid</th>
+                            <th i18n:translate>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tal:b repeat="item invoice.items">
+                            <tr class="group" tal:condition="repeat.item.start or (invoice.items[repeat.item.index - 1].group != item.group and item.group != 'reduced_amount')">
+                                <td tal:switch="item.group" colspan="4">
+                                    <tal:b tal:case="'reservation'" i18n:translate>
+                                        Reservations
+                                    </tal:b>
+                                    <tal:b tal:case="'submission'" i18n:translate>
+                                        Submission
+                                    </tal:b>
+                                    <tal:b tal:case="'form'" i18n:translate>
+                                        Selected Options
+                                    </tal:b>
+                                    <tal:b tal:case="'manual'" i18n:translate>
+                                        Discounts / Surcharges
+                                    </tal:b>
+                                    <tal:b tal:case="'migration'" i18n:translate>
+                                        Lump sum
+                                    </tal:b>
+                                    <tal:b tal:case="default">
+                                        ${item.group}
+                                    </tal:b>
+                                </td>
+                            </tr>
+                            <tr class="${item.paid and 'paid' or 'unpaid'}" tal:define="groupid hash(str(item.group) + str(repeat.item.index))">
+                                <td>
+                                    ${item.text}
+                                </td>
+                                <td tal:condition="show_quantity" class="unit">${'{:.2f}'.format(item.unit)}</td>
+                                <td tal:condition="show_quantity" class="quantity">${'{:.2f}'.format(item.quantity)}</td>
+                                <td tal:condition="show_vat" class="vat_rate">${'{:.2f}%'.format(item.vat_rate or 0.0)}</td>
+                                <td tal:condition="show_vat" class="vat">${'{:.2f}'.format(item.vat)}</td>
+                                <td class="amount">${'{:.2f}'.format(item.amount)}</td>
+                                <td class="payment-status" tal:condition="not item.paid">
+                                    <span i18n:translate class="show-for-sr">Unpaid</span>
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                </td>
+                                <td class="payment-status" tal:condition="item.paid">
+                                    <span i18n:translate class="show-for-sr">Paid</span>
+                                    <i class="fa ${item.source in ('datatrans', 'stripe_connect', 'worldline_saferpay') and 'fa-credit-card' or 'fa-check-circle'}" aria-hidden="true"></i>
+                                </td>
+                                <td class="actions">
+                                </td>
+                            </tr>
+                        </tal:b>
+                        <tr class="total">
+                            <td i18n:translate>Total</td>
+                            <td tal:condition="show_quantity" class="unit"></td>
+                            <td tal:condition="show_quantity" class="quantity"></td>
+                            <td tal:condition="show_vat" class="vat_rate"></td>
+                            <td tal:condition="show_vat" class="vat">
+                                ${'{:.2f}'.format(invoice.total_vat)}
+                            </td>
+                            <td class="amount">
+                                ${'{:.2f}'.format(invoice.total_amount)}
+                            </td>
+                            <td class="payment-status" tal:condition="not invoice.paid">
+                                <span i18n:translate class="show-for-sr">Unpaid</span>
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            </td>
+                            <td class="payment-status" tal:condition="invoice.paid">
+                                <span i18n:translate class="show-for-sr">Paid</span>
+                                <i class="fa fa-check-circle" aria-hidden="true"></i>
+                            </td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </tal:b>
+</div>

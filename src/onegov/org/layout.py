@@ -1952,6 +1952,37 @@ class TicketChatMessageLayout(DefaultLayout):
         ]
 
 
+class TicketInvoiceLayout(DefaultLayout):
+
+    model: Ticket
+
+    def __init__(self, model: Ticket, request: OrgRequest) -> None:
+        super().__init__(model, request)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Tickets'), get_current_tickets_url(self.request)),
+            Link(self.model.number, self.request.link(self.model)),
+            Link(_('Invoice'), '#')
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager_for_model(self.model):
+
+            links: list[Link | LinkGroup] = []
+
+            return links
+        return None
+
+    @cached_property
+    def has_submission_files(self) -> bool:
+        submission = getattr(self.model.handler, 'submission', None)
+        return submission is not None and bool(submission.files)
+
+
 class TextModulesLayout(DefaultLayout):
 
     @cached_property

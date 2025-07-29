@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-24 13:54+0200\n"
+"POT-Creation-Date: 2025-07-29 13:58+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -622,6 +622,9 @@ msgstr ""
 msgid "Publication"
 msgstr "Publication"
 
+msgid "Required publication dates"
+msgstr "Les dates de publication sont requises"
+
 msgid "Enable registering for update notifications"
 msgstr "Activer l'inscription aux notifications"
 
@@ -632,9 +635,6 @@ msgstr ""
 
 msgid "Notifications"
 msgstr "Notifications"
-
-msgid "Required publication dates"
-msgstr "Les dates de publication sont requises"
 
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Informations complémentaires du demandeur requises à l'e-mail"
@@ -3015,6 +3015,9 @@ msgstr "Nouveau message"
 msgid "Ticket Status"
 msgstr "Statut du ticket"
 
+msgid "Invoice"
+msgstr "Facture"
+
 msgid "Text module"
 msgstr "Module de texte"
 
@@ -3590,6 +3593,9 @@ msgstr "Annuler l'inscription"
 msgid "Edit submission"
 msgstr "Modifier votre envoi"
 
+msgid "Discount"
+msgstr "Remise"
+
 msgid "Reject"
 msgstr "Refuser"
 
@@ -3652,8 +3658,8 @@ msgstr "Refuser les réservations"
 msgid "Reject all with message"
 msgstr "Tout refuser avec message"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Événement"
 
@@ -4045,8 +4051,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
-"Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
+"« Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -5515,6 +5521,30 @@ msgstr "${count} notes"
 msgid "Change tag"
 msgstr "Changer d'étiquette"
 
+msgid "Booking Text"
+msgstr "Message/notification"
+
+msgid "Unit"
+msgstr "Unité"
+
+msgid "Quantity"
+msgstr "Quantité"
+
+msgid "Submission"
+msgstr "Soumission"
+
+msgid "Selected Options"
+msgstr "Options sélectionnées"
+
+msgid "Discounts / Surcharges"
+msgstr "Remises / Suppléments"
+
+msgid "Lump sum"
+msgstr "Montant forfaitaire"
+
+msgid "Unpaid"
+msgstr "Non payé"
+
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
 "will become the author of the whole note."
@@ -6345,6 +6375,12 @@ msgstr ""
 msgid "Registrations are no longer possible"
 msgstr "Les inscriptions ne sont plus possibles"
 
+msgid ""
+"Your changes would alter the price total but the payment is no longer open."
+msgstr ""
+"Vos modifications modifieraient le montant total, mais le paiement n'est "
+"plus ouvert."
+
 msgid "Pay Online and Complete"
 msgstr "Payer en ligne et compléter"
 
@@ -7174,6 +7210,10 @@ msgstr "Votre message a été envoyé"
 
 msgid "Zip archive created successfully"
 msgstr "L'archive Zip a été créée avec succès"
+
+#, python-format
+msgid "${ticket} Invoice"
+msgstr "${ticket} Facture"
 
 msgid "Your request has been submitted"
 msgstr "Votre demande a été envoyée"

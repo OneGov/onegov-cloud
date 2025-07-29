@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from onegov.activity import (
-    Invoice, InvoiceItem, Activity, Occasion, Attendee)
+    BookingPeriodInvoice, ActivityInvoiceItem, Activity, Occasion, Attendee)
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.exports.base import FeriennetExport
@@ -15,7 +15,7 @@ from sqlalchemy import or_
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from onegov.activity.models import Period
+    from onegov.activity.models import BookingPeriod
     from sqlalchemy.orm import Query, Session
 
 
@@ -40,7 +40,7 @@ class InvoiceItemExport(FeriennetExport):
     def rows(
         self,
         session: Session,
-        period: Period
+        period: BookingPeriod
     ) -> Iterator[Iterator[tuple[str, Any]]]:
         for item, tags, attendee in self.query(session, period):
             yield ((k, v) for k, v in self.fields(item, tags, attendee))
@@ -48,8 +48,8 @@ class InvoiceItemExport(FeriennetExport):
     def query(
         self,
         session: Session,
-        period: Period
-    ) -> Query[tuple[InvoiceItem, list[str] | None, Attendee]]:
+        period: BookingPeriod
+    ) -> Query[tuple[ActivityInvoiceItem, list[str] | None, Attendee]]:
 
         # There might be activities with same title from other periods
         # resulting in double entries of invoice items
@@ -62,32 +62,31 @@ class InvoiceItemExport(FeriennetExport):
         )
         activities = activities.subquery()
 
-        q = session.query(InvoiceItem, activities.c.tags, Attendee)
-        q = q.join(Invoice).join(User)
-        q = q.join(
-            activities, InvoiceItem.text == activities.c.title, isouter=True
-        ).join(Attendee,
-               InvoiceItem.attendee_id == Attendee.id,
-               isouter=True
-               )
+        q = session.query(ActivityInvoiceItem, activities.c.tags, Attendee)
+        q = q.join(BookingPeriodInvoice).join(User)
+        q = q.outerjoin(
+            activities, ActivityInvoiceItem.text == activities.c.title
+        ).outerjoin(
+            Attendee, ActivityInvoiceItem.attendee_id == Attendee.id
+        )
         q = q.options(
-            contains_eager(InvoiceItem.invoice)
-            .contains_eager(Invoice.user)
+            contains_eager(ActivityInvoiceItem.invoice)
+            .contains_eager(BookingPeriodInvoice.user)
             .undefer(User.data))
-        q = q.filter(Invoice.period_id == period.id)
+        q = q.filter(BookingPeriodInvoice.period_id == period.id)
         q = q.filter(or_(User.username == Attendee.username,
                          Attendee.username.is_(None)))
-        q = q.filter(User.id == Invoice.user_id)
+        q = q.filter(User.id == BookingPeriodInvoice.user_id)
         q = q.order_by(
             User.username,
-            InvoiceItem.group,
-            InvoiceItem.text
+            ActivityInvoiceItem.group,
+            ActivityInvoiceItem.text
         )
         return q
 
     def fields(
         self,
-        item: InvoiceItem,
+        item: ActivityInvoiceItem,
         tags: list[str] | None,
         attendee: Attendee
     ) -> Iterator[tuple[str, Any]]:

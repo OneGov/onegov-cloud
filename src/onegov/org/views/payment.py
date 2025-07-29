@@ -24,7 +24,7 @@ from onegov.pay.models.payment_providers.datatrans import DatatransPayment
 from onegov.pay.models.payment_providers.stripe import StripePayment
 from onegov.pay.models.payment_providers.worldline_saferpay import (
     SaferpayPayment)
-from onegov.ticket import Ticket, TicketCollection
+from onegov.ticket import Ticket
 from webob.response import Response
 from webob import exc, Response as WebobResponse
 
@@ -52,58 +52,39 @@ EMAIL_SUBJECTS = {
 }
 
 
-def ticket_by_link(
-    tickets: TicketCollection,
-    link: Any
-) -> Ticket | None:
-
-    # FIXME: We should probably do isinstance checks so type checkers
-    #        can understand that a Reservation has a token and a
-    #        FormSubmission has a id...
-    if link.__tablename__ == 'reservations':
-        return tickets.by_handler_id(link.token.hex)
-    elif link.__tablename__ == 'submissions':
-        return tickets.by_handler_id(link.id.hex)
-    return None
-
-
 def send_ticket_notifications(
     payment: Payment,
     request: OrgRequest,
     change: str
 ) -> None:
 
-    session = request.session
-    tickets = TicketCollection(session)
+    ticket = payment.ticket
 
-    for link in payment.links:
-        ticket = ticket_by_link(tickets, link)
+    if not ticket:
+        return
 
-        if not ticket:
-            continue
+    # create a notification in the chat
+    PaymentMessage.create(payment, ticket, request, change)
 
-        # create a notification in the chat
-        PaymentMessage.create(payment, ticket, request, change)
+    if change == 'captured':
+        return
 
-        if change == 'captured':
-            continue
+    # send an e-mail
+    email = ticket.snapshot.get('email') or ticket.handler.email
+    assert email is not None
 
-        # send an e-mail
-        email = ticket.snapshot.get('email') or ticket.handler.email
-        assert email is not None
-
-        send_ticket_mail(
-            request=request,
-            template='mail_payment_change.pt',
-            subject=EMAIL_SUBJECTS[change],
-            receivers=(email, ),
-            ticket=ticket,
-            content={
-                'model': ticket,
-                'payment': payment,
-                'change': change
-            }
-        )
+    send_ticket_mail(
+        request=request,
+        template='mail_payment_change.pt',
+        subject=EMAIL_SUBJECTS[change],
+        receivers=(email, ),
+        ticket=ticket,
+        content={
+            'model': ticket,
+            'payment': payment,
+            'change': change
+        }
+    )
 
 
 def handle_pdf_response(
@@ -183,7 +164,6 @@ def view_payments(
         'tickets': self.tickets_by_batch(),
         'reservation_dates_formatted': reservation_dates_formatted,
         'providers': providers,
-        'payment_links': self.payment_links_by_batch(),
         'pdf_export_link': append_query_param(request.url, 'format', 'pdf')
     }
 
@@ -343,12 +323,9 @@ def change_payment_amount(self: Payment, request: OrgRequest) -> JSON_ro:
     if net_amount <= 0 or (net_amount - self.fee) <= 0:
         raise exc.HTTPBadRequest('amount negative')
 
-    links = self.links
-    if links:
-        tickets = TicketCollection(request.session)
-        ticket = ticket_by_link(tickets, links[0])
-        if ticket:
-            TicketMessage.create(ticket, request, 'change-net-amount')
+    ticket = self.ticket
+    if ticket:
+        TicketMessage.create(ticket, request, 'change-net-amount')
 
     self.amount = net_amount - self.fee
     return {'net_amount': f'{format_(self.net_amount)} {self.currency}'}

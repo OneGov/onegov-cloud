@@ -4,10 +4,10 @@ from onegov.core.security import Public, Personal, Private
 from onegov.core.security.roles import (
     get_roles_setting as get_roles_setting_base)
 from onegov.org.app import OrgApp
-from onegov.org.models import Export
+from onegov.org.models import Export, TicketNote
 from onegov.org.views.directory import DirectorySubmissionAction
 from onegov.pay import Payment, PaymentCollection
-from onegov.ticket import Ticket, TicketCollection
+from onegov.ticket import Ticket, TicketCollection, TicketInvoice
 from onegov.ticket.collection import ArchivedTicketCollection
 
 
@@ -99,6 +99,23 @@ def has_permission_ticket(
     return permission in getattr(app.settings.roles, role)
 
 
+@OrgApp.permission_rule(model=DirectorySubmissionAction, permission=object)
+@OrgApp.permission_rule(model=Payment, permission=object)
+@OrgApp.permission_rule(model=TicketInvoice, permission=object)
+@OrgApp.permission_rule(model=TicketNote, permission=object)
+def has_permission_ticket_related_model(
+    app: OrgApp,
+    identity: Identity,
+    model: DirectorySubmissionAction,
+    permission: object
+) -> bool:
+
+    if model.ticket is None:
+        return permission in getattr(app.settings.roles, identity.role)
+
+    return has_permission_ticket(app, identity, model.ticket, permission)
+
+
 @OrgApp.permission_rule(model=TicketCollection, permission=object)
 @OrgApp.permission_rule(model=ArchivedTicketCollection, permission=object)
 def has_permission_ticket_collection(
@@ -115,9 +132,8 @@ def has_permission_ticket_collection(
     return permission in getattr(app.settings.roles, identity.role)
 
 
-@OrgApp.permission_rule(model=Payment, permission=object)
 @OrgApp.permission_rule(model=PaymentCollection, permission=object)
-def has_permission_payments(
+def has_permission_payment_collection(
     app: OrgApp,
     identity: Identity,
     model: Payment | PaymentCollection,
@@ -129,17 +145,3 @@ def has_permission_payments(
         return permission in {Public, Private, Personal}
 
     return permission in getattr(app.settings.roles, identity.role)
-
-
-@OrgApp.permission_rule(model=DirectorySubmissionAction, permission=object)
-def has_permission_directory_submission_action(
-    app: OrgApp,
-    identity: Identity,
-    model: DirectorySubmissionAction,
-    permission: object
-) -> bool:
-
-    if model.ticket is None:
-        return False
-
-    return has_permission_ticket(app, identity, model.ticket, permission)

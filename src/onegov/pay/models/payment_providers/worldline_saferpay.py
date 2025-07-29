@@ -502,7 +502,11 @@ class SaferpayPayment(Payment):
             flag_modified(self, 'meta')
         return True
 
-    def sync(self, remote_obj: SaferpayTransaction | None = None) -> None:
+    def sync(
+        self,
+        remote_obj: SaferpayTransaction | None = None,
+        capture: bool = False,
+    ) -> None:
         if self.refunds:
             try:
                 refund_tx = self.provider.client.inquire(
@@ -544,6 +548,14 @@ class SaferpayPayment(Payment):
 
         if self.capture_id != remote_obj.capture_id:
             self.capture_id = remote_obj.capture_id
+
+        if capture and remote_obj.status == 'AUTHORIZED':
+            captured, capture_id = self.provider.client.capture(remote_obj)
+            if captured:
+                if capture_id and capture_id != self.capture_id:
+                    self.capture_id = capture_id
+                self.state = 'paid'
+                return
 
         match remote_obj.status:
             case 'CAPTURED':

@@ -323,7 +323,11 @@ class DatatransPayment(Payment):
             flag_modified(self, 'meta')
         return refund
 
-    def sync(self, remote_obj: DatatransTransaction | None = None) -> None:
+    def sync(
+        self,
+        remote_obj: DatatransTransaction | None = None,
+        capture: bool = False
+    ) -> None:
         if self.refunds:
             refund_tx = self.provider.client.status(self.refunds[-1])
             if refund_tx.status in ('settled', 'transmitted'):
@@ -337,6 +341,10 @@ class DatatransPayment(Payment):
             # the status of the original transaction
 
         if remote_obj is None:
+            remote_obj = self.transaction
+
+        if capture and remote_obj.status == 'authorized':
+            self.provider.client.settle(remote_obj)
             remote_obj = self.transaction
 
         match remote_obj.status:

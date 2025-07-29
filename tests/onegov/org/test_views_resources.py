@@ -5,6 +5,7 @@ import re
 import tempfile
 import textwrap
 import transaction
+import warnings
 
 from datetime import datetime, date, timedelta
 from freezegun import freeze_time
@@ -14,10 +15,12 @@ from onegov.core.utils import module_path, normalize_for_url
 from onegov.file import FileCollection
 from onegov.form import FormSubmission
 from onegov.org.models import ResourceRecipientCollection
+from onegov.pay import Payment
 from onegov.reservation import Resource, ResourceCollection
 from onegov.ticket import TicketCollection
 from openpyxl import load_workbook
 from pathlib import Path
+from sqlalchemy import exc
 from sqlalchemy.orm.session import close_all_sessions
 from unittest.mock import patch
 from webtest import Upload
@@ -1332,6 +1335,168 @@ def test_reserve_allocation_adjustment_post_acceptance(client):
 
 
 @freeze_time("2015-08-28", tick=True)
+def test_reserve_allocation_adjustment_invoice_change(client):
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    resource.pricing_method = 'per_hour'
+    resource.price_per_hour = 10.00
+    resource.payment_method = 'manual'
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve('10:00', '12:00').json == {'success': True}
+
+    # fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+
+    ticket = formular.form.submit().follow().form.submit().follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # open the created ticket
+    client.login_admin()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    assert "info@example.org" in ticket
+    assert "10:00" in ticket
+    assert "12:00" in ticket
+    assert "Anpassen" in ticket
+    assert "20.00" in ticket
+
+    # adjust it
+    adjust = ticket.click('Anpassen', index=0)
+    adjust.form['start_time'] = '10:00'
+    adjust.form['end_time'] = '11:00'
+    ticket = adjust.form.submit().follow()
+    assert "10:00" in ticket
+    assert "11:00" in ticket
+    assert "10.00" in ticket
+
+    # mark as paid
+    assert ticket.pyquery('.payment-state').text() == "Offen"
+    client.post(ticket.pyquery('.mark-as-paid').attr('ic-post-to'))
+    ticket = client.get(ticket.request.url)
+
+    # try to adjust it again (invalid since it changes the price)
+    adjust = ticket.click('Anpassen', index=0)
+    adjust.form['start_time'] = '10:00'
+    adjust.form['end_time'] = '12:00'
+    adjust = adjust.form.submit()
+    assert 'die Zahlung ist nicht mehr offen' in adjust
+
+    # try a valid adjustment that doesn't change the price
+    adjust.form['start_time'] = '11:00'
+    adjust.form['end_time'] = '12:00'
+    ticket = adjust.form.submit().follow()
+    assert "11:00" in ticket
+    assert "12:00" in ticket
+    assert "10.00" in ticket
+
+
+@freeze_time("2015-08-28", tick=True)
+@patch('onegov.pay.models.payment.Payment.sync')
+def test_reject_reservation_price_change(sync, client):
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    resource.pricing_method = 'per_item'
+    resource.price_per_item = 10.00
+    resource.payment_method = 'manual'
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create three reservations
+    assert reserve('10:00', '10:30').json == {'success': True}
+    assert reserve('11:00', '11:30').json == {'success': True}
+    assert reserve('12:00', '12:30').json == {'success': True}
+
+    # and fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+    ticket = formular.form.submit().follow().form.submit().follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # open the created ticket
+    client.login_supporter()
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert '28. August 2015' in ticket
+    assert '10:00' in ticket
+    assert '10:30' in ticket
+    assert '11:00' in ticket
+    assert '11:30' in ticket
+    assert '12:00' in ticket
+    assert '12:30' in ticket
+    assert '30.00' in ticket
+
+    # reject the final reservation
+    assert client.app.session().query(Reservation).count() == 3
+    link = ticket.pyquery('a.delete-link')[-1].attrib['ic-get-from']
+    ticket = client.get(link).follow()
+
+    assert client.app.session().query(Reservation).count() == 2
+    assert '10:00' in ticket
+    assert '10:30' in ticket
+    assert '11:00' in ticket
+    assert '11:30' in ticket
+    assert '20.00' in ticket
+
+    # mark as paid
+    assert ticket.pyquery('.payment-state').text() == "Offen"
+    client.post(ticket.pyquery('.mark-as-paid').attr('ic-post-to'))
+    ticket = client.get(ticket.request.url)
+
+    # try to delete again (payment needs to be open or refunded)
+    link = ticket.pyquery('a.delete-link')[-1].attrib['ic-get-from']
+    ticket = client.get(link).follow()
+    assert 'Zahlung muss rückgängig gemacht werden' in ticket
+
+    # but if it changes the price even an open payment should
+    # result it in an error, if it's not a manual payment
+    payment = client.app.session().query(Payment).one()
+    # HACK: change type of payment to generic so it isn't treated
+    #       like a manual payment, even though it's also not an
+    #       online payment, we monkeypatch `Payment.sync` so it
+    #       doesn't raise. We would still need to monkeypatch
+    #       the `sync` of `StripePayment` & co. so this seems safer
+    payment.source = 'generic'
+    payment.state = 'open'
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            action='ignore',
+            message=r'Flushing object',
+            category=exc.SAWarning
+        )
+        transaction.commit()
+    close_all_sessions()
+    link = ticket.pyquery('a.delete-link')[-1].attrib['ic-get-from']
+    ticket = client.get(link).follow()
+    assert 'die Zahlung ist nicht mehr offen' in ticket
+
+
+@freeze_time("2015-08-28", tick=True)
 def test_send_reservation_summary(client):
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
@@ -2544,6 +2709,13 @@ def test_manual_reservation_payment_with_one_off_extra(client):
     assert "info@example.org" in payments
     assert "40.00" in payments
     assert "Offen" in payments
+
+    # TODO: use the actual link on the ticket
+    invoice = client.get(page.request.url + '/invoice')
+    assert '30.00' in invoice
+    assert '10.00' in invoice
+    assert '40.00' in invoice
+    invoice.showbrowser()
 
 
 @freeze_time("2017-07-09", tick=True)

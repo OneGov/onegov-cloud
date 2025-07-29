@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from onegov.activity import InvoiceCollection, InvoiceItem
+from onegov.activity import ActivityInvoiceItem
+from onegov.activity import BookingPeriodInvoiceCollection
 from onegov.core.security import Private
 from onegov.feriennet import FeriennetApp
 from onegov.pay import PaymentProviderCollection
@@ -36,7 +37,7 @@ def sync_payments_and_reconcile(
     # the reason we don't keep this all in the payment table is mainly a
     # performance one - we don't want to load the payments when rendering
     # the potentially large list of invoice items
-    InvoiceCollection(self.session).sync()
+    BookingPeriodInvoiceCollection(self.session).sync()
 
     return result
 
@@ -53,7 +54,7 @@ def refund_and_reconcile_stripe(
 
     result = refund_stripe(self, request)
     for link in self.links:
-        if isinstance(link, InvoiceItem):
+        if isinstance(link, ActivityInvoiceItem):
             link.paid = self.state == 'paid'
 
     return result
@@ -71,7 +72,7 @@ def refund_and_reconcile_datatrans(
 
     result = refund_datatrans(self, request)
     for link in self.links:
-        if isinstance(link, InvoiceItem):
+        if isinstance(link, ActivityInvoiceItem):
             link.paid = self.state == 'paid'
 
     return result

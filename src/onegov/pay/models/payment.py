@@ -17,10 +17,9 @@ from uuid import uuid4
 
 
 from typing import Any, TYPE_CHECKING
-
 if TYPE_CHECKING:
     import uuid
-    from onegov.ticket.model import Ticket
+    from onegov.ticket.models import Ticket
     from onegov.pay.models import PaymentProvider
     from onegov.pay.types import PaymentState
     from typing import Self
@@ -79,9 +78,12 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
         back_populates='payments'
     )
 
-    tickets: relationship[list[Ticket]] = relationship(
+    # NOTE: For now a payment is only ever associated with one ticket, but
+    #       eventually we may allow merging invoices/payments for tickets
+    ticket: relationship[Ticket | None] = relationship(
         'Ticket',
-        back_populates='payment'
+        back_populates='payment',
+        uselist=False
     )
 
     __mapper_args__ = {
@@ -119,9 +121,14 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
 
         raise NotImplementedError
 
-    def sync(self, remote_obj: Any | None = None) -> None:
+    def sync(
+        self,
+        remote_obj: Any | None = None,
+        capture: bool = False,
+    ) -> None:
         """ Updates the local payment information with the information from
-        the remote payment provider.
+        the remote payment provider and optionally try to capture the payment
+        if it hasn't been already.
 
         """
 
@@ -136,5 +143,5 @@ class ManualPayment(Payment):
     """
     __mapper_args__ = {'polymorphic_identity': 'manual'}
 
-    def sync(self, remote_obj: None = None) -> None:
+    def sync(self, remote_obj: None = None, capture: bool = False) -> None:
         pass

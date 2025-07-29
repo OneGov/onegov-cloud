@@ -19,7 +19,7 @@ from typing import Any, ClassVar, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from sqlalchemy.orm import Session
-    from .invoice import Invoice
+    from onegov.pay.models import Invoice
 
 
 KNOWN_SCHEMAS: dict[str, type[Schema]] = {}
@@ -33,7 +33,7 @@ class InvoiceReference(Base, TimestampMixin):
     outside the application. Usually a code used on an invoice to enter through
     online-banking.
 
-    Each invoice may have multiple references pointing to it. Each refernce
+    Each invoice may have multiple references pointing to it. Each reference
     is however unique.
 
     There are multiple schemas for references. Each schema generates its own

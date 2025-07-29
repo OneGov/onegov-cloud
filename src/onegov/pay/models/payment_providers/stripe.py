@@ -176,8 +176,15 @@ class StripePayment(Payment):
             self.state = 'cancelled'
             return refund
 
-    def sync(self, remote_obj: stripe.Charge | None = None) -> None:
+    def sync(
+        self,
+        remote_obj: stripe.Charge | None = None,
+        capture: bool = False,
+    ) -> None:
         charge = remote_obj or self.charge
+
+        if capture and not charge.captured:
+            charge.capture()
 
         if not charge.captured:
             self.state = 'open'

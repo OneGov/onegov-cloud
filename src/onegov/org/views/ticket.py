@@ -29,9 +29,10 @@ from onegov.org.layout import (
     FindYourSpotLayout, DefaultMailLayout, ArchivedTicketsLayout)
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import TicketChatMessageLayout
+from onegov.org.layout import TicketInvoiceLayout
+from onegov.org.layout import TicketLayout
 from onegov.org.layout import TicketNoteLayout
 from onegov.org.layout import TicketsLayout
-from onegov.org.layout import TicketLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
     CitizenDashboard, TicketChatMessage, TicketMessage, TicketNote,
@@ -991,6 +992,33 @@ def view_ticket_files(self: Ticket, request: OrgRequest) -> BaseResponse:
             date.today().strftime('%Y%m%d')
         )
     )
+
+
+@OrgApp.html(
+    model=Ticket,
+    name='invoice',
+    template='ticket_invoice.pt',
+    permission=Private
+)
+def view_ticket_invoice(
+    self: Ticket,
+    request: OrgRequest,
+    layout: TicketInvoiceLayout | None = None
+) -> RenderData:
+
+    invoice = self.invoice
+    if invoice is None:
+        raise exc.HTTPNotFound()
+
+    layout = layout or TicketInvoiceLayout(self, request)
+
+    return {
+        'title': _('${ticket} Invoice', mapping={'ticket': self.number}),
+        'layout': layout,
+        'ticket': self,
+        'invoice': self.invoice,
+        'payment': self.payment
+    }
 
 
 @OrgApp.form(model=Ticket, name='status', template='ticket_status.pt',

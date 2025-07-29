@@ -4,13 +4,15 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from __future__ import annotations
 
+from decimal import Decimal
 from onegov.core.orm.types import JSON, UTCDateTime, UUID
 from onegov.core.upgrade import upgrade_task
-from onegov.ticket import Ticket
-from sqlalchemy import Boolean, Column, Integer, Text, Enum
-from sqlalchemy import column, update, func, and_, true, false
-from sqlalchemy.orm import load_only
+from onegov.ticket import Ticket, TicketInvoice
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, Text, Enum
+from sqlalchemy import column, update, func, and_, true, false, Numeric
+from sqlalchemy.orm import load_only, selectinload
 from sqlalchemy.dialects.postgresql import HSTORE
+from uuid import uuid4
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -307,5 +309,101 @@ def add_payment_id_to_ticket(context: UpgradeContext) -> None:
                 payment_id=payment.id
             )
             context.session.execute(stmt)
+
+    context.session.flush()
+
+
+@upgrade_task('Add missing foreign key constraint')
+def add_foreign_key_constraint_to_payment_id(context: UpgradeContext) -> None:
+    if not context.has_constraint(
+        'tickets', 'fk_payments_tickets', 'FOREIGN KEY'
+    ):
+        context.operations.create_foreign_key(
+            'fk_payments_tickets',
+            'tickets',
+            'payments',
+            ['payment_id'],
+            ['id']
+        )
+
+
+@upgrade_task('Add new invoice columns')
+def add_new_invoice_columns(context: UpgradeContext) -> None:
+    if not context.has_column('tickets', 'invoice_id'):
+        context.operations.add_column(
+            'tickets', Column(
+                'invoice_id',
+                UUID,
+                ForeignKey('invoices.id'),
+                nullable=True
+            )
+        )
+        context.operations.create_index(
+            'ix_tickets_invoice_id',
+            'tickets',
+            ['invoice_id']
+        )
+    if not context.has_column('invoice_items', 'submission_id'):
+        context.operations.add_column(
+            'invoice_items', Column(
+                'submission_id',
+                UUID,
+                ForeignKey('submissions.id'),
+                nullable=True
+            )
+        )
+        context.operations.create_index(
+            'ix_invoices_submission_id',
+            'invoices',
+            ['submission_id']
+        )
+    if not context.has_column('invoice_items', 'reservation_id'):
+        context.operations.add_column(
+            'invoice_items', Column(
+                'reservation_id',
+                Integer,
+                nullable=True
+            )
+        )
+        context.operations.create_index(
+            'ix_invoices_reservation_id',
+            'invoices',
+            ['reservation_id']
+        )
+    if not context.has_column('invoice_items', 'vat_factor'):
+        context.operations.add_column(
+            'invoice_items', Column(
+                'vat_factor',
+                Numeric(precision=5, scale=4),
+                nullable=True
+            )
+        )
+
+    # generate invoices with a manual item from payments
+    # NOTE: For performance reasons we don't try to generate the
+    #       individual items. They can later be generated on-demand
+    #       when a reservation/form submission is altered and this
+    #       manual item can then be deleted afterwards.
+    for ticket in (
+        context.session.query(Ticket)
+        .filter(Ticket.payment_id.isnot(None))
+        .options(selectinload(Ticket.payment))
+    ):
+        payment = ticket.payment
+        assert payment is not None
+        invoice = TicketInvoice(
+            id=uuid4(),
+            ticket=ticket,
+        )
+        context.session.add(invoice)
+        item = invoice.add(
+            text=ticket.title,
+            group='migration',
+            unit=payment.amount,
+            quantity=Decimal('1'),
+            paid=payment.state == 'paid',
+            flush=False
+        )
+        item.payments.append(payment)
 
     context.session.flush()

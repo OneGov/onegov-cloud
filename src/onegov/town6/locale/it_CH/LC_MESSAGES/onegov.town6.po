@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-07-25 12:05+0200\n"
+"POT-Creation-Date: 2025-07-29 14:00+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2336,6 +2336,36 @@ msgstr "Tempo di elaborazione"
 
 msgid "Summary"
 msgstr "Riepilogo"
+
+msgid "Booking Text"
+msgstr "Testo prenotazione"
+
+msgid "Unit"
+msgstr "Unità"
+
+msgid "Quantity"
+msgstr "Quantità"
+
+msgid "VAT Rate"
+msgstr "Aliquota IVA"
+
+msgid "Submission"
+msgstr "Iscrizione"
+
+msgid "Selected Options"
+msgstr "Opzioni selezionate"
+
+msgid "Discounts / Surcharges"
+msgstr "Deduzioni / Supplementi"
+
+msgid "Lump sum"
+msgstr "Somma forfettaria"
+
+msgid "Unpaid"
+msgstr "Non pagato"
+
+msgid "Total"
+msgstr "Totale"
 
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
