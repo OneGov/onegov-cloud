@@ -224,10 +224,9 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
         self.parliamentarian_id.choices = [
             (str(parliamentarian.id), parliamentarian.title)
             for parliamentarian
-            in PASParliamentarianCollection(
-                self.request.session, True
-            ).query()
+            in PASParliamentarianCollection(self.request.session, True).query()
         ]
+
 
 class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):
 
