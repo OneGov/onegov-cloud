@@ -135,18 +135,6 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         nullable=False,
         default='manual'
     )
-
-    #: the id of the invoice corresponding to this submission
-    #: the invoice item(s) belonging to this submission are implicitly
-    #: linked through ``InvoiceItem.group`` and ``InvoiceItem.family`
-    #: which correspond to the form as a whole and individual paid
-    #: form fields respectively.
-    invoice_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('invoice_items.id'),
-        nullable=True
-    )
-
     minimum_price_total: dict_property[float | None] = meta_property()
 
     #: extensions
