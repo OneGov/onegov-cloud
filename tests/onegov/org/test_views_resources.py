@@ -2715,7 +2715,6 @@ def test_manual_reservation_payment_with_one_off_extra(client):
     assert '30.00' in invoice
     assert '10.00' in invoice
     assert '40.00' in invoice
-    invoice.showbrowser()
 
 
 @freeze_time("2017-07-09", tick=True)
@@ -2761,21 +2760,45 @@ def test_manual_reservation_payment_with_per_item_extra(client):
     ticket = page.form.submit().follow().form.submit().follow()
     assert 'RSV-' in ticket.text
 
-    # mark it as paid
     client.login_editor()
     page = client.get('/tickets/ALL/open').click("Annehmen").follow()
 
     assert page.pyquery('.payment-state').text() == "Offen"
 
+    # change the submission (works until it is marked as paid)
+    edit_page = page.click('Details bearbeiten')
+    edit_page.form['donation'] = 'No'
+    page = edit_page.form.submit().follow()
+    assert '30.00' in page
+
+    # mark it as paid
     client.post(page.pyquery('.mark-as-paid').attr('ic-post-to'))
     page = client.get(page.request.url)
 
     assert page.pyquery('.payment-state').text() == "Bezahlt"
 
+    # try to change it again (it should not work)
+    edit_page = page.click('Details bearbeiten')
+    edit_page.form['donation'] = 'Yes'
+    assert 'die Zahlung ist nicht mehr offen' in edit_page.form.submit()
+
+    # mark it as unpaid again
     client.post(page.pyquery('.mark-as-unpaid').attr('ic-post-to'))
     page = client.get(page.request.url)
 
+    # and change it back
+    edit_page = page.click('Details bearbeiten')
+    edit_page.form['donation'] = 'Yes'
+    page = edit_page.form.submit().follow()
+    assert '50.00' in page
     assert page.pyquery('.payment-state').text() == "Offen"
+
+    # TODO: use the actual link on the ticket
+    invoice = client.get(page.request.url + '/invoice')
+    assert '15.00' in invoice
+    assert '10.00' in invoice
+    assert '2.00' in invoice
+    assert '50.00' in invoice
 
     payments = client.get('/payments')
     assert "RSV-" in payments

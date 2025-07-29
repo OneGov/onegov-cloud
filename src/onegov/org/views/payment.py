@@ -377,6 +377,7 @@ def capture_stripe(self: StripePayment, request: OrgRequest) -> None:
 
     assert self.source == 'stripe_connect'
     self.charge.capture()
+    self.sync_invoice_items()
 
 
 @OrgApp.view(
@@ -393,6 +394,7 @@ def refund_stripe(self: StripePayment, request: OrgRequest) -> None:
 
     assert self.source == 'stripe_connect'
     self.refund()
+    self.sync_invoice_items()
 
 
 @OrgApp.view(
@@ -418,6 +420,7 @@ def capture_datatrans(self: DatatransPayment, request: OrgRequest) -> None:
         self.sync(tx)
     else:
         self.provider.client.settle(tx)
+        self.sync_invoice_items()
 
 
 @OrgApp.view(
@@ -465,6 +468,7 @@ def capture_saferpay(self: SaferpayPayment, request: OrgRequest) -> None:
         self.sync(tx)
     else:
         self.provider.client.capture(tx)
+        self.sync_invoice_items()
 
 
 @OrgApp.view(
@@ -482,6 +486,7 @@ def refund_saferpay(self: SaferpayPayment, request: OrgRequest) -> None:
     except SaferpayApiError:
         request.alert(_('Could not refund the payment'))
     else:
+        self.sync_invoice_items()
         if new_refund:
             send_ticket_notifications(self, request, 'refunded')
         request.success(_('The payment was refunded'))

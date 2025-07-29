@@ -131,6 +131,11 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
     ) -> bool:
         raise NotImplementedError
 
+    def sync_invoice_items(self) -> None:
+        """ Updates the paid state of any linked invoice items. """
+        for item in self.linked_invoice_items:
+            item.paid = item.payments[-1].state == 'paid'
+
     def sync(
         self,
         remote_obj: Any | None = None,
@@ -149,8 +154,7 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
         #       eagerly avoids us having to remember where we sync
         #       payments.
         if self._sync_state(remote_obj, capture) and update_invoice_items:
-            for item in self.linked_invoice_items:
-                item.paid = item.payments[-1].state == 'paid'
+            self.sync_invoice_items()
 
 
 class ManualPayment(Payment):
