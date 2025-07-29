@@ -185,6 +185,12 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
         ]
 
 
+class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
+    """ Kind of like AttendenceAddPlenaryForm but for commissions. """
+    pass
+
+
+
 class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):
 
     date = DateField(

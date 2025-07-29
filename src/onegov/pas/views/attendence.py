@@ -73,6 +73,42 @@ def add_attendence(
 
 @PasApp.form(
     model=AttendenceCollection,
+    name='new-commission-bulk',
+    template='form.pt',
+    permission=Private,
+    form=AttendenceAddPlenaryForm
+)
+def add_bulk_attendence(
+    self: AttendenceCollection,
+    request: TownRequest,
+    form: AttendenceAddPlenaryForm
+) -> RenderData | Response:
+
+    if form.submitted(request):
+        data = form.get_useful_data()
+        parliamentarian_ids = data.pop('parliamentarian_id')
+        for parliamentarian_id in parliamentarian_ids:
+            attendence = self.add(
+                parliamentarian_id=parliamentarian_id, **data
+            )
+            Change.add(request, 'add', attendence)
+        request.success(_('Added plenary session'))
+
+        return request.redirect(request.link(self))
+
+    layout = AttendenceCollectionLayout(self, request)
+    layout.breadcrumbs.append(Link(_('New plenary session'), '#'))
+
+    return {
+        'layout': layout,
+        'title': _('New plenary session'),
+        'form': form,
+        'form_width': 'large'
+    }
+
+
+@PasApp.form(
+    model=AttendenceCollection,
     name='new-bulk',
     template='form.pt',
     permission=Private,
