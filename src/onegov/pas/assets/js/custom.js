@@ -7,10 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Store all parliamentarians by commission
     let commissionParliamentarians = {};
-
-    // Load all commission-parliamentarian data once
     const baseUrl = window.location.href.split('/').slice(0, -2).join('/');
-    console.log(baseUrl)
     fetch(`${baseUrl}/commissions/commissions-parliamentarians-json`)
         .then(response => response.json())
         .then(data => {
@@ -19,8 +16,12 @@ document.addEventListener('DOMContentLoaded', function() {
             updateParliamentarians(commissionSelect.value);
         });
 
+    // NOTE: The "chosen" library is a jQuery plugin. It hides the original
+    // <select> element and creates a custom, styled dropdown. When we make a
+    // selection, the plugin triggers a change event on the original, hidden
+    // element using jQuery's internal event system. A vanilla JavaScript
+    // attempt (addEventListener, event delegation) won't cut it here.
     $(commissionSelect).on('change', function() {
-        console.log('commissionSelect change event fired');
         updateParliamentarians(this.value);
     });
 
