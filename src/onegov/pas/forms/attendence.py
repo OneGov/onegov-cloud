@@ -221,11 +221,13 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
             for commission
             in PASCommissionCollection(self.request.session).query()
         ]
+        # todo: this should be set with js
         self.parliamentarian_id.choices = [
             (str(parliamentarian.id), parliamentarian.title)
             for parliamentarian
             in PASParliamentarianCollection(self.request.session, True).query()
         ]
+        self.parliamentarian_id.choices = []
         self.parliamentarian_id.data = [
             choice[0] for choice in self.parliamentarian_id.choices
         ]

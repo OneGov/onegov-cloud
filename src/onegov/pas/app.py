@@ -10,7 +10,7 @@ from onegov.town6.app import get_i18n_localedirs as get_i18n_localedirs_base
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Iterator
     from onegov.core.types import RenderData
     from onegov.org.models import Organisation
     from onegov.town6.request import TownRequest
@@ -50,9 +50,14 @@ def get_template_directory() -> str:
     return 'templates'
 
 
-# @PasApp.webasset_path()
-# def get_js_path() -> str:
-#     return 'assets/js'
+@PasApp.webasset_path()
+def get_js_path() -> str:
+    return 'assets/js'
+
+
+@PasApp.webasset('custom')
+def get_custom_webasset() -> Iterator[str]:
+    yield 'custom.js'
 
 
 @PasApp.setting(section='i18n', name='localedirs')
