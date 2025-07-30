@@ -19,10 +19,16 @@ document.addEventListener('DOMContentLoaded', function() {
             updateParliamentarians(commissionSelect.value);
         });
 
-    commissionSelect.addEventListener('change', function() {
-        console.log('commissionSelect.addEventListener(change');
-        updateParliamentarians(commissionSelect.value);
+    const observer = new MutationObserver((_, obs) => {
+        if (document.getElementById('commission_id_chosen')) {
+            commissionSelect.addEventListener('change', () => {
+                console.log('commissionSelect change event fired');
+                updateParliamentarians(commissionSelect.value);
+            });
+            obs.disconnect();
+        }
     });
+    observer.observe(document.body, { childList: true, subtree: true });
 
     function updateParliamentarians(commissionId) {
         parliamentarianList.innerHTML = '';
