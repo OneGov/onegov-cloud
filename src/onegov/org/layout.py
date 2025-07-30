@@ -1995,11 +1995,6 @@ class TicketInvoiceLayout(DefaultLayout):
             ]
         return None
 
-    @cached_property
-    def has_submission_files(self) -> bool:
-        submission = getattr(self.model.handler, 'submission', None)
-        return submission is not None and bool(submission.files)
-
 
 class TextModulesLayout(DefaultLayout):
 

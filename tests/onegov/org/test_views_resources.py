@@ -2703,18 +2703,17 @@ def test_manual_reservation_payment_with_one_off_extra(client):
 
     assert page.pyquery('.payment-state').text() == "Offen"
 
+    invoice = page.click('Rechnung anzeigen')
+    assert '30.00' in invoice
+    assert '10.00' in invoice
+    assert '40.00' in invoice
+
     payments = client.get('/payments')
     assert "RSV-" in payments
     assert "Manuell" in payments
     assert "info@example.org" in payments
     assert "40.00" in payments
     assert "Offen" in payments
-
-    # TODO: use the actual link on the ticket
-    invoice = client.get(page.request.url + '/invoice')
-    assert '30.00' in invoice
-    assert '10.00' in invoice
-    assert '40.00' in invoice
 
 
 @freeze_time("2017-07-09", tick=True)
@@ -2771,8 +2770,24 @@ def test_manual_reservation_payment_with_per_item_extra(client):
     page = edit_page.form.submit().follow()
     assert '30.00' in page
 
+    # the invoice should change accordingly
+    invoice = page.click('Rechnung anzeigen')
+    assert '15.00' in invoice
+    assert '2.00' in invoice
+    assert '30.00' in invoice
+
+    # let's add a manual invoice item
+    item = invoice.click('Abzug / Zuschlag')
+    item.form['booking_text'] = 'Preisreduktion'
+    item.form['discount'] = '10.00'
+    invoice = item.form.submit().follow()
+    assert '15.00' in invoice
+    assert '2.00' in invoice
+    assert '-10.00' in invoice
+    assert '20.00' in invoice
+
     # mark it as paid
-    client.post(page.pyquery('.mark-as-paid').attr('ic-post-to'))
+    client.post(invoice.pyquery('.mark-as-paid').attr('ic-post-to'))
     page = client.get(page.request.url)
 
     assert page.pyquery('.payment-state').text() == "Bezahlt"
@@ -2790,15 +2805,28 @@ def test_manual_reservation_payment_with_per_item_extra(client):
     edit_page = page.click('Details bearbeiten')
     edit_page.form['donation'] = 'Yes'
     page = edit_page.form.submit().follow()
-    assert '50.00' in page
+    assert '40.00' in page
     assert page.pyquery('.payment-state').text() == "Offen"
 
-    # TODO: use the actual link on the ticket
-    invoice = client.get(page.request.url + '/invoice')
+    invoice = page.click('Rechnung anzeigen')
+    assert '15.00' in invoice
+    assert '10.00' in invoice
+    assert '-10.00' in invoice
+    assert '2.00' in invoice
+    assert '40.00' in invoice
+
+    # delete the manual invoice item
+    client.delete(
+        invoice.pyquery('.remove-invoice-item').attr('ic-delete-from')
+    )
+    invoice = client.get(invoice.request.url)
     assert '15.00' in invoice
     assert '10.00' in invoice
     assert '2.00' in invoice
     assert '50.00' in invoice
+
+    page = client.get(page.request.url)
+    assert '50.00' in page
 
     payments = client.get('/payments')
     assert "RSV-" in payments

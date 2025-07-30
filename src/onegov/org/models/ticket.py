@@ -97,11 +97,8 @@ def refresh_submission_invoice_items(
         self.ticket.invoice = invoice
 
     old_items = sorted(invoice.items, key=attrgetter('group'))
-    unused: set[InvoiceItem] = set(old_items)
-
-    # FIXME: This doesn't update fees, which we need to do if we ever
-    #        allow modifications of invoices with online payments
     new_items: list[InvoiceItem] = []
+    unused: set[InvoiceItem] = set(old_items)
     for meta in new_item_metas:
         existing: InvoiceItem | None = None
         for item in old_items:
@@ -594,7 +591,7 @@ class ReservationHandler(Handler):
                 self.submission.form_class,
                 data=self.submission.data
             )
-            item_extra = {'submission_id': self.id}
+            item_extra = {'submission_id': self.submission.id}
             extras = form.invoice_items(extra=item_extra)
             discounts = form.discount_items(extra=item_extra)
         else:
@@ -635,11 +632,8 @@ class ReservationHandler(Handler):
             self.ticket.invoice = invoice
 
         old_items = sorted(invoice.items, key=attrgetter('group'))
-        unused: set[InvoiceItem] = set(old_items)
-
-        # FIXME: This doesn't update fees, which we need to do if we ever
-        #        allow modifications of invoices with online payments
         new_items: list[InvoiceItem] = []
+        unused: set[InvoiceItem] = set(old_items)
         for meta in new_item_metas:
             existing: InvoiceItem | None = None
             for item in old_items:
@@ -653,6 +647,7 @@ class ReservationHandler(Handler):
                         break
                 elif meta.group == 'form':
                     assert meta.extra is not None
+                    assert item.submission_id is not None
                     assert meta.extra['submission_id'] == item.submission_id
                     if meta.family == item.family:
                         existing = item
@@ -680,10 +675,7 @@ class ReservationHandler(Handler):
 
         for existing in unused:
             # keep manually added items
-            if (
-                existing.group == 'manual'
-                or existing.group == 'reduced_amount'
-            ):
+            if existing.group == 'manual':
                 new_items.append(existing)
                 continue
 
