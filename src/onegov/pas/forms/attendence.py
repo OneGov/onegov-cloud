@@ -207,6 +207,7 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
     parliamentarian_id = MultiCheckboxField(
         label=_('Parliamentarian'),
         validators=[InputRequired()],
+        choices=[]  # are set with in custom.js
     )
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
@@ -221,13 +222,6 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
             for commission
             in PASCommissionCollection(self.request.session).query()
         ]
-        # todo: this should be set with js
-        self.parliamentarian_id.choices = [
-            (str(parliamentarian.id), parliamentarian.title)
-            for parliamentarian
-            in PASParliamentarianCollection(self.request.session, True).query()
-        ]
-        self.parliamentarian_id.choices = []
         self.parliamentarian_id.data = [
             choice[0] for choice in self.parliamentarian_id.choices
         ]
