@@ -775,6 +775,11 @@ def update_invoice_tables_for_polymorphism(context: UpgradeContext) -> None:
             'period_id',
             nullable=True
         )
+        context.operations.alter_column(
+            'invoices',
+            'user_id',
+            nullable=True
+        )
         # but add a check constraint enforcing the same invariant
         if not context.has_constraint(
             'invoices',

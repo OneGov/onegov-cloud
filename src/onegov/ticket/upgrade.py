@@ -7,6 +7,7 @@ from __future__ import annotations
 from decimal import Decimal
 from onegov.core.orm.types import JSON, UTCDateTime, UUID
 from onegov.core.upgrade import upgrade_task
+from onegov.pay import PaymentProvider
 from onegov.ticket import Ticket, TicketInvoice
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, Text, Enum
 from sqlalchemy import column, update, func, and_, true, false, Numeric
@@ -327,7 +328,10 @@ def add_foreign_key_constraint_to_payment_id(context: UpgradeContext) -> None:
         )
 
 
-@upgrade_task('Add new invoice columns')
+@upgrade_task(
+    'Add new invoice columns',
+    requires='onegov.activity:Update invoice tables for polymorphism'
+)
 def add_new_invoice_columns(context: UpgradeContext) -> None:
     if not context.has_column('tickets', 'invoice_id'):
         context.operations.add_column(
@@ -354,7 +358,7 @@ def add_new_invoice_columns(context: UpgradeContext) -> None:
         )
         context.operations.create_index(
             'ix_invoices_submission_id',
-            'invoices',
+            'invoice_items',
             ['submission_id']
         )
     if not context.has_column('invoice_items', 'reservation_id'):
@@ -367,7 +371,7 @@ def add_new_invoice_columns(context: UpgradeContext) -> None:
         )
         context.operations.create_index(
             'ix_invoices_reservation_id',
-            'invoices',
+            'invoice_items',
             ['reservation_id']
         )
     if not context.has_column('invoice_items', 'vat_factor'):
@@ -378,6 +382,22 @@ def add_new_invoice_columns(context: UpgradeContext) -> None:
                 nullable=True
             )
         )
+
+    # NOTE: This isn't super reliable, since the settings on the payment
+    #       provider could've changed, so there's old payments with different
+    #       settings. But it's the best we can do, since we don't store
+    #       on the payment, whether or not the fee was charged to the customer
+    #       On  the invoice we always want the price without the fee, since
+    #       we add it back on top later.
+    sources_that_charge_fee_to_customer = {
+        source
+        for source, in context.session.query(
+            PaymentProvider.type
+        ).filter(
+            PaymentProvider.default.is_(True),
+            PaymentProvider.meta['charge_fee_to_customer'] == True
+        )
+    }
 
     # generate invoices with a manual item from payments
     # NOTE: For performance reasons we don't try to generate the
@@ -396,14 +416,19 @@ def add_new_invoice_columns(context: UpgradeContext) -> None:
             ticket=ticket,
         )
         context.session.add(invoice)
+        if payment.source in sources_that_charge_fee_to_customer:
+            amount = payment.net_amount
+        else:
+            amount = payment.amount
         item = invoice.add(
             text=ticket.title,
             group='migration',
-            unit=payment.amount,
+            unit=amount,
             quantity=Decimal('1'),
             paid=payment.state == 'paid',
             flush=False
         )
         item.payments.append(payment)
+        item.paid = payment.state == 'paid'
 
     context.session.flush()

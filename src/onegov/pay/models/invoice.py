@@ -4,7 +4,8 @@ from decimal import Decimal
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.pay.models.invoice_item import InvoiceItem, SCALE
+from onegov.pay.constants import SCALE
+from onegov.pay.models.invoice_item import InvoiceItem
 from onegov.pay.utils import Price
 from sqlalchemy import and_
 from sqlalchemy import func

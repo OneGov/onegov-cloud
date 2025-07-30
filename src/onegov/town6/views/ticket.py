@@ -7,12 +7,12 @@ from onegov.org.views.ticket import (
     view_ticket_status, view_tickets, view_archived_tickets,
     view_pending_tickets, assign_ticket, view_send_to_gever,
     view_delete_all_archived_tickets, delete_ticket, change_tag,
-    view_my_tickets, view_ticket_invoice)
+    view_my_tickets, view_ticket_invoice, add_invoice_item)
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.town6 import TownApp
 from onegov.org.forms import (
     TicketNoteForm, TicketAssignmentForm, TicketChangeTagForm,
-    ExtendedInternalTicketChatMessageForm)
+    ExtendedInternalTicketChatMessageForm, ManualInvoiceItemForm)
 from onegov.org.forms import TicketChatMessageForm
 from onegov.org.models import TicketNote
 from onegov.org.models.resource import FindYourSpotCollection
@@ -128,6 +128,23 @@ def town_view_ticket_status(
 def town_view_ticket_invoice(self: Ticket, request: TownRequest) -> RenderData:
     return view_ticket_invoice(
         self, request, TicketInvoiceLayout(self, request))
+
+
+@TownApp.form(
+    model=Ticket,
+    name='add-invoice-item',
+    template='form.pt',
+    permission=Private,
+    form=ManualInvoiceItemForm
+)
+def town_add_invoice_item(
+    self: Ticket,
+    request: TownRequest,
+    form: ManualInvoiceItemForm,
+    layout: TicketInvoiceLayout | None = None
+) -> RenderData | Response:
+    return add_invoice_item(
+        self, request, form, TicketInvoiceLayout(self, request))
 
 
 @TownApp.html(

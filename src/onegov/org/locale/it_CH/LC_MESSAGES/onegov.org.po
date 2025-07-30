@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-29 13:58+0200\n"
+"POT-Creation-Date: 2025-07-30 15:46+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1181,6 +1181,18 @@ msgstr "Per didascalia"
 
 msgid "By last change"
 msgstr "Per data dell'ultima modifica"
+
+msgid "Booking Text"
+msgstr "Testo prenotazione"
+
+msgid "Kind"
+msgstr "Tipo"
+
+msgid "Discount"
+msgstr "Deduzione"
+
+msgid "Surcharge"
+msgstr "Supplemento"
 
 msgid "Agenda Items"
 msgstr "Elementi dell'agenda"
@@ -3018,6 +3030,9 @@ msgstr "Stato del biglietto"
 msgid "Invoice"
 msgstr "Fattura"
 
+msgid "Discount / Surcharge"
+msgstr "Deduzione / Supplemento"
+
 msgid "Text module"
 msgstr "Modulo di testo"
 
@@ -3593,9 +3608,6 @@ msgstr "Annulla registrazione"
 
 msgid "Edit submission"
 msgstr "Modifica iscrizione"
-
-msgid "Discount"
-msgstr "Deduzione"
 
 msgid "Reject"
 msgstr "Rifiutare"
@@ -5498,11 +5510,11 @@ msgstr "${count} nota"
 msgid "${count} notes"
 msgstr "${count} note"
 
+msgid "View Invoice"
+msgstr "Visualizza fattura"
+
 msgid "Change tag"
 msgstr "Modificare il tag"
-
-msgid "Booking Text"
-msgstr "Testo prenotazione"
 
 msgid "Unit"
 msgstr "Unità"
@@ -7189,9 +7201,26 @@ msgstr "Il tuo messaggio è stato inviato"
 msgid "Zip archive created successfully"
 msgstr "Archivio zip creato con successo"
 
+msgid "The payment is no longer open, so the invoice cannot be modified."
+msgstr ""
+"Il pagamento non è più aperto, quindi la fattura non può essere modificata."
+
+msgid "Remove Discount"
+msgstr "Rimuovi deduzione"
+
+msgid "Remove Surchage"
+msgstr "Rimuovi supplemento"
+
+#, python-format
+msgid "Do you really want to remove \"${booking_text}\"?"
+msgstr "Vuoi davvero rimuovere \"${booking_text}\"?"
+
 #, python-format
 msgid "${ticket} Invoice"
 msgstr "${ticket} Fattura"
+
+msgid "Add Discount / Surcharge"
+msgstr "Aggiungi deduzione / supplemento"
 
 msgid "Your request has been submitted"
 msgstr "La tua richiesta è stata inviata"

@@ -3,7 +3,7 @@ from __future__ import annotations
 from decimal import Decimal
 from functools import total_ordering
 from onegov.core.orm import Base
-from onegov.pay.models.invoice_item import SCALE
+from onegov.pay.constants import SCALE
 
 
 from typing import Any, NamedTuple, TYPE_CHECKING

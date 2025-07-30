@@ -1971,10 +1971,28 @@ class TicketInvoiceLayout(DefaultLayout):
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager_for_model(self.model):
+            payment = self.model.payment
+            if payment is not None and (
+                payment.source != 'manual'
+                or payment.state != 'open'
+            ):
+                return None
 
-            links: list[Link | LinkGroup] = []
-
-            return links
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Discount / Surcharge'),
+                            url=self.request.link(
+                                self.model,
+                                name='add-invoice-item'
+                            ),
+                            attrs={'class': 'new-invoice-item'}
+                        )
+                    ]
+                ),
+            ]
         return None
 
     @cached_property

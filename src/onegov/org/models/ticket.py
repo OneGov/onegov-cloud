@@ -139,7 +139,7 @@ def refresh_submission_invoice_items(
     for existing in unused:
         # keep manually added items
         if existing.group == 'manual':
-            new_items.append(item)
+            new_items.append(existing)
             continue
 
         # clear out any links to payments before deleting
@@ -684,7 +684,7 @@ class ReservationHandler(Handler):
                 existing.group == 'manual'
                 or existing.group == 'reduced_amount'
             ):
-                new_items.append(item)
+                new_items.append(existing)
                 continue
 
             # clear out any links to payments before deleting

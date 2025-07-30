@@ -5,6 +5,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.pay.models.payable import PayableManyTimes
+from onegov.pay.constants import PRECISION, SCALE
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
@@ -23,13 +24,6 @@ if TYPE_CHECKING:
     from datetime import date
     from onegov.pay.models import Invoice
     from sqlalchemy.sql import ColumnElement
-
-
-# total digits
-PRECISION = 8
-
-# digits after the point
-SCALE = 2
 
 
 class InvoiceItem(Base, TimestampMixin, PayableManyTimes):

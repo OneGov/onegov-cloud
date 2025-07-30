@@ -142,32 +142,42 @@
                     </ul>
                 </div>
 
-                <div class="ticket-panel" tal:define="payment handler.payment" tal:condition="payment">
+                <div class="ticket-panel" tal:define="payment handler.payment; invoice ticket.invoice" tal:condition="invoice or payment">
                     <h2 i18n:translate>Payment</h2>
 
                     <div class="field-display-block">
                         <div class="field-display-label" i18n:translate>Amount</div>
-                        <div class="field-display-data ticket-payment-amount" tal:attributes="data-edit edit_amount_url|nothing">
-                            <span><tal:b metal:use-macro="layout.macros['price']" tal:define="price payment; show_fee True;" /></span>
-                            <i tal:condition="edit_amount_url" id="edit-ticket-amount" class="fas fw fa-edit"></i>
+                        <div class="field-display-data ticket-payment-amount">
+                            <tal:b tal:condition="payment">
+                                <span><tal:b metal:use-macro="layout.macros['price']" tal:define="price payment; show_fee True;" /></span>
+                                <a tal:condition="edit_amount_url" href="${edit_amount_url}" class="fas fw fa-edit"></a>
+                            </tal:b>
+                            <tal:b tal:condition="not:payment">
+                                <span i18n:translate>Free of charge</span>
+                            </tal:b>
                         </div>
                     </div>
 
                     <div class="field-display-block">
                         <div class="field-display-label" i18n:translate>State</div>
                         <div class="field-display-data ticket-payment-status">
-                            <tal:b metal:use-macro="layout.macros['payment_status']" />
+                            <tal:b tal:condition="payment" metal:use-macro="layout.macros['payment_status']" />
+                            <div i18n:translate tal:condition="not:payment" class="payment-state payment-state-paid">
+                                Closed
+                            </div>
                         </div>
                     </div>
 
-                    <div class="field-display-block">
+                    <div class="field-display-block" tal:condition="payment">
                         <div class="field-display-label" i18n:translate>Source</div>
                         <div class="field-display-data ticket-payment-source">
                             <tal:b metal:use-macro="layout.macros['payment_source']" />
                         </div>
                     </div>
 
-                    <tal:b condition="payment_button" replace="payment_button(layout)" />
+                    <tal:b tal:condition="payment_button" tal:replace="payment_button(layout)" />
+
+                    <a tal:condition="invoice" href="${request.link(ticket, 'invoice')}" class="button small primary view-invoice" i18n:translate>View Invoice</a>
                 </div>
 
                 <div class="ticket-panel">

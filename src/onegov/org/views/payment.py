@@ -1,17 +1,15 @@
 from __future__ import annotations
 
-import decimal
 from collections import OrderedDict
-from decimal import Decimal
 from onegov.core.security import Private
 from onegov.core.utils import append_query_param
 from onegov.form import merge_forms
 from onegov.org import OrgApp, _
 from onegov.org.forms import DateRangeForm, ExportForm
 from onegov.org.forms.payments_search_form import PaymentSearchForm
-from onegov.org.layout import PaymentCollectionLayout, DefaultLayout
+from onegov.org.layout import PaymentCollectionLayout
 from onegov.org.mail import send_ticket_mail
-from onegov.org.models import PaymentMessage, TicketMessage
+from onegov.org.models import PaymentMessage
 from onegov.core.elements import Link
 from sedate import align_range_to_day, standardize_date, as_datetime
 from onegov.org.pdf.ticket import TicketsPdf
@@ -305,32 +303,6 @@ def run_export(
     return tuple(transform(p, links[p.id]) for p in payments)
 
 
-@OrgApp.json(
-    model=Payment,
-    name='change-net-amount',
-    request_method='POST',
-    permission=Private
-)
-def change_payment_amount(self: Payment, request: OrgRequest) -> JSON_ro:
-    request.assert_valid_csrf_token()
-    assert not self.paid
-    format_ = DefaultLayout(self, request).format_number
-    try:
-        net_amount = Decimal(request.params['netAmount'])  # type:ignore
-    except decimal.InvalidOperation:
-        return {'net_amount': f'{format_(self.net_amount)} {self.currency}'}
-
-    if net_amount <= 0 or (net_amount - self.fee) <= 0:
-        raise exc.HTTPBadRequest('amount negative')
-
-    ticket = self.ticket
-    if ticket:
-        TicketMessage.create(ticket, request, 'change-net-amount')
-
-    self.amount = net_amount - self.fee
-    return {'net_amount': f'{format_(self.net_amount)} {self.currency}'}
-
-
 @OrgApp.view(
     model=Payment,
     name='mark-as-paid',
@@ -345,6 +317,7 @@ def mark_as_paid(self: Payment, request: OrgRequest) -> None:
 
     assert self.source == 'manual'
     self.state = 'paid'
+    self.sync_invoice_items()
 
 
 @OrgApp.view(
@@ -361,6 +334,7 @@ def mark_as_unpaid(self: Payment, request: OrgRequest) -> None:
 
     assert self.source == 'manual'
     self.state = 'open'
+    self.sync_invoice_items()
 
 
 @OrgApp.view(

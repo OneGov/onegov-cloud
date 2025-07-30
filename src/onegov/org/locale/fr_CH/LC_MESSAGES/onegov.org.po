@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-29 13:58+0200\n"
+"POT-Creation-Date: 2025-07-30 15:46+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1177,6 +1177,18 @@ msgstr "Par légende"
 
 msgid "By last change"
 msgstr "Par date de dernière modification"
+
+msgid "Booking Text"
+msgstr "Message/notification"
+
+msgid "Kind"
+msgstr "Type"
+
+msgid "Discount"
+msgstr "Remise"
+
+msgid "Surcharge"
+msgstr "Supplément"
 
 msgid "Agenda Items"
 msgstr "Éléments d'agenda"
@@ -3018,11 +3030,14 @@ msgstr "Statut du ticket"
 msgid "Invoice"
 msgstr "Facture"
 
+msgid "Discount / Surcharge"
+msgstr "Remis / Supplément"
+
 msgid "Text module"
 msgstr "Module de texte"
 
 msgid "Do you really want to delete this text module?"
-msgstr "Voulez-vous vraiment supprimer ce module de texte ?"
+msgstr "Voulez-vous vraiment supprimer ce module de texte?"
 
 msgid "Delete text module"
 msgstr "Supprimer le module de texte"
@@ -3058,7 +3073,7 @@ msgid "E-Mail Recipient"
 msgstr "Destinataire de l'e-mail"
 
 msgid "Do you really want to delete this resource?"
-msgstr "Voulez-vous vraiment supprimer cette ressource ?"
+msgstr "Voulez-vous vraiment supprimer cette ressource?"
 
 msgid ""
 "This cannot be undone and will take a while depending on the number of "
@@ -3592,9 +3607,6 @@ msgstr "Annuler l'inscription"
 
 msgid "Edit submission"
 msgstr "Modifier votre envoi"
-
-msgid "Discount"
-msgstr "Remise"
 
 msgid "Reject"
 msgstr "Refuser"
@@ -5518,11 +5530,11 @@ msgstr "${count} note"
 msgid "${count} notes"
 msgstr "${count} notes"
 
+msgid "View Invoice"
+msgstr "Voir la facture"
+
 msgid "Change tag"
 msgstr "Changer d'étiquette"
-
-msgid "Booking Text"
-msgstr "Message/notification"
 
 msgid "Unit"
 msgstr "Unité"
@@ -7211,9 +7223,26 @@ msgstr "Votre message a été envoyé"
 msgid "Zip archive created successfully"
 msgstr "L'archive Zip a été créée avec succès"
 
+msgid "The payment is no longer open, so the invoice cannot be modified."
+msgstr ""
+"Le paiement n'est plus ouvert, donc la facture ne peut pas être modifiée."
+
+msgid "Remove Discount"
+msgstr "Supprimer la remise"
+
+msgid "Remove Surchage"
+msgstr "Supprimer le supplément"
+
+#, python-format
+msgid "Do you really want to remove \"${booking_text}\"?"
+msgstr "Voulez-vous vraiment supprimer «${booking_text}»?"
+
 #, python-format
 msgid "${ticket} Invoice"
 msgstr "${ticket} Facture"
+
+msgid "Add Discount / Surcharge"
+msgstr "Ajouter une remis / un supplément"
 
 msgid "Your request has been submitted"
 msgstr "Votre demande a été envoyée"
