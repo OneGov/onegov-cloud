@@ -83,6 +83,7 @@ def add_bulk_attendence(
     request: TownRequest,
     form: AttendenceAddCommissionBulkForm
 ) -> RenderData | Response:
+    request.include('custom')
 
     if form.submitted(request):
         data = form.get_useful_data()

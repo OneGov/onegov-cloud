@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-28 14:29+0200\n"
+"POT-Creation-Date: 2025-07-29 14:41+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -305,6 +305,9 @@ msgstr "Sitzung"
 msgid "Plenary session (bulk)"
 msgstr "Massenbuchung Plenarsitzung"
 
+msgid "Commission meeting (bulk)"
+msgstr "Massenbuchung Kommissionssitzung"
+
 msgid "Edit"
 msgstr "Bearbeiten"
 
@@ -602,6 +605,12 @@ msgstr "Neu"
 msgid "New attendence"
 msgstr "Neue Anwesenheit"
 
+msgid "Added commission session"
+msgstr "Kommissionssitzung hinzugefügt"
+
+msgid "New commission session"
+msgstr "Neue Kommissionssitzung"
+
 msgid "Added plenary session"
 msgstr "Plenarsitzung hinzugefügt"
 
@@ -688,7 +697,7 @@ msgstr "Der Satz wurde kopiert"
 msgid "Copy"
 msgstr "Kopieren"
 
-msgid "Copy rate set"
+msgid "Copy Rate Set"
 msgstr "Satz kopieren"
 
 msgid "Added a new settlement run"
