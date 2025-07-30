@@ -20,9 +20,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
     document.addEventListener('change', (event) => {
-        if (event.target === commissionSelect) {
+        if (event.target.id === 'commission_id') {
             console.log('commissionSelect change event fired');
-            updateParliamentarians(commissionSelect.value);
+            updateParliamentarians(event.target.value);
         }
     });
 
