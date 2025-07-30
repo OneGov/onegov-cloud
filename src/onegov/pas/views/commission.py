@@ -1,5 +1,6 @@
 from __future__ import annotations
 from itertools import groupby
+from sqlalchemy.orm import joinedload
 
 from onegov.core.elements import Link
 from onegov.core.security import Private, Public
@@ -186,14 +187,15 @@ def commissions_parliamentarians_json(
 ) -> JSON_ro:
     """Returns all commissions with their parliamentarians."""
     session = request.session
-    memberships = session.query(PASCommissionMembership).all()
-
+    memberships = session.query(PASCommissionMembership).options(
+        joinedload(PASCommissionMembership.parliamentarian)
+    ).all()
     valid_memberships = (m for m in memberships if m.parliamentarian)
 
     def key_func(m):
         return str(m.commission_id)
 
-    sorted_memberships = sorted(valid_memberships, key=key_func)
+    sorted_by_commission = sorted(valid_memberships, key=key_func)
 
     return {
         commission_id: [
@@ -201,7 +203,12 @@ def commissions_parliamentarians_json(
                 'id': str(m.parliamentarian.id),
                 'title': m.parliamentarian.title
             }
-            for m in group
+            for m in sorted(
+                group, key=lambda m: (
+                    m.parliamentarian.last_name or '',
+                    m.parliamentarian.first_name or ''
+                )
+            )
         ]
-        for commission_id, group in groupby(sorted_memberships, key=key_func)
+        for commission_id, group in groupby(sorted_by_commission, key=key_func)
     }
