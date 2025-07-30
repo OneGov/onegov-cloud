@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const li = document.createElement('li');
             const id = `parliamentarian_id-${parliamentarian.id}`;
             li.innerHTML = `
-                <input type="checkbox" name="parliamentarian_id" value="${parliamentarian.id}" id="${id}">
+                <input type="checkbox" name="parliamentarian_id" value="${parliamentarian.id}" id="${id}" checked>
                 <label for="${id}">${parliamentarian.title}</label>
             `;
             parliamentarianList.appendChild(li);
