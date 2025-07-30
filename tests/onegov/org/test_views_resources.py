@@ -2707,6 +2707,7 @@ def test_manual_reservation_payment_with_one_off_extra(client):
     assert '30.00' in invoice
     assert '10.00' in invoice
     assert '40.00' in invoice
+    assert invoice.pyquery('.payment-state').text() == "Offen"
 
     payments = client.get('/payments')
     assert "RSV-" in payments
@@ -2714,6 +2715,28 @@ def test_manual_reservation_payment_with_one_off_extra(client):
     assert "info@example.org" in payments
     assert "40.00" in payments
     assert "Offen" in payments
+
+    # add a manual discount
+    item = invoice.click('Abzug / Zuschlag')
+    item.form['booking_text'] = 'Gratis'
+    item.form['discount'] = '40.00'
+    invoice = item.form.submit().follow()
+    assert '30.00' in invoice
+    assert '10.00' in invoice
+    assert '40.00' in invoice
+    assert '-40.00' in invoice
+    assert not invoice.pyquery('.payment-state').text()
+
+    # delete the manual discount
+    client.delete(
+        invoice.pyquery('.remove-invoice-item').attr('ic-delete-from')
+    )
+    invoice = client.get(invoice.request.url)
+    assert '30.00' in invoice
+    assert '10.00' in invoice
+    assert '40.00' in invoice
+    assert 'Zahlungsmethode' in invoice
+    assert invoice.pyquery('.payment-state').text() == "Offen"
 
 
 @freeze_time("2017-07-09", tick=True)

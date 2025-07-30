@@ -102,13 +102,6 @@ class Invoice(Base, TimestampMixin):
     def price(self) -> Price:
         return Price(self.outstanding_amount, 'CHF')
 
-    @property
-    def has_donation(self) -> bool:
-        for item in self.items:
-            if item.group == 'donation':
-                return True
-        return False
-
     def readable_by_bucket(self, bucket: str) -> str | None:
         for ref in self.references:
             if ref.bucket == bucket:
@@ -157,56 +150,6 @@ class Invoice(Base, TimestampMixin):
             object_session(self).flush()
 
         return item
-
-    @hybrid_property
-    def discourage_changes(self) -> bool:
-        return self.discourage_changes_for_items(self.items)
-
-    @hybrid_property
-    def disable_changes(self) -> bool:
-        return self.disable_changes_for_items(self.items)
-
-    @hybrid_property
-    def has_online_payments(self) -> bool:
-        return self.has_online_payments_for_items(self.items)
-
-    def discourage_changes_for_items(
-        self,
-        items: Iterable[InvoiceItem]
-    ) -> bool:
-        for item in items:
-            if item.source == 'xml':
-                return True
-
-        return False
-
-    def disable_changes_for_items(
-        self,
-        items: Iterable[InvoiceItem]
-    ) -> bool:
-        for item in items:
-            if not item.source:
-                continue
-
-            if item.source == 'xml':
-                continue
-
-            states = {p.state for p in item.payments}
-
-            if 'open' in states or 'paid' in states:
-                return True
-        return False
-
-    def has_online_payments_for_items(
-        self,
-        items: Iterable[InvoiceItem]
-    ) -> bool:
-        for item in items:
-            if not item.source or item.source == 'xml':
-                continue
-
-            return True
-        return False
 
     if TYPE_CHECKING:
         paid: Column[bool]
