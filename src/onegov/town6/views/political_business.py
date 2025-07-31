@@ -85,9 +85,6 @@ def view_political_businesses(
     request: TownRequest,
     layout: PoliticalBusinessCollectionLayout | None = None
 ) -> RenderData | Response:
-    types = []
-    status = []
-    years = []
 
     count_per_business_type = count_political_businesses_by_type(request)
     types = sorted([
