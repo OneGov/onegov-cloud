@@ -90,6 +90,8 @@ from onegov.org.models import (
     PoliticalBusiness,
     PoliticalBusinessCollection,
 )
+from onegov.org.models.political_business import PoliticalBusinessStatus
+from onegov.org.models.political_business import PoliticalBusinessType
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.external_link import (
@@ -1318,8 +1320,8 @@ def get_meeting(
 def get_political_businesses(
     app: OrgApp,
     page: int = 0,
-    status: list[str] | None = None,
-    types: list[str] | None = None,
+    status: list[PoliticalBusinessStatus] | None = None,
+    types: list[PoliticalBusinessType] | None = None,
     years: list[int] | None = None,
 ) -> PoliticalBusinessCollection:
     return PoliticalBusinessCollection(
