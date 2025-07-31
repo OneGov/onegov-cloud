@@ -87,8 +87,11 @@ class MeetingForm(Form):
         collection = MeetingItemCollection(self.request.session)
         businesses = PoliticalBusinessCollection(self.request.session)
 
-        # new_items = self.json_to_items(self.meeting_items_neu.data)
-        new_items = self.json_to_items(self.meeting_items.raw_data[0])
+        # Somehow `meeting_items.data` is not set when the form is submitted,
+        # so we use `meeting_items.raw_data[0]` instead.
+        data = (self.meeting_items.raw_data[0]
+                if self.meeting_items.raw_data else '')
+        new_items = self.json_to_items(data)
         if not new_items:
             # clear all meeting items for this meeting
             for item in meeting.meeting_items:
@@ -97,13 +100,13 @@ class MeetingForm(Form):
             return
 
         current_items = {item.title: item for item in meeting.meeting_items}
-        new = []
-        for item in new_items:
-            number = item.get('number')
-            title = item.get('title')
-            item_name = item.get('agenda_item')
+        items = []
+        for new in new_items:
+            number = new.get('number')
+            title = new.get('title', '')
+            item_name = new.get('agenda_item')
 
-            if title == '' and item_name == '':
+            if number == '' and title == '' and item_name == '':
                 # skip empty items
                 continue
 
@@ -111,7 +114,7 @@ class MeetingForm(Form):
                 title in current_items and
                 item_name in [i.display_name for i in current_items.values()]):
                 # keep unchanged items
-                new.append(current_items[title])
+                items.append(current_items[title])
                 continue
 
             business = next(
@@ -137,9 +140,9 @@ class MeetingForm(Form):
                     meeting=obj,
                 )
             self.request.session.add(new_item)
-            new.append(new_item)
+            items.append(new_item)
 
-        meeting.meeting_items = new
+        meeting.meeting_items = items
 
     def process_obj(self, obj: Meeting) -> None:  # type:ignore[override]
         from onegov.org.models import PoliticalBusiness
@@ -161,7 +164,7 @@ class MeetingForm(Form):
                 meeting.meeting_items, meeting.meeting_items + businesses
             )
 
-    def json_to_items(self, text: str | None) -> list[str]:
+    def json_to_items(self, text: str | None) -> list[dict[str, str]]:
         if not text:
             return []
 
