@@ -599,7 +599,12 @@ var ManyOpeningHours = React.createClass({
             text: '',
             link: ''
         });
-        this.setState(state);
+        this.setState(state, () => {
+            // the select field of ManyMeetingItems uses jquery `chosen`
+            // plugin which needs to be reinitialized after the react
+            // component state has been updated
+            jQuery('.chosen-select').chosen({});
+        });
 
         e.preventDefault();
     },
@@ -728,7 +733,12 @@ var ManyMeetingItems = React.createClass({
             title: '',
             agenda_item: ''
         });
-        this.setState(state);
+        this.setState(state, () => {
+            // the select field of ManyMeetingItems uses jquery `chosen`
+            // plugin which needs to be reinitialized after the react
+            // component state has been updated
+            jQuery('.chosen-select').chosen({});
+        });
 
         e.preventDefault();
     },
