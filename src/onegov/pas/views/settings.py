@@ -4,7 +4,6 @@ from onegov.core.security import Private
 from onegov.org.models import Organisation
 from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import RateSetCollection
@@ -41,12 +40,6 @@ def view_pas_settings(
             'title': _('Rate sets'),
             'link': request.class_link(RateSetCollection),
             'icon': 'fa-exchange-alt'
-        },
-        {
-            'name': 'legislative-periods',
-            'title': _('Legislative periods'),
-            'link': request.class_link(LegislativePeriodCollection),
-            'icon': 'fa-calendar-alt'
         },
         {
             'name': 'settlement-runs',
