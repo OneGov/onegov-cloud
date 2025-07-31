@@ -96,8 +96,6 @@ from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
-from onegov.org.models.political_business import POLITICAL_BUSINESS_STATUS
-from onegov.org.models.political_business import POLITICAL_BUSINESS_TYPE
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.page import PageCollection
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
@@ -1316,8 +1314,8 @@ def get_meeting(
     path='/political-businesses',
     converters={
         'page': int,
-        'status': [LiteralConverter(*POLITICAL_BUSINESS_STATUS.keys())],
-        'types': [LiteralConverter(*POLITICAL_BUSINESS_TYPE.keys())],
+        'status': [LiteralConverter(PoliticalBusinessStatus)],
+        'types': [LiteralConverter(PoliticalBusinessType)],
         'years': [int],
     }
 )
