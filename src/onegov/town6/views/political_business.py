@@ -108,7 +108,7 @@ def view_political_businesses(
             text=request.translate(text) +
                 f' ({count_per_status[status]})',
             active=status in self.status,
-            url=request.link(self.for_filter(s=status)),
+            url=request.link(self.for_filter(status=status)),
         )
         for status, text in POLITICAL_BUSINESS_STATUS.items()
         if (status in count_per_status and count_per_status[status] > 0)

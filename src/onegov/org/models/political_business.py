@@ -10,6 +10,7 @@ from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID
+from onegov.core.utils import toggle
 from onegov.file import MultiAssociatedFiles
 from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
@@ -21,7 +22,7 @@ from typing import Literal, Self, TypeAlias, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
 
-    from collections.abc import Sequence
+    from collections.abc import Collection
     from sqlalchemy.orm import Query, Session
 
     from onegov.org.models import Meeting
@@ -29,35 +30,35 @@ if TYPE_CHECKING:
     from onegov.org.models import RISParliamentarian
     from onegov.org.models import RISParliamentaryGroup
 
-    PoliticalBusinessType: TypeAlias = Literal[
-        'inquiry',  # Anfrage
-        'report and proposal',  # Bericht und Antrag
-        'urgent interpellation',  # Dringliche Interpellation
-        'invitation',  # Einladung
-        'interpellation',  # Interpellation
-        'commission report',  # Kommissionsbericht
-        'motion',  # Motion
-        'postulate',  # Postulat
-        'resolution',  # Resolution
-        'election',  # Wahl
-        'parliamentary statement',  # Parlamentarische Erklärung
-        'miscellaneous',  # Verschiedenes
-    ]
+PoliticalBusinessType: TypeAlias = Literal[
+    'inquiry',  # Anfrage
+    'report and proposal',  # Bericht und Antrag
+    'urgent interpellation',  # Dringliche Interpellation
+    'invitation',  # Einladung
+    'interpellation',  # Interpellation
+    'commission report',  # Kommissionsbericht
+    'motion',  # Motion
+    'postulate',  # Postulat
+    'resolution',  # Resolution
+    'election',  # Wahl
+    'parliamentary statement',  # Parlamentarische Erklärung
+    'miscellaneous',  # Verschiedenes
+]
 
-    PoliticalBusinessStatus: TypeAlias = Literal[
-        'abgeschrieben',
-        'beantwortet',
-        'erheblich_erklaert',
-        'erledigt',
-        'nicht_erheblich_erklaert',
-        'nicht_zustandegekommen',
-        'pendent_exekutive',
-        'pendent_legislative',
-        'rueckzug',
-        'umgewandelt',
-        'zurueckgewiesen',
-        'ueberwiesen',
-    ]
+PoliticalBusinessStatus: TypeAlias = Literal[
+    'abgeschrieben',
+    'beantwortet',
+    'erheblich_erklaert',
+    'erledigt',
+    'nicht_erheblich_erklaert',
+    'nicht_zustandegekommen',
+    'pendent_exekutive',
+    'pendent_legislative',
+    'rueckzug',
+    'umgewandelt',
+    'zurueckgewiesen',
+    'ueberwiesen',
+]
 
 POLITICAL_BUSINESS_TYPE: dict[PoliticalBusinessType, str] = {
     'inquiry': _('Inquiry'),
@@ -264,15 +265,15 @@ class PoliticalBusinessCollection(
         self,
         session: Session,
         page: int = 0,
-        status: Sequence[PoliticalBusinessStatus] | None = None,
-        types: Sequence[PoliticalBusinessType] | None = None,
-        years: Sequence[int] | None = None,
+        status: Collection[PoliticalBusinessStatus] | None = None,
+        types: Collection[PoliticalBusinessType] | None = None,
+        years: Collection[int] | None = None,
     ) -> None:
         super().__init__(session)
         self.page = page
-        self.status = status if status is not None else []
-        self.types = types if types is not None else []
-        self.years = years if years is not None else []
+        self.status = set(status) if status else set()
+        self.types = set(types) if types else set()
+        self.years = set(years) if years else set()
         self.batch_size = 20
 
     @property
@@ -337,39 +338,18 @@ class PoliticalBusinessCollection(
 
     def for_filter(
         self,
-        status: Sequence[str] | None = None,
-        s: str | None = None,
-        types: Sequence[str] | None = None,
-        type: str | None = None,
-        years: Sequence[int] | None = None,
+        status: PoliticalBusinessStatus | None = None,
+        type: PoliticalBusinessType | None = None,
         year: int | None = None,
     ) -> Self:
-
-        status = list(self.status if status is None else status)
-        if s is not None:
-            if s in status:
-                status.remove(s)
-            else:
-                status.append(s)
-
-        types = list(self.types if types is None else types)
-        if type is not None:
-            if type in types:
-                types.remove(type)
-            else:
-                types.append(type)
-
-        years = list(self.years if years is None else years)
-        if year is not None:
-            if year in years:
-                years.remove(year)
-            else:
-                years.append(year)
+        status_ = toggle(self.status, status)
+        types = toggle(self.types, type)
+        years = toggle(self.years, year)
 
         return self.__class__(
             self.session,
             page=self.page,
-            status=status,
+            status=status_,
             types=types,
             years=years,
         )
