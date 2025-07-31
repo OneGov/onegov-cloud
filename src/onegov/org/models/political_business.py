@@ -264,8 +264,8 @@ class PoliticalBusinessCollection(
         self,
         session: Session,
         page: int = 0,
-        status: PoliticalBusinessStatus | Sequence[str] | None = None,
-        types: PoliticalBusinessType | Sequence[str] | None = None,
+        status: Sequence[PoliticalBusinessStatus] | None = None,
+        types: Sequence[PoliticalBusinessType] | None = None,
         years: Sequence[int] | None = None,
     ) -> None:
         super().__init__(session)
