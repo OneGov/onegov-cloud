@@ -99,6 +99,7 @@ class MeetingForm(Form):
         current_items = {item.title: item for item in meeting.meeting_items}
         new = []
         for item in new_items:
+            number = item.get('number')
             title = item.get('title')
             item_name = item.get('agenda_item')
 
@@ -106,8 +107,9 @@ class MeetingForm(Form):
                 # skip empty items
                 continue
 
-            if (title in current_items and item_name in
-                    [i.display_name for i in current_items.values()]):
+            if (number in [i.number for i in current_items.values()] and
+                title in current_items and
+                item_name in [i.display_name for i in current_items.values()]):
                 # keep unchanged items
                 new.append(current_items[title])
                 continue
@@ -119,7 +121,7 @@ class MeetingForm(Form):
             if business is None:
                 new_item = MeetingItem(
                     title=title,
-                    number=None,
+                    number=number,
                     political_business_id=None,
                     political_business=None,
                     meeting_id=obj.id,
@@ -128,7 +130,7 @@ class MeetingForm(Form):
             else:
                 new_item = MeetingItem(
                     title=title if title != '' else business.title,
-                    number=business.number,
+                    number=number,
                     political_business_id=business.id,
                     political_business=business,
                     meeting_id=obj.id,
@@ -178,6 +180,7 @@ class MeetingForm(Form):
             {
                 # labels for many-meeting-items
                 'labels': {
+                    'number': request.translate(_('Number')),
                     'title': request.translate(_('Title')),
                     'agenda_item': request.translate(_('Agenda Item')),
                     'add': request.translate(_('Add')),
@@ -186,6 +189,7 @@ class MeetingForm(Form):
                 # StringField: list of agenda items attached to this meeting
                 'values': [
                     {
+                        'number': agenda_item.number,
                         'title': agenda_item.title,
                         'agenda_item': (
                             agenda_item.political_business.display_name

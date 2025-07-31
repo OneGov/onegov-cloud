@@ -721,7 +721,7 @@ var ManyMeetingItems = React.createClass({
 
         if (state.values.length === 0) {
             state.values = [
-                {'title': '', 'agenda_item': ''}
+                {'number': '', 'title': '', 'agenda_item': ''}
             ];
         }
 
@@ -730,6 +730,7 @@ var ManyMeetingItems = React.createClass({
     handleAdd: function(index, e) {
         var state = JSON.parse(JSON.stringify(this.state));
         state.values.splice(index + 1, 0, {
+            number: '',
             title: '',
             agenda_item: ''
         });
@@ -775,6 +776,7 @@ var ManyMeetingItems = React.createClass({
         return (
             <div> {
                 _.map(values, function(value, index) {
+                    var onNumberChange = self.handleInputChange.bind(self, index, 'number');
                     var onTitleChange = self.handleInputChange.bind(self, index, 'title');
                     var onAgendaItemChange = self.handleInputChange.bind(self, index, 'agenda_item');
                     var onRemove = self.handleRemove.bind(self, index);
@@ -783,27 +785,38 @@ var ManyMeetingItems = React.createClass({
                     return (
                         <div key={index}>
                             <div className={"grid-x grid-padding-x" + (value.error && 'error' || '')}>
-                                <div className="small-6 cell">
+                                <div className="small-2 cell">
                                     <StringField
-                                                 type="text"
-                                                 label={data.labels.title}
-                                                 defaultValue={value.title}
-                                                 onChange={onTitleChange}
-                                                 extra={data.extra}
-                                                 size="medium"
-                                                 placeholder=""
+                                        type="text"
+                                        label={data.labels.number}
+                                        defaultValue={value.number}
+                                        onChange={onNumberChange}
+                                        extra={data.extra}
+                                        size="x-small"
+                                        placeholder=""
                                     />
                                 </div>
-                                <div className="small-6 cell">
+                                <div className="small-5 cell">
+                                    <StringField
+                                        type="text"
+                                        label={data.labels.title}
+                                        defaultValue={value.title}
+                                        onChange={onTitleChange}
+                                        extra={data.extra}
+                                        size="medium"
+                                        placeholder=""
+                                    />
+                                </div>
+                                <div className="small-5 cell">
                                     <SelectField
-                                                 type="text"
-                                                 label={data.labels.agenda_item}
-                                                 defaultValue={value.agenda_item}
-                                                 onChange={onAgendaItemChange}
-                                                 extra={data.extra}
-                                                 size="medium"
-                                                 placeholder={data.agenda_items[0]}
-                                                 options={data.agenda_items}
+                                        type="text"
+                                        label={data.labels.agenda_item}
+                                        defaultValue={value.agenda_item}
+                                        onChange={onAgendaItemChange}
+                                        extra={data.extra}
+                                        size="medium"
+                                        placeholder={data.agenda_items[0]}
+                                        options={data.agenda_items}
                                     />
                                 </div>
                             </div>
