@@ -157,7 +157,8 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
                 Link(
                     _('Users'), request.class_link(
                         UserCollection,
-                        variables={'active': [True]}),
+                        variables={'active': '1'}
+                    ),
                     attrs={'class': 'user'}
                 )
             )
