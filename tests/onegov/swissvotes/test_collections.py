@@ -100,7 +100,7 @@ def test_votes_default(swissvotes_app):
         to_date=4,
         legal_form=5,
         result=6,
-        policy_area=7,
+        policy_area=['7'],
         term=8,
         full_text=9,
         position_federal_council=10,
@@ -114,7 +114,7 @@ def test_votes_default(swissvotes_app):
     assert votes.to_date == 4
     assert votes.legal_form == 5
     assert votes.result == 6
-    assert votes.policy_area == 7
+    assert votes.policy_area == ['7']
     assert votes.term == 8
     assert votes.full_text == 9
     assert votes.position_federal_council == 10
