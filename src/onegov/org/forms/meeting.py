@@ -80,7 +80,7 @@ class MeetingForm(Form):
                 'meeting_items',
                 *(exclude or ())
             },
-            include=include,
+            include=include
         )
 
         meeting: Meeting = obj
@@ -89,7 +89,6 @@ class MeetingForm(Form):
 
         # new_items = self.json_to_items(self.meeting_items_neu.data)
         new_items = self.json_to_items(self.meeting_items.raw_data[0])
-        print("*** tschupre MeetingForm.populate_obj new items", new_items)
         if not new_items:
             # clear all meeting items for this meeting
             for item in meeting.meeting_items:
@@ -105,20 +104,13 @@ class MeetingForm(Form):
 
             if title == '' and item_name == '':
                 # skip empty items
-                print('*** tschupre populate skip empty item')
                 continue
 
             if (title in current_items and item_name in
                     [i.display_name for i in current_items.values()]):
                 # keep unchanged items
-                print('*** tschupre populate keep unchanged item')
                 new.append(current_items[title])
                 continue
-
-            if title == '' and item_name != '':
-                # if only the item_name is given, use it as title
-                print('*** tschupre populate set title from item_name')
-                title = item_name
 
             business = next(
                 (b for b in businesses.query().all()
@@ -133,21 +125,18 @@ class MeetingForm(Form):
                     meeting_id=obj.id,
                     meeting=obj,
                 )
-                print('*** tschupre populate new item without business', new_item)
             else:
                 new_item = MeetingItem(
-                    title=business.title,
+                    title=title if title != '' else business.title,
                     number=business.number,
                     political_business_id=business.id,
                     political_business=business,
                     meeting_id=obj.id,
                     meeting=obj,
                 )
-                print('*** tschupre populate new item with business', new_item)
             self.request.session.add(new_item)
             new.append(new_item)
 
-        print("*** tschupre MeetingForm.populate_obj new items", new)
         meeting.meeting_items = new
 
     def process_obj(self, obj: Meeting) -> None:  # type:ignore[override]

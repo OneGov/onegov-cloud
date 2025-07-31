@@ -33,7 +33,7 @@
                            href="${item.political_business_link}"
                            class="list-link">
                             <span class="${'list-title' if item.political_business_link else 'list-link'}">
-                                ${item.number} ${item.title}
+                                ${item.title}
                             </span>
                         </a>
                     </li>
