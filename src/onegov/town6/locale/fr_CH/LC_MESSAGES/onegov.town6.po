@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-29 16:41+0200\n"
+"POT-Creation-Date: 2025-07-31 14:02+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1858,6 +1858,9 @@ msgstr "Origine"
 msgid "This is an imported event"
 msgstr "Il s'agit d'un événement importé"
 
+msgid "General information about the event calendar"
+msgstr "Informations générales sur le calendrier des événements"
+
 msgid "Tag"
 msgstr "Étiquette"
 
@@ -1881,6 +1884,9 @@ msgstr "Photo"
 
 msgid "Private address"
 msgstr "Adresse privée"
+
+msgid "Place of residence"
+msgstr "Lieu de résidence"
 
 msgid "Date of birth"
 msgstr "Date de naissance"
@@ -2320,6 +2326,12 @@ msgstr "${count} notes"
 msgid "Amount"
 msgstr "Montant"
 
+msgid "Free of charge"
+msgstr "Gratuit"
+
+msgid "View Invoice"
+msgstr "Voir la facture"
+
 msgid "Group"
 msgstr "Groupe"
 
@@ -2340,6 +2352,36 @@ msgstr "Temps de traitement"
 
 msgid "Summary"
 msgstr "Sommaire"
+
+msgid "Booking Text"
+msgstr "Message/notification"
+
+msgid "Unit"
+msgstr "Unité"
+
+msgid "Quantity"
+msgstr "Quantité"
+
+msgid "VAT Rate"
+msgstr "Taux de TVA"
+
+msgid "Submission"
+msgstr "Soumission"
+
+msgid "Selected Options"
+msgstr "Options sélectionnées"
+
+msgid "Discounts / Surcharges"
+msgstr "Remises / Suppléments"
+
+msgid "Lump sum"
+msgstr "Montant forfaitaire"
+
+msgid "Unpaid"
+msgstr "Non payé"
+
+msgid "Total"
+msgstr "Total"
 
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "

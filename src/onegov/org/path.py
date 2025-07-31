@@ -450,12 +450,16 @@ def get_ticket(app: OrgApp, handler_code: str, id: UUID) -> Ticket | None:
 def get_tickets(
     app: OrgApp,
     handler: str = 'ALL',
-    state: ExtendedTicketState = 'open',
+    state: ExtendedTicketState | None = 'open',
     page: int = 0,
     group: str | None = None,
     owner: str | None = None,
     extra_parameters: dict[str, str] | None = None
-) -> TicketCollection:
+) -> TicketCollection | None:
+
+    if state is None:
+        return None
+
     return TicketCollection(
         app.session(),
         handler=handler,

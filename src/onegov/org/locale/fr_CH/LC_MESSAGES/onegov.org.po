@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-21 08:00+0200\n"
+"POT-Creation-Date: 2025-07-30 15:46+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -622,6 +622,9 @@ msgstr ""
 msgid "Publication"
 msgstr "Publication"
 
+msgid "Required publication dates"
+msgstr "Les dates de publication sont requises"
+
 msgid "Enable registering for update notifications"
 msgstr "Activer l'inscription aux notifications"
 
@@ -632,9 +635,6 @@ msgstr ""
 
 msgid "Notifications"
 msgstr "Notifications"
-
-msgid "Required publication dates"
-msgstr "Les dates de publication sont requises"
 
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Informations complémentaires du demandeur requises à l'e-mail"
@@ -1178,6 +1178,18 @@ msgstr "Par légende"
 msgid "By last change"
 msgstr "Par date de dernière modification"
 
+msgid "Booking Text"
+msgstr "Message/notification"
+
+msgid "Kind"
+msgstr "Type"
+
+msgid "Discount"
+msgstr "Remise"
+
+msgid "Surcharge"
+msgstr "Supplément"
+
 msgid "Agenda Items"
 msgstr "Éléments d'agenda"
 
@@ -1341,9 +1353,6 @@ msgstr "Date de naissance"
 
 msgid "Additional information"
 msgstr "Informations complémentaires"
-
-msgid "Date of death"
-msgstr "Date de décès"
 
 msgid "Place of origin"
 msgstr "Lieu d'origine"
@@ -2500,6 +2509,12 @@ msgstr "Filtres configurables manuellement"
 msgid "Both, predefined tags as well as configurable filters"
 msgstr "Les deux, balises prédéfinies et filtres configurables"
 
+msgid "General information above the event list"
+msgstr "Informations générales au-dessus de la liste des événements"
+
+msgid "General information below the event list"
+msgstr "Informations générales en dessous de la liste des événements"
+
 msgid "Documents"
 msgstr "Documents"
 
@@ -3012,11 +3027,17 @@ msgstr "Nouveau message"
 msgid "Ticket Status"
 msgstr "Statut du ticket"
 
+msgid "Invoice"
+msgstr "Facture"
+
+msgid "Discount / Surcharge"
+msgstr "Remis / Supplément"
+
 msgid "Text module"
 msgstr "Module de texte"
 
 msgid "Do you really want to delete this text module?"
-msgstr "Voulez-vous vraiment supprimer ce module de texte ?"
+msgstr "Voulez-vous vraiment supprimer ce module de texte?"
 
 msgid "Delete text module"
 msgstr "Supprimer le module de texte"
@@ -3052,7 +3073,7 @@ msgid "E-Mail Recipient"
 msgstr "Destinataire de l'e-mail"
 
 msgid "Do you really want to delete this resource?"
-msgstr "Voulez-vous vraiment supprimer cette ressource ?"
+msgstr "Voulez-vous vraiment supprimer cette ressource?"
 
 msgid ""
 "This cannot be undone and will take a while depending on the number of "
@@ -3649,8 +3670,8 @@ msgstr "Refuser les réservations"
 msgid "Reject all with message"
 msgstr "Tout refuser avec message"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Événement"
 
@@ -4042,8 +4063,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
-"Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
+"« Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -5509,8 +5530,32 @@ msgstr "${count} note"
 msgid "${count} notes"
 msgstr "${count} notes"
 
+msgid "View Invoice"
+msgstr "Voir la facture"
+
 msgid "Change tag"
 msgstr "Changer d'étiquette"
+
+msgid "Unit"
+msgstr "Unité"
+
+msgid "Quantity"
+msgstr "Quantité"
+
+msgid "Submission"
+msgstr "Soumission"
+
+msgid "Selected Options"
+msgstr "Options sélectionnées"
+
+msgid "Discounts / Surcharges"
+msgstr "Remises / Suppléments"
+
+msgid "Lump sum"
+msgstr "Montant forfaitaire"
+
+msgid "Unpaid"
+msgstr "Non payé"
 
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
@@ -6342,6 +6387,12 @@ msgstr ""
 msgid "Registrations are no longer possible"
 msgstr "Les inscriptions ne sont plus possibles"
 
+msgid ""
+"Your changes would alter the price total but the payment is no longer open."
+msgstr ""
+"Vos modifications modifieraient le montant total, mais le paiement n'est "
+"plus ouvert."
+
 msgid "Pay Online and Complete"
 msgstr "Payer en ligne et compléter"
 
@@ -7172,6 +7223,27 @@ msgstr "Votre message a été envoyé"
 msgid "Zip archive created successfully"
 msgstr "L'archive Zip a été créée avec succès"
 
+msgid "The payment is no longer open, so the invoice cannot be modified."
+msgstr ""
+"Le paiement n'est plus ouvert, donc la facture ne peut pas être modifiée."
+
+msgid "Remove Discount"
+msgstr "Supprimer la remise"
+
+msgid "Remove Surchage"
+msgstr "Supprimer le supplément"
+
+#, python-format
+msgid "Do you really want to remove \"${booking_text}\"?"
+msgstr "Voulez-vous vraiment supprimer «${booking_text}»?"
+
+#, python-format
+msgid "${ticket} Invoice"
+msgstr "${ticket} Facture"
+
+msgid "Add Discount / Surcharge"
+msgstr "Ajouter une remis / un supplément"
+
 msgid "Your request has been submitted"
 msgstr "Votre demande a été envoyée"
 
@@ -7261,6 +7333,15 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
+
+#~ msgid "Date of death"
+#~ msgstr "Date de décès"
+
+#~ msgid "Information above the event list"
+#~ msgstr "Information au-dessus de la liste des événements"
+
+#~ msgid "Information below the event list"
+#~ msgstr "Information en dessous de la liste des événements"
 
 #~ msgid "Portrait"
 #~ msgstr "Portrait"

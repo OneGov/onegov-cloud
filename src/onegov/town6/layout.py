@@ -60,6 +60,7 @@ from onegov.org.layout import (
     TextModuleLayout as OrgTextModuleLayout,
     TextModulesLayout as OrgTextModulesLayout,
     TicketChatMessageLayout as OrgTicketChatMessageLayout,
+    TicketInvoiceLayout as OrgTicketInvoiceLayout,
     TicketLayout as OrgTicketLayout,
     TicketNoteLayout as OrgTicketNoteLayout,
     TicketsLayout as OrgTicketsLayout,
@@ -458,6 +459,12 @@ class TicketLayout(OrgTicketLayout, DefaultLayout):
 
 
 class TicketNoteLayout(OrgTicketNoteLayout, DefaultLayout):
+
+    app: TownApp
+    request: TownRequest
+
+
+class TicketInvoiceLayout(OrgTicketInvoiceLayout, DefaultLayout):
 
     app: TownApp
     request: TownRequest

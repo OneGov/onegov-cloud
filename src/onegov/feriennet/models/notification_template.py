@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from markupsafe import Markup
-from onegov.activity import BookingCollection, InvoiceCollection
+from onegov.activity import BookingCollection, BookingPeriodInvoiceCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     import uuid
     from collections.abc import Callable
     from datetime import datetime
-    from onegov.activity.models import Period
+    from onegov.activity.models import BookingPeriod
     from onegov.feriennet.request import FeriennetRequest
     from typing import Protocol
     from typing import Self
@@ -54,7 +54,7 @@ class NotificationTemplate(Base, ContentMixin, TimestampMixin):
     #: The date the notification was last sent
     last_sent: Column[datetime | None] = Column(UTCDateTime, nullable=True)
 
-    def for_period(self, period: Period) -> Self:
+    def for_period(self, period: BookingPeriod) -> Self:
         """ Implements the required interface for the 'periods' macro in
         onegov.feriennet.
 
@@ -71,7 +71,7 @@ class TemplateVariables:
     def __init__(
         self,
         request: FeriennetRequest,
-        period: Period | None
+        period: BookingPeriod | None
     ) -> None:
         self.request = request
         self.period = period
@@ -140,7 +140,7 @@ class TemplateVariables:
 
     def invoices_link(self) -> Markup:
         return Markup('<a href="{}">{}</a>').format(
-            self.request.class_link(InvoiceCollection),
+            self.request.class_link(BookingPeriodInvoiceCollection),
             self.request.translate(_('Invoices'))
         )
 

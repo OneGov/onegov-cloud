@@ -1952,6 +1952,50 @@ class TicketChatMessageLayout(DefaultLayout):
         ]
 
 
+class TicketInvoiceLayout(DefaultLayout):
+
+    model: Ticket
+
+    def __init__(self, model: Ticket, request: OrgRequest) -> None:
+        super().__init__(model, request)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Tickets'), get_current_tickets_url(self.request)),
+            Link(self.model.number, self.request.link(self.model)),
+            Link(_('Invoice'), '#')
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager_for_model(self.model):
+            payment = self.model.payment
+            if payment is not None and (
+                payment.source != 'manual'
+                or payment.state != 'open'
+            ):
+                return None
+
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Discount / Surcharge'),
+                            url=self.request.link(
+                                self.model,
+                                name='add-invoice-item'
+                            ),
+                            attrs={'class': 'new-invoice-item'}
+                        )
+                    ]
+                ),
+            ]
+        return None
+
+
 class TextModulesLayout(DefaultLayout):
 
     @cached_property

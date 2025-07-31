@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-29 16:41+0200\n"
+"POT-Creation-Date: 2025-07-31 14:02+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -308,19 +308,19 @@ msgid "Delete meeting"
 msgstr "Sitzung löschen"
 
 msgid "Parliamentarians"
-msgstr "Parlamentarierinnen und Parlamentarier"
+msgstr "Parlamentsmitglieder"
 
 msgid "Parliamentarian"
-msgstr "Parlamentarier:in"
+msgstr "Parlamentsmitglied"
 
 msgid "Role (as a group member)"
 msgstr "Rolle (als Fraktionsmitglied)"
 
 msgid "Do you really want to delete this parliamentarian?"
-msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
+msgstr "Möchten Sie dieses Parlamentsmitglied wirklich löschen?"
 
 msgid "Delete parliamentarian"
-msgstr "Parlamentarier:in löschen"
+msgstr "Parlamentsmitglied löschen"
 
 msgid "Do you really want to remove this role?"
 msgstr "Rolle wirklich entfernen?"
@@ -1859,6 +1859,9 @@ msgstr "Herkunft"
 msgid "This is an imported event"
 msgstr "Dies ist eine importierte Veranstaltung"
 
+msgid "General information about the event calendar"
+msgstr "Allgemeine Informationen zum Veranstaltungskalender"
+
 msgid "Tag"
 msgstr "Schlagwort"
 
@@ -1882,6 +1885,9 @@ msgstr "Bild"
 
 msgid "Private address"
 msgstr "Privatadresse"
+
+msgid "Place of residence"
+msgstr "Wohnort"
 
 msgid "Date of birth"
 msgstr "Geburtsdatum"
@@ -2316,6 +2322,12 @@ msgstr "${count} Notizen"
 msgid "Amount"
 msgstr "Betrag"
 
+msgid "Free of charge"
+msgstr "Kostenlos"
+
+msgid "View Invoice"
+msgstr "Rechnung anzeigen"
+
 msgid "Group"
 msgstr "Gruppe"
 
@@ -2336,6 +2348,36 @@ msgstr "Bearbeitungszeit"
 
 msgid "Summary"
 msgstr "Zusammenfassung"
+
+msgid "Booking Text"
+msgstr "Buchungstext"
+
+msgid "Unit"
+msgstr "Einheit"
+
+msgid "Quantity"
+msgstr "Anzahl"
+
+msgid "VAT Rate"
+msgstr "Mehrwertsteuersatz"
+
+msgid "Submission"
+msgstr "Eintrag"
+
+msgid "Selected Options"
+msgstr "Ausgewählte Optionen"
+
+msgid "Discounts / Surcharges"
+msgstr "Abzüge / Zuschläge"
+
+msgid "Lump sum"
+msgstr "Pauschalbetrag"
+
+msgid "Unpaid"
+msgstr "Unbezahlt"
+
+msgid "Total"
+msgstr "Total"
 
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
@@ -2515,13 +2557,13 @@ msgid "The meeting has been deleted."
 msgstr "Die Sitzung wurde gelöscht."
 
 msgid "Added a new parliamentarian"
-msgstr "Parlamentarier:in hinzugefügt"
+msgstr "Parlamentsmitglied hinzugefügt"
 
 msgid "New parliamentarian"
-msgstr "Neue/r Parlamentarier/in"
+msgstr "Neues Parlamentsmitglied"
 
 msgid "The parliamentarian has been deleted."
-msgstr "Der Parlamentarier/in wurde gelöscht."
+msgstr "Das Parlamentsmitglied wurde gelöscht."
 
 msgid "Added a new role"
 msgstr "Neue Rolle hinzugefügt"

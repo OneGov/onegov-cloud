@@ -6,6 +6,7 @@ import zipfile
 
 from datetime import date
 from io import BytesIO
+from itertools import groupby
 from markupsafe import Markup
 from morepath import Response
 from onegov.chat import Message, MessageCollection
@@ -21,6 +22,7 @@ from onegov.form import Form
 from onegov.org import _, OrgApp
 from onegov.org.constants import TICKET_STATES
 from onegov.org.forms import ExtendedInternalTicketChatMessageForm
+from onegov.org.forms import ManualInvoiceItemForm
 from onegov.org.forms import TicketAssignmentForm
 from onegov.org.forms import TicketChangeTagForm
 from onegov.org.forms import TicketChatMessageForm
@@ -29,9 +31,10 @@ from onegov.org.layout import (
     FindYourSpotLayout, DefaultMailLayout, ArchivedTicketsLayout)
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import TicketChatMessageLayout
+from onegov.org.layout import TicketInvoiceLayout
+from onegov.org.layout import TicketLayout
 from onegov.org.layout import TicketNoteLayout
 from onegov.org.layout import TicketsLayout
-from onegov.org.layout import TicketLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
     CitizenDashboard, TicketChatMessage, TicketMessage, TicketNote,
@@ -66,6 +69,7 @@ if TYPE_CHECKING:
     from onegov.org.layout import Layout
     from onegov.org.request import OrgRequest
     from onegov.pay import Payment
+    from onegov.ticket import TicketInvoiceItem
     from sqlalchemy.orm import Query, Session
     from webob import Response as BaseResponse
 
@@ -136,9 +140,7 @@ def view_ticket(
     if payment and payment.source == 'manual':
         payment_button = manual_payment_button(payment, layout)
         if (request.is_manager or request.is_supporter) and not payment.paid:
-            edit_amount_url = layout.csrf_protected_url(
-                request.link(payment, name='change-net-amount')
-            )
+            edit_amount_url = request.link(self, name='add-invoice-item')
 
     if payment and payment.source in (
         'stripe_connect',
@@ -219,7 +221,8 @@ def delete_ticket(
 #        pure passthrough, then we can pass the request here
 def manual_payment_button(
     payment: Payment,
-    layout: Layout
+    layout: Layout,
+    css_class: str = 'small secondary'
 ) -> Link:
 
     if payment.state == 'open':
@@ -228,7 +231,7 @@ def manual_payment_button(
             url=layout.csrf_protected_url(
                 layout.request.link(payment, 'mark-as-paid'),
             ),
-            attrs={'class': 'mark-as-paid button small secondary'},
+            attrs={'class': f'mark-as-paid button {css_class}'},
             traits=(
                 Intercooler(
                     request_method='POST',
@@ -242,7 +245,7 @@ def manual_payment_button(
         url=layout.csrf_protected_url(
             layout.request.link(payment, 'mark-as-unpaid'),
         ),
-        attrs={'class': 'mark-as-unpaid button small secondary'},
+        attrs={'class': f'mark-as-unpaid button {css_class}'},
         traits=(
             Intercooler(
                 request_method='POST',
@@ -255,7 +258,8 @@ def manual_payment_button(
 # FIXME: same here as for manual_payment_button
 def online_payment_button(
     payment: Payment,
-    layout: Layout
+    layout: Layout,
+    css_class: str = 'small secondary'
 ) -> Link | None:
 
     if payment.state == 'open':
@@ -264,7 +268,7 @@ def online_payment_button(
             url=layout.csrf_protected_url(
                 layout.request.link(payment, 'capture')
             ),
-            attrs={'class': 'payment-capture button small secondary'},
+            attrs={'class': f'payment-capture button {css_class}'},
             traits=(
                 Confirm(
                     _('Do you really want capture the payment?'),
@@ -291,7 +295,7 @@ def online_payment_button(
             url=layout.csrf_protected_url(
                 layout.request.link(payment, 'refund')
             ),
-            attrs={'class': 'payment-refund button small secondary'},
+            attrs={'class': f'payment-refund button {css_class}'},
             traits=(
                 Confirm(
                     _('Do you really want to refund ${amount}?', mapping={
@@ -991,6 +995,212 @@ def view_ticket_files(self: Ticket, request: OrgRequest) -> BaseResponse:
             date.today().strftime('%Y%m%d')
         )
     )
+
+
+@OrgApp.html(
+    model=Ticket,
+    name='invoice',
+    template='ticket_invoice.pt',
+    permission=Private
+)
+def view_ticket_invoice(
+    self: Ticket,
+    request: OrgRequest,
+    layout: TicketInvoiceLayout | None = None
+) -> RenderData:
+
+    invoice = self.invoice
+    if invoice is None:
+        raise exc.HTTPNotFound()
+
+    payment = self.payment
+    if payment is not None and (
+        payment.source != 'manual'
+        or payment.state != 'open'
+    ):
+        request.warning(_(
+            'The payment is no longer open, so the invoice '
+            'cannot be modified.'
+        ))
+
+    payment = self.payment
+
+    def item_actions(item: TicketInvoiceItem) -> list[Link]:
+        if item.group != 'manual':
+            return []
+
+        if payment is not None and (
+            payment.source != 'manual'
+            or payment.state != 'open'
+        ):
+            return []
+
+        return [Link(
+            '',
+            attrs={
+                'class': 'fa fa-trash remove-invoice-item',
+                'title': _('Remove')
+            },
+            url=request.csrf_protected_url(request.link(
+                self,
+                'remove-invoice-item',
+                query_params={'item': item.id.hex}
+            )),
+            traits=(
+                Confirm(
+                    _('Remove Discount') if item.amount < 0 else
+                    _('Remove Surchage'),
+                    _(
+                        'Do you really want to remove "${booking_text}"?',
+                        mapping={'booking_text': item.text}
+                    )
+                ),
+                Intercooler(
+                    request_method='DELETE',
+                    redirect_after=request.url
+                ),
+            )
+        )]
+
+    layout = layout or TicketInvoiceLayout(self, request)
+
+    def sort_key(item: TicketInvoiceItem) -> tuple[int, str]:
+        match item.group:
+            case 'submission' | 'reservation' | 'migration':
+                return 0, item.group
+            case 'form':
+                return 1, item.group
+            case 'manual' | 'reduced_amount':
+                return 99, 'manual'
+            case _:
+                return 2, item.group
+
+    invoice_items = {
+        group: list(items)
+        for (__, group), items in groupby(
+            sorted(invoice.items, key=sort_key),
+            key=sort_key
+        )
+    }
+
+    payment_button: Link | None = None
+    if payment and payment.source == 'manual':
+        payment_button = manual_payment_button(
+            payment, layout, css_class='primary')
+
+    if payment and payment.source in (
+        'stripe_connect',
+        'datatrans',
+        'worldline_saferpay',
+    ):
+        payment_button = online_payment_button(
+            payment, layout, css_class='primary')
+
+    return {
+        'title': _('${ticket} Invoice', mapping={'ticket': self.number}),
+        'layout': layout,
+        'ticket': self,
+        'invoice': invoice,
+        'invoice_items': invoice_items,
+        'payment': payment,
+        'payment_button': payment_button,
+        'item_actions': item_actions
+    }
+
+
+@OrgApp.form(
+    model=Ticket,
+    name='add-invoice-item',
+    template='form.pt',
+    permission=Private,
+    form=ManualInvoiceItemForm
+)
+def add_invoice_item(
+    self: Ticket,
+    request: OrgRequest,
+    form: ManualInvoiceItemForm,
+    layout: TicketInvoiceLayout | None = None
+) -> RenderData | BaseResponse:
+
+    invoice = self.invoice
+    if invoice is None:
+        raise exc.HTTPNotFound()
+
+    payment = self.payment
+    if payment is not None and (
+        payment.source != 'manual'
+        or payment.state != 'open'
+    ):
+        return morepath.redirect(request.link(self, 'invoice'))
+
+    if form.submitted(request):
+        assert form.booking_text.data is not None
+        item = invoice.add(
+            text=form.booking_text.data,
+            group='manual',
+            family=form.kind.data,
+            unit=form.amount,
+        )
+        if payment is not None:
+            item.payments.append(payment)
+            item.paid = payment.state == 'paid'
+        request.session.flush()
+        self.handler.refresh_invoice_items(request)
+        return morepath.redirect(request.link(self, 'invoice'))
+
+    layout = layout or TicketInvoiceLayout(self, request)
+
+    return {
+        'title': _('Add Discount / Surcharge'),
+        'layout': layout,
+        'form': form,
+    }
+
+
+@OrgApp.view(
+    model=Ticket,
+    name='remove-invoice-item',
+    permission=Private,
+    request_method='DELETE'
+)
+def remove_invoice_item(
+    self: Ticket,
+    request: OrgRequest,
+    layout: TicketInvoiceLayout | None = None
+) -> None:
+
+    request.assert_valid_csrf_token()
+
+    invoice = self.invoice
+    if invoice is None:
+        raise exc.HTTPNotFound()
+
+    payment = self.payment
+    if payment is not None and (
+        payment.source != 'manual'
+        or payment.state != 'open'
+    ):
+        request.alert(_(
+            'The payment is no longer open, so the invoice '
+            'cannot be modified.'
+        ))
+        return
+
+    target: TicketInvoiceItem | None = None
+    item_id = request.GET.get('item')
+    for item in invoice.items:
+        if item.id.hex == item_id:
+            target = item
+            break
+
+    if target is None or target.group != 'manual':
+        raise exc.HTTPNotFound()
+
+    target.payments = []
+    invoice.items.remove(target)
+    request.session.delete(target)
+    request.session.flush()
+    self.handler.refresh_invoice_items(request)
 
 
 @OrgApp.form(model=Ticket, name='status', template='ticket_status.pt',

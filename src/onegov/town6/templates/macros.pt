@@ -2153,10 +2153,6 @@
     </div>
 </metal:generic_message>
 
-<metal:payment_link_fallback define-macro="payment_link_fallback" i18n:domain="onegov.town6">
-    <!--! pass -->
-</metal:payment_link_fallback>
-
 <metal:payments define-macro="payments" i18n:domain="onegov.town6">
     <table class="payments-table" tal:condition="payments">
         <thead>
@@ -2164,7 +2160,7 @@
                 <th class="select-all-checkbox-cell">
                     <input type="checkbox" aria-label="Select all payments" />
                 </th>
-                <th i18n:translate tal:condition="payment_links|nothing">
+                <th i18n:translate tal:condition="tickets|nothing">
                     Object
                 </th>
                 <th i18n:translate tal:condition="reservation_dates_formatted|nothing">
@@ -2196,35 +2192,21 @@
                 <td class="payment-checkbox-cell">
                     <input type="checkbox" name="selected_payments" value="${payment.id}" aria-label="Select this payment" />
                 </td>
-                <td tal:condition="payment_links|nothing">
+                <td tal:condition="tickets|nothing">
                     <tal:b define="ticket tickets[payment.id] | nothing">
-                        <tal:b repeat="link payment_links[payment.id]">
-                            <tal:b switch="link.__tablename__">
-                                <tal:b case="'submissions'">
-                                    <div>
-                                        <a tal:condition="ticket" href="${request.link(ticket)}">
-                                            <strong>${ticket.number}</strong> - ${ticket.group}
-                                        </a>
-                                        <div>
-                                            ${link.title}
-                                        </div>
-                                    </div>
-                                </tal:b>
-                                <tal:b case="'reservations'" condition="repeat.link.start">
-                                    <div>
-                                        <a tal:condition="ticket" href="${request.link(ticket)}">
-                                            <strong>${ticket.number}</strong> - ${ticket.group}
-                                        </a>
-                                        <div>
-                                            ${link.title}
-                                        </div>
-                                    </div>
-                                </tal:b>
-                                <tal:b case="default">
-                                    <metal:b use-macro="layout.macros['payment_link_fallback']" />
-                                </tal:b>
+                        <div tal:condition="ticket">
+                            <a tal:condition="ticket" href="${request.link(ticket)}">
+                                <strong>${ticket.number}</strong> - ${ticket.group}
+                            </a>
+                            <tal:b tal:switch="ticket.handler_code">
+                                <div tal:case="'RSV'">
+                                    ${ticket.ticket_email}
+                                </div>
+                                <div tal:case="default">
+                                    ${ticket.title}
+                                </div>
                             </tal:b>
-                        </tal:b>
+                        </div>
                     </tal:b>
                 </td>
                 <!-- Cell for Reservation Dates -->

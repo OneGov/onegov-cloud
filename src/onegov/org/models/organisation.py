@@ -140,6 +140,10 @@ class Organisation(Base, TimestampMixin):
     event_filter_definition: dict_property[str | None] = meta_property()
     event_filter_configuration: dict_property[dict[str, Any]]
     event_filter_configuration = meta_property(default=dict)
+    event_header_html: dict_markup_property[Markup | None]
+    event_header_html = dict_markup_property('meta')
+    event_footer_html: dict_markup_property[Markup | None]
+    event_footer_html = dict_markup_property('meta')
     event_files = associated(File, 'event_files', 'many-to-many')
 
     # social media

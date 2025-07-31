@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from functools import cached_property
 from datetime import date, datetime
-from onegov.activity import Activity, Period, Occasion, OccasionDate
-from onegov.activity import PeriodCollection
+from onegov.activity import Activity, BookingPeriod, Occasion, OccasionDate
+from onegov.activity import BookingPeriodCollection
 from onegov.core.utils import Bunch
 from onegov.feriennet import _
 from onegov.form import Form, merge_forms
@@ -22,7 +22,7 @@ from wtforms.validators import InputRequired, Optional, NumberRange
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.activity.models import PeriodMeta
+    from onegov.activity.models import BookingPeriodMeta
     from onegov.feriennet.request import FeriennetRequest
     from wtforms.fields.choices import _Choice
 
@@ -38,19 +38,19 @@ class PeriodSelectForm(Form):
 
     @property
     def period_choices(self) -> list[_Choice]:
-        q = PeriodCollection(self.request.session).query()
-        q = q.with_entities(Period.id, Period.title)
-        q = q.order_by(Period.execution_start)
+        q = BookingPeriodCollection(self.request.session).query()
+        q = q.with_entities(BookingPeriod.id, BookingPeriod.title)
+        q = q.order_by(BookingPeriod.execution_start)
 
         return [(row.id.hex, row.title) for row in q]
 
     @property
-    def selected_period(self) -> Period | None:
-        return PeriodCollection(self.request.session).by_id(
+    def selected_period(self) -> BookingPeriod | None:
+        return BookingPeriodCollection(self.request.session).by_id(
             self.period.data)
 
     @property
-    def active_period(self) -> PeriodMeta | None:
+    def active_period(self) -> BookingPeriodMeta | None:
         return self.request.app.active_period
 
     def on_request(self) -> None:
@@ -335,7 +335,7 @@ class PeriodForm(Form):
 
     @property
     def is_new(self) -> bool:
-        return isinstance(self.model, PeriodCollection)
+        return isinstance(self.model, BookingPeriodCollection)
 
     def on_request(self) -> None:
 
@@ -350,7 +350,7 @@ class PeriodForm(Form):
             self.confirmable.data = self.model.confirmable
         return super().validate()
 
-    def populate_obj(self, model: Period) -> None:  # type:ignore[override]
+    def populate_obj(self, model: BookingPeriod) -> None:  # type:ignore[override]
         adjust_defaults = model.booking_start != self.booking_start.data
         also_exclude: tuple[str, ...]
         if not self.confirmable.data and not adjust_defaults:
@@ -416,7 +416,7 @@ class PeriodForm(Form):
         else:
             model.pay_organiser_directly = False
 
-    def process_obj(self, model: Period) -> None:  # type:ignore[override]
+    def process_obj(self, model: BookingPeriod) -> None:  # type:ignore[override]
         super().process_obj(model)
 
         if model.all_inclusive:
@@ -460,7 +460,7 @@ class PeriodForm(Form):
 
     @cached_property
     def conflicting_activities(self) -> tuple[Activity, ...] | None:
-        if not isinstance(self.model, Period):
+        if not isinstance(self.model, BookingPeriod):
             return None
 
         session = self.request.session
@@ -570,7 +570,7 @@ class PeriodForm(Form):
         return None
 
     def ensure_no_payment_changes_after_confirmation(self) -> bool | None:
-        if isinstance(self.model, Period) and self.model.confirmed:
+        if isinstance(self.model, BookingPeriod) and self.model.confirmed:
             preview: Any = Bunch(
                 confirmable=self.model.confirmable,
                 booking_start=self.model.booking_start
