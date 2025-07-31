@@ -1,7 +1,9 @@
 from __future__ import annotations
+from itertools import groupby
+from sqlalchemy.orm import joinedload
 
 from onegov.core.elements import Link
-from onegov.core.security import Private
+from onegov.core.security import Private, Public
 from onegov.town6.views.commission import (
     view_commissions,
     add_commission,
@@ -23,6 +25,7 @@ from onegov.pas.models import PASCommissionMembership
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.core.types import JSON_ro
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
     from webob import Response
@@ -171,4 +174,41 @@ def pas_add_plenary_attendence(
         'title': _('New commission meeting'),
         'form': form,
         'form_width': 'large'
+    }
+
+
+@PasApp.json(
+    model=PASCommissionCollection,
+    name='commissions-parliamentarians-json',
+    permission=Public,
+)
+def commissions_parliamentarians_json(
+    self: PASCommissionCollection, request: TownRequest
+) -> JSON_ro:
+    """Returns all commissions with their parliamentarians."""
+    session = request.session
+    memberships = session.query(PASCommissionMembership).options(
+        joinedload(PASCommissionMembership.parliamentarian)
+    ).all()
+    valid_memberships = (m for m in memberships if m.parliamentarian)
+
+    def key_func(m):
+        return str(m.commission_id)
+
+    sorted_by_commission = sorted(valid_memberships, key=key_func)
+
+    return {
+        commission_id: [
+            {
+                'id': str(m.parliamentarian.id),
+                'title': m.parliamentarian.title
+            }
+            for m in sorted(
+                group, key=lambda m: (
+                    m.parliamentarian.last_name or '',
+                    m.parliamentarian.first_name or ''
+                )
+            )
+        ]
+        for commission_id, group in groupby(sorted_by_commission, key=key_func)
     }
