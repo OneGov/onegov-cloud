@@ -187,7 +187,10 @@ class MeetingForm(Form):
                 'values': [
                     {
                         'title': agenda_item.title,
-                        'agenda_item': agenda_item.display_name,
+                        'agenda_item': (
+                            agenda_item.political_business.display_name
+                            if agenda_item.political_business else
+                            agenda_item.display_name),
                         'error': '',
                         # 'error': self.agenda_items_errors.get(ix, ''),
                     }
