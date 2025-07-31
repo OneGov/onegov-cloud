@@ -1,8 +1,52 @@
 # Changes
 
+## 2025.37
+
+`2025-07-31` | [7f64381a29...69cd95cb21](https://github.com/OneGov/onegov-cloud/compare/7f64381a29^...69cd95cb21)
+
+### Dir
+
+##### Bring fields in same field set together
+
+`Bugfix` | [NONE](#NONE) | [af00a3b5c1](https://github.com/onegov/onegov-cloud/commit/af00a3b5c16c24414ed77881483fa0fbdc3dd900)
+
+### Org
+
+##### Adds ticket invoices with individual items
+
+This allows more robust modifications of ticket details with those
+modifications resulting in correct price changes. While also itemizing
+manually granted discounts or surcharges.
+
+`Feature` | [OGC-2321](https://linear.app/onegovcloud/issue/OGC-2321) | [69cd95cb21](https://github.com/onegov/onegov-cloud/commit/69cd95cb21bf0ab4857a842c0d05c97b32fe99b5)
+
+##### Fixes mTAN statistics not being sent for every month
+
+The previous fix actually introduced the problem it claimed to fix
+
+`Bugfix` | [OGC-2288](https://linear.app/onegovcloud/issue/OGC-2288) | [7591396b9a](https://github.com/onegov/onegov-cloud/commit/7591396b9aa9941fa7f286fb6487dbd7c5621035)
+
+### Pas
+
+##### Allows to copy rate set.
+
+`Feature` | [OGC-2443](https://linear.app/onegovcloud/issue/OGC-2443) | [e9c88617b2](https://github.com/onegov/onegov-cloud/commit/e9c88617b20557827b703420693ccd369aed1d91)
+
+### Ris
+
+##### Show parliamentarians place of residence
+
+Display private address if available, otherwise show place of residence
+
+`Feature` | [OGC-2487](https://linear.app/onegovcloud/issue/OGC-2487) | [7f64381a29](https://github.com/onegov/onegov-cloud/commit/7f64381a29f3eb772b43d19bf35f9474a70f3943)
+
+##### Make parliamentarian labels gender neutral
+
+`Feature` | [OGC-2486](https://linear.app/onegovcloud/issue/OGC-2486) | [5d8720535d](https://github.com/onegov/onegov-cloud/commit/5d8720535d0c28a68aa2e83502a2116301ace794)
+
 ## 2025.36
 
-`2025-07-25` | [93fd541297...867117fc85](https://github.com/OneGov/onegov-cloud/compare/93fd541297^...867117fc85)
+`2025-07-25` | [93fd541297...444995fa15](https://github.com/OneGov/onegov-cloud/compare/93fd541297^...444995fa15)
 
 ### Directories
 
@@ -2092,8 +2136,4 @@ Create variable for enable_update_notifications and use it for the condition.
 ## 2024.56
 
 `2024-11-26` | [d8727155ea...7ce0e4569a](https://github.com/OneGov/onegov-cloud/compare/d8727155ea^...7ce0e4569a)
-
-## 2024.55
-
-`2024-11-26` | [75d4cff3cf...0121dbe21d](https://github.com/OneGov/onegov-cloud/compare/75d4cff3cf^...0121dbe21d)
 
