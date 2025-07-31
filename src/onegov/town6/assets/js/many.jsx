@@ -745,7 +745,14 @@ var ManyMeetingItems = React.createClass({
     handleRemove: function(index, e) {
         var state = JSON.parse(JSON.stringify(this.state));
         state.values.splice(index, 1);
+
         this.setState(state);
+
+        if (state.values.length === 0) {
+            // If all items are removed, reload the page to reset the form
+            // as not any chosen item is left
+            window.location.reload();
+        }
 
         e.preventDefault();
     },
@@ -803,7 +810,7 @@ var ManyMeetingItems = React.createClass({
                             <div className="grid-x grid-padding-x align-center">
                                 <div>
                                     {
-                                        index > 0 && index === (values.length - 1) &&
+                                        index >= 0 && index === (values.length - 1) &&
                                         <a href="#" className="button round secondary field-button" onClick={onRemove}>
                                             <i className="fa fa-minus" aria-hidden="true" />
                                             <span className="show-for-sr">{data.labels.remove}</span>
