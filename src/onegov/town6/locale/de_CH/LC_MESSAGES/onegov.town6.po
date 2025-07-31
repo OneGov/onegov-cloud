@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-25 12:05+0200\n"
+"POT-Creation-Date: 2025-07-30 15:46+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2319,6 +2319,12 @@ msgstr "${count} Notizen"
 msgid "Amount"
 msgstr "Betrag"
 
+msgid "Free of charge"
+msgstr "Kostenlos"
+
+msgid "View Invoice"
+msgstr "Rechnung anzeigen"
+
 msgid "Group"
 msgstr "Gruppe"
 
@@ -2339,6 +2345,36 @@ msgstr "Bearbeitungszeit"
 
 msgid "Summary"
 msgstr "Zusammenfassung"
+
+msgid "Booking Text"
+msgstr "Buchungstext"
+
+msgid "Unit"
+msgstr "Einheit"
+
+msgid "Quantity"
+msgstr "Anzahl"
+
+msgid "VAT Rate"
+msgstr "Mehrwertsteuersatz"
+
+msgid "Submission"
+msgstr "Eintrag"
+
+msgid "Selected Options"
+msgstr "Ausgewählte Optionen"
+
+msgid "Discounts / Surcharges"
+msgstr "Abzüge / Zuschläge"
+
+msgid "Lump sum"
+msgstr "Pauschalbetrag"
+
+msgid "Unpaid"
+msgstr "Unbezahlt"
+
+msgid "Total"
+msgstr "Total"
 
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "

@@ -3,10 +3,13 @@ from __future__ import annotations
 from decimal import Decimal
 from functools import total_ordering
 from onegov.core.orm import Base
+from onegov.pay.constants import SCALE
 
 
-from typing import NamedTuple, TYPE_CHECKING
+from typing import Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from onegov.pay.models import Invoice, InvoiceItem
     from onegov.pay.types import PriceDict
     from sqlalchemy import Table
     from typing import Self, SupportsIndex
@@ -114,6 +117,86 @@ class Price(_PriceBase):
             self.amount - self.amount*discount,
             self.currency,
             credit_card_payment=self.credit_card_payment
+        )
+
+
+class _InvoiceItemMetaBase(NamedTuple):
+    text: str
+    group: str
+    unit: Decimal
+    quantity: Decimal = Decimal('1')
+    vat_rate: Decimal | None = None
+    family: str | None = None
+    extra: dict[str, Any] | None = None
+
+
+class InvoiceItemMeta(_InvoiceItemMetaBase):
+
+    @property
+    def amount(self) -> Decimal:
+        return round(
+            round(self.unit, SCALE) * round(self.quantity, SCALE),
+            SCALE
+        )
+
+    @staticmethod
+    def total(items: Iterable[InvoiceItemMeta]) -> Decimal:
+        return sum((item.amount for item in items), start=Decimal('0'))
+
+    def add_to_invoice(self, invoice: Invoice) -> InvoiceItem:
+        return invoice.add(
+            text=self.text,
+            group=self.group,
+            family=self.family,
+            unit=self.unit,
+            quantity=self.quantity,
+            vat_rate=self.vat_rate,
+            **(self.extra or {})
+        )
+
+    def refresh_item(self, item: InvoiceItem) -> None:
+        assert item.group == self.group
+        assert item.family == self.family
+        if item.text != self.text:
+            item.text = self.text
+        if item.unit != self.unit:
+            item.unit = self.unit
+        if item.quantity != self.quantity:
+            item.quantity = self.quantity
+        if item.vat_rate != self.vat_rate:
+            item.vat_rate = self.vat_rate
+        for attr, value in (self.extra or {}).items():
+            if hasattr(item, attr) and getattr(item, attr) != value:
+                setattr(item, attr, value)
+
+
+class _InvoiceDiscountMetaBase(NamedTuple):
+    text: str
+    group: str
+    discount: Decimal
+    vat_rate: Decimal | None = None
+    family: str | None = None
+    extra: dict[str, Any] | None = None
+
+
+class InvoiceDiscountMeta(_InvoiceDiscountMetaBase):
+
+    def apply_discount(
+        self,
+        total: Decimal,
+        remainder: Decimal
+    ) -> InvoiceItemMeta:
+        assert self.discount <= Decimal('1')
+        # we can't discount to a negative total, so we can at most
+        # discount the full remainder of the invoice
+        amount = min(round(total*self.discount, SCALE), remainder)
+        return InvoiceItemMeta(
+            text=self.text,
+            unit=-amount,
+            group=self.group,
+            family=self.family,
+            vat_rate=self.vat_rate,
+            extra=self.extra,
         )
 
 

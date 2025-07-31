@@ -5,7 +5,7 @@ import random
 from onegov.core.collection import Pagination
 from onegov.core.custom import msgpack
 from onegov.ticket import handlers as global_handlers
-from onegov.ticket.model import Ticket
+from onegov.ticket.models.ticket import Ticket
 from sqlalchemy import desc, distinct, func
 from sqlalchemy.orm import joinedload, undefer
 from uuid import UUID
@@ -13,7 +13,7 @@ from uuid import UUID
 
 from typing import Any, Literal, NamedTuple, Self, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ticket.model import TicketState
+    from onegov.ticket.models.ticket import TicketState
     from sqlalchemy.orm import Query, Session
     from typing import TypeAlias, TypedDict
 

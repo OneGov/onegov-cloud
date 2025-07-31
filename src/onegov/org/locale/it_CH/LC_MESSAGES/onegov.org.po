@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-24 13:54+0200\n"
+"POT-Creation-Date: 2025-07-30 15:46+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -625,6 +625,9 @@ msgstr ""
 msgid "Publication"
 msgstr "Pubblicazione"
 
+msgid "Required publication dates"
+msgstr "Date di pubblicazione obbligatorie"
+
 msgid "Enable registering for update notifications"
 msgstr "Attivare la registrazione per le notifiche"
 
@@ -634,9 +637,6 @@ msgstr ""
 
 msgid "Notifications"
 msgstr "Notifiche"
-
-msgid "Required publication dates"
-msgstr "Date di pubblicazione obbligatorie"
 
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Informazioni da fornire in aggiunta all'e-mail"
@@ -1181,6 +1181,18 @@ msgstr "Per didascalia"
 
 msgid "By last change"
 msgstr "Per data dell'ultima modifica"
+
+msgid "Booking Text"
+msgstr "Testo prenotazione"
+
+msgid "Kind"
+msgstr "Tipo"
+
+msgid "Discount"
+msgstr "Deduzione"
+
+msgid "Surcharge"
+msgstr "Supplemento"
 
 msgid "Agenda Items"
 msgstr "Elementi dell'agenda"
@@ -3015,6 +3027,12 @@ msgstr "Nuovo messaggio"
 msgid "Ticket Status"
 msgstr "Stato del biglietto"
 
+msgid "Invoice"
+msgstr "Fattura"
+
+msgid "Discount / Surcharge"
+msgstr "Deduzione / Supplemento"
+
 msgid "Text module"
 msgstr "Modulo di testo"
 
@@ -3653,8 +3671,8 @@ msgstr "Rifiuta le prenotazioni"
 msgid "Reject all with message"
 msgstr "Rifiuta tutto con messaggio"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -5492,8 +5510,32 @@ msgstr "${count} nota"
 msgid "${count} notes"
 msgstr "${count} note"
 
+msgid "View Invoice"
+msgstr "Visualizza fattura"
+
 msgid "Change tag"
 msgstr "Modificare il tag"
+
+msgid "Unit"
+msgstr "Unità"
+
+msgid "Quantity"
+msgstr "Quantità"
+
+msgid "Submission"
+msgstr "Iscrizione"
+
+msgid "Selected Options"
+msgstr "Opzioni selezionate"
+
+msgid "Discounts / Surcharges"
+msgstr "Deduzioni / Supplementi"
+
+msgid "Lump sum"
+msgstr "Somma forfettaria"
+
+msgid "Unpaid"
+msgstr "Non pagato"
 
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
@@ -6324,6 +6366,12 @@ msgstr ""
 msgid "Registrations are no longer possible"
 msgstr "Le iscrizioni non sono più possibili"
 
+msgid ""
+"Your changes would alter the price total but the payment is no longer open."
+msgstr ""
+"Le modifiche apportate altererebbero il prezzo totale, ma il pagamento non è "
+"più disponibile."
+
 msgid "Pay Online and Complete"
 msgstr "Paga online e completa"
 
@@ -7152,6 +7200,27 @@ msgstr "Il tuo messaggio è stato inviato"
 
 msgid "Zip archive created successfully"
 msgstr "Archivio zip creato con successo"
+
+msgid "The payment is no longer open, so the invoice cannot be modified."
+msgstr ""
+"Il pagamento non è più aperto, quindi la fattura non può essere modificata."
+
+msgid "Remove Discount"
+msgstr "Rimuovi deduzione"
+
+msgid "Remove Surchage"
+msgstr "Rimuovi supplemento"
+
+#, python-format
+msgid "Do you really want to remove \"${booking_text}\"?"
+msgstr "Vuoi davvero rimuovere \"${booking_text}\"?"
+
+#, python-format
+msgid "${ticket} Invoice"
+msgstr "${ticket} Fattura"
+
+msgid "Add Discount / Surcharge"
+msgstr "Aggiungi deduzione / supplemento"
 
 msgid "Your request has been submitted"
 msgstr "La tua richiesta è stata inviata"
