@@ -3010,7 +3010,10 @@ class UserManagementLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Usermanagement'), self.request.class_link(UserCollection))
+            Link(_('Usermanagement'), self.request.class_link(
+                UserCollection,
+                variables={'active': '1'}
+        )),
         ]
 
     @cached_property
@@ -3060,7 +3063,10 @@ class UserLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Usermanagement'), self.request.class_link(UserCollection)),
+            Link(_('Usermanagement'), self.request.class_link(
+                UserCollection,
+                variables={'active': '1'}
+        )),
             Link(self.model.title, self.request.link(self.model))
         ]
 
