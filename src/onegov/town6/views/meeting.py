@@ -138,8 +138,16 @@ def view_meeting(
             ).first()
             if business is not None:
                 item_data['political_business_link'] = request.link(business)
+        else:
+            if item.political_business:
+                item_data['political_business_link'] = (
+                    request.link(item.political_business))
+
         meeting_items_with_links.append(item_data)
 
+    meeting_items_with_links.sort(
+        key=lambda x: (x['number'] or '', x['title'] or '')
+    )
     return {
         'layout': layout,
         'page': self,
@@ -177,6 +185,9 @@ def edit_meeting(
         form.populate_obj(self)
         request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
+
+    elif request.method == 'GET':
+        form.process(obj=self)
 
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
