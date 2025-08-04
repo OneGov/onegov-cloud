@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import ContentMixin, dict_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
@@ -312,6 +312,8 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
         back_populates='parliamentarian',
         order_by='desc(ParliamentarianRole.start)'
     )
+
+    interests = dict_property('content')
 
     @property
     def active(self) -> bool:
