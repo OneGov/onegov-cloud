@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-31 14:02+0200\n"
+"POT-Creation-Date: 2025-08-04 09:56+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1942,8 +1942,14 @@ msgstr "Rôles"
 msgid "Parliament"
 msgstr "Parlement"
 
-msgid "Interests"
-msgstr "Intérêts"
+msgid "Interest ties"
+msgstr "Liens d'intérêt"
+
+msgid "Interest tie"
+msgstr "Lien d'intérêt"
+
+msgid "Category"
+msgstr "Catégorie"
 
 msgid "Role"
 msgstr "Rôle"
