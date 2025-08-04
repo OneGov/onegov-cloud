@@ -167,8 +167,8 @@
                     </ul>
                 </dd>
             </div>
-            <div tal:define="interests parliamentarian.content.get('interests')" tal:condition="parliamentarian.content.get('interests')">
-                <tal:b define="headers parliamentarian.content['interests']['headers']; rows parliamentarian.content['interests']['rows']">
+            <div tal:define="interests parliamentarian.interests" tal:condition="parliamentarian.interests['rows']">
+                <tal:b define="headers interests['headers']; rows interests['rows']">
                     <b i18n:translate>Interests</b>
                     <table class="table table-striped">
                         <thead>
