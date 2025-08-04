@@ -195,8 +195,8 @@ class ParliamentarianForm(NamedFileForm):
             },
             'values': [
                 {
-                    'interest_tie': tie['Kategorie'],
-                    'category': tie['Interessenbindung'],
+                    'interest_tie': tie['Interessenbindung'],
+                    'category': tie['Kategorie'],
                     'error': self.interest_tie_errors.get(ix, '')
                 } for ix, tie in enumerate(interest_ties['rows'])
             ]
