@@ -167,9 +167,9 @@
                     </ul>
                 </dd>
             </div>
-            <div tal:define="interests parliamentarian.interests" tal:condition="parliamentarian.interests['rows']">
+            <div tal:define="interests parliamentarian.interests" tal:condition="parliamentarian.interests['rows']|None">
                 <tal:b define="headers interests['headers']; rows interests['rows']">
-                    <b i18n:translate>Interests</b>
+                    <b i18n:translate>Interest ties</b>
                     <table class="table table-striped">
                         <thead>
                             <tr>
