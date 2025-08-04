@@ -49,6 +49,13 @@ var ManyFields = React.createClass({
                             onChange={this.props.onChange}
                         />
                 }
+                {
+                    this.props.type === "interest-ties" &&
+                        <ManyInterestTies
+                            data={this.props.data}
+                            onChange={this.props.onChange}
+                        />
+                }
             </div>
         );
     }
@@ -850,6 +857,132 @@ var ManyMeetingItems = React.createClass({
                     );
                 })
             } </div>
+        );
+    }
+});
+
+
+var ManyInterestTies = React.createClass({
+    getInitialState: function() {
+        var state = {
+            values: _.clone(this.props.data.values)
+        };
+
+        if (state.values.length === 0) {
+            state.values = [
+                {'interest_tie': '', 'category': ''}
+            ];
+        }
+
+        return state;
+    },
+    handleAdd: function(index, e) {
+        var state = JSON.parse(JSON.stringify(this.state));
+        state.values.splice(index + 1, 0, {
+            interest_tie: '',
+            category: ''
+        });
+        this.setState(state);
+
+        e.preventDefault();
+    },
+    handleRemove: function(index, e) {
+        var state = JSON.parse(JSON.stringify(this.state));
+        state.values.splice(index, 1);
+        this.setState(state);
+
+        e.preventDefault();
+    },
+    handleInputChange: function(index, name, e) {
+        var state = JSON.parse(JSON.stringify(this.state));
+
+        state.values[index][name] = e.target.value;
+
+        this.setState(state);
+
+        e.preventDefault();
+    },
+    componentWillUpdate: function(props, state) {
+        props.onChange(state);
+    },
+    render: function() {
+        var data = this.props.data;
+        var values = this.state.values;
+        var self = this;
+
+        // Get options from the data
+        var textOptions = data.textOptions || [];
+        var linkOptions = data.linkOptions || [];
+
+        var textPlaceholder = (data.placeholders && data.placeholders.text) || "Interest Tie";
+        var linkPlaceholder = (data.placeholders && data.placeholders.link) || "Category";
+
+        return (
+            <div>
+                {_.map(values, function(value, index) {
+                    var onInterestChange = self.handleInputChange.bind(self, index, 'interest_tie');
+                    var onCatChange = self.handleInputChange.bind(self, index, 'category');
+                    var onRemove = self.handleRemove.bind(self, index);
+                    var onAdd = self.handleAdd.bind(self, index);
+
+                    return (
+                        <div key={index}>
+                            <div className={"grid-x grid-padding-x" + (value.error && 'error' || '')}>
+                                <div className="small-6 cell">
+                                    <StringField required
+                                                 type="text"
+                                                 label={data.labels.interest_tie}
+                                                 defaultValue={value.interest_tie}
+                                                 onChange={onInterestChange}
+                                                 extra={data.extra}
+                                                 size="small"
+                                                 placeholder={textPlaceholder}
+                                                 // options={textOptions}
+                                    />
+                                </div>
+                                <div className="small-6 cell">
+                                    <StringField required
+                                                 type="text"
+                                                 label={data.labels.category}
+                                                 defaultValue={value.category}
+                                                 onChange={onCatChange}
+                                                 extra={data.extra}
+                                                 size="small"
+                                                 placeholder={linkPlaceholder}
+                                                 // options={linkOptions}
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid-x grid-padding-x align-center">
+                                <div>
+                                    {
+                                        index > 0 && index === (values.length - 1) &&
+                                        <a href="#" className="button round secondary field-button" onClick={onRemove}>
+                                            <i className="fa fa-minus" aria-hidden="true" />
+                                            <span className="show-for-sr">{data.labels.remove}</span>
+                                        </a>
+                                    }
+                                    {
+                                        index === (values.length - 1) &&
+                                        <a href="#" className="button round field-button" onClick={onAdd}>
+                                            <i className="fa fa-plus" aria-hidden="true" />
+                                            <span className="show-for-sr">{data.labels.add}</span>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                            {
+                                value.error &&
+                                <div className="row firebase-error">
+                                    <div className="small-12 columns end">
+                                        <small className="error">{value.error}</small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    );
+                })}
+            </div>
         );
     }
 });
