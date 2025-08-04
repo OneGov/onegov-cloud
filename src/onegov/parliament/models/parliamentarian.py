@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from datetime import date
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin, dict_property
+from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import dict_property, content_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
@@ -16,7 +17,8 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-from typing import Literal, TypeAlias, TYPE_CHECKING
+from typing import Literal, TypeAlias, TYPE_CHECKING, Any
+
 if TYPE_CHECKING:
     import uuid
     from onegov.parliament.models import (
@@ -313,7 +315,7 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
         order_by='desc(ParliamentarianRole.start)'
     )
 
-    interests = dict_property('content')
+    interests: dict_property[dict[str, Any]] = content_property(default=dict)
 
     @property
     def active(self) -> bool:

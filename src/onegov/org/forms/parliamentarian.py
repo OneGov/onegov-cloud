@@ -21,7 +21,7 @@ from wtforms.validators import URL
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from onegov.parliament.models.parliamentarian import Parliamentarian
 
 
 class ParliamentarianForm(NamedFileForm):
@@ -154,21 +154,19 @@ class ParliamentarianForm(NamedFileForm):
         render_kw={'class_': 'many many-interest-ties'}
     )
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.interest_tie_errors: dict[int, str] = {}
 
     def on_request(self) -> None:
         pass
 
-    def process_obj(self, obj: object) -> None:
+    def process_obj(self, obj: Parliamentarian) -> None:  # type:ignore[override]
         super().process_obj(obj)
 
-        interest_ties = obj.content.get('interests', None)
-        if not interest_ties:
-            self.interest_ties.data = self.interest_ties_to_json(None)
-        else:
-            self.interest_ties.data = self.interest_ties_to_json(interest_ties)
+        parliamentarian: Parliamentarian = obj
+        interest_ties = parliamentarian.interests or {'rows': []}
+        self.interest_ties.data = self.interest_ties_to_json(interest_ties)
 
     def populate_obj(
         self,
@@ -185,9 +183,8 @@ class ParliamentarianForm(NamedFileForm):
 
     def interest_ties_to_json(
         self,
-        ties: Sequence[tuple[str | None, str | None]] | None
+        interest_ties: dict[str, Any]
     ) -> str:
-        interest_ties = ties or []
 
         return json.dumps({
             'labels': {
