@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-31 14:02+0200\n"
+"POT-Creation-Date: 2025-08-05 14:36+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -313,17 +313,8 @@ msgstr "Parlamentsmitglieder"
 msgid "Parliamentarian"
 msgstr "Parlamentsmitglied"
 
-msgid "Role (as a group member)"
-msgstr "Rolle (als Fraktionsmitglied)"
-
-msgid "Membership of a parliamentary group"
-msgstr "Fraktionsmitgliedschaft"
-
 msgid "New parliamentary group membership"
 msgstr "Neue Fraktionsmitgliedschaft"
-
-msgid "Member of a commission"
-msgstr "Kommissionsmitgliedschaft"
 
 msgid "New commission membership"
 msgstr "Neue Kommissionsmitgliedschaft"
@@ -2580,9 +2571,6 @@ msgstr "Das Parlamentsmitglied wurde gelöscht."
 msgid "Added a new role"
 msgstr "Neue Rolle hinzugefügt"
 
-msgid "New role"
-msgstr "Neue Rolle"
-
 msgid "The parliamentarian role has been deleted."
 msgstr "Die Rolle des Parlamentariers wurde gelöscht."
 
@@ -2709,6 +2697,18 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid "Role (as a group member)"
+#~ msgstr "Rolle (als Fraktionsmitglied)"
+
+#~ msgid "Membership of a parliamentary group"
+#~ msgstr "Fraktionsmitgliedschaft"
+
+#~ msgid "Member of a commission"
+#~ msgstr "Kommissionsmitgliedschaft"
+
+#~ msgid "New role"
+#~ msgstr "Neue Rolle"
 
 #~ msgid "Inquiry"
 #~ msgstr "Anfrage"
