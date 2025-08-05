@@ -1,8 +1,56 @@
 # Changes
 
+## 2025.38
+
+`2025-08-05` | [1e867a456f...a139888454](https://github.com/OneGov/onegov-cloud/compare/1e867a456f^...a139888454)
+
+### Agency
+
+##### Add `miscField` for sync.
+
+`Feature` | [OGC-1894](https://linear.app/onegovcloud/issue/OGC-1894) | [6af98c9c2f](https://github.com/onegov/onegov-cloud/commit/6af98c9c2f4a15175fa162c7e50c1e5ad9163ac1)
+
+### Org
+
+##### Makes sure that changing the tag updates the Kaba code
+
+`Bugfix` | [OGC-2495](https://linear.app/onegovcloud/issue/OGC-2495) | [98ddf66068](https://github.com/onegov/onegov-cloud/commit/98ddf66068ac8bab03067dc2842e684c42fd4156)
+
+### Ris
+
+##### Meeting Items can be edited and extended
+
+`Feature` | [OGC-2477](https://linear.app/onegovcloud/issue/OGC-2477) | [e435583f66](https://github.com/onegov/onegov-cloud/commit/e435583f664f31e36a684f8b3dbcdfc4213ed13e)
+
+##### Interest ties are now editable
+
+`Feature` | [OGC-2455](https://linear.app/onegovcloud/issue/OGC-2455) | [f3a878e491](https://github.com/onegov/onegov-cloud/commit/f3a878e49165933313ecdda96db6d706b862750d)
+
+##### Adds hard-coded RIS link for non logged-in users
+
+`Feature` | [OGC-2371](https://linear.app/onegovcloud/issue/OGC-2371) | [dafd61b5d9](https://github.com/onegov/onegov-cloud/commit/dafd61b5d92044d5ffee4443cec90ce42daa1828)
+
+##### Main url for RIS is now configurable
+
+`Feature` | [OGC-2371](https://linear.app/onegovcloud/issue/OGC-2371) | [2f0b2f4c8d](https://github.com/onegov/onegov-cloud/commit/2f0b2f4c8dfe8b461445a3177f9b96fa4257fd25)
+
+##### Menu to add commission memberships
+
+`Feature` | [OGC-2461](https://linear.app/onegovcloud/issue/OGC-2461) | [a139888454](https://github.com/onegov/onegov-cloud/commit/a1398884547a04c41deac591a7a07f0d4b2b0fff)
+
+##### Improve political business filtering
+
+Sentry: https://seantis-gmbh.sentry.io/issues/6778531266/
+
+`Bugfix` | [NONE](#NONE) | [1e867a456f](https://github.com/onegov/onegov-cloud/commit/1e867a456f7b36044e8e0c248eee4467d929863d)
+
+##### Makes form fields in edit meeting evenly wide.
+
+`Bugfix` | [OGC-2453](https://linear.app/onegovcloud/issue/OGC-2453) | [0727a45720](https://github.com/onegov/onegov-cloud/commit/0727a457205f90d675509f671f03f8275050d9ed)
+
 ## 2025.37
 
-`2025-07-31` | [7f64381a29...69cd95cb21](https://github.com/OneGov/onegov-cloud/compare/7f64381a29^...69cd95cb21)
+`2025-07-31` | [7f64381a29...a77c094060](https://github.com/OneGov/onegov-cloud/compare/7f64381a29^...a77c094060)
 
 ### Dir
 
@@ -2132,8 +2180,4 @@ Create variable for enable_update_notifications and use it for the condition.
 ##### Firefigher mission exports: date in iso format
 
 `Bugfix` | [OGC-1932](https://linear.app/onegovcloud/issue/OGC-1932) | [db721e4ad8](https://github.com/onegov/onegov-cloud/commit/db721e4ad8ba94db4f840970653395718a68504d)
-
-## 2024.56
-
-`2024-11-26` | [d8727155ea...7ce0e4569a](https://github.com/OneGov/onegov-cloud/compare/d8727155ea^...7ce0e4569a)
 
