@@ -813,6 +813,9 @@ def change_tag(
                 selected_meta = meta
                 break
 
+        # NOTE: Don't include the E-Mail in the selected meta
+        selected_meta.pop('E-Mail', None)
+
         # NOTE: We don't modify the submission data but we exclude
         #       any metadata that's tied to the submission
         if selected_meta and (
@@ -822,7 +825,6 @@ def change_tag(
             selected_meta = {
                 key: value
                 for key, value in selected_meta.items()
-                if key != 'E-Mail'
                 if not any(
                     True
                     for field in form
@@ -830,11 +832,12 @@ def change_tag(
                 )
             }
 
-            kaba_code = selected_meta.pop('Kaba Code', None)
-            handler_data = self.handler_data or {}
-            if kaba_code and 'key_code' not in handler_data:
-                handler_data['key_code'] = kaba_code
-                self.handler_data = handler_data
+        # update the key code if it's different
+        kaba_code = selected_meta.pop('Kaba Code', None)
+        handler_data = self.handler_data or {}
+        if kaba_code and handler_data.get('key_code') != kaba_code:
+            handler_data['key_code'] = kaba_code
+            self.handler_data = handler_data
 
         self.tag_meta = selected_meta
 
