@@ -156,12 +156,12 @@ def add_parliamentarian_group_membership(
         request.success(_('Added a new role'))
         return request.redirect(request.link(self))
 
-    layout.breadcrumbs.append(Link(_('New role'), '#'))
+    layout.breadcrumbs.append(Link(_('New parliamentary group membership'), '#'))
     layout.include_editor()
 
     return {
         'layout': layout,
-        'title': _('New parliamentarian group role'),
+        'title': _('New parliamentary group membership'),
         'form': form,
         'form_width': 'large'
     }
@@ -171,7 +171,6 @@ def add_commission_membership(
     self: Parliamentarian,
     request: TownRequest,
     form: ParliamentarianCommissionRoleForm,
-    # layout: RISParliamentarianLayout | PASParliamentarianLayout
     layout: RISParliamentarianLayout
 ) -> RenderData | Response:
     form.delete_field('parliamentarian_id')
@@ -182,7 +181,6 @@ def add_commission_membership(
                 # FIXME: We should probably just use `ris` and `pas`
                 #        as the polymorphic types on every model
                 #        then we can directly use them
-                # polymorphic_type,
                 'ris_commission_membership',
                 CommissionMembership
             )(**form.get_useful_data())
@@ -190,12 +188,12 @@ def add_commission_membership(
         request.success(_('Added a new role'))
         return request.redirect(request.link(self))
 
-    layout.breadcrumbs.append(Link(_('New role'), '#'))
+    layout.breadcrumbs.append(Link(_('New commission membership'), '#'))
     layout.include_editor()
 
     return {
         'layout': layout,
-        'title': _('New commission role'),
+        'title': _('New commission membership'),
         'form': form,
         'form_width': 'large'
     }

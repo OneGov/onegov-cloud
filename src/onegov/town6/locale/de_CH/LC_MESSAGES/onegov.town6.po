@@ -316,6 +316,18 @@ msgstr "Parlamentsmitglied"
 msgid "Role (as a group member)"
 msgstr "Rolle (als Fraktionsmitglied)"
 
+msgid "Membership of a parliamentary group"
+msgstr "Fraktionsmitgliedschaft"
+
+msgid "New parliamentary group membership"
+msgstr "Neue Fraktionsmitgliedschaft"
+
+msgid "Member of a commission"
+msgstr "Kommissionsmitgliedschaft"
+
+msgid "New commission membership"
+msgstr "Neue Kommissionsmitgliedschaft"
+
 msgid "Do you really want to delete this parliamentarian?"
 msgstr "Möchten Sie dieses Parlamentsmitglied wirklich löschen?"
 
