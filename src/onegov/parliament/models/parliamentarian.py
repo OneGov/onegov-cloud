@@ -315,6 +315,7 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
         order_by='desc(ParliamentarianRole.start)'
     )
 
+    #: A parliamentarian's interest ties
     interests: dict_property[dict[str, Any]] = content_property(default=dict)
 
     @property
