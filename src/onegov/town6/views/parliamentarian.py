@@ -4,11 +4,12 @@ from onegov.core.elements import Link
 from onegov.core.security import Public, Private
 from onegov.org.forms import ParliamentarianForm
 from onegov.org.forms import ParliamentarianRoleForm
+from onegov.org.forms.commission_role import ParliamentarianCommissionRoleForm
 from onegov.org.models import RISParliamentarian
 from onegov.org.models import RISParliamentarianCollection
 from onegov.org.models import PoliticalBusinessParticipationCollection
 from onegov.parliament.collections import ParliamentarianCollection
-from onegov.parliament.models import ParliamentarianRole
+from onegov.parliament.models import ParliamentarianRole, CommissionMembership
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import (
@@ -133,7 +134,7 @@ def delete_parliamentarian(
     request.success(_('The parliamentarian has been deleted.'))
 
 
-def add_commission_membership(
+def add_parliamentarian_group_membership(
     self: Parliamentarian,
     request: TownRequest,
     form: ParliamentarianRoleForm,
@@ -160,7 +161,41 @@ def add_commission_membership(
 
     return {
         'layout': layout,
-        'title': _('New role'),
+        'title': _('New parliamentarian group role'),
+        'form': form,
+        'form_width': 'large'
+    }
+
+
+def add_commission_membership(
+    self: Parliamentarian,
+    request: TownRequest,
+    form: ParliamentarianCommissionRoleForm,
+    # layout: RISParliamentarianLayout | PASParliamentarianLayout
+    layout: RISParliamentarianLayout
+) -> RenderData | Response:
+    form.delete_field('parliamentarian_id')
+
+    if form.submitted(request):
+        self.commission_memberships.append(
+            CommissionMembership.get_polymorphic_class(
+                # FIXME: We should probably just use `ris` and `pas`
+                #        as the polymorphic types on every model
+                #        then we can directly use them
+                # polymorphic_type,
+                'ris_commission_membership',
+                CommissionMembership
+            )(**form.get_useful_data())
+        )
+        request.success(_('Added a new role'))
+        return request.redirect(request.link(self))
+
+    layout.breadcrumbs.append(Link(_('New role'), '#'))
+    layout.include_editor()
+
+    return {
+        'layout': layout,
+        'title': _('New commission role'),
         'form': form,
         'form_width': 'large'
     }
@@ -243,15 +278,32 @@ def ris_delete_parliamentarian(
 
 @TownApp.form(
     model=RISParliamentarian,
-    name='new-role',
+    name='new-role',  # change to 'add-group-role'
     template='form.pt',
     permission=Private,
     form=ParliamentarianRoleForm
 )
-def ris_add_commission_membership(
+def ris_add_parliamentary_group_membership(
     self: RISParliamentarian,
     request: TownRequest,
     form: ParliamentarianRoleForm
+) -> RenderData | Response:
+
+    layout = RISParliamentarianLayout(self, request)
+    return add_parliamentarian_group_membership(self, request, form, layout)
+
+
+@TownApp.form(
+    model=RISParliamentarian,
+    name='new-commission-role',  # change to 'add-group-role'
+    template='form.pt',
+    permission=Private,
+    form=ParliamentarianCommissionRoleForm
+)
+def ris_add_commission_membership(
+    self: RISParliamentarian,
+    request: TownRequest,
+    form: ParliamentarianCommissionRoleForm
 ) -> RenderData | Response:
 
     layout = RISParliamentarianLayout(self, request)
