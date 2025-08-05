@@ -1224,10 +1224,18 @@ class RISParliamentarianLayout(DefaultLayout):
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_('Role (as a group member)'),
-                            url=self.request.link(self.model, 'new-role'),
+                            text=_('New parliamentary group membership'),
+                            url=self.request.link(
+                                self.model, 'new-role'),
+                            # change to `new-group-role`
                             attrs={'class': 'new-role'}
                         ),
+                        Link(
+                            text=_('New commission membership'),
+                            url=self.request.link(
+                                self.model, 'new-commission-role'),
+                            attrs={'class': 'new-commission-role'}
+                        )
                     ],
                 ),
                 Link(
