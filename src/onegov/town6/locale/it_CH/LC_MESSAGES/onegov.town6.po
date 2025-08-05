@@ -1939,8 +1939,14 @@ msgstr "Ruoli"
 msgid "Parliament"
 msgstr "Parlamento"
 
-msgid "Interests"
-msgstr "Interessi"
+msgid "Interest ties"
+msgstr "Legami di interesse"
+
+msgid "Interest tie"
+msgstr "Legame di interesse"
+
+msgid "Category"
+msgstr "Categoria"
 
 msgid "Role"
 msgstr "Ruolo"

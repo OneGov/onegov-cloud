@@ -196,7 +196,7 @@ def edit_meeting(
         'layout': layout,
         'form': form,
         'title': _('Edit meeting'),
-        'form_width': 'large'
+        'form_width': 'full'
     }
 
 

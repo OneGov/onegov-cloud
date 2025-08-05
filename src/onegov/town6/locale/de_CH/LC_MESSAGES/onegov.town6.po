@@ -1946,8 +1946,14 @@ msgstr "Mitgliedschaften"
 msgid "Parliament"
 msgstr "Parlament"
 
-msgid "Interests"
+msgid "Interest ties"
 msgstr "Interessensbindungen"
+
+msgid "Interest tie"
+msgstr "Interessensbindung"
+
+msgid "Category"
+msgstr "Kategorie"
 
 msgid "Role"
 msgstr "Rolle"
