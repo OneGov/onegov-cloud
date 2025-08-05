@@ -240,8 +240,14 @@ class DefaultLayout(OrgDefaultLayout, Layout):
         )
 
     @cached_property
-    def ris_settings_url(self) -> str:
-        return self.request.link(self.request.app.org, 'ris-settings')
+    def ris_overview_url(self) -> str:
+        if self.request.is_logged_in:
+            return self.request.link(self.request.app.org, 'ris-settings')
+
+        return self.request.link(
+            self.request.app.org,
+            'topics/stadt-politik-und-recht/stadtparlament'
+        )
 
 
 class DefaultMailLayout(OrgDefaultMailLayout, Layout):
@@ -1056,7 +1062,7 @@ class MeetingCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(self.title, self.request.link(self.model)),
         ]
 
@@ -1096,7 +1102,7 @@ class MeetingLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(_('Meetings'), self.request.class_link(MeetingCollection)),
             Link(self.title, self.request.link(self.model)),
         ]
@@ -1159,7 +1165,7 @@ class RISParliamentarianCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(self.title, self.request.link(self.model))
         ]
 
@@ -1199,7 +1205,7 @@ class RISParliamentarianLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(
                 _('Parliamentarians'),
                 self.request.link(self.collection)
@@ -1272,7 +1278,7 @@ class RISParliamentarianRoleLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(
                 _('Parliamentarians'),
                 self.request.link(self.parliamentarian_collection)
@@ -1332,7 +1338,7 @@ class RISParliamentaryGroupCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(self.title, self.request.link(self.model))
         ]
 
@@ -1372,7 +1378,7 @@ class RISParliamentaryGroupLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(
                 _('Parliamentary groups'),
                 self.request.link(self.collection)
@@ -1431,7 +1437,7 @@ class RISPartyCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(self.title, self.request.link(self.model)),
         ]
 
@@ -1467,7 +1473,7 @@ class RISCommissionCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(self.title, self.request.link(self.model))
         ]
 
@@ -1507,7 +1513,7 @@ class RISCommissionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(_('Commissions'),
                  self.request.class_link(RISCommissionCollection)),
             Link(self.title, self.request.link(self.model))
@@ -1573,7 +1579,7 @@ class PoliticalBusinessCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(self.title, self.request.link(self.model))
         ]
 
@@ -1613,7 +1619,7 @@ class PoliticalBusinessLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(_('Political Businesses'),
                  self.request.class_link(PoliticalBusinessCollection)),
             Link(self.title, self.request.link(self.model))
