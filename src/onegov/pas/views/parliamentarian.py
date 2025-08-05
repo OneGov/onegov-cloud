@@ -9,7 +9,7 @@ from onegov.pas.layouts import PASParliamentarianCollectionLayout
 from onegov.pas.layouts import PASParliamentarianLayout
 from onegov.pas.models import PASParliamentarian
 from onegov.town6.views.parliamentarian import (
-    add_parliamentarian_group_membership)
+    add_parliamentary_group_membership)
 from onegov.town6.views.parliamentarian import add_parliamentarian
 from onegov.town6.views.parliamentarian import delete_parliamentarian
 from onegov.town6.views.parliamentarian import edit_parliamentarian
@@ -109,4 +109,4 @@ def pas_add_commission_membership(
 ) -> RenderData | Response:
 
     layout = PASParliamentarianLayout(self, request)
-    return add_parliamentarian_group_membership(self, request, form, layout)
+    return add_parliamentary_group_membership(self, request, form, layout)

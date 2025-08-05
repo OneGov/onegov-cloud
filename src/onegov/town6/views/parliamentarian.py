@@ -9,7 +9,8 @@ from onegov.org.models import RISParliamentarian
 from onegov.org.models import RISParliamentarianCollection
 from onegov.org.models import PoliticalBusinessParticipationCollection
 from onegov.parliament.collections import ParliamentarianCollection
-from onegov.parliament.models import ParliamentarianRole, CommissionMembership
+from onegov.parliament.models import ParliamentarianRole
+from onegov.parliament.models import CommissionMembership
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import (
@@ -134,7 +135,7 @@ def delete_parliamentarian(
     request.success(_('The parliamentarian has been deleted.'))
 
 
-def add_parliamentarian_group_membership(
+def add_parliamentary_group_membership(
     self: Parliamentarian,
     request: TownRequest,
     form: ParliamentarianRoleForm,
@@ -156,7 +157,8 @@ def add_parliamentarian_group_membership(
         request.success(_('Added a new role'))
         return request.redirect(request.link(self))
 
-    layout.breadcrumbs.append(Link(_('New parliamentary group membership'), '#'))
+    layout.breadcrumbs.append(
+        Link(_('New parliamentary group membership'), '#'))
     layout.include_editor()
 
     return {
@@ -288,7 +290,7 @@ def ris_add_parliamentary_group_membership(
 ) -> RenderData | Response:
 
     layout = RISParliamentarianLayout(self, request)
-    return add_parliamentarian_group_membership(self, request, form, layout)
+    return add_parliamentary_group_membership(self, request, form, layout)
 
 
 @TownApp.form(
