@@ -19,7 +19,6 @@ from sqlalchemy.orm import relationship
 
 from typing import Any
 from typing import IO
-from typing import TypedDict
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -53,10 +52,10 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
     #: the name of the attribute (e.g. `membership.title`).
     export_fields: dict_property[list[str]] = meta_property(default=list)
 
-    # IDs used for audm synchronisation
-    external_id_data: dict_property[ExternalIdData] = meta_property(
-        default=dict
-    )
+    #: IDs used for audm synchronisation
+    #: Use organization path as unique identifier since AUDM lacks external IDs
+    #: This is the name of all parent organisations joined
+    organisation_path: dict_property[str | None] = meta_property()
 
     #: The PDF for the agency and all its suborganizations.
     pdf = associated(AgencyPdf, 'pdf', 'one-to-one')
@@ -201,14 +200,3 @@ class AgencyProxy:
 
     def __init__(self, agency: Agency) -> None:
         self.id = agency.id
-
-
-class ExternalIdData(TypedDict, total=False):
-    """
-    Defines the structure for storing various identifiers that are used to
-    sync with external data source (like AUDM).
-    """
-
-    # Use organization path as unique identifier since AUDM lacks external IDs
-    # This is the name of all parent organisations joined
-    organisation_path: str | None
