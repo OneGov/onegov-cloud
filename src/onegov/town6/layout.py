@@ -244,10 +244,13 @@ class DefaultLayout(OrgDefaultLayout, Layout):
         if self.request.is_logged_in:
             return self.request.link(self.request.app.org, 'ris-settings')
 
-        return self.request.link(
-            self.request.app.org,
-            'topics/stadt-politik-und-recht/stadtparlament'
-        )
+        if self.request.app.org.ris_main_url:
+            return self.request.link(
+                self.request.app.org, self.request.app.org.ris_main_url
+            )
+
+        # fallback to the homepage
+        return self.request.link(self.request.app.org, '')
 
 
 class DefaultMailLayout(OrgDefaultMailLayout, Layout):
