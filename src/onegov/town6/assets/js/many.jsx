@@ -910,12 +910,8 @@ var ManyInterestTies = React.createClass({
         var values = this.state.values;
         var self = this;
 
-        // Get options from the data
-        var textOptions = data.textOptions || [];
-        var linkOptions = data.linkOptions || [];
-
-        var textPlaceholder = (data.placeholders && data.placeholders.text) || "Interest Tie";
-        var linkPlaceholder = (data.placeholders && data.placeholders.link) || "Category";
+        var tiePlaceholder = (data.placeholders && data.placeholders.interest_tie);
+        var catPlaceholder = (data.placeholders && data.placeholders.category);
 
         return (
             <div>
@@ -936,8 +932,7 @@ var ManyInterestTies = React.createClass({
                                                  onChange={onInterestChange}
                                                  extra={data.extra}
                                                  size="small"
-                                                 placeholder={textPlaceholder}
-                                                 // options={textOptions}
+                                                 placeholder={tiePlaceholder}
                                     />
                                 </div>
                                 <div className="small-6 cell">
@@ -948,8 +943,7 @@ var ManyInterestTies = React.createClass({
                                                  onChange={onCatChange}
                                                  extra={data.extra}
                                                  size="small"
-                                                 placeholder={linkPlaceholder}
-                                                 // options={linkOptions}
+                                                 placeholder={catPlaceholder}
                                     />
                                 </div>
                             </div>
