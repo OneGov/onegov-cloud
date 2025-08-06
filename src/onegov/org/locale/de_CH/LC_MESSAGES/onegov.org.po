@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-30 15:46+0200\n"
+"POT-Creation-Date: 2025-08-06 11:56+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -432,6 +432,21 @@ msgstr "Typ"
 
 msgid "Description"
 msgstr "Beschreibung"
+
+msgid "Commission"
+msgstr "Kommission"
+
+msgid "Parliamentarians"
+msgstr "Parlamentsmitglieder"
+
+msgid "Parliamentarian"
+msgstr "Parlamentsmitglied"
+
+msgid "Function"
+msgstr "Funktion"
+
+msgid "Role"
+msgstr "Rolle"
 
 msgid "Lead"
 msgstr "Einleitung"
@@ -1191,8 +1206,17 @@ msgstr "Abzug"
 msgid "Surcharge"
 msgstr "Zuschlag"
 
-msgid "Agenda Items"
+msgid "New agenda item"
+msgstr "Neues Traktandum"
+
+msgid "Agenda items"
 msgstr "Traktanden"
+
+msgid "Number"
+msgstr "Nummer"
+
+msgid "Agenda item"
+msgstr "Traktandum"
 
 msgid "Used in the overview and the e-mail subject"
 msgstr "Wird in der Übersicht und als E-Mail Subjekt verwendet"
@@ -1388,11 +1412,14 @@ msgstr "Webseite"
 msgid "Remarks"
 msgstr "Bemerkungen"
 
-msgid "Parliamentarian"
-msgstr "Parlamentarier:in"
+msgid "Interest ties"
+msgstr "Interessensbindungen"
 
-msgid "Role"
-msgstr "Rolle"
+msgid "Interest tie"
+msgstr "Interessensbindung"
+
+msgid "Category"
+msgstr "Kategorie"
 
 msgid "Parliamentary group"
 msgstr "Fraktion"
@@ -1426,9 +1453,6 @@ msgstr "Zahlungsart"
 
 msgid "Academic Title"
 msgstr "Akademischer Titel"
-
-msgid "Function"
-msgstr "Funktion"
 
 msgid "Organisation"
 msgstr "Organisation"
@@ -1486,9 +1510,6 @@ msgstr "Erstunterzeichner/in"
 
 msgid "Co-signatory"
 msgstr "Mitunterzeichner/in"
-
-msgid "Number"
-msgstr "Nummer"
 
 msgid "Business Status"
 msgstr "Status"
@@ -3664,8 +3685,8 @@ msgstr "Reservationen absagen"
 msgid "Reject all with message"
 msgstr "Alle absagen mit Kommentar"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
