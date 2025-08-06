@@ -33,18 +33,14 @@ class ParliamentarianCollection(GenericCollection[ParliamentarianT]):
         return Parliamentarian  # type: ignore[return-value]
 
     def query(self) -> Query[ParliamentarianT]:
-
         query = super().query()
 
         Parliamentarian = self.model_class  # noqa: N806
         if self.active is not None:
-            id_query = self.session.query(Parliamentarian)
             if self.active:
-                ids = [p.id for p in id_query if p.active]
-                query = query.filter(Parliamentarian.id.in_(ids))
+                query = query.filter(Parliamentarian.active == True)
             else:
-                ids = [p.id for p in id_query if not p.active]
-                query = query.filter(Parliamentarian.id.in_(ids))
+                query = query.filter(Parliamentarian.active == False)
 
         return query.order_by(
             Parliamentarian.last_name,
