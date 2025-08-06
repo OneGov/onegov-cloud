@@ -1747,9 +1747,8 @@ class TicketLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
-        if self.request.is_manager_for_model(self.model):
-
-            links: list[Link | LinkGroup]
+        links: list[Link | LinkGroup] = []
+        if is_manager := self.request.is_manager_for_model(self.model):
 
             # only show the model related links when the ticket is pending
             if self.model.state == 'pending':
@@ -1830,6 +1829,7 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': ('ticket-button', 'ticket-assign')},
                 ))
 
+        if self.request.is_logged_in:
             # ticket notes are always enabled
             links.append(
                 Link(
@@ -1845,17 +1845,17 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': 'ticket-pdf'}
                 )
             )
-            if self.has_submission_files:
-                links.append(
-                    Link(
-                        text=_('Download files'),
-                        url=self.request.link(self.model, 'files'),
-                        attrs={'class': 'ticket-files'}
-                    )
-                )
 
-            return links
-        return None
+        if is_manager and self.has_submission_files:
+            links.append(
+                Link(
+                    text=_('Download files'),
+                    url=self.request.link(self.model, 'files'),
+                    attrs={'class': 'ticket-files'}
+                )
+            )
+
+        return links or None
 
     @cached_property
     def has_submission_files(self) -> bool:

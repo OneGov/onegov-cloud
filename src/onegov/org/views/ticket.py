@@ -15,7 +15,7 @@ from onegov.core.elements import Link, Intercooler, Confirm
 from onegov.core.html import html_to_text
 from onegov.core.mail import Attachment
 from onegov.core.orm import as_selectable
-from onegov.core.security import Public, Private, Secret
+from onegov.core.security import Public, Personal, Private, Secret
 from onegov.core.templates import render_template
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
@@ -74,7 +74,7 @@ if TYPE_CHECKING:
     from webob import Response as BaseResponse
 
 
-@OrgApp.html(model=Ticket, template='ticket.pt', permission=Private)
+@OrgApp.html(model=Ticket, template='ticket.pt', permission=Personal)
 def view_ticket(
     self: Ticket,
     request: OrgRequest,
@@ -132,17 +132,18 @@ def view_ticket(
         select(stmt.c).where(stmt.c.channel_id == self.number)).first()
 
     # if we have a payment, show the payment button
+    is_manager = request.is_manager_for_model(self)
     layout = layout or TicketLayout(self, request)
     payment_button = None
     payment = handler.payment
     edit_amount_url = None
 
-    if payment and payment.source == 'manual':
+    if is_manager and payment and payment.source == 'manual':
         payment_button = manual_payment_button(payment, layout)
-        if (request.is_manager or request.is_supporter) and not payment.paid:
+        if not payment.paid:
             edit_amount_url = request.link(self, name='add-invoice-item')
 
-    if payment and payment.source in (
+    if is_manager and payment and payment.source in (
         'stripe_connect',
         'datatrans',
         'worldline_saferpay',
@@ -505,7 +506,7 @@ def send_new_note_notification(
 
 
 @OrgApp.form(
-    model=Ticket, name='note', permission=Private,
+    model=Ticket, name='note', permission=Personal,
     template='ticket_note_form.pt', form=TicketNoteForm
 )
 def handle_new_note(
@@ -539,7 +540,7 @@ def handle_new_note(
     }
 
 
-@OrgApp.view(model=TicketNote, permission=Private)
+@OrgApp.view(model=TicketNote, permission=Personal)
 def view_ticket_note(
     self: TicketNote,
     request: OrgRequest
@@ -547,9 +548,16 @@ def view_ticket_note(
     return request.redirect(request.link(self.ticket))
 
 
-@OrgApp.view(model=TicketNote, permission=Private, request_method='DELETE')
+def assert_can_modify_note(self: TicketNote, request: OrgRequest) -> None:
+    if not request.is_manager_for_model(self):
+        if self.owner != request.current_username:
+            raise exc.HTTPNotFound()
+
+
+@OrgApp.view(model=TicketNote, permission=Personal, request_method='DELETE')
 def delete_ticket_note(self: TicketNote, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
+    assert_can_modify_note(self, request)
 
     if self.ticket:
         # force a change of the ticket to make sure that it gets reindexed
@@ -560,7 +568,7 @@ def delete_ticket_note(self: TicketNote, request: OrgRequest) -> None:
 
 
 @OrgApp.form(
-    model=TicketNote, name='edit', permission=Private,
+    model=TicketNote, name='edit', permission=Personal,
     template='ticket_note_form.pt', form=TicketNoteForm
 )
 def handle_edit_note(
@@ -569,6 +577,8 @@ def handle_edit_note(
     form: TicketNoteForm,
     layout: TicketNoteLayout | None = None
 ) -> RenderData | BaseResponse:
+
+    assert_can_modify_note(self, request)
 
     assert self.ticket is not None
     if form.submitted(request):
@@ -942,7 +952,7 @@ def create_attachment_from_uploaded(
     return (attachment,)
 
 
-@OrgApp.view(model=Ticket, name='pdf', permission=Private)
+@OrgApp.view(model=Ticket, name='pdf', permission=Personal)
 def view_ticket_pdf(self: Ticket, request: OrgRequest) -> Response:
     """ View the generated PDF. """
 
