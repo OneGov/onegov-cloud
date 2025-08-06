@@ -335,7 +335,7 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
                 return True
 
         return False
-    
+
     @active.expression  # type:ignore[no-redef]
     def active(cls):
 
@@ -373,8 +373,10 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
                 return True
 
         for membership in self.commission_memberships:
-            membership_start = membership.start if membership.start is not None else date.min
-            membership_end = membership.end if membership.end is not None else date.max
+            membership_start = (
+                membership.start) if membership.start is not None else date.min
+            membership_end = (
+                membership.end) if membership.end is not None else date.max
             if membership_end >= start and membership_start <= end:
                 return True
 
