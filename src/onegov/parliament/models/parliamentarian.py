@@ -323,25 +323,33 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
 
     @hybrid_property
     def active(self) -> bool:
-        if not self.roles or not self.commission_memberships:
+        if not self.roles and not self.commission_memberships:
             return True
 
         for role in self.roles:
             if role.end is None or role.end >= date.today():
                 return True
 
-        for c_membership in self.commission_memberships:
-            if c_membership.end is None or c_membership.end >= date.today():
+        for membership in self.commission_memberships:
+            if membership.end is None or membership.end >= date.today():
                 return True
 
         return False
 
     @active.expression  # type:ignore[no-redef]
     def active(cls):
+        from onegov.parliament.models import (
+            CommissionMembership,
+            ParliamentarianRole,
+        )
 
         return or_(
-            ~exists().where(ParliamentarianRole.parliamentarian_id == cls.id),
-            ~exists().where(CommissionMembership.parliamentarian_id == cls.id),
+            and_(
+                ~exists().where(
+                    ParliamentarianRole.parliamentarian_id == cls.id),
+                ~exists().where(
+                    CommissionMembership.parliamentarian_id == cls.id)
+            ),
             exists().where(
                 and_(
                     ParliamentarianRole.parliamentarian_id == cls.id,
