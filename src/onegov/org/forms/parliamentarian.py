@@ -173,13 +173,23 @@ class ParliamentarianForm(NamedFileForm):
         obj: object,
         *args: Any, **kwargs: Any
     ) -> None:
-        super().populate_obj(obj, *args, **kwargs)
+        super().populate_obj(
+            obj,
+            exclude={'interest_ties'}
+        )
 
         if hasattr(obj, 'interests'):
             interests = obj.interests
             interests['rows'] = self.json_to_interest_ties(
                 self.interest_ties.data)
+            if not interests.get('headers'):
+                interests['headers'] = ['Interessenbindung', 'Kategorie']
             obj.interests = interests
+
+    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
+        data = super().get_useful_data()
+        data.pop('interest_ties')
+        return data
 
     def interest_ties_to_json(
         self,
