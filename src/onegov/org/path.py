@@ -45,6 +45,8 @@ from onegov.org.app import OrgApp
 from onegov.org.auth import MTANAuth
 from onegov.org.converters import keywords_converter
 from onegov.org.models import AtoZPages, PushNotificationCollection
+from onegov.org.models import RISCommissionMembershipCollection
+from onegov.org.models import RISCommissionMembership
 from onegov.org.models import CitizenDashboard, Dashboard
 from onegov.org.models import Clipboard
 from onegov.org.models import DirectorySubmissionAction
@@ -1359,3 +1361,15 @@ def get_meeting_item(
     session = app.session()
     res = session.query(MeetingItem).filter(MeetingItem.id == id).first()
     return res
+
+
+@OrgApp.path(
+    model=RISCommissionMembership,
+    path='/commission-membership/{id}',
+    converters={'id': UUID}
+)
+def get_commission_membership(
+    app: OrgApp,
+    id: UUID
+) -> RISCommissionMembership | None:
+    return RISCommissionMembershipCollection(app.session()).by_id(id)

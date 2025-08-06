@@ -138,17 +138,22 @@
                 <dd>
                     <ul class="more-list">
                         <li tal:repeat="membership parliamentarian.commission_memberships">
-                            <a href="${request.link(membership.commission)}" class="list-link">${membership.commission.title}</a>
-                            <span class="list-lead preview">
-                                ${membership.role_label}
-                            </span>
-                            <span tal:condition="membership.start">
-                                ${layout.format_date(membership.start, 'date')}
-                            </span>
-                            <span tal:condition="membership.end">
-                                -
-                                ${layout.format_date(membership.end, 'date')}
-                            </span>
+                            <div class="list-link">
+                                <a tal:condition="request.is_manager" href="${request.link(membership)}">${membership.role_label}</a>
+                                <span tal:condition="not request.is_manager">
+                                    ${membership.role_label}
+                                </span>
+                                <span tal:condition="membership.commission">
+                                    <tal:block i18n:translate> in </tal:block>
+                                    <a href="${request.link(membership.commission)}">${membership.commission.title}</a>
+                                </span>
+                                <span class="list-lead preview">
+                                    ${layout.format_date(membership.start, 'date')}
+                                    <span tal:condition="membership.end">
+                                        ${layout.format_date(membership.end, 'date')}
+                                    </span>
+                                </span>
+                            </div>
                         </li>
                     </ul>
                 </dd>
