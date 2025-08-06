@@ -2,7 +2,7 @@
     <tal:b metal:fill-slot="title">
         ${title}
     </tal:b>
-    <tal:b metal:fill-slot="content">
+    <tal:b metal:fill-slot="content" tal:define="is_manager request.is_manager_for_model(ticket)">
         <div class="grid-x grid-padding-x">
 
             <!--! note that the following snippet is DUPLICATED below, because when
@@ -57,7 +57,7 @@
                             Ticket updates by e-mail
                         </span>
 
-                        <a class="button small secondary" href="${request.link(ticket, 'mute')}">
+                        <a tal:condition="is_manager" class="button small secondary" href="${request.link(ticket, 'mute')}">
                             <i class="fa fa-fw fa-microphone-slash" aria-hidden="true"></i>
                             <span i18n:translate>Disable E-Mails</span>
                         </a>
@@ -71,14 +71,14 @@
                         </span>
 
                         <tal:b condition="not event_source">
-                            <a class="button small secondary" href="${request.link(ticket, 'unmute')}">
+                            <a tal:condition="is_manager" class="button small secondary" href="${request.link(ticket, 'unmute')}">
                                 <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
                                 <span i18n:translate>Enable E-Mails</span>
                             </a>
                         </tal:b>
 
                         <tal:b condition="event_source">
-                            <a class="button small secondary confirm disabled"
+                            <a tal:condition="is_manager" class="button small secondary confirm disabled"
                                data-confirm="E-Mails can not be sent for tickets of imported events"
                                 data-confirm-no="Cancel"
                                i18n:attributes="data-confirm;data-confirm-no"
@@ -91,14 +91,14 @@
                     </div>
 
                     <tal:b condition="not event_source and ticket.state != 'closed'">
-                        <a class="button small primary" href="${request.link(ticket, 'message-to-submitter')}">
+                        <a tal:condition="is_manager" class="button small primary" href="${request.link(ticket, 'message-to-submitter')}">
                             <i class="fa fa-fw fa-comment-o" aria-hidden="true"></i>
                             <span i18n:translate>Send Message</span>
                         </a>
                     </tal:b>
 
                     <tal:b condition="not event_source and ticket.state == 'closed'">
-                        <a class="button small disabled confirm"
+                        <a tal:condition="is_manager" class="button small disabled confirm"
                             data-confirm="Messages cannot be sent when the ticket is closed"
                             data-confirm-extra="Please reopen the ticket to send a message"
                             data-confirm-no="Cancel"
@@ -110,7 +110,7 @@
                     </tal:b>
 
                     <tal:b condition="event_source">
-                        <a class="button small disabled confirm"
+                        <a tal:condition="is_manager" class="button small disabled confirm"
                             data-confirm="Messages cannot be sent for imported events"
                             data-confirm-no="Cancel"
                             i18n:attributes="data-confirm;data-confirm-no">
@@ -177,7 +177,7 @@
 
                     <tal:b tal:condition="payment_button" tal:replace="payment_button(layout)" />
 
-                    <a tal:condition="invoice" href="${request.link(ticket, 'invoice')}" class="button small primary view-invoice" i18n:translate>View Invoice</a>
+                    <a tal:condition="is_manager and invoice" href="${request.link(ticket, 'invoice')}" class="button small primary view-invoice" i18n:translate>View Invoice</a>
                 </div>
 
                 <div class="ticket-panel">
@@ -198,8 +198,8 @@
                         </div>
                     </div>
 
-                    <div tal:condition="request.is_manager_for_model(ticket) and ticket.handler_code == 'RSV' and request.app.org.ticket_tags" class="field-display-block">
-                        <div class="field-display-label"><span i18n:translate>Tag</span> <a href="${request.link(ticket, 'change-tag')}" class="ticket-change-tag" title="Change tag" i18n:attributes="title" tal:condition="ticket.state == 'pending'"></a></div>
+                    <div tal:condition="ticket.handler_code == 'RSV' and request.app.org.ticket_tags" class="field-display-block">
+                        <div class="field-display-label"><span i18n:translate>Tag</span> <a href="${request.link(ticket, 'change-tag')}" class="ticket-change-tag" title="Change tag" i18n:attributes="title" tal:condition="is_manager and ticket.state == 'pending'"></a></div>
                         <div class="field-display-data ticket-tag">
                             <tal:b tal:condition="ticket.tag">${ticket.tag}</tal:b>
                             <tal:b tal:condition="not:ticket.tag" i18n:translate>Without</tal:b>

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.core.security import Public, Private, Secret
+from onegov.core.security import Public, Personal, Private, Secret
 from onegov.form import Form
 from onegov.org.views.ticket import (
     view_ticket, handle_new_note, handle_edit_note, message_to_submitter,
@@ -32,13 +32,13 @@ if TYPE_CHECKING:
     from webob import Response
 
 
-@TownApp.html(model=Ticket, template='ticket.pt', permission=Private)
+@TownApp.html(model=Ticket, template='ticket.pt', permission=Personal)
 def town_view_ticket(self: Ticket, request: TownRequest) -> RenderData:
     return view_ticket(self, request, TicketLayout(self, request))
 
 
 @TownApp.form(
-    model=Ticket, name='note', permission=Private,
+    model=Ticket, name='note', permission=Personal,
     template='ticket_note_form.pt', form=TicketNoteForm
 )
 def town_handle_new_note(
@@ -51,7 +51,7 @@ def town_handle_new_note(
 
 
 @TownApp.form(
-    model=TicketNote, name='edit', permission=Private,
+    model=TicketNote, name='edit', permission=Personal,
     template='ticket_note_form.pt', form=TicketNoteForm
 )
 def town_handle_edit_note(

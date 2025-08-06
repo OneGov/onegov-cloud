@@ -825,12 +825,13 @@ class ReservationHandler(Handler):
 
         layout = DefaultLayout(self.resource, request)
 
+        is_manager = request.is_manager_for_model(self.ticket)
         parts = []
         parts.append(
             render_macro(layout.macros['reservations'], request, {
                 'reservations': self.reservations,
                 'get_links': self.get_reservation_links
-                if self.ticket.state == 'pending' else None,
+                if is_manager and self.ticket.state == 'pending' else None,
                 'get_occupancy_url': self.get_occupancy_url,
                 'layout': layout
             })
@@ -848,7 +849,7 @@ class ReservationHandler(Handler):
             ))
 
         # render internal tag meta data
-        if request.is_manager_for_model(self.ticket) and self.ticket.tag_meta:
+        if is_manager and self.ticket.tag_meta:
             parts.append(
                 Markup('').join(
                     Markup(
@@ -977,6 +978,9 @@ class ReservationHandler(Handler):
     ) -> str | None:
 
         if self.deleted:
+            return None
+
+        if not request.is_manager_for_model(self.ticket):
             return None
 
         assert self.resource is not None
