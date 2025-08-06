@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from datetime import date
+from sqlalchemy import and_, or_, exists
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import dict_property, content_property
@@ -318,23 +321,73 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
     #: A parliamentarian's interest ties
     interests: dict_property[dict[str, Any]] = content_property(default=dict)
 
-    @property
+    @hybrid_property
     def active(self) -> bool:
-        if not self.roles:
+        if not self.roles and not self.commission_memberships:
             return True
+
         for role in self.roles:
             if role.end is None or role.end >= date.today():
                 return True
+
+        for membership in self.commission_memberships:
+            if membership.end is None or membership.end >= date.today():
+                return True
+
         return False
+
+    @active.expression  # type:ignore[no-redef]
+    def active(cls):
+        from onegov.parliament.models import (
+            CommissionMembership,
+            ParliamentarianRole,
+        )
+
+        return or_(
+            and_(
+                ~exists().where(
+                    ParliamentarianRole.parliamentarian_id == cls.id),
+                ~exists().where(
+                    CommissionMembership.parliamentarian_id == cls.id)
+            ),
+            exists().where(
+                and_(
+                    ParliamentarianRole.parliamentarian_id == cls.id,
+                    or_(
+                        ParliamentarianRole.end.is_(None),
+                        ParliamentarianRole.end >= date.today()
+                    )
+                )
+            ),
+            exists().where(
+                and_(
+                    CommissionMembership.parliamentarian_id == cls.id,
+                    or_(
+                        CommissionMembership.end.is_(None),
+                        CommissionMembership.end >= date.today()
+                    )
+                )
+            )
+        )
 
     def active_during(self, start: date, end: date) -> bool:
         if not self.roles:
             return True
+
         for role in self.roles:
             role_start = role.start if role.start is not None else date.min
             role_end = role.end if role.end is not None else date.max
             if role_end >= start and role_start <= end:
                 return True
+
+        for membership in self.commission_memberships:
+            membership_start = (
+                membership.start) if membership.start is not None else date.min
+            membership_end = (
+                membership.end) if membership.end is not None else date.max
+            if membership_end >= start and membership_start <= end:
+                return True
+
         return False
 
     @property
