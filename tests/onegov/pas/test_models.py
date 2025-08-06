@@ -120,8 +120,10 @@ def test_models(session):
     # ... parliamentarian.active
     assert parliamentarian.active is True
     parliamentarian_role.end = date(2022, 5, 5)
+    commission_membership.end = date(2022, 5, 5)
     assert parliamentarian.active is False
     parliamentarian.roles = []
+    parliamentarian.commission_memberships = []
     assert parliamentarian.active is True
 
     # commission.end_observer
