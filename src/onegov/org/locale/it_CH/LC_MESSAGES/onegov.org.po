@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-30 15:46+0200\n"
+"POT-Creation-Date: 2025-08-06 14:12+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -433,6 +433,18 @@ msgstr "Tipo"
 
 msgid "Description"
 msgstr "Descrizione"
+
+msgid "Commission"
+msgstr "Commissione"
+
+msgid "Parliamentarian"
+msgstr "Parlamentare"
+
+msgid "Function"
+msgstr "Funzione"
+
+msgid "Role"
+msgstr "Ruolo"
 
 msgid "Lead"
 msgstr "Principale"
@@ -1194,8 +1206,17 @@ msgstr "Deduzione"
 msgid "Surcharge"
 msgstr "Supplemento"
 
-msgid "Agenda Items"
+msgid "New agenda item"
+msgstr "Nuovo elemento dell'agenda"
+
+msgid "Agenda items"
 msgstr "Elementi dell'agenda"
+
+msgid "Number"
+msgstr "Numero"
+
+msgid "Agenda item"
+msgstr "Elemento dell'agenda"
 
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilizzato nella panoramica e nell'oggetto dell'e-mail"
@@ -1391,11 +1412,14 @@ msgstr "Sito web"
 msgid "Remarks"
 msgstr "Osservazioni"
 
-msgid "Parliamentarian"
-msgstr "Parlamentare"
+msgid "Interest ties"
+msgstr "Legami di interesse"
 
-msgid "Role"
-msgstr "Ruolo"
+msgid "Interest tie"
+msgstr "Legame di interesse"
+
+msgid "Category"
+msgstr "Categoria"
 
 msgid "Parliamentary group"
 msgstr "Gruppo parlamentare"
@@ -1430,9 +1454,6 @@ msgstr "Tipo di pagamento"
 
 msgid "Academic Title"
 msgstr "Titolo accademico"
-
-msgid "Function"
-msgstr "Funzione"
 
 msgid "Organisation"
 msgstr "Organizzazione"
@@ -1490,9 +1511,6 @@ msgstr "Primo firmatario"
 
 msgid "Co-signatory"
 msgstr "Cofirmatario"
-
-msgid "Number"
-msgstr "Numero"
 
 msgid "Business Status"
 msgstr "Stato"
@@ -3671,8 +3689,8 @@ msgstr "Rifiuta le prenotazioni"
 msgid "Reject all with message"
 msgstr "Rifiuta tutto con messaggio"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 

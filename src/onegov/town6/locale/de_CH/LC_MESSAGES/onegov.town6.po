@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-08-05 14:36+0200\n"
+"POT-Creation-Date: 2025-08-06 14:12+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -159,6 +159,12 @@ msgstr "RIS aktivieren"
 
 msgid "Enables the RIS integration for this organisation."
 msgstr "Aktiviert die RIS-Integration für diese Organisation."
+
+msgid "URL path for the RIS main page"
+msgstr "URL-Pfad für die RIS-Hauptseite"
+
+msgid "The URL path for the RIS main page for non-logged-in users."
+msgstr "Der URL-Pfad für die RIS-Hauptseite für nicht angemeldete Benutzer."
 
 msgid "Events"
 msgstr "Veranstaltungen"
@@ -373,6 +379,18 @@ msgstr "Möchten Sie das politische Geschäft wirklich löschen?"
 msgid "Delete political business"
 msgstr "Politisches Geschäft löschen"
 
+msgid "RIS settings"
+msgstr "RIS Einstellungen"
+
+msgid "Commission membership"
+msgstr "Kommissionsmitgliedschaft"
+
+msgid "Do you really want to remove this commission membership?"
+msgstr "Möchten Sie diese Kommissionsmitgliedschaft wirklich entfernen?"
+
+msgid "Remove commission membership"
+msgstr "Kommissionsmitgliedschaft entfernen"
+
 msgid "No availability periods defined."
 msgstr "Keine Verfügbarkeitszeiträume definiert."
 
@@ -443,6 +461,9 @@ msgstr "Keine aktiven Chats."
 
 msgid "Contact"
 msgstr "Kontakt"
+
+msgid "Function"
+msgstr "Funktion"
 
 msgid "No active commissions."
 msgstr "Keine aktiven Kommissionen."
@@ -1946,14 +1967,11 @@ msgstr "Mitgliedschaften"
 msgid "Parliament"
 msgstr "Parlament"
 
+msgid "in"
+msgstr "der"
+
 msgid "Interest ties"
 msgstr "Interessensbindungen"
-
-msgid "Interest tie"
-msgstr "Interessensbindung"
-
-msgid "Category"
-msgstr "Kategorie"
 
 msgid "Role"
 msgstr "Rolle"
@@ -2565,6 +2583,9 @@ msgstr "Sitzung bearbeiten"
 msgid "The meeting has been deleted."
 msgstr "Die Sitzung wurde gelöscht."
 
+msgid "The commission membership has been deleted."
+msgstr "Die Kommissionsmitgliedschaft wurde gelöscht."
+
 msgid "Added a new parliamentarian"
 msgstr "Parlamentsmitglied hinzugefügt"
 
@@ -2703,6 +2724,12 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid "Interest tie"
+#~ msgstr "Interessensbindung"
+
+#~ msgid "Category"
+#~ msgstr "Kategorie"
 
 #~ msgid "Role (as a group member)"
 #~ msgstr "Rolle (als Fraktionsmitglied)"

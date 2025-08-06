@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-30 15:46+0200\n"
+"POT-Creation-Date: 2025-08-06 14:12+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -432,6 +432,18 @@ msgstr "Type"
 
 msgid "Description"
 msgstr "Description"
+
+msgid "Commission"
+msgstr "Commission"
+
+msgid "Parliamentarian"
+msgstr "Parlementaire"
+
+msgid "Function"
+msgstr "Fonction"
+
+msgid "Role"
+msgstr "Rôle"
 
 msgid "Lead"
 msgstr "Accroche"
@@ -1190,8 +1202,17 @@ msgstr "Remise"
 msgid "Surcharge"
 msgstr "Supplément"
 
-msgid "Agenda Items"
+msgid "New agenda item"
+msgstr "Nouvel élément d'agenda"
+
+msgid "Agenda items"
 msgstr "Éléments d'agenda"
+
+msgid "Number"
+msgstr "Numéro"
+
+msgid "Agenda item"
+msgstr "Élément d'agenda"
 
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilisé dans l'aperçu et le sujet de l'e-mail"
@@ -1387,11 +1408,14 @@ msgstr "Site Web"
 msgid "Remarks"
 msgstr "Remarques"
 
-msgid "Parliamentarian"
-msgstr "Parlementaire"
+msgid "Interest ties"
+msgstr "Liens d'intérêt"
 
-msgid "Role"
-msgstr "Rôle"
+msgid "Interest tie"
+msgstr "Lien d'intérêt"
+
+msgid "Category"
+msgstr "Catégorie"
 
 msgid "Parliamentary group"
 msgstr "Groupe Parlementaire"
@@ -1425,9 +1449,6 @@ msgstr "Type de paiement"
 
 msgid "Academic Title"
 msgstr "Diplôme"
-
-msgid "Function"
-msgstr "Fonction"
 
 msgid "Organisation"
 msgstr "Organisation"
@@ -1485,9 +1506,6 @@ msgstr "Premier signataire"
 
 msgid "Co-signatory"
 msgstr "Co-signataire"
-
-msgid "Number"
-msgstr "Numéro"
 
 msgid "Business Status"
 msgstr "Statut"
@@ -3670,8 +3688,8 @@ msgstr "Refuser les réservations"
 msgid "Reject all with message"
 msgstr "Tout refuser avec message"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -4063,8 +4081,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "

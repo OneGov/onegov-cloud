@@ -149,7 +149,7 @@ class ParliamentarianForm(NamedFileForm):
     )
 
     interest_ties = StringField(
-        label=_('Interest Ties'),
+        label=_('Interest ties'),
         fieldset=_('Interest ties'),
         render_kw={'class_': 'many many-interest-ties'}
     )

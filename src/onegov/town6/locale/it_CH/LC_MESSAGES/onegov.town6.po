@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-08-05 14:36+0200\n"
+"POT-Creation-Date: 2025-08-06 14:12+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -155,6 +155,13 @@ msgstr "Attiva RIS"
 
 msgid "Enables the RIS integration for this organisation."
 msgstr "Attiva l'integrazione RIS per questa organizzazione."
+
+msgid "URL path for the RIS main page"
+msgstr "Percorso URL per la pagina principale RIS"
+
+msgid "The URL path for the RIS main page for non-logged-in users."
+msgstr ""
+"Il percorso URL per la pagina principale RIS per gli utenti non registrati."
 
 #, fuzzy
 msgid "Events"
@@ -369,6 +376,18 @@ msgstr "Vuoi davvero cancellare questo attività politico?"
 msgid "Delete political business"
 msgstr "Elimina affare politico"
 
+msgid "RIS settings"
+msgstr "Impostazioni RIS"
+
+msgid "Commission membership"
+msgstr "Appartenenza alla commissione"
+
+msgid "Do you really want to remove this commission membership?"
+msgstr "Vuoi davvero rimuovere questa appartenenza alla commissione?"
+
+msgid "Remove commission membership"
+msgstr "Rimuovi appartenenza alla commissione"
+
 msgid "No availability periods defined."
 msgstr "Nessun periodo di disponibilità definito."
 
@@ -440,6 +459,9 @@ msgstr "Nessuna chat attiva."
 #, fuzzy
 msgid "Contact"
 msgstr "Contatti"
+
+msgid "Function"
+msgstr "Funzione"
 
 msgid "No active commissions."
 msgstr "Nessuna commissione attiva."
@@ -1939,14 +1961,11 @@ msgstr "Ruoli"
 msgid "Parliament"
 msgstr "Parlamento"
 
+msgid "in"
+msgstr "di"
+
 msgid "Interest ties"
 msgstr "Legami di interesse"
-
-msgid "Interest tie"
-msgstr "Legame di interesse"
-
-msgid "Category"
-msgstr "Categoria"
 
 msgid "Role"
 msgstr "Ruolo"
@@ -2565,6 +2584,9 @@ msgstr "Modifica riunione"
 msgid "The meeting has been deleted."
 msgstr "La riunione è stata eliminata."
 
+msgid "The commission membership has been deleted."
+msgstr "L'appartenenza alla commissione è stata eliminata."
+
 msgid "Added a new parliamentarian"
 msgstr "Aggiunto un nuovo parlamentare"
 
@@ -2704,6 +2726,12 @@ msgstr "Sistema di informazione sui ratti (RIS)"
 
 msgid "New Note"
 msgstr "Nuova nota"
+
+#~ msgid "Interest tie"
+#~ msgstr "Legame di interesse"
+
+#~ msgid "Category"
+#~ msgstr "Categoria"
 
 #~ msgid "Role (as a group member)"
 #~ msgstr "Ruolo (come membro di un gruppo)"
