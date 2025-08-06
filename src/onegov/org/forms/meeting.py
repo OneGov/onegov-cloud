@@ -52,8 +52,8 @@ class MeetingForm(Form):
     )
 
     meeting_items = StringField(
-        label=_('New Agenda Item'),
-        fieldset=_('Agenda Items'),
+        label=_('New agenda item'),
+        fieldset=_('Agenda items'),
         render_kw={'class_': 'many many-meeting-items'},
     )
 
@@ -185,7 +185,7 @@ class MeetingForm(Form):
                 'labels': {
                     'number': request.translate(_('Number')),
                     'title': request.translate(_('Title')),
-                    'agenda_item': request.translate(_('Agenda Item')),
+                    'agenda_item': request.translate(_('Agenda item')),
                     'add': request.translate(_('Add')),
                     'remove': request.translate(_('Remove')),
                 },
