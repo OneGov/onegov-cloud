@@ -355,6 +355,18 @@ msgstr "Kommissionen"
 msgid "Commission"
 msgstr "Kommission"
 
+msgid "Commission membership"
+msgstr "Kommissionsmitgliedschaft"
+
+msgid "Do you really want to remove this commission membership?"
+msgstr "Möchten Sie diese Kommissionsmitgliedschaft wirklich entfernen?"
+
+msgid "The commission membership has been deleted."
+msgstr "Die Kommissionsmitgliedschaft wurde gelöscht."
+
+msgid "Remove commission membership"
+msgstr "Kommissionsmitgliedschaft entfernen"
+
 msgid "Do you really want to delete this commission?"
 msgstr "Möchten Sie die Kommission wirklich löschen?"
 
