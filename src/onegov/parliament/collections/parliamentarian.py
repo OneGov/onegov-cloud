@@ -38,9 +38,11 @@ class ParliamentarianCollection(GenericCollection[ParliamentarianT]):
         Parliamentarian = self.model_class  # noqa: N806
         if self.active is not None:
             if self.active:
-                query = query.filter(Parliamentarian.active == True)
+                query = query.filter(
+                    Parliamentarian.active.expression == True)  # type:ignore[attr-defined]
             else:
-                query = query.filter(Parliamentarian.active == False)
+                query = query.filter(
+                    Parliamentarian.active.expression == False)  # type:ignore[attr-defined]
 
         return query.order_by(
             Parliamentarian.last_name,
