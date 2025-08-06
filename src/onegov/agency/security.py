@@ -7,6 +7,7 @@ from onegov.agency.models import AgencyMembershipMoveWithinPerson
 from onegov.agency.models import AgencyMove
 from onegov.agency.models.ticket import AgencyMutationTicket
 from onegov.agency.models.ticket import PersonMutationTicket
+from onegov.core.security import Personal, Private
 from onegov.core.security.roles import (
     get_roles_setting as get_roles_setting_base)
 from onegov.core.security.rules import has_permission_logged_in
@@ -246,6 +247,11 @@ def has_permission_agency_mutation_ticket(
     model: AgencyMutationTicket,
     permission: object
 ) -> bool:
+    # TODO: We may allow extended access like we do in Org/Town in
+    #       the future, but for now let's restrict the access, since
+    #       there are tests that validate this restriction.
+    if permission is Personal:
+        permission = Private
     if model.handler and model.handler.agency:
         agency = model.handler.agency
         if not has_permission_agency(app, identity, agency, permission):
@@ -260,6 +266,11 @@ def has_permission_person_mutation_ticket(
     model: PersonMutationTicket,
     permission: object
 ) -> bool:
+    # TODO: We may allow extended access like we do in Org/Town in
+    #       the future, but for now let's restrict the access, since
+    #       there are tests that validate this restriction.
+    if permission is Personal:
+        permission = Private
     if model.handler and model.handler.person:
         person = model.handler.person
         if not has_permission_person(app, identity, person, permission):
