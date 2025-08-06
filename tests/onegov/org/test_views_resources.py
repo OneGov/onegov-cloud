@@ -2738,6 +2738,11 @@ def test_manual_reservation_payment_with_one_off_extra(client):
     assert 'Zahlungsmethode' in invoice
     assert invoice.pyquery('.payment-state').text() == "Offen"
 
+    # reject the final reservation (invoice should get deleted)
+    delete_url = page.pyquery('a.delete-link')[-1].attrib['ic-get-from']
+    page = client.get(delete_url).follow()
+    assert 'Rechnung anzeigen' not in page
+
 
 @freeze_time("2017-07-09", tick=True)
 def test_manual_reservation_payment_with_per_item_extra(client):

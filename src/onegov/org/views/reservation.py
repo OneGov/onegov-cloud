@@ -1325,10 +1325,14 @@ def reject_reservation(
         resource.scheduler.remove_reservation(token, reservation.id)
 
     if len(excluded) == 0 and submission:
-        forms.submissions.delete(submission)
+        # pretend we already deleted the submission
+        ticket.handler.submission = None  # type: ignore[attr-defined]
 
     if ticket.handler.refreshing_invoice_is_safe(request):
         ticket.handler.refresh_invoice_items(request)
+
+        if len(excluded) == 0 and submission:
+            forms.submissions.delete(submission)
 
         # since we might roll back previous changes we can't revoke
         # the kaba visits until now, since we didn't hook this change
