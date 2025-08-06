@@ -4,10 +4,10 @@ from datetime import date
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import TranslatedSelectField
+from onegov.org.models import RISCommissionCollection
+from onegov.org.models import RISParliamentarianCollection
 from onegov.parliament.models.commission_membership import ROLES
-from onegov.pas import _
-from onegov.pas.collections import PASCommissionCollection
-from onegov.pas.collections import PASParliamentarianCollection
+from onegov.town6 import _
 from wtforms.fields import DateField
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
@@ -47,12 +47,12 @@ class CommissionMembershipForm(Form):
         self.commission_id.choices = [
             (commission.id, commission.title)
             for commission
-            in PASCommissionCollection(self.request.session).query()
+            in RISCommissionCollection(self.request.session).query()
         ]
         self.parliamentarian_id.choices = [
             (parliamentarian.id, parliamentarian.title)
             for parliamentarian
-            in PASParliamentarianCollection(self.request.session).query()
+            in RISParliamentarianCollection(self.request.session).query()
         ]
 
 
@@ -63,5 +63,5 @@ class CommissionMembershipAddForm(CommissionMembershipForm):
         self.parliamentarian_id.choices = [
             (parliamentarian.id, parliamentarian.title)
             for parliamentarian
-            in PASParliamentarianCollection(self.request.session, True).query()
+            in RISParliamentarianCollection(self.request.session, True).query()
         ]

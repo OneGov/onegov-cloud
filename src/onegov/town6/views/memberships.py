@@ -1,20 +1,21 @@
 from __future__ import annotations
 
 from onegov.core.elements import Link
-from onegov.core.security import Private, Public
+from onegov.core.security import Private
 from onegov.org.forms.commission_membership import CommissionMembershipForm
 from onegov.org.models import RISCommissionMembership
+from onegov.org.models import RISCommissionMembershipCollection
 from onegov.parliament.models import CommissionMembership
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import RISCommissionMembershipLayout
-from onegov.town6.request import TownRequest
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from webob.response import Response
 
     from onegov.core.types import RenderData
+    from onegov.town6.request import TownRequest
 
 
 @TownApp.html(
@@ -66,3 +67,21 @@ def edit_commission_membership(
         'form': form,
         'form_width': 'large'
     }
+
+
+@TownApp.view(
+    model=RISCommissionMembership,
+    request_method='DELETE',
+    permission=Private,
+)
+def delete_commission_membership(
+    self: RISCommissionMembership,
+    request: TownRequest
+) -> None:
+
+    request.assert_valid_csrf_token()
+
+    collection = RISCommissionMembershipCollection(request.session)
+    collection.delete(self)
+
+    request.success(_('The commission membership has been deleted.'))
