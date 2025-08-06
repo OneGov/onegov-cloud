@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-08-06 11:56+0200\n"
+"POT-Creation-Date: 2025-08-06 14:12+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -435,9 +435,6 @@ msgstr "Beschreibung"
 
 msgid "Commission"
 msgstr "Kommission"
-
-msgid "Parliamentarians"
-msgstr "Parlamentsmitglieder"
 
 msgid "Parliamentarian"
 msgstr "Parlamentsmitglied"
@@ -7343,6 +7340,9 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid "Parliamentarians"
+#~ msgstr "Parlamentsmitglieder"
 
 #~ msgid "Date of death"
 #~ msgstr "Sterbedatum"
