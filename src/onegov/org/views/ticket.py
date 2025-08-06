@@ -549,9 +549,11 @@ def view_ticket_note(
 
 
 def assert_can_modify_note(self: TicketNote, request: OrgRequest) -> None:
-    if not request.is_manager_for_model(self):
-        if self.owner != request.current_username:
-            raise exc.HTTPNotFound()
+    if not (
+        self.owner == request.current_username
+        or request.is_manager_for_model(self)
+    ):
+        raise exc.HTTPNotFound()
 
 
 @OrgApp.view(model=TicketNote, permission=Personal, request_method='DELETE')
