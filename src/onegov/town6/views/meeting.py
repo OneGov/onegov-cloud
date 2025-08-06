@@ -11,6 +11,7 @@ from onegov.org.models import Meeting
 from onegov.org.models import MeetingCollection
 from onegov.org.models import MeetingItem
 from onegov.org.models import PoliticalBusiness
+from onegov.org.models.political_business import POLITICAL_BUSINESS_TYPE
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import MeetingCollectionLayout
@@ -129,8 +130,10 @@ def view_meeting(
         item_data = {
             'number': item.number,
             'title': item.title,
+            'business_type': None,
             'political_business_link': None
         }
+
         if item.political_business_link_id:
             business = request.session.query(PoliticalBusiness).filter(
                 PoliticalBusiness.meta['self_id'].astext ==
@@ -138,6 +141,8 @@ def view_meeting(
             ).first()
             if business is not None:
                 item_data['political_business_link'] = request.link(business)
+                item_data['business_type'] = (
+                    POLITICAL_BUSINESS_TYPE)[business.political_business_type]
         else:
             if item.political_business:
                 item_data['political_business_link'] = (
@@ -148,6 +153,7 @@ def view_meeting(
     meeting_items_with_links.sort(
         key=lambda x: (x['number'] or '', x['title'] or '')
     )
+
     return {
         'layout': layout,
         'page': self,

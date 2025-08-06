@@ -36,6 +36,11 @@
                                 ${item.number} ${item.title}
                             </span>
                         </a>
+                        <span class="list-lead preview">
+                            <span tal:condition="item.business_type">
+                                ${item.business_type}
+                            </span>
+                        </span>
                     </li>
                 </ul>
             </dd>
