@@ -167,8 +167,7 @@ def get_users(
 ) -> UserCollection:
     return UserCollection(
         app.session(),
-        active=active, role=role, tag=tag, provider=provider,
-        source=source
+        active=active, role=role, tag=tag, provider=provider, source=source
     )
 
 
