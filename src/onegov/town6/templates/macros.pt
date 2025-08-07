@@ -913,7 +913,7 @@
         <h2 i18n:translate>Invoice Items</h2>
         <tal:b metal:use-macro="layout.macros['invoice_items']" />
     </tal:b>
-    <tal:b tal:define="price price|nothing; invoice_items_has_total invoice_items and total_amount is not None|False" tal:condition="price and not invoice_items_has_total">
+    <tal:b tal:condition="price|nothing">
         <dl class="field-display">
             <dt i18n:translate>Total Amount</dt>
             <dd><metal:b use-macro="layout.macros['price']" /></dd>
