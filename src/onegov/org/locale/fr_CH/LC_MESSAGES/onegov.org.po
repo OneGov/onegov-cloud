@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-08-06 14:12+0200\n"
+"POT-Creation-Date: 2025-08-07 15:00+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -3688,8 +3688,8 @@ msgstr "Refuser les réservations"
 msgid "Reject all with message"
 msgstr "Tout refuser avec message"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Événement"
 
@@ -4081,8 +4081,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
-"Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
+"« Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -4288,6 +4288,9 @@ msgstr ""
 
 msgid "Links"
 msgstr "Liens"
+
+msgid "Invoice Items"
+msgstr "Postes de facture"
 
 msgid "Item(s)"
 msgstr "Article(s)"
@@ -4565,6 +4568,27 @@ msgstr "Fermer"
 
 msgid "Copy to clipboard"
 msgstr "Copier dans le presse-papiers"
+
+msgid "Unit"
+msgstr "Unité"
+
+msgid "Quantity"
+msgstr "Quantité"
+
+msgid "Submission"
+msgstr "Soumission"
+
+msgid "Selected Options"
+msgstr "Options sélectionnées"
+
+msgid "Discounts / Surcharges"
+msgstr "Remises / Suppléments"
+
+msgid "Lump sum"
+msgstr "Montant forfaitaire"
+
+msgid "Unpaid"
+msgstr "Non payé"
 
 msgid "No submissions yet."
 msgstr "Aucune soumission pour l'instant."
@@ -5553,27 +5577,6 @@ msgstr "Voir la facture"
 
 msgid "Change tag"
 msgstr "Changer d'étiquette"
-
-msgid "Unit"
-msgstr "Unité"
-
-msgid "Quantity"
-msgstr "Quantité"
-
-msgid "Submission"
-msgstr "Soumission"
-
-msgid "Selected Options"
-msgstr "Options sélectionnées"
-
-msgid "Discounts / Surcharges"
-msgstr "Remises / Suppléments"
-
-msgid "Lump sum"
-msgstr "Montant forfaitaire"
-
-msgid "Unpaid"
-msgstr "Non payé"
 
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "

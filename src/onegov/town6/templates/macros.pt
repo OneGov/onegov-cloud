@@ -909,7 +909,11 @@
             <metal:b use-macro="layout.macros['display_fields']" tal:define="fields fields.values()">
         </tal:b>
     </div>
-    <tal:b condition="price|nothing">
+    <tal:b tal:condition="invoice_items|nothing">
+        <h2 i18n:translate>Invoice Items</h2>
+        <tal:b metal:use-macro="layout.macros['invoice_items']" />
+    </tal:b>
+    <tal:b tal:define="price price|nothing; invoice_items_has_total invoice_items and total_amount is not None|False" tal:condition="price and not invoice_items_has_total">
         <dl class="field-display">
             <dt i18n:translate>Total Amount</dt>
             <dd><metal:b use-macro="layout.macros['price']" /></dd>
@@ -2061,7 +2065,7 @@
             </dd>
         </dl>
 
-        <tal:b condition="price" switch="'cc' if price.credit_card_payment else payment_method">
+        <tal:b tal:condition="price" switch="'cc' if price.credit_card_payment else payment_method">
             <tal:b case="'manual'">
                 <label style="display: none;">
                     <input type="radio" name="payment_method" value="manual" checked>
@@ -3187,3 +3191,99 @@
 
     </tal:b>
 </metal:b>
+
+<metal:invoice_items define-macro="invoice_items" i18n:domain="onegov.town6">
+    <table class="invoice-items" tal:define="total_amount total_amount|None; total_vat total_vat|None; total_paid total_paid|False; show_vat total_vat or any(item.vat for items in invoice_items.values() for item in items); show_quantity any(item.quantity != 1.0 for items in invoice_items.values() for item in items); item_actions item_actions|None; show_payment_state show_payment_state|False">
+        <thead>
+            <tr>
+                <th i18n:translate>Booking Text</th>
+                <th tal:condition="show_quantity" i18n:translate>Unit</th>
+                <th tal:condition="show_quantity" i18n:translate>Quantity</th>
+                <th tal:condition="show_vat" i18n:translate>VAT Rate</th>
+                <th tal:condition="show_vat" i18n:translate>VAT</th>
+                <th i18n:translate>Amount</th>
+                <th tal:condition="item_actions">
+                    <span i18n:translate class="show-for-sr">Actions</span>
+                </th>
+            </tr>
+        </thead>
+        <tal:b tal:repeat="(group, items) invoice_items.items()">
+            <thead>
+                <tr class="group">
+                    <th tal:switch="group" colspan="${2 + (2 if show_quantity else 0) + (2 if show_vat else 0) + (1 if item_actions else 0)}">
+                        <tal:b tal:case="'reservation'" i18n:translate>
+                            Reservations
+                        </tal:b>
+                        <tal:b tal:case="'submission'" i18n:translate>
+                            Submission
+                        </tal:b>
+                        <tal:b tal:case="'form'" i18n:translate>
+                            Selected Options
+                        </tal:b>
+                        <tal:b tal:case="'manual'" i18n:translate>
+                            Discounts / Surcharges
+                        </tal:b>
+                        <tal:b tal:case="'migration'" i18n:translate>
+                            Lump sum
+                        </tal:b>
+                        <tal:b tal:case="default">
+                            ${item.group}
+                        </tal:b>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tal:b tal:repeat="item items">
+                    <tr tal:define="groupid hash(str(item.group) + str(repeat.item.index)); paid total_paid or item.paid|False" tal:attributes="class ('paid' if paid else 'unpaid') if show_payment_state else None">
+                        <td>
+                            ${item.text}
+                        </td>
+                        <td tal:condition="show_quantity" class="unit">${'{:.2f}'.format(item.unit)}</td>
+                        <td tal:condition="show_quantity" class="quantity">${'{:.2f}'.format(item.quantity)}</td>
+                        <td tal:condition="show_vat" class="vat-rate">${'{:.1f}%'.format(item.vat_rate or 0.0)}</td>
+                        <td tal:condition="show_vat" class="vat">${'{:.2f}'.format(item.vat)}</td>
+                        <td class="amount">
+                            ${'{:.2f}'.format(item.amount)}
+                            <tal:b tal:condition="show_payment_state and paid">
+                                <i class="fa ${item.source in ('datatrans', 'stripe_connect', 'worldline_saferpay') and 'fa-credit-card' or 'fa-check-circle'}" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
+                                <span i18n:translate class="show-for-sr">Paid</span>
+                            </tal:b>
+                            <tal:b tal:condition="show_payment_state and not paid">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
+                                <span i18n:translate class="show-for-sr">Unpaid</span>
+                            </tal:b>
+                        </td>
+                        <td class="actions" tal:condition="item_actions">
+                            <tal:b tal:repeat="action actions" tal:define="actions item_actions(item)">
+                                ${action(layout)}
+                            </tal:b>
+                        </td>
+                    </tr>
+                </tal:b>
+            </tbody>
+        </tal:b>
+        <tfoot tal:condition="total_amount is not None">
+            <tr class="total${(' paid' if total_paid else ' unpaid') if show_payment_state else ''}">
+                <td i18n:translate>Total</td>
+                <td tal:condition="show_quantity" class="unit"></td>
+                <td tal:condition="show_quantity" class="quantity"></td>
+                <td tal:condition="show_vat" class="vat-rate"></td>
+                <td tal:condition="show_vat" class="vat">
+                    ${'{:.2f}'.format(total_vat)}
+                </td>
+                <td class="amount">
+                    ${'{:.2f}'.format(total_amount)}
+                    <tal:b tal:condition="show_payment_state and total_paid">
+                        <i class="fa fa-check-circle" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Paid</span>
+                    </tal:b>
+                    <tal:b tal:condition="show_payment_state and not total_paid">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Unpaid</span>
+                    </tal:b>
+                </td>
+                <td tal:condition="item_actions"></td>
+            </tr>
+        </tfoot>
+    </table>
+</metal:invoice_items>

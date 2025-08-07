@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-08-06 14:12+0200\n"
+"POT-Creation-Date: 2025-08-07 15:03+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -808,6 +808,9 @@ msgstr "Vorheriger Eintrag"
 msgid "Next Entry"
 msgstr "Nächster Eintrag"
 
+msgid "Invoice Items"
+msgstr "Rechnungspositionen"
+
 msgid "Total Amount"
 msgstr "Totalbetrag"
 
@@ -1242,6 +1245,42 @@ msgstr "Verfügbare Optionen für das Fokus-Widget:"
 msgid "Copy to clipboard"
 msgstr "In die Zwischenablage kopieren"
 
+msgid "Booking Text"
+msgstr "Buchungstext"
+
+msgid "Unit"
+msgstr "Einheit"
+
+msgid "Quantity"
+msgstr "Anzahl"
+
+msgid "VAT Rate"
+msgstr "Mehrwertsteuersatz"
+
+msgid "VAT"
+msgstr "MwSt"
+
+msgid "Amount"
+msgstr "Betrag"
+
+msgid "Submission"
+msgstr "Eintrag"
+
+msgid "Selected Options"
+msgstr "Ausgewählte Optionen"
+
+msgid "Discounts / Surcharges"
+msgstr "Abzüge / Zuschläge"
+
+msgid "Lump sum"
+msgstr "Pauschalbetrag"
+
+msgid "Unpaid"
+msgstr "Unbezahlt"
+
+msgid "Total"
+msgstr "Total"
+
 msgid "Hello!"
 msgstr "Guten Tag"
 
@@ -1446,9 +1485,6 @@ msgstr ""
 
 msgid "Pending approval"
 msgstr "Noch nicht akzeptiert"
-
-msgid "VAT"
-msgstr "MwSt"
 
 msgid "A new entry has been added to the \"${directory}\" directory:"
 msgstr "Ein neuer Eintrag wurde im Verzeichnis \"${directory}\" hinzugefügt:"
@@ -2346,9 +2382,6 @@ msgstr "${count} Notiz"
 msgid "${count} notes"
 msgstr "${count} Notizen"
 
-msgid "Amount"
-msgstr "Betrag"
-
 msgid "Free of charge"
 msgstr "Kostenlos"
 
@@ -2375,36 +2408,6 @@ msgstr "Bearbeitungszeit"
 
 msgid "Summary"
 msgstr "Zusammenfassung"
-
-msgid "Booking Text"
-msgstr "Buchungstext"
-
-msgid "Unit"
-msgstr "Einheit"
-
-msgid "Quantity"
-msgstr "Anzahl"
-
-msgid "VAT Rate"
-msgstr "Mehrwertsteuersatz"
-
-msgid "Submission"
-msgstr "Eintrag"
-
-msgid "Selected Options"
-msgstr "Ausgewählte Optionen"
-
-msgid "Discounts / Surcharges"
-msgstr "Abzüge / Zuschläge"
-
-msgid "Lump sum"
-msgstr "Pauschalbetrag"
-
-msgid "Unpaid"
-msgstr "Unbezahlt"
-
-msgid "Total"
-msgstr "Total"
 
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "

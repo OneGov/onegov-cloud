@@ -4,6 +4,7 @@ import datetime
 import secrets
 
 from decimal import Decimal
+from dataclasses import replace
 from functools import lru_cache
 from libres import new_scheduler
 from libres.db.models import Allocation
@@ -303,7 +304,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
                         raise ValueError('unhandled extras pricing method')
 
         extras = [
-            extra._replace(quantity=extras_quantity)
+            replace(extra, quantity=extras_quantity)
             for extra in (extras or ())
         ]
         total = InvoiceItemMeta.total(items)

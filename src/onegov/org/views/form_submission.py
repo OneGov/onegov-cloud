@@ -30,7 +30,8 @@ from onegov.org.models.ticket import (
 from onegov.org.utils import (
     currency_for_submission,
     emails_for_new_ticket,
-    invoice_items_for_submission
+    group_invoice_items,
+    invoice_items_for_submission,
 )
 from onegov.pay import InvoiceItemMeta, PaymentError, Price
 from onegov.ticket import TicketInvoice
@@ -212,6 +213,7 @@ def handle_pending_submission(
     else:
         checkout_button = None
 
+    show_vat = getattr(self.form, 'show_vat', False)
     return {
         'layout': layout or FormSubmissionLayout(self, request, title),
         'title': title,
@@ -221,10 +223,13 @@ def handle_pending_submission(
         'complete_link': complete_url,
         'model': self,
         'price': price,
-        'show_vat': getattr(self.form, 'show_vat', False),
+        'show_vat': show_vat,
         # NOTE: The VAT amount can be wrong if the fee is charged to
         #       the customer. So it's better to not show it yet.
         'hide_vat_amount': True,
+        'invoice_items': group_invoice_items(invoice_items),
+        'total_amount': current_total_amount,
+        'total_vat': show_vat and InvoiceItemMeta.total_vat(invoice_items),
         'checkout_button': checkout_button
     }
 

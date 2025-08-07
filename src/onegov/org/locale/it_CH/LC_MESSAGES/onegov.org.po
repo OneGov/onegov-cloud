@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-08-06 14:12+0200\n"
+"POT-Creation-Date: 2025-08-07 15:00+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3689,8 +3689,8 @@ msgstr "Rifiuta le prenotazioni"
 msgid "Reject all with message"
 msgstr "Rifiuta tutto con messaggio"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -4280,6 +4280,9 @@ msgstr ""
 msgid "Links"
 msgstr "Collegamenti"
 
+msgid "Invoice Items"
+msgstr "Voci di fattura"
+
 msgid "Item(s)"
 msgstr "Elemento(i)"
 
@@ -4554,6 +4557,27 @@ msgstr "Chiudi"
 
 msgid "Copy to clipboard"
 msgstr "Copia negli appunti"
+
+msgid "Unit"
+msgstr "Unità"
+
+msgid "Quantity"
+msgstr "Quantità"
+
+msgid "Submission"
+msgstr "Iscrizione"
+
+msgid "Selected Options"
+msgstr "Opzioni selezionate"
+
+msgid "Discounts / Surcharges"
+msgstr "Deduzioni / Supplementi"
+
+msgid "Lump sum"
+msgstr "Somma forfettaria"
+
+msgid "Unpaid"
+msgstr "Non pagato"
 
 msgid "No submissions yet."
 msgstr "Ancora nessuna iscrizione."
@@ -5533,27 +5557,6 @@ msgstr "Visualizza fattura"
 
 msgid "Change tag"
 msgstr "Modificare il tag"
-
-msgid "Unit"
-msgstr "Unità"
-
-msgid "Quantity"
-msgstr "Quantità"
-
-msgid "Submission"
-msgstr "Iscrizione"
-
-msgid "Selected Options"
-msgstr "Opzioni selezionate"
-
-msgid "Discounts / Surcharges"
-msgstr "Deduzioni / Supplementi"
-
-msgid "Lump sum"
-msgstr "Somma forfettaria"
-
-msgid "Unpaid"
-msgstr "Non pagato"
 
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "

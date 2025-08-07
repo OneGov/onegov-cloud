@@ -175,7 +175,12 @@
         width: 1%;
     }
 
-    .total .amount {
+    .actions {
+        width: 1%;
+    }
+
+    .total .amount,
+    .total .vat {
         padding-top: .75rem;
     }
 
