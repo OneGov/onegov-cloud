@@ -6,7 +6,7 @@ from xml.etree import ElementTree
 
 from bs4 import BeautifulSoup
 from lxml.etree import _Element
-from pyquery import PyQuery  # type: ignore[import-untyped]
+from pyquery import PyQuery  # type: ignore
 from webob import Response
 from webtest.app import _Files, TestApp, TestRequest
 from webtest.forms import Form
