@@ -6,7 +6,6 @@ import zipfile
 
 from datetime import date
 from io import BytesIO
-from itertools import groupby
 from markupsafe import Markup
 from morepath import Response
 from onegov.chat import Message, MessageCollection
@@ -42,7 +41,7 @@ from onegov.org.models import (
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter, ReservationHandler
 from onegov.org.pdf.ticket import TicketPdf
-from onegov.org.utils import get_current_tickets_url
+from onegov.org.utils import get_current_tickets_url, group_invoice_items
 from onegov.org.views.message import view_messages_feed
 from onegov.org.views.utils import assert_citizen_logged_in
 from onegov.org.views.utils import show_tags, show_filters
@@ -1079,25 +1078,6 @@ def view_ticket_invoice(
 
     layout = layout or TicketInvoiceLayout(self, request)
 
-    def sort_key(item: TicketInvoiceItem) -> tuple[int, str]:
-        match item.group:
-            case 'submission' | 'reservation' | 'migration':
-                return 0, item.group
-            case 'form':
-                return 1, item.group
-            case 'manual' | 'reduced_amount':
-                return 99, 'manual'
-            case _:
-                return 2, item.group
-
-    invoice_items = {
-        group: list(items)
-        for (__, group), items in groupby(
-            sorted(invoice.items, key=sort_key),
-            key=sort_key
-        )
-    }
-
     payment_button: Link | None = None
     if payment and payment.source == 'manual':
         payment_button = manual_payment_button(
@@ -1116,7 +1096,7 @@ def view_ticket_invoice(
         'layout': layout,
         'ticket': self,
         'invoice': invoice,
-        'invoice_items': invoice_items,
+        'invoice_items': group_invoice_items(invoice.items),
         'payment': payment,
         'payment_button': payment_button,
         'item_actions': item_actions

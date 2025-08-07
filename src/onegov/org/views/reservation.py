@@ -29,7 +29,7 @@ from onegov.org.models import (
     ReservationMessage, ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ReservationTicket
-from onegov.org.utils import emails_for_new_ticket
+from onegov.org.utils import emails_for_new_ticket, group_invoice_items
 from onegov.pay import InvoiceItemMeta, PaymentError, Price
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.reservation.collection import ResourceCollection
@@ -564,18 +564,18 @@ def confirm_reservation(
         if failed and failed.isdigit()
     }
 
-    items = self.invoice_items_for_reservation(
+    invoice_items = self.invoice_items_for_reservation(
         reservations,
         extras,
         discounts,
         reduced_amount_label=request.translate(_('Discount'))
     )
-    amount = InvoiceItemMeta.total(items)
+    total_amount = InvoiceItemMeta.total(invoice_items)
     price = request.app.adjust_price(Price(
-        amount,
+        total_amount,
         self.currency,
         credit_card_payment=credit_card_payment
-    ) if amount > 0 else None)
+    ) if total_amount > 0 else None)
 
     assert request.locale is not None
     return {
@@ -590,6 +590,10 @@ def confirm_reservation(
         'complete_link': request.link(self, 'finish'),
         'edit_link': request.link(self, 'form'),
         'price': price,
+        'invoice_items': group_invoice_items(invoice_items),
+        'total_amount': total_amount,
+        # TODO: Once reservations can include VAT, this should change
+        'total_vat': None,
         'checkout_button': price and request.app.checkout_button(
             button_label=request.translate(_('Pay Online and Complete')),
             title=self.title,

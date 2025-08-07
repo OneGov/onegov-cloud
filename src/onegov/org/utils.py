@@ -43,6 +43,7 @@ if TYPE_CHECKING:
     from onegov.form import Form, FormSubmission
     from onegov.org.models import ImageFile
     from onegov.org.request import OrgRequest
+    from onegov.pay import InvoiceItem
     from onegov.pay.types import PriceDict
     from onegov.reservation import Allocation, Reservation
     from pytz.tzinfo import DstTzInfo, StaticTzInfo
@@ -55,6 +56,7 @@ if TYPE_CHECKING:
     _DeltaT = TypeVar('_DeltaT')
     _SortT = TypeVar('_SortT', bound='SupportsRichComparison')
     _TransformedT = TypeVar('_TransformedT')
+    _ItemT = TypeVar('_ItemT', bound=InvoiceItem | InvoiceItemMeta)
     TzInfo: TypeAlias = DstTzInfo | StaticTzInfo
     DateRange: TypeAlias = tuple[datetime, datetime]
 
@@ -1652,7 +1654,7 @@ def invoice_items_for_submission(
 
     # NOTE: Eventually we may need something more sophisticated
     vat_rate = Decimal(org.vat_rate) if (
-        getattr(form, 'show_vat', False)
+        getattr(submission.form, 'show_vat', False)
         and (org := getattr(request.app, 'org', None))
         and org.vat_rate
     ) else None
@@ -1706,3 +1708,27 @@ def currency_for_submission(form: Form, submission: FormSubmission) -> str:
 
         return next(iter(rules.values())).currency or 'CHF'
     return 'CHF'
+
+
+def group_invoice_items(
+    invoice_items: Iterable[_ItemT]
+) -> dict[str, list[_ItemT]]:
+
+    def sort_key(item: _ItemT) -> tuple[int, str]:
+        match item.group:
+            case 'submission' | 'reservation' | 'migration':
+                return 0, item.group
+            case 'form':
+                return 1, item.group
+            case 'manual' | 'reduced_amount':
+                return 99, 'manual'
+            case _:
+                return 2, item.group
+
+    return {
+        group: list(items)
+        for (__, group), items in groupby(
+            sorted(invoice_items, key=sort_key),
+            key=sort_key
+        )
+    }

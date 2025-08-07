@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-08-06 14:12+0200\n"
+"POT-Creation-Date: 2025-08-07 15:03+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -806,6 +806,9 @@ msgstr "Voce precedente"
 msgid "Next Entry"
 msgstr "Prossima voce"
 
+msgid "Invoice Items"
+msgstr "Voci di fattura"
+
 msgid "Total Amount"
 msgstr "Importo totale"
 
@@ -1241,6 +1244,42 @@ msgstr "Opzioni disponibili per il widget di messa a fuoco:"
 msgid "Copy to clipboard"
 msgstr "Copia negli appunti"
 
+msgid "Booking Text"
+msgstr "Testo prenotazione"
+
+msgid "Unit"
+msgstr "Unità"
+
+msgid "Quantity"
+msgstr "Quantità"
+
+msgid "VAT Rate"
+msgstr "Aliquota IVA"
+
+msgid "VAT"
+msgstr "IVA"
+
+msgid "Amount"
+msgstr "Importo"
+
+msgid "Submission"
+msgstr "Iscrizione"
+
+msgid "Selected Options"
+msgstr "Opzioni selezionate"
+
+msgid "Discounts / Surcharges"
+msgstr "Deduzioni / Supplementi"
+
+msgid "Lump sum"
+msgstr "Somma forfettaria"
+
+msgid "Unpaid"
+msgstr "Non pagato"
+
+msgid "Total"
+msgstr "Totale"
+
 msgid "Hello!"
 msgstr "Ciao!"
 
@@ -1443,9 +1482,6 @@ msgstr ""
 
 msgid "Pending approval"
 msgstr "In attesa di approvazione"
-
-msgid "VAT"
-msgstr "IVA"
 
 msgid "A new entry has been added to the \"${directory}\" directory:"
 msgstr "Un nuovo elemento è stato aggiunto alla cartella \"${directory}\":"
@@ -2344,9 +2380,6 @@ msgstr "${count} nota"
 msgid "${count} notes"
 msgstr "${count} note"
 
-msgid "Amount"
-msgstr "Importo"
-
 msgid "Free of charge"
 msgstr "Gratuito"
 
@@ -2373,36 +2406,6 @@ msgstr "Tempo di elaborazione"
 
 msgid "Summary"
 msgstr "Riepilogo"
-
-msgid "Booking Text"
-msgstr "Testo prenotazione"
-
-msgid "Unit"
-msgstr "Unità"
-
-msgid "Quantity"
-msgstr "Quantità"
-
-msgid "VAT Rate"
-msgstr "Aliquota IVA"
-
-msgid "Submission"
-msgstr "Iscrizione"
-
-msgid "Selected Options"
-msgstr "Opzioni selezionate"
-
-msgid "Discounts / Surcharges"
-msgstr "Deduzioni / Supplementi"
-
-msgid "Lump sum"
-msgstr "Somma forfettaria"
-
-msgid "Unpaid"
-msgstr "Non pagato"
-
-msgid "Total"
-msgstr "Totale"
 
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "

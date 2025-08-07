@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-08-06 14:12+0200\n"
+"POT-Creation-Date: 2025-08-07 15:00+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3682,8 +3682,8 @@ msgstr "Reservationen absagen"
 msgid "Reject all with message"
 msgstr "Alle absagen mit Kommentar"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -4282,6 +4282,9 @@ msgstr ""
 msgid "Links"
 msgstr "Links"
 
+msgid "Invoice Items"
+msgstr "Rechnungspositionen"
+
 msgid "Item(s)"
 msgstr "Stück(e)"
 
@@ -4559,6 +4562,27 @@ msgstr "Schliessen"
 
 msgid "Copy to clipboard"
 msgstr "In die Zwischenablage kopieren"
+
+msgid "Unit"
+msgstr "Einheit"
+
+msgid "Quantity"
+msgstr "Anzahl"
+
+msgid "Submission"
+msgstr "Eintrag"
+
+msgid "Selected Options"
+msgstr "Ausgewählte Optionen"
+
+msgid "Discounts / Surcharges"
+msgstr "Abzüge / Zuschläge"
+
+msgid "Lump sum"
+msgstr "Pauschalbetrag"
+
+msgid "Unpaid"
+msgstr "Unbezahlt"
 
 msgid "No submissions yet."
 msgstr "Noch keine Eingaben."
@@ -5541,27 +5565,6 @@ msgstr "Rechnung anzeigen"
 
 msgid "Change tag"
 msgstr "Schlagwort ändern"
-
-msgid "Unit"
-msgstr "Einheit"
-
-msgid "Quantity"
-msgstr "Anzahl"
-
-msgid "Submission"
-msgstr "Eintrag"
-
-msgid "Selected Options"
-msgstr "Ausgewählte Optionen"
-
-msgid "Discounts / Surcharges"
-msgstr "Abzüge / Zuschläge"
-
-msgid "Lump sum"
-msgstr "Pauschalbetrag"
-
-msgid "Unpaid"
-msgstr "Unbezahlt"
 
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "

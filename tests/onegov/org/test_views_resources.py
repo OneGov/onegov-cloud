@@ -3019,11 +3019,14 @@ def test_manual_reservation_payment_with_discount(client):
     page.form['email'] = 'info@example.org'
 
     page.form['discount'] = 'No'
-    assert '10.00' not in page.form.submit().follow()
-    assert '20.00' in page.form.submit().follow()
+    result = page.form.submit().follow()
+    assert '20.00' in result
+    assert '-10.00' not in result
 
     page.form['discount'] = 'Yes'
-    assert '10.00' in page.form.submit().follow()
+    result = page.form.submit().follow()
+    assert '20.00' in result
+    assert '-10.00' in result
 
     ticket = page.form.submit().follow().form.submit().follow()
     assert 'RSV-' in ticket.text

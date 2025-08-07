@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from decimal import Decimal
-from functools import total_ordering
+from functools import cached_property, total_ordering
 from onegov.core.orm import Base
 from onegov.pay.constants import SCALE
 
@@ -120,7 +121,8 @@ class Price(_PriceBase):
         )
 
 
-class _InvoiceItemMetaBase(NamedTuple):
+@dataclass(frozen=True)
+class InvoiceItemMeta:
     text: str
     group: str
     unit: Decimal
@@ -129,19 +131,34 @@ class _InvoiceItemMetaBase(NamedTuple):
     family: str | None = None
     extra: dict[str, Any] | None = None
 
-
-class InvoiceItemMeta(_InvoiceItemMetaBase):
-
-    @property
+    @cached_property
     def amount(self) -> Decimal:
         return round(
             round(self.unit, SCALE) * round(self.quantity, SCALE),
             SCALE
         )
 
+    @cached_property
+    def vat(self) -> Decimal:
+        return self.amount - self.net_amount
+
+    @cached_property
+    def net_amount(self) -> Decimal:
+        if self.vat_rate is None:
+            return self.amount
+        vat_factor = round(
+                (self.vat_rate + Decimal('100')) / Decimal('100'),
+                4
+            )
+        return round(self.amount / vat_factor, SCALE)
+
     @staticmethod
     def total(items: Iterable[InvoiceItemMeta]) -> Decimal:
         return sum((item.amount for item in items), start=Decimal('0'))
+
+    @staticmethod
+    def total_vat(items: Iterable[InvoiceItemMeta]) -> Decimal:
+        return sum((item.vat for item in items), start=Decimal('0'))
 
     def add_to_invoice(self, invoice: Invoice) -> InvoiceItem:
         return invoice.add(
