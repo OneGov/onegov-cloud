@@ -85,9 +85,14 @@ def view_parliamentary_group(
     layout: RISParliamentaryGroupLayout | PASParliamentaryGroupLayout
 ) -> RenderData | Response:
 
+    active_roles = [
+        role for role in self.roles if not role.end
+    ]
+
     return {
         'layout': layout,
         'parliamentary_group': self,
+        'active_roles': active_roles,
         'title': layout.title,
     }
 
