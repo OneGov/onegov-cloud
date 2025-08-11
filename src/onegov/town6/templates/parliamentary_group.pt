@@ -21,7 +21,7 @@
                 <dt i18n:translate>Parliamentarians</dt>
                 <dd>
                     <ul>
-                        <li tal:repeat="role parliamentary_group.roles">
+                        <li tal:repeat="role active_roles">
                             <span tal:condition="request.is_manager">
                                 <a href="${request.link(role.parliamentarian)}">${role.parliamentarian.title}</a>
                                 (<a href="${request.link(role)}">${role.parliamentary_group_role_label}</a>)
@@ -31,12 +31,10 @@
                                 (${role.parliamentary_group_role_label})
                             </span>
 
-                            <span>
-                                <br>${layout.format_date(role.start, 'date')}
-                            </span>
-                            <span tal:condition="role.end">
-                                -
-                                ${layout.format_date(role.end, 'date')}
+                            <span tal:condition="role.start">
+                                <br>
+                                <span i18n:translate>since</span>
+                                <span>${layout.format_date(role.start, 'date')}</span>
                             </span>
                         </li>
                     </ul>
