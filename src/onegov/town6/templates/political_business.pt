@@ -37,7 +37,7 @@
                                 </span>
                             </a>
                             <span tal:condition="participation.participant_type" class="list-lead preview">
-                                (<span i18n:translate>${participation.participant_type}</span>)
+                                <span i18n:translate>${participation.participant_type}</span>
                             </span>
                         </li>
                     </ul>
