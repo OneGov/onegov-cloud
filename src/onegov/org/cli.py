@@ -2900,6 +2900,13 @@ def add_price_to_ticket(
 
             for ticket in tickets.all():
                 if isinstance(ticket.handler, ReservationHandler):
+                    if not ticket.handler.resource:
+                        click.secho(
+                            f'Ticket {ticket.number} has no resource, '
+                            'skipping',
+                            fg='yellow'
+                        )
+                        continue
                     if reservation['resource_name'].lower(
 
                     ) == ticket.handler.resource.name:  # type: ignore
@@ -2928,7 +2935,6 @@ def add_price_to_ticket(
         click.secho(f'Remaining IDs: {ids}', fg='yellow')
 
     return add_price
-        return resolve_doublette
 
 
 @cli.command(name='ris-rename-imported-participation-types-to-english')
