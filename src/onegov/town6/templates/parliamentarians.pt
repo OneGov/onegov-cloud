@@ -9,7 +9,7 @@
                 <ul tal:condition="parliamentarians" class="more-list parliamentarian-list">
                     <li tal:repeat="parliamentarian parliamentarians">
                         <a class="list-link" tal:attributes="href request.link(parliamentarian)">
-                            <h5 class="list-title">${parliamentarian.first_name} ${parliamentarian.last_name}</h5>
+                            <h5 class="list-title">${parliamentarian.last_name} ${parliamentarian.first_name}</h5>
                         </a>
                     </li>
                 </ul>
