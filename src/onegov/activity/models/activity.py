@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from onegov.activity.models.occasion import Occasion
-from onegov.activity.models.period import Period
+from onegov.activity.models.period import BookingPeriod
 from onegov.activity.utils import extract_thumbnail, extract_municipality
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import (
@@ -14,7 +14,7 @@ from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from onegov.user import User
 from sqlalchemy import Column, Enum, Text, ForeignKey
-from sqlalchemy import exists, and_, desc
+from sqlalchemy import exists, and_
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import object_session, relationship
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     import uuid
     from collections.abc import Iterable
     from onegov.activity.collections import PublicationRequestCollection
-    from onegov.activity.models import PeriodMeta, PublicationRequest
+    from onegov.activity.models import BookingPeriodMeta, PublicationRequest
     from onegov.core.orm.mixins import dict_property
     from typing import Literal
     from typing import Self, TypeAlias
@@ -195,7 +195,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
     def create_publication_request(
         self,
-        period: Period,
+        period: BookingPeriod,
         **kwargs: Any  # TODO: better type safety
     ) -> PublicationRequest:
         return self.requests.add(activity=self, period=period, **kwargs)
@@ -212,14 +212,17 @@ class Activity(Base, ContentMixin, TimestampMixin):
     def latest_request(self) -> PublicationRequest | None:
         q = self.requests.query()
         q = q.filter_by(activity_id=self.id)
-        q = q.join(Period)
-        q = q.order_by(desc(Period.active), desc(Period.execution_start))
+        q = q.join(BookingPeriod)
+        q = q.order_by(
+            BookingPeriod.active.desc(),
+            BookingPeriod.execution_start.desc()
+        )
 
         return q.first()
 
     def request_by_period(
         self,
-        period: Period | PeriodMeta | None
+        period: BookingPeriod | BookingPeriodMeta | None
     ) -> PublicationRequest | None:
 
         if not period:
@@ -229,7 +232,10 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
         return q.first()
 
-    def has_occasion_in_period(self, period: Period | PeriodMeta) -> bool:
+    def has_occasion_in_period(
+        self,
+        period: BookingPeriod | BookingPeriodMeta
+    ) -> bool:
         q = object_session(self).query(
             exists().where(and_(
                 Occasion.activity_id == self.id,

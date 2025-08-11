@@ -323,38 +323,55 @@ class DatatransPayment(Payment):
             flag_modified(self, 'meta')
         return refund
 
-    def sync(self, remote_obj: DatatransTransaction | None = None) -> None:
+    def _sync_state(
+        self,
+        remote_obj: DatatransTransaction | None = None,
+        capture: bool = False
+    ) -> bool:
         if self.refunds:
             refund_tx = self.provider.client.status(self.refunds[-1])
             if refund_tx.status in ('settled', 'transmitted'):
                 # the refund already went through
-                self.state = 'cancelled'
-                return
+                if self.state != 'cancelled':
+                    self.state = 'cancelled'
+                    return True
+                return False
             elif refund_tx.status not in ('failed', 'canceled'):
                 # the refund is still pending, let's not update yet
-                return
+                return False
             # the refund failed or got canceled, so we need to use
             # the status of the original transaction
 
         if remote_obj is None:
             remote_obj = self.transaction
 
+        if capture and remote_obj.status == 'authorized':
+            self.provider.client.settle(remote_obj)
+            remote_obj = self.transaction
+
+        new_state = self.state
         match remote_obj.status:
             case 'transmitted':
-                self.state = 'paid'
+                new_state = 'paid'
 
             case 'settled':
                 # TODO: Do we want a separate state for this?
                 pass
 
             case 'canceled':
-                self.state = 'cancelled'
+                new_state = 'cancelled'
 
             case 'failed':
-                self.state = 'failed'
+                new_state = 'failed'
 
             case _:
-                self.state = 'open'
+                new_state = 'open'
+
+        if self.state != new_state:
+            self.state = new_state
+            return True
+        else:
+            return False
 
 
 class DatatransProvider(PaymentProvider[DatatransPayment]):

@@ -4,9 +4,10 @@ import datetime
 import secrets
 
 from decimal import Decimal
+from dataclasses import replace
 from functools import lru_cache
 from libres import new_scheduler
-from libres.db.models import Allocation, Reservation
+from libres.db.models import Allocation
 from libres.db.models.base import ORMBase
 from onegov.core.orm import ModelBase
 from onegov.core.orm.mixins import content_property, dict_property
@@ -14,14 +15,14 @@ from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.file import MultiAssociatedFiles
 from onegov.form import parse_form
-from onegov.pay import Price, process_payment
+from onegov.pay import InvoiceItemMeta, Price, process_payment
 from sedate import align_date_to_day, utcnow
 from sqlalchemy import Column, Text
-from sqlalchemy.orm import relationship, undefer
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-from typing import cast, Any, Literal, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     # type gets shadowed by type in model, so we use Type as an alias
@@ -31,7 +32,8 @@ if TYPE_CHECKING:
     from libres.db.scheduler import Scheduler
     from onegov.form import Form
     from onegov.reservation.models import CustomReservation
-    from onegov.pay import Payment, PaymentError, PaymentProvider
+    from onegov.pay import (
+        InvoiceDiscountMeta, Payment, PaymentError, PaymentProvider)
     from onegov.pay.types import PaymentMethod
     from typing import TypeAlias
 
@@ -251,53 +253,33 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
         return parse_form(self.definition)
 
-    def price_of_reservation(
+    def invoice_items_for_reservation(
         self,
-        token: uuid.UUID,
-        extra: Price | None = None,
-        discount: Decimal | None = None,
-    ) -> Price:
+        reservations: Sequence[CustomReservation],
+        extras: Sequence[InvoiceItemMeta] | None = None,
+        discounts: Sequence[InvoiceDiscountMeta] | None = None,
+        *,
+        # HACK: This isn't great, but similarly adding i18n to
+        #       the reservation module for a single translation
+        #       string is similarly not great. For now we'll
+        #       live with this, even if it's ugly.
+        reduced_amount_label: str,
+    ) -> list[InvoiceItemMeta]:
 
-        # FIXME: libres is very laissez faire with the polymorphic
-        #        classes and always uses the base classes for queries
-        #        rather than the ones supplied to the Scheduler, so
-        #        we can't actually assume we get our Reservation class
-        #        unless we only ever create instances of our own class
-        #        inside the current context, this is not really acceptable
-        #        for type checking. We could pretend that the Scheduler
-        #        always gives us the class we bound do it, but that's
-        #        not technically true...
-        reservations = cast(
-            'list[CustomReservation]',
-            self.scheduler.reservations_by_token(token)
-            .options(undefer(Reservation.data))
-            .all()
-        )
-        if reservations:
-            reservation = reservations[0]
-            meta = (reservation.data or {}).get('ticket_tag_meta', {})
-            # HACK: This is not very robust, we should probably come up
-            #       with something better to handle price reductions for
-            #       specific tags
-            try:
-                reduced_amount = Decimal(meta.get('Price', meta.get('Preis')))
-                assert reduced_amount >= Decimal('0')
-            except Exception:
-                reduced_amount = None
-        else:
-            reduced_amount = None
+        if not reservations:
+            return []
 
-        total = Price.zero()
-        extras_total = Price.zero()
+        items: list[InvoiceItemMeta] = []
+        extras_quantity = Decimal('0')
         for reservation in reservations:
-            price = reservation.price(self)
-            if price:
-                total += price
+            item = reservation.invoice_item(self)
+            if item is not None:
+                items.append(item)
 
-            if extra:
+            if extras:
                 match self.extras_pricing_method:
                     case 'one_off':
-                        extras_total = extra
+                        extras_quantity = Decimal('1')
 
                     case 'per_hour':
                         # FIXME: Should we assert here or instead use
@@ -310,30 +292,63 @@ class Resource(ORMBase, ModelBase, ContentMixin,
                         else:
                             duration = datetime.timedelta(seconds=0)
 
-                        extras_total += extra * (
+                        extras_quantity += (
                             Decimal(duration.total_seconds())
                             / Decimal('3600')
                         )
 
                     case 'per_item' | None:
-                        extras_total += extra * reservation.quota
+                        extras_quantity += Decimal(reservation.quota)
 
                     case _:  # pragma: unreachable
                         raise ValueError('unhandled extras pricing method')
 
-        if discount and total:
-            total = total.apply_discount(discount)
+        extras = [
+            replace(extra, quantity=extras_quantity)
+            for extra in (extras or ())
+        ]
+        total = InvoiceItemMeta.total(items)
+        extras_total = InvoiceItemMeta.total(extras)
+
+        # TODO: Currently discounts only apply to the total before
+        #       the extras are applied, in the future we may have
+        #       discounts that only apply to the extras or both
+        discount_items: list[InvoiceItemMeta] = []
+        if discounts:
+            remainder = total
+            for discount in discounts:
+                item = discount.apply_discount(total, remainder)
+                remainder += item.amount
+                assert remainder >= Decimal('0')
+                discount_items.append(item)
+            total = remainder
 
         if extras_total and total:
             total += extras_total
         elif extras_total:
             total = extras_total
 
-        if reduced_amount is not None and reduced_amount < total.amount:
-            # return the reduced amount instead
-            return Price(reduced_amount, total.currency)
+        items = items + discount_items + extras
 
-        return total
+        reservation = reservations[0]
+        meta = (reservation.data or {}).get('ticket_tag_meta', {})
+        # HACK: This is not very robust, we should probably come up
+        #       with something better to handle price reductions for
+        #       specific tags
+        try:
+            reduced_amount = Decimal(meta.get('Price', meta.get('Preis')))
+            assert reduced_amount >= Decimal('0')
+        except Exception:
+            reduced_amount = None
+
+        if reduced_amount is not None and reduced_amount < total:
+            items.append(InvoiceItemMeta(
+                text=reduced_amount_label,
+                group='reduced_amount',
+                unit=reduced_amount-total
+            ))
+
+        return items
 
     def process_payment(
         self,

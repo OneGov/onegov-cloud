@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-21 08:00+0200\n"
+"POT-Creation-Date: 2025-08-07 15:03+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -161,6 +161,14 @@ msgstr "Activer RIS"
 msgid "Enables the RIS integration for this organisation."
 msgstr "Active l'intégration RIS pour cette organisation."
 
+msgid "URL path for the RIS main page"
+msgstr "Chemin URL pour la page principale RIS"
+
+msgid "The URL path for the RIS main page for non-logged-in users."
+msgstr ""
+"Le chemin URL pour la page principale RIS pour les utilisateurs non "
+"connectés."
+
 msgid "Events"
 msgstr "Événements"
 
@@ -313,8 +321,11 @@ msgstr "Parlementaires"
 msgid "Parliamentarian"
 msgstr "Parlementaire"
 
-msgid "Role (as a group member)"
-msgstr "Rôle (en tant que membre d'un groupe)"
+msgid "New parliamentary group membership"
+msgstr "Nouvelle adhésion au groupe parlementaire"
+
+msgid "New commission membership"
+msgstr "Nouvelle adhésion à la commission"
 
 msgid "Do you really want to delete this parliamentarian?"
 msgstr "Voulez-vous vraiment supprimer ce parlementaire ?"
@@ -369,6 +380,18 @@ msgstr "Voulez-vous vraiment supprimer cette affaire politique?"
 
 msgid "Delete political business"
 msgstr "Supprimer les affaires politiques"
+
+msgid "RIS settings"
+msgstr "Paramètres RIS"
+
+msgid "Commission membership"
+msgstr "Adhésion à la commission"
+
+msgid "Do you really want to remove this commission membership?"
+msgstr "Voulez-vous vraiment supprimer cette adhésion à la commission?"
+
+msgid "Remove commission membership"
+msgstr "Supprimer l'adhésion à la commission"
 
 msgid "No availability periods defined."
 msgstr "Aucune période de disponibilité définie."
@@ -440,6 +463,9 @@ msgstr "Aucun chat actif."
 
 msgid "Contact"
 msgstr "Contact"
+
+msgid "Function"
+msgstr "Fonction"
 
 msgid "No active commissions."
 msgstr "Aucune commission active."
@@ -595,8 +621,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
-"Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
+"« Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -783,6 +809,9 @@ msgstr "Entrée précédente"
 
 msgid "Next Entry"
 msgstr "Entrée suivante"
+
+msgid "Invoice Items"
+msgstr "Postes de facture"
 
 msgid "Total Amount"
 msgstr "Montant total"
@@ -1217,6 +1246,42 @@ msgstr "Options disponibles pour le widget Focus:"
 msgid "Copy to clipboard"
 msgstr "Copier dans le presse-papiers"
 
+msgid "Booking Text"
+msgstr "Message/notification"
+
+msgid "Unit"
+msgstr "Unité"
+
+msgid "Quantity"
+msgstr "Quantité"
+
+msgid "VAT Rate"
+msgstr "Taux de TVA"
+
+msgid "VAT"
+msgstr "TVA"
+
+msgid "Amount"
+msgstr "Montant"
+
+msgid "Submission"
+msgstr "Soumission"
+
+msgid "Selected Options"
+msgstr "Options sélectionnées"
+
+msgid "Discounts / Surcharges"
+msgstr "Remises / Suppléments"
+
+msgid "Lump sum"
+msgstr "Montant forfaitaire"
+
+msgid "Unpaid"
+msgstr "Non payé"
+
+msgid "Total"
+msgstr "Total"
+
 msgid "Hello!"
 msgstr "Bonjour"
 
@@ -1419,9 +1484,6 @@ msgstr ""
 msgid "Pending approval"
 msgstr "En attente d'approbation"
 
-msgid "VAT"
-msgstr "TVA"
-
 msgid "A new entry has been added to the \"${directory}\" directory:"
 msgstr "Une nouvelle entrée a été ajoutée au répertoire \"${directory}\":"
 
@@ -1621,6 +1683,9 @@ msgstr "Date/Heure"
 msgid "Agenda"
 msgstr "Agenda"
 
+msgid "No agenda items defined yet."
+msgstr "Aucun point d'ordre du jour défini pour le moment."
+
 msgid "No meetings defined yet."
 msgstr "Aucune réunion définie pour le moment."
 
@@ -1758,9 +1823,6 @@ msgstr "Souscrire à la lettre d'informations"
 msgid "Receive the newsletter by email"
 msgstr "Recevoir la lettre d'informations par e-mail"
 
-msgid "Year"
-msgstr "Année"
-
 msgid "Years"
 msgstr "Années"
 
@@ -1858,6 +1920,9 @@ msgstr "Origine"
 msgid "This is an imported event"
 msgstr "Il s'agit d'un événement importé"
 
+msgid "General information about the event calendar"
+msgstr "Informations générales sur le calendrier des événements"
+
 msgid "Tag"
 msgstr "Étiquette"
 
@@ -1881,6 +1946,9 @@ msgstr "Photo"
 
 msgid "Private address"
 msgstr "Adresse privée"
+
+msgid "Place of residence"
+msgstr "Lieu de résidence"
 
 msgid "Date of birth"
 msgstr "Date de naissance"
@@ -1936,8 +2004,11 @@ msgstr "Rôles"
 msgid "Parliament"
 msgstr "Parlement"
 
-msgid "Interests"
-msgstr "Intérêts"
+msgid "in"
+msgstr "de"
+
+msgid "Interest ties"
+msgstr "Liens d'intérêt"
 
 msgid "Role"
 msgstr "Rôle"
@@ -2019,6 +2090,9 @@ msgstr "Aucun business politique n'a été défini pour le moment."
 
 msgid "Datum"
 msgstr "Date"
+
+msgid "Year"
+msgstr "Année"
 
 msgid "No publications"
 msgstr "Aucune publication"
@@ -2314,8 +2388,11 @@ msgstr "${count} note"
 msgid "${count} notes"
 msgstr "${count} notes"
 
-msgid "Amount"
-msgstr "Montant"
+msgid "Free of charge"
+msgstr "Gratuit"
+
+msgid "View Invoice"
+msgstr "Voir la facture"
 
 msgid "Group"
 msgstr "Groupe"
@@ -2516,6 +2593,9 @@ msgstr "Éditer la réunion"
 msgid "The meeting has been deleted."
 msgstr "La réunion a été supprimée."
 
+msgid "The commission membership has been deleted."
+msgstr "L'adhésion à la commission a été supprimée."
+
 msgid "Added a new parliamentarian"
 msgstr "Ajout d'un nouveau parlementaire"
 
@@ -2527,9 +2607,6 @@ msgstr "Le parlementaire a été supprimé."
 
 msgid "Added a new role"
 msgstr "Ajout d'un nouveau rôle"
-
-msgid "New role"
-msgstr "Nouveau rôle"
 
 msgid "The parliamentarian role has been deleted."
 msgstr "Le rôle du parlementaire a été supprimé."
@@ -2657,3 +2734,15 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Nouveau commentaire"
+
+#~ msgid "Interest tie"
+#~ msgstr "Lien d'intérêt"
+
+#~ msgid "Category"
+#~ msgstr "Catégorie"
+
+#~ msgid "Role (as a group member)"
+#~ msgstr "Rôle (en tant que membre d'un groupe)"
+
+#~ msgid "New role"
+#~ msgstr "Nouveau rôle"

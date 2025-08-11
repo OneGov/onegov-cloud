@@ -45,6 +45,8 @@ from onegov.org.app import OrgApp
 from onegov.org.auth import MTANAuth
 from onegov.org.converters import keywords_converter
 from onegov.org.models import AtoZPages, PushNotificationCollection
+from onegov.org.models import RISCommissionMembershipCollection
+from onegov.org.models import RISCommissionMembership
 from onegov.org.models import CitizenDashboard, Dashboard
 from onegov.org.models import Clipboard
 from onegov.org.models import DirectorySubmissionAction
@@ -90,6 +92,8 @@ from onegov.org.models import (
     PoliticalBusiness,
     PoliticalBusinessCollection,
 )
+from onegov.org.models.political_business import PoliticalBusinessStatus
+from onegov.org.models.political_business import PoliticalBusinessType
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.external_link import (
@@ -165,8 +169,7 @@ def get_users(
 ) -> UserCollection:
     return UserCollection(
         app.session(),
-        active=active, role=role, tag=tag, provider=provider,
-        source=source
+        active=active, role=role, tag=tag, provider=provider, source=source
     )
 
 
@@ -450,12 +453,16 @@ def get_ticket(app: OrgApp, handler_code: str, id: UUID) -> Ticket | None:
 def get_tickets(
     app: OrgApp,
     handler: str = 'ALL',
-    state: ExtendedTicketState = 'open',
+    state: ExtendedTicketState | None = 'open',
     page: int = 0,
     group: str | None = None,
     owner: str | None = None,
     extra_parameters: dict[str, str] | None = None
-) -> TicketCollection:
+) -> TicketCollection | None:
+
+    if state is None:
+        return None
+
     return TicketCollection(
         app.session(),
         handler=handler,
@@ -1308,16 +1315,16 @@ def get_meeting(
     path='/political-businesses',
     converters={
         'page': int,
-        'status': [str],
-        'types': [str],
+        'status': [LiteralConverter(PoliticalBusinessStatus)],
+        'types': [LiteralConverter(PoliticalBusinessType)],
         'years': [int],
     }
 )
 def get_political_businesses(
     app: OrgApp,
     page: int = 0,
-    status: list[str] | None = None,
-    types: list[str] | None = None,
+    status: list[PoliticalBusinessStatus] | None = None,
+    types: list[PoliticalBusinessType] | None = None,
     years: list[int] | None = None,
 ) -> PoliticalBusinessCollection:
     return PoliticalBusinessCollection(
@@ -1353,3 +1360,15 @@ def get_meeting_item(
     session = app.session()
     res = session.query(MeetingItem).filter(MeetingItem.id == id).first()
     return res
+
+
+@OrgApp.path(
+    model=RISCommissionMembership,
+    path='/commission-membership/{id}',
+    converters={'id': UUID}
+)
+def get_commission_membership(
+    app: OrgApp,
+    id: UUID
+) -> RISCommissionMembership | None:
+    return RISCommissionMembershipCollection(app.session()).by_id(id)

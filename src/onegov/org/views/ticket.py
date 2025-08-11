@@ -14,13 +14,14 @@ from onegov.core.elements import Link, Intercooler, Confirm
 from onegov.core.html import html_to_text
 from onegov.core.mail import Attachment
 from onegov.core.orm import as_selectable
-from onegov.core.security import Public, Private, Secret
+from onegov.core.security import Public, Personal, Private, Secret
 from onegov.core.templates import render_template
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
 from onegov.org import _, OrgApp
 from onegov.org.constants import TICKET_STATES
 from onegov.org.forms import ExtendedInternalTicketChatMessageForm
+from onegov.org.forms import ManualInvoiceItemForm
 from onegov.org.forms import TicketAssignmentForm
 from onegov.org.forms import TicketChangeTagForm
 from onegov.org.forms import TicketChatMessageForm
@@ -29,9 +30,10 @@ from onegov.org.layout import (
     FindYourSpotLayout, DefaultMailLayout, ArchivedTicketsLayout)
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import TicketChatMessageLayout
+from onegov.org.layout import TicketInvoiceLayout
+from onegov.org.layout import TicketLayout
 from onegov.org.layout import TicketNoteLayout
 from onegov.org.layout import TicketsLayout
-from onegov.org.layout import TicketLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
     CitizenDashboard, TicketChatMessage, TicketMessage, TicketNote,
@@ -39,7 +41,7 @@ from onegov.org.models import (
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter, ReservationHandler
 from onegov.org.pdf.ticket import TicketPdf
-from onegov.org.utils import get_current_tickets_url
+from onegov.org.utils import get_current_tickets_url, group_invoice_items
 from onegov.org.views.message import view_messages_feed
 from onegov.org.views.utils import assert_citizen_logged_in
 from onegov.org.views.utils import show_tags, show_filters
@@ -66,11 +68,12 @@ if TYPE_CHECKING:
     from onegov.org.layout import Layout
     from onegov.org.request import OrgRequest
     from onegov.pay import Payment
+    from onegov.ticket import TicketInvoiceItem
     from sqlalchemy.orm import Query, Session
     from webob import Response as BaseResponse
 
 
-@OrgApp.html(model=Ticket, template='ticket.pt', permission=Private)
+@OrgApp.html(model=Ticket, template='ticket.pt', permission=Personal)
 def view_ticket(
     self: Ticket,
     request: OrgRequest,
@@ -128,19 +131,18 @@ def view_ticket(
         select(stmt.c).where(stmt.c.channel_id == self.number)).first()
 
     # if we have a payment, show the payment button
+    is_manager = request.is_manager_for_model(self)
     layout = layout or TicketLayout(self, request)
     payment_button = None
     payment = handler.payment
     edit_amount_url = None
 
-    if payment and payment.source == 'manual':
+    if is_manager and payment and payment.source == 'manual':
         payment_button = manual_payment_button(payment, layout)
-        if (request.is_manager or request.is_supporter) and not payment.paid:
-            edit_amount_url = layout.csrf_protected_url(
-                request.link(payment, name='change-net-amount')
-            )
+        if not payment.paid:
+            edit_amount_url = request.link(self, name='add-invoice-item')
 
-    if payment and payment.source in (
+    if is_manager and payment and payment.source in (
         'stripe_connect',
         'datatrans',
         'worldline_saferpay',
@@ -219,7 +221,8 @@ def delete_ticket(
 #        pure passthrough, then we can pass the request here
 def manual_payment_button(
     payment: Payment,
-    layout: Layout
+    layout: Layout,
+    css_class: str = 'small secondary'
 ) -> Link:
 
     if payment.state == 'open':
@@ -228,7 +231,7 @@ def manual_payment_button(
             url=layout.csrf_protected_url(
                 layout.request.link(payment, 'mark-as-paid'),
             ),
-            attrs={'class': 'mark-as-paid button small secondary'},
+            attrs={'class': f'mark-as-paid button {css_class}'},
             traits=(
                 Intercooler(
                     request_method='POST',
@@ -242,7 +245,7 @@ def manual_payment_button(
         url=layout.csrf_protected_url(
             layout.request.link(payment, 'mark-as-unpaid'),
         ),
-        attrs={'class': 'mark-as-unpaid button small secondary'},
+        attrs={'class': f'mark-as-unpaid button {css_class}'},
         traits=(
             Intercooler(
                 request_method='POST',
@@ -255,7 +258,8 @@ def manual_payment_button(
 # FIXME: same here as for manual_payment_button
 def online_payment_button(
     payment: Payment,
-    layout: Layout
+    layout: Layout,
+    css_class: str = 'small secondary'
 ) -> Link | None:
 
     if payment.state == 'open':
@@ -264,7 +268,7 @@ def online_payment_button(
             url=layout.csrf_protected_url(
                 layout.request.link(payment, 'capture')
             ),
-            attrs={'class': 'payment-capture button small secondary'},
+            attrs={'class': f'payment-capture button {css_class}'},
             traits=(
                 Confirm(
                     _('Do you really want capture the payment?'),
@@ -291,7 +295,7 @@ def online_payment_button(
             url=layout.csrf_protected_url(
                 layout.request.link(payment, 'refund')
             ),
-            attrs={'class': 'payment-refund button small secondary'},
+            attrs={'class': f'payment-refund button {css_class}'},
             traits=(
                 Confirm(
                     _('Do you really want to refund ${amount}?', mapping={
@@ -501,7 +505,7 @@ def send_new_note_notification(
 
 
 @OrgApp.form(
-    model=Ticket, name='note', permission=Private,
+    model=Ticket, name='note', permission=Personal,
     template='ticket_note_form.pt', form=TicketNoteForm
 )
 def handle_new_note(
@@ -535,7 +539,7 @@ def handle_new_note(
     }
 
 
-@OrgApp.view(model=TicketNote, permission=Private)
+@OrgApp.view(model=TicketNote, permission=Personal)
 def view_ticket_note(
     self: TicketNote,
     request: OrgRequest
@@ -543,9 +547,18 @@ def view_ticket_note(
     return request.redirect(request.link(self.ticket))
 
 
-@OrgApp.view(model=TicketNote, permission=Private, request_method='DELETE')
+def assert_can_modify_note(self: TicketNote, request: OrgRequest) -> None:
+    if not (
+        self.owner == request.current_username
+        or request.is_manager_for_model(self)
+    ):
+        raise exc.HTTPNotFound()
+
+
+@OrgApp.view(model=TicketNote, permission=Personal, request_method='DELETE')
 def delete_ticket_note(self: TicketNote, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
+    assert_can_modify_note(self, request)
 
     if self.ticket:
         # force a change of the ticket to make sure that it gets reindexed
@@ -556,7 +569,7 @@ def delete_ticket_note(self: TicketNote, request: OrgRequest) -> None:
 
 
 @OrgApp.form(
-    model=TicketNote, name='edit', permission=Private,
+    model=TicketNote, name='edit', permission=Personal,
     template='ticket_note_form.pt', form=TicketNoteForm
 )
 def handle_edit_note(
@@ -565,6 +578,8 @@ def handle_edit_note(
     form: TicketNoteForm,
     layout: TicketNoteLayout | None = None
 ) -> RenderData | BaseResponse:
+
+    assert_can_modify_note(self, request)
 
     assert self.ticket is not None
     if form.submitted(request):
@@ -809,6 +824,9 @@ def change_tag(
                 selected_meta = meta
                 break
 
+        # NOTE: Don't include the E-Mail in the selected meta
+        selected_meta.pop('E-Mail', None)
+
         # NOTE: We don't modify the submission data but we exclude
         #       any metadata that's tied to the submission
         if selected_meta and (
@@ -818,7 +836,6 @@ def change_tag(
             selected_meta = {
                 key: value
                 for key, value in selected_meta.items()
-                if key != 'E-Mail'
                 if not any(
                     True
                     for field in form
@@ -826,11 +843,12 @@ def change_tag(
                 )
             }
 
-            kaba_code = selected_meta.pop('Kaba Code', None)
-            handler_data = self.handler_data or {}
-            if kaba_code and 'key_code' not in handler_data:
-                handler_data['key_code'] = kaba_code
-                self.handler_data = handler_data
+        # update the key code if it's different
+        kaba_code = selected_meta.pop('Kaba Code', None)
+        handler_data = self.handler_data or {}
+        if kaba_code and handler_data.get('key_code') != kaba_code:
+            handler_data['key_code'] = kaba_code
+            self.handler_data = handler_data
 
         self.tag_meta = selected_meta
 
@@ -935,7 +953,7 @@ def create_attachment_from_uploaded(
     return (attachment,)
 
 
-@OrgApp.view(model=Ticket, name='pdf', permission=Private)
+@OrgApp.view(model=Ticket, name='pdf', permission=Personal)
 def view_ticket_pdf(self: Ticket, request: OrgRequest) -> Response:
     """ View the generated PDF. """
 
@@ -991,6 +1009,193 @@ def view_ticket_files(self: Ticket, request: OrgRequest) -> BaseResponse:
             date.today().strftime('%Y%m%d')
         )
     )
+
+
+@OrgApp.html(
+    model=Ticket,
+    name='invoice',
+    template='ticket_invoice.pt',
+    permission=Private
+)
+def view_ticket_invoice(
+    self: Ticket,
+    request: OrgRequest,
+    layout: TicketInvoiceLayout | None = None
+) -> RenderData:
+
+    invoice = self.invoice
+    if invoice is None:
+        raise exc.HTTPNotFound()
+
+    payment = self.payment
+    if payment is not None and (
+        payment.source != 'manual'
+        or payment.state != 'open'
+    ):
+        request.warning(_(
+            'The payment is no longer open, so the invoice '
+            'cannot be modified.'
+        ))
+
+    payment = self.payment
+
+    def item_actions(item: TicketInvoiceItem) -> list[Link]:
+        if item.group != 'manual':
+            return []
+
+        if payment is not None and (
+            payment.source != 'manual'
+            or payment.state != 'open'
+        ):
+            return []
+
+        return [Link(
+            '',
+            attrs={
+                'class': 'fa fa-trash remove-invoice-item',
+                'title': _('Remove')
+            },
+            url=request.csrf_protected_url(request.link(
+                self,
+                'remove-invoice-item',
+                query_params={'item': item.id.hex}
+            )),
+            traits=(
+                Confirm(
+                    _('Remove Discount') if item.amount < 0 else
+                    _('Remove Surchage'),
+                    _(
+                        'Do you really want to remove "${booking_text}"?',
+                        mapping={'booking_text': item.text}
+                    )
+                ),
+                Intercooler(
+                    request_method='DELETE',
+                    redirect_after=request.url
+                ),
+            )
+        )]
+
+    layout = layout or TicketInvoiceLayout(self, request)
+
+    payment_button: Link | None = None
+    if payment and payment.source == 'manual':
+        payment_button = manual_payment_button(
+            payment, layout, css_class='primary')
+
+    if payment and payment.source in (
+        'stripe_connect',
+        'datatrans',
+        'worldline_saferpay',
+    ):
+        payment_button = online_payment_button(
+            payment, layout, css_class='primary')
+
+    return {
+        'title': _('${ticket} Invoice', mapping={'ticket': self.number}),
+        'layout': layout,
+        'ticket': self,
+        'invoice': invoice,
+        'invoice_items': group_invoice_items(invoice.items),
+        'payment': payment,
+        'payment_button': payment_button,
+        'item_actions': item_actions
+    }
+
+
+@OrgApp.form(
+    model=Ticket,
+    name='add-invoice-item',
+    template='form.pt',
+    permission=Private,
+    form=ManualInvoiceItemForm
+)
+def add_invoice_item(
+    self: Ticket,
+    request: OrgRequest,
+    form: ManualInvoiceItemForm,
+    layout: TicketInvoiceLayout | None = None
+) -> RenderData | BaseResponse:
+
+    invoice = self.invoice
+    if invoice is None:
+        raise exc.HTTPNotFound()
+
+    payment = self.payment
+    if payment is not None and (
+        payment.source != 'manual'
+        or payment.state != 'open'
+    ):
+        return morepath.redirect(request.link(self, 'invoice'))
+
+    if form.submitted(request):
+        assert form.booking_text.data is not None
+        item = invoice.add(
+            text=form.booking_text.data,
+            group='manual',
+            family=form.kind.data,
+            unit=form.amount,
+        )
+        if payment is not None:
+            item.payments.append(payment)
+            item.paid = payment.state == 'paid'
+        request.session.flush()
+        self.handler.refresh_invoice_items(request)
+        return morepath.redirect(request.link(self, 'invoice'))
+
+    layout = layout or TicketInvoiceLayout(self, request)
+
+    return {
+        'title': _('Add Discount / Surcharge'),
+        'layout': layout,
+        'form': form,
+    }
+
+
+@OrgApp.view(
+    model=Ticket,
+    name='remove-invoice-item',
+    permission=Private,
+    request_method='DELETE'
+)
+def remove_invoice_item(
+    self: Ticket,
+    request: OrgRequest,
+    layout: TicketInvoiceLayout | None = None
+) -> None:
+
+    request.assert_valid_csrf_token()
+
+    invoice = self.invoice
+    if invoice is None:
+        raise exc.HTTPNotFound()
+
+    payment = self.payment
+    if payment is not None and (
+        payment.source != 'manual'
+        or payment.state != 'open'
+    ):
+        request.alert(_(
+            'The payment is no longer open, so the invoice '
+            'cannot be modified.'
+        ))
+        return
+
+    target: TicketInvoiceItem | None = None
+    item_id = request.GET.get('item')
+    for item in invoice.items:
+        if item.id.hex == item_id:
+            target = item
+            break
+
+    if target is None or target.group != 'manual':
+        raise exc.HTTPNotFound()
+
+    target.payments = []
+    invoice.items.remove(target)
+    request.session.delete(target)
+    request.session.flush()
+    self.handler.refresh_invoice_items(request)
 
 
 @OrgApp.form(model=Ticket, name='status', template='ticket_status.pt',

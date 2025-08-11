@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import morepath
-
+from datetime import date
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
 from onegov.form.collection import SurveyCollection
@@ -27,9 +27,16 @@ from onegov.org.models.ticket import (
     FormSubmissionTicket,
     ReservationTicket,
 )
-from onegov.org.utils import emails_for_new_ticket
-from onegov.pay import PaymentError, Price
+from onegov.org.utils import (
+    currency_for_submission,
+    emails_for_new_ticket,
+    group_invoice_items,
+    invoice_items_for_submission,
+)
+from onegov.pay import InvoiceItemMeta, PaymentError, Price
+from onegov.ticket import TicketInvoice
 from purl import URL
+from uuid import uuid4
 from webob.exc import HTTPMethodNotAllowed, HTTPNotFound
 
 
@@ -37,7 +44,7 @@ from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.core.types import RenderData
-    from onegov.form import Form, FormSubmission
+    from onegov.form import FormSubmission
     from onegov.org.request import OrgRequest
     from onegov.ticket import Ticket
     from webob import Response
@@ -62,23 +69,6 @@ def copy_query(
         url_obj = url_obj.query_param(field, value)
 
     return url_obj.as_string()
-
-
-def get_price(
-    request: OrgRequest,
-    form: Form,
-    submission: FormSubmission
-) -> Price | None:
-
-    total = form.total()
-
-    if 'price' in submission.meta:
-        if total is not None:
-            total += Price(**submission.meta['price'])
-        else:
-            total = Price(**submission.meta['price'])
-
-    return request.app.adjust_price(total)
 
 
 @OrgApp.html(model=PendingFormSubmission, template='submission.pt',
@@ -131,30 +121,13 @@ def handle_pending_submission(
         collection.submissions.update(self, form)
 
     completable = not form.errors and 'edit' not in request.GET
-    price = get_price(request, form, self)
+    invoice_items = invoice_items_for_submission(request, form, self)
+    current_total_amount = InvoiceItemMeta.total(invoice_items)
 
     # check minimum price total if set
-    current_total_amount = price and price.amount or 0.0
     minimum_total_amount = self.minimum_price_total or 0.0
     if current_total_amount < minimum_total_amount:
-        if price is not None:
-            currency = price.currency
-        else:
-            # We just pick the first currency from any pricing rule we can find
-            # if we can't find any, then we fall back to 'CHF'. Although that
-            # should be an invalid form definition.
-            currency = 'CHF'
-            for field in form._fields.values():
-                if not hasattr(field, 'pricing'):
-                    continue
-
-                rules = field.pricing.rules
-                if not rules:
-                    continue
-
-                currency = next(iter(rules.values())).currency
-                break
-
+        _currency = currency_for_submission(form, self)
         completable = False
         request.alert(
             _(
@@ -162,8 +135,8 @@ def handle_pending_submission(
                 'is ${total} but has to be at least ${minimum}. '
                 'Please adjust your inputs.',
                 mapping={
-                    'total': Price(current_total_amount, currency),
-                    'minimum': Price(minimum_total_amount, currency)
+                    'total': Price(current_total_amount, _currency),
+                    'minimum': Price(minimum_total_amount, _currency)
                 }
             )
         )
@@ -176,6 +149,17 @@ def handle_pending_submission(
     if window and not window.accepts_submissions(self.spots):
         request.alert(_('Registrations are no longer possible'))
         completable = False
+
+    if completable and ticket is not None:
+        # refresh invoice items if allowed, otherwise show an error
+        if ticket.handler.refreshing_invoice_is_safe(request):
+            ticket.handler.refresh_invoice_items(request)
+        else:
+            completable = False
+            request.alert(_(
+                'Your changes would alter the price total '
+                'but the payment is no longer open.'
+            ))
 
     if completable and (ticket is not None or 'return-to' in request.GET):
 
@@ -207,6 +191,14 @@ def handle_pending_submission(
     if 'return-to' in request.GET:
         complete_url = copy_query(request, complete_url, ('return-to', ))
 
+    price = request.app.adjust_price(Price(
+        amount=current_total_amount,
+        currency=currency_for_submission(form, self),
+        credit_card_payment=any(
+            price.credit_card_payment
+            for __, price in form.prices()
+        )
+    )) if self.state == 'pending' and current_total_amount > 0.0 else None
     email = self.email or self.get_email_field_data(form)
     if price:
         assert email is not None
@@ -221,6 +213,7 @@ def handle_pending_submission(
     else:
         checkout_button = None
 
+    show_vat = getattr(self.form, 'show_vat', False)
     return {
         'layout': layout or FormSubmissionLayout(self, request, title),
         'title': title,
@@ -230,10 +223,13 @@ def handle_pending_submission(
         'complete_link': complete_url,
         'model': self,
         'price': price,
-        'show_vat': getattr(self.form, 'show_vat', False),
-        # NOTE: The VAT amount can be wrong in the fee is charged to
+        'show_vat': show_vat,
+        # NOTE: The VAT amount can be wrong if the fee is charged to
         #       the customer. So it's better to not show it yet.
         'hide_vat_amount': True,
+        'invoice_items': group_invoice_items(invoice_items),
+        'total_amount': current_total_amount,
+        'total_vat': show_vat and InvoiceItemMeta.total_vat(invoice_items),
         'checkout_button': checkout_button
     }
 
@@ -326,14 +322,24 @@ def handle_complete_submission(
         else:
             provider = request.app.default_payment_provider
             token = provider.get_token(request) if provider else None
-            price = get_price(request, form, self)
+            invoice_items = invoice_items_for_submission(request, form, self)
+            amount = InvoiceItemMeta.total(invoice_items)
+            price = request.app.adjust_price(Price(
+                amount=amount,
+                currency=currency_for_submission(form, self),
+                credit_card_payment=any(
+                    price.credit_card_payment
+                    for __, price in form.prices()
+                )
+            )) if amount > 0.0 else None
             payment = self.process_payment(price, provider, token)
 
             # FIXME: Custom error message for PaymentError?
             if not payment or isinstance(payment, PaymentError):
                 request.alert(_('Your payment could not be processed'))
                 return morepath.redirect(request.link(self))
-            elif payment is not True:
+
+            if payment is not True:
                 self.payment = payment
 
             window = self.registration_window
@@ -361,6 +367,20 @@ def handle_complete_submission(
                     handler_id=self.id.hex
                 )
                 TicketMessage.create(ticket, request, 'opened', 'external')
+
+                if invoice_items:
+                    invoice = TicketInvoice(id=uuid4())
+                    request.session.add(invoice)
+
+                    for item_meta in invoice_items:
+                        item = item_meta.add_to_invoice(invoice)
+                        if payment is not True:
+                            if provider and payment.source == provider.type:
+                                item.payment_date = date.today()
+                            item.payments.append(payment)
+                            item.paid = payment.state == 'paid'
+
+                    ticket.invoice = invoice
 
             assert self.email is not None
             submission = collection.submissions.by_id(

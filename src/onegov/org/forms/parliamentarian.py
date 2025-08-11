@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from onegov.form.fields import PhoneNumberField
 from onegov.form.fields import TranslatedSelectField
 from onegov.form.fields import UploadField
@@ -16,6 +18,10 @@ from wtforms.validators import Email
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
 from wtforms.validators import URL
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.parliament.models.parliamentarian import Parliamentarian
 
 
 class ParliamentarianForm(NamedFileForm):
@@ -141,3 +147,83 @@ class ParliamentarianForm(NamedFileForm):
         label=_('Remarks'),
         fieldset=_('Additional information'),
     )
+
+    interest_ties = StringField(
+        label=_('Interest ties'),
+        fieldset=_('Interest ties'),
+        render_kw={'class_': 'many many-interest-ties'}
+    )
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.interest_tie_errors: dict[int, str] = {}
+
+    def on_request(self) -> None:
+        pass
+
+    def process_obj(self, obj: Parliamentarian) -> None:  # type:ignore[override]
+        super().process_obj(obj)
+
+        parliamentarian: Parliamentarian = obj
+        interest_ties = parliamentarian.interests or {'rows': []}
+        self.interest_ties.data = self.interest_ties_to_json(interest_ties)
+
+    def populate_obj(
+        self,
+        obj: object,
+        *args: Any, **kwargs: Any
+    ) -> None:
+        super().populate_obj(
+            obj,
+            exclude={'interest_ties'}
+        )
+
+        if hasattr(obj, 'interests'):
+            interests = obj.interests
+            interests['rows'] = self.json_to_interest_ties(
+                self.interest_ties.data)
+            if not interests.get('headers'):
+                interests['headers'] = ['Interessenbindung', 'Kategorie']
+            obj.interests = interests
+
+    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
+        data = super().get_useful_data()
+        data.pop('interest_ties')
+        return data
+
+    def interest_ties_to_json(
+        self,
+        interest_ties: dict[str, Any]
+    ) -> str:
+
+        return json.dumps({
+            'labels': {
+                'interest_tie': self.request.translate(_('Interest tie')),
+                'category': self.request.translate(_('Category')),
+                'add': self.request.translate(_('Add')),
+                'remove': self.request.translate(_('Remove')),
+            },
+            'values': [
+                {
+                    'interest_tie': tie['Interessenbindung'],
+                    'category': tie['Kategorie'],
+                    'error': self.interest_tie_errors.get(ix, '')
+                } for ix, tie in enumerate(interest_ties['rows'])
+            ]
+        })
+
+    def json_to_interest_ties(
+        self,
+        text: str | None
+    ) -> list[dict[str, str]]:
+        if not text:
+            return []
+
+        return [
+            {
+                'Interessenbindung': value['interest_tie'],
+                'Kategorie': value['category']
+            }
+            for value in json.loads(text).get('values', [])
+            if value['interest_tie'] and value['category']
+        ]

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from functools import cached_property
 
-from onegov.activity import Activity, PeriodCollection, Occasion
+from onegov.activity import Activity, BookingPeriodCollection, Occasion
 from onegov.activity import BookingCollection
 from onegov.core.elements import Link, Confirm, Intercooler, Block
 from onegov.core.elements import LinkGroup
@@ -25,9 +25,9 @@ if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
     from markupsafe import Markup
     from onegov.activity.models import (
-        Attendee, Booking, Period, PublicationRequest)
+        Attendee, Booking, BookingPeriod, PublicationRequest)
     from onegov.activity.collections import (
-        InvoiceCollection, VolunteerCollection)
+        BookingPeriodInvoiceCollection, VolunteerCollection)
     from onegov.core.elements import Trait
     from onegov.feriennet.app import FeriennetApp
     from onegov.feriennet.models import NotificationTemplate
@@ -180,7 +180,7 @@ class BookingCollectionLayout(DefaultLayout):
     def rega_link(
         self,
         attendee: Attendee | None,
-        period: Period | None,
+        period: BookingPeriod | None,
         grouped_bookings: dict[Attendee, dict[str, list[Booking]]]
     ) -> str | None:
 
@@ -502,7 +502,7 @@ class PeriodCollectionLayout(DefaultLayout):
         return [
             Link(
                 _('New Period'),
-                self.request.class_link(PeriodCollection, name='new'),
+                self.request.class_link(BookingPeriodCollection, name='new'),
                 attrs={'class': 'new-period'}
             ),
         ]
@@ -510,11 +510,11 @@ class PeriodCollectionLayout(DefaultLayout):
 
 class PeriodFormLayout(DefaultLayout):
 
-    model: Period | PeriodCollection
+    model: BookingPeriod | BookingPeriodCollection
 
     def __init__(
         self,
-        model: Period | PeriodCollection,
+        model: BookingPeriod | BookingPeriodCollection,
         request: FeriennetRequest,
         title: str
     ) -> None:
@@ -531,7 +531,7 @@ class PeriodFormLayout(DefaultLayout):
             ),
             Link(
                 _('Manage Periods'),
-                self.request.class_link(PeriodCollection)
+                self.request.class_link(BookingPeriodCollection)
             ),
             Link(self.title, '#')
         ]
@@ -804,7 +804,7 @@ class DonationLayout(DefaultLayout):
 
     def __init__(
         self,
-        model: InvoiceCollection,
+        model: BookingPeriodInvoiceCollection,
         request: FeriennetRequest,
         title: str
     ) -> None:
