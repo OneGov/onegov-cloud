@@ -213,7 +213,7 @@ def view_political_business(
 
     participations = self.participants
     participations.sort(key=lambda x: x.parliamentarian.title)
-    participations.sort(key=lambda x: x.participant_type, reverse=True)
+    participations.sort(key=lambda x: x.participant_type or '', reverse=True)
 
     return {
         'layout': layout,
