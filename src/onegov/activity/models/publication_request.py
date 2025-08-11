@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from .activity import Activity
-    from .period import Period
+    from .period import BookingPeriod
 
 
 class PublicationRequest(Base, TimestampMixin):
@@ -53,8 +53,8 @@ class PublicationRequest(Base, TimestampMixin):
         ForeignKey('periods.id'),
         nullable=False
     )
-    period: relationship[Period] = relationship(
-        'Period',
+    period: relationship[BookingPeriod] = relationship(
+        'BookingPeriod',
         back_populates='publication_requests',
         lazy='joined'
     )

@@ -113,6 +113,13 @@ class TicketNote(Message, TicketMessageMixin):
             layout.request, paragraphify(linkify(self.text)))
 
     def links(self, layout: DefaultLayout) -> Iterator[Link]:
+        # unprivileged members can only modify their own notes
+        if (
+            self.owner != layout.request.current_username
+            and not layout.request.is_manager_for_model(self.ticket)
+        ):
+            return
+
         yield Link(_('Edit'), layout.request.link(self, 'edit'))
         yield Link(
             _('Delete'), layout.csrf_protected_url(layout.request.link(self)),

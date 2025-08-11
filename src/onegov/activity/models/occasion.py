@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from .booking import Booking
     from .occasion_date import OccasionDate
     from .occasion_need import OccasionNeed
-    from .period import Period
+    from .period import BookingPeriod
 
 
 class Occasion(Base, TimestampMixin):
@@ -121,8 +121,8 @@ class Occasion(Base, TimestampMixin):
         ForeignKey('periods.id', use_alter=True),
         nullable=False
     )
-    period: relationship[Period] = relationship(
-        'Period',
+    period: relationship[BookingPeriod] = relationship(
+        'BookingPeriod',
         back_populates='occasions'
     )
 
@@ -251,12 +251,12 @@ class Occasion(Base, TimestampMixin):
 
     @total_cost.expression  # type:ignore[no-redef]
     def total_cost(cls) -> ColumnElement[Decimal]:
-        from onegov.activity.models.period import Period
+        from onegov.activity.models.period import BookingPeriod
 
         return coalesce(Occasion.cost, 0) + case([
-            (Period.all_inclusive == True, 0),
-            (Period.all_inclusive == False, func.coalesce(
-                Occasion.booking_cost, Period.booking_cost, 0
+            (BookingPeriod.all_inclusive == True, 0),
+            (BookingPeriod.all_inclusive == False, func.coalesce(
+                Occasion.booking_cost, BookingPeriod.booking_cost, 0
             )),
         ])
 

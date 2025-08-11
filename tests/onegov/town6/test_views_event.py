@@ -296,3 +296,19 @@ def test_view_occurrences_event_documents(client):
         page = client.get('/events')
         assert "Dokumente" in page
         assert "zoo-programm-saison-2024.pdf" in page
+
+
+def test_view_occurrences_event_information(client):
+    client.login_admin()
+    settings = client.get('/event-settings')
+    settings.form['event_header_html'] = (
+        '<em>My <strong>bold</strong> Header</em>')
+    settings.form['event_footer_html'] = (
+        '<em>My\n<strong>bold</strong>\nFooter</em>')
+    settings.form.submit()
+
+    client.logout()
+
+    page = client.get('/events')
+    assert 'My bold Header' in page.pyquery('.event-header').text()
+    assert 'My bold Footer' in page.pyquery('.event-footer').text()

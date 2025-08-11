@@ -36,7 +36,7 @@ from uuid import UUID
 from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
-    from onegov.activity.models import Period, PeriodMeta
+    from onegov.activity.models import BookingPeriod, BookingPeriodMeta
     from onegov.activity.models.booking import BookingState
     from onegov.core.elements import Trait
     from onegov.core.types import RenderData
@@ -85,7 +85,7 @@ def all_bookings(collection: BookingCollection) -> list[Booking]:
 
 
 def group_bookings(
-    period: Period | PeriodMeta,
+    period: BookingPeriod | BookingPeriodMeta,
     bookings: Iterable[Booking]
 ) -> dict[Attendee, dict[BookingState, SortedList[Booking]]]:
     """ Takes a (small) list of bookings and groups them by attendee and state
@@ -127,7 +127,7 @@ def group_bookings(
 
 
 def total_by_bookings(
-    period: Period | PeriodMeta | None,
+    period: BookingPeriod | BookingPeriodMeta | None,
     bookings: Collection[Booking]
 ) -> Decimal:
 
@@ -196,7 +196,7 @@ def get_booking_title(layout: DefaultLayout, booking: Booking) -> str:
 
 def actions_by_booking(
     layout: DefaultLayout,
-    period: Period | PeriodMeta | None,
+    period: BookingPeriod | BookingPeriodMeta | None,
     booking: Booking
 ) -> list[Link]:
 

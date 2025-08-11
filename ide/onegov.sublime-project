@@ -33,7 +33,7 @@
         "SublimeLinter.linters.mypy.python": "${project_path}/../venv/bin/python",
         "SublimeLinter.linters.mypy.excludes":
         [
-            "*/tests/*",
+            "*/tests/onegov/*",
         ],
         "SublimeLinter.linters.ruff.executable": "${project_path}/../venv/bin/ruff",
         "SublimeLinter.linters.ruff.python": "${project_path}/../venv/bin/python",

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from sqlalchemy import func
+
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
 from onegov.org.forms.political_business import PoliticalBusinessForm
@@ -14,8 +16,8 @@ from onegov.town6 import TownApp
 from onegov.town6.layout import PoliticalBusinessCollectionLayout
 from onegov.town6.layout import PoliticalBusinessLayout
 
-
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
@@ -34,6 +36,45 @@ def get_political_business_form_class(
     )
 
 
+def count_political_businesses_by_type(
+    request: TownRequest
+) -> dict[str, int]:
+    session = request.session
+    result = session.query(
+        PoliticalBusiness.political_business_type,
+        func.count(PoliticalBusiness.id).label('count')
+    ).group_by(PoliticalBusiness.political_business_type).all()
+
+    return dict(result)
+
+
+def count_political_businesses_by_status(
+    request: TownRequest
+) -> dict[str, int]:
+    session = request.session
+    result = session.query(
+        PoliticalBusiness.status,
+        func.count(PoliticalBusiness.id).label('count')
+    ).group_by(PoliticalBusiness.status).all()
+
+    return dict(result)
+
+
+def count_political_businesses_by_year(
+    request: TownRequest
+) -> dict[str, int]:
+    session = request.session
+    result = session.query(
+        func.extract('year', PoliticalBusiness.entry_date).label('year'),
+        func.count(PoliticalBusiness.id).label('count')
+    ).group_by(func.extract('year', PoliticalBusiness.entry_date)).all()
+
+    # convert decimal to string
+    return {
+        str(int(year)): count for year, count in result
+    }
+
+
 @TownApp.html(
     model=PoliticalBusinessCollection,
     template='political_businesses.pt',
@@ -45,6 +86,41 @@ def view_political_businesses(
     layout: PoliticalBusinessCollectionLayout | None = None
 ) -> RenderData | Response:
 
+    count_per_business_type = count_political_businesses_by_type(request)
+    types = sorted((
+        Link(
+            text=request.translate(text) +
+                 f' ({count_per_business_type[type_]})',
+            active=type_ in self.types,
+            url=request.link(self.for_filter(type=type_)),
+        )
+        for type_, text in POLITICAL_BUSINESS_TYPE.items()
+        if count_per_business_type.get(type_, 0) > 0
+    ), key=lambda x: (x.text or '').lower())
+
+    count_per_status = count_political_businesses_by_status(request)
+    status = sorted((
+        Link(
+            text=request.translate(text) +
+                f' ({count_per_status[status]})',
+            active=status in self.status,
+            url=request.link(self.for_filter(status=status)),
+        )
+        for status, text in POLITICAL_BUSINESS_STATUS.items()
+        if count_per_status.get(status, 0) > 0
+    ), key=lambda x: (x.text or '').lower())
+
+    count_per_year = count_political_businesses_by_year(request)
+    years = (
+        Link(
+            text=str(year_int) + f' ({count_per_year[str(year_int)]})',
+            active=year_int in self.years,
+            url=request.link(self.for_filter(year=year_int)),
+        )
+        for year_int in self.years_for_entries()
+        if count_per_year.get(str(year_int), 0) > 0
+    )
+
     return {
         # 'add_link': request.link(self, name='new'),
         'layout': layout or PoliticalBusinessCollectionLayout(self, request),
@@ -52,6 +128,9 @@ def view_political_businesses(
         'businesses': self.batch,
         'type_map': POLITICAL_BUSINESS_TYPE,
         'status_map': POLITICAL_BUSINESS_STATUS,
+        'business_types': types,
+        'business_status': status,
+        'years': years,
     }
 
 

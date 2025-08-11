@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from onegov.core.elements import Link
 from onegov.core.security import Private
+from onegov.org.forms.commission_membership import CommissionMembershipForm
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import PASCommissionMembershipCollection
-from onegov.pas.forms import CommissionMembershipForm
 from onegov.pas.layouts import PASCommissionMembershipLayout
 from onegov.pas.models import PASCommissionMembership
 

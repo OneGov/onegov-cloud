@@ -669,10 +669,10 @@ def transfer(
 
     def do_add_admins(local_cfg: ApplicationConfig, schema: str) -> None:
         id_ = str(uuid4())
-        password_hash = hash_password('test').replace('$', '\\$')
+        password_hash = hash_password('test')
         assert '"' not in schema and "'" not in schema
         query = (
-            f'INSERT INTO \\"{schema}\\".users '  # nosec: B608
+            f'INSERT INTO "{schema}".users '  # nosec: B608
             f"(type, id, username, password_hash, role, active, realname) "
             f"VALUES ('generic', '{id_}', 'admin@example.org', "
             f"'{password_hash}', 'admin', true, 'John Doe');"
@@ -683,6 +683,7 @@ def transfer(
             '-u',
             'postgres',
             'psql',
+            '-d',
             local_db,
             '-c',
             query,

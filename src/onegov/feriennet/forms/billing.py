@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import cached_property
-from onegov.activity import Invoice
+from onegov.activity import BookingPeriodInvoice
 from onegov.feriennet import _
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
@@ -215,6 +215,6 @@ class PaymentWithDateForm(Form):
                 self.items.data = [i.id.hex for i in self.invoice.items]
 
     @cached_property
-    def invoice(self) -> Invoice:
+    def invoice(self) -> BookingPeriodInvoice:
         return self.request.session.query(
-            Invoice).filter_by(id=self.request.params['invoice-id']).one()
+            BookingPeriodInvoice).filter_by(id=self.request.params['invoice-id']).one()

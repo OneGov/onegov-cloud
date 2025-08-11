@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from datetime import datetime
-    from onegov.activity.models import Activity, Period
+    from onegov.activity.models import Activity, BookingPeriod
 
 
 class OccasionCollection(GenericCollection[Occasion]):
@@ -33,7 +33,7 @@ class OccasionCollection(GenericCollection[Occasion]):
     def add(  # type:ignore[override]
         self,
         activity: Activity,
-        period: Period,
+        period: BookingPeriod,
         start: datetime,
         end: datetime,
         timezone: str,

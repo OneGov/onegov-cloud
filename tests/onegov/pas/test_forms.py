@@ -1,6 +1,8 @@
 from datetime import date
 from freezegun import freeze_time
 from onegov.core.utils import Bunch
+from onegov.org.forms.commission_membership import CommissionMembershipAddForm
+from onegov.org.forms.commission_membership import CommissionMembershipForm
 from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.collections import PASCommissionMembershipCollection
 from onegov.pas.collections import PASParliamentarianCollection
@@ -13,8 +15,6 @@ from onegov.pas.forms import AttendenceAddCommissionForm
 from onegov.pas.forms import AttendenceAddForm
 from onegov.pas.forms import AttendenceAddPlenaryForm
 from onegov.pas.forms import AttendenceForm
-from onegov.pas.forms import CommissionMembershipAddForm
-from onegov.pas.forms import CommissionMembershipForm
 from onegov.pas.forms import PASParliamentarianRoleForm
 from onegov.pas.forms import RateSetForm
 from onegov.pas.forms import SettlementRunForm

@@ -125,21 +125,37 @@ class RISParliamentarian(Parliamentarian, ORMSearchable):
     @hybrid_property
     def active(self) -> bool:
         # Wil: every parliamentarian is active if in a parliamentary
-        # group, which leads to a role
+        # group (which leads to a role) or in a commission
         for role in self.roles:
             if role.end is None or role.end >= utcnow().date():
                 return True
+
+        for membership in self.commission_memberships:
+            if membership.end is None or membership.end >= utcnow().date():
+                return True
+
         return False
 
     @active.expression  # type:ignore[no-redef]
     def active(cls):
 
-        return exists().where(
-            and_(
-                ParliamentarianRole.parliamentarian_id == cls.id,
-                or_(
-                    ParliamentarianRole.end.is_(None),
-                    ParliamentarianRole.end >= utcnow()
+        return or_(
+            exists().where(
+                and_(
+                    RISParliamentarianRole.parliamentarian_id == cls.id,
+                    or_(
+                        RISParliamentarianRole.end.is_(None),
+                        RISParliamentarianRole.end >= utcnow()
+                    )
+                )
+            ),
+            exists().where(
+                and_(
+                    RISCommissionMembership.parliamentarian_id == cls.id,
+                    or_(
+                        RISCommissionMembership.end.is_(None),
+                        RISCommissionMembership.end >= utcnow()
+                    )
                 )
             )
         )

@@ -5,7 +5,7 @@ import isodate
 from decimal import Decimal
 from functools import cached_property
 from onegov.activity import Occasion, OccasionCollection
-from onegov.activity import Period, PeriodCollection
+from onegov.activity import BookingPeriod, BookingPeriodCollection
 from onegov.core.custom import json
 from onegov.feriennet import _
 from onegov.form import Form
@@ -170,8 +170,8 @@ class OccasionForm(Form):
             self.administrative_cost_amount.data = amount
 
     @cached_property
-    def selected_period(self) -> Period | None:
-        return PeriodCollection(self.request.session).by_id(
+    def selected_period(self) -> BookingPeriod | None:
+        return BookingPeriodCollection(self.request.session).by_id(
             self.period_id.data)
 
     class DateRange(NamedTuple):
@@ -197,10 +197,10 @@ class OccasionForm(Form):
         return result
 
     def setup_period_choices(self) -> None:
-        query = PeriodCollection(self.request.session).query()
-        query = query.order_by(desc(Period.active), Period.title)
+        query = BookingPeriodCollection(self.request.session).query()
+        query = query.order_by(desc(BookingPeriod.active), BookingPeriod.title)
 
-        def choice(period: Period) -> tuple[str, str]:
+        def choice(period: BookingPeriod) -> tuple[str, str]:
             return str(period.id), '{} ({:%d.%m.%Y} - {:%d.%m.%Y})'.format(
                 period.title,
                 period.execution_start,

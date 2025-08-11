@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from onegov.activity import Period, PeriodCollection
+from onegov.activity import BookingPeriod, BookingPeriodCollection
 from onegov.feriennet import _
 from onegov.form import Form
 from onegov.form.fields import UploadField
 from onegov.form.validators import WhitelistedMimeType, FileSizeLimit
-from sqlalchemy import desc
 from wtforms.fields import SelectField
 from wtforms.validators import InputRequired, DataRequired, ValidationError
 
@@ -36,19 +35,16 @@ class BankStatementImportForm(Form):
 
     @property
     def period_choices(self) -> list[_Choice]:
-        periods = PeriodCollection(self.request.session)
+        periods = BookingPeriodCollection(self.request.session)
 
         q = periods.query()
-        q = q.with_entities(Period.id, Period.title)
-        q = q.order_by(desc(Period.active), desc(Period.prebooking_start))
+        q = q.with_entities(BookingPeriod.id, BookingPeriod.title)
+        q = q.order_by(
+            BookingPeriod.active.desc(),
+            BookingPeriod.prebooking_start.desc()
+        )
 
-        # NOTE: Technically not quite correct, it's a Row with two named
-        #       fields. But this is close enough for our purposes and is
-        #       quicker than defining a matching NamedTuple.
-        def choice(row: Period) -> _Choice:
-            return row.id.hex, row.title
-
-        return [choice(p) for p in q]
+        return [(period_id.hex, title) for period_id, title in q]
 
     def load_periods(self) -> None:
         self.period.choices = self.period_choices
@@ -60,7 +56,7 @@ class BankStatementImportForm(Form):
         self.load_periods()
 
     def validate_period(self, field: SelectField) -> None:
-        periods = PeriodCollection(self.request.session)
+        periods = BookingPeriodCollection(self.request.session)
         period = periods.by_id(field.data)
         assert period is not None
 

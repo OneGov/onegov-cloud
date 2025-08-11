@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.activity.models import Period
+from onegov.activity.models import BookingPeriod
 from onegov.core.collection import GenericCollection
 
 
@@ -9,11 +9,11 @@ if TYPE_CHECKING:
     from datetime import date
 
 
-class PeriodCollection(GenericCollection[Period]):
+class BookingPeriodCollection(GenericCollection[BookingPeriod]):
 
     @property
-    def model_class(self) -> type[Period]:
-        return Period
+    def model_class(self) -> type[BookingPeriod]:
+        return BookingPeriod
 
     def add(  # type:ignore[override]
         self,
@@ -28,7 +28,7 @@ class PeriodCollection(GenericCollection[Period]):
         cancellation_days: int | None = None,
         finalizable: bool = True,
         confirmable: bool = True
-    ) -> Period:
+    ) -> BookingPeriod:
 
         if not confirmable:
             prebooking = (booking[0], booking[0])
@@ -55,5 +55,5 @@ class PeriodCollection(GenericCollection[Period]):
 
         return period
 
-    def active(self) -> Period | None:
-        return self.query().filter(Period.active == True).first()
+    def active(self) -> BookingPeriod | None:
+        return self.query().filter(BookingPeriod.active == True).first()

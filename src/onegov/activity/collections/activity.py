@@ -5,7 +5,8 @@ import sedate
 
 from copy import copy
 from enum import IntEnum
-from onegov.activity.models import Activity, Occasion, OccasionDate, Period
+from onegov.activity.models import Activity, BookingPeriod
+from onegov.activity.models import Occasion, OccasionDate
 from onegov.activity.utils import date_range_decode
 from onegov.activity.utils import date_range_encode
 from onegov.activity.utils import merge_ranges
@@ -34,7 +35,7 @@ if TYPE_CHECKING:
     from collections.abc import Collection, Iterable, Iterator
     from datetime import date
     from markupsafe import Markup
-    from onegov.activity.models import PeriodMeta
+    from onegov.activity.models import BookingPeriodMeta
     from onegov.activity.models.activity import ActivityState
     from onegov.user import User
     from sqlalchemy.orm import Query, Session
@@ -414,7 +415,7 @@ class ActivityCollection(RangedPagination[ActivityT]):
             ))
 
         if self.filter.price_ranges:
-            o = o.join(Period)
+            o = o.join(BookingPeriod)
             o = o.filter(or_(
                 *(
                     and_(
@@ -581,7 +582,7 @@ class ActivityCollection(RangedPagination[ActivityT]):
 
     def available_weeks(
         self,
-        period: Period | PeriodMeta | None
+        period: BookingPeriod | BookingPeriodMeta | None
     ) -> Iterator[tuple[date, date]]:
         if not period:
             return

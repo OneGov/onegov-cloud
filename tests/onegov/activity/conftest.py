@@ -2,8 +2,8 @@ from datetime import timedelta
 from onegov.activity import ActivityCollection
 from onegov.activity import AttendeeCollection
 from onegov.activity import BookingCollection
+from onegov.activity import BookingPeriodCollection
 from onegov.activity import OccasionCollection
-from onegov.activity import PeriodCollection
 from onegov.core.utils import Bunch, module_path
 from onegov.user import User
 from onegov.user import UserCollection
@@ -46,7 +46,7 @@ def collections(session):
         attendees=AttendeeCollection(session),
         bookings=BookingCollection(session),
         occasions=OccasionCollection(session),
-        periods=PeriodCollection(session),
+        periods=BookingPeriodCollection(session),
     )
 
 

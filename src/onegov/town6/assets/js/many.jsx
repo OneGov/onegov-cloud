@@ -37,10 +37,24 @@ var ManyFields = React.createClass({
                 }
                 {
                     this.props.type === "firebasetopics" &&
-                    <ManyFirebasetopics
-                        data={this.props.data}
-                        onChange={this.props.onChange}
-                    />
+                        <ManyFirebasetopics
+                            data={this.props.data}
+                            onChange={this.props.onChange}
+                        />
+                }
+                {
+                    this.props.type === "meeting-items" &&
+                        <ManyMeetingItems
+                            data={this.props.data}
+                            onChange={this.props.onChange}
+                        />
+                }
+                {
+                    this.props.type === "interest-ties" &&
+                        <ManyInterestTies
+                            data={this.props.data}
+                            onChange={this.props.onChange}
+                        />
                 }
             </div>
         );
@@ -592,7 +606,12 @@ var ManyOpeningHours = React.createClass({
             text: '',
             link: ''
         });
-        this.setState(state);
+        this.setState(state, () => {
+            // the select field of ManyMeetingItems uses jquery `chosen`
+            // plugin which needs to be reinitialized after the react
+            // component state has been updated
+            jQuery('.chosen-select').chosen({});
+        });
 
         e.preventDefault();
     },
@@ -700,6 +719,321 @@ var ManyOpeningHours = React.createClass({
     }
 });
 
+
+var ManyMeetingItems = React.createClass({
+    getInitialState: function() {
+        var state = {
+            values: _.clone(this.props.data.values)
+        };
+
+        if (state.values.length === 0) {
+            state.values = [
+                {'number': '', 'title': '', 'agenda_item': ''}
+            ];
+        }
+
+        return state;
+    },
+    handleAdd: function(index, e) {
+        var state = JSON.parse(JSON.stringify(this.state));
+        state.values.splice(index + 1, 0, {
+            number: '',
+            title: '',
+            agenda_item: ''
+        });
+        this.setState(state, () => {
+            // the select field of ManyMeetingItems uses jquery `chosen`
+            // plugin which needs to be reinitialized after the react
+            // component state has been updated
+            jQuery('.chosen-select').chosen({});
+        });
+
+        e.preventDefault();
+    },
+    handleRemove: function(index, e) {
+        var state = JSON.parse(JSON.stringify(this.state));
+        state.values.splice(index, 1);
+
+        this.setState(state);
+
+        if (state.values.length === 0) {
+            // If all items are removed, reload the page to reset the form
+            // as not any chosen item is left
+            window.location.reload();
+        }
+
+        e.preventDefault();
+    },
+    handleInputChange: function(index, name, e) {
+        var state = JSON.parse(JSON.stringify(this.state));
+
+        state.values[index][name] = e.target.value;
+
+        this.setState(state);
+
+        e.preventDefault();
+    },
+    componentWillUpdate: function(props, state) {
+        props.onChange(state);
+    },
+    render: function() {
+        var data = this.props.data;
+        var values = this.state.values;
+        var self = this;
+        return (
+            <div> {
+                _.map(values, function(value, index) {
+                    var onNumberChange = self.handleInputChange.bind(self, index, 'number');
+                    var onTitleChange = self.handleInputChange.bind(self, index, 'title');
+                    var onAgendaItemChange = self.handleInputChange.bind(self, index, 'agenda_item');
+                    var onRemove = self.handleRemove.bind(self, index);
+                    var onAdd = self.handleAdd.bind(self, index);
+
+                    return (
+                        <div key={index}>
+                            <div className={"grid-x grid-padding-x" + (value.error && 'error' || '')}>
+                                <div className="small-2 cell">
+                                    <StringField
+                                        type="text"
+                                        label={data.labels.number}
+                                        defaultValue={value.number}
+                                        onChange={onNumberChange}
+                                        extra={data.extra}
+                                        size="x-small"
+                                        placeholder=""
+                                    />
+                                </div>
+                                <div className="small-5 cell">
+                                    <StringField
+                                        type="text"
+                                        label={data.labels.title}
+                                        defaultValue={value.title}
+                                        onChange={onTitleChange}
+                                        extra={data.extra}
+                                        size="medium"
+                                        placeholder=""
+                                    />
+                                </div>
+                                <div className="small-5 cell">
+                                    <SelectField
+                                        type="text"
+                                        label={data.labels.agenda_item}
+                                        defaultValue={value.agenda_item}
+                                        onChange={onAgendaItemChange}
+                                        extra={data.extra}
+                                        size="medium"
+                                        placeholder={data.agenda_items[0]}
+                                        options={data.agenda_items}
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid-x grid-padding-x align-center">
+                                <div>
+                                    {
+                                        index >= 0 && index === (values.length - 1) &&
+                                        <a href="#" className="button round secondary field-button" onClick={onRemove}>
+                                            <i className="fa fa-minus" aria-hidden="true" />
+                                            <span className="show-for-sr">{data.labels.remove}</span>
+                                        </a>
+                                    }
+                                    {
+                                        index === (values.length - 1) &&
+                                        <a href="#" className="button round field-button" onClick={onAdd}>
+                                            <i className="fa fa-plus" aria-hidden="true" />
+                                            <span className="show-for-sr">{data.labels.add}</span>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                            {
+                                value.error &&
+                                <div className="row error link-error">
+                                    <div className="small-12 columns end">
+                                        <small className="error link-error">{value.error}</small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    );
+                })
+            } </div>
+        );
+    }
+});
+
+
+var ManyInterestTies = React.createClass({
+    getInitialState: function() {
+        var state = {
+            values: _.clone(this.props.data.values)
+        };
+
+        if (state.values.length === 0) {
+            state.values = [
+                {'interest_tie': '', 'category': ''}
+            ];
+        }
+
+        return state;
+    },
+    handleAdd: function(index, e) {
+        var state = JSON.parse(JSON.stringify(this.state));
+        state.values.splice(index + 1, 0, {
+            interest_tie: '',
+            category: ''
+        });
+        this.setState(state);
+
+        e.preventDefault();
+    },
+    handleRemove: function(index, e) {
+        var state = JSON.parse(JSON.stringify(this.state));
+        state.values.splice(index, 1);
+        this.setState(state);
+
+        e.preventDefault();
+    },
+    handleInputChange: function(index, name, e) {
+        var state = JSON.parse(JSON.stringify(this.state));
+
+        state.values[index][name] = e.target.value;
+
+        this.setState(state);
+
+        e.preventDefault();
+    },
+    componentWillUpdate: function(props, state) {
+        props.onChange(state);
+    },
+    render: function() {
+        var data = this.props.data;
+        var values = this.state.values;
+        var self = this;
+
+        var tiePlaceholder = (data.placeholders && data.placeholders.interest_tie);
+        var catPlaceholder = (data.placeholders && data.placeholders.category);
+
+        return (
+            <div>
+                {_.map(values, function(value, index) {
+                    var onInterestChange = self.handleInputChange.bind(self, index, 'interest_tie');
+                    var onCatChange = self.handleInputChange.bind(self, index, 'category');
+                    var onRemove = self.handleRemove.bind(self, index);
+                    var onAdd = self.handleAdd.bind(self, index);
+
+                    return (
+                        <div key={index}>
+                            <div className={"grid-x grid-padding-x" + (value.error && 'error' || '')}>
+                                <div className="small-6 cell">
+                                    <StringField required
+                                                 type="text"
+                                                 label={data.labels.interest_tie}
+                                                 defaultValue={value.interest_tie}
+                                                 onChange={onInterestChange}
+                                                 extra={data.extra}
+                                                 size="small"
+                                                 placeholder={tiePlaceholder}
+                                    />
+                                </div>
+                                <div className="small-6 cell">
+                                    <StringField required
+                                                 type="text"
+                                                 label={data.labels.category}
+                                                 defaultValue={value.category}
+                                                 onChange={onCatChange}
+                                                 extra={data.extra}
+                                                 size="small"
+                                                 placeholder={catPlaceholder}
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid-x grid-padding-x align-center">
+                                <div>
+                                    {
+                                        index > 0 && index === (values.length - 1) &&
+                                        <a href="#" className="button round secondary field-button" onClick={onRemove}>
+                                            <i className="fa fa-minus" aria-hidden="true" />
+                                            <span className="show-for-sr">{data.labels.remove}</span>
+                                        </a>
+                                    }
+                                    {
+                                        index === (values.length - 1) &&
+                                        <a href="#" className="button round field-button" onClick={onAdd}>
+                                            <i className="fa fa-plus" aria-hidden="true" />
+                                            <span className="show-for-sr">{data.labels.add}</span>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                            {
+                                value.error &&
+                                <div className="row firebase-error">
+                                    <div className="small-12 columns end">
+                                        <small className="error">{value.error}</small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    }
+});
+
+
+var SelectField = React.createClass({
+
+    componentWillMount: function() {
+        this.id = _.uniqueId(this.props.type + '-');
+    },
+    componentDidMount: function() {
+        this.renderStringInput();
+
+        // chosen-select: forward jquery change event to React onChange
+        $(`#${this.id}`).on('change', (e) => {
+            this.props.onChange(e);
+        });
+    },
+    componentDidUpdate: function() {
+        this.renderStringInput();
+    },
+    renderStringInput: function() {
+        var onChange = this.props.onChange;
+    },
+
+    render: function() {
+        const options = this.props.options
+        const className = this.props.size + " chosen-select";
+
+        return (
+            <label>
+                <span className="label-text">{this.props.label}</span>
+
+                {
+                    this.props.required &&
+                        <span className="label-required">*</span>
+                }
+
+                <select
+                    id={this.id}
+                    type={this.props.type}
+                    className={className}
+                    defaultValue={this.props.defaultValue}
+                    onChange={this.props.onChange}
+                >
+                    <option value="">...</option>
+                {Object.keys(options).map((key, index) => (
+                    <option key={index} value={key}>
+                        {options[key]}
+                    </option>
+                ))}
+                </select>
+            </label>
+        );
+    }
+});
+
 var StringField = React.createClass({
     componentWillMount: function() {
         this.id = _.uniqueId(this.props.type + '-');
@@ -760,6 +1094,10 @@ function extractType(target) {
         return 'firebasetopics';
     }
 
+    if (classes.includes('many-meeting-items')) {
+        return 'meeting-items';
+    }
+
     var manyClass = classes.find(function(c) {
         return c.startsWith('many-');
     });
@@ -796,6 +1134,22 @@ jQuery.fn.many = function () {
                     placeholders: {
                         text: 'Key auswählen',
                         link: 'Label auswählen'
+                    },
+                    textOptions: [],
+                    linkOptions: [],
+                    values: []
+                };
+            } else if (type === 'meeting-items') {
+                data = {
+                    labels: {
+                        title: 'Title',
+                        agenda_item: 'Agenda Item',
+                        add: 'Hinzufügen',
+                        remove: 'Entfernen'
+                    },
+                    placeholders: {
+                        title: 'Title',
+                        agenda_item: 'Select Agenda Item'
                     },
                     textOptions: [],
                     linkOptions: [],

@@ -6,7 +6,9 @@ from io import BytesIO
 
 from lxml.etree import LxmlError
 
-from onegov.activity import Invoice, InvoiceItem, InvoiceCollection
+from onegov.activity import ActivityInvoiceItem
+from onegov.activity import BookingPeriodInvoice
+from onegov.activity import BookingPeriodInvoiceCollection
 from onegov.activity.iso20022 import match_iso_20022_to_usernames
 from onegov.core.custom import json
 from onegov.core.elements import Link, Confirm, Intercooler, Block
@@ -140,7 +142,7 @@ def view_billing(
             _('Show invoice'),
             attrs={'class': 'show-invoice'},
             url=request.class_link(
-                InvoiceCollection, {
+                BookingPeriodInvoiceCollection, {
                     'username': details.first.username,
                     'invoice': self.period.id.hex
                 }
@@ -152,7 +154,7 @@ def view_billing(
                 _('Show online payments'),
                 attrs={'class': 'show-online-payments'},
                 url=request.class_link(
-                    InvoiceItem, {'id': details.first.id},
+                    ActivityInvoiceItem, {'id': details.first.id},
                     name='online-payments'
                 )
             )
@@ -321,11 +323,11 @@ def view_online_payments(
     request: FeriennetRequest
 ) -> RenderData:
 
-    table = payments_association_table_for(InvoiceItem)
+    table = payments_association_table_for(ActivityInvoiceItem)
     session = request.session
 
     invoice_item_ids = self.invoices.query_items()
-    invoice_item_ids = invoice_item_ids.with_entities(InvoiceItem.id)
+    invoice_item_ids = invoice_item_ids.with_entities(ActivityInvoiceItem.id)
 
     payment_ids = session.query(table.c.payment_id)
     payment_ids = payment_ids.filter(
@@ -449,9 +451,12 @@ def view_execute_import(
 
     if payments:
         invoices = request.app.invoice_collection(period_id=invoice).query()
-        invoices = invoices.filter(Invoice.user_id.in_(payments.keys()))
+        invoices = invoices.filter(
+            BookingPeriodInvoice.user_id.in_(payments.keys()))
 
-        for invoice in invoices.options(joinedload(Invoice.items)):
+        for invoice in invoices.options(
+            joinedload(BookingPeriodInvoice.items)
+        ):
             for item in invoice.items:
                 item.tid = payments[invoice.user_id].tid
                 item.source = 'xml'
@@ -547,7 +552,7 @@ def view_billing_import(
         'uploaded': uploaded,
         'users': users,
         'user_link': lambda u: request.class_link(
-            InvoiceCollection, {'username': u}
+            BookingPeriodInvoiceCollection, {'username': u}
         ),
         'success_count': transactions and sum(
             1 for t in transactions if t.state == 'success'
@@ -608,7 +613,8 @@ def view_paid_date_form(
     if form.submitted(request):
         assert form.items.data is not None
         invoice = self.session.query(
-            Invoice).filter_by(id=request.params['invoice-id']).one()
+            BookingPeriodInvoice
+        ).filter_by(id=request.params['invoice-id']).one()
 
         items = invoice.items
         items = [i for i in items if i.id.hex in form.items.data]

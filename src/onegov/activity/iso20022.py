@@ -8,11 +8,11 @@ from functools import cached_property
 from datetime import date
 from decimal import Decimal
 from lxml import etree
-from onegov.activity.collections import InvoiceCollection
-from onegov.activity.models import Invoice
-from onegov.activity.models import InvoiceItem
-from onegov.activity.models import InvoiceReference
-from onegov.activity.models.invoice_reference import FeriennetSchema
+from onegov.activity.collections import BookingPeriodInvoiceCollection
+from onegov.activity.models import BookingPeriodInvoice
+from onegov.activity.models import ActivityInvoiceItem
+from onegov.pay.models import InvoiceReference
+from onegov.pay.models.invoice_reference import FeriennetSchema
 from onegov.user import User
 from sqlalchemy import func
 
@@ -261,22 +261,24 @@ def match_iso_20022_to_usernames(
 
     """
 
-    def items(period_id: UUID | None = None) -> Query[InvoiceItem]:
-        invoices = InvoiceCollection(session, period_id=period_id)
-        return invoices.query_items().outerjoin(Invoice).outerjoin(User)
+    def items(period_id: UUID | None = None) -> Query[ActivityInvoiceItem]:
+        invoices = BookingPeriodInvoiceCollection(session, period_id=period_id)
+        return invoices.query_items().outerjoin(
+            BookingPeriodInvoice).outerjoin(User)
 
     # Get all known transaction ids to check what was already paid
-    q1 = items().with_entities(InvoiceItem.tid, User.username)
-    q1 = q1.group_by(InvoiceItem.tid, User.username)
+    q1 = items().with_entities(ActivityInvoiceItem.tid, User.username)
+    q1 = q1.group_by(ActivityInvoiceItem.tid, User.username)
     q1 = q1.filter(
-        InvoiceItem.paid == True,
-        InvoiceItem.source == 'xml'
+        ActivityInvoiceItem.paid == True,
+        ActivityInvoiceItem.source == 'xml'
     )
 
     paid_transaction_ids = {i.tid: i.username for i in q1}
 
     # Get a list of reference/username pairs as fallback
-    q2 = session.query(InvoiceReference).outerjoin(Invoice).outerjoin(User)
+    q2 = session.query(InvoiceReference).outerjoin(
+        BookingPeriodInvoice).outerjoin(User)
     username_by_ref = dict(q2.with_entities(
         InvoiceReference.reference,
         User.username
@@ -285,11 +287,11 @@ def match_iso_20022_to_usernames(
     # Get the items matching the given period
     q3 = items(period_id=period_id).outerjoin(InvoiceReference).with_entities(
         User.username,
-        func.sum(InvoiceItem.amount).label('amount'),
+        func.sum(ActivityInvoiceItem.amount).label('amount'),
         InvoiceReference.reference,
     )
     q3 = q3.group_by(User.username, InvoiceReference.reference)
-    q3 = q3.filter(InvoiceItem.paid == False)
+    q3 = q3.filter(ActivityInvoiceItem.paid == False)
     q3 = q3.order_by(User.username)
 
     # Hash the invoices by reference (duplicates possible)

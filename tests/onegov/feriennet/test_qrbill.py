@@ -1,10 +1,11 @@
 from base64 import b64decode
-from onegov.activity.models import Invoice, InvoiceReference
+from onegov.activity.models import BookingPeriodInvoice
 from onegov.core.utils import Bunch
 from onegov.feriennet.qrbill import beneficiary_to_creditor
 from onegov.feriennet.qrbill import generate_qr_bill
 from onegov.feriennet.qrbill import qr_iban
 from onegov.feriennet.qrbill import swiss_iban
+from onegov.pay.models import InvoiceReference
 
 
 SWISS_IBAN = 'CH5604835012345678009'
@@ -64,7 +65,7 @@ def test_qrbill():
                 'place': place
             }
         )
-        invoice = Invoice()
+        invoice = BookingPeriodInvoice()
         invoice.add('group', 'text', amount, 1, flush=False)
         invoice.references.append(
             InvoiceReference(reference=reference, bucket=bucket, schema=schema)

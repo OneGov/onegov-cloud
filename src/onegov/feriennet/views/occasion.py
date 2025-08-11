@@ -4,9 +4,9 @@ from datetime import date
 from markupsafe import Markup
 from onegov.activity import AttendeeCollection
 from onegov.activity import Booking, BookingCollection
-from onegov.activity import InvoiceCollection
+from onegov.activity import BookingPeriodCollection
+from onegov.activity import BookingPeriodInvoiceCollection
 from onegov.activity import Occasion, OccasionCollection, OccasionNeed
-from onegov.activity import PeriodCollection
 from onegov.core.security import Private, Personal, Public
 from onegov.core.templates import render_template
 from onegov.feriennet import _
@@ -50,7 +50,7 @@ def new_occasion(
 
     if form.submitted(request):
         occasions = OccasionCollection(request.session)
-        periods = PeriodCollection(request.session)
+        periods = BookingPeriodCollection(request.session)
         period = periods.by_id(form.period_id.data)
         assert period is not None
 
@@ -89,7 +89,7 @@ def clone_occasion(
 
     if form.submitted(request):
         occasions = OccasionCollection(request.session)
-        periods = PeriodCollection(request.session)
+        periods = BookingPeriodCollection(request.session)
         period = periods.by_id(form.period_id.data)
         assert period is not None
 
@@ -346,7 +346,9 @@ def book_occasion(
                 }))
 
         if self.period.finalized:
-            return request.redirect(request.class_link(InvoiceCollection))
+            return request.redirect(
+                request.class_link(BookingPeriodInvoiceCollection)
+            )
         else:
             return request.redirect(request.link(self.activity))
 

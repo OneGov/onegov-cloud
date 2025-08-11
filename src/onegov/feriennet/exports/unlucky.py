@@ -13,7 +13,7 @@ from sqlalchemy import and_, not_
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from onegov.activity.models import Period, PeriodMeta
+    from onegov.activity.models import BookingPeriod, BookingPeriodMeta
     from sqlalchemy.orm import Query, Session
 
 
@@ -38,7 +38,7 @@ class UnluckyExport(FeriennetExport):
     def query(
         self,
         session: Session,
-        period: Period | PeriodMeta
+        period: BookingPeriod | BookingPeriodMeta
     ) -> Query[Attendee]:
 
         with_any_bookings = session.query(Booking.attendee_id).filter(
@@ -57,7 +57,7 @@ class UnluckyExport(FeriennetExport):
     def rows(
         self,
         session: Session,
-        period: Period | PeriodMeta
+        period: BookingPeriod | BookingPeriodMeta
     ) -> Iterator[Iterator[tuple[str, Any]]]:
 
         for user in self.query(session, period):

@@ -22,7 +22,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from onegov.activity.models import (
-        Activity, Attendee, Booking, InvoiceItem,
+        Activity, ActivityInvoiceItem, Attendee, Booking,
         Occasion, OccasionNeed, Volunteer)
     from onegov.user import User
 
@@ -212,7 +212,7 @@ class FeriennetExport(Export):
 
     def invoice_item_fields(
         self,
-        item: InvoiceItem
+        item: ActivityInvoiceItem
     ) -> Iterator[tuple[str, Any]]:
 
         yield _('Invoice Item Group'), item.group

@@ -1265,6 +1265,24 @@ ul.recipients {
     }
 }
 
+.event-header,
+.event-footer {
+    .accordion {
+        border-top: 1px solid $gray;
+        border-bottom: 1px solid $gray;
+
+        .accordion-item {
+            margin: 1rem;
+
+            .accordion-content {
+                border: none;
+                border-radius: 0;
+                padding-bottom: 0rem;
+            }
+        }
+    }
+}
+
 
 .result-field {
     display: block;

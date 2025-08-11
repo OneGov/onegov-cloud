@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from enum import Enum
 import inspect
+from operator import itemgetter
+
 import phonenumbers
 import sedate
 
@@ -212,13 +214,30 @@ class DurationField(Field):
 class TranslatedSelectField(SelectField):
     """ A select field which translates the option labels. """
 
-    def iter_choices(
-        self
-    ) -> Iterator[tuple[Any, str, bool, dict[str, Any]]]:
+    def __init__(
+        self,
+        *args: Any,
+        **kwargs: Any,
+    ):
+        self.choices_sorted = kwargs.pop('choices_sorted', False)
+        super().__init__(*args, **kwargs)
+
+    def iter_choices(self) -> Iterator[tuple[Any, str, bool, dict[str, Any]]]:
+        choices = []
+
         for choice in super().iter_choices():
             result = list(choice)
             result[1] = self.meta.request.translate(result[1])
-            yield tuple(result)
+
+            if self.choices_sorted:
+                choices.append(tuple(result))
+            else:
+                yield tuple(result)
+
+        if self.choices_sorted:
+            choices.sort(key=itemgetter(1))
+            for choice in choices:
+                yield choice
 
 
 class MultiCheckboxField(SelectMultipleField):

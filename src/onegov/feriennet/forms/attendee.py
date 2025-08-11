@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from functools import cached_property
 from onegov.activity import Attendee, AttendeeCollection
-from onegov.activity import Booking, BookingCollection, Occasion
-from onegov.activity import InvoiceCollection
+from onegov.activity import Booking, BookingCollection
+from onegov.activity import BookingPeriodInvoiceCollection
+from onegov.activity import Occasion
 from onegov.core.templates import render_macro
 from onegov.feriennet import _
 from onegov.feriennet.layout import DefaultLayout
@@ -53,7 +54,7 @@ class AttendeeBase(Form):
 
         # Update name changes on invoice items of current period
         if self.request.app.active_period is not None:
-            invoice_collection = InvoiceCollection(
+            invoice_collection = BookingPeriodInvoiceCollection(
                 session=self.request.session,
                 period_id=self.request.app.active_period.id)
 

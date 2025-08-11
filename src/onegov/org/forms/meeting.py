@@ -1,22 +1,27 @@
 from __future__ import annotations
 
+import json
+
 from wtforms.validators import Optional, InputRequired
 from wtforms import StringField
 
 from onegov.form import Form
-from onegov.form.fields import TimezoneDateTimeField, ChosenSelectMultipleField
+from onegov.form.fields import TimezoneDateTimeField
 from onegov.org.forms.fields import HtmlField
 from onegov.org import _
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Collection
+    from collections.abc import Sequence
+
     from onegov.org.models import Meeting
+    from onegov.org.models import MeetingItem
+    from onegov.org.models import PoliticalBusiness
 
 
 class MeetingForm(Form):
-
     title = StringField(
         label=_('Title'),
         validators=[InputRequired()],
@@ -46,24 +51,18 @@ class MeetingForm(Form):
         render_kw={'rows': 5}
     )
 
-    meeting_items = ChosenSelectMultipleField(
-        label=_('Agenda Items'),
-        choices=[],
-        validators=[Optional()]
+    meeting_items = StringField(
+        label=_('New agenda item'),
+        fieldset=_('Agenda items'),
+        render_kw={'class_': 'many many-meeting-items'},
     )
 
-    def on_request(self) -> None:
-        from onegov.org.models import MeetingItem
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.agenda_items_errors: dict[int, str] = {}
 
-        meetings = (
-            self.request.session.query(MeetingItem)
-            .order_by(MeetingItem.number, MeetingItem.title)
-            .all()
-        )
-        self.meeting_items.choices = [
-            (item.id.hex, item.display_name)
-            for item in meetings
-        ]
+    def on_request(self) -> None:
+        pass
 
     def populate_obj(  # type:ignore[override]
         self,
@@ -72,6 +71,8 @@ class MeetingForm(Form):
         include: Collection[str] | None = None
     ) -> None:
         from onegov.org.models import MeetingItem
+        from onegov.org.models import MeetingItemCollection
+        from onegov.org.models import PoliticalBusinessCollection
 
         super().populate_obj(
             obj,
@@ -83,33 +84,130 @@ class MeetingForm(Form):
         )
 
         meeting: Meeting = obj
-        meeting_item_ids = {item.id.hex for item in meeting.meeting_items}
-        new_item_ids = set(self.meeting_items.data or [])
+        collection = MeetingItemCollection(self.request.session)
+        businesses = PoliticalBusinessCollection(self.request.session)
 
-        items_to_add = new_item_ids - meeting_item_ids
-        for new_id in items_to_add:
-            item = (
-                self.request.session.query(MeetingItem)
-                .filter(MeetingItem.id == new_id)
-                .one()
-            )
-            if item is not None:
-                meeting.meeting_items.append(item)
+        # Somehow `meeting_items.data` is not set when the form is submitted,
+        # so we use `meeting_items.raw_data[0]` instead.
+        data = (self.meeting_items.raw_data[0]
+                if self.meeting_items.raw_data else '')
+        new_items = self.json_to_items(data)
+        if not new_items:
+            # clear all meeting items for this meeting
+            for item in meeting.meeting_items:
+                collection.delete(item)
+            obj.meeting_items = []
+            return
 
-        items_to_remove = meeting_item_ids - new_item_ids
-        for current_id in items_to_remove:
-            item = (
-                self.request.session.query(MeetingItem)
-                .filter(MeetingItem.id == current_id)
-                .one()
-            )
-            if item is not None:
-                meeting.meeting_items.remove(item)
+        current_items = {item.title: item for item in meeting.meeting_items}
+        items = []
+        for new in new_items:
+            number = new.get('number')
+            title = new.get('title', '')
+            item_name = new.get('agenda_item')
+
+            if number == '' and title == '' and item_name == '':
+                # skip empty items
+                continue
+
+            if (number in [i.number for i in current_items.values()] and
+                title in current_items and
+                item_name in [i.display_name for i in current_items.values()]):
+                # keep unchanged items
+                items.append(current_items[title])
+                continue
+
+            business = next(
+                (b for b in businesses.query().all()
+                 if b.display_name == item_name), None)
+
+            if business is None:
+                new_item = MeetingItem(
+                    title=title,
+                    number=number,
+                    political_business_id=None,
+                    political_business=None,
+                    meeting_id=obj.id,
+                    meeting=obj,
+                )
+            else:
+                new_item = MeetingItem(
+                    title=title if title != '' else business.title,
+                    number=number,
+                    political_business_id=business.id,
+                    political_business=business,
+                    meeting_id=obj.id,
+                    meeting=obj,
+                )
+            self.request.session.add(new_item)
+            items.append(new_item)
+
+        meeting.meeting_items = items
 
     def process_obj(self, obj: Meeting) -> None:  # type:ignore[override]
+        from onegov.org.models import PoliticalBusiness
+
         super().process_obj(obj)
 
         meeting: Meeting = obj
-        self.meeting_items.data = [
-            item.id.hex for item in meeting.meeting_items
-        ]
+
+        businesses = (
+            self.meta.request.session.query(PoliticalBusiness)
+            .order_by(PoliticalBusiness.number, PoliticalBusiness.title)
+            .all()
+        )
+
+        if not meeting.meeting_items:
+            self.meeting_items.data = self.items_to_json([], businesses)
+        else:
+            self.meeting_items.data = self.items_to_json(
+                meeting.meeting_items, meeting.meeting_items + businesses
+            )
+
+    def json_to_items(self, text: str | None) -> list[dict[str, str]]:
+        if not text:
+            return []
+
+        return list(json.loads(text).get('values', []))
+
+    def items_to_json(
+        self,
+        values: Sequence[MeetingItem],
+        options: Sequence[PoliticalBusiness],
+    ) -> str:
+        values = values or []
+        options = options or []
+
+        request = self.meta.request
+        return json.dumps(
+            {
+                # labels for many-meeting-items
+                'labels': {
+                    'number': request.translate(_('Number')),
+                    'title': request.translate(_('Title')),
+                    'agenda_item': request.translate(_('Agenda item')),
+                    'add': request.translate(_('Add')),
+                    'remove': request.translate(_('Remove')),
+                },
+                # StringField: list of agenda items attached to this meeting
+                'values': [
+                    {
+                        'number': agenda_item.number,
+                        'title': agenda_item.title,
+                        'agenda_item': (
+                            agenda_item.political_business.display_name
+                            if agenda_item.political_business else
+                            agenda_item.display_name),
+                        'error': '',
+                        # 'error': self.agenda_items_errors.get(ix, ''),
+                    }
+                    for ix, agenda_item in enumerate(sorted(
+                        values, key=lambda x: (x.number or '', x.title)))
+                ],
+                # SelectField: list of agenda items and businesses
+                'agenda_items': {
+                    option.display_name: option.display_name
+                    for option in options
+                },
+            }
+        )

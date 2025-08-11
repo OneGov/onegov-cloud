@@ -1,17 +1,15 @@
 from __future__ import annotations
 
-import decimal
 from collections import OrderedDict
-from decimal import Decimal
 from onegov.core.security import Private
 from onegov.core.utils import append_query_param
 from onegov.form import merge_forms
 from onegov.org import OrgApp, _
 from onegov.org.forms import DateRangeForm, ExportForm
 from onegov.org.forms.payments_search_form import PaymentSearchForm
-from onegov.org.layout import PaymentCollectionLayout, DefaultLayout
+from onegov.org.layout import PaymentCollectionLayout
 from onegov.org.mail import send_ticket_mail
-from onegov.org.models import PaymentMessage, TicketMessage
+from onegov.org.models import PaymentMessage
 from onegov.core.elements import Link
 from sedate import align_range_to_day, standardize_date, as_datetime
 from onegov.org.pdf.ticket import TicketsPdf
@@ -24,7 +22,7 @@ from onegov.pay.models.payment_providers.datatrans import DatatransPayment
 from onegov.pay.models.payment_providers.stripe import StripePayment
 from onegov.pay.models.payment_providers.worldline_saferpay import (
     SaferpayPayment)
-from onegov.ticket import Ticket, TicketCollection
+from onegov.ticket import Ticket
 from webob.response import Response
 from webob import exc, Response as WebobResponse
 
@@ -52,58 +50,39 @@ EMAIL_SUBJECTS = {
 }
 
 
-def ticket_by_link(
-    tickets: TicketCollection,
-    link: Any
-) -> Ticket | None:
-
-    # FIXME: We should probably do isinstance checks so type checkers
-    #        can understand that a Reservation has a token and a
-    #        FormSubmission has a id...
-    if link.__tablename__ == 'reservations':
-        return tickets.by_handler_id(link.token.hex)
-    elif link.__tablename__ == 'submissions':
-        return tickets.by_handler_id(link.id.hex)
-    return None
-
-
 def send_ticket_notifications(
     payment: Payment,
     request: OrgRequest,
     change: str
 ) -> None:
 
-    session = request.session
-    tickets = TicketCollection(session)
+    ticket = payment.ticket
 
-    for link in payment.links:
-        ticket = ticket_by_link(tickets, link)
+    if not ticket:
+        return
 
-        if not ticket:
-            continue
+    # create a notification in the chat
+    PaymentMessage.create(payment, ticket, request, change)
 
-        # create a notification in the chat
-        PaymentMessage.create(payment, ticket, request, change)
+    if change == 'captured':
+        return
 
-        if change == 'captured':
-            continue
+    # send an e-mail
+    email = ticket.snapshot.get('email') or ticket.handler.email
+    assert email is not None
 
-        # send an e-mail
-        email = ticket.snapshot.get('email') or ticket.handler.email
-        assert email is not None
-
-        send_ticket_mail(
-            request=request,
-            template='mail_payment_change.pt',
-            subject=EMAIL_SUBJECTS[change],
-            receivers=(email, ),
-            ticket=ticket,
-            content={
-                'model': ticket,
-                'payment': payment,
-                'change': change
-            }
-        )
+    send_ticket_mail(
+        request=request,
+        template='mail_payment_change.pt',
+        subject=EMAIL_SUBJECTS[change],
+        receivers=(email, ),
+        ticket=ticket,
+        content={
+            'model': ticket,
+            'payment': payment,
+            'change': change
+        }
+    )
 
 
 def handle_pdf_response(
@@ -183,7 +162,6 @@ def view_payments(
         'tickets': self.tickets_by_batch(),
         'reservation_dates_formatted': reservation_dates_formatted,
         'providers': providers,
-        'payment_links': self.payment_links_by_batch(),
         'pdf_export_link': append_query_param(request.url, 'format', 'pdf')
     }
 
@@ -325,35 +303,6 @@ def run_export(
     return tuple(transform(p, links[p.id]) for p in payments)
 
 
-@OrgApp.json(
-    model=Payment,
-    name='change-net-amount',
-    request_method='POST',
-    permission=Private
-)
-def change_payment_amount(self: Payment, request: OrgRequest) -> JSON_ro:
-    request.assert_valid_csrf_token()
-    assert not self.paid
-    format_ = DefaultLayout(self, request).format_number
-    try:
-        net_amount = Decimal(request.params['netAmount'])  # type:ignore
-    except decimal.InvalidOperation:
-        return {'net_amount': f'{format_(self.net_amount)} {self.currency}'}
-
-    if net_amount <= 0 or (net_amount - self.fee) <= 0:
-        raise exc.HTTPBadRequest('amount negative')
-
-    links = self.links
-    if links:
-        tickets = TicketCollection(request.session)
-        ticket = ticket_by_link(tickets, links[0])
-        if ticket:
-            TicketMessage.create(ticket, request, 'change-net-amount')
-
-    self.amount = net_amount - self.fee
-    return {'net_amount': f'{format_(self.net_amount)} {self.currency}'}
-
-
 @OrgApp.view(
     model=Payment,
     name='mark-as-paid',
@@ -368,6 +317,7 @@ def mark_as_paid(self: Payment, request: OrgRequest) -> None:
 
     assert self.source == 'manual'
     self.state = 'paid'
+    self.sync_invoice_items()
 
 
 @OrgApp.view(
@@ -384,6 +334,7 @@ def mark_as_unpaid(self: Payment, request: OrgRequest) -> None:
 
     assert self.source == 'manual'
     self.state = 'open'
+    self.sync_invoice_items()
 
 
 @OrgApp.view(
@@ -400,6 +351,7 @@ def capture_stripe(self: StripePayment, request: OrgRequest) -> None:
 
     assert self.source == 'stripe_connect'
     self.charge.capture()
+    self.sync_invoice_items()
 
 
 @OrgApp.view(
@@ -416,6 +368,7 @@ def refund_stripe(self: StripePayment, request: OrgRequest) -> None:
 
     assert self.source == 'stripe_connect'
     self.refund()
+    self.sync_invoice_items()
 
 
 @OrgApp.view(
@@ -441,6 +394,7 @@ def capture_datatrans(self: DatatransPayment, request: OrgRequest) -> None:
         self.sync(tx)
     else:
         self.provider.client.settle(tx)
+        self.sync_invoice_items()
 
 
 @OrgApp.view(
@@ -488,6 +442,7 @@ def capture_saferpay(self: SaferpayPayment, request: OrgRequest) -> None:
         self.sync(tx)
     else:
         self.provider.client.capture(tx)
+        self.sync_invoice_items()
 
 
 @OrgApp.view(
@@ -505,6 +460,7 @@ def refund_saferpay(self: SaferpayPayment, request: OrgRequest) -> None:
     except SaferpayApiError:
         request.alert(_('Could not refund the payment'))
     else:
+        self.sync_invoice_items()
         if new_refund:
             send_ticket_notifications(self, request, 'refunded')
         request.success(_('The payment was refunded'))

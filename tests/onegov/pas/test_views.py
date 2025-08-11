@@ -46,7 +46,6 @@ def test_views_manage(client_with_es):
     page.form['cost_of_living_adjustment'] = 2
     page = page.form.submit().follow()
     assert '2%' in page
-
     delete.append(page)
 
     # Legislative Periods
@@ -417,3 +416,48 @@ def test_view_upload_json(
     assert 'completed' in logs_page.pyquery(
         'tbody tr:last-child .import-status'
     ).text()
+
+
+def test_copy_rate_set(client):
+    client.login_admin()
+
+    settings = client.get('/').click('PAS Einstellungen')
+
+    # Add a rate set to copy
+    page = settings.click('Sätze')
+    page = page.click(href='new')
+    page.form['year'] = 2024
+    page.form['cost_of_living_adjustment'] = 2
+    page.form['plenary_none_president_halfday'] = 1
+    page.form['plenary_none_member_halfday'] = 1
+    page.form['commission_normal_president_initial'] = 1
+    page.form['commission_normal_president_additional'] = 1
+    page.form['study_normal_president_halfhour'] = 1
+    page.form['commission_normal_member_initial'] = 1
+    page.form['commission_normal_member_additional'] = 1
+    page.form['study_normal_member_halfhour'] = 1
+    page.form['commission_intercantonal_president_halfday'] = 1
+    page.form['study_intercantonal_president_hour'] = 1
+    page.form['commission_intercantonal_member_halfday'] = 1
+    page.form['study_intercantonal_member_hour'] = 1
+    page.form['commission_official_president_halfday'] = 1
+    page.form['commission_official_president_fullday'] = 1
+    page.form['study_official_president_halfhour'] = 1
+    page.form['commission_official_vice_president_halfday'] = 1
+    page.form['commission_official_vice_president_fullday'] = 1
+    page.form['study_official_member_halfhour'] = 1
+    page.form['shortest_all_president_halfhour'] = 1
+    page.form['shortest_all_member_halfhour'] = 1
+    page = page.form.submit()
+
+    page = client.get('/rate-sets')
+    page = page.click('Inaktiv')
+
+    href = page.pyquery('a.copy-icon').attr('href')
+    href = href.replace('http://localhost', '')
+    copy_page = client.get(href)
+
+    # Create new rateset, change just the year other values remain
+    copy_page.form['year'] = '2025'
+    new_page = copy_page.form.submit().follow()
+    assert '2025' in new_page

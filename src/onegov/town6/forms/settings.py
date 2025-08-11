@@ -286,3 +286,11 @@ class RISEnableForm(Form):
         description=_('Enables the RIS integration for this organisation.'),
         default=False
     )
+
+    # the url breadcrumbs shall point to for non-logged-in users
+    ris_main_url = StringField(
+        label=_('URL path for the RIS main page'),
+        description=_(
+            'The URL path for the RIS main page for non-logged-in users.'),
+        default='',
+    )

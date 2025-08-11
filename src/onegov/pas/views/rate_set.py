@@ -10,6 +10,7 @@ from onegov.pas.layouts import RateSetCollectionLayout
 from onegov.pas.layouts import RateSetLayout
 from onegov.pas.models import RateSet
 
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
@@ -126,6 +127,40 @@ def edit_rate_set(
     return {
         'layout': layout,
         'title': layout.title,
+        'form': form,
+        'form_width': 'large'
+    }
+
+
+@PasApp.form(
+    model=RateSet,
+    name='copy-rate-set',
+    permission=Private,
+    form=RateSetForm,
+    template='form.pt'
+)
+def copy_specific_rate_set(
+    self: RateSet,
+    request: TownRequest,
+    form: RateSetForm
+) -> RenderData | Response:
+    """ Create a new rate set based on a specific existing one."""
+
+    if form.submitted(request):
+        collection = RateSetCollection(request.session)
+        rate_set = collection.add(**form.get_useful_data())
+        request.success(_('The rate set was copied.'))
+        return request.redirect(request.link(rate_set))
+
+    form.process(obj=self)
+
+    layout = RateSetLayout(self, request)
+    layout.breadcrumbs.append(Link(_('Copy'), '#'))
+    layout.editbar_links = []
+
+    return {
+        'layout': layout,
+        'title': _('Copy Rate Set'),
         'form': form,
         'form_width': 'large'
     }

@@ -1,87 +1,78 @@
 from __future__ import annotations
 
+from datetime import date
+from sqlalchemy import and_, or_, func
+from sqlalchemy import Column, Date, Enum, ForeignKey, Text
+from sqlalchemy.orm import relationship
+from uuid import uuid4
+
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID
+from onegov.core.utils import toggle
 from onegov.file import MultiAssociatedFiles
 from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.search import ORMSearchable
-from sqlalchemy import Column, Date, Enum, ForeignKey, Text
-from sqlalchemy.orm import relationship
-from uuid import uuid4
-
 
 from typing import Literal, Self, TypeAlias, TYPE_CHECKING
+
 if TYPE_CHECKING:
     import uuid
-    from datetime import date
+
+    from collections.abc import Collection
+    from sqlalchemy.orm import Query, Session
+
     from onegov.org.models import Meeting
     from onegov.org.models import MeetingItem
     from onegov.org.models import RISParliamentarian
     from onegov.org.models import RISParliamentaryGroup
-    from sqlalchemy.orm import Query, Session
 
-    PoliticalBusinessType: TypeAlias = Literal[
-        'inquiry',  # Anfrage
-        'proposal',  # Antrag
-        'mandate',  # Auftrag
-        'report',   # Bericht
-        'report and proposal',  # Bericht und Antrag
-        'decision',  # Beschluss
-        'message',   # Botschaft
-        'urgent interpellation',  # Dringliche Interpellation
-        'invitation',  # Einladung
-        'interpelleation',  # Interpellation
-        'interpellation',  # Interpellation
-        'commission report',  # Kommissionsbericht
-        'communication',  # Mitteilung
-        'motion',  # Motion
-        'postulate',  # Postulat
-        'resolution',  # Resolution
-        'regulation',  # Verordnung
-        'miscellaneous',  # Verschiedenes
-        'elections'  # Wahlen
-    ]
+PoliticalBusinessType: TypeAlias = Literal[
+    'inquiry',  # Anfrage
+    'report and proposal',  # Bericht und Antrag
+    'urgent interpellation',  # Dringliche Interpellation
+    'invitation',  # Einladung
+    'interpellation',  # Interpellation
+    'commission report',  # Kommissionsbericht
+    'motion',  # Motion
+    'postulate',  # Postulat
+    'resolution',  # Resolution
+    'election',  # Wahl
+    'parliamentary statement',  # Parlamentarische Erklärung
+    'miscellaneous',  # Verschiedenes
+]
 
-    PoliticalBusinessStatus: TypeAlias = Literal[
-        'abgeschrieben',
-        'beantwortet',
-        'erheblich_erklaert',
-        'erledigt',
-        'nicht_erheblich_erklaert',
-        'nicht_zustandegekommen',
-        'pendent_exekutive',
-        'pendent_legislative',
-        'rueckzug',
-        'umgewandelt',
-        'zurueckgewiesen',
-        'ueberwiesen',
-    ]
-
+PoliticalBusinessStatus: TypeAlias = Literal[
+    'abgeschrieben',
+    'beantwortet',
+    'erheblich_erklaert',
+    'erledigt',
+    'nicht_erheblich_erklaert',
+    'nicht_zustandegekommen',
+    'pendent_exekutive',
+    'pendent_legislative',
+    'rueckzug',
+    'umgewandelt',
+    'zurueckgewiesen',
+    'ueberwiesen',
+]
 
 POLITICAL_BUSINESS_TYPE: dict[PoliticalBusinessType, str] = {
     'inquiry': _('Inquiry'),
-    'proposal': _('Proposal'),
-    'mandate': _('Mandate'),
-    'report': _('Report'),
     'report and proposal': _('Report and Proposal'),
-    'decision': _('Decision'),
-    'message': _('Message'),
     'urgent interpellation': _('Urgent Interpellation'),
     'invitation': _('Invitation'),
-    'interpelleation': _('Interpellation'),
     'interpellation': _('Interpellation'),
     'commission report': _('Commission Report'),
-    'communication': _('Communication'),
     'motion': _('Motion'),
     'postulate': _('Postulate'),
     'resolution': _('Resolution'),
-    'regulation': _('Regulation'),
+    'election': _('Election'),
+    'parliamentary statement': _('Parliamentary Statement'),
     'miscellaneous': _('Miscellaneous'),
-    'elections': _('Elections'),
 }
 
 # FIXME: i18n
@@ -109,7 +100,6 @@ class PoliticalBusiness(
     GeneralFileLinkExtension,
     ORMSearchable
 ):
-
     GERMAN_STATUS_NAME_TO_VALUE_MAP: dict[str, str] = {
         'Abgeschrieben': 'written_off',
         'Beantwortet': 'answered',
@@ -208,6 +198,10 @@ class PoliticalBusiness(
         back_populates='political_business'
     )
 
+    @property
+    def display_name(self) -> str:
+        return f'{self.number} {self.title}' if self.number else self.title
+
     def __repr__(self) -> str:
         return (f'<Political Business {self.number}, '
                 f'{self.title}, {self.political_business_type}>')
@@ -274,10 +268,16 @@ class PoliticalBusinessCollection(
     def __init__(
         self,
         session: Session,
-        page: int = 0
+        page: int = 0,
+        status: Collection[PoliticalBusinessStatus] | None = None,
+        types: Collection[PoliticalBusinessType] | None = None,
+        years: Collection[int] | None = None,
     ) -> None:
         super().__init__(session)
         self.page = page
+        self.status = set(status) if status else set()
+        self.types = set(types) if types else set()
+        self.years = set(years) if years else set()
         self.batch_size = 20
 
     @property
@@ -292,17 +292,85 @@ class PoliticalBusinessCollection(
 
     def query(self) -> Query[PoliticalBusiness]:
         query = super().query()
+
+        if self.types:
+            query = query.filter(
+                PoliticalBusiness.political_business_type.in_(self.types)
+            )
+
+        if self.status:
+            query = query.filter(
+                PoliticalBusiness.status.in_(self.status)
+            )
+
+        if self.years:
+            query = query.filter(
+                or_(*[
+                    and_(
+                        PoliticalBusiness.entry_date.isnot(None),
+                        PoliticalBusiness.entry_date >= date(year, 1, 1),
+                        PoliticalBusiness.entry_date < date(year + 1, 1, 1),
+                    )
+                    for year in self.years
+                ])
+            )
+
         return query.order_by(self.model_class.entry_date.desc())
+
+    def query_all(self) -> Query[PoliticalBusiness]:
+        """
+        Returns a query for all political businesses, ignoring the page,
+        status, types, and years filters.
+        """
+        return super().query().order_by(self.model_class.entry_date.desc())
 
     def subset(self) -> Query[PoliticalBusiness]:
         return self.query()
 
     def page_by_index(self, index: int) -> Self:
-        return self.__class__(self.session, page=index)
+        return self.__class__(
+            self.session,
+            page=index,
+            status=self.status,
+            types=self.types,
+            years=self.years,
+        )
 
     @property
     def page_index(self) -> int:
         return self.page
+
+    def for_filter(
+        self,
+        status: PoliticalBusinessStatus | None = None,
+        type: PoliticalBusinessType | None = None,
+        year: int | None = None,
+    ) -> Self:
+        status_ = toggle(self.status, status)
+        types = toggle(self.types, type)
+        years = toggle(self.years, year)
+
+        return self.__class__(
+            self.session,
+            page=self.page,
+            status=status_,
+            types=types,
+            years=years,
+        )
+
+    def years_for_entries(self) -> list[int]:
+        """ Returns a list of years for which there are entries in the db """
+
+        years = self.query_all().with_entities(
+            func.extract('year', PoliticalBusiness.entry_date).label('year')
+        ).filter(
+            PoliticalBusiness.entry_date.isnot(None)
+        ).distinct().order_by(
+            PoliticalBusiness.entry_date.desc()
+        )
+
+        # convert to a list of integers, remove duplicates, and sort
+        return sorted({int(year[0]) for year in years}, reverse=True)
 
 
 class PoliticalBusinessParticipationCollection(

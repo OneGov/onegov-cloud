@@ -150,14 +150,16 @@ class PoliticalBusinessForm(Form):
 
     political_business_type = TranslatedSelectField(
         label=_('Type'),
-        choices=sorted(POLITICAL_BUSINESS_TYPE.items()),
+        choices=POLITICAL_BUSINESS_TYPE.items(),
         validators=[InputRequired()],
+        choices_sorted=True,
     )
 
     status = TranslatedSelectField(
         label=_('Business Status'),
-        choices=sorted(POLITICAL_BUSINESS_STATUS.items()),
+        choices=POLITICAL_BUSINESS_STATUS.items(),
         validators=[InputRequired()],
+        choices_sorted=True,
         default='-',
     )
 

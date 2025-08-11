@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import port_for
 
 from attr import attrs, attrib
@@ -6,6 +8,9 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from mirakuru import TCPExecutor
 from textwrap import dedent
+
+
+from typing import Self
 
 
 @attrs(auto_attribs=True)
@@ -41,7 +46,7 @@ class GLAuth:
     glauth_binary: Path = attrib(converter=Path)
     glauth_config: str
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         self.context = Bunch()
 
         # pick the socket
@@ -67,7 +72,7 @@ class GLAuth:
 
         return self
 
-    def __exit__(self, *args, **kwargs):
+    def __exit__(self, *args: object, **kwargs: object) -> None:
 
         # stop the server
         self.context.executor.stop()

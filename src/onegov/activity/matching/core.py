@@ -6,7 +6,7 @@ quadratic runtime.
 """
 from __future__ import annotations
 
-from onegov.activity import Attendee, Booking, Occasion, Period
+from onegov.activity import Attendee, Booking, Occasion, BookingPeriod
 from onegov.activity.matching.score import Scoring
 from onegov.activity.matching.utils import overlaps, LoopBudget, HashableID
 from onegov.activity.matching.utils import booking_order, unblockable
@@ -346,7 +346,9 @@ def deferred_acceptance_from_database(
     hard_budget: bool = True,
 ) -> None:
 
-    period = session.query(Period).filter(Period.id == period_id).one()
+    period = session.query(BookingPeriod).filter(
+        BookingPeriod.id == period_id
+    ).one()
 
     b = session.query(Booking)
     b = b.options(joinedload(Booking.occasion))

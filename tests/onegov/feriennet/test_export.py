@@ -1,10 +1,11 @@
-from onegov.activity import InvoiceCollection, PeriodCollection, \
-    InvoiceReference
+from onegov.activity import BookingPeriodCollection
+from onegov.activity import BookingPeriodInvoiceCollection
 from datetime import date
 from onegov.core.utils import Bunch
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.exports.booking import BookingExport
 from onegov.feriennet.exports.invoiceitem import InvoiceItemExport
+from onegov.pay import InvoiceReference
 from sqlalchemy import func
 import transaction
 
@@ -60,12 +61,16 @@ def test_exports(client, scenario):
     scenario.refresh()
 
     session = scenario.session
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
     period = scenario.latest_period
 
     # create a mock request
     def invoice_collection(user_id=None, period_id=None):
-        return InvoiceCollection(session, user_id=user_id, period_id=period_id)
+        return BookingPeriodInvoiceCollection(
+            session,
+            user_id=user_id,
+            period_id=period_id
+        )
 
     def request(admin):
         return Bunch(
@@ -119,7 +124,10 @@ def test_exports(client, scenario):
     data = dict(list(items)[0])
     assert data['Activity Tags'] == "CAMP\nFamily Camp"
 
-    invoices = InvoiceCollection(session, scenario.latest_period.id)
+    invoices = BookingPeriodInvoiceCollection(
+        session,
+        scenario.latest_period.id
+    )
     invoice = invoices.query().first()
     invoice.references.append(InvoiceReference(
         reference='zzzzzAAAAaaaa',

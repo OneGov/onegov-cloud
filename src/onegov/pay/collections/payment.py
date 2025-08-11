@@ -6,12 +6,12 @@ from sedate import to_timezone
 
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.pay.models import Payment
+from onegov.ticket.models.ticket import Ticket
 from sqlalchemy.orm import joinedload
 from sqlalchemy import and_, func
 
 
 from typing import Any, TYPE_CHECKING
-from onegov.ticket.model import Ticket
 if TYPE_CHECKING:
     from datetime import date
     from collections.abc import Collection, Iterable
