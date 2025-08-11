@@ -390,10 +390,6 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
 
         return False
 
-    @property
-    def display_name(self) -> str:
-        return f'{self.first_name} {self.last_name}'
-
     #: A parliamentarian may be part of n commissions
     commission_memberships: relationship[list[CommissionMembership]]
     commission_memberships = relationship(
