@@ -196,6 +196,7 @@ def edit_meeting(
         form.process(obj=self)
 
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
+    layout.include_editor()
     layout.editbar_links = []
 
     return {
