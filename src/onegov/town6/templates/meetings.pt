@@ -6,6 +6,27 @@
         <div class="grid-x grid-padding-x">
             <div class="medium-6 cell main-content">
                 <p tal:condition="not:meetings" i18n:translate="">No meetings defined yet.</p>
+
+                <p tal:condition="upcoming_meeting|None">
+                    <h4 i18n:translate>Next Meeting</h4>
+                    <ul class="more-list meeting-list">
+                        <li>
+                            <a class="list-link" tal:attributes="href request.link(upcoming_meeting)">
+                            <span class="h5 list-title">
+                                ${upcoming_meeting.title}
+                            </span>
+                            </a>
+                            <a tal:attributes="href request.link(upcoming_meeting)">
+                                <p class="list-lead preview">
+                                    <span>${layout.format_date(upcoming_meeting.start_datetime, 'datetime')}</span>
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </p>
+
+                <h4 tal:condition="not: past_title" i18n:translate style="padding-top: 1rem">Upcoming Meetings</h4>
+                <h4 tal:condition="past_title" i18n:translate style="padding-top: 1rem">Past Meetings</h4>
                 <ul tal:condition="meetings" class="more-list meeting-list">
                     <li tal:repeat="meeting meetings">
                         <a class="list-link" tal:attributes="href request.link(meeting)">
