@@ -1,8 +1,46 @@
 # Changes
 
+## 2025.40
+
+`2025-08-12` | [8693e9e3ad...dd5d553803](https://github.com/OneGov/onegov-cloud/compare/8693e9e3ad^...dd5d553803)
+
+### Org
+
+##### Displays invoice items in confirmation step before payment
+
+`Feature` | [OGC-2287](https://linear.app/onegovcloud/issue/OGC-2287) | [e874288cc9](https://github.com/onegov/onegov-cloud/commit/e874288cc9f50331f1670039cd534d7d08bbea1d)
+
+##### Upgrade db upgrade step
+
+`Bugfix` | [OGC-2535](https://linear.app/onegovcloud/issue/OGC-2535) | [dd5d553803](https://github.com/onegov/onegov-cloud/commit/dd5d55380307bccf85fcdf9afb933cf169d5045a)
+
+### Ris
+
+##### Show parliamentarians last name first (as they are sorted by last name)
+
+`Feature` | [OGC-2506](https://linear.app/onegovcloud/issue/OGC-2506) | [90a0333e0e](https://github.com/onegov/onegov-cloud/commit/90a0333e0eee30b6552c31514c6b69521d155225)
+
+##### Show business type for agenda items of a meeting
+
+`Feature` | [OGC-2518](https://linear.app/onegovcloud/issue/OGC-2518) | [f71417732d](https://github.com/onegov/onegov-cloud/commit/f71417732d7da73a8cfadff18b5ad6fc3619b77a)
+
+##### Only show active members of parliamentary group
+
+`Feature` | [OGC-2523](https://linear.app/onegovcloud/issue/OGC-2523) | [98edfb501c](https://github.com/onegov/onegov-cloud/commit/98edfb501c039fc06e9a1bf5abed10ecbd87ad76)
+
+##### Load editor for html fields in meeting edit view
+
+`Bugfix` | [OGC-2515](https://linear.app/onegovcloud/issue/OGC-2515) | [b5f6c6ced8](https://github.com/onegov/onegov-cloud/commit/b5f6c6ced8d42348c8fcc898eb0c26f9dab82700)
+
+### Wil
+
+##### Event import for multiple zip codes
+
+`Feature` | [OGC-2530](https://linear.app/onegovcloud/issue/OGC-2530) | [4e7b700a57](https://github.com/onegov/onegov-cloud/commit/4e7b700a57d56fe325f021cb4ecec0028b55a547)
+
 ## 2025.39
 
-`2025-08-06` | [3cfa6d9948...62b6a77a88](https://github.com/OneGov/onegov-cloud/compare/3cfa6d9948^...62b6a77a88)
+`2025-08-06` | [3cfa6d9948...96f2b550b5](https://github.com/OneGov/onegov-cloud/compare/3cfa6d9948^...96f2b550b5)
 
 ### Org
 
@@ -2094,14 +2132,4 @@ Correct margin and padding if there is no text
 Enable the option to hide main images on news
 
 `Bugfix` | [OGC-1903](https://linear.app/onegovcloud/issue/OGC-1903) | [53135169e2](https://github.com/onegov/onegov-cloud/commit/53135169e2b654ca6782f448e19446ae2c989680)
-
-## test
-
-`2024-12-09` | [9c3aee5da3...9460a55000](https://github.com/OneGov/onegov-cloud/compare/9c3aee5da3^...9460a55000)
-
-### Swissvotes
-
-##### Adds translations for Basel poster collection, adjusts order of poster sources
-
-`Feature` | [SWI-42](https://linear.app/swissvotes/issue/SWI-42) | [4b8e08ca2b](https://github.com/onegov/onegov-cloud/commit/4b8e08ca2bacb5486bb69e5df322d89f56a5febc)
 
