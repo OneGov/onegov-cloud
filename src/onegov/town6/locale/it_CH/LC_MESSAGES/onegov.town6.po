@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-08-12 13:09+0200\n"
+"POT-Creation-Date: 2025-08-12 15:23+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1937,6 +1937,9 @@ msgstr "Numero del contratto"
 msgid "Picture"
 msgstr "Immagine"
 
+msgid "Party"
+msgstr "Partito"
+
 msgid "Private address"
 msgstr "Indirizzo privato"
 
@@ -2083,9 +2086,6 @@ msgstr "Gruppo parlamentare"
 
 msgid "No political businesses defined yet."
 msgstr "Nessun affare politico ancora definito."
-
-msgid "Datum"
-msgstr "Data"
 
 msgid "Year"
 msgstr "Anno"
@@ -2732,6 +2732,9 @@ msgstr "Sistema di informazione sui ratti (RIS)"
 
 msgid "New Note"
 msgstr "Nuova nota"
+
+#~ msgid "Datum"
+#~ msgstr "Data"
 
 #~ msgid "Interest tie"
 #~ msgstr "Legame di interesse"
