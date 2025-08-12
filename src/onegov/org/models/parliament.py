@@ -108,6 +108,10 @@ class RISParliamentarian(Parliamentarian, ORMSearchable):
     }
 
     @property
+    def title(self) -> str:
+        return f'{self.last_name} {self.first_name}'
+
+    @property
     def es_suggestion(self) -> tuple[str, ...]:
         return (
             f'{self.first_name} {self.last_name}',

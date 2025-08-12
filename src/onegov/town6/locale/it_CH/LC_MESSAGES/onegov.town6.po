@@ -2081,6 +2081,9 @@ msgstr "Tipo di attività"
 msgid "Status"
 msgstr "Stato"
 
+msgid "Submission/publication date"
+msgstr "Data di invio/pubblicazione"
+
 msgid "Participants"
 msgstr "Autore / Partecipanti"
 

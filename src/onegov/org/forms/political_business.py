@@ -164,7 +164,7 @@ class PoliticalBusinessForm(Form):
     )
 
     entry_date = DateField(
-        label=_('Entry Date'),
+        label=_('Submission/publication date'),
         validators=[InputRequired()],
         default=date.today,
     )
@@ -223,7 +223,7 @@ class PoliticalBusinessForm(Form):
             choices: list[_Choice] = [
                 (
                     str(participant.id),
-                    participant.display_name,
+                    participant.title,
                     {'data-role': selected.get(participant.id) or ''}
                 )
                 for participant in selectable_participants
