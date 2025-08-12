@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-08-12 13:24+0200\n"
+"POT-Creation-Date: 2025-08-12 13:09+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2071,6 +2071,9 @@ msgstr "Tipo di attività"
 
 msgid "Status"
 msgstr "Stato"
+
+msgid "Submission/publication date"
+msgstr "Data di invio/pubblicazione"
 
 msgid "Participants"
 msgstr "Autore / Partecipanti"
