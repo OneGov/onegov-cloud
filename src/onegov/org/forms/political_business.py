@@ -164,7 +164,7 @@ class PoliticalBusinessForm(Form):
     )
 
     entry_date = DateField(
-        label=_('Entry Date'),
+        label=_('Submission/publication date'),
         validators=[InputRequired()],
         default=date.today,
     )
