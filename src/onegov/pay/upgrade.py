@@ -65,7 +65,8 @@ def add_invoiced_state_to_payments(context: UpgradeContext) -> None:
         context.operations.execute('COMMIT')
 
         context.operations.execute(
-            "ALTER TYPE payment_state ADD VALUE IF NOT EXISTS 'invoiced'")
+            "ALTER TYPE payment_state ADD VALUE IF NOT EXISTS 'invoiced'"
+        )
 
         # Start new transaction
         context.operations.execute('BEGIN')
