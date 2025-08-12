@@ -8,7 +8,7 @@
                 <p tal:condition="not:meetings" i18n:translate="">No meetings defined yet.</p>
 
                 <p tal:condition="upcoming_meeting|None">
-                    <h5>Nächstes Meeting</h5>
+                    <h4 i18n:translate>Next Meeting</h4>
                     <ul class="more-list meeting-list">
                         <li>
                             <a class="list-link" tal:attributes="href request.link(upcoming_meeting)">
@@ -25,8 +25,8 @@
                     </ul>
                 </p>
 
-                <h5 tal:condition="not: past_title">Künftige Meetings</h5>
-                <h5 tal:condition="past_title">Vergangene Meetings</h5>
+                <h4 tal:condition="not: past_title" i18n:translate style="padding-top: 1rem">Future Meetings</h4>
+                <h4 tal:condition="past_title" i18n:translate style="padding-top: 1rem">Past Meetings</h4>
                 <ul tal:condition="meetings" class="more-list meeting-list">
                     <li tal:repeat="meeting meetings">
                         <a class="list-link" tal:attributes="href request.link(meeting)">
