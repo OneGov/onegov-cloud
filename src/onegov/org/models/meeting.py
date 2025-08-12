@@ -120,7 +120,7 @@ class Meeting(
 
     @past.expression  # type:ignore[no-redef]
     def past(cls):
-        return exists.where(cls.start_datetime < func.now())
+        return cls.start_datetime < func.now()
 
     def __repr__(self) -> str:
         return f'<Meeting {self.title}, {self.start_datetime}>'
