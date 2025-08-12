@@ -1268,20 +1268,20 @@ def test_get_polymorphic_class() -> None:
     assert Plain.get_polymorphic_class('B', 2) == 2
     assert Plain.get_polymorphic_class('C', 3) == 3
 
-    assert Base.get_polymorphic_class('A') is ChildA
     assert PolyBase.get_polymorphic_class('A') is ChildA
-    assert PolyBase.get_polymorphic_class('A') is ChildA
+    assert ChildA.get_polymorphic_class('A') is ChildA
+    assert ChildB.get_polymorphic_class('A') is ChildA  # type: ignore[comparison-overlap]
 
-    assert Base.get_polymorphic_class('B') is ChildB
     assert PolyBase.get_polymorphic_class('B') is ChildB
-    assert PolyBase.get_polymorphic_class('B') is ChildB
+    assert ChildA.get_polymorphic_class('B') is ChildB  # type: ignore[comparison-overlap]
+    assert ChildB.get_polymorphic_class('B') is ChildB
 
-    assert Base.get_polymorphic_class('C', None) is None
     assert PolyBase.get_polymorphic_class('C', None) is None
-    assert PolyBase.get_polymorphic_class('C', None) is None
+    assert ChildA.get_polymorphic_class('C', None) is None
+    assert ChildB.get_polymorphic_class('C', None) is None
 
     with pytest.raises(AssertionError) as assertion_info:
-        Base.get_polymorphic_class('C')
+        PolyBase.get_polymorphic_class('C')
 
     assert "No such polymorphic_identity: C" in str(assertion_info.value)
 
