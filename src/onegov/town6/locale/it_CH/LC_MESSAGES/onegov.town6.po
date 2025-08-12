@@ -316,11 +316,11 @@ msgstr "Parlamentari"
 msgid "Parliamentarian"
 msgstr "Parlamentare"
 
-msgid "New parliamentary group membership"
-msgstr "Nuova appartenenza al gruppo parlamentare"
+msgid "New parliamentary group function"
+msgstr "Nuova funzione del gruppo parlamentare"
 
-msgid "New commission membership"
-msgstr "Nuova appartenenza alla commissione"
+msgid "New commission function"
+msgstr "Nuova funzione della commissione"
 
 msgid "Do you really want to delete this parliamentarian?"
 msgstr "Vuole davvero cancellare questo parlamentare?"
@@ -1991,8 +1991,8 @@ msgstr "Sito web"
 msgid "Remarks"
 msgstr "Osservazioni"
 
-msgid "Roles"
-msgstr "Ruoli"
+msgid "Functions"
+msgstr "Funzioni"
 
 msgid "Parliament"
 msgstr "Parlamento"
@@ -2732,6 +2732,9 @@ msgstr "Sistema di informazione sui ratti (RIS)"
 
 msgid "New Note"
 msgstr "Nuova nota"
+
+#~ msgid "Roles"
+#~ msgstr "Ruoli"
 
 #~ msgid "Interest tie"
 #~ msgstr "Legame di interesse"

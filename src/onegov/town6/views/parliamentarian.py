@@ -159,12 +159,12 @@ def add_parliamentary_group_membership(
         return request.redirect(request.link(self))
 
     layout.breadcrumbs.append(
-        Link(_('New parliamentary group membership'), '#'))
+        Link(_('New parliamentary group function'), '#'))
     layout.include_editor()
 
     return {
         'layout': layout,
-        'title': _('New parliamentary group membership'),
+        'title': _('New parliamentary group function'),
         'form': form,
         'form_width': 'large'
     }
@@ -191,12 +191,12 @@ def add_commission_membership(
         request.success(_('Added a new role'))
         return request.redirect(request.link(self))
 
-    layout.breadcrumbs.append(Link(_('New commission membership'), '#'))
+    layout.breadcrumbs.append(Link(_('New commission function'), '#'))
     layout.include_editor()
 
     return {
         'layout': layout,
-        'title': _('New commission membership'),
+        'title': _('New commission function'),
         'form': form,
         'form_width': 'large'
     }

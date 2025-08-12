@@ -319,11 +319,11 @@ msgstr "Parlamentsmitglieder"
 msgid "Parliamentarian"
 msgstr "Parlamentsmitglied"
 
-msgid "New parliamentary group membership"
-msgstr "Neue Fraktionsmitgliedschaft"
+msgid "New parliamentary group function"
+msgstr "Neue Fraktionsfunktion"
 
-msgid "New commission membership"
-msgstr "Neue Kommissionsmitgliedschaft"
+msgid "New commission function"
+msgstr "Neue Kommissionsfunktion"
 
 msgid "Do you really want to delete this parliamentarian?"
 msgstr "Möchten Sie dieses Parlamentsmitglied wirklich löschen?"
@@ -1997,8 +1997,8 @@ msgstr "Webseite"
 msgid "Remarks"
 msgstr "Bemerkungen"
 
-msgid "Roles"
-msgstr "Mitgliedschaften"
+msgid "Functions"
+msgstr "Funktionen"
 
 msgid "Parliament"
 msgstr "Parlament"
@@ -2730,6 +2730,9 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid "Roles"
+#~ msgstr "Mitgliedschaften"
 
 #~ msgid "Interest tie"
 #~ msgstr "Interessensbindung"
