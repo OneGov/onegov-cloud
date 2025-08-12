@@ -223,7 +223,7 @@ class PoliticalBusinessForm(Form):
             choices: list[_Choice] = [
                 (
                     str(participant.id),
-                    participant.display_name,
+                    participant.title,
                     {'data-role': selected.get(participant.id) or ''}
                 )
                 for participant in selectable_participants
