@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 import os.path
 
@@ -6,7 +8,13 @@ from onegov.core import utils
 from webtest import TestApp as Client
 
 
-def test_independence(temporary_directory):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from webob import Response
+
+
+def test_independence(temporary_directory: str) -> None:
 
     class App(Framework):
         pass
@@ -21,6 +29,7 @@ def test_independence(temporary_directory):
     )
 
     app.set_application_id('tests/foo')
+    assert app.filestorage is not None
     app.filestorage.writetext('document.txt', 'foo')
     assert app.filestorage.readbytes('document.txt') == b'foo'
     assert app.filestorage.readtext('document.txt') == 'foo'
@@ -43,7 +52,7 @@ def test_independence(temporary_directory):
         os.path.join(temporary_directory, 'tests-bar/document.txt'))
 
 
-def test_filestorage(temporary_directory, redis_url):
+def test_filestorage(temporary_directory: str, redis_url: str) -> None:
 
     class App(Framework):
         pass
@@ -57,16 +66,16 @@ def test_filestorage(temporary_directory, redis_url):
         pass
 
     @App.view(model=Model)
-    def view_file(self, request):
-        return request.filestorage_link(request.params.get('file'))
+    def view_file(self: Model, request: CoreRequest) -> str | None:
+        return request.filestorage_link(request.GET['file'])
 
     @App.view(model=Login)
-    def view_login(self, request):
+    def view_login(self: Login, request: CoreRequest) -> None:
 
         @request.after
-        def remember_login(response):
+        def remember_login(response: Response) -> None:
             request.app.remember_identity(response, request, morepath.Identity(
-                userid=request.params.get('userid'),
+                userid=request.GET['userid'],
                 uid='1',
                 groupids=frozenset({'admins'}),
                 role='admin',
@@ -74,7 +83,7 @@ def test_filestorage(temporary_directory, redis_url):
             ))
 
     @App.view(model=Model, name='csrf-token')
-    def view_csrf_token(self, request):
+    def view_csrf_token(self: Model, request: CoreRequest) -> bytes:
         return request.new_csrf_token()
 
     utils.scan_morepath_modules(App)
@@ -91,6 +100,7 @@ def test_filestorage(temporary_directory, redis_url):
         redis_url=redis_url
     )
     app.set_application_id('tests/foo')
+    assert app.filestorage is not None
     app.filestorage.writetext('test.txt', 'asdf')
     app.filestorage.writetext('readme', 'readme')
 

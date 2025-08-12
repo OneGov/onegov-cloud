@@ -48,7 +48,7 @@ from yubico_client.yubico_exceptions import (  # type:ignore[import-untyped]
 from typing import overload, Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
-    from collections.abc import Callable, Collection, Iterator
+    from collections.abc import Callable, Collection, Iterator, Mapping
     from fs.base import FS, SubFS
     from re import Match
     from sqlalchemy import Column
@@ -614,7 +614,7 @@ def ensure_scheme(url: str | None, default: str = 'http') -> str | None:
     return _url.scheme(default).as_string()
 
 
-def is_uuid(value: str | UUID) -> bool:
+def is_uuid(value: object) -> bool:
     """ Returns true if the given value is a uuid. The value may be a string
     or of type UUID. If it's a string, the uuid is checked with a regex.
     """
@@ -731,7 +731,8 @@ def scan_morepath_modules(cls: type[morepath.App]) -> None:
 
 def get_unique_hstore_keys(
     session: Session,
-    column: Column[dict[str, Any]]
+    column: Column[dict[str, Any]] | Column[dict[str, Any] | None] |
+            Column[Mapping[str, Any]] | Column[Mapping[str, Any] | None]
 ) -> set[str]:
     """ Returns a set of keys found in an hstore column over all records
     of its table.
