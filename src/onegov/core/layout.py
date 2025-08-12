@@ -211,7 +211,7 @@ class Layout:
         self,
         number: numbers.Number | Decimal | float | str | None,
         decimal_places: int | None = None,
-        padding: str = ''
+        padding: int | str = ''
     ) -> str:
         """ Takes the given numer and formats it according to locale.
 
