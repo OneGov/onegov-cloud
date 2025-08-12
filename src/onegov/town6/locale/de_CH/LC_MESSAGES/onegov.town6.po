@@ -319,11 +319,11 @@ msgstr "Parlamentsmitglieder"
 msgid "Parliamentarian"
 msgstr "Parlamentsmitglied"
 
-msgid "New parliamentary group membership"
-msgstr "Neue Fraktionsmitgliedschaft"
+msgid "New parliamentary group function"
+msgstr "Neue Fraktionsfunktion"
 
-msgid "New commission membership"
-msgstr "Neue Kommissionsmitgliedschaft"
+msgid "New commission function"
+msgstr "Neue Kommissionsfunktion"
 
 msgid "Do you really want to delete this parliamentarian?"
 msgstr "Möchten Sie dieses Parlamentsmitglied wirklich löschen?"
@@ -1688,6 +1688,15 @@ msgstr "Es wurden noch keine Traktanden erfasst."
 msgid "No meetings defined yet."
 msgstr "Noch keine Sitzungen definiert."
 
+msgid "Next Meeting"
+msgstr "Nächste Sitzung"
+
+msgid "Upcoming Meetings"
+msgstr "Künftige Sitzungen"
+
+msgid "Past Meetings"
+msgstr "Vergangene Sitzungen"
+
 msgid "Directory entry adopted."
 msgstr "Verzeichniseintrag übernommen."
 
@@ -2000,8 +2009,8 @@ msgstr "Webseite"
 msgid "Remarks"
 msgstr "Bemerkungen"
 
-msgid "Roles"
-msgstr "Mitgliedschaften"
+msgid "Functions"
+msgstr "Funktionen"
 
 msgid "Parliament"
 msgstr "Parlament"
@@ -2571,12 +2580,6 @@ msgstr "Die Kommission wurde gelöscht."
 msgid "Sort"
 msgstr "Sortieren"
 
-msgid "Past Meetings"
-msgstr "Vergangene"
-
-msgid "Upcoming Meetings"
-msgstr "Zukünftige"
-
 msgid "Added a new meeting"
 msgstr "Neue Sitzung hinzugefügt"
 
@@ -2733,6 +2736,9 @@ msgstr "Neue Notiz"
 
 #~ msgid "Datum"
 #~ msgstr "Datum"
+
+#~ msgid "Roles"
+#~ msgstr "Mitgliedschaften"
 
 #~ msgid "Interest tie"
 #~ msgstr "Interessensbindung"

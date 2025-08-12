@@ -321,11 +321,11 @@ msgstr "Parlementaires"
 msgid "Parliamentarian"
 msgstr "Parlementaire"
 
-msgid "New parliamentary group membership"
-msgstr "Nouvelle adhésion au groupe parlementaire"
+msgid "New parliamentary group function"
+msgstr "Nouvelle fonction de groupe parlementaire"
 
-msgid "New commission membership"
-msgstr "Nouvelle adhésion à la commission"
+msgid "New commission function"
+msgstr "Nouvelle fonction de commission"
 
 msgid "Do you really want to delete this parliamentarian?"
 msgstr "Voulez-vous vraiment supprimer ce parlementaire ?"
@@ -1689,6 +1689,15 @@ msgstr "Aucun point d'ordre du jour défini pour le moment."
 msgid "No meetings defined yet."
 msgstr "Aucune réunion définie pour le moment."
 
+msgid "Next Meeting"
+msgstr "Prochaine réunion"
+
+msgid "Upcoming Meetings"
+msgstr "Réunions à venir"
+
+msgid "Past Meetings"
+msgstr "Réunions passées"
+
 msgid "Directory entry adopted."
 msgstr "L'entrée de répertoire a été adoptée."
 
@@ -2001,8 +2010,8 @@ msgstr "Site Web"
 msgid "Remarks"
 msgstr "Remarques"
 
-msgid "Roles"
-msgstr "Rôles"
+msgid "Functions"
+msgstr "Fonctions"
 
 msgid "Parliament"
 msgstr "Parlement"
@@ -2578,12 +2587,6 @@ msgstr "La commission a été supprimée."
 msgid "Sort"
 msgstr "Trier"
 
-msgid "Past Meetings"
-msgstr "Passées"
-
-msgid "Upcoming Meetings"
-msgstr "A venir"
-
 msgid "Added a new meeting"
 msgstr "Ajout d'une nouvelle réunion"
 
@@ -2740,6 +2743,9 @@ msgstr "Nouveau commentaire"
 
 #~ msgid "Datum"
 #~ msgstr "Date"
+
+#~ msgid "Roles"
+#~ msgstr "Rôles"
 
 #~ msgid "Interest tie"
 #~ msgstr "Lien d'intérêt"

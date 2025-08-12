@@ -63,10 +63,19 @@ def view_meetings(
         )
     ]
 
+    upcoming_meeting = (
+        MeetingCollection(request.session, past=False)
+        .query()
+        .order_by(Meeting.past)
+        .first()
+    )
+
     return {
         'filters': filters,
         'layout': layout or MeetingCollectionLayout(self, request),
         'meetings': self.query().all(),
+        'upcoming_meeting': upcoming_meeting,
+        'past_title': self.past,
         'title': _('Meetings'),
     }
 
