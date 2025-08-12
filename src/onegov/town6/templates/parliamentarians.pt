@@ -11,6 +11,11 @@
                         <a class="list-link" tal:attributes="href request.link(parliamentarian)">
                             <h5 class="list-title">${parliamentarian.title}</h5>
                         </a>
+                        <a tal:attributes="href request.link(parliamentarian)">
+                            <p class="list-lead preview">
+                                <span>${parliamentarian.party}</span>
+                            </p>
+                        </a>
                     </li>
                 </ul>
             </div>
