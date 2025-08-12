@@ -1656,6 +1656,7 @@ def adjust_reservation(
         return show_error(utils.get_libres_error(e, request))
 
     if new_reservation is not None:
+        failed_to_revoke = False
         clients = KabaClient.from_resource(resource, request.app)
         data = reservation.data
         if data is None:
@@ -1684,7 +1685,12 @@ def adjust_reservation(
                     # NOTE: We can only revoke existing future visits
                     old_visit_id = old_visit_ids.get(site_id)
                     if old_visit_id and old_start > now:
-                        clients[site_id].revoke_visit(old_visit_id)
+                        try:
+                            clients[site_id].revoke_visit(old_visit_id)
+                        except (KeyError, KabaApiError) as e:
+                            if isinstance(e, KabaApiError):
+                                log.info('Kaba API error', exc_info=True)
+                            failed_to_revoke = True
                     # NOTE: We can only create future visits
                     if start > now:
                         visit_ids[site_id] = clients[site_id].create_visit(
@@ -1720,6 +1726,10 @@ def adjust_reservation(
             request,
         )
         if not intercooler:
+            if failed_to_revoke:
+                request.warning(_(
+                    'Failed to revoke one or more door codes in dormakaba API'
+                ))
             request.success(_('The reservation was adjusted'))
     elif not intercooler:
         request.warning(_('The reservation was left unchanged'))
@@ -1845,6 +1855,7 @@ def edit_kaba(
     if not form.submitted(request):
         return show_form()
 
+    failed_to_revoke = False
     savepoint = transaction.savepoint()
     if form.data != {
         name: ticket.handler_data.get(name)
@@ -1885,7 +1896,12 @@ def edit_kaba(
                     # if there is an old visit, revoke it
                     old_visit_id = old_visit_ids.get(site_id)
                     if old_visit_id and old_start > now:
-                        clients[site_id].revoke_visit(old_visit_id)
+                        try:
+                            clients[site_id].revoke_visit(old_visit_id)
+                        except (KeyError, KabaApiError) as e:
+                            if isinstance(e, KabaApiError):
+                                log.info('Kaba API error', exc_info=True)
+                            failed_to_revoke = True
 
                     if start > now:
                         visit_ids[site_id] = clients[site_id].create_visit(
@@ -1914,6 +1930,11 @@ def edit_kaba(
                     'code': code,
                     'visit_ids': visit_ids,
                 }
+
+    if failed_to_revoke:
+        request.warning(_(
+            'Failed to revoke one or more door codes in dormakaba API'
+        ))
 
     request.success(_('Your changes were saved'))
 
