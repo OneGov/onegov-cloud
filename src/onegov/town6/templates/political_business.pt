@@ -23,7 +23,7 @@
                 <dd><div tal:content="status_map[business.status]"> </div></dd>
             </div>
             <div tal:condition="business.entry_date">
-                <dt i18n:translate>Date</dt>
+                <dt i18n:translate>Submission/publication date</dt>
                 <dd><div tal:content="layout.format_date(business.entry_date, 'date')"></div></dd>
             </div>
             <div tal:condition="participations">
