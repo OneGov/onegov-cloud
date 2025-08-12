@@ -7,10 +7,10 @@ from wtforms.validators import DataRequired
 from onegov.core.csv import convert_excel_to_csv, CSVFile
 from onegov.form.fields import UploadField
 from onegov.org.forms.fields import HtmlField
+from onegov.org.utils import extract_categories_and_subcategories
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from wtforms.fields import BooleanField
-from onegov.core.layout import Layout
 from onegov.file.utils import name_without_extension
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
@@ -28,8 +28,6 @@ from markupsafe import Markup
 
 
 from typing import Any, TYPE_CHECKING
-
-from onegov.org.utils import extract_categories_and_subcategories
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Callable
@@ -85,10 +83,6 @@ class NewsletterForm(Form):
         news: Iterable[News]
     ) -> type[Self]:
 
-        # FIXME: using a layout just for format_date seems bad, we should
-        #        probably extract these functions into util modules
-        layout = Layout(None, request)
-
         choices = tuple(
             (
                 str(item.id),
@@ -97,7 +91,7 @@ class NewsletterForm(Form):
                     '<div class="date">{}</div>'
                 ).format(
                     item.title,
-                    layout.format_date(item.created, 'relative')
+                    request.format_date(item.created, 'relative'),
                 )
             )
             for item in news
@@ -149,9 +143,6 @@ class NewsletterForm(Form):
         occurrences: Iterable[Occurrence]
     ) -> type[Self]:
 
-        # FIXME: another use of layout for format_date
-        layout = Layout(None, request)
-
         choices = tuple(
             (
                 str(item.id),
@@ -160,7 +151,8 @@ class NewsletterForm(Form):
                     '<div class="date">{}</div>'
                 ).format(
                     item.title,
-                    layout.format_date(item.localized_start, 'datetime')
+                    request.format_date(
+                        item.localized_start, 'dd.MM.yyyy HH:mm')
                 )
             )
             for item in occurrences
@@ -201,9 +193,6 @@ class NewsletterForm(Form):
         publications: Iterable[File]
     ) -> type[Self]:
 
-        # FIXME: another use of layout for format_date
-        layout = Layout(None, request)
-
         choices = tuple(
             (
                 str(item.id),
@@ -212,7 +201,7 @@ class NewsletterForm(Form):
                     '<div class="date">{}</div>'
                 ).format(
                     name_without_extension(item.name),
-                    layout.format_date(item.created, 'date')
+                    request.format_date(item.created, 'dd.MM.yyyy')
                 )
             )
             for item in publications

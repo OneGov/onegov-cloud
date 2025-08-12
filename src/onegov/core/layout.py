@@ -1,21 +1,18 @@
 from __future__ import annotations
 
 
-import arrow
-import babel.dates
-import babel.numbers
 import isodate
 import numbers
 import sedate
 
 from datetime import datetime
 from functools import cached_property
-from functools import lru_cache
 from onegov.core import utils
 from onegov.core.templates import PageTemplate
 from pytz import timezone
 
 from typing import overload, Any, TypeVar, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from chameleon import PageTemplateFile
     from collections.abc import Callable, Collection, Iterable, Iterator
@@ -154,40 +151,8 @@ class Layout:
         return self.request.csrf_protected_url(url)
 
     def format_date(self, dt: datetime | date | None, format: str) -> str:
-        """ Takes a datetime and formats it according to local timezone and
-        the given format.
-
-        """
-        if dt is None:
-            return ''
-
-        if getattr(dt, 'tzinfo', None) is not None:
-            dt = self.timezone.normalize(
-                dt.astimezone(self.timezone)  # type:ignore[attr-defined]
-            )
-
-        locale = self.request.locale
-        assert locale is not None, 'Cannot format date without a locale'
-        if format == 'relative':
-            adt = arrow.get(dt)
-
-            try:
-                return adt.humanize(locale=locale)
-            except ValueError:
-                return adt.humanize(locale=locale.split('_')[0])
-
-        fmt = getattr(self, format + '_format')
-        if fmt.startswith('skeleton:'):
-            return babel.dates.format_skeleton(
-                fmt.replace('skeleton:', ''),
-                datetime=dt,
-                fuzzy=False,
-                locale=locale
-            )
-        elif hasattr(dt, 'hour'):
-            return babel.dates.format_datetime(dt, format=fmt, locale=locale)
-        else:
-            return babel.dates.format_date(dt, format=fmt, locale=locale)
+        fmt = getattr(self, f'{format}_format', format)
+        return self.request.format_date(dt, fmt)
 
     def isodate(self, date: datetime) -> str:
         """ Returns the given date in the ISO 8601 format. """
@@ -197,43 +162,13 @@ class Layout:
         """ Returns the given ISO 8601 string as datetime. """
         return isodate.parse_datetime(string)
 
-    @staticmethod
-    @lru_cache(maxsize=8)
-    def number_symbols(locale: str) -> tuple[str, str]:
-        """ Returns the locale specific number symbols. """
-
-        return (
-            babel.numbers.get_decimal_symbol(locale),
-            babel.numbers.get_group_symbol(locale)
-        )
-
     def format_number(
         self,
         number: numbers.Number | Decimal | float | str | None,
         decimal_places: int | None = None,
         padding: str = ''
     ) -> str:
-        """ Takes the given numer and formats it according to locale.
-
-        If the number is an integer, the default decimal places are 0,
-        otherwise 2.
-
-        """
-        if isinstance(number, str):
-            return number
-
-        if number is None:
-            return ''
-
-        if decimal_places is None:
-            if isinstance(number, numbers.Integral):
-                decimal_places = 0
-            else:
-                decimal_places = 2
-
-        decimal, group = self.number_symbols(self.request.locale)
-        result = '{{:{},.{}f}}'.format(padding, decimal_places).format(number)
-        return result.translate({ord(','): group, ord('.'): decimal})
+        return self.request.format_number(number, decimal_places, padding)
 
     @property
     def view_name(self) -> str | None:
