@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-08-12 13:09+0200\n"
+"POT-Creation-Date: 2025-08-12 15:23+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1943,6 +1943,9 @@ msgstr "Vertragsnummer"
 msgid "Picture"
 msgstr "Bild"
 
+msgid "Party"
+msgstr "Partei"
+
 msgid "Private address"
 msgstr "Privatadresse"
 
@@ -2089,9 +2092,6 @@ msgstr "Fraktion"
 
 msgid "No political businesses defined yet."
 msgstr "Es wurden noch keine politischen Geschäfte erfasst."
-
-msgid "Datum"
-msgstr "Datum"
 
 msgid "Year"
 msgstr "Jahr"
@@ -2730,6 +2730,9 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid "Datum"
+#~ msgstr "Datum"
 
 #~ msgid "Interest tie"
 #~ msgstr "Interessensbindung"

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-08-12 13:09+0200\n"
+"POT-Creation-Date: 2025-08-12 15:23+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -621,8 +621,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -1944,6 +1944,9 @@ msgstr "Numéro de contrat"
 msgid "Picture"
 msgstr "Photo"
 
+msgid "Party"
+msgstr "Parti"
+
 msgid "Private address"
 msgstr "Adresse privée"
 
@@ -2090,9 +2093,6 @@ msgstr "Groupe parlementaire"
 
 msgid "No political businesses defined yet."
 msgstr "Aucun business politique n'a été défini pour le moment."
-
-msgid "Datum"
-msgstr "Date"
 
 msgid "Year"
 msgstr "Année"
@@ -2737,6 +2737,9 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Nouveau commentaire"
+
+#~ msgid "Datum"
+#~ msgstr "Date"
 
 #~ msgid "Interest tie"
 #~ msgstr "Lien d'intérêt"
