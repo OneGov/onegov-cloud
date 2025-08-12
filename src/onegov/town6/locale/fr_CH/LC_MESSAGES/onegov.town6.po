@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-08-07 15:03+0200\n"
+"POT-Creation-Date: 2025-08-12 13:24+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -321,11 +321,11 @@ msgstr "Parlementaires"
 msgid "Parliamentarian"
 msgstr "Parlementaire"
 
-msgid "New parliamentary group membership"
-msgstr "Nouvelle adhésion au groupe parlementaire"
+msgid "New parliamentary group function"
+msgstr "Nouvelle fonction de groupe parlementaire"
 
-msgid "New commission membership"
-msgstr "Nouvelle adhésion à la commission"
+msgid "New commission function"
+msgstr "Nouvelle fonction de commission"
 
 msgid "Do you really want to delete this parliamentarian?"
 msgstr "Voulez-vous vraiment supprimer ce parlementaire ?"
@@ -1998,8 +1998,8 @@ msgstr "Site Web"
 msgid "Remarks"
 msgstr "Remarques"
 
-msgid "Roles"
-msgstr "Rôles"
+msgid "Functions"
+msgstr "Fonctions"
 
 msgid "Parliament"
 msgstr "Parlement"
@@ -2734,6 +2734,9 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Nouveau commentaire"
+
+#~ msgid "Roles"
+#~ msgstr "Rôles"
 
 #~ msgid "Interest tie"
 #~ msgstr "Lien d'intérêt"

@@ -106,7 +106,7 @@
                 <dd tal:content="Markup('<br>').join(parliamentarian.remarks.split('\n'))"></dd>
             </div>
             <div tal:condition="parliamentarian.roles">
-                <dt i18n:translate>Roles</dt>
+                <dt i18n:translate>Functions</dt>
                 <dd>
                     <ul class="more-list">
                         <li tal:repeat="role parliamentarian.roles">
