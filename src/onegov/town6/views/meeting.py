@@ -66,7 +66,7 @@ def view_meetings(
     upcoming_meeting = (
         MeetingCollection(request.session, past=False)
         .query()
-        .order_by(Meeting.past == False)
+        .order_by(Meeting.past)
         .first()
     )
 

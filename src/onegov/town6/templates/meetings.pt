@@ -25,7 +25,7 @@
                     </ul>
                 </p>
 
-                <h4 tal:condition="not: past_title" i18n:translate style="padding-top: 1rem">Future Meetings</h4>
+                <h4 tal:condition="not: past_title" i18n:translate style="padding-top: 1rem">Upcoming Meetings</h4>
                 <h4 tal:condition="past_title" i18n:translate style="padding-top: 1rem">Past Meetings</h4>
                 <ul tal:condition="meetings" class="more-list meeting-list">
                     <li tal:repeat="meeting meetings">
