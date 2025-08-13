@@ -16,7 +16,7 @@
             <div>
                 <div class="right-side">
                     <span>
-                        <button type="button" data-toggle="submitters" class="${has_submitter_filter and 'primary radius button small' or 'secondary radius button small'} selected-owner">
+                        <button type="button" data-toggle="submitters" class="${has_submitter_filter and 'primary radius button small' or 'secondary radius button small'} selected-submitter">
                             <span class="show-for-sr"><tal:b i18n:translate>Submitter</tal:b>:</span>
                             <span>${submitter}</span>
                         </button>
