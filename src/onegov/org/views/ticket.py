@@ -1444,6 +1444,36 @@ def get_owners(
         )
 
 
+def get_submitters(
+    self: TicketCollection | ArchivedTicketCollection,
+    request: OrgRequest
+) -> Iterator[Link]:
+
+    all_submitters = self.for_submitter('*')
+    query = (
+        all_submitters.subset()
+        .with_entities(Ticket.ticket_email.distinct())
+        .order_by(None)
+        .order_by(Ticket.ticket_email)
+    )
+
+    yield Link(
+        text=_('All Submitters'),
+        url=request.link(all_submitters),
+        active=self.submitter == '*'
+    )
+
+    for email, in query:
+        if email is None:
+            # NOTE: Shouldn't happen but let's guard against it just in case
+            continue
+        yield Link(
+            text=email,
+            url=request.link(self.for_submitter(email)),
+            active=self.submitter == email
+        )
+
+
 def groups_by_handler_code(session: Session) -> dict[str, list[str]]:
     query = as_selectable("""
             SELECT
@@ -1479,6 +1509,7 @@ def view_tickets(
         'group': self.group,
         'state': self.state,
         'owner': self.owner,
+        'submitter': self.submitter,
         'page': self.page,
         'extra_parameters': self.extra_parameters,
     }
@@ -1486,9 +1517,11 @@ def view_tickets(
     groups = groups_by_handler_code(request.session)
     handlers = tuple(get_handlers(self, request, groups))
     owners = tuple(get_owners(self, request))
+    submitters = tuple(get_submitters(self, request))
     filters = tuple(get_filters(self, request))
     handler = next((h for h in handlers if h.active), None)
     owner = next((o for o in owners if o.active), None)
+    submitter = next((s for s in submitters if s.active), None)
     layout = layout or TicketsLayout(self, request)
 
     def archive_link(ticket: Ticket) -> str:
@@ -1501,12 +1534,18 @@ def view_tickets(
         'filters': filters,
         'handlers': handlers,
         'owners': owners,
+        'submitters': submitters,
         'tickets_state': self.state,
         'archive_tickets': self.state == 'closed',
         'has_handler_filter': self.handler != 'ALL',
         'has_owner_filter': self.owner != '*',
+        'has_submitter_filter': self.submitter != '*',
         'handler': handler,
         'owner': owner,
+        # NOTE: Not all submitters will be valid for every filter so
+        #       if it's not valid we fallback to whatever we were given
+        #       there should be zero results, but that's fine
+        'submitter': submitter.text if submitter else self.submitter,
         'action_link': archive_link
     }
 
@@ -1525,8 +1564,10 @@ def view_archived_tickets(
     groups = groups_by_handler_code(request.session)
     handlers = tuple(get_handlers(self, request, groups))
     owners = tuple(get_owners(self, request))
+    submitters = tuple(get_submitters(self, request))
     handler = next((h for h in handlers if h.active), None)
     owner = next((o for o in owners if o.active), None)
+    submitter = next((s for s in submitters if s.active), None)
     layout = layout or ArchivedTicketsLayout(self, request)
 
     def action_link(ticket: Ticket) -> str:
@@ -1539,12 +1580,18 @@ def view_archived_tickets(
         'filters': [],
         'handlers': handlers,
         'owners': owners,
+        'submitters': submitters,
         'tickets_state': self.state,
         'archive_tickets': False,
         'has_handler_filter': self.handler != 'ALL',
         'has_owner_filter': self.owner != '*',
+        'has_submitter_filter': self.submitter != '*',
         'handler': handler,
         'owner': owner,
+        # NOTE: Not all submitters will be valid for every filter so
+        #       if it's not valid we fallback to whatever we were given
+        #       there should be zero results, but that's fine
+        'submitter': submitter.text if submitter else self.submitter,
         'action_link': action_link
     }
 

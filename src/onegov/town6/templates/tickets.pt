@@ -26,6 +26,21 @@
             <div>
                 <div class="right-side">
                     <span>
+                        <button type="button" data-toggle="submitters" class="${has_submitter_filter and 'primary radius button small' or 'secondary radius button small'} selected-submitter">
+                            <span class="show-for-sr"><tal:b i18n:translate>Submitter</tal:b>:</span>
+                            <span>${submitter}</span>
+                        </button>
+                        <div id="submitters" class="dropdown-pane" data-dropdown data-hover="true" data-hover-pane="true">
+                            <ul class="f-dropdown disable-scroll">
+                                <li tal:repeat="link submitters">
+                                    <a href="${link.attrs.href}" class="${repeat.link.start and 'ALL-link' or 'ticket-group-filter'}">
+                                        ${link.text}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </span>
+                    <span>
                         <button type="button" data-toggle="owners" class="${has_owner_filter and 'primary radius button small' or 'secondary radius button small'} selected-owner">
                             <span i18n:translate class="show-for-sr">Owner:</span>
                             <span>${owner.text}</span>

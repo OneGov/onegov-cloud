@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-08-07 15:00+0200\n"
+"POT-Creation-Date: 2025-08-13 10:30+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1510,8 +1510,8 @@ msgstr "Co-signataire"
 msgid "Business Status"
 msgstr "Statut"
 
-msgid "Entry Date"
-msgstr "Date"
+msgid "Submission/publication date"
+msgstr "Date de soumission/publication"
 
 msgid "Participations"
 msgstr "Auteur / Participants"
@@ -7311,6 +7311,9 @@ msgstr "Tous les tickets"
 
 msgid "All Users"
 msgstr "Tous les utilisateurs"
+
+msgid "All Submitters"
+msgstr "Tous les auteurs"
 
 #, python-format
 msgid "${success_count} tickets deleted, ${error_count} are not deletable"
