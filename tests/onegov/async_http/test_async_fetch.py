@@ -7,22 +7,28 @@ from onegov.async_http.fetch import async_aiohttp_get_all
 from onegov.core.utils import Bunch
 
 
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.async_http.fetch import UrlType
 
-valid_urls = [
+valid_urls: list[UrlType] = [
     'https://seantis.ch',
     'https://www.google.ch',
 ]
 
-invalid_urls: list[Any] = [
+invalid_urls: list[UrlType] = [
     'invalid.url.com',
     Bunch(url='xxx', name='Failed')
 ]
 
 
 def test_fetch_all_invalid() -> None:
+
+    with pytest.raises(InvalidURL):
+        async_aiohttp_get_all(invalid_urls)
+
+
+def test_fetch_all_invalid_with_custom_handler() -> None:
 
     def callback(url: UrlType, response: object) -> UrlType:
         return url
@@ -34,9 +40,6 @@ def test_fetch_all_invalid() -> None:
             return str(exception)
         else:
             raise exception
-
-    with pytest.raises(InvalidURL):
-        async_aiohttp_get_all(invalid_urls[0])
 
     results = async_aiohttp_get_all(
         invalid_urls,
