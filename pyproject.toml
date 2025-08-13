@@ -74,7 +74,6 @@ module = [
     "tests.onegov.activity.*",
     "tests.onegov.agency.*",
     "tests.onegov.api.*",
-    "tests.onegov.async_http.*",
     "tests.onegov.chat.*",
     "tests.onegov.directory.*",
     "tests.onegov.election_day.*",
