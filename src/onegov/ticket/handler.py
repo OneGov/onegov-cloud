@@ -228,6 +228,19 @@ class Handler:
 
         return False
 
+    @property
+    def reply_to(self) -> str | None:
+        """ An optional email address which will be used as a Reply-To
+        in mails instead of any global setting.
+
+        For example for a certain subset of forms you may want replies
+        to end up with the department in charge of those specific forms
+        instead of a global bucket.
+
+        """
+
+        return None
+
     @classmethod
     def handle_extra_parameters(
         cls,

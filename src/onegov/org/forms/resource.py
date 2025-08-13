@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from wtforms.fields import BooleanField
 from wtforms.fields import DecimalField
+from wtforms.fields import EmailField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
@@ -198,6 +199,12 @@ class ResourceBaseForm(Form):
         coerce=coerce_component_tuple,
         fieldset='dormakaba',
         widget=ComponentSelectWidget(multiple=True)
+    )
+
+    reply_to = EmailField(
+        label=_('E-Mail Reply Address (Reply-To)'),
+        fieldset=_('Tickets'),
+        description=_('Replies to automated e-mails go to this address.')
     )
 
     pricing_method = RadioField(

@@ -10,7 +10,8 @@ from libres import new_scheduler
 from libres.db.models import Allocation
 from libres.db.models.base import ORMBase
 from onegov.core.orm import ModelBase
-from onegov.core.orm.mixins import content_property, dict_property
+from onegov.core.orm.mixins import (
+    content_property, dict_property, meta_property)
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.file import MultiAssociatedFiles
@@ -164,6 +165,10 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
     #: hint on how to get to the resource
     pick_up: dict_property[str | None] = content_property()
+
+    #: the reply_to address to supersede the global reply_to address for
+    #: tickets created through this form
+    reply_to: dict_property[str | None] = meta_property()
 
     __mapper_args__ = {
         'polymorphic_on': 'type',

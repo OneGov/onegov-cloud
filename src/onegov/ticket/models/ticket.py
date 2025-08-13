@@ -388,6 +388,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
         self.snapshot['summary'] = self.handler.get_summary(request)
         self.snapshot['email'] = self.handler.email
+        self.snapshot['reply_to'] = self.handler.reply_to
         for info in ('name', 'address', 'phone'):
             data = getattr(self.handler, f'submitter_{info}')
             if data:

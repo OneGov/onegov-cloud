@@ -393,6 +393,12 @@ class FormSubmissionHandler(Handler):
 
         return False
 
+    @property
+    def reply_to(self) -> str | None:
+        if self.submission and self.submission.form:
+            return self.submission.form.reply_to
+        return self.ticket.snapshot.get('reply_to')
+
     def get_summary(
         self,
         request: OrgRequest  # type:ignore[override]
@@ -752,6 +758,14 @@ class ReservationHandler(Handler):
                 return False
 
         return True
+
+    @property
+    def reply_to(self) -> str | None:
+        if self.deleted:
+            return self.ticket.snapshot.get('reply_to')
+
+        assert self.resource is not None
+        return self.resource.reply_to
 
     def prepare_delete_ticket(self) -> None:
         for reservation in self.reservations or ():
