@@ -113,6 +113,7 @@ def test_payments_export(client):
         'Status Ticket': None,
         'Ticket entschieden': None,
         'ID beim Zahlungsanbieter': None,
+        'Referenzen beim Zahlungsanbieter': [],
         'Status': 'Offen',
         'Währung': 'CHF',
         'Betrag': 1.0,

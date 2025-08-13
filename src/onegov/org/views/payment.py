@@ -285,6 +285,11 @@ def run_export(
         r: dict[str, Any] = OrderedDict()
         r['source'] = formatter(payment.source)
         r['source_id'] = formatter(payment.remote_id)
+        r['source_references'] = (
+            tuple(formatter(r) for r in payment.remote_references)
+            if nested
+            else formatter('\n'.join(payment.remote_references))
+        )
         r['state'] = formatter(payment.state)
         r['currency'] = formatter(payment.currency)
         r['gross'] = formatter(payment.amount)
