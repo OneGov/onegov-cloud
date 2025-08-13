@@ -68,6 +68,7 @@ from onegov.org.models import (
 from onegov.page.collection import PageCollection
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
+from onegov.ticket import Ticket
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
 from onegov.town6.upgrade import migrate_theme_options
 from onegov.user.models import TAN
@@ -90,7 +91,6 @@ if TYPE_CHECKING:
     from onegov.core.upgrade import UpgradeContext
     from onegov.org.app import OrgApp
     from onegov.org.request import OrgRequest
-    from onegov.ticket import Ticket
     from sqlalchemy.orm import Query, Session
 
     from translationstring import TranslationString
@@ -2967,3 +2967,49 @@ def ris_rename_imported_participation_types_to_english(
         transaction.commit()
 
     return rename_participation_types
+
+
+@cli.command(name='add-invoice-to-tickets')
+def add_invoice_to_tickets(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    
+    def add_invoice(request: OrgRequest, app: OrgApp) -> None:
+        import_date = datetime(2025, 7, 9)
+        # Add timezone zurich with pytz
+        from pytz import timezone
+        import_date = timezone('Europe/Zurich').localize(
+            import_date
+        )
+
+        session = request.session
+        tickets = TicketCollection(session).query().filter(
+            Ticket.handler_code == 'RSV').filter(
+                Ticket.created <= import_date
+            )
+        for ticket in tickets.all()[30:35]:
+            click.echo(ticket.number)
+            payment = ticket.payment
+            if payment is None:
+                continue
+            amount = payment.amount
+            click.secho(payment.amount, fg='cyan')
+            ticket.handler.refresh_invoice_items(request)
+            click.secho(payment.amount, fg='cyan')
+            click.secho(ticket.invoice.total_amount, fg='blue')
+            if ticket.invoice and (
+                difference := amount - payment.amount
+            ):
+                click.secho(difference, fg='red')
+                family = 'surcharge' if difference > 0 else 'discount'
+                item = ticket.invoice.add(
+                    text='Import Korrektur',
+                    group='manual',
+                    family=family,
+                    unit=difference,
+                )
+                if payment is not None:
+                    item.payments.append(payment)
+                    item.paid = payment.state == 'paid'
+                request.session.flush()
+                ticket.handler.refresh_invoice_items(request)
+    return add_invoice
