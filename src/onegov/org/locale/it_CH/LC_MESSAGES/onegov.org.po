@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-08-07 15:00+0200\n"
+"POT-Creation-Date: 2025-08-13 10:30+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1515,8 +1515,8 @@ msgstr "Cofirmatario"
 msgid "Business Status"
 msgstr "Stato"
 
-msgid "Entry Date"
-msgstr "Data"
+msgid "Submission/publication date"
+msgstr "Data di invio/pubblicazione"
 
 msgid "Participations"
 msgstr "Partecipanti"
@@ -7289,6 +7289,9 @@ msgstr "Tutti i biglietti"
 
 msgid "All Users"
 msgstr "Tutti gli utenti"
+
+msgid "All Submitters"
+msgstr "Tutti i mittenti"
 
 #, python-format
 msgid "${success_count} tickets deleted, ${error_count} are not deletable"
