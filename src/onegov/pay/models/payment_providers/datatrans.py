@@ -311,6 +311,10 @@ class DatatransPayment(Payment):
         return base.format(self.remote_id)
 
     @property
+    def remote_references(self) -> list[str]:
+        return [self.refno] if self.refno else []
+
+    @property
     def transaction(self) -> DatatransTransaction:
         assert self.remote_id
         return self.provider.client.status(self.remote_id)

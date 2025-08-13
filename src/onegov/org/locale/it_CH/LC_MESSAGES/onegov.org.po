@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-08-13 10:30+0200\n"
+"POT-Creation-Date: 2025-08-13 16:09+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -262,6 +262,9 @@ msgstr ""
 
 msgid "ID Payment Provider"
 msgstr "ID elaboratore dei pagamenti"
+
+msgid "References Payment Provider"
+msgstr "Riferimenti elaboratore dei pagamenti"
 
 msgid "Status"
 msgstr "Stato"
@@ -1024,6 +1027,12 @@ msgstr ""
 "Descrive il modo in cui questa risorsa può essere prelevata. Questo testo "
 "viene utilizzato nella pagina di stato del biglietto per informare l'utente"
 
+msgid "E-Mail Reply Address (Reply-To)"
+msgstr "Indirizzo di risposta dell'e-mail (Rispondi a)"
+
+msgid "Replies to automated e-mails go to this address."
+msgstr "Le risposte alle e-mail automatizzate sono inviate a questo indirizzo."
+
 msgid "Show VAT"
 msgstr "Visualizza l'IVA"
 
@@ -1746,12 +1755,6 @@ msgstr "URL che punta al logo"
 
 msgid "Logo (Square)"
 msgstr "Logo (quadrato)"
-
-msgid "E-Mail Reply Address (Reply-To)"
-msgstr "Indirizzo di risposta dell'e-mail (Rispondi a)"
-
-msgid "Replies to automated e-mails go to this address."
-msgstr "Le risposte alle e-mail automatizzate sono inviate a questo indirizzo."
 
 msgid "Primary Color"
 msgstr "Colore primario"

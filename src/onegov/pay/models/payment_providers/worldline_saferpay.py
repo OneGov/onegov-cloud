@@ -478,6 +478,17 @@ class SaferpayPayment(Payment):
         return base.format(self.remote_id)
 
     @property
+    def remote_references(self) -> list[str]:
+        references = []
+        if self.order_id:
+            references.append(self.order_id)
+        if self.six_transaction_reference:
+            references.append(self.six_transaction_reference)
+        if self.capture_id:
+            references.append(self.capture_id)
+        return references
+
+    @property
     def transaction(self) -> SaferpayTransaction:
         assert self.remote_id
         return self.provider.client.inquire(transaction_id=self.remote_id)
