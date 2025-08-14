@@ -1199,13 +1199,17 @@ def get_sent_notification_collection(
 @OrgApp.path(
     model=RISParliamentarianCollection,
     path='/parliamentarians',
-    converters={'active': bool}
+    converters={
+        'active': bool,
+        'party': str
+    }
 )
 def get_parliamentarians(
     app: OrgApp,
-    active: bool = True
+    active: bool = True,
+    party: str | None = None
 ) -> RISParliamentarianCollection:
-    return RISParliamentarianCollection(app.session(), active)
+    return RISParliamentarianCollection(app.session(), active, party)
 
 
 @OrgApp.path(
