@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-08-07 15:00+0200\n"
+"POT-Creation-Date: 2025-08-13 16:09+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -261,6 +261,9 @@ msgstr ""
 
 msgid "ID Payment Provider"
 msgstr "ID beim Zahlungsanbieter"
+
+msgid "References Payment Provider"
+msgstr "Referenzen beim Zahlungsanbieter"
 
 msgid "Status"
 msgstr "Status"
@@ -1021,6 +1024,12 @@ msgstr ""
 "Dieser Text wird auf Ticket-Status-Seite genutzt, um den Nutzer zu "
 "informieren"
 
+msgid "E-Mail Reply Address (Reply-To)"
+msgstr "E-Mail Antwort Adresse (Reply-To)"
+
+msgid "Replies to automated e-mails go to this address."
+msgstr "Antworten an automatisch generierte E-Mails gehen an diese Adresse."
+
 msgid "Show VAT"
 msgstr "MwSt anzeigen"
 
@@ -1511,8 +1520,8 @@ msgstr "Mitunterzeichner/in"
 msgid "Business Status"
 msgstr "Status"
 
-msgid "Entry Date"
-msgstr "Datum"
+msgid "Submission/publication date"
+msgstr "Einreichungs-/Publikationsdatum"
 
 msgid "Participations"
 msgstr "Verfasser / Beteiligte"
@@ -1745,12 +1754,6 @@ msgstr "Link zum Logo"
 
 msgid "Logo (Square)"
 msgstr "Logo (Quadratisch)"
-
-msgid "E-Mail Reply Address (Reply-To)"
-msgstr "E-Mail Antwort Adresse (Reply-To)"
-
-msgid "Replies to automated e-mails go to this address."
-msgstr "Antworten an automatisch generierte E-Mails gehen an diese Adresse."
 
 msgid "Primary Color"
 msgstr "Primärfarbe"
@@ -7300,6 +7303,9 @@ msgstr "Alle Tickets"
 
 msgid "All Users"
 msgstr "Alle Benutzer"
+
+msgid "All Submitters"
+msgstr "Alle Antragsteller"
 
 #, python-format
 msgid "${success_count} tickets deleted, ${error_count} are not deletable"

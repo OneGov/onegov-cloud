@@ -13,7 +13,7 @@ echo "Running type checks on onegov package"
 mypy -p onegov
 
 echo "Running type checks on tests"
-mypy -p tests.shared
+mypy -p tests
 
 echo "Running type checks on do/changes"
 mypy do/changes

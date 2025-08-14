@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-08-07 15:00+0200\n"
+"POT-Creation-Date: 2025-08-13 16:09+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -261,6 +261,9 @@ msgstr ""
 
 msgid "ID Payment Provider"
 msgstr "ID Opérateurs de paiement"
+
+msgid "References Payment Provider"
+msgstr "Références Opérateurs de paiement"
 
 msgid "Status"
 msgstr "Statut"
@@ -1021,6 +1024,12 @@ msgstr ""
 "Décrit la manière dont cette ressource peut être récupérée. Ce texte est "
 "utilisé sur la page de statut du ticket pour informer le client"
 
+msgid "E-Mail Reply Address (Reply-To)"
+msgstr "Adresse e-mail de réponse (Reply-To)"
+
+msgid "Replies to automated e-mails go to this address."
+msgstr "Les réponses aux e-mails automatisés sont envoyées à cette adresse."
+
 msgid "Show VAT"
 msgstr "Afficher la TVA"
 
@@ -1510,8 +1519,8 @@ msgstr "Co-signataire"
 msgid "Business Status"
 msgstr "Statut"
 
-msgid "Entry Date"
-msgstr "Date"
+msgid "Submission/publication date"
+msgstr "Date de soumission/publication"
 
 msgid "Participations"
 msgstr "Auteur / Participants"
@@ -1744,12 +1753,6 @@ msgstr "URL pointant vers le logo"
 
 msgid "Logo (Square)"
 msgstr "Logo (carré)"
-
-msgid "E-Mail Reply Address (Reply-To)"
-msgstr "Adresse e-mail de réponse (Reply-To)"
-
-msgid "Replies to automated e-mails go to this address."
-msgstr "Les réponses aux e-mails automatisés sont envoyées à cette adresse."
 
 msgid "Primary Color"
 msgstr "Couleur primaire"
@@ -7311,6 +7314,9 @@ msgstr "Tous les tickets"
 
 msgid "All Users"
 msgstr "Tous les utilisateurs"
+
+msgid "All Submitters"
+msgstr "Tous les auteurs"
 
 #, python-format
 msgid "${success_count} tickets deleted, ${error_count} are not deletable"

@@ -126,7 +126,7 @@ def handle_pending_submission(
 
     # check minimum price total if set
     minimum_total_amount = self.minimum_price_total or 0.0
-    if current_total_amount < minimum_total_amount:
+    if minimum_total_amount and current_total_amount < minimum_total_amount:
         _currency = currency_for_submission(form, self)
         completable = False
         request.alert(

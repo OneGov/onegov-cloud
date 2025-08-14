@@ -457,6 +457,7 @@ def get_tickets(
     page: int = 0,
     group: str | None = None,
     owner: str | None = None,
+    submitter: str | None = None,
     extra_parameters: dict[str, str] | None = None
 ) -> TicketCollection | None:
 
@@ -470,6 +471,7 @@ def get_tickets(
         page=page,
         group=group,
         owner=owner or '*',
+        submitter=submitter or '*',
         extra_parameters=extra_parameters,
     )
 
@@ -485,6 +487,7 @@ def get_archived_tickets(
     page: int = 0,
     group: str | None = None,
     owner: str | None = None,
+    submitter: str | None = None,
     extra_parameters: dict[str, str] | None = None
 ) -> ArchivedTicketCollection:
     return ArchivedTicketCollection(
@@ -494,6 +497,7 @@ def get_archived_tickets(
         page=page,
         group=group,
         owner=owner or '*',
+        submitter=submitter or '*',
         extra_parameters=extra_parameters
     )
 

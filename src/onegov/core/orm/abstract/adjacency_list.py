@@ -21,7 +21,7 @@ from sqlalchemy.schema import Index
 from sqlalchemy.sql.expression import column, nullsfirst
 
 
-from typing import Generic, TYPE_CHECKING, Any, TypeVar
+from typing import overload, Any, Generic, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from sqlalchemy.orm.query import Query
@@ -691,6 +691,17 @@ NUMERIC_PRIORITY_TRANS = str.maketrans({
     '8': 'I',
     '9': 'J'
 })
+
+
+# NOTE: As mypy correctly complains these overloads are not safe, but using
+#       this function as a sort key would be very annoying without this
+#       safety hole. (The unsafety occurs when the runtime value for `str`
+#       is the empty string, since the first overload should match, but
+#       there's no way for the type checker to know that)
+@overload
+def numeric_priority(string: Literal[''] | None, max_len: int = 4) -> None: ...  # type: ignore[overload-overlap]
+@overload
+def numeric_priority(string: str, max_len: int = 4) -> int: ...
 
 
 def numeric_priority(string: str | None, max_len: int = 4) -> int | None:
