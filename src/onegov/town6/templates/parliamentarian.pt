@@ -169,7 +169,10 @@
                         <li tal:repeat="participation sorted(parliamentarian.political_businesses, key=lambda p: p.political_business.entry_date or layout.now(), reverse=True)">
                             <a tal:attributes="href request.link(participation.political_business)" class="list-link">
                                 <span class="list-title">
-                                    ${participation.political_business.number|None} ${participation.political_business.title}
+                                    ${participation.political_business.title}
+                                    <span tal:condition="participation.political_business.number|None">
+                                        (${participation.political_business.number})
+                                    </span>
                                 </span>
                             </a>
                         </li>
