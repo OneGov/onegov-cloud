@@ -479,7 +479,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
     def migration(
         self,
         new_structure: str,
-        new_configuration: DirectoryConfiguration
+        new_configuration: DirectoryConfiguration | None
     ) -> DirectoryMigration:
 
         return DirectoryMigration(
