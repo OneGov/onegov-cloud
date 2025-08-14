@@ -189,6 +189,20 @@ def refresh_submission_invoice_items(
     request.session.flush()
 
 
+def change_submission_email(
+    submission: FormSubmission | None,
+    email: str
+) -> None:
+
+    if submission is None:
+        return
+
+    submission.email = email
+    name = submission.get_email_field_name()
+    if name is not None:
+        submission.data[name] = email
+
+
 class OrgTicketMixin:
     """ Adds additional methods to the ticket, needed by the organisations
     implementation of it. Strictly limited to things that
@@ -334,8 +348,20 @@ class FormSubmissionHandler(Handler):
     def email(self) -> str:
         return (
             self.submission.email or ''
-            if self.submission is not None else ''
+            if self.submission is not None
+            else self.ticket.snapshot.get('email', '')
         )
+
+    @property
+    def email_changeable(self) -> bool:
+        return True
+
+    def change_email(self, email: str) -> None:
+        if self.deleted:
+            self.ticket.snapshot['email'] = email
+        else:
+            change_submission_email(self.submission, email)
+        self.ticket.ticket_email = email
 
     @property
     def title(self) -> str:
@@ -743,8 +769,21 @@ class ReservationHandler(Handler):
     def email(self) -> str:
         # the e-mail is the same over all reservations
         if self.deleted:
-            return self.ticket.snapshot.get('email')  # type:ignore
+            return self.ticket.snapshot.get('email', '')
         return self.reservations[0].email
+
+    @property
+    def email_changeable(self) -> bool:
+        return True
+
+    def change_email(self, email: str) -> None:
+        if self.deleted:
+            self.ticket.snapshot['email'] = email
+        else:
+            for reservation in self.reservations:
+                reservation.email = email
+            change_submission_email(self.submission, email)
+        self.ticket.ticket_email = email
 
     @property
     def undecided(self) -> bool:
@@ -1162,7 +1201,20 @@ class EventSubmissionHandler(Handler):
 
     @cached_property
     def email(self) -> str | None:
-        return self.event.meta.get('submitter_email') if self.event else None
+        if self.event is None:
+            return self.ticket.snapshot.get('email')
+        return self.event.meta.get('submitter_email')
+
+    @property
+    def email_changeable(self) -> bool:
+        return True
+
+    def change_email(self, email: str) -> None:
+        if self.event is None:
+            self.ticket.snapshot['email'] = email
+        else:
+            self.event.meta['submitter_email'] = email
+        self.ticket.ticket_email = email
 
     @property
     def title(self) -> str:
@@ -1378,8 +1430,20 @@ class DirectoryEntryHandler(Handler):
         return (
             # we don't allow directory entry submissions without an email
             self.submission.email  # type:ignore[return-value]
-            if self.submission is not None else ''
+            if self.submission is not None
+            else self.ticket.snapshot.get('email')
         )
+
+    @property
+    def email_changeable(self) -> bool:
+        return True
+
+    def change_email(self, email: str) -> None:
+        if self.submission is None:
+            self.ticket.snapshot['email'] = email
+        else:
+            change_submission_email(self.submission, email)
+        self.ticket.ticket_email = email
 
     @property
     def submitter_name(self) -> str | None:

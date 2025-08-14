@@ -481,6 +481,35 @@ def test_hide_form(client):
     assert response.status_code == 200
 
 
+def test_change_email(client):
+    collection = FormCollection(client.app.session())
+    collection.definitions.add('Newsletter', definition=textwrap.dedent("""
+        E-Mail *= @@@
+    """), type='custom')
+
+    transaction.commit()
+
+    page = client.get('/form/newsletter')
+    page.form['e_mail'] = 'info@example.org'
+    page = page.form.submit().follow().form.submit().follow()
+    assert "Referenz Anfrage" in page
+
+    client.login_supporter()
+    ticket = client.get('/tickets/ALL/open').click("Annehmen").follow()
+    assert ticket.pyquery('.ticket-submitter-email a').text() == (
+        'info@example.org')
+
+    # change the email
+    client.post(
+        ticket.pyquery('.ticket-submitter-email').attr('data-edit'),
+        {'email': 'new@example.org'}
+    )
+    ticket = client.get(ticket.request.url)
+    assert 'E-Mail Adresse des Antragstellers geändert' in ticket
+    assert ticket.pyquery('.ticket-submitter-email a').text() == (
+        'new@example.org')
+
+
 def test_manual_form_payment(client):
     collection = FormCollection(client.app.session())
     collection.definitions.add('Govikon Poster', definition=textwrap.dedent("""

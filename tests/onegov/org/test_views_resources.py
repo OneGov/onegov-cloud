@@ -1224,6 +1224,51 @@ def test_reserve_allocation_partially(client):
 
 
 @freeze_time("2015-08-28", tick=True)
+def test_reserve_allocation_change_email(client):
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve('10:00', '12:00').json == {'success': True}
+
+    # fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+
+    ticket = formular.form.submit().follow().form.submit().follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # open the created ticket
+    client.login_admin()
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert ticket.pyquery('.ticket-submitter-email a').text() == (
+        'info@example.org')
+
+    # change the email
+    client.post(
+        ticket.pyquery('.ticket-submitter-email').attr('data-edit'),
+        {'email': 'new@example.org'}
+    )
+    ticket = client.get(ticket.request.url)
+    assert 'E-Mail Adresse des Antragstellers geändert' in ticket
+    assert ticket.pyquery('.ticket-submitter-email a').text() == (
+        'new@example.org')
+
+
+@freeze_time("2015-08-28", tick=True)
 def test_reserve_allocation_adjustment_pre_acceptance(client):
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
