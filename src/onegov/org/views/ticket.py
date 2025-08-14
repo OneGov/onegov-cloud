@@ -5,6 +5,7 @@ import os
 import zipfile
 
 from datetime import date
+from email_validator import validate_email, EmailNotValidError
 from io import BytesIO
 from markupsafe import Markup
 from morepath import Response
@@ -63,7 +64,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Mapping
     from email.headerregistry import Address
     from onegov.core.request import CoreRequest
-    from onegov.core.types import EmailJsonDict, RenderData, SequenceOrScalar
+    from onegov.core.types import (
+        EmailJsonDict, JSON_ro, RenderData, SequenceOrScalar)
     from onegov.form.fields import UploadFileWithORMSupport
     from onegov.org.layout import Layout
     from onegov.org.request import OrgRequest
@@ -135,7 +137,12 @@ def view_ticket(
     layout = layout or TicketLayout(self, request)
     payment_button = None
     payment = handler.payment
+    edit_email_url = None
     edit_amount_url = None
+
+    if is_manager and self.handler.email_changeable:
+        edit_email_url = request.csrf_protected_url(
+            request.link(self, 'change-email'))
 
     if is_manager and payment and payment.source == 'manual':
         payment_button = manual_payment_button(payment, layout)
@@ -166,6 +173,7 @@ def view_ticket(
         'feed_data': json.dumps(
             view_messages_feed(messages, request)
         ),
+        'edit_email_url': edit_email_url,
         'edit_amount_url': edit_amount_url,
         'show_tags': show_tags(request),
         'show_filters': show_filters(request),
@@ -798,6 +806,44 @@ def assign_ticket(
         'layout': layout or TicketLayout(self, request),
         'form': form,
     }
+
+
+@OrgApp.json(
+    model=Ticket,
+    name='change-email',
+    request_method='POST',
+    permission=Private
+)
+def change_email(self: Ticket, request: OrgRequest) -> JSON_ro:
+    request.assert_valid_csrf_token()
+
+    if not self.handler.email_changeable:
+        raise exc.HTTPForbidden()
+
+    email = request.POST.get('email')
+    if not isinstance(email, str):
+        return {'email': self.ticket_email}
+
+    try:
+        validate_email(
+            email,
+            # NOTE: The Email validator from WTForms doesn't check this either
+            #       although maybe we should check this in the future.
+            check_deliverability=False
+        )
+    except EmailNotValidError:
+        return {'email': self.ticket_email}
+
+    if self.ticket_email != email:
+        TicketMessage.create(
+            self,
+            request,
+            'change-email',
+            old_email=self.ticket_email,
+            new_email=email,
+        )
+        self.handler.change_email(email)
+    return {'email': email}
 
 
 @OrgApp.form(model=Ticket, name='change-tag', permission=Private,

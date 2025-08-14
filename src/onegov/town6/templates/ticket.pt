@@ -30,9 +30,10 @@
                 <div class="ticket-panel ticket-submitter ${ticket.muted and 'ticket-submitter-muted' or 'ticket-submitter-unmuted'}">
                     <h2 i18n:translate>Submitter</h2>
 
-                    <div class="ticket-submitter-meta nowrap">
+                    <div class="ticket-submitter-meta ticket-submitter-email nowrap" tal:attributes="data-edit edit_email_url|nothing">
                         <i class="far fa-fw fa-envelope"></i>
                         <a href="mailto:${submitter}">${submitter}</a>
+                        <i tal:condition="edit_email_url" id="edit-ticket-email" class="fas fw fa-edit" aria-hidden="true"></i>
                     </div>
 
                     <div class="ticket-submitter-meta nowrap" tal:condition="submitter_name">

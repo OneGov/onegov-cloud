@@ -4,38 +4,45 @@
             <a href="${link}">${model.channel_id}</a> - ${model.meta.group}
         </metal:b>
         <metal:b fill-slot="text">
-            <tal:b switch="model.meta.change">
-                <tal:b case="'opened'" i18n:translate>
+            <tal:b tal:switch="model.meta.change">
+                <tal:b tal:case="'opened'" i18n:translate>
                     Ticket opened.
                 </tal:b>
-                <tal:b case="'accepted'" i18n:translate>
+                <tal:b tal:case="'accepted'" i18n:translate>
                     Ticket accepted.
                 </tal:b>
-                <tal:b case="'closed'" i18n:translate>
+                <tal:b tal:case="'closed'" i18n:translate>
                     Ticket closed.
                 </tal:b>
-                <tal:b case="'reopened'" i18n:translate>
+                <tal:b tal:case="'reopened'" i18n:translate>
                     Ticket reopened.
                 </tal:b>
-                <tal:b case="'assigned'" define="old model.meta.get('old_owner')">
+                <tal:b tal:case="'assigned'" tal:define="old model.meta.get('old_owner')">
                     <tal:b i18n:translate>Ticket assigned</tal:b>
-                    <tal:b condition="not layout.org.hide_personal_email or model.meta.get('origin') == 'external' or request.is_logged_in">
-                        (<tal:b condition="old">${old} → </tal:b>${model.meta.get('new_owner')}).
+                    <tal:b tal:condition="not layout.org.hide_personal_email or model.meta.get('origin') == 'external' or request.is_logged_in">
+                        (<tal:b tal:condition="old">${old} → </tal:b>${model.meta.get('new_owner')}).
                     </tal:b>
                 </tal:b>
-                <tal:b case="'muted'" i18n:translate>
+                <tal:b tal:case="'muted'" i18n:translate>
                     Ticket e-mails disabled.
                 </tal:b>
-                <tal:b case="'unmuted'" i18n:translate>
+                <tal:b tal:case="'unmuted'" i18n:translate>
                     Ticket e-mails enabled.
                 </tal:b>
-                <tal:b case="'change-net-amount'" i18n:translate>
+                <tal:b tal:case="'change-net-amount'" i18n:translate>
                     Payment amount changed.
                 </tal:b>
-                <tal:b case="'archived'" i18n:translate>
+                <tal:b tal:case="'change-email'" tal:define="old model.meta.get('old_email'); new model.meta.get('new_email')">
+                    <tal:b i18n:translate>Submitter e-mail changed.</tal:b>
+                    <tal:b tal:condition="old and new">
+                        <br>
+                        <a href="mailto:${old}">${old}</a> <i class="fa fa-arrow-right"></i> <a href="mailto:${new}">${new}</a>
+                    </tal:b>
+                </tal:b>
+                <tal:b tal:case="'archived'" i18n:translate>
                     Ticket archived.
                 </tal:b>
-                <tal:b case="'unarchived'" i18n:translate>
+                <tal:b tal:case="'unarchived'" i18n:translate>
                     Ticket recovered from archive.
                 </tal:b>
             </tal:b>
