@@ -136,7 +136,7 @@ class Handler:
 
     @property
     def email_changeable(self) -> bool:
-        """ Returns whether or not the email address behin the ticket request
+        """ Returns whether or not the email address behind the ticket request
         may be changed.
         """
         return False
