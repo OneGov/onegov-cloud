@@ -1955,6 +1955,9 @@ msgstr "Vertragsnummer"
 msgid "Picture"
 msgstr "Bild"
 
+msgid "Party"
+msgstr "Partei"
+
 msgid "Private address"
 msgstr "Privatadresse"
 

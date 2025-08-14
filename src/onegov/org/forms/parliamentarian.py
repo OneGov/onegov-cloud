@@ -51,6 +51,11 @@ class ParliamentarianForm(NamedFileForm):
         fieldset=_('Basic properties'),
     )
 
+    party = StringField(
+        label=_('Party'),
+        fieldset=_('Basic properties'),
+    )
+
     private_address = StringField(
         label=_('Address'),
         fieldset=_('Private address'),

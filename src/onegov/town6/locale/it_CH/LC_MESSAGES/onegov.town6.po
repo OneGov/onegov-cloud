@@ -1949,6 +1949,9 @@ msgstr "Numero del contratto"
 msgid "Picture"
 msgstr "Immagine"
 
+msgid "Party"
+msgstr "Partito"
+
 msgid "Private address"
 msgstr "Indirizzo privato"
 

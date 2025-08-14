@@ -624,8 +624,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -1955,6 +1955,9 @@ msgstr "Numéro de contrat"
 
 msgid "Picture"
 msgstr "Photo"
+
+msgid "Party"
+msgstr "Parti"
 
 msgid "Private address"
 msgstr "Adresse privée"
