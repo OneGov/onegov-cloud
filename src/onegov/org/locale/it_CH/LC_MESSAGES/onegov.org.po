@@ -847,7 +847,7 @@ msgid "Image"
 msgstr "Immagine"
 
 msgid "Ideal size: 700 x 420 px (5:3)"
-msgstr "Ideale dimensione: 700 x 420 px (5:3)"
+msgstr "Dimensione ideale: 700 x 420 px (5:3)"
 
 msgid "Additional Information (PDF)"
 msgstr "Informazioni aggiuntive (PDF)"
