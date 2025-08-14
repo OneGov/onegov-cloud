@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from collections.abc import Mapping
     from collections.abc import Sequence
-    from lxml.etree import _Element
+    from lxml.etree import _Element, _ElementTree
     from onegov.gis.models.coordinates import RealCoordinates
     from typing import TypeVar
 
@@ -25,7 +25,9 @@ if TYPE_CHECKING:
 class GuidleBase:
     """ Base class for parsing guidle exports containing general helpers. """
 
-    def __init__(self, root: _Element) -> None:
+    def __init__(self, root: _Element | _ElementTree[_Element]) -> None:
+        if hasattr(root, 'getroot'):
+            root = root.getroot()
         self.root = root
         self.nsmap = {'guidle': 'http://www.guidle.com'}
         self.cleaner = Cleaner(

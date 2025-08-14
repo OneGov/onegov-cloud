@@ -76,7 +76,6 @@ module = [
     "tests.onegov.api.*",
     "tests.onegov.directory.*",
     "tests.onegov.election_day.*",
-    "tests.onegov.event.*",
     "tests.onegov.feriennet.*",
     "tests.onegov.file.*",
     "tests.onegov.form.*",
