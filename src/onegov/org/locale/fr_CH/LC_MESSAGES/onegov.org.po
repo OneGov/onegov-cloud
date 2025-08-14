@@ -859,6 +859,9 @@ msgstr "Profitez d'un concerto dans le jardin du château."
 msgid "Image"
 msgstr "Image"
 
+msgid "Ideal size: 700 x 420 px (5:3)"
+msgstr "Taille idéale : 700 x 420 px (5:3)"
+
 msgid "Additional Information (PDF)"
 msgstr "Informations complémentaires (PDF)"
 

@@ -858,6 +858,9 @@ msgstr "Freuen Sie sich auf ein klassisches Konzert im Schlossgarten."
 msgid "Image"
 msgstr "Bild"
 
+msgid "Ideal size: 700 x 420 px (5:3)"
+msgstr "Ideale Größe: 700 x 420 px (5:3)"
+
 msgid "Additional Information (PDF)"
 msgstr "Zusätzliche Informationen (PDF)"
 
