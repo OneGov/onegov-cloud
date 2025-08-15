@@ -172,6 +172,39 @@ def test_ensure_states():
         '4.2': 'completed'
     }
 
+    # 1 draft
+    assembly = create()
+    assembly.agenda_items[0].state = 'draft'
+    assert ensure_states(assembly.agenda_items[0]) == {
+        assembly,  # was completed
+        assembly.agenda_items[0].vota[0],  # was completed
+        assembly.agenda_items[0].vota[1],  # was completed
+        assembly.agenda_items[0].vota[2],  # was completed
+        assembly.agenda_items[1],  # was ongoing
+        assembly.agenda_items[1].vota[0],  # was completed
+        assembly.agenda_items[1].vota[1],  # was ongoing
+        assembly.agenda_items[1].vota[2],  # was ongoing
+        assembly.agenda_items[2],  # was scheduled
+        assembly.agenda_items[3],  # was scheduled
+        assembly.agenda_items[3].vota[0],  # was scheduled
+        assembly.agenda_items[3].vota[1],  # was scheduled
+    }
+    assert get(assembly) == {
+        '': 'draft',
+        '1': 'draft',
+        '1.1': 'draft',
+        '1.2': 'draft',
+        '1.3': 'draft',
+        '2': 'draft',
+        '2.1': 'draft',
+        '2.2': 'draft',
+        '2.3': 'draft',
+        '3': 'draft',
+        '4': 'draft',
+        '4.1': 'draft',
+        '4.2': 'draft'
+    }
+
     # 1 ongoing
     assembly = create()
     assembly.agenda_items[0].state = 'ongoing'

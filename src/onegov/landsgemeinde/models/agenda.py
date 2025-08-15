@@ -34,10 +34,12 @@ if TYPE_CHECKING:
     from typing import Literal
     from typing import TypeAlias
 
-    AgendaItemState: TypeAlias = Literal['scheduled', 'ongoing', 'completed']
+    AgendaItemState: TypeAlias = Literal[
+        'draft', 'scheduled', 'ongoing', 'completed']
 
 
 STATES: dict[AgendaItemState, TranslationString] = {
+    'draft': _('draft'),
     'scheduled': _('scheduled'),
     'ongoing': _('ongoing'),
     'completed': _('completed')
