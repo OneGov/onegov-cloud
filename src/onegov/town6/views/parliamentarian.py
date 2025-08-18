@@ -47,6 +47,13 @@ def view_parliamentarians(
             (_('Inactive'), False)
         )
     ]
+    filters['party'] = [
+        Link(
+            text=value,
+            active=self.party == value,
+            url=request.link(self.for_filter(party=value))
+        ) for value in self.party_values()
+    ]
 
     return {
         'add_link': request.link(self, name='new'),

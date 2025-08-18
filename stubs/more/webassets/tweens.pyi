@@ -4,7 +4,7 @@ from urllib.parse import unquote as unquote
 
 from more.webassets.core import IncludeRequest
 from morepath.request import Request, Response
-from webassets import Environment  # type: ignore[import-untyped]
+from webassets import Environment
 
 CONTENT_TYPES: set[str]
 METHODS: set[str]

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-08-13 16:09+0200\n"
+"POT-Creation-Date: 2025-08-14 10:09+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -857,6 +857,9 @@ msgstr "Freuen Sie sich auf ein klassisches Konzert im Schlossgarten."
 
 msgid "Image"
 msgstr "Bild"
+
+msgid "Ideal size: 700 x 420 px (5:3)"
+msgstr "Ideale Größe: 700 x 420 px (5:3)"
 
 msgid "Additional Information (PDF)"
 msgstr "Zusätzliche Informationen (PDF)"
@@ -5128,6 +5131,9 @@ msgstr "Ticket E-Mails aktiviert."
 
 msgid "Payment amount changed."
 msgstr "Zahlungsbetrag geändert."
+
+msgid "Submitter e-mail changed."
+msgstr "E-Mail Adresse des Antragstellers geändert."
 
 msgid "Ticket archived."
 msgstr "Ticket archiviert."

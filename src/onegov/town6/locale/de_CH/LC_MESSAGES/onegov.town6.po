@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-08-13 10:30+0200\n"
+"POT-Creation-Date: 2025-08-14 10:15+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1794,6 +1794,9 @@ msgstr "Ticket E-Mails aktiviert."
 msgid "Payment amount changed."
 msgstr "Zahlungsbetrag geändert."
 
+msgid "Submitter e-mail changed."
+msgstr "E-Mail Adresse des Antragstellers geändert."
+
 msgid "Ticket archived."
 msgstr "Ticket archiviert."
 
@@ -1951,6 +1954,9 @@ msgstr "Vertragsnummer"
 
 msgid "Picture"
 msgstr "Bild"
+
+msgid "Party"
+msgstr "Partei"
 
 msgid "Private address"
 msgstr "Privatadresse"
