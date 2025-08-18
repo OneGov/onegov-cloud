@@ -19,7 +19,7 @@ from uuid import uuid4
 from xml.etree.ElementTree import tostring
 
 
-from typing import Any, IO, TypeVar, TYPE_CHECKING
+from typing import overload, Any, IO, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     import pytest
     from bs4 import NavigableString, Tag
@@ -36,6 +36,7 @@ if TYPE_CHECKING:
 
     _AppT = TypeVar('_AppT', bound=Framework)
     _ResourceT = TypeVar('_ResourceT', bound=Resource)
+    _BinaryIOT = TypeVar('_BinaryIOT', bound=IO[bytes])
 
 
 def get_meta(
@@ -92,6 +93,27 @@ def open_pdf(byte_string: IO[bytes], exe: str = 'evince') -> None:
         f.write(byte_string.read())
     cmd = exe
     os.system(f'{cmd} {path} &')
+
+
+@overload
+def create_image(
+    width: int = 50,
+    height: int = 50,
+    output: None = None
+) -> BytesIO: ...
+@overload
+def create_image(
+    width: int,
+    height: int,
+    output: _BinaryIOT
+) -> _BinaryIOT: ...
+@overload
+def create_image(
+    width: int = 50,
+    height: int = 50,
+    *,
+    output: _BinaryIOT
+) -> _BinaryIOT: ...
 
 
 def create_image(
