@@ -144,6 +144,11 @@ class MeetingForm(Form):
 
         meeting.meeting_items = items
 
+        # update links from businesses to meeting
+        for item in meeting.meeting_items:
+            if item.political_business:
+                item.political_business.meeting_items.append(item)
+
     def process_obj(self, obj: Meeting) -> None:  # type:ignore[override]
         from onegov.org.models import PoliticalBusiness
 
