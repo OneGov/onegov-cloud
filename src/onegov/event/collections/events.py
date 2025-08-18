@@ -704,11 +704,10 @@ class EventCollection(Pagination[Event]):
         for event in (
                 self.session.query(Event)
                 .filter(Event.source.notin_(source_ids))):  # type:ignore[union-attr]
-            items_to_purge.append(event.source) if event.source else None
-            click.echo(f' - removing event as not in xml stream ')
-            click.echo(f' - removing event as not in xml stream '
-                       f'{event.title} {event.start}')
-            items_to_purge.append(event.source) if event.source else None
+            if event.source:
+                items_to_purge.append(event.source)
+                click.echo(f' - removing event as not in xml stream '
+                           f'{event.title} {event.start}')
 
         return self.from_import(
             items,
