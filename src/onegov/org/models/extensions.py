@@ -15,6 +15,8 @@ from onegov.core.orm.mixins import (
 from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url, to_html_ul
 from onegov.form.utils import remove_empty_links
+from sqlalchemy.orm.attributes import flag_modified
+
 from onegov.file import File, FileCollection
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
@@ -859,7 +861,8 @@ def _files_observer(
     state = inspect(self)
     for file in state.attrs.files.history.deleted:
         if key in file.meta.get('linked_accesses', ()):
-            del file.linked_accesses[key]
+            del file.meta['linked_accesses'][key]
+            flag_modified(file, 'meta')
 
     # we could try to determine which accesses if any need to
     # be updated using the SQLAlchemy inspect API, but it's
