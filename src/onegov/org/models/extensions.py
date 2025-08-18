@@ -858,9 +858,9 @@ def _files_observer(
     # remove ourselves if the link has been deleted
     state = inspect(self)
     for file in state.attrs.files.history.deleted:
-        if (key in file.meta.get('linked_accesses', ()) and
-                hasattr(file, 'linked_accesses')):
-            del file.linked_accesses[key]
+        if key in file.meta.get('linked_accesses', ()):
+            del file.meta['linked_accesses'][key]
+            flag_modified(file, 'meta')
 
     # we could try to determine which accesses if any need to
     # be updated using the SQLAlchemy inspect API, but it's
