@@ -1,11 +1,12 @@
 from collections.abc import Generator, Sequence
-from typing import Any, TypedDict, TypeVar, overload
+from typing import Any, Generic, TypedDict, TypeVar, overload
 from typing_extensions import TypeAlias
 
 from bs4 import BeautifulSoup
 from webtest.response import TestResponse
 
 _T = TypeVar("_T")
+_ResponseT = TypeVar("_ResponseT", bound=TestResponse)
 
 class _Classes(TypedDict):
     submit: type[Submit]
@@ -40,14 +41,21 @@ class Upload:
 
 class Field:
     classes: _Classes
-    form: Form
+    form: Form[Any]
     tag: str
     name: str
     pos: int
     id: str
     attrs: dict[str, str]
     def __init__(
-        self, form: Form, tag: str, name: str, pos: int, value: str | None = None, id: str | None = None, **attrs: str
+        self,
+        form: Form[Any],
+        tag: str,
+        name: str,
+        pos: int,
+        value: str | None = None,
+        id: str | None = None,
+        **attrs: str
     ) -> None: ...
     def value__get(self) -> str: ...
     def value__set(self, value: str | None) -> None: ...
@@ -126,9 +134,9 @@ class Submit(Field):
     def value(self) -> None: ...  # type: ignore[override]
     def value_if_submitted(self) -> str: ...
 
-class Form:
+class Form(Generic[_ResponseT]):
     FieldClass: type[Field]
-    response: TestResponse
+    response: _ResponseT
     text: str
     html: BeautifulSoup
     action: str
@@ -137,7 +145,7 @@ class Form:
     enctype: str
     field_order: list[tuple[str, Field]]
     fields: dict[str, list[Field]]
-    def __init__(self, response: TestResponse, text: str, parser_features: Sequence[str] | str = "html.parser") -> None: ...
+    def __init__(self, response: _ResponseT, text: str, parser_features: Sequence[str] | str = "html.parser") -> None: ...
     # NOTE: Technically it is only safe to pass `str | None` for most fields
     #       but this method is not really usable if we don't lift this
     #       restriction, we just have to assume people know what they
@@ -167,7 +175,7 @@ class Form:
     def select_multiple(self, name: str, value: Sequence[object], texts: None = None, index: int | None = None) -> None: ...
     def submit(
         self, name: str | None = None, index: int | None = None, value: str | None = None, **args: Any
-    ) -> TestResponse: ...
+    ) -> _ResponseT: ...
     def lint(self) -> None: ...
     def upload_fields(self) -> list[tuple[str, str] | tuple[str, str, bytes]]: ...
     def submit_fields(

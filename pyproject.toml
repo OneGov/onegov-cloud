@@ -80,7 +80,6 @@ module = [
     "tests.onegov.fsi.*",
     "tests.onegov.gazette.*",
     "tests.onegov.landsgemeinde.*",
-    "tests.onegov.onboarding.*",
     "tests.onegov.org.*",
     "tests.onegov.page.*",
     "tests.onegov.parliament.*",

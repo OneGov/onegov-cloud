@@ -161,7 +161,7 @@ class GenericResponseExtension(BaseExtension):
         self,
         groupname: str,
         label: str,
-        form: Form | None = None,
+        form: Form[Self] | None = None,
         checked: bool = True,
         limit: int | None = None
     ) -> None:
@@ -194,7 +194,7 @@ class GenericResponseExtension(BaseExtension):
         self,
         groupname: str,
         label: str,
-        form: Form | None = None
+        form: Form[Self] | None = None
     ) -> None:
         """ Like `select_checkbox`, but with the ability to select a radio
         button by the name of its label.
@@ -234,7 +234,7 @@ class SkipNFormsExtension(BaseExtension):
     n = 0
 
     @property
-    def form(self) -> Form:
+    def form(self) -> Form[Self]:
         """ Use Form with ID 'main-form', else ignore the first n forms.
 
         """
