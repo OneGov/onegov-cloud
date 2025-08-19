@@ -1,8 +1,32 @@
 # Changes
 
+## 2025.42
+
+`2025-08-19` | [49b0111cab...84b9b657ca](https://github.com/OneGov/onegov-cloud/compare/49b0111cab^...84b9b657ca)
+
+### Org
+
+##### Verify attribute exists
+
+`Bugfix` | [OGC-2547](https://linear.app/onegovcloud/issue/OGC-2547) | [d1165ed86e](https://github.com/onegov/onegov-cloud/commit/d1165ed86e0a78b1dac9c9e59c5cc74e3ccc0b4c)
+
+### Ris
+
+##### Link political business to meeting
+
+`Feature` | [OGC-2521](https://linear.app/onegovcloud/issue/OGC-2521) | [9bf54e6dbd](https://github.com/onegov/onegov-cloud/commit/9bf54e6dbd8f481ae1a3122c4538991aa54e2ae6)
+
+### Wil
+
+##### Event import: Remove imported events that are not in the current xml stream
+
+The xml stream represents a complete set of events
+
+`Bugfix` | [OGC-2447](https://linear.app/onegovcloud/issue/OGC-2447) | [1ecaa32222](https://github.com/onegov/onegov-cloud/commit/1ecaa32222f8a69e76b9a739961f3656bc73009a)
+
 ## 2025.41
 
-`2025-08-14` | [70e42da5d8...c5f28d0179](https://github.com/OneGov/onegov-cloud/compare/70e42da5d8^...c5f28d0179)
+`2025-08-14` | [70e42da5d8...12ec42d921](https://github.com/OneGov/onegov-cloud/compare/70e42da5d8^...12ec42d921)
 
 **Upgrade hints**
 - onegov-org --select /onegov_town6/wil ris-rename-imported-participation-types-to-english or sudo ogc org --select /onegov_town6/wil ris-rename-imported-participation-types-to-english
@@ -2128,14 +2152,4 @@ Enable the option to hide main images on news
 ## test
 
 `2024-12-17` | [9c3aee5da3...b6de332b06](https://github.com/OneGov/onegov-cloud/compare/9c3aee5da3^...b6de332b06)
-
-## 2024.59
-
-`2024-12-12` | [0e99c5e925...5ae8a276f3](https://github.com/OneGov/onegov-cloud/compare/0e99c5e925^...5ae8a276f3)
-
-### Files
-
-##### Sort sidebar documents alphabetically (org and town6)
-
-`Feature` | [OGC-1797](https://linear.app/onegovcloud/issue/OGC-1797) | [0e99c5e925](https://github.com/onegov/onegov-cloud/commit/0e99c5e92511685250f051c15dcdf952d182c2c9)
 
