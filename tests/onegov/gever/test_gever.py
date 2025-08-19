@@ -1,7 +1,7 @@
 from urllib.parse import urlsplit
 
 
-def test_url_parse_hostname():
+def test_url_parse_hostname() -> None:
 
     url = "http://stackoverflow.com/questions/1234567/blah-blah-blah-blah"
     base_url = "{0.scheme}://{0.netloc}/".format(urlsplit(url))
