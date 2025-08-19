@@ -267,6 +267,7 @@ class PoliticalBusinessForm(Form):
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()
         result.pop('participants', None)
+        result.pop('files', None)
         result['parliamentary_group_id'] = (
             result.get('parliamentary_group_id') or None)
         return result
