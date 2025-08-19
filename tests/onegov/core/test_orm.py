@@ -469,7 +469,9 @@ def test_json_type(postgres_dsn: str) -> None:
 
 
 def test_session_manager_sharing(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Test(Base):
         __tablename__ = 'test'
@@ -478,7 +480,7 @@ def test_session_manager_sharing(postgres_dsn: str) -> None:
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
 
-    test = Test(id=1)  # type: ignore[call-arg]
+    test = Test(id=1)
 
     # session_manager is a weakref proxy so we need to go through some hoops
     # to get the actual instance for a proper identity test

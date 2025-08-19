@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 from datetime import timezone
 from freezegun import freeze_time
@@ -8,7 +10,12 @@ from onegov.user import UserGroupCollection
 from pytest import raises
 
 
-def test_notice_create(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_notice_create(session: Session) -> None:
     notice = OfficialNotice()
     notice.state = 'drafted'
     notice.title = 'Very Important Official Announcement'
@@ -53,7 +60,7 @@ def test_notice_create(session):
     assert notice.issues == {}
 
 
-def test_notice_ownership(session):
+def test_notice_ownership(session: Session) -> None:
     users = UserCollection(session)
     groups = UserGroupCollection(session)
     user = users.add('1@2.3', '1234', 'admin', realname='user')
@@ -62,7 +69,7 @@ def test_notice_ownership(session):
     notice = OfficialNotice(
         title='title',
         state='drafted',
-        text='Text',
+        text=Markup('Text'),
     )
     notice.user = user
     notice.group = group
@@ -76,16 +83,18 @@ def test_notice_ownership(session):
     assert notice.group.name == 'group'
 
 
-def test_notice_expired(session):
+def test_notice_expired(session: Session) -> None:
     notice = OfficialNotice(
         title='title',
         state='drafted',
-        text='Text',
+        text=Markup('Text'),
     )
     session.add(notice)
     session.flush()
 
     notice = session.query(OfficialNotice).one()
+    # undo mypy narrowing of notice.expired
+    notice2 = notice
     assert notice.expired is False
 
     notice.expiry_date = datetime(2018, 1, 2, 0, 0, tzinfo=timezone.utc)
@@ -94,15 +103,17 @@ def test_notice_expired(session):
     with freeze_time("2018-01-02"):
         assert notice.expired is False
     with freeze_time("2018-01-02 00:01"):
-        assert notice.expired is True
+        assert notice2.expired is True
     with freeze_time("2018-01-03"):
         assert notice.expired is True
 
 
-def test_notice_transitions():
+def test_notice_transitions(session: Session) -> None:
 
     # Drafted
     notice = OfficialNotice(state='drafted')
+    # undo mypy narrowing of notice.statr
+    notice2 = notice
     assert notice.state == 'drafted'
 
     with raises(AssertionError):
@@ -112,7 +123,7 @@ def test_notice_transitions():
     with raises(AssertionError):
         notice.publish()
     notice.submit()
-    assert notice.state == 'submitted'
+    assert notice2.state == 'submitted'
 
     # Submitted
     notice = OfficialNotice(state='submitted')
@@ -170,7 +181,7 @@ def test_notice_transitions():
     assert notice.state == 'submitted'
 
 
-def test_notice_polymorphism(session):
+def test_notice_polymorphism(session: Session) -> None:
 
     class MyOfficialNotice(OfficialNotice):
         __mapper_args__ = {'polymorphic_identity': 'my'}
@@ -182,7 +193,7 @@ def test_notice_polymorphism(session):
         OfficialNotice(
             title='original',
             state='drafted',
-            text='Text',
+            text=Markup('Text'),
         )
     )
 
@@ -190,7 +201,7 @@ def test_notice_polymorphism(session):
         MyOfficialNotice(
             title='my',
             state='drafted',
-            text='Text',
+            text=Markup('Text'),
         )
     )
 
@@ -198,7 +209,7 @@ def test_notice_polymorphism(session):
         MyOtherOfficialNotice(
             title='other',
             state='drafted',
-            text='Text',
+            text=Markup('Text'),
         )
     )
 
@@ -209,7 +220,7 @@ def test_notice_polymorphism(session):
     assert session.query(MyOtherOfficialNotice).one().title == 'other'
 
 
-def test_issue(session):
+def test_issue(session: Session) -> None:
     session.add(OfficialNotice(title='title', state='drafted'))
     session.flush()
     notice = session.query(OfficialNotice).one()
@@ -228,7 +239,7 @@ def test_issue(session):
     assert notice.issues == {'a': None, 'b': None, 'c': None}
 
 
-def test_category(session):
+def test_category(session: Session) -> None:
     session.add(OfficialNotice(title='title', state='drafted'))
     session.flush()
     notice = session.query(OfficialNotice).one()
@@ -247,7 +258,7 @@ def test_category(session):
     assert notice.categories == {'a': None, 'b': None, 'c': None}
 
 
-def test_organization(session):
+def test_organization(session: Session) -> None:
     session.add(OfficialNotice(title='title', state='drafted'))
     session.flush()
     notice = session.query(OfficialNotice).one()
