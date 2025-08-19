@@ -24,6 +24,7 @@ from yubico_client import Yubico  # type: ignore[import-untyped]
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
+    from onegov.core.orm import Base  # noqa: F401
     from sqlalchemy.orm import Session
 
 
@@ -285,8 +286,9 @@ def test_is_sorted() -> None:
 
 
 def test_get_unique_hstore_keys(postgres_dsn: str) -> None:
-
-    Base = declarative_base()
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -307,9 +309,9 @@ def test_get_unique_hstore_keys(postgres_dsn: str) -> None:
 
     assert utils.get_unique_hstore_keys(mgr.session(), Document._tags) == set()
 
-    mgr.session().add(Document(tags=None))  # type: ignore[call-arg]
-    mgr.session().add(Document(tags=['foo', 'bar']))  # type: ignore[call-arg]
-    mgr.session().add(Document(tags=['foo', 'baz']))  # type: ignore[call-arg]
+    mgr.session().add(Document(tags=None))  # type: ignore[misc]
+    mgr.session().add(Document(tags=['foo', 'bar']))  # type: ignore[misc]
+    mgr.session().add(Document(tags=['foo', 'baz']))  # type: ignore[misc]
 
     transaction.commit()
 

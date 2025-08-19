@@ -11,6 +11,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
+    from onegov.core.orm import Base  # noqa: F401
 
 
 def test_pagination() -> None:
@@ -111,7 +112,9 @@ def test_pagination_negative_page_index() -> None:
 
 
 def test_generic_collection(postgres_dsn: str) -> None:
-    Base = declarative_base()
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Document(Base):
         __tablename__ = 'document'
@@ -119,7 +122,7 @@ def test_generic_collection(postgres_dsn: str) -> None:
         id = Column(Integer, primary_key=True)
         title = Column(Text)
 
-    class DocumentCollection(GenericCollection[Document]):  # type: ignore[type-var]
+    class DocumentCollection(GenericCollection[Document]):
 
         @property
         def model_class(self) -> type[Document]:
