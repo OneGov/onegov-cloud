@@ -186,6 +186,7 @@ class PoliticalBusiness(
         back_populates='political_businesses'
     )
 
+    # tschupre: needless as we have meeting items, remove it with db upgrade script
     #: The meetings this agenda item was discussed in
     meetings: relationship[Meeting] = relationship(
         'Meeting',
@@ -193,9 +194,11 @@ class PoliticalBusiness(
         order_by='Meeting.start_datetime',
         lazy='joined',
     )
+
     meeting_items: relationship[list[MeetingItem]] = relationship(
         'MeetingItem',
-        back_populates='political_business'
+        back_populates='political_business',
+        lazy='joined',
     )
 
     @property

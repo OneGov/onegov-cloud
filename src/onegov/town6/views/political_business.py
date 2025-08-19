@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from sqlalchemy import func
+from sqlalchemy.orm import joinedload
 
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
 from onegov.org.forms.political_business import PoliticalBusinessForm
+from onegov.org.models import Meeting
+from onegov.org.models import MeetingItem
 from onegov.org.models import PoliticalBusiness
 from onegov.org.models import PoliticalBusinessCollection
 from onegov.org.models import PoliticalBusinessParticipationCollection
@@ -214,6 +217,17 @@ def view_political_business(
     participations = self.participants
     participations.sort(key=lambda x: x.parliamentarian.title)
     participations.sort(key=lambda x: x.participant_type or '', reverse=True)
+
+    # sort meeting items of this business
+    items = (
+        request.session.query(MeetingItem)
+        .join(Meeting, Meeting.id == MeetingItem.meeting_id)
+        .filter(MeetingItem.political_business_id == self.id)
+        .options(joinedload(MeetingItem.meeting))
+        .order_by(Meeting.start_datetime.desc())
+        .all()
+    )
+    self.meeting_items = items
 
     return {
         'layout': layout,
