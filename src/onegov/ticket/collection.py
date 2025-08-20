@@ -6,7 +6,7 @@ from onegov.core.collection import Pagination
 from onegov.core.custom import msgpack
 from onegov.ticket import handlers as global_handlers
 from onegov.ticket.models.ticket import Ticket
-from sqlalchemy import desc, distinct, func
+from sqlalchemy import desc, func
 from sqlalchemy.orm import joinedload, undefer
 from uuid import UUID
 
@@ -109,15 +109,6 @@ class TicketCollectionPagination(Pagination[Ticket]):
             self.session, index, self.state, self.handler, self.group,
             self.owner, self.submitter, self.extra_parameters
         )
-
-    def available_groups(self, handler: str = '*') -> tuple[str, ...]:
-        query = self.query().with_entities(distinct(Ticket.group))
-        query = query.order_by(Ticket.group)
-
-        if handler != '*':
-            query = query.filter(Ticket.handler_code == handler)
-
-        return tuple(r[0] for r in query.all())
 
     def for_state(self, state: ExtendedTicketState) -> Self:
         return self.__class__(

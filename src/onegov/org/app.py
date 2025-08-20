@@ -245,7 +245,14 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
                 # the permission is only exclusive, if at least one user group
                 # has exclusive permissions. But user groups with non-exclusive
                 # permissions still have permission to access the ticket.
-                if exclusive
+                if exclusive or (
+                    # if there is exclusive access to the whole handler code
+                    # we need to treat non-exclusive access to a group as
+                    # exclusive, so the users with non-exclusive access
+                    # to this group keep their access rights.
+                    group is not None
+                    and handler_perms.get(None, (False, ))[0]
+                )
             }
             for handler_code, handler_perms in permissions.items()
         }

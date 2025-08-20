@@ -54,6 +54,8 @@ from onegov.org.models import Editor
 from onegov.org.models import Export
 from onegov.org.models import ExportCollection
 from onegov.org.models import ExtendedDirectory
+from onegov.org.models import FilteredArchivedTicketCollection
+from onegov.org.models import FilteredTicketCollection
 from onegov.org.models import FormPersonMove
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFileCollection
@@ -451,7 +453,7 @@ def get_ticket(app: OrgApp, handler_code: str, id: UUID) -> Ticket | None:
     )}
 )
 def get_tickets(
-    app: OrgApp,
+    request: OrgRequest,
     handler: str = 'ALL',
     state: ExtendedTicketState | None = 'open',
     page: int = 0,
@@ -464,8 +466,8 @@ def get_tickets(
     if state is None:
         return None
 
-    return TicketCollection(
-        app.session(),
+    return FilteredTicketCollection(
+        request.session,
         handler=handler,
         state=state,
         page=page,
@@ -473,6 +475,7 @@ def get_tickets(
         owner=owner or '*',
         submitter=submitter or '*',
         extra_parameters=extra_parameters,
+        request=request,
     )
 
 
@@ -482,7 +485,7 @@ def get_tickets(
     converters={'page': int}
 )
 def get_archived_tickets(
-    app: OrgApp,
+    request: OrgRequest,
     handler: str = 'ALL',
     page: int = 0,
     group: str | None = None,
@@ -490,15 +493,16 @@ def get_archived_tickets(
     submitter: str | None = None,
     extra_parameters: dict[str, str] | None = None
 ) -> ArchivedTicketCollection:
-    return ArchivedTicketCollection(
-        app.session(),
+    return FilteredArchivedTicketCollection(
+        request.session,
         handler=handler,
         state='archived',
         page=page,
         group=group,
         owner=owner or '*',
         submitter=submitter or '*',
-        extra_parameters=extra_parameters
+        extra_parameters=extra_parameters,
+        request=request,
     )
 
 
