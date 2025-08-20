@@ -41,6 +41,7 @@ from onegov.org.models import (
     ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter, ReservationHandler
+from onegov.org.models.ticket import apply_ticket_permissions
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.utils import get_current_tickets_url, group_invoice_items
 from onegov.org.views.message import view_messages_feed
@@ -53,7 +54,7 @@ from onegov.ticket.errors import InvalidStateChange
 from onegov.gever.gever_client import GeverClientCAS
 from onegov.user import User, UserCollection
 from operator import itemgetter
-from sqlalchemy import select
+from sqlalchemy import func, select
 from webob import exc
 from urllib.parse import urlsplit
 
@@ -1386,21 +1387,21 @@ def get_filters(
         active=self.state == 'unfinished',
         attrs={'class': 'ticket-filter-my'}
     )
-    for id, text in TICKET_STATES.items():
-        if id != 'archived':
+    for state, text in TICKET_STATES.items():
+        if state != 'archived':
+            coll = self.for_state(state)
+            if self.state == 'unfinished':
+                # FIXME: This is another case where we pass invalid
+                #        state just so the generated URL is shorter
+                #        we should make morepath aware of defaults
+                #        so it can ellide parameters that have been
+                #        set to their default value automatically
+                coll = coll.for_owner(None)  # type: ignore[arg-type]
             yield Link(
                 text=text,
-                url=request.link(
-                    self.for_state(id)
-                    # FIXME: This is another case where we pass invalid
-                    #        state just so the generated URL is shorter
-                    #        we should make morepath aware of defaults
-                    #        so it can ellide parameters that have been
-                    #        set to their default value automatically
-                    .for_owner(None)  # type:ignore[arg-type]
-                ),
-                active=self.state == id,
-                attrs={'class': 'ticket-filter-' + id}
+                url=request.link(coll),
+                active=self.state == state,
+                attrs={'class': 'ticket-filter-' + state}
             )
 
 
@@ -1496,6 +1497,9 @@ def get_submitters(
 ) -> Iterator[Link]:
 
     all_submitters = self.for_submitter('*')
+    if hasattr(self, 'request'):
+        # ensure ticket permission filters are set
+        all_submitters.request = self.request  # type: ignore[union-attr]
     query = (
         all_submitters.subset()
         .with_entities(Ticket.ticket_email.distinct())
@@ -1520,22 +1524,24 @@ def get_submitters(
         )
 
 
-def groups_by_handler_code(session: Session) -> dict[str, list[str]]:
-    query = as_selectable("""
-            SELECT
-                handler_code,                         -- Text
-                ARRAY_AGG(DISTINCT "group") AS groups -- ARRAY(Text)
-            FROM tickets GROUP BY handler_code
-        """)
+def groups_by_handler_code(
+    self: TicketCollection | ArchivedTicketCollection
+) -> dict[str, list[str]]:
+    query = self.session.query(
+        Ticket.handler_code,
+        func.array_agg(Ticket.group.distinct())
+    ).group_by(Ticket.handler_code)
 
-    groups = {
-        r.handler_code: r.groups
-        for r in session.execute(select(query.c))
+    # HACK: only apply the ticket permissions filter if there is request
+    #       attribute on the collection. This is a bit fragile, ideally
+    #       we turn this back into a method on `TicketCollection`.
+    if hasattr(self, 'request'):
+        query = apply_ticket_permissions(query, 'ALL', self.request)
+
+    return {
+        handler_code: sorted(groups, key=normalize_for_url)
+        for handler_code, groups in query
     }
-    for handler in groups:
-        groups[handler].sort(key=lambda g: normalize_for_url(g))
-
-    return groups
 
 
 @OrgApp.html(
@@ -1560,7 +1566,7 @@ def view_tickets(
         'extra_parameters': self.extra_parameters,
     }
 
-    groups = groups_by_handler_code(request.session)
+    groups = groups_by_handler_code(self)
     handlers = tuple(get_handlers(self, request, groups))
     owners = tuple(get_owners(self, request))
     submitters = tuple(get_submitters(self, request))
@@ -1586,7 +1592,16 @@ def view_tickets(
         'has_handler_filter': self.handler != 'ALL',
         'has_owner_filter': self.owner != '*',
         'has_submitter_filter': self.submitter != '*',
-        'handler': handler,
+        'handler': handler.text if handler else self.group or (
+            request.translate(ticket_handlers.registry[self.handler].handler_title)  # type: ignore[attr-defined]
+            if self.handler in ticket_handlers.registry
+            else self.handler
+        ),
+        'handler_class': ' '.join(handler.attrs['class']) if handler else (
+            f'{self.handler}-link'
+            if self.group is None
+            else f'{self.handler}-sub-link ticket-group-filter'
+        ),
         'owner': owner,
         # NOTE: Not all submitters will be valid for every filter so
         #       if it's not valid we fallback to whatever we were given
@@ -1607,7 +1622,7 @@ def view_archived_tickets(
     layout: ArchivedTicketsLayout | None = None
 ) -> RenderData:
 
-    groups = groups_by_handler_code(request.session)
+    groups = groups_by_handler_code(self)
     handlers = tuple(get_handlers(self, request, groups))
     owners = tuple(get_owners(self, request))
     submitters = tuple(get_submitters(self, request))
@@ -1632,7 +1647,16 @@ def view_archived_tickets(
         'has_handler_filter': self.handler != 'ALL',
         'has_owner_filter': self.owner != '*',
         'has_submitter_filter': self.submitter != '*',
-        'handler': handler,
+        'handler': handler.text if handler else self.group or (
+            request.translate(ticket_handlers.registry[self.handler].handler_title)  # type: ignore[attr-defined]
+            if self.handler in ticket_handlers.registry
+            else self.handler
+        ),
+        'handler_class': ' '.join(handler.attrs['class']) if handler else (
+            f'{self.handler}-link'
+            if self.group is None
+            else f'{self.handler}-sub-link ticket-group-filter'
+        ),
         'owner': owner,
         # NOTE: Not all submitters will be valid for every filter so
         #       if it's not valid we fallback to whatever we were given
