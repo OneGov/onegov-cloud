@@ -1,3 +1,5 @@
+import transaction
+
 from morepath import Identity
 from onegov.core.security import Personal
 from onegov.core.security import Private
@@ -7,10 +9,11 @@ from onegov.ticket import Ticket
 from onegov.ticket import TicketPermission
 from onegov.user.models import User
 from onegov.user.models import UserGroup
+from uuid import uuid4
 
 
-def test_security_ticket_permissions(org_app):
-    session = org_app.session()
+def test_security_ticket_permissions(client, test_password):
+    session = client.app.session()
 
     # Remove existing users
     session.query(User).delete()
@@ -34,14 +37,14 @@ def test_security_ticket_permissions(org_app):
         result = User(
             realname=name,
             username=f'{name}@example.org',
-            password_hash='hash',
+            password_hash=test_password,
             role=role,
             groups=groups or []
         )
         session.add(result)
         return result
 
-    roles = ('admin', 'editor', 'member', 'anonymous')
+    roles = ('admin', 'editor', 'supporter', 'member', 'anonymous')
     users = {}
     for role in roles:
         users[role] = create_user(role, role)
@@ -81,7 +84,8 @@ def test_security_ticket_permissions(org_app):
             title=f'{handler_code}-{group}',
             group=group,
             handler_code=handler_code,
-            handler_id=f'{handler_code}-{group}'
+            handler_id=uuid4().hex,
+            state='open'
         )
         session.add(result)
         return result
@@ -92,18 +96,22 @@ def test_security_ticket_permissions(org_app):
         'FRM-S': create_ticket('FRM', 'Steuererklärung'),
         'FRM-W': create_ticket('FRM', 'Wohnsitzbestätigung'),
     }
+    ticket_nrs = {
+        group: ticket.number
+        for group, ticket in tickets.items()
+    }
 
     session.flush()
 
     # Test permissions
 
     def permits(user, model, permission):
-        return org_app._permits(
+        return client.app._permits(
             Identity(
                 userid=user.username,
                 groupids=frozenset(group.id.hex for group in user.groups),
                 role=user.role,
-                application_id=org_app.application_id
+                application_id=client.app.application_id
             ),
             model,
             permission
@@ -137,11 +145,13 @@ def test_security_ticket_permissions(org_app):
     ticket = tickets['EVN']
     assert_admin(users['admin'], ticket)
     assert_editor(users['editor'], ticket)
+    assert_editor(users['supporter'], ticket)
     assert_member(users['member'], ticket)
     assert_anonymous(users['anonymous'], ticket)
     for group in groups:
         assert_admin(users[f'{group}-admin'], ticket)
         assert_editor(users[f'{group}-editor'], ticket)
+        assert_editor(users[f'{group}-supporter'], ticket)
         assert_member(users[f'{group}-member'], ticket)
         assert_anonymous(users[f'{group}-anonymous'], ticket)
 
@@ -149,19 +159,23 @@ def test_security_ticket_permissions(org_app):
     ticket = tickets['PER']
     assert_admin(users['admin'], ticket)
     assert_member(users['editor'], ticket)  # downgraded
+    assert_member(users['supporter'], ticket)  # downgraded
     assert_member(users['member'], ticket)
     assert_anonymous(users['anonymous'], ticket)
     for group in ('Sekretariat', 'Steueramt'):
         assert_admin(users[f'{group}-admin'], ticket)
         assert_member(users[f'{group}-editor'], ticket)  # downgraded
+        assert_member(users[f'{group}-supporter'], ticket)  # downgraded
         assert_member(users[f'{group}-member'], ticket)
         assert_anonymous(users[f'{group}-anonymous'], ticket)
     assert_admin(users['HR-admin'], ticket)
     assert_editor(users['HR-editor'], ticket)
+    assert_editor(users['HR-supporter'], ticket)
     assert_member(users['HR-member'], ticket)
     assert_anonymous(users['HR-anonymous'], ticket)
     assert_admin(users['HR+Steueramt-admin'], ticket)
     assert_editor(users['HR+Steueramt-editor'], ticket)
+    assert_editor(users['HR+Steueramt-supporter'], ticket)
     assert_member(users['HR+Steueramt-member'], ticket)
     assert_anonymous(users['HR+Steueramt-anonymous'], ticket)
 
@@ -169,29 +183,184 @@ def test_security_ticket_permissions(org_app):
     ticket = tickets['FRM-S']
     assert_admin(users['admin'], ticket)
     assert_member(users['editor'], ticket)  # downgraded
+    assert_member(users['supporter'], ticket)  # downgraded
     assert_member(users['member'], ticket)
     assert_anonymous(users['anonymous'], ticket)
     assert_admin(users['HR-admin'], ticket)
     assert_member(users['HR-editor'], ticket)  # downgraded
+    assert_member(users['HR-supporter'], ticket)  # downgraded
     assert_member(users['HR-member'], ticket)
     assert_anonymous(users['HR-anonymous'], ticket)
     for group in ('Steueramt', 'HR+Steueramt', 'Sekretariat'):
         assert_admin(users[f'{group}-admin'], ticket)
         assert_editor(users[f'{group}-editor'], ticket)
+        assert_editor(users[f'{group}-supporter'], ticket)
         assert_member(users[f'{group}-member'], ticket)
         assert_anonymous(users[f'{group}-anonymous'], ticket)
 
     ticket = tickets['FRM-W']
     assert_admin(users['admin'], ticket)
     assert_member(users['editor'], ticket)  # downgraded
+    assert_member(users['supporter'], ticket)  # downgraded
     assert_member(users['member'], ticket)
     assert_anonymous(users['anonymous'], ticket)
     for group in ('Steueramt', 'HR', 'HR+Steueramt'):
         assert_admin(users[f'{group}-admin'], ticket)
         assert_member(users[f'{group}-editor'], ticket)  # downgraded
+        assert_member(users[f'{group}-supporter'], ticket)  # downgraded
         assert_member(users[f'{group}-member'], ticket)
         assert_anonymous(users[f'{group}-anonymous'], ticket)
     assert_admin(users['Sekretariat-admin'], ticket)
     assert_editor(users['Sekretariat-editor'], ticket)
+    assert_editor(users['Sekretariat-supporter'], ticket)
     assert_member(users['Sekretariat-member'], ticket)
     assert_anonymous(users['Sekretariat-anonymous'], ticket)
+
+
+    # check what's visible in the tickets list
+    transaction.commit()
+
+    def assert_visible_tickets(username, visible, code='ALL', status=None):
+        instance = client.spawn()
+        instance.login(f'{username}@example.org', 'hunter2')
+        tickets = instance.get(
+            f'/tickets/{code}/all',
+            expect_errors=status is not None
+        )
+        if status is not None:
+            assert status == tickets.status_code
+            return
+        numbers = tickets.pyquery('.ticket-number-plain a')
+        assert set(item.text() for item in numbers.items()) == set(visible)
+
+    # admins should always be able to see everything
+    assert_visible_tickets('admin', ticket_nrs.values())
+    for group in groups:
+        assert_visible_tickets(f'{group}-admin', ticket_nrs.values())
+
+    # supporters/editors should only see what they have access to
+    assert_visible_tickets('editor', [ticket_nrs['EVN']])
+    assert_visible_tickets('supporter', [ticket_nrs['EVN']])
+
+    assert_visible_tickets('Steueramt-editor', [
+        ticket_nrs['EVN'],
+        ticket_nrs['FRM-S'],
+    ])
+    assert_visible_tickets('Steueramt-supporter', [
+        ticket_nrs['EVN'],
+        ticket_nrs['FRM-S'],
+    ])
+
+    assert_visible_tickets('HR-editor', [
+        ticket_nrs['EVN'],
+        ticket_nrs['PER'],
+    ])
+    assert_visible_tickets('HR-supporter', [
+        ticket_nrs['EVN'],
+        ticket_nrs['PER'],
+    ])
+
+    assert_visible_tickets('HR+Steueramt-editor', [
+        ticket_nrs['EVN'],
+        ticket_nrs['PER'],
+        ticket_nrs['FRM-S'],
+    ])
+    assert_visible_tickets('HR+Steueramt-supporter', [
+        ticket_nrs['EVN'],
+        ticket_nrs['PER'],
+        ticket_nrs['FRM-S'],
+    ])
+
+    assert_visible_tickets('Sekretariat-editor', [
+        ticket_nrs['EVN'],
+        ticket_nrs['FRM-S'],
+        ticket_nrs['FRM-W'],
+    ])
+    assert_visible_tickets('Sekretariat-supporter', [
+        ticket_nrs['EVN'],
+        ticket_nrs['FRM-S'],
+        ticket_nrs['FRM-W'],
+    ])
+
+    # filtering should work correctly regardless of access
+    assert_visible_tickets('admin', [ticket_nrs['EVN']], 'EVN')
+    for group in groups:
+        assert_visible_tickets(f'{group}-admin', [ticket_nrs['EVN']], 'EVN')
+
+    assert_visible_tickets('editor', [ticket_nrs['EVN']], 'EVN')
+    assert_visible_tickets('supporter', [ticket_nrs['EVN']], 'EVN')
+
+    assert_visible_tickets('Steueramt-editor', [ticket_nrs['EVN']], 'EVN')
+    assert_visible_tickets('Steueramt-supporter', [ticket_nrs['EVN']], 'EVN')
+
+    assert_visible_tickets('HR-editor', [ticket_nrs['EVN']], 'EVN')
+    assert_visible_tickets('HR-supporter', [ticket_nrs['EVN']], 'EVN')
+
+    assert_visible_tickets('HR+Steueramt-editor', [ticket_nrs['EVN']], 'EVN')
+    assert_visible_tickets('HR+Steueramt-supporter', [
+        ticket_nrs['EVN'],
+    ], 'EVN')
+
+    assert_visible_tickets('Sekretariat-editor', [ticket_nrs['EVN']], 'EVN')
+    assert_visible_tickets('Sekretariat-supporter', [ticket_nrs['EVN']], 'EVN')
+
+    assert_visible_tickets('admin', [
+        ticket_nrs['FRM-S'],
+        ticket_nrs['FRM-W'],
+    ], 'FRM')
+    for group in groups:
+        assert_visible_tickets(f'{group}-admin', [
+            ticket_nrs['FRM-S'],
+            ticket_nrs['FRM-W'],
+        ], 'FRM')
+
+    assert_visible_tickets('editor', [], 'FRM')
+    assert_visible_tickets('supporter', [], 'FRM')
+
+    assert_visible_tickets('Steueramt-editor', [ticket_nrs['FRM-S']], 'FRM')
+    assert_visible_tickets('Steueramt-supporter', [ticket_nrs['FRM-S']], 'FRM')
+
+    assert_visible_tickets('HR-editor', [], 'FRM')
+    assert_visible_tickets('HR-supporter', [], 'FRM')
+
+    assert_visible_tickets('HR+Steueramt-editor', [ticket_nrs['FRM-S']], 'FRM')
+    assert_visible_tickets('HR+Steueramt-supporter', [
+        ticket_nrs['FRM-S'],
+    ], 'FRM')
+
+    assert_visible_tickets('Sekretariat-editor', [
+        ticket_nrs['FRM-S'],
+        ticket_nrs['FRM-W'],
+    ], 'FRM')
+    assert_visible_tickets('Sekretariat-supporter', [
+        ticket_nrs['FRM-S'],
+        ticket_nrs['FRM-W'],
+    ], 'FRM')
+
+    assert_visible_tickets('admin', [ticket_nrs['PER']], 'PER')
+    for group in groups:
+        assert_visible_tickets(f'{group}-admin', [ticket_nrs['PER']], 'PER')
+
+    assert_visible_tickets('editor', [], 'PER')
+    assert_visible_tickets('supporter', [], 'PER')
+
+    assert_visible_tickets('Steueramt-editor', [], 'PER')
+    assert_visible_tickets('Steueramt-supporter', [], 'PER')
+
+    assert_visible_tickets('HR-editor', [ticket_nrs['PER']], 'PER')
+    assert_visible_tickets('HR-supporter', [ticket_nrs['PER']], 'PER')
+
+    assert_visible_tickets('HR+Steueramt-editor', [ticket_nrs['PER']], 'PER')
+    assert_visible_tickets('HR+Steueramt-supporter', [
+        ticket_nrs['PER'],
+    ], 'PER')
+
+    assert_visible_tickets('Sekretariat-editor', [], 'PER')
+    assert_visible_tickets('Sekretariat-supporter', [], 'PER')
+
+    # members/anonymous users should not have access to this view
+    assert_visible_tickets('member', [], status=403)
+    assert_visible_tickets('anonymous', [], status=403)
+    for group in groups:
+        assert_visible_tickets(f'{group}-member', [], status=403)
+        assert_visible_tickets(f'{group}-anonymous', [], status=403)
