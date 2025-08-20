@@ -76,6 +76,7 @@ def test_security_ticket_permissions(client, test_password):
     )
     # a sole non-exclusive permission should mean all groups have access
     create_permission('EVN', None, groups['Sekretariat'][0], exclusive=False)
+    create_permission('RSV', 'A', groups['Sekretariat'][0])
 
     # ... tickets
     def create_ticket(handler_code, group=''):
@@ -95,6 +96,8 @@ def test_security_ticket_permissions(client, test_password):
         'PER': create_ticket('PER'),
         'FRM-S': create_ticket('FRM', 'Steuererklärung'),
         'FRM-W': create_ticket('FRM', 'Wohnsitzbestätigung'),
+        'RSV': create_ticket('RSV'),
+        'RSV-A': create_ticket('RSV', 'A'),
     }
     ticket_nrs = {
         group: ticket.number
@@ -143,6 +146,19 @@ def test_security_ticket_permissions(client, test_password):
 
     # no permission defined
     ticket = tickets['EVN']
+    assert_admin(users['admin'], ticket)
+    assert_editor(users['editor'], ticket)
+    assert_editor(users['supporter'], ticket)
+    assert_member(users['member'], ticket)
+    assert_anonymous(users['anonymous'], ticket)
+    for group in groups:
+        assert_admin(users[f'{group}-admin'], ticket)
+        assert_editor(users[f'{group}-editor'], ticket)
+        assert_editor(users[f'{group}-supporter'], ticket)
+        assert_member(users[f'{group}-member'], ticket)
+        assert_anonymous(users[f'{group}-anonymous'], ticket)
+
+    ticket = tickets['RSV']
     assert_admin(users['admin'], ticket)
     assert_editor(users['editor'], ticket)
     assert_editor(users['supporter'], ticket)
@@ -216,6 +232,24 @@ def test_security_ticket_permissions(client, test_password):
     assert_member(users['Sekretariat-member'], ticket)
     assert_anonymous(users['Sekretariat-anonymous'], ticket)
 
+    ticket = tickets['RSV-A']
+    assert_admin(users['admin'], ticket)
+    assert_member(users['editor'], ticket)  # downgraded
+    assert_member(users['supporter'], ticket)  # downgraded
+    assert_member(users['member'], ticket)
+    assert_anonymous(users['anonymous'], ticket)
+    for group in ('Steueramt', 'HR', 'HR+Steueramt'):
+        assert_admin(users[f'{group}-admin'], ticket)
+        assert_member(users[f'{group}-editor'], ticket)  # downgraded
+        assert_member(users[f'{group}-supporter'], ticket)  # downgraded
+        assert_member(users[f'{group}-member'], ticket)
+        assert_anonymous(users[f'{group}-anonymous'], ticket)
+    assert_admin(users['Sekretariat-admin'], ticket)
+    assert_editor(users['Sekretariat-editor'], ticket)
+    assert_editor(users['Sekretariat-supporter'], ticket)
+    assert_member(users['Sekretariat-member'], ticket)
+    assert_anonymous(users['Sekretariat-anonymous'], ticket)
+
 
     # check what's visible in the tickets list
     transaction.commit()
@@ -239,48 +273,65 @@ def test_security_ticket_permissions(client, test_password):
         assert_visible_tickets(f'{group}-admin', ticket_nrs.values())
 
     # supporters/editors should only see what they have access to
-    assert_visible_tickets('editor', [ticket_nrs['EVN']])
-    assert_visible_tickets('supporter', [ticket_nrs['EVN']])
+    assert_visible_tickets('editor', [
+        ticket_nrs['EVN'],
+        ticket_nrs['RSV'],
+    ])
+    assert_visible_tickets('supporter', [
+        ticket_nrs['EVN'],
+        ticket_nrs['RSV'],
+    ])
 
     assert_visible_tickets('Steueramt-editor', [
         ticket_nrs['EVN'],
         ticket_nrs['FRM-S'],
+        ticket_nrs['RSV'],
     ])
     assert_visible_tickets('Steueramt-supporter', [
         ticket_nrs['EVN'],
         ticket_nrs['FRM-S'],
+        ticket_nrs['RSV'],
     ])
 
     assert_visible_tickets('HR-editor', [
         ticket_nrs['EVN'],
         ticket_nrs['PER'],
+        ticket_nrs['RSV'],
     ])
     assert_visible_tickets('HR-supporter', [
         ticket_nrs['EVN'],
         ticket_nrs['PER'],
+        ticket_nrs['RSV'],
     ])
 
     assert_visible_tickets('HR+Steueramt-editor', [
         ticket_nrs['EVN'],
         ticket_nrs['PER'],
         ticket_nrs['FRM-S'],
+        ticket_nrs['RSV'],
     ])
     assert_visible_tickets('HR+Steueramt-supporter', [
         ticket_nrs['EVN'],
         ticket_nrs['PER'],
         ticket_nrs['FRM-S'],
+        ticket_nrs['RSV'],
     ])
 
     assert_visible_tickets('Sekretariat-editor', [
         ticket_nrs['EVN'],
         ticket_nrs['FRM-S'],
         ticket_nrs['FRM-W'],
+        ticket_nrs['RSV'],
+        ticket_nrs['RSV-A'],
     ])
     assert_visible_tickets('Sekretariat-supporter', [
         ticket_nrs['EVN'],
         ticket_nrs['FRM-S'],
         ticket_nrs['FRM-W'],
+        ticket_nrs['RSV'],
+        ticket_nrs['RSV-A'],
     ])
+
 
     # filtering should work correctly regardless of access
     assert_visible_tickets('admin', [ticket_nrs['EVN']], 'EVN')
@@ -314,6 +365,7 @@ def test_security_ticket_permissions(client, test_password):
             ticket_nrs['FRM-W'],
         ], 'FRM')
 
+
     assert_visible_tickets('editor', [], 'FRM')
     assert_visible_tickets('supporter', [], 'FRM')
 
@@ -337,6 +389,7 @@ def test_security_ticket_permissions(client, test_password):
         ticket_nrs['FRM-W'],
     ], 'FRM')
 
+
     assert_visible_tickets('admin', [ticket_nrs['PER']], 'PER')
     for group in groups:
         assert_visible_tickets(f'{group}-admin', [ticket_nrs['PER']], 'PER')
@@ -357,6 +410,41 @@ def test_security_ticket_permissions(client, test_password):
 
     assert_visible_tickets('Sekretariat-editor', [], 'PER')
     assert_visible_tickets('Sekretariat-supporter', [], 'PER')
+
+
+    assert_visible_tickets('admin', [
+        ticket_nrs['RSV'],
+        ticket_nrs['RSV-A'],
+    ], 'RSV')
+    for group in groups:
+        assert_visible_tickets(f'{group}-admin', [
+            ticket_nrs['RSV'],
+            ticket_nrs['RSV-A'],
+        ], 'RSV')
+
+    assert_visible_tickets('editor', [ticket_nrs['RSV']], 'RSV')
+    assert_visible_tickets('supporter', [ticket_nrs['RSV']], 'RSV')
+
+    assert_visible_tickets('Steueramt-editor', [ticket_nrs['RSV']], 'RSV')
+    assert_visible_tickets('Steueramt-supporter', [ticket_nrs['RSV']], 'RSV')
+
+    assert_visible_tickets('HR-editor', [ticket_nrs['RSV']], 'RSV')
+    assert_visible_tickets('HR-supporter', [ticket_nrs['RSV']], 'RSV')
+
+    assert_visible_tickets('HR+Steueramt-editor', [ticket_nrs['RSV']], 'RSV')
+    assert_visible_tickets('HR+Steueramt-supporter', [
+        ticket_nrs['RSV'],
+    ], 'RSV')
+
+    assert_visible_tickets('Sekretariat-editor', [
+        ticket_nrs['RSV'],
+        ticket_nrs['RSV-A'],
+    ], 'RSV')
+    assert_visible_tickets('Sekretariat-supporter', [
+        ticket_nrs['RSV'],
+        ticket_nrs['RSV-A'],
+    ], 'RSV')
+
 
     # members/anonymous users should not have access to this view
     assert_visible_tickets('member', [], status=403)
