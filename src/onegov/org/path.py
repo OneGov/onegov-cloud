@@ -54,8 +54,6 @@ from onegov.org.models import Editor
 from onegov.org.models import Export
 from onegov.org.models import ExportCollection
 from onegov.org.models import ExtendedDirectory
-from onegov.org.models import FilteredArchivedTicketCollection
-from onegov.org.models import FilteredTicketCollection
 from onegov.org.models import FormPersonMove
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFileCollection
@@ -94,13 +92,15 @@ from onegov.org.models import (
     PoliticalBusiness,
     PoliticalBusinessCollection,
 )
-from onegov.org.models.political_business import PoliticalBusinessStatus
-from onegov.org.models.political_business import PoliticalBusinessType
-from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
+from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
+from onegov.org.models.political_business import PoliticalBusinessStatus
+from onegov.org.models.political_business import PoliticalBusinessType
 from onegov.org.models.resource import FindYourSpotCollection
+from onegov.org.models.ticket import FilteredArchivedTicketCollection
+from onegov.org.models.ticket import FilteredTicketCollection
 from onegov.page import PageCollection
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection

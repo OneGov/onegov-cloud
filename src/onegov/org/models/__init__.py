@@ -76,8 +76,6 @@ from onegov.org.models.push_notification import PushNotification
 from onegov.org.models.push_notification import PushNotificationCollection
 from onegov.org.models.tan import TANAccess
 from onegov.org.models.tan import TANAccessCollection
-from onegov.org.models.ticket import FilteredArchivedTicketCollection
-from onegov.org.models.ticket import FilteredTicketCollection
 from onegov.org.models.traitinfo import TraitInfo
 
 __all__ = (
@@ -102,8 +100,6 @@ __all__ = (
     'ExportCollection',
     'ExtendedDirectory',
     'ExtendedDirectoryEntry',
-    'FilteredArchivedTicketCollection',
-    'FilteredTicketCollection',
     'FormPersonMove',
     'GeneralFile',
     'GeneralFileCollection',
