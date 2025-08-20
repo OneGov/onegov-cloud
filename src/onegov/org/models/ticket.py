@@ -19,17 +19,17 @@ from onegov.org.utils import (
 from onegov.pay import ManualPayment
 from onegov.reservation import Allocation, Resource, Reservation
 from onegov.ticket import handlers, Handler, Ticket, TicketInvoice
+from onegov.ticket.collection import TicketCollection, ArchivedTicketCollection
 from onegov.search.utils import extract_hashtags
 from operator import attrgetter
 from purl import URL
 from sedate import utcnow
-from sqlalchemy import desc
-from sqlalchemy import func
+from sqlalchemy import and_, desc, func, or_, text
 from sqlalchemy.orm import object_session, undefer
 from uuid import uuid4
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
     from onegov.chat.models import Chat
@@ -39,6 +39,7 @@ if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
     from onegov.pay import InvoiceItem, InvoiceItemMeta, Payment
     from onegov.ticket.handler import _Q
+    from onegov.ticket.collection import ExtendedTicketState
     from sqlalchemy import Column
     from sqlalchemy.orm import Query, Session
     from typing import TypeAlias
@@ -1751,3 +1752,167 @@ class ChatHandler(Handler):
         request: OrgRequest  # type: ignore[override]
     ) -> list[Link | LinkGroup]:
         return []
+
+
+def apply_ticket_permissions(
+    query: Query[Ticket],
+    filtered_handler: str,
+    request: OrgRequest | None,
+) -> Query[Ticket]:
+    if request is None or request.is_manager:
+        return query
+
+    permissions = request.app.ticket_permissions
+    if not permissions:
+        # no permission downgrades occur
+        return query
+
+    groupids: frozenset[str]
+    groupids = getattr(request.identity, 'groupids', frozenset())
+    inclusions: dict[str, set[str]] = {}
+    exclusions: dict[str, set[str]] = {}
+    for handler, groups in permissions.items():
+        if None in groups and groupids.isdisjoint(groups[None]):
+            # we only have access to the specific groups we were added to
+            # any other ticket in this handler is excluded, if we end up
+            # with an empty set here that means that we don't have access
+            # to this handler at all
+            inclusions[handler] = {
+                group
+                for group, allowed_ids in groups.items()
+                if group is not None
+                if not groupids.isdisjoint(allowed_ids)
+            }
+        else:
+            # in every other case we have access to all groups, except for
+            # the ones that were exclusively assigned to someone else
+            excluded = {
+                group
+                for group, allowed_ids in groups.items()
+                if group is not None
+                if groupids.isdisjoint(allowed_ids)
+            }
+            if excluded:
+                exclusions[handler] = excluded
+
+    if not inclusions and not exclusions:
+        return query
+
+    if filtered_handler != 'ALL':
+        # we only need to emit a simple condition, so let's special case
+        # so we produce less work for the query compiler/optimizer
+        included_groups = inclusions.get(filtered_handler)
+        excluded_groups = exclusions.get(filtered_handler)
+        if included_groups is None:
+            if excluded_groups is None:
+                # no filter necessary
+                return query
+            return query.filter(Ticket.group.notin_(excluded_groups))
+        elif not included_groups:
+            # we don't have access to anything for this handler
+            return query.filter(text('1=0'))
+        return query.filter(Ticket.group.in_(included_groups))
+
+    filtered_handlers = inclusions.keys() | exclusions.keys()
+    assert filtered_handlers
+    conditions = []
+    for handler in filtered_handlers:
+        included_groups = inclusions.get(handler)
+        excluded_groups = exclusions.get(handler)
+        if included_groups is None:
+            assert excluded_groups is not None
+            conditions.append(and_(
+                Ticket.handler_code == handler,
+                Ticket.group.notin_(excluded_groups)
+            ))
+        elif included_groups:
+            conditions.append(and_(
+                Ticket.handler_code == handler,
+                Ticket.group.in_(included_groups)
+            ))
+        # NOTE: The case of an empty included_groups is handled
+        #       by the final filter in the or_, since it excludes
+        #       any handler codes we have filters for.
+
+    return query.filter(or_(
+        *conditions,
+        Ticket.handler_code.notin_(filtered_handlers)
+    ))
+
+
+class FilteredTicketCollection(TicketCollection):
+
+    def __init__(
+        self,
+        session: Session,
+        page: int = 0,
+        state: ExtendedTicketState = 'open',
+        handler: str = 'ALL',
+        group: str | None = None,
+        owner: str = '*',
+        submitter: str = '*',
+        extra_parameters: dict[str, Any] | None = None,
+        # NOTE: This is pretty fragile since the `for_X` methods will
+        #       not preserve the request, so if we rely on that being
+        #       the case anywhere we manually need to set the request
+        #       afterwards, but the alternative seems even worse, so
+        #       we'll allow it for now...
+        request: OrgRequest | None = None,
+    ) -> None:
+        super().__init__(
+            session,
+            page=page,
+            state=state,
+            handler=handler,
+            group=group,
+            owner=owner,
+            submitter=submitter,
+            extra_parameters=extra_parameters,
+        )
+        self.request = request
+
+    def subset(self) -> Query[Ticket]:
+        return apply_ticket_permissions(
+            super().subset(),
+            self.handler,
+            self.request
+        )
+
+
+class FilteredArchivedTicketCollection(ArchivedTicketCollection):
+
+    def __init__(
+        self,
+        session: Session,
+        page: int = 0,
+        state: Literal['archived'] = 'archived',
+        handler: str = 'ALL',
+        group: str | None = None,
+        owner: str = '*',
+        submitter: str = '*',
+        extra_parameters: dict[str, Any] | None = None,
+        # NOTE: This is pretty fragile since the `for_X` methods will
+        #       not preserve the request, so if we rely on that being
+        #       the case anywhere we manually need to set the request
+        #       afterwards, but the alternative seems even worse, so
+        #       we'll allow it for now...
+        request: OrgRequest | None = None,
+    ) -> None:
+        super().__init__(
+            session,
+            page=page,
+            state='archived',
+            handler=handler,
+            group=group,
+            owner=owner,
+            submitter=submitter,
+            extra_parameters=extra_parameters,
+        )
+        self.request = request
+
+    def subset(self) -> Query[Ticket]:
+        return apply_ticket_permissions(
+            super().subset(),
+            self.handler,
+            self.request
+        )
