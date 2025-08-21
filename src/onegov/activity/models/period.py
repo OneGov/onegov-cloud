@@ -31,11 +31,11 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from decimal import Decimal
     from onegov.activity.matching.score import Scoring
-    from onegov.activity.models import Invoice, PublicationRequest
+    from onegov.activity.models import BookingPeriodInvoice, PublicationRequest
     from sqlalchemy.orm import Session
 
 
-class PeriodMixin:
+class BookingPeriodMixin:
 
     # It's doubtful that the Ferienpass would ever run anywhere else but
     # in Switzerland ;)
@@ -215,7 +215,7 @@ class PeriodMixin:
         return self.max_bookings_per_attendee
 
 
-class PeriodMetaBase(NamedTuple):
+class _BookinPeriodMeta(NamedTuple):
     id: uuid.UUID
     title: str
     active: bool
@@ -244,7 +244,7 @@ class PeriodMetaBase(NamedTuple):
 
 
 @msgpack.make_serializable(tag=30)
-class PeriodMeta(PeriodMetaBase, PeriodMixin):
+class BookingPeriodMeta(_BookinPeriodMeta, BookingPeriodMixin):
     # TODO: We would like to add a request scoped cache to
     #       all the properties on PeriodMixin, since they would
     #       likely not change within the time span of a single
@@ -254,8 +254,8 @@ class PeriodMeta(PeriodMetaBase, PeriodMixin):
     #       a short TTL like 60 seconds. That would already avoid
     #       the many redundant calls to `phase`.
 
-    def materialize(self, session: Session) -> Period:
-        period = session.query(Period).get(self.id)
+    def materialize(self, session: Session) -> BookingPeriod:
+        period = session.query(BookingPeriod).get(self.id)
         assert period is not None
         return period
 
@@ -268,7 +268,7 @@ class PeriodMeta(PeriodMetaBase, PeriodMixin):
         )
 
 
-class Period(Base, PeriodMixin, TimestampMixin):
+class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
 
     __tablename__ = 'periods'
 
@@ -436,8 +436,8 @@ class Period(Base, PeriodMixin, TimestampMixin):
         back_populates='period'
     )
 
-    invoices: relationship[list[Invoice]] = relationship(
-        'Invoice',
+    invoices: relationship[list[BookingPeriodInvoice]] = relationship(
+        'BookingPeriodInvoice',
         back_populates='period'
     )
 
@@ -535,9 +535,9 @@ class Period(Base, PeriodMixin, TimestampMixin):
         session = object_session(self)
 
         def future_periods() -> Iterator[uuid.UUID]:
-            p = session.query(Period)
-            p = p.order_by(desc(Period.execution_start))
-            p = p.with_entities(Period.id)
+            p = session.query(BookingPeriod)
+            p = p.order_by(desc(BookingPeriod.execution_start))
+            p = p.with_entities(BookingPeriod.id)
 
             for period in p:
                 if period.id == self.id:
@@ -600,5 +600,5 @@ class Period(Base, PeriodMixin, TimestampMixin):
     def scoring(self, scoring: Scoring) -> None:
         self.data['match-settings'] = scoring.settings
 
-    def materialize(self, session: Session) -> Period:
+    def materialize(self, session: Session) -> BookingPeriod:
         return self

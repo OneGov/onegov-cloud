@@ -11,7 +11,7 @@ from sqlalchemy.orm import joinedload, undefer
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from onegov.activity.models import Period
+    from onegov.activity.models import BookingPeriod
     from sqlalchemy.orm import Query, Session
 
 
@@ -33,7 +33,11 @@ class OccasionExport(FeriennetExport):
         assert form.selected_period is not None
         return self.rows(session, form.selected_period)
 
-    def query(self, session: Session, period: Period) -> Query[Occasion]:
+    def query(
+        self,
+        session: Session,
+        period: BookingPeriod
+    ) -> Query[Occasion]:
         q = session.query(Occasion)
         q = q.filter(Occasion.period_id == period.id)
         q = q.options(joinedload(Occasion.activity).joinedload(Activity.user))
@@ -46,7 +50,7 @@ class OccasionExport(FeriennetExport):
     def rows(
         self,
         session: Session,
-        period: Period
+        period: BookingPeriod
     ) -> Iterator[Iterator[tuple[str, Any]]]:
 
         for occasion in self.query(session, period):
@@ -79,7 +83,7 @@ class OccasionNeedExport(FeriennetExport):
     def query(
         self,
         session: Session,
-        period: Period
+        period: BookingPeriod
     ) -> Query[OccasionNeed]:
 
         q = session.query(OccasionNeed)
@@ -105,7 +109,7 @@ class OccasionNeedExport(FeriennetExport):
     def rows(
         self,
         session: Session,
-        period: Period
+        period: BookingPeriod
     ) -> Iterator[Iterator[tuple[str, Any]]]:
 
         for need in self.query(session, period):

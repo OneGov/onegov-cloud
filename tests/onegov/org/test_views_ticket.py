@@ -788,7 +788,8 @@ def test_disable_tickets(client):
     client.login_editor()
     page = client.get('/tickets/ALL/open')
     assert ticket_number in page
-    assert 'hans.maulwurf@simpsons.com' not in page
+    assert 'hans.maulwurf@simpsons.com' not in page.pyquery(
+        '.ticket-group').text()
     assert 'Annehmen' not in page
 
     client.logout()
@@ -796,7 +797,7 @@ def test_disable_tickets(client):
     client.login_admin()
     page = client.get('/tickets/ALL/open')
     assert ticket_number in page
-    assert 'hans.maulwurf@simpsons.com' in page
+    assert 'hans.maulwurf@simpsons.com' in page.pyquery('.ticket-group').text()
     assert 'hans.maulwurf@simpsons.com' in page.click('Annehmen').follow()
 
 

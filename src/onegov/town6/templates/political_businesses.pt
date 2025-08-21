@@ -10,22 +10,27 @@
                 <table tal:condition="businesses">
                     <thead>
                         <tr>
-                            <th i18n:translate>Number</th>
-                            <th i18n:translate>Datum</th>
+                            <th i18n:translate>Date</th>
                             <th i18n:translate>Business Type</th>
                             <th i18n:translate>Status</th>
                             <th i18n:translate>Political Business</th>
+                            <th i18n:translate>Number</th>
                         </tr>
                     </thead>
                     <tbody tal:repeat="business businesses">
                         <tr>
-                            <td><span>${business.number}</span></td>
                             <td><span>${layout.format_date(business.entry_date, 'date')}</span></td>
-                            <td><span>${type_map[business.political_business_type]}</span></td>
-                            <td><span>${status_map[business.status]}</span></td>
+                            <td>
+                                <span tal:condition="python: business.political_business_type in type_map">${type_map[business.political_business_type]}</span>
+                                <span tal:condition="python: business.political_business_type not in type_map">-</span>
+                            </td>
+                            <td>
+                                <span tal:condition="python: business.status in status_map">${status_map[business.status]}</span>
+                                <span tal:condition="python: business.status not in status_map">-</span>
                             <td>
                                 <a tal:attributes="href request.link(business)">${business.title}</a>
                             </td>
+                            <td><span>${business.number}</span></td>
                         </tr>
                     </tbody>
                 </table>

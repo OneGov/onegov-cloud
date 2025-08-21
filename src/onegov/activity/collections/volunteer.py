@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from datetime import date, datetime
-    from onegov.activity.models import Period, PeriodMeta
+    from onegov.activity.models import BookingPeriod, BookingPeriodMeta
     from onegov.activity.models.volunteer import VolunteerState
     from sqlalchemy.orm import Query, Session
     from uuid import UUID
@@ -78,7 +78,7 @@ class VolunteerCollection(GenericCollection[Volunteer]):
     def __init__(
         self,
         session: Session,
-        period: Period | PeriodMeta | None
+        period: BookingPeriod | BookingPeriodMeta | None
     ) -> None:
         super().__init__(session)
         self.period = period
@@ -99,5 +99,8 @@ class VolunteerCollection(GenericCollection[Volunteer]):
 
         return self.session.execute(query)
 
-    def for_period(self, period: Period | PeriodMeta | None) -> Self:
+    def for_period(
+        self,
+        period: BookingPeriod | BookingPeriodMeta | None
+    ) -> Self:
         return self.__class__(self.session, period)

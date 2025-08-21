@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-21 08:00+0200\n"
+"POT-Creation-Date: 2025-08-14 10:15+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -160,6 +160,12 @@ msgstr "RIS aktivieren"
 msgid "Enables the RIS integration for this organisation."
 msgstr "Aktiviert die RIS-Integration für diese Organisation."
 
+msgid "URL path for the RIS main page"
+msgstr "URL-Pfad für die RIS-Hauptseite"
+
+msgid "The URL path for the RIS main page for non-logged-in users."
+msgstr "Der URL-Pfad für die RIS-Hauptseite für nicht angemeldete Benutzer."
+
 msgid "Events"
 msgstr "Veranstaltungen"
 
@@ -308,19 +314,22 @@ msgid "Delete meeting"
 msgstr "Sitzung löschen"
 
 msgid "Parliamentarians"
-msgstr "Parlamentarierinnen und Parlamentarier"
+msgstr "Parlamentsmitglieder"
 
 msgid "Parliamentarian"
-msgstr "Parlamentarier:in"
+msgstr "Parlamentsmitglied"
 
-msgid "Role (as a group member)"
-msgstr "Rolle (als Fraktionsmitglied)"
+msgid "New parliamentary group function"
+msgstr "Neue Fraktionsfunktion"
+
+msgid "New commission function"
+msgstr "Neue Kommissionsfunktion"
 
 msgid "Do you really want to delete this parliamentarian?"
-msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
+msgstr "Möchten Sie dieses Parlamentsmitglied wirklich löschen?"
 
 msgid "Delete parliamentarian"
-msgstr "Parlamentarier:in löschen"
+msgstr "Parlamentsmitglied löschen"
 
 msgid "Do you really want to remove this role?"
 msgstr "Rolle wirklich entfernen?"
@@ -370,11 +379,26 @@ msgstr "Möchten Sie das politische Geschäft wirklich löschen?"
 msgid "Delete political business"
 msgstr "Politisches Geschäft löschen"
 
+msgid "RIS settings"
+msgstr "RIS Einstellungen"
+
+msgid "Commission membership"
+msgstr "Kommissionsmitgliedschaft"
+
+msgid "Do you really want to remove this commission membership?"
+msgstr "Möchten Sie diese Kommissionsmitgliedschaft wirklich entfernen?"
+
+msgid "Remove commission membership"
+msgstr "Kommissionsmitgliedschaft entfernen"
+
 msgid "No availability periods defined."
 msgstr "Keine Verfügbarkeitszeiträume definiert."
 
 msgid "State:"
 msgstr "Status:"
+
+msgid "Submitter"
+msgstr "Antragsteller/in"
 
 msgid "Owner:"
 msgstr "Besitzer:"
@@ -440,6 +464,9 @@ msgstr "Keine aktiven Chats."
 
 msgid "Contact"
 msgstr "Kontakt"
+
+msgid "Function"
+msgstr "Funktion"
 
 msgid "No active commissions."
 msgstr "Keine aktiven Kommissionen."
@@ -784,6 +811,9 @@ msgstr "Vorheriger Eintrag"
 msgid "Next Entry"
 msgstr "Nächster Eintrag"
 
+msgid "Invoice Items"
+msgstr "Rechnungspositionen"
+
 msgid "Total Amount"
 msgstr "Totalbetrag"
 
@@ -907,9 +937,6 @@ msgstr "Veröffentlicht"
 
 msgid "Withdrawn"
 msgstr "Zurückgezogen"
-
-msgid "Submitter"
-msgstr "Antragsteller/in"
 
 msgid "Title"
 msgstr "Titel"
@@ -1218,6 +1245,42 @@ msgstr "Verfügbare Optionen für das Fokus-Widget:"
 msgid "Copy to clipboard"
 msgstr "In die Zwischenablage kopieren"
 
+msgid "Booking Text"
+msgstr "Buchungstext"
+
+msgid "Unit"
+msgstr "Einheit"
+
+msgid "Quantity"
+msgstr "Anzahl"
+
+msgid "VAT Rate"
+msgstr "Mehrwertsteuersatz"
+
+msgid "VAT"
+msgstr "MwSt"
+
+msgid "Amount"
+msgstr "Betrag"
+
+msgid "Submission"
+msgstr "Eintrag"
+
+msgid "Selected Options"
+msgstr "Ausgewählte Optionen"
+
+msgid "Discounts / Surcharges"
+msgstr "Abzüge / Zuschläge"
+
+msgid "Lump sum"
+msgstr "Pauschalbetrag"
+
+msgid "Unpaid"
+msgstr "Unbezahlt"
+
+msgid "Total"
+msgstr "Total"
+
 msgid "Hello!"
 msgstr "Guten Tag"
 
@@ -1423,9 +1486,6 @@ msgstr ""
 msgid "Pending approval"
 msgstr "Noch nicht akzeptiert"
 
-msgid "VAT"
-msgstr "MwSt"
-
 msgid "A new entry has been added to the \"${directory}\" directory:"
 msgstr "Ein neuer Eintrag wurde im Verzeichnis \"${directory}\" hinzugefügt:"
 
@@ -1622,8 +1682,20 @@ msgstr "Datum/Zeit"
 msgid "Agenda"
 msgstr "Traktanden"
 
+msgid "No agenda items defined yet."
+msgstr "Es wurden noch keine Traktanden erfasst."
+
 msgid "No meetings defined yet."
 msgstr "Noch keine Sitzungen definiert."
+
+msgid "Next Meeting"
+msgstr "Nächste Sitzung"
+
+msgid "Upcoming Meetings"
+msgstr "Künftige Sitzungen"
+
+msgid "Past Meetings"
+msgstr "Vergangene Sitzungen"
 
 msgid "Directory entry adopted."
 msgstr "Verzeichniseintrag übernommen."
@@ -1721,6 +1793,9 @@ msgstr "Ticket E-Mails aktiviert."
 
 msgid "Payment amount changed."
 msgstr "Zahlungsbetrag geändert."
+
+msgid "Submitter e-mail changed."
+msgstr "E-Mail Adresse des Antragstellers geändert."
 
 msgid "Ticket archived."
 msgstr "Ticket archiviert."
@@ -1856,6 +1931,9 @@ msgstr "Herkunft"
 msgid "This is an imported event"
 msgstr "Dies ist eine importierte Veranstaltung"
 
+msgid "General information about the event calendar"
+msgstr "Allgemeine Informationen zum Veranstaltungskalender"
+
 msgid "Tag"
 msgstr "Schlagwort"
 
@@ -1877,8 +1955,14 @@ msgstr "Vertragsnummer"
 msgid "Picture"
 msgstr "Bild"
 
+msgid "Party"
+msgstr "Partei"
+
 msgid "Private address"
 msgstr "Privatadresse"
+
+msgid "Place of residence"
+msgstr "Wohnort"
 
 msgid "Date of birth"
 msgstr "Geburtsdatum"
@@ -1928,13 +2012,16 @@ msgstr "Webseite"
 msgid "Remarks"
 msgstr "Bemerkungen"
 
-msgid "Roles"
-msgstr "Mitgliedschaften"
+msgid "Functions"
+msgstr "Funktionen"
 
 msgid "Parliament"
 msgstr "Parlament"
 
-msgid "Interests"
+msgid "in"
+msgstr "der"
+
+msgid "Interest ties"
 msgstr "Interessensbindungen"
 
 msgid "Role"
@@ -2006,6 +2093,9 @@ msgstr "Geschäftsart"
 msgid "Status"
 msgstr "Status"
 
+msgid "Submission/publication date"
+msgstr "Einreichungs-/Publikationsdatum"
+
 msgid "Participants"
 msgstr "Verfasser/Beteiligte"
 
@@ -2014,9 +2104,6 @@ msgstr "Fraktion"
 
 msgid "No political businesses defined yet."
 msgstr "Es wurden noch keine politischen Geschäfte erfasst."
-
-msgid "Datum"
-msgstr "Datum"
 
 msgid "Year"
 msgstr "Jahr"
@@ -2310,8 +2397,11 @@ msgstr "${count} Notiz"
 msgid "${count} notes"
 msgstr "${count} Notizen"
 
-msgid "Amount"
-msgstr "Betrag"
+msgid "Free of charge"
+msgstr "Kostenlos"
+
+msgid "View Invoice"
+msgstr "Rechnung anzeigen"
 
 msgid "Group"
 msgstr "Gruppe"
@@ -2493,12 +2583,6 @@ msgstr "Die Kommission wurde gelöscht."
 msgid "Sort"
 msgstr "Sortieren"
 
-msgid "Past Meetings"
-msgstr "Vergangene"
-
-msgid "Upcoming Meetings"
-msgstr "Zukünftige"
-
 msgid "Added a new meeting"
 msgstr "Neue Sitzung hinzugefügt"
 
@@ -2511,20 +2595,20 @@ msgstr "Sitzung bearbeiten"
 msgid "The meeting has been deleted."
 msgstr "Die Sitzung wurde gelöscht."
 
+msgid "The commission membership has been deleted."
+msgstr "Die Kommissionsmitgliedschaft wurde gelöscht."
+
 msgid "Added a new parliamentarian"
-msgstr "Parlamentarier:in hinzugefügt"
+msgstr "Parlamentsmitglied hinzugefügt"
 
 msgid "New parliamentarian"
-msgstr "Neue/r Parlamentarier/in"
+msgstr "Neues Parlamentsmitglied"
 
 msgid "The parliamentarian has been deleted."
-msgstr "Der Parlamentarier/in wurde gelöscht."
+msgstr "Das Parlamentsmitglied wurde gelöscht."
 
 msgid "Added a new role"
 msgstr "Neue Rolle hinzugefügt"
-
-msgid "New role"
-msgstr "Neue Rolle"
 
 msgid "The parliamentarian role has been deleted."
 msgstr "Die Rolle des Parlamentariers wurde gelöscht."
@@ -2652,6 +2736,27 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid "Roles"
+#~ msgstr "Mitgliedschaften"
+
+#~ msgid "Interest tie"
+#~ msgstr "Interessensbindung"
+
+#~ msgid "Category"
+#~ msgstr "Kategorie"
+
+#~ msgid "Role (as a group member)"
+#~ msgstr "Rolle (als Fraktionsmitglied)"
+
+#~ msgid "Membership of a parliamentary group"
+#~ msgstr "Fraktionsmitgliedschaft"
+
+#~ msgid "Member of a commission"
+#~ msgstr "Kommissionsmitgliedschaft"
+
+#~ msgid "New role"
+#~ msgstr "Neue Rolle"
 
 #~ msgid "Inquiry"
 #~ msgstr "Anfrage"

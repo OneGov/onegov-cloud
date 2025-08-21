@@ -5,15 +5,15 @@ import random
 from onegov.core.collection import Pagination
 from onegov.core.custom import msgpack
 from onegov.ticket import handlers as global_handlers
-from onegov.ticket.model import Ticket
-from sqlalchemy import desc, distinct, func
+from onegov.ticket.models.ticket import Ticket
+from sqlalchemy import desc, func
 from sqlalchemy.orm import joinedload, undefer
 from uuid import UUID
 
 
 from typing import Any, Literal, NamedTuple, Self, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ticket.model import TicketState
+    from onegov.ticket.models.ticket import TicketState
     from sqlalchemy.orm import Query, Session
     from typing import TypeAlias, TypedDict
 
@@ -40,6 +40,7 @@ class TicketCollectionPagination(Pagination[Ticket]):
         handler: str = 'ALL',
         group: str | None = None,
         owner: str = '*',
+        submitter: str = '*',
         extra_parameters: dict[str, Any] | None = None
     ):
         super().__init__(page)
@@ -49,6 +50,7 @@ class TicketCollectionPagination(Pagination[Ticket]):
         self.handlers = global_handlers
         self.group = group
         self.owner = owner
+        self.submitter = submitter
 
         if self.handler != 'ALL':
             self.extra_parameters = extra_parameters or {}
@@ -84,6 +86,9 @@ class TicketCollectionPagination(Pagination[Ticket]):
         if self.owner != '*':
             query = query.filter(Ticket.user_id == self.owner)
 
+        if self.submitter != '*':
+            query = query.filter(Ticket.ticket_email == self.submitter)
+
         if self.handler != 'ALL':
             query = query.filter(Ticket.handler_code == self.handler)
 
@@ -102,34 +107,25 @@ class TicketCollectionPagination(Pagination[Ticket]):
     def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session, index, self.state, self.handler, self.group,
-            self.owner, self.extra_parameters
+            self.owner, self.submitter, self.extra_parameters
         )
-
-    def available_groups(self, handler: str = '*') -> tuple[str, ...]:
-        query = self.query().with_entities(distinct(Ticket.group))
-        query = query.order_by(Ticket.group)
-
-        if handler != '*':
-            query = query.filter(Ticket.handler_code == handler)
-
-        return tuple(r[0] for r in query.all())
 
     def for_state(self, state: ExtendedTicketState) -> Self:
         return self.__class__(
             self.session, 0, state, self.handler, self.group, self.owner,
-            self.extra_parameters
+            self.submitter, self.extra_parameters
         )
 
     def for_handler(self, handler: str) -> Self:
         return self.__class__(
             self.session, 0, self.state, handler, self.group, self.owner,
-            self.extra_parameters
+            self.submitter, self.extra_parameters
         )
 
     def for_group(self, group: str) -> Self:
         return self.__class__(
             self.session, 0, self.state, self.handler, group, self.owner,
-            self.extra_parameters
+            self.submitter, self.extra_parameters
         )
 
     def for_owner(self, owner: str | UUID) -> Self:
@@ -138,7 +134,13 @@ class TicketCollectionPagination(Pagination[Ticket]):
 
         return self.__class__(
             self.session, 0, self.state, self.handler, self.group, owner,
-            self.extra_parameters
+            self.submitter, self.extra_parameters
+        )
+
+    def for_submitter(self, submitter: str) -> Self:
+        return self.__class__(
+            self.session, 0, self.state, self.handler, self.group, self.owner,
+            submitter, self.extra_parameters
         )
 
 

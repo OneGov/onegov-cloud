@@ -748,7 +748,7 @@ def send_monthly_mtan_statistics(request: OrgRequest) -> None:
 
     today = to_timezone(utcnow(), 'Europe/Zurich')
 
-    if today.weekday() != MON or today.day >= 7:
+    if today.weekday() != MON or today.day > 7:
         return
 
     year = today.year
@@ -1251,7 +1251,7 @@ def wil_daily_event_import(request: OrgRequest) -> None:
         return
 
     minaza_url = 'https://azizi.2mp.ch/export/events/v/1'
-    params = {'zip': '9500'}
+    params = {'zip': '9500,9512,9552'}
     headers = {'Authorization': f'apikey {api_token}'}
 
     log.info(f'Start querying url {minaza_url} for Wil event import')

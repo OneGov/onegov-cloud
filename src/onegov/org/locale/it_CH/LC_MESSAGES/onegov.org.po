@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-07-21 08:00+0200\n"
+"POT-Creation-Date: 2025-08-14 10:09+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -263,6 +263,9 @@ msgstr ""
 msgid "ID Payment Provider"
 msgstr "ID elaboratore dei pagamenti"
 
+msgid "References Payment Provider"
+msgstr "Riferimenti elaboratore dei pagamenti"
+
 msgid "Status"
 msgstr "Stato"
 
@@ -433,6 +436,18 @@ msgstr "Tipo"
 
 msgid "Description"
 msgstr "Descrizione"
+
+msgid "Commission"
+msgstr "Commissione"
+
+msgid "Parliamentarian"
+msgstr "Parlamentare"
+
+msgid "Function"
+msgstr "Funzione"
+
+msgid "Role"
+msgstr "Ruolo"
 
 msgid "Lead"
 msgstr "Principale"
@@ -625,6 +640,9 @@ msgstr ""
 msgid "Publication"
 msgstr "Pubblicazione"
 
+msgid "Required publication dates"
+msgstr "Date di pubblicazione obbligatorie"
+
 msgid "Enable registering for update notifications"
 msgstr "Attivare la registrazione per le notifiche"
 
@@ -634,9 +652,6 @@ msgstr ""
 
 msgid "Notifications"
 msgstr "Notifiche"
-
-msgid "Required publication dates"
-msgstr "Date di pubblicazione obbligatorie"
 
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Informazioni da fornire in aggiunta all'e-mail"
@@ -846,6 +861,9 @@ msgstr "Goditi un concerto nel giardino del castello."
 msgid "Image"
 msgstr "Immagine"
 
+msgid "Ideal size: 700 x 420 px (5:3)"
+msgstr "Dimensione ideale: 700 x 420 px (5:3)"
+
 msgid "Additional Information (PDF)"
 msgstr "Informazioni aggiuntive (PDF)"
 
@@ -1011,6 +1029,12 @@ msgid ""
 msgstr ""
 "Descrive il modo in cui questa risorsa può essere prelevata. Questo testo "
 "viene utilizzato nella pagina di stato del biglietto per informare l'utente"
+
+msgid "E-Mail Reply Address (Reply-To)"
+msgstr "Indirizzo di risposta dell'e-mail (Rispondi a)"
+
+msgid "Replies to automated e-mails go to this address."
+msgstr "Le risposte alle e-mail automatizzate sono inviate a questo indirizzo."
 
 msgid "Show VAT"
 msgstr "Visualizza l'IVA"
@@ -1182,8 +1206,29 @@ msgstr "Per didascalia"
 msgid "By last change"
 msgstr "Per data dell'ultima modifica"
 
-msgid "Agenda Items"
+msgid "Booking Text"
+msgstr "Testo prenotazione"
+
+msgid "Kind"
+msgstr "Tipo"
+
+msgid "Discount"
+msgstr "Deduzione"
+
+msgid "Surcharge"
+msgstr "Supplemento"
+
+msgid "New agenda item"
+msgstr "Nuovo elemento dell'agenda"
+
+msgid "Agenda items"
 msgstr "Elementi dell'agenda"
+
+msgid "Number"
+msgstr "Numero"
+
+msgid "Agenda item"
+msgstr "Elemento dell'agenda"
 
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilizzato nella panoramica e nell'oggetto dell'e-mail"
@@ -1346,9 +1391,6 @@ msgstr "Data di nascita"
 msgid "Additional information"
 msgstr "Informazioni aggiuntive"
 
-msgid "Date of death"
-msgstr "Data di morte"
-
 msgid "Place of origin"
 msgstr "Luogo di origine"
 
@@ -1382,11 +1424,14 @@ msgstr "Sito web"
 msgid "Remarks"
 msgstr "Osservazioni"
 
-msgid "Parliamentarian"
-msgstr "Parlamentare"
+msgid "Interest ties"
+msgstr "Legami di interesse"
 
-msgid "Role"
-msgstr "Ruolo"
+msgid "Interest tie"
+msgstr "Legame di interesse"
+
+msgid "Category"
+msgstr "Categoria"
 
 msgid "Parliamentary group"
 msgstr "Gruppo parlamentare"
@@ -1421,9 +1466,6 @@ msgstr "Tipo di pagamento"
 
 msgid "Academic Title"
 msgstr "Titolo accademico"
-
-msgid "Function"
-msgstr "Funzione"
 
 msgid "Organisation"
 msgstr "Organizzazione"
@@ -1482,14 +1524,11 @@ msgstr "Primo firmatario"
 msgid "Co-signatory"
 msgstr "Cofirmatario"
 
-msgid "Number"
-msgstr "Numero"
-
 msgid "Business Status"
 msgstr "Stato"
 
-msgid "Entry Date"
-msgstr "Data"
+msgid "Submission/publication date"
+msgstr "Data di invio/pubblicazione"
 
 msgid "Participations"
 msgstr "Partecipanti"
@@ -1719,12 +1758,6 @@ msgstr "URL che punta al logo"
 
 msgid "Logo (Square)"
 msgstr "Logo (quadrato)"
-
-msgid "E-Mail Reply Address (Reply-To)"
-msgstr "Indirizzo di risposta dell'e-mail (Rispondi a)"
-
-msgid "Replies to automated e-mails go to this address."
-msgstr "Le risposte alle e-mail automatizzate sono inviate a questo indirizzo."
 
 msgid "Primary Color"
 msgstr "Colore primario"
@@ -2505,6 +2538,12 @@ msgstr "Filtri configurabili manualmente"
 msgid "Both, predefined tags as well as configurable filters"
 msgstr "Entrambi, tag predefiniti e filtri configurabili"
 
+msgid "General information above the event list"
+msgstr "Informazioni generali sopra l'elenco degli eventi"
+
+msgid "General information below the event list"
+msgstr "Informazioni generali sotto l'elenco degli eventi"
+
 msgid "Documents"
 msgstr "Documenti"
 
@@ -3011,6 +3050,12 @@ msgstr "Nuovo messaggio"
 
 msgid "Ticket Status"
 msgstr "Stato del biglietto"
+
+msgid "Invoice"
+msgstr "Fattura"
+
+msgid "Discount / Surcharge"
+msgstr "Deduzione / Supplemento"
 
 msgid "Text module"
 msgstr "Modulo di testo"
@@ -3650,8 +3695,8 @@ msgstr "Rifiuta le prenotazioni"
 msgid "Reject all with message"
 msgstr "Rifiuta tutto con messaggio"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -4241,6 +4286,9 @@ msgstr ""
 msgid "Links"
 msgstr "Collegamenti"
 
+msgid "Invoice Items"
+msgstr "Voci di fattura"
+
 msgid "Item(s)"
 msgstr "Elemento(i)"
 
@@ -4515,6 +4563,27 @@ msgstr "Chiudi"
 
 msgid "Copy to clipboard"
 msgstr "Copia negli appunti"
+
+msgid "Unit"
+msgstr "Unità"
+
+msgid "Quantity"
+msgstr "Quantità"
+
+msgid "Submission"
+msgstr "Iscrizione"
+
+msgid "Selected Options"
+msgstr "Opzioni selezionate"
+
+msgid "Discounts / Surcharges"
+msgstr "Deduzioni / Supplementi"
+
+msgid "Lump sum"
+msgstr "Somma forfettaria"
+
+msgid "Unpaid"
+msgstr "Non pagato"
 
 msgid "No submissions yet."
 msgstr "Ancora nessuna iscrizione."
@@ -5052,6 +5121,9 @@ msgstr "E-mail dei biglietti abilitate."
 msgid "Payment amount changed."
 msgstr "Importo del pagamento modificato."
 
+msgid "Submitter e-mail changed."
+msgstr "Indirizzo e-mail del mittente modificato."
+
 msgid "Ticket archived."
 msgstr "Biglietto archiviato."
 
@@ -5488,6 +5560,9 @@ msgstr "${count} nota"
 
 msgid "${count} notes"
 msgstr "${count} note"
+
+msgid "View Invoice"
+msgstr "Visualizza fattura"
 
 msgid "Change tag"
 msgstr "Modificare il tag"
@@ -6321,6 +6396,12 @@ msgstr ""
 msgid "Registrations are no longer possible"
 msgstr "Le iscrizioni non sono più possibili"
 
+msgid ""
+"Your changes would alter the price total but the payment is no longer open."
+msgstr ""
+"Le modifiche apportate altererebbero il prezzo totale, ma il pagamento non è "
+"più disponibile."
+
 msgid "Pay Online and Complete"
 msgstr "Paga online e completa"
 
@@ -7150,6 +7231,27 @@ msgstr "Il tuo messaggio è stato inviato"
 msgid "Zip archive created successfully"
 msgstr "Archivio zip creato con successo"
 
+msgid "The payment is no longer open, so the invoice cannot be modified."
+msgstr ""
+"Il pagamento non è più aperto, quindi la fattura non può essere modificata."
+
+msgid "Remove Discount"
+msgstr "Rimuovi deduzione"
+
+msgid "Remove Surchage"
+msgstr "Rimuovi supplemento"
+
+#, python-format
+msgid "Do you really want to remove \"${booking_text}\"?"
+msgstr "Vuoi davvero rimuovere \"${booking_text}\"?"
+
+#, python-format
+msgid "${ticket} Invoice"
+msgstr "${ticket} Fattura"
+
+msgid "Add Discount / Surcharge"
+msgstr "Aggiungi deduzione / supplemento"
+
 msgid "Your request has been submitted"
 msgstr "La tua richiesta è stata inviata"
 
@@ -7197,6 +7299,9 @@ msgstr "Tutti i biglietti"
 msgid "All Users"
 msgstr "Tutti gli utenti"
 
+msgid "All Submitters"
+msgstr "Tutti i mittenti"
+
 #, python-format
 msgid "${success_count} tickets deleted, ${error_count} are not deletable"
 msgstr ""
@@ -7239,6 +7344,15 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid "Date of death"
+#~ msgstr "Data di morte"
+
+#~ msgid "Information above the event list"
+#~ msgstr "Informazioni sopra l'elenco degli eventi"
+
+#~ msgid "Information below the event list"
+#~ msgstr "Informazioni sotto l'elenco degli eventi"
 
 #~ msgid "Portrait"
 #~ msgstr "Ritratto"

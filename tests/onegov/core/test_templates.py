@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 import os
 import os.path
@@ -8,11 +10,19 @@ from onegov.core.framework import Framework
 from onegov.core.layout import ChameleonLayout
 from onegov.core.templates import render_macro, PageTemplate, PageTemplateFile
 from translationstring import TranslationStringFactory
-PageTemplateFile
 from webtest import TestApp as Client
 
 
-def test_chameleon_with_translation(temporary_directory, redis_url):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from onegov.core.types import RenderData
+
+
+def test_chameleon_with_translation(
+    temporary_directory: str,
+    redis_url: str
+) -> None:
     # Test chameleon in a real scenario with templating and translations
 
     templates = os.path.join(temporary_directory, 'templates')
@@ -58,15 +68,15 @@ def test_chameleon_with_translation(temporary_directory, redis_url):
         pass
 
     @App.template_directory()
-    def get_template_directory():
+    def get_template_directory() -> str:
         return templates
 
     @App.setting(section='i18n', name='localedirs')
-    def get_localedirs():
+    def get_localedirs() -> list[str]:
         return [locale]
 
     @App.setting(section='i18n', name='default_locale')
-    def get_i18n_default_locale():
+    def get_i18n_default_locale() -> str:
         return 'de'
 
     @App.path(path='/')
@@ -74,13 +84,13 @@ def test_chameleon_with_translation(temporary_directory, redis_url):
         pass
 
     @App.html(model=Root, template='index.pt')
-    def view_root(self, request):
+    def view_root(self: Root, request: CoreRequest) -> RenderData:
         return {
             'foo': _("We're sinking, we're sinking!")
         }
 
     @App.view(model=Root, name='macro')
-    def view_root_macro(self, request):
+    def view_root_macro(self: Root, request: CoreRequest) -> str:
         registry = request.app.config.template_engine_registry
         template = registry._template_loaders['.pt']['index.pt']
         template.macros['testmacro']
@@ -105,7 +115,7 @@ def test_chameleon_with_translation(temporary_directory, redis_url):
     assert '<i>Makro</i>' in client.get('/macro').text
 
 
-def test_inject_default_vars(temporary_directory, redis_url):
+def test_inject_default_vars(temporary_directory: str, redis_url: str) -> None:
 
     templates = os.path.join(temporary_directory, 'templates')
     os.mkdir(templates)
@@ -125,7 +135,7 @@ def test_inject_default_vars(temporary_directory, redis_url):
         pass
 
     @Parent.template_directory()
-    def get_template_directory():
+    def get_template_directory() -> str:
         return templates
 
     @Parent.path(path='/')
@@ -133,13 +143,13 @@ def test_inject_default_vars(temporary_directory, redis_url):
         pass
 
     @Parent.view(model=Root, template='index.pt')
-    def view_root(self, request):
+    def view_root(self: Root, request: CoreRequest) -> RenderData:
         return {
             'injected': 'foobar'
         }
 
     @Parent.template_variables()
-    def get_parent_template_variables(request):
+    def get_parent_template_variables(request: CoreRequest) -> RenderData:
         return {
             'injected': 'parent',
             'parent': True
@@ -149,7 +159,7 @@ def test_inject_default_vars(temporary_directory, redis_url):
         pass
 
     @Child.template_variables()
-    def get_child_template_variables(request):
+    def get_child_template_variables(request: CoreRequest) -> RenderData:
         return {
             'injected': 'child',
             'child': True
@@ -183,13 +193,13 @@ def test_inject_default_vars(temporary_directory, redis_url):
     assert 'niño' in child_page
 
 
-def test_macro_lookup(temporary_directory, redis_url):
+def test_macro_lookup(temporary_directory: str, redis_url: str) -> None:
 
     parent = os.path.join(temporary_directory, 'parent')
-    child = os.path.join(temporary_directory, 'child')
+    child_dir = os.path.join(temporary_directory, 'child')
 
     os.mkdir(parent)
-    os.mkdir(child)
+    os.mkdir(child_dir)
 
     with open(os.path.join(parent, 'index.pt'), 'w') as f:
         f.write("""
@@ -214,7 +224,7 @@ def test_macro_lookup(temporary_directory, redis_url):
             </html>
         """)
 
-    with open(os.path.join(child, 'macros.pt'), 'w') as f:
+    with open(os.path.join(child_dir, 'macros.pt'), 'w') as f:
         f.write("""
             <!DOCTYPE html>
             <html xmlns="http://www.w3.org/1999/xhtml"
@@ -229,7 +239,7 @@ def test_macro_lookup(temporary_directory, redis_url):
         pass
 
     @Parent.template_directory()
-    def get_parent_template_directory():
+    def get_parent_template_directory() -> str:
         return parent
 
     @Parent.path(path='/')
@@ -237,7 +247,7 @@ def test_macro_lookup(temporary_directory, redis_url):
         pass
 
     @Parent.view(model=Root, template='index.pt')
-    def view_root(self, request):
+    def view_root(self: Root, request: CoreRequest) -> RenderData:
         return {
             'layout': ChameleonLayout(self, request)
         }
@@ -246,8 +256,8 @@ def test_macro_lookup(temporary_directory, redis_url):
         pass
 
     @Child.template_directory()
-    def get_child_template_directory():
-        return child
+    def get_child_template_directory() -> str:
+        return child_dir
 
     utils.scan_morepath_modules(Parent)
     utils.scan_morepath_modules(Child)
@@ -265,7 +275,7 @@ def test_macro_lookup(temporary_directory, redis_url):
     assert 'Child' in page
 
 
-def test_boolean_attributes(temporary_directory, redis_url):
+def test_boolean_attributes(temporary_directory: str, redis_url: str) -> None:
     select = """
     <select>
         <option value="1" tal:attributes="selected True"></option>
@@ -287,40 +297,40 @@ def test_boolean_attributes(temporary_directory, redis_url):
     """
 
     # PageTemplate
-    page = PageTemplate(select + radio_1 + radio_2)()
-    assert '<option value="1" selected="selected"></option>' in page
-    assert '<option value="2"></option>' in page
-    assert '<option value="3"></option>' in page
-    assert '<input type="radio" value="1" checked="checked">' in page
-    assert '<input type="radio" value="2">' in page
-    assert '<input type="radio" value="3">' in page
-    assert '<input type="radio" value="4" disabled="disabled">' in page
-    assert '<input type="radio" value="5">' in page
-    assert '<input type="radio" value="6">' in page
+    rendered = PageTemplate(select + radio_1 + radio_2)()
+    assert '<option value="1" selected="selected"></option>' in rendered
+    assert '<option value="2"></option>' in rendered
+    assert '<option value="3"></option>' in rendered
+    assert '<input type="radio" value="1" checked="checked">' in rendered
+    assert '<input type="radio" value="2">' in rendered
+    assert '<input type="radio" value="3">' in rendered
+    assert '<input type="radio" value="4" disabled="disabled">' in rendered
+    assert '<input type="radio" value="5">' in rendered
+    assert '<input type="radio" value="6">' in rendered
 
     # PageTemplateFile
     template = os.path.join(temporary_directory, 'template.pt')
     with open(template, 'w') as f:
         f.write(select + radio_1 + radio_2)
-    page = PageTemplateFile(template)()
-    assert '<option value="1" selected="selected"></option>' in page
-    assert '<option value="2"></option>' in page
-    assert '<option value="3"></option>' in page
-    assert '<input type="radio" value="1" checked="checked">' in page
-    assert '<input type="radio" value="2">' in page
-    assert '<input type="radio" value="3">' in page
-    assert '<input type="radio" value="4" disabled="disabled">' in page
-    assert '<input type="radio" value="5">' in page
-    assert '<input type="radio" value="6">' in page
+    rendered = PageTemplateFile(template)()
+    assert '<option value="1" selected="selected"></option>' in rendered
+    assert '<option value="2"></option>' in rendered
+    assert '<option value="3"></option>' in rendered
+    assert '<input type="radio" value="1" checked="checked">' in rendered
+    assert '<input type="radio" value="2">' in rendered
+    assert '<input type="radio" value="3">' in rendered
+    assert '<input type="radio" value="4" disabled="disabled">' in rendered
+    assert '<input type="radio" value="5">' in rendered
+    assert '<input type="radio" value="6">' in rendered
 
     # PageTemplateLoader
-    parent = os.path.join(temporary_directory, 'parent')
-    child = os.path.join(temporary_directory, 'child')
+    parent_dir = os.path.join(temporary_directory, 'parent')
+    child_dir = os.path.join(temporary_directory, 'child')
 
-    os.mkdir(parent)
-    os.mkdir(child)
+    os.mkdir(parent_dir)
+    os.mkdir(child_dir)
 
-    with open(os.path.join(parent, 'index.pt'), 'w') as f:
+    with open(os.path.join(parent_dir, 'index.pt'), 'w') as f:
         f.write(f"""
             <!DOCTYPE html>
             <html xmlns="http://www.w3.org/1999/xhtml"
@@ -331,7 +341,7 @@ def test_boolean_attributes(temporary_directory, redis_url):
             </html>
         """)
 
-    with open(os.path.join(parent, 'macros.pt'), 'w') as f:
+    with open(os.path.join(parent_dir, 'macros.pt'), 'w') as f:
         f.write(f"""
             <!DOCTYPE html>
             <html xmlns="http://www.w3.org/1999/xhtml"
@@ -341,7 +351,7 @@ def test_boolean_attributes(temporary_directory, redis_url):
             </html>
         """)
 
-    with open(os.path.join(child, 'macros.pt'), 'w') as f:
+    with open(os.path.join(child_dir, 'macros.pt'), 'w') as f:
         f.write(f"""
             <!DOCTYPE html>
             <html xmlns="http://www.w3.org/1999/xhtml"
@@ -354,7 +364,7 @@ def test_boolean_attributes(temporary_directory, redis_url):
             </html>
         """)
 
-    with open(os.path.join(child, 'slot.pt'), 'w') as f:
+    with open(os.path.join(child_dir, 'slot.pt'), 'w') as f:
         f.write(f"""
             <!DOCTYPE html>
             <html xmlns="http://www.w3.org/1999/xhtml"
@@ -371,15 +381,15 @@ def test_boolean_attributes(temporary_directory, redis_url):
         pass
 
     @Parent.template_directory()
-    def get_parent_template_directory():
-        return parent
+    def get_parent_template_directory() -> str:
+        return parent_dir
 
     @Parent.path(path='/')
     class Root:
         pass
 
     @Parent.view(model=Root, template='index.pt')
-    def view_root(self, request):
+    def view_root(self: Root, request: CoreRequest) -> RenderData:
         return {
             'layout': ChameleonLayout(self, request)
         }
@@ -388,11 +398,11 @@ def test_boolean_attributes(temporary_directory, redis_url):
         pass
 
     @Child.template_directory()
-    def get_child_template_directory():
-        return child
+    def get_child_template_directory() -> str:
+        return child_dir
 
     @Child.view(model=Root, name='slot', template='slot.pt')
-    def view_slot(self, request):
+    def view_slot(self: Root, request: CoreRequest) -> RenderData:
         return {
             'layout': ChameleonLayout(self, request)
         }

@@ -23,28 +23,33 @@ class ParliamentarianCollection(GenericCollection[ParliamentarianT]):
     def __init__(
         self,
         session: Session,
-        active: bool | None = None
+        active: bool | None = None,
+        party: str | None = None
     ):
         super().__init__(session)
         self.active = active
+        self.party = party
 
     @property
     def model_class(self) -> type[ParliamentarianT]:
         return Parliamentarian  # type: ignore[return-value]
 
     def query(self) -> Query[ParliamentarianT]:
-
         query = super().query()
 
         Parliamentarian = self.model_class  # noqa: N806
         if self.active is not None:
-            id_query = self.session.query(Parliamentarian)
             if self.active:
-                ids = [p.id for p in id_query if p.active]
-                query = query.filter(Parliamentarian.id.in_(ids))
+                query = query.filter(
+                    Parliamentarian.active.expression == True)  # type:ignore[attr-defined]
             else:
-                ids = [p.id for p in id_query if not p.active]
-                query = query.filter(Parliamentarian.id.in_(ids))
+                query = query.filter(
+                    Parliamentarian.active.expression == False)  # type:ignore[attr-defined]
+        if self.party is not None:
+            if self.party in self.party_values():
+                query = query.filter(
+                    Parliamentarian.party.in_([self.party])
+                )
 
         return query.order_by(
             Parliamentarian.last_name,
@@ -53,6 +58,16 @@ class ParliamentarianCollection(GenericCollection[ParliamentarianT]):
 
     def for_filter(
         self,
-        active: bool | None = None
+        active: bool | None = None,
+        party: str | None = None,
     ) -> Self:
-        return self.__class__(self.session, active)
+        return self.__class__(self.session, active, party)
+
+    def party_values(self) -> list[str]:
+        """ Returns a list of all parties given in the database. """
+
+        return sorted([
+            party[0]
+            for party in self.session.query(Parliamentarian.party).distinct()
+            if party[0]
+        ])

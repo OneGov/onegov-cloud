@@ -2834,6 +2834,7 @@ def ris_rename_imported_participation_types_to_english(
         'Erstunterzeichner/in': 'First signatory',
         'Mitunterzeichner/in': 'Co-signatory',
         'Vorstösser/in': 'First signatory',
+        'Vorstösser/-in': 'First signatory',
     }
 
     def rename_participation_types(request: OrgRequest, app: OrgApp) -> None:

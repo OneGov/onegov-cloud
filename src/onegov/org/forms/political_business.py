@@ -164,7 +164,7 @@ class PoliticalBusinessForm(Form):
     )
 
     entry_date = DateField(
-        label=_('Entry Date'),
+        label=_('Submission/publication date'),
         validators=[InputRequired()],
         default=date.today,
     )
@@ -223,7 +223,7 @@ class PoliticalBusinessForm(Form):
             choices: list[_Choice] = [
                 (
                     str(participant.id),
-                    participant.display_name,
+                    participant.title,
                     {'data-role': selected.get(participant.id) or ''}
                 )
                 for participant in selectable_participants
@@ -260,7 +260,7 @@ class PoliticalBusinessForm(Form):
             .all()
         )
         self.parliamentary_group_id.choices = [
-            (str(g.id.hex), g.name) for g in groups
+            (str(g.id), g.name) for g in groups
         ]
         self.parliamentary_group_id.choices.insert(0, ('', '-'))
 

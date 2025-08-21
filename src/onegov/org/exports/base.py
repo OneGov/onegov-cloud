@@ -35,6 +35,7 @@ class OrgExport(Export):
     ) -> Iterator[tuple[str, Any]]:
 
         yield _('ID Payment Provider'), payment.remote_id
+        yield _('References Payment Provider'), payment.remote_references
         yield _('Status'), _(payment.state.capitalize())
         yield _('Currency'), payment.currency
         yield _('Amount'), payment.amount

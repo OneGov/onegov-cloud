@@ -6,8 +6,10 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 
+import click
 import logging
 import requests
+
 from dateutil.parser import parse
 from html import unescape
 
@@ -499,6 +501,7 @@ class EventCollection(Pagination[Event]):
         organizers = {}
         items = []
         items_to_purge = []
+        source_ids = []
         h2t_config = {'ignore_emphasis': True}
 
         root = etree.fromstring(xml_stream)
@@ -593,12 +596,13 @@ class EventCollection(Pagination[Event]):
                 location_data[i] for i in ['title', 'street', 'zip', 'city']
                 if location_data[i]
             )
-            coordinates = Coordinates(
-                lat=float(
-                    location_data['lat']) if location_data.get('lat') else 0.0,
-                lon=float(
-                    location_data['lon']) if location_data.get('lon') else 0.0
-            )
+            coordinates = None
+            if (location_data.get('lat', None) and
+                    location_data.get('lon', None)):
+                coordinates = Coordinates(
+                    lat=float(location_data['lat']),
+                    lon=float(location_data['lon'])
+                )
             event_image, event_image_name = get_event_image(event)
 
             ticket_price = find_element_text(event, 'ticketPrice')
@@ -691,6 +695,19 @@ class EventCollection(Pagination[Event]):
                         pdf_filename=None,
                     )
                 )
+
+                source_ids.append(schedule_id)
+
+        # ogc-2447 imported events with source ids not in this `xml_stream`
+        # can be removed to prevent duplicates as the xml stream represents
+        # a complete set of events
+        for event in (
+                self.session.query(Event)
+                .filter(Event.source.notin_(source_ids))):  # type:ignore[union-attr]
+            if event.source:
+                items_to_purge.append(event.source)
+                click.echo(f' - removing event as not in xml stream '
+                           f'{event.title} {event.start}')
 
         return self.from_import(
             items,
