@@ -155,6 +155,11 @@ class MeetingForm(Form):
 
         businesses = (
             self.meta.request.session.query(PoliticalBusiness)
+            .with_entities(
+                PoliticalBusiness.number,
+                PoliticalBusiness.title,
+                PoliticalBusiness.display_name
+            )
             .order_by(PoliticalBusiness.number, PoliticalBusiness.title)
             .all()
         )
