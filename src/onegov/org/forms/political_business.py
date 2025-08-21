@@ -260,7 +260,7 @@ class PoliticalBusinessForm(Form):
             .all()
         )
         self.parliamentary_group_id.choices = [
-            (str(g.id.hex), g.name) for g in groups
+            (str(g.id), g.name) for g in groups
         ]
         self.parliamentary_group_id.choices.insert(0, ('', '-'))
 
