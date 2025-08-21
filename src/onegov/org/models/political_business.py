@@ -25,6 +25,7 @@ if TYPE_CHECKING:
 
     from collections.abc import Collection
     from sqlalchemy.orm import Query, Session
+    from sqlalchemy.sql import ColumnElement
 
     from onegov.org.models import Meeting
     from onegov.org.models import MeetingItem
@@ -204,7 +205,7 @@ class PoliticalBusiness(
         return f'{self.number} {self.title}' if self.number else self.title
 
     @display_name.expression  # type:ignore[no-redef]
-    def display_name(cls):
+    def display_name(cls) -> ColumnElement[str]:
         return func.concat(
             func.coalesce(cls.number, ''),
             case([
@@ -387,7 +388,7 @@ class PoliticalBusinessCollection(
         """ Returns the given political business by display name or None. """
         return (
             self.query()
-            .filter(PoliticalBusiness.display_name == display_name)
+            .filter(str(PoliticalBusiness.display_name) == display_name)
             .first()
         )
 
