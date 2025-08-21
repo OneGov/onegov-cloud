@@ -264,13 +264,6 @@ class PoliticalBusinessForm(Form):
         ]
         self.parliamentary_group_id.choices.insert(0, ('', '-'))
 
-    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
-        result = super().get_useful_data()
-        result.pop('participants', None)
-        result['parliamentary_group_id'] = (
-            result.get('parliamentary_group_id') or None)
-        return result
-
     def populate_obj(  # type: ignore[override]
         self,
         obj: PoliticalBusiness,  # type: ignore[override]
