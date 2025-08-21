@@ -201,9 +201,6 @@ def edit_meeting(
         request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
-    elif request.method == 'GET':
-        form.process(obj=self)
-
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.include_editor()
     layout.editbar_links = []
