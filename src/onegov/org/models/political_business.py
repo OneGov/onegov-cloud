@@ -352,7 +352,7 @@ class PoliticalBusinessCollection(
 
         return self.__class__(
             self.session,
-            page=self.page,
+            page=0,
             status=status_,
             types=types,
             years=years,
