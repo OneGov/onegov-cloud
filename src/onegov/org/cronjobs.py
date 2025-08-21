@@ -689,7 +689,8 @@ def end_chats_and_create_tickets(request: OrgRequest) -> None:
                     'event': 'browser-notification',
                     'title': request.translate(_('New ticket')),
                     'created': ticket.created.isoformat()
-                }
+                },
+                groupids=request.app.groupids_for_ticket(ticket),
             )
 
 

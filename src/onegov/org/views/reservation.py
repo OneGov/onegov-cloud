@@ -775,7 +775,8 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
             'event': 'browser-notification',
             'title': request.translate(_('New ticket')),
             'created': ticket.created.isoformat()
-        }
+        },
+        groupids=request.app.groupids_for_ticket(ticket),
     )
 
     if request.auto_accept(ticket):

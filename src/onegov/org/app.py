@@ -50,6 +50,7 @@ if TYPE_CHECKING:
     from onegov.core.mail import Attachment
     from onegov.core.types import EmailJsonDict, SequenceOrScalar
     from onegov.pay import Price
+    from onegov.ticket import Ticket
     from onegov.ticket.collection import TicketCount
     from reg.dispatch import _KeyLookup
 
@@ -261,6 +262,14 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             }
             for handler_code, handler_perms in permissions.items()
         }
+
+    def groupids_for_ticket(self, ticket: Ticket) -> list[str] | None:
+        handler_perms = self.ticket_permissions.get(ticket.handler_code)
+        if handler_perms is None:
+            return None
+
+        group_perms = handler_perms.get(ticket.group)
+        return handler_perms.get(None) if group_perms is None else group_perms
 
     @orm_cached(policy='on-table-change:files')
     def publications_count(self) -> int:
