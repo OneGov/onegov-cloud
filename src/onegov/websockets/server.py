@@ -72,8 +72,8 @@ class WebSocketServer(ServerConnection):
 
     def __init__(
         self,
-        config: Config,
-        session_manager: SessionManager,
+        config: Config | None,
+        session_manager: SessionManager | None,
         host: str,
         *args: Any,
         **kwargs: Any
@@ -152,6 +152,7 @@ class WebSocketServer(ServerConnection):
 
     @property
     def session(self) -> Session:
+        assert self.session_manager is not None
         self.session_manager.set_current_schema(self.schema)
 
         session = self.session_manager.session()
@@ -181,6 +182,9 @@ class WebSocketServer(ServerConnection):
 
     @cached_property
     def application_config(self) -> dict[str, Any]:
+        if self.config is None:
+            return {}
+
         for c in self.config.applications:
             if c.namespace == self.namespace:
                 return c.configuration
@@ -189,7 +193,7 @@ class WebSocketServer(ServerConnection):
 
     @cached_property
     def browser_session(self) -> BrowserSession | dict[str, Any]:
-        if self.signed_session_id is None:
+        if self.config is None or self.signed_session_id is None:
             return {}
         session_id = self.unsign(self.signed_session_id)
         if session_id is None:
@@ -735,29 +739,33 @@ def process_request(
     assert isinstance(self, WebSocketServer)
     url = urlparse(request.path)
 
-    if '/chats' not in url.path:
-        # For non-chat requests (e.g., ticker) we'll skip the dance below
-        # and let the protocol handle authentication
-        # (handle_authentication).
-        return None
-
     try:
         cookie = SimpleCookie(request.headers.get_all('Cookie')[0])
         session_id = cookie['session_id'].value
     except IndexError:
-        log.error(
-            'No session cookie found in request. '
-            'Check that you sent the request from the same origin as '
-            f'the WebSocket server ({self.host})'
-        )
+        if '/chats' in url.path:
+            log.error(
+                'No session cookie found in request. '
+                'Check that you sent the request from the same origin as '
+                f'the WebSocket server ({self.host})'
+            )
 
-        return self.respond(http.HTTPStatus.BAD_REQUEST, '')
+            return self.respond(http.HTTPStatus.BAD_REQUEST, '')
+        session_id = None
 
     self.signed_session_id = session_id
 
     try:
         self.schema = param_from_path('schema', request.path)
     except ValueError as err:
+        if '/chats' not in url.path:
+            # For non-chat requests we'll treat this as a non-critical error
+            # FIXME: This should only happen for internal message sent through
+            #        the management channel, ideally we route those through
+            #        a different path, so we can keep this validation for user
+            #        connections.
+            return None
+
         log.error(
             f'Unable to retrieve schema from path: {request.path}',
             exc_info=err
@@ -769,6 +777,12 @@ def process_request(
     self.user_id = self.browser_session.get('userid')
     self.role = self.browser_session.get('role')
     self.groupids = self.browser_session.get('groupids', frozenset())
+
+    if '/chats' not in url.path:
+        # For non-chat requests (e.g., ticker) we'll skip the dance below
+        # and let the protocol handle authentication
+        # (handle_authentication).
+        return None
 
     try:
         # Consume the presented token or deny the connection. The token
@@ -810,15 +824,13 @@ async def main(
             Base,
             session_config={'autoflush': False}
         )
-
-        # TODO: Pass in valid origins. Is there already a list of allowed
-        # origins?
-        async with serve(handle_start, host, port,
-                         process_request=process_request,
-                         create_connection=partial(WebSocketServer, config,  # type: ignore[arg-type]
-                                                   session_manager, host)):
-            await Future()
-
     else:
-        async with serve(handle_start, host, port):
-            await Future()
+        session_manager = None
+
+    # TODO: Pass in valid origins. Is there already a list of allowed
+    # origins?
+    async with serve(handle_start, host, port,
+                     process_request=process_request,
+                     create_connection=partial(WebSocketServer, config,  # type: ignore[arg-type]
+                                               session_manager, host)):
+        await Future()
