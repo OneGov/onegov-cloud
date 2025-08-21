@@ -117,10 +117,7 @@ class MeetingForm(Form):
                 items.append(current_items[title])
                 continue
 
-            business = next(
-                (b for b in businesses.query().all()
-                 if b.display_name == item_name), None)
-
+            business = businesses.by_display_name(item_name)
             if business is None:
                 new_item = MeetingItem(
                     title=title,
