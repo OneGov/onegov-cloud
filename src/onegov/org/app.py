@@ -240,7 +240,12 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
         return {
             handler_code: {
-                group: group_perms
+                group: group_perms if exclusive else
+                # if we treated a non-exclusive group as exclusive it also
+                # needs to include all of the members of the exclusive handler
+                # scoped group, otherwise we'll incorrectly restrict their
+                # access to these groups.
+                list({*group_perms, *handler_perms[None][1]})
                 for group, (exclusive, group_perms) in handler_perms.items()
                 # the permission is only exclusive, if at least one user group
                 # has exclusive permissions. But user groups with non-exclusive
