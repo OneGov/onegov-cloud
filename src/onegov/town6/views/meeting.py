@@ -156,6 +156,8 @@ def view_meeting(
             if item.political_business:
                 item_data['political_business_link'] = (
                     request.link(item.political_business))
+                item_data['business_type'] = (
+                    POLITICAL_BUSINESS_TYPE)[item.political_business.political_business_type]
 
         meeting_items_with_links.append(item_data)
 
