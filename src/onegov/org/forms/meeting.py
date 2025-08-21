@@ -104,7 +104,7 @@ class MeetingForm(Form):
         for new in new_items:
             number = new.get('number')
             title = new.get('title', '')
-            item_name = new.get('agenda_item')
+            item_name = new.get('agenda_item', '')
 
             if number == '' and title == '' and item_name == '':
                 # skip empty items
