@@ -60,9 +60,14 @@ async def broadcast(
     websocket: ClientConnection,
     schema: str,
     channel: str | None,
-    message: JSON_ro
+    message: JSON_ro,
+    groupids: list[str] | None = None
 ) -> None:
     """ Broadcasts the given message to all connected clients.
+
+    Optionally can be filtered to a list of groupids, for users with
+    a lower privilege level like editors or members. admins will always
+    receive all broadcasts in channels they've subscribed to.
 
     Assumes prior authentication.
 
@@ -73,7 +78,8 @@ async def broadcast(
             'type': 'broadcast',
             'schema': schema,
             'channel': channel,
-            'message': message
+            'message': message,
+            'groupids': groupids,
         })
     )
     await acknowledged(websocket)

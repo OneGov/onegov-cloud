@@ -383,7 +383,8 @@ def do_report_person_change(
             'event': 'browser-notification',
             'title': request.translate(_('New ticket')),
             'created': ticket.created.isoformat()
-        }
+        },
+        groupids=request.app.groupids_for_ticket(ticket),
     )
 
     return ticket

@@ -38,15 +38,15 @@ if TYPE_CHECKING:
     from onegov.server.config import Config
 
 
-CONNECTIONS: dict[str, set[ServerConnection]] = {}
+CONNECTIONS: dict[str, set[WebSocketServer]] = {}
 TOKEN = ''  # nosec: B105
 
 NOTFOUND = object()
 SESSIONS: dict[str, Session] = {}
-STAFF_CONNECTIONS: dict[str, set[ServerConnection]] = {}
+STAFF_CONNECTIONS: dict[str, set[WebSocketServer]] = {}
 STAFF: dict[str, dict[str, User]] = {}  # For Authentication of User
 ACTIVE_CHATS: dict[str, dict[UUID, Chat]] = {}  # For DB
-CHANNELS: dict[str, dict[str, set[ServerConnection]]] = {}
+CHANNELS: dict[str, dict[str, set[WebSocketServer]]] = {}
 
 
 class WebSocketServer(ServerConnection):
@@ -66,6 +66,8 @@ class WebSocketServer(ServerConnection):
     """
     schema: str
     user_id: str | None
+    role: str | None
+    groupids: frozenset[str]
     signed_session_id: str | None
 
     def __init__(
@@ -241,7 +243,7 @@ async def acknowledge(websocket: ServerConnection) -> None:
 
 
 async def handle_listen(
-    websocket: ServerConnection,
+    websocket: WebSocketServer,
     payload: JSONObject_ro
 ) -> None:
     """ Handles listening clients. """
@@ -294,7 +296,7 @@ async def handle_authentication(
 
 
 async def handle_status(
-    websocket: ServerConnection,
+    websocket: WebSocketServer,
     payload: JSONObject_ro
 ) -> None:
     """ Handles status requests. """
@@ -319,7 +321,7 @@ async def handle_status(
 
 
 async def handle_broadcast(
-    websocket: ServerConnection,
+    websocket: WebSocketServer,
     payload: JSONObject_ro
 ) -> None:
     """ Handles broadcasts. """
@@ -329,6 +331,7 @@ async def handle_broadcast(
     message = payload.get('message')
     schema = payload.get('schema')
     channel = payload.get('channel')
+    groupids = payload.get('groupids')
     if not schema or not isinstance(schema, str):
         await error(websocket, f'invalid schema: {schema}')
         return
@@ -343,6 +346,13 @@ async def handle_broadcast(
 
     schema_channel = f'{schema}-{channel}' if channel else schema
     connections = CONNECTIONS.get(schema_channel, set())
+    if isinstance(groupids, list):
+        connections = {
+            connection
+            for connection in connections
+            if connection.role == 'admin'
+            or not connection.groupids.isdisjoint(groupids)
+        }
     if connections:
         broadcast(
             connections,
@@ -359,7 +369,7 @@ async def handle_broadcast(
 
 
 async def handle_manage(
-    websocket: ServerConnection,
+    websocket: WebSocketServer,
     authentication_payload: JSONObject_ro
 ) -> None:
     """ Handles managing clients. """
@@ -513,7 +523,7 @@ async def handle_staff_chat(
         all_channels = CHANNELS.setdefault(schema, {})
         staff_connections = STAFF_CONNECTIONS.setdefault(schema, set())
         staff_connections.add(websocket)
-        channel_connections: set[ServerConnection] = set()
+        channel_connections: set[WebSocketServer] = set()
         open_channel = ''
 
         log.debug(f'added {websocket.id} to staff-connections')
@@ -687,6 +697,7 @@ async def handle_staff_chat(
 
 
 async def handle_start(websocket: ServerConnection) -> None:
+    assert isinstance(websocket, WebSocketServer)
     log.debug(f'{websocket.id} connected')
     message = await websocket.recv()
     payload = get_payload(message, ('authenticate', 'register',
@@ -696,9 +707,9 @@ async def handle_start(websocket: ServerConnection) -> None:
     elif payload and payload['type'] == 'register':
         await handle_listen(websocket, payload)
     elif payload and (payload['type'] == 'customer_chat'):
-        await handle_customer_chat(websocket, payload)  # type: ignore
+        await handle_customer_chat(websocket, payload)
     elif payload and (payload['type'] == 'staff_chat'):
-        await handle_staff_chat(websocket, payload)  # type: ignore
+        await handle_staff_chat(websocket, payload)
     else:
         # FIXME: technically message can be bytes
         await error(websocket, f'invalid command: {message}')  # type:ignore
@@ -756,6 +767,8 @@ def process_request(
 
     # browser_session requires self.schema
     self.user_id = self.browser_session.get('userid')
+    self.role = self.browser_session.get('role')
+    self.groupids = self.browser_session.get('groupids', frozenset())
 
     try:
         # Consume the presented token or deny the connection. The token
