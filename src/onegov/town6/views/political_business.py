@@ -149,8 +149,10 @@ def view_add_political_business(
     layout = PoliticalBusinessCollectionLayout(self, request)
 
     if form.submitted(request):
-        data = form.get_useful_data()
-        political_business = self.add(**data)
+        political_business = self.add(
+            title=form.title.data,
+            political_business_type=form.political_business_type.data,
+        )
         form.populate_obj(political_business)
         request.success(_('Added a new political business'))
 
