@@ -388,7 +388,7 @@ class PoliticalBusinessCollection(
         """ Returns the given political business by display name or None. """
         return (
             self.query()
-            .filter(str(PoliticalBusiness.display_name) == display_name)
+            .filter(PoliticalBusiness.display_name == display_name)  # type:ignore[comparison-overlap]
             .first()
         )
 
