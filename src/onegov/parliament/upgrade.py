@@ -99,3 +99,11 @@ def add_start_end_columns_to_meetings(
             'par_meetings',
             Column('end_datetime', UTCDateTime, nullable=True)
         )
+
+
+@upgrade_task('Remove unused political businesses relationship from meeting')
+def remove_unused_political_businesses_relationship(
+    context: UpgradeContext
+) -> None:
+    if context.has_column('par_meetings', 'political_business_id'):
+        context.operations.drop_column('par_meetings', 'political_business_id')
