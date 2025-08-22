@@ -186,7 +186,7 @@ class PoliticalBusiness(
         back_populates='political_businesses'
     )
 
-    # tschupre: needless as we have meeting items, remove it with db upgrade script
+    # FIXME: needless as we have meeting items
     #: The meetings this agenda item was discussed in
     meetings: relationship[Meeting] = relationship(
         'Meeting',
