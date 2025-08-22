@@ -1,8 +1,90 @@
 # Changes
 
+## 2025.43
+
+`2025-08-22` | [8642ecad1b...cf4a5b2885](https://github.com/OneGov/onegov-cloud/compare/8642ecad1b^...cf4a5b2885)
+
+### Landsgemeinde
+
+##### Add status "draft"
+
+`Feature` | [OGC-2268](https://linear.app/onegovcloud/issue/OGC-2268) | [d418096d74](https://github.com/onegov/onegov-cloud/commit/d418096d749cfaf990cf8bbef03ef2615bbe972a)
+
+### Org
+
+##### Hides tickets that can't be processed from tickets list
+
+Previously they were displayed, but couldn't be opened, because the
+filter happened after the query, so completely hiding would've broken
+pagination.
+
+We now do our best to apply the filter as part of the query, so we get
+a correct pagination, total number of results etc.
+
+This also fixes a corner-case with non-exclusive ticket permissions on
+a ticket group vs. exclusive ticket permissions on the handler code.
+
+`Bugfix` | [OGC-2459](https://linear.app/onegovcloud/issue/OGC-2459) | [f83e80efbc](https://github.com/onegov/onegov-cloud/commit/f83e80efbcd92520acf68d7adbbb9af26095546d)
+
+##### Fixes incomplete fix for corner case in ticket permissions
+
+`Bugfix` | [cc6cb4a2aa](https://github.com/onegov/onegov-cloud/commit/cc6cb4a2aa1e244f05d00680f32c9e1761e00e32)
+
+##### Avoids sending ticket notifications to users without permissions
+
+Previously all new tickets lead to a unrestricted global broadcast, but
+since ticket permissions can cause some users to only see a subset of
+all the tickets, they should only receive broadcasts for those tickets.
+
+`Bugfix` | [OGC-2554](https://linear.app/onegovcloud/issue/OGC-2554) | [18d3ba973e](https://github.com/onegov/onegov-cloud/commit/18d3ba973ea119fb86a7705440cace0e17127c51)
+
+### Ris
+
+##### Reorder menu actions to Edit, Delete, then Add
+
+`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [5249a732c4](https://github.com/onegov/onegov-cloud/commit/5249a732c45be35c888d66452a4c0cdc19bd64aa)
+
+##### Show related meetings for political business
+
+`Feature` | [OGC-2521](https://linear.app/onegovcloud/issue/OGC-2521) | [42cad7089f](https://github.com/onegov/onegov-cloud/commit/42cad7089f08faf9bf51b7c46448c23978e9c947)
+
+##### Move menu to the top
+
+Like elsewhere in town6
+
+`Feature` | [OGC-2558](https://linear.app/onegovcloud/issue/OGC-2558) | [0f0d39b2b7](https://github.com/onegov/onegov-cloud/commit/0f0d39b2b717deee0fa805ce880508f2adf7d1f2)
+
+##### Filtering for multiple parliamentarian attributes
+
+`Feature` | [OGC-2509](https://linear.app/onegovcloud/issue/OGC-2509) | [cf4a5b2885](https://github.com/onegov/onegov-cloud/commit/cf4a5b288563a98fc9897b56532435ebbaa2fe57)
+
+##### Handle empty status for political businesses
+
+Older imported political businesses may have no status assigned
+
+`Bugfix` | [OGC-2549](https://linear.app/onegovcloud/issue/OGC-2549) | [ac64ed1e03](https://github.com/onegov/onegov-cloud/commit/ac64ed1e03805211a9cdbc2b9ecba8a1bb12395f)
+
+##### Fixes parliamentary group does not get processed when editing political business
+
+`Bugfix` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [6a72477a71](https://github.com/onegov/onegov-cloud/commit/6a72477a71d11c315f0e09cab26d1dd7e98bfe91)
+
+##### Meeting: Show political business type in any case
+
+`Bugfix` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [38520a2863](https://github.com/onegov/onegov-cloud/commit/38520a2863647a0b51611b92715bdde6df7fde03)
+
+##### Resolve issue when creating political business with files
+
+As files cannot be handled in the collection add from get_useful_data moving to populate_obj approach
+
+`Bugfix` | [OGC-2551](https://linear.app/onegovcloud/issue/OGC-2551) | [5b421e4b61](https://github.com/onegov/onegov-cloud/commit/5b421e4b611b8028f512e4683df5713a2db16de4)
+
+##### Make meeting form more efficient
+
+`Bugfix` | [OGC-2556](https://linear.app/onegovcloud/issue/OGC-2556) | [2ebf4885f8](https://github.com/onegov/onegov-cloud/commit/2ebf4885f86055b87e1f640dcab00f1e520a98a8)
+
 ## 2025.42
 
-`2025-08-19` | [49b0111cab...84b9b657ca](https://github.com/OneGov/onegov-cloud/compare/49b0111cab^...84b9b657ca)
+`2025-08-19` | [49b0111cab...1ca26203ca](https://github.com/OneGov/onegov-cloud/compare/49b0111cab^...1ca26203ca)
 
 ### Org
 
@@ -2148,8 +2230,4 @@ Enable the option to hide main images on news
 ##### Adds scope setting to OIDC authentication provider
 
 `Feature` | [OGC-1767](https://linear.app/onegovcloud/issue/OGC-1767) | [dc2ebc87dc](https://github.com/onegov/onegov-cloud/commit/dc2ebc87dcc8d8e699c59f2e21eb53492e899d87)
-
-## test
-
-`2024-12-17` | [9c3aee5da3...b6de332b06](https://github.com/OneGov/onegov-cloud/compare/9c3aee5da3^...b6de332b06)
 
