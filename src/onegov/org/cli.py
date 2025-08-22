@@ -2866,9 +2866,17 @@ def ris_rebuild_political_business_links_to_meetings(
         businesses = PoliticalBusinessCollection(session)
         meetings = MeetingCollection(session)
         meeting_items = MeetingItemCollection(session)
+        already_ok_counter = 0
+        no_business_link_id_counter = 0
+        assigned_counter = 0
+        no_business_found_counter = 0
+        multiple_meetings_found_counter = 0
+        single_meeting_found_counter = 0
+        no_meeting_found_counter = 0
 
         for meeting_item in meeting_items.query():
             if meeting_item.political_business_id:
+                already_ok_counter += 1
                 continue
 
             if not meeting_item.political_business_link_id:
@@ -2876,6 +2884,7 @@ def ris_rebuild_political_business_links_to_meetings(
                 click.secho(
                     f'No political business link found for meeting '
                     f'item {meeting_item.id}', fg='yellow')
+                no_business_link_id_counter += 1
                 continue
 
             if meeting_item.political_business_link_id:
@@ -2889,7 +2898,9 @@ def ris_rebuild_political_business_links_to_meetings(
                     click.secho(f'Assign political business id to '
                                 f'{meeting_item.title}', fg='green')
                     meeting_item.political_business_id = business.id
+                    assigned_counter += 1
                 else:
+                    no_business_found_counter += 1
                     meeting = meetings.query().filter(
                         Meeting.id == meeting_item.meeting_id).first()
                     if meeting:
@@ -2916,14 +2927,41 @@ def ris_rebuild_political_business_links_to_meetings(
 
             business.meetings = collected_meetings  # type: ignore[assignment]
             if len(collected_meetings) > 1:
+                multiple_meetings_found_counter += 1
                 click.secho(f'Multiple meetings found for political business '
                             f'{business.title}', fg='green')
             elif len(collected_meetings) == 0:
+                no_meeting_found_counter += 1
                 click.secho(f'No meeting found for political business '
                             f'{business.title}', fg='yellow')
             else:
+                single_meeting_found_counter += 1
                 click.secho(f'Set meeting for political business '
                             f'{business.title}', fg='green')
+
+        # echo counter results
+        click.secho('')
+        click.secho(f'Meeting items with political business link id '
+                    f'{already_ok_counter}', fg='green')
+        click.secho(f'Meeting items with no political business link id '
+                    f'{no_business_link_id_counter}', fg='red')
+        click.secho(f'No business found for {no_business_found_counter} '
+                    f'meeting items', fg='yellow')
+        click.secho(f'Political business links assigned to meeting items '
+                    f'{assigned_counter}', fg='green')
+        click.secho(f'Of totally {meeting_items.query().count()} meeting '
+                    f'items', fg='green')
+
+        click.secho('')
+        click.secho(f'Multiple meetings found for '
+                    f'{multiple_meetings_found_counter} political businesses',
+                    fg='green')
+        click.secho(f'Single meeting found for {single_meeting_found_counter} '
+                    f'political businesses', fg='green')
+        click.secho(f'No meeting found for {no_meeting_found_counter} '
+                    f'political businesses', fg='yellow')
+        click.secho(f'Total number of political businesses '
+                    f'{businesses.query().count()}', fg='green')
 
         transaction.commit()
 
