@@ -30,7 +30,7 @@ if TYPE_CHECKING:
 
 
 def view_parliamentarians(
-    self: RISParliamentarianCollection,
+    self: ParliamentarianCollection,
     request: TownRequest,
     layout: RISParliamentarianCollectionLayout
             | PASParliamentarianCollectionLayout
@@ -65,7 +65,7 @@ def view_parliamentarians(
 
 
 def add_parliamentarian(
-    self: RISParliamentarianCollection,
+    self: ParliamentarianCollection,
     request: TownRequest,
     form: ParliamentarianForm | PASParliamentarianForm,
     layout: RISParliamentarianCollectionLayout
@@ -89,7 +89,7 @@ def add_parliamentarian(
 
 
 def view_parliamentarian(
-    self: RISParliamentarian,
+    self: Parliamentarian,
     request: TownRequest,
     layout: RISParliamentarianLayout | PASParliamentarianLayout
 ) -> RenderData | Response:
@@ -102,7 +102,7 @@ def view_parliamentarian(
 
 
 def edit_parliamentarian(
-    self: RISParliamentarian,
+    self: Parliamentarian,
     request: TownRequest,
     form: ParliamentarianForm | PASParliamentarianForm,
     layout: RISParliamentarianLayout | PASParliamentarianLayout
@@ -128,7 +128,7 @@ def edit_parliamentarian(
 
 
 def delete_parliamentarian(
-    self: RISParliamentarian,
+    self: Parliamentarian,
     request: TownRequest,
 ) -> None:
 
@@ -137,14 +137,14 @@ def delete_parliamentarian(
     businesses = PoliticalBusinessParticipationCollection(request.session)
     businesses.by_parliamentarian_id(self.id).delete()
 
-    parliamentarians = RISParliamentarianCollection(request.session)
+    parliamentarians = ParliamentarianCollection(request.session)
     parliamentarians.delete(self)
 
     request.success(_('The parliamentarian has been deleted.'))
 
 
 def add_parliamentary_group_membership(
-    self: RISParliamentarian,
+    self: Parliamentarian,
     request: TownRequest,
     form: ParliamentarianRoleForm,
     layout: RISParliamentarianLayout | PASParliamentarianLayout

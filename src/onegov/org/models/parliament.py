@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from onegov.core.utils import toggle
 from onegov.parliament.collections import CommissionCollection
 from onegov.parliament.collections import CommissionMembershipCollection
 from onegov.parliament.collections import ParliamentarianCollection
@@ -20,7 +19,6 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from typing import Self, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Collection
     from onegov.org.models import PoliticalBusiness
     from onegov.org.models import PoliticalBusinessParticipation
     from sqlalchemy.orm import Query, Session
@@ -173,54 +171,9 @@ class RISParliamentarianCollection(
     ParliamentarianCollection[RISParliamentarian]
 ):
 
-    def __init__(
-        self,
-        session: Session,
-        active: Collection[bool] | None = None,
-        party: Collection[str] | None = None
-    ):
-        super().__init__(session)
-        self.active = set(active) if active else set()
-        self.party = set(party) if party else set()
-
     @property
     def model_class(self) -> type[RISParliamentarian]:
         return RISParliamentarian
-
-    def query(self) -> Query[RISParliamentarian]:
-        # do not invoke super().query() here as PAS (ParliamentarianCollection)
-        # does not support multiple filters yet
-        query = self.session.query(self.model_class)
-
-        RISParliamentarian = self.model_class  # noqa: N806
-        if self.active:
-            query = query.filter(
-                RISParliamentarian.active.expression.in_(self.active))
-                # RISParliamentarian.active.in_(self.active))
-
-        if self.party:
-            query = query.filter(
-                RISParliamentarian.party.in_(self.party)
-            )
-
-        return query.order_by(
-            RISParliamentarian.last_name,
-            RISParliamentarian.first_name
-        ).distinct()
-
-    def for_filter(
-        self,
-        active: bool | None = None,
-        party: str | None = None,
-    ) -> Self:
-        active_ = toggle(self.active, active)
-        party_ = toggle(self.party, party)
-
-        return self.__class__(
-            self.session,
-            active=active_,
-            party=party_
-        )
 
 
 class RISParliamentarianRole(ParliamentarianRole):
