@@ -40,7 +40,7 @@ def view_parliamentarians(
     filters['active'] = [
         Link(
             text=request.translate(title),
-            active=self.active == value,
+            active=value in self.active,
             url=request.link(self.for_filter(active=value))
         ) for title, value in (
             (_('Active'), True),
@@ -50,7 +50,7 @@ def view_parliamentarians(
     filters['party'] = [
         Link(
             text=value,
-            active=self.party == value,
+            active=value in self.party,
             url=request.link(self.for_filter(party=value))
         ) for value in self.party_values()
     ]
