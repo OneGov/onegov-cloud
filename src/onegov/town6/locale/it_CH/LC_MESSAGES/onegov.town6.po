@@ -2021,6 +2021,9 @@ msgstr "Legami di interesse"
 msgid "Role"
 msgstr "Ruolo"
 
+msgid "No filter results found or no parliamentarians defined yet."
+msgstr "Nessun risultato del filtro trovato o nessun parlamentare ancora definito."
+
 msgid "No parliamentarians defined yet."
 msgstr "Nessun parlamentare ancora definito."
 

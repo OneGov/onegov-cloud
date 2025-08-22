@@ -2028,6 +2028,9 @@ msgstr "Liens d'intérêt"
 msgid "Role"
 msgstr "Rôle"
 
+msgid "No filter results found or no parliamentarians defined yet."
+msgstr "Aucun résultat de filtre trouvé ou aucun parlementaire n'a été défini pour le moment."
+
 msgid "No parliamentarians defined yet."
 msgstr "Aucun parlementaire n'a été défini pour le moment."
 
