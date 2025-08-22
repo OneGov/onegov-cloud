@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from datetime import date
-from sqlalchemy import and_, or_, func
+from sqlalchemy import and_, or_, func, case
 from sqlalchemy import Column, Date, Enum, ForeignKey, Text
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -24,6 +25,7 @@ if TYPE_CHECKING:
 
     from collections.abc import Collection
     from sqlalchemy.orm import Query, Session
+    from sqlalchemy.sql import ColumnElement
 
     from onegov.org.models import Meeting
     from onegov.org.models import MeetingItem
@@ -198,9 +200,19 @@ class PoliticalBusiness(
         back_populates='political_business'
     )
 
-    @property
+    @hybrid_property
     def display_name(self) -> str:
         return f'{self.number} {self.title}' if self.number else self.title
+
+    @display_name.expression  # type:ignore[no-redef]
+    def display_name(cls) -> ColumnElement[str]:
+        return func.concat(
+            func.coalesce(cls.number, ''),
+            case([
+                (and_(cls.number.isnot(None), cls.number != ''), ' ')
+            ], else_=''),
+            cls.title
+        )
 
     def __repr__(self) -> str:
         return (f'<Political Business {self.number}, '
@@ -371,6 +383,14 @@ class PoliticalBusinessCollection(
 
         # convert to a list of integers, remove duplicates, and sort
         return sorted({int(year[0]) for year in years}, reverse=True)
+
+    def by_display_name(self, display_name: str) -> PoliticalBusiness | None:
+        """ Returns the given political business by display name or None. """
+        return (
+            self.query()
+            .filter(PoliticalBusiness.display_name == display_name)  # type:ignore[comparison-overlap]
+            .first()
+        )
 
 
 class PoliticalBusinessParticipationCollection(

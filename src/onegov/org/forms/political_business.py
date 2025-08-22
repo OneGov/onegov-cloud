@@ -279,4 +279,5 @@ class PoliticalBusinessForm(Form):
             include=include
         )
 
+        # handles the case when no parliamentary group is selected
         obj.parliamentary_group_id = self.parliamentary_group_id.data or None
