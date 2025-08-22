@@ -162,6 +162,7 @@ def view_add_political_business(
         return request.redirect(request.link(political_business))
 
     layout.breadcrumbs.append(Link(_('New'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -194,6 +195,7 @@ def edit_political_business(
 
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'layout': layout,
