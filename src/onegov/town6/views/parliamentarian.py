@@ -79,6 +79,7 @@ def add_parliamentarian(
         return request.redirect(request.link(parliamentarian))
 
     layout.breadcrumbs.append(Link(_('New'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -118,6 +119,7 @@ def edit_parliamentarian(
 
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -168,6 +170,7 @@ def add_parliamentary_group_membership(
     layout.breadcrumbs.append(
         Link(_('New parliamentary group function'), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -200,6 +203,7 @@ def add_commission_membership(
 
     layout.breadcrumbs.append(Link(_('New commission function'), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,

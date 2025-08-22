@@ -104,6 +104,7 @@ def add_meeting(
         return request.redirect(request.link(meeting))
 
     layout.breadcrumbs.append(Link(_('New'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -206,6 +207,7 @@ def edit_meeting(
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.include_editor()
     layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'layout': layout,
