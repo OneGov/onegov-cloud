@@ -233,7 +233,11 @@ def view_political_business(
     )
     self.meeting_items = items
 
-    links = get_audio_links(self)
+    links = []
+    audio_link = self.content.get('audio_link', None)
+    if audio_link:
+        links.append((_('Listen to parliamentary debate'), audio_link))
+    print('*** tschupre sidepanel links', links)
 
     return {
         'layout': layout,
@@ -247,14 +251,6 @@ def view_political_business(
         'show_side_panel': True if links else False,
         'sidepanel_links': links,
     }
-
-
-def get_audio_links(self):
-    links = []
-    audio_link = self.content.get('audio_link', None)
-    if audio_link:
-        links.append((_('Listen to parliamentary debate'), audio_link))
-    return links
 
 
 @TownApp.view(
