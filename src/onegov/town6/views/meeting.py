@@ -166,6 +166,14 @@ def view_meeting(
         key=lambda x: (x['number'] or '', x['title'] or '')
     )
 
+    links = []
+    audio_link = self.content.get('audio_link', None)
+    if audio_link:
+        links.append(('Parlamentsdebatte anhören', audio_link))
+    video_link = self.content.get('video_link', None)
+    if video_link:
+        links.append(('Parlamentsdebatte ansehen', video_link))
+
     return {
         'layout': layout,
         'page': self,
@@ -177,6 +185,7 @@ def view_meeting(
         'coordinates': None,
         'title': title,
         'meeting_items_with_links': meeting_items_with_links,
+        'sidepanel_links': links,
     }
 
 
