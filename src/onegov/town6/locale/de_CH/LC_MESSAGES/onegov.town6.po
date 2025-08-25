@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-08-25 11:53+0200\n"
+"POT-Creation-Date: 2025-08-14 10:15+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -319,17 +319,17 @@ msgstr "Parlamentsmitglieder"
 msgid "Parliamentarian"
 msgstr "Parlamentsmitglied"
 
-msgid "Do you really want to delete this parliamentarian?"
-msgstr "Möchten Sie dieses Parlamentsmitglied wirklich löschen?"
-
-msgid "Delete parliamentarian"
-msgstr "Parlamentsmitglied löschen"
-
 msgid "New parliamentary group function"
 msgstr "Neue Fraktionsfunktion"
 
 msgid "New commission function"
 msgstr "Neue Kommissionsfunktion"
+
+msgid "Do you really want to delete this parliamentarian?"
+msgstr "Möchten Sie dieses Parlamentsmitglied wirklich löschen?"
+
+msgid "Delete parliamentarian"
+msgstr "Parlamentsmitglied löschen"
 
 msgid "Do you really want to remove this role?"
 msgstr "Rolle wirklich entfernen?"
@@ -2028,8 +2028,10 @@ msgid "Role"
 msgstr "Rolle"
 
 msgid "No filter results found or no parliamentarians defined yet."
-msgstr ""
-"Keine Filterergebnisse gefunden oder noch keine Parlamentarier erfasst."
+msgstr "Keine Filterergebnisse gefunden oder noch keine Parlamentarier erfasst."
+
+msgid "No parliamentarians defined yet."
+msgstr "Noch keine Parlamentarier erfasst."
 
 msgid "No parliamentary groups defined yet."
 msgstr "Noch keine Fraktionen erfasst."
@@ -2590,12 +2592,6 @@ msgstr "Neue Sitzung hinzugefügt"
 msgid "New meeting"
 msgstr "Neue Sitzung"
 
-msgid "Listen to parliamentary debate"
-msgstr "Parlamentsdebatte anhören"
-
-msgid "Watch parliamentary debate"
-msgstr "Parlamentsdebatte ansehen"
-
 msgid "Edit meeting"
 msgstr "Sitzung bearbeiten"
 
@@ -2743,9 +2739,6 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Neue Notiz"
-
-#~ msgid "No parliamentarians defined yet."
-#~ msgstr "Noch keine Parlamentarier erfasst."
 
 #~ msgid "Roles"
 #~ msgstr "Mitgliedschaften"
