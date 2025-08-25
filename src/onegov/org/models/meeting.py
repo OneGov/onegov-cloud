@@ -13,7 +13,6 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID, MarkupText, UTCDateTime
 from onegov.file import MultiAssociatedFiles
 from onegov.org import _
-from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.search import ORMSearchable
 from sqlalchemy import Column, Text, ForeignKey
@@ -33,7 +32,6 @@ if TYPE_CHECKING:
 
 
 class Meeting(
-    AccessExtension,  # required??
     MultiAssociatedFiles,
     Base,
     ContentMixin,
