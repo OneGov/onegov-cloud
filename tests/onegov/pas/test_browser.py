@@ -1,18 +1,11 @@
-# current problem. Name Error shortcuts in chameleon templates?
 def test_add_commission_bulk_attendence(browser):
     browser.login_admin()
-    browser.visit('/pas-settings')
-    return
-
-    # Settlement Runs
-    browser.links.find_by_text('Abrechnungsläufe').click()
-    browser.links.find_by_href('new').click()
+    browser.visit('/settlement-runs')
     browser.fill('name', 'Q1')
     browser.fill('start', '2024-01-01')
     browser.fill('end', '2024-03-31')
     browser.check('active')
     browser.find_by_value('Absenden').click()
-    return
 
     # Commission
     browser.visit('/pas-settings')
