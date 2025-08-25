@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from uuid import UUID
 from onegov.core.security import Private
 from onegov.pas import PasApp
 from onegov.pas.collections import ChangeCollection
@@ -9,6 +8,7 @@ from onegov.pas.layouts import ChangeLayout
 from onegov.pas.models import Change
 from onegov.pas.models.commission import PASCommission
 from onegov.pas.models.parliamentarian import PASParliamentarian
+
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
