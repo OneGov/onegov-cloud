@@ -23,8 +23,12 @@
                             <td>${change.user}</td>
                             <td>${change.action_label}</td>
                             <td><tal:block tal:condition="change.date">${layout.format_date(change.date, 'date')}</tal:block></td>
-                            <td><tal:block tal:condition="change.parliamentarian">${change.parliamentarian.title}</tal:block></td>
-                            <td><tal:block tal:condition="change.commission">${change.commission.title}</tal:block></td>
+                            <td tal:define="parliamentarian_id change.changes.get('parliamentarian_id'); parliamentarian parliamentarians.get(parliamentarian_id)">
+                                <tal:block tal:condition="parliamentarian">${parliamentarian.title}</tal:block>
+                            </td>
+                            <td tal:define="commission_id change.changes.get('commission_id'); commission commissions.get(commission_id)">
+                                <tal:block tal:condition="commission">${commission.title}</tal:block>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
