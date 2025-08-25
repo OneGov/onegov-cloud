@@ -170,7 +170,8 @@ def view_meeting(
     audio_link = self.content.get('audio_link', None)
     if audio_link:
         links.append((_('Listen to parliamentary debate'), audio_link))
-    video_link = 'https://live.stadtwil.ch/'  # FIXME: needs to go into content
+    # FIXME: static video url needs to go into content
+    video_link = self.content.get('video_link', 'https://live.stadtwil.ch/')
     if video_link:
         links.append((_('Watch parliamentary debate'), video_link))
     print('*** tschupre sidepanel links', links)
@@ -197,7 +198,7 @@ def view_meeting(
     template='form.pt',
     permission=Private,
     form=get_meeting_form_class,
-    pass_model=True
+    pass_model=False,
 )
 def edit_meeting(
     self: Meeting,
@@ -214,6 +215,8 @@ def edit_meeting(
         form.populate_obj(self)
         request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
+
+    form.process(obj=self)
 
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.include_editor()
