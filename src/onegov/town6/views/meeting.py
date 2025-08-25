@@ -166,13 +166,7 @@ def view_meeting(
         key=lambda x: (x['number'] or '', x['title'] or '')
     )
 
-    links = []
-    audio_link = self.content.get('audio_link', None)
-    if audio_link:
-        links.append(('Parlamentsdebatte anhören', audio_link))
-    video_link = self.content.get('video_link', None)
-    if video_link:
-        links.append(('Parlamentsdebatte ansehen', video_link))
+    links = get_audio_and_video_links(self)
 
     return {
         'layout': layout,
@@ -185,8 +179,20 @@ def view_meeting(
         'coordinates': None,
         'title': title,
         'meeting_items_with_links': meeting_items_with_links,
+        'show_side_panel': True if links else False,
         'sidepanel_links': links,
     }
+
+
+def get_audio_and_video_links(self):
+    links = []
+    audio_link = self.content.get('audio_link', None)
+    if audio_link:
+        links.append((_('Listen to parliamentary debate'), audio_link))
+    video_link = 'https://live.stadtwil.ch/'
+    if video_link:
+        links.append((_('Watch parliamentary debate'), video_link))
+    return links
 
 
 @TownApp.form(
