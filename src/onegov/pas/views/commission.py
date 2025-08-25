@@ -192,7 +192,7 @@ def commissions_parliamentarians_json(
 
     def key_func(m: PASCommissionMembership) -> str:
         return str(m.commission_id)
-    
+
     # Note: Iterable passed into groupby needs to be sorted
     sorted_memberships = sorted(valid_memberships, key=key_func)
 
