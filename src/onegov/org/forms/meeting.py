@@ -51,6 +51,18 @@ class MeetingForm(Form):
         render_kw={'rows': 5}
     )
 
+    audio_link = StringField(
+        label=_('Audio link to parliamentary debate'),
+        description='https://',
+        validators=[Optional()],
+    )
+
+    video_link = StringField(
+        label=_('Video link to parliamentary debate'),
+        description='https://',
+        validators=[Optional()],
+    )
+
     meeting_items = StringField(
         label=_('New agenda item'),
         fieldset=_('Agenda items'),
@@ -82,6 +94,11 @@ class MeetingForm(Form):
             },
             include=include
         )
+
+        if self.audio_link.data:
+            obj.content['audio_link'] = self.audio_link.data
+        if self.video_link.data:
+            obj.content['video_link'] = self.video_link.data
 
         meeting: Meeting = obj
         collection = MeetingItemCollection(self.request.session)
@@ -163,6 +180,9 @@ class MeetingForm(Form):
             .order_by(PoliticalBusiness.number, PoliticalBusiness.title)
             .all()
         )
+
+        self.audio_link.data = obj.content.get('audio_link', '')
+        self.video_link.data = obj.content.get('video_link', '')
 
         if not meeting.meeting_items:
             self.meeting_items.data = self.items_to_json([], businesses)
