@@ -182,7 +182,7 @@
             <div tal:define="interests parliamentarian.interests" tal:condition="parliamentarian.interests['rows']|None">
                 <tal:b define="headers interests['headers']; rows interests['rows']">
                     <b i18n:translate>Interest ties</b>
-                    <table class="table table-striped">
+                    <table class="table table-striped interests">
                         <thead>
                             <tr>
                                 <th tal:repeat="header headers" tal:content="header">${header}</th>

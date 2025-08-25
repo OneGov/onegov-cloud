@@ -1469,3 +1469,9 @@ p.full-text-width {
 .absolute {
     position: absolute;
 }
+
+.interests{
+    table-layout: fixed;
+}
+.interests thead th:nth-child(1) { width: 60%; }
+.interests thead th:nth-child(2) { width: 40%; }
