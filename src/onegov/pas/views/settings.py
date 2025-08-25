@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 @PasApp.html(
     model=Organisation,
     name='pas-settings',
-    template='dashboard.pt',
+    template='pas_dashboard.pt',
     permission=Private
 )
 def view_pas_settings(
