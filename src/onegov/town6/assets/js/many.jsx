@@ -540,14 +540,14 @@ var ManyFirebasetopics = React.createClass({
                                 </div>
                                 <div className="small-6 cell">
                                     <StringField required
-                                                 type="text"
-                                                 label={data.labels.link}
-                                                 defaultValue={value.link}
-                                                 onChange={onLinkChange}
-                                                 extra={data.extra}
-                                                 size="small"
-                                                 placeholder={linkPlaceholder}
-                                                 options={linkOptions}
+                                        type="text"
+                                        label={data.labels.link}
+                                        defaultValue={value.link}
+                                        onChange={onLinkChange}
+                                        extra={data.extra}
+                                        size="small"
+                                        placeholder={linkPlaceholder}
+                                        options={linkOptions}
                                      />
                                     </div>
                                 </div>
@@ -882,7 +882,12 @@ var ManyInterestTies = React.createClass({
             interest_tie: '',
             category: ''
         });
-        this.setState(state);
+        this.setState(state, () => {
+            // the select field of ManyMeetingItems uses jquery `chosen`
+            // plugin which needs to be reinitialized after the react
+            // component state has been updated
+            jQuery('.chosen-select').chosen({});
+        });
 
         e.preventDefault();
     },
@@ -926,24 +931,25 @@ var ManyInterestTies = React.createClass({
                             <div className={"grid-x grid-padding-x" + (value.error && 'error' || '')}>
                                 <div className="small-6 cell">
                                     <StringField required
-                                                 type="text"
-                                                 label={data.labels.interest_tie}
-                                                 defaultValue={value.interest_tie}
-                                                 onChange={onInterestChange}
-                                                 extra={data.extra}
-                                                 size="small"
-                                                 placeholder={tiePlaceholder}
+                                         type="text"
+                                         label={data.labels.interest_tie}
+                                         defaultValue={value.interest_tie}
+                                         onChange={onInterestChange}
+                                         extra={data.extra}
+                                         size="small"
+                                         placeholder={tiePlaceholder}
                                     />
                                 </div>
                                 <div className="small-6 cell">
-                                    <StringField required
-                                                 type="text"
-                                                 label={data.labels.category}
-                                                 defaultValue={value.category}
-                                                 onChange={onCatChange}
-                                                 extra={data.extra}
-                                                 size="small"
-                                                 placeholder={catPlaceholder}
+                                    <SelectField required
+                                        type="text"
+                                        label={data.labels.category}
+                                        defaultValue={value.category}
+                                        onChange={onCatChange}
+                                        extra={data.extra}
+                                        size="small"
+                                        placeholder={catPlaceholder}
+                                        options={data.categories}
                                     />
                                 </div>
                             </div>
