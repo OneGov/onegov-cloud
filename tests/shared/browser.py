@@ -1,5 +1,6 @@
 import json
 from os import environ, system
+import datetime
 import re
 import shutil
 import time
@@ -216,7 +217,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
         # Click somewhere else to ensure the editor loses focus and updates
         self.find_by_tag('body').click()
 
-    def set_datetime_element(self, selector, date_time):
+    def set_datetime_element(self, selector, date_or_time):
         """ Sets the date and time on a datetime-local field directly by
         setting its value.
         """
@@ -225,7 +226,10 @@ class ExtendedBrowser(InjectedBrowserExtension):
         # element of the datetime picker and seeing what kind of format it
         # expects:
         # document.getElementById('publication_start').value;
-        date_time = date_time.strftime("%Y-%m-%dT%H:%M")
+        if isinstance(date_or_time, datetime.datetime):
+            date_or_time = date_or_time.strftime("%Y-%m-%dT%H:%M")
+        elif isinstance(date_or_time, datetime.date):
+            date_or_time = date_or_time.strftime("%Y-%m-%d")
 
         script = """
             function setDateTimeDirect(selector, dateTimeString) {
@@ -248,7 +252,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
             setDateTimeDirect(arguments[0], arguments[1]);
         """
 
-        self.execute_script(script, selector, date_time)
+        self.execute_script(script, selector, date_or_time)
 
     def scroll_to_css(self, css):
         """ Scrolls to the first element matching the given css expression. """
