@@ -88,11 +88,15 @@ def add_bulk_attendence(
     if form.submitted(request):
         data = form.get_useful_data()
         parliamentarian_ids = data.pop('parliamentarian_id')
-        for parliamentarian_id in parliamentarian_ids:
-            attendence = self.add(
-                parliamentarian_id=parliamentarian_id, **data
-            )
-            Change.add(request, 'add', attendence)
+        if parliamentarian_ids:
+            for parliamentarian_id in parliamentarian_ids:
+                attendence = self.add(
+                    parliamentarian_id=parliamentarian_id, **data
+                )
+                Change.add(request, 'add', attendence)
+        else:
+            request.warning(_('No parliamentarians selected'))
+            return None
         request.success(_('Added commission session'))
 
         return request.redirect(request.link(self))
