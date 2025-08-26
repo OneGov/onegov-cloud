@@ -45,7 +45,7 @@ class AttendenceCollectionLayout(DefaultLayout):
                             attrs={'class': 'new-attendence'}
                         ),
                         Link(
-                            text=_('Commission session (bulk)'),
+                            text=_('Commission meeting (bulk)'),
                             url=self.request.link(
                                 self.model, 'new-commission-bulk'
                             ),
