@@ -166,15 +166,14 @@ def view_meeting(
         key=lambda x: (x['number'] or '', x['title'] or '')
     )
 
-    links = []
-    audio_link = self.content.get('audio_link', None)
-    if audio_link:
-        links.append((_('Listen to parliamentary debate'), audio_link))
-    # FIXME: static video url needs to go into content
-    video_link = self.content.get('video_link', 'https://live.stadtwil.ch/')
-    if video_link:
+    links: list[tuple[str, str]] = []
+    if self.audio_link.strip():
+        links.append((_('Listen to parliamentary debate'), self.audio_link))
+    default = ('https://live.stadtwil.ch/'
+               if request.app.org.name == 'Stadt Wil' else '')
+    video_link = self.video_link or default
+    if video_link.strip():
         links.append((_('Watch parliamentary debate'), video_link))
-    print('*** tschupre sidepanel links', links)
 
     return {
         'layout': layout,
@@ -198,7 +197,7 @@ def view_meeting(
     template='form.pt',
     permission=Private,
     form=get_meeting_form_class,
-    pass_model=False,
+    pass_model=True,
 )
 def edit_meeting(
     self: Meeting,
@@ -215,8 +214,6 @@ def edit_meeting(
         form.populate_obj(self)
         request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
-
-    form.process(obj=self)
 
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.include_editor()

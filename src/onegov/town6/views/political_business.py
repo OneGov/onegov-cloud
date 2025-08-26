@@ -233,11 +233,9 @@ def view_political_business(
     )
     self.meeting_items = items
 
-    links = []
-    audio_link = self.content.get('audio_link', None)
-    if audio_link:
-        links.append((_('Listen to parliamentary debate'), audio_link))
-    print('*** tschupre sidepanel links', links)
+    links: list[tuple[str, str]] = []
+    if self.audio_link.strip():
+        links.append((_('Listen to parliamentary debate'), self.audio_link))
 
     return {
         'layout': layout,

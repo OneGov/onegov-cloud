@@ -177,7 +177,7 @@ class PoliticalBusinessForm(Form):
     )
 
     audio_link = StringField(
-        label=_('Audio Link to parliamentary debate'),
+        label=_('Audio link to parliamentary debate'),
         description='https://',
         validators=[Optional()],
     )
