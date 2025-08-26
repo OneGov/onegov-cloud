@@ -501,7 +501,13 @@ def test_fetch_commissions_parliamentarians_json(client):
     memberships.add(commission_id=commission2.id, parliamentarian_id=parl3.id)
 
     session.flush()
-    transaction.commmit()
+    commission1_id = str(commission1.id)
+    commission2_id = str(commission2.id)
+    parl1_title = parl1.title
+    parl2_title = parl2.title
+    parl3_title = parl3.title
+    parl3_id = str(parl3.id)
+    transaction.commit()
 
     response = client.get('/commissions/commissions-parliamentarians-json')
     assert response.status_code == 200
@@ -510,8 +516,6 @@ def test_fetch_commissions_parliamentarians_json(client):
     data = response.json
 
     assert isinstance(data, dict)
-    commission1_id = str(commission1.id)
-    commission2_id = str(commission2.id)
 
     # Commission A should have John and Jane
     assert commission1_id in data
@@ -519,8 +523,8 @@ def test_fetch_commissions_parliamentarians_json(client):
     assert len(commission_a_parliamentarians) == 2
 
     parl_names = [p['title'] for p in commission_a_parliamentarians]
-    assert parl1.title in parl_names
-    assert parl2.title in parl_names
+    assert parl1_title in parl_names
+    assert parl2_title in parl_names
 
     for parl in commission_a_parliamentarians:
         assert 'id' in parl
@@ -532,14 +536,16 @@ def test_fetch_commissions_parliamentarians_json(client):
     assert commission2_id in data
     commission_b_parliamentarians = data[commission2_id]
     assert len(commission_b_parliamentarians) == 1
-    assert commission_b_parliamentarians[0]['title'] == parl3.title
-    assert commission_b_parliamentarians[0]['id'] == str(parl3.id)
+    assert commission_b_parliamentarians[0]['title'] == parl3_title
+    assert commission_b_parliamentarians[0]['id'] == parl3_id
 
     # Test edge cases
+    session = client.app.session()
+    commissions = PASCommissionCollection(session)
     commission3 = commissions.add(name='Empty Commission')
     session.flush()
+    commission3_id = str(commission3.id)
 
     response2 = client.get('/commissions/commissions-parliamentarians-json')
     data2 = response2.json
-    commission3_id = str(commission3.id)
     assert commission3_id not in data2
