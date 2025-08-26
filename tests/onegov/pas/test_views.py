@@ -6,7 +6,9 @@ from webtest import Upload
 from typing import Any
 from onegov.pas.collections.commission import PASCommissionCollection
 from onegov.pas.collections import PASParliamentarianCollection
-from onegov.pas.collections.commission_membership import PASCommissionMembershipCollection
+from onegov.pas.collections.commission_membership import (
+    PASCommissionMembershipCollection
+)
 
 
 @pytest.mark.flaky(reruns=5, only_rerun=None)
@@ -467,8 +469,9 @@ def test_copy_rate_set(client):
 
 
 def test_fetch_commissions_parliamentarians_json(client):
-    """Test the commissions-parliamentarians-json endpoint that the JS dropdown uses."""
-    # Create test commissions
+    """Test the commissions-parliamentarians-json endpoint that the JS
+    dropdown uses."""
+
     session = client.app.session()
     commissions = PASCommissionCollection(session)
     commission1 = commissions.add(name='Commission A')
@@ -488,7 +491,6 @@ def test_fetch_commissions_parliamentarians_json(client):
         last_name='Johnson',
     )
 
-    # Create commission memberships (the relationships the JS needs)
     memberships = PASCommissionMembershipCollection(session)
 
     # Commission A has John and Jane
@@ -498,35 +500,28 @@ def test_fetch_commissions_parliamentarians_json(client):
     # Commission B has Bob
     memberships.add(commission_id=commission2.id, parliamentarian_id=parl3.id)
 
-    session.flush()  # Make sure all objects have IDs
+    session.flush()
     transaction.commmit()
 
-    # Test the endpoint
     response = client.get('/commissions/commissions-parliamentarians-json')
     assert response.status_code == 200
     assert response.content_type == 'application/json'
 
     data = response.json
 
-    # Should return a dict with commission IDs as keys
     assert isinstance(data, dict)
-
-    # Convert IDs to strings (as the endpoint does)
     commission1_id = str(commission1.id)
     commission2_id = str(commission2.id)
 
     # Commission A should have John and Jane
-    breakpoint()
     assert commission1_id in data
     commission_a_parliamentarians = data[commission1_id]
     assert len(commission_a_parliamentarians) == 2
 
-    # Check the data structure matches what the JS expects
     parl_names = [p['title'] for p in commission_a_parliamentarians]
     assert parl1.title in parl_names
     assert parl2.title in parl_names
 
-    # Check each parliamentarian has required fields
     for parl in commission_a_parliamentarians:
         assert 'id' in parl
         assert 'title' in parl
