@@ -364,8 +364,8 @@ def get_settlement_run_export(
 
     model_map: dict[str, type] = {
         'Party': Party,
-        'Commission': PASCommission,
-        'Parliamentarian': PASParliamentarian,
+        'PASCommission': PASCommission,
+        'PASParliamentarian': PASParliamentarian,
     }
     entity = (
         session.query(model_map.get(literal_type))
