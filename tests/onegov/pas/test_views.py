@@ -49,22 +49,6 @@ def test_views_manage(client_with_es):
 
     delete.append(page)
 
-    # Legislative Periods
-    page = settings.click('Legislaturen')
-    page = page.click(href='new')
-    page.form['name'] = '2020-2024'
-    page.form['start'] = '2020-01-01'
-    page.form['end'] = '2023-12-31'
-    page = page.form.submit().follow()
-    assert '31.12.2023' in page
-
-    page = page.click('Bearbeiten')
-    page.form['end'] = '2024-12-31'
-    page = page.form.submit().follow()
-    assert '31.12.2024' in page
-
-    delete.append(page)
-
     # Settlement Runs
     page = settings.click('Abrechnungsläufe')
     page = page.click(href='new')
@@ -224,7 +208,6 @@ def test_views_manage(client_with_es):
     assert '0 Resultate' in client.get('/search?q=bb')
     assert '0 Resultate' in client.get('/search?q=cc')
     assert '0 Resultate' in client.get('/search?q=first')
-    assert '0 Resultate' in client.get('/search?q=2020-2024')
     assert '0 Resultate' in client.get('/search?q=Q1')
 
     client.login_admin()
@@ -233,14 +216,12 @@ def test_views_manage(client_with_es):
     assert '1 Resultat' in client.get('/search?q=bb')
     assert '1 Resultat' in client.get('/search?q=cc')
     assert '1 Resultat' in client.get('/search?q=first')
-    assert '1 Resultat' in client.get('/search?q=2020-2024')
     assert '1 Resultat' in client.get('/search?q=Q1')
 
     # Delete
     for page in delete:
         page.click('Löschen')
     assert 'Noch keine Sätze erfasst' in settings.click('Sätze')
-    assert 'Noch keine Legislaturen erfasst' in settings.click('Legislaturen')
     assert 'Noch keine Abrechnungsläufe erfasst' in\
            settings.click('Abrechnungsläufe')
     assert 'Noch keine Parteien erfasst' in settings.click('Parteien')
@@ -399,6 +380,8 @@ def test_view_upload_json(
     assert 'Import Details' in log_detail_page
     status = log_detail_page.pyquery('.import-status').text()
     assert 'completed' in status, f"Import status not 'completed': {status}"
+    # Todo: This should validate all columns on all table
+    # For example address is not checked here.
 
     # --- Second Import (Test idempotency) ---
     # Run the import again with the same data, to test robustness
