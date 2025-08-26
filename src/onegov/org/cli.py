@@ -2966,3 +2966,37 @@ def ris_rebuild_political_business_links_to_meetings(
         transaction.commit()
 
     return rebuild_political_business_links
+
+
+@cli.command(name='ris-make-imported-files-general-file')
+def ris_make_imported_files_general_file(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    onegov-org --select /onegov_town6/wil ris-make-imported-files-general-file
+    """
+
+    def make_general_file(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        businesses = PoliticalBusinessCollection(session)
+        meetings = MeetingCollection(session)
+
+        counter = 0
+        for business in businesses.query():
+            for file in business.files:
+                if file.type == 'generic':
+                    file.type = 'general'
+                    counter += 1
+        click.secho(f'Set {counter} political business files to '
+                    f'type "general"', fg='green')
+        transaction.commit()
+
+        counter = 0
+        for meeting in meetings.query():
+            for file in meeting.files:
+                if file.type == 'generic':
+                    file.type = 'general'
+                    counter += 1
+        click.secho(f'Set {counter} meeting files to type "general"',
+                    fg='green')
+
+    return make_general_file
