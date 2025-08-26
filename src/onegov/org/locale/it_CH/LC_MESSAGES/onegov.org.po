@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-08-14 10:09+0200\n"
+"POT-Creation-Date: 2025-08-26 09:05+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1217,6 +1217,12 @@ msgstr "Deduzione"
 
 msgid "Surcharge"
 msgstr "Supplemento"
+
+msgid "Audio link to parliamentary debate"
+msgstr "Collegamento audio al dibattito parlamentare"
+
+msgid "Video link to parliamentary debate"
+msgstr "Collegamento video al dibattito parlamentare"
 
 msgid "New agenda item"
 msgstr "Nuovo elemento dell'agenda"
@@ -3695,8 +3701,8 @@ msgstr "Rifiuta le prenotazioni"
 msgid "Reject all with message"
 msgstr "Rifiuta tutto con messaggio"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 

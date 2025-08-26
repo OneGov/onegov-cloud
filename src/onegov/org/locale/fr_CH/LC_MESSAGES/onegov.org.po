@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-08-14 10:09+0200\n"
+"POT-Creation-Date: 2025-08-26 09:05+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1213,6 +1213,12 @@ msgstr "Remise"
 
 msgid "Surcharge"
 msgstr "Supplément"
+
+msgid "Audio link to parliamentary debate"
+msgstr "Lien audio vers le débat parlementaire"
+
+msgid "Video link to parliamentary debate"
+msgstr "Lien vidéo vers le débat parlementaire"
 
 msgid "New agenda item"
 msgstr "Nouvel élément d'agenda"
@@ -3694,8 +3700,8 @@ msgstr "Refuser les réservations"
 msgid "Reject all with message"
 msgstr "Tout refuser avec message"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -4087,8 +4093,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "

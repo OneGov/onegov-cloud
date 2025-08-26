@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-08-14 10:09+0200\n"
+"POT-Creation-Date: 2025-08-26 09:05+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1214,6 +1214,12 @@ msgstr "Abzug"
 
 msgid "Surcharge"
 msgstr "Zuschlag"
+
+msgid "Audio link to parliamentary debate"
+msgstr "Audio Link zur Parlamentsdebatte"
+
+msgid "Video link to parliamentary debate"
+msgstr "Video Link zur Parlamentsdebatte"
 
 msgid "New agenda item"
 msgstr "Neues Traktandum"
@@ -3688,8 +3694,8 @@ msgstr "Reservationen absagen"
 msgid "Reject all with message"
 msgstr "Alle absagen mit Kommentar"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
