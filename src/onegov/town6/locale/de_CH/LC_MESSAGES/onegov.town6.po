@@ -2027,6 +2027,9 @@ msgstr "Interessensbindungen"
 msgid "Role"
 msgstr "Rolle"
 
+msgid "No filter results found or no parliamentarians defined yet."
+msgstr "Keine Filterergebnisse gefunden oder noch keine Parlamentarier erfasst."
+
 msgid "No parliamentarians defined yet."
 msgstr "Noch keine Parlamentarier erfasst."
 

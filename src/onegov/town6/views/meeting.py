@@ -104,6 +104,7 @@ def add_meeting(
         return request.redirect(request.link(meeting))
 
     layout.breadcrumbs.append(Link(_('New'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -156,6 +157,8 @@ def view_meeting(
             if item.political_business:
                 item_data['political_business_link'] = (
                     request.link(item.political_business))
+                item_data['business_type'] = (
+                    POLITICAL_BUSINESS_TYPE)[item.political_business.political_business_type]
 
         meeting_items_with_links.append(item_data)
 
@@ -201,12 +204,10 @@ def edit_meeting(
         request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
-    elif request.method == 'GET':
-        form.process(obj=self)
-
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.include_editor()
     layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'layout': layout,

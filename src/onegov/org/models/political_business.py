@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from datetime import date
-from sqlalchemy import and_, or_, func
+from sqlalchemy import and_, or_, func, case
 from sqlalchemy import Column, Date, Enum, ForeignKey, Text
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -13,7 +14,6 @@ from onegov.core.orm.types import UUID
 from onegov.core.utils import toggle
 from onegov.file import MultiAssociatedFiles
 from onegov.org import _
-from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.search import ORMSearchable
 
@@ -24,6 +24,7 @@ if TYPE_CHECKING:
 
     from collections.abc import Collection
     from sqlalchemy.orm import Query, Session
+    from sqlalchemy.sql import ColumnElement
 
     from onegov.org.models import Meeting
     from onegov.org.models import MeetingItem
@@ -93,7 +94,6 @@ POLITICAL_BUSINESS_STATUS: dict[PoliticalBusinessStatus, str] = {
 
 
 class PoliticalBusiness(
-    AccessExtension,
     MultiAssociatedFiles,
     Base,
     ContentMixin,
@@ -186,6 +186,7 @@ class PoliticalBusiness(
         back_populates='political_businesses'
     )
 
+    # FIXME: needless as we have meeting items
     #: The meetings this agenda item was discussed in
     meetings: relationship[Meeting] = relationship(
         'Meeting',
@@ -193,14 +194,26 @@ class PoliticalBusiness(
         order_by='Meeting.start_datetime',
         lazy='joined',
     )
+
     meeting_items: relationship[list[MeetingItem]] = relationship(
         'MeetingItem',
-        back_populates='political_business'
+        back_populates='political_business',
+        lazy='joined',
     )
 
-    @property
+    @hybrid_property
     def display_name(self) -> str:
         return f'{self.number} {self.title}' if self.number else self.title
+
+    @display_name.expression  # type:ignore[no-redef]
+    def display_name(cls) -> ColumnElement[str]:
+        return func.concat(
+            func.coalesce(cls.number, ''),
+            case([
+                (and_(cls.number.isnot(None), cls.number != ''), ' ')
+            ], else_=''),
+            cls.title
+        )
 
     def __repr__(self) -> str:
         return (f'<Political Business {self.number}, '
@@ -371,6 +384,14 @@ class PoliticalBusinessCollection(
 
         # convert to a list of integers, remove duplicates, and sort
         return sorted({int(year[0]) for year in years}, reverse=True)
+
+    def by_display_name(self, display_name: str) -> PoliticalBusiness | None:
+        """ Returns the given political business by display name or None. """
+        return (
+            self.query()
+            .filter(PoliticalBusiness.display_name == display_name)  # type:ignore[comparison-overlap]
+            .first()
+        )
 
 
 class PoliticalBusinessParticipationCollection(

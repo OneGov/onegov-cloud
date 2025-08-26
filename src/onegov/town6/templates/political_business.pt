@@ -58,14 +58,19 @@
                 </dd>
             </div>
 
-            <div tal:condition="business.meetings">
+            <div tal:condition="business.meeting_items">
                 <dt i18n:translate>Meetings</dt>
                 <dd>
-                    <ul tal:repeat="meeting business.meetings">
+                    <ul tal:repeat="meeting_item business.meeting_items" class="more-list">
                         <li>
-                            <a tal:attributes="href request.link(meeting)">${meeting.title}</a>
-                            <span tal:condition="meeting.start_datetime|None">(${layout.format_date(meeting.start_datetime, 'datetime')})</span>
-                            <span tal:condition="meeting.end_datetime|None">(${layout.format_date(meeting.end_datetime, 'datetime')})</span>
+                            <a tal:attributes="href request.link(meeting_item.meeting)" class="list-link">
+                                <span class="list-title">
+                                    ${meeting_item.meeting.title}
+                                </span>
+                            </a>
+                            <span tal:condition="meeting_item.meeting.start_datetime|None" class="list-lead preview">
+                                ${layout.format_date(meeting_item.meeting.start_datetime, 'datetime')}
+                            </span>
                         </li>
                     </ul>
                 </dd>

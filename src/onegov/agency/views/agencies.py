@@ -622,6 +622,10 @@ def report_agency_change(
                 'title': request.translate(_('New ticket')),
                 'created': ticket.created.isoformat()
             }
+            # FIXME: set groupids to all groups which are linked
+            #        to this agency or the first parent agency with
+            #        links to one or more groups, to mirror email
+            #        notifications.
         )
 
         request.success(_('Thank you for your submission!'))

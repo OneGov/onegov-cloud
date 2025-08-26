@@ -104,7 +104,7 @@ class MeetingForm(Form):
         for new in new_items:
             number = new.get('number')
             title = new.get('title', '')
-            item_name = new.get('agenda_item')
+            item_name = new.get('agenda_item', '')
 
             if number == '' and title == '' and item_name == '':
                 # skip empty items
@@ -117,10 +117,7 @@ class MeetingForm(Form):
                 items.append(current_items[title])
                 continue
 
-            business = next(
-                (b for b in businesses.query().all()
-                 if b.display_name == item_name), None)
-
+            business = businesses.by_display_name(item_name)
             if business is None:
                 new_item = MeetingItem(
                     title=title,
@@ -158,6 +155,11 @@ class MeetingForm(Form):
 
         businesses = (
             self.meta.request.session.query(PoliticalBusiness)
+            .with_entities(
+                PoliticalBusiness.number,
+                PoliticalBusiness.title,
+                PoliticalBusiness.display_name
+            )
             .order_by(PoliticalBusiness.number, PoliticalBusiness.title)
             .all()
         )

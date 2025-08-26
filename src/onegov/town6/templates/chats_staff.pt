@@ -26,12 +26,12 @@
                     <tal:b repeat="fieldset form.fieldsets">
                         <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower().replace(' ', '-')}">
                             <legend>${fieldset.label}</legend>
-                            <div class="formfields">
+                            <div class="formfields" tal:define="form_two_columns form_two_columns|False">
                                 <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
                             </div>
                         </fieldset>
                         <tal:b condition="not:fieldset.is_visible">
-                            <div class="formfields">
+                            <div class="formfields" tal:define="form_two_columns form_two_columns|False">
                                 <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
                             </div>
                         </tal:b>
@@ -52,8 +52,7 @@
                                 <p class="list-lead preview"></p>
                             </li>
                             <tal:b tal:repeat="request open_requests">
-                                <li class="open-request" data-request-id="${request.id.hex}" data-user="${request.customer_name}" 
-                                id="request-${request.id.hex}">
+                                <li class="open-request" data-request-id="${request.id.hex}" data-user="${request.customer_name}" id="request-${request.id.hex}">
                                     <a class="list-link" href="#"><span class="blob"></span><span class="list-title">${request.customer_name}</span></a>
                                     <p class="list-lead preview">${request.topic}</p>
                                 </li>
