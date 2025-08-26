@@ -176,6 +176,12 @@ class PoliticalBusinessForm(Form):
         choices=[],
     )
 
+    audio_link = StringField(
+        label=_('Audio Link to parliamentary debate'),
+        description='https://',
+        validators=[Optional()],
+    )
+
     participants = BusinessParticipationField(
         FormField(
             ParticipantForm,
