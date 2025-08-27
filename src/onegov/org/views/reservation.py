@@ -867,12 +867,17 @@ def accept_reservation(
     view_ticket: ReservationTicket | None = None,
 ) -> Response:
 
-    if not self.data or not self.data.get('accepted'):
-        resource = request.app.libres_resources.by_reservation(self)
-        assert resource is not None
-        reservations = resource.scheduler.reservations_by_token(self.token)
-        reservations = reservations.order_by(Reservation.start)
+    resource = request.app.libres_resources.by_reservation(self)
+    assert resource is not None
+    reservations = [
+        reservation
+        for reservation in resource.scheduler
+                           .reservations_by_token(self.token)
+                           .order_by(Reservation.start)
+        if not (reservation.data or {}).get('accepted')
+    ]
 
+    if reservations:
         token = self.token
         tickets = TicketCollection(request.session)
         ticket = tickets.by_handler_id(token.hex)
