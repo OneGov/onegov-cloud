@@ -1396,13 +1396,18 @@ def view_my_reservations_ical(
         stmt.c.accepted.is_(True)
     )))
 
+    ticket_label = request.translate(_('Check request status'))
     key_code_label = request.translate(_('Key Code'))
 
     for r in records:
         start = r.start
         end = r.end + timedelta(microseconds=1)
 
-        description = r.ticket_number
+        url = request.class_link(Ticket, {
+            'handler_code': r.handler_code,
+            'id': r.ticket_id
+        }, name='status')
+        description = f'{r.ticket_number}\n{ticket_label}: {url}'
         if include_key_code and r.key_code:
             description = f'{description}\n{key_code_label}: {r.key_code}'
 
@@ -1414,10 +1419,7 @@ def view_my_reservations_ical(
         evt.add('dtstart', standardize_date(start, 'UTC'))
         evt.add('dtend', standardize_date(end, 'UTC'))
         evt.add('dtstamp', date)
-        evt.add('url', request.class_link(Ticket, {
-            'handler_code': r.handler_code,
-            'id': r.ticket_id
-        }, name='status'))
+        evt.add('url', url)
 
         cal.add_component(evt)
 
@@ -1493,22 +1495,24 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
         stmt.c.resource == self.id, s <= stmt.c.start, stmt.c.start <= e
     )))
 
+    ticket_label = request.translate(_('Ticket'))
     for r in records:
         start = r.start
         end = r.end + timedelta(microseconds=1)
 
+        url = request.class_link(Ticket, {
+            'handler_code': r.handler_code,
+            'id': r.ticket_id
+        })
         evt = icalendar.Event()
         evt.add('uid', f'{r.token}-{r.id}')
         evt.add('summary', r.title)
         evt.add('location', self.title)
-        evt.add('description', r.description)
+        evt.add('description', f'{r.description}\n{ticket_label}: {url}')
         evt.add('dtstart', standardize_date(start, 'UTC'))
         evt.add('dtend', standardize_date(end, 'UTC'))
         evt.add('dtstamp', date)
-        evt.add('url', request.class_link(Ticket, {
-            'handler_code': r.handler_code,
-            'id': r.ticket_id
-        }))
+        evt.add('url', url)
 
         cal.add_component(evt)
 
