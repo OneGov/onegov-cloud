@@ -384,18 +384,22 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
         n, unit = self.deadline
 
-        # hours result in a simple offset
-        def deadline_using_h() -> datetime.datetime:
-            return dt - datetime.timedelta(hours=n)
+        match unit:
+            case 'h':
+                # hours result in a simple offset
+                deadline = dt - datetime.timedelta(hours=n)
 
-        # days require that we align the date to the beginning of the date
-        def deadline_using_d() -> datetime.datetime:
-            return (
-                align_date_to_day(dt, self.timezone, 'down')
-                - datetime.timedelta(days=(n - 1))
-            )
+            case 'd':
+                # days require that we align the date
+                # to the beginning of the date
+                deadline = (
+                    align_date_to_day(dt, self.timezone, 'down')
+                    - datetime.timedelta(days=(n - 1))
+                )
 
-        deadline = locals()[f'deadline_using_{unit}']()
+            case _:
+                raise AssertionError('unreachable')
+
         return deadline <= utcnow()
 
     def is_zip_blocked(self, date: datetime.date) -> bool:
