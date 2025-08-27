@@ -397,7 +397,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
                     - datetime.timedelta(days=(n - 1))
                 )
 
-            case _:
+            case _:  # pragma: unreachable
                 raise AssertionError('unreachable')
 
         return deadline <= utcnow()
