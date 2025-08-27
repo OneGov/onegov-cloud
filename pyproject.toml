@@ -36,6 +36,7 @@ exclude_lines = [
     "pragma: unreachable",
     "assert_never[(]",
     "@overload",
+    "case _:",
     "raise NotImplementedError",
     "raise AssertionError[(].unreachable.[)]",
     "if TYPE_CHECKING:",
