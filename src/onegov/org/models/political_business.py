@@ -10,7 +10,6 @@ from uuid import uuid4
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
-from onegov.core.orm.mixins import dict_property, content_property
 from onegov.core.orm.types import UUID
 from onegov.core.utils import toggle
 from onegov.file import MultiAssociatedFiles
@@ -203,9 +202,6 @@ class PoliticalBusiness(
         back_populates='political_business',
         lazy='joined',
     )
-
-    #: link to audio url
-    audio_link: dict_property[str] = content_property(default='')
 
     @hybrid_property
     def display_name(self) -> str:

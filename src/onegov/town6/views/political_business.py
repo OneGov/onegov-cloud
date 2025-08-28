@@ -233,10 +233,6 @@ def view_political_business(
     )
     self.meeting_items = items
 
-    links: list[tuple[str, str]] = []
-    if self.audio_link.strip():
-        links.append((_('Listen to parliamentary debate'), self.audio_link))
-
     return {
         'layout': layout,
         'business': self,
@@ -246,8 +242,6 @@ def view_political_business(
         'status_map': POLITICAL_BUSINESS_STATUS,
         'files': getattr(self, 'files', None),
         'political_groups': groups,
-        'show_side_panel': True if links else False,
-        'sidepanel_links': links,
     }
 
 
