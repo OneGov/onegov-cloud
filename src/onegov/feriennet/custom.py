@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from onegov.activity import BookingCollection
-from onegov.activity import PeriodCollection
+from onegov.activity import BookingPeriodCollection
 from onegov.activity import VolunteerCollection
 from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import BillingCollection
@@ -67,7 +67,7 @@ def get_admin_tools(
             links.append(
                 Link(
                     text=_('Periods'),
-                    url=request.class_link(PeriodCollection),
+                    url=request.class_link(BookingPeriodCollection),
                     attrs={'class': 'manage-periods'}
                 )
             )

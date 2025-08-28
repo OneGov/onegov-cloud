@@ -17,6 +17,7 @@ from onegov.org.forms.form_export import FormSubmissionsExport
 from onegov.org.forms.form_registration import FormRegistrationWindowForm
 from onegov.org.forms.generic import ExportForm, DateRangeForm
 from onegov.org.forms.imageset import ImageSetForm
+from onegov.org.forms.invoice import ManualInvoiceItemForm
 from onegov.org.forms.meeting import MeetingForm
 from onegov.org.forms.mtan import PublicMTANForm
 from onegov.org.forms.mtan import PublicRequestMTANForm
@@ -88,6 +89,7 @@ __all__ = (
     'LinkForm',
     'ManageUserForm',
     'ManageUserGroupForm',
+    'ManualInvoiceItemForm',
     'MapSettingsForm',
     'MeetingForm',
     'ModuleSettingsForm',

@@ -7,8 +7,6 @@ from onegov.pas.forms.attendence import AttendenceAddCommissionBulkForm
 from onegov.pas.forms.attendence import AttendenceAddForm
 from onegov.pas.forms.attendence import AttendenceAddPlenaryForm
 from onegov.pas.forms.attendence import AttendenceForm
-from onegov.pas.forms.commission_membership import CommissionMembershipAddForm
-from onegov.pas.forms.commission_membership import CommissionMembershipForm
 from onegov.pas.forms.legislative_period import LegislativePeriodForm
 from onegov.pas.forms.parliamentarian_role import (
     PASParliamentarianRoleForm
@@ -26,8 +24,6 @@ __all__ = (
     'AttendenceAddPlenaryForm',
     'AttendenceForm',
     'CommissionForm',
-    'CommissionMembershipAddForm',
-    'CommissionMembershipForm',
     'LegislativePeriodForm',
     'PASParliamentarianForm',
     'PASParliamentarianRoleForm',

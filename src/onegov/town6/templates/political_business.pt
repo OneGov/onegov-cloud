@@ -23,21 +23,21 @@
                 <dd><div tal:content="status_map[business.status]"> </div></dd>
             </div>
             <div tal:condition="business.entry_date">
-                <dt i18n:translate>Date</dt>
+                <dt i18n:translate>Submission/publication date</dt>
                 <dd><div tal:content="layout.format_date(business.entry_date, 'date')"></div></dd>
             </div>
-            <div tal:condition="business.participants">
+            <div tal:condition="participations">
                 <dt i18n:translate>Participants</dt>
                 <dd>
                     <ul class="more-list">
-                        <li tal:repeat="participations business.participants">
-                            <a tal:attributes="href request.link(participations.parliamentarian)" class="list-link">
+                        <li tal:repeat="participation participations">
+                            <a tal:attributes="href request.link(participation.parliamentarian)" class="list-link">
                                 <span class="list-title">
-                                ${participations.parliamentarian.first_name} ${participations.parliamentarian.last_name}
+                                ${participation.parliamentarian.title}
                                 </span>
                             </a>
-                            <span tal:condition="participations.participant_type" class="list-lead preview">
-                                (<span i18n:translate>${participations.participant_type}</span>)
+                            <span tal:condition="participation.participant_type" class="list-lead preview">
+                                <span i18n:translate>${participation.participant_type}</span>
                             </span>
                         </li>
                     </ul>
@@ -58,14 +58,19 @@
                 </dd>
             </div>
 
-            <div tal:condition="business.meetings">
+            <div tal:condition="business.meeting_items">
                 <dt i18n:translate>Meetings</dt>
                 <dd>
-                    <ul tal:repeat="meeting business.meetings">
+                    <ul tal:repeat="meeting_item business.meeting_items" class="more-list">
                         <li>
-                            <a tal:attributes="href request.link(meeting)">${meeting.title}</a>
-                            <span tal:condition="meeting.start_datetime|None">(${layout.format_date(meeting.start_datetime, 'datetime')})</span>
-                            <span tal:condition="meeting.end_datetime|None">(${layout.format_date(meeting.end_datetime, 'datetime')})</span>
+                            <a tal:attributes="href request.link(meeting_item.meeting)" class="list-link">
+                                <span class="list-title">
+                                    ${meeting_item.meeting.title}
+                                </span>
+                            </a>
+                            <span tal:condition="meeting_item.meeting.start_datetime|None" class="list-lead preview">
+                                ${layout.format_date(meeting_item.meeting.start_datetime, 'datetime')}
+                            </span>
                         </li>
                     </ul>
                 </dd>

@@ -18,6 +18,9 @@ if TYPE_CHECKING:
     from sqlalchemy.sql import ColumnElement
     from typing import Self
 
+    class HasHTML(Protocol):
+        def __html__(self, /) -> str: ...
+
     class _dict_property_factory(Protocol):  # noqa: N801
 
         @overload
@@ -540,7 +543,11 @@ class dict_markup_property(dict_property[_MarkupT]):  # noqa: N801
         # fallback to the default
         return self.default() if callable(self.default) else self.default
 
-    def __set__(self, instance: object, value: _MarkupT) -> None:
+    def __set__(
+        self,
+        instance: object,
+        value: _MarkupT | str | HasHTML
+    ) -> None:
         super().__set__(
             instance,
             # escape when setting the value

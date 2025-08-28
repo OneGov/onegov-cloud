@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import cached_property
-from onegov.activity.models import Attendee, Booking, Occasion, Period
+from onegov.activity.models import Attendee, Booking, Occasion, BookingPeriod
 from onegov.activity.utils import random_group_code
 from onegov.user import User
 from sqlalchemy import func, or_
@@ -70,7 +70,7 @@ class GroupInvite:
             .filter_by(group_code=self.group_code)
             .filter(or_(
                 Booking.state.in_(('open', 'accepted')),
-                Period.confirmed == False
+                BookingPeriod.confirmed == False
             ))
         )
 

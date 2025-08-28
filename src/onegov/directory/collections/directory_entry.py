@@ -10,7 +10,7 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.dialects.postgresql import array
 
 
-from typing import Any, Protocol, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, Protocol, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Mapping
@@ -49,6 +49,26 @@ class DirectoryEntryCollection(
     directory model and this view-supporting collection.
 
     """
+
+    @overload
+    def __init__(
+        self: DirectoryEntryCollection[DirectoryEntry],
+        directory: Directory,
+        type: Literal['*', 'generic'] = '*',
+        keywords: Mapping[str, list[str]] | None = None,
+        page: int = 0,
+        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None
+    ) -> None: ...
+
+    @overload
+    def __init__(
+        self,
+        directory: Directory,
+        type: str,
+        keywords: Mapping[str, list[str]] | None = None,
+        page: int = 0,
+        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None
+    ) -> None: ...
 
     def __init__(
         self,

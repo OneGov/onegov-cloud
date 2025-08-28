@@ -8,9 +8,10 @@ document.addEventListener("DOMContentLoaded", function() {
     if (!(chatInput && sendButton)) {
         // This can happen if any of these elements' ids change, or if they are
         // removed.
+        // eslint-disable-next-line no-console
         console.error(
             "Chat elements could not be found, skipping common features."
-        )
+        );
 
         return;
     }
@@ -26,5 +27,5 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function isEmpty(message) {
-    return message.trim().length === 0
+    return message.trim().length === 0;
 }

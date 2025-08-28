@@ -1,6 +1,6 @@
 from datetime import date
 from decimal import Decimal
-from onegov.activity.collections import InvoiceCollection
+from onegov.activity.collections import BookingPeriodInvoiceCollection
 from onegov.activity.iso20022 import extract_transactions
 from onegov.activity.iso20022 import match_iso_20022_to_usernames
 from onegov.activity.utils import generate_xml
@@ -122,7 +122,7 @@ def test_invoice_matching(session, owner, member,
     p1 = prebooking_period
     p2 = inactive_period
 
-    invoices = InvoiceCollection(session)
+    invoices = BookingPeriodInvoiceCollection(session)
 
     own_i1 = invoices.add(user_id=owner.id, period_id=p1.id)
     mem_i1 = invoices.add(user_id=member.id, period_id=p1.id)
@@ -397,7 +397,7 @@ def test_invoice_matching_multischema(session, owner, prebooking_period):
     period = prebooking_period
 
     # create an invoice with two possible references
-    invoices = InvoiceCollection(
+    invoices = BookingPeriodInvoiceCollection(
         session,
         period_id=period.id,
         user_id=owner.id,

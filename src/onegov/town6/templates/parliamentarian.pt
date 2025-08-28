@@ -27,6 +27,10 @@
                     </div>
                 </dd>
             </div>
+            <div tal:condition="parliamentarian.party">
+                <dt i18n:translate>Party</dt>
+                <dd>${parliamentarian.party}</dd>
+            </div>
             <div tal:condition="parliamentarian.private_address">
                 <dt i18n:translate>Private address</dt>
                 <dd>
@@ -106,7 +110,7 @@
                 <dd tal:content="Markup('<br>').join(parliamentarian.remarks.split('\n'))"></dd>
             </div>
             <div tal:condition="parliamentarian.roles">
-                <dt i18n:translate>Roles</dt>
+                <dt i18n:translate>Functions</dt>
                 <dd>
                     <ul class="more-list">
                         <li tal:repeat="role parliamentarian.roles">
@@ -138,17 +142,22 @@
                 <dd>
                     <ul class="more-list">
                         <li tal:repeat="membership parliamentarian.commission_memberships">
-                            <a href="${request.link(membership.commission)}" class="list-link">${membership.commission.title}</a>
-                            <span class="list-lead preview">
-                                ${membership.role_label}
-                            </span>
-                            <span tal:condition="membership.start">
-                                <br>${layout.format_date(membership.start, 'date')}
-                            </span>
-                            <span tal:condition="membership.end">
-                                -
-                                ${layout.format_date(membership.end, 'date')}
-                            </span>
+                            <div class="list-link">
+                                <a tal:condition="request.is_manager" href="${request.link(membership)}">${membership.role_label}</a>
+                                <span tal:condition="not request.is_manager">
+                                    ${membership.role_label}
+                                </span>
+                                <span tal:condition="membership.commission">
+                                    <tal:block i18n:translate> in </tal:block>
+                                    <a href="${request.link(membership.commission)}">${membership.commission.title}</a>
+                                </span>
+                                <span class="list-lead preview">
+                                    ${layout.format_date(membership.start, 'date')}
+                                    <span tal:condition="membership.end">
+                                        ${layout.format_date(membership.end, 'date')}
+                                    </span>
+                                </span>
+                            </div>
                         </li>
                     </ul>
                 </dd>
@@ -160,16 +169,19 @@
                         <li tal:repeat="participation sorted(parliamentarian.political_businesses, key=lambda p: p.political_business.entry_date or layout.now(), reverse=True)">
                             <a tal:attributes="href request.link(participation.political_business)" class="list-link">
                                 <span class="list-title">
-                                    ${participation.political_business.number|None} ${participation.political_business.title}
+                                    ${participation.political_business.title}
+                                    <span tal:condition="participation.political_business.number|None">
+                                        (${participation.political_business.number})
+                                    </span>
                                 </span>
                             </a>
                         </li>
                     </ul>
                 </dd>
             </div>
-            <div tal:define="interests parliamentarian.content.get('interests')" tal:condition="parliamentarian.content.get('interests')">
-                <tal:b define="headers parliamentarian.content['interests']['headers']; rows parliamentarian.content['interests']['rows']">
-                    <b i18n:translate>Interests</b>
+            <div tal:define="interests parliamentarian.interests" tal:condition="parliamentarian.interests['rows']|None">
+                <tal:b define="headers interests['headers']; rows interests['rows']">
+                    <b i18n:translate>Interest ties</b>
                     <table class="table table-striped">
                         <thead>
                             <tr>

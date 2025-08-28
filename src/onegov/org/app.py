@@ -50,6 +50,7 @@ if TYPE_CHECKING:
     from onegov.core.mail import Attachment
     from onegov.core.types import EmailJsonDict, SequenceOrScalar
     from onegov.pay import Price
+    from onegov.ticket import Ticket
     from onegov.ticket.collection import TicketCount
     from reg.dispatch import _KeyLookup
 
@@ -240,15 +241,35 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
         return {
             handler_code: {
-                group: group_perms
+                group: group_perms if exclusive else
+                # if we treated a non-exclusive group as exclusive it also
+                # needs to include all of the members of the exclusive handler
+                # scoped group, otherwise we'll incorrectly restrict their
+                # access to these groups.
+                list({*group_perms, *handler_perms[None][1]})
                 for group, (exclusive, group_perms) in handler_perms.items()
                 # the permission is only exclusive, if at least one user group
                 # has exclusive permissions. But user groups with non-exclusive
                 # permissions still have permission to access the ticket.
-                if exclusive
+                if exclusive or (
+                    # if there is exclusive access to the whole handler code
+                    # we need to treat non-exclusive access to a group as
+                    # exclusive, so the users with non-exclusive access
+                    # to this group keep their access rights.
+                    group is not None
+                    and handler_perms.get(None, (False, ))[0]
+                )
             }
             for handler_code, handler_perms in permissions.items()
         }
+
+    def groupids_for_ticket(self, ticket: Ticket) -> list[str] | None:
+        handler_perms = self.ticket_permissions.get(ticket.handler_code)
+        if handler_perms is None:
+            return None
+
+        group_perms = handler_perms.get(ticket.group)
+        return handler_perms.get(None) if group_perms is None else group_perms
 
     @orm_cached(policy='on-table-change:files')
     def publications_count(self) -> int:

@@ -689,7 +689,8 @@ def end_chats_and_create_tickets(request: OrgRequest) -> None:
                     'event': 'browser-notification',
                     'title': request.translate(_('New ticket')),
                     'created': ticket.created.isoformat()
-                }
+                },
+                groupids=request.app.groupids_for_ticket(ticket),
             )
 
 
@@ -1251,7 +1252,7 @@ def wil_daily_event_import(request: OrgRequest) -> None:
         return
 
     minaza_url = 'https://azizi.2mp.ch/export/events/v/1'
-    params = {'zip': '9500'}
+    params = {'zip': '9500,9512,9552'}
     headers = {'Authorization': f'apikey {api_token}'}
 
     log.info(f'Start querying url {minaza_url} for Wil event import')

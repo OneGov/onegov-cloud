@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from functools import cached_property
 
-from sqlalchemy import exists, func
+from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 from sedate import utcnow
 
@@ -13,7 +13,6 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID, MarkupText, UTCDateTime
 from onegov.file import MultiAssociatedFiles
 from onegov.org import _
-from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.search import ORMSearchable
 from sqlalchemy import Column, Text, ForeignKey
@@ -33,7 +32,6 @@ if TYPE_CHECKING:
 
 
 class Meeting(
-    AccessExtension,  # required??
     MultiAssociatedFiles,
     Base,
     ContentMixin,
@@ -120,7 +118,7 @@ class Meeting(
 
     @past.expression  # type:ignore[no-redef]
     def past(cls):
-        return exists.where(cls.start_datetime < func.now())
+        return cls.start_datetime < func.now()
 
     def __repr__(self) -> str:
         return f'<Meeting {self.title}, {self.start_datetime}>'

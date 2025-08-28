@@ -10,6 +10,7 @@ import pytz
 from contextlib import suppress
 from collections import defaultdict, Counter, OrderedDict
 from datetime import datetime, time, timedelta
+from decimal import Decimal
 from email.headerregistry import Address
 from functools import lru_cache
 from isodate import parse_date, parse_datetime
@@ -24,6 +25,7 @@ from onegov.file import File, FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
+from onegov.pay import InvoiceItemMeta, Price
 from onegov.reservation import Resource
 from onegov.ticket import Ticket, TicketCollection, TicketPermission
 from onegov.user import User, UserGroup
@@ -38,8 +40,10 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from lxml.etree import _Element
     from onegov.core.request import CoreRequest
+    from onegov.form import Form, FormSubmission
     from onegov.org.models import ImageFile
     from onegov.org.request import OrgRequest
+    from onegov.pay import InvoiceItem
     from onegov.pay.types import PriceDict
     from onegov.reservation import Allocation, Reservation
     from pytz.tzinfo import DstTzInfo, StaticTzInfo
@@ -52,6 +56,7 @@ if TYPE_CHECKING:
     _DeltaT = TypeVar('_DeltaT')
     _SortT = TypeVar('_SortT', bound='SupportsRichComparison')
     _TransformedT = TypeVar('_TransformedT')
+    _ItemT = TypeVar('_ItemT', bound=InvoiceItem | InvoiceItemMeta)
     TzInfo: TypeAlias = DstTzInfo | StaticTzInfo
     DateRange: TypeAlias = tuple[datetime, datetime]
 
@@ -527,7 +532,21 @@ class AllocationEventInfo:
 
     @property
     def event_classes(self) -> Iterator[str]:
-        if self.allocation.end < sedate.utcnow():
+        if self.allocation.end < sedate.utcnow() or (
+            # if the user can't override the deadline the event should
+            # appear as if it were in the past
+            not self.request.is_manager
+            and self.resource.is_past_deadline(
+                # for partly available allocations we use the end of the
+                # allocation, since some small sliver of the allocation
+                # may still be before the deadline, we could get a slightly
+                # more accurate result by subtracting the raster, but it
+                # doesn't seem worth the extra CPU cycles.
+                self.allocation.end
+                if self.allocation.partly_available
+                else self.allocation.start
+            )
+        ):
             yield 'event-in-past'
 
         if self.quota > 1:
@@ -1639,3 +1658,91 @@ def get_current_tickets_url(request: OrgRequest) -> str:
         TicketCollection,
         state or {'handler': 'ALL', 'state': 'open', 'page': 0}
     )
+
+
+def invoice_items_for_submission(
+    request: CoreRequest,
+    form: Form,
+    submission: FormSubmission
+) -> list[InvoiceItemMeta]:
+
+    # NOTE: Eventually we may need something more sophisticated
+    vat_rate = Decimal(org.vat_rate) if (
+        getattr(submission.form, 'show_vat', False)
+        and (org := getattr(request.app, 'org', None))
+        and org.vat_rate
+    ) else None
+    extra = {'submission_id': submission.id}
+    items = form.invoice_items(extra=extra, vat_rate=vat_rate)
+    discounts = form.discount_items(extra=extra, vat_rate=vat_rate)
+
+    # for backwards compatibility we still support a raw price
+    # instead of a more complete invoice item
+    if 'invoice_item' in submission.meta:
+        items.insert(0, InvoiceItemMeta(**submission.meta['invoice_item']))
+    elif 'price' in submission.meta:
+        price = Price(**submission.meta['price'])
+        items.insert(0, InvoiceItemMeta(
+            text=request.translate(_('Lump sum')),
+            group='submission',
+            unit=price.amount,
+            vat_rate=vat_rate,
+        ))
+
+    total = InvoiceItemMeta.total(items)
+    if discounts:
+        remainder = total
+        for discount in discounts:
+            item = discount.apply_discount(total, remainder)
+            remainder += item.amount
+            assert remainder >= 0.0
+            items.append(item)
+        total = remainder
+
+    return items
+
+
+def currency_for_submission(form: Form, submission: FormSubmission) -> str:
+    if 'currency' in submission.meta:
+        return submission.meta['currency']
+
+    if 'price' in submission.meta:
+        return submission.meta['price'].get('currency', 'CHF')
+
+    # We just pick the first currency from any pricing rule we can find
+    # if we can't find any, then we fall back to 'CHF'. Although that
+    # should be an invalid form definition.
+    for field in form._fields.values():
+        if not hasattr(field, 'pricing'):
+            continue
+
+        rules = field.pricing.rules
+        if not rules:
+            continue
+
+        return next(iter(rules.values())).currency or 'CHF'
+    return 'CHF'
+
+
+def group_invoice_items(
+    invoice_items: Iterable[_ItemT]
+) -> dict[str, list[_ItemT]]:
+
+    def sort_key(item: _ItemT) -> tuple[int, str]:
+        match item.group:
+            case 'submission' | 'reservation' | 'migration':
+                return 0, item.group
+            case 'form':
+                return 1, item.group
+            case 'manual' | 'reduced_amount':
+                return 99, 'manual'
+            case _:
+                return 2, item.group
+
+    return {
+        group: list(items)
+        for (__, group), items in groupby(
+            sorted(invoice_items, key=sort_key),
+            key=sort_key
+        )
+    }

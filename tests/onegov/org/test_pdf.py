@@ -15,6 +15,7 @@ def open_ticket(request, token, handler_code, create_message=True):
         ticket = TicketCollection(request.session).open_ticket(
             handler_code=handler_code, handler_id=token
         )
+        ticket.handler.refresh_invoice_items(request)
         if create_message:
             TicketMessage.create(ticket, request, 'opened')
     return ticket
@@ -61,6 +62,11 @@ def test_ticket_pdf(org_app):
     def get_translate(**kwargs):
         return org_app.chameleon_translations.get('de_CH')
 
+    def get_form(form_cls, **kwargs):
+        form = form_cls(meta={'request': request})
+        form.request = request
+        return form
+
     def class_link(cls, *args, **kwargs):
         return cls.__name__
 
@@ -82,6 +88,7 @@ def test_ticket_pdf(org_app):
         is_manager=True,
         is_manager_for_model=lambda model: True,
         get_translate=get_translate,
+        get_form=get_form,
         locale='de_CH',
         host_url=host_url,
         class_link=class_link,
@@ -91,8 +98,16 @@ def test_ticket_pdf(org_app):
     )
     collection = ResourceCollection(libres_context)
     forms = FormCollection(session)
-    room = collection.add('Stairway to Heaven', 'Europe/Zurich', type='room',
-                          definition='# Data\nName *= ___')
+    room = collection.add(
+        'Stairway to Heaven',
+        'Europe/Zurich',
+        type='room',
+        definition='# Data\nName *= ___',
+        content={
+            'pricing_method': 'per_hour',
+            'price_per_hour': 50.0
+        }
+    )
 
     scheduler = room.get_scheduler(libres_context)
     dates = (datetime(2017, 6, 7, 12), datetime(2017, 6, 7, 18))
@@ -145,7 +160,7 @@ def test_ticket_pdf(org_app):
     metadata = ('Betreff', 'Antragsteller/in', 'Status', 'Gruppe', 'Zuständig',
                 'Erstellt', 'Reaktionszeit', 'Bearbeitungszeit')
 
-    titles = ('Zusammenfassung', 'Aktivität')
+    titles = ('Zusammenfassung', 'Aktivität', 'Rechnung')
 
     for entry in metadata:
         assert entry in page

@@ -5,14 +5,14 @@ from onegov.activity import Activity
 from onegov.activity import ActivityCollection
 from onegov.activity import AttendeeCollection
 from onegov.activity import BookingCollection
+from onegov.activity import BookingPeriodCollection
 from onegov.activity import OccasionCollection
-from onegov.activity import PeriodCollection
 from onegov.activity.models import Attendee
 from onegov.activity.models import Booking
+from onegov.activity.models import BookingPeriod
 from onegov.activity.models import Occasion
 from onegov.activity.models import OccasionDate
 from onegov.activity.models import OccasionNeed
-from onegov.activity.models import Period
 from onegov.core.utils import normalize_for_url
 from onegov.pay import PaymentProviderCollection
 from onegov.user import UserCollection
@@ -48,7 +48,7 @@ class Collections:
 
     @cached_property
     def periods(self):
-        return PeriodCollection(self.session)
+        return BookingPeriodCollection(self.session)
 
     @cached_property
     def occasions(self):
@@ -180,7 +180,7 @@ class Scenario(BaseScenario):
         else:
             raise NotImplementedError
 
-        self.periods.append(self.add(Period, **columns))
+        self.periods.append(self.add(BookingPeriod, **columns))
 
         if columns.get('confirmed'):
             self.latest_period.confirm_and_start_booking_phase()

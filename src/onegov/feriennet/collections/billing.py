@@ -4,11 +4,13 @@ from collections import OrderedDict
 from decimal import Decimal
 from itertools import groupby
 from onegov.activity import Activity, Attendee, Booking, Occasion
+from onegov.activity import ActivityInvoiceItem
 from onegov.activity import BookingCollection
-from onegov.activity import Invoice, InvoiceItem, InvoiceReference
-from onegov.activity import InvoiceCollection
+from onegov.activity import BookingPeriodInvoice
+from onegov.activity import BookingPeriodInvoiceCollection
 from onegov.core.orm import as_selectable, as_selectable_from_path
 from onegov.core.utils import module_path
+from onegov.pay import InvoiceReference
 from onegov.user import User
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
@@ -18,7 +20,7 @@ from ulid import ULID
 from typing import Any, Literal, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterator
-    from onegov.activity.models import Period, PeriodMeta
+    from onegov.activity.models import BookingPeriod, BookingPeriodMeta
     from onegov.feriennet.request import FeriennetRequest
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql.selectable import Alias
@@ -54,7 +56,7 @@ class BillingCollection:
     def __init__(
         self,
         request: FeriennetRequest,
-        period: Period | PeriodMeta,
+        period: BookingPeriod | BookingPeriodMeta,
         username: str | None = None,
         expand: bool = False,
         state: Literal['paid', 'unpaid'] | None = None
@@ -81,7 +83,7 @@ class BillingCollection:
     def period_id(self) -> UUID:
         return self.period.id
 
-    def for_period(self, period: Period) -> Self:
+    def for_period(self, period: BookingPeriod) -> Self:
         return self.__class__(
             self.request, period, self.username, self.expand, self.state)
 
@@ -210,7 +212,7 @@ class BillingCollection:
         text: str,
         user_id: UUID,
         amount: Decimal
-    ) -> InvoiceItem | None:
+    ) -> ActivityInvoiceItem | None:
         """ Includes a donation for the given user and period.
 
         Unlike manual positions, donations are supposed to be off/on per
@@ -224,7 +226,7 @@ class BillingCollection:
             self.invoices.query()
             .outerjoin(User)
             .filter(User.id == user_id)
-            .options(joinedload(Invoice.items))
+            .options(joinedload(BookingPeriodInvoice.items))
             .one()
         )
 
@@ -251,7 +253,7 @@ class BillingCollection:
             self.invoices.query()
             .outerjoin(User)
             .filter(User.id == user_id)
-            .options(joinedload(Invoice.items))
+            .options(joinedload(BookingPeriodInvoice.items))
             .first()
         )
 
@@ -283,14 +285,15 @@ class BillingCollection:
         invoices = self.invoices
 
         # delete all existing invoices
-        invoice_ids = invoices.query().with_entities(Invoice.id).subquery()
+        invoice_ids = invoices.query().with_entities(
+            BookingPeriodInvoice.id).subquery()
 
         def delete_queries() -> Iterator[Query[Any]]:
             yield session.query(InvoiceReference).filter(
                 InvoiceReference.invoice_id.in_(invoice_ids))
 
-            yield session.query(InvoiceItem).filter(
-                InvoiceItem.invoice_id.in_(invoice_ids))
+            yield session.query(ActivityInvoiceItem).filter(
+                ActivityInvoiceItem.invoice_id.in_(invoice_ids))
 
             yield invoices.query()
 
@@ -338,7 +341,7 @@ class BookingInvoiceBridge:
     def __init__(
         self,
         session: Session,
-        period: Period | PeriodMeta
+        period: BookingPeriod | BookingPeriodMeta
     ) -> None:
         # tracks attendees which had at least one booking added through the
         # bridge (even if said booking was free)
@@ -347,7 +350,7 @@ class BookingInvoiceBridge:
         # init auxiliary tools
         self.session = session
         self.period = period
-        self.invoices = InvoiceCollection(session)
+        self.invoices = BookingPeriodInvoiceCollection(session)
 
         # preload data
         self.activities = {
@@ -361,8 +364,8 @@ class BookingInvoiceBridge:
         # holds invoices which existed already
         self.existing = {
             i.user.username: i for i in self.invoices.query()
-             .options(joinedload(Invoice.user))
-             .filter(Invoice.period_id == period.id)
+             .options(joinedload(BookingPeriodInvoice.user))
+             .filter(BookingPeriodInvoice.period_id == period.id)
         }
 
         # holds attendee ids which already had at least one item in this period

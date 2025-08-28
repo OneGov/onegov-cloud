@@ -3,6 +3,7 @@ from itertools import groupby
 
 from onegov.core.elements import Link
 from onegov.core.security import Private, Public
+from onegov.org.forms.commission_membership import CommissionMembershipAddForm
 from onegov.town6.views.commission import (
     view_commissions,
     add_commission,
@@ -14,7 +15,6 @@ from onegov.pas import PasApp
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.forms import AttendenceAddCommissionForm
-from onegov.pas.forms import CommissionMembershipAddForm
 from onegov.pas.forms import CommissionForm
 from onegov.pas.layouts import PASCommissionCollectionLayout
 from onegov.pas.layouts import PASCommissionLayout

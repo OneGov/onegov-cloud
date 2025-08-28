@@ -25,16 +25,22 @@
             </div>
 
             <dt i18n:translate>Agenda</dt>
-            <dd>
+            <p tal:condition="not:meeting_items_with_links" i18n:translate="">No agenda items defined yet.</p>
+            <dd tal:condition="meeting_items_with_links">
                 <ul class="more-list">
                     <li tal:repeat="item meeting_items_with_links">
                         <a tal:omit-tag="not: item.political_business_link"
-                           href="${item.political_business_link}"
-                           class="list-link">
+                            href="${item.political_business_link}"
+                            class="list-link">
                             <span class="${'list-title' if item.political_business_link else 'list-link'}">
                                 ${item.number} ${item.title}
                             </span>
                         </a>
+                        <span class="list-lead preview">
+                            <span tal:condition="item.business_type">
+                                ${item.business_type}
+                            </span>
+                        </span>
                     </li>
                 </ul>
             </dd>

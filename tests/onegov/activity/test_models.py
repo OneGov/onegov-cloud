@@ -5,6 +5,7 @@ import sqlalchemy
 import transaction
 
 from datetime import datetime, date, timedelta
+from decimal import Decimal
 from freezegun import freeze_time
 from markupsafe import Markup
 from sedate import standardize_date
@@ -14,17 +15,17 @@ from onegov.activity import ActivityFilter
 from onegov.activity import Attendee
 from onegov.activity import AttendeeCollection
 from onegov.activity import Booking, BookingCollection
-from onegov.activity import Invoice, InvoiceCollection
+from onegov.activity import BookingPeriod, BookingPeriodCollection
+from onegov.activity import BookingPeriodInvoice
+from onegov.activity import BookingPeriodInvoiceCollection
 from onegov.activity.models.age_barrier import YearAgeBarrier
-from onegov.activity.models.invoice_reference import FeriennetSchema
-from onegov.activity.models.invoice_reference import ESRSchema
 from onegov.activity import Occasion, OccasionDate
 from onegov.activity import OccasionCollection
-from onegov.activity import Period
-from onegov.activity import PeriodCollection
 from onegov.activity import PublicationRequestCollection
 from onegov.activity.models import DAYS
 from onegov.core.utils import Bunch
+from onegov.pay.models.invoice_reference import FeriennetSchema
+from onegov.pay.models.invoice_reference import ESRSchema
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from psycopg2.extras import NumericRange
@@ -169,7 +170,7 @@ def test_occasions(session, owner):
 
     activities = ActivityCollection(session)
     occasions = OccasionCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
 
     period = periods.add(
         title="Autumn 2016",
@@ -369,7 +370,7 @@ def test_profiles(session, owner):
 
     activities = ActivityCollection(session)
     occasions = OccasionCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
 
     sport = activities.add("Sport", username=owner.username)
 
@@ -443,7 +444,7 @@ def test_profiles(session, owner):
 
 
 def test_occasion_daterange_constraint(session, owner):
-    period = PeriodCollection(session).add(
+    period = BookingPeriodCollection(session).add(
         title="Autumn 2016",
         prebooking=(datetime(2000, 1, 1), datetime(2000, 1, 1)),
         booking=(datetime(2000, 1, 1), datetime(2000, 1, 1)),
@@ -467,7 +468,7 @@ def test_no_orphan_bookings(session, owner):
 
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
     occasions = OccasionCollection(session)
     bookings = BookingCollection(session)
 
@@ -506,7 +507,7 @@ def test_no_orphan_occasions(session, owner):
 
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
     occasions = OccasionCollection(session)
     bookings = BookingCollection(session)
 
@@ -572,7 +573,7 @@ def test_no_orphan_occasions(session, owner):
 def test_occasion_duration(session, owner):
 
     activities = ActivityCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
     occasions = OccasionCollection(session)
 
     retreat = activities.add("Management Retreat", username=owner.username)
@@ -780,7 +781,7 @@ def test_occasion_duration_with_multiple_dates(collections, owner):
 def test_occasion_durations_query(session, owner):
 
     activities = ActivityCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
     occasions = OccasionCollection(session)
 
     retreat = activities.add("Management Retreat", username=owner.username)
@@ -865,7 +866,7 @@ def test_occasion_durations_query(session, owner):
 def test_occasion_ages(session, owner):
 
     activities = ActivityCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
     occasions = OccasionCollection(session)
 
     retreat = activities.add("Management Retreat", username=owner.username)
@@ -983,7 +984,7 @@ def test_booking_collection(session, owner):
 
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
     occasions = OccasionCollection(session)
     bookings = BookingCollection(session)
 
@@ -1031,7 +1032,7 @@ def test_booking_collection(session, owner):
 def test_star_nobble_booking(session, owner):
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
     occasions = OccasionCollection(session)
     bookings = BookingCollection(session)
 
@@ -1139,7 +1140,7 @@ def test_booking_period_id_reference(session, owner):
 
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
     occasions = OccasionCollection(session)
     bookings = BookingCollection(session)
 
@@ -1192,7 +1193,7 @@ def test_happiness(session, owner):
 
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
     occasions = OccasionCollection(session)
     bookings = BookingCollection(session)
 
@@ -1338,7 +1339,7 @@ def test_happiness(session, owner):
 def test_attendees_count(session, owner):
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
     occasions = OccasionCollection(session)
     bookings = BookingCollection(session)
 
@@ -1444,7 +1445,7 @@ def test_attendees_count(session, owner):
 def test_accept_booking(session, owner):
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
     occasions = OccasionCollection(session)
     bookings = BookingCollection(session)
 
@@ -1641,7 +1642,7 @@ def test_accept_booking(session, owner):
 def test_booking_limit_exemption(session, owner):
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
     occasions = OccasionCollection(session)
     bookings = BookingCollection(session)
 
@@ -1714,7 +1715,7 @@ def test_booking_limit_exemption(session, owner):
 def test_cancel_booking(session, owner):
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
     occasions = OccasionCollection(session)
     bookings = BookingCollection(session)
 
@@ -1950,7 +1951,7 @@ def test_cancel_booking(session, owner):
 
 
 def test_period_phases(session):
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
 
     period = periods.add(
         title="Autumn 2016",
@@ -2035,74 +2036,79 @@ def test_invoices(session, owner, prebooking_period, inactive_period):
     p1 = prebooking_period
     p2 = inactive_period
 
-    invoices = InvoiceCollection(session, user_id=owner.id)
+    invoices = BookingPeriodInvoiceCollection(session, user_id=owner.id)
 
     assert invoices.total_amount == 0
     assert invoices.outstanding_amount == 0
     assert invoices.paid_amount == 0
 
     i1 = invoices.add(period_id=p1.id)
-    i1.add("Malcolm", "Camp", 100.0, 1.0)
-    i1.add("Malcolm", "Pass", 25.0, 1.0)
-    i1.add("Dewey", "Football", 100.0, 1.0)
-    i1.add("Dewey", "Pass", 25.0, 1.0)
-    i1.add("Discount", "8%", 250, -0.05)
+    i1.add("Malcolm", "Camp", Decimal('100'), Decimal('1'))
+    i1.add("Malcolm", "Pass", Decimal('25'), Decimal('1'))
+    i1.add("Dewey", "Football", Decimal('100'), Decimal('1'))
+    i1.add("Dewey", "Pass", Decimal('25'), Decimal('1'))
+    i1.add("Discount", "8%", Decimal('250'), Decimal('-0.05'))
 
-    assert i1.total_amount == 237.5
-    assert i1.outstanding_amount == 237.5
+    assert i1.total_amount == Decimal('237.5')
+    assert i1.outstanding_amount == Decimal('237.5')
     assert i1.paid_amount == 0
-    assert InvoiceCollection(session).total_amount == 237.5
+    assert BookingPeriodInvoiceCollection(
+        session).total_amount == Decimal('237.5')
 
     i2 = invoices.add(period_id=p2.id)
-    i2.add("Malcolm", "Camp", 100, 1 / 3)
+    i2.add("Malcolm", "Camp", Decimal('100'), Decimal('1') / Decimal('3'))
 
     # this is 33, not 33.33 because both unit and quantity are truncated
     # to two decimals after the point. So when we added 1 / 3 above, we really
     # added 0.33 to the database (100 * 0.33 = 33)
-    assert InvoiceCollection(session, period_id=p2.id).total_amount == 33
-    assert i2.total_amount == 33
-    assert i2.outstanding_amount == 33
-    assert i2.paid_amount == 0
+    assert BookingPeriodInvoiceCollection(
+        session, period_id=p2.id).total_amount == Decimal('33')
+    assert i2.total_amount == Decimal('33')
+    assert i2.outstanding_amount == Decimal('33')
+    assert i2.paid_amount == Decimal('0')
 
-    assert InvoiceCollection(session, period_id=p1.id).total_amount == 237.5
-    assert InvoiceCollection(session, period_id=p2.id).total_amount == 33
-    assert InvoiceCollection(session).total_amount == 270.5
+    assert BookingPeriodInvoiceCollection(session, period_id=p1.id
+        ).total_amount == Decimal('237.5')
+    assert BookingPeriodInvoiceCollection(session, period_id=p2.id
+        ).total_amount == Decimal('33')
+    assert BookingPeriodInvoiceCollection(
+        session).total_amount == Decimal('270.5')
 
     # pay part of the first invoice
     i1.items[0].paid = True
-    assert i1.total_amount == 237.5
-    assert i1.outstanding_amount == 137.5
-    assert i1.paid_amount == 100.0
+    assert i1.total_amount == Decimal('237.5')
+    assert i1.outstanding_amount == Decimal('137.5')
+    assert i1.paid_amount == Decimal('100.0')
     assert i1.paid == False
 
-    assert session.query(func.sum(Invoice.total_amount))\
-        .first()[0] == 270.5
-    assert session.query(func.sum(Invoice.outstanding_amount))\
-        .first()[0] == 170.5
-    assert session.query(func.sum(Invoice.paid_amount))\
-        .first()[0] == 100
+    assert session.query(func.sum(BookingPeriodInvoice.total_amount)
+        ).first()[0] == Decimal('270.5')
+    assert session.query(func.sum(BookingPeriodInvoice.outstanding_amount)
+        ).first()[0] == Decimal('170.5')
+    assert session.query(func.sum(BookingPeriodInvoice.paid_amount)
+        ).first()[0] == Decimal('100')
 
-    assert InvoiceCollection(session, period_id=p1.id)\
-        .outstanding_amount == 137.5
-    assert InvoiceCollection(session, period_id=p2.id)\
-        .outstanding_amount == 33
+    assert BookingPeriodInvoiceCollection(session, period_id=p1.id
+        ).outstanding_amount == Decimal('137.5')
+    assert BookingPeriodInvoiceCollection(session, period_id=p2.id
+        ).outstanding_amount == Decimal('33')
 
-    assert InvoiceCollection(session).unpaid_count() == 2
-    assert InvoiceCollection(session).unpaid_count(
+    assert BookingPeriodInvoiceCollection(session).unpaid_count() == 2
+    assert BookingPeriodInvoiceCollection(session).unpaid_count(
         excluded_period_ids=(p1.id, )) == 1
 
     # pay all of the second invoice
     i2.items[0].paid = True
-    assert i2.total_amount == 33
-    assert i2.outstanding_amount == 0
-    assert i2.paid_amount == 33
+    assert i2.total_amount == Decimal('33')
+    assert i2.outstanding_amount == Decimal('0')
+    assert i2.paid_amount == Decimal('33')
     assert i2.paid == True
 
-    assert InvoiceCollection(session).unpaid_count() == 1
+    assert BookingPeriodInvoiceCollection(session).unpaid_count() == 1
 
 
 def test_invoice_reference(session, owner, prebooking_period):
-    invoices = InvoiceCollection(
+    invoices = BookingPeriodInvoiceCollection(
         session, user_id=owner.id, period_id=prebooking_period.id)
 
     # DEFAULT SCHEMA
@@ -2201,7 +2207,7 @@ def test_invoice_reference_extract_feriennet_schema():
 
 
 def test_invoice_reference_uniqueness(session, owner, prebooking_period):
-    invoices = InvoiceCollection(
+    invoices = BookingPeriodInvoiceCollection(
         session, user_id=owner.id, period_id=prebooking_period.id)
 
     i1 = invoices.add()
@@ -2214,7 +2220,7 @@ def test_confirm_period(session, owner):
 
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
     occasions = OccasionCollection(session)
     bookings = BookingCollection(session)
 
@@ -2284,7 +2290,7 @@ def test_cancel_occasion(session, owner):
 
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
     occasions = OccasionCollection(session)
     bookings = BookingCollection(session)
 
@@ -2517,7 +2523,7 @@ def test_cancellation_deadline(session, collections, prebooking_period, owner):
 
 
 def test_prebooking_phases():
-    period = Period()
+    period = BookingPeriod()
 
     period.prebooking_start = date(2017, 5, 1)
     period.prebooking_end = date(2017, 5, 2)
@@ -2556,7 +2562,7 @@ def test_publication_request(session, owner):
 
     activities = ActivityCollection(session)
     requests = PublicationRequestCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
 
     period = periods.add(
         title="Autumn 2016",
@@ -2583,7 +2589,7 @@ def test_archive_period(session, owner):
 
     activities = ActivityCollection(session)
     occasions = OccasionCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
 
     current_period = periods.add(
         title="Autumn 2017",

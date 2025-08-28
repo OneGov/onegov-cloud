@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from datetime import datetime
@@ -9,7 +11,12 @@ from onegov.user import UserGroupCollection
 from transaction import commit
 
 
-def test_notice_collection(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_notice_collection(session: Session) -> None:
     notices = OfficialNoticeCollection(session)
     assert notices.query().count() == 0
 
@@ -59,7 +66,7 @@ def test_notice_collection(session):
     assert notices.for_state('published').query().count() == 0
 
 
-def test_notice_collection_search(session):
+def test_notice_collection_search(session: Session) -> None:
     groups = UserGroupCollection(session)
     group_a = groups.add(name='GroupA')
     group_b = groups.add(name='GroupB1')
@@ -162,7 +169,7 @@ def test_notice_collection_search(session):
     assert notices.for_term(str(notice.id).split('-')[0]).query().count() == 1
 
 
-def test_notice_collection_users_and_groups(session):
+def test_notice_collection_users_and_groups(session: Session) -> None:
     groups = UserGroupCollection(session)
     group_ab = groups.add(name='AB')
     group_c = groups.add(name='C')
@@ -249,7 +256,7 @@ def test_notice_collection_users_and_groups(session):
     ]
 
 
-def test_notice_collection_issues(session):
+def test_notice_collection_issues(session: Session) -> None:
     notices = OfficialNoticeCollection(session)
     notices.add(title='a', text='text', issues=None)
     notices.add(title='b', text='text', issues=[])
@@ -273,7 +280,7 @@ def test_notice_collection_issues(session):
         assert sorted([notice.title for notice in notices.query()]) == result
 
 
-def test_notice_collection_categories(session):
+def test_notice_collection_categories(session: Session) -> None:
     notices = OfficialNoticeCollection(session)
     notices.add(title='a', text='text', categories=None)
     notices.add(title='b', text='text', categories=[])
@@ -298,7 +305,7 @@ def test_notice_collection_categories(session):
         ]) == result
 
 
-def test_notice_collection_organizations(session):
+def test_notice_collection_organizations(session: Session) -> None:
     notices = OfficialNoticeCollection(session)
     notices.add(title='a', text='text', organizations=None)
     notices.add(title='b', text='text', organizations=[])
@@ -323,7 +330,7 @@ def test_notice_collection_organizations(session):
         ]) == result
 
 
-def test_notice_collection_order(session):
+def test_notice_collection_order(session: Session) -> None:
     groups = UserGroupCollection(session)
     group_c = groups.add(name='C').id
     group_d = groups.add(name='D').id
@@ -357,8 +364,8 @@ def test_notice_collection_order(session):
         )
 
     # Default ordering by issue date
-    result = [n.first_issue for n in notices.query()]
-    assert result == [date_1, date_1, date_1, date_1, date_2, date_3]
+    dresult = [n.first_issue for n in notices.query()]
+    assert dresult == [date_1, date_1, date_1, date_1, date_2, date_3]
 
     # Explicit direction
     result = [n.title for n in notices.for_order('title', 'asc').query()]
@@ -367,10 +374,10 @@ def test_notice_collection_order(session):
     result = [n.title for n in notices.for_order('title', 'desc').query()]
     assert result == ['E', 'D', 'C', 'B', 'B', 'A']
 
-    result = [n.title for n in notices.for_order('title', '').query()]
+    result = [n.title for n in notices.for_order('title', '').query()]  # type: ignore[arg-type]
     assert result == ['A', 'B', 'B', 'C', 'D', 'E']
 
-    result = [n.title for n in notices.for_order('title', 'xxx').query()]
+    result = [n.title for n in notices.for_order('title', 'xxx').query()]  # type: ignore[arg-type]
     assert result == ['A', 'B', 'B', 'C', 'D', 'E']
 
     # Default direction
@@ -389,68 +396,68 @@ def test_notice_collection_order(session):
     assert result == ['E', 'D', 'C', 'B', 'B', 'A']
 
     # Invalid
-    result = [n.first_issue for n in notices.for_order('result').query()]
-    assert result == [date_1, date_1, date_1, date_1, date_2, date_3]
+    dresult = [n.first_issue for n in notices.for_order('result').query()]
+    assert dresult == [date_1, date_1, date_1, date_1, date_2, date_3]
 
-    result = [n.first_issue for n in notices.for_order('users').query()]
-    assert result == [date_1, date_1, date_1, date_1, date_2, date_3]
+    dresult = [n.first_issue for n in notices.for_order('users').query()]
+    assert dresult == [date_1, date_1, date_1, date_1, date_2, date_3]
 
-    result = [n.first_issue for n in notices.for_order(None).query()]
-    assert result == [date_1, date_1, date_1, date_1, date_2, date_3]
+    dresult = [n.first_issue for n in notices.for_order(None).query()]  # type: ignore[arg-type]
+    assert dresult == [date_1, date_1, date_1, date_1, date_2, date_3]
 
     # Valid
-    result = [n.text for n in notices.for_order('text').query()]
-    assert result == ['g', 'g', 'h', 'h', 'i', 'j']
+    mresult = [n.text for n in notices.for_order('text').query()]
+    assert mresult == ['g', 'g', 'h', 'h', 'i', 'j']
 
     # ... user_id
-    result = [n.user_id for n in notices.for_order('user_id').query()]
-    assert result == sorted(2 * [user_a] + 2 * [user_b] + [user_c]) + [None]
+    uresult = [n.user_id for n in notices.for_order('user_id').query()]
+    assert uresult == sorted(2 * [user_a] + 2 * [user_b] + [user_c]) + [None]
 
     # ... organization
-    result = [
+    oresult = [
         n.organization for n in notices.for_order('organization').query()
     ]
-    assert result == ['p', 'p', 'p', 'q', 'q', 'q']
+    assert oresult == ['p', 'p', 'p', 'q', 'q', 'q']
 
     # ... category
-    result = [n.category for n in notices.for_order('category').query()]
-    assert result == ['X', 'X', 'X', 'X', 'Y', 'Y']
+    oresult = [n.category for n in notices.for_order('category').query()]
+    assert oresult == ['X', 'X', 'X', 'X', 'Y', 'Y']
 
     # ... name
-    result = [n.name for n in notices.for_order('name').query()]
-    assert result == ['a', 'b', 'b-1', 'c', 'd', 'e']
+    oresult = [n.name for n in notices.for_order('name').query()]
+    assert oresult == ['a', 'b', 'b-1', 'c', 'd', 'e']
 
     # ... group.name
-    result = [
+    oresult = [
         n.group.name if n.group else None
         for n in notices.for_order('group.name').query()
     ]
-    assert result == [None, None, 'C', 'C', 'D', 'D']
+    assert oresult == [None, None, 'C', 'C', 'D', 'D']
 
     # ... user.name(s)
-    result = [
+    oresult = [
         n.user.realname if n.user else None
         for n in notices.for_order('user.realname').query()
     ]
-    assert result == [None, None, 'o', 'o', 'p', 'p']
+    assert oresult == [None, None, 'o', 'o', 'p', 'p']
 
-    result = [
+    oresult = [
         n.user.username if n.user else None
         for n in notices.for_order('user.username').query()
     ]
-    assert result == [
+    assert oresult == [
         None, 'a@example.org', 'a@example.org',
         'b@example.org', 'b@example.org', 'c@example.org'
     ]
 
-    result = [
+    oresult = [
         n.user.realname or n.user.username if n.user else None
         for n in notices.for_order('user.name').query()
     ]
-    assert result == [None, 'c@example.org', 'o', 'o', 'p', 'p']
+    assert oresult == [None, 'c@example.org', 'o', 'o', 'p', 'p']
 
 
-def test_notice_collection_pagination(session):
+def test_notice_collection_pagination(session: Session) -> None:
     notices = OfficialNoticeCollection(session)
 
     assert notices.page_index == 0
@@ -476,26 +483,34 @@ def test_notice_collection_pagination(session):
 
     drafted = notices.for_state('drafted')
     assert drafted.subset_count == 12
+    assert drafted.next is not None
     assert len(drafted.next.batch) == 12 - drafted.batch_size
 
     submitted = notices.for_state('submitted')
     assert submitted.subset_count == 12
+    assert submitted.next is not None
     assert len(submitted.next.batch) == 12 - submitted.batch_size
 
     accepted = notices.for_state('accepted')
     assert accepted.subset_count == 12
+    assert accepted.next is not None
     assert len(accepted.next.batch) == 12 - accepted.batch_size
 
     published = notices.for_state('published')
     assert published.subset_count == 12
+    assert published.next is not None
     assert len(published.next.batch) == 12 - published.batch_size
 
     rejected = notices.for_state('rejected')
     assert rejected.subset_count == 12
+    assert rejected.next is not None
     assert len(rejected.next.batch) == 12 - rejected.batch_size
 
 
-def test_notice_collection_pagination_negative_page_index(session):
+def test_notice_collection_pagination_negative_page_index(
+    session: Session
+) -> None:
+
     notices = OfficialNoticeCollection(session, page=-1)
     assert notices.page == 0
     assert notices.page_index == 0
@@ -503,4 +518,4 @@ def test_notice_collection_pagination_negative_page_index(session):
     assert notices.page_by_index(-3).page_index == 0
 
     with pytest.raises(AssertionError):
-        OfficialNoticeCollection(session, None)
+        OfficialNoticeCollection(session, None)  # type: ignore[arg-type]

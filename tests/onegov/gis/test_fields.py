@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 
 from base64 import b64encode, b64decode
@@ -7,18 +9,19 @@ from onegov.gis.models import Coordinates
 from onegov.gis.forms import CoordinatesField
 
 
-def test_coordinates_field():
+def test_coordinates_field() -> None:
     value = re.compile(r'value="([a-zA-Z0-9=]+)"')
 
     # initially the field contains empty coordinates
-    field = CoordinatesField().bind(Form(), 'coordinates')
+    field: CoordinatesField
+    field = CoordinatesField().bind(Form(), 'coordinates')  # type: ignore[attr-defined]
     assert not field.data
     assert field.data.lat is None
     assert field.data.lon is None
     assert field.data.zoom is None
 
     # this holds true for the rendered field
-    coordinate = json.loads(b64decode(value.search(field()).group(1)))
+    coordinate = json.loads(b64decode(value.search(field()).group(1)))  # type: ignore[union-attr]
 
     assert coordinate.lat is None
     assert coordinate.lon is None
@@ -38,7 +41,7 @@ def test_coordinates_field():
     assert field.data.zoom == 10
 
     # which again holds true for the rendered field
-    coordinate = json.loads(b64decode(value.search(field()).group(1)))
+    coordinate = json.loads(b64decode(value.search(field()).group(1)))  # type: ignore[union-attr]
 
     assert coordinate.lat == 47.05183585
     assert coordinate.lon == 8.30576869173879
@@ -57,7 +60,7 @@ def test_coordinates_field():
 
     # on an object, coordinates are stored as is
     class Test:
-        pass
+        coordinates: Coordinates
 
     test = Test()
     field.populate_obj(test, 'coordinates')
@@ -65,8 +68,9 @@ def test_coordinates_field():
     assert test.coordinates.lat == 47.05183585
     assert test.coordinates.lon == 8.30576869173879
 
+    test2 = Test()
     field.data = Coordinates()
-    field.populate_obj(test, 'coordinates')
-    assert test.coordinates.lat is None
-    assert test.coordinates.lon is None
-    assert test.coordinates.zoom is None
+    field.populate_obj(test2, 'coordinates')
+    assert test2.coordinates.lat is None
+    assert test2.coordinates.lon is None
+    assert test2.coordinates.zoom is None

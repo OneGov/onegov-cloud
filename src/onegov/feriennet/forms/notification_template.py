@@ -24,7 +24,7 @@ from wtforms.validators import InputRequired, ValidationError
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterator
-    from onegov.activity.models import PeriodMeta
+    from onegov.activity.models import BookingPeriodMeta
     from onegov.feriennet.request import FeriennetRequest
     from sqlalchemy.orm import Query
 
@@ -129,7 +129,7 @@ class NotificationTemplateSendForm(Form):
         self.occasion.choices = list(self.occasion_choices)
 
     @cached_property
-    def period(self) -> PeriodMeta:
+    def period(self) -> BookingPeriodMeta:
         for period in self.request.app.periods:
             if period.id == self.model.period_id:
                 return period

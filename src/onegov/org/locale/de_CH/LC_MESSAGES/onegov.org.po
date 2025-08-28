@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-24 13:54+0200\n"
+"POT-Creation-Date: 2025-08-14 10:09+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -262,6 +262,9 @@ msgstr ""
 msgid "ID Payment Provider"
 msgstr "ID beim Zahlungsanbieter"
 
+msgid "References Payment Provider"
+msgstr "Referenzen beim Zahlungsanbieter"
+
 msgid "Status"
 msgstr "Status"
 
@@ -432,6 +435,18 @@ msgstr "Typ"
 
 msgid "Description"
 msgstr "Beschreibung"
+
+msgid "Commission"
+msgstr "Kommission"
+
+msgid "Parliamentarian"
+msgstr "Parlamentsmitglied"
+
+msgid "Function"
+msgstr "Funktion"
+
+msgid "Role"
+msgstr "Rolle"
 
 msgid "Lead"
 msgstr "Einleitung"
@@ -623,6 +638,9 @@ msgstr ""
 msgid "Publication"
 msgstr "Publikation"
 
+msgid "Required publication dates"
+msgstr "Publikationsdaten erforderlich"
+
 msgid "Enable registering for update notifications"
 msgstr "Registrierung für Benachrichtigungen aktivieren"
 
@@ -632,9 +650,6 @@ msgstr ""
 
 msgid "Notifications"
 msgstr "Mitteilungen"
-
-msgid "Required publication dates"
-msgstr "Publikationsdaten erforderlich"
 
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Zusätzliche zur E-Mail benötigte Informationen des Antragstellers"
@@ -843,6 +858,9 @@ msgstr "Freuen Sie sich auf ein klassisches Konzert im Schlossgarten."
 msgid "Image"
 msgstr "Bild"
 
+msgid "Ideal size: 700 x 420 px (5:3)"
+msgstr "Ideale Größe: 700 x 420 px (5:3)"
+
 msgid "Additional Information (PDF)"
 msgstr "Zusätzliche Informationen (PDF)"
 
@@ -1008,6 +1026,12 @@ msgstr ""
 "Beschreibt, wie die Reservations-Resource abgeholt oder bezogen werden kann. "
 "Dieser Text wird auf Ticket-Status-Seite genutzt, um den Nutzer zu "
 "informieren"
+
+msgid "E-Mail Reply Address (Reply-To)"
+msgstr "E-Mail Antwort Adresse (Reply-To)"
+
+msgid "Replies to automated e-mails go to this address."
+msgstr "Antworten an automatisch generierte E-Mails gehen an diese Adresse."
 
 msgid "Show VAT"
 msgstr "MwSt anzeigen"
@@ -1179,8 +1203,29 @@ msgstr "Nach Beschreibung"
 msgid "By last change"
 msgstr "Nach Zeitpunkt der letzten Änderung"
 
-msgid "Agenda Items"
+msgid "Booking Text"
+msgstr "Buchungstext"
+
+msgid "Kind"
+msgstr "Art"
+
+msgid "Discount"
+msgstr "Abzug"
+
+msgid "Surcharge"
+msgstr "Zuschlag"
+
+msgid "New agenda item"
+msgstr "Neues Traktandum"
+
+msgid "Agenda items"
 msgstr "Traktanden"
+
+msgid "Number"
+msgstr "Nummer"
+
+msgid "Agenda item"
+msgstr "Traktandum"
 
 msgid "Used in the overview and the e-mail subject"
 msgstr "Wird in der Übersicht und als E-Mail Subjekt verwendet"
@@ -1376,11 +1421,14 @@ msgstr "Webseite"
 msgid "Remarks"
 msgstr "Bemerkungen"
 
-msgid "Parliamentarian"
-msgstr "Parlamentarier:in"
+msgid "Interest ties"
+msgstr "Interessensbindungen"
 
-msgid "Role"
-msgstr "Rolle"
+msgid "Interest tie"
+msgstr "Interessensbindung"
+
+msgid "Category"
+msgstr "Kategorie"
 
 msgid "Parliamentary group"
 msgstr "Fraktion"
@@ -1414,9 +1462,6 @@ msgstr "Zahlungsart"
 
 msgid "Academic Title"
 msgstr "Akademischer Titel"
-
-msgid "Function"
-msgstr "Funktion"
 
 msgid "Organisation"
 msgstr "Organisation"
@@ -1475,14 +1520,11 @@ msgstr "Erstunterzeichner/in"
 msgid "Co-signatory"
 msgstr "Mitunterzeichner/in"
 
-msgid "Number"
-msgstr "Nummer"
-
 msgid "Business Status"
 msgstr "Status"
 
-msgid "Entry Date"
-msgstr "Datum"
+msgid "Submission/publication date"
+msgstr "Einreichungs-/Publikationsdatum"
 
 msgid "Participations"
 msgstr "Verfasser / Beteiligte"
@@ -1715,12 +1757,6 @@ msgstr "Link zum Logo"
 
 msgid "Logo (Square)"
 msgstr "Logo (Quadratisch)"
-
-msgid "E-Mail Reply Address (Reply-To)"
-msgstr "E-Mail Antwort Adresse (Reply-To)"
-
-msgid "Replies to automated e-mails go to this address."
-msgstr "Antworten an automatisch generierte E-Mails gehen an diese Adresse."
 
 msgid "Primary Color"
 msgstr "Primärfarbe"
@@ -3008,6 +3044,12 @@ msgstr "Neue Nachricht"
 msgid "Ticket Status"
 msgstr "Ticket Status"
 
+msgid "Invoice"
+msgstr "Rechnung"
+
+msgid "Discount / Surcharge"
+msgstr "Abzug / Zuschlag"
+
 msgid "Text module"
 msgstr "Textbaustein"
 
@@ -3646,8 +3688,8 @@ msgstr "Reservationen absagen"
 msgid "Reject all with message"
 msgstr "Alle absagen mit Kommentar"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -4246,6 +4288,9 @@ msgstr ""
 msgid "Links"
 msgstr "Links"
 
+msgid "Invoice Items"
+msgstr "Rechnungspositionen"
+
 msgid "Item(s)"
 msgstr "Stück(e)"
 
@@ -4523,6 +4568,27 @@ msgstr "Schliessen"
 
 msgid "Copy to clipboard"
 msgstr "In die Zwischenablage kopieren"
+
+msgid "Unit"
+msgstr "Einheit"
+
+msgid "Quantity"
+msgstr "Anzahl"
+
+msgid "Submission"
+msgstr "Eintrag"
+
+msgid "Selected Options"
+msgstr "Ausgewählte Optionen"
+
+msgid "Discounts / Surcharges"
+msgstr "Abzüge / Zuschläge"
+
+msgid "Lump sum"
+msgstr "Pauschalbetrag"
+
+msgid "Unpaid"
+msgstr "Unbezahlt"
 
 msgid "No submissions yet."
 msgstr "Noch keine Eingaben."
@@ -5066,6 +5132,9 @@ msgstr "Ticket E-Mails aktiviert."
 msgid "Payment amount changed."
 msgstr "Zahlungsbetrag geändert."
 
+msgid "Submitter e-mail changed."
+msgstr "E-Mail Adresse des Antragstellers geändert."
+
 msgid "Ticket archived."
 msgstr "Ticket archiviert."
 
@@ -5499,6 +5568,9 @@ msgstr "${count} Notiz"
 
 msgid "${count} notes"
 msgstr "${count} Notizen"
+
+msgid "View Invoice"
+msgstr "Rechnung anzeigen"
 
 msgid "Change tag"
 msgstr "Schlagwort ändern"
@@ -6328,6 +6400,12 @@ msgstr ""
 
 msgid "Registrations are no longer possible"
 msgstr "Anmeldungen sind nicht mehr möglich"
+
+msgid ""
+"Your changes would alter the price total but the payment is no longer open."
+msgstr ""
+"Ihre Änderungen würde den Preis verändern, aber die Zahlung ist nicht mehr "
+"offen."
 
 msgid "Pay Online and Complete"
 msgstr "Online zahlen und abschliessen"
@@ -7163,6 +7241,28 @@ msgstr "Ihre Nachricht wurde gesendet"
 msgid "Zip archive created successfully"
 msgstr "ZIP-Archiv erfolgreich generiert"
 
+msgid "The payment is no longer open, so the invoice cannot be modified."
+msgstr ""
+"Die Zahlung ist nicht mehr offen, daher kann die Rechnung nicht verändert "
+"werden."
+
+msgid "Remove Discount"
+msgstr "Abzug entfernen"
+
+msgid "Remove Surchage"
+msgstr "Zuschlag entfernen"
+
+#, python-format
+msgid "Do you really want to remove \"${booking_text}\"?"
+msgstr "Möchten Sie wirklich \"${booking_text}\" entfernen?"
+
+#, python-format
+msgid "${ticket} Invoice"
+msgstr "${ticket} Rechnung"
+
+msgid "Add Discount / Surcharge"
+msgstr "Abzug / Zuschlag hinzufügen"
+
 msgid "Your request has been submitted"
 msgstr "Anfrage eingereicht"
 
@@ -7210,6 +7310,9 @@ msgstr "Alle Tickets"
 msgid "All Users"
 msgstr "Alle Benutzer"
 
+msgid "All Submitters"
+msgstr "Alle Antragsteller"
+
 #, python-format
 msgid "${success_count} tickets deleted, ${error_count} are not deletable"
 msgstr ""
@@ -7252,6 +7355,9 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid "Parliamentarians"
+#~ msgstr "Parlamentsmitglieder"
 
 #~ msgid "Date of death"
 #~ msgstr "Sterbedatum"

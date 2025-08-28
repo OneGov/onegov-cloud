@@ -174,13 +174,19 @@ def get_legislative_period(
 @PasApp.path(
     model=PASParliamentarianCollection,
     path='/parliamentarians',
-    converters={'active': bool}
+    converters={
+        'active': [bool],
+        'party': [str]
+    }
 )
 def get_parliamentarians(
     app: PasApp,
-    active: bool = True
+    active: list[bool] | None = None,
 ) -> PASParliamentarianCollection:
-    return PASParliamentarianCollection(app.session(), active)
+    return PASParliamentarianCollection(
+        app.session(),
+        active=active or [True],
+    )
 
 
 @PasApp.path(
