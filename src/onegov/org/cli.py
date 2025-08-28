@@ -2966,3 +2966,59 @@ def ris_rebuild_political_business_links_to_meetings(
         transaction.commit()
 
     return rebuild_political_business_links
+
+
+@cli.command(name='ris-wil-meetings-shorten-audio-link')
+def ris_wil_meetings_shorten_audio_link(
+
+) -> Callable[[OrgRequest, OrgApp], None]:
+    def ris_wil_meetings_shorten_audio_link(
+            request: OrgRequest,
+            app: OrgApp
+    ) -> None:
+
+        meetings = MeetingCollection(request.session)
+        recapp_counter = 0
+        http_counter = 0
+        for meeting in meetings.query():
+            if not meeting.audio_link:
+                continue
+
+            if (meeting.audio_link ==
+                    'https://wil.recapp.ch/viewer/default/timeline'):
+                meeting.audio_link = 'https://wil.recapp.ch'
+                recapp_counter += 1
+                continue
+
+            if 'http://wil.recapp.ch' in meeting.audio_link:
+                meeting.audio_link = (
+                    meeting.audio_link.replace('http', 'https'))
+                http_counter += 1
+                continue
+
+            if meeting.audio_link == 'https://wil.recapp.ch':
+                continue
+
+            if 'http://verbalix.stadtwil.ch' in meeting.audio_link:
+                meeting.audio_link = (
+                    meeting.audio_link.replace('http', 'https'))
+                http_counter += 1
+                continue
+
+            if meeting.audio_link == 'https://verbalix.stadtwil.ch/':
+                continue
+
+            if 'https://verbalix.stadtwil.ch/' in meeting.audio_link:
+                continue
+
+            click.secho(
+                f'audio link for meeting {meeting.title} vom '
+                f'{meeting.start_datetime}: {meeting.audio_link}', fg='yellow')
+
+        click.secho(f'Shortened recapp audio links for {recapp_counter} '
+                    f'meetings', fg='green')
+        click.secho(f'Adjusted verbalix http audio links for {http_counter} '
+                    f'meetings', fg='green')
+        transaction.commit()
+
+    return ris_wil_meetings_shorten_audio_link
