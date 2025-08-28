@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 
 
 class Meeting(
-    AccessExtension,  # required??
+    AccessExtension,
     MultiAssociatedFiles,
     Base,
     ContentMixin,
