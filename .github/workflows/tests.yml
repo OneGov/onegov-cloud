@@ -203,7 +203,7 @@ jobs:
           --reruns-delay 1 \
           --only-rerun "AttributeError: 'SessionManager'" \
           --only-rerun "AttributeError: 'DefaultLayout'" \
-          --only-rerun "ReferenceError: $ is not defined" \
+          --only-rerun ".*ReferenceError: [$] is not defined" \
           --only-rerun "FileNotFoundError:" \
           --only-rerun "Bad response: 404 Not Found" \
           --junit-xml=/tmp/junit.xml \
