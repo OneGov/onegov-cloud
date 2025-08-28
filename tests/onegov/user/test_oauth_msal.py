@@ -13,7 +13,7 @@ from onegov.user import UserApp
 from onegov.user.auth.provider import AzureADProvider
 
 # App url set in our AzureAD test tenant
-MSAL_TEST_FQGN = os.environ.get('MSAL_TEST_FQGN', '')
+MSAL_TEST_FQGN = os.environ.get('MSAL_TEST_FQGN')
 
 # We only hardcode our tenant here for the devs convenience to not set it
 # with env vars, since it is needed due to the tenant check in msal,
@@ -121,7 +121,7 @@ def test_msal_configuration_primary(app: App) -> None:
     assert provider.is_primary(app) is True
 
 
-@pytest.mark.skipif(MSAL_TEST_FQGN, reason='Running in CI/CD')
+@pytest.mark.skipif(not not MSAL_TEST_FQGN, reason='Running in CI/CD')
 def test_msal_client_local(app: App) -> None:
     pass
 

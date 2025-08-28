@@ -109,8 +109,8 @@ def app(
               request_method='POST')
     def handle_auth(self: Auth, request: CoreRequest) -> str:
         if self.login_to(
-                request.GET['username'],
-                request.GET['password'],
+                request.params['username'],  # type: ignore[arg-type]
+                request.params['password'],  # type: ignore[arg-type]
                 request):
 
             return 'success'

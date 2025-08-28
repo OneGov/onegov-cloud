@@ -16,7 +16,7 @@ from onegov.user.auth.provider import SAML2Provider
 from typing import Any
 
 # location of our local SAML2 IdP metadata XML
-IDP_METADATA = os.environ.get('SAML2_TEST_IDP_METADATA', '')
+IDP_METADATA = os.environ.get('SAML2_TEST_IDP_METADATA')
 
 class App(Framework, UserApp):
     pass
@@ -182,7 +182,7 @@ def test_saml2_authenticate_request(app: App, idp_metadata: str) -> None:
     assert browser_session['login_to'] == '/'
 
 
-@pytest.mark.skipif(IDP_METADATA, reason='Running in CI/CD')
+@pytest.mark.skipif(not not IDP_METADATA, reason='Running in CI/CD')
 def test_saml2_client_local(app: App, idp_metadata: str) -> None:
     pass
 
