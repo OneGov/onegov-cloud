@@ -1495,6 +1495,9 @@ def test_reserve_allocation_add_reservation_invoice_change(client):
     assert "12:00" in ticket
     assert "20.00" in ticket
 
+    # accept it
+    ticket = ticket.click('Alle Reservationen annehmen').follow()
+
     # try to add a second reservation (invalid time range)
     add = ticket.click('Reservation hinzufügen', index=0)
     add.form['date'] = '2015-08-28'
@@ -1512,6 +1515,8 @@ def test_reserve_allocation_add_reservation_invoice_change(client):
     assert "12:00" in ticket
     assert "14:00" in ticket
     assert "40.00" in ticket
+    # the new reservation should already have been accepted
+    assert 'Alle Reservationen annehmen' not in ticket
 
     # mark as paid
     assert ticket.pyquery('.payment-state').text() == "Offen"
