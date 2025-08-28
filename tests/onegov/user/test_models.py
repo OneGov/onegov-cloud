@@ -32,6 +32,12 @@ def test_user_initials():
     user = User(username='a.b.c.d.e.f')
     assert user.initials == 'AB'
 
+    user = User(username='.a..b...c..')
+    assert user.initials == 'AB'
+
+    user = User(username='.@example.org')
+    assert user.initials == '?'
+
     user = User(username='victor', realname='Victor Sullivan')
     assert user.initials == 'VS'
 
