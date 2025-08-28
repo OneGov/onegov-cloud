@@ -84,8 +84,6 @@ module = [
     "tests.onegov.pas.*",
     "tests.onegov.pay.*",
     "tests.onegov.search.*",
-    "tests.onegov.shared.*",
-    "tests.onegov.stepsequence.*",
     "tests.onegov.swissvotes.*",
     "tests.onegov.ticket.*",
     "tests.onegov.town6.*",
