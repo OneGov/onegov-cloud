@@ -160,7 +160,7 @@ jobs:
           --only-rerun "AttributeError: 'SessionManager'" \
           --only-rerun "AttributeError: 'DefaultLayout'" \
           --only-rerun "ReferenceError: $ is not defined" \
-          --only-rerun "FileNotFoundError: [Errno 2] No such file" \
+          --only-rerun "FileNotFoundError:" \
           --only-rerun "Bad response: 404 Not Found" \
           --junit-xml=/tmp/junit.xml \
           -o junit_family=legacy \
