@@ -7,7 +7,7 @@
         <div class="grid-x grid-padding-x">
             <div class="large-7 medium-8 cell main-content">
                 <div tal:condition="parliamentary_group.roles">
-                    <h6 i18n:translate>Parliamentarians</h6>
+                    <h2 i18n:translate class="h3">Parliamentarians</h2>
                     <ul class="more-list">
                         <li tal:repeat="role active_roles">
                             <a href="${request.link(role.parliamentarian)}" class="list-link">
@@ -24,7 +24,7 @@
                 <div class="sidebar-wrapper">
                     <div class="side-panel">
                         <div tal:condition="parliamentary_group.description">
-                            <h3 i18n:translate>Description</h3>
+                            <h2 i18n:translate class="h3">Description</h2>
                             <div tal:content="parliamentary_group.description"></div>
                         </div>
                         <div tal:condition="parliamentary_group.start">

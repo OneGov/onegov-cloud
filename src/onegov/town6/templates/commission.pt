@@ -7,7 +7,7 @@
         <div class="grid-x grid-padding-x">
             <div class="large-8 medium-8 cell main-content">
                 <div tal:condition="commission.memberships">
-<!--?                    <h6 i18n:translate>Parliamentarians</h6>-->
+                    <h2 i18n:translate class="h3">Parliamentarians</h2>
                     <dd>
                         <ul class="more-list">
                             <li tal:repeat="membership commission.memberships">

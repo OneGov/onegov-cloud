@@ -6,17 +6,8 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
             <div class="large-8 medium-8 cell main-content">
-<!--?                <div tal:condition="parliamentarian.picture">-->
-<!--?                    <div class="person-card">-->
-<!--?                        <div class="person-card-portrait">-->
-<!--?                            <div class="cover-image"-->
-<!--?                                 style='background-image: url("${request.link(parliamentarian.picture)}");'></div>-->
-<!--?                        </div>-->
-<!--?                    </div>-->
-<!--?                </div>-->
-<!--?                <p>-->
                 <div tal:condition="parliamentarian.roles">
-                    <h6 i18n:translate>Functions</h6>
+                    <h2 i18n:translate class="h3">Functions</h2>
                     <ul class="more-list">
                         <li tal:repeat="role parliamentarian.roles">
                             <div class="list-link">
@@ -44,7 +35,7 @@
                     </ul>
                 </div>
                 <div tal:condition="parliamentarian.commission_memberships">
-                    <h6 i18n:translate>Commissions</h6>
+                    <h2 i18n:translate class="h3">Commissions</h2>
                     <ul class="more-list">
                         <li tal:repeat="membership parliamentarian.commission_memberships">
                             <div class="list-link">
@@ -67,7 +58,7 @@
                     </ul>
                 </div>
                 <div tal:condition="parliamentarian.political_businesses">
-                    <h6 i18n:translate>Political Businesses</h6>
+                    <h2 i18n:translate class="h3">Political Businesses</h2>
                     <ul class="more-list">
                         <li tal:repeat="participation sorted(parliamentarian.political_businesses, key=lambda p: p.political_business.entry_date or layout.now(), reverse=True)">
                             <a tal:attributes="href request.link(participation.political_business)" class="list-link">
@@ -83,7 +74,7 @@
                 </div>
                 <div tal:define="interests parliamentarian.interests" tal:condition="parliamentarian.interests['rows']|None">
                     <tal:b define="headers interests['headers']; rows interests['rows']">
-                        <h6 i18n:translate>Interest ties</h6>
+                        <h2 i18n:translate class="h3">Interest ties</h2>
                         <table class="table table-striped interests">
                             <thead>
                                 <tr>
@@ -103,6 +94,7 @@
                 <div class="sidebar-wrapper">
                     <div class="side-panel">
                         <dl class="field-display">
+                            <h2 class="h3">Personal Details</h2>
                             <div tal:condition="parliamentarian.picture">
                                 <div class="person-card" style="margin-bottom: 1rem;">
                                     <div class="person-card-portrait">
