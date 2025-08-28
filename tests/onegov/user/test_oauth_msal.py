@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import textwrap
 
@@ -8,9 +10,10 @@ import yaml
 from onegov.core import Framework
 from onegov.core.utils import scan_morepath_modules
 from onegov.user import UserApp
+from onegov.user.auth.provider import AzureADProvider
 
 # App url set in our AzureAD test tenant
-MSAL_TEST_FQGN = os.environ.get('MSAL_TEST_FQGN')
+MSAL_TEST_FQGN = os.environ.get('MSAL_TEST_FQGN', '')
 
 # We only hardcode our tenant here for the devs convenience to not set it
 # with env vars, since it is needed due to the tenant check in msal,
@@ -20,11 +23,12 @@ TEST_TENANT = os.environ.get(
 )
 
 
-@pytest.fixture(scope='function')
-def app(postgres_dsn, redis_url):
+class App(Framework, UserApp):
+    pass
 
-    class App(Framework, UserApp):
-        pass
+
+@pytest.fixture(scope='function')
+def app(postgres_dsn: str, redis_url: str) -> App:
 
     scan_morepath_modules(App)
     morepath.commit(App)
@@ -40,7 +44,7 @@ def app(postgres_dsn, redis_url):
     return app
 
 
-def configure_provider(app, primary=False):
+def configure_provider(app: App, primary: bool = False) -> None:
     client_id = os.environ.get('MSAL_TEST_CLIENT_ID')
     client_secret = os.environ.get('MSAL_TEST_CLIENT_SECRET')
     config = textwrap.dedent(f"""
@@ -69,11 +73,13 @@ def configure_provider(app, primary=False):
     app.configure_authentication_providers(**yaml.safe_load(config))
 
 
-def test_msal_configuration(app):
+def test_msal_configuration(app: App) -> None:
     configure_provider(app)
 
     provider = app.providers['msal']
+    assert isinstance(provider, AzureADProvider)
     client = provider.tenants.client(app)
+    assert client is not None
     assert not client.validate_authority
 
     # Test default configuration of the commented blocks
@@ -91,11 +97,13 @@ def test_msal_configuration(app):
     assert provider.is_primary(app) is False
 
 
-def test_msal_configuration_primary(app):
+def test_msal_configuration_primary(app: App) -> None:
     configure_provider(app, primary=True)
 
     provider = app.providers['msal']
+    assert isinstance(provider, AzureADProvider)
     client = provider.tenants.client(app)
+    assert client is not None
     assert not client.validate_authority
 
     # Test default configuration of the commented blocks
@@ -114,10 +122,10 @@ def test_msal_configuration_primary(app):
 
 
 @pytest.mark.skipif(MSAL_TEST_FQGN, reason='Running in CI/CD')
-def test_msal_client_local(app):
+def test_msal_client_local(app: App) -> None:
     pass
 
 
 @pytest.mark.skipif(not MSAL_TEST_FQGN, reason='Running locally')
-def test_msal_client_ci(app):
+def test_msal_client_ci(app: App) -> None:
     pass
