@@ -97,7 +97,7 @@
                             <h2 class="h3">Personal Details</h2>
                             <div tal:condition="parliamentarian.picture">
                                 <div class="person-card" style="margin-bottom: 1rem;">
-                                    <div class="person-card-portrait">
+                                    <div class="person-card-portrait" style="border-radius: 0;">
                                         <div class="cover-image"
                                              style='background-image: url("${request.link(parliamentarian.picture)}");'></div>
                                     </div>
