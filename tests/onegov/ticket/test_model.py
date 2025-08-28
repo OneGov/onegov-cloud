@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 import transaction
 
@@ -12,7 +14,12 @@ from sedate import utcnow
 from sqlalchemy.exc import IntegrityError
 
 
-def test_transitions(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_transitions(session: Session) -> None:
 
     # the created timestamp would usually be set as the session is flushed
     ticket = Ticket(state='open', created=Ticket.timestamp())
@@ -29,45 +36,51 @@ def test_transitions(session):
         ticket.reopen_ticket(user)
 
     ticket.accept_ticket(user)
-    assert ticket.state == 'pending'
+    # undo mypy narrowing of state
+    ticket2 = ticket
+    assert ticket2.state == 'pending'
     assert ticket.user == user
 
     ticket.accept_ticket(user)  # idempotent..
-    assert ticket.state == 'pending'
+    assert ticket2.state == 'pending'
     assert ticket.user == user
 
     with pytest.raises(InvalidStateChange):
         ticket.accept_ticket(User())  # ..unless it's another user
 
     ticket.reopen_ticket(user)  # idempotent as well -> would lead to no change
-    assert ticket.state == 'pending'
+    assert ticket2.state == 'pending'
     assert ticket.user == user
 
+    # undo mypy narrowing of state
+    ticket2 = ticket
     ticket.close_ticket()
-    assert ticket.state == 'closed'
+    assert ticket2.state == 'closed'
     assert ticket.user == user
 
     ticket.close_ticket()  # idempotent
-    assert ticket.state == 'closed'
+    assert ticket2.state == 'closed'
     assert ticket.user == user
 
     with pytest.raises(InvalidStateChange):
         ticket.accept_ticket(user)
 
+    # undo mypy narrowing of state
+    ticket2 = ticket
     another_user = User()
     ticket.reopen_ticket(another_user)
-    assert ticket.state == 'pending'
-    assert ticket.user is another_user
+    assert ticket2.state == 'pending'
+    assert ticket2.user is another_user
 
     ticket.reopen_ticket(another_user)  # idempotent..
-    assert ticket.state == 'pending'
-    assert ticket.user is another_user
+    assert ticket2.state == 'pending'
+    assert ticket2.user is another_user
 
     with pytest.raises(InvalidStateChange):
         ticket.reopen_ticket(user)  # ..unless it's another user
 
 
-def test_process_time(session):
+def test_process_time(session: Session) -> None:
 
     user = User()
 
@@ -138,7 +151,7 @@ def test_process_time(session):
         assert ticket.last_state_change == utcnow()
 
 
-def test_legacy_process_time(session):
+def test_legacy_process_time(session: Session) -> None:
     """ Tests the process_time/response_time for existing tickets, which cannot
     be migrated as this information cannot be inferred.
 
@@ -223,7 +236,7 @@ def test_legacy_process_time(session):
         assert ticket.last_state_change == utcnow()
 
 
-def test_ticket_permission(session):
+def test_ticket_permission(session: Session) -> None:
     user_group = UserGroup(name='group')
     permission = TicketPermission(
         handler_code='PER', group=None, user_group=user_group
@@ -243,7 +256,7 @@ def test_ticket_permission(session):
     assert session.query(TicketPermission).count() == 0
 
 
-def test_ticket_permission_uniqueness(session):
+def test_ticket_permission_uniqueness(session: Session) -> None:
     user_group = UserGroup(name='group')
     permission = TicketPermission(
         handler_code='PER',
@@ -277,7 +290,7 @@ def test_ticket_permission_uniqueness(session):
     assert session.query(TicketPermission).count() == 1
 
 
-def test_invalid_ticket_permission(session):
+def test_invalid_ticket_permission(session: Session) -> None:
     user_group = UserGroup(name='group')
     permission = TicketPermission(
         handler_code='PER',

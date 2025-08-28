@@ -85,7 +85,6 @@ module = [
     "tests.onegov.pay.*",
     "tests.onegov.search.*",
     "tests.onegov.swissvotes.*",
-    "tests.onegov.ticket.*",
     "tests.onegov.town6.*",
     "tests.onegov.translator_directory.*",
     "tests.onegov.user.*",
