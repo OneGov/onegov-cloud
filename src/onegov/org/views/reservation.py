@@ -1576,7 +1576,7 @@ def add_reservation(
         sedate.as_datetime(form.date.data),
         resource.timezone,
     )
-    if form.whole_day.data == 'no':
+    if 'whole_day' in form and form.whole_day.data == 'no':
         assert form.start_time.data is not None
         assert form.end_time.data is not None
         start_time = form.start_time.data
