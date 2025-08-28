@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-08-14 10:09+0200\n"
+"POT-Creation-Date: 2025-08-27 16:10+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -116,6 +116,21 @@ msgstr "Archivé"
 
 msgid "All"
 msgstr "Tout"
+
+msgid "Reservations"
+msgstr "Réservations"
+
+msgid "Submission"
+msgstr "Soumission"
+
+msgid "Selected Options"
+msgstr "Options sélectionnées"
+
+msgid "Discounts / Surcharges"
+msgstr "Remises / Suppléments"
+
+msgid "Lump sum"
+msgstr "Montant forfaitaire"
 
 msgid "Paid"
 msgstr "Payé"
@@ -1115,22 +1130,22 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The limit cannot be lower than the already confirmed number of attendees "
-"(${claimed_spots})"
+"The limit cannot be lower than the already confirmed number of attendees ($"
+"{claimed_spots})"
 msgstr ""
-"La limite ne peut être inférieure au nombre de participants déjà confirmés "
-"(${claimed_spots})"
+"La limite ne peut être inférieure au nombre de participants déjà confirmés ($"
+"{claimed_spots})"
 
 #, python-format
 msgid ""
-"The limit cannot be lower than the already confirmed number attendees "
-"(${claimed_spots}) and the number of pending requests (${pending_requests}). "
+"The limit cannot be lower than the already confirmed number attendees ($"
+"{claimed_spots}) and the number of pending requests (${pending_requests}). "
 "Either enable the waiting list, process the pending requests or increase the "
 "limit. "
 msgstr ""
 "La limite ne peut pas être inférieure au nombre de participants déjà "
-"confirmés (${claims_spots}) et au nombre de demandes en attente "
-"(${pending_requests}). Activez la liste d'attente, traitez les demandes en "
+"confirmés (${claims_spots}) et au nombre de demandes en attente ($"
+"{pending_requests}). Activez la liste d'attente, traitez les demandes en "
 "attente ou augmentez la limite."
 
 msgid "The end date must be later than the start date"
@@ -1536,6 +1551,9 @@ msgstr "Commençant à"
 
 msgid "Ending at"
 msgstr "Finissant à"
+
+msgid "Quota"
+msgstr "Quota"
 
 msgid "Key Code"
 msgstr "Code clé"
@@ -2685,9 +2703,9 @@ msgid ""
 "Either choose a different date range or give this window a title to "
 "differenciate it from other windows."
 msgstr ""
-"L'intervalle de dates chevauche une fenêtre de soumission existante "
-"(${range}). Choisissez un autre intervalle de dates ou donnez un titre à "
-"cette fenêtre pour la différencier des autres fenêtres."
+"L'intervalle de dates chevauche une fenêtre de soumission existante ($"
+"{range}). Choisissez un autre intervalle de dates ou donnez un titre à cette "
+"fenêtre pour la différencier des autres fenêtres."
 
 msgid "Short name to identify the text module"
 msgstr "Nom court pour identifier le module de texte"
@@ -3065,9 +3083,6 @@ msgstr "Voulez-vous vraiment supprimer ce module de texte?"
 
 msgid "Delete text module"
 msgstr "Supprimer le module de texte"
-
-msgid "Reservations"
-msgstr "Réservations"
 
 msgid "Recipients"
 msgstr "Destinataires"
@@ -3694,6 +3709,9 @@ msgstr "Refuser les réservations"
 msgid "Reject all with message"
 msgstr "Tout refuser avec message"
 
+msgid "Add reservation"
+msgstr "Ajouter une réservation"
+
 #.
 #. Used in sentence: "${event} published."
 msgid "Event"
@@ -3898,6 +3916,18 @@ msgstr "Temps de traitement"
 
 msgid "Event Source"
 msgstr "Source d'événement"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Unit"
+msgstr "Unité"
+
+msgid "Quantity"
+msgstr "Quantité"
+
+msgid "VAT"
+msgstr "TVA"
 
 msgid "Payment"
 msgstr "Paiement"
@@ -4149,8 +4179,8 @@ msgstr ""
 "Nous n'avons pas pu réserver certains créneaux correspondant à vos critères "
 "pour les dates${and_rooms} suivantes. Veuillez noter que certaines de ces "
 "dates peuvent encore avoir un ou plusieurs créneaux disponibles qui sont "
-"soit plus courts, soit plus longs que la durée que vous avez choisie. "
-"${dates}"
+"soit plus courts, soit plus longs que la durée que vous avez choisie. $"
+"{dates}"
 
 #. Used in sentence: "We were unable to reserve some slots matching your
 #. criteria for the following dates${and_rooms}, please note that some of those
@@ -4213,9 +4243,6 @@ msgstr ""
 
 msgid "Copied to Clipboard!"
 msgstr "Copié dans le presse-papiers!"
-
-msgid "Total"
-msgstr "Total"
 
 msgid "Healthy"
 msgstr "Santé"
@@ -4313,9 +4340,6 @@ msgstr "Frais de carte de crédit"
 msgid "${vat_rate}% included"
 msgstr "${vat_rate}% incluse"
 
-msgid "VAT"
-msgstr "TVA"
-
 msgid "Value Added Tax"
 msgstr "Taxe sur la valeur ajoutée"
 
@@ -4337,9 +4361,6 @@ msgid ""
 msgstr ""
 "Les personnes vivant en dehors des localités ayant les codes postaux "
 "suivants ne peuvent réserver cette allocation que le ${date} : ${zipcodes}"
-
-msgid "Quota"
-msgstr "Quota"
 
 msgid "Initiated"
 msgstr "Initié"
@@ -4575,24 +4596,6 @@ msgstr "Fermer"
 msgid "Copy to clipboard"
 msgstr "Copier dans le presse-papiers"
 
-msgid "Unit"
-msgstr "Unité"
-
-msgid "Quantity"
-msgstr "Quantité"
-
-msgid "Submission"
-msgstr "Soumission"
-
-msgid "Selected Options"
-msgstr "Options sélectionnées"
-
-msgid "Discounts / Surcharges"
-msgstr "Remises / Suppléments"
-
-msgid "Lump sum"
-msgstr "Montant forfaitaire"
-
 msgid "Unpaid"
 msgstr "Non payé"
 
@@ -4607,8 +4610,8 @@ msgstr "Bonjour"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Votre adresse e-mail vient d'être utilisée pour créer un compte sur "
-"${homepage}."
+"Votre adresse e-mail vient d'être utilisée pour créer un compte sur $"
+"{homepage}."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Pour activer votre compte, cliquer sur confirmer ci-dessous:"
@@ -4812,14 +4815,14 @@ msgid "${author} wrote"
 msgstr "${author} a écrit"
 
 msgid ""
-"This is the notification for notes on reservations for ${request.app.org."
-"title}. If you no longer want to receive this e-mail please contact an "
-"administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
-"Il s'agit de la notification de notes sur les réservations pour ${request."
-"app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, veuillez "
-"contacter un administrateur afin qu'il puisse vous retirer de la liste des "
-"destinataires."
+"Il s'agit de la notification de notes sur les réservations pour $"
+"{request.app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, "
+"veuillez contacter un administrateur afin qu'il puisse vous retirer de la "
+"liste des destinataires."
 
 msgid "Pending approval"
 msgstr "En attente d'approbation"
@@ -4852,10 +4855,10 @@ msgid ""
 "you no longer want to receive this e-mail please contact an administrator so "
 "they can remove you from the recipients list."
 msgstr ""
-"Ceci est la notification pour les réservations pour ${request.app.org."
-"title}. Si vous ne souhaitez plus recevoir cet e-mail, veuillez contacter un "
-"administrateur afin qu'il puisse vous supprimer de la liste des "
-"destinataires."
+"Ceci est la notification pour les réservations pour $"
+"{request.app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, "
+"veuillez contacter un administrateur afin qu'il puisse vous supprimer de la "
+"liste des destinataires."
 
 msgid "An administrator just created a new account on ${org} for you."
 msgstr ""
@@ -4950,8 +4953,8 @@ msgid ""
 "you no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Il s'agit d'une notification concernant les réservations rejetées pour "
-"${organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
+"Il s'agit d'une notification concernant les réservations rejetées pour $"
+"{organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
 "veuillez contacter un administrateur afin qu'il vous retire de la liste des "
 "destinataires."
 
@@ -5102,6 +5105,12 @@ msgstr "1 réservation rejetée."
 
 msgid "${count} reservations rejected."
 msgstr "${count} réservations rejetées."
+
+msgid "1 reservation added."
+msgstr "1 réservation ajoutée."
+
+msgid "${count} reservations added."
+msgstr "${count} réservations ajoutées."
 
 msgid "1 reservation adjusted:"
 msgstr "1 réservation ajustée:"
@@ -6132,8 +6141,8 @@ msgstr "Nouveau destinataire"
 
 #, python-format
 msgid ""
-"Registration for notifications on new entries in the directory "
-"\"${directory}\""
+"Registration for notifications on new entries in the directory \"${directory}"
+"\""
 msgstr ""
 "Inscription pour les notifications sur les nouvelles entrées dans le dossier "
 "\"${directory}\""
@@ -6494,8 +6503,8 @@ msgid ""
 "you one already. Your subscribed categories are ${subscribed}."
 msgstr ""
 "C'est fait! Nous avons envoyé un lien de confirmation vers ${address}, si "
-"nous ne vous en avions pas déjà envoyé un. Vos catégories abonnées sont "
-"${subscribed}."
+"nous ne vous en avions pas déjà envoyé un. Vos catégories abonnées sont $"
+"{subscribed}."
 
 # python-format
 #, python-format
@@ -6910,6 +6919,25 @@ msgstr "Refuser toutes les réservations avec le message"
 msgid "Reservation summary"
 msgstr "Résumé des réservations"
 
+msgid ""
+"Since the other reservations in this ticket have already been accepted, this "
+"reservation will also be immediately accepted. However we will not send a "
+"new reservation confirmation."
+msgstr ""
+"Les autres réservations figurant sur ce billet ayant déjà été acceptées, "
+"cette réservation sera également acceptée immédiatement. Cependant, nous "
+"n'enverrons pas de nouvelle confirmation de réservation."
+
+msgid ""
+"The targeted availability is not partially reservable and does not fully "
+"cover the selected time range."
+msgstr ""
+"La disponibilité ciblée n'est pas partiellement réservable et ne couvre pas "
+"entièrement la plage horaire sélectionnée."
+
+msgid "Added a new reservation"
+msgstr "Ajout d'une nouvelle réservation"
+
 msgid "Reservation not adjustable"
 msgstr "Réservation non ajustable"
 
@@ -7303,8 +7331,8 @@ msgstr "Une erreur s'est produite lors du téléchargement sur Gever."
 
 #, python-format
 msgid ""
-"Encountered an error while uploading to Gever. Response status code is "
-"${status}."
+"Encountered an error while uploading to Gever. Response status code is $"
+"{status}."
 msgstr ""
 "Une erreur s'est produite lors du téléchargement sur Gever. Le code d'état "
 "de la réponse est ${status}."
