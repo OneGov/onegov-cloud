@@ -4,7 +4,7 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
-            <div class="medium-7 cell main-content">
+            <div class="large-7 medium-8 cell main-content">
                 <p tal:condition="not:parliamentarians" i18n:translate>No filter results found or no parliamentarians defined yet.</p>
                 <ul tal:condition="parliamentarians" class="more-list parliamentarian-list">
                     <li tal:repeat="parliamentarian parliamentarians">
@@ -18,7 +18,7 @@
                 </ul>
             </div>
 
-            <div class="large-4 medium-4 cell medium-offset-1 sidebar filter-panel">
+            <div class="large-4 medium-4 cell sidebar filter-panel">
                 <div class="sidebar-wrapper">
                     <div class="side-panel filter-active">
                         <h2 class="filter-title h3" i18n:translate>State</h2>

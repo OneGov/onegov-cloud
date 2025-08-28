@@ -701,9 +701,10 @@ $pageref-color-hover: $iron;
 
             .list-title {
                 @include more-link-after;
+                padding-right: 7%;
 
                 &::after {
-                    padding-right: 6%;
+                    padding-right: 5%;
                     right: 0;
                 }
             }
@@ -750,6 +751,10 @@ $pageref-color-hover: $iron;
                 }
             }
         }
+    }
+
+    > li:last-child {
+        margin-bottom: 1rem;
     }
 }
 
