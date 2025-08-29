@@ -1117,12 +1117,12 @@ class MeetingLayout(DefaultLayout):
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-meeting'},
+                    attrs={'class': 'edit-link'},
                 ),
                 Link(
                     text=_('Delete'),
                     url=self.csrf_protected_url(self.request.link(self.model)),
-                    attrs={'class': 'delete-meeting'},
+                    attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
                             _(

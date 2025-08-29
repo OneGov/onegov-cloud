@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-08-27 16:11+0200\n"
+"POT-Creation-Date: 2025-08-29 08:26+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -624,8 +624,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -1287,8 +1287,8 @@ msgstr "Bonjour"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Votre adresse e-mail vient d'être utilisée pour créer un compte sur $"
-"{homepage}."
+"Votre adresse e-mail vient d'être utilisée pour créer un compte sur "
+"${homepage}."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Pour activer votre compte, cliquer sur confirmer ci-dessous:"
@@ -1472,14 +1472,14 @@ msgid "${author} wrote"
 msgstr "${author} a écrit"
 
 msgid ""
-"This is the notification for notes on reservations for $"
-"{request.app.org.title}. If you no longer want to receive this e-mail please "
-"contact an administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for ${request.app.org."
+"title}. If you no longer want to receive this e-mail please contact an "
+"administrator so they can remove you from the recipients list."
 msgstr ""
-"Il s'agit de la notification de notes sur les réservations pour $"
-"{request.app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, "
-"veuillez contacter un administrateur afin qu'il puisse vous retirer de la "
-"liste des destinataires."
+"Il s'agit de la notification de notes sur les réservations pour ${request."
+"app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, veuillez "
+"contacter un administrateur afin qu'il puisse vous retirer de la liste des "
+"destinataires."
 
 msgid "Pending approval"
 msgstr "En attente d'approbation"
@@ -1498,8 +1498,8 @@ msgid ""
 "no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Ceci est une notification pour les nouvelles réservations de $"
-"{organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
+"Ceci est une notification pour les nouvelles réservations de "
+"${organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
 "veuillez contacter un administrateur afin qu'il vous retire de la liste des "
 "destinataires."
 
@@ -1602,8 +1602,8 @@ msgid ""
 "you no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Il s'agit d'une notification concernant les réservations rejetées pour $"
-"{organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
+"Il s'agit d'une notification concernant les réservations rejetées pour "
+"${organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
 "veuillez contacter un administrateur afin qu'il vous retire de la liste des "
 "destinataires."
 
@@ -1953,14 +1953,32 @@ msgstr "Exporter ces événements"
 msgid "Submit your event"
 msgstr "Soumettez votre événement"
 
+msgid "Functions"
+msgstr "Fonctions"
+
+msgid "Parliament"
+msgstr "Parlement"
+
+msgid "in"
+msgstr "de"
+
+msgid "Interest ties"
+msgstr "Liens d'intérêt"
+
+msgid "Personal details"
+msgstr "Détails personnels"
+
+msgid "First name"
+msgstr "Prénom"
+
+msgid "Last name"
+msgstr "Nom de famille"
+
 msgid "Personnel number"
 msgstr "Numéro de personnel"
 
 msgid "Contract number"
 msgstr "Numéro de contrat"
-
-msgid "Picture"
-msgstr "Photo"
 
 msgid "Party"
 msgstr "Parti"
@@ -2018,18 +2036,6 @@ msgstr "Site Web"
 
 msgid "Remarks"
 msgstr "Remarques"
-
-msgid "Functions"
-msgstr "Fonctions"
-
-msgid "Parliament"
-msgstr "Parlement"
-
-msgid "in"
-msgstr "de"
-
-msgid "Interest ties"
-msgstr "Liens d'intérêt"
 
 msgid "Role"
 msgstr "Rôle"
@@ -2093,6 +2099,9 @@ msgstr "Réinitialiser le filtre"
 msgid "Export a vCard of this person"
 msgstr "Exporter une vCard de cette personne"
 
+msgid "Information"
+msgstr "Information"
+
 msgid "Number"
 msgstr "Numéro"
 
@@ -2119,9 +2128,6 @@ msgstr "Année"
 
 msgid "No publications"
 msgstr "Aucune publication"
-
-msgid "Information"
-msgstr "Information"
 
 msgid ""
 "You can search through the content of all listed files by using the search "
@@ -2760,6 +2766,9 @@ msgstr "Nouveau commentaire"
 
 #~ msgid "No parliamentarians defined yet."
 #~ msgstr "Aucun parlementaire n'a été défini pour le moment."
+
+#~ msgid "Picture"
+#~ msgstr "Photo"
 
 #~ msgid "Roles"
 #~ msgstr "Rôles"

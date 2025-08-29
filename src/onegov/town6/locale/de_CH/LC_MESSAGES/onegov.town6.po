@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-08-27 16:11+0200\n"
+"POT-Creation-Date: 2025-08-29 08:26+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1286,8 +1286,8 @@ msgstr "Guten Tag"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Ihre E-Mail Adresse wurde soeben zur Erstellung eines Accounts auf $"
-"{homepage} verwendet."
+"Ihre E-Mail Adresse wurde soeben zur Erstellung eines Accounts auf "
+"${homepage} verwendet."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Um Ihren Account zu aktivieren, bestätigen Sie bitte die Anmeldung:"
@@ -1310,8 +1310,8 @@ msgstr "Wir wünschen Ihnen einen schönen Tag!"
 
 msgid "Your e-mail address was just used to send a login link to ${homepage}."
 msgstr ""
-"Ihre E-Mail Adresse wurde soeben zum Senden eines Anmeldelinks auf $"
-"{homepage} verwendet."
+"Ihre E-Mail Adresse wurde soeben zum Senden eines Anmeldelinks auf "
+"${homepage} verwendet."
 
 msgid "Use the token below or click on the link to complete your login."
 msgstr ""
@@ -1474,12 +1474,12 @@ msgid "${author} wrote"
 msgstr "${author} schrieb"
 
 msgid ""
-"This is the notification for notes on reservations for $"
-"{request.app.org.title}. If you no longer want to receive this e-mail please "
-"contact an administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for ${request.app.org."
+"title}. If you no longer want to receive this e-mail please contact an "
+"administrator so they can remove you from the recipients list."
 msgstr ""
-"Dies ist die Benachrichtigung für Notizen zu Reservierungen für $"
-"{request.app.org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, "
+"Dies ist die Benachrichtigung für Notizen zu Reservierungen für ${request."
+"app.org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, "
 "kontaktieren Sie bitte einen Administrator, damit er Sie aus der Liste "
 "entfernen kann."
 
@@ -1500,8 +1500,8 @@ msgid ""
 "no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Dies ist eine Benachrichtigung zu den neuen Reservationen von $"
-"{organisation}. Falls Sie diese E-Mails nicht mehr bekommen möchten, melden "
+"Dies ist eine Benachrichtigung zu den neuen Reservationen von "
+"${organisation}. Falls Sie diese E-Mails nicht mehr bekommen möchten, melden "
 "Sie sich bitte bei einem Administrator damit dieser Sie von der "
 "Empfängerliste streichen kann."
 
@@ -1526,8 +1526,8 @@ msgstr ""
 
 msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""
-"Um Ihr Konto zu verwenden benötigen Sie den YubiKey mit der Seriennummer $"
-"{number}"
+"Um Ihr Konto zu verwenden benötigen Sie den YubiKey mit der Seriennummer "
+"${number}"
 
 msgid "Latest news"
 msgstr "Aktuelles"
@@ -1603,8 +1603,8 @@ msgid ""
 "you no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Dies ist eine Benachrichtigung über die abgelehnten Reservierungen für $"
-"{Organisation}. Wenn Sie diese Benachrichtigungen nicht mehr erhalten "
+"Dies ist eine Benachrichtigung über die abgelehnten Reservierungen für "
+"${Organisation}. Wenn Sie diese Benachrichtigungen nicht mehr erhalten "
 "möchten, kontaktieren Sie bitte einen Administrator, damit er Sie aus der "
 "Empfängerliste entfernen kann."
 
@@ -1952,14 +1952,32 @@ msgstr "Diese Termine exportieren"
 msgid "Submit your event"
 msgstr "Veranstaltung erfassen"
 
+msgid "Functions"
+msgstr "Funktionen"
+
+msgid "Parliament"
+msgstr "Parlament"
+
+msgid "in"
+msgstr "der"
+
+msgid "Interest ties"
+msgstr "Interessensbindungen"
+
+msgid "Personal details"
+msgstr "Personenalien"
+
+msgid "First name"
+msgstr "Vorname"
+
+msgid "Last name"
+msgstr "Nachname"
+
 msgid "Personnel number"
 msgstr "Personalnummer"
 
 msgid "Contract number"
 msgstr "Vertragsnummer"
-
-msgid "Picture"
-msgstr "Bild"
 
 msgid "Party"
 msgstr "Partei"
@@ -2017,18 +2035,6 @@ msgstr "Webseite"
 
 msgid "Remarks"
 msgstr "Bemerkungen"
-
-msgid "Functions"
-msgstr "Funktionen"
-
-msgid "Parliament"
-msgstr "Parlament"
-
-msgid "in"
-msgstr "der"
-
-msgid "Interest ties"
-msgstr "Interessensbindungen"
 
 msgid "Role"
 msgstr "Rolle"
@@ -2091,6 +2097,9 @@ msgstr "Filter zurücksetzen"
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
 
+msgid "Information"
+msgstr "Information"
+
 msgid "Number"
 msgstr "Nummer"
 
@@ -2117,9 +2126,6 @@ msgstr "Jahr"
 
 msgid "No publications"
 msgstr "Keine Publikationen"
-
-msgid "Information"
-msgstr "Information"
 
 msgid ""
 "You can search through the content of all listed files by using the search "
@@ -2752,6 +2758,9 @@ msgstr "Neue Notiz"
 
 #~ msgid "No parliamentarians defined yet."
 #~ msgstr "Noch keine Parlamentarier erfasst."
+
+#~ msgid "Picture"
+#~ msgstr "Bild"
 
 #~ msgid "Roles"
 #~ msgstr "Mitgliedschaften"
