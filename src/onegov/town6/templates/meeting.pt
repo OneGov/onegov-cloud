@@ -7,7 +7,7 @@
         <tal:b metal:use-macro="layout.macros.page_content"
              tal:define="lead None; text None; people None; coordinates None; contact None; files files; show_side_panel True;">
             <tal:b metal:fill-slot="before-panels">
-                <div class="side-panel" style="margin-bottom: 2rem;">
+                <div class="side-panel">
                     <div tal:condition="page.start_datetime">
                         <h2 i18n:translate class="h3">Date/Time</h2>
                         <div>
@@ -16,11 +16,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="side-panel" style="margin-bottom: 2rem;">
+                <div class="side-panel">
                     <div tal:condition="page.address">
                         <h2 i18n:translate class="h3">Location</h2>
                         <div tal:content="page.address"></div>
                     </div>
+                </div>
+                <div class="side-panel">
                     <div tal:condition="page.description">
                         <h2 i18n:translate class="h3">Description</h2>
                         <div tal:content="page.description"></div>

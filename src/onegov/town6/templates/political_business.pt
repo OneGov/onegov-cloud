@@ -7,25 +7,27 @@
         <tal:b metal:use-macro="layout.macros.page_content"
             tal:define="lead None; text None; people None; coordinates None; contact None; files files; show_side_panel True;">
             <tal:b metal:fill-slot="before-panels">
-                <dl class="field-display side-panel" style="margin-bottom:2rem">
-                    <h2 class="h3" i18n:translate>Information</h2>
-                    <div tal:condition="business.number">
-                        <dt i18n:translate>Number</dt>
-                        <dd><div tal:content="business.number"></div></dd>
-                    </div>
-                    <div tal:condition="business.political_business_type">
-                        <dt i18n:translate>Business Type</dt>
-                        <dd><div tal:content="type_map[business.political_business_type]"></div></dd>
-                    </div>
-                    <div tal:condition="business.status">
-                        <dt i18n:translate>Status</dt>
-                        <dd><div tal:content="status_map[business.status]"> </div></dd>
-                    </div>
-                    <div tal:condition="business.entry_date">
-                        <dt i18n:translate>Submission/publication date</dt>
-                        <dd><div tal:content="layout.format_date(business.entry_date, 'date')"></div></dd>
-                    </div>
-                </dl>
+                <div class="side-panel">
+                    <dl class="field-display">
+                        <h2 class="h3" i18n:translate>Information</h2>
+                        <div tal:condition="business.number">
+                            <dt i18n:translate>Number</dt>
+                            <dd><div tal:content="business.number"></div></dd>
+                        </div>
+                        <div tal:condition="business.political_business_type">
+                            <dt i18n:translate>Business Type</dt>
+                            <dd><div tal:content="type_map[business.political_business_type]"></div></dd>
+                        </div>
+                        <div tal:condition="business.status">
+                            <dt i18n:translate>Status</dt>
+                            <dd><div tal:content="status_map[business.status]"> </div></dd>
+                        </div>
+                        <div tal:condition="business.entry_date">
+                            <dt i18n:translate>Submission/publication date</dt>
+                            <dd><div tal:content="layout.format_date(business.entry_date, 'date')"></div></dd>
+                        </div>
+                    </dl>
+                </div>
             </tal:b>
             <tal:b metal:fill-slot="after-panels">
             </tal:b>

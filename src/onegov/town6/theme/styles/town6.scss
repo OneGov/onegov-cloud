@@ -767,6 +767,11 @@ $pageref-color-hover: $iron;
     }
 }
 
+.side-panel {
+    // reduce margin-bottom
+    margin-bottom: 2rem !important;
+}
+
 .side-panel .more-list {
 
     li {

@@ -15,7 +15,7 @@
                                     <span tal:content="membership.parliamentarian.title" class="list-title"></span>
                                 </a>
                                 <span class="list-lead preview">
-                                        ${membership.role_label}
+                                    ${membership.role_label}
                                 </span>
                             </li>
                         </ul>
@@ -26,7 +26,7 @@
                 <div class="sidebar-wrapper">
                     <div class="side-panel">
                         <div tal:condition="commission.description">
-                            <h3 i18n:translate>Contact</h3>
+                            <h2 class="h3" i18n:translate>Contact</h2>
                             <div tal:content="commission.description"></div>
                         </div>
                         <div tal:condition="commission.start">
