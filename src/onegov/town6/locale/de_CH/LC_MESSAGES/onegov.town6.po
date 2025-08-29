@@ -2602,6 +2602,12 @@ msgstr "Neue Sitzung hinzugefügt"
 msgid "New meeting"
 msgstr "Neue Sitzung"
 
+msgid "Listen to parliamentary debate"
+msgstr "Parlamentsdebatte anhören"
+
+msgid "Watch parliamentary debate"
+msgstr "Parlamentsdebatte ansehen"
+
 msgid "Edit meeting"
 msgstr "Sitzung bearbeiten"
 
@@ -2749,6 +2755,9 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid "No parliamentarians defined yet."
+#~ msgstr "Noch keine Parlamentarier erfasst."
 
 #~ msgid "Picture"
 #~ msgstr "Bild"
