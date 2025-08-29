@@ -74,7 +74,9 @@ class MeetingForm(Form):
         self.agenda_items_errors: dict[int, str] = {}
 
     def on_request(self) -> None:
-        pass
+        # prevent showing access field as all ris information is public
+        if hasattr(self, 'access'):
+            self.delete_field('access')
 
     def populate_obj(  # type:ignore[override]
         self,

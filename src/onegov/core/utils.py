@@ -68,6 +68,7 @@ _unwanted_url_chars = re.compile(r'[\.\(\)\\/\s<>\[\]{},:;?!@&=+$#@%|\*"\'`]+')
 _double_dash = re.compile(r'[-]+')
 _number_suffix = re.compile(r'-([0-9]+)$')
 _repeated_spaces = re.compile(r'\s\s+')
+_repeated_dots = re.compile(r'\.\.+')
 _uuid = re.compile(
     r'^[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}$')
 
@@ -172,6 +173,12 @@ def remove_repeated_spaces(text: str) -> str:
     """ Removes repeated spaces in the text ('a  b' -> 'a b'). """
 
     return _repeated_spaces.sub(' ', text)
+
+
+def remove_repeated_dots(text: str) -> str:
+    """ Removes repeated dots in the text ('a..b' -> 'a.b'). """
+
+    return _repeated_dots.sub('.', text)
 
 
 @contextmanager

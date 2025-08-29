@@ -2,12 +2,15 @@ from __future__ import annotations
 
 from onegov.core.security import Public, Private
 from onegov.org.forms import (
+    AddReservationForm,
     KabaEditForm,
     InternalTicketChatMessageForm,
     ReservationAdjustmentForm,
 )
 from onegov.org.models.ticket import ReservationTicket
 from onegov.org.views.reservation import (
+    add_reservation,
+    add_reservation_from_ticket,
     handle_reservation_form,
     confirm_reservation,
     get_reservation_form_class,
@@ -149,6 +152,40 @@ def town_reject_reservation_with_message_from_ticket(
 ) -> RenderData | Response | None:
     layout = TicketChatMessageLayout(self, request, internal=True)
     return reject_reservation_with_message_from_ticket(
+        self, request, form, layout)
+
+
+@TownApp.form(
+    model=Reservation,
+    name='add',
+    permission=Private,
+    form=AddReservationForm,
+    template='form.pt'
+)
+def town_add_reservation(
+    self: Reservation,
+    request: TownRequest,
+    form: AddReservationForm
+) -> RenderData | Response | None:
+    layout = ReservationLayout(self, request)  # type:ignore
+    return add_reservation(self, request, form, None, layout)
+
+
+@TownApp.form(
+    model=ReservationTicket,
+    name='add-reservation',
+    permission=Private,
+    form=AddReservationForm,
+    template='form.pt'
+)
+def town_add_reservation_from_ticket(
+    self: ReservationTicket,
+    request: TownRequest,
+    form: AddReservationForm,
+    layout: TicketLayout | None = None
+) -> RenderData | Response | None:
+    layout = TicketLayout(self, request)
+    return add_reservation_from_ticket(
         self, request, form, layout)
 
 

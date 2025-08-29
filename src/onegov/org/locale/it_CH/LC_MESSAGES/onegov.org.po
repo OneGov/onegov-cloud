@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-08-26 09:05+0200\n"
+"POT-Creation-Date: 2025-08-27 16:10+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -117,6 +117,21 @@ msgstr "Fare Archivio"
 
 msgid "All"
 msgstr "Tutti"
+
+msgid "Reservations"
+msgstr "Prenotazioni"
+
+msgid "Submission"
+msgstr "Iscrizione"
+
+msgid "Selected Options"
+msgstr "Opzioni selezionate"
+
+msgid "Discounts / Surcharges"
+msgstr "Deduzioni / Supplementi"
+
+msgid "Lump sum"
+msgstr "Somma forfettaria"
 
 msgid "Paid"
 msgstr "Pagato"
@@ -1119,22 +1134,22 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The limit cannot be lower than the already confirmed number of attendees "
-"(${claimed_spots})"
+"The limit cannot be lower than the already confirmed number of attendees ($"
+"{claimed_spots})"
 msgstr ""
-"Il limite non può essere inferiore numero di partecipanti già confermato "
-"(${claimed_spots})"
+"Il limite non può essere inferiore numero di partecipanti già confermato ($"
+"{claimed_spots})"
 
 #, python-format
 msgid ""
-"The limit cannot be lower than the already confirmed number attendees "
-"(${claimed_spots}) and the number of pending requests (${pending_requests}). "
+"The limit cannot be lower than the already confirmed number attendees ($"
+"{claimed_spots}) and the number of pending requests (${pending_requests}). "
 "Either enable the waiting list, process the pending requests or increase the "
 "limit. "
 msgstr ""
 "Il limite non può essere inferiore al numero di partecipanti già confermato "
-"(${claimed_spots}) e al numero di richieste in sospeso "
-"(${pending_requests}). Abilita la lista d'attesa, elabora le richieste in "
+"(${claimed_spots}) e al numero di richieste in sospeso ($"
+"{pending_requests}). Abilita la lista d'attesa, elabora le richieste in "
 "sospeso o aumenta il limite. "
 
 msgid "The end date must be later than the start date"
@@ -1547,6 +1562,9 @@ msgstr "A partire da"
 
 msgid "Ending at"
 msgstr "Fine a"
+
+msgid "Quota"
+msgstr "Quota"
 
 msgid "Key Code"
 msgstr "Codice chiave"
@@ -3072,9 +3090,6 @@ msgstr "Confermi di voler eliminare questo modulo di testo?"
 msgid "Delete text module"
 msgstr "Elimina modulo di testo"
 
-msgid "Reservations"
-msgstr "Prenotazioni"
-
 msgid "Recipients"
 msgstr "Destinatari"
 
@@ -3701,6 +3716,10 @@ msgstr "Rifiuta le prenotazioni"
 msgid "Reject all with message"
 msgstr "Rifiuta tutto con messaggio"
 
+msgid "Add reservation"
+msgstr "Aggiungi prenotazione"
+
+#.
 #. Used in sentence: "${event} published."
 #.
 msgid "Event"
@@ -3901,6 +3920,18 @@ msgstr "Tempo di elaborazione"
 
 msgid "Event Source"
 msgstr "Origine evento"
+
+msgid "Total"
+msgstr "Totale"
+
+msgid "Unit"
+msgstr "Unità"
+
+msgid "Quantity"
+msgstr "Quantità"
+
+msgid "VAT"
+msgstr "IVA"
 
 msgid "Payment"
 msgstr "Pagamento"
@@ -4211,9 +4242,6 @@ msgstr "Il modulo contiene errori. Controlli per favore i campi evidenziati."
 msgid "Copied to Clipboard!"
 msgstr "Copiato negli appunti!"
 
-msgid "Total"
-msgstr "Totale"
-
 msgid "Healthy"
 msgstr "In stato corretto"
 
@@ -4310,9 +4338,6 @@ msgstr "Commissione sulla carta di credito"
 msgid "${vat_rate}% included"
 msgstr "${vat_rate}% inclusa"
 
-msgid "VAT"
-msgstr "IVA"
-
 msgid "Value Added Tax"
 msgstr "Imposta sul valore aggiunto"
 
@@ -4334,9 +4359,6 @@ msgid ""
 msgstr ""
 "Le persone che vivono al di fuori dei seguenti codici postali possono "
 "prenotare questa allocazione solo il ${date}: ${zipcodes}"
-
-msgid "Quota"
-msgstr "Quota"
 
 msgid "Initiated"
 msgstr "Avviato"
@@ -4570,24 +4592,6 @@ msgstr "Chiudi"
 msgid "Copy to clipboard"
 msgstr "Copia negli appunti"
 
-msgid "Unit"
-msgstr "Unità"
-
-msgid "Quantity"
-msgstr "Quantità"
-
-msgid "Submission"
-msgstr "Iscrizione"
-
-msgid "Selected Options"
-msgstr "Opzioni selezionate"
-
-msgid "Discounts / Surcharges"
-msgstr "Deduzioni / Supplementi"
-
-msgid "Lump sum"
-msgstr "Somma forfettaria"
-
 msgid "Unpaid"
 msgstr "Non pagato"
 
@@ -4602,8 +4606,8 @@ msgstr "Ciao!"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su "
-"${homepage}."
+"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su $"
+"{homepage}."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Per attivare il tuo account, fai clic su conferma qui di seguito:"
@@ -4806,13 +4810,13 @@ msgid "${author} wrote"
 msgstr "${author} ha scritto"
 
 msgid ""
-"This is the notification for notes on reservations for ${request.app.org."
-"title}. If you no longer want to receive this e-mail please contact an "
-"administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
-"Questa è la notifica per le note sulle prenotazioni per ${request.app.org."
-"title}. Se non si desidera più ricevere questo messaggio di posta "
-"elettronica si prega di contattare un amministratore in modo che possa "
+"Questa è la notifica per le note sulle prenotazioni per $"
+"{request.app.org.title}. Se non si desidera più ricevere questo messaggio di "
+"posta elettronica si prega di contattare un amministratore in modo che possa "
 "rimuovervi dall'elenco dei destinatari lista"
 
 msgid "Pending approval"
@@ -5090,6 +5094,12 @@ msgstr "1 prenotazione rifiutata."
 
 msgid "${count} reservations rejected."
 msgstr "${count} prenotazioni rifiutate."
+
+msgid "1 reservation added."
+msgstr "1 prenotazione aggiunta."
+
+msgid "${count} reservations added."
+msgstr "${count} prenotazioni aggiunte."
 
 msgid "1 reservation adjusted:"
 msgstr "1 prenotazione regolata:"
@@ -5822,8 +5832,8 @@ msgid ""
 "Availability period updated. ${deleted} allocations removed, ${created} new "
 "allocations created."
 msgstr ""
-"Periodo di disponibilità aggiornato. ${deleted} allocazioni rimosse, "
-"${created} nuove allocazioni create."
+"Periodo di disponibilità aggiornato. ${deleted} allocazioni rimosse, $"
+"{created} nuove allocazioni create."
 
 msgid "Availability period not found"
 msgstr "Periodo di disponibilità non trovato"
@@ -5919,8 +5929,8 @@ msgid ""
 "A password reset link has been sent to ${email}, provided an active account "
 "exists for this email address."
 msgstr ""
-"Il collegamento per reimpostare la password è stato inviato all'indirizzo "
-"${email} (se si tratta di un account attivo esistente)."
+"Il collegamento per reimpostare la password è stato inviato all'indirizzo $"
+"{email} (se si tratta di un account attivo esistente)."
 
 msgid "Password changed."
 msgstr "Password modificata."
@@ -6111,11 +6121,11 @@ msgstr "Nuovo destinatario"
 
 #, python-format
 msgid ""
-"Registration for notifications on new entries in the directory "
-"\"${directory}\""
+"Registration for notifications on new entries in the directory \"${directory}"
+"\""
 msgstr ""
-"Registrazione per le notifiche sui nuovi elementi nella cartella "
-"\"${directory}\""
+"Registrazione per le notifiche sui nuovi elementi nella cartella \"$"
+"{directory}\""
 
 #, python-format
 msgid ""
@@ -6834,8 +6844,8 @@ msgid ""
 "Failed to create visits using the dormakaba API for site ID ${site_id} "
 "please make sure your credentials are still valid."
 msgstr ""
-"Impossibile creare visite con l'API di dormakaba per l'ID del sito "
-"${site_id}. Assicurarsi che le credenziali siano ancora valide."
+"Impossibile creare visite con l'API di dormakaba per l'ID del sito $"
+"{site_id}. Assicurarsi che le credenziali siano ancora valide."
 
 msgid "Your reservations were accepted"
 msgstr "Le tue prenotazioni sono state accettate"
@@ -6893,6 +6903,25 @@ msgstr "Rifiuta tutte le prenotazioni con messaggio"
 
 msgid "Reservation summary"
 msgstr "Riepilogo della prenotazione"
+
+msgid ""
+"Since the other reservations in this ticket have already been accepted, this "
+"reservation will also be immediately accepted. However we will not send a "
+"new reservation confirmation."
+msgstr ""
+"Poiché le altre prenotazioni contenute in questo biglietto sono già state "
+"accettate, anche questa prenotazione sarà immediatamente accettata. "
+"Tuttavia, non invieremo una nuova conferma di prenotazione."
+
+msgid ""
+"The targeted availability is not partially reservable and does not fully "
+"cover the selected time range."
+msgstr ""
+"La disponibilità mirata non è parzialmente prenotabile e non copre "
+"interamente l'intervallo di tempo selezionato."
+
+msgid "Added a new reservation"
+msgstr "Aggiunta una nuova prenotazione"
 
 msgid "Reservation not adjustable"
 msgstr "Prenotazione non regolabile"
@@ -7006,8 +7035,8 @@ msgstr "Totale di ${number} collegamenti trovati."
 msgid ""
 "Migrates links from the given domain to the current domain \"${domain}\"."
 msgstr ""
-"Migra i collegamenti dal dominio specificato al dominio corrente "
-"\"${domain}\"."
+"Migra i collegamenti dal dominio specificato al dominio corrente \"${domain}"
+"\"."
 
 msgid "OneGov API"
 msgstr "API OneGov"
@@ -7287,8 +7316,8 @@ msgstr "Si è verificato un errore durante il caricamento su Gever."
 
 #, python-format
 msgid ""
-"Encountered an error while uploading to Gever. Response status code is "
-"${status}."
+"Encountered an error while uploading to Gever. Response status code is $"
+"{status}."
 msgstr ""
 "Si è verificato un errore durante il caricamento su Gever.Il codice di stato "
 "della risposta è ${status}."

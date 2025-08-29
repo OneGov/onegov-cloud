@@ -1159,7 +1159,13 @@ class ReservationHandler(Handler):
         advanced_links.append(Link(
             text=_('Reject all with message'),
             url=request.link(self.ticket, 'reject-reservation-with-message'),
-            attrs={'class': 'delete-link'},
+            attrs={'class': ('delete-link', 'border')},
+        ))
+
+        advanced_links.append(Link(
+            text=_('Add reservation'),
+            url=request.link(self.ticket, 'add-reservation'),
+            attrs={'class': 'new-reservation'}
         ))
 
         links.append(LinkGroup(

@@ -54,7 +54,7 @@ class Client(TestApp[_AppT]):
         username: str,
         password: str,
         to: str | None = None
-    ) -> TestResponse:
+    ) -> ExtendedResponse:
         """ Login a user through the usualy /auth/login path. """
 
         url = '/auth/login' + (to and ('/?to=' + to) or '')
@@ -64,19 +64,19 @@ class Client(TestApp[_AppT]):
         login_page.form.set('password', password)
         return login_page.form.submit()
 
-    def login_admin(self, to: str | None = None) -> TestResponse:
+    def login_admin(self, to: str | None = None) -> ExtendedResponse:
         return self.login('admin@example.org', 'hunter2', to)
 
-    def login_editor(self, to: str | None = None) -> TestResponse:
+    def login_editor(self, to: str | None = None) -> ExtendedResponse:
         return self.login('editor@example.org', 'hunter2', to)
 
-    def login_supporter(self, to: str | None = None) -> TestResponse:
+    def login_supporter(self, to: str | None = None) -> ExtendedResponse:
         return self.login('supporter@example.org', 'hunter2', to)
 
-    def login_member(self, to: str | None = None) -> TestResponse:
+    def login_member(self, to: str | None = None) -> ExtendedResponse:
         return self.login('member@example.org', 'hunter2', to)
 
-    def logout(self) -> TestResponse:
+    def logout(self) -> ExtendedResponse:
         return self.get('/auth/logout')
 
     def get_email(
