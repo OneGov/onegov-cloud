@@ -3001,7 +3001,7 @@ def ris_make_imported_files_general_file(
 
     return make_general_file
 
-  
+
 @cli.command(name='ris-wil-meetings-fix-audio-links')
 def ris_wil_meetings_shorten_audio_links(
 ) -> Callable[[OrgRequest, OrgApp], None]:
