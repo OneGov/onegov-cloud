@@ -719,6 +719,7 @@
 </metal:empty_lead_hint>
 
 <metal:page_content define-macro="page_content_sidebar" i18n:domain="onegov.town6">
+    <div tal:condition="no_sidebar_offset|False" class="small-12 medium-4 cell sidebar ${'filter-panel' if filter_panel else ''}" tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False"
     <div class="small-12 medium-4 cell sidebar medium-offset-1 ${'filter-panel' if filter_panel else ''}" tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False"
     tal:define="files files|None; highlight_contacts highlight_contacts|True; filter_panel filter_panel|False; sidepanel_contact page.sidepanel_contact|None;">
         <div class="sidebar-wrapper">
@@ -840,7 +841,7 @@
 </metal:page_content>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
-    <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False; imageset page.photo_album|None; as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content'; sidepanel_contact page.sidepanel_contact|None;">
+    <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False; imageset page.photo_album|None; as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content'; sidepanel_contact page.sidepanel_contact|None; no_sidebar_offset no_sidebar_offset|False;">
         <tal:b condition="not: people or files or contact or coordinates or location or show_side_panel or more_entries|False">
             <div class="small-12 cell page-content-main">
                 <img class="page-image" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
@@ -895,7 +896,7 @@
                     </div>
                 </div>
             </div>
-            <metal:b use-macro="layout.macros['page_content_sidebar']" tal:define="filter_panel filter_panel|False" />
+            <metal:b use-macro="layout.macros['page_content_sidebar']" tal:define="filter_panel filter_panel|False; no_sidebar_offset no_sidebar_offset|False;" />
         </tal:b>
     </div>
 </metal:page_content>

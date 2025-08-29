@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-08-27 16:11+0200\n"
+"POT-Creation-Date: 2025-08-29 08:26+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1285,8 +1285,8 @@ msgstr "Ciao!"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su $"
-"{homepage}."
+"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su "
+"${homepage}."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Per attivare il tuo account, fai clic su conferma qui di seguito:"
@@ -1471,13 +1471,13 @@ msgid "${author} wrote"
 msgstr "${author} ha scritto"
 
 msgid ""
-"This is the notification for notes on reservations for $"
-"{request.app.org.title}. If you no longer want to receive this e-mail please "
-"contact an administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for ${request.app.org."
+"title}. If you no longer want to receive this e-mail please contact an "
+"administrator so they can remove you from the recipients list."
 msgstr ""
-"Questa è la notifica per le note sulle prenotazioni per $"
-"{request.app.org.title}. Se non si desidera più ricevere questo messaggio di "
-"posta elettronica si prega di contattare un amministratore in modo che possa "
+"Questa è la notifica per le note sulle prenotazioni per ${request.app.org."
+"title}. Se non si desidera più ricevere questo messaggio di posta "
+"elettronica si prega di contattare un amministratore in modo che possa "
 "rimuovervi dall'elenco dei destinatari lista"
 
 msgid "Pending approval"
@@ -1946,14 +1946,32 @@ msgstr "Esporta questi eventi"
 msgid "Submit your event"
 msgstr "Invia il tuo evento"
 
+msgid "Functions"
+msgstr "Funzioni"
+
+msgid "Parliament"
+msgstr "Parlamento"
+
+msgid "in"
+msgstr "di"
+
+msgid "Interest ties"
+msgstr "Legami di interesse"
+
+msgid "Personal details"
+msgstr "Dettagli personali"
+
+msgid "First name"
+msgstr "Nome"
+
+msgid "Last name"
+msgstr "Cognome"
+
 msgid "Personnel number"
 msgstr "Numero del personale"
 
 msgid "Contract number"
 msgstr "Numero del contratto"
-
-msgid "Picture"
-msgstr "Immagine"
 
 msgid "Party"
 msgstr "Partito"
@@ -2011,18 +2029,6 @@ msgstr "Sito web"
 
 msgid "Remarks"
 msgstr "Osservazioni"
-
-msgid "Functions"
-msgstr "Funzioni"
-
-msgid "Parliament"
-msgstr "Parlamento"
-
-msgid "in"
-msgstr "di"
-
-msgid "Interest ties"
-msgstr "Legami di interesse"
 
 msgid "Role"
 msgstr "Ruolo"
@@ -2085,6 +2091,10 @@ msgstr "Ripristina filtro"
 msgid "Export a vCard of this person"
 msgstr "Esporta una vCard di questa persona"
 
+#, fuzzy
+msgid "Information"
+msgstr "Conferma"
+
 msgid "Number"
 msgstr "Numero"
 
@@ -2111,10 +2121,6 @@ msgstr "Anno"
 
 msgid "No publications"
 msgstr "Nessuna pubblicazione"
-
-#, fuzzy
-msgid "Information"
-msgstr "Conferma"
 
 msgid ""
 "You can search through the content of all listed files by using the search "
@@ -2745,6 +2751,9 @@ msgstr "Sistema di informazione sui ratti (RIS)"
 
 msgid "New Note"
 msgstr "Nuova nota"
+
+#~ msgid "Picture"
+#~ msgstr "Immagine"
 
 #~ msgid "Roles"
 #~ msgstr "Ruoli"
