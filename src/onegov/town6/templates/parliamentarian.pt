@@ -94,7 +94,7 @@
                 <div class="sidebar-wrapper">
                     <div class="side-panel">
                         <dl class="field-display">
-                            <h2 class="h3">Personal Details</h2>
+                            <h2 class="h3" i18n:translate>Personal details</h2>
                             <div tal:condition="parliamentarian.picture">
                                 <div class="person-card" style="margin-bottom: 1rem;">
                                     <div class="person-card-portrait" style="border-radius: 0;">
