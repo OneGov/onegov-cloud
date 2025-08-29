@@ -86,17 +86,20 @@ def add_bulk_attendence(
     request.include('custom')
 
     if form.submitted(request):
+
         data = form.get_useful_data()
-        parliamentarian_ids = data.pop('parliamentarian_id')
-        if parliamentarian_ids:
-            for parliamentarian_id in parliamentarian_ids:
+        if raw_parl_ids := request.POST.getall('parliamentarian_id'):
+            # Remove static field; choices are set dynamically via JS
+            data.pop('parliamentarian_id', None)
+            for parliamentarian_id in raw_parl_ids:
                 attendence = self.add(
                     parliamentarian_id=parliamentarian_id, **data
                 )
                 Change.add(request, 'add', attendence)
         else:
             request.warning(_('No parliamentarians selected'))
-            return None
+            return request.redirect(request.class_link(AttendenceCollection))
+
         request.success(_('Added commission session'))
 
         return request.redirect(request.link(self))

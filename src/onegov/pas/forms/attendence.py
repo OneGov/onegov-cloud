@@ -223,9 +223,15 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
             for commission
             in PASCommissionCollection(self.request.session).query()
         ]
-        self.parliamentarian_id.data = [
-            choice[0] for choice in self.parliamentarian_id.choices
+        # Set choices for all possible parliamentarians so WTForms can validate
+        self.parliamentarian_id.choices = [
+            (str(parliamentarian.id), parliamentarian.title)
+            for parliamentarian
+            in PASParliamentarianCollection(
+                self.request.session, [True]).query()
         ]
+        # JavaScript will handle selection based on commission
+        self.parliamentarian_id.data = []
 
 
 class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):

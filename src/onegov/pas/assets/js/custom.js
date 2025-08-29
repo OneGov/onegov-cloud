@@ -1,8 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
+    handleBulkAddCommission();
+});
+
+
+function handleBulkAddCommission() {
+
   const commissionSelect = document.getElementById("commission_id");
   const parliamentarianList = document.getElementById("parliamentarian_id");
-
-  if (!commissionSelect || !parliamentarianList) return;
 
   // Store all parliamentarians by commission
   let commissionParliamentarians = {};
@@ -15,6 +19,9 @@ document.addEventListener("DOMContentLoaded", function () {
       // Initial update based on selected commission
       updateParliamentarians(commissionSelect.value);
       isInitialLoad = false;
+    })
+    .catch(error => {
+      console.error("DEBUG: Fetch error:", error);
     });
 
   // NOTE: The "chosen" library is a jQuery plugin. It hides the original
@@ -27,22 +34,38 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   function updateParliamentarians(commissionId) {
-    parliamentarianList.innerHTML = "";
-    if (!commissionId) return;
+
+    // Hide all existing checkboxes first
+    const allCheckboxes = parliamentarianList.querySelectorAll('li');
+
+    allCheckboxes.forEach(li => {
+      li.style.display = 'none';
+      const checkbox = li.querySelector('input[type="checkbox"]');
+      if (checkbox) {
+        checkbox.checked = false;
+      }
+    });
+
+    if (!commissionId) {
+      return;
+    }
 
     const parliamentarians = commissionParliamentarians[commissionId] || [];
-    parliamentarians.forEach((parliamentarian, index) => {
-      const li = document.createElement("li");
-      const id = `parliamentarian_id-${parliamentarian.id}`;
-      if (!isInitialLoad) {
-        li.classList.add("animate-in");
-        li.style.animationDelay = `${index * 50}ms`;
+
+    parliamentarians.forEach((parliamentarian) => {
+      // Find the existing checkbox for this parliamentarian
+      const existingCheckbox = parliamentarianList.querySelector(`input[value="${parliamentarian.id}"]`);
+
+      if (existingCheckbox) {
+        const li = existingCheckbox.closest('li');
+        if (li) {
+          li.style.display = 'block';
+          existingCheckbox.checked = true;
+          if (!isInitialLoad) {
+            li.classList.add("animate-in");
+          }
+        }
       }
-      li.innerHTML = `
-                <input type="checkbox" name="parliamentarian_id" value="${parliamentarian.id}" id="${id}" checked>
-                <label for="${id}">${parliamentarian.title}</label>
-            `;
-      parliamentarianList.appendChild(li);
     });
   }
-});
+}
