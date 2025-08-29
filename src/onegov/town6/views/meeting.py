@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import morepath
+from purl import URL
 from webob.exc import HTTPNotFound
 
 from onegov.core.elements import Link
 from onegov.core.security.permissions import Public, Private
-from onegov.org.forms import MeetingForm
+from onegov.org.forms import MeetingForm, ExportForm
 
 from onegov.org.models import Meeting
 from onegov.org.models import MeetingCollection
@@ -246,3 +247,44 @@ def view_redirect_meeting_item_to_meeting(
     Redirect for search results, if we link to MeetingItem we show the Meeting
     """
     return morepath.redirect(request.link(self.meeting))
+
+
+@TownApp.form(
+    model=Meeting,
+    permission=Public,
+    name='export',
+    template='export.pt',
+    form=ExportForm,
+    pass_model=True
+)
+def meeting_view_export(
+    self: Meeting,
+    request: TownRequest,
+    form: ExportForm
+) -> RenderData | Response:
+
+    # layout = MeetingCollectionLayout(self, request)
+    layout = MeetingLayout(self, request)
+    layout.breadcrumbs.append(Link(_('Export'), '#'))
+    layout.editbar_links = None
+
+    # no format to choose
+    form.delete_field('file_format')
+
+    if form.submitted(request):
+        url = URL(request.link(self, '+zip'))
+        url = url.query_param('format', form.format)
+
+        return request.redirect(url.as_string())
+
+    return {
+        'layout': layout,
+        'form': form,
+        'title': _('Export meeting documents'),
+        'explanation': _('On the right side you can choose the political '
+                         'businesses you want to export files for. The resulting'
+                         ' zipfile contains the documents per political '
+                         'business.'),
+        'filters': None,
+        'count': 0,
+    }

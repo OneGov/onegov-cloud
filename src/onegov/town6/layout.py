@@ -1139,6 +1139,11 @@ class MeetingLayout(DefaultLayout):
                             )
                         )
                     )
+                ),
+                Link(
+                    text=_('Export'),
+                    url=self.request.link(self.model, name='+export'),
+                    attrs={'class': 'export-link'}
                 )
             ]
         return None
