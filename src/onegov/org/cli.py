@@ -2968,13 +2968,13 @@ def ris_rebuild_political_business_links_to_meetings(
     return rebuild_political_business_links
 
 
-@cli.command(name='ris-wil-meetings-shorten-audio-link')
-def ris_wil_meetings_shorten_audio_link(
-
+@cli.command(name='ris-wil-meetings-fix-audio-links')
+def ris_wil_meetings_shorten_audio_links(
 ) -> Callable[[OrgRequest, OrgApp], None]:
-    def ris_wil_meetings_shorten_audio_link(
-            request: OrgRequest,
-            app: OrgApp
+
+    def ris_wil_meetings_fix_audio_links(
+        request: OrgRequest,
+        app: OrgApp
     ) -> None:
 
         meetings = MeetingCollection(request.session)
@@ -3015,10 +3015,10 @@ def ris_wil_meetings_shorten_audio_link(
                 f'audio link for meeting {meeting.title} vom '
                 f'{meeting.start_datetime}: {meeting.audio_link}', fg='yellow')
 
-        click.secho(f'Shortened recapp audio links for {recapp_counter} '
+        click.secho(f'Fixed recapp audio links for {recapp_counter} '
                     f'meetings', fg='green')
-        click.secho(f'Adjusted verbalix http audio links for {http_counter} '
+        click.secho(f'Fixed verbalix http audio links for {http_counter} '
                     f'meetings', fg='green')
         transaction.commit()
 
-    return ris_wil_meetings_shorten_audio_link
+    return ris_wil_meetings_fix_audio_links
