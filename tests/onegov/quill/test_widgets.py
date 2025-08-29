@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from onegov.form import Form
 from onegov.quill.widgets import QuillInput
 from onegov.quill.fields import QuillField
 
 
-def test_widget_initalization():
+def test_widget_initalization() -> None:
     input = QuillInput()
     assert input.formats == [
         'bold', 'italic', 'link', 'header', 'list', 'blockquote'
@@ -48,10 +50,10 @@ def test_widget_initalization():
     assert input.toolbar == []
 
 
-def test_widget_render():
+def test_widget_render() -> None:
     form = Form()
     field = QuillField()
-    field = field.bind(form, 'html')
+    field = field.bind(form, 'html')  # type: ignore[attr-defined]
     field.data = 'xxx'
 
     input = QuillInput()

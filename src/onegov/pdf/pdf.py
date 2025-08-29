@@ -3,6 +3,7 @@ from __future__ import annotations
 from bleach.linkifier import LinkifyFilter
 from bleach.sanitizer import Cleaner
 from copy import deepcopy
+from contextlib import contextmanager
 from functools import partial
 from html5lib.filters.whitespace import Filter as WhitespaceFilter
 from io import StringIO
@@ -22,6 +23,7 @@ from reportlab.lib.enums import TA_RIGHT
 from reportlab.lib.units import cm
 from reportlab.platypus import Frame
 from reportlab.platypus import Image
+from reportlab.platypus import KeepTogether
 from reportlab.platypus import ListFlowable
 from reportlab.platypus import NextPageTemplate
 from reportlab.platypus import PageTemplate
@@ -37,7 +39,7 @@ if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath, SupportsRead
     from bleach.callbacks import _HTMLAttrs
     from bleach.sanitizer import _Filter
-    from collections.abc import Iterable, Sequence
+    from collections.abc import Iterable, Iterator, Sequence
     from reportlab.lib.styles import PropertySet
     from reportlab.platypus.doctemplate import _PageCallback
     from reportlab.platypus.tables import _TableCommand
@@ -239,10 +241,31 @@ class Pdf(PDFDocument):
             ('LINEBELOW', (0, 0), (-1, 0), 0.2, colors.black),
         )
 
+    @contextmanager
+    def keep_together(self) -> Iterator[None]:
+        """ Keeps anything added during the lifetime of this contextmanager
+        together.
+
+        Example::
+
+            pdf = Pdf(file, author='OneGov')
+            with pdf.keep_together():
+                pdf.h1('Title')
+                pdf.table([[...]])
+            pdf.generate()
+
+        """
+        complete_story, self.story = self.story, []
+        try:
+            yield
+        finally:
+            complete_story.append(KeepTogether(self.story))
+            self.story = complete_story
+
     def table_of_contents(self) -> None:
         """ Adds a table of contents.
 
-        The entries are added automatically when adding headers. Example:
+        The entries are added automatically when adding headers. Example::
 
             pdf = Pdf(file, author='OneGov', toc_levels=2)
             pdf.init_a4_portrait(page_fn=draw_header)

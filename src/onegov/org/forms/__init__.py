@@ -29,6 +29,7 @@ from onegov.org.forms.parliamentarian import ParliamentarianForm
 from onegov.org.forms.parliamentarian_role import ParliamentarianRoleForm
 from onegov.org.forms.parliamentary_group import ParliamentaryGroupForm
 from onegov.org.forms.person import PersonForm
+from onegov.org.forms.reservation import AddReservationForm
 from onegov.org.forms.reservation import FindYourSpotForm
 from onegov.org.forms.reservation import KabaEditForm
 from onegov.org.forms.reservation import ReservationAdjustmentForm
@@ -60,6 +61,7 @@ from onegov.org.forms.userprofile import UserProfileForm
 
 
 __all__ = (
+    'AddReservationForm',
     'AllocationRuleForm',
     'AnalyticsSettingsForm',
     'CitizenLoginForm',
