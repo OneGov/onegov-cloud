@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from os import environ, system
-import datetime
+from datetime import datetime
 import re
 import shutil
 import time
@@ -16,7 +16,7 @@ from time import sleep
 from typing import cast, Any, ParamSpec, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from datetime import datetime, date
+    from datetime import date
     from os import PathLike
     from selenium.webdriver import Chrome
     from splinter import Browser
@@ -271,10 +271,11 @@ class ExtendedBrowser(InjectedBrowserExtension):
         # element of the datetime picker and seeing what kind of format it
         # expects:
         # document.getElementById('publication_start').value;
-        if isinstance(date_or_time, datetime.datetime):
-            date_or_time = date_or_time.strftime("%Y-%m-%dT%H:%M")
+        if isinstance(date_or_time, datetime):
+            date_or_time_s = date_or_time.strftime("%Y-%m-%dT%H:%M")
         else:
-            date_or_time = date_or_time.strftime("%Y-%m-%d")
+            # Many oneogv forms use a date widget with no time, support that:
+            date_or_time_s = date_or_time.strftime("%Y-%m-%d")
 
         script = """
             function setDateTimeDirect(selector, dateTimeString) {
@@ -297,7 +298,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
             setDateTimeDirect(arguments[0], arguments[1]);
         """
 
-        self.execute_script(script, selector, date_or_time)
+        self.execute_script(script, selector, date_or_time_s)
 
     def scroll_to_css(self, css: str) -> None:
         """ Scrolls to the first element matching the given css expression. """
