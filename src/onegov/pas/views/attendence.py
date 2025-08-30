@@ -5,7 +5,7 @@ from onegov.core.security import Private
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import AttendenceCollection
-from onegov.pas.forms import AttendenceAddForm
+from onegov.pas.forms import AttendenceAddCommissionBulkForm, AttendenceAddForm
 from onegov.pas.forms import AttendenceAddPlenaryForm
 from onegov.pas.forms import AttendenceForm
 from onegov.pas.layouts import AttendenceCollectionLayout
@@ -66,6 +66,50 @@ def add_attendence(
     return {
         'layout': layout,
         'title': _('New attendence'),
+        'form': form,
+        'form_width': 'large'
+    }
+
+
+@PasApp.form(
+    model=AttendenceCollection,
+    name='new-commission-bulk',
+    template='form.pt',
+    permission=Private,
+    form=AttendenceAddCommissionBulkForm
+)
+def add_bulk_attendence(
+    self: AttendenceCollection,
+    request: TownRequest,
+    form: AttendenceAddCommissionBulkForm
+) -> RenderData | Response:
+    request.include('custom')
+
+    if form.submitted(request):
+
+        data = form.get_useful_data()
+        if raw_parl_ids := request.POST.getall('parliamentarian_id'):
+            # Remove static field; choices are set dynamically via JS
+            data.pop('parliamentarian_id', None)
+            for parliamentarian_id in raw_parl_ids:
+                attendence = self.add(
+                    parliamentarian_id=parliamentarian_id, **data
+                )
+                Change.add(request, 'add', attendence)
+        else:
+            request.warning(_('No parliamentarians selected'))
+            return request.redirect(request.class_link(AttendenceCollection))
+
+        request.success(_('Added commission session'))
+
+        return request.redirect(request.link(self))
+
+    layout = AttendenceCollectionLayout(self, request)
+    layout.breadcrumbs.append(Link(_('New commission session'), '#'))
+
+    return {
+        'layout': layout,
+        'title': _('New commission session'),
         'form': form,
         'form_width': 'large'
     }

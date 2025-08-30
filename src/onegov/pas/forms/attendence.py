@@ -186,6 +186,54 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
         ]
 
 
+class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
+    """ Kind of like AttendenceAddPlenaryForm but for commissions. """
+
+    date = DateField(
+        label=_('Date'),
+        validators=[InputRequired()],
+        default=datetime.date.today
+    )
+
+    duration = FloatField(
+        label=_('Duration in hours'),
+        validators=[InputRequired()],
+    )
+
+    commission_id = ChosenSelectField(
+        label=_('Commission'),
+        validators=[InputRequired()],
+    )
+
+    parliamentarian_id = MultiCheckboxField(
+        label=_('Parliamentarian'),
+        validators=[InputRequired()],
+        choices=[]  # are set with in custom.js
+    )
+
+    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
+        result = super().get_useful_data()
+        result['duration'] = int(60 * (result.get('duration') or 0))
+        result['type'] = 'commission'
+        return result
+
+    def on_request(self) -> None:
+        self.commission_id.choices = [
+            (commission.id, commission.title)
+            for commission
+            in PASCommissionCollection(self.request.session).query()
+        ]
+        # Set choices for all possible parliamentarians so WTForms can validate
+        self.parliamentarian_id.choices = [
+            (str(parliamentarian.id), parliamentarian.title)
+            for parliamentarian
+            in PASParliamentarianCollection(
+                self.request.session, [True]).query()
+        ]
+        # JavaScript will handle selection based on commission
+        self.parliamentarian_id.data = []
+
+
 class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):
 
     date = DateField(
