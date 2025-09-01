@@ -7,6 +7,7 @@ import morepath
 import os
 import zipfile
 
+from markupsafe import escape
 from webob.exc import HTTPNotFound
 from webob.response import Response
 
@@ -341,17 +342,22 @@ def view_meeting_export(
             if not meeting_item.political_business.files:
                 meeting_items_no_docs.append(meeting_item.title)
 
+    intro = request.translate(
+        _('No documents are assigned to the following agenda items:')
+    )
+    items = ''.join(f'<li>{title}</li>'
+                    for title in meeting_items_no_docs)
+    note_html = intro + f'<ul>{items}</ul>'
+
     return {
         'layout': layout,
         'form': form,
         'title': _('Export meeting documents'),
-        'explanation': _('Select the meeting documents and agenda item '
+        'explanation': _('Select the meeting and agenda item '
                          'documents you want to export. The resulting zipfile '
                          'contains the documents per meeting item.'),
         'has_note': True if meeting_items_no_docs else False,
-        'note': 'Please note that not documents are assigned to the following '
-                'agenda items: {}'.format(
-            ', '.join(meeting_items_no_docs) if meeting_items_no_docs else ''),
+        'note_html': escape(note_html),
         'filters': None,
         'count': file_count,
     }

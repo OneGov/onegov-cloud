@@ -8,8 +8,8 @@
             <div class="panel">
                 <p>${explanation}</p>
             </div>
-            <div class="callout panel" tal:condition="has_note">
-                <p>${note}</p>
+            <div class="callout panel" tal:condition="has_note|nothing">
+                <p tal:content="note_html"></p>
             </div>
             <div metal:use-macro="layout.macros['form']" />
             </div>
