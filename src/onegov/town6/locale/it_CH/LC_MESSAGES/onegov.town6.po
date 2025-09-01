@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-08-14 10:15+0200\n"
+"POT-Creation-Date: 2025-08-29 08:26+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -316,17 +316,17 @@ msgstr "Parlamentari"
 msgid "Parliamentarian"
 msgstr "Parlamentare"
 
-msgid "New parliamentary group function"
-msgstr "Nuova funzione del gruppo parlamentare"
-
-msgid "New commission function"
-msgstr "Nuova funzione della commissione"
-
 msgid "Do you really want to delete this parliamentarian?"
 msgstr "Vuole davvero cancellare questo parlamentare?"
 
 msgid "Delete parliamentarian"
 msgstr "Elimina parlamentare"
+
+msgid "New parliamentary group function"
+msgstr "Nuova funzione del gruppo parlamentare"
+
+msgid "New commission function"
+msgstr "Nuova funzione della commissione"
 
 msgid "Do you really want to remove this role?"
 msgstr "Vuoi davvero rimuovere questo ruolo?"
@@ -1751,6 +1751,12 @@ msgstr "1 prenotazione rifiutata."
 msgid "${count} reservations rejected."
 msgstr "${count} prenotazioni rifiutate."
 
+msgid "1 reservation added."
+msgstr "1 prenotazione aggiunta."
+
+msgid "${count} reservations added."
+msgstr "${count} prenotazioni aggiunte."
+
 msgid "1 reservation adjusted:"
 msgstr "1 prenotazione regolata:"
 
@@ -1940,14 +1946,32 @@ msgstr "Esporta questi eventi"
 msgid "Submit your event"
 msgstr "Invia il tuo evento"
 
+msgid "Functions"
+msgstr "Funzioni"
+
+msgid "Parliament"
+msgstr "Parlamento"
+
+msgid "in"
+msgstr "di"
+
+msgid "Interest ties"
+msgstr "Legami di interesse"
+
+msgid "Personal details"
+msgstr "Dettagli personali"
+
+msgid "First name"
+msgstr "Nome"
+
+msgid "Last name"
+msgstr "Cognome"
+
 msgid "Personnel number"
 msgstr "Numero del personale"
 
 msgid "Contract number"
 msgstr "Numero del contratto"
-
-msgid "Picture"
-msgstr "Immagine"
 
 msgid "Party"
 msgstr "Partito"
@@ -2006,23 +2030,12 @@ msgstr "Sito web"
 msgid "Remarks"
 msgstr "Osservazioni"
 
-msgid "Functions"
-msgstr "Funzioni"
-
-msgid "Parliament"
-msgstr "Parlamento"
-
-msgid "in"
-msgstr "di"
-
-msgid "Interest ties"
-msgstr "Legami di interesse"
-
 msgid "Role"
 msgstr "Ruolo"
 
-msgid "No parliamentarians defined yet."
-msgstr "Nessun parlamentare ancora definito."
+msgid "No filter results found or no parliamentarians defined yet."
+msgstr ""
+"Nessun risultato del filtro trovato o nessun parlamentare ancora definito."
 
 msgid "No parliamentary groups defined yet."
 msgstr "Nessun gruppo parlamentare ancora definito."
@@ -2078,6 +2091,10 @@ msgstr "Ripristina filtro"
 msgid "Export a vCard of this person"
 msgstr "Esporta una vCard di questa persona"
 
+#, fuzzy
+msgid "Information"
+msgstr "Conferma"
+
 msgid "Number"
 msgstr "Numero"
 
@@ -2104,10 +2121,6 @@ msgstr "Anno"
 
 msgid "No publications"
 msgstr "Nessuna pubblicazione"
-
-#, fuzzy
-msgid "Information"
-msgstr "Conferma"
 
 msgid ""
 "You can search through the content of all listed files by using the search "
@@ -2738,6 +2751,9 @@ msgstr "Sistema di informazione sui ratti (RIS)"
 
 msgid "New Note"
 msgstr "Nuova nota"
+
+#~ msgid "Picture"
+#~ msgstr "Immagine"
 
 #~ msgid "Roles"
 #~ msgstr "Ruoli"

@@ -532,7 +532,21 @@ class AllocationEventInfo:
 
     @property
     def event_classes(self) -> Iterator[str]:
-        if self.allocation.end < sedate.utcnow():
+        if self.allocation.end < sedate.utcnow() or (
+            # if the user can't override the deadline the event should
+            # appear as if it were in the past
+            not self.request.is_manager
+            and self.resource.is_past_deadline(
+                # for partly available allocations we use the end of the
+                # allocation, since some small sliver of the allocation
+                # may still be before the deadline, we could get a slightly
+                # more accurate result by subtracting the raster, but it
+                # doesn't seem worth the extra CPU cycles.
+                self.allocation.end
+                if self.allocation.partly_available
+                else self.allocation.start
+            )
+        ):
             yield 'event-in-past'
 
         if self.quota > 1:

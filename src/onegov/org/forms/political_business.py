@@ -207,6 +207,10 @@ class PoliticalBusinessForm(Form):
     )
 
     def on_request(self) -> None:
+        # prevent showing access field as all ris information is public
+        if hasattr(self, 'access'):
+            self.delete_field('access')
+
         selectable_participants = (
             self.request.session.query(RISParliamentarian)
             .filter(RISParliamentarian.active)
