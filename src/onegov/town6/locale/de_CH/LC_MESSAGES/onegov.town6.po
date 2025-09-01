@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-08-07 15:03+0200\n"
+"POT-Creation-Date: 2025-08-29 08:26+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -319,17 +319,17 @@ msgstr "Parlamentsmitglieder"
 msgid "Parliamentarian"
 msgstr "Parlamentsmitglied"
 
-msgid "New parliamentary group membership"
-msgstr "Neue Fraktionsmitgliedschaft"
-
-msgid "New commission membership"
-msgstr "Neue Kommissionsmitgliedschaft"
-
 msgid "Do you really want to delete this parliamentarian?"
 msgstr "Möchten Sie dieses Parlamentsmitglied wirklich löschen?"
 
 msgid "Delete parliamentarian"
 msgstr "Parlamentsmitglied löschen"
+
+msgid "New parliamentary group function"
+msgstr "Neue Fraktionsfunktion"
+
+msgid "New commission function"
+msgstr "Neue Kommissionsfunktion"
 
 msgid "Do you really want to remove this role?"
 msgstr "Rolle wirklich entfernen?"
@@ -396,6 +396,9 @@ msgstr "Keine Verfügbarkeitszeiträume definiert."
 
 msgid "State:"
 msgstr "Status:"
+
+msgid "Submitter"
+msgstr "Antragsteller/in"
 
 msgid "Owner:"
 msgstr "Besitzer:"
@@ -934,9 +937,6 @@ msgstr "Veröffentlicht"
 
 msgid "Withdrawn"
 msgstr "Zurückgezogen"
-
-msgid "Submitter"
-msgstr "Antragsteller/in"
 
 msgid "Title"
 msgstr "Titel"
@@ -1688,6 +1688,15 @@ msgstr "Es wurden noch keine Traktanden erfasst."
 msgid "No meetings defined yet."
 msgstr "Noch keine Sitzungen definiert."
 
+msgid "Next Meeting"
+msgstr "Nächste Sitzung"
+
+msgid "Upcoming Meetings"
+msgstr "Künftige Sitzungen"
+
+msgid "Past Meetings"
+msgstr "Vergangene Sitzungen"
+
 msgid "Directory entry adopted."
 msgstr "Verzeichniseintrag übernommen."
 
@@ -1749,6 +1758,12 @@ msgstr "1 Reservation abgelehnt."
 msgid "${count} reservations rejected."
 msgstr "${count} Reservationen abgelehnt."
 
+msgid "1 reservation added."
+msgstr "1 Reservation hinzugefügt."
+
+msgid "${count} reservations added."
+msgstr "${count} Reservationen hinzugefügt."
+
 msgid "1 reservation adjusted:"
 msgstr "1 Reservation angepasst:"
 
@@ -1784,6 +1799,9 @@ msgstr "Ticket E-Mails aktiviert."
 
 msgid "Payment amount changed."
 msgstr "Zahlungsbetrag geändert."
+
+msgid "Submitter e-mail changed."
+msgstr "E-Mail Adresse des Antragstellers geändert."
 
 msgid "Ticket archived."
 msgstr "Ticket archiviert."
@@ -1934,14 +1952,35 @@ msgstr "Diese Termine exportieren"
 msgid "Submit your event"
 msgstr "Veranstaltung erfassen"
 
+msgid "Functions"
+msgstr "Funktionen"
+
+msgid "Parliament"
+msgstr "Parlament"
+
+msgid "in"
+msgstr "der"
+
+msgid "Interest ties"
+msgstr "Interessensbindungen"
+
+msgid "Personal details"
+msgstr "Personenalien"
+
+msgid "First name"
+msgstr "Vorname"
+
+msgid "Last name"
+msgstr "Nachname"
+
 msgid "Personnel number"
 msgstr "Personalnummer"
 
 msgid "Contract number"
 msgstr "Vertragsnummer"
 
-msgid "Picture"
-msgstr "Bild"
+msgid "Party"
+msgstr "Partei"
 
 msgid "Private address"
 msgstr "Privatadresse"
@@ -1997,23 +2036,12 @@ msgstr "Webseite"
 msgid "Remarks"
 msgstr "Bemerkungen"
 
-msgid "Roles"
-msgstr "Mitgliedschaften"
-
-msgid "Parliament"
-msgstr "Parlament"
-
-msgid "in"
-msgstr "der"
-
-msgid "Interest ties"
-msgstr "Interessensbindungen"
-
 msgid "Role"
 msgstr "Rolle"
 
-msgid "No parliamentarians defined yet."
-msgstr "Noch keine Parlamentarier erfasst."
+msgid "No filter results found or no parliamentarians defined yet."
+msgstr ""
+"Keine Filterergebnisse gefunden oder noch keine Parlamentarier erfasst."
 
 msgid "No parliamentary groups defined yet."
 msgstr "Noch keine Fraktionen erfasst."
@@ -2069,6 +2097,9 @@ msgstr "Filter zurücksetzen"
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
 
+msgid "Information"
+msgstr "Information"
+
 msgid "Number"
 msgstr "Nummer"
 
@@ -2077,6 +2108,9 @@ msgstr "Geschäftsart"
 
 msgid "Status"
 msgstr "Status"
+
+msgid "Submission/publication date"
+msgstr "Einreichungs-/Publikationsdatum"
 
 msgid "Participants"
 msgstr "Verfasser/Beteiligte"
@@ -2087,17 +2121,11 @@ msgstr "Fraktion"
 msgid "No political businesses defined yet."
 msgstr "Es wurden noch keine politischen Geschäfte erfasst."
 
-msgid "Datum"
-msgstr "Datum"
-
 msgid "Year"
 msgstr "Jahr"
 
 msgid "No publications"
 msgstr "Keine Publikationen"
-
-msgid "Information"
-msgstr "Information"
 
 msgid ""
 "You can search through the content of all listed files by using the search "
@@ -2568,17 +2596,17 @@ msgstr "Die Kommission wurde gelöscht."
 msgid "Sort"
 msgstr "Sortieren"
 
-msgid "Past Meetings"
-msgstr "Vergangene"
-
-msgid "Upcoming Meetings"
-msgstr "Zukünftige"
-
 msgid "Added a new meeting"
 msgstr "Neue Sitzung hinzugefügt"
 
 msgid "New meeting"
 msgstr "Neue Sitzung"
+
+msgid "Listen to parliamentary debate"
+msgstr "Parlamentsdebatte anhören"
+
+msgid "Watch parliamentary debate"
+msgstr "Parlamentsdebatte ansehen"
 
 msgid "Edit meeting"
 msgstr "Sitzung bearbeiten"
@@ -2727,6 +2755,15 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid "No parliamentarians defined yet."
+#~ msgstr "Noch keine Parlamentarier erfasst."
+
+#~ msgid "Picture"
+#~ msgstr "Bild"
+
+#~ msgid "Roles"
+#~ msgstr "Mitgliedschaften"
 
 #~ msgid "Interest tie"
 #~ msgstr "Interessensbindung"

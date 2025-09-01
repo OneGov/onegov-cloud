@@ -1,10 +1,17 @@
+from __future__ import annotations
+
 import pytest
 
 from datetime import date, datetime
 from onegov.reservation import ResourceCollection
 
 
-def test_resource_collection(libres_context):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from libres.context.core import Context
+
+
+def test_resource_collection(libres_context: Context) -> None:
 
     collection = ResourceCollection(libres_context)
     assert collection.query().count() == 0
@@ -15,15 +22,16 @@ def test_resource_collection(libres_context):
     assert resource.get_scheduler(libres_context).resource == resource.id
 
     assert collection.query().count() == 1
-    assert collection.by_id(resource.id)
     assert collection.by_name('executive-lounge')
 
-    collection.delete(collection.by_id(resource.id))
+    result = collection.by_id(resource.id)
+    assert result is not None
+    collection.delete(result)
 
     assert collection.query().count() == 0
 
 
-def test_resource_save_delete(libres_context):
+def test_resource_save_delete(libres_context: Context) -> None:
     collection = ResourceCollection(libres_context)
 
     resource = collection.add('Executive Lounge', 'Europe/Zurich')
@@ -47,7 +55,7 @@ def test_resource_save_delete(libres_context):
     assert scheduler.managed_allocations().count() == 0
 
 
-def test_resource_highlight_allocations(libres_context):
+def test_resource_highlight_allocations(libres_context: Context) -> None:
     collection = ResourceCollection(libres_context)
     resource = collection.add('Executive Lounge', 'Europe/Zurich')
 
@@ -66,7 +74,7 @@ def test_resource_highlight_allocations(libres_context):
     assert resource.highlights_min == allocations[-1].id
 
 
-def test_resource_form_definition(libres_context):
+def test_resource_form_definition(libres_context: Context) -> None:
     collection = ResourceCollection(libres_context)
 
     resource = collection.add(
@@ -74,7 +82,8 @@ def test_resource_form_definition(libres_context):
         timezone='Europe/Zurich',
         definition='Mail *= @@@'
     )
-    assert resource.form_class().mail is not None
+    assert resource.form_class is not None
+    assert 'mail' in resource.form_class()
 
     resource.definition = None
     assert resource.form_class is None

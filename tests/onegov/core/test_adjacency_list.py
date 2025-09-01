@@ -1,6 +1,8 @@
-from decimal import Decimal
+from __future__ import annotations
+
 import pytest
 
+from decimal import Decimal
 from onegov.core.orm.abstract import (
     AdjacencyList,
     AdjacencyListCollection,
@@ -8,6 +10,11 @@ from onegov.core.orm.abstract import (
     sort_siblings,
 )
 from onegov.core.orm.abstract.adjacency_list import numeric_priority
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
 
 class FamilyMember(AdjacencyList):
@@ -24,11 +31,11 @@ class DeadFamilyMember(FamilyMember):
     __mapper_args__ = {'polymorphic_identity': 'dead'}
 
 
-class FamilyMemberCollection(AdjacencyListCollection):
+class FamilyMemberCollection(AdjacencyListCollection[FamilyMember]):
     __listclass__ = FamilyMember
 
 
-def test_add(session):
+def test_add(session: Session) -> None:
 
     family = FamilyMemberCollection(session)
 
@@ -62,7 +69,7 @@ def test_add(session):
     assert family.roots == [adam]
 
 
-def test_add_unique_page(session):
+def test_add_unique_page(session: Session) -> None:
 
     family = FamilyMemberCollection(session)
     r1 = family.add_root(title='Test')
@@ -82,7 +89,7 @@ def test_add_unique_page(session):
     assert c3.name == 'test-2'
 
 
-def test_add_or_get_page(session):
+def test_add_or_get_page(session: Session) -> None:
 
     family = FamilyMemberCollection(session)
     root = family.add_or_get_root(title='Wurzel', name='root')
@@ -109,14 +116,16 @@ def test_add_or_get_page(session):
     assert family.query().count() == 2
 
     # invalid name (not normalized)
-    with pytest.raises(AssertionError) as assertion_info:
+    with pytest.raises(
+        AssertionError,
+        match=r'The given name was not normalized'
+    ):
         family.add_or_get_root(title='Test', name='Test')
-        assert 'The given name was not normalized' in assertion_info.value
 
     assert family.query().count() == 2
 
 
-def test_page_by_path(session):
+def test_page_by_path(session: Session) -> None:
 
     family = FamilyMemberCollection(session)
 
@@ -135,7 +144,7 @@ def test_page_by_path(session):
     assert family.by_path('/news/jah-toast') is None
 
 
-def test_delete(session):
+def test_delete(session: Session) -> None:
     family = FamilyMemberCollection(session)
 
     news = family.add_root('News')
@@ -146,7 +155,7 @@ def test_delete(session):
     assert family.by_path('/news') is None
 
 
-def test_polymorphic(session):
+def test_polymorphic(session: Session) -> None:
     family = FamilyMemberCollection(session)
     eve = family.add_root("Eve")
 
@@ -171,7 +180,7 @@ def test_polymorphic(session):
     assert not family.by_path('/eve/inexistant', ensure_type='dead')
 
 
-def test_move_root(session):
+def test_move_root(session: Session) -> None:
 
     family = FamilyMemberCollection(session)
     a = family.add_root("a")
@@ -191,7 +200,7 @@ def test_move_root(session):
     assert family.query(ordered=True).all() == [a, b]
 
 
-def test_move(session):
+def test_move(session: Session) -> None:
 
     family = FamilyMemberCollection(session)
 
@@ -214,7 +223,7 @@ def test_move(session):
     assert a.siblings.all() == [a, b]
 
 
-def test_move_keep_hierarchy(session):
+def test_move_keep_hierarchy(session: Session) -> None:
 
     family = FamilyMemberCollection(session)
 
@@ -234,7 +243,7 @@ def test_move_keep_hierarchy(session):
                 family.move(target=target, subject=c, direction=direction)
 
 
-def test_add_sorted(session):
+def test_add_sorted(session: Session) -> None:
     family = FamilyMemberCollection(session)
 
     root = family.add_root("root")
@@ -266,7 +275,7 @@ def test_add_sorted(session):
     assert query.all() == [a, aa, b, c, d, e]
 
 
-def test_change_title(session):
+def test_change_title(session: Session) -> None:
     family = FamilyMemberCollection(session)
 
     root = family.add_root("root")
@@ -281,7 +290,7 @@ def test_change_title(session):
     assert a.siblings.all() == [a, c, b]
 
 
-def test_change_title_unordered(session):
+def test_change_title_unordered(session: Session) -> None:
     family = FamilyMemberCollection(session)
 
     root = family.add_root("root")
@@ -296,7 +305,7 @@ def test_change_title_unordered(session):
     assert a.siblings.all() == [b, c, a]
 
 
-def test_numeric_priority():
+def test_numeric_priority() -> None:
     assert numeric_priority('A') == 1000
     assert numeric_priority('AA') == 1100
     assert numeric_priority('BA') == 2100
@@ -313,7 +322,7 @@ def test_numeric_priority():
     ]
 
 
-def test_move_uses_binary_gap(session):
+def test_move_uses_binary_gap(session: Session) -> None:
     family = FamilyMemberCollection(session)
     root = family.add_root("root")
 
@@ -363,7 +372,7 @@ def test_move_uses_binary_gap(session):
     assert Decimal(str(order_c3)) < Decimal(str(order_b3))
 
 
-def test_add_uses_binary_gap(session):
+def test_add_uses_binary_gap(session: Session) -> None:
     family = FamilyMemberCollection(session)
     root = family.add_root("root")
 

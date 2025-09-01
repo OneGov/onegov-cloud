@@ -1114,25 +1114,15 @@ class MeetingLayout(DefaultLayout):
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
-                LinkGroup(
-                    title=_('Add'),
-                    links=[
-                        Link(
-                            text=_('Meeting'),
-                            url=self.request.link(self.model, 'new'),
-                            attrs={'class': 'new-meeting'},
-                        ),
-                    ],
-                ),
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-meeting'},
+                    attrs={'class': 'edit-link'},
                 ),
                 Link(
                     text=_('Delete'),
                     url=self.csrf_protected_url(self.request.link(self.model)),
-                    attrs={'class': 'delete-meeting'},
+                    attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
                             _(
@@ -1220,24 +1210,6 @@ class RISParliamentarianLayout(DefaultLayout):
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
-                LinkGroup(
-                    title=_('Add'),
-                    links=[
-                        Link(
-                            text=_('New parliamentary group membership'),
-                            url=self.request.link(
-                                self.model, 'new-role'),
-                            # change to `new-group-role`
-                            attrs={'class': 'new-role'}
-                        ),
-                        Link(
-                            text=_('New commission membership'),
-                            url=self.request.link(
-                                self.model, 'new-commission-role'),
-                            attrs={'class': 'new-commission-role'}
-                        )
-                    ],
-                ),
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
@@ -1266,6 +1238,24 @@ class RISParliamentarianLayout(DefaultLayout):
                             )
                         )
                     )
+                ),
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('New parliamentary group function'),
+                            url=self.request.link(
+                                self.model, 'new-role'),
+                            # change to `new-group-role`
+                            attrs={'class': 'new-role'}
+                        ),
+                        Link(
+                            text=_('New commission function'),
+                            url=self.request.link(
+                                self.model, 'new-commission-role'),
+                            attrs={'class': 'new-commission-role'}
+                        )
+                    ],
                 ),
             ]
         return None

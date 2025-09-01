@@ -40,12 +40,19 @@ def view_parliamentarians(
     filters['active'] = [
         Link(
             text=request.translate(title),
-            active=self.active == value,
+            active=value in self.active,
             url=request.link(self.for_filter(active=value))
         ) for title, value in (
             (_('Active'), True),
             (_('Inactive'), False)
         )
+    ]
+    filters['party'] = [
+        Link(
+            text=value,
+            active=value in self.party,
+            url=request.link(self.for_filter(party=value))
+        ) for value in self.party_values()
     ]
 
     return {
@@ -72,6 +79,7 @@ def add_parliamentarian(
         return request.redirect(request.link(parliamentarian))
 
     layout.breadcrumbs.append(Link(_('New'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -111,6 +119,7 @@ def edit_parliamentarian(
 
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -159,12 +168,13 @@ def add_parliamentary_group_membership(
         return request.redirect(request.link(self))
 
     layout.breadcrumbs.append(
-        Link(_('New parliamentary group membership'), '#'))
+        Link(_('New parliamentary group function'), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _('New parliamentary group membership'),
+        'title': _('New parliamentary group function'),
         'form': form,
         'form_width': 'large'
     }
@@ -191,12 +201,13 @@ def add_commission_membership(
         request.success(_('Added a new role'))
         return request.redirect(request.link(self))
 
-    layout.breadcrumbs.append(Link(_('New commission membership'), '#'))
+    layout.breadcrumbs.append(Link(_('New commission function'), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _('New commission membership'),
+        'title': _('New commission function'),
         'form': form,
         'form_width': 'large'
     }

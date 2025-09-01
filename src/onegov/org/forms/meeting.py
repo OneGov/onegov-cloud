@@ -51,6 +51,18 @@ class MeetingForm(Form):
         render_kw={'rows': 5}
     )
 
+    audio_link = StringField(
+        label=_('Audio link to parliamentary debate'),
+        description='https://',
+        validators=[Optional()],
+    )
+
+    video_link = StringField(
+        label=_('Video link to parliamentary debate'),
+        description='https://',
+        validators=[Optional()],
+    )
+
     meeting_items = StringField(
         label=_('New agenda item'),
         fieldset=_('Agenda items'),
@@ -62,7 +74,9 @@ class MeetingForm(Form):
         self.agenda_items_errors: dict[int, str] = {}
 
     def on_request(self) -> None:
-        pass
+        # prevent showing access field as all ris information is public
+        if hasattr(self, 'access'):
+            self.delete_field('access')
 
     def populate_obj(  # type:ignore[override]
         self,
@@ -104,7 +118,7 @@ class MeetingForm(Form):
         for new in new_items:
             number = new.get('number')
             title = new.get('title', '')
-            item_name = new.get('agenda_item')
+            item_name = new.get('agenda_item', '')
 
             if number == '' and title == '' and item_name == '':
                 # skip empty items
@@ -117,10 +131,7 @@ class MeetingForm(Form):
                 items.append(current_items[title])
                 continue
 
-            business = next(
-                (b for b in businesses.query().all()
-                 if b.display_name == item_name), None)
-
+            business = businesses.by_display_name(item_name)
             if business is None:
                 new_item = MeetingItem(
                     title=title,
@@ -144,6 +155,11 @@ class MeetingForm(Form):
 
         meeting.meeting_items = items
 
+        # update links from businesses to meeting
+        for item in meeting.meeting_items:
+            if item.political_business:
+                item.political_business.meeting_items.append(item)
+
     def process_obj(self, obj: Meeting) -> None:  # type:ignore[override]
         from onegov.org.models import PoliticalBusiness
 
@@ -153,6 +169,11 @@ class MeetingForm(Form):
 
         businesses = (
             self.meta.request.session.query(PoliticalBusiness)
+            .with_entities(
+                PoliticalBusiness.number,
+                PoliticalBusiness.title,
+                PoliticalBusiness.display_name
+            )
             .order_by(PoliticalBusiness.number, PoliticalBusiness.title)
             .all()
         )

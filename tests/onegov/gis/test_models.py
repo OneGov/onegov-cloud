@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.orm import ModelBase
 from onegov.core.orm import SessionManager
 from onegov.core.orm.mixins import ContentMixin
@@ -7,12 +9,19 @@ from sqlalchemy import Integer
 from sqlalchemy.ext.declarative import declarative_base
 
 
-def test_mutable_coordinates(postgres_dsn):
-    Base = declarative_base(cls=ModelBase)
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import Base  # noqa: F401
+
+
+def test_mutable_coordinates(postgres_dsn: str) -> None:
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Monument(Base, ContentMixin, CoordinatesMixin):
         __tablename__ = 'monument'
-        id = Column(Integer, primary_key=True)
+        id: Column[int] = Column(Integer, primary_key=True)
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('foo')

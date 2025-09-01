@@ -13,6 +13,7 @@ from onegov.org.models import PaymentMessage
 from onegov.core.elements import Link
 from sedate import align_range_to_day, standardize_date, as_datetime
 from onegov.org.pdf.ticket import TicketsPdf
+from onegov.pay import Invoice
 from onegov.pay import Payment
 from onegov.pay import PaymentCollection
 from onegov.pay import PaymentProviderCollection
@@ -23,6 +24,7 @@ from onegov.pay.models.payment_providers.stripe import StripePayment
 from onegov.pay.models.payment_providers.worldline_saferpay import (
     SaferpayPayment)
 from onegov.ticket import Ticket
+from sqlalchemy.orm import joinedload
 from webob.response import Response
 from webob import exc, Response as WebobResponse
 
@@ -90,15 +92,22 @@ def handle_pdf_response(
     request: OrgRequest
 ) -> WebobResponse:
     # Export a pdf of all invoiced, without pagination limit
-    all_payments = list(self.by_state('invoiced').subset())
+    payment_ids = [
+        payment_id
+        for payment_id, in self.by_state('invoiced').subset().with_entities(
+            Payment.id
+        )
+    ]
 
-    if not all_payments:
+    if not payment_ids:
         request.warning(_('No payments found for PDF generation'))
         return request.redirect(request.class_link(PaymentCollection))
 
-    payment_ids = [p.id for p in all_payments]
     tickets = self.session.query(Ticket).filter(
         Ticket.payment_id.in_(payment_ids)
+    ).options(
+        joinedload(Ticket.payment),
+        joinedload(Ticket.invoice).selectinload(Invoice.items)
     ).all()
 
     if not tickets:
@@ -285,6 +294,11 @@ def run_export(
         r: dict[str, Any] = OrderedDict()
         r['source'] = formatter(payment.source)
         r['source_id'] = formatter(payment.remote_id)
+        r['source_references'] = (
+            tuple(formatter(r) for r in payment.remote_references)
+            if nested
+            else formatter('\n'.join(payment.remote_references))
+        )
         r['state'] = formatter(payment.state)
         r['currency'] = formatter(payment.currency)
         r['gross'] = formatter(payment.amount)

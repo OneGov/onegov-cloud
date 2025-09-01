@@ -11,6 +11,7 @@ from onegov.org.models import Meeting
 from onegov.org.models import MeetingCollection
 from onegov.org.models import MeetingItem
 from onegov.org.models import PoliticalBusiness
+from onegov.org.models.political_business import POLITICAL_BUSINESS_TYPE
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import MeetingCollectionLayout
@@ -62,10 +63,19 @@ def view_meetings(
         )
     ]
 
+    upcoming_meeting = (
+        MeetingCollection(request.session, past=False)
+        .query()
+        .order_by(Meeting.past)
+        .first()
+    )
+
     return {
         'filters': filters,
         'layout': layout or MeetingCollectionLayout(self, request),
         'meetings': self.query().all(),
+        'upcoming_meeting': upcoming_meeting,
+        'past_title': self.past,
         'title': _('Meetings'),
     }
 
@@ -94,6 +104,7 @@ def add_meeting(
         return request.redirect(request.link(meeting))
 
     layout.breadcrumbs.append(Link(_('New'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -129,8 +140,10 @@ def view_meeting(
         item_data = {
             'number': item.number,
             'title': item.title,
+            'business_type': None,
             'political_business_link': None
         }
+
         if item.political_business_link_id:
             business = request.session.query(PoliticalBusiness).filter(
                 PoliticalBusiness.meta['self_id'].astext ==
@@ -138,16 +151,30 @@ def view_meeting(
             ).first()
             if business is not None:
                 item_data['political_business_link'] = request.link(business)
+                item_data['business_type'] = (
+                    POLITICAL_BUSINESS_TYPE)[business.political_business_type]
         else:
             if item.political_business:
                 item_data['political_business_link'] = (
                     request.link(item.political_business))
+                item_data['business_type'] = (
+                    POLITICAL_BUSINESS_TYPE)[item.political_business.political_business_type]
 
         meeting_items_with_links.append(item_data)
 
     meeting_items_with_links.sort(
         key=lambda x: (x['number'] or '', x['title'] or '')
     )
+
+    links: list[tuple[str, str]] = []
+    if self.audio_link.strip():
+        links.append((_('Listen to parliamentary debate'), self.audio_link))
+    default = ('https://live.stadtwil.ch/'
+               if request.app.org.name == 'Stadt Wil' else '')
+    video_link = self.video_link or default
+    if video_link.strip():
+        links.append((_('Watch parliamentary debate'), video_link))
+
     return {
         'layout': layout,
         'page': self,
@@ -159,6 +186,8 @@ def view_meeting(
         'coordinates': None,
         'title': title,
         'meeting_items_with_links': meeting_items_with_links,
+        'show_side_panel': True if links else False,
+        'sidepanel_links': links,
     }
 
 
@@ -168,7 +197,7 @@ def view_meeting(
     template='form.pt',
     permission=Private,
     form=get_meeting_form_class,
-    pass_model=True
+    pass_model=True,
 )
 def edit_meeting(
     self: Meeting,
@@ -186,11 +215,10 @@ def edit_meeting(
         request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
-    elif request.method == 'GET':
-        form.process(obj=self)
-
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
+    layout.include_editor()
     layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'layout': layout,

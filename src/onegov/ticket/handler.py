@@ -135,6 +135,25 @@ class Handler:
         raise NotImplementedError
 
     @property
+    def email_changeable(self) -> bool:
+        """ Returns whether or not the email address behind the ticket request
+        may be changed.
+        """
+        return False
+
+    def change_email(self, email: str) -> None:
+        """ Handles the logic for changing the email.
+
+        Every handler is tied to a different set of objects, which may or
+        may not store the email redundantly. So they all need to be changed
+        in order for data to remain consistent.
+
+        This method is only expected to work for handlers that return ``True``
+        for `email_changeable`.
+        """
+        raise NotImplementedError
+
+    @property
     def submitter_name(self) -> str | None:
         """ Returns the name of the submitter """
         return None
@@ -227,6 +246,19 @@ class Handler:
         """
 
         return False
+
+    @property
+    def reply_to(self) -> str | None:
+        """ An optional email address which will be used as a Reply-To
+        in mails instead of any global setting.
+
+        For example for a certain subset of forms you may want replies
+        to end up with the department in charge of those specific forms
+        instead of a global bucket.
+
+        """
+
+        return None
 
     @classmethod
     def handle_extra_parameters(

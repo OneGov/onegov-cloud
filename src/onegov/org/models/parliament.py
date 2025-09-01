@@ -108,6 +108,10 @@ class RISParliamentarian(Parliamentarian, ORMSearchable):
     }
 
     @property
+    def title(self) -> str:
+        return f'{self.last_name} {self.first_name}'
+
+    @property
     def es_suggestion(self) -> tuple[str, ...]:
         return (
             f'{self.first_name} {self.last_name}',
@@ -126,6 +130,8 @@ class RISParliamentarian(Parliamentarian, ORMSearchable):
     def active(self) -> bool:
         # Wil: every parliamentarian is active if in a parliamentary
         # group (which leads to a role) or in a commission
+        # this will be changed to the parents class implementation
+        # once the inactive parliamentarians have end dates defined
         for role in self.roles:
             if role.end is None or role.end >= utcnow().date():
                 return True

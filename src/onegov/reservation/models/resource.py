@@ -10,7 +10,8 @@ from libres import new_scheduler
 from libres.db.models import Allocation
 from libres.db.models.base import ORMBase
 from onegov.core.orm import ModelBase
-from onegov.core.orm.mixins import content_property, dict_property
+from onegov.core.orm.mixins import (
+    content_property, dict_property, meta_property)
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.file import MultiAssociatedFiles
@@ -164,6 +165,10 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
     #: hint on how to get to the resource
     pick_up: dict_property[str | None] = content_property()
+
+    #: the reply_to address to supersede the global reply_to address for
+    #: tickets created through this form
+    reply_to: dict_property[str | None] = meta_property()
 
     __mapper_args__ = {
         'polymorphic_on': 'type',
@@ -379,18 +384,22 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
         n, unit = self.deadline
 
-        # hours result in a simple offset
-        def deadline_using_h() -> datetime.datetime:
-            return dt - datetime.timedelta(hours=n)
+        match unit:
+            case 'h':
+                # hours result in a simple offset
+                deadline = dt - datetime.timedelta(hours=n)
 
-        # days require that we align the date to the beginning of the date
-        def deadline_using_d() -> datetime.datetime:
-            return (
-                align_date_to_day(dt, self.timezone, 'down')
-                - datetime.timedelta(days=(n - 1))
-            )
+            case 'd':
+                # days require that we align the date
+                # to the beginning of the date
+                deadline = (
+                    align_date_to_day(dt, self.timezone, 'down')
+                    - datetime.timedelta(days=(n - 1))
+                )
 
-        deadline = locals()[f'deadline_using_{unit}']()
+            case _:  # pragma: unreachable
+                raise AssertionError('unreachable')
+
         return deadline <= utcnow()
 
     def is_zip_blocked(self, date: datetime.date) -> bool:

@@ -1,16 +1,22 @@
-import textwrap
-from tempfile import NamedTemporaryFile
+from __future__ import annotations
 
 import pytest
+import textwrap
 
 from onegov.core.utils import Bunch
 from onegov.directory import DirectoryCollection, DirectoryConfiguration
 from onegov.directory.migration import StructuralChanges
 from onegov.form.errors import DuplicateLabelError
+from tempfile import NamedTemporaryFile
 from tests.shared.utils import create_image
 
 
-def test_detect_added_fields():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_detect_added_fields() -> None:
     changes = StructuralChanges(
         """
             First Name = ___
@@ -28,7 +34,7 @@ def test_detect_added_fields():
     assert not changes.removed_fieldsets
 
 
-def test_detect_removed_fields():
+def test_detect_removed_fields() -> None:
     changes = StructuralChanges(
         """
             First Name = ___
@@ -46,7 +52,7 @@ def test_detect_removed_fields():
     assert not changes.removed_fieldsets
 
 
-def test_duplicate_label_error():
+def test_duplicate_label_error() -> None:
 
     with pytest.raises(DuplicateLabelError):
         StructuralChanges(
@@ -55,7 +61,7 @@ def test_duplicate_label_error():
         )
 
 
-def test_detect_renamed_fields():
+def test_detect_renamed_fields() -> None:
     changes = StructuralChanges(
         """
             # F
@@ -117,7 +123,7 @@ def test_detect_renamed_fields():
     assert changes.added_fields == ['Comment']
 
 
-def test_detect_renamed_fields_changing_fieldsets():
+def test_detect_renamed_fields_changing_fieldsets() -> None:
     changes = StructuralChanges(
         """
             # General
@@ -175,7 +181,7 @@ def test_detect_renamed_fields_changing_fieldsets():
     assert changes.removed_fields == ['General/Other']
 
 
-def test_detect_changed_fields():
+def test_detect_changed_fields() -> None:
     changes = StructuralChanges(
         """
             Name = ___
@@ -211,7 +217,7 @@ def test_detect_changed_fields():
     assert changes.changed_fields == ['Name']
 
 
-def test_add_fieldset_at_top():
+def test_add_fieldset_at_top() -> None:
     old = textwrap.dedent("""
     A *= ___
     # Unchanged
@@ -226,7 +232,7 @@ def test_add_fieldset_at_top():
     assert not changes.removed_fields
 
 
-def test_add_fieldset_at_bottom():
+def test_add_fieldset_at_bottom() -> None:
     old = textwrap.dedent("""
     A *= ___
     B *= ___
@@ -253,7 +259,7 @@ def test_add_fieldset_at_bottom():
     assert not changes.removed_fields
 
 
-def test_remove_fieldset_in_between():
+def test_remove_fieldset_in_between() -> None:
 
     old = """
         # Main
@@ -303,7 +309,7 @@ def test_remove_fieldset_in_between():
     assert not changes.changed_fields
 
 
-def test_directory_migration(session):
+def test_directory_migration(session: Session) -> None:
     """
     Testcases:
     - nested radio fields

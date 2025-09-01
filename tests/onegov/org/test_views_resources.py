@@ -1224,6 +1224,51 @@ def test_reserve_allocation_partially(client):
 
 
 @freeze_time("2015-08-28", tick=True)
+def test_reserve_allocation_change_email(client):
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve('10:00', '12:00').json == {'success': True}
+
+    # fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+
+    ticket = formular.form.submit().follow().form.submit().follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # open the created ticket
+    client.login_admin()
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert ticket.pyquery('.ticket-submitter-email a').text() == (
+        'info@example.org')
+
+    # change the email
+    client.post(
+        ticket.pyquery('.ticket-submitter-email').attr('data-edit'),
+        {'email': 'new@example.org'}
+    )
+    ticket = client.get(ticket.request.url)
+    assert 'E-Mail Adresse des Antragstellers geändert' in ticket
+    assert ticket.pyquery('.ticket-submitter-email a').text() == (
+        'new@example.org')
+
+
+@freeze_time("2015-08-28", tick=True)
 def test_reserve_allocation_adjustment_pre_acceptance(client):
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
@@ -1404,6 +1449,87 @@ def test_reserve_allocation_adjustment_invoice_change(client):
     assert "11:00" in ticket
     assert "12:00" in ticket
     assert "10.00" in ticket
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_reserve_allocation_add_reservation_invoice_change(client):
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('konferenzraum')
+    resource.pricing_method = 'per_hour'
+    resource.price_per_hour = 10.00
+    resource.payment_method = 'manual'
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=[
+            (datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 12)),
+            (datetime(2015, 8, 28, 12), datetime(2015, 8, 28, 14)),
+            (datetime(2015, 8, 28, 14), datetime(2015, 8, 28, 16)),
+        ],
+        whole_day=False,
+        partly_available=False
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve('10:00', '12:00').json == {'success': True}
+
+    # fill out the form
+    formular = client.get('/resource/konferenzraum/form')
+    formular.form['email'] = 'info@example.org'
+
+    ticket = formular.form.submit().follow().form.submit().follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # open the created ticket
+    client.login_admin()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert "info@example.org" in ticket
+    assert "10:00" in ticket
+    assert "12:00" in ticket
+    assert "20.00" in ticket
+
+    # accept it
+    ticket = ticket.click('Alle Reservationen annehmen').follow()
+
+    # try to add a second reservation (invalid time range)
+    add = ticket.click('Reservation hinzufügen', index=0)
+    add.form['date'] = '2015-08-28'
+    add.form['whole_day'] = 'yes'
+    assert 'kann nicht teilweise reserviert werden' in add.form.submit()
+
+    # actually add a second reservation
+    add = ticket.click('Reservation hinzufügen', index=0)
+    add.form['date'] = '2015-08-28'
+    add.form['whole_day'] = 'no'
+    add.form['start_time'] = '12:00'
+    add.form['end_time'] = '14:00'
+    ticket = add.form.submit().follow()
+    assert "10:00" in ticket
+    assert "12:00" in ticket
+    assert "14:00" in ticket
+    assert "40.00" in ticket
+    # the new reservation should already have been accepted
+    assert 'Alle Reservationen annehmen' not in ticket
+
+    # mark as paid
+    assert ticket.pyquery('.payment-state').text() == "Offen"
+    client.post(ticket.pyquery('.mark-as-paid').attr('ic-post-to'))
+    ticket = client.get(ticket.request.url)
+
+    # try to add a third reservation
+    add = ticket.click('Reservation hinzufügen', index=0)
+    add.form['date'] = '2015-08-28'
+    add.form['whole_day'] = 'no'
+    add.form['start_time'] = '14:00'
+    add.form['end_time'] = '16:00'
+    assert 'die Zahlung ist nicht mehr offen' in add.form.submit()
 
 
 @freeze_time("2015-08-28", tick=True)
@@ -2825,6 +2951,12 @@ def test_manual_reservation_payment_with_per_item_extra(client):
     edit_page.form['donation'] = 'Yes'
     assert 'die Zahlung ist nicht mehr offen' in edit_page.form.submit()
 
+    # try to add a new reservation (it should not work)
+    add_page = page.click('Reservation hinzufügen')
+    add_page.form['date'] = '2017-07-09'
+    add_page.form['quota_other'] = '2'
+    assert 'die Zahlung ist nicht mehr offen' in add_page.form.submit()
+
     # mark it as unpaid again
     client.post(page.pyquery('.mark-as-unpaid').attr('ic-post-to'))
     page = client.get(page.request.url)
@@ -2836,12 +2968,19 @@ def test_manual_reservation_payment_with_per_item_extra(client):
     assert '40.00' in page
     assert page.pyquery('.payment-state').text() == "Offen"
 
+    # add a new reservation
+    add_page = page.click('Reservation hinzufügen')
+    add_page.form['date'] = '2017-07-09'
+    add_page.form['quota_other'] = '2'
+    page = add_page.form.submit().follow()
+    assert '90.00' in page
+
     invoice = page.click('Rechnung anzeigen')
     assert '15.00' in invoice
     assert '10.00' in invoice
     assert '-10.00' in invoice
     assert '2.00' in invoice
-    assert '40.00' in invoice
+    assert '90.00' in invoice
 
     # delete the manual invoice item
     client.delete(
@@ -2851,17 +2990,25 @@ def test_manual_reservation_payment_with_per_item_extra(client):
     assert '15.00' in invoice
     assert '10.00' in invoice
     assert '2.00' in invoice
-    assert '50.00' in invoice
+    assert '100.00' in invoice
 
     page = client.get(page.request.url)
-    assert '50.00' in page
+    assert '100.00' in page
 
     payments = client.get('/payments')
     assert "RSV-" in payments
     assert "Manuell" in payments
     assert "info@example.org" in payments
-    assert "50.00" in payments
+    assert "100.00" in payments
     assert "Offen" in payments
+
+    # adding another new reservation should fail
+    # since we used up all of the quota
+    add_page = page.click('Reservation hinzufügen')
+    add_page.form['date'] = '2017-07-09'
+    add_page.form['quota_other'] = '1'
+    assert ('Der gewünschte Zeitraum ist nicht mehr verfügbar'
+        ) in add_page.form.submit()
 
 
 @freeze_time("2017-07-09", tick=True)

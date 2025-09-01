@@ -361,3 +361,7 @@ if (
     sidePanel.append(list);
     sidePanel.show();
 }
+
+$('.is-accordion-submenu-parent a span').on('click', function(e) {
+    e.stopPropagation();
+});

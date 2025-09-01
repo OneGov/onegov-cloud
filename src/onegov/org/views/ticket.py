@@ -5,6 +5,7 @@ import os
 import zipfile
 
 from datetime import date
+from email_validator import validate_email, EmailNotValidError
 from io import BytesIO
 from markupsafe import Markup
 from morepath import Response
@@ -40,6 +41,7 @@ from onegov.org.models import (
     ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter, ReservationHandler
+from onegov.org.models.ticket import apply_ticket_permissions
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.utils import get_current_tickets_url, group_invoice_items
 from onegov.org.views.message import view_messages_feed
@@ -52,7 +54,7 @@ from onegov.ticket.errors import InvalidStateChange
 from onegov.gever.gever_client import GeverClientCAS
 from onegov.user import User, UserCollection
 from operator import itemgetter
-from sqlalchemy import select
+from sqlalchemy import func, select
 from webob import exc
 from urllib.parse import urlsplit
 
@@ -63,7 +65,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Mapping
     from email.headerregistry import Address
     from onegov.core.request import CoreRequest
-    from onegov.core.types import EmailJsonDict, RenderData, SequenceOrScalar
+    from onegov.core.types import (
+        EmailJsonDict, JSON_ro, RenderData, SequenceOrScalar)
     from onegov.form.fields import UploadFileWithORMSupport
     from onegov.org.layout import Layout
     from onegov.org.request import OrgRequest
@@ -135,7 +138,12 @@ def view_ticket(
     layout = layout or TicketLayout(self, request)
     payment_button = None
     payment = handler.payment
+    edit_email_url = None
     edit_amount_url = None
+
+    if is_manager and self.handler.email_changeable:
+        edit_email_url = request.csrf_protected_url(
+            request.link(self, 'change-email'))
 
     if is_manager and payment and payment.source == 'manual':
         payment_button = manual_payment_button(payment, layout)
@@ -166,6 +174,7 @@ def view_ticket(
         'feed_data': json.dumps(
             view_messages_feed(messages, request)
         ),
+        'edit_email_url': edit_email_url,
         'edit_amount_url': edit_amount_url,
         'show_tags': show_tags(request),
         'show_filters': show_filters(request),
@@ -800,6 +809,44 @@ def assign_ticket(
     }
 
 
+@OrgApp.json(
+    model=Ticket,
+    name='change-email',
+    request_method='POST',
+    permission=Private
+)
+def change_email(self: Ticket, request: OrgRequest) -> JSON_ro:
+    request.assert_valid_csrf_token()
+
+    if not self.handler.email_changeable:
+        raise exc.HTTPForbidden()
+
+    email = request.POST.get('email')
+    if not isinstance(email, str):
+        return {'email': self.ticket_email}
+
+    try:
+        validate_email(
+            email,
+            # NOTE: The Email validator from WTForms doesn't check this either
+            #       although maybe we should check this in the future.
+            check_deliverability=False
+        )
+    except EmailNotValidError:
+        return {'email': self.ticket_email}
+
+    if self.ticket_email != email:
+        TicketMessage.create(
+            self,
+            request,
+            'change-email',
+            old_email=self.ticket_email,
+            new_email=email,
+        )
+        self.handler.change_email(email)
+    return {'email': email}
+
+
 @OrgApp.form(model=Ticket, name='change-tag', permission=Private,
              form=TicketChangeTagForm, template='form.pt')
 def change_tag(
@@ -1340,21 +1387,21 @@ def get_filters(
         active=self.state == 'unfinished',
         attrs={'class': 'ticket-filter-my'}
     )
-    for id, text in TICKET_STATES.items():
-        if id != 'archived':
+    for state, text in TICKET_STATES.items():
+        if state != 'archived':
+            coll = self.for_state(state)
+            if self.state == 'unfinished':
+                # FIXME: This is another case where we pass invalid
+                #        state just so the generated URL is shorter
+                #        we should make morepath aware of defaults
+                #        so it can ellide parameters that have been
+                #        set to their default value automatically
+                coll = coll.for_owner(None)  # type: ignore[arg-type]
             yield Link(
                 text=text,
-                url=request.link(
-                    self.for_state(id)
-                    # FIXME: This is another case where we pass invalid
-                    #        state just so the generated URL is shorter
-                    #        we should make morepath aware of defaults
-                    #        so it can ellide parameters that have been
-                    #        set to their default value automatically
-                    .for_owner(None)  # type:ignore[arg-type]
-                ),
-                active=self.state == id,
-                attrs={'class': 'ticket-filter-' + id}
+                url=request.link(coll),
+                active=self.state == state,
+                attrs={'class': 'ticket-filter-' + state}
             )
 
 
@@ -1444,22 +1491,57 @@ def get_owners(
         )
 
 
-def groups_by_handler_code(session: Session) -> dict[str, list[str]]:
-    query = as_selectable("""
-            SELECT
-                handler_code,                         -- Text
-                ARRAY_AGG(DISTINCT "group") AS groups -- ARRAY(Text)
-            FROM tickets GROUP BY handler_code
-        """)
+def get_submitters(
+    self: TicketCollection | ArchivedTicketCollection,
+    request: OrgRequest
+) -> Iterator[Link]:
 
-    groups = {
-        r.handler_code: r.groups
-        for r in session.execute(select(query.c))
+    all_submitters = self.for_submitter('*')
+    if hasattr(self, 'request'):
+        # ensure ticket permission filters are set
+        all_submitters.request = self.request  # type: ignore[union-attr]
+    query = (
+        all_submitters.subset()
+        .with_entities(Ticket.ticket_email.distinct())
+        .order_by(None)
+        .order_by(Ticket.ticket_email)
+    )
+
+    yield Link(
+        text=_('All Submitters'),
+        url=request.link(all_submitters),
+        active=self.submitter == '*'
+    )
+
+    for email, in query:
+        if email is None:
+            # NOTE: Shouldn't happen but let's guard against it just in case
+            continue
+        yield Link(
+            text=email,
+            url=request.link(self.for_submitter(email)),
+            active=self.submitter == email
+        )
+
+
+def groups_by_handler_code(
+    self: TicketCollection | ArchivedTicketCollection
+) -> dict[str, list[str]]:
+    query = self.session.query(
+        Ticket.handler_code,
+        func.array_agg(Ticket.group.distinct())
+    ).group_by(Ticket.handler_code)
+
+    # HACK: only apply the ticket permissions filter if there is request
+    #       attribute on the collection. This is a bit fragile, ideally
+    #       we turn this back into a method on `TicketCollection`.
+    if hasattr(self, 'request'):
+        query = apply_ticket_permissions(query, 'ALL', self.request)
+
+    return {
+        handler_code: sorted(groups, key=normalize_for_url)
+        for handler_code, groups in query
     }
-    for handler in groups:
-        groups[handler].sort(key=lambda g: normalize_for_url(g))
-
-    return groups
 
 
 @OrgApp.html(
@@ -1479,16 +1561,19 @@ def view_tickets(
         'group': self.group,
         'state': self.state,
         'owner': self.owner,
+        'submitter': self.submitter,
         'page': self.page,
         'extra_parameters': self.extra_parameters,
     }
 
-    groups = groups_by_handler_code(request.session)
+    groups = groups_by_handler_code(self)
     handlers = tuple(get_handlers(self, request, groups))
     owners = tuple(get_owners(self, request))
+    submitters = tuple(get_submitters(self, request))
     filters = tuple(get_filters(self, request))
     handler = next((h for h in handlers if h.active), None)
     owner = next((o for o in owners if o.active), None)
+    submitter = next((s for s in submitters if s.active), None)
     layout = layout or TicketsLayout(self, request)
 
     def archive_link(ticket: Ticket) -> str:
@@ -1501,12 +1586,27 @@ def view_tickets(
         'filters': filters,
         'handlers': handlers,
         'owners': owners,
+        'submitters': submitters,
         'tickets_state': self.state,
         'archive_tickets': self.state == 'closed',
         'has_handler_filter': self.handler != 'ALL',
         'has_owner_filter': self.owner != '*',
-        'handler': handler,
+        'has_submitter_filter': self.submitter != '*',
+        'handler': handler.text if handler else self.group or (
+            request.translate(ticket_handlers.registry[self.handler].handler_title)  # type: ignore[attr-defined]
+            if self.handler in ticket_handlers.registry
+            else self.handler
+        ),
+        'handler_class': ' '.join(handler.attrs['class']) if handler else (
+            f'{self.handler}-link'
+            if self.group is None
+            else f'{self.handler}-sub-link ticket-group-filter'
+        ),
         'owner': owner,
+        # NOTE: Not all submitters will be valid for every filter so
+        #       if it's not valid we fallback to whatever we were given
+        #       there should be zero results, but that's fine
+        'submitter': submitter.text if submitter else self.submitter,
         'action_link': archive_link
     }
 
@@ -1522,11 +1622,13 @@ def view_archived_tickets(
     layout: ArchivedTicketsLayout | None = None
 ) -> RenderData:
 
-    groups = groups_by_handler_code(request.session)
+    groups = groups_by_handler_code(self)
     handlers = tuple(get_handlers(self, request, groups))
     owners = tuple(get_owners(self, request))
+    submitters = tuple(get_submitters(self, request))
     handler = next((h for h in handlers if h.active), None)
     owner = next((o for o in owners if o.active), None)
+    submitter = next((s for s in submitters if s.active), None)
     layout = layout or ArchivedTicketsLayout(self, request)
 
     def action_link(ticket: Ticket) -> str:
@@ -1539,12 +1641,27 @@ def view_archived_tickets(
         'filters': [],
         'handlers': handlers,
         'owners': owners,
+        'submitters': submitters,
         'tickets_state': self.state,
         'archive_tickets': False,
         'has_handler_filter': self.handler != 'ALL',
         'has_owner_filter': self.owner != '*',
-        'handler': handler,
+        'has_submitter_filter': self.submitter != '*',
+        'handler': handler.text if handler else self.group or (
+            request.translate(ticket_handlers.registry[self.handler].handler_title)  # type: ignore[attr-defined]
+            if self.handler in ticket_handlers.registry
+            else self.handler
+        ),
+        'handler_class': ' '.join(handler.attrs['class']) if handler else (
+            f'{self.handler}-link'
+            if self.group is None
+            else f'{self.handler}-sub-link ticket-group-filter'
+        ),
         'owner': owner,
+        # NOTE: Not all submitters will be valid for every filter so
+        #       if it's not valid we fallback to whatever we were given
+        #       there should be zero results, but that's fine
+        'submitter': submitter.text if submitter else self.submitter,
         'action_link': action_link
     }
 

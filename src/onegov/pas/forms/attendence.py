@@ -146,8 +146,8 @@ class AttendenceAddForm(AttendenceForm):
         super().on_request()
         self.parliamentarian_id.choices = [
             (str(parliamentarian.id), parliamentarian.title)
-            for parliamentarian
-            in PASParliamentarianCollection(self.request.session, True).query()
+            for parliamentarian in PASParliamentarianCollection(
+                self.request.session, [True]).query()
         ]
 
 
@@ -178,7 +178,8 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
         self.parliamentarian_id.choices = [
             (str(parliamentarian.id), parliamentarian.title)
             for parliamentarian
-            in PASParliamentarianCollection(self.request.session, True).query()
+            in PASParliamentarianCollection(
+                self.request.session, [True]).query()
         ]
         self.parliamentarian_id.data = [
             choice[0] for choice in self.parliamentarian_id.choices

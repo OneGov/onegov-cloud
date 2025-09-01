@@ -92,13 +92,15 @@ from onegov.org.models import (
     PoliticalBusiness,
     PoliticalBusinessCollection,
 )
-from onegov.org.models.political_business import PoliticalBusinessStatus
-from onegov.org.models.political_business import PoliticalBusinessType
-from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
+from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
+from onegov.org.models.political_business import PoliticalBusinessStatus
+from onegov.org.models.political_business import PoliticalBusinessType
 from onegov.org.models.resource import FindYourSpotCollection
+from onegov.org.models.ticket import FilteredArchivedTicketCollection
+from onegov.org.models.ticket import FilteredTicketCollection
 from onegov.page import PageCollection
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection
@@ -451,26 +453,29 @@ def get_ticket(app: OrgApp, handler_code: str, id: UUID) -> Ticket | None:
     )}
 )
 def get_tickets(
-    app: OrgApp,
+    request: OrgRequest,
     handler: str = 'ALL',
     state: ExtendedTicketState | None = 'open',
     page: int = 0,
     group: str | None = None,
     owner: str | None = None,
+    submitter: str | None = None,
     extra_parameters: dict[str, str] | None = None
 ) -> TicketCollection | None:
 
     if state is None:
         return None
 
-    return TicketCollection(
-        app.session(),
+    return FilteredTicketCollection(
+        request.session,
         handler=handler,
         state=state,
         page=page,
         group=group,
         owner=owner or '*',
+        submitter=submitter or '*',
         extra_parameters=extra_parameters,
+        request=request,
     )
 
 
@@ -480,21 +485,24 @@ def get_tickets(
     converters={'page': int}
 )
 def get_archived_tickets(
-    app: OrgApp,
+    request: OrgRequest,
     handler: str = 'ALL',
     page: int = 0,
     group: str | None = None,
     owner: str | None = None,
+    submitter: str | None = None,
     extra_parameters: dict[str, str] | None = None
 ) -> ArchivedTicketCollection:
-    return ArchivedTicketCollection(
-        app.session(),
+    return FilteredArchivedTicketCollection(
+        request.session,
         handler=handler,
         state='archived',
         page=page,
         group=group,
         owner=owner or '*',
-        extra_parameters=extra_parameters
+        submitter=submitter or '*',
+        extra_parameters=extra_parameters,
+        request=request,
     )
 
 
@@ -1195,13 +1203,21 @@ def get_sent_notification_collection(
 @OrgApp.path(
     model=RISParliamentarianCollection,
     path='/parliamentarians',
-    converters={'active': bool}
+    converters={
+        'active': [bool],
+        'party': [str]
+    }
 )
 def get_parliamentarians(
     app: OrgApp,
-    active: bool = True
+    active: list[bool] | None = None,
+    party: list[str] | None = None
 ) -> RISParliamentarianCollection:
-    return RISParliamentarianCollection(app.session(), active)
+    return RISParliamentarianCollection(
+        app.session(),
+        active=active or [True],
+        party=party
+    )
 
 
 @OrgApp.path(
