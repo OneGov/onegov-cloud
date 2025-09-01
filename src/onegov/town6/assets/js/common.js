@@ -323,6 +323,45 @@ $('a[data-back-link]').on('click', function(e) {
     if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;
 });
 
+
+// if there are headings in the content and if there is a .sidebar-wrapper, add a div with the class "side-panel" to the sidebar and add the headings to it
+if (
+    $('.main-content').find('h1, h2, h3, h4, h5, h6').length
+    || $('.page-content-main').find('h1, h2, h3, h4, h5, h6').length
+    && $('.sidebar-wrapper').length
+) {
+    var sidePanel = $('.side-panel.content-panel');
+    var list = $('<ul class="more-list"></ul>');
+    var mainContent = $('.main-content').length ? $('.main-content') : $('.page-content-main');
+    mainContent.find('h1, h2, h3, h4, h5, h6').each(function() {
+        var heading = this;
+        if (heading.textContent === '') {
+            return; // skip empty headings
+        }
+        var id = this.textContent
+        id = id.trim().toLowerCase()
+        // replace ä, ö, ü with ae, oe, ue
+        id = id.replace(/ä/g, 'ae');
+        id = id.replace(/ö/g, 'oe');
+        id = id.replace(/ü/g, 'ue');
+        id = id.replace(/[^a-z0-9]+/g, '-');
+        console.log('Generated ID:', id);
+
+        if (id) {
+            var link = $('<a class="anchor-link" href="#' + id + '"><i class="fa fa-link"></i></a>');
+            $(heading).append(link);
+            var anchor = $('<a class="category-anchor"></a>');
+            anchor.attr('id', id);
+            $(heading).prepend(anchor);
+            var level = parseInt(heading.tagName.charAt(1), 10);
+            var link = $('<li><a class="list-link level-' + level + '" href="#' + id + '">' + heading.textContent + '</a></li>');
+            list.append(link);
+        }
+    });
+    sidePanel.append(list);
+    sidePanel.show();
+}
+
 $('.is-accordion-submenu-parent a span').on('click', function(e) {
     e.stopPropagation();
 });

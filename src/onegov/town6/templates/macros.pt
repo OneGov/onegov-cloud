@@ -833,7 +833,10 @@
                     </li>
                 </ul>
             </div>
-
+            <div class="side-panel content-panel" style="display: none;">
+                <h3 i18n:translate>Content</h3>
+                <ul class="more-list"></ul>
+            </div>
             <tal:b metal:define-slot="after-panels"><div id="after-panels"></div></tal:b>
 
         </div>

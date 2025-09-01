@@ -1486,9 +1486,39 @@ p.full-text-width {
 /* RIS */
 
 .business-participants {
-    margin-bottom: 0rem;
+    margin-bottom: 0;
+}
+
+.anchor-link {
+    display: none !important;
+}
+
+.main-content .anchor-link {
+    color: $aluminum;
+    display: inline !important;
+    opacity: 0;
+    padding-left: .5rem;
+    position: absolute;
+    font-size: 80%;
+    transition: opacity 200ms linear;
+
+    &:hover {
+        opacity: 1;
+    }
 }
 
 .absolute {
     position: absolute;
+}
+
+a.category-anchor {
+    display: block;
+    position: relative;
+    top: -115px;
+    visibility: hidden;
+}
+
+.content-panel .level-3 {
+    font-weight: normal !important;
+    padding-left: .5rem;
 }
