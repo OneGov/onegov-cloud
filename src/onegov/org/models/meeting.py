@@ -10,6 +10,7 @@ from sedate import utcnow
 from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import dict_property, content_property
 from onegov.core.orm.types import UUID, MarkupText, UTCDateTime
 from onegov.file import MultiAssociatedFiles
 from onegov.org import _
@@ -113,6 +114,12 @@ class Meeting(
         back_populates='meeting',
         order_by='desc(MeetingItem.number)'
     )
+
+    #: link to audio url
+    audio_link: dict_property[str] = content_property(default='')
+
+    #: link to video url
+    video_link: dict_property[str] = content_property(default='')
 
     @hybrid_property
     def past(self):
