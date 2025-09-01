@@ -7,11 +7,11 @@ import morepath
 import os
 import zipfile
 
-from markupsafe import escape
 from webob.exc import HTTPNotFound
 from webob.response import Response
 
 from onegov.core.elements import Link
+from onegov.core.html import sanitize_html
 from onegov.core.security.permissions import Public, Private
 from onegov.org.forms import MeetingForm
 from onegov.org.forms.meeting import MeetingExportPoliticalBusinessForm
@@ -357,7 +357,7 @@ def view_meeting_export(
                          'documents you want to export. The resulting zipfile '
                          'contains the documents per meeting item.'),
         'has_note': True if meeting_items_no_docs else False,
-        'note_html': escape(note_html),
+        'note_html': sanitize_html(note_html),
         'filters': None,
         'count': file_count,
     }
