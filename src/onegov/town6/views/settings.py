@@ -17,7 +17,7 @@ from onegov.org.forms.settings import (
     DataRetentionPolicyForm, FirebaseSettingsForm, VATSettingsForm,
     KabaSettingsForm, CitizenLoginSettingsForm)
 from onegov.org.models import Organisation
-from onegov.town6.forms.settings import RISEnableForm
+from onegov.town6.forms.settings import RISSettingsForm
 from onegov.org.views.settings import (
     handle_homepage_settings, handle_people_settings, view_settings,
     handle_ticket_settings, preview_holiday_settings, handle_general_settings,
@@ -514,13 +514,13 @@ def town_handle_people_settings(
 
 @TownApp.form(
     model=Organisation, name='ris-enable', template='form.pt',
-    permission=Secret, form=RISEnableForm, setting=_('Ratsinformationssystem'),
-    icon='fa-landmark', order=500
+    permission=Secret, form=RISSettingsForm,
+    setting=_('Ratsinformationssystem'), icon='fa-landmark', order=500
 )
 def town_handle_ris_enable(
     self: Organisation,
     request: TownRequest,
-    form: RISEnableForm
+    form: RISSettingsForm
 ) -> RenderData | Response:
     return handle_generic_settings(
         self, request, form, _('Ratsinformationssystem (RIS)'),
