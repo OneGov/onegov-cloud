@@ -12,7 +12,6 @@ from webob.response import Response
 
 from onegov.core.elements import Link
 from onegov.core.security.permissions import Public, Private
-from onegov.file import FileCollection
 from onegov.org.forms import MeetingForm
 from onegov.org.forms.meeting import MeetingExportPoliticalBusinessForm
 
@@ -270,6 +269,64 @@ def view_meeting_export(
     form: MeetingExportPoliticalBusinessForm
 ) -> RenderData | Response:
 
+    def build_zip_response() -> Response:
+        meeting_doc_ids = form.get_selected_meeting_documents_ids()
+        business_doc_ids = form.get_selected_business_document_ids()
+
+        base_storage_path = request.app.depot_storage_path
+        assert (base_storage_path is not None), (
+            'Depot storage path is not configured')
+
+        with (NamedTemporaryFile(delete=False) as f):
+            zip_path = f.name
+
+            with zipfile.ZipFile(
+                    zip_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                # meeting documents
+                for file in self.files:
+                    if file.id in meeting_doc_ids:
+                        path = (
+                            Path(base_storage_path)
+                            / file.reference.path / 'file')
+                        with open(path, 'rb') as file_content:
+                            zip_file.writestr(
+                                os.path.join(self.display_name, file.name),
+                                file_content.read())
+
+                # business documents
+                for meeting_item in self.meeting_items:
+                    business = meeting_item.political_business
+                    if business:
+                        for file in business.files:
+                            if file.id in business_doc_ids:
+                                path = (
+                                    Path(base_storage_path)
+                                    / file.reference.path / 'file')
+                                with open(path, 'rb') as file_content:
+                                    zip_file.writestr(
+                                        os.path.join(
+                                            business.title, file.name),
+                                        file_content.read())
+
+                        if not business.files:
+                            filename = _('no-files.txt')
+                            zip_file.writestr(
+                                os.path.join(business.title, filename), '')
+
+                    else:
+                        # no political business linked to meeting item
+                        filename = _('no-files.txt')
+                        zip_file.writestr(
+                            os.path.join(meeting_item.title, filename), '')
+
+            with open(zip_path, 'rb') as zip_file:
+                response = Response()
+                response.body = zip_file.read()
+                response.content_type = 'application/zip'
+                response.content_disposition = (
+                    f'attachment; filename="{self.display_name}.zip"')
+                return response
+
     # layout = MeetingCollectionLayout(self, request)
     layout = MeetingLayout(self, request)
     layout.breadcrumbs.append(Link(_('Export'), '#'))
@@ -279,56 +336,19 @@ def view_meeting_export(
     file_count += len(self.files)
     for meeting_item in self.meeting_items:
         if meeting_item.political_business:
-            file_count +=len(meeting_item.political_business.files)
+            file_count += len(meeting_item.political_business.files)
 
     if form.submitted(request):
-        meeting_doc_ids = form.get_selected_meeting_documents_ids()
-        business_doc_ids = form.get_selected_business_document_ids()
-
-        with NamedTemporaryFile(delete=False) as f:
-            zip_path = f.name
-
-            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-                # meeting documents
-                for file in self.files:
-                    if file.id in meeting_doc_ids:
-                        path = Path(request.app.depot_storage_path) / file.reference.path / 'file'
-                        with open(path, 'rb') as file_content:
-                            zip_file.writestr(os.path.join(self.display_name, file.name), file_content.read())
-
-                # business documents
-                for meeting_item in self.meeting_items:
-                    business = meeting_item.political_business
-                    if business:
-                        for file in business.files:
-                            if file.id in business_doc_ids:
-                                path = Path(request.app.depot_storage_path) / file.reference.path / 'file'
-                                with open(path, 'rb') as file_content:
-                                    zip_file.writestr(os.path.join(business.title, file.name), file_content.read())
-
-                        if not business.files:
-                            filename = _('no-files.txt')
-                            zip_file.writestr(os.path.join(business.title, filename), '')
-
-                    else:
-                        # no political business linked to meeting item
-                        filename = _('no-files.txt')
-                        zip_file.writestr(os.path.join(meeting_item.title, filename), '')
-
-            with open(zip_path, 'rb') as zip_file:
-                response = Response()
-                response.body = zip_file.read()
-                response.content_type = 'application/zip'
-                response.content_disposition = f'attachment; filename="{self.display_name}.zip"'
-                return response
+        return build_zip_response()
 
     return {
         'layout': layout,
         'form': form,
         'title': _('Export meeting documents'),
-        'explanation': _('Below you can select the meeting documents and political '
-                         'business documents you want to export. The resulting '
-                         'zipfile contains the documents per political business.'),
+        'explanation': _('Below you can select the meeting documents and '
+                         'political business documents you want to export. '
+                         'The resulting zipfile contains the documents per '
+                         'political business.'),
         'filters': None,
         'count': file_count,
     }

@@ -66,7 +66,7 @@ class Meeting(
         return f'{self.title} ({self.start_datetime})'
 
     @property
-    def display_name(self):
+    def display_name(self) -> str:
         # return title and start_datetime as dmY
         return f'{self.title} {self.start_datetime:%d.%m.%Y}'
 

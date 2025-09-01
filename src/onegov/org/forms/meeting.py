@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 
 from wtforms.validators import Optional, InputRequired
-from wtforms import StringField, SelectMultipleField
+from wtforms import StringField
 
 from onegov.form import Form
 from onegov.form.fields import TimezoneDateTimeField, MultiCheckboxField
@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Collection
     from collections.abc import Sequence
+    from wtforms.fields.choices import _Choice
 
     from onegov.org.models import Meeting
     from onegov.org.models import MeetingItem
@@ -234,7 +235,7 @@ class MeetingExportPoliticalBusinessForm(Form):
         choices=[],
     )
 
-    def process_obj(self, obj: Meeting) -> None:
+    def process_obj(self, obj: Meeting) -> None:  # type:ignore[override]
         super().process_obj(obj)
 
         self.meeting_documents.choices = [
@@ -244,33 +245,21 @@ class MeetingExportPoliticalBusinessForm(Form):
         self.meeting_documents.data = [doc.id for doc in obj.files]
         self.meeting_documents.description = obj.display_name
 
-        document_structure = {}
-        for index, meeting_item in enumerate(obj.meeting_items, start=1):
+        choices: list[_Choice] = []
+        for meeting_item in obj.meeting_items:
             business = meeting_item.political_business
             if not business:
                 continue
 
-            document_structure[index] = {
-                'name': business.title,
-                'documents': [
-                    {'id': doc.id, 'name': doc.name}
-                    for doc in business.files
-                ]
-            }
-
-        choices = []
-        for value in document_structure.values():
-            business_name = value['name']
-            for doc in value['documents']:
-                choices.append((str(doc['id']), f"{business_name} - {doc['name']}"))
+            choices.extend([
+                (str(doc.id), f'{business.title} - {doc.name}')
+                for doc in business.files
+            ])
         self.business_documents.choices = choices
-        self.business_documents.data = [doc_id for doc_id, _ in choices]
+        self.business_documents.data = [c[0] for c in choices]
 
     def get_selected_meeting_documents_ids(self) -> list[str]:
-        return self.meeting_documents.data
+        return [str(i) for i in self.meeting_documents.data or []]
 
     def get_selected_business_document_ids(self) -> list[str]:
-        return self.business_documents.data
-
-
-
+        return [str(i) for i in self.business_documents.data or []]
