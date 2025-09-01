@@ -175,6 +175,15 @@ def view_meeting(
         key=lambda x: (x['number'] or '', x['title'] or '')
     )
 
+    links: list[tuple[str, str]] = []
+    if self.audio_link.strip():
+        links.append((_('Listen to parliamentary debate'), self.audio_link))
+    default = ('https://live.stadtwil.ch/'
+               if request.app.org.name == 'Stadt Wil' else '')
+    video_link = self.video_link or default
+    if video_link.strip():
+        links.append((_('Watch parliamentary debate'), video_link))
+
     return {
         'layout': layout,
         'page': self,
@@ -186,6 +195,8 @@ def view_meeting(
         'coordinates': None,
         'title': title,
         'meeting_items_with_links': meeting_items_with_links,
+        'show_side_panel': True if links else False,
+        'sidepanel_links': links,
     }
 
 
@@ -195,7 +206,7 @@ def view_meeting(
     template='form.pt',
     permission=Private,
     form=get_meeting_form_class,
-    pass_model=True
+    pass_model=True,
 )
 def edit_meeting(
     self: Meeting,

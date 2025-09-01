@@ -54,6 +54,18 @@ class MeetingForm(Form):
         render_kw={'rows': 5}
     )
 
+    audio_link = StringField(
+        label=_('Audio link to parliamentary debate'),
+        description='https://',
+        validators=[Optional()],
+    )
+
+    video_link = StringField(
+        label=_('Video link to parliamentary debate'),
+        description='https://',
+        validators=[Optional()],
+    )
+
     meeting_items = StringField(
         label=_('New agenda item'),
         fieldset=_('Agenda items'),

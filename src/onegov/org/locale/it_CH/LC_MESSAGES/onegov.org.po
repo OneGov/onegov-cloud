@@ -1233,6 +1233,12 @@ msgstr "Deduzione"
 msgid "Surcharge"
 msgstr "Supplemento"
 
+msgid "Audio link to parliamentary debate"
+msgstr "Collegamento audio al dibattito parlamentare"
+
+msgid "Video link to parliamentary debate"
+msgstr "Collegamento video al dibattito parlamentare"
+
 msgid "New agenda item"
 msgstr "Nuovo elemento dell'agenda"
 

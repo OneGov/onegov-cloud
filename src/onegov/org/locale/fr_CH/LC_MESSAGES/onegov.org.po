@@ -1229,6 +1229,12 @@ msgstr "Remise"
 msgid "Surcharge"
 msgstr "Supplément"
 
+msgid "Audio link to parliamentary debate"
+msgstr "Lien audio vers le débat parlementaire"
+
+msgid "Video link to parliamentary debate"
+msgstr "Lien vidéo vers le débat parlementaire"
+
 msgid "New agenda item"
 msgstr "Nouvel élément d'agenda"
 

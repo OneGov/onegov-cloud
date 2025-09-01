@@ -1230,6 +1230,12 @@ msgstr "Abzug"
 msgid "Surcharge"
 msgstr "Zuschlag"
 
+msgid "Audio link to parliamentary debate"
+msgstr "Audio Link zur Parlamentsdebatte"
+
+msgid "Video link to parliamentary debate"
+msgstr "Video Link zur Parlamentsdebatte"
+
 msgid "New agenda item"
 msgstr "Neues Traktandum"
 
