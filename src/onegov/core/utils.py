@@ -150,7 +150,10 @@ def normalize_for_url(text: str) -> str:
     return clean
 
 
-def normalize_for_path(text: str, default: str = '_default_path_') -> str:
+def normalize_for_path(
+    text: str,
+    default: str = '_default_path_'
+) -> str:
     """
     Takes the given text and makes it fit to be used for a path. It replaces
     invalid characters (for windows and linux systems) with underscores.
@@ -159,7 +162,10 @@ def normalize_for_path(text: str, default: str = '_default_path_') -> str:
     return sanitized or default
 
 
-def normalize_for_filename(text: str, default: str = '_default_file_') -> str:
+def normalize_for_filename(
+    text: str,
+    default: str = '_default_filename_'
+) -> str:
     """
     Takes the given text and makes it fit to be used as a filename for windows
     and linux systems. Replaces invalid characters with underscores.
