@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Collection
     from collections.abc import Sequence
-    from wtforms.fields.choices import _Choice
+    from wtforms.fields.choices import _Choice, SelectMultipleField
 
     from onegov.org.models import Meeting
     from onegov.org.models import MeetingItem
@@ -228,10 +228,11 @@ class MeetingExportPoliticalBusinessForm(Form):
     meeting_documents = MultiCheckboxField(
         label=_('Meeting documents'),
         choices=[],
+        default=[],
     )
 
-    business_documents = MultiCheckboxField(
-        label=_('Political business documents'),
+    agenda_item_documents = MultiCheckboxField(
+        label=_('Agenda item documents'),
         choices=[],
     )
 
@@ -242,7 +243,6 @@ class MeetingExportPoliticalBusinessForm(Form):
             (str(doc.id), doc.name)
             for doc in obj.files
         ]
-        self.meeting_documents.data = [doc.id for doc in obj.files]
         self.meeting_documents.description = obj.display_name
 
         choices: list[_Choice] = []
@@ -252,14 +252,22 @@ class MeetingExportPoliticalBusinessForm(Form):
                 continue
 
             choices.extend([
-                (str(doc.id), f'{business.title} - {doc.name}')
+                (str(doc.id), f'{meeting_item.title} - {doc.name}')
                 for doc in business.files
             ])
-        self.business_documents.choices = choices
-        self.business_documents.data = [c[0] for c in choices]
+        self.agenda_item_documents.choices = choices
+
+        if self.meta.request.method == 'GET':
+            # preselect all files on form get
+            self.select_all(self.meeting_documents)
+            self.select_all(self.agenda_item_documents)
+
+    def select_all(self, field: SelectMultipleField) -> None:
+        if not field.data:
+            field.data = [choice[0] for choice in field.choices]
 
     def get_selected_meeting_documents_ids(self) -> list[str]:
         return [str(i) for i in self.meeting_documents.data or []]
 
-    def get_selected_business_document_ids(self) -> list[str]:
-        return [str(i) for i in self.business_documents.data or []]
+    def get_selected_agenda_item_document_ids(self) -> list[str]:
+        return [str(i) for i in self.agenda_item_documents.data or []]

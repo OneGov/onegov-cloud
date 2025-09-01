@@ -271,7 +271,7 @@ def view_meeting_export(
 
     def build_zip_response() -> Response:
         meeting_doc_ids = form.get_selected_meeting_documents_ids()
-        business_doc_ids = form.get_selected_business_document_ids()
+        agenda_item_doc_ids = form.get_selected_agenda_item_document_ids()
 
         base_storage_path = request.app.depot_storage_path
         assert (base_storage_path is not None), (
@@ -286,38 +286,27 @@ def view_meeting_export(
                 for file in self.files:
                     if file.id in meeting_doc_ids:
                         path = (
-                            Path(base_storage_path)
-                            / file.reference.path / 'file')
+                                Path(base_storage_path)
+                                / file.reference.path / 'file')
                         with open(path, 'rb') as file_content:
                             zip_file.writestr(
                                 os.path.join(self.display_name, file.name),
                                 file_content.read())
 
-                # business documents
+                # agenda item documents
                 for meeting_item in self.meeting_items:
                     business = meeting_item.political_business
                     if business:
                         for file in business.files:
-                            if file.id in business_doc_ids:
+                            if file.id in agenda_item_doc_ids:
                                 path = (
-                                    Path(base_storage_path)
-                                    / file.reference.path / 'file')
+                                        Path(base_storage_path)
+                                        / file.reference.path / 'file')
                                 with open(path, 'rb') as file_content:
                                     zip_file.writestr(
                                         os.path.join(
-                                            business.title, file.name),
+                                            meeting_item.title, file.name),
                                         file_content.read())
-
-                        if not business.files:
-                            filename = _('no-files.txt')
-                            zip_file.writestr(
-                                os.path.join(business.title, filename), '')
-
-                    else:
-                        # no political business linked to meeting item
-                        filename = _('no-files.txt')
-                        zip_file.writestr(
-                            os.path.join(meeting_item.title, filename), '')
 
             with open(zip_path, 'rb') as zip_file:
                 response = Response()
@@ -339,16 +328,30 @@ def view_meeting_export(
             file_count += len(meeting_item.political_business.files)
 
     if form.submitted(request):
+        form.populate_obj(self)
         return build_zip_response()
+
+    meeting_items_no_docs = []
+    if not self.files:
+        meeting_items_no_docs.append(self.display_name)
+    for meeting_item in self.meeting_items:
+        if not meeting_item.political_business:
+            meeting_items_no_docs.append(meeting_item.title)
+        else:
+            if not meeting_item.political_business.files:
+                meeting_items_no_docs.append(meeting_item.title)
 
     return {
         'layout': layout,
         'form': form,
         'title': _('Export meeting documents'),
-        'explanation': _('Below you can select the meeting documents and '
-                         'political business documents you want to export. '
-                         'The resulting zipfile contains the documents per '
-                         'political business.'),
+        'explanation': _('Select the meeting documents and agenda item '
+                         'documents you want to export. The resulting zipfile '
+                         'contains the documents per meeting item.'),
+        'has_note': True if meeting_items_no_docs else False,
+        'note': 'Please note that not documents are assigned to the following '
+                'agenda items: {}'.format(
+            ', '.join(meeting_items_no_docs) if meeting_items_no_docs else ''),
         'filters': None,
         'count': file_count,
     }
