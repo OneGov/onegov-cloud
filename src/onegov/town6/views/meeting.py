@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from pathlib import Path
-from tempfile import NamedTemporaryFile
-
 import morepath
 import os
 import zipfile
+
+from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 from webob.exc import HTTPNotFound
 from webob.response import Response
@@ -13,6 +13,7 @@ from webob.response import Response
 from onegov.core.elements import Link
 from onegov.core.html import sanitize_html
 from onegov.core.security.permissions import Public, Private
+from onegov.core.utils import normalize_for_path, normalize_for_filename
 from onegov.org.forms import MeetingForm
 from onegov.org.forms.meeting import MeetingExportPoliticalBusinessForm
 
@@ -283,16 +284,20 @@ def view_meeting_export(
 
             with zipfile.ZipFile(
                     zip_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+
                 # meeting documents
                 for file in self.files:
                     if file.id in meeting_doc_ids:
                         path = (
                                 Path(base_storage_path)
-                                / file.reference.path / 'file')
+                                / file.reference.path / 'file'
+                        )
                         with open(path, 'rb') as file_content:
+                            folder_name = normalize_for_path(self.display_name)
                             zip_file.writestr(
-                                os.path.join(self.display_name, file.name),
-                                file_content.read())
+                                os.path.join(folder_name, file.name),
+                                file_content.read()
+                            )
 
                 # agenda item documents
                 for meeting_item in self.meeting_items:
@@ -304,17 +309,20 @@ def view_meeting_export(
                                         Path(base_storage_path)
                                         / file.reference.path / 'file')
                                 with open(path, 'rb') as file_content:
+                                    folder_name = normalize_for_path(
+                                        meeting_item.display_name)
                                     zip_file.writestr(
-                                        os.path.join(
-                                            meeting_item.title, file.name),
-                                        file_content.read())
+                                        os.path.join(folder_name, file.name),
+                                        file_content.read()
+                                    )
 
             with open(zip_path, 'rb') as zip_file:
+                filename = normalize_for_filename(self.display_name)
                 response = Response()
                 response.body = zip_file.read()
                 response.content_type = 'application/zip'
                 response.content_disposition = (
-                    f'attachment; filename="{self.display_name}.zip"')
+                    f'attachment; filename="{filename}.zip"')
                 return response
 
     # layout = MeetingCollectionLayout(self, request)
@@ -337,10 +345,11 @@ def view_meeting_export(
         meeting_items_no_docs.append(self.display_name)
     for meeting_item in self.meeting_items:
         if not meeting_item.political_business:
-            meeting_items_no_docs.append(meeting_item.title)
+            meeting_items_no_docs.append(meeting_item.display_name)
         else:
             if not meeting_item.political_business.files:
-                meeting_items_no_docs.append(meeting_item.title)
+                meeting_items_no_docs.append(meeting_item.display_name)
+    meeting_items_no_docs = sorted(meeting_items_no_docs)
 
     intro = request.translate(
         _('No documents are assigned to the following agenda items:')

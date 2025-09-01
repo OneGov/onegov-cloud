@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 
+from operator import itemgetter
 from wtforms.validators import Optional, InputRequired
 from wtforms import StringField
 
@@ -243,6 +244,8 @@ class MeetingExportPoliticalBusinessForm(Form):
             (str(doc.id), doc.name)
             for doc in obj.files
         ]
+        self.meeting_documents.choices = sorted(
+            self.meeting_documents.choices, key=itemgetter(1))
         self.meeting_documents.description = obj.display_name
 
         choices: list[_Choice] = []
@@ -252,10 +255,11 @@ class MeetingExportPoliticalBusinessForm(Form):
                 continue
 
             choices.extend([
-                (str(doc.id), f'{meeting_item.title} - {doc.name}')
+                (str(doc.id), f'{meeting_item.display_name} - {doc.name}')
                 for doc in business.files
             ])
-        self.agenda_item_documents.choices = choices
+        self.agenda_item_documents.choices = sorted(
+            choices, key=itemgetter(1))
 
         if self.meta.request.method == 'GET':
             # preselect all files on form get
