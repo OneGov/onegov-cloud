@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-08-14 10:15+0200\n"
+"POT-Creation-Date: 2025-08-29 08:26+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -319,17 +319,17 @@ msgstr "Parlamentsmitglieder"
 msgid "Parliamentarian"
 msgstr "Parlamentsmitglied"
 
-msgid "New parliamentary group function"
-msgstr "Neue Fraktionsfunktion"
-
-msgid "New commission function"
-msgstr "Neue Kommissionsfunktion"
-
 msgid "Do you really want to delete this parliamentarian?"
 msgstr "Möchten Sie dieses Parlamentsmitglied wirklich löschen?"
 
 msgid "Delete parliamentarian"
 msgstr "Parlamentsmitglied löschen"
+
+msgid "New parliamentary group function"
+msgstr "Neue Fraktionsfunktion"
+
+msgid "New commission function"
+msgstr "Neue Kommissionsfunktion"
 
 msgid "Do you really want to remove this role?"
 msgstr "Rolle wirklich entfernen?"
@@ -1758,6 +1758,12 @@ msgstr "1 Reservation abgelehnt."
 msgid "${count} reservations rejected."
 msgstr "${count} Reservationen abgelehnt."
 
+msgid "1 reservation added."
+msgstr "1 Reservation hinzugefügt."
+
+msgid "${count} reservations added."
+msgstr "${count} Reservationen hinzugefügt."
+
 msgid "1 reservation adjusted:"
 msgstr "1 Reservation angepasst:"
 
@@ -1946,14 +1952,32 @@ msgstr "Diese Termine exportieren"
 msgid "Submit your event"
 msgstr "Veranstaltung erfassen"
 
+msgid "Functions"
+msgstr "Funktionen"
+
+msgid "Parliament"
+msgstr "Parlament"
+
+msgid "in"
+msgstr "der"
+
+msgid "Interest ties"
+msgstr "Interessensbindungen"
+
+msgid "Personal details"
+msgstr "Personenalien"
+
+msgid "First name"
+msgstr "Vorname"
+
+msgid "Last name"
+msgstr "Nachname"
+
 msgid "Personnel number"
 msgstr "Personalnummer"
 
 msgid "Contract number"
 msgstr "Vertragsnummer"
-
-msgid "Picture"
-msgstr "Bild"
 
 msgid "Party"
 msgstr "Partei"
@@ -2012,26 +2036,12 @@ msgstr "Webseite"
 msgid "Remarks"
 msgstr "Bemerkungen"
 
-msgid "Functions"
-msgstr "Funktionen"
-
-msgid "Parliament"
-msgstr "Parlament"
-
-msgid "in"
-msgstr "der"
-
-msgid "Interest ties"
-msgstr "Interessensbindungen"
-
 msgid "Role"
 msgstr "Rolle"
 
 msgid "No filter results found or no parliamentarians defined yet."
-msgstr "Keine Filterergebnisse gefunden oder noch keine Parlamentarier erfasst."
-
-msgid "No parliamentarians defined yet."
-msgstr "Noch keine Parlamentarier erfasst."
+msgstr ""
+"Keine Filterergebnisse gefunden oder noch keine Parlamentarier erfasst."
 
 msgid "No parliamentary groups defined yet."
 msgstr "Noch keine Fraktionen erfasst."
@@ -2087,6 +2097,9 @@ msgstr "Filter zurücksetzen"
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
 
+msgid "Information"
+msgstr "Information"
+
 msgid "Number"
 msgstr "Nummer"
 
@@ -2113,9 +2126,6 @@ msgstr "Jahr"
 
 msgid "No publications"
 msgstr "Keine Publikationen"
-
-msgid "Information"
-msgstr "Information"
 
 msgid ""
 "You can search through the content of all listed files by using the search "
@@ -2592,6 +2602,12 @@ msgstr "Neue Sitzung hinzugefügt"
 msgid "New meeting"
 msgstr "Neue Sitzung"
 
+msgid "Listen to parliamentary debate"
+msgstr "Parlamentsdebatte anhören"
+
+msgid "Watch parliamentary debate"
+msgstr "Parlamentsdebatte ansehen"
+
 msgid "Edit meeting"
 msgstr "Sitzung bearbeiten"
 
@@ -2739,6 +2755,12 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid "No parliamentarians defined yet."
+#~ msgstr "Noch keine Parlamentarier erfasst."
+
+#~ msgid "Picture"
+#~ msgstr "Bild"
 
 #~ msgid "Roles"
 #~ msgstr "Mitgliedschaften"

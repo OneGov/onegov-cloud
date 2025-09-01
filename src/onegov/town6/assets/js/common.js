@@ -322,3 +322,7 @@ if ($('.header-image .page-image').length) {
 $('a[data-back-link]').on('click', function(e) {
     if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;
 });
+
+$('.is-accordion-submenu-parent a span').on('click', function(e) {
+    e.stopPropagation();
+});

@@ -1,8 +1,101 @@
 # Changes
 
+## 2025.45
+
+`2025-09-01` | [313087dab3...9e538ee57c](https://github.com/OneGov/onegov-cloud/compare/313087dab3^...9e538ee57c)
+
+**Upgrade hints**
+- onegov-org --select /onegov_town6/wil ris-make-imported-files-general-file
+### Pas
+
+##### Remove Legislative, Add '/files' entry.
+
+`Bugfix` | [OGC-2402](https://linear.app/onegovcloud/issue/OGC-2402) | [87ed8854c2](https://github.com/onegov/onegov-cloud/commit/87ed8854c2a0f2517a4935b915b8b79bff59b613)
+
+### Ris
+
+##### Make imported files from type general
+
+`Feature` | [OGC-2550](https://linear.app/onegovcloud/issue/OGC-2550) | [313087dab3](https://github.com/onegov/onegov-cloud/commit/313087dab35246dcd0578997076d8ab47a11a294)
+
+##### Don't show access field for meeting and political business
+
+All RIS information is public
+
+`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [d2b375cc04](https://github.com/onegov/onegov-cloud/commit/d2b375cc0400f10effc8f3c2ae861bd89b44de0d)
+
+##### Enhance layout for all views
+
+`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [b87bae8692](https://github.com/onegov/onegov-cloud/commit/b87bae86928666803a3fea2ff2f6da1d92dc05af)
+
+### User
+
+##### Fixes crash in `User.get_initials` related to dots in the username
+
+`Bugfix` | [4163ae4783](https://github.com/onegov/onegov-cloud/commit/4163ae47838f5a252b333b89e59e00cad197d971)
+
+## 2025.44
+
+`2025-08-28` | [225a83e987...00c68baacd](https://github.com/OneGov/onegov-cloud/compare/225a83e987^...00c68baacd)
+
+### Org
+
+##### Displays invoice items in ticket PDF
+
+`Feature` | [OGC-2563](https://linear.app/onegovcloud/issue/OGC-2563) | [857cd3e652](https://github.com/onegov/onegov-cloud/commit/857cd3e6529ac342dfc8a1caeb86502a7aff7979)
+
+##### De-emphasizes allocations that are past the resource deadline (#2014)
+
+Previously these could appear green and only yielded an error once you
+tried to actually reserve them. Now they should appear gray. One can
+still attempt to reserve those allocations, just like with past
+allocations, but it should be less frustrating over all.
+
+`Feature` | [OGC-2334](https://linear.app/onegovcloud/issue/OGC-2334) | [6d477c0577](https://github.com/onegov/onegov-cloud/commit/6d477c057769a2d58bb14b00e29ff154af24385f)
+
+##### Adds view to add a new reservation to an existing ticket
+
+`Feature` | [OGC-2571](https://linear.app/onegovcloud/issue/OGC-2571) | [cca0b68557](https://github.com/onegov/onegov-cloud/commit/cca0b68557b693c227488d664c4c09406aabb518)
+
+##### Includes ticket url in iCal event description for compatibility
+
+`Bugfix` | [OGC-2575](https://linear.app/onegovcloud/issue/OGC-2575) | [897c9f10c5](https://github.com/onegov/onegov-cloud/commit/897c9f10c5c75981caebfd9de7b98ed3ab7c0652)
+
+##### Makes reservations acceptance view more robust
+
+If for whatever reason the ticket managed to transition into a state
+where only some of the reservations have been accepted, it was then
+impossible to accept the remaining reservations, since the validation
+only checks the state on the first reservation and assumes all
+reservations share that state.
+
+`Bugfix` | [OGC-2576](https://linear.app/onegovcloud/issue/OGC-2576) | [af4496b612](https://github.com/onegov/onegov-cloud/commit/af4496b61206e6bfa460a1bf48b4c66548be7c27)
+
+### Pas
+
+##### Fixes `InvalidRequestError`.
+
+`Bugfix` | [353074d970](https://github.com/onegov/onegov-cloud/commit/353074d970e757841105ced645e7b52f7ad07eeb)
+
+##### Fix N+1 query in /changes.
+
+`Performance` | [OGC-2560](https://linear.app/onegovcloud/issue/OGC-2560) | [a905c060da](https://github.com/onegov/onegov-cloud/commit/a905c060da9be59b09035b7136e9d049a83e4166)
+
+### Ris
+
+##### Remove access extension as information is pubic
+
+`Feature` | [OGC-2567](https://linear.app/onegovcloud/issue/OGC-2567) | [551476ef92](https://github.com/onegov/onegov-cloud/commit/551476ef92c724e360524559e4ea269951e34d4a)
+
+### Town6
+
+##### Align padding for menu group
+
+`Feature` | [NONE](#NONE) | [56edafef0d](https://github.com/onegov/onegov-cloud/commit/56edafef0d647917dec5989f257ca69f7fc9522b)
+
 ## 2025.43
 
-`2025-08-22` | [8642ecad1b...cf4a5b2885](https://github.com/OneGov/onegov-cloud/compare/8642ecad1b^...cf4a5b2885)
+`2025-08-22` | [8642ecad1b...e0d7756edf](https://github.com/OneGov/onegov-cloud/compare/8642ecad1b^...e0d7756edf)
 
 ### Landsgemeinde
 
@@ -2053,181 +2146,4 @@ Restyle the sidebar-toggler so it is fixed to the bottom and more visible.
 ## test
 
 No changes since last release
-
-## test
-
-`2025-01-08` | [9c3aee5da3...bcfbf712a8](https://github.com/OneGov/onegov-cloud/compare/9c3aee5da3^...bcfbf712a8)
-
-### Core
-
-##### Add descriptions in formcode docs
-
-`Feature` | [OGC-1942](https://linear.app/onegovcloud/issue/OGC-1942) | [6908b4cf33](https://github.com/onegov/onegov-cloud/commit/6908b4cf33cdf05552da1056b87d03f645b688b8)
-
-### Landsgemeinde
-
-##### Remove "Auskunft" from Footer
-
-`Feature` | [OGC-1991](https://linear.app/onegovcloud/issue/OGC-1991) | [675267da50](https://github.com/onegov/onegov-cloud/commit/675267da50dc7ee3968a96c8feb7fa76abf519ab)
-
-##### Rename Archive
-
-`Feature` | [OGC-1990](https://linear.app/onegovcloud/issue/OGC-1990) | [ee62c7a0c9](https://github.com/onegov/onegov-cloud/commit/ee62c7a0c915845d604adcc8ab0e539ca26cdd50)
-
-##### Prevent crash on file replacement
-
-`Bugfix` | [OGC-1999](https://linear.app/onegovcloud/issue/OGC-1999) | [eb0b55a269](https://github.com/onegov/onegov-cloud/commit/eb0b55a269f1cd0967615027dfd1a7cbf2f70f36)
-
-##### File Upload View
-
-`Bugfix` | [OGC-1998](https://linear.app/onegovcloud/issue/OGC-1998) | [95e4fb151e](https://github.com/onegov/onegov-cloud/commit/95e4fb151e53671ac667940d31a9dd019d97ef9e)
-
-### Settings
-
-##### Displays the web statistics url
-
-`Feature` | [OGC-1639](https://linear.app/onegovcloud/issue/OGC-1639) | [13baf032fd](https://github.com/onegov/onegov-cloud/commit/13baf032fd10932908cc089f192b2cb12c0c6fe0)
-
-### Town 6
-
-##### Search View
-
-`Feature` | [OGC-1966](https://linear.app/onegovcloud/issue/OGC-1966) | [c080567c8e](https://github.com/onegov/onegov-cloud/commit/c080567c8ed2d2e13e277e2689db56e5fb6ef974)
-
-### User
-
-##### Fixes various issues in OIDC authentication provider
-
-`Bugfix` | [OGC-1767](https://linear.app/onegovcloud/issue/OGC-1767) | [bef47625f0](https://github.com/onegov/onegov-cloud/commit/bef47625f02b602e040449cdd2534619bf595ddb)
-
-## 2024.60
-
-`2024-12-19` | [5925b224b9...7bff3ede2e](https://github.com/OneGov/onegov-cloud/compare/5925b224b9^...7bff3ede2e)
-
-**Upgrade hints**
-- On the off-chance that we have some duplicate `Payment` associations this upgrade task will fail, in which case we would need to write another migration to remove duplicates for all links on `Payment`.
-### Agency
-
-##### Import Staka LU: Skip label 'Telefon' but keep 'Telefonist'
-
-`Feature` | [OGC-1954](https://linear.app/onegovcloud/issue/OGC-1954) | [5925b224b9](https://github.com/onegov/onegov-cloud/commit/5925b224b9354ea45f2ab9fc7bd384e4bf624449)
-
-##### Allows ticket notifications to target parent organisations
-
-`Feature` | [OGC-1658](https://linear.app/onegovcloud/issue/OGC-1658) | [0250a72e1e](https://github.com/onegov/onegov-cloud/commit/0250a72e1eeedf91ab2fbb1e2a99f558226d776c)
-
-##### Prevent cutting content in person card
-
-`Bugfix` | [OGC-1963](https://linear.app/onegovcloud/issue/OGC-1963) | [d296c64877](https://github.com/onegov/onegov-cloud/commit/d296c64877697d606fa4653e749164e5a5ea4a8f)
-
-### Api
-
-##### Return a 403 for missing authorization when requesting a JWT token
-
-`Bugfix` | [7d33b93711](https://github.com/onegov/onegov-cloud/commit/7d33b93711a3804f9fc9941dd790598dfd7df7bf)
-
-##### Makes sure invisible endpoint items are inaccessible
-
-`Bugfix` | [OGC-1992](https://linear.app/onegovcloud/issue/OGC-1992) | [9e317877f1](https://github.com/onegov/onegov-cloud/commit/9e317877f1d21f11c2658415fde14c4c187fe65d)
-
-### Core
-
-##### Adds unique constraint to association tables
-
-`Bugfix` | [OGC-1969](https://linear.app/onegovcloud/issue/OGC-1969) | [4adcb66f82](https://github.com/onegov/onegov-cloud/commit/4adcb66f825d3be0a67c27ef4cda190d18f9711d)
-
-### Election Day
-
-##### Election results shown as pending as long as election not completed/final
-
-Note: No model or api adaption done
-
-`Feature|` | [OGC-1939](https://linear.app/onegovcloud/issue/OGC-1939) | [7663a133d9](https://github.com/onegov/onegov-cloud/commit/7663a133d90f35221e3b3fce660babdbd64872a8)
-
-### Electionday
-
-##### Adds additional date metadata to subscribers
-
-`Feature` | [OGC-1882](https://linear.app/onegovcloud/issue/OGC-1882) | [1770d45927](https://github.com/onegov/onegov-cloud/commit/1770d45927b012e16ff7e99b6a56a6e869bd2158)
-
-##### Include specific URLs for sub-results in SMS when possible
-
-`Feature` | [OGC-1881](https://linear.app/onegovcloud/issue/OGC-1881) | [01eb7d8b03](https://github.com/onegov/onegov-cloud/commit/01eb7d8b034861d80a24166838f95974db679776)
-
-### Feriennet
-
-##### Make it possible to change attendee info without active period
-
-`Bugfix` | [PRO-1341](https://linear.app/projuventute/issue/PRO-1341) | [8693110cd8](https://github.com/onegov/onegov-cloud/commit/8693110cd8edf4d4d93b58efadf790f82f3e9de5)
-
-### File
-
-##### Apply EXIF orientation to image when stripping EXIF metadata
-
-`Bugfix` | [OGC-1993](https://linear.app/onegovcloud/issue/OGC-1993) | [5859fb2455](https://github.com/onegov/onegov-cloud/commit/5859fb2455bd1c3b6c68c0248b1ee2be526ee945)
-
-### Files
-
-##### Sort sidebar documents alphabetically (org and town6)
-
-`Feature` | [OGC-1797](https://linear.app/onegovcloud/issue/OGC-1797) | [0e99c5e925](https://github.com/onegov/onegov-cloud/commit/0e99c5e92511685250f051c15dcdf952d182c2c9)
-
-### Org
-
-##### Avoid generating redundant file links for linked general files
-
-This also updates WebTest to the newest version, since we need it in
-order to test multi-file uploads.
-
-`Bugfix` | [OGC-1967](https://linear.app/onegovcloud/issue/OGC-1967) | [27c3e25ed5](https://github.com/onegov/onegov-cloud/commit/27c3e25ed579219df1454d5fcfa36dd6708b640d)
-
-##### Re-add submit-button for directory entry suggestion button
-
-`Bugfix` | [OGC-1986](https://linear.app/onegovcloud/issue/OGC-1986) | [7e4076face](https://github.com/onegov/onegov-cloud/commit/7e4076face9c972078d73bedd4b2cdef53bd511b)
-
-##### Submits individual uploads in dropzone sequentially
-
-Submitting them in parallel sometimes results in nginx producing 503
-errors and there's no significant speed benefit to starting the uploads
-in parallel, since we will still be limited by our bandwidth.
-
-`Bugfix` | [OGC-1994](https://linear.app/onegovcloud/issue/OGC-1994) | [e12dd0bb88](https://github.com/onegov/onegov-cloud/commit/e12dd0bb884315e8a299549e219554254ac8f3c2)
-
-### Pas
-
-##### Generating various exports.
-
-`Feature` | [OGC-1878](https://linear.app/onegovcloud/issue/OGC-1878) | [96f09cfc20](https://github.com/onegov/onegov-cloud/commit/96f09cfc200a20d153fa81ab5b4dccbaecba0f9b)
-
-### Town6
-
-##### Sidebar make person function as wide as document names and map
-
-`Feature` | [NONE](#NONE) | [13d6a10ad3](https://github.com/onegov/onegov-cloud/commit/13d6a10ad3fbd27e9e26440acfdb47917ac6b467)
-
-##### Icon Links
-
-Correct margin and padding if there is no text
-
-`Feature` | [OGC-1943](https://linear.app/onegovcloud/issue/OGC-1943) | [471d46565c](https://github.com/onegov/onegov-cloud/commit/471d46565c7158a752b41722125a600bdaffea13)
-
-##### Make the context-specific-function multi line capable.
-
-`Feature` | [OGC-1955](https://linear.app/onegovcloud/issue/OGC-1955) | [597a6cc034](https://github.com/onegov/onegov-cloud/commit/597a6cc034b87d7b3e727c9aa83e3cf38aafd4a4)
-
-##### Lead is no longer a mandatory field in ExternalLinkForm
-
-`Feature` | [OGC-1941](https://linear.app/onegovcloud/issue/OGC-1941) | [5523e08e31](https://github.com/onegov/onegov-cloud/commit/5523e08e31cc2b0e4ee865b3e3126f41aabe1cde)
-
-##### Main image in news
-
-Enable the option to hide main images on news
-
-`Bugfix` | [OGC-1903](https://linear.app/onegovcloud/issue/OGC-1903) | [53135169e2](https://github.com/onegov/onegov-cloud/commit/53135169e2b654ca6782f448e19446ae2c989680)
-
-### User
-
-##### Adds scope setting to OIDC authentication provider
-
-`Feature` | [OGC-1767](https://linear.app/onegovcloud/issue/OGC-1767) | [dc2ebc87dc](https://github.com/onegov/onegov-cloud/commit/dc2ebc87dcc8d8e699c59f2e21eb53492e899d87)
 

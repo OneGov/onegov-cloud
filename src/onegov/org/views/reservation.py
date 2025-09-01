@@ -18,7 +18,7 @@ from onegov.org import utils
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import (
-    KabaEditForm, ReservationAdjustmentForm,
+    AddReservationForm, KabaEditForm, ReservationAdjustmentForm,
     ReservationForm, InternalTicketChatMessageForm)
 from onegov.org.kaba import KabaApiError, KabaClient
 from onegov.org.layout import ReservationLayout, TicketChatMessageLayout
@@ -867,12 +867,17 @@ def accept_reservation(
     view_ticket: ReservationTicket | None = None,
 ) -> Response:
 
-    if not self.data or not self.data.get('accepted'):
-        resource = request.app.libres_resources.by_reservation(self)
-        assert resource is not None
-        reservations = resource.scheduler.reservations_by_token(self.token)
-        reservations = reservations.order_by(Reservation.start)
+    resource = request.app.libres_resources.by_reservation(self)
+    assert resource is not None
+    reservations = [
+        reservation
+        for reservation in resource.scheduler
+                           .reservations_by_token(self.token)
+                           .order_by(Reservation.start)
+        if not (reservation.data or {}).get('accepted')
+    ]
 
+    if reservations:
         token = self.token
         tickets = TicketCollection(request.session)
         ticket = tickets.by_handler_id(token.hex)
@@ -1521,6 +1526,235 @@ def send_reservation_summary(
 
 @OrgApp.form(
     model=Reservation,
+    name='add',
+    permission=Private,
+    form=AddReservationForm,
+    template='form.pt'
+)
+def add_reservation(
+    self: Reservation,
+    request: OrgRequest,
+    form: AddReservationForm,
+    view_ticket: ReservationTicket | None = None,
+    layout: ReservationLayout | TicketLayout | None = None
+) -> RenderData | Response:
+
+    token = self.token
+    resource = request.app.libres_resources.by_reservation(self)
+    assert resource is not None
+
+    tickets = TicketCollection(request.session)
+    ticket = tickets.by_handler_id(token.hex)
+    assert ticket is not None
+
+    # if we're accessing this view through the ticket it
+    # had better match the ticket we retrieved
+    if view_ticket is not None and view_ticket != ticket:
+        raise exc.HTTPNotFound()
+
+    def show_form() -> RenderData:
+        return {
+            'title': _('Add reservation'),
+            'layout': layout or ReservationLayout(resource, request),
+            'form': form,
+        }
+
+    form.apply_resource(resource)
+    if not form.submitted(request):
+        if self.data and self.data.get('accepted'):
+            request.warning(_(
+                'Since the other reservations in this ticket '
+                'have already been accepted, this reservation '
+                'will also be immediately accepted. However '
+                'we will not send a new reservation confirmation.'
+            ))
+        return show_form()
+
+    assert form.date.data is not None
+    assert form.quota.data is not None
+    dt = sedate.replace_timezone(
+        sedate.as_datetime(form.date.data),
+        resource.timezone,
+    )
+    if 'whole_day' in form and form.whole_day.data == 'no':
+        assert form.start_time.data is not None
+        assert form.end_time.data is not None
+        start_time = form.start_time.data
+        end_time = form.end_time.data
+    else:
+        start_time = time(0, 0)
+        end_time = time(23, 59)
+
+    try:
+        start, end = sedate.get_date_range(
+            dt,
+            start_time,
+            end_time,
+            raise_non_existent=True
+        )
+    except pytz.NonExistentTimeError:
+        request.alert(_(
+            'The selected time does not exist on this date due to '
+            'the switch from standard time to daylight saving time.'
+        ))
+        return show_form()
+
+    # if the matched allocation isn't partly available expand it to the
+    # whole allocation for a better user experience, but don't ever shrink
+    # it, since that's most certainly not what they want to have happen.
+    for allocation in resource.scheduler.allocations_in_range(start, end):
+        if not allocation.overlaps(start, end):
+            continue
+
+        if allocation.partly_available:
+            break
+
+        if allocation.contains(start, end):
+            start, end = allocation.start, allocation.end
+        else:
+            request.alert(_(
+                'The targeted availability is not partially reservable '
+                'and does not fully cover the selected time range.'
+            ))
+            return show_form()
+
+    savepoint = transaction.savepoint()
+    try:
+        temp_token = resource.scheduler.reserve(
+            self.email,
+            (start, end),
+            quota=form.quota.data
+        )
+    except LibresError as e:
+        request.alert(utils.get_libres_error(e, request))
+        return show_form()
+
+    reservation: Reservation = (
+        resource.scheduler.reservations_by_token(temp_token).one()  # type:ignore
+    )
+    # change the temporary token back to the shared reservation token
+    reservation.token = token
+    try:
+        resource.scheduler._approve_reservation_record(reservation)
+    except LibresError as e:
+        request.session.flush()
+        savepoint.rollback()
+        request.alert(utils.get_libres_error(e, request))
+        return show_form()
+
+    request.session.flush()
+    if ticket.handler.refreshing_invoice_is_safe(request):
+        ticket.handler.refresh_invoice_items(request)
+    else:
+        request.session.flush()
+        savepoint.rollback()
+        request.alert(_(
+            'Your changes would alter the price total '
+            'but the payment is no longer open.'
+        ))
+        return show_form()
+
+    if self.data and self.data.get('accepted'):
+        # we need to accept the new reservation
+        data = reservation.data
+        if data is None:
+            data = reservation.data = {}
+
+        data['accepted'] = True
+
+        clients = KabaClient.from_resource(resource, request.app)
+        if clients and (lead := timedelta(
+            minutes=ticket.handler.data['key_code_lead_time']
+        )) is not None and (
+            (start := reservation.display_start() - lead) > sedate.utcnow()
+        ):
+            # add visit
+            components: dict[str, list[str]] = {}
+            for site_id, component in resource.kaba_components:  # type: ignore[attr-defined]
+                components.setdefault(site_id, []).append(component)
+
+            code = ticket.handler.data['key_code']
+            lag = timedelta(minutes=ticket.handler.data['key_code_lag_time'])
+            end = reservation.display_end() + lag
+            visit_ids = {}
+            for site_id, group in components.items():
+                try:
+                    visit_ids[site_id] = clients[site_id].create_visit(
+                        code=code,
+                        name=ticket.number,
+                        message='Managed through OneGov Cloud',
+                        start=start,
+                        end=end,
+                        components=group,
+                    )
+                except (KeyError, KabaApiError) as e:
+                    if isinstance(e, KabaApiError):
+                        log.info('Kaba API error', exc_info=True)
+
+                    # roll back previous changes
+                    request.session.flush()
+                    savepoint.rollback()
+                    request.alert(_(
+                        'Failed to create visits using the dormakaba API '
+                        'for site ID ${site_id} please make sure your '
+                        'credentials are still valid.',
+                        mapping={'site_id': site_id}
+                    ))
+                    return show_form()
+
+                data['kaba'] = {
+                    'code': code,
+                    'visit_ids': visit_ids,
+                }
+
+    ReservationMessage.create(
+        [reservation],
+        ticket,
+        request,
+        'added'
+    )
+
+    request.success(_('Added a new reservation'))
+    if view_ticket is not None:
+        return request.redirect(request.link(view_ticket))
+
+    return request.redirect(request.link(self))
+
+
+@OrgApp.form(
+    model=ReservationTicket,
+    name='add-reservation',
+    permission=Private,
+    form=AddReservationForm,
+    template='form.pt'
+)
+def add_reservation_from_ticket(
+    self: ReservationTicket,
+    request: OrgRequest,
+    form: AddReservationForm,
+    layout: TicketLayout | None = None
+) -> RenderData | Response | None:
+
+    if self.handler.deleted:
+        raise exc.HTTPNotFound()
+
+    layout = layout or TicketLayout(self, request)
+    layout.breadcrumbs[-1].attrs['href'] = request.link(self)
+    layout.breadcrumbs.append(
+        Link(_('Add reservation'), '#')
+    )
+
+    return add_reservation(
+        self.handler.reservations[0],
+        request,
+        form,
+        self,
+        layout
+    )
+
+
+@OrgApp.form(
+    model=Reservation,
     name='adjust',
     permission=Private,
     form=ReservationAdjustmentForm,
@@ -1643,6 +1877,7 @@ def adjust_reservation(
             if ticket.handler.refreshing_invoice_is_safe(request):
                 ticket.handler.refresh_invoice_items(request)
             else:
+                request.session.flush()
                 savepoint.rollback()
                 return show_error(_(
                     'Your changes would alter the price total '
@@ -1653,6 +1888,7 @@ def adjust_reservation(
             reservation.payment = payment
     except LibresError as e:
         # rollback previous changes
+        request.session.flush()
         savepoint.rollback()
         return show_error(utils.get_libres_error(e, request))
 
@@ -1707,6 +1943,7 @@ def adjust_reservation(
                         log.info('Kaba API error', exc_info=True)
 
                     # roll back previous changes
+                    request.session.flush()
                     savepoint.rollback()
                     return show_error(_(
                         'Failed to create visits using the dormakaba API '

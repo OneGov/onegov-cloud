@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 import transaction
 
@@ -8,11 +10,20 @@ from pytz import utc
 from uuid import uuid4
 
 
-def test_libres_context_fixture(session_manager, libres_context):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from libres.context.core import Context
+    from onegov.core.orm import SessionManager
+
+
+def test_libres_context_fixture(
+    session_manager: SessionManager,
+    libres_context: Context
+) -> None:
     assert session_manager is libres_context.get_service('session_provider')
 
 
-def test_resource_scheduler(libres_context):
+def test_resource_scheduler(libres_context: Context) -> None:
     resource = Resource(id=uuid4())
 
     with pytest.raises(AssertionError):
@@ -26,7 +37,7 @@ def test_resource_scheduler(libres_context):
     assert scheduler.resource == resource.id
 
 
-def test_scheduler_boundaries(libres_context):
+def test_scheduler_boundaries(libres_context: Context) -> None:
     resource = Resource(id=uuid4())
     resource.timezone = 'Europe/Amsterdam'
 
@@ -55,7 +66,11 @@ def test_scheduler_boundaries(libres_context):
     assert scheduler.managed_allocations().count() == 0
 
 
-def test_delete_cascade(session_manager, libres_context):
+def test_delete_cascade(
+    session_manager: SessionManager,
+    libres_context: Context
+) -> None:
+
     resource = Resource(id=uuid4())
     resource.timezone = 'Europe/Zurich'
     resource.name = 'test'
@@ -82,25 +97,25 @@ def test_delete_cascade(session_manager, libres_context):
     assert scheduler.managed_allocations().count() == 0
 
 
-def test_invalid_deadlines():
+def test_invalid_deadlines() -> None:
     resource = Resource()
 
     with pytest.raises(ValueError):
-        resource.deadline = 'Foobar'
+        resource.deadline = 'Foobar'  # type: ignore[assignment]
 
     with pytest.raises(ValueError):
-        resource.deadline = '3h'
+        resource.deadline = '3h'  # type: ignore[assignment]
 
     with pytest.raises(ValueError):
-        resource.deadline = ('3', 'd')
+        resource.deadline = ('3', 'd')  # type: ignore[assignment]
 
     with pytest.raises(ValueError):
         resource.deadline = (0, 'd')
 
     with pytest.raises(ValueError):
-        resource.deadline = (3, 'm')
+        resource.deadline = (3, 'm')  # type: ignore[assignment]
 
-    resource.deadline = ''
+    resource.deadline = ''  # type: ignore[assignment]
     assert resource.deadline is None
 
     resource.deadline = None
@@ -108,7 +123,7 @@ def test_invalid_deadlines():
     resource.deadline = (24, 'h')
 
 
-def test_deadline():
+def test_deadline() -> None:
     resource = Resource(timezone='UTC')
 
     # by default, no deadline is active

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.org import _
+from copy import deepcopy
 from datetime import date
 from functools import partial
 from io import BytesIO, StringIO
@@ -8,20 +8,22 @@ from io import BytesIO, StringIO
 from bleach import Cleaner
 from bleach.linkifier import LinkifyFilter
 from lxml import etree
-from pdfdocument.document import MarkupParagraph
-from reportlab.platypus import PageBreak, Paragraph
-
 from onegov.chat import MessageCollection
-from onegov.org.constants import TICKET_STATES, PAYMENT_STATES, PAYMENT_SOURCES
+from onegov.org import _
+from onegov.org.constants import (
+    INVOICE_GROUPS, PAYMENT_STATES, PAYMENT_SOURCES, TICKET_STATES)
 from onegov.org.layout import TicketLayout
 from onegov.org.models.ticket import ticket_submitter
+from onegov.org.utils import group_invoice_items
 from onegov.org.views.message import view_messages_feed
 from onegov.pdf import Pdf, page_fn_header
 from onegov.qrcode import QrCode
 from html5lib.filters.whitespace import Filter as WhitespaceFilter
+from pdfdocument.document import MarkupParagraph
 from reportlab.lib import colors
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
+from reportlab.platypus import PageBreak, Paragraph
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
@@ -204,7 +206,7 @@ class TicketPdf(Pdf):
             if isinstance(row[0], Paragraph):
                 continue
             row[0] = MarkupParagraph(  # type:ignore[index]
-                self.translate(row[0]), style=self.style.bold)
+                self.translate(row[0]), style=deepcopy(self.style.bold))
         return super().table(data, columns, style, ratios)
 
     def ticket_summary(self, html: str | None, linkify: bool = True) -> None:
@@ -347,6 +349,130 @@ class TicketPdf(Pdf):
 
         self.table(data, 'even')
 
+    def ticket_invoice(self, ticket: Ticket, layout: TicketLayout) -> None:
+        invoice = ticket.invoice
+        if not invoice:
+            return
+
+        show_quantity = any(item.quantity != 1.0 for item in invoice.items)
+        show_vat = any(item.vat for item in invoice.items)
+        item_groups = group_invoice_items(invoice.items)
+        headers = [_('Booking Text')]
+        totals: list[Paragraph | str] = [
+            MarkupParagraph(
+                self.translate(_('Total')),
+                style=deepcopy(self.style.bold)
+            )
+        ]
+        ratios: list[float] = []
+        if show_quantity:
+            headers.extend((
+                _('Unit'),
+                _('Quantity'),
+            ))
+            totals.extend(('', ''))
+            ratios.extend((12.0, 12.0))
+        if show_vat:
+            headers.extend((
+                _('VAT Rate'),
+                _('VAT'),
+            ))
+            totals.extend(('', layout.format_number(invoice.total_vat, 2)))
+            ratios.extend((12.0, 12.0))
+        headers.append(_('Amount'))
+        totals.append(layout.format_number(invoice.total_amount, 2))
+        ratios.append(12.0)
+        ratios.insert(0, 100.0 - sum(ratios))
+        num_cols = len(headers)
+        base_style: list[_TableCommand] = [
+            ('TOPPADDING', (0, 0), (-1, -1), 1),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+            ('LEFTPADDING', (0, 0), (1, -1), 2),
+            ('LEFTPADDING', (1, 0), (-1, -1), 0),
+            ('RIGHTPADDING', (-1, 0), (-1, -1), 2),
+            ('RIGHTPADDING', (-2, 0), (-2, -1), 0),
+            ('FIRSTLINEINDENT', (0, 0), (-1, -1), 0),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('ALIGN', (0, 0), (1, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
+        ]
+        head_style = base_style[:]
+        head_style.extend((
+            ('BACKGROUND', (0, 0), (-1, 0), colors.whitesmoke),
+            ('LINEBELOW', (0, 0), (-1, 0), 0.2, colors.black),
+        ))
+        group_style = base_style[:]
+        group_style.extend((
+            ('SPAN', (0, 0), (-1, 0)),
+            ('ROWBACKGROUNDS', (0, 0), (-1, -1), [
+                colors.whitesmoke,
+                colors.white
+            ]),
+            ('LINEABOVE', (0, 0), (-1, 0), 0.2, colors.black),
+            ('LINEBELOW', (0, -1), (-1, -1), 0.2, colors.black),
+        ))
+        footer_style = base_style[:]
+        footer_style.extend((
+            ('BACKGROUND', (0, 0), (-1, 0), colors.whitesmoke),
+            ('LINEABOVE', (0, 0), (-1, 0), 0.2, colors.black),
+            ('LINEBELOW', (0, 0), (-1, 0), 0.2, colors.black),
+        ))
+
+        with self.keep_together():
+            self.h2(_('Invoice'))
+            self.table(
+                [[
+                    MarkupParagraph(
+                        self.translate(h),
+                        style=deepcopy(self.style.bold)
+                    )
+                    for h in headers
+                ]],
+                ratios,
+                ratios=True,
+                border=False,
+                style=head_style,
+                first_bold=False
+            )
+            for group, items in item_groups.items():
+                data = [[
+                    MarkupParagraph(
+                        self.translate(INVOICE_GROUPS[group]),
+                        style=deepcopy(self.style.bold)
+                    ),
+                    *(('') * (num_cols - 1))
+                ]]
+                for item in items:
+                    column = [item.text]
+                    if show_quantity:
+                        column.extend((
+                            layout.format_number(item.unit, 2),
+                            layout.format_number(item.quantity, 2),
+                        ))
+                    if show_vat:
+                        column.extend((
+                            f'{layout.format_number(item.vat_rate or 0, 1)}%',
+                            layout.format_number(item.vat, 2),
+                        ))
+                    column.append(layout.format_number(item.amount, 2))
+                    data.append(column)
+                self.table(
+                    data,
+                    ratios,
+                    ratios=True,
+                    border=False,
+                    style=group_style,
+                    first_bold=False
+                )
+            self.table(
+                [totals],
+                ratios,
+                ratios=True,
+                border=False,
+                style=footer_style,
+                first_bold=False
+            )
+
     def ticket_payment(self, ticket: Ticket, layout: TicketLayout) -> None:
         price = ticket.handler.payment
         if not price:
@@ -455,6 +581,7 @@ class TicketPdf(Pdf):
             self.p(self.translate(deleted_message))
             self.spacer()
         self.ticket_summary(summary)
+        self.ticket_invoice(ticket, layout)
         self.ticket_payment(ticket, layout)
 
         # If used for the user instead of the manager...

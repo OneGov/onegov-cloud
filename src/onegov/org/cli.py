@@ -2966,3 +2966,93 @@ def ris_rebuild_political_business_links_to_meetings(
         transaction.commit()
 
     return rebuild_political_business_links
+
+
+@cli.command(name='ris-make-imported-files-general-file')
+def ris_make_imported_files_general_file(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    onegov-org --select /onegov_town6/wil ris-make-imported-files-general-file
+    """
+
+    def make_general_file(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        businesses = PoliticalBusinessCollection(session)
+        meetings = MeetingCollection(session)
+
+        counter = 0
+        for business in businesses.query():
+            for file in business.files:
+                if file.type == 'generic':
+                    file.type = 'general'
+                    counter += 1
+        click.secho(f'Set {counter} political business files to '
+                    f'type "general"', fg='green')
+        transaction.commit()
+
+        counter = 0
+        for meeting in meetings.query():
+            for file in meeting.files:
+                if file.type == 'generic':
+                    file.type = 'general'
+                    counter += 1
+        click.secho(f'Set {counter} meeting files to type "general"',
+                    fg='green')
+
+    return make_general_file
+
+
+@cli.command(name='ris-wil-meetings-fix-audio-links')
+def ris_wil_meetings_shorten_audio_links(
+) -> Callable[[OrgRequest, OrgApp], None]:
+
+    def ris_wil_meetings_fix_audio_links(
+        request: OrgRequest,
+        app: OrgApp
+    ) -> None:
+
+        meetings = MeetingCollection(request.session)
+        recapp_counter = 0
+        http_counter = 0
+        for meeting in meetings.query():
+            if not meeting.audio_link:
+                continue
+
+            if (meeting.audio_link ==
+                    'https://wil.recapp.ch/viewer/default/timeline'):
+                meeting.audio_link = 'https://wil.recapp.ch'
+                recapp_counter += 1
+                continue
+
+            if 'http://wil.recapp.ch' in meeting.audio_link:
+                meeting.audio_link = (
+                    meeting.audio_link.replace('http', 'https'))
+                http_counter += 1
+                continue
+
+            if meeting.audio_link == 'https://wil.recapp.ch':
+                continue
+
+            if 'http://verbalix.stadtwil.ch' in meeting.audio_link:
+                meeting.audio_link = (
+                    meeting.audio_link.replace('http', 'https'))
+                http_counter += 1
+                continue
+
+            if meeting.audio_link == 'https://verbalix.stadtwil.ch/':
+                continue
+
+            if 'https://verbalix.stadtwil.ch/' in meeting.audio_link:
+                continue
+
+            click.secho(
+                f'audio link for meeting {meeting.title} vom '
+                f'{meeting.start_datetime}: {meeting.audio_link}', fg='yellow')
+
+        click.secho(f'Fixed recapp audio links for {recapp_counter} '
+                    f'meetings', fg='green')
+        click.secho(f'Fixed verbalix http audio links for {http_counter} '
+                    f'meetings', fg='green')
+        transaction.commit()
+
+    return ris_wil_meetings_fix_audio_links

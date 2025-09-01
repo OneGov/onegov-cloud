@@ -51,6 +51,18 @@ class MeetingForm(Form):
         render_kw={'rows': 5}
     )
 
+    audio_link = StringField(
+        label=_('Audio link to parliamentary debate'),
+        description='https://',
+        validators=[Optional()],
+    )
+
+    video_link = StringField(
+        label=_('Video link to parliamentary debate'),
+        description='https://',
+        validators=[Optional()],
+    )
+
     meeting_items = StringField(
         label=_('New agenda item'),
         fieldset=_('Agenda items'),
@@ -62,7 +74,9 @@ class MeetingForm(Form):
         self.agenda_items_errors: dict[int, str] = {}
 
     def on_request(self) -> None:
-        pass
+        # prevent showing access field as all ris information is public
+        if hasattr(self, 'access'):
+            self.delete_field('access')
 
     def populate_obj(  # type:ignore[override]
         self,
