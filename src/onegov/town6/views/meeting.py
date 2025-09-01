@@ -275,6 +275,12 @@ def view_meeting_export(
     layout.breadcrumbs.append(Link(_('Export'), '#'))
     layout.editbar_links = None
 
+    file_count = 0
+    file_count += len(self.files)
+    for meeting_item in self.meeting_items:
+        if meeting_item.political_business:
+            file_count +=len(meeting_item.political_business.files)
+
     if form.submitted(request):
         meeting_doc_ids = form.get_selected_meeting_documents_ids()
         business_doc_ids = form.get_selected_business_document_ids()
@@ -324,5 +330,5 @@ def view_meeting_export(
                          'business documents you want to export. The resulting '
                          'zipfile contains the documents per political business.'),
         'filters': None,
-        'count': 0,
+        'count': file_count,
     }
