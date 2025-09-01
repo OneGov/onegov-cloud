@@ -63,10 +63,10 @@ def test_normalize_for_path(
     default: str,
     expected: str
 ) -> None:
-    if default is None:
-        assert utils.normalize_for_path(input_path) == expected
-    else:
+    if default:
         assert utils.normalize_for_path(input_path, default) == expected
+    else:
+        assert utils.normalize_for_path(input_path) == expected
 
 
 @pytest.mark.parametrize("input_text, default, expected", [
@@ -87,11 +87,11 @@ def test_normalize_for_filename(
     default: str,
     expected: str
 ) -> None:
-    if default is None:
-        assert utils.normalize_for_filename(input_text) == expected
-    else:
+    if default:
         assert utils.normalize_for_filename(
             input_text, default=default) == expected
+    else:
+        assert utils.normalize_for_filename(input_text) == expected
 
 
 def test_touch(temporary_directory: str) -> None:
