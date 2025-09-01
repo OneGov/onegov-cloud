@@ -473,10 +473,6 @@ h1.main-title small {
         padding-top: .7rem;
         transition: opacity 200ms linear;
 
-
-        &::after {
-            display: none !important;
-        }
     }
 
     .agenda-item-title {
@@ -490,6 +486,12 @@ h1.main-title small {
         border-top: 0 !important;
         display: flex !important;
         padding-top: 0 !important;
+        align-items: inherit !important;
+
+
+        &::after {
+            display: none !important;
+        }
     }
 
     .draft {
