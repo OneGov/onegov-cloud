@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import json
-import shutil
+from os import environ, system
+from datetime import datetime
 import re
+import shutil
 import time
 from contextlib import suppress
 from http.client import RemoteDisconnected
 from onegov.core.utils import module_path
-from os import environ, system
 from selenium.webdriver import ActionChains, Keys
 from time import sleep
 
@@ -15,7 +16,7 @@ from time import sleep
 from typing import cast, Any, ParamSpec, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from datetime import datetime
+    from datetime import date
     from os import PathLike
     from selenium.webdriver import Chrome
     from splinter import Browser
@@ -259,7 +260,9 @@ class ExtendedBrowser(InjectedBrowserExtension):
         # Click somewhere else to ensure the editor loses focus and updates
         self.find_by_tag('body').click()
 
-    def set_datetime_element(self, selector: str, date_time: datetime) -> None:
+    def set_datetime_element(
+        self, selector: str, date_or_time: datetime | date
+    ) -> None:
         """ Sets the date and time on a datetime-local field directly by
         setting its value.
         """
@@ -268,7 +271,11 @@ class ExtendedBrowser(InjectedBrowserExtension):
         # element of the datetime picker and seeing what kind of format it
         # expects:
         # document.getElementById('publication_start').value;
-        date_time_str = date_time.strftime("%Y-%m-%dT%H:%M")
+        if isinstance(date_or_time, datetime):
+            date_or_time_s = date_or_time.strftime("%Y-%m-%dT%H:%M")
+        else:
+            # Many oneogv forms use a date widget with no time, support that:
+            date_or_time_s = date_or_time.strftime("%Y-%m-%d")
 
         script = """
             function setDateTimeDirect(selector, dateTimeString) {
@@ -291,7 +298,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
             setDateTimeDirect(arguments[0], arguments[1]);
         """
 
-        self.execute_script(script, selector, date_time_str)
+        self.execute_script(script, selector, date_or_time_s)
 
     def scroll_to_css(self, css: str) -> None:
         """ Scrolls to the first element matching the given css expression. """
