@@ -3,10 +3,10 @@ from __future__ import annotations
 import json
 
 from wtforms.validators import Optional, InputRequired
-from wtforms import StringField
+from wtforms import StringField, SelectMultipleField
 
 from onegov.form import Form
-from onegov.form.fields import TimezoneDateTimeField
+from onegov.form.fields import TimezoneDateTimeField, MultiCheckboxField
 from onegov.org.forms.fields import HtmlField
 from onegov.org import _
 
@@ -220,3 +220,57 @@ class MeetingForm(Form):
                 },
             }
         )
+
+
+class MeetingExportPoliticalBusinessForm(Form):
+
+    meeting_documents = MultiCheckboxField(
+        label=_('Meeting documents'),
+        choices=[],
+    )
+
+    business_documents = MultiCheckboxField(
+        label=_('Political business documents'),
+        choices=[],
+    )
+
+    def process_obj(self, obj: Meeting) -> None:
+        super().process_obj(obj)
+
+        self.meeting_documents.choices = [
+            (str(doc.id), doc.name)
+            for doc in obj.files
+        ]
+        self.meeting_documents.data = [doc.id for doc in obj.files]
+        self.meeting_documents.description = obj.display_name
+
+        document_structure = {}
+        for index, meeting_item in enumerate(obj.meeting_items, start=1):
+            business = meeting_item.political_business
+            if not business:
+                continue
+
+            document_structure[index] = {
+                'name': business.title,
+                'documents': [
+                    {'id': doc.id, 'name': doc.name}
+                    for doc in business.files
+                ]
+            }
+
+        choices = []
+        for value in document_structure.values():
+            business_name = value['name']
+            for doc in value['documents']:
+                choices.append((str(doc['id']), f"{business_name} - {doc['name']}"))
+        self.business_documents.choices = choices
+        self.business_documents.data = [doc_id for doc_id, _ in choices]
+
+    def get_selected_meeting_documents_ids(self) -> list[str]:
+        return self.meeting_documents.data
+
+    def get_selected_business_document_ids(self) -> list[str]:
+        return self.business_documents.data
+
+
+
