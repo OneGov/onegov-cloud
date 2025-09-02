@@ -831,6 +831,7 @@ def delete_content_marked_deletable(request: OrgRequest) -> None:
             count += 1
 
         query = request.session.query(Event)
+        query = query.filter(Event.end < now)
         for obj in query:
             if not obj.future_occurrences(limit=1).all():
                 log.info(f'Cron: Delete past event for {name}: '
