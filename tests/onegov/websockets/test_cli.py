@@ -1,16 +1,28 @@
+from __future__ import annotations
+
+import pytest
+
 from click.testing import CliRunner
 from onegov.websockets.cli import cli
 from os import path
-from pytest import fixture
 from unittest.mock import patch
 from yaml import dump
 
 
-@fixture(scope='function')
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import SessionManager
+    from unittest.mock import MagicMock
+
+
+@pytest.fixture(scope='function')
 def cfg_path(
-    postgres_dsn, session_manager, temporary_directory, redis_url,
-    websocket_config
-):
+    postgres_dsn: str,
+    session_manager: SessionManager,
+    temporary_directory: str,
+    redis_url: str,
+    websocket_config: dict[str, Any]
+) -> str:
     cfg = {
         'applications': [
             {
@@ -44,7 +56,13 @@ def cfg_path(
 
 @patch('onegov.websockets.cli.init_sentry')
 @patch('onegov.websockets.cli.main')
-def test_cli_serve(main, init_sentry, cfg_path, websocket_config):
+def test_cli_serve(
+    main: MagicMock,
+    init_sentry: MagicMock,
+    cfg_path: str,
+    websocket_config: dict[str, Any]
+) -> None:
+
     runner = CliRunner()
 
     result = runner.invoke(cli, [
@@ -87,7 +105,14 @@ def test_cli_serve(main, init_sentry, cfg_path, websocket_config):
 @patch('onegov.websockets.cli.connect')
 @patch('onegov.websockets.cli.authenticate')
 @patch('onegov.websockets.cli.get_status', return_value='XYZ')
-def test_cli_status(status, authenticate, connect, cfg_path, websocket_config):
+def test_cli_status(
+    status: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    cfg_path: str,
+    websocket_config: dict[str, Any]
+) -> None:
+
     runner = CliRunner()
 
     result = runner.invoke(cli, [
@@ -123,8 +148,13 @@ def test_cli_status(status, authenticate, connect, cfg_path, websocket_config):
 @patch('onegov.websockets.cli.authenticate')
 @patch('onegov.websockets.cli.broadast_message', return_value='XYZ')
 def test_cli_broadcast(
-    broadcast, authenticate, connect, cfg_path, websocket_config
-):
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    cfg_path: str,
+    websocket_config: dict[str, Any]
+) -> None:
+
     runner = CliRunner()
 
     result = runner.invoke(cli, [
@@ -177,16 +207,24 @@ def test_cli_broadcast(
     assert connect.call_args[0][0] == websocket_config['url']
     assert authenticate.call_count == 3
     assert authenticate.call_args[0][1] == 'super-super-secret-token'
-    assert broadcast.call_count == 3
-    assert broadcast.call_args[0][1] == 'foo-bar'
-    assert broadcast.call_args[0][2]
-    assert broadcast.call_args[0][3] == {'a': 'b'}
-    assert 'foo-bar-{}'.format(broadcast.call_args[0][2]) in result.output
+    # NOTE: undo mypy narrowing of call_args
+    broadcast2 = broadcast
+    assert broadcast2.call_count == 3
+    assert broadcast2.call_args[0][1] == 'foo-bar'
+    assert broadcast2.call_args[0][2]
+    assert broadcast2.call_args[0][3] == {'a': 'b'}
+    assert f'foo-bar-{broadcast2.call_args[0][2]}' in result.output
 
 
 @patch('onegov.websockets.cli.connect')
 @patch('onegov.websockets.cli.register')
-def test_cli_listen(register, connect, cfg_path, websocket_config):
+def test_cli_listen(
+    register: MagicMock,
+    connect: MagicMock,
+    cfg_path: str,
+    websocket_config: dict[str, Any]
+) -> None:
+
     runner = CliRunner()
 
     result = runner.invoke(cli, [
@@ -227,7 +265,9 @@ def test_cli_listen(register, connect, cfg_path, websocket_config):
     assert result.exit_code == 0
     assert connect.call_count == 3
     assert connect.call_args[0][0] == websocket_config['url']
-    assert register.call_count == 3
-    assert register.call_args[0][1] == 'foo-bar'
-    assert register.call_args[0][2]
-    assert 'foo-bar-{}'.format(register.call_args[0][2]) in result.output
+    # NOTE: undo mypy narrowing of call_args
+    register2 = register
+    assert register2.call_count == 3
+    assert register2.call_args[0][1] == 'foo-bar'
+    assert register2.call_args[0][2]
+    assert f'foo-bar-{register2.call_args[0][2]}' in result.output
