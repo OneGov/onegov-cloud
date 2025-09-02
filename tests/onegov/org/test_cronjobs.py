@@ -1286,8 +1286,10 @@ def test_delete_content_marked_deletable__news(org_app, handlers):
         assert count_news() == 0
 
 
-def test_delete_content_marked_deletable__events_occurrences(org_app,
-                                                             handlers):
+def test_delete_content_marked_deletable__events_occurrences(
+    org_app,
+    handlers
+):
     register_echo_handler(handlers)
     register_directory_handler(handlers)
 
@@ -1298,10 +1300,10 @@ def test_delete_content_marked_deletable__events_occurrences(org_app,
 
     transaction.begin()
 
-    title = 'Antelope Canyon Tour'
+    title_1 = 'Antelope Canyon Tour'
     events = EventCollection(org_app.session())
-    event = events.add(
-        title=title,
+    event_1 = events.add(
+        title=title_1,
         start=datetime(2024, 4, 18, 11, 0),
         end=datetime(2024, 4, 18, 13, 0),
         timezone='Europe/Zurich',
@@ -1314,18 +1316,32 @@ def test_delete_content_marked_deletable__events_occurrences(org_app,
         location='Antelope Canyon, Page, Arizona',
         tags=['nature', 'stunning', 'canyon'],
     )
-    event.recurrence = as_rdates('FREQ=WEEKLY;COUNT=4', event.start)
-    event.submit()
-    event.publish()
+    event_1.recurrence = as_rdates('FREQ=WEEKLY;COUNT=4', event_1.start)
+    event_1.submit()
+    event_1.publish()  # spawns occurrences
+
+    title_2 = 'Hiking Mount Pilatus'
+    event_2 = events.add(
+        title=title_2,
+        start=datetime(2024, 4, 18, 6, 0),
+        end=datetime(2024, 4, 18, 18, 0),
+        timezone='Europe/Zurich',
+        content={
+            'description': 'Wandern ist des Müllers Lust!'
+        }
+    )
+    event_2.recurrence = as_rdates('FREQ=WEEKLY;COUNT=2', event_2.start)
+    event_2.submit()
+    # not yet accepted and published, no additional occurrences
 
     transaction.commit()
     close_all_sessions()
 
-    def count_events():
+    def count_events(title):
         return (EventCollection(org_app.session()).query()
                 .filter_by(title=title).count())
 
-    def count_occurrences():
+    def count_occurrences(title):
         return (OccurrenceCollection(org_app.session(), outdated=True)
                 .query().filter_by(title=title).count())
 
@@ -1333,42 +1349,107 @@ def test_delete_content_marked_deletable__events_occurrences(org_app,
         # default setting, no deletion of past event and past occurrences
         assert org_app.org.delete_past_events is False
 
-        assert count_events() == 1
-        assert count_occurrences() == 4
+        assert count_events(title_1) == 1
+        assert count_occurrences(title_1) == 4
+        assert count_events(title_2) == 1
+        assert count_occurrences(title_2) == 0  # as it did not get published
 
         client.get(get_cronjob_url(job))
-        assert count_events() == 1
-        assert count_occurrences() == 4
+        assert count_events(title_1) == 1
+        assert count_occurrences(title_1) == 4
+        assert count_events(title_2) == 1
+        assert count_occurrences(title_2) == 0
 
     with (freeze_time(datetime(2024, 4, 19, 6, 0, tzinfo=tz))):
-        # an old occurrence could be deleted but the setting is not enabled
+        # an old occurrence could be deleted, but the setting is not enabled
         client.get(get_cronjob_url(job))
-        assert count_events() == 1
-        assert count_occurrences() == 4
+        assert count_events(title_1) == 1
+        assert count_occurrences(title_1) == 4
+        assert count_events(title_2) == 1
+        assert count_occurrences(title_2) == 0
 
-        # switch setting and see if past events and past occurrences are
-        # deleted
+        # switch setting and see if past events/occurrences get deleted
         transaction.begin()
         org_app.org.delete_past_events = True
         transaction.commit()
         close_all_sessions()
 
         client.get(get_cronjob_url(job))
-        assert count_events() == 1
-        assert count_occurrences() == 3
+        assert count_events(title_1) == 1
+        assert count_occurrences(title_1) == 3
+        assert count_events(title_2) == 0
+        assert count_occurrences(title_2) == 0
 
     with (freeze_time(datetime(2024, 5, 9, tzinfo=tz))):
         client.get(get_cronjob_url(job))
-        assert count_events() == 1
-        assert count_occurrences() == 1
+        assert count_events(title_1) == 1
+        assert count_occurrences(title_1) == 1
 
     with (freeze_time(datetime(2024, 5, 10, tzinfo=tz))):
         # finally after all occurrences took place, the event as well as all
         # occurrences got deleted by the cronjob (April 18th + 3*7 days =
         # May 10)
         client.get(get_cronjob_url(job))
-        assert count_events() == 0
-        assert count_occurrences() == 0
+        assert count_events(title_1) == 0
+        assert count_occurrences(title_1) == 0
+
+
+def test_delete_content_marked_deletable__events_occurrences_ogc_2562(
+    org_app,
+    handlers
+):
+    # events accidentally got deleted in the cronjob prior ticket acceptance
+    # and event publishing as no future occurrences were found
+
+    register_echo_handler(handlers)
+    register_directory_handler(handlers)
+
+    client = Client(org_app)
+    job = get_cronjob_by_name(org_app, 'delete_content_marked_deletable')
+    job.app = org_app
+    tz = ensure_timezone('Europe/Zurich')
+
+    transaction.begin()
+
+    title = 'No accepted nor published event'
+    events = EventCollection(org_app.session())
+    event = events.add(
+        title=title,
+        start=datetime(2025, 9, 2, 11, 0),
+        end=datetime(2025, 9, 2, 13, 0),
+        timezone='Europe/Zurich',
+        content={
+            'description': 'afraid to get deleted prior beeing published'
+        },
+        location='trash bin',
+        tags=['trash', 'bin', 'afraid'],
+    )
+    event.recurrence = as_rdates('FREQ=WEEKLY;COUNT=4', event.start)
+    event.submit()
+    # no yet published, no occurrences spawn
+
+    org_app.org.delete_past_events = True
+
+    transaction.commit()
+    close_all_sessions()
+
+    def count_events(title):
+        return (EventCollection(org_app.session()).query()
+                .filter_by(title=title).count())
+
+    def count_occurrences(title):
+        return (OccurrenceCollection(org_app.session(), outdated=True)
+                .query().filter_by(title=title).count())
+
+    with (freeze_time(datetime(2024, 4, 18, tzinfo=tz))):
+        assert org_app.org.delete_past_events is True
+
+        assert count_events(title) == 1
+        assert count_occurrences(title) == 0
+
+        client.get(get_cronjob_url(job))
+        assert count_events(title) == 1
+        assert count_occurrences(title) == 0
 
 
 @pytest.mark.parametrize(
