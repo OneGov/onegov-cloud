@@ -336,7 +336,6 @@ def view_meeting_export(
                     f'attachment; filename="{filename}.zip"')
                 return response
 
-    # layout = MeetingCollectionLayout(self, request)
     layout = MeetingLayout(self, request)
     layout.breadcrumbs.append(Link(_('Export'), '#'))
     layout.editbar_links = None
