@@ -71,6 +71,10 @@ class SwissVoteCollection(Pagination[SwissVote]):
         sort_by: str | None = None,
         sort_order: str | None = None
     ) -> None:
+        # ignore empty policy areas swi-63
+        if policy_area and '' in policy_area:
+            policy_area = [i for i in policy_area if i]
+
         super().__init__(page)
         self.app = app
         self.session = app.session()
