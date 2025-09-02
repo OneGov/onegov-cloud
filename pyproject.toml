@@ -73,7 +73,6 @@ ignore_missing_imports = true
 module = [
     "tests.onegov.activity.*",
     "tests.onegov.agency.*",
-    "tests.onegov.api.*",
     "tests.onegov.election_day.*",
     "tests.onegov.feriennet.*",
     "tests.onegov.form.*",
