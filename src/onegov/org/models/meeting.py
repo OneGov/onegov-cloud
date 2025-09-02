@@ -66,6 +66,11 @@ class Meeting(
     def title_text(self) -> str:
         return f'{self.title} ({self.start_datetime})'
 
+    @property
+    def display_name(self) -> str:
+        # return title and start_datetime as dmY
+        return f'{self.title} {self.start_datetime:%d.%m.%Y}'
+
     #: Internal ID
     id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]

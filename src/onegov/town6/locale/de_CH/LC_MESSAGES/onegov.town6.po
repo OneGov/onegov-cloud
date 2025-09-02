@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-08-29 08:26+0200\n"
+"POT-Creation-Date: 2025-09-01 11:54+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2614,6 +2614,19 @@ msgstr "Sitzung bearbeiten"
 msgid "The meeting has been deleted."
 msgstr "Die Sitzung wurde gelöscht."
 
+msgid "No documents are assigned to the following agenda items:"
+msgstr "Keine Dokumente sind den folgenden Traktanden zugewiesen:"
+
+msgid "Export meeting documents"
+msgstr "Sitzungsdokumente exportieren"
+
+msgid ""
+"Select the meeting and agenda item documents you want to export. The "
+"resulting zipfile contains the documents per meeting item."
+msgstr ""
+"Wählen Sie die Sitzungs- und Traktandendokumente aus, die Sie exportieren "
+"möchten. Die resultierende Zip-Datei enthält die Dokumente pro Traktanden."
+
 msgid "The commission membership has been deleted."
 msgstr "Die Kommissionsmitgliedschaft wurde gelöscht."
 
@@ -2755,6 +2768,12 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid "Meeting documents"
+#~ msgstr "Sitzungsdokumente"
+
+#~ msgid "Agenda item documents"
+#~ msgstr "Traktandendokumente"
 
 #~ msgid "No parliamentarians defined yet."
 #~ msgstr "Noch keine Parlamentarier erfasst."

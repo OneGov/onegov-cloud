@@ -1,11 +1,21 @@
 from __future__ import annotations
 
 import morepath
+import os
+import zipfile
+
+from pathlib import Path
+from tempfile import NamedTemporaryFile
+
 from webob.exc import HTTPNotFound
+from webob.response import Response
 
 from onegov.core.elements import Link
+from onegov.core.html import sanitize_html
 from onegov.core.security.permissions import Public, Private
+from onegov.core.utils import normalize_for_path, normalize_for_filename
 from onegov.org.forms import MeetingForm
+from onegov.org.forms.meeting import MeetingExportPoliticalBusinessForm
 
 from onegov.org.models import Meeting
 from onegov.org.models import MeetingCollection
@@ -23,7 +33,6 @@ if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
     from onegov.core.types import RenderData
     from onegov.core.request import CoreRequest
-    from webob import Response
 
 
 def get_meeting_form_class(
@@ -257,3 +266,117 @@ def view_redirect_meeting_item_to_meeting(
     Redirect for search results, if we link to MeetingItem we show the Meeting
     """
     return morepath.redirect(request.link(self.meeting))
+
+
+@TownApp.form(
+    model=Meeting,
+    permission=Public,
+    name='export',
+    template='export.pt',
+    form=MeetingExportPoliticalBusinessForm,
+    pass_model=True
+)
+def view_meeting_export(
+    self: Meeting,
+    request: TownRequest,
+    form: MeetingExportPoliticalBusinessForm
+) -> RenderData | Response:
+
+    def build_zip_response() -> Response:
+        meeting_doc_ids = form.get_selected_meeting_documents_ids()
+        agenda_item_doc_ids = form.get_selected_agenda_item_document_ids()
+
+        base_storage_path = request.app.depot_storage_path
+        assert (base_storage_path is not None), (
+            'Depot storage path is not configured')
+
+        with (NamedTemporaryFile(delete=False) as f):
+            zip_path = f.name
+
+            with zipfile.ZipFile(
+                    zip_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+
+                # meeting documents
+                for file in self.files:
+                    if file.id in meeting_doc_ids:
+                        path = (
+                                Path(base_storage_path)
+                                / file.reference.path / 'file'
+                        )
+                        with open(path, 'rb') as file_content:
+                            folder_name = normalize_for_path(self.display_name)
+                            zip_file.writestr(
+                                os.path.join(folder_name, file.name),
+                                file_content.read()
+                            )
+
+                # agenda item documents
+                for meeting_item in self.meeting_items:
+                    business = meeting_item.political_business
+                    if business:
+                        for file in business.files:
+                            if file.id in agenda_item_doc_ids:
+                                path = (
+                                        Path(base_storage_path)
+                                        / file.reference.path / 'file')
+                                with open(path, 'rb') as file_content:
+                                    folder_name = normalize_for_path(
+                                        meeting_item.display_name)
+                                    zip_file.writestr(
+                                        os.path.join(folder_name, file.name),
+                                        file_content.read()
+                                    )
+
+            with open(zip_path, 'rb') as zip_file:
+                filename = normalize_for_filename(self.display_name)
+                response = Response()
+                response.body = zip_file.read()
+                response.content_type = 'application/zip'
+                response.content_disposition = (
+                    f'attachment; filename="{filename}.zip"')
+                return response
+
+    layout = MeetingLayout(self, request)
+    layout.breadcrumbs.append(Link(_('Export'), '#'))
+    layout.editbar_links = None
+
+    file_count = 0
+    file_count += len(self.files)
+    for meeting_item in self.meeting_items:
+        if meeting_item.political_business:
+            file_count += len(meeting_item.political_business.files)
+
+    if form.submitted(request):
+        form.populate_obj(self)
+        return build_zip_response()
+
+    meeting_items_no_docs = []
+    if not self.files:
+        meeting_items_no_docs.append(self.display_name)
+    for meeting_item in self.meeting_items:
+        if not meeting_item.political_business:
+            meeting_items_no_docs.append(meeting_item.display_name)
+        else:
+            if not meeting_item.political_business.files:
+                meeting_items_no_docs.append(meeting_item.display_name)
+    meeting_items_no_docs = sorted(meeting_items_no_docs)
+
+    intro = request.translate(
+        _('No documents are assigned to the following agenda items:')
+    )
+    items = ''.join(f'<li>{title}</li>'
+                    for title in meeting_items_no_docs)
+    note_html = intro + f'<ul>{items}</ul>'
+
+    return {
+        'layout': layout,
+        'form': form,
+        'title': _('Export meeting documents'),
+        'explanation': _('Select the meeting and agenda item '
+                         'documents you want to export. The resulting zipfile '
+                         'contains the documents per meeting item.'),
+        'has_note': True if meeting_items_no_docs else False,
+        'note_html': sanitize_html(note_html),
+        'filters': None,
+        'count': file_count,
+    }

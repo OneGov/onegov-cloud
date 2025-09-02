@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-08-29 08:26+0200\n"
+"POT-Creation-Date: 2025-09-01 11:54+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2614,6 +2614,20 @@ msgstr "Modifica riunione"
 
 msgid "The meeting has been deleted."
 msgstr "La riunione è stata eliminata."
+
+msgid "No documents are assigned to the following agenda items:"
+msgstr "Nessun documento è assegnato ai seguenti punti all'ordine del giorno:"
+
+msgid "Export meeting documents"
+msgstr "Esporta i documenti della riunione"
+
+msgid ""
+"Select the meeting and agenda item documents you want to export. The "
+"resulting zipfile contains the documents per meeting item."
+msgstr ""
+"Seleziona i documenti della riunione e dell'ordine del giorno che vuoi "
+"esportare. Il file zip risultante contiene i documenti per voce della "
+"riunione."
 
 msgid "The commission membership has been deleted."
 msgstr "L'appartenenza alla commissione è stata eliminata."
