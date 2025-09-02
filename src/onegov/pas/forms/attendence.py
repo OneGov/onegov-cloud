@@ -6,6 +6,7 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import MultiCheckboxField
 from onegov.pas import _
+from onegov.pas.custom import get_current_settlement_run
 from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.models import SettlementRun
@@ -46,6 +47,11 @@ class SettlementRunBoundMixin:
                 return False
 
         return True
+
+    def set_default_value_to_settlement_run_start(self) -> None:
+        settlement_run = get_current_settlement_run(self.request.session)
+        if settlement_run:
+            self.date.data = settlement_run.start
 
 
 class AttendenceForm(Form, SettlementRunBoundMixin):
@@ -127,6 +133,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
         return result
 
     def on_request(self) -> None:
+        self.set_default_value_to_settlement_run_start()
         self.parliamentarian_id.choices = [
             (str(parliamentarian.id), parliamentarian.title)
             for parliamentarian
@@ -175,6 +182,7 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
         return result
 
     def on_request(self) -> None:
+        self.set_default_value_to_settlement_run_start()
         self.parliamentarian_id.choices = [
             (str(parliamentarian.id), parliamentarian.title)
             for parliamentarian
@@ -218,6 +226,7 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
         return result
 
     def on_request(self) -> None:
+        self.set_default_value_to_settlement_run_start()
         self.commission_id.choices = [
             (commission.id, commission.title)
             for commission
@@ -268,6 +277,7 @@ class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):
         return result
 
     def on_request(self) -> None:
+        self.set_default_value_to_settlement_run_start()
         self.parliamentarian_id.choices = [
             (
                 str(membership.parliamentarian.id),
