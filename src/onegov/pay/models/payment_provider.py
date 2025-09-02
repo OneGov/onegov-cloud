@@ -26,7 +26,9 @@ if TYPE_CHECKING:
     from onegov.pay import Price
     from onegov.pay.types import PaymentState
 
-_P = TypeVar('_P', bound=Payment)
+    _P = TypeVar('_P', bound=Payment, default=Payment)
+else:
+    _P = TypeVar('_P', bound=Payment)
 
 
 class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):

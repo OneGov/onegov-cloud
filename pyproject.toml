@@ -82,7 +82,6 @@ module = [
     "tests.onegov.landsgemeinde.*",
     "tests.onegov.org.*",
     "tests.onegov.pas.*",
-    "tests.onegov.pay.*",
     "tests.onegov.search.*",
     "tests.onegov.swissvotes.*",
     "tests.onegov.town6.*",
