@@ -149,3 +149,21 @@ class AgendaItem(
             for line in (self.title or '').splitlines()
             if (stripped_line := line.strip())
         ]
+
+    @property
+    def more_files(self) -> list[LandsgemeindeFile]:
+        files = self.files
+        if self.memorial_pdf:
+            return [
+                file for file in files
+                if file != self.memorial_pdf and isinstance(file,
+                                                            LandsgemeindeFile)
+            ]
+        return []
+
+    @more_files.setter
+    def more_files(self, value: list[LandsgemeindeFile]) -> None:
+        if self.memorial_pdf:
+            self.files = value + [self.memorial_pdf]
+        else:
+            self.files = value  # type: ignore
