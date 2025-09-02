@@ -52,7 +52,7 @@ implicit_reexport = true
 warn_unreachable = true
 warn_return_any = false
 # FIXME: remove sqlalchemy when upgrading to SQlAlchemy 2.0
-untyped_calls_exclude = "sqlalchemy,pycurl,onegov.core.types"
+untyped_calls_exclude = "sqlalchemy,pycurl,onegov.core.types,selenium.webdriver.chrome.webdriver"
 plugins = "sqlmypy"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
@@ -75,7 +75,6 @@ module = [
     "tests.onegov.agency.*",
     "tests.onegov.election_day.*",
     "tests.onegov.feriennet.*",
-    "tests.onegov.form.*",
     "tests.onegov.fsi.*",
     "tests.onegov.gazette.*",
     "tests.onegov.landsgemeinde.*",

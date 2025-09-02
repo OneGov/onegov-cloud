@@ -83,15 +83,15 @@ class decimal_range:  # noqa: N801
 
     def __init__(
         self,
-        start: float | Decimal,
-        stop: float | Decimal,
+        start: str | float | Decimal,
+        stop: str | float | Decimal,
         step: str | float | Decimal | None = None
-    ):
-        if step is None:
-            step = 1 if start <= stop else -1
+    ) -> None:
 
         self.start = self.current = Decimal(start)
         self.stop = Decimal(stop)
+        if step is None:
+            step = '1' if self.start <= self.stop else '-1'
         self.step = Decimal(step)
 
         assert self.step != Decimal(0)
