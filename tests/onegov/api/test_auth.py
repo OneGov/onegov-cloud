@@ -1,15 +1,24 @@
-from base64 import b64encode
-from uuid import uuid4
-from collections import namedtuple
+from __future__ import annotations
+
 import transaction
+
+from base64 import b64encode
+from collections import namedtuple
+from freezegun import freeze_time
 from onegov.api.models import ApiKey
 from onegov.api.token import jwt_decode, get_token
 from onegov.core.utils import Bunch
 from onegov.user import UserCollection
-from freezegun import freeze_time
+from uuid import uuid4
 
 
-def test_token_generation_bearer(session):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from tests.shared.client import Client
+
+
+def test_token_generation_bearer(session: Session) -> None:
 
     user = UserCollection(session).add(
         username='a@a.a', password='a', role='admin'
@@ -25,12 +34,10 @@ def test_token_generation_bearer(session):
     authorization = namedtuple('authorization', ['authtype', 'params'])
     authorization.authtype = 'Bearer'
     authorization.params = str(key.key)
-    request = Bunch(
-        **{
-            'identity_secret': 'secret',
-            'session': session,
-            'authorization': authorization,
-        }
+    request: Any = Bunch(
+        identity_secret='secret',
+        session=session,
+        authorization=authorization,
     )
     time_restricted_token = get_token(request)['token']
     assert time_restricted_token
@@ -40,7 +47,7 @@ def test_token_generation_bearer(session):
     assert decoded_result['id'] == str(key.id)
 
 
-def test_token_generation_basic(session):
+def test_token_generation_basic(session: Session) -> None:
 
     user = UserCollection(session).add(
         username='a@a.a', password='a', role='admin'
@@ -58,12 +65,10 @@ def test_token_generation_basic(session):
     authorization = namedtuple('authorization', ['authtype', 'params'])
     authorization.authtype = 'Basic'
     authorization.params = b64encode(auth.encode('utf-8')).decode()
-    request = Bunch(
-        **{
-            'identity_secret': 'secret',
-            'session': session,
-            'authorization': authorization,
-        }
+    request: Any = Bunch(
+        identity_secret='secret',
+        session=session,
+        authorization=authorization,
     )
     time_restricted_token = get_token(request)['token']
     assert time_restricted_token
@@ -73,7 +78,7 @@ def test_token_generation_basic(session):
     assert decoded_result['id'] == str(key.id)
 
 
-def test_get_token_bearer(client):
+def test_get_token_bearer(client: Client) -> None:
 
     user = UserCollection(client.app.session()).add(
         username='a@a.a', password='a', role='admin'
@@ -94,7 +99,7 @@ def test_get_token_bearer(client):
     assert response.status_code == 200
 
 
-def test_get_token_basic(client):
+def test_get_token_basic(client: Client) -> None:
 
     user = UserCollection(client.app.session()).add(
         username='a@a.a', password='a', role='admin'
@@ -118,7 +123,7 @@ def test_get_token_basic(client):
     assert response.status_code == 200
 
 
-def test_jwt_auth_bearer(client):
+def test_jwt_auth_bearer(client: Client) -> None:
 
     user = UserCollection(client.app.session()).add(
         username='a@a.a', password='a', role='admin'
@@ -144,7 +149,7 @@ def test_jwt_auth_bearer(client):
     assert response.status_code == 200
 
 
-def test_jwt_auth_basic(client):
+def test_jwt_auth_basic(client: Client) -> None:
 
     user = UserCollection(client.app.session()).add(
         username='a@a.a', password='a', role='admin'
@@ -172,7 +177,7 @@ def test_jwt_auth_basic(client):
     assert response.status_code == 200
 
 
-def test_jwt_expired(client):
+def test_jwt_expired(client: Client) -> None:
     with freeze_time('2019-01-01T00:00:00'):
         user = UserCollection(client.app.session()).add(
             username='a@a.a', password='a', role='admin'
