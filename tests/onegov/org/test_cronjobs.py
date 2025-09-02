@@ -1360,6 +1360,25 @@ def test_delete_content_marked_deletable__events_occurrences(
         assert count_events(title_2) == 1
         assert count_occurrences(title_2) == 0
 
+        # ogc-2562
+        # switch setting and see nothing gets deleted event without occurrences
+        # and prio end date
+        transaction.begin()
+        org_app.org.delete_past_events = True
+        transaction.commit()
+        close_all_sessions()
+
+        client.get(get_cronjob_url(job))
+        assert count_events(title_1) == 1
+        assert count_occurrences(title_1) == 4
+        assert count_events(title_2) == 1
+        assert count_occurrences(title_2) == 0
+
+        transaction.begin()
+        org_app.org.delete_past_events = False
+        transaction.commit()
+        close_all_sessions()
+
     with (freeze_time(datetime(2024, 4, 19, 6, 0, tzinfo=tz))):
         # an old occurrence could be deleted, but the setting is not enabled
         client.get(get_cronjob_url(job))
@@ -1392,71 +1411,6 @@ def test_delete_content_marked_deletable__events_occurrences(
         client.get(get_cronjob_url(job))
         assert count_events(title_1) == 0
         assert count_occurrences(title_1) == 0
-
-
-def test_delete_content_marked_deletable__events_occurrences_ogc_2562(
-    org_app,
-    handlers
-):
-    # events accidentally got deleted in the cronjob prior ticket acceptance
-    # and event publishing as no future occurrences were found
-
-    register_echo_handler(handlers)
-    register_directory_handler(handlers)
-
-    client = Client(org_app)
-    job = get_cronjob_by_name(org_app, 'delete_content_marked_deletable')
-    job.app = org_app
-    tz = ensure_timezone('Europe/Zurich')
-
-    transaction.begin()
-
-    title = 'No accepted nor published event'
-    events = EventCollection(org_app.session())
-    event = events.add(
-        title=title,
-        start=datetime(2025, 9, 2, 11, 0),
-        end=datetime(2025, 9, 2, 13, 0),
-        timezone='Europe/Zurich',
-        content={
-            'description': 'afraid to get deleted prior beeing published'
-        },
-        location='trash bin',
-        tags=['trash', 'bin', 'afraid'],
-    )
-    event.recurrence = as_rdates('FREQ=WEEKLY;COUNT=4', event.start)
-    event.submit()
-    # no yet published, no occurrences spawn
-
-    org_app.org.delete_past_events = True
-
-    transaction.commit()
-    close_all_sessions()
-
-    def count_events(title):
-        return (EventCollection(org_app.session()).query()
-                .filter_by(title=title).count())
-
-    def count_occurrences(title):
-        return (OccurrenceCollection(org_app.session(), outdated=True)
-                .query().filter_by(title=title).count())
-
-    with (freeze_time(datetime(2025, 9, 2, tzinfo=tz))):
-        assert org_app.org.delete_past_events is True
-
-        assert count_events(title) == 1
-        assert count_occurrences(title) == 0
-
-        client.get(get_cronjob_url(job))
-        assert count_events(title) == 1
-        assert count_occurrences(title) == 0
-
-    # even unpublished event gets deleted
-    with (freeze_time(datetime(2025, 9, 3, tzinfo=tz))):
-        client.get(get_cronjob_url(job))
-
-        assert count_events(title) == 0
-        assert count_occurrences(title) == 0
 
 
 @pytest.mark.parametrize(
