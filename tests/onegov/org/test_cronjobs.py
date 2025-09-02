@@ -1441,7 +1441,7 @@ def test_delete_content_marked_deletable__events_occurrences_ogc_2562(
         return (OccurrenceCollection(org_app.session(), outdated=True)
                 .query().filter_by(title=title).count())
 
-    with (freeze_time(datetime(2024, 4, 18, tzinfo=tz))):
+    with (freeze_time(datetime(2025, 9, 2, tzinfo=tz))):
         assert org_app.org.delete_past_events is True
 
         assert count_events(title) == 1
@@ -1449,6 +1449,13 @@ def test_delete_content_marked_deletable__events_occurrences_ogc_2562(
 
         client.get(get_cronjob_url(job))
         assert count_events(title) == 1
+        assert count_occurrences(title) == 0
+
+    # even unpublished event gets deleted
+    with (freeze_time(datetime(2025, 9, 3, tzinfo=tz))):
+        client.get(get_cronjob_url(job))
+
+        assert count_events(title) == 0
         assert count_occurrences(title) == 0
 
 
