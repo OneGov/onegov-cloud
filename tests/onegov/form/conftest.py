@@ -83,13 +83,13 @@ def form_app(request: pytest.FixtureRequest) -> TestApp:
 
     @_TestApp.path(path='/snippets')
     class Snippets(Content):
-        html = """
+        html = f"""
             <!doctype html>
             <html>
                 <head>
-                    <script type="text/javascript" src="{}"></script>
-                    <script type="text/javascript" src="{}"></script>
-                    <link rel="stylesheet" href="{}">
+                    <script type="text/javascript" src="{react}"></script>
+                    <script type="text/javascript" src="{react_dom}"></script>
+                    <link rel="stylesheet" href="{fontawesome}">
                     <style>
                         .formcode-toolbar-element {{
                             height: 10px;
@@ -106,7 +106,7 @@ def form_app(request: pytest.FixtureRequest) -> TestApp:
                     <textarea></textarea>
                 </body>
             </html>
-        """.format(react, react_dom, fontawesome)
+        """
 
     @_TestApp.path(path='/registry')
     class Registry(Content):
@@ -158,7 +158,7 @@ def form_app(request: pytest.FixtureRequest) -> TestApp:
         request.include('formcode')
         return self.html
 
-    return create_app(TestApp, request, use_maildir=False)
+    return create_app(_TestApp, request, use_maildir=False)
 
 
 @pytest.fixture(scope='function')
