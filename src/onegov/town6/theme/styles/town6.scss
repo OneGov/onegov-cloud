@@ -547,7 +547,7 @@ table {
     transition: opacity .3s ease;
     width: 30px;
 
-    .show {
+    &.show {
         opacity: 1;
     }
 }
