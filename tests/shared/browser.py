@@ -310,7 +310,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
         # https://gist.github.com/z41/c11f8a4072e9f67e5755d4a1a72c8f02
         dropzone = self.find_by_css(selector)[0]._element  # type: ignore[attr-defined]
 
-        input = self.driver.execute_script(JS_DROP_FILE, dropzone)  # type: ignore[no-untyped-call]
+        input = self.driver.execute_script(JS_DROP_FILE, dropzone)
         input.send_keys(str(path))
 
     @property
@@ -354,7 +354,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
 
         Use a regex expression to filter by the message of the error
         """
-        messages = self.driver.get_log('browser')  # type: ignore[no-untyped-call]
+        messages = self.driver.get_log('browser')
         if not messages:
             return []
 
