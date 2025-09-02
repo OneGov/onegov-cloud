@@ -159,7 +159,7 @@ class AgendaItem(
                 if file != self.memorial_pdf and isinstance(file,
                                                             LandsgemeindeFile)
             ]
-        return []
+        return self.files  # type: ignore
 
     @more_files.setter
     def more_files(self, value: list[LandsgemeindeFile]) -> None:
