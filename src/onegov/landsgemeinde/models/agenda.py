@@ -164,6 +164,6 @@ class AgendaItem(
     @more_files.setter
     def more_files(self, value: list[LandsgemeindeFile]) -> None:
         if self.memorial_pdf:
-            self.files = value + [self.memorial_pdf]
+            self.files = [*value, self.memorial_pdf]
         else:
             self.files = value  # type: ignore
