@@ -365,3 +365,45 @@ if (
 $('.is-accordion-submenu-parent a span').on('click', function(e) {
     e.stopPropagation();
 });
+
+
+$('.main-content table, .page-content-main table').each(function() {
+    if ($(this).width() > $('.main-content').width() || $(this).width() > $('.page-content-main').width()) {
+        const $table = $(this);
+        const $container = $('<div class="table-container"></div>');
+        const $gradient = $('<div class="scroll-gradient"></div>');
+
+        $table.wrap($container);
+        $table.addClass('scroll');
+        $table.parent().append($gradient);
+    }
+});
+
+function setupScrollGradient() {
+    $('.scroll').each(function() {
+        const $table = $(this);
+        const $gradient = $table.siblings('.scroll-gradient');
+
+        if ($gradient.length === 0) return;
+
+        function updateGradient() {
+            const scrollWidth = $table[0].scrollWidth;
+            const clientWidth = $table[0].clientWidth;
+            const scrollLeft = $table[0].scrollLeft;
+
+            const hasMoreContent = scrollLeft + clientWidth < scrollWidth - 5; // 5px tolerance
+
+            if (hasMoreContent) {
+                $gradient.addClass('show');
+            } else {
+                $gradient.removeClass('show');
+            }
+        }
+
+        updateGradient();
+        $table.on('scroll', updateGradient);
+        $(window).on('resize', updateGradient);
+    });
+}
+
+setupScrollGradient();
