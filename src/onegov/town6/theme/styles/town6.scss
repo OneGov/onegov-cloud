@@ -523,13 +523,39 @@ $table-border-color: smart-scale($table-background, $table-color-scale);
 
 table {
     font-family: $header-font-family;
+
+    td p {
+        hyphens: none;
+        margin-bottom: 0;
+    }
+}
+
+/* Gradient overlay for scrollable tables */
+.table-container {
+    position: relative;
+    width: 100%;
+}
+
+.scroll-gradient {
+    background: linear-gradient(to right, transparent, #e0e0e0);
+    bottom: 0;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: opacity .3s ease;
+    width: 30px;
+
+    &.show {
+        opacity: 1;
+    }
 }
 
 table tr th,
 table tr td {
     font-size: .875rem;
 }
-
 
 /*
     Pagination customisations
