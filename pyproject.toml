@@ -73,7 +73,6 @@ ignore_missing_imports = true
 module = [
     "tests.onegov.activity.*",
     "tests.onegov.agency.*",
-    "tests.onegov.api.*",
     "tests.onegov.election_day.*",
     "tests.onegov.feriennet.*",
     "tests.onegov.form.*",
@@ -82,12 +81,10 @@ module = [
     "tests.onegov.landsgemeinde.*",
     "tests.onegov.org.*",
     "tests.onegov.pas.*",
-    "tests.onegov.pay.*",
     "tests.onegov.search.*",
     "tests.onegov.swissvotes.*",
     "tests.onegov.town6.*",
     "tests.onegov.translator_directory.*",
-    "tests.onegov.websockets.*",
     "tests.onegov.winterthur.*",
 ]
 check_untyped_defs = false

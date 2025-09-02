@@ -8,7 +8,11 @@ from onegov.websockets import log
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import JSON_ro
+    from typing import TypedDict
     from websockets.asyncio.client import ClientConnection
+
+    class StatusMessage(TypedDict):
+        connections: dict[str, int]
 
 
 async def acknowledged(websocket: ClientConnection) -> None:
@@ -85,7 +89,7 @@ async def broadcast(
     await acknowledged(websocket)
 
 
-async def status(websocket: ClientConnection) -> str | None:
+async def status(websocket: ClientConnection) -> StatusMessage | None:
     """ Receives the status of the server.
 
     Assumes prior authentication.

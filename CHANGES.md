@@ -1,8 +1,46 @@
 # Changes
 
+## 2025.46
+
+`2025-09-02` | [c01adb76b6...d2a37ed20f](https://github.com/OneGov/onegov-cloud/compare/c01adb76b6^...d2a37ed20f)
+
+**Upgrade hints**
+- onegov-org --select /onegov_town6/wil ris-wil-meetings-fix-audio-links
+### Pas
+
+##### Bulk add commission attendances.
+
+`Feature` | [OGC-2489](https://linear.app/onegovcloud/issue/OGC-2489) | [56a3fe9f49](https://github.com/onegov/onegov-cloud/commit/56a3fe9f49731e4a40f94aa2cd616a90793357de)
+
+### Ris
+
+##### Show audio and video links for meetings
+
+`Feature` | [OGC-2522](https://linear.app/onegovcloud/issue/OGC-2522) | [c01adb76b6](https://github.com/onegov/onegov-cloud/commit/c01adb76b6336ff441bfa0621fd00ffb07ea671a)
+
+##### Adds export view to meeting in order to download related meeting item documents
+
+`Feature` | [OGC-2297](https://linear.app/onegovcloud/issue/OGC-2297) | [d2a37ed20f](https://github.com/onegov/onegov-cloud/commit/d2a37ed20f4732e4ec37f0a9a85b2f7c88ccab15)
+
+### Town6
+
+##### Fix more-list
+
+`Feature` | [015b897a87](https://github.com/onegov/onegov-cloud/commit/015b897a87ca1986f20770c27c1b2ec153b34518)
+
+##### List Corrections
+
+`Feature` | [aaf293052b](https://github.com/onegov/onegov-cloud/commit/aaf293052bf8ea579dfc70970eb728d873af653c)
+
+##### Anchor links
+
+Add anchor links to headings in main content
+
+`Feature` | [OGC-2267](https://linear.app/onegovcloud/issue/OGC-2267) | [e35d58b11f](https://github.com/onegov/onegov-cloud/commit/e35d58b11f2caff4ad33732dbd1e00cae98ae7de)
+
 ## 2025.45
 
-`2025-09-01` | [313087dab3...9e538ee57c](https://github.com/OneGov/onegov-cloud/compare/313087dab3^...9e538ee57c)
+`2025-09-01` | [313087dab3...6fc92791b8](https://github.com/OneGov/onegov-cloud/compare/313087dab3^...6fc92791b8)
 
 **Upgrade hints**
 - onegov-org --select /onegov_town6/wil ris-make-imported-files-general-file
@@ -2142,8 +2180,4 @@ Restyle the sidebar-toggler so it is fixed to the bottom and more visible.
 ##### Adds optional ordering by filename or caption to image sets
 
 `Feature` | [OGC-2000](https://linear.app/onegovcloud/issue/OGC-2000) | [f67e97d4ed](https://github.com/onegov/onegov-cloud/commit/f67e97d4ed357dccaee3008bc58544504b22b02d)
-
-## test
-
-No changes since last release
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 import transaction
 
@@ -13,21 +15,21 @@ from unittest import mock
 
 
 @pytest.fixture(autouse=True)
-def no_requests(monkeypatch):
+def no_requests(monkeypatch: pytest.MonkeyPatch) -> None:
     # prevents tests from making live requests
     mock_session = mock.Mock()
     monkeypatch.delattr('requests.sessions.Session.request')
 
 
-def test_worldline_fee_policy():
+def test_worldline_fee_policy() -> None:
     assert WorldlineFeePolicy.from_amount(100) == 1.89
     assert WorldlineFeePolicy.compensate(100) == 101.92
     assert WorldlineFeePolicy.compensate(33.33) == 34.1
 
 
-def test_saferpay_capture_good_tx():
+def test_saferpay_capture_good_tx() -> None:
     mock_session = mock.Mock()
-    provider = WorldlineSaferpay(customer_id='foo', terminal_id='bar')
+    provider = WorldlineSaferpay(customer_id='foo', terminal_id='bar')  # type: ignore[misc]
     client = provider.client
     client.session = mock_session
     tx = SaferpayTransaction(
@@ -36,7 +38,7 @@ def test_saferpay_capture_good_tx():
         six_transaction_reference='six',
         type='PAYMENT',
         status='AUTHORIZED',
-        amount={'value': '100', 'currency_code': 'CHF'},
+        amount={'value': '100', 'currency_code': 'CHF'},  # type: ignore[arg-type]
     )
 
     with mock.patch(
@@ -51,9 +53,9 @@ def test_saferpay_capture_good_tx():
         mock_session.post.assert_called_once()
 
 
-def test_datatrans_settle_bad_tx(caplog):
+def test_datatrans_settle_bad_tx(caplog: pytest.LogCaptureFixture) -> None:
     mock_session = mock.Mock()
-    provider = WorldlineSaferpay(customer_id='foo', terminal_id='bar')
+    provider = WorldlineSaferpay(customer_id='foo', terminal_id='bar')  # type: ignore[misc]
     client = provider.client
     client.session = mock_session
     tx = SaferpayTransaction(
@@ -62,7 +64,7 @@ def test_datatrans_settle_bad_tx(caplog):
         six_transaction_reference='six',
         type='PAYMENT',
         status='AUTHORIZED',
-        amount={'value': '100', 'currency_code': 'CHF'},
+        amount={'value': '100', 'currency_code': 'CHF'},  # type: ignore[arg-type]
     )
 
     with mock.patch(
@@ -80,9 +82,9 @@ def test_datatrans_settle_bad_tx(caplog):
         assert 'capture failed' in caplog.text
 
 
-def test_datatrans_settle_negative_vote():
+def test_datatrans_settle_negative_vote() -> None:
     mock_session = mock.Mock()
-    provider = WorldlineSaferpay(customer_id='foo', terminal_id='bar')
+    provider = WorldlineSaferpay(customer_id='foo', terminal_id='bar')  # type: ignore[misc]
     client = provider.client
     client.session = mock_session
     tx = SaferpayTransaction(
@@ -91,7 +93,7 @@ def test_datatrans_settle_negative_vote():
         six_transaction_reference='six',
         type='REFUND',
         status='AUTHORIZED',
-        amount={'value': '100', 'currency_code': 'CHF'},
+        amount={'value': '100', 'currency_code': 'CHF'},  # type: ignore[arg-type]
     )
 
     with mock.patch(
