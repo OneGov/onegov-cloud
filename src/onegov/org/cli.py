@@ -64,7 +64,6 @@ from onegov.org.models import (
     RISParliamentaryGroupCollection,
 )
 from onegov.page.collection import PageCollection
-from onegov.parliament.collections import ParliamentarianCollection
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
