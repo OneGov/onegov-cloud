@@ -804,6 +804,7 @@ def delete_content_marked_deletable(request: OrgRequest) -> None:
     now = to_timezone(utcnow(), 'Europe/Zurich')
     count = 0
 
+    name = request.app.org.title or 'unknown'
     for base in request.app.session_manager.bases:
         for model in find_models(base, lambda cls: issubclass(
                 cls, DeletableContentExtension)):
@@ -811,9 +812,11 @@ def delete_content_marked_deletable(request: OrgRequest) -> None:
             query = request.session.query(model)
             query = query.filter(model.delete_when_expired == True)
             for obj in query:
-                # delete entry if end date passed
+                # delete entry if the end date passed
                 if isinstance(obj, (News, ExtendedDirectoryEntry)):
                     if obj.publication_end and obj.publication_end < now:
+                        log.info(f'Cron: Delete expired obj for {name}: '
+                                 f'{obj.title}')
                         request.session.delete(obj)
                         count += 1
 
@@ -822,12 +825,16 @@ def delete_content_marked_deletable(request: OrgRequest) -> None:
         query = request.session.query(Occurrence)
         query = query.filter(Occurrence.end < now)
         for obj in query:
+            log.info(f'Cron: Delete past occurrence for {name}: '
+                     f'{obj.title} - {obj.end}')
             request.session.delete(obj)
             count += 1
 
         query = request.session.query(Event)
         for obj in query:
             if not obj.future_occurrences(limit=1).all():
+                log.info(f'Cron: Delete past event for {name}: '
+                         f'{obj.title} - {obj.end}')
                 request.session.delete(obj)
                 count += 1
 
