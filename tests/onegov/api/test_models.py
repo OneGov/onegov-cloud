@@ -97,8 +97,9 @@ def test_api_endpoint(app: App, endpoint_class: type[Endpoint]) -> None:
     assert new.page == 5
     assert new.extra_parameters == {'a': '1'}
 
-    new = ApiEndpoint(request).for_filter(a='1').for_page(1)
+    new = ApiEndpoint(request).for_page(1)
     assert new is not None
+    new = new.for_filter(a='1')
     assert new.page is None
     assert new.extra_parameters == {'a': '1'}
 
