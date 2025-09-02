@@ -53,8 +53,8 @@ msgstr "Titel"
 msgid "Irrelevant"
 msgstr "Unerheblich"
 
-msgid "Excerpt from the Memorial (PDF)"
-msgstr "Auszug aus dem Memorial (PDF)"
+msgid "Excerpt from the Memorial.pdf"
+msgstr "Auszug aus dem Memorial.pdf"
 
 msgid "Memorial"
 msgstr "Memorial"

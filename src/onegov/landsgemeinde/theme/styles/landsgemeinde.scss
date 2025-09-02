@@ -565,11 +565,13 @@ h1.main-title small {
 
 /*Download Icons*/
 .downloads a,
-.memorial-link {
+.memorial-link,
+.more-files-link {
     @include smooth-edges;
     background: $white-smoke;
     display: flex;
     font-weight: bold;
+    margin-bottom: .5rem;
     padding: 1rem;
     transition: background 200ms linear;
 
