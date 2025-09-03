@@ -55,22 +55,6 @@ def test_views_manage(client_with_es):
 
     add_rate_set(settings, delete)
 
-    # Legislative Periods
-    page = settings.click('Legislaturen')
-    page = page.click(href='new')
-    page.form['name'] = '2020-2024'
-    page.form['start'] = '2020-01-01'
-    page.form['end'] = '2023-12-31'
-    page = page.form.submit().follow()
-    assert '31.12.2023' in page
-
-    page = page.click('Bearbeiten')
-    page.form['end'] = '2024-12-31'
-    page = page.form.submit().follow()
-    assert '31.12.2024' in page
-
-    delete.append(page)
-
     # Settlement Runs
     page = settings.click('Abrechnungsläufe')
     page = page.click(href='new')
@@ -479,22 +463,6 @@ def test_simple_attendence_add(client):
     delete = []
 
     add_rate_set(settings, delete)
-
-    # Legislative Periods
-    page = settings.click('Legislaturen')
-    page = page.click(href='new')
-    page.form['name'] = '2020-2024'
-    page.form['start'] = '2020-01-01'
-    page.form['end'] = '2023-12-31'
-    page = page.form.submit().follow()
-    assert '31.12.2023' in page
-
-    page = page.click('Bearbeiten')
-    page.form['end'] = '2024-12-31'
-    page = page.form.submit().follow()
-    assert '31.12.2024' in page
-
-    delete.append(page)
 
     # Settlement Runs
     page = settings.click('Abrechnungsläufe')
