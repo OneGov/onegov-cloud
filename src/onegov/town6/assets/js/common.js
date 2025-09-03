@@ -326,8 +326,8 @@ $('a[data-back-link]').on('click', function(e) {
 
 // if there are headings in the content and if there is a .sidebar-wrapper, add a div with the class "side-panel" to the sidebar and add the headings to it
 if (
-    $('.main-content').find('h1, h2, h3, h4, h5, h6').length
-    || $('.page-content-main').find('h1, h2, h3, h4, h5, h6').length
+    $('.main-content').find('h1, h2, h3, h4, h5, h6').length > 2
+    || $('.page-content-main').find('h1, h2, h3, h4, h5, h6').length > 2
     && $('.sidebar-wrapper').length
 ) {
     var sidePanel = $('.side-panel.content-panel');
