@@ -1,53 +1,62 @@
 from __future__ import annotations
+
+from collections import defaultdict
 from io import BytesIO
 from sedate import utcnow
 from onegov.core.utils import module_path
+from webob import Response
+from decimal import Decimal
+from operator import itemgetter
+from weasyprint import HTML, CSS  # type: ignore[import-untyped]
+from weasyprint.text.fonts import (  # type: ignore[import-untyped]
+    FontConfiguration)
+import xlsxwriter   # type: ignore[import-untyped]
+
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.calculate_pay import calculate_rate
-from onegov.pas.collections import SettlementRunCollection,\
-AttendenceCollection, CommissionCollection
+from onegov.pas.collections import (
+    AttendenceCollection,
+    PASCommissionCollection,
+    SettlementRunCollection,
+)
 from onegov.pas.custom import get_current_rate_set
-from onegov.pas.export_single_parliamentarian import\
-generate_parliamentarian_settlement_pdf
+from onegov.pas.export_single_parliamentarian import (
+    generate_parliamentarian_settlement_pdf
+)
 from onegov.pas.forms import SettlementRunForm
 from onegov.pas.layouts import SettlementRunCollectionLayout
 from onegov.pas.layouts import SettlementRunLayout
 from onegov.pas.models import (
-SettlementRun,
-Party,
-Commission,
-Attendence,
+    Attendence,
+    PASCommission,
+    PASParliamentarian,
+    Party,
+    SettlementRun,
 )
-from webob import Response
-from decimal import Decimal
-from weasyprint import HTML, CSS  # type: ignore[import-untyped]
-from weasyprint.text.fonts import (  # type: ignore[import-untyped]
-FontConfiguration)
-import xlsxwriter   # type: ignore[import-untyped]
 from onegov.pas.models.attendence import TYPES
 from onegov.pas.path import SettlementRunExport, SettlementRunAllExport
-from onegov.pas.models import Parliamentarian
 from onegov.pas.utils import (
-format_swiss_number,
-get_parliamentarians_with_settlements,
-get_parties_with_settlements,
+    format_swiss_number,
+    get_parliamentarians_with_settlements,
+    get_parties_with_settlements,
 )
-from operator import itemgetter
 
-
-from typing import TYPE_CHECKING, Literal
-if TYPE_CHECKING:
-from onegov.core.types import RenderData
-from onegov.town6.request import TownRequest
+from typing import Literal, TypeAlias, TYPE_CHECKING, Any
 from collections.abc import Iterator
-from datetime import date
-SettlementDataRow = tuple[
-    'date', Parliamentarian, str, Decimal, Decimal, Decimal
-]
-TotalRow = tuple[str, Decimal, Decimal, Decimal, Decimal, Decimal]
+if TYPE_CHECKING:
+    from datetime import date
+    from onegov.core.types import RenderData
+    from onegov.town6.request import TownRequest
+
+    SettlementDataRow: TypeAlias = tuple[
+        'date', PASParliamentarian, str, Decimal, Decimal, Decimal
+    ]
+    TotalRow: TypeAlias = tuple[
+        str, Decimal, Decimal, Decimal, Decimal, Decimal
+    ]
 
 
 XLSX_MIMETYPE = (
@@ -65,27 +74,27 @@ self: SettlementRunCollection,
 request: TownRequest
 ) -> RenderData:
 
-layout = SettlementRunCollectionLayout(self, request)
+    layout = SettlementRunCollectionLayout(self, request)
 
-filters = {}
-filters['active'] = [
-    Link(
-        text=request.translate(title),
-        active=self.active == value,
-        url=request.link(self.for_filter(active=value))
-    ) for title, value in (
-        (_('Active'), True),
-        (_('Inactive'), False)
-    )
-]
+    filters = {}
+    filters['active'] = [
+        Link(
+            text=request.translate(title),
+            active=self.active == value,
+            url=request.link(self.for_filter(active=value))
+        ) for title, value in (
+            (_('Active'), True),
+            (_('Inactive'), False)
+        )
+    ]
 
-return {
-    'add_link': request.link(self, name='new'),
-    'filters': filters,
-    'layout': layout,
-    'settlement_runs': self.query().all(),
-    'title': layout.title,
-}
+    return {
+        'add_link': request.link(self, name='new'),
+        'filters': filters,
+        'layout': layout,
+        'settlement_runs': self.query().all(),
+        'title': layout.title,
+    }
 
 
 @PasApp.form(
@@ -101,14 +110,14 @@ request: TownRequest,
 form: SettlementRunForm
 ) -> RenderData | Response:
 
-if form.submitted(request):
-    settlement_run = self.add(**form.get_useful_data())
-    request.success(_('Added a new settlement run'))
+    if form.submitted(request):
+        settlement_run = self.add(**form.get_useful_data())
+        request.success(_('Added a new settlement run'))
 
-    return request.redirect(request.link(settlement_run))
+        return request.redirect(request.link(settlement_run))
 
-layout = SettlementRunCollectionLayout(self, request)
-layout.breadcrumbs.append(Link(_('New'), '#'))
+    layout = SettlementRunCollectionLayout(self, request)
+    layout.breadcrumbs.append(Link(_('New'), '#'))
 
     return {
         'layout': layout,
@@ -135,8 +144,8 @@ def view_settlement_run(
     parties = get_parties_with_settlements(session, self.start, self.end)
 
     # Get commissions active during settlement run period
-    commissions = CommissionCollection(session).query().order_by(
-        Commission.name
+    commissions = PASCommissionCollection(session).query().order_by(
+        PASCommission.name
     )
 
     # Get parliamentarians active during settlement run period with settlements
@@ -214,12 +223,26 @@ def view_settlement_run(
     }
 
     excel_categories = {
-        'salary_export': {
-            'title': _('Excel Report'),
+        'abschlussliste_export': {
+            'title': _('Abschlussliste'),
             'links': [
                 Link(
-                    # Simple export of the basic attributes of parliamentarians
-                    _('Excel Report (XLSX)'),
+                    _('Abschlussliste (XLSX)'),
+                    request.link(
+                        SettlementRunAllExport(
+                            settlement_run=self,
+                            category='abschlussliste-xlsx-export'
+                        ),
+                        name='run-export'
+                    ),
+                )
+            ]
+        },
+        'salary_export': {
+            'title': _('Buchungen Abrechnungslauf'),
+            'links': [
+                Link(
+                    _('Buchungen Abrechnungslauf (Kontrollliste)'),
                     request.link(
                         SettlementRunAllExport(
                             settlement_run=self,
@@ -256,7 +279,7 @@ def view_settlement_run(
 def _get_commission_totals(
     settlement_run: SettlementRun,
     request: TownRequest,
-    commission: Commission
+    commission: PASCommission
 ) -> list[TotalRow]:
     """Get totals for a specific commission grouped by party."""
     session = request.session
@@ -462,7 +485,7 @@ def generate_settlement_pdf(
     settlement_run: SettlementRun,
     request: TownRequest,
     entity_type: Literal['all', 'commission', 'party', 'parliamentarian'],
-    entity: Commission | Party | Parliamentarian | None = None,
+    entity: PASCommission | Party | PASParliamentarian | None = None,
 ) -> bytes:
     """ Entry point for almost all settlement PDF generations. """
     font_config = FontConfiguration()
@@ -470,7 +493,7 @@ def generate_settlement_pdf(
     with open(css_path) as f:
         css = CSS(string=f.read())
 
-    if entity_type == 'commission' and isinstance(entity, Commission):
+    if entity_type == 'commission' and isinstance(entity, PASCommission):
         settlement_data = _get_commission_settlement_data(
             settlement_run, request, entity
         )
@@ -503,7 +526,7 @@ def generate_settlement_pdf(
 def _get_commission_settlement_data(
     settlement_run: SettlementRun,
     request: TownRequest,
-    commission: Commission
+    commission: PASCommission
 ) -> list[SettlementDataRow]:
     """Get settlement data for a specific commission."""
     session = request.session
@@ -975,6 +998,141 @@ def generate_xlsx_export_rows(
         ]
 
 
+def get_abschlussliste_data(
+    settlement_run: SettlementRun,
+    request: TownRequest,
+) -> list[dict[str, Any]]:
+    session = request.session
+    rate_set = get_current_rate_set(session, settlement_run)
+    if not rate_set:
+        return []
+
+    parliamentarians = get_parliamentarians_with_settlements(
+        session, settlement_run.start, settlement_run.end
+    )
+
+    parl_data = defaultdict(lambda: {
+        'plenum_duration': Decimal('0'),
+        'plenum_compensation': Decimal('0'),
+        'commission_duration': Decimal('0'),
+        'commission_compensation': Decimal('0'),
+        'study_duration': Decimal('0'),
+        'study_compensation': Decimal('0'),
+        'shortest_duration': Decimal('0'),
+        'shortest_compensation': Decimal('0'),
+        'expenses': Decimal('0'),
+    })
+
+    attendances = AttendenceCollection(
+        session,
+        date_from=settlement_run.start,
+        date_to=settlement_run.end,
+    ).query()
+
+    for att in attendances:
+        p = att.parliamentarian
+        is_president = any(r.role == 'president' for r in p.roles)
+        compensation = calculate_rate(
+            rate_set=rate_set,
+            attendence_type=att.type,
+            duration_minutes=int(att.duration),
+            is_president=is_president,
+            commission_type=att.commission.type if att.commission else None
+        )
+
+        data = parl_data[p.id]
+        if att.type == 'plenary':
+            data['plenum_duration'] += Decimal(att.duration)
+            data['plenum_compensation'] += Decimal(str(compensation))
+        elif att.type == 'commission':
+            data['commission_duration'] += Decimal(att.duration)
+            data['commission_compensation'] += Decimal(str(compensation))
+        elif att.type == 'study':
+            data['study_duration'] += Decimal(att.duration)
+            data['study_compensation'] += Decimal(str(compensation))
+        elif att.type == 'shortest':
+            data['shortest_duration'] += Decimal(att.duration)
+            data['shortest_compensation'] += Decimal(str(compensation))
+
+    result = []
+    for p in parliamentarians:
+        party = p.get_party_during_period(
+            settlement_run.start, settlement_run.end, session
+        )
+        data = parl_data[p.id]
+        data['parliamentarian'] = p
+        data['party'] = party.name if party else ''
+        data['faction'] = party.name if party else ''
+        result.append(data)
+
+    return sorted(
+        result,
+        key=lambda x: (
+            x['parliamentarian'].last_name,
+            x['parliamentarian'].first_name
+        )
+    )
+
+
+def generate_abschlussliste_xlsx(
+    settlement_run: SettlementRun,
+    request: TownRequest
+) -> BytesIO:
+    output = BytesIO()
+    workbook = xlsxwriter.Workbook(output)
+
+    # Details tab
+    details_ws = workbook.add_worksheet('Details')
+    details_headers = [
+        'Name', 'Vorname', 'Partei', 'Fraktion',
+        'Plenum / Kommission Zeit', 'Entschädigung',
+        'Aktenstudium Zeit', 'Aktenstudium Entschädigung',
+        'Kürzestsitzungen Zeit', 'Kürzestsitzungen Entschädigung'
+    ]
+    details_ws.write_row(0, 0, details_headers)
+
+    # Übersicht tab
+    overview_ws = workbook.add_worksheet('Übersicht')
+    overview_headers = [
+        'Name', 'Vorname', 'Partei', 'Fraktion',
+        'Plenum Zeit', 'Plenum Entschädigung',
+        'Kommissionen Zeit', 'Kommissionen Entschädigung',
+        'Spesen'
+    ]
+    overview_ws.write_row(0, 0, overview_headers)
+
+    data = get_abschlussliste_data(settlement_run, request)
+
+    for row_num, row_data in enumerate(data, 1):
+        p = row_data['parliamentarian']
+
+        # Details tab row
+        details_row = [
+            p.last_name, p.first_name, row_data['party'], row_data['faction'],
+            row_data['plenum_duration'] + row_data['commission_duration'],
+            row_data['plenum_compensation']
+            + row_data['commission_compensation'],
+            row_data['study_duration'], row_data['study_compensation'],
+            row_data['shortest_duration'], row_data['shortest_compensation']
+        ]
+        details_ws.write_row(row_num, 0, details_row)
+
+        # Übersicht tab row
+        overview_row = [
+            p.last_name, p.first_name, row_data['party'], row_data['faction'],
+            row_data['plenum_duration'], row_data['plenum_compensation'],
+            row_data['commission_duration'] + row_data['shortest_duration'],
+            row_data['commission_compensation']
+            + row_data['shortest_compensation'],
+            row_data['expenses']
+        ]
+        overview_ws.write_row(row_num, 0, overview_row)
+
+    workbook.close()
+    output.seek(0)
+    return output
+
+
 @PasApp.view(
     model=SettlementRunAllExport,
     permission=Private,
@@ -999,27 +1157,22 @@ def view_settlement_run_all_export(
             content_type='application/pdf',
             content_disposition=f'attachment; filename={filename}.pdf'
         )
+    elif self.category == 'abschlussliste-xlsx-export':
+        filename = 'Abschlussliste.xlsx'
+        output = generate_abschlussliste_xlsx(self.settlement_run, request)
+        return Response(
+            output.read(),
+            content_type=XLSX_MIMETYPE,
+            content_disposition=f'attachment; filename="{filename}"'
+        )
     elif self.category == 'plain-xlsx-export':
-        pass
         q = self.settlement_run.get_run_number_for_year(
             self.settlement_run.end
         )
         year = self.settlement_run.end.year
-        filename = f'Excel_Report_{year}_{q}.xlsx'
-        output = BytesIO()
-        workbook = xlsxwriter.Workbook(
-            output, {'default_date_format': 'dd.mm.yyyy'})
-        worksheet = workbook.add_worksheet('Übersicht')
-
-
-    else:
-        # todo: this needs to be csv
-        # and a new category
-        q = self.settlement_run.get_run_number_for_year(
-            self.settlement_run.end
+        filename = (
+            f'Buchungen Abrechnungslauf KR-{year}_{q:02d}_Kontrollliste.xlsx'
         )
-        year = self.settlement_run.end.year
-        filename = f'Excel_Report_{year}_{q}.xlsx'
         output = BytesIO()
         workbook = xlsxwriter.Workbook(
             output, {'default_date_format': 'dd.mm.yyyy'})
@@ -1031,8 +1184,15 @@ def view_settlement_run_all_export(
 
         workbook.close()
         output.seek(0)
-        return Response( output.read(), content_type=XLSX_MIMETYPE,
-            content_disposition=f'attachment; filename="{filename}"')
+        return Response(
+            output.read(),
+            content_type=XLSX_MIMETYPE,
+            content_disposition=f'attachment; filename="{filename}"'
+        )
+    else:
+        raise NotImplementedError(
+            'Export category {self.category} not implemented for all exports'
+        )
 
 
 @PasApp.view(
@@ -1060,7 +1220,7 @@ def view_settlement_run_export(
         filename = f'Partei_{self.entity.name}'
 
     elif self.category == 'commission':
-        assert isinstance(self.entity, Commission)
+        assert isinstance(self.entity, PASCommission)
 
         pdf_bytes = generate_settlement_pdf(
             settlement_run=self.settlement_run,
@@ -1071,8 +1231,8 @@ def view_settlement_run_export(
         filename = f'commission_{self.entity.name}'
 
     elif self.category == 'parliamentarian':
-        assert isinstance(self.entity, Parliamentarian)
-        # Parliamentarian specific export has it's own rendering function
+        assert isinstance(self.entity, PASParliamentarian)
+        # PASParliamentarian specific export has it's own rendering function
         pdf_bytes = generate_parliamentarian_settlement_pdf(
             self.settlement_run, request, self.entity
         )
