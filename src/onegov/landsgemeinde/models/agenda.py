@@ -10,6 +10,7 @@ from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
+from onegov.file.models.file import File
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
 from onegov.landsgemeinde.models.votum import Votum
@@ -151,19 +152,15 @@ class AgendaItem(
         ]
 
     @property
-    def more_files(self) -> list[LandsgemeindeFile]:
+    def more_files(self) -> list[File]:
         files = self.files
         if self.memorial_pdf:
-            return [
-                file for file in files
-                if file != self.memorial_pdf and isinstance(file,
-                                                            LandsgemeindeFile)
-            ]
-        return self.files  # type: ignore
+            return [file for file in files if file.name != 'memorial_pdf']
+        return files
 
     @more_files.setter
-    def more_files(self, value: list[LandsgemeindeFile]) -> None:
+    def more_files(self, value: list[File]) -> None:
         if self.memorial_pdf:
             self.files = [*value, self.memorial_pdf]
         else:
-            self.files = value  # type: ignore
+            self.files = value
