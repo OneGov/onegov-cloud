@@ -49,6 +49,9 @@ class SettlementRunBoundMixin:
         return True
 
     def set_default_value_to_settlement_run_start(self) -> None:
+        if self.request.method == 'POST':
+            return
+
         settlement_run = get_current_settlement_run(self.request.session)
         if settlement_run:
             self.date.data = settlement_run.start
