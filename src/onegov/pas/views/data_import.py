@@ -3,25 +3,25 @@ from __future__ import annotations
 import json
 import logging
 
-
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.core.utils import dictionary_to_binary
 from onegov.org.models import Organisation
 from onegov.pas import _, PasApp
 from onegov.pas.forms.data_import import DataImportForm
-from onegov.pas.importer.json_import import (
-    import_zug_kub_data,
-    Commission,
-    CommissionMembership,
-    Parliamentarian,
-    ParliamentarianRole,
+from onegov.pas.importer.json_import import import_zug_kub_data
+from onegov.pas.layouts import ImportLayout
+from onegov.pas.models import (
+    PASCommission,
+    PASCommissionMembership,
+    PASParliamentarian,
+    PASParliamentarianRole,
     Party,
 )
-from onegov.pas.layouts import ImportLayout
 
 
 from typing import Any, TYPE_CHECKING, TypedDict
+
 if TYPE_CHECKING:
     from onegov.core.types import LaxFileDict, RenderData
     from collections.abc import Sequence
@@ -108,18 +108,18 @@ def handle_data_import(
 
     # Helper function to get display title for various imported objects
     def get_item_display_title(item: Any) -> str:
-        if isinstance(item, Parliamentarian):
+        if isinstance(item, PASParliamentarian):
             return item.title  # Already includes first/last name etc.
-        elif isinstance(item, (Commission, Party)):
+        elif isinstance(item, (PASCommission, Party)):
             return item.name
-        elif isinstance(item, CommissionMembership):
+        elif isinstance(item, PASCommissionMembership):
             # Ensure related objects are loaded or handle potential errors
             parl_title = (item.parliamentarian.title
                           if item.parliamentarian else 'Unknown Parl.')
             comm_name = (item.commission.name
                          if item.commission else 'Unknown Comm.')
             return f'{parl_title} in {comm_name} ({item.role})'
-        elif isinstance(item, ParliamentarianRole):
+        elif isinstance(item, PASParliamentarianRole):
             parl_title = (item.parliamentarian.title
                           if item.parliamentarian else 'Unknown Parl.')
             role_details: list[str] = [str(item.role)]

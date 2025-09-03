@@ -1,4 +1,5 @@
 from __future__ import annotations
+import json
 
 from functools import cached_property
 from itertools import islice
@@ -215,12 +216,32 @@ class AgencyLayout(
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.has_model_permission(Private):
             if self.model.deletable(self.request):
+                def get_all_children_titles_json(
+                        agency: ExtendedAgency) -> list[dict[str, Any]]:
+                    return [
+                        {
+                            'title': child.title,
+                            'children': get_all_children_titles_json(child)
+                        }
+                        for child in agency.children
+                    ]
+
+                children = json.dumps(get_all_children_titles_json(self.model))
+                if children != '[]':
+                    confirm_text = _('This cannot be undone. Following '
+                        'agencies will be deleted as well:')
+                else:
+                    confirm_text = _('This cannot be undone.')
+
                 delete_traits: Sequence[Trait] = (
                     Confirm(
                         _('Do you really want to delete this agency?'),
-                        _('This cannot be undone.'),
+                        confirm_text,
                         _('Delete agency'),
-                        _('Cancel')
+                        _('Cancel'),
+                        children,
+                        _('Please scroll to the bottom to enable the confirm '
+                          'button.')
                     ),
                     Intercooler(
                         request_method='DELETE',

@@ -162,6 +162,9 @@ def send_ticket_mail(
     if 'ticket' not in content:
         content['ticket'] = ticket
 
+    if 'reply_to' not in kwargs and ticket.handler.reply_to:
+        kwargs['reply_to'] = ticket.handler.reply_to
+
     send_transactional_html_mail(
         request=request,
         template=template,

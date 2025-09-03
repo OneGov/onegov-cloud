@@ -4,7 +4,7 @@ if ($('#current').length) {
         const listHeight = $('.sidebar .agenda-item-list').height();
         const currentHeight = $('.sidebar #current').height();
 
-        $('.agenda-item-list').animate({
+        $('.sidebar .agenda-item-list').animate({
             scrollTop: positionCurrent - listHeight/2 + currentHeight/2
         });
     } else {

@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import os
 import transaction
 
 from onegov.core.datamanager import FileDataManager
 
 
-def test_file_data_manager_commit(temporary_directory):
+def test_file_data_manager_commit(temporary_directory: str) -> None:
 
     data = 'data'.encode('utf-8')
     path = '{}/a.txt'.format(temporary_directory)
@@ -20,7 +22,7 @@ def test_file_data_manager_commit(temporary_directory):
     os.remove(path)
 
 
-def test_file_data_manager_abort(temporary_directory):
+def test_file_data_manager_abort(temporary_directory: str) -> None:
 
     data = 'data'.encode('utf-8')
     path = '{}/b.txt'.format(temporary_directory)

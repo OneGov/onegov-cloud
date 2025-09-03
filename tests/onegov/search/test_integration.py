@@ -674,15 +674,14 @@ def test_language_detection(es_url, postgres_dsn):
     english = app.es_search(languages=['en']).execute().load()
     french = app.es_search(languages=['fr']).execute().load()
 
-    # this illustrates that language detection is not exact (esp. if the
-    # text is rather short)
+    # even very short sentences have pretty reliable detection now
     assert len(german) == 1
-    assert len(english) == 0
-    assert len(french) == 2
+    assert len(english) == 1
+    assert len(french) == 1
 
     assert german[0].title == "Mein Dokument"
-    assert french[0].title == "My document"
-    assert french[1].title == "Mon document"
+    assert english[0].title == "My document"
+    assert french[0].title == "Mon document"
 
 
 def test_language_update(es_url, postgres_dsn):

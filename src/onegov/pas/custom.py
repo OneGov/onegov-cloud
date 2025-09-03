@@ -53,7 +53,6 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
                 # If multiple active runs exist (should not happen),
                 # don't show the link.
                 pass
-
             management_links.extend((
                 Link(
                     _('Attendences'),
@@ -64,6 +63,11 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
                     _('Changes'),
                     request.class_link(ChangeCollection),
                     attrs={'class': 'changes'}
+                ),
+                Link(
+                    _('Files'),
+                    request.link(request.app.org, 'files'),
+                    attrs={'class': 'files'}
                 ),
                 Link(
                     _('PAS settings'),

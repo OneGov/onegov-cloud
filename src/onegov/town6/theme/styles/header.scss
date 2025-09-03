@@ -184,10 +184,14 @@ $settings-icon: '\f1de';
     .timeline::before { @include icon('\f017'); }
     .no-tickets::before { @include icon('\f145'); }
     .link-check::before { @include icon-bold('\f0fa'); }
+    .ris-settings::before { @include icon-bold('\f66f'); }
     .ticket-archive::before { @include icon-bold('\f1c6'); }
     .text-modules::before { @include icon('\f249'); }
     .forms::before { @include icon-bold('\f570'); }
     .surveys::before { @include icon-bold('\f681'); }
+    .citizen-login::before { @include icon-bold("\f2f6"); }
+    .citizen-tickets::before { @include icon-bold('\f3ff'); }
+    .citizen-reservations::before { @include icon('\f073'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;
@@ -459,10 +463,6 @@ $editbar-fg-color-active: $white;
     box-shadow: $navbar-shadow;
     margin-bottom: 2px;
     margin-top: -2px;
-
-    li.is-dropdown-submenu-parent > a {
-        padding-top: .9rem !important;
-    }
 
     li {
         a::before, button::before {

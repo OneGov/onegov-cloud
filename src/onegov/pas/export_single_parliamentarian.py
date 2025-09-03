@@ -1,25 +1,27 @@
 from __future__ import annotations
 
-from onegov.pas.calculate_pay import calculate_rate
 from dataclasses import dataclass
-from typing import cast
+from decimal import Decimal
+from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import (
     AttendenceCollection,
 )
 from onegov.pas.custom import get_current_rate_set
-from decimal import Decimal
+from onegov.pas.models.attendence import Attendence
+from onegov.pas.models.attendence import TYPES
+from onegov.pas.utils import format_swiss_number
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration,
 )
-from onegov.pas.models.attendence import TYPES, Attendence
 from datetime import date  # noqa: TC003
-from onegov.pas.utils import format_swiss_number, module_path
+from onegov.pas.utils import module_path
 
 
 from typing import TYPE_CHECKING, Literal, TypedDict
 if TYPE_CHECKING:
-    from onegov.pas.models import Parliamentarian, RateSet
+    from datetime import date
+    from onegov.pas.models import PASParliamentarian, RateSet
     from onegov.pas.models.settlement_run import SettlementRun
 
 
@@ -52,18 +54,20 @@ if TYPE_CHECKING:
 def generate_parliamentarian_settlement_pdf(
     settlement_run: SettlementRun,
     request: TownRequest,
-    parliamentarian: Parliamentarian,
+    parliamentarian: PASParliamentarian,
 ) -> bytes:
     """Generate PDF for parliamentarian settlement data."""
     font_config = FontConfiguration()
     session = request.session
-
+    cola_multiplier = Decimal(
+        str(1 + (rate_set.cost_of_living_adjustment / 100))
+    )
     rate_set = get_current_rate_set(session, settlement_run)
     quarter = settlement_run.get_run_number_for_year(settlement_run.end)
     css_path = module_path(
         'onegov.pas', 'views/templates/parliamentarian_settlement_pdf.css'
     )
-    with open(css_path, 'r') as f:
+    with open(css_path) as f:
         css = CSS(string=f.read())
 
     data = _get_parliamentarian_settlement_data(
@@ -86,7 +90,7 @@ def generate_parliamentarian_settlement_pdf(
             </div>
 
             <div class="date">
-                Zug {current_date}
+                Zug {settlement_run.end.strftime('%d.%m.%Y')}
             </div>
 
             <h2 class="title">
@@ -139,10 +143,11 @@ def generate_parliamentarian_settlement_pdf(
     # Now, start building the second part of the report document. Notice that
     # this one now is *with* cost of living adjustment.
     total = Decimal('0')
+    total = Decimal('0')
     cola_multiplier = Decimal(
         str(1 + (rate_set.cost_of_living_adjustment / 100))
     )
-    type_mappings = [
+    type_mappings: list[tuple[str, TotalType]] = [
         ('Total aller Plenarsitzungen inkl. Teuerungszulage',
          cast('TotalType', 'plenary')),
         ('Total aller Kommissionssitzungen inkl. Teuerungszulage',
@@ -192,7 +197,7 @@ def generate_parliamentarian_settlement_pdf(
 def _get_parliamentarian_settlement_data(
     settlement_run: SettlementRun,
     request: TownRequest,
-    parliamentarian: Parliamentarian,
+    parliamentarian: PASParliamentarian,
     rate_set: RateSet,
 ) -> dict[str, list[ParliamentarianEntry]]:
     """Get settlement data for a specific parliamentarian."""

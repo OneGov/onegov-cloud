@@ -9,10 +9,10 @@ from onegov.core.utils import module_path
 from onegov.org.cli import cli as org_cli
 from onegov.pas.cli import cli
 from onegov.pas.models import (
-    Commission,
-    CommissionMembership,
-    Parliamentarian,
-    ParliamentaryGroup,
+    PASCommission,
+    PASCommissionMembership,
+    PASParliamentarian,
+    PASParliamentaryGroup,
     Party
 )
 
@@ -73,8 +73,8 @@ def test_import_commission_data(
         session = session_manager.session()
 
         # Check commission
-        commission = session.query(Commission).first()
-        commission: Commission
+        commission = session.query(PASCommission).first()
+        commission: PASCommission
         # Name should be inferred from the filename
         assert commission.name == 'commission test'
         assert commission.type == 'normal'
@@ -86,17 +86,17 @@ def test_import_commission_data(
         assert party_names == expected_parties
 
         # Check parliamentary groups
-        groups = session.query(ParliamentaryGroup).all()
+        groups = session.query(PASParliamentaryGroup).all()
         group_names = {g.name for g in groups}
         assert group_names == expected_parties
 
         # Check parliamentarians
-        parliamentarians = session.query(Parliamentarian).all()
+        parliamentarians = session.query(PASParliamentarian).all()
         assert len(parliamentarians) == 2
 
         # Check specific parliamentarian
         vivianne = (
-            session.query(Parliamentarian)
+            session.query(PASParliamentarian)
             .filter_by(personnel_number='5506')
             .one()
         )
@@ -105,8 +105,8 @@ def test_import_commission_data(
         assert vivianne.shipping_address == 'StrasseB'
 
         # Check memberships
-        vivianne_memmbersh: CommissionMembership = (
-            session.query(CommissionMembership)
+        vivianne_memmbersh: PASCommissionMembership = (
+            session.query(PASCommissionMembership)
             .filter_by(parliamentarian_id=vivianne.id)
             .one()
         )
@@ -118,9 +118,9 @@ def test_import_commission_data(
 
         # Check president role
         president = (
-            session.query(CommissionMembership)
-            .join(Parliamentarian)
-            .filter(Parliamentarian.first_name == 'Lea')
+            session.query(PASCommissionMembership)
+            .join(PASParliamentarian)
+            .filter(PASParliamentarian.first_name == 'Lea')
             .one()
         )
         assert president

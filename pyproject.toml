@@ -52,7 +52,7 @@ implicit_reexport = true
 warn_unreachable = true
 warn_return_any = false
 # FIXME: remove sqlalchemy when upgrading to SQlAlchemy 2.0
-untyped_calls_exclude = "sqlalchemy,pycurl,onegov.core.types"
+untyped_calls_exclude = "sqlalchemy,pycurl,onegov.core.types,selenium.webdriver.chrome.webdriver"
 plugins = "sqlmypy"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
@@ -63,13 +63,31 @@ module = [
     #        in OCQMS, so we could just copy that code over... plus the
     #        standard lib technically supports some ISO-8601 formats as well
     "isodate.*",
-    # TODO: Consider switching to fasttext-langdetect
-    #       langdetect is really, really slow by comparison...
-    "langdetect.*",
     # FIXME: Remove after https://github.com/lipoja/URLExtract/issues/164
     "urlextract.*",
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# very lax rules for tests that don't have type hints yet
+module = [
+    "tests.onegov.activity.*",
+    "tests.onegov.agency.*",
+    "tests.onegov.election_day.*",
+    "tests.onegov.feriennet.*",
+    "tests.onegov.fsi.*",
+    "tests.onegov.gazette.*",
+    "tests.onegov.landsgemeinde.*",
+    "tests.onegov.org.*",
+    "tests.onegov.pas.*",
+    "tests.onegov.search.*",
+    "tests.onegov.swissvotes.*",
+    "tests.onegov.town6.*",
+    "tests.onegov.translator_directory.*",
+    "tests.onegov.winterthur.*",
+]
+check_untyped_defs = false
+ignore_errors = true
 
 
 [tool.bandit]
@@ -309,6 +327,9 @@ keep-runtime-typing = true
 
 [tool.ruff.lint.ruff]
 extend-markup-names = ["chameleon.utils.Markup"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["attr.attrib"]
 
 [tool.ruff.format]
 quote-style = "single"

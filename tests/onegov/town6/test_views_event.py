@@ -19,7 +19,7 @@ from tests.shared.utils import create_pdf
 @patch('onegov.websockets.integration.broadcast')
 def test_event_steps(broadcast, authenticate, connect, client):
 
-    form_page = client.get('/events').click("Veranstaltung vorschlagen")
+    form_page = client.get('/events').click("Veranstaltung erfassen")
     start_date = date.today() + timedelta(days=1)
     end_date = start_date + timedelta(days=4)
 
@@ -258,7 +258,7 @@ def test_create_events_directly(client):
 
 def test_hide_event_submission_option(client):
     events_page = client.get('/events')
-    assert "Veranstaltung vorschlagen" in events_page
+    assert "Veranstaltung erfassen" in events_page
 
     client.login_admin()
     settings = client.get('/event-settings')
@@ -266,13 +266,13 @@ def test_hide_event_submission_option(client):
     settings.form.submit()
 
     events_page = client.get('/events')
-    assert "Veranstaltung vorschlagen" not in events_page
+    assert "Veranstaltung erfassen" not in events_page
 
     settings.form['submit_events_visible'] = True
     settings.form.submit()
 
     events_page = client.get('/events')
-    assert "Veranstaltung vorschlagen" in events_page
+    assert "Veranstaltung erfassen" in events_page
 
 
 def test_view_occurrences_event_documents(client):
@@ -296,3 +296,19 @@ def test_view_occurrences_event_documents(client):
         page = client.get('/events')
         assert "Dokumente" in page
         assert "zoo-programm-saison-2024.pdf" in page
+
+
+def test_view_occurrences_event_information(client):
+    client.login_admin()
+    settings = client.get('/event-settings')
+    settings.form['event_header_html'] = (
+        '<em>My <strong>bold</strong> Header</em>')
+    settings.form['event_footer_html'] = (
+        '<em>My\n<strong>bold</strong>\nFooter</em>')
+    settings.form.submit()
+
+    client.logout()
+
+    page = client.get('/events')
+    assert 'My bold Header' in page.pyquery('.event-header').text()
+    assert 'My bold Footer' in page.pyquery('.event-footer').text()

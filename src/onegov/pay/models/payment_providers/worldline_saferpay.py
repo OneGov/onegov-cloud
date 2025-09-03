@@ -478,6 +478,17 @@ class SaferpayPayment(Payment):
         return base.format(self.remote_id)
 
     @property
+    def remote_references(self) -> list[str]:
+        references = []
+        if self.order_id:
+            references.append(self.order_id)
+        if self.six_transaction_reference:
+            references.append(self.six_transaction_reference)
+        if self.capture_id:
+            references.append(self.capture_id)
+        return references
+
+    @property
     def transaction(self) -> SaferpayTransaction:
         assert self.remote_id
         return self.provider.client.inquire(transaction_id=self.remote_id)
@@ -502,7 +513,11 @@ class SaferpayPayment(Payment):
             flag_modified(self, 'meta')
         return True
 
-    def sync(self, remote_obj: SaferpayTransaction | None = None) -> None:
+    def _sync_state(
+        self,
+        remote_obj: SaferpayTransaction | None = None,
+        capture: bool = False,
+    ) -> bool:
         if self.refunds:
             try:
                 refund_tx = self.provider.client.inquire(
@@ -513,15 +528,18 @@ class SaferpayPayment(Payment):
                     'Failed to synchronize Saferpay refund transaction %s',
                     self.refunds[-1]
                 )
-                return
+                return False
 
             if refund_tx.status == 'CAPTURED':
                 # the refund already went through
-                self.state = 'cancelled'
-                return
+                if self.state != 'cancelled':
+                    self.state = 'cancelled'
+                    return True
+                else:
+                    return False
             elif refund_tx.status not in ('AUTHORIZED', 'PENDING'):
                 # the refund is still pending, let's not update yet
-                return
+                return False
             # the refund failed or got canceled, so we need to use
             # the status of the original transaction
 
@@ -533,31 +551,52 @@ class SaferpayPayment(Payment):
                     'TRANSACTION_ABORTED',
                     'TRANSACTION_DECLINED',
                 ):
-                    self.state = 'failed'
-                    return
+                    if self.state != 'failed':
+                        self.state = 'failed'
+                        return True
+                    else:
+                        return False
 
                 log.exception(
                     'Failed to synchronize Saferpay transaction %s',
                     self.remote_id
                 )
-                return
+                return False
 
         if self.capture_id != remote_obj.capture_id:
             self.capture_id = remote_obj.capture_id
 
+        if capture and remote_obj.status == 'AUTHORIZED':
+            captured, capture_id = self.provider.client.capture(remote_obj)
+            if captured:
+                if capture_id and capture_id != self.capture_id:
+                    self.capture_id = capture_id
+                if self.state != 'paid':
+                    self.state = 'paid'
+                    return True
+                else:
+                    return False
+
+        new_state = self.state
         match remote_obj.status:
             case 'CAPTURED':
-                self.state = 'paid'
+                new_state = 'paid'
 
             case 'PENDING':
                 # TODO: Do we want a separate state for this?
                 pass
 
             case 'CANCELED':
-                self.state = 'cancelled'
+                new_state = 'cancelled'
 
             case _:
-                self.state = 'open'
+                new_state = 'open'
+
+        if self.state != new_state:
+            self.state = new_state
+            return True
+        else:
+            return False
 
 
 class WorldlineSaferpay(PaymentProvider[SaferpayPayment]):

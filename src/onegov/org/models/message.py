@@ -90,7 +90,7 @@ class TicketNote(Message, TicketMessageMixin):
 
     if TYPE_CHECKING:
         # text is not optional for TicketNote
-        text: Column[str]  # type:ignore[assignment]
+        text: Column[str]
 
     @classmethod
     def create(  # type:ignore[override]
@@ -113,6 +113,13 @@ class TicketNote(Message, TicketMessageMixin):
             layout.request, paragraphify(linkify(self.text)))
 
     def links(self, layout: DefaultLayout) -> Iterator[Link]:
+        # unprivileged members can only modify their own notes
+        if (
+            self.owner != layout.request.current_username
+            and not layout.request.is_manager_for_model(self.ticket)
+        ):
+            return
+
         yield Link(_('Edit'), layout.request.link(self, 'edit'))
         yield Link(
             _('Delete'), layout.csrf_protected_url(layout.request.link(self)),
@@ -210,10 +217,48 @@ class ReservationMessage(Message, TicketMessageMixin):
         change: str,
         origin: str = 'internal'
     ) -> Self:
-        return super().create(ticket, request, change=change,
-                              origin=origin, reservations=[
-            r.id for r in reservations
-        ])
+        return super().create(
+            ticket,
+            request,
+            change=change,
+            origin=origin,
+            reservations=[
+                # NOTE: we record more than just the id, since if the
+                #       change is, that we deleted the reservations,
+                #       then we no longer will know when those reservations
+                #       were.
+                {
+                    'id': reservation.id,
+                    'start': reservation.display_start(),
+                    'end': reservation.display_end(),
+                }
+                for reservation in reservations
+            ]
+        )
+
+
+class ReservationAdjustedMessage(Message, TicketMessageMixin):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'reservation_adjusted'
+    }
+
+    @classmethod
+    def create(  # type:ignore[override]
+        cls,
+        old_reservation: Reservation,
+        new_reservation: Reservation,
+        ticket: Ticket,
+        request: OrgRequest,
+    ) -> Self:
+        return super().create(
+            ticket,
+            request,
+            old_start=old_reservation.display_start(),
+            old_end=old_reservation.display_end(),
+            new_start=new_reservation.display_start(),
+            new_end=new_reservation.display_end()
+        )
 
 
 class SubmissionMessage(Message, TicketMessageMixin):

@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from inspect import isabstract
 from collections import OrderedDict
 
@@ -11,6 +12,9 @@ from datetime import datetime, timedelta
 from functools import lru_cache
 from itertools import groupby, chain
 
+from requests.adapters import HTTPAdapter
+from urllib3.util import Retry
+
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.core.orm import find_models, Base
@@ -18,7 +22,7 @@ from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
 from onegov.directory.collections.directory import EntryRecipientCollection
-from onegov.event import Occurrence, Event
+from onegov.event import Occurrence, Event, EventCollection
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form, Form
 from onegov.newsletter.models import Recipient
@@ -577,15 +581,15 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
     end = align_date_to_day(today, 'Europe/Zurich', 'up')
 
     # load all approved reservations for all required resources
-    all_reservations = [
-        r for r in request.session.query(Reservation)
+    all_reservations = (
+        request.session.query(Reservation)
         .filter(Reservation.resource.in_(resource_ids))
         .filter(Reservation.status == 'approved')
-        .filter(Reservation.data != None)
+        .filter(Reservation.data['accepted'] == True)
         .filter(and_(start <= Reservation.start, Reservation.start <= end))
         .order_by(Reservation.resource, Reservation.start)
-        if r.data and r.data.get('accepted')
-    ]
+        .all()
+    )
 
     # load all linked form submissions
     if all_reservations:
@@ -685,7 +689,8 @@ def end_chats_and_create_tickets(request: OrgRequest) -> None:
                     'event': 'browser-notification',
                     'title': request.translate(_('New ticket')),
                     'created': ticket.created.isoformat()
-                }
+                },
+                groupids=request.app.groupids_for_ticket(ticket),
             )
 
 
@@ -839,10 +844,23 @@ def update_newsletter_email_bounce_statistics(
     # occurs when EST is observing standard time (UTC-5) and CEST is observing
     # daylight saving time (UTC+2).
     # Postmark uses EST in `fromdate` and `todate`, see
-    # https://postmarkapp.com/developer/api/bounce-api.
+    # https://postmarkapp.com/developer/api/bounce-api and
+    # https://postmarkapp.com/developer/api/suppressions-api for the
+    # suppression api.
+
+    def create_retry_session() -> requests.Session:
+        adapter = HTTPAdapter(max_retries=Retry(
+            total=3,
+            backoff_factor=3,
+            status_forcelist=[429, 500, 502, 503, 504],
+        ))
+        session = requests.Session()
+        session.mount('https://', adapter)
+
+        return session
 
     def get_postmark_token() -> str:
-        # read postmark token from the applications configuration
+        # read postmark token from the application's configuration
         mail_config = request.app.mail
         if mail_config:
             mailer = mail_config.get('marketing', {}).get('mailer', None)
@@ -851,24 +869,24 @@ def update_newsletter_email_bounce_statistics(
 
         return ''
 
-    def get_bounces() -> list[dict[str, Any]]:
-        token = get_postmark_token()
-        yesterday = utcnow() - timedelta(days=1)
+    def fetch_postmark_data(
+        url: str,
+        params: dict[str, Any],
+    ) -> dict[str, Any]:
+        session = create_retry_session()
         r = None
-
         try:
-            r = requests.get(
-                'https://api.postmarkapp.com/bounces?count=500&offset=0',
-                f'fromDate={yesterday.date()}&toDate='
-                f'{yesterday.date()}&inactive=true',
+            r = session.get(
+                url,
+                params=params,
                 headers={
                     'Accept': 'application/json',
-                    'X-Postmark-Server-Token': token,
+                    'X-Postmark-Server-Token': get_postmark_token(),
                 },
                 timeout=30,
             )
             r.raise_for_status()
-            bounces = r.json().get('Bounces', [])
+            return r.json() or {}
         except requests.exceptions.HTTPError as http_err:
             if r and r.status_code == 401:
                 raise RuntimeWarning(
@@ -877,10 +895,37 @@ def update_newsletter_email_bounce_statistics(
             else:
                 raise
 
-        return bounces
+    def get_bounces() -> list[dict[str, Any]]:
+        yesterday = utcnow() - timedelta(days=1)
+        params = {
+            'count': '500',
+            'offset': '0',
+            'fromDate': str(yesterday.date()),
+            'toDate': str(yesterday.date()),
+            'inactive': 'true',
+        }
+        data = fetch_postmark_data(
+            'https://api.postmarkapp.com/bounces',
+            params
+        )
+        return data.get('Bounces', [])
+
+    def get_suppressions() -> list[dict[str, Any]]:
+        from_ = utcnow() - timedelta(days=365)
+        params = {
+            'fromDate': str(from_.date()),
+        }
+        data = fetch_postmark_data(
+            'https://api.postmarkapp.com/message-streams/outbound/suppressions/dump',
+            params,
+        )
+        return data.get('Suppressions', [])
 
     postmark_bounces = get_bounces()
+    postmark_suppressed_addresses = [
+        s.get('EmailAddress') for s in get_suppressions()]
     collections = (RecipientCollection, EntryRecipientCollection)
+
     for collection in collections:
         recipients = collection(request.session)
 
@@ -889,9 +934,16 @@ def update_newsletter_email_bounce_statistics(
             inactive = bounce.get('Inactive', False)
             recipient = recipients.by_address(email)
 
-            if recipient and inactive:
+            if recipient and inactive and not recipient.is_inactive:
                 log.info(f'Mark recipient {recipient.address} as inactive')
                 recipient.mark_inactive()
+
+        # if any inactive recipient is not/no longer on the suppressed
+        # list, we reactivate him/her
+        for recipient in recipients.by_inactive():
+            if recipient.address not in postmark_suppressed_addresses:
+                log.info(f'Reactivate recipient {recipient.address}')
+                recipient.reactivate()
 
 
 @OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
@@ -1180,3 +1232,46 @@ def normalize_adjacency_list_order(request: OrgRequest) -> None:
                 session.rollback()
             except Exception:
                 log.exception(f"Error during rollback for '{table_name}'")
+
+
+@OrgApp.cronjob(hour='03', minute='02', timezone='Europe/Zurich')
+def wil_daily_event_import(request: OrgRequest) -> None:
+    """
+    Daily import from Minasa (azizi data hub) for Wil
+    Minasa doc: https://minasa-demo.ch/wiki/datenhub:schema
+    Import doc: https://minasa-demo.ch/wiki/datenhub:import
+
+    """
+    if request.app.org.name != 'Stadt Wil':
+        return
+
+    api_token = request.app.azizi_api_token
+    if not api_token:
+        log.warning(
+            'Azizi API token Stadt Wil unknown - no event import possible')
+        return
+
+    minaza_url = 'https://azizi.2mp.ch/export/events/v/1'
+    params = {'zip': '9500,9512,9552'}
+    headers = {'Authorization': f'apikey {api_token}'}
+
+    log.info(f'Start querying url {minaza_url} for Wil event import')
+    try:
+        response = requests.get(
+            minaza_url, params=params, headers=headers, timeout=60)
+    except Exception:
+        log.exception(f'Failed to retrieve events for Wil from {minaza_url}')
+        return
+
+    if response.status_code != 200:
+        log.error(
+            f'Failed to retrieve events for Wil from {minaza_url}, '
+            f'with params: {params}, '
+            f'status code: {response.status_code}')
+        return
+
+    collection = EventCollection(request.session)
+    added, updated, purged = collection.from_minasa(response.content)
+    log.info(f'Wil: Events successfully imported '
+             f'{len(added)} added, {len(updated)} updated, '
+             f'{len(purged)} deleted')

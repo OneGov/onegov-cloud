@@ -5,7 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 from __future__ import annotations
 
-from sqlalchemy import Column
+from sqlalchemy import Column, Text
 from onegov.core.orm.types import UUID
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 
@@ -27,4 +27,19 @@ def add_external_id_for_api(context: UpgradeContext) -> None:
                     nullable=True,
                     unique=True,
                 ),
+            )
+
+
+@upgrade_task('Add party column to pas_parliamentarians')
+def add_party_column_to_pas_parliamentarians(context: UpgradeContext) -> None:
+    if context.has_table('pas_parliamentarians'):
+        if not context.has_column('pas_parliamentarians', 'party'):
+            context.add_column_with_defaults(
+                'pas_parliamentarians',
+                Column(
+                    'party',
+                    Text,
+                    nullable=True
+                ),
+                default=None
             )

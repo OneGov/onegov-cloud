@@ -99,6 +99,10 @@ class EntryRecipientCollection:
 
         return query.first()
 
+    def by_inactive(self) -> Query[EntryRecipient]:
+        return self.query().filter(
+            EntryRecipient.meta['inactive'].as_boolean() == True)
+
     def add(
         self,
         address: str,

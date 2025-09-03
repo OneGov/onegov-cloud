@@ -447,7 +447,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         csrf_support: bool = True,
         data: dict[str, Any] | None = None,
         model: object = None,
-        formdata: MultiDict[str, str | _FieldStorageWithFile] | None = None
+        formdata: MultiDict[str, str | _FieldStorageWithFile] | None = None,
+        pass_model: bool = False,
     ) -> _F:
         """ Returns an instance of the given form class, set up with the
         correct translator and with CSRF protection enabled (the latter
@@ -480,12 +481,18 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         # instead of adding it to the form like it is done below - the meta
         # can also be accessed by form widgets
         meta['request'] = self
+        meta['model'] = model
 
         # by default use POST data as formdata, but this can be overriden
         # by passing in something else as formdata
         if formdata is None and self.POST:
             formdata = self.POST
-        form = form_class(formdata=formdata, meta=meta, data=data)
+        form = form_class(
+            formdata=formdata,
+            meta=meta,
+            data=data,
+            obj=model if pass_model else None,
+        )
 
         assert not hasattr(form, 'request')
         form.request = self  # type:ignore[attr-defined]
@@ -854,7 +861,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         self,
         data: str | bytes | None,
         salt: str | bytes | None = None,
-        max_age: int = 3600
+        max_age: int | None = 3600
     ) -> Any | None:
         """ Deserialize a token created by :meth:`new_url_safe_token`.
 

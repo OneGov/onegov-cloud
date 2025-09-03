@@ -7,6 +7,7 @@ from collections import OrderedDict
 from functools import cached_property
 
 from markupsafe import Markup
+
 from onegov.core.i18n import get_translation_bound_meta
 from onegov.core.orm.abstract import MoveDirection
 from onegov.core.orm.mixins import (
@@ -14,21 +15,23 @@ from onegov.core.orm.mixins import (
 from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url, to_html_ul
 from onegov.form.utils import remove_empty_links
+from sqlalchemy.orm.attributes import flag_modified
+
 from onegov.file import File, FileCollection
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
 from onegov.org.forms import ResourceForm
-from onegov.org.forms.extensions import CoordinatesFormExtension,\
-    PushNotificationFormExtension
+from onegov.org.forms.extensions import (
+    CoordinatesFormExtension, PushNotificationFormExtension)
 from onegov.org.forms.extensions import PublicationFormExtension
 from onegov.org.forms.fields import UploadOrSelectExistingMultipleFilesField
 from onegov.org.observer import observes
 from onegov.page import Page, PageCollection
 from onegov.people import Person, PersonCollection
 from onegov.reservation import Resource
-from sqlalchemy import inspect
+from sqlalchemy import desc, inspect
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import object_session
 from urlextract import URLExtract
@@ -55,9 +58,9 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import relationship
     from typing import type_check_only, Protocol
     from wtforms import Field
+    from wtforms.fields.choices import _Choice
     from wtforms.fields.core import _Filter
     from wtforms.meta import _MultiDictLikeWithGetlist
-    from wtforms.fields.choices import _Choice
 
     class SupportsExtendForm(Protocol):
         def extend_form(
@@ -858,7 +861,8 @@ def _files_observer(
     state = inspect(self)
     for file in state.attrs.files.history.deleted:
         if key in file.meta.get('linked_accesses', ()):
-            del file.linked_accesses[key]
+            del file.meta['linked_accesses'][key]
+            flag_modified(file, 'meta')
 
     # we could try to determine which accesses if any need to
     # be updated using the SQLAlchemy inspect API, but it's
@@ -1248,9 +1252,10 @@ class InlinePhotoAlbumExtension(ContentExtension):
     ) -> type[FormT]:
 
         from onegov.org.models import ImageSetCollection
+        from onegov.org.models import ImageSet
         albums: list[ImageSet] = (  # noqa: TC201
-            ImageSetCollection(request.session).query().all()
-        )
+            ImageSetCollection(request.session).query().order_by(
+                desc(ImageSet.last_change), ImageSet.title).all())
         if not albums:
             return form_class
 

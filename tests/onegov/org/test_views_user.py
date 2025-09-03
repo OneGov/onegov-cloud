@@ -208,8 +208,29 @@ def test_filters(client):
     add_user('emilia@example.org', 'admin', 'active')
     add_user('frank@example.org', 'admin', 'inactive')
 
+    # test active filter by default
+    users = client.get('/usermanagement')
+    assert not users.pyquery('.filter-active .active a')
+
+    users = client.get('/usermanagement?active=1')
+    assert users.pyquery('.filter-active .active a').text() == 'Aktiv'
+    users = client.get('/usermanagement?active=0')
+    assert users.pyquery('.filter-active .active a').text() == 'Inaktiv'
+    # assert not users.pyquery('.filter-active .active a')
+
+    # test active filter clicking breadcrumb (collection and user layout)
+    users = users.click('Benutzerverwaltung')
+    assert users.pyquery('.filter-active .active a').text() == 'Aktiv'
+    user = users.click('Ansicht', index=0).click('Benutzerverwaltung')
+    assert user.pyquery('.filter-active .active a').text() == 'Aktiv'
+
+    # test active filter after submitting a user change
+    user = users.click('Ansicht', index=0).click('Bearbeiten')
+    users = user.form.submit().follow()
+    assert users.pyquery('.filter-active .active a').text() == 'Aktiv'
+
+    # test active filter via Menu user
     users = client.get('/').click('Benutzer', index=1)
-    # ensure 'active' filter is selected by default
     assert users.pyquery('.filter-active .active a').text() == 'Aktiv'
     assert 'arno' in users
     assert 'beno' not in users

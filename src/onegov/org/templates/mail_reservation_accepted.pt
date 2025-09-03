@@ -21,9 +21,16 @@
         <p>
             <a href="${request.link(ticket, 'status')}" i18n:translate>Check request status</a>
         </p>
-        <tal:b condition="show_submission|nothing">
+        <p tal:condition="my_reservations_url|nothing">
+            <a href="${my_reservations_url}" i18n:translate>See all your reservations</a>
+        </p>
+        <tal:b tal:condition="show_submission|nothing">
             <hr class="large">
             <metal:b use-macro="layout.macros['display_form']"/>
+        </tal:b>
+        <tal:b tal:condition="ticket.handler.payment">
+            <hr class="large">
+            <metal:b tal:define="payment ticket.handler.payment; show_vat ticket.handler.show_vat" use-macro="layout.macros['payment']" />
         </tal:b>
     </tal:b>
 </div>

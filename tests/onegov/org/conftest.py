@@ -100,6 +100,12 @@ def org_app(request):
 
 
 @pytest.fixture(scope='function')
+def wil_app(request):
+    yield create_org_app(request, org_name='Stadt Wil',
+                         use_elasticsearch=False)
+
+
+@pytest.fixture(scope='function')
 def es_org_app(request):
     yield create_org_app(request, use_elasticsearch=True)
 
@@ -129,7 +135,12 @@ def org_app_url(request, org_app):
     server.stop()
 
 
-def create_org_app(request, use_elasticsearch, cls=OrgApp):
+def create_org_app(
+    request,
+    org_name='Govikon',
+    use_elasticsearch=False,
+    cls=OrgApp
+):
     app = create_app(
         cls,
         request,
@@ -154,8 +165,10 @@ def create_org_app(request, use_elasticsearch, cls=OrgApp):
     })
     session = app.session()
 
-    org = create_new_organisation(app, name="Govikon", create_files=False)
-    org.meta['reply_to'] = 'mails@govikon.ch'
+    org = create_new_organisation(app, name=org_name, create_files=False)
+    domain = org_name.replace(' ', '').strip()
+    domain = domain.lower()
+    org.meta['reply_to'] = f'mails@{domain}.ch'
     org.meta['locales'] = 'de_CH'
 
     # usually we don't want to create the users directly, anywhere else you

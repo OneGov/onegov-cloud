@@ -50,6 +50,7 @@ if TYPE_CHECKING:
     from onegov.core.mail import Attachment
     from onegov.core.types import EmailJsonDict, SequenceOrScalar
     from onegov.pay import Price
+    from onegov.ticket import Ticket
     from onegov.ticket.collection import TicketCount
     from reg.dispatch import _KeyLookup
 
@@ -125,7 +126,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         self.enable_yubikey = enable_yubikey
         self.disable_password_reset = disable_password_reset
 
-    def configure_api_token(
+    def configure_plausible_api_token(
         self,
         *,
         plausible_api_token: str = '',
@@ -133,6 +134,15 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     ) -> None:
 
         self.plausible_api_token = plausible_api_token
+
+    def configure_stadt_wil_azizi_api_token(
+            self,
+            *,
+            azizi_api_token: str = '',
+            ** cfg: Any
+    ) -> None:
+
+        self.azizi_api_token = azizi_api_token
 
     def configure_mtan_hook(self, **cfg: Any) -> None:
         """
@@ -231,15 +241,35 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
         return {
             handler_code: {
-                group: group_perms
+                group: group_perms if exclusive else
+                # if we treated a non-exclusive group as exclusive it also
+                # needs to include all of the members of the exclusive handler
+                # scoped group, otherwise we'll incorrectly restrict their
+                # access to these groups.
+                list({*group_perms, *handler_perms[None][1]})
                 for group, (exclusive, group_perms) in handler_perms.items()
                 # the permission is only exclusive, if at least one user group
                 # has exclusive permissions. But user groups with non-exclusive
                 # permissions still have permission to access the ticket.
-                if exclusive
+                if exclusive or (
+                    # if there is exclusive access to the whole handler code
+                    # we need to treat non-exclusive access to a group as
+                    # exclusive, so the users with non-exclusive access
+                    # to this group keep their access rights.
+                    group is not None
+                    and handler_perms.get(None, (False, ))[0]
+                )
             }
             for handler_code, handler_perms in permissions.items()
         }
+
+    def groupids_for_ticket(self, ticket: Ticket) -> list[str] | None:
+        handler_perms = self.ticket_permissions.get(ticket.handler_code)
+        if handler_perms is None:
+            return None
+
+        group_perms = handler_perms.get(ticket.group)
+        return handler_perms.get(None) if group_perms is None else group_perms
 
     @orm_cached(policy='on-table-change:files')
     def publications_count(self) -> int:
@@ -459,6 +489,7 @@ def get_i18n_localedirs() -> list[str]:
     return [
         utils.module_path('onegov.org', 'locale'),
         utils.module_path('onegov.form', 'locale'),
+        utils.module_path('onegov.parliament', 'locale'),
         utils.module_path('onegov.user', 'locale')
     ]
 
@@ -591,6 +622,7 @@ def get_public_ticket_messages() -> Collection[str]:
         'event',
         'payment',
         'reservation',
+        'reservation_adjusted',
         'submission',
         'ticket',
         'ticket_chat',
@@ -601,6 +633,11 @@ def get_public_ticket_messages() -> Collection[str]:
 @OrgApp.setting(section='org', name='disabled_extensions')
 def get_disabled_extensions() -> Collection[str]:
     return ()
+
+
+@OrgApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return True
 
 
 @OrgApp.setting(section='org', name='render_mtan_access_limit_exceeded')
@@ -693,12 +730,17 @@ def get_sortable_asset() -> Iterator[str]:
 
 @OrgApp.webasset('fullcalendar')
 def get_fullcalendar_asset() -> Iterator[str]:
-    yield 'fullcalendar.css'
     yield 'fullcalendar.js'
     yield 'fullcalendar.de.js'
     yield 'fullcalendar.fr.js'
     yield 'reservationcalendar.jsx'
     yield 'reservationcalendar_custom.js'
+
+
+@OrgApp.webasset('occupancycalendar')
+def get_occupancycalendar_asset() -> Iterator[str]:
+    yield 'occupancycalendar.jsx'
+    yield 'occupancycalendar_custom.js'
 
 
 @OrgApp.webasset('reservationlist')
@@ -857,6 +899,27 @@ def get_all_blank_asset() -> Iterator[str]:
 @OrgApp.webasset('people-select')
 def people_select_asset() -> Iterator[str]:
     yield 'people-select.js'
+
+
+@OrgApp.webasset('participant-select')
+def particpant_select_asset() -> Iterator[str]:
+    yield 'participant-select.js'
+
+
+@OrgApp.webasset('kaba-configurations')
+def kaba_configurations_asset() -> Iterator[str]:
+    yield 'kaba-configurations.js'
+
+
+@OrgApp.webasset('mapbox_address_autofill')
+def mapbox_address_autofill() -> Iterator[str]:
+    yield 'mapbox-search-web.js'  # implicit dependency
+    yield 'mapbox_address_autofill.js'
+
+
+@OrgApp.webasset('invoicing')
+def get_invoicing() -> Iterator[str]:
+    yield 'invoicing.js'
 
 
 def wrap_with_mtan_hook(

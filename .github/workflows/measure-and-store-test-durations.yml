@@ -3,7 +3,7 @@ name: Measure and store test durations for pytest-split
 on:
   workflow_dispatch:  # allow to run manually
   schedule:
-    - cron: '0 6 * * 1'  # run once a week on monday morning
+    - cron: '0 4 * * 1'  # run once a week on monday morning
 
 jobs:
   build:

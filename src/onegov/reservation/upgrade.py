@@ -5,6 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from __future__ import annotations
 
 from libres.db.models import Allocation, Reservation
+from libres.db.models.types.json_type import JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.reservation import LibresIntegration
 from onegov.reservation import Resource
@@ -128,3 +129,38 @@ def add_resource_subgroup_column(context: UpgradeContext) -> None:
         context.operations.add_column(
             'resources', Column('subgroup', Text, nullable=True)
         )
+
+
+@upgrade_task('Migrate old text-based JSON columns to JSONB')
+def migrated_text_based_json_to_jsonb(context: UpgradeContext) -> None:
+    if context.has_table('reservations'):
+        context.operations.alter_column(
+            'reservations',
+            'data',
+            type_=JSON,
+            postgresql_using='"data"::jsonb'
+        )
+    if context.has_table('allocations'):
+        context.operations.alter_column(
+            'allocations',
+            'data',
+            type_=JSON,
+            postgresql_using='"data"::jsonb'
+        )
+
+
+@upgrade_task('Translate default views to their new names')
+def translate_default_views_to_their_new_names(
+    context: UpgradeContext
+) -> None:
+    if context.has_table('resources'):
+        context.operations.execute("""
+            UPDATE resources SET content = jsonb_set(
+                content, '{default_view}', '"dayGridMonth"'
+            ) WHERE content->>'default_view' = 'month';
+        """)
+        context.operations.execute("""
+            UPDATE resources SET content = jsonb_set(
+                content, '{default_view}', '"timeGridWeek"'
+            ) WHERE content->>'default_view' = 'agendaWeek';
+        """)

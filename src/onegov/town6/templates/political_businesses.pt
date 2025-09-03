@@ -1,0 +1,60 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x">
+            <div class="large-8 medium-8 cell main-content">
+                <p tal:condition="not: businesses" i18n:translate="">No political businesses defined yet.</p>
+
+                <table tal:condition="businesses">
+                    <thead>
+                        <tr>
+                            <th i18n:translate>Date</th>
+                            <th i18n:translate>Business Type</th>
+                            <th i18n:translate>Status</th>
+                            <th i18n:translate>Political Business</th>
+                            <th i18n:translate>Number</th>
+                        </tr>
+                    </thead>
+                    <tbody tal:repeat="business businesses">
+                        <tr>
+                            <td><span>${layout.format_date(business.entry_date, 'date')}</span></td>
+                            <td>
+                                <span tal:condition="python: business.political_business_type in type_map">${type_map[business.political_business_type]}</span>
+                                <span tal:condition="python: business.political_business_type not in type_map">-</span>
+                            </td>
+                            <td>
+                                <span tal:condition="python: business.status in status_map">${status_map[business.status]}</span>
+                                <span tal:condition="python: business.status not in status_map">-</span>
+                            <td>
+                                <a tal:attributes="href request.link(business)">${business.title}</a>
+                            </td>
+                            <td><span>${business.number}</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div tal:condition="businesses" class="pagination-centered">
+                    <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model; pagination_centered True" />
+                </div>
+            </div>
+
+            <div class="large-4 medium-4 cell sidebar filter-panel">
+                <div class="sidebar-wrapper">
+                    <div tal:condition="business_types" class="side-panel filter-business-types">
+                        <h2 class="h3" i18n:translate>Business Type</h2>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags business_types" />
+                    </div>
+                    <div tal:condition="business_status" class="side-panel filter-business-status">
+                        <h2 class="h3" i18n:translate>Status</h2>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags business_status" />
+                    </div>
+                    <div tal:condition="years" class="side-panel filter-business-years">
+                        <h2 class="h3" i18n:translate>Year</h2>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags years" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>

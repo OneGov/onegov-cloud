@@ -1,20 +1,16 @@
 from __future__ import annotations
 
 import html
-import os
 import re
 
-from onegov.core.custom import json
-from langdetect import DetectorFactory, PROFILES_DIRECTORY
-from langdetect.utils.lang_profile import LangProfile
+from lingua import IsoCode639_1, LanguageDetectorBuilder
 from onegov.core.orm import find_models
 
 
 from typing import Any, Generic, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
-    from langdetect.detector import Detector
-    from langdetect.language import Language
+    from lingua import ConfidenceValue
     from onegov.search.mixins import Searchable
 
 
@@ -135,33 +131,23 @@ def related_types(model: type[object]) -> set[str]:
 
 
 class LanguageDetector:
-    """ Detects languages with the help of langdetect.
-
-    Unlike langdetect this detector may be limited to a subset of all
-    supported languages, which may improve accuracy if the subset is known and
-    saves some memory.
+    """ Detects languages with the help of lingua-language-detector.
 
     """
 
     def __init__(self, supported_languages: Sequence[str]) -> None:
         self.supported_languages = supported_languages
-        self.factory = DetectorFactory()
-
-        for ix, language in enumerate(supported_languages):
-            path = os.path.join(PROFILES_DIRECTORY, language)
-
-            with open(path, encoding='utf-8') as f:
-                profile = LangProfile(**json.load(f))
-                self.factory.add_profile(profile, ix, len(supported_languages))
-
-    def spawn_detector(self, text: str) -> Detector:
-        detector = self.factory.create()
-        detector.append(text)
-
-        return detector
+        self.detector = LanguageDetectorBuilder.from_iso_codes_639_1(*(
+            IsoCode639_1.from_str(language)
+            for language in supported_languages
+        )).build()
 
     def detect(self, text: str) -> str:
-        return self.spawn_detector(text).detect()
+        language = self.detector.detect_language_of(text)
+        if language is None:
+            # fallback to the first supported language
+            return self.supported_languages[0]
+        return language.iso_code_639_1.name.lower()
 
-    def probabilities(self, text: str) -> list[Language]:
-        return self.spawn_detector(text).get_probabilities()
+    def probabilities(self, text: str) -> list[ConfidenceValue]:
+        return self.detector.compute_language_confidence_values(text)

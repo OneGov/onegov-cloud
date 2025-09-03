@@ -1,11 +1,16 @@
-from onegov.pas.models import Attendence, Commission, RateSet, SettlementRun,\
-    Parliamentarian
+from onegov.pas.models import (
+    Attendence,
+    PASCommission,
+    PASParliamentarian,
+    RateSet,
+    SettlementRun
+)
 from datetime import date
 
 
 def test_generate_parliamentarian_export(session):
     # Create parliamentarian
-    parliamentarian = Parliamentarian(
+    parliamentarian = PASParliamentarian(
         first_name='John', last_name='Doe', gender='male'
     )
     session.add(parliamentarian)
@@ -30,7 +35,7 @@ def test_generate_parliamentarian_export(session):
     session.add(rate_set)
 
     # Create test commission
-    commission = Commission(name='Test Commission', type='normal')
+    commission = PASCommission(name='Test PASCommission', type='normal')
     session.add(commission)
     session.flush()
 

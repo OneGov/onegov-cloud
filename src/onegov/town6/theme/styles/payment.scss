@@ -50,6 +50,7 @@
     background-color: $white;
     display: inline-block;
     padding: 2px 8px;
+    white-space:nowrap;
 
     &.payment-state-open {
         border: 1px solid get-color(info);
@@ -90,6 +91,16 @@
             margin-right: .75ex;
         }
     }
+
+    &.payment-state-invoiced {
+        border: 1px solid get-color(info);
+
+        &::before {
+            @include icon('\f1ea');
+            color: get-color(info);
+            margin-right: .75ex;
+        }
+    }
 }
 
 .tickets-table .payment-state {
@@ -117,5 +128,106 @@
     td {
         padding-right: 5px;
         vertical-align: top;
+    }
+}
+
+/*
+    Invoice
+*/
+.invoice-items {
+    position: relative;
+    width: 100%;
+
+    thead th:not(:first-child) {
+        text-align: center !important;
+    }
+
+    tbody tr {
+        background-color: transparent;
+
+        &.paid:hover {
+            background-color: $green-pastel !important;
+        }
+
+        &.unpaid:hover {
+            background-color: $red-pastel !important;
+        }
+    }
+
+    td {
+        border: 0;
+        padding-bottom: .35rem;
+        padding-top: .35rem;
+
+        &:not(:first-child) {
+            white-space: nowrap;
+        }
+    }
+
+    .group th {
+        padding-bottom: .75rem;
+        padding-top: .75rem;
+    }
+
+    .amount, .unit, .quantity, .vat, .vat-rate {
+        font-family: $font-family-monospace;
+        text-align: right;
+        width: 1%;
+    }
+
+    .actions {
+        width: 1%;
+    }
+
+    .total .amount,
+    .total .vat {
+        padding-top: .75rem;
+    }
+
+    .total td {
+        padding-bottom: .5rem;
+        padding-top: .5rem;
+    }
+
+    .total td:last-child {
+        padding-right: .75rem;
+    }
+
+    .total td:first-child,
+    .group th:first-child {
+        font-weight: bold;
+        text-decoration: underline;
+        text-decoration-color: $body-font-color;
+    }
+
+    tbody tr:last-child td {
+        // make sure the backgrounds of all item lines cover the same
+        // height, here we mask the extended height of the row with
+        // a white box-shadow
+        box-shadow: 0 -.75rem $white inset;
+        padding-bottom: 1rem;
+    }
+
+    .unpaid .amount {
+        color: $red-dark;
+    }
+
+    .paid .amount {
+        color: $green-dark;
+    }
+
+    a.remove-invoice-item {
+        color: $red-dark;
+
+        &:link,
+        &:visited {
+            color: $red-dark;
+        }
+
+        &:hover,
+        &:active,
+        &:focus {
+            color: rgba($red-dark, .9);
+        }
     }
 }

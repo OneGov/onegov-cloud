@@ -5,13 +5,13 @@ from uuid import UUID
 
 from onegov.pas import log
 from onegov.pas.models import (
-    CommissionMembership,
-    Parliamentarian,
-    Commission,
-    ParliamentaryGroup,
-    Party,
-    ParliamentarianRole,
     ImportLog,
+    PASCommission,
+    PASCommissionMembership,
+    PASParliamentarian,
+    PASParliamentarianRole,
+    PASParliamentaryGroup,
+    Party,
 )
 from sqlalchemy.orm import selectinload
 
@@ -172,9 +172,8 @@ class MembershipData(TypedDict):
 
 from typing import TYPE_CHECKING, TypedDict
 if TYPE_CHECKING:
-    from onegov.pas.models.parliamentarian_role import ParliamentaryGroupRole
-    from onegov.pas.models.parliamentarian_role import PartyRole
-    from onegov.pas.models.parliamentarian_role import Role
+    from onegov.parliament.models.parliamentarian_role import (
+        ParliamentaryGroupRole, PartyRole, Role)
     from collections.abc import Sequence
     from sqlalchemy.orm import Session
 
@@ -253,8 +252,8 @@ class PeopleImporter(DataImporter):
     }
 
     def bulk_import(self, people_data: Sequence[PersonData]) -> tuple[
-        dict[str, Parliamentarian],
-        dict[str, list[Parliamentarian]],
+        dict[str, PASParliamentarian],
+        dict[str, list[PASParliamentarian]],
         int,  # Add processed count
     ]:
         """
@@ -266,16 +265,16 @@ class PeopleImporter(DataImporter):
             - A dictionary with lists of created and updated parliamentarians.
             - The total number of people records processed from the input.
         """
-        new_parliamentarians: list[Parliamentarian] = []
-        updated_parliamentarians: list[Parliamentarian] = []
+        new_parliamentarians: list[PASParliamentarian] = []
+        updated_parliamentarians: list[PASParliamentarian] = []
         processed_count = 0
-        result_map: dict[str, Parliamentarian] = {}
+        result_map: dict[str, PASParliamentarian] = {}
 
         # Fetch existing parliamentarians by external_kub_id
         existing_ids = [p['id'] for p in people_data if p.get('id')]
         existing_parliamentarians = (
-            self.session.query(Parliamentarian)
-            .filter(Parliamentarian.external_kub_id.in_(existing_ids))
+            self.session.query(PASParliamentarian)
+            .filter(PASParliamentarian.external_kub_id.in_(existing_ids))
             .all()
         )
         existing_map = {
@@ -358,7 +357,7 @@ class PeopleImporter(DataImporter):
         return result_map, details, processed_count
 
     def _update_parliamentarian_attributes(
-        self, parliamentarian: Parliamentarian, person_data: PersonData
+        self, parliamentarian: PASParliamentarian, person_data: PersonData
     ) -> bool:
         """Updates attributes of an existing Parliamentarian object.
         Returns True if any attributes were changed, False otherwise."""
@@ -384,7 +383,7 @@ class PeopleImporter(DataImporter):
 
     def _create_parliamentarian(
         self, person_data: PersonData
-    ) -> Parliamentarian | None:
+    ) -> PASParliamentarian | None:
         """Creates a single new Parliamentarian object from person data."""
 
         person_id = person_data.get('id')
@@ -408,7 +407,7 @@ class PeopleImporter(DataImporter):
                 'email'
             ]
 
-        parliamentarian = Parliamentarian(**parliamentarian_kwargs)
+        parliamentarian = PASParliamentarian(**parliamentarian_kwargs)
         return parliamentarian
 
 
@@ -418,12 +417,12 @@ class OrganizationImporter(DataImporter):
     def bulk_import(
         self, organizations_data: Sequence[OrganizationData]
     ) -> tuple[
-        dict[str, Commission],
-        dict[str, ParliamentaryGroup],  # Currently unused, but kept for
+        dict[str, PASCommission],
+        dict[str, PASParliamentaryGroup],  # Currently unused, but kept for
         # structure
         dict[str, Party],
         dict[str, Any],  # Other orgs
-        dict[str, dict[str, list[Commission | Party]]],  # Details
+        dict[str, dict[str, list[PASCommission | Party]]],  # Details
         dict[str, int],  # Processed counts per type
     ]:
         """
@@ -438,13 +437,13 @@ class OrganizationImporter(DataImporter):
             - Other organizations
             - Dictionary containing lists of created/updated objects per type.
         """
-        commissions_to_create: list[Commission] = []
-        commissions_to_update: list[Commission] = []
+        commissions_to_create: list[PASCommission] = []
+        commissions_to_update: list[PASCommission] = []
         parties_to_create: list[Party] = []
         parties_to_update: list[Party] = []
 
         # Details structure to return
-        details: dict[str, dict[str, list[Commission | Party]]] = {
+        details: dict[str, dict[str, list[PASCommission | Party]]] = {
             'commissions': {'created': [], 'updated': []},
             'parliamentary_groups': {'created': [], 'updated': []},
             'parties': {'created': [], 'updated': []},
@@ -458,8 +457,8 @@ class OrganizationImporter(DataImporter):
         }
 
         # Maps to return (will contain both existing and new objects)
-        commission_map: dict[str, Commission] = {}
-        parliamentary_group_map: dict[str, ParliamentaryGroup] = {}
+        commission_map: dict[str, PASCommission] = {}
+        parliamentary_group_map: dict[str, PASParliamentaryGroup] = {}
         party_map: dict[str, Party] = {}
         # Not ORM objects, no update needed
         other_organizations: dict[str, Any] = {}
@@ -467,8 +466,8 @@ class OrganizationImporter(DataImporter):
         # Fetch existing organizations by external_kub_id
         existing_ids = [o['id'] for o in organizations_data if o.get('id')]
         existing_commissions = (
-            self.session.query(Commission)
-            .filter(Commission.external_kub_id.in_(existing_ids))
+            self.session.query(PASCommission)
+            .filter(PASCommission.external_kub_id.in_(existing_ids))
             .all()
         )
         existing_parties = (
@@ -522,7 +521,7 @@ class OrganizationImporter(DataImporter):
                             )
                         # No need to add to save list, session tracks changes
                     else:
-                        commission = Commission(
+                        commission = PASCommission(
                             external_kub_id=org_uuid,
                             name=org_name,
                             type='normal',
@@ -564,7 +563,8 @@ class OrganizationImporter(DataImporter):
                         # No need to add to save list, session tracks changes
                     else:
                         # Create new party (since not found in initial map)
-                        party = Party(external_kub_id=org_uuid, name=org_name)
+                        party = (
+                            Party(external_kub_id=org_uuid, name=org_name))
                         log.debug(
                             f'Creating party (from Fraktion): {org_id}'
                         )
@@ -673,9 +673,9 @@ class MembershipImporter(DataImporter):
 
     def __init__(self, session: Session) -> None:
         self.session = session
-        self.parliamentarian_map: dict[str, Parliamentarian] = {}
-        self.commission_map: dict[str, Commission] = {}
-        self.parliamentary_group_map: dict[str, ParliamentaryGroup] = {}
+        self.parliamentarian_map: dict[str, PASParliamentarian] = {}
+        self.commission_map: dict[str, PASCommission] = {}
+        self.parliamentary_group_map: dict[str, PASParliamentaryGroup] = {}
         # party_map now keyed by external_kub_id for consistency
         self.party_map: dict[str, Party] = {}
         self.other_organization_map: dict[str, Any] = {}
@@ -683,9 +683,9 @@ class MembershipImporter(DataImporter):
     def init(
         self,
         session: Session,
-        parliamentarian_map: dict[str, Parliamentarian],
-        commission_map: dict[str, Commission],
-        parliamentary_group_map: dict[str, ParliamentaryGroup],
+        parliamentarian_map: dict[str, PASParliamentarian],
+        commission_map: dict[str, PASCommission],
+        parliamentary_group_map: dict[str, PASParliamentaryGroup],
         party_map: dict[str, Party],
         other_organization_map: dict[str, Any],
     ) -> None:
@@ -700,7 +700,7 @@ class MembershipImporter(DataImporter):
 
     def _extract_and_update_or_create_missing_parliamentarians(
         self, memberships_data: Sequence[MembershipData]
-    ) -> dict[str, list[Parliamentarian]]:
+    ) -> dict[str, list[PASParliamentarian]]:
         """
         Extracts/updates/creates parliamentarians found only in membership
         data.
@@ -713,9 +713,9 @@ class MembershipImporter(DataImporter):
         missing info (address, email) from membership data. If no, create a
         new parliamentarian. Updates self.parliamentarian_map accordingly.
         """
-        parliamentarians_to_create: list[Parliamentarian] = []
+        parliamentarians_to_create: list[PASParliamentarian] = []
         # Use a set for updates to automatically handle duplicates
-        parliamentarians_to_update: set[Parliamentarian] = set()
+        parliamentarians_to_update: set[PASParliamentarian] = set()
 
         # 1. Identify potential missing parliamentarian IDs
         missing_person_ids = {
@@ -733,8 +733,8 @@ class MembershipImporter(DataImporter):
             return {'created': [], 'updated': []}
 
         existing_db_parliamentarians = (
-            self.session.query(Parliamentarian)
-            .filter(Parliamentarian.external_kub_id.in_(missing_person_ids))
+            self.session.query(PASParliamentarian)
+            .filter(PASParliamentarian.external_kub_id.in_(missing_person_ids))
             .all()
         )
         existing_db_map = {
@@ -856,7 +856,7 @@ class MembershipImporter(DataImporter):
 
     def _update_parliamentarian_from_membership(
         self,
-        parliamentarian: Parliamentarian,
+        parliamentarian: PASParliamentarian,
         person_data: PersonData,
         membership_data: MembershipData,
     ) -> bool:
@@ -916,7 +916,7 @@ class MembershipImporter(DataImporter):
 
     def _create_parliamentarian_from_membership(
         self, person_data: PersonData, membership_data: MembershipData
-    ) -> Parliamentarian | None:
+    ) -> PASParliamentarian | None:
         """
         Creates a new Parliamentarian object using data primarily from a
         membership record.
@@ -931,7 +931,7 @@ class MembershipImporter(DataImporter):
 
         try:
             uuid_value = UUID(person_id)
-            parliamentarian = Parliamentarian(
+            parliamentarian = PASParliamentarian(
                 external_kub_id=uuid_value,
                 first_name=person_data.get('firstName', ''),
                 last_name=person_data.get('officialName', ''),
@@ -981,10 +981,10 @@ class MembershipImporter(DataImporter):
               processed counts per category.
             - A dictionary containing the count of processed items per type.
         """
-        commission_memberships_to_create: list[CommissionMembership] = []
-        commission_memberships_to_update: list[CommissionMembership] = []
-        parliamentarian_roles_to_create: list[ParliamentarianRole] = []
-        parliamentarian_roles_to_update: list[ParliamentarianRole] = []
+        commission_memberships_to_create: list[PASCommissionMembership] = []
+        commission_memberships_to_update: list[PASCommissionMembership] = []
+        parliamentarian_roles_to_create: list[PASParliamentarianRole] = []
+        parliamentarian_roles_to_update: list[PASParliamentarianRole] = []
 
         # Details structure to return - Use the new TypedDict where applicable
         details: dict[str, ImportCategoryResult | dict[str, Any]] = {
@@ -1032,16 +1032,16 @@ class MembershipImporter(DataImporter):
         [g.id for g in self.parliamentary_group_map.values() if g.id]
 
         existing_commission_memberships_map: dict[
-            tuple[UUID | None, UUID | None], CommissionMembership
+            tuple[UUID | None, UUID | None], PASCommissionMembership
         ] = {}
         if parliamentarian_ids and commission_ids:
             existing_cms = (
-                self.session.query(CommissionMembership)
+                self.session.query(PASCommissionMembership)
                 .filter(
-                    CommissionMembership.parliamentarian_id.in_(
+                    PASCommissionMembership.parliamentarian_id.in_(
                         parliamentarian_ids
                     ),
-                    CommissionMembership.commission_id.in_(commission_ids),
+                    PASCommissionMembership.commission_id.in_(commission_ids),
                 )
                 .all()
             )
@@ -1056,22 +1056,22 @@ class MembershipImporter(DataImporter):
 
         # Define the precise structure for the role key tuple
         role_key_type = tuple[UUID, UUID | None, UUID | None, str, str | None]
-        existing_roles_map: dict[role_key_type, ParliamentarianRole] = {}
+        existing_roles_map: dict[role_key_type, PASParliamentarianRole] = {}
         if parliamentarian_ids:
             # Fetch all roles for the relevant parliamentarians
             # We'll filter/map them client-side
             existing_roles = (
-                self.session.query(ParliamentarianRole)
+                self.session.query(PASParliamentarianRole)
                 .filter(
-                    ParliamentarianRole.parliamentarian_id.in_(
+                    PASParliamentarianRole.parliamentarian_id.in_(
                         parliamentarian_ids
                     )
                 )
                 .options(
                     # Eager load related objects to prevent N+1 queries
                     # during updates.
-                    selectinload(ParliamentarianRole.party),
-                    selectinload(ParliamentarianRole.parliamentary_group),
+                    selectinload(PASParliamentarianRole.party),
+                    selectinload(PASParliamentarianRole.parliamentary_group),
                 )
                 .all()
             )
@@ -1529,10 +1529,10 @@ class MembershipImporter(DataImporter):
 
     def _create_commission_membership(
         self,
-        parliamentarian: Parliamentarian,
-        commission: Commission,
+        parliamentarian: PASParliamentarian,
+        commission: PASCommission,
         membership_data: MembershipData,
-    ) -> CommissionMembership | None:
+    ) -> PASCommissionMembership | None:
         """Create a CommissionMembership object."""
         try:
             if not parliamentarian.id or not commission.id:
@@ -1557,7 +1557,7 @@ class MembershipImporter(DataImporter):
 
             assert parliamentarian.id is not None
             assert commission.id is not None
-            return CommissionMembership(
+            return PASCommissionMembership(
                 parliamentarian=parliamentarian,
                 parliamentarian_id=parliamentarian.id,
                 commission=commission,
@@ -1573,7 +1573,9 @@ class MembershipImporter(DataImporter):
             return None
 
     def _update_commission_membership(
-        self, membership: CommissionMembership, membership_data: MembershipData
+        self,
+        membership: PASCommissionMembership,
+        membership_data: MembershipData
     ) -> bool:
         """
         Updates an existing CommissionMembership object.
@@ -1608,28 +1610,29 @@ class MembershipImporter(DataImporter):
 
     def _create_parliamentarian_role(
         self,
-        parliamentarian: Parliamentarian,
+        parliamentarian: PASParliamentarian,
         role: Role,
-        parliamentary_group: ParliamentaryGroup | None = None,
+        parliamentary_group: PASParliamentaryGroup | None = None,
         parliamentary_group_role: ParliamentaryGroupRole | None = None,
         party: Party | None = None,
         party_role: PartyRole | None = None,
         additional_information: str | None = None,
         start_date: str | None = None,
         end_date: str | None = None,
-    ) -> ParliamentarianRole | None:
+    ) -> PASParliamentarianRole | None:
         try:
             # Ensure parliamentarian has an ID
             if not parliamentarian.id:
                 log.warning(
-                    'Skipping parliamentarian role: Parliamentarian missing '
+                    'Skipping parliamentarian role: '
+                    'PASParliamentarian missing '
                     f'ID: {parliamentarian.first_name} '
                     f'{parliamentarian.last_name}'
                 )
                 return None
 
             assert parliamentarian.id is not None
-            return ParliamentarianRole(
+            return PASParliamentarianRole(
                 parliamentarian=parliamentarian,
                 parliamentarian_id=parliamentarian.id,
                 role=role,
@@ -1649,9 +1652,9 @@ class MembershipImporter(DataImporter):
 
     def _update_parliamentarian_role(
         self,
-        role_obj: ParliamentarianRole,
+        role_obj: PASParliamentarianRole,
         role: Role,
-        parliamentary_group: ParliamentaryGroup | None = None,
+        parliamentary_group: PASParliamentaryGroup | None = None,
         parliamentary_group_role: ParliamentaryGroupRole | None = None,
         party: Party | None = None,
         party_role: PartyRole | None = None,

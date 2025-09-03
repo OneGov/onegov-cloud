@@ -22,18 +22,20 @@ var set_date_range_selector_filter = function(name, value) {
     delete location.query.page;
 
     // keep range in query if range is equal 'past' and if date (value) is in the past, otherwise delete
-    if (date.isSame(moment(), 'day') || date.isAfter(moment(), 'day') || location.query.range != 'past') {
+    if (date.isSame(moment(), 'day') || date.isAfter(moment(), 'day') || location.query.range !== 'past') {
         delete location.query.range;
     }
 
     var url = location.toString();
     var target = $('.date-range-selector-target');
+    var results = $('.date-range-selector-results');
 
     if (target.length === 0) {
         window.location.href = url;
     } else {
         $.get(url, function(data) {
             target.replaceWith($(data).find('.date-range-selector-target'));
+            results.replaceWith($(data).find('.date-range-selector-results'));
             history.replaceState({}, "", url);
         });
     }

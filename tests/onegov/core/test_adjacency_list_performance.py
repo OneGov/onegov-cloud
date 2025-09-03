@@ -1,15 +1,26 @@
-from onegov.org.models import News
-from onegov.core.utils import Bunch, normalize_for_url
-from sqlalchemy import event
-from sqlalchemy.orm.attributes import get_history
+from __future__ import annotations
+
 import pytest
 import transaction
 
+from onegov.core.utils import Bunch, normalize_for_url
 from onegov.org.models.page import NewsCollection
+from onegov.org.models import News
+from sqlalchemy import event
+from sqlalchemy.orm.attributes import get_history
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from sqlalchemy.orm.unitofwork import UOWTransaction
 
 
 @pytest.mark.parametrize("item_count", [1000])  # Parameterize if needed later
-def test_add_performance_large_collection(item_count, session):
+def test_add_performance_large_collection(
+    item_count: int,
+    session: Session
+) -> None:
     """
     Previously, we encountered a performance issue with our AdjacencyList
     implementation. When news items were sorted alphabetically by sort key,
@@ -29,7 +40,7 @@ def test_add_performance_large_collection(item_count, session):
     """
 
 
-    def add_news(session):
+    def add_news(session: Session) -> int:
         root_title = 'Aktuelles'
         root_name = normalize_for_url(root_title)
         root_item = News(title=root_title, name=root_name, type='news')
@@ -48,9 +59,9 @@ def test_add_performance_large_collection(item_count, session):
     root_item_id = add_news(session)
 
     root_item = session.query(News).filter_by(id=root_item_id).one()
-    request = Bunch(session=session)
+    request: Any = Bunch(session=session)
     news_collection = NewsCollection(request, root=root_item)
-    new_item_data = {
+    new_item_data: dict[str, Any] = {
         'parent': root_item,
         'title': 'AAAAAAA',
         'lead': '',
@@ -60,7 +71,10 @@ def test_add_performance_large_collection(item_count, session):
     update_counter = {'count': 0}
 
     # Event listener function to count News.order updates
-    def count_order_updates(session, flush_context):
+    def count_order_updates(
+        session: Session,
+        flush_context: UOWTransaction
+    ) -> None:
         for instance in session.dirty:
             if isinstance(instance, News):
                 # Check if 'order' attribute is changing

@@ -31,7 +31,8 @@
 var get_choices = function(form, field_name) {
     var fields = form.find(
         'input[name="' + field_name + '"]:checked, ' +
-        'select[name="' + field_name + '"]'
+        'select[name="' + field_name + '"], ' +
+        'input[type="text"][name="' + field_name + '"]'
     );
     if (fields.length === 0) {
         return null;
@@ -130,7 +131,12 @@ var setup_depends_on = function(form) {
         evaluate_dependencies(form, input, dependencies);
 
         _.each(dependencies, function(dependency) {
-            get_dependency_target(form, dependency).on('change', function() {
+            var target = get_dependency_target(form, dependency);
+            var trigger = 'change';
+            if (target.is('[type="text"]')) {
+                trigger = 'keyup';
+            }
+            target.on(trigger, function() {
                 evaluate_dependencies(form, input, dependencies);
             });
         });

@@ -710,3 +710,96 @@ def test_mtan_access_unauthorized_resource(org_app, client, smsdir):
     unauth_page = anonymous.get(page_url, expect_errors=True)
     assert "Zugriff verweigert" in unauth_page.text
     assert "folgen Sie diesem Link um sich anzumelden" in unauth_page.text
+
+
+def test_citizen_login(client):
+    admin = client.spawn()
+    client2 = client.spawn()
+
+    # by default it is off
+    links = client.get('/').pyquery('.globals a.citizen-login')
+    assert not list(links.items())
+    assert client.get('/auth/citizen-login', status=404)
+    assert client.get('/auth/confirm-citizen-login', status=404)
+
+    # let's enable it
+    admin.login_admin()
+    settings = admin.get('/').click('Einstellungen').click('Kunden-Login')
+    settings.form['citizen_login_enabled'].checked = True
+    settings.form.submit().follow()
+
+    # now it should be there
+    links = client.get('/').pyquery('.globals a.citizen-login')
+    assert links.text() == 'Kunden-Login'
+
+    login_page = client.get(links.attr('href'))
+    login_page.form['email'] = 'citizen@example.org'
+    confirm_page = login_page.form.submit().follow()
+    assert "Kunden-Login bestätigen" in confirm_page.text
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)['TextBody']
+    assert 'confirm-citizen-login' in message
+    token = re.search(r'&token=([^)]+)', message).group(1)
+
+    # finish login with the token
+    confirm_page.form['token'] = token
+    index_page = confirm_page.form.submit().follow()
+
+    links = index_page.pyquery('.globals a.logout')
+    assert links.text() == 'Abmelden'
+
+    # visiting the login/confimation view while authenticated redirects you
+    assert client.get('/auth/citizen-login').follow().request.path == '/'
+    assert client.get(
+        '/auth/confirm-citizen-login'
+    ).follow().request.path == '/'
+
+    index_page = client.get(links.attr('href')).follow()
+    links = index_page.pyquery('.globals a.citizen-login')
+    assert links.text() == 'Kunden-Login'
+
+    # a second user can't use the same token to login as well
+    confirm_page = client.get('/auth/confirm-citizen-login')
+    confirm_page.form['token'] = token
+    login_page = confirm_page.form.submit().follow()
+    assert login_page.request.path == '/auth/citizen-login'
+    assert 'Ungültiger oder abgelaufener Login-Code' in login_page
+
+
+def test_citizen_login_via_confirm_url(client):
+    admin = client.spawn()
+    client2 = client.spawn()
+
+    # by default it is off
+    links = client.get('/').pyquery('.globals a.citizen-login')
+    assert not list(links.items())
+
+    # let's enable it
+    admin.login_admin()
+    settings = admin.get('/').click('Einstellungen').click('Kunden-Login')
+    settings.form['citizen_login_enabled'].checked = True
+    settings.form.submit().follow()
+
+    # now it should be there
+    links = client.get('/').pyquery('.globals a.citizen-login')
+    assert links.text() == 'Kunden-Login'
+
+    login_page = client.get(links.attr('href'))
+    login_page.form['email'] = 'citizen@example.org'
+    confirm_page = login_page.form.submit().follow()
+    assert "Kunden-Login bestätigen" in confirm_page.text
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)['TextBody']
+    assert 'confirm-citizen-login' in message
+    url = re.search(r'localhost(/auth/[^)]+)', message).group(1)
+
+    # finish login with the confirm url
+    confirm_page = client.get(url)
+    index_page = confirm_page.form.submit().follow()
+
+    links = index_page.pyquery('.globals a.logout')
+    assert links.text() == 'Abmelden'
+
+    index_page = client.get(links.attr('href')).follow()
+    links = index_page.pyquery('.globals a.citizen-login')
+    assert links.text() == 'Kunden-Login'

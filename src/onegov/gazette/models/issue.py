@@ -199,8 +199,7 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
             notice.publish(request)
 
         from onegov.gazette.pdf import IssuePdf  # circular
-        # FIXME: asymmetric property
-        self.pdf = IssuePdf.from_issue(  # type:ignore[assignment]
+        self.pdf = IssuePdf.from_issue(
             issue=self,
             request=request,
             first_publication_number=self.first_publication_number,

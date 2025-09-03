@@ -4,7 +4,7 @@
 */
 
 var rc = $.reservationCalendar = {};
-var defaultOptions = {
+rc.defaultOptions = {
     /*
         Returns the allocations in a fullcalendar compatible events feed.
         See http://fullcalendar.io/docs/event_data/events_json_feed/
@@ -43,7 +43,7 @@ var defaultOptions = {
                 ?start=2016-02-04T2200:00.000Z
                 &end=2016-02-05T2300:00.000Z
                 &whole_day=no
-                &view=month
+                &view=dayGridMonth
     */
     selectUrl: null,
 
@@ -69,7 +69,7 @@ var defaultOptions = {
     /*
         The view shown initially
     */
-    view: 'month',
+    view: 'dayGridMonth',
 
     /*
         The date shown initially
@@ -99,44 +99,52 @@ rc.passEventsToCalendar = function(calendar, target, source) {
     });
 };
 
-rc.getFullcalendarOptions = function(options) {
-    var rcOptions = $.extend(true, defaultOptions, options);
+rc.getFullcalendarOptions = function(rcExtendOptions) {
+    var rcOptions = $.extend(true, rc.defaultOptions, rcExtendOptions);
 
-    // the fullcalendar default options
-    var fcOptions = {
-        allDaySlot: false,
-        height: 'auto',
-        events: rcOptions.feed,
-        minTime: rcOptions.minTime,
-        maxTime: rcOptions.maxTime,
-        editable: rcOptions.editable,
-        selectable: rcOptions.editable,
-        defaultView: rcOptions.view,
+    // contains both base options and extended options
+    // extended options will be available on the calendar
+    // object via calendar.exOptions
+    var options = {
+        // the fullcalendar default options
+        fc: {
+            allDaySlot: false,
+            height: 'auto',
+            events: rcOptions.feed,
+            slotMinTime: rcOptions.minTime,
+            slotMaxTime: rcOptions.maxTime,
+            editable: rcOptions.editable,
+            selectable: rcOptions.editable,
+            initialView: rcOptions.view,
+            locale: window.locale.language,
+            multiMonthMaxColumns: 1
+        },
         highlights_min: rcOptions.highlights_min,
         highlights_max: rcOptions.highlights_max,
         afterSetup: [],
         viewRenderers: [],
         eventRenderers: [],
         reservations: rcOptions.reservations,
-        reservationform: rcOptions.reservationform,
-        locale: window.locale.language
+        reservationform: rcOptions.reservationform
     };
+
+    var fcOptions = options.fc;
 
     // the reservation calendar type definition
     var views = [];
 
     switch (rcOptions.type) {
         case 'daypass':
-            views = ['month'];
-            fcOptions.header = {
+            views = ['dayGridMonth'];
+            fcOptions.headerToolbar = {
                 left: 'title today prev,next',
                 center: '',
                 right: ''
             };
             break;
         case 'room':
-            views = ['month', 'agendaWeek', 'agendaDay'];
-            fcOptions.header = {
+            views = ['multiMonthYear', 'dayGridMonth', 'timeGridWeek', 'timeGridDay'];
+            fcOptions.headerToolbar = {
                 left: 'title today prev,next',
                 center: '',
                 right: views.join(',')
@@ -145,8 +153,8 @@ rc.getFullcalendarOptions = function(options) {
             fcOptions.weekNumbers = true;
             break;
         case 'daily-item':
-            views = ['month'];
-            fcOptions.header = {
+            views = ['dayGridMonth'];
+            fcOptions.headerToolbar = {
                 left: 'title today prev,next',
                 center: '',
                 right: ''
@@ -158,96 +166,117 @@ rc.getFullcalendarOptions = function(options) {
 
     // select a valid default view
     if (!_.contains(views, rcOptions.view)) {
-        fcOptions.defaultView = views[0];
+        fcOptions.initialView = views[0];
+    }
+
+    // select initial date
+    if (rcOptions.date) {
+        fcOptions.initialDate = rcOptions.date;
     }
 
     // implements editing
     if (rcOptions.editable) {
 
         // create events on selection
-        fcOptions.select = function(start, end, _jsevent, view) {
+        fcOptions.select = function(info) {
+            var view = info.view;
             var url = new Url(rcOptions.selectUrl);
-            url.query.start = start.toISOString();
+            url.query.start = info.startStr;
 
-            if (view.name === "month") {
-                url.query.end = end.subtract(1, 'days').toISOString();
+            if (view.type === "dayGridMonth" || view.type === "multiMonthYear") {
+                var end = moment(info.end);
+                url.query.end = end.subtract(1, 'days').format('YYYY-MM-DD');
                 url.query.whole_day = 'yes';
-                url.query.view = view.name;
+                url.query.view = view.type;
             } else {
-                url.query.end = end.toISOString();
+                url.query.end = info.endStr;
                 url.query.whole_day = 'no';
-                url.query.view = view.name;
+                url.query.view = view.type;
             }
             window.location.href = url.toString();
         };
 
         // edit events on drag&drop, resize
-        fcOptions.eventDrop = fcOptions.eventResize = function(event, _delta, _revertFunc, _jsEvent, _ui, view) {
-            var url = new Url(event.editurl);
-            url.query.start = event.start.toISOString();
-            url.query.end = event.end.toISOString();
-            url.query.view = view.name;
+        fcOptions.eventDrop = fcOptions.eventResize = function(info) {
+            var event = info.event;
+            var url = new Url(event.extendedProps.editurl);
+            url.query.start = event.startStr;
+            url.query.end = event.endStr;
+            url.query.view = info.view.type;
             location.href = url.toString();
         };
 
         // make sure other code can react if events are being changed
-        fcOptions.eventDragStart = fcOptions.eventResizeStart = function(event) {
-            event.is_changing = true;
+        fcOptions.eventDragStart = fcOptions.eventResizeStart = function(info) {
+            info.event.is_changing = true;
         };
     }
 
     // after event rendering
-    fcOptions.eventRenderers.push(rc.renderPartitions);
-    fcOptions.eventRenderers.push(rc.highlightEvents);
-    fcOptions.eventRenderers.push(rc.setupEventPopups);
+    options.eventRenderers.push(rc.renderPartitions);
+    options.eventRenderers.push(rc.highlightEvents);
+    options.eventRenderers.push(rc.setupEventPopups);
 
-    fcOptions.eventAfterRender = function(event, element, view) {
-        var renderers = view.options.eventRenderers;
+    // render additional content lines
+    fcOptions.eventContent = function(info, h) {
+        var event = info.event;
+        var lines = event.title.split('\n');
+        var content = [];
+        for (var i = 0; i < lines.length; i++) {
+            if (i !== 0) {
+                content[i * 2 - 1] = h('br');
+            }
+            content[i * 2] = lines[i];
+        }
+        return h('span', {class: 'fc-title'}, content);
+    };
+
+    fcOptions.eventDidMount = function(info) {
+        var renderers = options.eventRenderers;
         for (var i = 0; i < renderers.length; i++) {
-            renderers[i](event, element, view);
+            renderers[i](info.event, $(info.el), info.view);
         }
     };
 
     // view change rendering
-    fcOptions.viewRender = function(view, element) {
-        rc.setupDatePicker(view, element);
-        var renderers = view.options.viewRenderers;
+    fcOptions.viewClassNames = function(info) {
+        var renderers = options.viewRenderers;
         for (var i = 0; i < renderers.length; i++) {
-            renderers[i](view, element);
+            renderers[i](info.view, $(info.el));
         }
+        return null;
     };
 
     // history handling
-    rc.setupHistory(fcOptions);
+    rc.setupHistory(options);
 
     // reservation selection
-    rc.setupReservationSelect(fcOptions);
+    rc.setupReservationSelect(options);
 
     // resource switching mechanism
-    rc.setupResourceSwitch(fcOptions, rcOptions.resourcesUrl, rcOptions.resourceActive);
+    rc.setupResourceSwitch(options, rcOptions.resourcesUrl, rcOptions.resourceActive);
 
     // setup allocation refresh handling
-    fcOptions.afterSetup.push(rc.setupAllocationsRefetch);
+    options.afterSetup.push(rc.setupAllocationsRefetch);
 
-    // switch to the correct date after the instance has been creted
-    if (rcOptions.date) {
-        fcOptions.afterSetup.push(function(calendar) {
-            calendar.fullCalendar('gotoDate', rcOptions.date);
-        });
-    }
+    // setup date picker
+    options.afterSetup.push(rc.setupDatePicker);
 
-    return fcOptions;
+    return options;
 };
 
-$.fn.reservationCalendar = function(options) {
-    var fcOptions = rc.getFullcalendarOptions($.extend(true, defaultOptions, options));
+$.fn.reservationCalendar = function(extendOptions) {
+    var options = rc.getFullcalendarOptions(extendOptions);
 
     return this.map(function(_ix, element) {
 
-        var calendar = $(element).fullCalendar(fcOptions);
+        var calendar = new FullCalendar.Calendar(element, options.fc);
+        calendar.exOptions = options;
 
-        for (var i = 0; i < fcOptions.afterSetup.length; i++) {
-            fcOptions.afterSetup[i](calendar);
+        calendar.render();
+
+        for (var i = 0; i < options.afterSetup.length; i++) {
+            options.afterSetup[i](calendar, element);
         }
 
         return calendar;
@@ -255,9 +284,9 @@ $.fn.reservationCalendar = function(options) {
 };
 
 // handles clicks on events
-rc.setupEventPopups = function(event, element, view) {
+rc.setupEventPopups = function(event, element) {
     $(element).click(function(e) {
-        var calendar = $(view.el.closest('.fc'));
+        var calendar = $(element).closest('.fc');
         rc.removeAllPopups();
         rc.showActionsPopup(calendar, element, event);
         e.preventDefault();
@@ -266,16 +295,17 @@ rc.setupEventPopups = function(event, element, view) {
 };
 
 // show date picker when clicking on title
-rc.setupDatePicker = function(view, element) {
-    var calendar = $(view.el.closest('.fc'));
-    var title = calendar.find('.fc-header-toolbar .fc-left h2');
+rc.setupDatePicker = function(calendar, element) {
+    var title = $(element).find('.fc-header-toolbar .fc-toolbar-title');
     var input = $(
-        '<input type="text" tabindex="-1" aria-hidden="true"/>'
+        '<input type="text" name="date" tabindex="-1" aria-hidden="true"/>'
     ).css({
         visibility: 'hidden',
         width: 0,
         height: 0,
         border: 0,
+        margin: 0,
+        padding: 0
     }).datetimepicker({
         allowBlank: true,
         timepicker: false,
@@ -283,32 +313,37 @@ rc.setupDatePicker = function(view, element) {
         dayOfWeekStart: 1,
         lang: window.locale.language,
         closeOnDateSelect: true,
-        onSelectDate: function(ct, $i) {
-            calendar.fullCalendar('gotoDate', ct);
+        onSelectDate: function(ct, _$i) {
+            calendar.gotoDate(ct);
+            rc.setHistory(ct, calendar.view);
         },
         onShow: function(_ct, $i) {
             this.setOptions({value: $i.val()});
             setTimeout(function() {
                 $('.xdsoft_datetimepicker').trigger('afterOpen.xdsoft');
             }, 50);
-        },
+        }
     });
+    var icon = $(
+        '<span class="fa fa-calendar fa-calendar-alt absolute"></span>'
+    ).css('margin-left', '.5rem');
     input.unbind();
+    title.append(icon);
     title.append(input);
     title.click(function() {
-        input.val(calendar.fullCalendar('getDate').format('YYYY-MM-DD'));
+        input.val(moment(calendar.getDate()).format('YYYY-MM-DD'));
         input.datetimepicker('show');
     }).on('mouseenter', function() {
         title.css('cursor', 'pointer');
     }).on('mouseleave', function() {
         title.css('cursor', '');
     });
-}
+};
 
 // highlight events implementation
 rc.highlightEvents = function(event, element, view) {
-    var min = view.options.highlights_min;
-    var max = view.options.highlights_max;
+    var min = view.calendar.exOptions.highlights_min;
+    var max = view.calendar.exOptions.highlights_max;
 
     if (min === null || max === null) {
         return;
@@ -321,7 +356,7 @@ rc.highlightEvents = function(event, element, view) {
 
 rc.setupAllocationsRefetch = function(calendar) {
     $(window).on('rc-allocations-changed', function() {
-        calendar.fullCalendar('refetchEvents');
+        calendar.refetchEvents();
     });
 };
 
@@ -362,16 +397,17 @@ rc.reserve = function(calendar, url, start, end, quota, wholeDay) {
     rc.post(calendar, url.toString());
 };
 
+// eslint-disable-next-line complexity
 rc.shouldRenderReservationForm = function(event, previousReservationState) {
-    const showWholeDay = event.partlyAvailable && event.wholeDay;
-    const showTimeRange = event.partlyAvailable && (!event.wholeDay || !event.state.wholeDay);
+    const showWholeDay = event.extendedProps.partlyAvailable && event.extendedProps.wholeDay;
+    const showTimeRange = event.extendedProps.partlyAvailable && (!event.extendedProps.wholeDay || !(event.state && event.state.wholeDay));
     const hasPreviousTimeToOffer = !_.isEmpty(previousReservationState) &&
         (
-            previousReservationState.start !== event.start.format('HH:mm') ||
-            previousReservationState.end !== event.end.format('HH:mm')
+            previousReservationState.start !== moment(event.start).format('HH:mm') ||
+            previousReservationState.end !== moment(event.end).format('HH:mm')
         );
     const showPreviousTime = (showTimeRange || showWholeDay) && hasPreviousTimeToOffer;
-    const showQuota = !event.partlyAvailable  && (event.quotaLeft > 1);
+    const showQuota = !event.extendedProps.partlyAvailable && (event.extendedProps.quotaLeft > 1);
 
     // Determine if any fields need to be rendered
     return (
@@ -387,21 +423,21 @@ rc.showActionsPopup = function(calendar, element, event) {
     var wrapper = $('<div class="reservation-actions">');
     var reservation = $('<div class="reservation-form">').appendTo(wrapper);
 
-    if (event.actions.length > 0) {
+    if (event.extendedProps.actions.length > 0) {
         $('<h3 />').text(locale('Allocation')).appendTo(wrapper);
-        $(event.actions.join('')).appendTo(wrapper);
+        $(event.extendedProps.actions.join('')).appendTo(wrapper);
     }
 
     // Check if the reservation form needs to be rendered
-    if (!event.actions.length && !rc.shouldRenderReservationForm(event, rc.previousReservationState)) {
+    if (!event.extendedProps.actions.length && !rc.shouldRenderReservationForm(event, rc.previousReservationState)) {
         // Directly submit the reservation if no fields or actions are present
         rc.reserve(
             calendar,
-            event.reserveurl,
-            event.start.format('HH:mm'),
-            event.end.format('HH:mm'),
-            event.quota,
-            event.wholeDay
+            event.extendedProps.reserveurl,
+            moment(event.start).format('HH:mm'),
+            moment(event.end).format('HH:mm'),
+            event.extendedProps.quota,
+            event.extendedProps.wholeDay
         );
         return;
     }
@@ -414,7 +450,7 @@ rc.showActionsPopup = function(calendar, element, event) {
         function(state) {
             rc.reserve(
                 calendar,
-                event.reserveurl,
+                event.extendedProps.reserveurl,
                 state.start,
                 state.end,
                 state.quota,
@@ -506,53 +542,69 @@ rc.removeAllPopups = function() {
     $('.popup').popup('hide').remove();
 };
 
-// setup browser history handling
-rc.setupHistory = function(fcOptions) {
-    var isPopping = false;
-    var isFirst = true;
+rc.isFirstHistoryEntry = true;
 
-    fcOptions.viewRenderers.push(function(view) {
+rc.setHistory = function(date, view) {
+    var url = new Url(window.location.href);
+    url.query.view = view.type;
+    url.query.date = moment(date).format('YYYYMMDD');
+
+    $('a.calendar-dependent').each(function(_ix, el) {
+        var dependentUrl = new Url($(el).attr('href'));
+        dependentUrl.query.view = url.query.view;
+        dependentUrl.query.date = url.query.date;
+        $(el).attr('href', dependentUrl.toString());
+    });
+
+    var state = [
+        {
+            'view': view.type,
+            'date': date
+        },
+        document.title + ' ' + view.title,
+        url.toString()
+    ];
+
+    if (rc.isFirstHistoryEntry) {
+        window.history.replaceState.apply(window.history, state);
+        rc.isFirstHistoryEntry = false;
+    } else {
+        window.history.pushState.apply(window.history, state);
+    }
+};
+
+// setup browser history handling
+rc.setupHistory = function(options) {
+    var isPopping = false;
+
+    options.viewRenderers.push(function(view) {
         if (isPopping) {
             return;
         }
 
-        var url = new Url(window.location.href);
-        url.query.view = view.name;
-        url.query.date = view.intervalStart.format('YYYYMMDD');
-
-        $('a.calendar-dependent').each(function(_ix, el) {
-            var dependentUrl = new Url($(el).attr('href'));
-            dependentUrl.query.view = url.query.view;
-            dependentUrl.query.date = url.query.date;
-            $(el).attr('href', dependentUrl.toString());
-        });
-
-        var state = [
-            {
-                'view': view.name,
-                'date': view.intervalStart
-            },
-            document.title + ' ' + view.title,
-            url.toString()
-        ];
-
-        if (isFirst) {
-            window.history.replaceState.apply(window.history, state);
-            isFirst = false;
-        } else {
-            window.history.pushState.apply(window.history, state);
+        var start = view.currentStart;
+        if (view.type === 'multiMonthYear') {
+            // instead use getDate and truncate to the current month
+            var current = view.calendar.getDate();
+            start = moment({
+                year: current.getFullYear(),
+                month: current.getMonth(),
+                day: 1
+            }).toDate();
         }
+
+        rc.setHistory(start, view);
     });
 
-    fcOptions.afterSetup.push(function(calendar) {
+    options.afterSetup.push(function(calendar) {
         window.onpopstate = function(event) {
             if (event.state === null) {
                 return;
             }
 
             isPopping = true;
-            calendar.fullCalendar('changeView', event.state.view);
-            calendar.fullCalendar('gotoDate', event.state.date);
+            calendar.changeView(event.state.view);
+            calendar.gotoDate(event.state.date);
             isPopping = false;
         };
     });
@@ -566,58 +618,58 @@ rc.bustIECache = function(originalUrl) {
 };
 
 // setup the reservation selection on the right
-rc.setupReservationSelect = function(fcOptions) {
+rc.setupReservationSelect = function(options) {
     var selection = null;
 
-    fcOptions.afterSetup.push(function(calendar) {
-        var view = $(calendar).find('.fc-view-container');
+    options.afterSetup.push(function(calendar, element) {
+        var view = $(element).find('.fc-view');
 
         selection = $('<div class="reservation-selection"></div>')
             .insertAfter(view);
         $('<div class="clearfix"></div>').insertAfter(selection);
 
-        calendar.fullCalendar('option', 'aspectRatio', 1.2);
+        calendar.setOption('aspectRatio', 1.2);
 
-        calendar.on('rc-reservation-error', function(_e, data, _calendar, target) {
-            var event = calendar.find('.has-popup');
+        $(element).on('rc-reservation-error', function(_e, data, _calendar, target) {
+            var event = $(element).find('.has-popup');
 
             if (!target || target.length === 0) {
                 if (event.length !== 0) {
                     target = event;
                 } else {
-                    target = calendar.find('.fc-view');
+                    target = view;
                 }
             }
 
-            target = target || calendar.find('.has-popup') || calendar.find('.fc-view');
+            target = target || $(element).find('.has-popup') || view;
             rc.showErrorPopup(calendar, target, data.message);
         });
 
-        calendar.on('rc-reservations-changed', function() {
-            $.getJSON(rc.bustIECache(fcOptions.reservations), function(data) {
+        $(element).on('rc-reservations-changed', function() {
+            $.getJSON(rc.bustIECache(options.reservations), function(data) {
                 ReservationSelection.render(
                     selection.get(0),
-                    calendar,
+                    $(element),
                     data.reservations,
                     data.prediction,
-                    fcOptions.reservationform
+                    options.reservationform
                 );
 
                 rc.loadPreviousReservationState(data.reservations);
             });
         });
 
-        calendar.trigger('rc-reservations-changed');
+        $(element).trigger('rc-reservations-changed');
     });
 };
 
 // setup the ability to switch to other resources
-rc.setupResourceSwitch = function(fcOptions, resourcesUrl, active) {
-    fcOptions.afterSetup.push(function(calendar) {
+rc.setupResourceSwitch = function(options, resourcesUrl, active) {
+    options.afterSetup.push(function(_calendar, element) {
         var setup = function(choices) {
-            var container = $(calendar).find('.fc-center');
+            var container = $(element).find('.fc-toolbar-chunk').eq(1);
 
-            if (fcOptions.header.right === '') {
+            if (options.fc.headerToolbar.right === '') {
                 container.css('float', 'right');
             }
 
@@ -675,21 +727,25 @@ rc.loadPreviousReservationState = function(reservations) {
 };
 
 // renders the occupied partitions on an event
-rc.renderPartitions = function(event, element, calendar) {
+rc.renderPartitions = function(event, element, view) {
 
     if (event.is_moving) {
         return;
     }
 
+    if (view.type !== 'timeGridWeek' && view.type !== 'timeGridDay') {
+        return;
+    }
+
+    var calendar = view.calendar;
     var free = _.template('<div style="height:<%= height %>%;" class="partition-free"></div>');
     var used = _.template('<div style="height:<%= height %>%;" class="partition-occupied"></div>');
-    var partition_block = _.template('<div style="height:<%= height %>px;" class="partitions"><%= partitions %></div>');
 
     // build the individual partitions
     var event_partitions = rc.adjustPartitions(
         event,
-        moment.duration(calendar.options.minTime).hours(),
-        moment.duration(calendar.options.maxTime).hours()
+        moment.duration(calendar.getOption('slotMinTime')).hours(),
+        moment.duration(calendar.getOption('slotMaxTime')).hours()
     );
 
     var partitions = '';
@@ -712,26 +768,28 @@ rc.renderPartitions = function(event, element, calendar) {
     }
 
     // render the whole block
-    var html = $(partition_block({height: height, partitions: partitions}));
+    var html = $(partitions);
     var offset = 0;
-    var duration = event.end - event.start;
+    var start = moment(event.start);
+    var duration = moment(event.end) - start;
 
-    html.children().each(function(ix, partition) {
-        var reserved = event.partitions[ix][1];
-        var percent = event.partitions[ix][0] / 100;
+    html.each(function(ix, partition) {
+        var reserved = event.extendedProps.partitions[ix][1];
+        var percent = event.extendedProps.partitions[ix][0] / 100;
 
         if (!reserved) {
             var subevent = _.clone(event);
 
-            subevent.start = moment(event.start + duration * offset);
-            subevent.end = moment(event.start + duration * (offset + percent));
-            rc.setupEventPopups(subevent, partition, calendar);
+            subevent.start = moment(start + duration * offset);
+            subevent.end = moment(start + duration * (offset + percent));
+            subevent.extendedProps = event.extendedProps;
+            rc.setupEventPopups(subevent, partition);
         }
 
         offset += percent;
     });
 
-    $('.fc-bg', element).wrapInner(html);
+    $('<div class="fc-bg"></div>').wrapInner(html).insertAfter($('.fc-event-main', element));
 };
 
 // partitions are relative to the event. Since depending on the
@@ -740,14 +798,14 @@ rc.renderPartitions = function(event, element, calendar) {
 // the calendar and adjusts the partitions if necessary.
 rc.adjustPartitions = function(event, min_hour, max_hour) {
 
-    if (_.isUndefined(event.partitions)) {
-        return event.partitions;
+    if (_.isUndefined(event.extendedProps.partitions)) {
+        return event.extendedProps.partitions;
     }
 
     // clone the partitions
-    var partitions = _.map(event.partitions, _.clone);
-    var start_hour = event.start.hours();
-    var end_hour = event.end.hours() === 0 ? 24 : event.end.hours();
+    var partitions = _.map(event.extendedProps.partitions, _.clone);
+    var start_hour = moment(event.start).hours();
+    var end_hour = moment(event.end).hours() === 0 ? 24 : moment(event.end).hours();
     var duration = end_hour - start_hour;
 
     // if the event fits inside the calendar hours, all is ok
@@ -1094,6 +1152,7 @@ ReservationForm = React.createClass({
             return this.isValidQuota(this.state.quota);
         }
     },
+    // eslint-disable-next-line complexity
     render: function() {
         var buttonEnabled = this.isValidState();
         var showWholeDay = this.props.partlyAvailable && this.props.wholeDay;
@@ -1191,16 +1250,16 @@ ReservationForm = React.createClass({
 
 ReservationForm.render = function(element, event, previousReservationState, onSubmit) {
 
-    var fullyAvailable = event.partitions.length === 1 && event.partitions[0][1] === false;
+    var fullyAvailable = event.extendedProps.partitions.length === 1 && event.extendedProps.partitions[0][1] === false;
 
     ReactDOM.render(
         <ReservationForm
-            partlyAvailable={event.partlyAvailable}
-            quota={event.quota}
-            quotaLeft={event.quotaLeft}
-            start={event.start}
-            end={event.end}
-            wholeDay={event.wholeDay}
+            partlyAvailable={event.extendedProps.partlyAvailable}
+            quota={event.extendedProps.quota}
+            quotaLeft={event.extendedProps.quotaLeft}
+            start={moment(event.start)}
+            end={moment(event.end)}
+            wholeDay={event.extendedProps.wholeDay}
             fullyAvailable={fullyAvailable}
             previousReservationState={previousReservationState}
             onSubmit={onSubmit}

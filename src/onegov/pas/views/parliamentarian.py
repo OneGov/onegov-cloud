@@ -1,16 +1,20 @@
 from __future__ import annotations
 
-from onegov.core.elements import Link
 from onegov.core.security import Private
-from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import ParliamentarianCollection
-from onegov.pas.forms import ParliamentarianForm
-from onegov.pas.forms import ParliamentarianRoleForm
-from onegov.pas.layouts import ParliamentarianCollectionLayout
-from onegov.pas.layouts import ParliamentarianLayout
-from onegov.pas.models import Parliamentarian
-from onegov.pas.models import ParliamentarianRole
+from onegov.pas.collections import PASParliamentarianCollection
+from onegov.pas.forms import PASParliamentarianForm
+from onegov.pas.forms import PASParliamentarianRoleForm
+from onegov.pas.layouts import PASParliamentarianCollectionLayout
+from onegov.pas.layouts import PASParliamentarianLayout
+from onegov.pas.models import PASParliamentarian
+from onegov.town6.views.parliamentarian import (
+    add_parliamentary_group_membership)
+from onegov.town6.views.parliamentarian import add_parliamentarian
+from onegov.town6.views.parliamentarian import delete_parliamentarian
+from onegov.town6.views.parliamentarian import edit_parliamentarian
+from onegov.town6.views.parliamentarian import view_parliamentarian
+from onegov.town6.views.parliamentarian import view_parliamentarians
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -20,164 +24,89 @@ if TYPE_CHECKING:
 
 
 @PasApp.html(
-    model=ParliamentarianCollection,
+    model=PASParliamentarianCollection,
     template='parliamentarians.pt',
     permission=Private
 )
-def view_parliamentarians(
-    self: ParliamentarianCollection,
+def pas_view_parliamentarians(
+    self: PASParliamentarianCollection,
     request: TownRequest
-) -> RenderData:
+) -> RenderData | Response:
 
-    layout = ParliamentarianCollectionLayout(self, request)
-
-    filters = {}
-    filters['active'] = [
-        Link(
-            text=request.translate(title),
-            active=self.active == value,
-            url=request.link(self.for_filter(active=value))
-        ) for title, value in (
-            (_('Active'), True),
-            (_('Inactive'), False)
-        )
-    ]
-
-    return {
-        'add_link': request.link(self, name='new'),
-        'filters': filters,
-        'layout': layout,
-        'parliamentarians': self.query().all(),
-        'title': layout.title,
-    }
+    layout = PASParliamentarianCollectionLayout(self, request)
+    return view_parliamentarians(self, request, layout)
 
 
 @PasApp.form(
-    model=ParliamentarianCollection,
+    model=PASParliamentarianCollection,
     name='new',
     template='form.pt',
     permission=Private,
-    form=ParliamentarianForm
+    form=PASParliamentarianForm
 )
-def add_parliamentarian(
-    self: ParliamentarianCollection,
+def pas_add_parliamentarian(
+    self: PASParliamentarianCollection,
     request: TownRequest,
-    form: ParliamentarianForm
+    form: PASParliamentarianForm
 ) -> RenderData | Response:
-
-    if form.submitted(request):
-        parliamentarian = self.add(**form.get_useful_data())
-        request.success(_('Added a new parliamentarian'))
-
-        return request.redirect(request.link(parliamentarian))
-
-    layout = ParliamentarianCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_('New'), '#'))
-
-    return {
-        'layout': layout,
-        'title': _('New parliamentarian'),
-        'form': form,
-        'form_width': 'large'
-    }
+    layout = PASParliamentarianCollectionLayout(self, request)
+    return add_parliamentarian(self, request, form, layout)
 
 
 @PasApp.html(
-    model=Parliamentarian,
+    model=PASParliamentarian,
     template='parliamentarian.pt',
     permission=Private
 )
-def view_parliamentarian(
-    self: Parliamentarian,
+def pas_view_parliamentarian(
+    self: PASParliamentarian,
     request: TownRequest
-) -> RenderData:
-
-    layout = ParliamentarianLayout(self, request)
-
-    return {
-        'layout': layout,
-        'parliamentarian': self,
-        'title': layout.title,
-    }
+) -> RenderData | Response:
+    layout = PASParliamentarianLayout(self, request)
+    return view_parliamentarian(self, request, layout)
 
 
 @PasApp.form(
-    model=Parliamentarian,
+    model=PASParliamentarian,
     name='edit',
     template='form.pt',
     permission=Private,
-    form=ParliamentarianForm
+    form=PASParliamentarianForm
 )
-def edit_parliamentarian(
-    self: Parliamentarian,
+def pas_edit_parliamentarian(
+    self: PASParliamentarian,
     request: TownRequest,
-    form: ParliamentarianForm
+    form: PASParliamentarianForm
 ) -> RenderData | Response:
-
-    if form.submitted(request):
-        form.populate_obj(self)
-        request.success(_('Your changes were saved'))
-        return request.redirect(request.link(self))
-
-    form.process(obj=self)
-
-    layout = ParliamentarianLayout(self, request)
-    layout.breadcrumbs.append(Link(_('Edit'), '#'))
-    layout.editbar_links = []
-
-    return {
-        'layout': layout,
-        'title': layout.title,
-        'form': form,
-        'form_width': 'large'
-    }
+    layout = PASParliamentarianLayout(self, request)
+    return edit_parliamentarian(self, request, form, layout)
 
 
 @PasApp.view(
-    model=Parliamentarian,
+    model=PASParliamentarian,
     request_method='DELETE',
     permission=Private
 )
-def delete_parliamentarian(
-    self: Parliamentarian,
+def pas_delete_parliamentarian(
+    self: PASParliamentarian,
     request: TownRequest
 ) -> None:
 
-    request.assert_valid_csrf_token()
-
-    collection = ParliamentarianCollection(request.session)
-    collection.delete(self)
+    return delete_parliamentarian(self, request)
 
 
 @PasApp.form(
-    model=Parliamentarian,
+    model=PASParliamentarian,
     name='new-role',
     template='form.pt',
     permission=Private,
-    form=ParliamentarianRoleForm
+    form=PASParliamentarianRoleForm
 )
-def add_commission_membership(
-    self: Parliamentarian,
+def pas_add_commission_membership(
+    self: PASParliamentarian,
     request: TownRequest,
-    form: ParliamentarianRoleForm
+    form: PASParliamentarianRoleForm
 ) -> RenderData | Response:
 
-    form.delete_field('parliamentarian_id')
-
-    if form.submitted(request):
-        self.roles.append(
-            ParliamentarianRole(**form.get_useful_data())
-        )
-        request.success(_('Added a new role'))
-        return request.redirect(request.link(self))
-
-    layout = ParliamentarianLayout(self, request)
-    layout.breadcrumbs.append(Link(_('New role'), '#'))
-    layout.include_editor()
-
-    return {
-        'layout': layout,
-        'title': _('New role'),
-        'form': form,
-        'form_width': 'large'
-    }
+    layout = PASParliamentarianLayout(self, request)
+    return add_parliamentary_group_membership(self, request, form, layout)

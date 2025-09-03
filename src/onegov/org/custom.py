@@ -5,8 +5,14 @@ from onegov.core.elements import Link, LinkGroup
 from onegov.form.collection import FormCollection, SurveyCollection
 from onegov.org import _, OrgApp
 from onegov.org.models import (
-    GeneralFileCollection, ImageFileCollection, Organisation, Dashboard)
+    CitizenDashboard,
+    Dashboard,
+    GeneralFileCollection,
+    ImageFileCollection,
+    Organisation,
+)
 from onegov.pay import PaymentProviderCollection, PaymentCollection
+from onegov.reservation import Reservation, ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
@@ -33,6 +39,8 @@ def logout_path(request: OrgRequest) -> str:
 
 def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
 
+    citizen_login_enabled = request.app.org.citizen_login_enabled
+
     # Authentication / Userprofile
     if request.is_logged_in:
         yield LinkGroup(_('Account'), classes=('user', ), links=(
@@ -55,6 +63,24 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
                 Auth.from_request_path(request), name='login'
             ), attrs={'class': 'login'}
         )
+
+        if citizen_login_enabled and not request.authenticated_email:
+            dashboard = CitizenDashboard(request)
+            if dashboard.is_available:
+                auth = Auth.from_request(
+                    request,
+                    request.link(dashboard)
+                )
+            else:
+                auth = Auth.from_request_path(request)
+            yield Link(
+                _('Citizen Login'), request.link(
+                    auth, name='citizen-login'
+                ), attrs={
+                    'class': 'citizen-login',
+                    'title': _('No registration necessary')
+                }
+            )
 
         if request.app.enable_user_registration:
             yield Link(
@@ -131,7 +157,8 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
                 Link(
                     _('Users'), request.class_link(
                         UserCollection,
-                        variables={'active': [True]}),
+                        variables={'active': '1'}
+                    ),
                     attrs={'class': 'user'}
                 )
             )
@@ -142,6 +169,15 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
                     attrs={'class': 'users'}
                 )
             )
+
+            if request.app.org.ris_enabled:
+                links.append(
+                    Link(
+                        _('RIS Settings'),
+                        request.link(request.app.org, 'ris-settings'),
+                        attrs={'class': 'ris-settings'}
+                    ),
+                )
 
             links.append(
                 Link(
@@ -253,4 +289,59 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
             classes=('with-count', css),
             links=links,
             attributes={'data-count': str(screen_count)}
+        )
+
+    if citizen_login_enabled and request.authenticated_email:
+        # This logout link is specific to citizens, if we're logged
+        # in as another user, then we don't need this additional
+        # logout link
+        if not request.is_logged_in:
+            yield Link(
+                _('Logout'),
+                request.link(
+                    Auth.from_request(request, to=logout_path(request)),
+                    name='citizen-logout'
+                ),
+                attrs={'class': 'logout'}
+            )
+
+            yield Link(
+                _('Dashboard'),
+                request.class_link(CitizenDashboard),
+                attrs={'class': 'dashboard'}
+            )
+
+        # NOTE: Only show this if we have at least one reservation
+        #       this way we don't need a setting to signal whether
+        #       or not this instance even accepts reservations.
+        if request.session.query(
+            request.session.query(Reservation)
+            .filter(Reservation.status == 'approved')
+            .filter(Reservation.email == request.authenticated_email)
+            .exists()
+        ).scalar():
+            yield Link(
+                _('My Reservations'),
+                request.class_link(
+                    ResourceCollection,
+                    name='my-reservations'
+                ),
+                attrs={
+                    'class': ('citizen-reservations'),
+                }
+            )
+
+        yield Link(
+            _('My Requests'),
+            request.class_link(
+                TicketCollection,
+                {
+                    'handler': 'ALL',
+                    'state': 'all',
+                },
+                name='my-tickets'
+            ),
+            attrs={
+                'class': ('citizen-tickets'),
+            }
         )

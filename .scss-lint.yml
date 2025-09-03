@@ -1,3 +1,4 @@
+# TODO: Get rid of this config file, once nobody is using it anymore
 linters:
   Indentation:
     width: 4

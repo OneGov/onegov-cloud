@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from enum import Enum
 import inspect
+from operator import itemgetter
+
 import phonenumbers
 import sedate
 
@@ -18,7 +21,8 @@ from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import log, _
 from onegov.form.utils import path_to_filename
 from onegov.form.validators import ValidPhoneNumber
-from onegov.form.widgets import ChosenSelectWidget, LinkPanelWidget
+from onegov.form.widgets import ChosenSelectWidget
+from onegov.form.widgets import LinkPanelWidget
 from onegov.form.widgets import DurationInput
 from onegov.form.widgets import HoneyPotWidget
 from onegov.form.widgets import IconWidget
@@ -48,7 +52,7 @@ from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 from wtforms.validators import URL
 from wtforms.validators import ValidationError
-from wtforms.widgets import CheckboxInput, ColorInput
+from wtforms.widgets import CheckboxInput, ColorInput, TextInput
 
 
 from typing import Any, IO, Literal, TYPE_CHECKING
@@ -210,13 +214,30 @@ class DurationField(Field):
 class TranslatedSelectField(SelectField):
     """ A select field which translates the option labels. """
 
-    def iter_choices(
-        self
-    ) -> Iterator[tuple[Any, str, bool, dict[str, Any]]]:
+    def __init__(
+        self,
+        *args: Any,
+        **kwargs: Any,
+    ):
+        self.choices_sorted = kwargs.pop('choices_sorted', False)
+        super().__init__(*args, **kwargs)
+
+    def iter_choices(self) -> Iterator[tuple[Any, str, bool, dict[str, Any]]]:
+        choices = []
+
         for choice in super().iter_choices():
             result = list(choice)
             result[1] = self.meta.request.translate(result[1])
-            yield tuple(result)
+
+            if self.choices_sorted:
+                choices.append(tuple(result))
+            else:
+                yield tuple(result)
+
+        if self.choices_sorted:
+            choices.sort(key=itemgetter(1))
+            for choice in choices:
+                yield choice
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -307,7 +328,9 @@ class UploadField(FileField):
             # resend_upload
             action = valuelist[0]
             fieldstorage = valuelist[1]
-            self.data = binary_to_dictionary(
+            # NOTE: I'm not sure why mypy complains here, a total version
+            #       of a TypedDict should be assignable to a non-total version
+            self.data = binary_to_dictionary(  # type: ignore[assignment]
                 dictionary_to_binary({'data': str(valuelist[3])}),
                 str(valuelist[2])
             )
@@ -333,7 +356,7 @@ class UploadField(FileField):
     def process_fieldstorage(
         self,
         fs: RawFormValue
-    ) -> StrictFileDict | FileDict:
+    ) -> FileDict:
 
         self.file = getattr(fs, 'file', getattr(fs, 'stream', None))
         self.filename = path_to_filename(getattr(fs, 'filename', None))
@@ -344,7 +367,7 @@ class UploadField(FileField):
         self.file.seek(0)
 
         try:
-            return binary_to_dictionary(self.file.read(), self.filename)
+            return binary_to_dictionary(self.file.read(), self.filename)  # type: ignore[return-value]
         finally:
             self.file.seek(0)
 
@@ -933,4 +956,48 @@ class TypeAheadField(StringField):
     ):
         self.url = url
 
+        super().__init__(*args, **kwargs)
+
+
+class MapboxPlaceDetail(Enum):
+    """Determines the level of geographical precision of autofill. """
+
+    # Line levels (specific parts of the street address)
+    STREET_NUMBER = 'address-line1'  # Street number and name
+    APPARTMENT_OR_FLOOR = 'address-line2'  # Apartment, suite, floor, etc.
+
+    # Administrative levels (geographic areas)
+    # Use this to match canton in CH:
+    LEAST_SPECIFIC = 'address-level1'
+
+    # Use this to match place municipality
+    MORE_SPECIFIC = 'address-level2'
+
+    # The most specific area, not commonly used.
+    MOST_SPECIFIC = 'address-level3'
+
+
+class PlaceAutocompleteField(StringField):
+    """Provides address completion for places (via mapbox_address_autofill.js).
+    """
+
+    widget = TextInput()
+
+    def __init__(self,
+                 autocomplete_attribute: MapboxPlaceDetail | None = None,
+                 *args: Any,
+                 **kwargs: Any):
+
+        form = kwargs.get('_form')
+        if form is not None:
+            form.meta.request.include('mapbox_address_autofill')
+        if 'render_kw' not in kwargs:
+            kwargs['render_kw'] = {}
+
+        effective_autocomplete_attribute = (
+            autocomplete_attribute or MapboxPlaceDetail.MORE_SPECIFIC
+        )
+        kwargs['render_kw']['autocomplete'] = (
+                effective_autocomplete_attribute.value
+        )
         super().__init__(*args, **kwargs)

@@ -192,12 +192,12 @@ class ORMSearchable(Searchable):
 
     @classproperty  # type:ignore[no-redef]
     @classmethod
-    def es_id(cls) -> str:  # type:ignore[override]
+    def es_id(cls) -> str:
         return 'id'
 
     @classproperty  # type:ignore[no-redef]
     @classmethod
-    def es_type_name(cls) -> str:  # type:ignore[override]
+    def es_type_name(cls) -> str:
         return cls.__tablename__  # type:ignore[attr-defined]
 
     @property

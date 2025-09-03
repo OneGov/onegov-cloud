@@ -7,7 +7,6 @@ import sqlalchemy
 from copy import deepcopy
 from elasticsearch.exceptions import NotFoundError
 from elasticsearch.helpers import streaming_bulk
-from langdetect.lang_detect_exception import LangDetectException
 from itertools import groupby
 from operator import itemgetter
 from queue import Queue, Empty, Full
@@ -604,7 +603,8 @@ class TypeMappingRegistry:
         As a consequence, a change in the mapping requires a reindex.
 
         """
-        assert type_name not in self.mappings
+        assert type_name not in self.mappings, \
+            f"Type '{type_name}' already registered"
         self.mappings[type_name] = TypeMapping(type_name, mapping, model)
 
     @property
@@ -850,10 +850,7 @@ class ORMLanguageDetector(utils.LanguageDetector):
         if not text:
             return self.supported_languages[0]
 
-        try:
-            return self.detect(text)
-        except LangDetectException:
-            return self.supported_languages[0]
+        return self.detect(text)
 
 
 class ORMEventTranslator:

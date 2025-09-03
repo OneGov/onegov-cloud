@@ -50,7 +50,8 @@ translator_data = dict(
     comments=None,
     expertise_professional_guilds=tuple(),
     expertise_professional_guilds_other=tuple(),
-    expertise_interpreting_types=tuple()
+    expertise_interpreting_types=tuple(),
+    for_admins_only=False
 )
 
 

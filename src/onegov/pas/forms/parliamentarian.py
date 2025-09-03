@@ -5,9 +5,9 @@ from onegov.form.fields import TranslatedSelectField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
 from onegov.form.validators import ValidPhoneNumber
+from onegov.parliament.models.parliamentarian import GENDERS
+from onegov.parliament.models.parliamentarian import SHIPPING_METHODS
 from onegov.pas import _
-from onegov.pas.models.parliamentarian import GENDERS
-from onegov.pas.models.parliamentarian import SHIPPING_METHODS
 from wtforms.fields import DateField
 from wtforms.fields import EmailField
 from wtforms.fields import StringField
@@ -19,7 +19,7 @@ from wtforms.validators import Optional
 from wtforms.validators import URL
 
 
-class ParliamentarianForm(NamedFileForm):
+class PASParliamentarianForm(NamedFileForm):
 
     personnel_number = StringField(
         label=_('Personnel number'),

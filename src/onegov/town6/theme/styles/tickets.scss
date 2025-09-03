@@ -504,7 +504,7 @@ button {
     }
 }
 
-.selected-owner {
+.selected-owner, .selected-submitter {
 
     &.secondary {
         ::before {
@@ -563,6 +563,26 @@ button {
 
         li {
             margin-bottom: .5rem;
+        }
+
+        .reservation {
+            background: $white-smoke;
+            border-radius: 2px;
+            margin-bottom: 1rem;
+            margin-left: -0.5rem;
+            position: relative;
+        }
+
+        .reservation-details {
+            font-size: .8rem;
+            padding: .5rem 8rem .5rem .5rem;
+        }
+
+        .reservation-actions {
+            font-size: .8rem;
+            position: absolute;
+            right: .5rem;
+            top: .275rem;
         }
     }
 

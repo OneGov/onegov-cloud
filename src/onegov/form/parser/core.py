@@ -382,6 +382,21 @@ The optional `!` at the end of the price indicates that credit card payment
 will become mandatory if this option is selected. It is possible to achieve
 this without a price increase too: (0 CHF!)
 
+Discounts
+~~~~~~~~~
+
+Radio buttons and checkboxes may apply proportial discounts. How those
+discounts are applied will depend on the consumer. It will not be factored
+into the price of the form automatically, since there may be other costs
+associated with the submission, that aren't part of the form.
+
+Example discount::
+
+    Discount =
+        (x) No discount
+        ( ) Sports club (50%)
+        ( ) School (100%)
+
 """
 from __future__ import annotations
 
@@ -419,8 +434,9 @@ from onegov.form.utils import as_internal_id
 from typing import final, Any, ClassVar, Literal, Self, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
-    from onegov.form.types import PricingRules, RawPricing
+    from onegov.form.types import PricingRules
     from onegov.form.utils import decimal_range
+    from pyparsing import ParseResults
     from re import Pattern
     from typing import TypeAlias
     from yaml.nodes import ScalarNode
@@ -1117,6 +1133,7 @@ class MultipleFileinputField(FileinputBase, Field):
 class OptionsField:
     choices: list[Choice]
     pricing: PricingRules
+    discount: dict[str, float]
 
     @classmethod
     def create(  # type:ignore[misc]
@@ -1131,13 +1148,22 @@ class OptionsField:
         choices = [
             Choice(
                 key=c.label,
-                label=c.label + format_pricing(c.pricing),
+                label=(
+                    c.label
+                    + format_pricing(c.pricing)
+                    + format_discount(c.discount)
+                ),
                 selected=c.checked
             )
             for c in field.choices
         ]
 
         pricing = {c.label: c.pricing for c in field.choices if c.pricing}
+        discount = {
+            c.label: c.discount.amount / Decimal('100')
+            for c in field.choices
+            if c.discount
+        }
 
         return cls(  # type:ignore[return-value]
             label=identifier.label,
@@ -1146,6 +1172,7 @@ class OptionsField:
             fieldset=fieldset,
             choices=choices,
             pricing=pricing or None,
+            discount=discount or None,
             field_help=field_help
         )
 
@@ -1277,11 +1304,18 @@ def parse_field_block(
     return result
 
 
-def format_pricing(pricing: RawPricing | None) -> str:
+def format_pricing(pricing: ParseResults | None) -> str:
     if not pricing:
         return ''
 
-    return ' ({:.2f} {})'.format(pricing[0], pricing[1])
+    return ' ({:.2f} {})'.format(pricing.amount, pricing.currency)
+
+
+def format_discount(discount: ParseResults | None) -> str:
+    if not discount:
+        return ''
+
+    return ' ({:.2f}%)'.format(discount.amount)
 
 
 def match(expr: pp.ParserElement, text: str) -> bool:

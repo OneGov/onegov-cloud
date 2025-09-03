@@ -37,7 +37,7 @@ def page_fn_footer(canvas: Canvas, doc: Template) -> None:
     canvas.drawRightString(
         doc.pagesize[0] - doc.rightMargin,
         doc.bottomMargin / 2,
-        f'{canvas.getPageNumber()}'  # type:ignore[no-untyped-call]
+        f'{canvas.getPageNumber()}'
     )
     canvas.restoreState()
 

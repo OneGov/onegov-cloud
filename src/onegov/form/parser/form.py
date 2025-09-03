@@ -291,6 +291,7 @@ def handle_field(
             choices=[(c.key, c.label) for c in field.choices],
             default=next((c.key for c in field.choices if c.selected), None),
             pricing=field.pricing,
+            discount=field.discount,
             # do not coerce None into 'None'
             coerce=lambda v: str(v) if v is not None else v,
             description=field.field_help
@@ -306,6 +307,7 @@ def handle_field(
             choices=[(c.key, c.label) for c in field.choices],
             default=[c.key for c in field.choices if c.selected],
             pricing=field.pricing,
+            discount=field.discount,
             # do not coerce None into 'None'
             coerce=lambda v: str(v) if v is not None else v,
             description=field.field_help

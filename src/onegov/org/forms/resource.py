@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from wtforms.fields import BooleanField
 from wtforms.fields import DecimalField
+from wtforms.fields import EmailField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
@@ -16,6 +17,7 @@ from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.filters import as_float
 from onegov.form.validators import ValidFormDefinition
+from onegov.form.widgets import ChosenSelectWidget
 from onegov.org import _, log
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import DateRangeForm
@@ -29,8 +31,36 @@ from onegov.org.kaba import KabaApiError, KabaClient
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
+    from markupsafe import Markup
     from onegov.org.request import OrgRequest
     from onegov.reservation import Resource
+
+
+def coerce_component_tuple(value: Any) -> tuple[str, str] | None:
+    if not value:
+        return None
+
+    if isinstance(value, str):
+        value = value.rsplit(':', 1)
+
+    site_id, component = value
+    return site_id, component
+
+
+class ComponentSelectWidget(ChosenSelectWidget):
+    @classmethod
+    def render_option(
+        cls,
+        value: Any,
+        label: str,
+        selected: bool,
+        **kwargs: Any
+    ) -> Markup:
+        if value:
+            value = ':'.join(value)
+        else:
+            value = ''
+        return super().render_option(value, label, selected, **kwargs)
 
 
 class ResourceBaseForm(Form):
@@ -156,17 +186,25 @@ class ResourceBaseForm(Form):
     default_view = RadioField(
         label=_('Default view'),
         fieldset=_('View'),
-        default='agendaWeek',
+        default='timeGridWeek',
         validators=[InputRequired()],
         choices=(
-            ('agendaWeek', _('Week view')),
-            ('month', _('Month view')),
+            ('timeGridWeek', _('Week view')),
+            ('dayGridMonth', _('Month view')),
         ))
 
     kaba_components = ChosenSelectMultipleField(
         label=_('Doors'),
         choices=(),
+        coerce=coerce_component_tuple,
         fieldset='dormakaba',
+        widget=ComponentSelectWidget(multiple=True)
+    )
+
+    reply_to = EmailField(
+        label=_('E-Mail Reply Address (Reply-To)'),
+        fieldset=_('Tickets'),
+        description=_('Replies to automated e-mails go to this address.')
     )
 
     pricing_method = RadioField(
@@ -205,6 +243,22 @@ class ResourceBaseForm(Form):
         validators=[InputRequired()],
     )
 
+    extras_pricing_method = RadioField(
+        label=_('Prices in extra fields are'),
+        description=_(
+            'If no extra fields are defined or none of the extra fields '
+            'contain pricing information, then this setting has no effect.'
+        ),
+        fieldset=_('Payments'),
+        default='per_item',
+        validators=[InputRequired()],
+        choices=(
+            ('one_off', _('One-off')),
+            ('per_item', _('Per item')),
+            ('per_hour', _('Per hour'))
+        )
+    )
+
     def on_request(self) -> None:
         if hasattr(self.model, 'type'):
             if self.model.type == 'daypass':
@@ -217,13 +271,17 @@ class ResourceBaseForm(Form):
                 self.delete_field('kaba_components')
                 return
 
-        client = KabaClient.from_app(self.request.app)
-        if client is None:
+        clients = KabaClient.from_app(self.request.app)
+        if not clients:
             self.delete_field('kaba_components')
             return
 
         try:
-            self.kaba_components.choices = client.component_choices()
+            self.kaba_components.choices = [
+                choice
+                for client in clients.values()
+                for choice in client.component_choices()
+            ]
         except KabaApiError:
             log.info('Kaba API error', exc_info=True)
             self.request.alert(_(

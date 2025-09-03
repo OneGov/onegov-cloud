@@ -463,7 +463,7 @@ class LDAPProvider(
             ldap=ldap,
             auth_method=cfg.get('auth_method', 'compare'),
             attributes=LDAPAttributes.from_cfg(cfg),
-            custom_hint=cfg.get('hint', None),
+            custom_hint=cfg.get('hint', ''),
             roles=RolesMapping(cfg.get('roles', {
                 '__default__': {
                     'admins': 'admins',
@@ -616,9 +616,9 @@ class LDAPKerberosProvider(
 
         # Kerberos configuration
         kerberos = KerberosClient(
-            keytab=cfg.get('kerberos_keytab', None),
-            hostname=cfg.get('kerberos_hostname', None),
-            service=cfg.get('kerberos_service', None))
+            keytab=cfg.get('kerberos_keytab', None),  # type: ignore[arg-type]
+            hostname=cfg.get('kerberos_hostname', None),  # type: ignore[arg-type]
+            service=cfg.get('kerberos_service', None))  # type: ignore[arg-type]
 
         provider = cls(
             name=name,
@@ -842,7 +842,7 @@ class AzureADProvider(
         return cls(
             name=name,
             tenants=MSALConnections.from_cfg(cfg.get('tenants', {})),
-            custom_hint=cfg.get('hint', None),
+            custom_hint=cfg.get('hint', ''),
             roles=RolesMapping(cfg.get('roles', {
                 '__default__': {
                     'admins': 'admins',
@@ -1083,7 +1083,7 @@ class SAML2Provider(
         return cls(
             name=name,
             tenants=SAML2Connections.from_cfg(cfg.get('tenants', {})),
-            custom_hint=cfg.get('hint', None),
+            custom_hint=cfg.get('hint', ''),
             roles=RolesMapping(cfg.get('roles', {
                 '__default__': {
                     'admins': 'admins',
@@ -1339,7 +1339,7 @@ class OIDCProvider(
         return cls(
             name=name,
             tenants=OIDCConnections.from_cfg(cfg.get('tenants', {})),
-            custom_hint=cfg.get('hint', None),
+            custom_hint=cfg.get('hint', ''),
             roles=RolesMapping(cfg.get('roles', {
                 '__default__': {
                     'admins': 'admins',
@@ -1497,7 +1497,7 @@ class OIDCProvider(
         last_name = payload.get(client.attributes.last_name, None)
         groups = payload.get(client.attributes.group, None)
         if first_name and last_name:
-            realname = f'{first_name} {last_name}'
+            realname: str | None = f'{first_name} {last_name}'
         else:
             realname = payload.get(client.attributes.preferred_username, None)
 

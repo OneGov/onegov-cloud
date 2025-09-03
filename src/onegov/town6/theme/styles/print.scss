@@ -215,7 +215,7 @@
         border: 1px solid blue;
     }
 
-    a[href]:after {
+    a[href]::after {
         content: none !important;
     }
 }

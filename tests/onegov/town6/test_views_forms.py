@@ -454,3 +454,44 @@ def test_save_and_cancel_in_editbar(client):
     page = client.get('/events/enter-event')
     assert 'save-link' in page
     assert 'cancel-link' in page
+
+
+def test_copy_event(client):
+    with freeze_time('2025-04-28 08:00:00'):
+        client.login_admin()
+
+        page = client.get('/events/enter-event')
+        page.form['email'] = 'art@club.org'
+        page.form['title'] = 'Painting Cats'
+        page.form['start_date'] = date(2025, 4, 28).isoformat()
+        page.form['start_time'] = "18:00"
+        page.form['end_time'] = "22:00"
+        page.form['location'] = 'Art Gallery'
+        page.form['organizer'] = 'Art Club'
+        page.form['repeat'] = 'without'
+
+        page = page.form.submit().follow().follow()
+        page = page.click('Painting Cats')
+        assert 'Painting Cats' in page
+        assert 'Montag, 28. April 2025' in page
+        assert '18:00 - 22:00' in page
+        assert 'Art Gallery' in page
+        assert 'Art Club' in page
+
+        page = page.click('Kopieren')
+        assert 'Veranstaltung hinzufügen' in page
+        page.form['title'] = 'Painting Dogs'
+        page = page.form.submit().follow().follow()
+        assert 'erfolgreich erstellt' in page
+
+        assert 'Painting Dogs' in page
+        assert 'Painting Cats' in page
+
+        page = page.click('Painting Dogs')
+        assert 'Painting Cats' not in page
+
+        assert 'Painting Dogs' in page
+        assert 'Montag, 28. April 2025' in page
+        assert '18:00 - 22:00' in page
+        assert 'Art Gallery' in page
+        assert 'Art Club' in page

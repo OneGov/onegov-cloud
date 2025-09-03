@@ -369,6 +369,30 @@ def handle_allocation_rule(
 
         return request.redirect(request.link(self, name='rules'))
 
+    elif not request.POST:
+        start, end = utils.parse_fullcalendar_request(request, self.timezone)
+        whole_day = request.params.get('whole_day') == 'yes'
+
+        if start and end:
+            if whole_day:
+                form['start'].data = start
+                form['end'].data = end
+
+                if hasattr(form, 'as_whole_day'):
+                    form.as_whole_day.data = 'yes'
+
+            else:
+                form['start'].data = start
+                form['end'].data = end
+
+                if hasattr(form, 'as_whole_day'):
+                    form.as_whole_day.data = 'no'
+
+                if hasattr(form, 'start_time'):
+                    assert hasattr(form, 'end_time')
+                    form.start_time.data = start
+                    form.end_time.data = end
+
     return {
         'layout': layout,
         'title': _('New availabilty period'),

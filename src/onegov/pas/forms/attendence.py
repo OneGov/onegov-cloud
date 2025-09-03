@@ -6,8 +6,8 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import MultiCheckboxField
 from onegov.pas import _
-from onegov.pas.collections import CommissionCollection
-from onegov.pas.collections import ParliamentarianCollection
+from onegov.pas.collections import PASCommissionCollection
+from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.models import SettlementRun
 from onegov.pas.models.attendence import TYPES
 from wtforms.fields import DateField
@@ -86,7 +86,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
             and self.commission_id.data
             and self.parliamentarian_id.data
         ):
-            collection = ParliamentarianCollection(self.request.session)
+            collection = PASParliamentarianCollection(self.request.session)
             parliamentarian = collection.by_id(self.parliamentarian_id.data)
             if parliamentarian:
                 commission_ids = [
@@ -130,12 +130,12 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
         self.parliamentarian_id.choices = [
             (str(parliamentarian.id), parliamentarian.title)
             for parliamentarian
-            in ParliamentarianCollection(self.request.session).query()
+            in PASParliamentarianCollection(self.request.session).query()
         ]
         self.commission_id.choices = [
             (commission.id, commission.title)
             for commission
-            in CommissionCollection(self.request.session).query()
+            in PASCommissionCollection(self.request.session).query()
         ]
         self.commission_id.choices.insert(0, ('', '-'))
 
@@ -146,8 +146,8 @@ class AttendenceAddForm(AttendenceForm):
         super().on_request()
         self.parliamentarian_id.choices = [
             (str(parliamentarian.id), parliamentarian.title)
-            for parliamentarian
-            in ParliamentarianCollection(self.request.session, True).query()
+            for parliamentarian in PASParliamentarianCollection(
+                self.request.session, [True]).query()
         ]
 
 
@@ -178,11 +178,60 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
         self.parliamentarian_id.choices = [
             (str(parliamentarian.id), parliamentarian.title)
             for parliamentarian
-            in ParliamentarianCollection(self.request.session, True).query()
+            in PASParliamentarianCollection(
+                self.request.session, [True]).query()
         ]
         self.parliamentarian_id.data = [
             choice[0] for choice in self.parliamentarian_id.choices
         ]
+
+
+class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
+    """ Kind of like AttendenceAddPlenaryForm but for commissions. """
+
+    date = DateField(
+        label=_('Date'),
+        validators=[InputRequired()],
+        default=datetime.date.today
+    )
+
+    duration = FloatField(
+        label=_('Duration in hours'),
+        validators=[InputRequired()],
+    )
+
+    commission_id = ChosenSelectField(
+        label=_('Commission'),
+        validators=[InputRequired()],
+    )
+
+    parliamentarian_id = MultiCheckboxField(
+        label=_('Parliamentarian'),
+        validators=[InputRequired()],
+        choices=[]  # are set with in custom.js
+    )
+
+    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
+        result = super().get_useful_data()
+        result['duration'] = int(60 * (result.get('duration') or 0))
+        result['type'] = 'commission'
+        return result
+
+    def on_request(self) -> None:
+        self.commission_id.choices = [
+            (commission.id, commission.title)
+            for commission
+            in PASCommissionCollection(self.request.session).query()
+        ]
+        # Set choices for all possible parliamentarians so WTForms can validate
+        self.parliamentarian_id.choices = [
+            (str(parliamentarian.id), parliamentarian.title)
+            for parliamentarian
+            in PASParliamentarianCollection(
+                self.request.session, [True]).query()
+        ]
+        # JavaScript will handle selection based on commission
+        self.parliamentarian_id.data = []
 
 
 class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):

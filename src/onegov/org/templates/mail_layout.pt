@@ -106,6 +106,21 @@
         width: 100% !important;
     }
 
+    table.fit-content {
+        width: auto !important;
+    }
+
+    table.fit-content td {
+        vertical-align: middle;
+    }
+
+    .arrow {
+        font-size: 22px;
+        font-weight: bold;
+        padding: 20px 40px;
+        color: #999;
+    }
+
     table.body-wrap {
         width: 100%;
         padding: 20px;
@@ -206,6 +221,13 @@
         padding: 0;
     }
 
+    .token {
+        background-color: #f5f5f5;
+        Margin-bottom: 10px;
+        padding: 0;
+        font-size: 22px;
+    }
+
     .header {
         background-color: #eee;
         padding: 5px 10px;
@@ -280,7 +302,7 @@
     .logo svg {
         display: block;
         height: 6em;
-        margin: 0 auto;
+        Margin: 0 auto;
         padding-bottom: 20px;
     }
     </style>

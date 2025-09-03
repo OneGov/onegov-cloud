@@ -1,37 +1,65 @@
+from __future__ import annotations
+
 import json
 from os import environ, system
+from datetime import datetime
 import re
 import shutil
 import time
-
 from contextlib import suppress
 from http.client import RemoteDisconnected
-from typing import Callable
-
-from selenium.webdriver import ActionChains, Keys
-
 from onegov.core.utils import module_path
+from selenium.webdriver import ActionChains, Keys
 from time import sleep
+
+
+from typing import cast, Any, ParamSpec, Self, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from datetime import date
+    from os import PathLike
+    from selenium.webdriver import Chrome
+    from splinter import Browser
+else:
+    Browser = object
+
+P = ParamSpec('P')
 
 
 with open(module_path('tests.shared', 'drop_file.js')) as f:
     JS_DROP_FILE = f.read()
 
 
-class InjectedBrowserExtension:
+class InjectedBrowserExtension(Browser):
     """ Offers methods to inject an extended browser into the Splinter browser
     class hierarchy. All methods not related to spawning/cloning a new browser
     instance are provided by :class:`ExtendedBrowser`.
 
     """
 
+    driver: Chrome
+    clones: list[Self]
+    spawn_parameters: tuple[
+        type[Self],
+        Callable[..., Browser],
+        tuple[Any, ...],
+        dict[str, Any]
+    ]
+
     @classmethod
-    def spawn(cls, browser_factory, *args, **kwargs):
+    def spawn(
+        cls,
+        browser_factory: Callable[P, Browser],
+        *args: P.args,
+        **kwargs: P.kwargs
+    ) -> Self:
         """ Takes a Splinter browser factory together with the arguments
         meant for the factory and returns a new browser with the current class
         injected into the class hierarchy.
 
         """
+
+        browser: Browser
 
         # spawning Chrome on Travis is rather flaky and succeeds less than
         # 50% of the time for unknown reasons
@@ -43,11 +71,11 @@ class InjectedBrowserExtension:
         else:
             browser = browser_factory(*args, **kwargs)
 
-        class LeechedExtendedBrowser(cls, browser.__class__):
+        class LeechedExtendedBrowser(cls, browser.__class__):  # type: ignore
 
-            clones = []
+            clones: list[Self] = []
 
-            def quit(self):
+            def quit(self) -> None:
                 for clone in self.clones:
                     with suppress(RemoteDisconnected):
                         clone.quit()
@@ -55,11 +83,12 @@ class InjectedBrowserExtension:
                 with suppress(RemoteDisconnected):
                     super().quit()
 
+        browser = cast('Self', browser)
         browser.spawn_parameters = cls, browser_factory, args, kwargs
         browser.__class__ = LeechedExtendedBrowser
         return browser
 
-    def clone(self):
+    def clone(self) -> Self:
         """ Returns an independent instance of the current browser (all state
         is reset on the new instance).
 
@@ -76,7 +105,7 @@ class InjectedBrowserExtension:
         return browser
 
     @property
-    def clone_parameters(self):
+    def clone_parameters(self) -> dict[str, Any]:
         """ Returns a dictionary of values that need to be applied to the new
         browser instance after it is cloned.
 
@@ -90,18 +119,21 @@ class ExtendedBrowser(InjectedBrowserExtension):
     """
 
     # Prefix appended to urls without http prefix.
-    baseurl = None
+    baseurl: str | None = None
 
     @property
-    def clone_parameters(self):
+    def clone_parameters(self) -> dict[str, Any]:
         return {
             'baseurl': self.baseurl
         }
 
     def visit(
-            self, url, sleep_before_fail=0, expected_errors=None,
-            ignore_all_console_errors=False
-    ):
+        self,
+        url: str,
+        sleep_before_fail: float = 0,
+        expected_errors: list[dict[str, Any]] | None = None,
+        ignore_all_console_errors: bool = False
+    ) -> None:
         """ Overrides the default visit method to provided baseurl support.
             halt_on_fail keeps the browser window open for some minutes
             before failing the test.
@@ -110,12 +142,16 @@ class ExtendedBrowser(InjectedBrowserExtension):
         if self.baseurl and not url.startswith('http'):
             url = self.baseurl.rstrip('/') + url
 
-        page = super().visit(url)
+        super().visit(url)
         if not ignore_all_console_errors:
             self.fail_on_console_errors(sleep_before_fail, expected_errors)
-        return page
 
-    def login(self, username, password, to=None):
+    def login(
+        self,
+        username: str,
+        password: str,
+        to: str | None = None
+    ) -> None:
         """ Login a user through the usualy /auth/login path. """
 
         url = '/auth/login' + (to and ('/?to=' + to) or '')
@@ -125,25 +161,29 @@ class ExtendedBrowser(InjectedBrowserExtension):
         self.fill('password', password)
         self.find_by_css('form input[type="submit"]').first.click()
 
-    def login_admin(self, to=None):
+    def login_admin(self, to: str | None = None) -> None:
         self.login('admin@example.org', 'hunter2', to)
 
-    def login_editor(self, to=None):
+    def login_editor(self, to: str | None = None) -> None:
         self.login('editor@example.org', 'hunter2', to)
 
-    def login_member(self, to=None):
+    def login_member(self, to: str | None = None) -> None:
         self.login('member@example.org', 'hunter2', to)
 
-    def logout(self):
+    def logout(self) -> None:
         self.visit('/auth/logout')
 
-    def wait_for_js_variable(self, variable, timeout=10.0):
+    def wait_for_js_variable(
+        self,
+        variable: str,
+        timeout: float = 10.0
+    ) -> None:
         """ Wait until the given javascript variable is no longer undefined """
 
         time_budget = timeout
         interval = 0.1
 
-        def undefined():
+        def undefined() -> bool:
             try:
                 return self.evaluate_script(f'{variable} == undefined')
             except Exception as exception:
@@ -158,7 +198,11 @@ class ExtendedBrowser(InjectedBrowserExtension):
         if time_budget <= 0:
             raise RuntimeError("Timeout reached")
 
-    def wait_for(self, condition: Callable[..., bool], timeout: float = 10.0):
+    def wait_for(
+        self,
+        condition: Callable[[], bool],
+        timeout: float = 10.0
+    ) -> bool:
         """Wait until the condition is satisfied or timeout is reached."""
 
         if not callable(condition):
@@ -176,7 +220,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
 
         raise TimeoutError("Timeout reached")
 
-    def interact_with_ace_editor(self, content):
+    def interact_with_ace_editor(self, content: str | dict[str, Any]) -> None:
         # I actually tried setting the value with js, (would be much simpler)
         # while this die made text appear in the ace editor field,  it wasn't
         # actually truly set, probably due to some intricacies of ace.
@@ -216,7 +260,9 @@ class ExtendedBrowser(InjectedBrowserExtension):
         # Click somewhere else to ensure the editor loses focus and updates
         self.find_by_tag('body').click()
 
-    def set_datetime_element(self, selector, date_time):
+    def set_datetime_element(
+        self, selector: str, date_or_time: datetime | date
+    ) -> None:
         """ Sets the date and time on a datetime-local field directly by
         setting its value.
         """
@@ -225,7 +271,11 @@ class ExtendedBrowser(InjectedBrowserExtension):
         # element of the datetime picker and seeing what kind of format it
         # expects:
         # document.getElementById('publication_start').value;
-        date_time = date_time.strftime("%Y-%m-%dT%H:%M")
+        if isinstance(date_or_time, datetime):
+            date_or_time_s = date_or_time.strftime("%Y-%m-%dT%H:%M")
+        else:
+            # Many oneogv forms use a date widget with no time, support that:
+            date_or_time_s = date_or_time.strftime("%Y-%m-%d")
 
         script = """
             function setDateTimeDirect(selector, dateTimeString) {
@@ -248,23 +298,23 @@ class ExtendedBrowser(InjectedBrowserExtension):
             setDateTimeDirect(arguments[0], arguments[1]);
         """
 
-        self.execute_script(script, selector, date_time)
+        self.execute_script(script, selector, date_or_time_s)
 
-    def scroll_to_css(self, css):
+    def scroll_to_css(self, css: str) -> None:
         """ Scrolls to the first element matching the given css expression. """
 
         self.execute_script(
             'document.querySelector("{}").scrollIntoView()'.format(css))
 
-    def drop_file(self, selector, path):
+    def drop_file(self, selector: str, path: PathLike[str]) -> None:
         # https://gist.github.com/z41/c11f8a4072e9f67e5755d4a1a72c8f02
-        dropzone = self.find_by_css(selector)[0]._element
+        dropzone = self.find_by_css(selector)[0]._element  # type: ignore[attr-defined]
 
         input = self.driver.execute_script(JS_DROP_FILE, dropzone)
         input.send_keys(str(path))
 
     @property
-    def failsafe_filters(self):
+    def failsafe_filters(self) -> list[dict[str, Any]]:
         return [
             dict(source='security', rgxp="Content Security Policy"),
             dict(source='security', rgxp="Refused to connect"),
@@ -276,7 +326,11 @@ class ExtendedBrowser(InjectedBrowserExtension):
             dict(level='SEVERE', rgxp=re.escape("api.mapbox.com")),
         ]
 
-    def fail_on_console_errors(self, sleep_before=0, expected_errors=None):
+    def fail_on_console_errors(
+        self,
+        sleep_before: float = 0,
+        expected_errors: list[dict[str, Any]] | None = None
+    ) -> None:
         expected_errors = expected_errors or []
         filters = expected_errors + self.failsafe_filters
         error_msgs = self.get_console_log(filters)
@@ -284,7 +338,10 @@ class ExtendedBrowser(InjectedBrowserExtension):
             sleep(sleep_before)
         assert not error_msgs, error_msgs
 
-    def get_console_log(self, filters=None):
+    def get_console_log(
+        self,
+        filters: list[dict[str, Any]] | None = None
+    ) -> list[dict[str, Any]]:
         """
         Get the browsers console log.
         Filter the message by using filters. The filter excludes the entry
@@ -303,7 +360,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
 
         filters = filters or []
 
-        def apply_filter(fil, item):
+        def apply_filter(fil: dict[str, Any], item: dict[str, Any]) -> bool:
             checks = []
             for k, v in fil.items():
                 if k == 'rgxp':
@@ -314,7 +371,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
                     checks.append(item.get(k) == v)
             return all(checks)
 
-        def include(item):
+        def include(item: dict[str, Any]) -> bool:
             for fil in filters:
                 if apply_filter(fil, item):
                     return False
@@ -322,14 +379,17 @@ class ExtendedBrowser(InjectedBrowserExtension):
 
         return [item for item in messages if include(item)]
 
-    def console_log(self, filters=None):
+    def console_log(
+        self,
+        filters: list[dict[str, Any]] | None = None
+    ) -> str:
         console_log = self.get_console_log(filters)
         return "\n".join(
             (f"{i['level']}: {i['message']}" for i in console_log)
         )
 
 
-def screen_shot(name, browser, open_file=True):
+def screen_shot(name: str, browser: Browser, open_file: bool = True) -> None:
     file = browser.screenshot(f'/tmp/{name}.png', full=True)
     if not open_file:
         return

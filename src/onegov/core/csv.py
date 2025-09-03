@@ -43,7 +43,7 @@ if TYPE_CHECKING:
     )
 
     class _RowType(Protocol[_T_co]):
-        def __call__(self, rownumber: int, **kwargs: str) -> _T_co: ...
+        def __call__(self, *, rownumber: int, **kwargs: str) -> _T_co: ...
 
     class DefaultRow(Protocol):
         @property

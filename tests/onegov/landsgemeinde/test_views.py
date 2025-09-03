@@ -156,8 +156,40 @@ def test_views(client_with_es):
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=aliquip')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=consequat')
 
+    # states view
+    page = client_with_es.get('/landsgemeinde/2023-05-07/states')
+    assert 'abgeschlossen' in page
+    assert 'geplant' not in page
+
+    state_url = page.pyquery('.votum a[ic-post-to]').attr['ic-post-to']
+    client_with_es.post(state_url)
+    page = client_with_es.get('/landsgemeinde/2023-05-07/states')
+    assert 'Entwurf' in page
+    assert 'laufend' not in page
+    assert 'abgeschlossen' not in page
+
+    ai_url = page.pyquery('.agenda-item a[ic-post-to]').attr['ic-post-to']
+    client_with_es.post(ai_url)
+    page = client_with_es.get('/landsgemeinde/2023-05-07/states')
+    assert 'geplant' in page
+    assert 'Entwurf' in page  # Votum state shouldn't change
+
+    ai_url = page.pyquery('.agenda-item a[ic-post-to]').attr['ic-post-to']
+    client_with_es.post(ai_url)
+    page = client_with_es.get('/landsgemeinde/2023-05-07/states')
+    assert 'laufend' in page
+    assert 'Entwurf' in page  # Votum state still shouldn't change
+
+    assembly_url = page.pyquery('.assembly a[ic-post-to]').attr['ic-post-to']
+    client_with_es.post(assembly_url)
+    page = client_with_es.get('/landsgemeinde/2023-05-07/states')
+    assert 'abgeschlossen' in page
+    assert 'geplant' not in page
+    assert 'laufend' not in page
+
     # delete votum
     with freeze_time('2023-05-07 9:36'):
+        page = client_with_es.get('/traktandum/2023-05-07/6')
         page.click('Löschen', href='votum')
         page = page.click('A. consectetur adipiscing', index=0)
     assert '<p>Dolore magna aliqua.</p>' in page
@@ -177,7 +209,6 @@ def test_views(client_with_es):
         page.click('Löschen')
         page = page.click('Archiv', index=0)
     assert 'Noch keine Landsgemeinden erfasst.' in page
-
 
 def test_view_pages_cache(landsgemeinde_app):
     client = Client(landsgemeinde_app)

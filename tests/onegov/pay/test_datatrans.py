@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 import transaction
 
@@ -11,29 +13,29 @@ from unittest import mock
 
 
 @pytest.fixture(autouse=True)
-def no_requests(monkeypatch):
+def no_requests(monkeypatch: pytest.MonkeyPatch) -> None:
     # prevents tests from making live requests
     mock_session = mock.Mock()
     monkeypatch.delattr('requests.sessions.Session.request')
 
 
-def test_datatrans_fee_policy():
+def test_datatrans_fee_policy() -> None:
     assert DatatransFeePolicy.from_amount(100) == .29
     assert DatatransFeePolicy.compensate(100) == 100.29
 
 
-def test_datatrans_settle_good_tx():
+def test_datatrans_settle_good_tx() -> None:
     mock_session = mock.Mock()
-    provider = DatatransProvider(merchant_id='foo')
+    provider = DatatransProvider(merchant_id='foo')  # type: ignore[misc]
     client = provider.client
     client.session = mock_session
-    tx = DatatransTransaction(
+    tx = DatatransTransaction(  # type: ignore[call-arg]
         merchantId='foo',
         transactionId='bar',
         type='payment',
         status='authorized',
         refno='baz',
-        currency='CHF',
+        currency='CHF',  # type: ignore[arg-type]
         detail={'authorize': {'amount': 100}}
     )
 
@@ -52,18 +54,18 @@ def test_datatrans_settle_good_tx():
         )
 
 
-def test_datatrans_settle_bad_tx(caplog):
+def test_datatrans_settle_bad_tx(caplog: pytest.LogCaptureFixture) -> None:
     mock_session = mock.Mock()
-    provider = DatatransProvider(merchant_id='foo')
+    provider = DatatransProvider(merchant_id='foo')  # type: ignore[misc]
     client = provider.client
     client.session = mock_session
-    tx = DatatransTransaction(
+    tx = DatatransTransaction(  # type: ignore[call-arg]
         merchantId='foo',
         transactionId='bar',
         type='payment',
         status='authorized',
         refno='baz',
-        currency='CHF',
+        currency='CHF',  # type: ignore[arg-type]
         detail={'authorize': {'amount': 100}}
     )
 
@@ -80,18 +82,18 @@ def test_datatrans_settle_bad_tx(caplog):
         assert 'settle failed' in caplog.text
 
 
-def test_datatrans_settle_negative_vote():
+def test_datatrans_settle_negative_vote() -> None:
     mock_session = mock.Mock()
-    provider = DatatransProvider(merchant_id='foo')
+    provider = DatatransProvider(merchant_id='foo')  # type: ignore[misc]
     client = provider.client
     client.session = mock_session
-    tx = DatatransTransaction(
+    tx = DatatransTransaction(  # type: ignore[call-arg]
         merchantId='not_foo',
         transactionId='bar',
         type='payment',
         status='authorized',
         refno='baz',
-        currency='CHF',
+        currency='CHF',  # type: ignore[arg-type]
         detail={'authorize': {'amount': 100}}
     )
 

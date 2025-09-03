@@ -9,6 +9,8 @@ from itertools import chain
 import pytz
 import yaml
 
+from sqlalchemy import Enum
+
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base, find_models
 from onegov.core.orm.types import JSON, UTCDateTime, UUID
@@ -20,13 +22,15 @@ from onegov.file import File
 from onegov.form import FormDefinition
 from onegov.org.models import (
     Organisation, Topic, News, ExtendedDirectory, PushNotification)
+from onegov.org.models.political_business import (
+    POLITICAL_BUSINESS_STATUS, POLITICAL_BUSINESS_TYPE)
 from onegov.org.utils import annotate_html
 from onegov.page import Page, PageCollection
 from onegov.people import Person
 from onegov.reservation import Resource
 from onegov.ticket import TicketPermission
 from onegov.user import User, UserGroup
-from sqlalchemy import Column, ForeignKey
+from sqlalchemy import Column, ForeignKey, Text
 from sqlalchemy.orm import undefer, selectinload, load_only
 
 
@@ -522,3 +526,189 @@ def convert_directories_to_ticket_permissions(context: UpgradeContext) -> None:
             context.session.add(permission)
 
         del user_group.meta['directories']
+
+
+@upgrade_task('Set default extras pricing method on existing resources')
+def set_default_extras_pricing_method(context: UpgradeContext) -> None:
+    if not context.has_table('resources'):
+        return
+
+    # In order to keep the behavior of existing resources with priced
+    # extras the same we need to set them to "one_off", the new default
+    # will be "per_item"
+    for resource in (
+        context.session.query(Resource)
+        .filter(Resource.definition.isnot(None))
+    ):
+        resource.extras_pricing_method = 'one_off'
+
+
+@upgrade_task('Add party column to par_parliamentarians')
+def add_party_column_to_par_parliamentarians(context: UpgradeContext) -> None:
+    if not context.has_column('par_parliamentarians', 'party'):
+        context.add_column_with_defaults(
+            'par_parliamentarians',
+            Column(
+                'party',
+                Text,
+                nullable=True
+            ),
+            default=None
+        )
+
+
+@upgrade_task('Migrate Kaba config to new format')
+def migrate_kaba_config_to_new_format(context: UpgradeContext) -> None:
+    org = context.session.query(Organisation).first()
+    if org is None:
+        return
+
+    site_id = org.meta.pop('kaba_site_id', None)
+    api_key = org.meta.pop('kaba_api_key', None)
+    api_secret = org.meta.pop('kaba_api_secret', None)
+    if not (site_id and api_key and api_secret):
+        return
+
+    org.meta['kaba_configurations'] = [{
+        'site_id': site_id,
+        'api_key': api_key,
+        'api_secret': api_secret,
+    }]
+
+    if context.has_table('resources'):
+        # update kaba_components to new format
+        context.session.execute("""
+            UPDATE resources
+               SET meta = jsonb_set(
+                   meta,
+                   '{kaba_components}',
+                   to_jsonb(ARRAY(
+                       SELECT jsonb_build_array(:site_id, value)
+                         FROM jsonb_array_elements(meta->'kaba_components')
+                   ))
+                )
+             WHERE meta ? 'kaba_components'
+        """, {'site_id': site_id})
+
+    if context.has_table('reservations'):
+        # update visits to new format
+        context.session.execute("""
+            UPDATE reservations
+               SET data = jsonb_set(
+                   data,
+                   '{kaba,visit_ids}',
+                   jsonb_build_object(:site_id, data->'kaba'->'visit_id')
+                ) #- '{kaba,visit_id}'
+             WHERE data ? 'kaba'
+               AND data->'kaba' ? 'visit_id'
+        """, {'site_id': site_id})
+
+
+@upgrade_task('Update political business enum values')
+def update_political_business_enum_values(
+    context: UpgradeContext
+) -> None:
+    if context.has_enum('par_political_business_type'):
+        context.update_enum_values(
+            'par_political_business_type',
+            POLITICAL_BUSINESS_TYPE.keys()
+        )
+    if context.has_enum('par_political_business_status'):
+        context.update_enum_values(
+            'par_political_business_status',
+            POLITICAL_BUSINESS_STATUS.keys()
+        )
+
+
+@upgrade_task('Change political business participation type column type')
+def change_political_business_participation_type_column_type(
+    context: UpgradeContext
+) -> None:
+    table = 'par_political_business_participants'
+    if context.has_table(table) and context.has_column(
+        table,
+        'participant_type'
+    ):
+        context.operations.alter_column(
+            'par_political_business_participants',
+            'participant_type',
+            type_=Text,
+        )
+
+
+@upgrade_task('Remove obsolete polymorphic type columns')
+def remove_obsolete_polymorphic_type_columns(context: UpgradeContext) -> None:
+    for table in (
+        'par_attendence',
+        'par_parties',
+        'par_changes',
+        'par_legislative_periods',
+        'par_political_businesses',
+        'par_political_business_participants',
+    ):
+        column = 'poly_type' if table == 'par_attendence' else 'type'
+        if context.has_table(table) and context.has_column(table, column):
+            context.operations.drop_column(table, column)
+
+
+@upgrade_task('Make political business participation type column nullable')
+def make_political_business_participation_type_column_nullable(
+    context: UpgradeContext
+) -> None:
+    table = 'par_political_business_participants'
+    if context.has_table(table) and context.has_column(
+        table,
+        'participant_type'
+    ):
+        context.operations.alter_column(
+            table,
+            'participant_type',
+            nullable=True,
+        )
+
+
+@upgrade_task('Update political business type enum values')
+def update_political_business_type_enum_values(
+    context: UpgradeContext
+) -> None:
+
+    new_business_type = Enum(
+        *POLITICAL_BUSINESS_TYPE.keys(),
+        name='par_political_business_type',
+    )
+
+    if context.has_enum('par_political_business_type'):
+        op = context.operations
+
+        op.execute("""
+            ALTER TABLE par_political_businesses
+            ALTER COLUMN political_business_type TYPE Text;
+            UPDATE par_political_businesses
+            SET political_business_type = 'interpellation'
+            WHERE political_business_type = 'interpelleation';
+            UPDATE par_political_businesses
+            SET political_business_type = 'election'
+            WHERE political_business_type = 'elections';
+            UPDATE par_political_businesses
+            SET political_business_type = 'miscellaneous'
+            WHERE political_business_type = 'proposal';
+            UPDATE par_political_businesses
+            SET political_business_type = 'miscellaneous'
+            WHERE political_business_type = 'mandate';
+            UPDATE par_political_businesses
+            SET political_business_type = 'miscellaneous'
+            WHERE political_business_type = 'communication';
+            UPDATE par_political_businesses
+            SET political_business_type = 'miscellaneous'
+            WHERE political_business_type = 'report';
+            DROP TYPE par_political_business_type;
+        """)
+
+        new_business_type.create(op.get_bind())
+
+        op.execute("""
+            ALTER TABLE par_political_businesses
+            ALTER COLUMN political_business_type
+            TYPE par_political_business_type
+            USING political_business_type::text::par_political_business_type;
+        """)

@@ -5,10 +5,10 @@ from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.models import (
     Party,
-    Parliamentarian,
-    ParliamentarianRole,
+    PASParliamentarian,
+    PASParliamentarianRole,
     RateSet,
-    Commission,
+    PASCommission,
     SettlementRun,
     Attendence,
 )
@@ -34,13 +34,13 @@ def test_parliamentarian_settlement_calculations(session):
         session.add(rate_set)
 
         # Create parliamentarian with president role
-        parliamentarian = Parliamentarian(
+        parliamentarian = PASParliamentarian(
             first_name='Jane',
             last_name='President',
             gender='female'
         )
         party = Party(name='Test Party')
-        role = ParliamentarianRole(
+        role = PASParliamentarianRole(
             parliamentarian=parliamentarian,
             role='president',
             party=party,
@@ -49,7 +49,7 @@ def test_parliamentarian_settlement_calculations(session):
         session.add_all([parliamentarian, role, party])
 
         # Create commission
-        commission = Commission(name='Test Commission', type='normal')
+        commission = PASCommission(name='Test PASCommission', type='normal')
         session.add(commission)
 
         # Create various attendances to test different scenarios

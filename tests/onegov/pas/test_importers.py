@@ -3,9 +3,9 @@ from __future__ import annotations
 import pytest
 
 from onegov.pas.models import (
-    Parliamentarian,
+    PASCommission,
+    PASParliamentarian,
     Party,
-    Commission,
 )
 from onegov.pas.importer.json_import import (
     PeopleImporter,
@@ -61,7 +61,7 @@ def test_people_importer_existing_parliamentarian(session, people_json):
     from uuid import UUID
     # Pre-populate the database with one parliamentarian from the fixture
     existing_person_data = people_json['results'][0]
-    existing_parliamentarian = Parliamentarian(
+    existing_parliamentarian = PASParliamentarian(
         external_kub_id=UUID(existing_person_data['id']),  # Convert to UUID
         first_name='OldFirstName',  # Use a different first name initially
         last_name=existing_person_data['officialName'],
@@ -81,7 +81,7 @@ def test_people_importer_existing_parliamentarian(session, people_json):
     assert len(parliamentarian_map) == len(people_json['results'])
 
     # Check the updated parliamentarian
-    updated_parliamentarian = session.query(Parliamentarian).filter_by(
+    updated_parliamentarian = session.query(PASParliamentarian).filter_by(
         external_kub_id=UUID(existing_person_data['id'])  # Use UUID for query
     ).one_or_none()
 
@@ -101,7 +101,7 @@ def test_people_importer_existing_parliamentarian(session, people_json):
     existing_person_data['salutation']
 
     # Ensure no duplicate parliamentarian was created
-    count = session.query(Parliamentarian).filter_by(
+    count = session.query(PASParliamentarian).filter_by(
         external_kub_id=UUID(existing_person_data['id'])  # Use UUID for query
     ).count()
     assert count == 1
@@ -128,7 +128,7 @@ def test_organization_importer_existing(session,
         if o['organizationTypeTitle'] == 'Fraktion'
     )
     # Assuming 'Fraktion' maps to Party
-    existing_commission = Commission(
+    existing_commission = PASCommission(
         external_kub_id=UUID(commission_data['id']),  # Convert to UUID
         name='Old Commission Name',
         type='normal',
@@ -158,7 +158,7 @@ def test_organization_importer_existing(session,
 
     # 1. Check Commission Update
     updated_commission = (
-        session.query(Commission)
+        session.query(PASCommission)
         .filter_by(external_kub_id=UUID(commission_data['id']))  # Use UUID
         .one_or_none()
     )
@@ -171,7 +171,7 @@ def test_organization_importer_existing(session,
 
     # Check Commission Count (ensure no duplicates)
     commission_count = (
-        session.query(Commission)
+        session.query(PASCommission)
         .filter_by(external_kub_id=UUID(commission_data['id']))  # Use UUID
         .count()
     )

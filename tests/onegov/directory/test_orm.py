@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 import transaction
 
@@ -12,7 +14,12 @@ from onegov.directory.errors import DuplicateEntryError, ValidationError
 from onegov.file import File
 
 
-def test_directory_title_and_order(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_directory_title_and_order(session: Session) -> None:
     collection = DirectoryCollection(session)
     doctors = collection.add(
         title='Doctors',
@@ -50,7 +57,7 @@ def test_directory_title_and_order(session):
     assert collection.query().all() == [doctors, patients, staff]
 
 
-def test_directory_fields(session):
+def test_directory_fields(session: Session) -> None:
     people = DirectoryCollection(session).add(
         title='People',
         structure="""
@@ -69,7 +76,7 @@ def test_directory_fields(session):
     assert people.fields[1].required
 
 
-def test_directory_configuration(session):
+def test_directory_configuration(session: Session) -> None:
     people = DirectoryCollection(session).add(
         title='People',
         structure="""
@@ -79,17 +86,17 @@ def test_directory_configuration(session):
         """,
         configuration=DirectoryConfiguration(
             title="[General/First Name] [General/Last Name]",
-            order=('General/Last Name', 'General/First Name'),
+            order=['General/Last Name', 'General/First Name'],
         )
     )
 
     assert people.configuration.title\
         == "[General/First Name] [General/Last Name]"
 
-    assert people.configuration.order == (
+    assert people.configuration.order == [
         'General/Last Name',
         'General/First Name'
-    )
+    ]
 
     person = {
         'general_first_name': 'Tom',
@@ -102,11 +109,11 @@ def test_directory_configuration(session):
     people.configuration.title = "[General/Last Name] [General/First Name]"
     session.flush()
 
-    people = DirectoryCollection(session).query().first()
+    people = DirectoryCollection(session).query().first()  # type: ignore[assignment]
     assert people.configuration.extract_title(person) == 'Riddle Tom'
 
 
-def test_directory_configuration_missing_fields():
+def test_directory_configuration_missing_fields() -> None:
     cfg = DirectoryConfiguration(
         title="[First Name] [Last Name]",
         keywords=['Category']
@@ -133,7 +140,7 @@ def test_directory_configuration_missing_fields():
     """) == {'title': ['Last Name']}
 
 
-def test_directory_form(session):
+def test_directory_form(session: Session) -> None:
     people = DirectoryCollection(session).add(
         title='People',
         structure="""
@@ -142,13 +149,13 @@ def test_directory_form(session):
         """,
         configuration=DirectoryConfiguration(
             title="[First Name] [Last Name]",
-            order=('Last Name', 'First Name'),
+            order=['Last Name', 'First Name'],
         )
     )
 
     form = people.form_class()
-    form.first_name.data = 'Rick'
-    form.last_name.data = 'Sanchez'
+    form['first_name'].data = 'Rick'
+    form['last_name'].data = 'Sanchez'
 
     rick = DirectoryEntry(content={})
     form.populate_obj(rick)
@@ -161,11 +168,11 @@ def test_directory_form(session):
     form = people.form_class()
     form.process(obj=rick)
 
-    assert form.first_name.data == 'Rick'
-    assert form.last_name.data == 'Sanchez'
+    assert form['first_name'].data == 'Rick'
+    assert form['last_name'].data == 'Sanchez'
 
 
-def test_directory_entry_collection(session):
+def test_directory_entry_collection(session: Session) -> None:
     directory = DirectoryCollection(session).add(
         title='Albums',
         structure="""
@@ -183,8 +190,8 @@ def test_directory_entry_collection(session):
         """,
         configuration=DirectoryConfiguration(
             title="[Title]",
-            order=('Artist', 'Title'),
-            keywords=('Genre', 'German')
+            order=['Artist', 'Title'],
+            keywords=['Genre', 'German']
         )
     )
 
@@ -272,13 +279,13 @@ def test_directory_entry_collection(session):
     assert albums.query().all() != sorted_entries
 
 
-def test_validation_error(session):
+def test_validation_error(session: Session) -> None:
     places = DirectoryCollection(session).add(
         title='Place',
         structure="Name *= ___",
         configuration=DirectoryConfiguration(
-            title=('Name', ),
-            order=('Name', ),
+            title='Name',
+            order=['Name'],
         )
     )
 
@@ -286,7 +293,7 @@ def test_validation_error(session):
         places.add(values={'name': ''})
 
 
-def test_files(session):
+def test_files(session: Session) -> None:
     press_releases = DirectoryCollection(session).add(
         title="Press Releases",
         structure="""
@@ -294,8 +301,8 @@ def test_files(session):
             File = *.txt
         """,
         configuration=DirectoryConfiguration(
-            title=('Title', ),
-            order=('Title', ),
+            title='Title',
+            order=['Title'],
         )
     )
 
@@ -310,7 +317,7 @@ def test_files(session):
         file=txt
     ))
 
-    def commit():
+    def commit() -> None:
         nonlocal iphone_found, press_releases
 
         transaction.commit()
@@ -324,7 +331,7 @@ def test_files(session):
     assert session.query(File).count() == 1
 
     file = session.query(File).one()
-    assert file.directory_entry == iphone_found
+    assert file.directory_entry == iphone_found  # type: ignore[attr-defined]
     file_id = file.id
     press_releases.update(iphone_found, dict(
         title="iPhone Found in Ancient Ruins in the Andes",
@@ -368,7 +375,7 @@ def test_files(session):
     assert session.query(File).count() == 0
 
 
-def test_multi_files(session):
+def test_multi_files(session: Session) -> None:
     press_releases = DirectoryCollection(session).add(
         title="Press Releases",
         structure="""
@@ -376,8 +383,8 @@ def test_multi_files(session):
             Files = *.txt (multiple)
         """,
         configuration=DirectoryConfiguration(
-            title=('Title', ),
-            order=('Title', ),
+            title='Title',
+            order=['Title'],
         )
     )
 
@@ -399,7 +406,7 @@ def test_multi_files(session):
         files=txts
     ))
 
-    def commit():
+    def commit() -> None:
         nonlocal iphone_found, press_releases
 
         transaction.commit()
@@ -459,7 +466,7 @@ def test_multi_files(session):
     assert session.query(File).count() == 0
 
 
-def test_migrate_text_field(session):
+def test_migrate_text_field(session: Session) -> None:
     rooms = DirectoryCollection(session).add(
         title="Rooms",
         structure="""
@@ -467,8 +474,8 @@ def test_migrate_text_field(session):
             Note  = ...
         """,
         configuration=DirectoryConfiguration(
-            title=('Name', ),
-            order=('Name', ),
+            title='Name',
+            order=['Name'],
         )
     )
 
@@ -486,7 +493,7 @@ def test_migrate_text_field(session):
     assert conference.values['note'] == 'Has a beamer and snacks'
 
 
-def test_migrate_rename_field(session):
+def test_migrate_rename_field(session: Session) -> None:
     rooms = DirectoryCollection(session).add(
         title="Rooms",
         structure="""
@@ -494,8 +501,8 @@ def test_migrate_rename_field(session):
             Note  = ___
         """,
         configuration=DirectoryConfiguration(
-            title=('Name', ),
-            order=('Name', ),
+            title='Name',
+            order=['Name'],
         )
     )
 
@@ -513,15 +520,15 @@ def test_migrate_rename_field(session):
     assert conference.values['notiz'] == 'Has a beamer and snacks'
 
 
-def test_migrate_introduce_radio_field(session):
+def test_migrate_introduce_radio_field(session: Session) -> None:
     rooms = DirectoryCollection(session).add(
         title="Rooms",
         structure="""
             Name *= ___
         """,
         configuration=DirectoryConfiguration(
-            title=('Name', ),
-            order=('Name', ),
+            title='Name',
+            order=['Name'],
         )
     )
 
@@ -551,15 +558,15 @@ def test_migrate_introduce_radio_field(session):
     assert not conference.values['beamer'] == 'Yes'
 
 
-def test_introduce_required_field_fail(session):
+def test_introduce_required_field_fail(session: Session) -> None:
     rooms = DirectoryCollection(session).add(
         title="Rooms",
         structure="""
             Name *= ___
         """,
         configuration=DirectoryConfiguration(
-            title=('Name', ),
-            order=('Name', ),
+            title='Name',
+            order=['Name'],
         )
     )
 
@@ -576,15 +583,15 @@ def test_introduce_required_field_fail(session):
         session.flush()
 
 
-def test_introduce_required_field(session):
+def test_introduce_required_field(session: Session) -> None:
     rooms = DirectoryCollection(session).add(
         title="Rooms",
         structure="""
             Name *= ___
         """,
         configuration=DirectoryConfiguration(
-            title=('Name', ),
-            order=('Name', ),
+            title='Name',
+            order=['Name'],
         )
     )
 
@@ -602,7 +609,7 @@ def test_introduce_required_field(session):
 
     # then fill out the values
     conference.values['seats'] = 3
-    conference.content.changed()
+    conference.content.changed()  # type: ignore[attr-defined]
 
     session.flush()
 
@@ -615,15 +622,15 @@ def test_introduce_required_field(session):
     session.flush()
 
 
-def test_introduce_image_field(session):
+def test_introduce_image_field(session: Session) -> None:
     logos = DirectoryCollection(session).add(
         title="Logos",
         structure="""
             Name *= ___
         """,
         configuration=DirectoryConfiguration(
-            title=('Name', ),
-            order=('Name', )
+            title='Name',
+            order=['Name'],
         )
     )
 
@@ -650,7 +657,7 @@ def test_introduce_image_field(session):
     assert logos.entries[0].values == {'name': 'Mc Donalds', 'logo': None}
 
 
-def test_change_number_range_fail(session):
+def test_change_number_range_fail(session: Session) -> None:
     rooms = DirectoryCollection(session).add(
         title="Prediction",
         structure="""
@@ -658,8 +665,8 @@ def test_change_number_range_fail(session):
             Confidence = 0..1000
         """,
         configuration=DirectoryConfiguration(
-            title=('Description', ),
-            order=('Description', ),
+            title='Description',
+            order=['Description'],
         )
     )
 
@@ -679,14 +686,14 @@ def test_change_number_range_fail(session):
         session.flush()
 
 
-def test_add_duplicate_entry(session):
+def test_add_duplicate_entry(session: Session) -> None:
 
     foos = DirectoryCollection(session).add(
         title="Foos",
         structure="Name *= ___",
         configuration=DirectoryConfiguration(
-            title=('Name', ),
-            order=('Name', ),
+            title='Name',
+            order=['Name'],
         )
     )
 
@@ -697,7 +704,7 @@ def test_add_duplicate_entry(session):
         foos.add(values=dict(name='foobar'))
 
 
-def test_custom_order(session):
+def test_custom_order(session: Session) -> None:
 
     names = DirectoryCollection(session).add(
         title="Names",
@@ -707,7 +714,7 @@ def test_custom_order(session):
         """,
         configuration=DirectoryConfiguration(
             title='[First Name] [Last Name]',
-            order=('First Name', ),
+            order=['First Name'],
         )
     )
 

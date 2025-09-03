@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import CommissionCollection
+from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.layouts import DefaultLayout
 from onegov.org.models import Organisation
 from onegov.core.security import Private
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 @PasApp.html(
     model=Organisation,
     name='pas',
-    template='dashboard.pt',
+    template='pas_dashboard.pt',
     permission=Private
 )
 def view_dashboard(
@@ -31,7 +31,7 @@ def view_dashboard(
         {
             'name': 'commissions',
             'title': _('Commissions'),
-            'link': request.class_link(CommissionCollection),
+            'link': request.class_link(PASCommissionCollection),
             'icon': 'fa-user-friends'
         },
         {

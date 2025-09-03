@@ -13,7 +13,7 @@ from onegov.form.fields import FIELDS_NO_RENDERED_PLACEHOLDER
 from onegov.form.fields import HoneyPotField
 from onegov.form.utils import get_fields_from_class
 from onegov.form.validators import If, StrictOptional
-from onegov.pay import Price
+from onegov.pay import InvoiceDiscountMeta, InvoiceItemMeta, Price
 from operator import itemgetter
 from wtforms import Form as BaseForm
 from wtforms.fields import EmailField
@@ -183,7 +183,8 @@ class Form(BaseForm):
         preprocessors = [
             self.process_fieldset(),
             self.process_depends_on(),
-            self.process_pricing()
+            self.process_pricing(),
+            self.process_discount(),
         ]
 
         for processor in preprocessors:
@@ -368,6 +369,35 @@ class Form(BaseForm):
         for field_id, pricing in pricings.items():
             self._fields[field_id].pricing = pricing
 
+    def process_discount(self) -> Iterator[None]:
+        """ Processes the discount parameter on the fields, which adds the
+        ability to have fields associated with a proportional discount.
+
+        See :class:`Form` for more information.
+
+        """
+
+        discounts: dict[str, dict[str, Decimal]] = {}
+
+        # move the pricing rule to the field class (happens once per class)
+        for field_id, field in self._unbound_fields:
+            if not hasattr(field, 'discount'):
+                field.discount = field.kwargs.pop('discount', None)
+
+        # prepare the pricing rules
+        for field_id, field in self._unbound_fields:
+            if field.discount:
+                discounts[field_id] = {
+                    key: Decimal(value)
+                    for key, value in field.discount.items()
+                }
+
+        yield
+
+        # attach the pricing rules to the field instances
+        for field_id, discount in discounts.items():
+            self._fields[field_id].discount = discount
+
     def render_display(self, field: Field) -> Markup | None:
         """ Renders the given field for display (no input). May be overwritten
         by descendants to return different html, or to return None.
@@ -439,6 +469,30 @@ class Form(BaseForm):
 
         return prices
 
+    def invoice_items(
+        self,
+        group: str = 'form',
+        vat_rate: Decimal | None = None,
+        extra: dict[str, Any] | None = None,
+    ) -> list[InvoiceItemMeta]:
+        """ Returns the invoice items for all selected items depending
+        on the formdata. """
+        return [
+            InvoiceItemMeta(
+                # NOTE: In some rare cases we may get a static field that has
+                #       a label with a translation string instead of a static
+                #       string defined through form code.
+                text=label if type(label := self[field_id].label.text) is str
+                           else self.request.translate(label),
+                group=group,
+                family=f'price-{field_id}',
+                unit=price.amount,
+                extra=extra,
+                vat_rate=vat_rate,
+            )
+            for field_id, price in self.prices()
+        ]
+
     def total(self) -> Price | None:
         """ Returns the total amount of all prices. """
         prices = self.prices()
@@ -454,6 +508,81 @@ class Form(BaseForm):
                 for field_id, price in prices
             )
         )
+
+    def discounts(self) -> list[tuple[str, Decimal]]:
+        """ Returns the discounts of all selected items depending on the
+        formdata. """
+
+        discounts = []
+
+        for field_id, field in self._fields.items():
+            if not hasattr(field, 'discount') or not field.discount:
+                continue
+
+            if not self.is_visible_through_dependencies(field_id):
+                continue
+
+            values = field.data
+            if not isinstance(values, list):
+                values = [values]
+
+            field_discounts = [
+                discount
+                for value in values
+                if (discount := field.discount.get(value))
+            ]
+            if field_discounts:
+                discount = sum(field_discounts, start=Decimal('0'))
+                discounts.append((field_id, discount))
+
+        return discounts
+
+    def discount_items(
+        self,
+        group: str = 'form',
+        vat_rate: Decimal | None = None,
+        extra: dict[str, Any] | None = None,
+    ) -> list[InvoiceDiscountMeta]:
+        """ Returns the discount items for all selected items depending
+        on the formdata. """
+        return [
+            InvoiceDiscountMeta(
+                # NOTE: In some rare cases we may get a static field that has
+                #       a label with a translation string instead of a static
+                #       string defined through form code.
+                text=label if type(label := self[field_id].label.text) is str
+                           else self.request.translate(label),
+                group=group,
+                family=f'discount-{field_id}',
+                discount=discount,
+                vat_rate=vat_rate,
+                extra=extra
+            )
+            for field_id, discount in self.discounts()
+        ]
+
+    def total_discount(self) -> Decimal | None:
+        """ Returns the total amount of all discounts.
+
+        The discount is returned as a multiplier between `-Inf` and `1`.
+        Discounts above `1` are clamped to `1`, since we can't discount
+        more than 100% of the price.
+
+        Negative discounts are allowed, but are generally discouraged.
+
+        This discount will not be automatically be applied to the price
+        of this form, since there may be external factors increasing the
+        price of your submission. Also the discount may not apply to
+        the options selected in the form.
+        """
+
+        discounts = self.discounts()
+
+        total = sum(discount for field_id, discount in discounts)
+        if not total:
+            return None
+
+        return min(total, Decimal('1'))
 
     def submitted(self, request: CoreRequest) -> bool:
         """ Returns true if the given request is a successful post request. """
@@ -973,27 +1102,31 @@ def enforce_order(
 def move_fields(
     form_class: type[_FormT],
     fields: Collection[str],
-    after: str | None
+    after: str | None = None,
+    before: str | None = None,
 ) -> type[_FormT]:
     """ Reorders the given fields (given by name) by inserting them directly
     after the given field.
 
-    If ``after`` is None, the fields are moved to the end.
+    If ``after`` and ``before`` are ``None``, the fields are moved to the end.
 
     """
 
-    fields_in_order = []
+    fields_in_order: list[str] = []
 
     for name, _ in utils.get_fields_from_class(form_class):
         if name in fields:
             continue
+
+        if name == before:
+            fields_in_order.extend(fields)
 
         fields_in_order.append(name)
 
         if name == after:
             fields_in_order.extend(fields)
 
-    if after is None:
+    if after is None and before is None:
         fields_in_order.extend(fields)
 
     return enforce_order(form_class, fields_in_order)

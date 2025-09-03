@@ -12,17 +12,19 @@ from sqlalchemy import Text
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import date
-    from onegov.pas.models.parliamentarian_role import ParliamentarianRole
+    from onegov.pas.models import PASParliamentarianRole
 
 
 class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
-    __tablename__ = 'pas_parties'
+    __tablename__ = 'par_parties'
 
+    es_type_name = 'pas_party'
     es_public = False
     es_properties = {'name': {'type': 'text'}}
 
@@ -43,7 +45,7 @@ class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     #: External ID
     external_kub_id: Column[uuid.UUID | None] = Column(
-        UUID,   # type:ignore[arg-type]
+        UUID,  # type:ignore[arg-type]
         nullable=True,
         default=uuid4,
         unique=True
@@ -74,9 +76,9 @@ class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
     description = dict_markup_property('content')
 
     #: A party may have n roles
-    roles: relationship[list[ParliamentarianRole]]
+    roles: relationship[list[PASParliamentarianRole]]
     roles = relationship(
-        'ParliamentarianRole',
+        'PASParliamentarianRole',
         cascade='all, delete-orphan',
         back_populates='party'
     )

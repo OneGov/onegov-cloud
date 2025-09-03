@@ -1,0 +1,215 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x">
+            <div class="large-8 medium-8 cell main-content">
+                <div tal:condition="parliamentarian.roles">
+                    <h2 i18n:translate class="h3">Functions</h2>
+                    <ul class="more-list">
+                        <li tal:repeat="role parliamentarian.roles">
+                            <div class="list-link">
+                                <span>
+                                    <a tal:condition="request.is_manager" href="${request.link(role)}"> ${role.role_label}
+                                        <tal:block i18n:translate>Parliament</tal:block></a>
+                                    <tal:b tal:condition="not request.is_manager">
+                                    ${role.role_label}
+                                        <tal:block i18n:translate>Parliament</tal:block>
+                                    </tal:b>
+                                    <tal:b tal:condition="role.parliamentary_group">
+                                        /
+                                        ${role.parliamentary_group_role_label}
+                                        <tal:block i18n:translate>Parliamentary group</tal:block>
+                                        <a href="${request.link(role.parliamentary_group)}">${role.parliamentary_group.title}</a>
+                                    </tal:b>
+                                </span>
+                            </div>
+                            <span class="list-lead preview">
+                                ${layout.format_date(role.start, 'date')}
+                                <tal:b tal:condition="role.end">
+                                -
+                                ${layout.format_date(role.end, 'date')}
+                                </tal:b>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+                <div tal:condition="parliamentarian.commission_memberships">
+                    <h2 i18n:translate class="h3">Commissions</h2>
+                    <ul class="more-list">
+                        <li tal:repeat="membership parliamentarian.commission_memberships">
+                            <div class="list-link">
+                                <span>
+                                    <a tal:condition="request.is_manager" href="${request.link(membership)}">${membership.role_label} </a>
+                                    <tal:b tal:condition="not request.is_manager">${membership.role_label} </tal:b>
+                                    <tal:b tal:condition="membership.commission">
+                                    <tal:b i18n:translate> in </tal:b>
+                                    <a href="${request.link(membership.commission)}">${membership.commission.title}</a>
+                                </span>
+                            </div>
+                            <span class="list-lead preview">
+                                ${layout.format_date(membership.start, 'date')}
+                                <tal:b tal:condition="membership.end">
+                                    ${layout.format_date(membership.end, 'date')}
+                                </tal:b>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+                <div tal:condition="parliamentarian.political_businesses">
+                    <h2 i18n:translate class="h3">Political Businesses</h2>
+                    <ul class="more-list">
+                        <li tal:repeat="participation sorted(parliamentarian.political_businesses, key=lambda p: p.political_business.entry_date or layout.now(), reverse=True)">
+                            <a tal:attributes="href request.link(participation.political_business)" class="list-link">
+                                <span class="list-title">
+                                    ${participation.political_business.title}
+                                    <span tal:condition="participation.political_business.number|None">
+                                        (${participation.political_business.number})
+                                    </span>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div tal:define="interests parliamentarian.interests" tal:condition="parliamentarian.interests['rows']|None">
+                    <tal:b define="headers interests['headers']; rows interests['rows']">
+                        <h2 i18n:translate class="h3">Interest ties</h2>
+                        <table class="table table-striped interests">
+                            <thead>
+                                <tr>
+                                    <th tal:repeat="header headers" tal:content="header">${header}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr tal:repeat="row rows">
+                                    <td tal:repeat="header headers" >${row[header]}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </tal:b>
+                </div>
+            </div>
+            <div class="large-4 medium-4 cell sidebar filter-panel">
+                <div class="sidebar-wrapper">
+                    <div class="side-panel">
+                        <dl class="field-display">
+                            <h2 class="h3" i18n:translate>Personal details</h2>
+                            <div tal:condition="parliamentarian.picture">
+                                <div class="person-card" style="margin-bottom: 1rem;">
+                                    <div class="person-card-portrait" style="border-radius: 0;">
+                                        <div class="cover-image"
+                                             style='background-image: url("${request.link(parliamentarian.picture)}");'></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div tal:condition="parliamentarian.first_name">
+                                <dt i18n:translate>First name</dt>
+                                <dd>${parliamentarian.first_name}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.last_name">
+                                <dt i18n:translate>Last name</dt>
+                                <dd>${parliamentarian.last_name}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.personnel_number">
+                                <dt i18n:translate>Personnel number</dt>
+                                <dd>${parliamentarian.personnel_number}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.contract_number">
+                                            <dt i18n:translate>Contract number</dt>
+                                <dd>${parliamentarian.contract_number}</dd>
+                            </div>
+                <!--?            <div tal:condition="parliamentarian.gender">-->
+                <!--?                <dt i18n:translate>Gender</dt>-->
+                <!--?                <dd>${parliamentarian.gender_label}</dd>-->
+                <!--?            </div>-->
+                            <div tal:condition="parliamentarian.party">
+                                <dt i18n:translate>Party</dt>
+                                <dd>${parliamentarian.party}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.private_address">
+                                <dt i18n:translate>Private address</dt>
+                                <dd>
+                                    <span tal:condition="parliamentarian.private_address">${parliamentarian.private_address}<br></span>
+                                    <span tal:condition="parliamentarian.private_address_addition">${parliamentarian.private_address_addition}<br></span>
+                                    <span tal:condition="parliamentarian.private_address_zip_code">${parliamentarian.private_address_zip_code} ${parliamentarian.private_address_city}</span>
+                                </dd>
+                            </div>
+                            <div tal:condition="not: parliamentarian.private_address">
+                                <dt i18n:translate>Place of residence</dt>
+                                <dd>
+                                    <span tal:condition="parliamentarian.private_address_zip_code">${parliamentarian.private_address_zip_code} ${parliamentarian.private_address_city}</span>
+                                </dd>
+                            </div>
+                            <div tal:condition="parliamentarian.date_of_birth">
+                                <dt i18n:translate>Date of birth</dt>
+                                <dd>${layout.format_date(parliamentarian.date_of_birth, 'date')}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.date_of_death">
+                                <dt i18n:translate>Date of death</dt>
+                                <dd>${layout.format_date(parliamentarian.date_of_death, 'date')}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.place_of_origin">
+                                <dt i18n:translate>Place of origin</dt>
+                                <dd>${parliamentarian.place_of_origin}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.occupation">
+                                <dt i18n:translate>Occupation</dt>
+                                <dd>${parliamentarian.occupation}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.academic_title">
+                                <dt i18n:translate>Academic title</dt>
+                                <dd>${parliamentarian.academic_title}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.salutation">
+                                <dt i18n:translate>Salutation</dt>
+                                <dd>${parliamentarian.salutation}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.salutation_for_address">
+                                <dt i18n:translate>Salutation used in the address</dt>
+                                <dd>${parliamentarian.salutation_for_address}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.salutation_for_letter">
+                                <dt i18n:translate>Salutation used for letters</dt>
+                                <dd>${parliamentarian.salutation_for_letter}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.forwarding_of_bills">
+                                <dt i18n:translate>How bills should be delivered</dt>
+                                <dd>${parliamentarian.forwarding_of_bills}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.phone_private">
+                                <dt i18n:translate>Private phone number</dt>
+                                <dd>${layout.format_phone_number(parliamentarian.phone_private)}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.phone_mobile">
+                                <dt i18n:translate>Mobile phone number</dt>
+                                <dd>${layout.format_phone_number(parliamentarian.phone_mobile)}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.phone_business">
+                                <dt i18n:translate>Business phone number</dt>
+                                <dd>${layout.format_phone_number(parliamentarian.phone_business)}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.email_primary">
+                                <dt i18n:translate>Primary email address</dt>
+                                <dd>${parliamentarian.email_primary}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.email_secondary">
+                                <dt i18n:translate>Secondary email address</dt>
+                                <dd>${parliamentarian.email_secondary}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.website">
+                                <dt i18n:translate>Website</dt>
+                                <dd>${parliamentarian.website}</dd>
+                            </div>
+                            <div tal:condition="parliamentarian.remarks">
+                                <dt i18n:translate>Remarks</dt>
+                                <dd tal:content="Markup('<br>').join(parliamentarian.remarks.split('\n'))"></dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>

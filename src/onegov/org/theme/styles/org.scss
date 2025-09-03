@@ -2,9 +2,9 @@
     useful mixins
 */
 
-// sass-lint:disable-all
+// stylelint-disable declaration-block-no-duplicate-properties
 @mixin grayscale {
-    filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale");
+            filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale");
             filter: grayscale(100%);
        -moz-filter: grayscale(100%);
         -ms-filter: grayscale(100%);
@@ -20,7 +20,7 @@
             filter: none;
     -webkit-filter: none;
 }
-// sass-lint:enable-all
+// stylelint-enable declaration-block-no-duplicate-properties
 
 @mixin hairline {
     border: 0;
@@ -127,7 +127,7 @@ a[href^="mailto:"] {
     @include prefix(word-break, break-all);
 
     // Non standard for WebKit
-    word-break: break-word;
+    word-break: break-word; /* stylelint-disable-line declaration-property-value-keyword-no-deprecated */
 }
 
 /*
@@ -348,6 +348,9 @@ $globals-height: 2.5rem;
     .ticket-archive::before { @include icon('\f1c6'); }
     .forms::before { @include icon('\f15c'); }
     .surveys::before { @include icon('\f080'); }
+    .citizen-login::before { @include icon('\f090'); }
+    .citizen-tickets::before { @include icon('\f145'); }
+    .citizen-reservations::before { @include icon('\f133'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;
@@ -619,6 +622,11 @@ $footer-border-width: 0;
     line-height: 1.5rem;
     list-style-type: none;
     margin: 0 0 1rem;
+}
+
+.tiktok {
+    margin-left: 2px;
+    margin-right: 2px;
 }
 
 /*
@@ -3021,7 +3029,7 @@ button {
     }
 }
 
-.selected-owner {
+.selected-owner, .selected-submitter {
     margin-left: 1rem !important;
 
     &.secondary {
@@ -3079,7 +3087,64 @@ button {
     to {box-shadow: none;}
 }
 
-.calendar {
+.occupancy-calendar {
+    .fc-view:not(.fc-list), .fc-view:not(.fc-list) + .fc-popover {
+        .event-accepted,
+        .event-accepted .fc-bg,
+        .event-accepted .fc-content {
+            border-width: 0;
+            background-color: $blue-dark;
+        }
+
+        .event-pending,
+        .event-pending .fc-bg,
+        .event-pending .fc-content {
+            border-width: 0;
+            background-color: lighten(desaturate($blue-dark, 50%), 10%);
+        }
+    }
+
+    .fc-event, .fc-event-main {
+        padding: 0 !important;
+    }
+
+    .fc-event .fc-content {
+        position: relative;
+        z-index: 2;
+        padding: 2px 4px;
+        border-top-right-radius: 1.2rem;
+        white-space: nowrap;
+
+        &::first-line {
+            font-weight: bold;
+        }
+    }
+
+    .fc-event.fc-timegrid-event-short .fc-title {
+        font-weight: bold;
+    }
+
+    .fc-list-item-title::first-line {
+        font-weight: bold;
+    }
+
+    &[data-editable="true"] .fc-list-item {
+        cursor: pointer;
+    }
+
+    .fc-event .fc-bg {
+        opacity: 1 !important;
+        border-top-right-radius: 1.5rem;
+    }
+
+    .fc-bg-event {
+        background-color: $green;
+        opacity: .15;
+        cursor: default !important;
+    }
+}
+
+.calendar, .occupancy-calendar {
 
     margin-bottom: 1.5rem;
 
@@ -3095,14 +3160,12 @@ button {
         outline: none;
     }
 
-    .fc-content {
-        // pass through pointer events to the background, where we have the
-        // hover and javascript handling
-        pointer-events: none;
-    }
-
     .fc-toolbar {
-        margin-bottom: 0;
+        align-items: end;
+
+        &.fc-header-toolbar {
+            margin-bottom: 2rem;
+        }
 
         h2 {
             clear: both;
@@ -3110,15 +3173,18 @@ button {
             float: none;
             margin-bottom: 1rem;
             text-align: left;
+
+            &:hover .fa {
+                color: $primary-color;
+            }
         }
 
-        .fc-left {
-            float: none;
+        h2 + button {
+            margin-left: 0 !important;
+        }
 
-            button {
-                margin-bottom: 15px;
-                margin-left: 0;
-            }
+        select {
+            margin: 0;
         }
     }
 
@@ -3150,10 +3216,23 @@ button {
         background-color: $primary-color !important;
     }
 
-    .fc-month-view {
-        .fc-day-number {
+    .fc-dayGridMonth-view, .fc-multimonth {
+        .fc-daygrid-day-number {
             font-size: .875rem;
             padding: .25rem .5rem;
+        }
+    }
+
+    .fc-view.fc-multimonth {
+        max-height: 850px;
+
+        .fc-event .fc-content {
+            max-height: 2.5rem;
+            overflow-y: hidden;
+
+            .fc-title {
+                font-size: .675rem;
+            }
         }
     }
 
@@ -3183,12 +3262,13 @@ button {
             filter: grayscale(1);
         }
 
-        .fc-day-header,
-        .fc-day-number {
+        .fc-daygrid-day-header,
+        .fc-daygrid-day-number {
             font-size: .9em;
         }
 
         .fc-event {
+            overflow: hidden;
             border: 0;
             border-radius: 2px;
             margin: 0 0 2px;
@@ -3196,7 +3276,13 @@ button {
         }
 
         .fc-bg {
-            background: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+            opacity: .25;
         }
 
         .event-unavailable {
@@ -3218,8 +3304,8 @@ button {
     }
 
     .fc-event {
-        div.fc-time,
-        span.fc-time {
+        div.fc-event-time,
+        span.fc-event-time {
             display: none;
         }
 
@@ -3228,7 +3314,7 @@ button {
             padding: 0;
         }
 
-        &.fc-short .fc-title {
+        &.fc-timegrid-event-short .fc-title {
             display: inline-block;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -3248,25 +3334,53 @@ button {
         }
     }
 
-    .fc button,
-    .fc-button {
+    .fc-more-link {
+        font-size: .8rem;
+    }
+
+    &.fc button,
+    &.fc .fc-button {
         @include button(
             $padding: $button-tny,
             $bg: $smoke
         );
+        margin-bottom: 0;
+        border-radius: 4px;
         background-image: none;
-        box-shadow: none;
+        box-shadow: none !important;
         font-size: .9rem;
         height: 2.25rem;
         text-shadow: none;
 
-        &.fc-state-active,
-        &.fc-state-disabled {
-            background: $charcoal;
-            color: $white;
+        .fc-icon {
+            margin-top: -4px;
+        }
+
+        &.fc-button-active,
+        &:disabled {
+            background: $charcoal !important;
+            color: $white !important;
             opacity: 1;
         }
+
+        &:hover,
+        &:focus,
+        &:active {
+          color: #333;
+          background-color: #bebebe;
+        }
     }
+
+    &.fc .fc-button-primary {
+        background-color: #f5f5f5;
+        color: #333;
+    }
+}
+
+.calendar .fc-event-main {
+    // pass through pointer events to the background, where we have the
+    // hover and javascript handling
+    pointer-events: none;
 }
 
 .calendar-footer {
@@ -3285,28 +3399,27 @@ button {
     Fullcalendar responsive design
 */
 @media #{$small-up} {
-    .fc .fc-toolbar {
+    .calendar .fc-toolbar {
         width: 100%;
     }
 }
 
 @media #{$large-up} {
-    .fc .fc-toolbar {
+    .calendar .fc-toolbar {
         width: 80%;
     }
 }
 
 @media (max-width: 850px) {
-    .fc-center {
-        display: block;
-        width: 100%;
-    }
-}
+    .calendar {
+        .fc-toolbar {
+            flex-direction: column;
+            align-items: start;
+        }
 
-@media (min-width: 850px) {
-    .fc-center {
-        display: inline-block;
-        width: 40%;
+        .fc-toolbar-chunk {
+            margin-bottom: .5rem;
+        }
     }
 }
 
@@ -3319,6 +3432,17 @@ button {
 @media #{$medium-only} {
     .calendar-footer {
         width: 75%;
+    }
+
+    .occupancy-calendar {
+        .fc-toolbar {
+            flex-direction: column;
+            align-items: start;
+        }
+
+        .fc-toolbar-chunk {
+            margin-bottom: .5rem;
+        }
     }
 }
 
@@ -4187,7 +4311,7 @@ ul.search-results {
         width: 20%;
     }
 
-    .fc-view-container,
+    .calendar .fc-view,
     .reservation-list {
         display: inline-block;
         float: left;
@@ -4204,7 +4328,7 @@ ul.search-results {
         }
     }
 
-    .fc-view-container,
+    .calendar .fc-view,
     .reservation-list {
         width: 75%;
     }
@@ -4217,7 +4341,7 @@ ul.search-results {
         width: 100%;
     }
 
-    .fc-view-container,
+    .calendar .fc-view,
     .reservation-list {
         display: block;
         width: 100%;
@@ -4228,12 +4352,6 @@ ul.search-results {
         .fc-button-group {
             display: inline-block;
             font-size: .7rem;
-        }
-
-        .fc-right {
-            left: -7px;
-            margin-bottom: 1rem;
-            position: relative;
         }
     }
 
@@ -4282,6 +4400,26 @@ ul.search-results {
 
         li {
             margin-bottom: .5rem;
+        }
+
+        .reservation {
+            background: $white-smoke;
+            border-radius: 2px;
+            margin-bottom: 1rem;
+            margin-left: -0.5rem;
+            position: relative;
+        }
+
+        .reservation-details {
+            font-size: .8rem;
+            padding: .5rem 8rem .5rem .5rem;
+        }
+
+        .reservation-actions {
+            font-size: .8rem;
+            position: absolute;
+            right: .5rem;
+            top: .275rem;
         }
     }
 
@@ -4561,6 +4699,7 @@ ul.recipients {
     background-color: $white;
     display: inline-block;
     padding: 2px 8px;
+    white-space:nowrap;
 
     &.payment-state-open {
         border: 1px solid $info-color;
@@ -4601,6 +4740,16 @@ ul.recipients {
             margin-right: .75ex;
         }
     }
+
+    &.payment-state-invoiced {
+        border: 1px solid get-color(info);
+
+        &::before {
+            @include icon('\f1ea');
+            color: get-color(info);
+            margin-right: .75ex;
+        }
+    }
 }
 
 .tickets-table .payment-state {
@@ -4628,6 +4777,107 @@ ul.recipients {
     td {
         padding-right: 5px;
         vertical-align: top;
+    }
+}
+
+/*
+    Invoice
+*/
+.invoice-items {
+    position: relative;
+    width: 100%;
+
+    thead th:not(:first-child) {
+        text-align: center !important;
+    }
+
+    tbody tr {
+        background-color: transparent;
+
+        &.paid:hover {
+            background-color: $green-pastel !important;
+        }
+
+        &.unpaid:hover {
+            background-color: $red-pastel !important;
+        }
+    }
+
+    td {
+        border: 0;
+        padding-bottom: .35rem;
+        padding-top: .35rem;
+
+        &:not(:first-child) {
+            white-space: nowrap;
+        }
+    }
+
+    .group th {
+        padding-bottom: .75rem;
+        padding-top: .75rem;
+    }
+
+    .amount, .unit, .quantity, .vat, .vat-rate {
+        font-family: $font-family-monospace;
+        text-align: right;
+        width: 1%;
+    }
+
+    .actions {
+        width: 1%;
+    }
+
+    .total .amount,
+    .total .vat {
+        padding-top: .75rem;
+    }
+
+    .total td {
+        padding-bottom: .5rem;
+        padding-top: .5rem;
+    }
+
+    .total td:last-child {
+        padding-right: .75rem;
+    }
+
+    .total td:first-child,
+    .group th:first-child {
+        font-weight: bold;
+        text-decoration: underline;
+        text-decoration-color: $body-font-color;
+    }
+
+    tbody tr:last-child td {
+        // make sure the backgrounds of all item lines cover the same
+        // height, here we mask the extended height of the row with
+        // a white box-shadow
+        box-shadow: 0 -.75rem $white inset;
+        padding-bottom: 1rem;
+    }
+
+    .unpaid .amount {
+        color: $red-dark;
+    }
+
+    .paid .amount {
+        color: $green-dark;
+    }
+
+    a.remove-invoice-item {
+        color: $red-dark;
+
+        &:link,
+        &:visited {
+            color: $red-dark;
+        }
+
+        &:hover,
+        &:active,
+        &:focus {
+            color: rgba($red-dark, .9);
+        }
     }
 }
 
@@ -4836,6 +5086,29 @@ h2 + div.timeline {
     .file {
         margin-left: 4rem;
     }
+
+    .reservation-adjustment {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 0;
+
+        .fa {
+            font-size: 1.5rem;
+            color: rgba(0, 0, 0, .5);
+        }
+
+        .reservation-details {
+            font-size: .8rem;
+            padding: .5rem;
+            background: rgba(255, 255, 255, .7);
+            border-radius: 2px;
+            box-shadow: 3px 3px 3px rgba(220, 220, 220, .2);
+            flex: 0 0 32.66%;
+            margin: .5rem 0;
+        }
+
+    }
 }
 
 /*
@@ -4847,6 +5120,10 @@ h2 + div.timeline {
 .message-directory,
 .message-submission {
     background: lighten($green-pastel, 2.5%);
+}
+
+.message-reservation_adjusted {
+    background: lighten($yellow-pastel, 2.5%);
 }
 
 .message-ticket_note {
@@ -6873,4 +7150,31 @@ pre code,
 code {
     padding: $code-padding-inline;
     display: inline;
+}
+
+// confirm scrollable list
+.confirm-list {
+    margin-bottom: 1rem;
+    max-height: 40vh;
+    overflow: auto;
+    padding: 10px;
+
+    ul {
+        margin-bottom: 0;
+    }
+}
+
+.button.alert.yes.disabled {
+    cursor: not-allowed !important;
+    opacity: .6;
+}
+
+.scroll-hint {
+    color: #8e1c26;
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+p.full-text-width {
+    max-width: 100% !important;
 }

@@ -6,11 +6,11 @@ from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.pas import _
-from onegov.pas.collections import ParliamentarianCollection
+from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.layouts.default import DefaultLayout
 
 
-class ParliamentarianCollectionLayout(DefaultLayout):
+class PASParliamentarianCollectionLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
@@ -46,11 +46,11 @@ class ParliamentarianCollectionLayout(DefaultLayout):
         return None
 
 
-class ParliamentarianLayout(DefaultLayout):
+class PASParliamentarianLayout(DefaultLayout):
 
     @cached_property
-    def collection(self) -> ParliamentarianCollection:
-        return ParliamentarianCollection(self.request.session)
+    def collection(self) -> PASParliamentarianCollection:
+        return PASParliamentarianCollection(self.request.session)
 
     @cached_property
     def title(self) -> str:

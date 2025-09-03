@@ -113,6 +113,12 @@ def get_create_new_organisation_factory(
     return create_new_organisation
 
 
+# NOTE: Feriennet doesn't need a citizen login
+@TranslatorDirectoryApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return False
+
+
 @TranslatorDirectoryApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     mine = utils.module_path('onegov.translator_directory', 'locale')

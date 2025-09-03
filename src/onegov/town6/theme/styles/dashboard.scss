@@ -2,6 +2,10 @@
     Dashboard
 */
 
+.boardlet-group .cell {
+    flex-grow: 1;
+}
+
 .boardlet {
     background: $white-smoke;
     border-top: 5px solid $primary_color;
@@ -68,6 +72,7 @@
 
         .fact-text {
             margin-left: .5rem;
+            width: 100%;
         }
     }
 }

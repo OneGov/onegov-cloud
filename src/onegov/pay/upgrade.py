@@ -4,6 +4,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from __future__ import annotations
 
+
 from onegov.core.upgrade import upgrade_task
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -51,3 +52,21 @@ def add_enabled_to_payment_providers(context: UpgradeContext) -> None:
             column=Column('enabled', Boolean, nullable=False),
             default=True
         )
+
+
+@upgrade_task('Add invoiced state to payments')
+def add_invoiced_state_to_payments(context: UpgradeContext) -> None:
+    if context.has_table('payments'):
+        # On one of the instances this upgrade step failed (ogc-2335)
+        # Solution: We end the current transaction first
+        # before altering the type
+
+        # End current transaction
+        context.operations.execute('COMMIT')
+
+        context.operations.execute(
+            "ALTER TYPE payment_state ADD VALUE IF NOT EXISTS 'invoiced'"
+        )
+
+        # Start new transaction
+        context.operations.execute('BEGIN')

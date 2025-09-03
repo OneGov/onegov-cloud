@@ -52,6 +52,11 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
     #: the name of the attribute (e.g. `membership.title`).
     export_fields: dict_property[list[str]] = meta_property(default=list)
 
+    #: IDs used for audm synchronisation
+    #: Use organization path as unique identifier since AUDM lacks external IDs
+    #: This is the name of all parent organisations joined
+    organisation_path: dict_property[str | None] = meta_property()
+
     #: The PDF for the agency and all its suborganizations.
     pdf = associated(AgencyPdf, 'pdf', 'one-to-one')
 

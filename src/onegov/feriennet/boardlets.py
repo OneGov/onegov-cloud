@@ -8,8 +8,9 @@ from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import BillingCollection, MatchCollection
 from onegov.feriennet.exports.unlucky import UnluckyExport
 from onegov.feriennet.layout import DefaultLayout
-from onegov.org.boardlets import TicketBoardlet, EditedTopicsBoardlet, \
-    EditedNewsBoardlet, PlausibleStats, PlausibleTopPages
+from onegov.org.boardlets import (
+    EditedTopicsBoardlet, EditedNewsBoardlet, PlausibleStats,
+    PlausibleTopPages, TicketBoardlet)
 from onegov.org.models import Boardlet, BoardletFact
 from sqlalchemy import func
 
@@ -17,7 +18,7 @@ from sqlalchemy import func
 from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from onegov.activity.models import PeriodMeta
+    from onegov.activity.models import BookingPeriodMeta
     from onegov.activity.models.booking import BookingState
     from onegov.feriennet.collections.match import OccasionState
     from onegov.feriennet.request import FeriennetRequest
@@ -33,7 +34,7 @@ class FeriennetBoardlet(Boardlet):
         return self.request.session
 
     @cached_property
-    def period(self) -> PeriodMeta | None:
+    def period(self) -> BookingPeriodMeta | None:
         return self.request.app.active_period
 
     @cached_property

@@ -40,6 +40,9 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
 
     external_user_id: dict_property[str | None] = meta_property()
 
+    # miscField50
+    staff_number: dict_property[str | None] = meta_property()
+
     @property
     def es_suggestion(self) -> tuple[str, ...]:
         suffix = f' ({self.function})' if self.function else ''

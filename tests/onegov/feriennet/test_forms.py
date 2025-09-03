@@ -8,9 +8,9 @@ from webob.multidict import MultiDict
 from onegov.activity import ActivityCollection
 from onegov.activity import AttendeeCollection
 from onegov.activity import BookingCollection
-from onegov.activity import InvoiceCollection
+from onegov.activity import BookingPeriodCollection
+from onegov.activity import BookingPeriodInvoiceCollection
 from onegov.activity import OccasionCollection
-from onegov.activity import PeriodCollection
 from onegov.core.utils import Bunch
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.forms import NotificationTemplateSendForm, PeriodForm
@@ -40,13 +40,13 @@ def create_form(session, confirmable, start, delta=None):
         ('execution_end', iter_start())
     ]))
     form.request = Bunch(translate=lambda txt: txt, include=lambda src: None)
-    form.model = PeriodCollection(session)
+    form.model = BookingPeriodCollection(session)
     return form
 
 
 def add_period_by_form(form, session):
     # add the period like in view name='new'
-    return PeriodCollection(session).add(
+    return BookingPeriodCollection(session).add(
         title=form.title.data,
         prebooking=form.prebooking,
         booking=form.booking,
@@ -163,7 +163,7 @@ def test_vacation_activity_form(session, test_password):
 def test_notification_template_send_form(session):
     activities = ActivityCollection(session, type='vacation')
     attendees = AttendeeCollection(session)
-    periods = PeriodCollection(session)
+    periods = BookingPeriodCollection(session)
     occasions = OccasionCollection(session)
     bookings = BookingCollection(session)
 
@@ -245,7 +245,11 @@ def test_notification_template_send_form(session):
 
     # create a mock request
     def invoice_collection(user_id=None, period_id=None):
-        return InvoiceCollection(session, user_id=user_id, period_id=period_id)
+        return BookingPeriodInvoiceCollection(
+            session,
+            user_id=user_id,
+            period_id=period_id
+        )
 
     def request(admin):
         return Bunch(
