@@ -3,19 +3,14 @@ import json
 from webtest import Upload
 
 
-from typing import Any
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from webtest.response import TestResponse
 
 
-
-@pytest.mark.flaky(reruns=5, only_rerun=None)
-def test_views_manage(client_with_es):
-    client = client_with_es
-    client.login_admin()
-
-    settings = client.get('/').click('PAS Einstellungen')
-    delete = []
-
-    # Rate Sets
+def add_rate_set(settings: 'TestResponse', delete: list['TestResponse']) -> None:
+    """Adds a rate set via the UI."""
     page = settings.click('Sätze')
     page = page.click(href='new')
     page.form['year'] = 2024
@@ -48,6 +43,17 @@ def test_views_manage(client_with_es):
     page = page.form.submit().follow()
     assert '2%' in page
     delete.append(page)
+
+
+@pytest.mark.flaky(reruns=5, only_rerun=None)
+def test_views_manage(client_with_es):
+    client = client_with_es
+    client.login_admin()
+
+    settings = client.get('/').click('PAS Einstellungen')
+    delete = []
+
+    add_rate_set(settings, delete)
 
     # Legislative Periods
     page = settings.click('Legislaturen')
@@ -472,39 +478,7 @@ def test_simple_attendence_add(client):
     settings = client.get('/').click('PAS Einstellungen')
     delete = []
 
-    # Rate Sets
-    page = settings.click('Sätze')
-    page = page.click(href='new')
-    page.form['year'] = 2024
-    page.form['cost_of_living_adjustment'] = 1
-    page.form['plenary_none_president_halfday'] = 1
-    page.form['plenary_none_member_halfday'] = 1
-    page.form['commission_normal_president_initial'] = 1
-    page.form['commission_normal_president_additional'] = 1
-    page.form['study_normal_president_halfhour'] = 1
-    page.form['commission_normal_member_initial'] = 1
-    page.form['commission_normal_member_additional'] = 1
-    page.form['study_normal_member_halfhour'] = 1
-    page.form['commission_intercantonal_president_halfday'] = 1
-    page.form['study_intercantonal_president_hour'] = 1
-    page.form['commission_intercantonal_member_halfday'] = 1
-    page.form['study_intercantonal_member_hour'] = 1
-    page.form['commission_official_president_halfday'] = 1
-    page.form['commission_official_president_fullday'] = 1
-    page.form['study_official_president_halfhour'] = 1
-    page.form['commission_official_vice_president_halfday'] = 1
-    page.form['commission_official_vice_president_fullday'] = 1
-    page.form['study_official_member_halfhour'] = 1
-    page.form['shortest_all_president_halfhour'] = 1
-    page.form['shortest_all_member_halfhour'] = 1
-    page = page.form.submit().follow()
-    assert 'CHF 1.-' in page
-
-    page = page.click('Bearbeiten')
-    page.form['cost_of_living_adjustment'] = 2
-    page = page.form.submit().follow()
-    assert '2%' in page
-    delete.append(page)
+    add_rate_set(settings, delete)
 
     # Legislative Periods
     page = settings.click('Legislaturen')
