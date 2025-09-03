@@ -86,7 +86,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
             and self.commission_id.data
             and self.parliamentarian_id.data
         ):
-            collection = PASParliamentarianCollection(self.request.session)
+            collection = PASParliamentarianCollection(self.request.app)
             parliamentarian = collection.by_id(self.parliamentarian_id.data)
             if parliamentarian:
                 commission_ids = [
@@ -130,7 +130,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
         self.parliamentarian_id.choices = [
             (str(parliamentarian.id), parliamentarian.title)
             for parliamentarian
-            in PASParliamentarianCollection(self.request.session).query()
+            in PASParliamentarianCollection(self.request.app).query()
         ]
         self.commission_id.choices = [
             (commission.id, commission.title)
@@ -147,7 +147,7 @@ class AttendenceAddForm(AttendenceForm):
         self.parliamentarian_id.choices = [
             (str(parliamentarian.id), parliamentarian.title)
             for parliamentarian in PASParliamentarianCollection(
-                self.request.session, [True]).query()
+                self.request.app, active=[True]).query()
         ]
 
 
@@ -179,7 +179,7 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
             (str(parliamentarian.id), parliamentarian.title)
             for parliamentarian
             in PASParliamentarianCollection(
-                self.request.session, [True]).query()
+                self.request.app, active=[True]).query()
         ]
         self.parliamentarian_id.data = [
             choice[0] for choice in self.parliamentarian_id.choices

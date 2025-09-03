@@ -7,6 +7,7 @@ from onegov.pas import _
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import ChangeCollection
 from onegov.user import Auth
+from onegov.user import UserCollection
 from onegov.pas.models import SettlementRun, RateSet
 
 from typing import TYPE_CHECKING
@@ -59,6 +60,10 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
                         _('More settings'),
                         request.link(request.app.org, 'settings'),
                         attrs={'class': 'settings'}
+                    ),
+                    Link(
+                        _('Users'), request.class_link(UserCollection),
+                        attrs={'class': 'user'}
                     ),
                 )
             )

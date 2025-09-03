@@ -2,6 +2,7 @@ from onegov.pas.custom import get_global_tools
 from onegov.pas.custom import get_top_navigation
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
+
 from onegov.core.utils import Bunch
 
 
@@ -59,6 +60,6 @@ def test_app_custom(pas_app):
     assert as_text(get_global_tools(request)) == [
         {'Peter': ['Logout']},
         {'Management': [
-            'Attendences', 'Changes', 'PAS settings', 'More settings'
+            'Attendences', 'Changes', 'PAS settings', 'More settings', 'Users'
         ]}
     ]

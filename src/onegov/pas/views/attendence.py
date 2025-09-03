@@ -44,7 +44,6 @@ def view_attendences(
     model=AttendenceCollection,
     name='new',
     template='form.pt',
-    permission=Private,
     form=AttendenceAddForm
 )
 def add_attendence(
@@ -75,7 +74,6 @@ def add_attendence(
     model=AttendenceCollection,
     name='new-bulk',
     template='form.pt',
-    permission=Private,
     form=AttendenceAddPlenaryForm
 )
 def add_plenary_attendence(
@@ -130,7 +128,6 @@ def view_attendence(
     model=Attendence,
     name='edit',
     template='form.pt',
-    permission=Private,
     form=AttendenceForm
 )
 def edit_attendence(
@@ -162,7 +159,6 @@ def edit_attendence(
 @PasApp.view(
     model=Attendence,
     request_method='DELETE',
-    permission=Private
 )
 def delete_attendence(
     self: Attendence,

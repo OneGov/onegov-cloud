@@ -714,3 +714,42 @@ msgstr "Abrechnungen nach Parlamentarier:in"
 
 msgid "Total all parties"
 msgstr "Total Alle Parteien"
+
+msgid "Administrator"
+msgstr "Administrator"
+
+msgid "Administrators"
+msgstr "Administratoren"
+
+msgid "Editor"
+msgstr "Editor"
+
+msgid "Editors"
+msgstr "Editoren"
+
+msgid "Member"
+msgstr "Mitglied"
+
+msgid "Members"
+msgstr "Mitglieder"
+
+msgid "Parliamentarian"
+msgstr "Parlamentarier:in"
+
+msgid "Parliamentarians"
+msgstr "Parlamentarier:innen"
+
+msgid "Admin"
+msgstr "Administrator"
+
+msgid "Edit User"
+msgstr "Benutzer bearbeiten"
+
+msgid "User successfully edited"
+msgstr "Benutzer erfolgreich bearbeitet"
+
+msgid "Users"
+msgstr "Benutzer"
+
+msgid "Personal Information"
+msgstr "Persönliche Informationen"

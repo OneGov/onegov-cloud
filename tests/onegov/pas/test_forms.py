@@ -21,7 +21,7 @@ from onegov.pas.forms import SettlementRunForm
 from onegov.pas.models import RateSet
 from onegov.pas.models import SettlementRun
 from pytest import fixture
-
+from tests.onegov.pas.conftest import DummyApp
 
 
 class DummyPostData(dict):
@@ -44,7 +44,8 @@ def dummy_request(session):
             sentry_dsn=None,
             version='1.0',
             websockets_client_url=lambda x: x,
-            websockets_private_channel=None
+            websockets_private_channel=None,
+            session=lambda: session
         ),
         include=lambda x: x,
         is_manager=True,
@@ -55,7 +56,8 @@ def dummy_request(session):
 
 @freeze_time('2024-01-01')
 def test_attendence_forms(session, dummy_request):
-    parliamentarians = PASParliamentarianCollection(session)
+
+    parliamentarians = PASParliamentarianCollection(DummyApp(session=session))
     parliamentarian = parliamentarians.add(first_name='a', last_name='b')
     parliamentarians.add(first_name='p', last_name='q')
 
@@ -174,7 +176,7 @@ def test_attendence_forms(session, dummy_request):
 
 @freeze_time('2024-01-01')
 def test_add_plenary_attendence_form(session, dummy_request):
-    parliamentarians = PASParliamentarianCollection(session)
+    parliamentarians = PASParliamentarianCollection(DummyApp(session=session))
     parliamentarian = parliamentarians.add(first_name='a', last_name='b')
     parliamentarians.add(first_name='p', last_name='q')
 
@@ -202,7 +204,8 @@ def test_add_plenary_attendence_form(session, dummy_request):
 
 @freeze_time('2024-01-01')
 def test_add_commission_attendence_form(session, dummy_request):
-    parliamentarians = PASParliamentarianCollection(session)
+
+    parliamentarians = PASParliamentarianCollection(DummyApp(session=session))
     parliamentarian = parliamentarians.add(first_name='a', last_name='b')
     parliamentarians.add(first_name='p', last_name='q')
 
@@ -239,7 +242,7 @@ def test_add_commission_attendence_form(session, dummy_request):
 
 @freeze_time('2024-01-01')
 def test_commission_membership_forms(session, dummy_request):
-    parliamentarians = PASParliamentarianCollection(session)
+    parliamentarians = PASParliamentarianCollection(DummyApp(session=session))
     parliamentarian = parliamentarians.add(first_name='a', last_name='b')
     parliamentarians.add(first_name='p', last_name='q')
 
@@ -268,7 +271,7 @@ def test_commission_membership_forms(session, dummy_request):
 
 
 def test_parliamentarian_role_form(session, dummy_request):
-    parliamentarians = PASParliamentarianCollection(session)
+    parliamentarians = PASParliamentarianCollection(DummyApp(session=session))
     parliamentarians.add(first_name='p', last_name='q')
 
     groups = PASParliamentaryGroupCollection(session)

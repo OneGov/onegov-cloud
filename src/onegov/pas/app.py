@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+from functools import cached_property
 from onegov.core.utils import module_path
 from onegov.pas.content import create_new_organisation
 from onegov.pas.custom import get_global_tools
 from onegov.pas.custom import get_top_navigation
+from onegov.pas.request import PasRequest
 from onegov.pas.theme import PasTheme
 from onegov.town6 import TownApp
 from onegov.town6.app import get_i18n_localedirs as get_i18n_localedirs_base
+
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -17,7 +20,7 @@ if TYPE_CHECKING:
 
 
 class PasApp(TownApp):
-    pass
+    request_class = PasRequest
 
 
 @PasApp.setting(section='org', name='create_new_organisation')
@@ -26,7 +29,7 @@ def get_create_new_organisation_factory(
     return create_new_organisation
 
 
-# NOTE: Feriennet doesn't need a citizen login
+# NOTE: PAS doesn't need a citizen login
 @PasApp.setting(section='org', name='citizen_login_enabled')
 def get_citizen_login_enabled() -> bool:
     return False

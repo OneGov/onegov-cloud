@@ -50,7 +50,7 @@ class PASParliamentarianLayout(DefaultLayout):
 
     @cached_property
     def collection(self) -> PASParliamentarianCollection:
-        return PASParliamentarianCollection(self.request.session)
+        return PASParliamentarianCollection(self.request.app)
 
     @cached_property
     def title(self) -> str:
@@ -114,20 +114,6 @@ class PASParliamentarianLayout(DefaultLayout):
                             )
                         )
                     )
-                ),
-                LinkGroup(
-                    title=_('Export'),
-                    links=[
-                        Link(
-                            text=_('CSV billing export'),
-                            url=self.request.link(
-                                self.model,
-                                'csv-billing-export',
-                                query_params={'format': 'csv'},
-                            ),
-                            attrs={'class': 'csv-billing-export'}
-                        ),
-                    ]
                 ),
             ]
         return None
