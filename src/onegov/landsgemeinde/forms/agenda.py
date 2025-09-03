@@ -11,10 +11,11 @@ from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.layouts import DefaultLayout
-from onegov.landsgemeinde.models import AgendaItem
+from onegov.landsgemeinde.models import AgendaItem, LandsgemeindeFile
 from onegov.landsgemeinde.models.agenda import STATES
 from onegov.landsgemeinde.utils import timestamp_to_seconds
 from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.fields import UploadMultipleFilesWithORMSupport
 from sqlalchemy import func
 from wtforms.fields import BooleanField
 from wtforms.fields import IntegerField
@@ -83,6 +84,12 @@ class AgendaItemForm(NamedFileForm):
             NumberRange(min=1),
             Optional()
         ],
+    )
+
+    more_files = UploadMultipleFilesWithORMSupport(
+        label=_('Additional documents'),
+        fieldset=_('Documents'),
+        file_class=LandsgemeindeFile,
     )
 
     start_time = TimeField(
