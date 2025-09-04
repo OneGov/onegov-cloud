@@ -4,11 +4,12 @@ from onegov.core.elements import Link
 from onegov.org.custom import logout_path
 from onegov.org.elements import LinkGroup
 from onegov.pas import _
-from onegov.pas.collections import AttendanceCollection
+from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import ChangeCollection
 from onegov.user import Auth
 from onegov.pas.models import SettlementRun, RateSet
 from sqlalchemy.orm.exc import MultipleResultsFound
+
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -59,7 +60,7 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
             management_links.extend((
                 Link(
                     _('Attendances'),
-                    request.class_link(AttendanceCollection),
+                    request.class_link(AttendenceCollection),
                     attrs={'class': 'attendances'}
                 ),
                 Link(
