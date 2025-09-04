@@ -260,12 +260,14 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
     political_business = relationship(
         'PoliticalBusiness',
         back_populates='participants',
+        lazy='joined',
     )
 
     #: the related parliamentarian
     parliamentarian: relationship[RISParliamentarian] = relationship(
         'RISParliamentarian',
         back_populates='political_businesses',
+        lazy='joined',
     )
 
     def __repr__(self) -> str:

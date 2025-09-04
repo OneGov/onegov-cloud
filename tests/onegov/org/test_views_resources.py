@@ -2842,6 +2842,13 @@ def test_manual_reservation_payment_with_one_off_extra(client):
     assert "40.00" in payments
     assert "Offen" in payments
 
+    invoices = client.get('/invoices')
+    assert "RSV-" in invoices
+    assert "info@example.org" in invoices
+    assert "40.00" in invoices
+    assert "Unbezahlt" in invoices
+    assert "Unfakturiert" in invoices
+
     # add a manual discount
     item = invoice.click('Abzug / Zuschlag')
     item.form['booking_text'] = 'Gratis'
@@ -3002,6 +3009,13 @@ def test_manual_reservation_payment_with_per_item_extra(client):
     assert "100.00" in payments
     assert "Offen" in payments
 
+    invoices = client.get('/invoices')
+    assert "RSV-" in invoices
+    assert "info@example.org" in invoices
+    assert "100.00" in invoices
+    assert "Unbezahlt" in invoices
+    assert "Unfakturiert" in invoices
+
     # adding another new reservation should fail
     # since we used up all of the quota
     add_page = page.click('Reservation hinzufügen')
@@ -3077,6 +3091,13 @@ def test_manual_reservation_payment_with_per_hour_extra(client):
     assert "39.00" in payments
     assert "Offen" in payments
 
+    invoices = client.get('/invoices')
+    assert "RSV-" in invoices
+    assert "info@example.org" in invoices
+    assert "39.00" in invoices
+    assert "Unbezahlt" in invoices
+    assert "Unfakturiert" in invoices
+
 
 @freeze_time("2017-07-09", tick=True)
 def test_manual_reservation_payment_without_extra(client):
@@ -3130,6 +3151,13 @@ def test_manual_reservation_payment_without_extra(client):
     assert "info@example.org" in payments
     assert "20.00" in payments
     assert "Offen" in payments
+
+    invoices = client.get('/invoices')
+    assert "RSV-" in invoices
+    assert "info@example.org" in invoices
+    assert "20.00" in invoices
+    assert "Unbezahlt" in invoices
+    assert "Unfakturiert" in invoices
 
 
 @freeze_time("2017-07-09", tick=True)
@@ -3200,6 +3228,13 @@ def test_manual_reservation_payment_with_discount(client):
     assert "info@example.org" in payments
     assert "10.00" in payments
     assert "Offen" in payments
+
+    invoices = client.get('/invoices')
+    assert "RSV-" in invoices
+    assert "info@example.org" in invoices
+    assert "10.00" in invoices
+    assert "Unbezahlt" in invoices
+    assert "Unfakturiert" in invoices
 
 
 def test_allocation_rules_on_rooms(client):

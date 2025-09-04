@@ -3,13 +3,15 @@ from __future__ import annotations
 from onegov.core.security import Private
 from onegov.form import merge_forms
 from onegov.org.views.payment import (
-    export_payments, handle_batch_set_payment_state, view_payments)
-from onegov.town6 import TownApp
-from onegov.org.forms.payments_search_form import PaymentSearchForm
-from onegov.org.forms import DateRangeForm, ExportForm
-
+    export_payments, handle_batch_set_payment_state,
+    view_invoices, view_payments)
+from onegov.org.forms import (
+    DateRangeForm, ExportForm, PaymentSearchForm, TicketInvoiceSearchForm)
 from onegov.pay import PaymentCollection
-from onegov.town6.layout import PaymentCollectionLayout
+from onegov.ticket import TicketInvoiceCollection
+from onegov.town6 import TownApp
+from onegov.town6.layout import (
+    PaymentCollectionLayout, TicketInvoiceCollectionLayout)
 
 
 from typing import TYPE_CHECKING
@@ -34,6 +36,21 @@ def town_view_payments(
 ) -> RenderData | Response:
     layout = PaymentCollectionLayout(self, request)
     return view_payments(self, request, form, layout)
+
+
+@TownApp.form(
+    model=TicketInvoiceCollection,
+    template='invoices.pt',
+    form=TicketInvoiceSearchForm,
+    permission=Private
+)
+def town_view_invoices(
+    self: TicketInvoiceCollection,
+    request: TownRequest,
+    form: TicketInvoiceSearchForm
+) -> RenderData | Response:
+    layout = TicketInvoiceCollectionLayout(self, request)
+    return view_invoices(self, request, form, layout)
 
 
 @TownApp.json(

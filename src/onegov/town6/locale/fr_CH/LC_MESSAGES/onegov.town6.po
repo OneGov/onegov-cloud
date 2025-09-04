@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-09-01 11:54+0200\n"
+"POT-Creation-Date: 2025-09-04 11:56+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -624,8 +624,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
-"Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
+"« Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -693,6 +693,27 @@ msgstr "Cet album ne contient pas encore d'images."
 
 msgid "No photo albums defined yet."
 msgstr "Aucun album photo défini pour le moment."
+
+msgid "No invoices yet."
+msgstr "Pas encore de factures."
+
+msgid "Batch Action"
+msgstr "Action par lot"
+
+msgid "Mark as Invoiced"
+msgstr "Marquer comme facturé"
+
+msgid "Mark as Uninvoiced"
+msgstr "Marquer comme non facturé"
+
+msgid "Mark as Paid"
+msgstr "Marquer comme payé"
+
+msgid "Mark as Unpaid"
+msgstr "Marquer comme non payé"
+
+msgid "Apply to selected"
+msgstr "Appliquer aux sélectionnés"
 
 msgid "Search term"
 msgstr "Terme de recherche"
@@ -812,6 +833,9 @@ msgstr "Entrée précédente"
 
 msgid "Next Entry"
 msgstr "Entrée suivante"
+
+msgid "Content"
+msgstr "Contenu"
 
 msgid "Invoice Items"
 msgstr "Postes de facture"
@@ -1118,6 +1142,18 @@ msgstr "Créé"
 msgid "Disbursed"
 msgstr "Décaissé"
 
+msgid "Select this payment"
+msgstr "Sélectionnez ce paiement"
+
+msgid "Select this invoice"
+msgstr "Sélectionnez cette facture"
+
+msgid "Uninvoiced"
+msgstr "Non facturé"
+
+msgid "Unpaid"
+msgstr "Non payé"
+
 msgid "Find Your Spot"
 msgstr "Rechercher les dates / Réservations récurrentes"
 
@@ -1150,9 +1186,6 @@ msgstr "Pas une publication"
 
 msgid "Digital seal"
 msgstr "Sceau électronique"
-
-msgid "Content"
-msgstr "Contenu"
 
 msgid "1 page"
 msgstr "1 page"
@@ -1276,9 +1309,6 @@ msgstr "Remises / Suppléments"
 msgid "Lump sum"
 msgstr "Montant forfaitaire"
 
-msgid "Unpaid"
-msgstr "Non payé"
-
 msgid "Total"
 msgstr "Total"
 
@@ -1287,8 +1317,8 @@ msgstr "Bonjour"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Votre adresse e-mail vient d'être utilisée pour créer un compte sur "
-"${homepage}."
+"Votre adresse e-mail vient d'être utilisée pour créer un compte sur $"
+"{homepage}."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Pour activer votre compte, cliquer sur confirmer ci-dessous:"
@@ -1472,14 +1502,14 @@ msgid "${author} wrote"
 msgstr "${author} a écrit"
 
 msgid ""
-"This is the notification for notes on reservations for ${request.app.org."
-"title}. If you no longer want to receive this e-mail please contact an "
-"administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
-"Il s'agit de la notification de notes sur les réservations pour ${request."
-"app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, veuillez "
-"contacter un administrateur afin qu'il puisse vous retirer de la liste des "
-"destinataires."
+"Il s'agit de la notification de notes sur les réservations pour $"
+"{request.app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, "
+"veuillez contacter un administrateur afin qu'il puisse vous retirer de la "
+"liste des destinataires."
 
 msgid "Pending approval"
 msgstr "En attente d'approbation"
@@ -1498,8 +1528,8 @@ msgid ""
 "no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Ceci est une notification pour les nouvelles réservations de "
-"${organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
+"Ceci est une notification pour les nouvelles réservations de $"
+"{organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
 "veuillez contacter un administrateur afin qu'il vous retire de la liste des "
 "destinataires."
 
@@ -1602,8 +1632,8 @@ msgid ""
 "you no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Il s'agit d'une notification concernant les réservations rejetées pour "
-"${organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
+"Il s'agit d'une notification concernant les réservations rejetées pour $"
+"{organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
 "veuillez contacter un administrateur afin qu'il vous retire de la liste des "
 "destinataires."
 
@@ -2068,21 +2098,6 @@ msgstr "Exporter l'exécution de la facture au format PDF"
 
 msgid "No payments yet."
 msgstr "Pas de paiements pour le moment."
-
-msgid "Batch Action"
-msgstr "Action par lot"
-
-msgid "Mark as Invoiced"
-msgstr "Marquer comme facturé"
-
-msgid "Mark as Paid"
-msgstr "Marquer comme payé"
-
-msgid "Mark as Unpaid"
-msgstr "Marquer comme non payé"
-
-msgid "Apply to selected"
-msgstr "Appliquer aux sélectionnés"
 
 msgid "Select organisation"
 msgstr "Sélectionner une organisation"

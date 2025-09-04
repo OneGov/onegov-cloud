@@ -10,6 +10,7 @@ from onegov.pay.utils import Price
 from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import select
+from sqlalchemy import Boolean
 from sqlalchemy import CheckConstraint
 from sqlalchemy import Column
 from sqlalchemy import Text
@@ -72,6 +73,14 @@ class Invoice(Base, TimestampMixin):
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
+    )
+
+    #: true if invoiced
+    invoiced: Column[bool] = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+        index=True,
     )
 
     #: the specific items linked with this invoice

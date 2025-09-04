@@ -32,7 +32,7 @@ def get_template_variables(request: FeriennetRequest) -> RenderData:
 def get_global_tools(
     request: FeriennetRequest
 ) -> Iterator[Link | LinkGroup]:
-    yield from get_base_tools(request)
+    yield from get_base_tools(request, invoicing=False)
     yield from get_personal_tools(request)
     yield from get_admin_tools(request)
 
