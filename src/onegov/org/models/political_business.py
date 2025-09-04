@@ -260,6 +260,7 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
     political_business = relationship(
         'PoliticalBusiness',
         back_populates='participants',
+        lazy='joined',
     )
 
     #: the related parliamentarian
