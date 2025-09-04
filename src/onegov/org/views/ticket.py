@@ -41,7 +41,6 @@ from onegov.org.models import (
     ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter, ReservationHandler
-from onegov.org.models.ticket import apply_ticket_permissions
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.utils import get_current_tickets_url, group_invoice_items
 from onegov.org.views.message import view_messages_feed
@@ -54,7 +53,7 @@ from onegov.ticket.errors import InvalidStateChange
 from onegov.gever.gever_client import GeverClientCAS
 from onegov.user import User, UserCollection
 from operator import itemgetter
-from sqlalchemy import func, select
+from sqlalchemy import select
 from webob import exc
 from urllib.parse import urlsplit
 
@@ -1527,20 +1526,9 @@ def get_submitters(
 def groups_by_handler_code(
     self: TicketCollection | ArchivedTicketCollection
 ) -> dict[str, list[str]]:
-    query = self.session.query(
-        Ticket.handler_code,
-        func.array_agg(Ticket.group.distinct())
-    ).group_by(Ticket.handler_code)
-
-    # HACK: only apply the ticket permissions filter if there is request
-    #       attribute on the collection. This is a bit fragile, ideally
-    #       we turn this back into a method on `TicketCollection`.
-    if hasattr(self, 'request'):
-        query = apply_ticket_permissions(query, 'ALL', self.request)
-
     return {
         handler_code: sorted(groups, key=normalize_for_url)
-        for handler_code, groups in query
+        for handler_code, groups in self.groups_by_handler_code()
     }
 
 

@@ -4785,6 +4785,14 @@ ul.recipients {
 /*
     Invoices table
 */
+#ticket_group_chosen .chosen-results {
+
+    .ticket-group-filter {
+        font-weight: normal;
+        margin-left: 1.4rem;
+    }
+}
+
 .invoices-table {
     width: 100%;
 
