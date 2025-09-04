@@ -4781,6 +4781,54 @@ ul.recipients {
 }
 
 /*
+    Invoices table
+*/
+.invoices-table {
+    width: 100%;
+
+    tr.paid {
+        &.uninvoiced .invoiced-state {
+            color: get-color(warning);
+            filter: grayscale(1);
+        }
+        &.invoiced .invoiced-state, .paid-state {
+            color: get-color(success);
+        }
+    }
+
+    tr.unpaid.invoiced {
+        .invoiced-state {
+            color: get-color(success);
+        }
+        .paid-state {
+            color: get-color(warning);
+        }
+    }
+
+    tr.unpaid.uninvoiced {
+        .invoiced-state {
+            color: get-color(alert);
+        }
+        .paid-state {
+            color: get-color(warning);
+            filter: grayscale(1);
+        }
+    }
+
+    .invoiced-state, .paid-state {
+        font-size: 1.25rem;
+        text-align: center;
+        white-space: nowrap;
+        width: 1%;
+    }
+
+    td {
+        padding-right: 5px;
+        vertical-align: top;
+    }
+}
+
+/*
     Invoice
 */
 .invoice-items {
