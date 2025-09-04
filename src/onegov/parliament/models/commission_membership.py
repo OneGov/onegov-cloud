@@ -115,7 +115,8 @@ class CommissionMembership(Base, TimestampMixin):
     #: the related parliamentarian (which may have any number of memberships)
     parliamentarian: relationship[Parliamentarian] = relationship(
         'Parliamentarian',
-        back_populates='commission_memberships'
+        back_populates='commission_memberships',
+        lazy='joined',
     )
 
     def __repr__(self) -> str:
