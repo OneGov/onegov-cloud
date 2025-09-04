@@ -1,8 +1,48 @@
 # Changes
 
+## 2025.47
+
+`2025-09-04` | [acdb4252ef...53a86818aa](https://github.com/OneGov/onegov-cloud/compare/acdb4252ef^...53a86818aa)
+
+### Org
+
+##### Improves robustness of Kaba key revocation
+
+Previously it was possible for a `KeyError` to be emitted, which would
+have been caught by the views, since they do a `clients[site_id]`, even
+though it definitely should not have been caught.
+
+`Bugfix` | [OGC-2579](https://linear.app/onegovcloud/issue/OGC-2579) | [acdb4252ef](https://github.com/onegov/onegov-cloud/commit/acdb4252efccdbaab6351f2818a527a2fea5cffb)
+
+### Pas
+
+##### Adds default start date for commission.
+
+`Feature` | [OGC-2591](https://linear.app/onegovcloud/issue/OGC-2591) | [20a477612e](https://github.com/onegov/onegov-cloud/commit/20a477612e4bb5b7f302e9479824c7e355036e1d)
+
+### Town6
+
+##### Table
+
+Add scroll to tables wider than the content, remove margin from p in table
+
+`Feature` | [OGC-2270](https://linear.app/onegovcloud/issue/OGC-2270) | [f5a9883bd0](https://github.com/onegov/onegov-cloud/commit/f5a9883bd0dc47a2e7ed0567e4070d9f64d01850)
+
+##### Content-sidebar
+
+Only show content sidebar if there are more than 2 subtitles
+
+`Feature` | [1398ba2dd0](https://github.com/onegov/onegov-cloud/commit/1398ba2dd07d466d7b069392547befef62b342e0)
+
+##### Agenda item files
+
+File upload for additional files
+
+`Feature` | [OGC-2269](https://linear.app/onegovcloud/issue/OGC-2269) | [850949b51c](https://github.com/onegov/onegov-cloud/commit/850949b51cd78b467d6eab82acc6431b25c631c5)
+
 ## 2025.46
 
-`2025-09-02` | [c01adb76b6...d2a37ed20f](https://github.com/OneGov/onegov-cloud/compare/c01adb76b6^...d2a37ed20f)
+`2025-09-02` | [c01adb76b6...57240da96f](https://github.com/OneGov/onegov-cloud/compare/c01adb76b6^...57240da96f)
 
 **Upgrade hints**
 - onegov-org --select /onegov_town6/wil ris-wil-meetings-fix-audio-links
@@ -2152,32 +2192,4 @@ Restyle the sidebar-toggler so it is fixed to the bottom and more visible.
 ##### API For News and Events
 
 `Feature` | [OGC-1950](https://linear.app/onegovcloud/issue/OGC-1950) | [e9e35cb967](https://github.com/onegov/onegov-cloud/commit/e9e35cb967ebcde1369507192ec1d56db9451a6a)
-
-## 2025.1
-
-`2025-01-09` | [4cbd81a1fe...fa75011145](https://github.com/OneGov/onegov-cloud/compare/4cbd81a1fe^...fa75011145)
-
-### Core
-
-##### Update stamp price
-
-`Feature` | [NONE](#NONE) | [e9bcdd74bc](https://github.com/onegov/onegov-cloud/commit/e9bcdd74bc4da984f533bde08d17e607f454d626)
-
-### Election Day
-
-##### Adds missing static entities for unit tests
-
-`Bugfix` | [NONE](#NONE) | [4cbd81a1fe](https://github.com/onegov/onegov-cloud/commit/4cbd81a1fecce0cf72a85082979017256f9fae88)
-
-### Electionday
-
-##### Adds municipality and map data for 2025
-
-`Feature` | [OGC-1953](https://linear.app/onegovcloud/issue/OGC-1953) | [db7d0c9304](https://github.com/onegov/onegov-cloud/commit/db7d0c93044bbc02b257555a1dc8fd044af78e8c)
-
-### Org
-
-##### Adds optional ordering by filename or caption to image sets
-
-`Feature` | [OGC-2000](https://linear.app/onegovcloud/issue/OGC-2000) | [f67e97d4ed](https://github.com/onegov/onegov-cloud/commit/f67e97d4ed357dccaee3008bc58544504b22b02d)
 
