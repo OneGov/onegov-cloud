@@ -37,7 +37,7 @@
                     </ul>
                 </div>
                 <div tal:condition="parliamentarian.commission_memberships">
-                    <h2 i18n:translate class="h3">Commissions</h2>
+                    <h2 i18n:translate class="h3">Commissions</h2>  
                     <ul class="more-list">
                         <li tal:repeat="membership parliamentarian.commission_memberships">
                             <div class="list-link">
@@ -61,12 +61,12 @@
                 <div tal:condition="parliamentarian.political_businesses">
                     <h2 i18n:translate class="h3">Political Businesses</h2>
                     <ul class="more-list">
-                        <li tal:repeat="business businesses">
-                            <a tal:attributes="href request.link(business.business)" class="list-link">
+                        <li tal:repeat="participation sorted(parliamentarian.political_businesses, key=lambda p: p.political_business.entry_date or layout.now(), reverse=True)">
+                            <a tal:attributes="href request.link(participation.political_business)" class="list-link">
                                 <span class="list-title">
-                                    ${business.title}
-                                        <span tal:condition="business.number|None">
-                                        (${business.number})
+                                    ${participation.political_business.title}
+                                    <span tal:condition="participation.political_business.number|None">
+                                        (${participation.political_business.number})
                                     </span>
                                 </span>
                             </a>
