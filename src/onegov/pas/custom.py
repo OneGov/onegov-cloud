@@ -4,7 +4,7 @@ from onegov.core.elements import Link
 from onegov.org.custom import logout_path
 from onegov.org.elements import LinkGroup
 from onegov.pas import _
-from onegov.pas.collections import AttendenceCollection
+from onegov.pas.collections import AttendanceCollection
 from onegov.pas.collections import ChangeCollection
 from onegov.user import Auth
 from onegov.pas.models import SettlementRun, RateSet
@@ -58,9 +58,9 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
 
             management_links.extend((
                 Link(
-                    _('Attendences'),
-                    request.class_link(AttendenceCollection),
-                    attrs={'class': 'attendences'}
+                    _('Attendances'),
+                    request.class_link(AttendanceCollection),
+                    attrs={'class': 'attendances'}
                 ),
                 Link(
                     _('Changes'),
