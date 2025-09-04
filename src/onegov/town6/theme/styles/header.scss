@@ -57,6 +57,7 @@ $payment-capture-icon: '\f09d';
 $payment-refund-icon: '\f0e2';
 $payment-provider-icon: '\f09d';
 $payments-icon: $payment-provider-icon;
+$invoice-icon: '\f1ea';
 $rule-link-icon: '\f085';
 $select-icon: '\f14a';
 $send-link-icon: '\f1d8';
@@ -174,6 +175,7 @@ $settings-icon: '\f1de';
     .users::before { @include icon-bold("\f0c0"); }
     .payment::before { @include icon($payments-icon); }
     .payment-provider::before { @include icon-bold($payment-provider-icon); }
+    .invoice::before { @include icon($invoice-icon); }
     .profile::before { @include icon("\f2bd"); }
     .management::before { @include icon-bold('\f013'); }
     .chats::before { @include icon-bold('\f086'); }

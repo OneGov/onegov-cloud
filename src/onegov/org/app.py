@@ -917,6 +917,11 @@ def mapbox_address_autofill() -> Iterator[str]:
     yield 'mapbox_address_autofill.js'
 
 
+@OrgApp.webasset('payments')
+def get_payments() -> Iterator[str]:
+    yield 'payments.js'
+
+
 @OrgApp.webasset('invoicing')
 def get_invoicing() -> Iterator[str]:
     yield 'invoicing.js'
