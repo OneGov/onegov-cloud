@@ -102,15 +102,15 @@ from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import FilteredArchivedTicketCollection
 from onegov.org.models.ticket import FilteredTicketCollection
 from onegov.page import PageCollection
-from onegov.pay import PaymentProvider, Payment, PaymentCollection
-from onegov.pay import PaymentProviderCollection
+from onegov.pay import Payment, PaymentCollection
+from onegov.pay import PaymentProvider, PaymentProviderCollection
 from onegov.people import Person, PersonCollection
 from onegov.qrcode import QrCode
 from onegov.reservation import Allocation
 from onegov.reservation import Reservation
 from onegov.reservation import Resource
 from onegov.reservation import ResourceCollection
-from onegov.ticket import Ticket, TicketCollection
+from onegov.ticket import Ticket, TicketCollection, TicketInvoiceCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, User, UserCollection
 from onegov.user import UserGroup, UserGroupCollection
@@ -941,6 +941,38 @@ def get_payments(
         ticket_end=ticket_end,
         reservation_start=reservation_start,
         reservation_end=reservation_end
+    )
+
+
+@OrgApp.path(
+    model=TicketInvoiceCollection,
+    path='/invoices',
+    converters={
+        'page': int,
+        'ticket_start': datetime_converter,
+        'ticket_end': datetime_converter,
+        'reservation_start': datetime_converter,
+        'reservation_end': datetime_converter,
+        'invoiced': bool,
+    }
+)
+def get_invoices(
+    app: OrgApp,
+    page: int = 0,
+    ticket_start: datetime | None = None,
+    ticket_end: datetime | None = None,
+    reservation_start: datetime | None = None,
+    reservation_end: datetime | None = None,
+    invoiced: bool | None = None,
+) -> TicketInvoiceCollection:
+    return TicketInvoiceCollection(
+        session=app.session(),
+        page=page,
+        ticket_start=ticket_start,
+        ticket_end=ticket_end,
+        reservation_start=reservation_start,
+        reservation_end=reservation_end,
+        invoiced=invoiced,
     )
 
 

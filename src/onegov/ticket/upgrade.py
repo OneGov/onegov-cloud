@@ -432,3 +432,17 @@ def add_new_invoice_columns(context: UpgradeContext) -> None:
         item.paid = payment.state == 'paid'
 
     context.session.flush()
+
+
+@upgrade_task('Add new invoice columns 2')
+def sadge(context: UpgradeContext) -> None:
+    from onegov.ticket import TicketInvoiceItem
+    for item in (
+        context.session.query(TicketInvoiceItem)
+        .filter(TicketInvoiceItem.group == 'migration')
+        .options(selectinload(TicketInvoiceItem.payments))
+    ):
+        if item.payments:
+            item.paid = item.payments[-1].state == 'paid'
+
+    context.session.flush()

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-09-01 16:34+0200\n"
+"POT-Creation-Date: 2025-09-04 11:50+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1130,22 +1130,22 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The limit cannot be lower than the already confirmed number of attendees "
-"(${claimed_spots})"
+"The limit cannot be lower than the already confirmed number of attendees ($"
+"{claimed_spots})"
 msgstr ""
-"La limite ne peut être inférieure au nombre de participants déjà confirmés "
-"(${claimed_spots})"
+"La limite ne peut être inférieure au nombre de participants déjà confirmés ($"
+"{claimed_spots})"
 
 #, python-format
 msgid ""
-"The limit cannot be lower than the already confirmed number attendees "
-"(${claimed_spots}) and the number of pending requests (${pending_requests}). "
+"The limit cannot be lower than the already confirmed number attendees ($"
+"{claimed_spots}) and the number of pending requests (${pending_requests}). "
 "Either enable the waiting list, process the pending requests or increase the "
 "limit. "
 msgstr ""
 "La limite ne peut pas être inférieure au nombre de participants déjà "
-"confirmés (${claims_spots}) et au nombre de demandes en attente "
-"(${pending_requests}). Activez la liste d'attente, traitez les demandes en "
+"confirmés (${claims_spots}) et au nombre de demandes en attente ($"
+"{pending_requests}). Activez la liste d'attente, traitez les demandes en "
 "attente ou augmentez la limite."
 
 msgid "The end date must be later than the start date"
@@ -1462,14 +1462,11 @@ msgstr "Groupe Parlementaire"
 msgid "Parliamentary group role"
 msgstr "Rôle dans le groupe parlementaire"
 
-msgid "From reservation date"
-msgstr "À partir de la date de réservation"
+msgid "Filter Invoices"
+msgstr "Filtrer les factures"
 
-msgid "Filter Payments"
-msgstr "Filtrer les paiements"
-
-msgid "To reservation date"
-msgstr "À la date de réservation"
+msgid "Uninvoiced"
+msgstr "Non facturé"
 
 msgid "Ticket created from date"
 msgstr "Ticket créé à partir de la date"
@@ -1482,6 +1479,18 @@ msgstr "Filtre les paiements par date de création de leur ticket associé."
 
 msgid "Ticket created to date"
 msgstr "Ticket créé à ce jour"
+
+msgid "From reservation date"
+msgstr "À partir de la date de réservation"
+
+msgid "Filter by Reservation Date"
+msgstr "Filtrer par date de réservation"
+
+msgid "To reservation date"
+msgstr "À la date de réservation"
+
+msgid "Filter Payments"
+msgstr "Filtrer les paiements"
 
 msgid "Payment Type"
 msgstr "Type de paiement"
@@ -2715,9 +2724,9 @@ msgid ""
 "Either choose a different date range or give this window a title to "
 "differenciate it from other windows."
 msgstr ""
-"L'intervalle de dates chevauche une fenêtre de soumission existante "
-"(${range}). Choisissez un autre intervalle de dates ou donnez un titre à "
-"cette fenêtre pour la différencier des autres fenêtres."
+"L'intervalle de dates chevauche une fenêtre de soumission existante ($"
+"{range}). Choisissez un autre intervalle de dates ou donnez un titre à cette "
+"fenêtre pour la différencier des autres fenêtres."
 
 msgid "Short name to identify the text module"
 msgstr "Nom court pour identifier le module de texte"
@@ -3269,6 +3278,12 @@ msgstr "Opérateurs de paiement"
 msgid "Synchronise"
 msgstr "Synchroniser"
 
+msgid "Invoices"
+msgstr "Factures"
+
+msgid "Export Bill run as PDF"
+msgstr "Exporter l'exécution de la facture au format PDF"
+
 msgid "Directory"
 msgstr "Dossier"
 
@@ -3724,8 +3739,8 @@ msgstr "Tout refuser avec message"
 msgid "Add reservation"
 msgstr "Ajouter une réservation"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Événement"
 
@@ -4129,8 +4144,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
-"Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
+"« Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -4191,8 +4206,8 @@ msgstr ""
 "Nous n'avons pas pu réserver certains créneaux correspondant à vos critères "
 "pour les dates${and_rooms} suivantes. Veuillez noter que certaines de ces "
 "dates peuvent encore avoir un ou plusieurs créneaux disponibles qui sont "
-"soit plus courts, soit plus longs que la durée que vous avez choisie. "
-"${dates}"
+"soit plus courts, soit plus longs que la durée que vous avez choisie. $"
+"{dates}"
 
 #. Used in sentence: "We were unable to reserve some slots matching your
 #. criteria for the following dates${and_rooms}, please note that some of those
@@ -4236,6 +4251,27 @@ msgstr "Cet album ne contient pas encore d'images."
 
 msgid "No photo albums defined yet."
 msgstr "Aucun album photo défini pour le moment."
+
+msgid "No invoices yet."
+msgstr "Pas encore de factures."
+
+msgid "Batch Action"
+msgstr "Action par lot"
+
+msgid "Mark as Invoiced"
+msgstr "Marquer comme facturé"
+
+msgid "Mark as Uninvoiced"
+msgstr "Marquer comme non facturé"
+
+msgid "Mark as Paid"
+msgstr "Marquer comme payé"
+
+msgid "Mark as Unpaid"
+msgstr "Marquer comme non payé"
+
+msgid "Apply to selected"
+msgstr "Appliquer aux sélectionnés"
 
 msgid "Skip navigation"
 msgstr "Ignorez la navigation"
@@ -4501,6 +4537,15 @@ msgstr "Réservation"
 msgid "Disbursed"
 msgstr "Décaissé"
 
+msgid "Select this payment"
+msgstr "Sélectionnez ce paiement"
+
+msgid "Select this invoice"
+msgstr "Sélectionnez cette facture"
+
+msgid "Unpaid"
+msgstr "Non payé"
+
 msgid "Digital seal"
 msgstr "Sceau électronique"
 
@@ -4608,9 +4653,6 @@ msgstr "Fermer"
 msgid "Copy to clipboard"
 msgstr "Copier dans le presse-papiers"
 
-msgid "Unpaid"
-msgstr "Non payé"
-
 msgid "No submissions yet."
 msgstr "Aucune soumission pour l'instant."
 
@@ -4622,8 +4664,8 @@ msgstr "Bonjour"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Votre adresse e-mail vient d'être utilisée pour créer un compte sur "
-"${homepage}."
+"Votre adresse e-mail vient d'être utilisée pour créer un compte sur $"
+"{homepage}."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Pour activer votre compte, cliquer sur confirmer ci-dessous:"
@@ -4827,14 +4869,14 @@ msgid "${author} wrote"
 msgstr "${author} a écrit"
 
 msgid ""
-"This is the notification for notes on reservations for ${request.app.org."
-"title}. If you no longer want to receive this e-mail please contact an "
-"administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
-"Il s'agit de la notification de notes sur les réservations pour ${request."
-"app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, veuillez "
-"contacter un administrateur afin qu'il puisse vous retirer de la liste des "
-"destinataires."
+"Il s'agit de la notification de notes sur les réservations pour $"
+"{request.app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, "
+"veuillez contacter un administrateur afin qu'il puisse vous retirer de la "
+"liste des destinataires."
 
 msgid "Pending approval"
 msgstr "En attente d'approbation"
@@ -4867,10 +4909,10 @@ msgid ""
 "you no longer want to receive this e-mail please contact an administrator so "
 "they can remove you from the recipients list."
 msgstr ""
-"Ceci est la notification pour les réservations pour ${request.app.org."
-"title}. Si vous ne souhaitez plus recevoir cet e-mail, veuillez contacter un "
-"administrateur afin qu'il puisse vous supprimer de la liste des "
-"destinataires."
+"Ceci est la notification pour les réservations pour $"
+"{request.app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, "
+"veuillez contacter un administrateur afin qu'il puisse vous supprimer de la "
+"liste des destinataires."
 
 msgid "An administrator just created a new account on ${org} for you."
 msgstr ""
@@ -4965,8 +5007,8 @@ msgid ""
 "you no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Il s'agit d'une notification concernant les réservations rejetées pour "
-"${organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
+"Il s'agit d'une notification concernant les réservations rejetées pour $"
+"{organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
 "veuillez contacter un administrateur afin qu'il vous retire de la liste des "
 "destinataires."
 
@@ -5287,26 +5329,8 @@ msgstr "Activé :"
 msgid "Fee:"
 msgstr "Tarif :"
 
-msgid "Export Bill run as PDF"
-msgstr "Exporter l'exécution de la facture au format PDF"
-
 msgid "No payments yet."
 msgstr "Pas de paiements pour le moment."
-
-msgid "Batch Action"
-msgstr "Action par lot"
-
-msgid "Mark as Invoiced"
-msgstr "Marquer comme facturé"
-
-msgid "Mark as Paid"
-msgstr "Marquer comme payé"
-
-msgid "Mark as Unpaid"
-msgstr "Marquer comme non payé"
-
-msgid "Apply to selected"
-msgstr "Appliquer aux sélectionnés"
 
 msgid ""
 "The following requests have been submitted. To see the state of process you "
@@ -6153,8 +6177,8 @@ msgstr "Nouveau destinataire"
 
 #, python-format
 msgid ""
-"Registration for notifications on new entries in the directory "
-"\"${directory}\""
+"Registration for notifications on new entries in the directory \"${directory}"
+"\""
 msgstr ""
 "Inscription pour les notifications sur les nouvelles entrées dans le dossier "
 "\"${directory}\""
@@ -6515,8 +6539,8 @@ msgid ""
 "you one already. Your subscribed categories are ${subscribed}."
 msgstr ""
 "C'est fait! Nous avons envoyé un lien de confirmation vers ${address}, si "
-"nous ne vous en avions pas déjà envoyé un. Vos catégories abonnées sont "
-"${subscribed}."
+"nous ne vous en avions pas déjà envoyé un. Vos catégories abonnées sont $"
+"{subscribed}."
 
 # python-format
 #, python-format
@@ -6637,9 +6661,6 @@ msgstr "Votre paiement a été retiré"
 msgid "Your payment has been refunded"
 msgstr "Votre paiement a été remboursé"
 
-msgid "No payments found for PDF generation"
-msgstr "Aucun paiement trouvé pour la génération PDF"
-
 msgid "No tickets found for PDF generation"
 msgstr "Aucun ticket trouvé pour la génération PDF"
 
@@ -6657,6 +6678,22 @@ msgstr "${count} paiements marqués comme payés."
 #, python-format
 msgid "${count} payments marked as unpaid."
 msgstr "${count} paiements marqués comme non payés."
+
+#, python-format
+msgid "${count} invoices marked as invoiced."
+msgstr "${count} factures marquées comme facturées."
+
+#, python-format
+msgid "${count} invoices marked as uninvoiced."
+msgstr "${count} factures marquées comme non facturées."
+
+#, python-format
+msgid "${count} invoices marked as unpaid."
+msgstr "${count} factures marquées comme non payées."
+
+#, python-format
+msgid "${count} invoices marked as paid."
+msgstr "${count} factures marquées comme payées."
 
 msgid "The ticket was marked as paid"
 msgstr "Le ticket a été marqué comme payé"
@@ -7343,8 +7380,8 @@ msgstr "Une erreur s'est produite lors du téléchargement sur Gever."
 
 #, python-format
 msgid ""
-"Encountered an error while uploading to Gever. Response status code is "
-"${status}."
+"Encountered an error while uploading to Gever. Response status code is $"
+"{status}."
 msgstr ""
 "Une erreur s'est produite lors du téléchargement sur Gever. Le code d'état "
 "de la réponse est ${status}."

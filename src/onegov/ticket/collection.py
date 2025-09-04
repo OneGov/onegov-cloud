@@ -4,15 +4,20 @@ import random
 
 from onegov.core.collection import Pagination
 from onegov.core.custom import msgpack
+from onegov.pay.collections import InvoiceCollection
 from onegov.ticket import handlers as global_handlers
+from onegov.ticket.models.invoice import TicketInvoice
+from onegov.ticket.models.invoice_item import TicketInvoiceItem
 from onegov.ticket.models.ticket import Ticket
+from sedate import to_timezone
 from sqlalchemy import desc, func
-from sqlalchemy.orm import joinedload, undefer
+from sqlalchemy.orm import contains_eager, joinedload, selectinload, undefer
 from uuid import UUID
 
 
 from typing import Any, Literal, NamedTuple, Self, TYPE_CHECKING
 if TYPE_CHECKING:
+    from datetime import date, datetime
     from onegov.ticket.models.ticket import TicketState
     from sqlalchemy.orm import Query, Session
     from typing import TypeAlias, TypedDict
@@ -279,3 +284,146 @@ class TicketCollection(TicketCollectionPagination):
 class ArchivedTicketCollection(TicketCollectionPagination):
     def query(self) -> Query[Ticket]:
         return self.session.query(Ticket)
+
+
+class TicketInvoiceCollection(
+    Pagination[TicketInvoice],
+    InvoiceCollection[TicketInvoice, TicketInvoiceItem]
+):
+
+    def __init__(
+        self,
+        session: Session,
+        page: int = 0,
+        ticket_start: datetime | None = None,
+        ticket_end: datetime | None = None,
+        reservation_start: datetime | None = None,
+        reservation_end: datetime | None = None,
+        invoiced: bool | None = None,
+    ) -> None:
+        Pagination.__init__(self, page)
+        self.session = session
+        self.invoiced = invoiced
+        self.ticket_start = ticket_start
+        self.ticket_end = ticket_end
+        self.reservation_start = reservation_start
+        self.reservation_end = reservation_end
+
+    @property
+    def model_class(self) -> type[TicketInvoice]:
+        return TicketInvoice
+
+    @property
+    def item_model_class(self) -> type[TicketInvoiceItem]:
+        return TicketInvoiceItem
+
+    def query(self) -> Query[TicketInvoice]:
+        return self.session.query(TicketInvoice)
+
+    def subset(self) -> Query[TicketInvoice]:
+        query = self.query()
+
+        query = query.join(TicketInvoice.ticket)
+
+        query = query.options(
+            selectinload(TicketInvoice.items),
+            contains_eager(TicketInvoice.ticket)
+        )
+
+        if self.invoiced is not None:
+            query = query.filter(TicketInvoice.invoiced == self.invoiced)
+
+        # Filter payments by each associated ticket creation date
+        if self.ticket_start is not None:
+            query = query.filter(Ticket.created >= self.ticket_start)
+
+        if self.ticket_end is not None:
+            query = query.filter(Ticket.created <= self.ticket_end)
+
+        # Filter payments by the reservation dates it belongs to
+        if self.reservation_start or self.reservation_end:
+            from onegov.reservation import Reservation
+
+            subquery = self.session.query(Reservation)
+            subquery.join(
+                TicketInvoiceItem,
+                Reservation.id == TicketInvoiceItem.reservation_id
+            )
+            subquery = subquery.filter(
+                TicketInvoiceItem.invoice_id == TicketInvoice.id
+            )
+
+            if self.reservation_start is not None:
+                subquery = subquery.filter(
+                    Reservation.end >= self.reservation_start
+                )
+            if self.reservation_end is not None:
+                subquery = subquery.filter(
+                    Reservation.start <= self.reservation_end
+                )
+
+            query = query.filter(subquery.exists())
+
+        return query.order_by(Ticket.created.desc())
+
+    @property
+    def page_index(self) -> int:
+        return self.page
+
+    def page_by_index(self, index: int) -> Self:
+        return self.__class__(
+            self.session,
+            page=index,
+            ticket_start=self.ticket_start,
+            ticket_end=self.ticket_end,
+            reservation_start=self.reservation_start,
+            reservation_end=self.reservation_end,
+            invoiced=self.invoiced
+        )
+
+    def reservation_dates_by_batch(self) -> dict[UUID, tuple[date, date]]:
+        if not self.batch:
+            return {}
+        from onegov.reservation import Reservation
+        return {
+            invoice_id: (
+                to_timezone(start, 'Europe/Zurich').date(),
+                to_timezone(end, 'Europe/Zurich').date()
+            )
+            for invoice_id, start, end in self.session.query(Reservation)
+            .join(
+                TicketInvoiceItem,
+                TicketInvoiceItem.reservation_id == Reservation.id
+            )
+            .filter(TicketInvoiceItem.invoice_id.in_([
+                el.id for el in self.batch
+            ]))
+            .group_by(TicketInvoiceItem.invoice_id)
+            .with_entities(
+                TicketInvoiceItem.invoice_id,
+                func.min(Reservation.start),
+                func.max(Reservation.end)
+            )
+        }
+
+    def __eq__(self, other: object) -> bool:
+        return (
+            isinstance(other, TicketInvoiceCollection)
+            and self.page == other.page
+            and self.invoiced is other.invoiced
+            and self.ticket_start == other.ticket_start
+            and self.ticket_end == other.ticket_end
+            and self.reservation_start == other.reservation_start
+            and self.reservation_end == other.reservation_end
+        )
+
+    def by_invoiced(self, invoiced: bool | None) -> Self:
+        return self.__class__(
+            self.session,
+            page=0,
+            ticket_start=self.ticket_start,
+            ticket_end=self.ticket_end,
+            reservation_start=self.reservation_start,
+            reservation_end=self.reservation_end,
+            invoiced=invoiced
+        )

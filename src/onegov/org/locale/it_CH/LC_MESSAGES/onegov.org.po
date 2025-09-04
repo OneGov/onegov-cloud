@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-09-01 16:34+0200\n"
+"POT-Creation-Date: 2025-09-04 11:50+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1134,22 +1134,22 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The limit cannot be lower than the already confirmed number of attendees "
-"(${claimed_spots})"
+"The limit cannot be lower than the already confirmed number of attendees ($"
+"{claimed_spots})"
 msgstr ""
-"Il limite non può essere inferiore numero di partecipanti già confermato "
-"(${claimed_spots})"
+"Il limite non può essere inferiore numero di partecipanti già confermato ($"
+"{claimed_spots})"
 
 #, python-format
 msgid ""
-"The limit cannot be lower than the already confirmed number attendees "
-"(${claimed_spots}) and the number of pending requests (${pending_requests}). "
+"The limit cannot be lower than the already confirmed number attendees ($"
+"{claimed_spots}) and the number of pending requests (${pending_requests}). "
 "Either enable the waiting list, process the pending requests or increase the "
 "limit. "
 msgstr ""
 "Il limite non può essere inferiore al numero di partecipanti già confermato "
-"(${claimed_spots}) e al numero di richieste in sospeso "
-"(${pending_requests}). Abilita la lista d'attesa, elabora le richieste in "
+"(${claimed_spots}) e al numero di richieste in sospeso ($"
+"{pending_requests}). Abilita la lista d'attesa, elabora le richieste in "
 "sospeso o aumenta il limite. "
 
 msgid "The end date must be later than the start date"
@@ -1466,14 +1466,11 @@ msgstr "Gruppo parlamentare"
 msgid "Parliamentary group role"
 msgstr "Ruolo nel gruppo parlamentare"
 
-msgid "From reservation date"
-msgstr "Dalla data di prenotazione"
+msgid "Filter Invoices"
+msgstr "Filtra fatture"
 
-msgid "Filter Payments"
-msgstr "Filtra pagamenti"
-
-msgid "To reservation date"
-msgstr "Alla data di prenotazione"
+msgid "Uninvoiced"
+msgstr "Non fatturato"
 
 msgid "Ticket created from date"
 msgstr "Ticket creato dalla data"
@@ -1487,6 +1484,18 @@ msgstr ""
 
 msgid "Ticket created to date"
 msgstr "Ticket creato fino ad oggi"
+
+msgid "From reservation date"
+msgstr "Dalla data di prenotazione"
+
+msgid "Filter by Reservation Date"
+msgstr "Filtra per data di prenotazione"
+
+msgid "To reservation date"
+msgstr "Alla data di prenotazione"
+
+msgid "Filter Payments"
+msgstr "Filtra pagamenti"
 
 msgid "Payment Type"
 msgstr "Tipo di pagamento"
@@ -3269,6 +3278,12 @@ msgstr "Provider di servizi di pagamento"
 msgid "Synchronise"
 msgstr "Sincronizza"
 
+msgid "Invoices"
+msgstr "Fatture"
+
+msgid "Export Bill run as PDF"
+msgstr "Esporta l'esecuzione della fattura come PDF"
+
 msgid "Directory"
 msgstr "Cartella"
 
@@ -3725,8 +3740,8 @@ msgstr "Rifiuta tutto con messaggio"
 msgid "Add reservation"
 msgstr "Aggiungi prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -4229,6 +4244,27 @@ msgstr "Questo album non contiene ancora nessuna immagine."
 msgid "No photo albums defined yet."
 msgstr "Nessun album fotografico ancora definito."
 
+msgid "No invoices yet."
+msgstr "Nessuna fattura ancora."
+
+msgid "Batch Action"
+msgstr "Azione di gruppo"
+
+msgid "Mark as Invoiced"
+msgstr "Contrassegna come fatturato"
+
+msgid "Mark as Uninvoiced"
+msgstr "Contrassegna come non fatturato"
+
+msgid "Mark as Paid"
+msgstr "Contrassegna come pagato"
+
+msgid "Mark as Unpaid"
+msgstr "Contrassegna come non pagato"
+
+msgid "Apply to selected"
+msgstr "Applica ai selezionati"
+
 msgid "Skip navigation"
 msgstr "Migrazione dei link"
 
@@ -4491,6 +4527,15 @@ msgstr "Prenotazione"
 msgid "Disbursed"
 msgstr "Erogato"
 
+msgid "Select this payment"
+msgstr "Seleziona questo pagamento"
+
+msgid "Select this invoice"
+msgstr "Seleziona questa fattura"
+
+msgid "Unpaid"
+msgstr "Non pagato"
+
 msgid "Digital seal"
 msgstr "Sigillo digitale"
 
@@ -4597,9 +4642,6 @@ msgstr "Chiudi"
 msgid "Copy to clipboard"
 msgstr "Copia negli appunti"
 
-msgid "Unpaid"
-msgstr "Non pagato"
-
 msgid "No submissions yet."
 msgstr "Ancora nessuna iscrizione."
 
@@ -4611,8 +4653,8 @@ msgstr "Ciao!"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su "
-"${homepage}."
+"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su $"
+"{homepage}."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Per attivare il tuo account, fai clic su conferma qui di seguito:"
@@ -4815,13 +4857,13 @@ msgid "${author} wrote"
 msgstr "${author} ha scritto"
 
 msgid ""
-"This is the notification for notes on reservations for ${request.app.org."
-"title}. If you no longer want to receive this e-mail please contact an "
-"administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
-"Questa è la notifica per le note sulle prenotazioni per ${request.app.org."
-"title}. Se non si desidera più ricevere questo messaggio di posta "
-"elettronica si prega di contattare un amministratore in modo che possa "
+"Questa è la notifica per le note sulle prenotazioni per $"
+"{request.app.org.title}. Se non si desidera più ricevere questo messaggio di "
+"posta elettronica si prega di contattare un amministratore in modo che possa "
 "rimuovervi dall'elenco dei destinatari lista"
 
 msgid "Pending approval"
@@ -5269,26 +5311,8 @@ msgstr "Abilitato:"
 msgid "Fee:"
 msgstr "Imposta:"
 
-msgid "Export Bill run as PDF"
-msgstr "Esporta l'esecuzione della fattura come PDF"
-
 msgid "No payments yet."
 msgstr "Nessun pagamento ancora."
-
-msgid "Batch Action"
-msgstr "Azione di gruppo"
-
-msgid "Mark as Invoiced"
-msgstr "Contrassegna come fatturato"
-
-msgid "Mark as Paid"
-msgstr "Contrassegna come pagato"
-
-msgid "Mark as Unpaid"
-msgstr "Contrassegna come non pagato"
-
-msgid "Apply to selected"
-msgstr "Applica ai selezionati"
 
 msgid ""
 "The following requests have been submitted. To see the state of process you "
@@ -5837,8 +5861,8 @@ msgid ""
 "Availability period updated. ${deleted} allocations removed, ${created} new "
 "allocations created."
 msgstr ""
-"Periodo di disponibilità aggiornato. ${deleted} allocazioni rimosse, "
-"${created} nuove allocazioni create."
+"Periodo di disponibilità aggiornato. ${deleted} allocazioni rimosse, $"
+"{created} nuove allocazioni create."
 
 msgid "Availability period not found"
 msgstr "Periodo di disponibilità non trovato"
@@ -5934,8 +5958,8 @@ msgid ""
 "A password reset link has been sent to ${email}, provided an active account "
 "exists for this email address."
 msgstr ""
-"Il collegamento per reimpostare la password è stato inviato all'indirizzo "
-"${email} (se si tratta di un account attivo esistente)."
+"Il collegamento per reimpostare la password è stato inviato all'indirizzo $"
+"{email} (se si tratta di un account attivo esistente)."
 
 msgid "Password changed."
 msgstr "Password modificata."
@@ -6126,11 +6150,11 @@ msgstr "Nuovo destinatario"
 
 #, python-format
 msgid ""
-"Registration for notifications on new entries in the directory "
-"\"${directory}\""
+"Registration for notifications on new entries in the directory \"${directory}"
+"\""
 msgstr ""
-"Registrazione per le notifiche sui nuovi elementi nella cartella "
-"\"${directory}\""
+"Registrazione per le notifiche sui nuovi elementi nella cartella \"$"
+"{directory}\""
 
 #, python-format
 msgid ""
@@ -6616,9 +6640,6 @@ msgstr "Il tuo pagamento è stato ritirato"
 msgid "Your payment has been refunded"
 msgstr "Il tuo pagamento è stato rimborsato"
 
-msgid "No payments found for PDF generation"
-msgstr "Nessun pagamento trovato per la generazione di PDF"
-
 msgid "No tickets found for PDF generation"
 msgstr "Nessun biglietto trovato per la generazione di PDF"
 
@@ -6636,6 +6657,22 @@ msgstr "${count} pagamenti contrassegnati come pagati."
 #, python-format
 msgid "${count} payments marked as unpaid."
 msgstr "${count} pagamenti contrassegnati come non pagati."
+
+#, python-format
+msgid "${count} invoices marked as invoiced."
+msgstr "${count} fatture contrassegnate come fatturate."
+
+#, python-format
+msgid "${count} invoices marked as uninvoiced."
+msgstr "${count} fatture contrassegnate come non fatturate."
+
+#, python-format
+msgid "${count} invoices marked as unpaid."
+msgstr "${count} fatture contrassegnate come non pagate."
+
+#, python-format
+msgid "${count} invoices marked as paid."
+msgstr "${count} fatture contrassegnate come pagate."
 
 msgid "The ticket was marked as paid"
 msgstr "Il biglietto è stato contrassegnato come pagato"
@@ -6849,8 +6886,8 @@ msgid ""
 "Failed to create visits using the dormakaba API for site ID ${site_id} "
 "please make sure your credentials are still valid."
 msgstr ""
-"Impossibile creare visite con l'API di dormakaba per l'ID del sito "
-"${site_id}. Assicurarsi che le credenziali siano ancora valide."
+"Impossibile creare visite con l'API di dormakaba per l'ID del sito $"
+"{site_id}. Assicurarsi che le credenziali siano ancora valide."
 
 msgid "Your reservations were accepted"
 msgstr "Le tue prenotazioni sono state accettate"
@@ -7040,8 +7077,8 @@ msgstr "Totale di ${number} collegamenti trovati."
 msgid ""
 "Migrates links from the given domain to the current domain \"${domain}\"."
 msgstr ""
-"Migra i collegamenti dal dominio specificato al dominio corrente "
-"\"${domain}\"."
+"Migra i collegamenti dal dominio specificato al dominio corrente \"${domain}"
+"\"."
 
 msgid "OneGov API"
 msgstr "API OneGov"
@@ -7321,8 +7358,8 @@ msgstr "Si è verificato un errore durante il caricamento su Gever."
 
 #, python-format
 msgid ""
-"Encountered an error while uploading to Gever. Response status code is "
-"${status}."
+"Encountered an error while uploading to Gever. Response status code is $"
+"{status}."
 msgstr ""
 "Si è verificato un errore durante il caricamento su Gever.Il codice di stato "
 "della risposta è ${status}."

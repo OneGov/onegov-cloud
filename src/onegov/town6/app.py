@@ -337,8 +337,3 @@ def get_staff_chat_asset() -> Iterator[str]:
 def get_staff_client_asset() -> Iterator[str]:
     yield 'chat-shared.js'
     yield 'chat-client.js'
-
-
-@TownApp.webasset('invoicing')
-def get_invoicing() -> Iterator[str]:
-    yield 'invoicing.js'
