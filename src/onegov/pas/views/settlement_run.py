@@ -3,8 +3,8 @@ from __future__ import annotations
 from collections import defaultdict
 from io import BytesIO
 from sedate import utcnow
-from onegov.core.utils import module_path
 from webob import Response
+from onegov.core.utils import module_path
 from decimal import Decimal
 from operator import itemgetter
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
@@ -44,9 +44,10 @@ from onegov.pas.utils import (
     get_parties_with_settlements,
 )
 
-from typing import Literal, TypeAlias, TYPE_CHECKING, Any
-from collections.abc import Iterator
+
+from typing import Any, Literal, TypeAlias, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from datetime import date
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
@@ -70,8 +71,8 @@ template='settlement_runs.pt',
 permission=Private
 )
 def view_settlement_runs(
-self: SettlementRunCollection,
-request: TownRequest
+    self: SettlementRunCollection,
+    request: TownRequest
 ) -> RenderData:
 
     layout = SettlementRunCollectionLayout(self, request)

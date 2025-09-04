@@ -49,9 +49,9 @@ def dummy_request(session):
         include=lambda x: x,
         is_manager=True,
         locale='de_CH',
-        session=session
+        session=session,
+        method='GET'  # not dynamic but doenst matter our purposess
     )
-
 
 @freeze_time('2024-01-01')
 def test_attendence_forms(session, dummy_request):
@@ -420,3 +420,49 @@ def test_settlement_run_form(session, dummy_request):
     assert not form.validate()
     assert 'start' not in form.errors
     assert 'end' not in form.errors
+
+
+def test_settlement_run_form_active(session, dummy_request):
+    collection = SettlementRunCollection(session)
+    settlement_run = collection.add(
+        name='2022',
+        start=date(2022, 1, 1),
+        end=date(2022, 12, 31),
+        active=True
+    )
+
+    # add another active
+    form = SettlementRunForm(DummyPostData({
+        'name': '2023',
+        'start': '2023-01-01',
+        'end': '2023-12-31',
+        'active': 'y'
+    }))
+    form.model = collection
+    form.request = dummy_request
+    assert not form.validate()
+    assert form.errors['active'][0].interpolate() == \
+        'Only one settlement run can be active at a time'
+
+    # add an inactive
+    form = SettlementRunForm(DummyPostData({
+        'name': '2023',
+        'start': '2023-01-01',
+        'end': '2023-12-31',
+    }))
+    form.model = collection
+    form.request = dummy_request
+    assert form.validate()
+    assert 'active' not in form.errors
+
+    # edit the active one
+    form = SettlementRunForm(DummyPostData({
+        'name': '2022-new',
+        'start': '2022-01-01',
+        'end': '2022-12-31',
+        'active': 'y'
+    }))
+    form.model = settlement_run
+    form.request = dummy_request
+    assert form.validate()
+    assert 'active' not in form.errors

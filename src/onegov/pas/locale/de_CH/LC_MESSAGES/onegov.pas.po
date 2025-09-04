@@ -29,6 +29,9 @@ msgstr "Aktivitäten"
 msgid "PAS settings"
 msgstr "PAS Einstellungen"
 
+msgid "Files"
+msgstr "Dateien"
+
 msgid "More settings"
 msgstr "Weitere Einstellungen"
 
@@ -112,6 +115,12 @@ msgstr "Unerwarteter Fehler bei der Verarbeitung der Datei ${name}: ${error}"
 
 msgid "Name"
 msgstr "Name"
+
+msgid "Start"
+msgstr "Start"
+
+msgid "End"
+msgstr "Ende"
 
 msgid "Personnel number"
 msgstr "Personalnummer"
@@ -284,6 +293,9 @@ msgstr "Sätze für ${year} bereits erfasst"
 
 msgid "Active"
 msgstr "Aktiv"
+
+msgid "Only one settlement run can be active at a time"
+msgstr "Nur ein Abrechnungslauf kann gleichzeitig aktiv sein"
 
 msgid "End must be after start"
 msgstr "Ende muss nach dem Start liegen"
@@ -476,6 +488,9 @@ msgstr "Noch keine Aktivitäten."
 msgid "Action"
 msgstr "Aktion"
 
+msgid "Function"
+msgstr "Funktion"
+
 msgid "No active commissions."
 msgstr "Keine aktiven Kommissionen."
 
@@ -604,6 +619,9 @@ msgstr "Neu"
 
 msgid "New attendence"
 msgstr "Neue Anwesenheit"
+
+msgid "No parliamentarians selected"
+msgstr "Keine Parliamentarier ausgewählt"
 
 msgid "Added commission session"
 msgstr "Kommissionssitzung hinzugefügt"

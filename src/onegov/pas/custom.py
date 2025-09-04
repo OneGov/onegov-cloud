@@ -38,21 +38,24 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
 
         # Management Dropdown
         if request.is_admin:
+
             session = request.session
-            management_links = []
+            management_links: list[Link] = []
             try:
                 current_run = get_current_settlement_run(session)
-                management_links.append(
-                    Link(
-                        _('Current Settlement Run'),
-                        request.link(current_run),
-                        attrs={'class': 'settlement-run'}
+                if current_run:
+                    management_links.append(
+                        Link(
+                            _('Current Settlement Run'),
+                            request.link(current_run),
+                            attrs={'class': 'settlement-run'}
+                        )
                     )
-                )
             except MultipleResultsFound:
-                # If multiple active runs exist (should not happen),
-                # don't show the link.
+                # If multiple active runs exist (should not happen), but
+                # just to # be safe
                 pass
+
             management_links.extend((
                 Link(
                     _('Attendences'),
@@ -65,14 +68,14 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
                     attrs={'class': 'changes'}
                 ),
                 Link(
-                    _('Files'),
-                    request.link(request.app.org, 'files'),
-                    attrs={'class': 'files'}
-                ),
-                Link(
                     _('PAS settings'),
                     request.link(request.app.org, 'pas-settings'),
                     attrs={'class': 'pas-settings'}
+                ),
+                Link(
+                    _('Files'),
+                    request.link(request.app.org, 'files'),
+                    attrs={'class': 'files'}
                 ),
                 Link(
                     _('More settings'),
@@ -92,10 +95,10 @@ def get_top_navigation(request: TownRequest) -> list[Link]:
     return []
 
 
-def get_current_settlement_run(session: Session) -> SettlementRun:
+def get_current_settlement_run(session: Session) -> SettlementRun | None:
     query = session.query(SettlementRun)
     query = query.filter(SettlementRun.active == True)
-    return query.one()
+    return query.first()
 
 
 def get_current_rate_set(session: Session, run: SettlementRun) -> RateSet:
