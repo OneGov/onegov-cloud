@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-09-02 16:15+0200\n"
+"POT-Creation-Date: 2025-09-04 12:14+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -543,6 +543,12 @@ msgstr "Keine Import Logs gefunden"
 
 msgid "Skip navigation"
 msgstr "Navigation überspringen"
+
+msgid "Settlement Run"
+msgstr "Abrechnungslauf"
+
+msgid "(not active)"
+msgstr "(Keiner aktiv)"
 
 msgid "Search term"
 msgstr "Suchbegriff"
