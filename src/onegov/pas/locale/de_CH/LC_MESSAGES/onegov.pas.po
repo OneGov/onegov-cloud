@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-08-26 13:44+0200\n"
+"POT-Creation-Date: 2025-09-02 16:15+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -29,6 +29,9 @@ msgstr "Aktivitäten"
 msgid "PAS settings"
 msgstr "PAS Einstellungen"
 
+msgid "Files"
+msgstr "Dateien"
+
 msgid "More settings"
 msgstr "Weitere Einstellungen"
 
@@ -52,15 +55,6 @@ msgstr "Kommission"
 
 msgid "Parliamentarian is not in this commission."
 msgstr "Parlamentarier:in ist nicht in dieser Kommission."
-
-msgid "Function"
-msgstr "Funktion"
-
-msgid "Start"
-msgstr "Start"
-
-msgid "End"
-msgstr "Ende"
 
 msgid "People Data (JSON)"
 msgstr "Personendaten (JSON)"
@@ -112,6 +106,12 @@ msgstr "Unerwarteter Fehler bei der Verarbeitung der Datei ${name}: ${error}"
 
 msgid "Name"
 msgstr "Name"
+
+msgid "Start"
+msgstr "Start"
+
+msgid "End"
+msgstr "Ende"
 
 msgid "Personnel number"
 msgstr "Personalnummer"
@@ -284,6 +284,9 @@ msgstr "Sätze für ${year} bereits erfasst"
 
 msgid "Active"
 msgstr "Aktiv"
+
+msgid "Only one settlement run can be active at a time"
+msgstr "Nur ein Abrechnungslauf kann gleichzeitig aktiv sein"
 
 msgid "End must be after start"
 msgstr "Ende muss nach dem Start liegen"
@@ -476,6 +479,9 @@ msgstr "Noch keine Aktivitäten."
 msgid "Action"
 msgstr "Aktion"
 
+msgid "Function"
+msgstr "Funktion"
+
 msgid "No active commissions."
 msgstr "Keine aktiven Kommissionen."
 
@@ -604,6 +610,9 @@ msgstr "Neu"
 
 msgid "New attendence"
 msgstr "Neue Anwesenheit"
+
+msgid "No parliamentarians selected"
+msgstr "Keine Parliamentarier ausgewählt"
 
 msgid "Added commission session"
 msgstr "Kommissionssitzung hinzugefügt"
