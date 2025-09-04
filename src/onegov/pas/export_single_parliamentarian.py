@@ -9,13 +9,13 @@ from onegov.pas.collections import (
 from onegov.pas.custom import get_current_rate_set
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.attendence import TYPES
+from onegov.core.utils import module_path
 from onegov.pas.utils import format_swiss_number
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration,
 )
 from datetime import date  # noqa: TC003
-from onegov.pas.utils import module_path
 
 
 from typing import TYPE_CHECKING, Literal, TypedDict
@@ -59,10 +59,10 @@ def generate_parliamentarian_settlement_pdf(
     """Generate PDF for parliamentarian settlement data."""
     font_config = FontConfiguration()
     session = request.session
+    rate_set = get_current_rate_set(session, settlement_run)
     cola_multiplier = Decimal(
         str(1 + (rate_set.cost_of_living_adjustment / 100))
     )
-    rate_set = get_current_rate_set(session, settlement_run)
     quarter = settlement_run.get_run_number_for_year(settlement_run.end)
     css_path = module_path(
         'onegov.pas', 'views/templates/parliamentarian_settlement_pdf.css'
@@ -73,7 +73,6 @@ def generate_parliamentarian_settlement_pdf(
     data = _get_parliamentarian_settlement_data(
         settlement_run, request, parliamentarian, rate_set
     )
-    current_date = date.today().strftime('%d.%m.%Y')
     html = f"""
         <!DOCTYPE html>
         <html>
@@ -110,12 +109,11 @@ def generate_parliamentarian_settlement_pdf(
     """
 
     type_totals: dict[TotalType, TypeTotal] = {
-        cast('TotalType', 'plenary'): {'entries': [], 'total': Decimal('0')},
-        cast('TotalType', 'commission'): {'entries': [],
-                                          'total': Decimal('0')},
-        cast('TotalType', 'study'): {'entries': [], 'total': Decimal('0')},
-        cast('TotalType', 'shortest'): {'entries': [], 'total': Decimal('0')},
-        cast('TotalType', 'expenses'): {'entries': [], 'total': Decimal('0')},
+        'plenary': {'entries': [], 'total': Decimal('0')},
+        'commission': {'entries': [], 'total': Decimal('0')},
+        'study': {'entries': [], 'total': Decimal('0')},
+        'shortest': {'entries': [], 'total': Decimal('0')},
+        'expenses': {'entries': [], 'total': Decimal('0')},
     }
 
     for entry in data['entries']:
@@ -149,15 +147,15 @@ def generate_parliamentarian_settlement_pdf(
     )
     type_mappings: list[tuple[str, TotalType]] = [
         ('Total aller Plenarsitzungen inkl. Teuerungszulage',
-         cast('TotalType', 'plenary')),
+         'plenary'),
         ('Total aller Kommissionssitzungen inkl. Teuerungszulage',
-         cast('TotalType', 'commission')),
+         'commission'),
         ('Total aller Aktenstudium inkl. Teuerungszulage',
-         cast('TotalType', 'study')),
+         'study'),
         ('Total aller Kürzestsitzungen inkl. Teuerungszulage',
-         cast('TotalType', 'shortest')),
+         'shortest'),
         ('Total Spesen inkl. Teuerungszulage',
-         cast('TotalType', 'expenses')),
+         'expenses'),
     ]
     for type_name, type_key in type_mappings:
         total_value = sum(

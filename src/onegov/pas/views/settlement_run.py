@@ -1011,17 +1011,19 @@ def get_abschlussliste_data(
         session, settlement_run.start, settlement_run.end
     )
 
-    parl_data = defaultdict(lambda: {
-        'plenum_duration': Decimal('0'),
-        'plenum_compensation': Decimal('0'),
-        'commission_duration': Decimal('0'),
-        'commission_compensation': Decimal('0'),
-        'study_duration': Decimal('0'),
-        'study_compensation': Decimal('0'),
-        'shortest_duration': Decimal('0'),
-        'shortest_compensation': Decimal('0'),
-        'expenses': Decimal('0'),
-    })
+    parl_data: defaultdict[str, dict[str, Any]] = defaultdict(
+        lambda: {
+            'plenum_duration': Decimal('0'),
+            'plenum_compensation': Decimal('0'),
+            'commission_duration': Decimal('0'),
+            'commission_compensation': Decimal('0'),
+            'study_duration': Decimal('0'),
+            'study_compensation': Decimal('0'),
+            'shortest_duration': Decimal('0'),
+            'shortest_compensation': Decimal('0'),
+            'expenses': Decimal('0'),
+        }
+    )
 
     attendances = AttendenceCollection(
         session,
@@ -1040,7 +1042,7 @@ def get_abschlussliste_data(
             commission_type=att.commission.type if att.commission else None
         )
 
-        data = parl_data[p.id]
+        data = parl_data[str(p.id)]
         if att.type == 'plenary':
             data['plenum_duration'] += Decimal(att.duration)
             data['plenum_compensation'] += Decimal(str(compensation))
@@ -1059,7 +1061,7 @@ def get_abschlussliste_data(
         party = p.get_party_during_period(
             settlement_run.start, settlement_run.end, session
         )
-        data = parl_data[p.id]
+        data = parl_data[str(p.id)]
         data['parliamentarian'] = p
         data['party'] = party.name if party else ''
         data['faction'] = party.name if party else ''
