@@ -2,13 +2,17 @@ from __future__ import annotations
 
 import datetime
 
+from wtforms import HiddenField
+
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import MultiCheckboxField
+from onegov.org.forms import commission
 from onegov.pas import _
 from onegov.pas.custom import get_current_settlement_run
 from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.collections import PASParliamentarianCollection
+from onegov.pas.custom import AttendenceCollection
 from onegov.pas.models import SettlementRun
 from onegov.pas.models.attendence import TYPES
 from wtforms.fields import DateField
@@ -244,6 +248,83 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
         ]
         # JavaScript will handle selection based on commission
         self.parliamentarian_id.data = []
+
+
+class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):
+    """ Edit form for bulk attendance changes. """
+
+    date = DateField(
+        label=_('Date'),
+        validators=[InputRequired()],
+        default=datetime.date.today
+    )
+
+    duration = FloatField(
+        label=_('Duration in hours'),
+        validators=[InputRequired()],
+    )
+
+    commission_id = ChosenSelectField(
+        label=_('Commission'),
+        validators=[InputRequired()],
+        render_kw={'readonly': True}
+    )
+
+    parliamentarian_id = MultiCheckboxField(
+        label=_('Parliamentarian'),
+        validators=[InputRequired()],
+        choices=[]  # are set with in custom.js
+    )
+
+    bulk_edit_id = HiddenField(
+        label=_('Bulk edit group'),
+        validators=[InputRequired()],
+    )
+
+    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
+        result = super().get_useful_data()
+        result['duration'] = int(60 * (result.get('duration') or 0))
+        result['type'] = 'commission'
+        return result
+
+    def process_obj(self, obj: Attendence) -> None:   # type: ignore[override]
+        super().process_obj(obj)
+        self.duration.data = obj.duration / 60
+
+        attendences = AttendenceCollection(
+                self.request.session).query().filter_by(
+                    bulk_edit_id=obj.bulk_edit_id
+                )
+        selected_parliamentarians = [
+            (
+                str(attendence.parliamentarian.id),
+                attendence.parliamentarian.title
+            ) for attendence in attendences
+        ]
+
+        if obj.type == 'plenary':
+            self.hide(self.commission_id)
+            self.parliamentarian_id.choices = [
+                (str(parliamentarian.id), parliamentarian.title)
+                for parliamentarian in PASParliamentarianCollection(
+                    self.request.session, [True]).query()
+            ]
+        else:
+            self.commission_id.choices = [
+                (obj.commission.id, obj.commission.title)  # type:ignore
+            ]
+
+            self.parliamentarian_id.choices = [
+                (str(m.parliamentarian.id),
+                m.parliamentarian.title)
+                for m in PASCommissionCollection(
+                self.request.session).query().filter_by(
+                    id=obj.commission_id
+                ).first().memberships  # type:ignore
+            ]
+
+        self.parliamentarian_id.data = [choice[0] for choice in selected_parliamentarians]
+
 
 
 class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):

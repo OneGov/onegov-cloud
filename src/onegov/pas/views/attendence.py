@@ -1,4 +1,7 @@
 from __future__ import annotations
+from itertools import groupby
+from operator import attrgetter
+import uuid
 
 from onegov.core.elements import Link
 from onegov.core.security import Private
@@ -8,6 +11,7 @@ from onegov.pas.collections import AttendenceCollection
 from onegov.pas.forms import AttendenceAddCommissionBulkForm, AttendenceAddForm
 from onegov.pas.forms import AttendenceAddPlenaryForm
 from onegov.pas.forms import AttendenceForm
+from onegov.pas.forms.attendence import AttendenceEditBulkForm
 from onegov.pas.layouts import AttendenceCollectionLayout
 from onegov.pas.layouts import AttendenceLayout
 from onegov.pas.models import Attendence
@@ -32,11 +36,22 @@ def view_attendences(
 
     layout = AttendenceCollectionLayout(self, request)
 
+    # Get all records ordered by bulk_edit_id
+    all_attendances = self.query().order_by(Attendence.created.desc()).all()
+
+    # Group them in Python
+    bulk_edit_groups = [
+        list(group) 
+        for bulk_edit_id, group in groupby(all_attendances, key=attrgetter(
+            'bulk_edit_id'))
+    ]
+
     return {
         'add_link': request.link(self, name='new'),
         'layout': layout,
         'attendences': self.query().all(),
         'title': layout.title,
+        'bulk_edit_groups': bulk_edit_groups
     }
 
 
@@ -62,6 +77,7 @@ def add_attendence(
 
     layout = AttendenceCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_('New'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -91,10 +107,12 @@ def add_bulk_attendence(
         if raw_parl_ids := request.POST.getall('parliamentarian_id'):
             # Remove static field; choices are set dynamically via JS
             data.pop('parliamentarian_id', None)
+            bulk_edit_id = uuid.uuid4()
             for parliamentarian_id in raw_parl_ids:
                 attendence = self.add(
                     parliamentarian_id=parliamentarian_id, **data
                 )
+                attendence.bulk_edit_id = bulk_edit_id
                 Change.add(request, 'add', attendence)
         else:
             request.warning(_('No parliamentarians selected'))
@@ -106,10 +124,70 @@ def add_bulk_attendence(
 
     layout = AttendenceCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_('New commission session'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
         'title': _('New commission session'),
+        'form': form,
+        'form_width': 'large'
+    }
+
+
+@PasApp.form(
+    model=Attendence,
+    name='edit-bulk-attendences',
+    template='form.pt',
+    permission=Private,
+    form=AttendenceEditBulkForm 
+)
+def edit_bulk_attendence(
+    self: Attendence,
+    request: TownRequest,
+    form: AttendenceEditBulkForm
+) -> RenderData | Response:
+    request.include('custom')
+
+    if form.submitted(request):
+
+        data = form.get_useful_data()
+        # if raw_parl_ids := request.POST.getall('parliamentarian_id'):
+        #     # Remove static field; choices are set dynamically via JS
+        #     data.pop('parliamentarian_id', None)
+        #     bulk_edit_id = uuid.uuid4()
+        #     for parliamentarian_id in raw_parl_ids:
+        #         attendence = self.add(
+        #             parliamentarian_id=parliamentarian_id, **data
+        #         )
+        #         attendence.bulk_edit_id = bulk_edit_id
+        #         Change.add(request, 'add', attendence)
+        # else:
+        #     request.warning(_('No parliamentarians selected'))
+        #     return request.redirect(request.class_link(AttendenceCollection))
+
+        # request.success(_('Added commission session'))
+
+        # return request.redirect(request.link(self))
+    elif not request.POST:
+        form.process(obj=self)
+
+    layout = AttendenceCollectionLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Attendences'), request.class_link(AttendenceCollection)),
+        Link(_('Edit commission session'), '#')
+    ]
+    layout.edit_mode = True
+    layout.editmode_links.append(
+        Link(
+            _('Delete'),
+            request.class_link(AttendenceCollection) # Needs to be created
+        )
+    )
+
+    return {
+        'layout': layout,
+        'title': _('Edit commission session'),
         'form': form,
         'form_width': 'large'
     }
@@ -131,10 +209,12 @@ def add_plenary_attendence(
     if form.submitted(request):
         data = form.get_useful_data()
         parliamentarian_ids = data.pop('parliamentarian_id')
+        bulk_edit_id = uuid.uuid4()
         for parliamentarian_id in parliamentarian_ids:
             attendence = self.add(
                 parliamentarian_id=parliamentarian_id, **data
             )
+            attendence.bulk_edit_id = bulk_edit_id
             Change.add(request, 'add', attendence)
         request.success(_('Added plenary session'))
 
@@ -142,6 +222,7 @@ def add_plenary_attendence(
 
     layout = AttendenceCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_('New plenary session'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -193,7 +274,7 @@ def edit_attendence(
 
     layout = AttendenceLayout(self, request)
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
-    layout.editbar_links = []
+    layout.edit_mode = True   
 
     return {
         'layout': layout,
