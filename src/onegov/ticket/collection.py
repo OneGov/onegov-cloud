@@ -148,6 +148,12 @@ class TicketCollectionPagination(Pagination[Ticket]):
             submitter, self.extra_parameters
         )
 
+    def groups_by_handler_code(self) -> Query[tuple[str, list[str]]]:
+        return self.query().with_entities(
+            Ticket.handler_code,
+            func.array_agg(Ticket.group.distinct())
+        ).group_by(Ticket.handler_code)
+
 
 @msgpack.make_serializable(tag=60)
 class TicketCount(NamedTuple):
@@ -295,6 +301,7 @@ class TicketInvoiceCollection(
         self,
         session: Session,
         page: int = 0,
+        ticket_group: str | None = None,
         ticket_start: datetime | None = None,
         ticket_end: datetime | None = None,
         reservation_start: datetime | None = None,
@@ -304,6 +311,7 @@ class TicketInvoiceCollection(
         Pagination.__init__(self, page)
         self.session = session
         self.invoiced = invoiced
+        self.ticket_group = ticket_group
         self.ticket_start = ticket_start
         self.ticket_end = ticket_end
         self.reservation_start = reservation_start
@@ -332,6 +340,13 @@ class TicketInvoiceCollection(
 
         if self.invoiced is not None:
             query = query.filter(TicketInvoice.invoiced == self.invoiced)
+
+        if self.ticket_group:
+            handler_code, *remainder = self.ticket_group.split('-', 1)
+            query = query.filter(Ticket.handler_code == handler_code)
+            if remainder:
+                group, = remainder
+                query = query.filter(Ticket.group == group)
 
         # Filter payments by each associated ticket creation date
         if self.ticket_start is not None:
@@ -374,6 +389,7 @@ class TicketInvoiceCollection(
         return self.__class__(
             self.session,
             page=index,
+            ticket_group=self.ticket_group,
             ticket_start=self.ticket_start,
             ticket_end=self.ticket_end,
             reservation_start=self.reservation_start,
@@ -411,6 +427,7 @@ class TicketInvoiceCollection(
             isinstance(other, TicketInvoiceCollection)
             and self.page == other.page
             and self.invoiced is other.invoiced
+            and self.ticket_group == other.ticket_group
             and self.ticket_start == other.ticket_start
             and self.ticket_end == other.ticket_end
             and self.reservation_start == other.reservation_start
@@ -421,6 +438,7 @@ class TicketInvoiceCollection(
         return self.__class__(
             self.session,
             page=0,
+            ticket_group=self.ticket_group,
             ticket_start=self.ticket_start,
             ticket_end=self.ticket_end,
             reservation_start=self.reservation_start,

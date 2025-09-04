@@ -40,6 +40,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         page: int = 0,
         start: datetime | None = None,
         end: datetime | None = None,
+        ticket_group: str | None = None,
         ticket_start: datetime | None = None,
         ticket_end: datetime | None = None,
         reservation_start: datetime | None = None,
@@ -54,6 +55,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         self.end = end
         self.status = status
         self.payment_type = payment_type
+        self.ticket_group = ticket_group
         self.ticket_start = ticket_start
         self.ticket_end = ticket_end
         self.reservation_start = reservation_start
@@ -101,6 +103,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             and self.page == other.page
             and self.start == other.start
             and self.end == other.end
+            and self.ticket_group == other.ticket_group
             and self.ticket_start == other.ticket_start
             and self.ticket_end == other.ticket_end
             and self.reservation_start == other.reservation_start
@@ -129,9 +132,14 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             query = query.filter(Payment.state == self.status)
 
         # Filter payments by each associated ticket creation date
-        if self.ticket_start or self.ticket_end:
+        if self.ticket_start or self.ticket_end or self.ticket_group:
             query = query.join(Ticket, Payment.id == Ticket.payment_id)
-
+            if self.ticket_group:
+                handler_code, *remainder = self.ticket_group.split('-', 1)
+                query = query.filter(Ticket.handler_code == handler_code)
+                if remainder:
+                    group, = remainder
+                    query = query.filter(Ticket.group == group)
             if self.ticket_start:
                 query = query.filter(Ticket.created >= self.ticket_start)
             if self.ticket_end:
@@ -166,6 +174,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             page=index,
             start=self.start,
             end=self.end,
+            ticket_group=self.ticket_group,
             ticket_start=self.ticket_start,
             ticket_end=self.ticket_end,
             reservation_start=self.reservation_start,

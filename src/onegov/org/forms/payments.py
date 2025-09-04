@@ -1,15 +1,21 @@
 from __future__ import annotations
 
+from onegov.core.utils import normalize_for_url
 from onegov.form.core import Form
-from onegov.form.fields import TranslatedSelectField, TimezoneDateTimeField
+from onegov.form.fields import (
+    ChosenSelectField, TimezoneDateTimeField, TranslatedSelectField)
 from onegov.form.validators import StrictOptional
 from onegov.org import _
+from onegov.ticket import handlers as ticket_handlers
+from operator import itemgetter
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
     from onegov.pay import PaymentCollection
-    from onegov.ticket import TicketInvoiceCollection
+    from onegov.ticket import TicketCollection, TicketInvoiceCollection
+    from wtforms.fields.choices import _Choice
 
 
 def coerce_optional_bool(choice: str | bool | None) -> bool | None:
@@ -22,6 +28,60 @@ def coerce_optional_bool(choice: str | bool | None) -> bool | None:
             case _:
                 return None
     return choice
+
+
+def get_ticket_group_choices(request: CoreRequest) -> list[_Choice]:
+    tickets: TicketCollection | None
+    # NOTE: This is a little bit expensive, but since we don't use the
+    #       same ticket collection class in every application this is
+    #       easier than overwriting these forms in every application
+    tickets = request.resolve_path('/tickets/ALL/all')
+    if tickets is None:
+        return []
+
+    handlers: list[tuple[str, str]] = []
+
+    groups = dict(tickets.groups_by_handler_code())
+    for handler_code in groups:
+        if handler_code not in ticket_handlers.registry:
+            continue
+        handler = ticket_handlers.get(handler_code)
+        assert hasattr(handler, 'handler_title')
+        handlers.append(
+            (handler_code, request.translate(handler.handler_title))
+        )
+
+    handlers.sort(key=itemgetter(1))
+
+    choices: list[_Choice] = []
+
+    for handler_code, title in handlers:
+        handler_groups = groups[handler_code]
+        handler_groups.sort(key=normalize_for_url)
+
+        choices.append((
+            handler_code,
+            title,
+            {
+                'class': f'{handler_code}-link'
+                f'{" is-parent" if handler_groups else ""}'
+            }
+        ))
+        choices.extend(
+            (
+                f'{handler_code}-{group}',
+                group,
+                {'class': f'{handler_code}-sub-link ticket-group-filter'}
+            )
+            for group in handler_groups
+        )
+
+    choices.insert(0, (
+        '',
+        request.translate(_('All Tickets')),
+        {'class': 'ALL-link'}
+    ))
+    return choices
 
 
 class TicketInvoiceSearchForm(Form):
@@ -39,6 +99,13 @@ class TicketInvoiceSearchForm(Form):
         ],
         coerce=coerce_optional_bool,
         default=None,
+    )
+
+    ticket_group = ChosenSelectField(
+        label=_('Ticket category'),
+        fieldset=_('Filter Invoices'),
+        choices=[],
+        default='ALL',
     )
 
     ticket_start_date = TimezoneDateTimeField(
@@ -73,9 +140,13 @@ class TicketInvoiceSearchForm(Form):
         validators=[StrictOptional()]
     )
 
+    def on_request(self) -> None:
+        self.ticket_group.choices = get_ticket_group_choices(self.request)
+
     def apply_model(self, model: TicketInvoiceCollection) -> None:
         """Populate the form fields from the model's filter values."""
         self.invoiced.data = model.invoiced
+        self.ticket_group.data = model.ticket_group or ''
         self.ticket_start_date.data = model.ticket_start
         self.ticket_end_date.data = model.ticket_end
         self.reservation_start_date.data = model.reservation_start
@@ -84,6 +155,7 @@ class TicketInvoiceSearchForm(Form):
     def update_model(self, model: TicketInvoiceCollection) -> None:
         """Update the model's filter values from the form's data."""
         model.invoiced = self.invoiced.data
+        model.ticket_group = self.ticket_group.data or None
         model.ticket_start = self.ticket_start_date.data
         model.ticket_end = self.ticket_end_date.data
         model.reservation_start = self.reservation_start_date.data
@@ -118,6 +190,13 @@ class PaymentSearchForm(Form):
             ('provider', _('Payment Provider'))
         ],
         default='',
+    )
+
+    ticket_group = ChosenSelectField(
+        label=_('Ticket category'),
+        fieldset=_('Filter Payments'),
+        choices=[],
+        default='ALL',
     )
 
     ticket_start_date = TimezoneDateTimeField(
@@ -157,6 +236,7 @@ class PaymentSearchForm(Form):
         self.reservation_start_date.data = model.reservation_start
         self.reservation_end_date.data = model.reservation_end
         self.status.data = model.status or ''
+        self.ticket_group.data = model.ticket_group
         self.ticket_start_date.data = model.ticket_start
         self.ticket_end_date.data = model.ticket_end
         self.payment_type.data = model.payment_type or ''
@@ -166,8 +246,12 @@ class PaymentSearchForm(Form):
         model.reservation_start = self.reservation_start_date.data
         model.reservation_end = self.reservation_end_date.data
         model.status = self.status.data or None
+        model.ticket_group = self.ticket_group.data or None
         model.ticket_start = self.ticket_start_date.data
         model.ticket_end = self.ticket_end_date.data
         model.payment_type = self.payment_type.data or None
         # Reset to the first page when filters change
         model.page = 0
+
+    def on_request(self) -> None:
+        self.ticket_group.choices = get_ticket_group_choices(self.request)

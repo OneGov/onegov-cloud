@@ -924,6 +924,7 @@ def get_payments(
     end: datetime | None = None,
     status: str | None = None,
     payment_type: str | None = None,
+    ticket_group: str | None = None,
     ticket_start: datetime | None = None,
     ticket_end: datetime | None = None,
     reservation_start: datetime | None = None,
@@ -937,6 +938,7 @@ def get_payments(
         end=end,
         status=status,
         payment_type=payment_type,
+        ticket_group=ticket_group,
         ticket_start=ticket_start,
         ticket_end=ticket_end,
         reservation_start=reservation_start,
@@ -959,6 +961,7 @@ def get_payments(
 def get_invoices(
     app: OrgApp,
     page: int = 0,
+    ticket_group: str | None = None,
     ticket_start: datetime | None = None,
     ticket_end: datetime | None = None,
     reservation_start: datetime | None = None,
@@ -968,6 +971,7 @@ def get_invoices(
     return TicketInvoiceCollection(
         session=app.session(),
         page=page,
+        ticket_group=ticket_group,
         ticket_start=ticket_start,
         ticket_end=ticket_end,
         reservation_start=reservation_start,
