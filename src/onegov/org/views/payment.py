@@ -198,7 +198,10 @@ def handle_batch_set_payment_state(
             invoiced = None
     payments_query = self.session.query(Payment).distinct().filter(
         Payment.id.in_(payment_ids)
-    ).options(joinedload(Payment.linked_invoice_items).joinedload(TicketInvoice))
+    ).options(
+        joinedload(Payment.linked_invoice_items)
+        .joinedload(TicketInvoiceItem.invoice)
+    )
     # State sequence is assumed to be: 'open' -> 'invoiced' - 'paid'
     updated_count = 0
     for payment in payments_query:
@@ -215,11 +218,14 @@ def handle_batch_set_payment_state(
             if payment.state == 'paid' and state == 'invoiced':
                 payment.state = state
 
-        # update the invoiced state of any linked invoices
-        if invoiced is not None:
-            for item in payment.linked_invoice_items:
-                if item.invoice.invoiced != invoiced:
-                    item.invoice.invoiced = invoiced
+        # update the paid/invoiced state of any linked invoices
+        for item in payment.linked_invoice_items:
+            paid = item.payments[-1].state == 'paid'
+            if item.paid is not paid:
+                item.paid = paid
+
+            if invoiced is not None and item.invoice.invoiced != invoiced:
+                item.invoice.invoiced = invoiced
 
         updated_count += 1
 
