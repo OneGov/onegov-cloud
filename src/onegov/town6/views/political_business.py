@@ -218,15 +218,7 @@ def view_political_business(
     layout = PoliticalBusinessLayout(self, request)
     groups = [self.parliamentary_group] if self.parliamentary_group else []
 
-    participations = (
-        request.session.query(PoliticalBusinessParticipation)
-        .filter(
-            PoliticalBusinessParticipation.political_business_id == self.id)
-        .options(
-            joinedload(PoliticalBusinessParticipation.parliamentarian)
-        )
-        .all()
-    )
+    participations = self.participants
     participations.sort(key=lambda x: x.parliamentarian.title)
     participations.sort(key=lambda x: x.participant_type or '', reverse=True)
 
