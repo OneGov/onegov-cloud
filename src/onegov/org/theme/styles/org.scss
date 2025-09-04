@@ -1663,6 +1663,7 @@ $payment-capture-icon: '\f09d';
 $payment-refund-icon: '\f0e2';
 $payment-provider-icon: '\f283';
 $payments-icon: '\f09d';
+$invoice-icon: '\f1ea';
 $rule-link-icon: '\f085';
 $select-icon: '\f14a';
 $send-link-icon: '\f1d9';
@@ -1802,6 +1803,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .paste-link::before { @include icon($paste-link-icon); }
     .payment-provider::before { @include icon($payment-provider-icon); }
     .payments::before { @include icon($payments-icon); }
+    .invoice::before { @include icon($invoice-icon); }
     .select::before { @include icon($select-icon); }
     .send-link::before { @include icon($send-link-icon); }
     .sort-link::before { @include icon($sort-link-icon); }

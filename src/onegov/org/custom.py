@@ -13,7 +13,7 @@ from onegov.org.models import (
 )
 from onegov.pay import PaymentProviderCollection, PaymentCollection
 from onegov.reservation import Reservation, ResourceCollection
-from onegov.ticket import TicketCollection
+from onegov.ticket import TicketCollection, TicketInvoiceCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from purl import URL
@@ -134,6 +134,14 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
                 _('Payments'),
                 request.class_link(PaymentCollection),
                 attrs={'class': 'payment'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('Invoices'),
+                request.class_link(TicketInvoiceCollection),
+                attrs={'class': 'invoice'}
             )
         )
 
