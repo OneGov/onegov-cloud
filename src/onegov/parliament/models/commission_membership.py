@@ -101,7 +101,8 @@ class CommissionMembership(Base, TimestampMixin):
     #: the related commission (which may have any number of memberships)
     commission: relationship[Commission] = relationship(
         'Commission',
-        back_populates='memberships'
+        back_populates='memberships',
+        lazy='joined',
     )
 
     #: the id of the parliamentarian
