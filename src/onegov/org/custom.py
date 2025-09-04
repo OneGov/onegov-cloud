@@ -37,7 +37,10 @@ def logout_path(request: OrgRequest) -> str:
     return url.path() or '/'
 
 
-def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
+def get_global_tools(
+    request: OrgRequest,
+    invoicing: bool = True
+) -> Iterator[Link | LinkGroup]:
 
     citizen_login_enabled = request.app.org.citizen_login_enabled
 
@@ -137,13 +140,14 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
             )
         )
 
-        links.append(
-            Link(
-                _('Invoices'),
-                request.class_link(TicketInvoiceCollection),
-                attrs={'class': 'invoice'}
+        if invoicing:
+            links.append(
+                Link(
+                    _('Invoices'),
+                    request.class_link(TicketInvoiceCollection),
+                    attrs={'class': 'invoice'}
+                )
             )
-        )
 
         links.append(
             Link(
