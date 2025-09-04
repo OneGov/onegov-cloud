@@ -339,6 +339,18 @@ class PoliticalBusinessCollection(
         """
         return super().query().order_by(self.model_class.entry_date.desc())
 
+    def by_parliamentarian_id(
+        self,
+        parliamentarian_id: uuid.UUID
+    ) -> Query[PoliticalBusiness]:
+        return (
+            self.query()
+            .join(PoliticalBusinessParticipation)
+            .filter(PoliticalBusinessParticipation.
+                    parliamentarian_id == parliamentarian_id
+            )
+        )
+
     def subset(self) -> Query[PoliticalBusiness]:
         return self.query()
 

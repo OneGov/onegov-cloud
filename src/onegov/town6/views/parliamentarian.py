@@ -6,6 +6,8 @@ from onegov.org.forms import ParliamentarianForm
 from onegov.org.forms import ParliamentarianRoleForm
 from onegov.org.forms.commission_role import ParliamentarianCommissionRoleForm
 from onegov.org.models import RISParliamentarian
+from onegov.org.models import PoliticalBusinessCollection
+from onegov.org.models import PoliticalBusiness
 from onegov.org.models import RISParliamentarianCollection
 from onegov.org.models import PoliticalBusinessParticipationCollection
 from onegov.parliament.collections import ParliamentarianCollection
@@ -255,7 +257,29 @@ def ris_view_parliamentarian(
 ) -> RenderData | Response:
 
     layout = RISParliamentarianLayout(self, request)
-    return view_parliamentarian(self, request, layout)
+
+    collection = PoliticalBusinessCollection(request.session)
+    query = collection.by_parliamentarian_id(self.id)
+    query = query.order_by(
+        PoliticalBusiness.entry_date,
+        PoliticalBusiness.title,
+    )
+
+    businesses = [
+        {
+            'business': b,
+            'number': b.number,
+            'title': b.title,
+        }
+        for b in query.all()
+    ]
+
+    return {
+        'layout': layout,
+        'parliamentarian': self,
+        'businesses': businesses,
+        'title': layout.title,
+    }
 
 
 @TownApp.form(
