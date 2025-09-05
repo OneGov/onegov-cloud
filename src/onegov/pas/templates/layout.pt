@@ -78,10 +78,12 @@
                                 <div class="cell small-12">
                                     <div class="global-header-flex ${'' if toolbox else 'centered'}">
                                         <div tal:condition="layout.current_settlement_run" class="current-settlement-run">
-                                            <i class="fas fa-hand-holding-usd" aria-hidden="true"></i>
-                                            <span i18n:translate="">Settlement Run</span>:
-                                            <span>${layout.format_date(layout.current_settlement_run.start, 'date')} - ${layout.format_date(layout.current_settlement_run.end, 'date')}</span>
-                                            <span class="not-active" tal:condition="not layout.current_settlement_run.active" i18n:translate="">(not active)</span>
+                                            <a href="${request.link(layout.current_settlement_run, '..')}">
+                                                <i class="fas fa-hand-holding-usd" aria-hidden="true"></i>
+                                                <span i18n:translate="">Settlement Run</span>:
+                                                <span>${layout.format_date(layout.current_settlement_run.start, 'date')} - ${layout.format_date(layout.current_settlement_run.end, 'date')}</span>
+                                                <span class="not-active" tal:condition="not layout.current_settlement_run.active" i18n:translate="">(not active)</span>
+                                            </a>
                                         </div>
                                         <ul tal:condition="toolbox" class="vertical medium-horizontal menu global-tools-menu" data-responsive-menu="accordion medium-dropdown">
                                         <li tal:repeat="tool toolbox">
