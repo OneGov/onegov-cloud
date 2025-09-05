@@ -44,6 +44,7 @@ class Meeting(
 
     __tablename__ = 'par_meetings'
 
+    # polymorphic type of meeting
     type: Column[str] = Column(
         Text,
         nullable=False,
