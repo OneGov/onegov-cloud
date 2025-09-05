@@ -102,7 +102,7 @@ def add_start_end_columns_to_meetings(
 
 
 @upgrade_task('Add type column to parliament models 2nd attempt')
-def add_type_column_to_parliament_models(
+def add_type_column_to_parliament_models_second(
     context: UpgradeContext
 ) -> None:
     # this is only needed as on the first attempt type columns and
@@ -112,7 +112,8 @@ def add_type_column_to_parliament_models(
     for table, type_name, poly_type in (
             ('par_attendence', 'poly_type', 'pas_attendence'),
             ('par_changes', 'type', 'pas_change'),
-            ('par_commission_memberships', 'type', 'pas_commission_membership'),
+            ('par_commission_memberships', 'type',
+             'pas_commission_membership'),
             ('par_commissions', 'poly_type', 'pas_commission'),
             ('par_legislative_periods', 'type', 'pas_legislative_period'),
             ('par_meeting_items', 'type', 'pas_meeting_items'),
@@ -121,7 +122,8 @@ def add_type_column_to_parliament_models(
             ('par_parliamentary_groups', 'type', 'pas_parliamentary_group'),
             ('par_parties', 'type', 'pas_party'),
             ('par_political_businesses', 'type', 'pas_political_businesses'),
-            ('par_political_business_participants', 'type', 'pas_political_business_participants')
+            ('par_political_business_participants', 'type',
+             'pas_political_business_participants')
     ):
         if not context.has_column(table, type_name):
             context.operations.add_column(
