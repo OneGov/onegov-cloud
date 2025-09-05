@@ -143,4 +143,3 @@ def add_type_column_to_parliament_models_second(
             context.operations.execute(
                 f'ALTER TABLE {table} ALTER COLUMN {type_name} SET NOT NULL'
             )
-
