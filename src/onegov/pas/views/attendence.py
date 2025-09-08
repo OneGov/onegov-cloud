@@ -36,10 +36,7 @@ def view_attendences(
 
     layout = AttendenceCollectionLayout(self, request)
 
-    # Get all records ordered by bulk_edit_id
     all_attendances = self.query().order_by(Attendence.created.desc()).all()
-
-    # Group them in Python
     bulk_edit_groups = [
         list(group) 
         for bulk_edit_id, group in groupby(all_attendances, key=attrgetter(
@@ -49,7 +46,7 @@ def view_attendences(
     return {
         'add_link': request.link(self, name='new'),
         'layout': layout,
-        'attendences': self.query().all(),
+        'attendences': all_attendances,
         'title': layout.title,
         'bulk_edit_groups': bulk_edit_groups
     }
@@ -151,23 +148,28 @@ def edit_bulk_attendence(
     if form.submitted(request):
 
         data = form.get_useful_data()
-        # if raw_parl_ids := request.POST.getall('parliamentarian_id'):
-        #     # Remove static field; choices are set dynamically via JS
-        #     data.pop('parliamentarian_id', None)
-        #     bulk_edit_id = uuid.uuid4()
-        #     for parliamentarian_id in raw_parl_ids:
-        #         attendence = self.add(
-        #             parliamentarian_id=parliamentarian_id, **data
-        #         )
-        #         attendence.bulk_edit_id = bulk_edit_id
-        #         Change.add(request, 'add', attendence)
-        # else:
-        #     request.warning(_('No parliamentarians selected'))
-        #     return request.redirect(request.class_link(AttendenceCollection))
+        if raw_parl_ids := request.POST.getall('parliamentarian_id'):
+            # Remove static field; choices are set dynamically via JS
+            all_parliamentarians = data.pop('parliamentarian_id', None)
+            if self.type == 'plenary':
+                unselected_parliamentarians = [
+                    pid for pid in all_parliamentarians
+                    if pid not in raw_parl_ids
+                ]
+                for parliamentarian in unselected_parliamentarians:
+                    attendences = AttendenceCollection(request.session
+                                                       ).query().filter(
+                        Attendence.parliamentarian_id == parliamentarian,
+                        Attendence.bulk_edit_id == form.bulk_edit_id.data,
+                    ).first()
+                    for attendence in attendences:
+                        Change.add(request, 'delete', attendence)
+                        request.delete(attendence)
+            return request.redirect(request.class_link(AttendenceCollection))
 
-        # request.success(_('Added commission session'))
+        request.success(_('Added commission session'))
 
-        # return request.redirect(request.link(self))
+        return request.redirect(request.link(self))
     elif not request.POST:
         form.process(obj=self)
 
@@ -208,15 +210,17 @@ def add_plenary_attendence(
 
     if form.submitted(request):
         data = form.get_useful_data()
-        parliamentarian_ids = data.pop('parliamentarian_id')
-        bulk_edit_id = uuid.uuid4()
-        for parliamentarian_id in parliamentarian_ids:
-            attendence = self.add(
-                parliamentarian_id=parliamentarian_id, **data
-            )
-            attendence.bulk_edit_id = bulk_edit_id
-            Change.add(request, 'add', attendence)
-        request.success(_('Added plenary session'))
+        if raw_parl_ids := request.POST.getall('parliamentarian_id'):
+            # Remove static field; choices are set dynamically via JS
+            data.pop('parliamentarian_id', None)
+            bulk_edit_id = uuid.uuid4()
+            for parliamentarian_id in raw_parl_ids:
+                attendence = self.add(
+                    parliamentarian_id=parliamentarian_id, **data
+                )
+                attendence.bulk_edit_id = bulk_edit_id
+                Change.add(request, 'add', attendence)
+            request.success(_('Added plenary session'))
 
         return request.redirect(request.link(self))
 

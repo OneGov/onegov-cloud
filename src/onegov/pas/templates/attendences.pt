@@ -6,23 +6,25 @@
         <div class="grid-x grid-padding-x">
             <div class="medium-7 cell main-content">
                 <p tal:condition="not:attendences" i18n:translate="">No meeting defined yet.</p>
-                <table tal:condition="attendences" class="attendences">
+                <table tal:condition="attendences" class="attendences hover">
                     <thead>
                         <tr>
                             <th i18n:translate>Date</th>
                             <th i18n:translate>Duration</th>
                             <th i18n:translate>Parliamentarian</th>
                             <th i18n:translate>Type</th>
-                            <th i18n:translate>Comission</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr tal:repeat="attendence attendences">
-                            <td><a href="${request.link(attendence)}" i18n:translate>${layout.format_date(attendence.date, 'date')}</a></td>
+                            <td>${layout.format_date(attendence.date, 'date')}</td>
                             <td>${(attendence.duration/60)} h</td>
                             <td>${attendence.parliamentarian.title}</td>
-                            <td>${attendence.type_label}</td>
-                            <td><tal:block tal:condition="attendence.commission">${attendence.commission.title}</tal:block></td>
+                            <td>${attendence.type_label}
+                                <tal:block tal:condition="attendence.commission"><br>
+                                    <i>${attendence.commission.title}</i></tal:block></td>
+                            <td><a href="${request.link(attendence)}" i18n:translate><i class="fa fa-edit"></i></a></td>
                         </tr>
                     </tbody>
                 </table>
@@ -30,8 +32,8 @@
             <div class="medium-5 cell">
                 <h3 i18n:translate>Bulk edits</h3>
                 <ul class="more-list">
-                    <li tal:repeat="group bulk_edit_groups">
-                        <tal:b tal:define="attendence group[0]" tal:condition="attendence.bulk_edit_id">
+                    <tal:b tal:repeat="group bulk_edit_groups">
+                        <li tal:define="attendence group[0]" tal:condition="attendence.bulk_edit_id">
                             <a class="list-link" href="${request.link(attendence, 'edit-bulk-attendences')}">
                                 <i class="fa fa-edit"></i>
                                 <span class="list-title" i18n:translate>${layout.format_date(attendence.date, 'date')}, ${attendence.type_label}</span>
@@ -45,8 +47,8 @@
                                         bearbeitet: ${layout.format_date(attendence.modified, 'datetime')}
                                 </p>
                             </a>
-                        </tal:b>
-                    </li>
+                        </li>
+                    </tal:b>
                 </ul>
             </div>
 

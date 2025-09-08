@@ -323,7 +323,9 @@ class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):
                 ).first().memberships  # type:ignore
             ]
 
-        self.parliamentarian_id.data = [choice[0] for choice in selected_parliamentarians]
+        self.parliamentarian_id.data = [
+            choice[0] for choice in selected_parliamentarians
+        ]
 
 
 
