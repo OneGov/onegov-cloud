@@ -36,17 +36,17 @@ from onegov.pas.models import (
 )
 from onegov.pas.models.attendence import TYPES
 from onegov.pas.path import SettlementRunExport, SettlementRunAllExport
-from onegov.pas.abschlussliste import generate_xlsx_export_rows
-
 from onegov.pas.utils import (
     format_swiss_number,
     get_parliamentarians_with_settlements,
     get_parties_with_settlements,
 )
+from onegov.pas.views.abschlussliste import generate_abschlussliste_xlsx
+from onegov.pas.views.pas_excel_export_nr_3_lohnart_fibu import (
+        generate_fibu_export_rows)
+
 
 from typing import Literal, TypeAlias, TYPE_CHECKING
-
-from onegov.pas.views.abschlussliste import generate_abschlussliste_xlsx
 if TYPE_CHECKING:
     from datetime import date
     from onegov.core.types import RenderData
@@ -246,7 +246,7 @@ def view_settlement_run(
                     request.link(
                         SettlementRunAllExport(
                             settlement_run=self,
-                            category='plain-xlsx-export'
+                            category='buchungen-abrechnungslauf-kontroll-xlsx-export'
                         ),
                         name='run-export'
                     ),
@@ -949,7 +949,9 @@ def view_settlement_run_all_export(
             content_type=XLSX_MIMETYPE,
             content_disposition=f'attachment; filename="{filename}"'
         )
-    elif self.category == 'plain-xlsx-export':
+    elif self.category == 'buchungen-abrechnungslauf-kontroll-xlsx-export':
+        pass
+    elif self.category == 'fibu-csv-export':
         q = self.settlement_run.get_run_number_for_year(
             self.settlement_run.end
         )
@@ -962,7 +964,7 @@ def view_settlement_run_all_export(
             output, {'default_date_format': 'dd.mm.yyyy'})
         worksheet = workbook.add_worksheet('DATA')
 
-        for row_num, row_data in enumerate(generate_xlsx_export_rows(
+        for row_num, row_data in enumerate(generate_fibu_export_rows(
                 self.settlement_run, request)):
             worksheet.write_row(row_num, 0, row_data)
 

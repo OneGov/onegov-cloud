@@ -1,5 +1,4 @@
 from __future__ import annotations
-from decimal import Decimal
 from sedate import utcnow
 from collections.abc import Iterator
 
@@ -8,18 +7,20 @@ from onegov.pas.collections import (
     AttendenceCollection,
 )
 from onegov.pas.custom import get_current_rate_set
-from onegov.pas.models import (
-    SettlementRun,
-)
+from decimal import Decimal
 from onegov.pas.models.attendence import TYPES
-
-from onegov.town6.request import TownRequest
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.town6.request import TownRequest
+    from onegov.pas.models import ( SettlementRun)
     from datetime import date
     from collections.abc import Iterator
+
+
+# Doc:
+# 'KR-Entschaedigung - 1.Quartal 2024 (1).csv'
 
 
 NEW_LOHNART_MAPPING = {
@@ -35,11 +36,20 @@ NEW_LOHNART_MAPPING = {
     }
 }
 
+"""
+Hier noch die Infos bezüglich den FibU-Konten:
+    3000.2 für Plenarsitzungen
+    3000.3 für Kommissionsitzungen & Aktenstudium
+    3000.3 amtlichen Missionen Kantonsratspräsidiums
+    3170.1 Fahr- und Verpflegungsspesen
+"""
 
-def generate_xlsx_export_rows(
+
+def generate_fibu_export_rows(
     settlement_run: SettlementRun,
     request: TownRequest
 ) -> Iterator[list[str | Decimal | date]]:
+    """ Finanzbuchhaltung export """
 
     yield [
         'Personalnummer', 'Vertragsnummer', 'Lohnart / Lohnarten Nr.',
