@@ -2,13 +2,8 @@ from __future__ import annotations
 
 from functools import cached_property
 from onegov.pas import _
-from onegov.pas.custom import get_current_settlement_run
 from onegov.town6.layout import DefaultLayout as BaseDefaultLayout
-
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from onegov.pas.models.settlement_run import SettlementRun
+from onegov.pas.models.settlement_run import SettlementRun
 
 
 class DefaultLayout(BaseDefaultLayout):
@@ -16,7 +11,10 @@ class DefaultLayout(BaseDefaultLayout):
     @cached_property
     def current_settlement_run(self) -> SettlementRun | None:
         try:
-            return get_current_settlement_run(self.request.session)
+            session = self.request.session
+            query = session.query(SettlementRun)
+            query = query.filter(SettlementRun.active == True)
+            return query.first() if query.count() == 1 else None
         except Exception:  # layout.pt checks for None
             return None
 
