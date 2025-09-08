@@ -4,6 +4,10 @@ from freezegun import freeze_time
 def test_meetings(client):
     client.login_admin().follow()
 
+    # ris views not enabled
+    assert client.get('/meetings', status=404)
+    assert client.get('/meetings/new', status=404)
+
     # enable ris
     settings = client.get('/ris-enable')
     settings.form['ris_enabled'] = True
