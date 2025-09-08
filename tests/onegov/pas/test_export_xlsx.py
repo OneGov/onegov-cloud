@@ -108,7 +108,7 @@ def test_export_abschlussliste_xlsx(client_with_es, session):
     # Verify XLSX content
     csv_file = convert_xlsx_to_csv(BytesIO(response.body))
     reader = csv.reader(StringIO(csv_file))
-    
+
     # check header
     headers = next(reader)
     assert headers == [

@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from collections import defaultdict
 from io import BytesIO
-from sedate import utcnow
 from webob import Response
 from onegov.core.utils import module_path
 from decimal import Decimal
@@ -38,15 +36,18 @@ from onegov.pas.models import (
 )
 from onegov.pas.models.attendence import TYPES
 from onegov.pas.path import SettlementRunExport, SettlementRunAllExport
+from onegov.pas.abschlussliste import generate_xlsx_export_rows
+
 from onegov.pas.utils import (
     format_swiss_number,
     get_parliamentarians_with_settlements,
     get_parties_with_settlements,
 )
 
-from typing import Literal, TypeAlias, TYPE_CHECKING, Any
+from typing import Literal, TypeAlias, TYPE_CHECKING
+
+from onegov.pas.views.abschlussliste import generate_abschlussliste_xlsx
 if TYPE_CHECKING:
-    from collections.abc import Iterator
     from datetime import date
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
@@ -65,9 +66,9 @@ XLSX_MIMETYPE = (
 
 
 @PasApp.html(
-model=SettlementRunCollection,
-template='settlement_runs.pt',
-permission=Private
+    model=SettlementRunCollection,
+    template='settlement_runs.pt',
+    permission=Private
 )
 def view_settlement_runs(
     self: SettlementRunCollection,
@@ -914,224 +915,6 @@ def _get_party_settlement_data(
         ))
 
     return sorted(result, key=itemgetter(0))
-
-
-NEW_LOHNART_MAPPING = {
-    'plenary': {'nr': '2405', 'text': 'Sitzungsentschädigung KR'},
-    'commission': {
-        'nr': '2410',
-        'text': 'Kommissionsentschädigung KR inkl. Kürzestsitzungen'
-    },
-    'study': {'nr': '2421', 'text': 'Aktenstudium Kantonsrat'},
-    'shortest': {
-        'nr': '2410',
-        'text': 'Kommissionsentschädigung KR inkl. Kürzestsitzungen'
-    }
-}
-
-
-def generate_xlsx_export_rows(
-    settlement_run: SettlementRun,
-    request: TownRequest
-) -> Iterator[list[str | Decimal | date]]:
-
-    yield [
-        'Personalnummer', 'Vertragsnummer', 'Lohnart / Lohnarten Nr.',
-        '', '', '', '', '', '', '', '', '',  # D-L empty
-        'Betrag', '', '', '',  # M-P empty (M is Betrag)
-        'Bemerkung/Lohnartentext, welche auf der Lohnabrechnung erscheint', '',
-        'Fibu-Konto', 'Kostenstelle / Kostenträger',  # S-T
-        '', '', '', '', '',  # U-Y empty
-        'Angabe zum Jahr und zum Quartal', 'Exportdatum'  # Z-AA
-    ]
-
-    session = request.session
-    rate_set = get_current_rate_set(session, settlement_run)
-    if not rate_set:
-        return
-
-    # Get all attendences in period
-    attendences = AttendenceCollection(
-        session,
-        date_from=settlement_run.start,
-        date_to=settlement_run.end
-    ).query()
-
-    cola_multiplier = Decimal(
-        str(1 + (rate_set.cost_of_living_adjustment / 100))
-    )
-    quarter = settlement_run.get_run_number_for_year(settlement_run.end)
-    year_quarter_str = f'{settlement_run.end.year} Q{quarter}'
-
-    for attendance in attendences:
-        parliamentarian = attendance.parliamentarian
-        lohnart_info = NEW_LOHNART_MAPPING.get(attendance.type)
-
-        if not lohnart_info:
-            lohnart_nr = ''
-            lohnart_text = request.translate(TYPES.get(
-                attendance.type, ''))
-        else:
-            lohnart_nr = lohnart_info['nr']
-            lohnart_text = lohnart_info['text']
-
-        is_president = any(r.role == 'president'
-                           for r in parliamentarian.roles)
-        base_rate = calculate_rate(
-            rate_set=rate_set,
-            attendence_type=attendance.type,
-            duration_minutes=int(attendance.duration),
-            is_president=is_president,
-            commission_type=(
-                attendance.commission.type if attendance.commission else None
-            )
-        )
-        rate_with_cola = Decimal(base_rate * cola_multiplier)
-
-        # Some columns are left empty on purpose (this is what is asked)
-        yield [
-            parliamentarian.personnel_number or '', '', lohnart_nr,
-            '', '', '', '', '', '', '', '', '', rate_with_cola,
-            '', '', '', lohnart_text, '', '', '',
-            '', '', '', '', '', year_quarter_str, utcnow().strftime('%d.%m.%Y')
-        ]
-
-
-def get_abschlussliste_data(
-    settlement_run: SettlementRun,
-    request: TownRequest,
-) -> list[dict[str, Any]]:
-    session = request.session
-    rate_set = get_current_rate_set(session, settlement_run)
-    if not rate_set:
-        return []
-
-    parliamentarians = get_parliamentarians_with_settlements(
-        session, settlement_run.start, settlement_run.end
-    )
-
-    parl_data: defaultdict[str, dict[str, Any]] = defaultdict(
-        lambda: {
-            'plenum_duration': Decimal('0'),
-            'plenum_compensation': Decimal('0'),
-            'commission_duration': Decimal('0'),
-            'commission_compensation': Decimal('0'),
-            'study_duration': Decimal('0'),
-            'study_compensation': Decimal('0'),
-            'shortest_duration': Decimal('0'),
-            'shortest_compensation': Decimal('0'),
-            'expenses': Decimal('0'),
-        }
-    )
-
-    attendances = AttendenceCollection(
-        session,
-        date_from=settlement_run.start,
-        date_to=settlement_run.end,
-    ).query()
-
-    for att in attendances:
-        p = att.parliamentarian
-        is_president = any(r.role == 'president' for r in p.roles)
-        compensation = calculate_rate(
-            rate_set=rate_set,
-            attendence_type=att.type,
-            duration_minutes=int(att.duration),
-            is_president=is_president,
-            commission_type=att.commission.type if att.commission else None
-        )
-
-        data = parl_data[str(p.id)]
-        if att.type == 'plenary':
-            data['plenum_duration'] += Decimal(att.duration)
-            data['plenum_compensation'] += Decimal(str(compensation))
-        elif att.type == 'commission':
-            data['commission_duration'] += Decimal(att.duration)
-            data['commission_compensation'] += Decimal(str(compensation))
-        elif att.type == 'study':
-            data['study_duration'] += Decimal(att.duration)
-            data['study_compensation'] += Decimal(str(compensation))
-        elif att.type == 'shortest':
-            data['shortest_duration'] += Decimal(att.duration)
-            data['shortest_compensation'] += Decimal(str(compensation))
-
-    result = []
-    for p in parliamentarians:
-        party = p.get_party_during_period(
-            settlement_run.start, settlement_run.end, session
-        )
-        data = parl_data[str(p.id)]
-        data['parliamentarian'] = p
-        data['party'] = party.name if party else ''
-        data['faction'] = party.name if party else ''
-        result.append(data)
-
-    return sorted(
-        result,
-        key=lambda x: (
-            x['parliamentarian'].last_name,
-            x['parliamentarian'].first_name
-        )
-    )
-
-
-def generate_abschlussliste_xlsx(
-    settlement_run: SettlementRun,
-    request: TownRequest
-) -> BytesIO:
-    output = BytesIO()
-    workbook = xlsxwriter.Workbook(output)
-
-    # Details tab
-    details_ws = workbook.add_worksheet('Details')
-    details_headers = [
-        'Name', 'Vorname', 'Partei', 'Fraktion',
-        'Plenum / Kommission Zeit', 'Entschädigung',
-        'Aktenstudium Zeit', 'Aktenstudium Entschädigung',
-        'Kürzestsitzungen Zeit', 'Kürzestsitzungen Entschädigung'
-    ]
-    details_ws.write_row(0, 0, details_headers)
-
-    # Übersicht tab
-    overview_ws = workbook.add_worksheet('Übersicht')
-    overview_headers = [
-        'Name', 'Vorname', 'Partei', 'Fraktion',
-        'Plenum Zeit', 'Plenum Entschädigung',
-        'Kommissionen Zeit', 'Kommissionen Entschädigung',
-        'Spesen'
-    ]
-    overview_ws.write_row(0, 0, overview_headers)
-
-    data = get_abschlussliste_data(settlement_run, request)
-
-    for row_num, row_data in enumerate(data, 1):
-        p = row_data['parliamentarian']
-
-        # Details tab row
-        details_row = [
-            p.last_name, p.first_name, row_data['party'], row_data['faction'],
-            row_data['plenum_duration'] + row_data['commission_duration'],
-            row_data['plenum_compensation']
-            + row_data['commission_compensation'],
-            row_data['study_duration'], row_data['study_compensation'],
-            row_data['shortest_duration'], row_data['shortest_compensation']
-        ]
-        details_ws.write_row(row_num, 0, details_row)
-
-        # Übersicht tab row
-        overview_row = [
-            p.last_name, p.first_name, row_data['party'], row_data['faction'],
-            row_data['plenum_duration'], row_data['plenum_compensation'],
-            row_data['commission_duration'] + row_data['shortest_duration'],
-            row_data['commission_compensation']
-            + row_data['shortest_compensation'],
-            row_data['expenses']
-        ]
-        overview_ws.write_row(row_num, 0, overview_row)
-
-    workbook.close()
-    output.seek(0)
-    return output
 
 
 @PasApp.view(
