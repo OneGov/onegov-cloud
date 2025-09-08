@@ -44,8 +44,7 @@ from onegov.pas.utils import (
     get_parties_with_settlements,
 )
 
-
-from typing import Any, Literal, TypeAlias, TYPE_CHECKING
+from typing import Literal, TypeAlias, TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from datetime import date
@@ -98,17 +97,16 @@ def view_settlement_runs(
     }
 
 
-@PasApp.form(
-model=SettlementRunCollection,
-name='new',
-template='form.pt',
-permission=Private,
-form=SettlementRunForm
+@PasApp.form(model=SettlementRunCollection,
+    name='new',
+    template='form.pt',
+    permission=Private,
+    form=SettlementRunForm
 )
 def add_settlement_run(
-self: SettlementRunCollection,
-request: TownRequest,
-form: SettlementRunForm
+    self: SettlementRunCollection,
+    request: TownRequest,
+    form: SettlementRunForm
 ) -> RenderData | Response:
 
     if form.submitted(request):
