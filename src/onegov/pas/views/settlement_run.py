@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+from io import BytesIO
 from webob import Response
+from onegov.core.utils import module_path
 from decimal import Decimal
 from operator import itemgetter
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration)
+import xlsxwriter   # type: ignore[import-untyped]
 
 from onegov.core.elements import Link
 from onegov.core.security import Private
@@ -38,6 +41,9 @@ from onegov.pas.utils import (
     get_parliamentarians_with_settlements,
     get_parties_with_settlements,
 )
+from onegov.pas.views.abschlussliste import generate_abschlussliste_xlsx
+from onegov.pas.views.pas_excel_export_nr_3_lohnart_fibu import (
+        generate_fibu_export_rows)
 
 
 from typing import Literal, TypeAlias, TYPE_CHECKING
@@ -54,120 +60,9 @@ if TYPE_CHECKING:
     ]
 
 
-PDF_CSS = """
-@page {
-    size: A4;
-    margin: 2.5cm 0.75cm 2cm 0.75cm;  /* top right bottom left */
-    @top-right {
-        content: "Staatskanzlei";
-        font-family: Helvetica, Arial, sans-serif;
-        font-size: 8pt;
-    }
-}
-
-body {
-    font-family: Helvetica, Arial, sans-serif;
-    font-size: 7pt;
-    line-height: 1.2;
-}
-
-table {
-    border-collapse: collapse;
-    margin-top: 1cm;
-    width: 100%;
-    table-layout: fixed;
-}
-
-/* Journal entries table - updated column widths */
-.journal-table th:nth-child(1), /* Date */
-.journal-table td:nth-child(1) {
-    width: 20pt;
-}
-
-.journal-table th:nth-child(2), /* Personnel Number */
-.journal-table td:nth-child(2) {
-    width: 20pt;
-}
-
-.journal-table th:nth-child(3), /* Person */
-.journal-table td:nth-child(3) {
-    width: 80pt;
-}
-
-.journal-table th:nth-child(4), /* Type */
-.journal-table td:nth-child(4) {
-    width: 170pt;
-}
-
-.journal-table th:nth-child(5), /* Value */
-.journal-table td:nth-child(5),
-.journal-table th:nth-child(6), /* CHF */
-.journal-table td:nth-child(6),
-.journal-table th:nth-child(7), /* CHF + TZ */
-.journal-table td:nth-child(7) {
-    width: 30pt;
-}
-
-/* Party summary table */
-.summary-table th:nth-child(1), /* Name */
-.summary-table td:nth-child(1) {
-    width: 120pt;
-}
-
-.summary-table th:nth-child(2), /* Meetings */
-.summary-table td:nth-child(2),
-.summary-table th:nth-child(3), /* Expenses */
-.summary-table td:nth-child(3),
-.summary-table th:nth-child(4), /* Total */
-.summary-table td:nth-child(4),
-.summary-table th:nth-child(5), /* COLA */
-.summary-table td:nth-child(5),
-.summary-table th:nth-child(6), /* Final */
-.summary-table td:nth-child(6) {
-    width: 60pt;
-}
-
-/* Dark header for title row */
-th[colspan="6"] {
-    background-color: #707070;
-    color: white;
-    font-weight: bold;
-    text-align: left;
-    padding: 2pt;
-    border: 1pt solid #000;
-}
-
-th:not([colspan]) {
-    background-color: #d5d7d9;
-    font-weight: bold;
-    text-align: left;
-    padding: 2pt;
-    border: 1pt solid #000;
-}
-
-td {
-    padding: 2pt;
-    border: 1pt solid #000;
-}
-
-tr:nth-child(even):not(.total-row) td {
-    background-color: #f3f3f3;
-}
-
-.numeric {
-    text-align: right;
-}
-
-.total-row {
-    font-weight: bold;
-    background-color: #d5d7d9;
-}
-
-.summary-table {
-    margin-top: 2cm;
-    /* page-break-before: always; */
-}
-    """
+XLSX_MIMETYPE = (
+'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+)
 
 
 @PasApp.html(
@@ -203,8 +98,7 @@ def view_settlement_runs(
     }
 
 
-@PasApp.form(
-    model=SettlementRunCollection,
+@PasApp.form(model=SettlementRunCollection,
     name='new',
     template='form.pt',
     permission=Private,
@@ -259,7 +153,7 @@ def view_settlement_run(
         session, self.start, self.end
     )
 
-    categories = {
+    pdf_categories = {
         'party': {
             'title': _('Settlements by Party'),
             'links': [
@@ -278,7 +172,7 @@ def view_settlement_run(
             ],
         },
         'all': {
-            'title': _('All Settlements'),  # Gesamtabrechnung
+            'title': _('All Settlements'),
             'links': [
                 Link(
                     _('All Parties'),
@@ -289,7 +183,7 @@ def view_settlement_run(
                         ),
                         name='run-export'
                     ),
-                )
+                ),
             ],
         },
         'commissions': {
@@ -328,10 +222,56 @@ def view_settlement_run(
         },
     }
 
+    excel_categories = {
+        'abschlussliste_export': {
+            'title': _('Abschlussliste'),
+            'links': [
+                Link(
+                    _('Abschlussliste (XLSX)'),
+                    request.link(
+                        SettlementRunAllExport(
+                            settlement_run=self,
+                            category='abschlussliste-xlsx-export'
+                        ),
+                        name='run-export'
+                    ),
+                )
+            ]
+        },
+        'salary_export': {
+            'title': _('Buchungen Abrechnungslauf'),
+            'links': [
+                Link(
+                    _('Buchungen Abrechnungslauf (Kontrollliste)'),
+                    request.link(
+                        SettlementRunAllExport(
+                            settlement_run=self,
+                            category='buchungen-abrechnungslauf-kontroll-xlsx-export'
+                        ),
+                        name='run-export'
+                    ),
+                )
+            ]
+        }
+    }
+
+    export_tabs_data = {
+        'pdf': {
+            'tab_title': _('PDF Exports'),
+            'panel_id': 'panel-pdf-exports',
+            'categories': pdf_categories
+        },
+        'excel': {
+            'tab_title': _('Excel Exports'),
+            'panel_id': 'panel-excel-exports',
+            'categories': excel_categories
+        }
+    }
+
     return {
         'layout': layout,
         'settlement_run': self,
-        'categories': categories,
+        'export_tabs_data': export_tabs_data,
         'title': layout.title,
     }
 
@@ -549,7 +489,9 @@ def generate_settlement_pdf(
 ) -> bytes:
     """ Entry point for almost all settlement PDF generations. """
     font_config = FontConfiguration()
-    css = CSS(string=PDF_CSS)
+    css_path = module_path('onegov.pas', 'views/templates/settlement_pdf.css')
+    with open(css_path) as f:
+        css = CSS(string=f.read())
 
     if entity_type == 'commission' and isinstance(entity, PASCommission):
         settlement_data = _get_commission_settlement_data(
@@ -999,8 +941,44 @@ def view_settlement_run_all_export(
             content_type='application/pdf',
             content_disposition=f'attachment; filename={filename}.pdf'
         )
+    elif self.category == 'abschlussliste-xlsx-export':
+        filename = 'Abschlussliste.xlsx'
+        output = generate_abschlussliste_xlsx(self.settlement_run, request)
+        return Response(
+            output.read(),
+            content_type=XLSX_MIMETYPE,
+            content_disposition=f'attachment; filename="{filename}"'
+        )
+    elif self.category == 'buchungen-abrechnungslauf-kontroll-xlsx-export':
+        pass
+    elif self.category == 'fibu-csv-export':
+        q = self.settlement_run.get_run_number_for_year(
+            self.settlement_run.end
+        )
+        year = self.settlement_run.end.year
+        filename = (
+            f'Buchungen Abrechnungslauf KR-{year}_{q:02d}_Kontrollliste.xlsx'
+        )
+        output = BytesIO()
+        workbook = xlsxwriter.Workbook(
+            output, {'default_date_format': 'dd.mm.yyyy'})
+        worksheet = workbook.add_worksheet('DATA')
+
+        for row_num, row_data in enumerate(generate_fibu_export_rows(
+                self.settlement_run, request)):
+            worksheet.write_row(row_num, 0, row_data)
+
+        workbook.close()
+        output.seek(0)
+        return Response(
+            output.read(),
+            content_type=XLSX_MIMETYPE,
+            content_disposition=f'attachment; filename="{filename}"'
+        )
     else:
-        raise NotImplementedError()
+        raise NotImplementedError(
+            'Export category {self.category} not implemented for all exports'
+        )
 
 
 @PasApp.view(

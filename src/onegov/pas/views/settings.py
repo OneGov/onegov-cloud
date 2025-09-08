@@ -81,7 +81,7 @@ def view_pas_settings(
         {
             'name': 'import',
             'title': _('Data Import (JSON)'),
-            'link': request.link(request.app.org, 'import'),
+            'link': request.link(request.app.org, 'pas-import'),
             'icon': 'fa-file-import'
         },
     ]
