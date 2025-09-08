@@ -108,7 +108,12 @@ def add_meeting(
     layout = MeetingCollectionLayout(self, request)
 
     if form.submitted(request):
-        meeting = self.add(**form.get_useful_data())
+        meeting = self.add(
+            title=form.title.data,
+            address=form.address.data
+        )
+        form.populate_obj(meeting)
+
         request.success(_('Added a new meeting'))
         return request.redirect(request.link(meeting))
 
