@@ -51,6 +51,10 @@ def test_meetings(client):
         assert '01.10.2025 13:00' in page
         assert 'Nächste Sitzung' in page
 
+        # test meeting items
+
+        # test export view
+
         # delete meeting
         meeting.click('Löschen')
         assert 'Noch keine Sitzungen definiert' in client.get('/meetings')
