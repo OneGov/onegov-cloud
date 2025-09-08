@@ -252,6 +252,21 @@ def view_settlement_run(
                     ),
                 )
             ]
+        },
+        'fibu_export': {
+            'title': _('FiBu Export'),
+            'links': [
+                Link(
+                    _('FiBu CSV Export'),
+                    request.link(
+                        SettlementRunAllExport(
+                            settlement_run=self,
+                            category='fibu-csv-export'
+                        ),
+                        name='run-export'
+                    ),
+                )
+            ]
         }
     }
 
@@ -952,27 +967,42 @@ def view_settlement_run_all_export(
     elif self.category == 'buchungen-abrechnungslauf-kontroll-xlsx-export':
         pass
     elif self.category == 'fibu-csv-export':
-        q = self.settlement_run.get_run_number_for_year(
-            self.settlement_run.end
-        )
+        import csv
         year = self.settlement_run.end.year
-        filename = (
-            f'Buchungen Abrechnungslauf KR-{year}_{q:02d}_Kontrollliste.xlsx'
-        )
+        filename = f'KR-Entschaedigung - {year}.csv'
+        
         output = BytesIO()
-        workbook = xlsxwriter.Workbook(
-            output, {'default_date_format': 'dd.mm.yyyy'})
-        worksheet = workbook.add_worksheet('DATA')
-
-        for row_num, row_data in enumerate(generate_fibu_export_rows(
-                self.settlement_run, request)):
-            worksheet.write_row(row_num, 0, row_data)
-
-        workbook.close()
-        output.seek(0)
+        # Use utf-8-sig to ensure proper Excel compatibility with BOM
+        text_output = output
+        csv_data = []
+        
+        for row_data in generate_fibu_export_rows(self.settlement_run, request):
+            csv_data.append(row_data)
+        
+        # Create CSV content as string
+        csv_string = ""
+        for row in csv_data:
+            # Convert all values to strings and escape quotes
+            row_strings = []
+            for value in row:
+                if value is None:
+                    row_strings.append("")
+                else:
+                    # Convert to string and handle quotes
+                    str_value = str(value)
+                    if '"' in str_value:
+                        str_value = str_value.replace('"', '""')
+                    if ',' in str_value or '"' in str_value or '\n' in str_value:
+                        str_value = f'"{str_value}"'
+                    row_strings.append(str_value)
+            csv_string += ",".join(row_strings) + "\n"
+        
+        # Encode to bytes with BOM for Excel compatibility
+        csv_bytes = '\ufeff'.encode('utf-8') + csv_string.encode('utf-8')
+        
         return Response(
-            output.read(),
-            content_type=XLSX_MIMETYPE,
+            csv_bytes,
+            content_type='text/csv; charset=utf-8',
             content_disposition=f'attachment; filename="{filename}"'
         )
     else:
