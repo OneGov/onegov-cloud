@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from onegov.core.utils import normalize_for_url
 from onegov.form.core import Form
-from onegov.form.fields import (
-    ChosenSelectField, TimezoneDateTimeField, TranslatedSelectField)
+from onegov.form.fields import ChosenSelectField, TranslatedSelectField
 from onegov.form.validators import StrictOptional
 from onegov.org import _
 from onegov.ticket import handlers as ticket_handlers
 from operator import itemgetter
+from wtforms import DateField
 
 
 from typing import TYPE_CHECKING
@@ -86,7 +86,6 @@ def get_ticket_group_choices(request: CoreRequest) -> list[_Choice]:
 
 class TicketInvoiceSearchForm(Form):
 
-    tz = 'Europe/Zurich'
     css_class = 'resettable'
 
     invoiced = TranslatedSelectField(
@@ -108,34 +107,30 @@ class TicketInvoiceSearchForm(Form):
         default='ALL',
     )
 
-    ticket_start_date = TimezoneDateTimeField(
+    ticket_start_date = DateField(
         label=_('Ticket created from date'),
-        timezone=tz,
         fieldset=_('Filter by Ticket Date'),
         description=_('Filters payments by the creation date of their '
                       'associated ticket.'),
         validators=[StrictOptional()]
     )
 
-    ticket_end_date = TimezoneDateTimeField(
+    ticket_end_date = DateField(
         label=_('Ticket created to date'),
-        timezone=tz,
         fieldset=_('Filter by Ticket Date'),
         description=_('Filters payments by the creation date of their '
                       'associated ticket.'),
         validators=[StrictOptional()]
     )
 
-    reservation_start_date = TimezoneDateTimeField(
+    reservation_start_date = DateField(
         label=_('From reservation date'),
-        timezone=tz,
         fieldset=_('Filter by Reservation Date'),
         validators=[StrictOptional()]
     )
 
-    reservation_end_date = TimezoneDateTimeField(
+    reservation_end_date = DateField(
         label=_('To reservation date'),
-        timezone=tz,
         fieldset=_('Filter by Reservation Date'),
         validators=[StrictOptional()]
     )
@@ -166,7 +161,6 @@ class TicketInvoiceSearchForm(Form):
 
 class PaymentSearchForm(Form):
 
-    tz = 'Europe/Zurich'
     css_class = 'resettable'
 
     status = TranslatedSelectField(
@@ -199,34 +193,30 @@ class PaymentSearchForm(Form):
         default='ALL',
     )
 
-    ticket_start_date = TimezoneDateTimeField(
+    ticket_start_date = DateField(
         label=_('Ticket created from date'),
-        timezone=tz,
         fieldset=_('Filter by Ticket Date'),
         description=_('Filters payments by the creation date of their '
                       'associated ticket.'),
                 validators=[StrictOptional()]
     )
 
-    ticket_end_date = TimezoneDateTimeField(
+    ticket_end_date = DateField(
         label=_('Ticket created to date'),
-        timezone=tz,
         fieldset=_('Filter by Ticket Date'),
         description=_('Filters payments by the creation date of their '
                       'associated ticket.'),
                 validators=[StrictOptional()]
     )
 
-    reservation_start_date = TimezoneDateTimeField(
+    reservation_start_date = DateField(
         label=_('From reservation date'),
-                timezone=tz,
         fieldset=_('Filter by Reservation Date'),
                 validators=[StrictOptional()]
     )
 
-    reservation_end_date = TimezoneDateTimeField(
+    reservation_end_date = DateField(
         label=_('To reservation date'),
-        timezone=tz,
         fieldset=_('Filter by Reservation Date'),
                 validators=[StrictOptional()]
     )
