@@ -10,7 +10,6 @@ from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
-from wtforms.validators import ValidationError
 
 
 class SettlementRunForm(Form):
@@ -39,17 +38,6 @@ class SettlementRunForm(Form):
     description = HtmlField(
         label=_('Description'),
     )
-
-    def validate_active(self, field: BooleanField) -> None:
-        if field.data:
-            query = self.request.session.query(SettlementRun)
-            query = query.filter(SettlementRun.active == True)
-            if isinstance(self.model, SettlementRun):
-                query = query.filter(SettlementRun.id != self.model.id)
-            if query.first():
-                raise ValidationError(
-                    _('Only one settlement run can be active at a time')
-                )
 
     def ensure_valid_dates(self) -> bool:
         start = self.start.data
