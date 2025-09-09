@@ -123,4 +123,5 @@ def remove_old_pas_tables(
 
     for tablename in tablenames:
         if context.has_table(tablename):
-            context.operations.drop_table(tablename)
+            context.operations.execute(
+                f'DROP TABLE IF EXISTS {tablename} CASCADE')
