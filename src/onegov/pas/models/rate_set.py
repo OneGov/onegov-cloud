@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 class RateSet(Base, ContentMixin, TimestampMixin):
     """ Sätze """
 
-    __tablename__ = 'par_rate_sets'
+    __tablename__ = 'pas_rate_sets'
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(
