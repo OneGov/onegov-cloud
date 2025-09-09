@@ -143,3 +143,26 @@ def add_type_column_to_parliament_models_second(
             context.operations.execute(
                 f'ALTER TABLE {table} ALTER COLUMN {type_name} SET NOT NULL'
             )
+
+
+@upgrade_task('Remove old pas tables')
+def remove_old_pas_tables(
+    context: UpgradeContext
+) -> None:
+
+    tablenames = [
+        'pas_attendence',
+        'pas_changes',
+        'pas_commission_memberships',
+        'pas_commissions',
+        'pas_legislative_periods',
+        'pas_parliamentarian_roles',
+        'pas_parliamentarians',
+        'pas_parliamentary_groups',
+        'pas_parties',
+    ]
+
+    for tablename in tablenames:
+        if context.has_table(tablename):
+            context.operations.execute(
+                f'DROP TABLE IF EXISTS {tablename} CASCADE')
