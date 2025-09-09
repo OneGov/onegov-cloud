@@ -111,14 +111,11 @@ def remove_old_pas_tables(
         'pas_changes',
         'pas_commission_memberships',
         'pas_commissions',
-        'pas_import_logs',
         'pas_legislative_periods',
         'pas_parliamentarian_roles',
         'pas_parliamentarians',
         'pas_parliamentary_groups',
         'pas_parties',
-        'pas_rate_sets',
-        'pas_settlements',
     ]
 
     for tablename in tablenames:
