@@ -3,9 +3,20 @@ from __future__ import annotations
 from functools import cached_property
 from onegov.pas import _
 from onegov.town6.layout import DefaultLayout as BaseDefaultLayout
+from onegov.pas.models.settlement_run import SettlementRun
 
 
 class DefaultLayout(BaseDefaultLayout):
+
+    @cached_property
+    def current_settlement_run(self) -> SettlementRun | None:
+        try:
+            session = self.request.session
+            query = session.query(SettlementRun)
+            query = query.filter(SettlementRun.active == True)
+            return query.first() if query.count() == 1 else None
+        except Exception:  # layout.pt checks for None
+            return None
 
     @cached_property
     def pas_settings_url(self) -> str:
