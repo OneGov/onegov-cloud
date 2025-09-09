@@ -5,7 +5,7 @@ import zipfile
 from freezegun import freeze_time
 from webtest import Upload
 
-from shared.utils import create_image
+from tests.shared.utils import create_image
 
 
 def test_meetings(client):
