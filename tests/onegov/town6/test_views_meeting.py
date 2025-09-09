@@ -1,4 +1,11 @@
+import io
+import json
+import zipfile
+
 from freezegun import freeze_time
+from webtest import Upload
+
+from shared.utils import create_image
 
 
 def test_meetings(client):
@@ -39,21 +46,68 @@ def test_meetings(client):
         # edit meeting
         edit = meeting.click('Bearbeiten')
         edit.form['start_datetime'] = '2025-10-01 13:00'
+        edit.form['audio_link'] = 'https://audio.example.com/meeting.mp3'
+        edit.form['video_link'] = 'https://video.example.com/meeting.mp4'
         meeting = edit.form.submit().follow()
 
         assert 'Test Meeting' in meeting
         assert 'Es wurden noch keine Traktanden erfasst' in meeting
         assert 'Town Hall' in meeting
         assert '01.10.2025 13:00' in meeting
+        assert 'Links' in meeting
+        assert 'https://audio.example.com/meeting.mp3' in meeting
+        assert 'https://video.example.com/meeting.mp4' in meeting
 
         page = client.get('/meetings')
         assert 'Test Meeting' in page
         assert '01.10.2025 13:00' in page
         assert 'Nächste Sitzung' in page
 
+        # add doc to meeting
+        edit = meeting.click('Bearbeiten')
+        edit.form.fields['files'][-1].value = [
+            Upload('flyer.jpg', create_image().read())]
+        meeting = edit.form.submit().follow()
+
+        assert 'Test Meeting' in meeting
+        assert 'Dokumente' in meeting
+        assert 'flyer.jpg' in meeting
+
         # test meeting items
+        edit = meeting.click('Bearbeiten')
+        edit.form['start_datetime'] = '2025-10-01 14:00'
+        edit.form['meeting_items'] = json.dumps({  # many field
+            'values': [{
+                'number': '0.1',
+                'title': 'Intro',
+                'agenda_item': ''
+            }]
+        })
+        meeting = edit.form.submit().follow()
+
+        assert 'Test Meeting' in meeting
+        assert 'Es wurden noch keine Traktanden erfasst' not in meeting
+        assert 'Town Hall' in meeting
+        assert '01.10.2025 14:00' in meeting
+        assert 'Links' in meeting
+        assert 'https://audio.example.com/meeting.mp3' in meeting
+        assert 'https://video.example.com/meeting.mp4' in meeting
+        assert '0.1'
+        assert 'Intro' in meeting
 
         # test export view
+        export = meeting.click('Export')
+        assert 'Sitzungsdokumente exportieren' in export
+        response = export.form.submit()
+        assert response.status_code == 200
+        assert response.content_type == 'application/zip'
+        assert response.content_disposition == (
+            'attachment; filename="Test Meeting 01.10.2025.zip"')
+        with zipfile.ZipFile(io.BytesIO(response.body), 'r') as zf:
+            file_list = zf.namelist()
+            # Verify that meeting and political business documents are stored
+            # in their respective folders
+            assert 'Test Meeting 01.10.2025/flyer.jpg' in file_list
 
         # delete meeting
         meeting.click('Löschen')
