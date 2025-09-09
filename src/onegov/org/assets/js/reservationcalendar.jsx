@@ -89,6 +89,8 @@ rc.events = [
     'rc-reservations-changed'
 ];
 
+rc.targetEvent = null;
+
 rc.passEventsToCalendar = function(calendar, target, source) {
     var cal = $(calendar);
 
@@ -371,9 +373,10 @@ rc.request = function(calendar, url, attribute) {
 
     el.on('complete.ic', function() {
         el.remove();
+        rc.targetEvent = null;
     });
 
-    var source = $(calendar).find('.has-popup');
+    var source = rc.targetEvent || $(calendar).find('.has-popup');
     rc.passEventsToCalendar(calendar, el, source);
 
     el.click();
@@ -431,6 +434,7 @@ rc.showActionsPopup = function(calendar, element, event) {
     // Check if the reservation form needs to be rendered
     if (!event.extendedProps.actions.length && !rc.shouldRenderReservationForm(event, rc.previousReservationState)) {
         // Directly submit the reservation if no fields or actions are present
+        rc.targetEvent = $(element);
         rc.reserve(
             calendar,
             event.extendedProps.reserveurl,
@@ -448,6 +452,7 @@ rc.showActionsPopup = function(calendar, element, event) {
         event,
         rc.previousReservationState,
         function(state) {
+            rc.targetEvent = $(element);
             rc.reserve(
                 calendar,
                 event.extendedProps.reserveurl,
