@@ -282,7 +282,7 @@ class TicketCollection(TicketCollectionPagination):
 
     def by_ticket_email(self, ticket_email: str) -> Query[Ticket]:
         return self.query().filter(
-            Ticket.ticket_email == ticket_email)
+            func.lower(Ticket.ticket_email) == ticket_email.lower())
 
 
 # FIXME: Why is this its own subclass? shouldn't this at least override
