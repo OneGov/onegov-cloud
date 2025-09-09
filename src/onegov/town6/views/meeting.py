@@ -341,6 +341,9 @@ def view_meeting_export(
                     f'attachment; filename="{filename}.zip"')
                 return response
 
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
+
     layout = MeetingLayout(self, request)
     layout.breadcrumbs.append(Link(_('Export'), '#'))
     layout.editbar_links = None

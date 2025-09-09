@@ -594,6 +594,10 @@ def run_processors(
                 # disable debug options in cli (like query output)
                 pass
 
+            def configure_search(self, **cfg: Any) -> None:
+                # disable search options in cli
+                self.es_client = None
+
         @CliApplication.path(path=view_path)
         class Model:
             pass
@@ -631,7 +635,12 @@ def run_processors(
         Config({
             'applications': applications,
         }),
-        configure_morepath=False,
+        # NOTE: For commands that create a new schema this is essential
+        #       otherwise the SQLAlchemy metadata may be incomplete
+        # FIXME: For some reason when this is enabled we get noisy logging
+        #        related to i18n, so we should replace the affected logger
+        #        with a NullHandler...
+        configure_morepath=group_context.creates_path,
         configure_logging=False
     )
 
