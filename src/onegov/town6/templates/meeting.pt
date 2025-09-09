@@ -40,13 +40,8 @@
             <dd tal:condition="meeting_items_with_links">
                 <ul class="more-list">
                     <li tal:repeat="item meeting_items_with_links">
-<<<<<<< Updated upstream
                         <a href="${item.political_business_link or '#'}" class="list-link ${'' if item.political_business_link else 'no-link'}">
                             <span class="list-title">
-=======
-                        <a tal:omit-tag="not: item.political_business_link" href="${item.political_business_link}">
-                            <span class="${'list-link' if item.political_business_link else 'list-title'}">
->>>>>>> Stashed changes
                                 ${item.number} ${item.title}
                             </span>
                         </a>

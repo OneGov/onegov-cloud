@@ -144,7 +144,7 @@ def add_type_column_to_parliament_models_second(
                 f'ALTER TABLE {table} ALTER COLUMN {type_name} SET NOT NULL'
             )
 
-
+            
 @upgrade_task('Remove old pas tables')
 def remove_old_pas_tables(
     context: UpgradeContext
