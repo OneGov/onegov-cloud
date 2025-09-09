@@ -99,3 +99,28 @@ def add_start_end_columns_to_meetings(
             'par_meetings',
             Column('end_datetime', UTCDateTime, nullable=True)
         )
+
+
+@upgrade_task('Remove old pas tables')
+def remove_old_pas_tables(
+        context: UpgradeContext
+) -> None:
+
+    tablenames = [
+        'pas_attendence',
+        'pas_changes',
+        'pas_commission_memberships',
+        'pas_commissions',
+        'pas_import_logs',
+        'pas_legislative_periods',
+        'pas_parliamentarian_roles',
+        'pas_parliamentarians',
+        'pas_parliamentary_groups',
+        'pas_parties',
+        'pas_rate_sets',
+        'pas_settlements',
+    ]
+
+    for tablename in tablenames:
+        if context.has_table(tablename):
+            context.operations.drop_table(tablename)
