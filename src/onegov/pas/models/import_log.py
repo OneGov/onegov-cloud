@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 class ImportLog(Base, TimestampMixin):
     """ Logs the summary of a KUB data import attempt. """
 
-    __tablename__ = 'pas_import_logs'
+    __tablename__ = 'par_import_logs'
 
     id: Column[uuid.UUID] = Column(
         UUID,  # type: ignore[arg-type]

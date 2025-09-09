@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 class SettlementRun(Base, ContentMixin, TimestampMixin, ORMSearchable):
     """ Abrechnungslauf """
 
-    __tablename__ = 'pas_settlements'
+    __tablename__ = 'par_settlements'
 
     es_public = False
     es_properties = {'name': {'type': 'text'}}
