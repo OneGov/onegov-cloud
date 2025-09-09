@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-from onegov.core.orm.types import UUID
 from onegov.pay import Invoice
 from onegov.user import User
-from sqlalchemy import Column
-from sqlalchemy import ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 
@@ -16,6 +13,7 @@ if TYPE_CHECKING:
     from decimal import Decimal
     from onegov.activity.models import ActivityInvoiceItem
     from onegov.activity.models import BookingPeriod
+    from sqlalchemy import Column
 
 
 class BookingPeriodInvoice(Invoice):
@@ -26,22 +24,14 @@ class BookingPeriodInvoice(Invoice):
     }
 
     #: the period to which this invoice belongs to
-    period_id: Column[uuid.UUID] = Column(  # type: ignore[assignment]
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('periods.id'),
-        nullable=True
-    )
+    period_id: Column[uuid.UUID]
     period: relationship[BookingPeriod] = relationship(
         'BookingPeriod',
         back_populates='invoices'
     )
 
     #: the user to which the invoice belongs
-    user_id: Column[uuid.UUID] = Column(  # type: ignore[assignment]
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('users.id'),
-        nullable=True
-    )
+    user_id: Column[uuid.UUID]
     # FIXME: Do we need this backref? It's across module boundaries, so
     #        not the best for proper module isolation
     user: relationship[User] = relationship(User, backref='invoices')

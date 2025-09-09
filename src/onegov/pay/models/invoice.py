@@ -13,6 +13,7 @@ from sqlalchemy import select
 from sqlalchemy import Boolean
 from sqlalchemy import CheckConstraint
 from sqlalchemy import Column
+from sqlalchemy import ForeignKey
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import object_session, relationship, joinedload
@@ -95,6 +96,20 @@ class Invoice(Base, TimestampMixin):
         back_populates='invoice',
         cascade='all, delete-orphan'
     )
+
+    if not TYPE_CHECKING:
+        # define columns used by subclasses, so they exist even if
+        # module discovery excludes the module containing the subclasses
+        period_id = Column(
+            UUID,  # type:ignore[arg-type]
+            ForeignKey('periods.id'),
+            nullable=True
+        )
+        user_id = Column(
+            UUID,  # type:ignore[arg-type]
+            ForeignKey('users.id'),
+            nullable=True
+        )
 
     # NOTE: Since period_id and user_id will exist for all polymorphic
     #       identities we need a CHECK constraint instead of NOT NULLABLE
