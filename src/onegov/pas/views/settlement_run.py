@@ -8,7 +8,6 @@ from operator import itemgetter
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration)
-import xlsxwriter   # type: ignore[import-untyped]
 
 from onegov.core.elements import Link
 from onegov.core.security import Private
@@ -41,7 +40,10 @@ from onegov.pas.utils import (
     get_parliamentarians_with_settlements,
     get_parties_with_settlements,
 )
-from onegov.pas.views.abschlussliste import generate_abschlussliste_xlsx
+from onegov.pas.views.abschlussliste import (
+    generate_abschlussliste_xlsx,
+    generate_buchungen_abrechnungslauf_xlsx
+)
 from onegov.pas.views.pas_excel_export_nr_3_lohnart_fibu import (
         generate_fibu_export_rows)
 
@@ -250,7 +252,7 @@ def view_settlement_run(
                         ),
                         name='run-export'
                     ),
-                )
+                ),
             ]
         },
         'fibu_export': {
@@ -965,41 +967,45 @@ def view_settlement_run_all_export(
             content_disposition=f'attachment; filename="{filename}"'
         )
     elif self.category == 'buchungen-abrechnungslauf-kontroll-xlsx-export':
-        pass
+        filename = 'Buchungen_Abrechnungslauf.xlsx'
+        output = generate_buchungen_abrechnungslauf_xlsx(
+            self.settlement_run, request)
+        return Response(
+            output.read(),
+            content_type=XLSX_MIMETYPE,
+            content_disposition=f'attachment; filename="{filename}"'
+        )
     elif self.category == 'fibu-csv-export':
-        import csv
         year = self.settlement_run.end.year
         filename = f'KR-Entschaedigung - {year}.csv'
-        
+
         output = BytesIO()
         # Use utf-8-sig to ensure proper Excel compatibility with BOM
-        text_output = output
-        csv_data = []
-        
-        for row_data in generate_fibu_export_rows(self.settlement_run, request):
-            csv_data.append(row_data)
-        
+        csv_data = list(generate_fibu_export_rows(
+            self.settlement_run, request))
+
         # Create CSV content as string
-        csv_string = ""
+        csv_string = ''
         for row in csv_data:
             # Convert all values to strings and escape quotes
             row_strings = []
             for value in row:
                 if value is None:
-                    row_strings.append("")
+                    row_strings.append('')  # type: ignore[unreachable]
                 else:
                     # Convert to string and handle quotes
                     str_value = str(value)
                     if '"' in str_value:
                         str_value = str_value.replace('"', '""')
-                    if ',' in str_value or '"' in str_value or '\n' in str_value:
+                    if (',' in str_value or '"' in str_value or
+                            '\n' in str_value):
                         str_value = f'"{str_value}"'
                     row_strings.append(str_value)
-            csv_string += ",".join(row_strings) + "\n"
-        
+            csv_string += ','.join(row_strings) + '\n'
+
         # Encode to bytes with BOM for Excel compatibility
         csv_bytes = '\ufeff'.encode('utf-8') + csv_string.encode('utf-8')
-        
+
         return Response(
             csv_bytes,
             content_type='text/csv; charset=utf-8',
@@ -1007,7 +1013,7 @@ def view_settlement_run_all_export(
         )
     else:
         raise NotImplementedError(
-            'Export category {self.category} not implemented for all exports'
+            f'Export category {self.category} not implemented for all exports'
         )
 
 

@@ -14,7 +14,7 @@ from onegov.pas.models.attendence import TYPES
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
-    from onegov.pas.models import ( SettlementRun)
+    from onegov.pas.models import (SettlementRun)
     from datetime import date
     from collections.abc import Iterator
 
@@ -49,7 +49,8 @@ def generate_fibu_export_rows(
     settlement_run: SettlementRun,
     request: TownRequest
 ) -> Iterator[list[str | Decimal | date]]:
-    """ Finanzbuchhaltung export """
+    """ Finanzbuchhaltung export. Notice a lot of columns
+    are empty, this is by choice."""
 
     yield [
         'Personalnummer', 'Vertragsnummer', 'Lohnart / Lohnarten Nr.',
