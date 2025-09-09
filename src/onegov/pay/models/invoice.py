@@ -101,7 +101,7 @@ class Invoice(Base, TimestampMixin):
     #       constaints on the columns.
     __table_args__ = (
         CheckConstraint(
-            '(period_id IS NOT NULL AND user_id IS NOT NULL)'
+            '(period_id IS NOT NULL AND user_id IS NOT NULL) '
             "OR type != 'booking_period'",
             name='ck_booking_period_required_columns'
         ),
