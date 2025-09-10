@@ -3,21 +3,27 @@ from itertools import groupby
 from operator import attrgetter
 import uuid
 
+from more_itertools import flatten
+
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import AttendenceCollection
+from onegov.pas.collections import (AttendenceCollection,
+                                    PASParliamentarianCollection)
 from onegov.pas.forms import AttendenceAddCommissionBulkForm, AttendenceAddForm
 from onegov.pas.forms import AttendenceAddPlenaryForm
 from onegov.pas.forms import AttendenceForm
-from onegov.pas.forms.attendence import AttendenceEditBulkForm
+from onegov.pas.forms.attendence import (AttendenceCommissionBulkEditForm,
+                                         AttendencePlenaryBulkEditForm)
 from onegov.pas.layouts import AttendenceCollectionLayout
 from onegov.pas.layouts import AttendenceLayout
 from onegov.pas.models import Attendence
 from onegov.pas.models import Change
 
 from typing import TYPE_CHECKING
+
+from onegov.pas.models.commission_membership import PASCommissionMembership
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
@@ -36,17 +42,34 @@ def view_attendences(
 
     layout = AttendenceCollectionLayout(self, request)
 
-    all_attendances = self.query().order_by(Attendence.created.desc()).all()
+    all_attendances = self.query().order_by(
+        Attendence.bulk_edit_id
+    )
+    bulk_edit_attendences = all_attendances.filter(
+        Attendence.bulk_edit_id.isnot(None)
+    ).all()
+
     bulk_edit_groups = [
-        list(group) 
-        for bulk_edit_id, group in groupby(all_attendances, key=attrgetter(
-            'bulk_edit_id'))
+        sorted(group, key=attrgetter('created', 'modified'),
+               reverse=True)
+        for bulk_edit_id, group in groupby(
+            bulk_edit_attendences, key=attrgetter('bulk_edit_id'))
     ]
+    # Sort groups by the most recent entry in each group
+    bulk_edit_groups.sort(
+        key=lambda group: max(  # type: ignore[arg-type]
+            (attendence.modified
+             or attendence.created  # type: ignore[return-value]
+             for attendence in group),
+            default=None
+        ),
+        reverse=True
+    )
 
     return {
         'add_link': request.link(self, name='new'),
         'layout': layout,
-        'attendences': all_attendances,
+        'attendences': flatten(bulk_edit_groups),
         'title': layout.title,
         'bulk_edit_groups': bulk_edit_groups
     }
@@ -133,15 +156,15 @@ def add_bulk_attendence(
 
 @PasApp.form(
     model=Attendence,
-    name='edit-bulk-attendences',
+    name='edit-plenary-bulk-attendences',
     template='form.pt',
     permission=Private,
-    form=AttendenceEditBulkForm 
+    form=AttendencePlenaryBulkEditForm
 )
-def edit_bulk_attendence(
+def edit_plenary_bulk_attendence(
     self: Attendence,
     request: TownRequest,
-    form: AttendenceEditBulkForm
+    form: AttendencePlenaryBulkEditForm
 ) -> RenderData | Response:
     request.include('custom')
 
@@ -149,27 +172,44 @@ def edit_bulk_attendence(
 
         data = form.get_useful_data()
         if raw_parl_ids := request.POST.getall('parliamentarian_id'):
-            # Remove static field; choices are set dynamically via JS
-            all_parliamentarians = data.pop('parliamentarian_id', None)
-            if self.type == 'plenary':
-                unselected_parliamentarians = [
-                    pid for pid in all_parliamentarians
-                    if pid not in raw_parl_ids
-                ]
-                for parliamentarian in unselected_parliamentarians:
-                    attendences = AttendenceCollection(request.session
-                                                       ).query().filter(
+            data.pop('parliamentarian_id', None)
+            all_parliamentarians = [
+                str(parliamentarian.id)
+                for parliamentarian
+                in PASParliamentarianCollection(
+                    request.session, [True]).query()
+            ]
+            collection = AttendenceCollection(request.session)
+
+            unselected_parliamentarians = [
+                pid for pid in all_parliamentarians
+                if pid not in raw_parl_ids
+            ]
+            for parliamentarian in unselected_parliamentarians:
+                if attendence := collection.query().filter(
                         Attendence.parliamentarian_id == parliamentarian,
                         Attendence.bulk_edit_id == form.bulk_edit_id.data,
+                    ).first():
+                    Change.add(request, 'delete', attendence)
+                    collection.delete(attendence)
+
+            for parliamentarian_id in raw_parl_ids:
+                attendence = collection.query().filter(
+                        Attendence.parliamentarian_id == parliamentarian_id,
+                        Attendence.bulk_edit_id == form.bulk_edit_id.data,
                     ).first()
-                    for attendence in attendences:
-                        Change.add(request, 'delete', attendence)
-                        request.delete(attendence)
+                if attendence:
+                    form.populate_obj(attendence)
+                    Change.add(request, 'edit', attendence)
+                else:
+                    attendence = collection.add(
+                        parliamentarian_id=parliamentarian_id, **data
+                    )
+                    Change.add(request, 'add', attendence)
+
+            request.success(_('Edited attendences'))
             return request.redirect(request.class_link(AttendenceCollection))
 
-        request.success(_('Added commission session'))
-
-        return request.redirect(request.link(self))
     elif not request.POST:
         form.process(obj=self)
 
@@ -177,13 +217,98 @@ def edit_bulk_attendence(
     layout.breadcrumbs = [
         Link(_('Homepage'), layout.homepage_url),
         Link(_('Attendences'), request.class_link(AttendenceCollection)),
-        Link(_('Edit commission session'), '#')
+        Link(_('Edit session'), '#')
     ]
     layout.edit_mode = True
     layout.editmode_links.append(
         Link(
             _('Delete'),
-            request.class_link(AttendenceCollection) # Needs to be created
+            request.class_link(AttendenceCollection)  # Needs to be created
+        )
+    )
+
+    return {
+        'layout': layout,
+        'title': _('Edit plenary session'),
+        'form': form,
+        'form_width': 'large'
+    }
+
+
+@PasApp.form(
+    model=Attendence,
+    name='edit-commission-bulk-attendences',
+    template='form.pt',
+    permission=Private,
+    form=AttendenceCommissionBulkEditForm
+)
+def edit_commission_bulk_attendence(
+    self: Attendence,
+    request: TownRequest,
+    form: AttendenceCommissionBulkEditForm
+) -> RenderData | Response:
+    request.include('custom')
+
+    if form.submitted(request):
+
+        data = form.get_useful_data()
+        if raw_parl_ids := request.POST.getall('parliamentarian_id'):
+            data.pop('parliamentarian_id', None)
+            collection = AttendenceCollection(request.session)
+            memberships = request.session.query(
+                PASCommissionMembership
+            ).filter(
+                PASCommissionMembership.commission_id
+                == form.commission_id.data
+            ).all()
+            commission_parliamentarians = [
+                str(membership.parliamentarian_id)
+                for membership in memberships
+            ]
+            unselected_parliamentarians = [
+                pid for pid in commission_parliamentarians
+                if pid not in raw_parl_ids
+            ]
+            for parliamentarian in unselected_parliamentarians:
+                if attendence := collection.query().filter(
+                        Attendence.parliamentarian_id == parliamentarian,
+                        Attendence.bulk_edit_id == form.bulk_edit_id.data,
+                    ).first():
+                    Change.add(request, 'delete', attendence)
+                    collection.delete(attendence)
+
+            for parliamentarian_id in raw_parl_ids:
+                attendence = collection.query().filter(
+                        Attendence.parliamentarian_id == parliamentarian_id,
+                        Attendence.bulk_edit_id == form.bulk_edit_id.data,
+                    ).first()
+                if attendence:
+                    form.populate_obj(attendence)
+                    Change.add(request, 'edit', attendence)
+                else:
+                    attendence = collection.add(
+                        parliamentarian_id=parliamentarian_id, **data
+                    )
+                    Change.add(request, 'add', attendence)
+
+        request.success(_('Edited session'))
+
+        return request.redirect(request.class_link(AttendenceCollection))
+
+    elif not request.POST:
+        form.process(obj=self)
+
+    layout = AttendenceCollectionLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Attendences'), request.class_link(AttendenceCollection)),
+        Link(_('Edit session'), '#')
+    ]
+    layout.edit_mode = True
+    layout.editmode_links.append(
+        Link(
+            _('Delete'),
+            request.class_link(AttendenceCollection)  # Needs to be created
         )
     )
 
@@ -278,7 +403,7 @@ def edit_attendence(
 
     layout = AttendenceLayout(self, request)
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
-    layout.edit_mode = True   
+    layout.edit_mode = True
 
     return {
         'layout': layout,
