@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-09-04 11:56+0200\n"
+"POT-Creation-Date: 2025-09-10 15:49+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1401,6 +1401,30 @@ msgstr ""
 "Falls Sie sich nicht für diese Benachrichtigungen angemeldet haben, können "
 "Sie diese Nachricht ignorieren."
 
+msgid "New customer message in Ticket ${link}"
+msgstr "Neue Kunden Nachricht in Ticket ${link}"
+
+msgid "${author} wrote"
+msgstr "${author} schrieb"
+
+#. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
+msgid "Please ${link} to reply."
+msgstr "Bitte ${link} um zu antworten"
+
+#. Used in sentence: "Please ${link} to reply."
+msgid "visit the request page"
+msgstr "öffnen Sie die Anfrage"
+
+msgid ""
+"This is the notification for customer messages on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
+msgstr ""
+"Dies ist die tägliche Reservations-Übersicht für ${organisation}. Falls Sie "
+"dieses E-Mail nicht mehr bekommen möchten, melden Sie sich bitte bei einem "
+"Administrator damit dieser Sie von der Empfängerliste streichen kann."
+
 msgid "Good morning,"
 msgstr "Guten Morgen"
 
@@ -1499,9 +1523,6 @@ msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
 
 msgid "New note in Ticket ${link}"
 msgstr "Neue Notiz in Ticket ${link}"
-
-msgid "${author} wrote"
-msgstr "${author} schrieb"
 
 msgid ""
 "This is the notification for notes on reservations for $"
@@ -1659,18 +1680,9 @@ msgstr "Abgelehnt"
 msgid "A message has been sent regarding ${ref}:"
 msgstr "Sie haben zu ${ref} eine Nachricht erhalten:"
 
-#. Canonical text for ${link} is: "visit the request status page"
-#. Canonical text for ${link} is: "visit the request page"
-msgid "Please ${link} to reply."
-msgstr "Bitte ${link} um zu antworten"
-
 #. Used in sentence: "Please ${link} to reply."
 msgid "visit the request status page"
 msgstr "öffnen Sie den Anfragestatus"
-
-#. Used in sentence: "Please ${link} to reply."
-msgid "visit the request page"
-msgstr "öffnen Sie die Anfrage"
 
 msgid "Your request has been closed."
 msgstr "Ihre Anfrage wurde abgeschlossen"

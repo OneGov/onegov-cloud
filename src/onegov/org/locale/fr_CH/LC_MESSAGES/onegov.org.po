@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-09-10 11:28+0200\n"
+"POT-Creation-Date: 2025-09-10 15:48+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1798,6 +1798,16 @@ msgid ""
 msgstr ""
 "Pour chaque jour sélectionné ci-dessous, une notification avec les "
 "réservations du jour sera envoyée au destinataire ci-dessus à 6h00.."
+
+msgid "Customer Messages"
+msgstr "Messages des clients"
+
+msgid ""
+"Each time a customer adds a message to the ticket for a reservation, a "
+"notification is sent to the recipient above."
+msgstr ""
+"Chaque fois qu'un client ajoute un message au ticket pour une réservation, "
+"une notification est envoyée au destinataire ci-dessus."
 
 msgid "Internal Notes"
 msgstr "Notes internes"
@@ -4777,6 +4787,34 @@ msgstr ""
 "Si vous ne vous êtes pas abonné à ces notifications, vous pouvez tout "
 "simplement ignorer cet e-mail."
 
+msgid "New customer message in Ticket ${link}"
+msgstr "Nouveau message du client dans le ticket ${link}"
+
+msgid "${author} wrote"
+msgstr "${author} a écrit"
+
+#. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
+msgid "Please ${link} to reply."
+msgstr "Veuillez vous rendre sur ${link} pour répondre."
+
+#. Used in sentence: "Please ${link} to reply."
+msgid "visit the request page"
+msgstr "visitez la page de la demande"
+
+msgid "Have a great day!"
+msgstr "Passez une bonne journée!"
+
+msgid ""
+"This is the notification for customer messages on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
+msgstr ""
+"Ceci est une notification concernant les messages clients relatifs aux "
+"réservations pour ${request.app.org.title}. Si vous ne souhaitez plus "
+"recevoir cet e-mail, veuillez contacter un administrateur afin qu'il vous "
+"retire de la liste des destinataires."
+
 msgid "Good morning,"
 msgstr "Bonjour,"
 
@@ -4785,9 +4823,6 @@ msgstr "Les réservations suivantes sont programmées pour aujourd'hui."
 
 msgid "No reservations today."
 msgstr "Aucune réservation aujourd'hui."
-
-msgid "Have a great day!"
-msgstr "Passez une bonne journée!"
 
 msgid ""
 "This is the daily reservation overview for ${organisation}. If you no longer "
@@ -4899,9 +4934,6 @@ msgstr "Votre événement a malheureusement été rejeté:"
 
 msgid "New note in Ticket ${link}"
 msgstr "Nouvelle note dans le billet ${link}"
-
-msgid "${author} wrote"
-msgstr "${author} a écrit"
 
 msgid ""
 "This is the notification for notes on reservations for $"
@@ -5068,18 +5100,9 @@ msgstr "Vous avez un nouveau ticket"
 msgid "A message has been sent regarding ${ref}:"
 msgstr "Un message a été envoyé à propos de ${ref}:"
 
-#. Canonical text for ${link} is: "visit the request status page"
-#. Canonical text for ${link} is: "visit the request page"
-msgid "Please ${link} to reply."
-msgstr "Veuillez vous rendre sur ${link} pour répondre."
-
 #. Used in sentence: "Please ${link} to reply."
 msgid "visit the request status page"
 msgstr "visitez la page de statut de la demande"
-
-#. Used in sentence: "Please ${link} to reply."
-msgid "visit the request page"
-msgstr "visitez la page de la demande"
 
 msgid "Your request has been closed."
 msgstr "Votre demande a été complétée."
@@ -7290,6 +7313,11 @@ msgstr "Rembourser ${amount}"
 
 msgid "Your ticket has a new message"
 msgstr "Votre ticket a un nouveau message"
+
+#, python-format
+msgid "${org} New Customer Message in Reservation for ${resource_title}"
+msgstr ""
+"${org} Nouveau message du client dans la réservation pour ${resource_title}"
 
 #, python-format
 msgid "${org} New Note in Reservation for ${resource_title}"
