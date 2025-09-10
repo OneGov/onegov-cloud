@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.pas.importer.zug_kub_importer import import_zug_kub_data
 import json
 import logging
 
@@ -9,7 +10,6 @@ from onegov.core.utils import dictionary_to_binary
 from onegov.org.models import Organisation
 from onegov.pas import _, PasApp
 from onegov.pas.forms.data_import import DataImportForm
-from onegov.pas.importer.json_import import import_zug_kub_data
 from onegov.pas.layouts import ImportLayout
 from onegov.pas.models import (
     PASCommission,
