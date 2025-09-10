@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-09-04 11:50+0200\n"
+"POT-Creation-Date: 2025-09-10 10:26+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -218,6 +218,9 @@ msgstr "Opérateur de paiement"
 
 msgid "Payments"
 msgstr "Paiements"
+
+msgid "Invoices"
+msgstr "Factures"
 
 msgid "Text modules"
 msgstr "Modules de texte"
@@ -1462,11 +1465,17 @@ msgstr "Groupe Parlementaire"
 msgid "Parliamentary group role"
 msgstr "Rôle dans le groupe parlementaire"
 
+msgid "All Tickets"
+msgstr "Tous les tickets"
+
 msgid "Filter Invoices"
 msgstr "Filtrer les factures"
 
 msgid "Uninvoiced"
 msgstr "Non facturé"
+
+msgid "Ticket category"
+msgstr "Catégorie de billet"
 
 msgid "Ticket created from date"
 msgstr "Ticket créé à partir de la date"
@@ -1640,6 +1649,26 @@ msgstr "Sous-groupe"
 
 msgid "Extra Fields Definition"
 msgstr "Définition de champs supplémentaires"
+
+msgid "Extra Field values to include in calendar subscription"
+msgstr "Valeurs supplémentaires à inclure dans l'abonnement au calendrier"
+
+msgid ""
+"By default only the e-mail address and link to the ticket is included. You "
+"may wish to include additional administrative information like a phone "
+"number, name or address. Please be aware however that this data can be "
+"viewed by anyone that knows the subscription URL, so only include what you "
+"must."
+msgstr ""
+"Par défaut, seules l'adresse e-mail et le lien vers le ticket sont inclus. "
+"Vous pouvez ajouter des informations administratives supplémentaires telles "
+"qu'un numéro de téléphone, un nom ou une adresse. Veuillez toutefois noter "
+"que ces données peuvent être consultées par toute personne connaissant l'URL "
+"d'abonnement. Ne fournissez donc que les informations strictement "
+"nécessaires."
+
+msgid "Calendar Subscription"
+msgstr "Abonnement au calendrier"
 
 msgid "Closing date for the public"
 msgstr "Date de clôture pour le public"
@@ -2249,9 +2278,6 @@ msgstr ""
 msgid "Accept request and close ticket automatically based on:"
 msgstr ""
 "Accepter la demande et fermer le ticket automatiquement en fonction de :"
-
-msgid "Ticket category"
-msgstr "Catégorie de billet"
 
 msgid "User role"
 msgstr "Rôle d'utilisateur"
@@ -3277,9 +3303,6 @@ msgstr "Opérateurs de paiement"
 
 msgid "Synchronise"
 msgstr "Synchroniser"
-
-msgid "Invoices"
-msgstr "Factures"
 
 msgid "Export Bill run as PDF"
 msgstr "Exporter l'exécution de la facture au format PDF"
@@ -7391,9 +7414,6 @@ msgstr "Le PDF de ce billet a été téléchargé avec succès vers Gever."
 
 msgid "My"
 msgstr "Mes"
-
-msgid "All Tickets"
-msgstr "Tous les tickets"
 
 msgid "All Users"
 msgstr "Tous les utilisateurs"

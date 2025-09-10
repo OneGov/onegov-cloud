@@ -135,6 +135,9 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     price_per_item: dict_property[float | None]
     price_per_item = content_property('price_per_reservation')
 
+    #: extra field values to include in the ical event description
+    ical_fields: dict_property[list[str]] = content_property(default=list)
+
     #: reservation deadline (e.g. None, (5, 'd'), (24, 'h'))
     deadline: dict_property[tuple[int, DeadlineUnit] | None]
     deadline = content_property()
