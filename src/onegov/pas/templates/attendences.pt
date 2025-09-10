@@ -24,7 +24,7 @@
                             <td>${attendence.type_label}
                                 <tal:block tal:condition="attendence.commission"><br>
                                     <i>${attendence.commission.title}</i></tal:block></td>
-                            <td><a href="${request.link(attendence)}" i18n:translate><i class="fa fa-edit"></i></a></td>
+                            <td><a href="${request.link(attendence)}"><i class="fa fa-edit"></i></a></td>
                         </tr>
                     </tbody>
                 </table>
@@ -36,15 +36,15 @@
                         <li tal:define="attendence group[0]; name 'edit-plenary-bulk-attendences' if attendence.type == 'plenary' else 'edit-commission-bulk-attendences'" tal:condition="attendence.bulk_edit_id">
                             <a class="list-link" href="${request.link(attendence, name)}">
                                 <i class="fa fa-edit"></i>
-                                <span class="list-title" i18n:translate>${layout.format_date(attendence.date, 'date')}, ${attendence.type_label}</span>
+                                <span class="list-title">${layout.format_date(attendence.date, 'date')}, <tal:b i18n:translate>${attendence.type_label}</tal:b></span>
                             </a>
                             <a href="${request.link(attendence, name)}">
                                 <p class="list-lead preview">
                                     <tal:b tal:condition="attendence.commission">
                                         ${attendence.commission.title}<br>
                                     </tal:b>
-                                    ${len(group)} Anwesenheiten, ${attendence.duration/60} h<br>
-                                        bearbeitet: ${layout.format_date(attendence.modified or attendence.created, 'datetime')}
+                                    ${len(group)} <tal:b i18n:translate>Attendences</tal:b>, ${attendence.duration/60} h<br>
+                                       <tal:b i18n:translate>edited</tal:b>: ${layout.format_date(attendence.modified or attendence.created, 'datetime')}
                                 </p>
                             </a>
                         </li>

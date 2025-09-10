@@ -266,8 +266,7 @@ class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):
     commission_id = ChosenSelectField(
         label=_('Commission'),
         validators=[InputRequired()],
-        render_kw={'readonly': True,
-                   'disabled': 'disabled'},
+        render_kw={'readonly': True},
     )
 
     parliamentarian_id = MultiCheckboxField(
@@ -329,14 +328,7 @@ class AttendenceCommissionBulkEditForm(AttendenceEditBulkForm):
             (obj.commission.id, obj.commission.title)  # type:ignore
         ]
 
-        self.parliamentarian_id.choices = [
-            (str(m.parliamentarian.id),
-            m.parliamentarian.title)
-            for m in PASCommissionCollection(
-            self.request.session).query().filter_by(
-                id=obj.commission_id
-            ).first().memberships  # type:ignore
-        ]
+        self.commission_id.data = str(obj.commission_id)
 
         self.parliamentarian_id.data = [
             choice[0] for choice in selected_parliamentarians

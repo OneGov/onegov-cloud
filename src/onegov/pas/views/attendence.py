@@ -5,7 +5,7 @@ import uuid
 
 from more_itertools import flatten
 
-from onegov.core.elements import Link
+from onegov.core.elements import BackLink, Confirm, Intercooler, Link
 from onegov.core.security import Private
 from onegov.pas import _
 from onegov.pas import PasApp
@@ -168,47 +168,48 @@ def edit_plenary_bulk_attendence(
 ) -> RenderData | Response:
     request.include('custom')
 
+    all_parliamentarians = [
+        str(parliamentarian.id)
+        for parliamentarian
+        in PASParliamentarianCollection(
+            request.session, [True]).query()
+    ]
+
     if form.submitted(request):
 
         data = form.get_useful_data()
-        if raw_parl_ids := request.POST.getall('parliamentarian_id'):
-            data.pop('parliamentarian_id', None)
-            all_parliamentarians = [
-                str(parliamentarian.id)
-                for parliamentarian
-                in PASParliamentarianCollection(
-                    request.session, [True]).query()
-            ]
-            collection = AttendenceCollection(request.session)
+        raw_parl_ids = request.POST.getall('parliamentarian_id')
+        data.pop('parliamentarian_id', None)
+        collection = AttendenceCollection(request.session)
 
-            unselected_parliamentarians = [
-                pid for pid in all_parliamentarians
-                if pid not in raw_parl_ids
-            ]
-            for parliamentarian in unselected_parliamentarians:
-                if attendence := collection.query().filter(
-                        Attendence.parliamentarian_id == parliamentarian,
-                        Attendence.bulk_edit_id == form.bulk_edit_id.data,
-                    ).first():
-                    Change.add(request, 'delete', attendence)
-                    collection.delete(attendence)
+        unselected_parliamentarians = [
+            pid for pid in all_parliamentarians
+            if pid not in raw_parl_ids
+        ]
+        for parliamentarian in unselected_parliamentarians:
+            if attendence := collection.query().filter(
+                    Attendence.parliamentarian_id == parliamentarian,
+                    Attendence.bulk_edit_id == form.bulk_edit_id.data,
+                ).first():
+                Change.add(request, 'delete', attendence)
+                collection.delete(attendence)
 
-            for parliamentarian_id in raw_parl_ids:
-                attendence = collection.query().filter(
-                        Attendence.parliamentarian_id == parliamentarian_id,
-                        Attendence.bulk_edit_id == form.bulk_edit_id.data,
-                    ).first()
-                if attendence:
-                    form.populate_obj(attendence)
-                    Change.add(request, 'edit', attendence)
-                else:
-                    attendence = collection.add(
-                        parliamentarian_id=parliamentarian_id, **data
-                    )
-                    Change.add(request, 'add', attendence)
+        for parliamentarian_id in raw_parl_ids:
+            attendence = collection.query().filter(
+                    Attendence.parliamentarian_id == parliamentarian_id,
+                    Attendence.bulk_edit_id == form.bulk_edit_id.data,
+                ).first()
+            if attendence:
+                form.populate_obj(attendence)
+                Change.add(request, 'edit', attendence)
+            else:
+                attendence = collection.add(
+                    parliamentarian_id=parliamentarian_id, **data
+                )
+                Change.add(request, 'add', attendence)
 
-            request.success(_('Edited attendences'))
-            return request.redirect(request.class_link(AttendenceCollection))
+        request.success(_('Edited attendences'))
+        return request.redirect(request.class_link(AttendenceCollection))
 
     elif not request.POST:
         form.process(obj=self)
@@ -220,10 +221,28 @@ def edit_plenary_bulk_attendence(
         Link(_('Edit session'), '#')
     ]
     layout.edit_mode = True
+    layout.editmode_links[1] = BackLink(
+        attrs={'class': 'cancel-link'},
+    )
     layout.editmode_links.append(
         Link(
-            _('Delete'),
-            request.class_link(AttendenceCollection)  # Needs to be created
+            text=_('Delete'),
+            url=layout.csrf_protected_url(
+                request.link(self, name='delete-attendences')),
+            traits=(
+                Confirm(
+                    _(
+                        'Do you really want to delete this bulk edit?'
+                    ),
+                    _('This cannot be undone.'),
+                    _('Delete Attendencess'),
+                    _('Cancel')
+                ),
+                Intercooler(
+                    request_method='DELETE',
+                    redirect_after=request.class_link(AttendenceCollection)
+                )),
+            attrs={'class': 'delete-link'},
         )
     )
 
@@ -291,7 +310,7 @@ def edit_commission_bulk_attendence(
                     )
                     Change.add(request, 'add', attendence)
 
-        request.success(_('Edited session'))
+        request.success(_('Edited attendences'))
 
         return request.redirect(request.class_link(AttendenceCollection))
 
@@ -305,10 +324,28 @@ def edit_commission_bulk_attendence(
         Link(_('Edit session'), '#')
     ]
     layout.edit_mode = True
+    layout.editmode_links[1] = BackLink(
+        attrs={'class': 'cancel-link'},
+    )
     layout.editmode_links.append(
         Link(
-            _('Delete'),
-            request.class_link(AttendenceCollection)  # Needs to be created
+            text=_('Delete'),
+            url=layout.csrf_protected_url(
+                request.link(self, name='delete-attendences')),
+            traits=(
+                Confirm(
+                    _(
+                        'Do you really want to delete this bulk edit?'
+                    ),
+                    _('This cannot be undone.'),
+                    _('Delete Attendencess'),
+                    _('Cancel')
+                ),
+                Intercooler(
+                    request_method='DELETE',
+                    redirect_after=request.class_link(AttendenceCollection)
+                )),
+            attrs={'class': 'delete-link'},
         )
     )
 
@@ -428,3 +465,29 @@ def delete_attendence(
     Change.add(request, 'delete', self)
     collection = AttendenceCollection(request.session)
     collection.delete(self)
+
+
+@PasApp.view(
+    model=Attendence,
+    name='delete-attendences',
+    request_method='DELETE',
+    permission=Private
+)
+def delete_attendences(
+    self: Attendence,
+    request: TownRequest
+) -> None:
+
+    request.assert_valid_csrf_token()
+
+    attendences = request.session.query(Attendence).filter(
+        Attendence.bulk_edit_id == self.bulk_edit_id
+    ).all()
+
+    for attendence in attendences:
+        Change.add(request, 'delete', attendence)
+        collection = AttendenceCollection(request.session)
+        collection.delete(attendence)
+    request.success(_('Deleted ${count} attendeces', mapping={
+            'count': len(attendences)
+        }))
