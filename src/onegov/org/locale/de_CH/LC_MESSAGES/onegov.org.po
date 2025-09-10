@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-09-04 11:50+0200\n"
+"POT-Creation-Date: 2025-09-10 11:28+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -218,6 +218,9 @@ msgstr "Zahlungsanbieter"
 
 msgid "Payments"
 msgstr "Zahlungen"
+
+msgid "Invoices"
+msgstr "Rechnungen"
 
 msgid "Text modules"
 msgstr "Textbausteine"
@@ -1463,11 +1466,17 @@ msgstr "Fraktion"
 msgid "Parliamentary group role"
 msgstr "Rolle in der Fraktion"
 
+msgid "All Tickets"
+msgstr "Alle Tickets"
+
 msgid "Filter Invoices"
 msgstr "Rechnungen filtern"
 
 msgid "Uninvoiced"
 msgstr "Unfakturiert"
+
+msgid "Ticket category"
+msgstr "Ticket-Kategorie"
 
 msgid "Ticket created from date"
 msgstr "Von Datum — Ticket erstellt"
@@ -1638,8 +1647,40 @@ msgstr "Dient zur Gruppierung in der Übersicht"
 msgid "Subgroup"
 msgstr "Untergruppe"
 
+msgid "Additional information for confirmed reservations"
+msgstr "Zusätzliche Informationen für bestätigte Reservationen"
+
+msgid ""
+"This text will be included in the confirmation and reservation summary e-"
+"mails sent out to customers. As well as displayed on the ticket status page, "
+"once reservations have been accepted."
+msgstr ""
+"Dieser Text wird im Kunden-E-Mail für die Reservationsbestätigung und die "
+"Terminübersicht angezeigt. Zusätzlich wird es nach der Bestätigung auf der "
+"Status-Seite des Tickets angezeigt."
+
 msgid "Extra Fields Definition"
 msgstr "Extra-Felder Definition"
+
+msgid "Extra Field values to include in calendar subscription"
+msgstr "Extra-Feld Eingaben im Kalender-Abonnement"
+
+msgid ""
+"By default only the e-mail address and link to the ticket is included. You "
+"may wish to include additional administrative information like a phone "
+"number, name or address. Please be aware however that this data can be "
+"viewed by anyone that knows the subscription URL, so only include what you "
+"must."
+msgstr ""
+"Standardmässig sind nur die E-Mail Adresse und der Link zum Ticket "
+"enthalten. Diese Einstellung erlaubt es zusätzliche administrativen "
+"Informationen, wie z.B. eine Telefonnummer oder ein Name direkt im Kalender "
+"zu hinterlegen. Diese Einstellung ist jedoch mit Vorsicht zu geniessen, da "
+"diese Angaben für alle Personen sichtbar sind, die den Kalender abonniert "
+"haben oder den Link kennen."
+
+msgid "Calendar Subscription"
+msgstr "Kalender-Abonnement"
 
 msgid "Closing date for the public"
 msgstr "Annahmeschluss für die Öffentlichkeit"
@@ -2247,9 +2288,6 @@ msgstr ""
 
 msgid "Accept request and close ticket automatically based on:"
 msgstr "Akzeptiere und schliesse Tickets automatisch basierend auf:"
-
-msgid "Ticket category"
-msgstr "Ticket-Kategorie"
 
 msgid "User role"
 msgstr "Benutzer-Rolle"
@@ -3273,9 +3311,6 @@ msgstr "Zahlungsanbieter"
 
 msgid "Synchronise"
 msgstr "Synchronisieren"
-
-msgid "Invoices"
-msgstr "Rechnungen"
 
 msgid "Export Bill run as PDF"
 msgstr "Fakturierte Belege als PDF exportieren"
@@ -7380,9 +7415,6 @@ msgstr "Das PDF dieses Tickets wurde erfolgreich hochgeladen zu Gever."
 
 msgid "My"
 msgstr "Meine"
-
-msgid "All Tickets"
-msgstr "Alle Tickets"
 
 msgid "All Users"
 msgstr "Alle Benutzer"

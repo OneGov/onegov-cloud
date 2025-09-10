@@ -10,7 +10,7 @@ from onegov.pas import _
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.commission import PASCommission
 from onegov.pas.models.parliamentarian import PASParliamentarian
-from sqlalchemy import Column
+from sqlalchemy import Column, Text
 from sqlalchemy import Enum
 from sqlalchemy import String
 from sqlalchemy.orm import object_session
@@ -96,6 +96,18 @@ class Change(Base, ContentMixin, TimestampMixin):
         String,
         nullable=False
     )
+
+    #: The polymorphic type of change
+    type: Column[str] = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'pas_change',
+    }
 
     @property
     def attendence(self) -> Attendence | None:

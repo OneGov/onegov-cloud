@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-09-04 11:50+0200\n"
+"POT-Creation-Date: 2025-09-10 11:28+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -219,6 +219,9 @@ msgstr "Elaboratore dei pagamenti"
 
 msgid "Payments"
 msgstr "Pagamenti"
+
+msgid "Invoices"
+msgstr "Fatture"
 
 msgid "Text modules"
 msgstr "Moduli di testo"
@@ -1466,11 +1469,17 @@ msgstr "Gruppo parlamentare"
 msgid "Parliamentary group role"
 msgstr "Ruolo nel gruppo parlamentare"
 
+msgid "All Tickets"
+msgstr "Tutti i biglietti"
+
 msgid "Filter Invoices"
 msgstr "Filtra fatture"
 
 msgid "Uninvoiced"
 msgstr "Non fatturato"
+
+msgid "Ticket category"
+msgstr "Categoria del biglietto"
 
 msgid "Ticket created from date"
 msgstr "Ticket creato dalla data"
@@ -1642,8 +1651,41 @@ msgstr "Utilizzato per raggruppare la risorsa nella panoramica"
 msgid "Subgroup"
 msgstr "Sottogruppo"
 
+msgid "Additional information for confirmed reservations"
+msgstr "Informazioni aggiuntive per prenotazioni confermate"
+
+msgid ""
+"This text will be included in the confirmation and reservation summary e-"
+"mails sent out to customers. As well as displayed on the ticket status page, "
+"once reservations have been accepted."
+msgstr ""
+"Questo testo sarà incluso nelle e-mail di conferma e di riepilogo della "
+"prenotazione inviate ai clienti. Inoltre, una volta accettate le "
+"prenotazioni, sarà visualizzato nella pagina dello stato dei biglietti."
+
 msgid "Extra Fields Definition"
 msgstr "Definizione dei campi aggiuntivi"
+
+msgid "Extra Field values to include in calendar subscription"
+msgstr ""
+"Valori dei campi aggiuntivi da includere nell'abbonamento al calendario"
+
+msgid ""
+"By default only the e-mail address and link to the ticket is included. You "
+"may wish to include additional administrative information like a phone "
+"number, name or address. Please be aware however that this data can be "
+"viewed by anyone that knows the subscription URL, so only include what you "
+"must."
+msgstr ""
+"Per impostazione predefinita, vengono inclusi solo l'indirizzo e-mail e il "
+"link al ticket. È possibile includere ulteriori informazioni amministrative "
+"come numero di telefono, nome o indirizzo. Si prega di tenere presente, "
+"tuttavia, che questi dati possono essere visualizzati da chiunque conosca "
+"l'URL dell'abbonamento, quindi includere solo le informazioni strettamente "
+"necessarie."
+
+msgid "Calendar Subscription"
+msgstr "Abbonamento al calendario"
 
 msgid "Closing date for the public"
 msgstr "Data di chiusura per il pubblico"
@@ -2252,9 +2294,6 @@ msgstr ""
 
 msgid "Accept request and close ticket automatically based on:"
 msgstr "Accetta la richiesta e chiudi il ticket automaticamente in base a:"
-
-msgid "Ticket category"
-msgstr "Categoria del biglietto"
 
 msgid "User role"
 msgstr "Ruolo utente"
@@ -3277,9 +3316,6 @@ msgstr "Provider di servizi di pagamento"
 
 msgid "Synchronise"
 msgstr "Sincronizza"
-
-msgid "Invoices"
-msgstr "Fatture"
 
 msgid "Export Bill run as PDF"
 msgstr "Esporta l'esecuzione della fattura come PDF"
@@ -7369,9 +7405,6 @@ msgstr "Il PDF di questo biglietto è stato caricato con successo su Gever."
 
 msgid "My"
 msgstr "Il mio"
-
-msgid "All Tickets"
-msgstr "Tutti i biglietti"
 
 msgid "All Users"
 msgstr "Tutti gli utenti"
