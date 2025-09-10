@@ -93,7 +93,16 @@ class ResourceBaseForm(Form):
     )
 
     text = HtmlField(
-        label=_('Text'))
+        label=_('Text')
+    )
+
+    confirmation_text = HtmlField(
+        label=_('Additional information for confirmed reservations'),
+        description=_('This text will be included in the confirmation '
+                      'and reservation summary e-mails sent out to '
+                      'customers. As well as displayed on the ticket '
+                      'status page, once reservations have been accepted.')
+    )
 
     pick_up = TextAreaField(
         label=_('Pick-Up'),

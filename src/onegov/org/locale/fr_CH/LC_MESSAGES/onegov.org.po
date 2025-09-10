@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-09-10 10:26+0200\n"
+"POT-Creation-Date: 2025-09-10 11:28+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1646,6 +1646,18 @@ msgstr "Utilisé pour grouper la ressource dans la vue d'ensemble"
 
 msgid "Subgroup"
 msgstr "Sous-groupe"
+
+msgid "Additional information for confirmed reservations"
+msgstr "Informations supplémentaires pour les réservations confirmées"
+
+msgid ""
+"This text will be included in the confirmation and reservation summary e-"
+"mails sent out to customers. As well as displayed on the ticket status page, "
+"once reservations have been accepted."
+msgstr ""
+"Ce texte sera inclus dans les e-mails de confirmation et de résumé de "
+"réservation envoyés aux clients. Il sera également affiché sur la page "
+"d'état des billets, une fois les réservations acceptées."
 
 msgid "Extra Fields Definition"
 msgstr "Définition de champs supplémentaires"

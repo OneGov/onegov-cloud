@@ -1308,8 +1308,11 @@ def view_ticket_status(
     )
 
     pick_up_hint = None
+    extra_information = None
     if resource := getattr(self.handler, 'resource', None):
         pick_up_hint = resource.pick_up
+        if not self.handler.deleted and not self.handler.undecided:
+            extra_information = resource.confirmation_text
     if submission := getattr(self.handler, 'submission', None):
         if form_definition := getattr(submission, 'form', None):
             pick_up_hint = form_definition.pick_up
@@ -1322,7 +1325,8 @@ def view_ticket_status(
             view_messages_feed(messages, request)
         ) or None,
         'form': form,
-        'pick_up_hint': pick_up_hint
+        'pick_up_hint': pick_up_hint,
+        'extra_information': extra_information,
     }
 
 
