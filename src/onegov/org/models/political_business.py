@@ -128,10 +128,6 @@ class PoliticalBusiness(
         'number': {'type': 'text'}
     }
 
-    __mapper_args__ = {
-        'polymorphic_identity': 'ris_political_business',
-    }
-
     @property
     def es_suggestion(self) -> str:
         return f'{self.title} {self.number}'
@@ -230,10 +226,6 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
     """ A participant of a political business, e.g. a parliamentarian. """
 
     __tablename__ = 'par_political_business_participants'
-
-    __mapper_args__ = {
-        'polymorphic_identity': 'ris_political_business_participant',
-    }
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(

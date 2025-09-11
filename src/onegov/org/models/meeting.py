@@ -44,10 +44,6 @@ class Meeting(
 
     __tablename__ = 'par_meetings'
 
-    __mapper_args__ = {
-        'polymorphic_identity': 'generic',
-    }
-
     es_public = True
     es_properties = {'title_text': {'type': 'text'}}
 

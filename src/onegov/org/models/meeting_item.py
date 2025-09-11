@@ -27,10 +27,6 @@ class MeetingItem(Base, ORMSearchable):
         'number': {'type': 'text'}
     }
 
-    __mapper_args__ = {
-        'polymorphic_identity': 'generic',
-    }
-
     @property
     def es_suggestion(self) -> str:
         return self.title
