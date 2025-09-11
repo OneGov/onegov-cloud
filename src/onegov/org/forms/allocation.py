@@ -187,14 +187,13 @@ class AllocationRuleForm(Form):
         self.extend.data = value['extend']
 
         for k, v in value['options'].items():
-            if hasattr(self, k):
-                if getattr(self, k) is not None:
-                    getattr(self, k).data = v
+            if k in self:
+                self[k].data = v
 
     @property
     def options(self) -> dict[str, Any]:
         return {
-            k: getattr(self, k).data for k in self._fields
+            k: f.data for k, f in self._fields.items()
             if k not in ('title', 'extend', 'csrf_token')
         }
 
