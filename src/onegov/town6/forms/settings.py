@@ -302,6 +302,13 @@ class RISSettingsForm(Form):
         description=_(
             'A list of predefined categories for interest ties. '
             'Each category is a semicolon separated list of interests. '
-            'Example: "A;B;C"'),
-        render_kw={'rows': 8}
+            'Example: cat 1 text; cat 2 text; cat 3 text'),
+        render_kw={'rows': 12}
     )
+
+    def process_obj(self, obj: Organisation) -> None:  # type:ignore
+        super().process_obj(obj)
+
+        default = self.request.translate(_('Default interest tie categories'))
+        if self.ris_interest_tie_categories.data is None:
+            self.ris_interest_tie_categories.data = default
