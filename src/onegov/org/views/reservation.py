@@ -194,12 +194,22 @@ def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
         else:
             raise NotImplementedError()
 
-        err = request.translate(
-            _('Reservations must be made ${n} ${unit} in advance', mapping={
-                'n': n,
-                'unit': unit
-            })
-        )
+        err = request.translate(_(
+            'Reservations must be made at least ${n} ${unit} in advance.',
+            mapping={'n': n, 'unit': unit}
+        ))
+
+        return respond_with_error(request, err)
+
+    # if there's a lead time, make sure to observe it for anonymous users...
+    if not request.is_manager and resource.is_before_lead_time(start):
+        assert resource.lead_time is not None
+        n = resource.lead_time
+        unit = request.translate(_('day') if n == 1 else _('days'))
+        err = request.translate(_(
+            'Reservations can only be made at most ${n} ${unit} in advance.',
+            mapping={'n': n, 'unit': unit}
+        ))
 
         return respond_with_error(request, err)
 
