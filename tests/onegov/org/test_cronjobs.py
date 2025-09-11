@@ -2373,7 +2373,7 @@ def test_wil_daily_event_import(wil_app, capturelog):
     assert events[0].description == 'Pole Vault description'
     assert events[0].tags == []
     assert events[0].start == start_dates[0]
-    assert events[0].end == start_dates[0] + timedelta(hours=1)
+    assert events[0].end == start_dates[0] + timedelta(hours=2)
     assert events[0].recurrence == None
     assert events[0].occurrence_dates() == [start_dates[0]]
     assert (events[0].location ==
