@@ -200,6 +200,15 @@ class ParliamentarianForm(NamedFileForm):
         self,
         interest_ties: dict[str, Any]
     ) -> str:
+        cats = [self.request.translate(_('No categories defined.'))]
+
+        interest_tie_cats = self.request.app.org.ris_interest_tie_categories  # type:ignore[attr-defined]
+        if interest_tie_cats:
+            cats = [
+                i.strip() for i in
+                interest_tie_cats.split(';')
+                if i
+            ]
 
         return json.dumps({
             'labels': {
@@ -207,6 +216,9 @@ class ParliamentarianForm(NamedFileForm):
                 'category': self.request.translate(_('Category')),
                 'add': self.request.translate(_('Add')),
                 'remove': self.request.translate(_('Remove')),
+            },
+            'categories': {
+                val: val for val in cats
             },
             'values': [
                 {
