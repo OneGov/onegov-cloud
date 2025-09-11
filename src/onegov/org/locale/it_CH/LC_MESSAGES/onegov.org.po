@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-09-11 09:55+0200\n"
+"POT-Creation-Date: 2025-09-11 11:22+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -4970,6 +4970,9 @@ msgstr "Non desideri più ricevere queste notifiche?"
 msgid "The following reservations have been accepted:"
 msgstr "Sono state accettate le seguenti prenotazioni:"
 
+msgid "See Ticket ${link} for additional information."
+msgstr "Per ulteriori informazioni, consultare il biglietto ${link}."
+
 msgid ""
 "This is the notification for reservations for ${request.app.org.title}. If "
 "you no longer want to receive this e-mail please contact an administrator so "
@@ -5541,6 +5544,9 @@ msgid ""
 "Receives notifications for reservations of the day on the following days:"
 msgstr ""
 "Riceve le notifiche per le prenotazioni del giorno nei giorni successivi:"
+
+msgid "Receives notifications for customer messages on reservations."
+msgstr "Riceve notifiche relative ai messaggi dei clienti sulle prenotazioni."
 
 msgid "Receives notifications for internal notes on reservations."
 msgstr "Riceve le notifiche per le note interne sulle prenotazioni."

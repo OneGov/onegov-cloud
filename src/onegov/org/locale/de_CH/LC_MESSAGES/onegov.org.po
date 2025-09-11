@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-09-11 09:55+0200\n"
+"POT-Creation-Date: 2025-09-11 11:22+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -4979,6 +4979,9 @@ msgstr "Möchten Sie diese Benachrichtigungen nicht mehr erhalten?"
 msgid "The following reservations have been accepted:"
 msgstr "Die folgenden Reservationen wurden bestätigt:"
 
+msgid "See Ticket ${link} for additional information."
+msgstr "Siehe Ticket ${link} für zusätzliche Informationen."
+
 msgid ""
 "This is the notification for reservations for ${request.app.org.title}. If "
 "you no longer want to receive this e-mail please contact an administrator so "
@@ -5551,6 +5554,9 @@ msgid ""
 "Receives notifications for reservations of the day on the following days:"
 msgstr ""
 "Erhält Benachrichtigungen für Reservationen des Tages an folgenden Tagen:"
+
+msgid "Receives notifications for customer messages on reservations."
+msgstr "Erhält Benachrichtigungen für Kunden Nachrichten zu Reservationen."
 
 msgid "Receives notifications for internal notes on reservations."
 msgstr "Erhält Benachrichtigungen für interne Notizen zu Reservationen."

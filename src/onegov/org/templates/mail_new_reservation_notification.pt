@@ -1,4 +1,4 @@
-<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
     <tal:b metal:fill-slot="title">
         ${title}
     </tal:b>
@@ -19,6 +19,13 @@
 
         <tal:b tal:condition="show_submission|nothing">
             <hr class="large">
+            <table class="field-display">
+                <tr><td><b i18n:translate>E-Mail</b></td></tr>
+                <tr><td>${model.email}</td></tr>
+                <tr tal:condition="ticket.tag"><td height="5"></td></tr>
+                <tr tal:condition="ticket.tag"><td><b i18n:translate>Tag</b></td></tr>
+                <tr tal:condition="ticket.tag"><td>${ticket.tag}</td></tr>
+            </table>
             <metal:b use-macro="layout.macros['display_form']"/>
         </tal:b>
         <tal:b tal:condition="ticket.handler.payment">
@@ -28,6 +35,10 @@
         <tal:b tal:define="show_submission show_submission|False" tal:condition="show_submission or ticket.handler.payment">
             <hr class="large">
         </tal:b>
+
+        <p i18n:translate>
+            See Ticket <a href="${request.link(model)}" i18n:name="link">${ticket_reference}</a> for additional information.
+        </p>
         <p i18n:translate>Have a great day!</p>
     </tal:b>
     <tal:b metal:fill-slot="above-footer">

@@ -891,20 +891,15 @@ def accept_reservation(
         token = self.token
         tickets = TicketCollection(request.session)
         ticket = tickets.by_handler_id(token.hex)
-        assert ticket is not None
+        assert isinstance(ticket, ReservationTicket)
 
         # if we're accessing this view through the ticket it
         # had better match the ticket we retrieved
         if view_ticket is not None and view_ticket != ticket:
             raise exc.HTTPNotFound()
 
-        forms = FormCollection(request.session)
-        submission = forms.submissions.by_id(token)
-
-        if submission:
-            form = submission.form_obj
-        else:
-            form = None
+        submission = ticket.handler.submission
+        form = submission.form_obj if submission is not None else None
 
         # Include all the forms details to be able to print it out
         show_submission = True
@@ -1044,6 +1039,7 @@ def accept_reservation(
             )
         )
 
+        assert hasattr(ticket, 'reference')
         content = render_template(
             'mail_new_reservation_notification.pt',
             request,
@@ -1053,6 +1049,7 @@ def accept_reservation(
                 'form': form,
                 'model': self,
                 'ticket': ticket,
+                'ticket_reference': ticket.reference(request),
                 'resource': resource,
                 'reservations': reservations,
                 'show_submission': show_submission,
@@ -1288,6 +1285,7 @@ def reject_reservation(
 
         form = submission.form_obj
 
+        assert hasattr(ticket, 'reference')
         content = render_template(
             'mail_rejected_reservation_notification',
             request,
@@ -1299,6 +1297,8 @@ def reject_reservation(
                 'resource': resource,
                 'reservations': targeted,
                 'show_submission': True,
+                'ticket': ticket,
+                'ticket_reference': ticket.reference(request),
                 'message': message,
             },
         )
