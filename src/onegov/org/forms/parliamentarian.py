@@ -20,12 +20,12 @@ from wtforms.validators import Optional
 from wtforms.validators import URL
 
 from typing import Any, TYPE_CHECKING
-
 if TYPE_CHECKING:
     from onegov.parliament.models.parliamentarian import Parliamentarian
 
 
 class ParliamentarianForm(NamedFileForm):
+
     gender = TranslatedSelectField(
         label=_('Gender'),
         fieldset=_('Basic properties'),
@@ -200,7 +200,7 @@ class ParliamentarianForm(NamedFileForm):
         self,
         interest_ties: dict[str, Any]
     ) -> str:
-        cats = [self.request.translate(_('No categories defined'))]
+        cats = ['No categories defined']
 
         interest_tie_cats = self.request.app.org.ris_interest_tie_categories  # type:ignore[attr-defined]
         if interest_tie_cats:

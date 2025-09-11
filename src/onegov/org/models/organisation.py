@@ -19,8 +19,8 @@ from onegov.org.models.swiss_holidays import SwissHolidays
 from sqlalchemy import Column, Text
 from uuid import uuid4
 
-from typing import Any, NamedTuple, TYPE_CHECKING
 
+from typing import Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Iterator
