@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-09-11 09:55+0200\n"
+"POT-Creation-Date: 2025-09-11 11:38+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1545,6 +1545,12 @@ msgstr "Ne souhaitez-vous plus recevoir ces notifications ?"
 msgid "The following reservations have been accepted:"
 msgstr "Les réservations suivantes ont été acceptées:"
 
+msgid "Tag"
+msgstr "Étiquette"
+
+msgid "See Ticket ${link} for additional information."
+msgstr "Pour plus d'informations, consultez le ticket ${link}."
+
 msgid ""
 "This is a notification for the new reservations for ${organisation}. If you "
 "no longer wish to receive these notifications, please contact an "
@@ -1984,9 +1990,6 @@ msgstr "Il s'agit d'un événement importé"
 msgid "General information about the event calendar"
 msgstr "Informations générales sur le calendrier des événements"
 
-msgid "Tag"
-msgstr "Étiquette"
-
 msgid "Date"
 msgstr "Date"
 
@@ -2284,6 +2287,11 @@ msgid ""
 "Receives notifications for reservations of the day on the following days:"
 msgstr ""
 "Reçoit des notifications pour les réservations du jour les jours suivants:"
+
+msgid "Receives notifications for customer messages on reservations."
+msgstr ""
+"Reçoit des notifications pour les messages des clients concernant les "
+"réservations."
 
 msgid "Receives notifications for internal notes on reservations."
 msgstr "Reçoit des notifications pour les notes internes sur les réservations."
