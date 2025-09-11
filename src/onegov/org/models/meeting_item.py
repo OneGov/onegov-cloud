@@ -27,15 +27,7 @@ class MeetingItem(Base, ORMSearchable):
         'number': {'type': 'text'}
     }
 
-    # polymorphic type of meeting item
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
-
     __mapper_args__ = {
-        'polymorphic_on': type,
         'polymorphic_identity': 'generic',
     }
 

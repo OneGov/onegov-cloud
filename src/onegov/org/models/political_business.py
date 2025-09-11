@@ -128,15 +128,7 @@ class PoliticalBusiness(
         'number': {'type': 'text'}
     }
 
-    # polymorphic type of political business
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
-
     __mapper_args__ = {
-        'polymorphic_on': type,
         'polymorphic_identity': 'ris_political_business',
     }
 
@@ -239,15 +231,7 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
 
     __tablename__ = 'par_political_business_participants'
 
-    # polymorphic type of political business participant
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
-
     __mapper_args__ = {
-        'polymorphic_on': type,
         'polymorphic_identity': 'ris_political_business_participant',
     }
 

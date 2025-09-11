@@ -44,15 +44,7 @@ class Meeting(
 
     __tablename__ = 'par_meetings'
 
-    # polymorphic type of meeting
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
-
     __mapper_args__ = {
-        'polymorphic_on': type,
         'polymorphic_identity': 'generic',
     }
 
