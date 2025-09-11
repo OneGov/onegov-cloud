@@ -391,7 +391,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         return (
             align_date_to_day(dt, self.timezone, 'down')
             - datetime.timedelta(days=self.lead_time)
-        ) >= utcnow()
+        ) > utcnow()
 
     def is_past_deadline(self, dt: datetime.datetime) -> bool:
         if not self.deadline:
