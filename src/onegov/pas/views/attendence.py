@@ -20,6 +20,7 @@ from onegov.pas.layouts import AttendenceCollectionLayout
 from onegov.pas.layouts import AttendenceLayout
 from onegov.pas.models import Attendence
 from onegov.pas.models import Change
+from sqlalchemy import desc
 
 from typing import TYPE_CHECKING
 
@@ -42,29 +43,31 @@ def view_attendences(
 
     layout = AttendenceCollectionLayout(self, request)
 
-    all_attendances = self.query().order_by(
-        Attendence.bulk_edit_id
-    )
-    bulk_edit_attendences = all_attendances.filter(
-        Attendence.bulk_edit_id.isnot(None)
+    bulk_edit_attendences = self.query().order_by(
+        desc(Attendence.bulk_edit_id),
     ).all()
 
     bulk_edit_groups = [
-        sorted(group, key=attrgetter('created', 'modified'),
-               reverse=True)
+        sorted(group, key=attrgetter('created', 'modified'), reverse=True)
         for bulk_edit_id, group in groupby(
             bulk_edit_attendences, key=attrgetter('bulk_edit_id'))
     ]
-    # Sort groups by the most recent entry in each group
-    bulk_edit_groups.sort(
-        key=lambda group: max(  # type: ignore[arg-type]
-            (attendence.modified
-             or attendence.created  # type: ignore[return-value]
+
+    non_null_groups = [g for g in bulk_edit_groups if getattr(
+        g[0], 'bulk_edit_id', None) is not None]
+    null_groups = [g for g in bulk_edit_groups if getattr(
+        g[0], 'bulk_edit_id', None) is None]
+
+    non_null_groups.sort(
+        key=lambda group: max(  # type: ignore
+            (attendence.modified or attendence.created
              for attendence in group),
             default=None
         ),
         reverse=True
     )
+
+    bulk_edit_groups = non_null_groups + null_groups
 
     return {
         'add_link': request.link(self, name='new'),

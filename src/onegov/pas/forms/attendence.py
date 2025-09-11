@@ -12,7 +12,7 @@ from onegov.pas.custom import get_current_settlement_run
 from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.custom import AttendenceCollection
-from onegov.pas.models import SettlementRun
+from onegov.pas.models import PASCommissionMembership, SettlementRun
 from onegov.pas.models.attendence import TYPES
 from wtforms.fields import DateField
 from wtforms.fields import FloatField
@@ -311,6 +311,17 @@ class AttendenceCommissionBulkEditForm(AttendenceEditBulkForm):
 
     def process_obj(self, obj: Attendence) -> None:   # type: ignore[override]
         super().process_obj(obj)
+
+        memberships = self.request.session.query(
+            PASCommissionMembership).filter(
+                PASCommissionMembership.commission_id == obj.commission_id
+            ).all()
+
+        self.parliamentarian_id.choices = [
+            (str(m.parliamentarian.id), m.parliamentarian.title)
+            for m in memberships
+        ]
+
         self.duration.data = obj.duration / 60
 
         attendences = AttendenceCollection(
