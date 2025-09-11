@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-09-10 15:48+0200\n"
+"POT-Creation-Date: 2025-09-11 09:55+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1703,6 +1703,19 @@ msgstr "Heures"
 
 msgid "Days"
 msgstr "Jours"
+
+msgid "Opening date for the public"
+msgstr "Date d'ouverture pour le public"
+
+msgid "Opening date"
+msgstr "Date d'ouverture"
+
+msgid "No opening date"
+msgstr "Pas de date d'ouverture"
+
+msgid "Start accepting reservations days before the allocation"
+msgstr ""
+"Commencez à accepter les réservations quelques jours avant l'attribution."
 
 msgid "Limit reservations to certain zip-codes"
 msgstr "Limiter les réservations à certains codes postaux"
@@ -5494,21 +5507,35 @@ msgstr ""
 "personne avec laquelle vous partagerez ce lien aura un accès permanent à ces "
 "informations."
 
-msgid "Reservations must be made at least one day in advance."
+#, python-format
+msgid "Reservations must be made at least ${n} ${unit} in advance."
 msgstr ""
-"Les réservations doivent être effectuées au moins une journée à l'avance."
+"Les réservations doivent être effectuées au moins ${n} ${unit} à l'avance."
 
-msgid "Reservations must be made at least one hour in advance."
-msgstr ""
-"Les réservations doivent être effectuées au moins une heure à l'avance."
+msgid "day"
+msgstr "jour"
 
-msgid "Reservations must be made at least ${n} days in advance."
-msgstr ""
-"Les réservations doivent être effectuées au moins ${n} jours à l'avance."
+msgid "days"
+msgstr "jours"
 
-msgid "Reservations must be made at least ${n} hours in advance."
+msgid "hour"
+msgstr "heure"
+
+msgid "hours"
+msgstr "heures"
+
+#, python-format
+msgid "Reservations can only be made at most ${n} ${unit} in advance."
 msgstr ""
-"Les réservations doivent être effectuées au moins ${n} heures à l'avance."
+"Les réservations ne peuvent être effectuées qu'au plus tôt ${n} ${unit} à "
+"l'avance."
+
+msgid ""
+"Reservations must be made at least ${n1} ${unit1} and at most ${n2} ${unit2} "
+"in advance."
+msgstr ""
+"Les réservations doivent être effectuées au moins ${n1} ${unit1} et au plus "
+"tard ${n2} ${unit2} à l'avance."
 
 msgid ""
 "Select a free time span in the calendar to create an availability period."
@@ -6919,22 +6946,6 @@ msgid ""
 msgstr ""
 "L'heure sélectionnée n'existe pas à cette date en raison du passage de "
 "l'heure normale à l'heure d'été."
-
-msgid "hour"
-msgstr "heure"
-
-msgid "hours"
-msgstr "heures"
-
-msgid "day"
-msgstr "jour"
-
-msgid "days"
-msgstr "jours"
-
-#, python-format
-msgid "Reservations must be made ${n} ${unit} in advance"
-msgstr "Les réservations doivent être effectuées ${n} ${unit} à l'avance"
 
 msgid "This date lies in the past"
 msgstr "Cette date est passée"

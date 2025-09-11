@@ -3260,7 +3260,7 @@ button {
             }
         }
 
-        .event-in-past {
+        .event-in-past, .event-outside-booking-window {
             filter: grayscale(1);
         }
 

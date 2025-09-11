@@ -173,6 +173,30 @@ class ResourceBaseForm(Form):
         ]
     )
 
+    lead_time_unit = RadioField(
+        label=_('Opening date for the public'),
+        fieldset=_('Opening date'),
+        default='n',
+        validators=[InputRequired()],
+        choices=(
+            ('n', _(
+                'No opening date')),
+            ('d', _(
+                'Start accepting reservations days before the allocation')),
+        )
+    )
+
+    lead_time_days = IntegerField(
+        label=_('Days'),
+        fieldset=_('Opening date'),
+        depends_on=('lead_time_unit', 'd'),
+        default=1,
+        validators=[
+            InputRequired(),
+            NumberRange(min=1)
+        ]
+    )
+
     zipcode_block_use = BooleanField(
         label=_('Limit reservations to certain zip-codes'),
         fieldset=_('Zip-code limit'),
@@ -426,6 +450,17 @@ class ResourceBaseForm(Form):
         else:
             raise NotImplementedError()
 
+    @property
+    def lead_time(self) -> int | None:
+        if self.lead_time_unit.data == 'd':
+            return self.lead_time_days.data
+        return None
+
+    @lead_time.setter
+    def lead_time(self, value: int | None) -> None:
+        self.lead_time_unit.data = 'd' if value else 'n'
+        self.lead_time_days.data = value
+
     # FIXME: Use TypedDict?
     @property
     def zipcode_block(self) -> dict[str, Any] | None:
@@ -452,17 +487,30 @@ class ResourceBaseForm(Form):
             str(i) for i in sorted(value['zipcode_list']))
 
     def populate_obj(self, obj: Resource) -> None:  # type:ignore
-        super().populate_obj(
-            obj,
-            exclude=('deadline', 'zipcode_block', 'ical_fields')
-        )
+        super().populate_obj(obj, exclude={
+            'deadline',
+            'deadline_unit',
+            'deadline_days',
+            'deadline_hours',
+            'ical_fields',
+            'lead_time',
+            'lead_time_unit',
+            'lead_time_days',
+            'zipcode_block',
+            'zipcode_block_use',
+            'zipcode_field',
+            'zipcode_days',
+            'zipcode_list',
+        })
         obj.deadline = self.deadline
+        obj.lead_time = self.lead_time
         obj.zipcode_block = self.zipcode_block
         obj.ical_fields = list(self.extract_field_ids(self.ical_fields))
 
     def process_obj(self, obj: Resource) -> None:  # type:ignore
         super().process_obj(obj)
         self.deadline = obj.deadline
+        self.lead_time = obj.lead_time
         self.zipcode_block = obj.zipcode_block
         self.ical_fields.data = '\n'.join(obj.ical_fields)
 
