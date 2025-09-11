@@ -3,6 +3,7 @@ from __future__ import annotations
 from onegov.org.forms.commission import CommissionForm
 from onegov.org.forms.parliamentary_group import ParliamentaryGroupForm
 from onegov.pas.forms.attendence import AttendenceAddCommissionForm
+from onegov.pas.forms.attendence import AttendenceAddCommissionBulkForm
 from onegov.pas.forms.attendence import AttendenceAddForm
 from onegov.pas.forms.attendence import AttendenceAddPlenaryForm
 from onegov.pas.forms.attendence import AttendenceForm
@@ -18,6 +19,7 @@ from onegov.pas.forms.settlement_run import SettlementRunForm
 
 __all__ = (
     'AttendenceAddCommissionForm',
+    'AttendenceAddCommissionBulkForm',
     'AttendenceAddForm',
     'AttendenceAddPlenaryForm',
     'AttendenceForm',

@@ -128,6 +128,18 @@ class PoliticalBusiness(
         'number': {'type': 'text'}
     }
 
+    # polymorphic type of political business
+    type: Column[str] = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'ris_political_business',
+    }
+
     @property
     def es_suggestion(self) -> str:
         return f'{self.title} {self.number}'
@@ -227,6 +239,18 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
 
     __tablename__ = 'par_political_business_participants'
 
+    # polymorphic type of political business participant
+    type: Column[str] = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'ris_political_business_participant',
+    }
+
     #: Internal ID
     id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
@@ -260,12 +284,14 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
     political_business = relationship(
         'PoliticalBusiness',
         back_populates='participants',
+        lazy='joined',
     )
 
     #: the related parliamentarian
     parliamentarian: relationship[RISParliamentarian] = relationship(
         'RISParliamentarian',
         back_populates='political_businesses',
+        lazy='joined',
     )
 
     def __repr__(self) -> str:

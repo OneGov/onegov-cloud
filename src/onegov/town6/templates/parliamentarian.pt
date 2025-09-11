@@ -11,49 +11,50 @@
                     <ul class="more-list">
                         <li tal:repeat="role parliamentarian.roles">
                             <div class="list-link">
-                                <a tal:condition="request.is_manager" href="${request.link(role)}"> ${role.role_label}
-                                    <tal:block i18n:translate>Parliament</tal:block></a>
-                                <span tal:condition="not request.is_manager">
-                                ${role.role_label}
-                                    <tal:block i18n:translate>Parliament</tal:block>
-                                </span>
-                                <span tal:condition="role.parliamentary_group">
-                                    /
-                                    ${role.parliamentary_group_role_label}
-                                    <tal:block i18n:translate>Parliamentary group</tal:block>
-                                    <a href="${request.link(role.parliamentary_group)}">${role.parliamentary_group.title}</a>
-                                </span>
-                                <span class="list-lead preview">
-                                    ${layout.format_date(role.start, 'date')}
-                                    <span tal:condition="role.end">
-                                    -
-                                    ${layout.format_date(role.end, 'date')}
-                                    </span>
+                                <span>
+                                    <a tal:condition="request.is_manager" href="${request.link(role)}"> ${role.role_label}
+                                        <tal:block i18n:translate>Parliament</tal:block></a>
+                                    <tal:b tal:condition="not request.is_manager">
+                                    ${role.role_label}
+                                        <tal:block i18n:translate>Parliament</tal:block>
+                                    </tal:b>
+                                    <tal:b tal:condition="role.parliamentary_group">
+                                        /
+                                        ${role.parliamentary_group_role_label}
+                                        <tal:block i18n:translate>Parliamentary group</tal:block>
+                                        <a href="${request.link(role.parliamentary_group)}">${role.parliamentary_group.title}</a>
+                                    </tal:b>
                                 </span>
                             </div>
+                            <span class="list-lead preview">
+                                ${layout.format_date(role.start, 'date')}
+                                <tal:b tal:condition="role.end">
+                                -
+                                ${layout.format_date(role.end, 'date')}
+                                </tal:b>
+                            </span>
                         </li>
                     </ul>
                 </div>
                 <div tal:condition="parliamentarian.commission_memberships">
-                    <h2 i18n:translate class="h3">Commissions</h2>
+                    <h2 i18n:translate class="h3">Commissions</h2>  
                     <ul class="more-list">
                         <li tal:repeat="membership parliamentarian.commission_memberships">
                             <div class="list-link">
-                                <a tal:condition="request.is_manager" href="${request.link(membership)}">${membership.role_label}</a>
-                                <span tal:condition="not request.is_manager">
-                                    ${membership.role_label}
-                                </span>
-                                <span tal:condition="membership.commission">
-                                    <span i18n:translate> in </span>
+                                <span>
+                                    <a tal:condition="request.is_manager" href="${request.link(membership)}">${membership.role_label} </a>
+                                    <tal:b tal:condition="not request.is_manager">${membership.role_label} </tal:b>
+                                    <tal:b tal:condition="membership.commission">
+                                    <tal:b i18n:translate> in </tal:b>
                                     <a href="${request.link(membership.commission)}">${membership.commission.title}</a>
                                 </span>
-                                <span class="list-lead preview">
-                                    ${layout.format_date(membership.start, 'date')}
-                                    <span tal:condition="membership.end">
-                                        ${layout.format_date(membership.end, 'date')}
-                                    </span>
-                                </span>
                             </div>
+                            <span class="list-lead preview">
+                                ${layout.format_date(membership.start, 'date')}
+                                <tal:b tal:condition="membership.end">
+                                    ${layout.format_date(membership.end, 'date')}
+                                </tal:b>
+                            </span>
                         </li>
                     </ul>
                 </div>

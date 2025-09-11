@@ -102,15 +102,15 @@ from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import FilteredArchivedTicketCollection
 from onegov.org.models.ticket import FilteredTicketCollection
 from onegov.page import PageCollection
-from onegov.pay import PaymentProvider, Payment, PaymentCollection
-from onegov.pay import PaymentProviderCollection
+from onegov.pay import Payment, PaymentCollection
+from onegov.pay import PaymentProvider, PaymentProviderCollection
 from onegov.people import Person, PersonCollection
 from onegov.qrcode import QrCode
 from onegov.reservation import Allocation
 from onegov.reservation import Reservation
 from onegov.reservation import Resource
 from onegov.reservation import ResourceCollection
-from onegov.ticket import Ticket, TicketCollection
+from onegov.ticket import Ticket, TicketCollection, TicketInvoiceCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, User, UserCollection
 from onegov.user import UserGroup, UserGroupCollection
@@ -910,10 +910,10 @@ def get_payment(app: OrgApp, id: UUID) -> Payment | None:
         'end': datetime_converter,
         'status': str,
         'payment_type': str,
-        'ticket_start': datetime_converter,
-        'ticket_end': datetime_converter,
-        'reservation_start': datetime_converter,
-        'reservation_end': datetime_converter
+        'ticket_start': extended_date_converter,
+        'ticket_end': extended_date_converter,
+        'reservation_start': extended_date_converter,
+        'reservation_end': extended_date_converter
     }
 )
 def get_payments(
@@ -924,10 +924,11 @@ def get_payments(
     end: datetime | None = None,
     status: str | None = None,
     payment_type: str | None = None,
-    ticket_start: datetime | None = None,
-    ticket_end: datetime | None = None,
-    reservation_start: datetime | None = None,
-    reservation_end: datetime | None = None
+    ticket_group: str | None = None,
+    ticket_start: date | None = None,
+    ticket_end: date | None = None,
+    reservation_start: date | None = None,
+    reservation_end: date | None = None
 ) -> PaymentCollection:
     return PaymentCollection(
         session=app.session(),
@@ -937,10 +938,45 @@ def get_payments(
         end=end,
         status=status,
         payment_type=payment_type,
+        ticket_group=ticket_group,
         ticket_start=ticket_start,
         ticket_end=ticket_end,
         reservation_start=reservation_start,
         reservation_end=reservation_end
+    )
+
+
+@OrgApp.path(
+    model=TicketInvoiceCollection,
+    path='/invoices',
+    converters={
+        'page': int,
+        'ticket_start': extended_date_converter,
+        'ticket_end': extended_date_converter,
+        'reservation_start': extended_date_converter,
+        'reservation_end': extended_date_converter,
+        'invoiced': bool,
+    }
+)
+def get_invoices(
+    app: OrgApp,
+    page: int = 0,
+    ticket_group: str | None = None,
+    ticket_start: date | None = None,
+    ticket_end: date | None = None,
+    reservation_start: date | None = None,
+    reservation_end: date | None = None,
+    invoiced: bool | None = None,
+) -> TicketInvoiceCollection:
+    return TicketInvoiceCollection(
+        session=app.session(),
+        page=page,
+        ticket_group=ticket_group,
+        ticket_start=ticket_start,
+        ticket_end=ticket_end,
+        reservation_start=reservation_start,
+        reservation_end=reservation_end,
+        invoiced=invoiced,
     )
 
 

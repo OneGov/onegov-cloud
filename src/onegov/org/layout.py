@@ -58,7 +58,7 @@ from onegov.pay import PaymentCollection, PaymentProviderCollection
 from onegov.people import PersonCollection
 from onegov.qrcode import QrCode
 from onegov.reservation import ResourceCollection
-from onegov.ticket import TicketCollection
+from onegov.ticket import TicketCollection, TicketInvoiceCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from onegov.user.utils import password_reset_url
@@ -3310,6 +3310,37 @@ class PaymentCollectionLayout(DefaultLayout):
                     text=_('Export'),
                     url=self.request.class_link(OrgExport, {'id': 'payments'}),
                     attrs={'class': 'export-link'}
+                )
+            )
+
+        return links
+
+
+class TicketInvoiceCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Invoices'), self.request.class_link(
+                TicketInvoiceCollection
+            ))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        links: list[Link | LinkGroup] = []
+
+        if self.request.is_manager_for_model(self.model):
+
+            links.append(
+                Link(
+                    text=_('Export Bill run as PDF'),
+                    url=self.request.link(
+                        self.model,
+                        query_params={'format': 'pdf'}
+                    ),
+                    attrs={'class': 'ticket-pdf'}
                 )
             )
 

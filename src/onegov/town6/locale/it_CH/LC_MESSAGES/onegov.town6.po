@@ -702,6 +702,27 @@ msgstr "Questo album non contiene ancora nessuna immagine."
 msgid "No photo albums defined yet."
 msgstr "Nessun album fotografico ancora definito."
 
+msgid "No invoices yet."
+msgstr "Nessuna fattura ancora."
+
+msgid "Batch Action"
+msgstr "Azione di gruppo"
+
+msgid "Mark as Invoiced"
+msgstr "Contrassegna come fatturato"
+
+msgid "Mark as Uninvoiced"
+msgstr "Contrassegna come non fatturato"
+
+msgid "Mark as Paid"
+msgstr "Contrassegna come pagato"
+
+msgid "Mark as Unpaid"
+msgstr "Contrassegna come non pagato"
+
+msgid "Apply to selected"
+msgstr "Applica ai selezionati"
+
 msgid "Search term"
 msgstr "Termine di ricerca"
 
@@ -819,6 +840,10 @@ msgstr "Voce precedente"
 
 msgid "Next Entry"
 msgstr "Prossima voce"
+
+#, fuzzy
+msgid "Content"
+msgstr "Contatti"
 
 msgid "Invoice Items"
 msgstr "Voci di fattura"
@@ -1127,6 +1152,18 @@ msgstr "Creato"
 msgid "Disbursed"
 msgstr "Erogato"
 
+msgid "Select this payment"
+msgstr "Seleziona questo pagamento"
+
+msgid "Select this invoice"
+msgstr "Seleziona questa fattura"
+
+msgid "Uninvoiced"
+msgstr "Non fatturato"
+
+msgid "Unpaid"
+msgstr "Non pagato"
+
 msgid "Find Your Spot"
 msgstr "Cerca le date / Prenotazioni ricorrenti"
 
@@ -1159,10 +1196,6 @@ msgstr "Non una pubblicazione"
 
 msgid "Digital seal"
 msgstr "Sigillo digitale"
-
-#, fuzzy
-msgid "Content"
-msgstr "Contatti"
 
 msgid "1 page"
 msgstr "1 pagina"
@@ -1285,9 +1318,6 @@ msgstr "Deduzioni / Supplementi"
 msgid "Lump sum"
 msgstr "Somma forfettaria"
 
-msgid "Unpaid"
-msgstr "Non pagato"
-
 msgid "Total"
 msgstr "Totale"
 
@@ -1296,8 +1326,8 @@ msgstr "Ciao!"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su "
-"${homepage}."
+"Il tuo indirizzo e-mail è stato appena utilizzato per creare un account su $"
+"{homepage}."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Per attivare il tuo account, fai clic su conferma qui di seguito:"
@@ -1378,6 +1408,30 @@ msgid ""
 msgstr ""
 "Se non ti sei iscritto a queste notifiche puoi semplicemente ignorare questa "
 "e-mail."
+
+msgid "New customer message in Ticket ${link}"
+msgstr "Nuovo messaggio del cliente nel ticket ${link}"
+
+msgid "${author} wrote"
+msgstr "${author} ha scritto"
+
+#. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
+msgid "Please ${link} to reply."
+msgstr "Per favore ${link} per rispondere."
+
+#. Used in sentence: "Please ${link} to reply."
+msgid "visit the request page"
+msgstr "visita la pagina di richiesta"
+
+msgid ""
+"This is the notification for customer messages on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
+msgstr ""
+"Questa è la notifica relativa ai messaggi dei clienti sulle prenotazioni per "
+"${request.app.org.title}. Se non desideri più ricevere questa e-mail, "
+"contatta un amministratore affinché ti rimuova dall'elenco dei destinatari."
 
 msgid "Good morning,"
 msgstr "Buongiorno,"
@@ -1478,17 +1532,14 @@ msgstr "Purtroppo l'evento è stato rifiutato:"
 msgid "New note in Ticket ${link}"
 msgstr "Nuova nota nel ticket ${link}"
 
-msgid "${author} wrote"
-msgstr "${author} ha scritto"
-
 msgid ""
-"This is the notification for notes on reservations for ${request.app.org."
-"title}. If you no longer want to receive this e-mail please contact an "
-"administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
-"Questa è la notifica per le note sulle prenotazioni per ${request.app.org."
-"title}. Se non si desidera più ricevere questo messaggio di posta "
-"elettronica si prega di contattare un amministratore in modo che possa "
+"Questa è la notifica per le note sulle prenotazioni per $"
+"{request.app.org.title}. Se non si desidera più ricevere questo messaggio di "
+"posta elettronica si prega di contattare un amministratore in modo che possa "
 "rimuovervi dall'elenco dei destinatari lista"
 
 msgid "Pending approval"
@@ -1502,6 +1553,12 @@ msgstr "Non desideri più ricevere queste notifiche?"
 
 msgid "The following reservations have been accepted:"
 msgstr "Sono state accettate le seguenti prenotazioni:"
+
+msgid "Tag"
+msgstr "Tag"
+
+msgid "See Ticket ${link} for additional information."
+msgstr "Per ulteriori informazioni, consultare il biglietto ${link}."
 
 msgid ""
 "This is a notification for the new reservations for ${organisation}. If you "
@@ -1630,18 +1687,9 @@ msgstr "Rifiutata"
 msgid "A message has been sent regarding ${ref}:"
 msgstr "È stato inviato un messaggio relativo a ${ref}:"
 
-#. Canonical text for ${link} is: "visit the request status page"
-#. Canonical text for ${link} is: "visit the request page"
-msgid "Please ${link} to reply."
-msgstr "Per favore ${link} per rispondere."
-
 #. Used in sentence: "Please ${link} to reply."
 msgid "visit the request status page"
 msgstr "visita la pagina di richiesta dello stato"
-
-#. Used in sentence: "Please ${link} to reply."
-msgid "visit the request page"
-msgstr "visita la pagina di richiesta"
 
 msgid "Your request has been closed."
 msgstr "La richiesta è stata chiusa."
@@ -1945,9 +1993,6 @@ msgstr "Questo è un evento importato"
 msgid "General information about the event calendar"
 msgstr "Informazioni generali sul calendario degli eventi"
 
-msgid "Tag"
-msgstr "Tag"
-
 msgid "Date"
 msgstr "Data"
 
@@ -2072,21 +2117,6 @@ msgstr "Esporta l'esecuzione della fattura come PDF"
 msgid "No payments yet."
 msgstr "Nessun pagamento ancora."
 
-msgid "Batch Action"
-msgstr "Azione di gruppo"
-
-msgid "Mark as Invoiced"
-msgstr "Contrassegna come fatturato"
-
-msgid "Mark as Paid"
-msgstr "Contrassegna come pagato"
-
-msgid "Mark as Unpaid"
-msgstr "Contrassegna come non pagato"
-
-msgid "Apply to selected"
-msgstr "Applica ai selezionati"
-
 msgid "Select organisation"
 msgstr "Selezionare l'organizzazione"
 
@@ -2208,21 +2238,30 @@ msgstr ""
 "potete utilizzare il seguente link. Si noti tuttavia che chiunque condivida "
 "questo link avrà accesso permanente a queste informazioni."
 
-msgid "Reservations must be made at least one day in advance."
+msgid "Reservations must be made at least ${n} ${unit} in advance."
 msgstr ""
-"Le prenotazioni devono essere effettuate con almeno un giorno di anticipo."
+"Le prenotazioni devono essere effettuate con almeno ${n} ${unit} di anticipo."
 
-msgid "Reservations must be made at least one hour in advance."
-msgstr ""
-"Le prenotazioni devono essere effettuate con almeno un'ora di anticipo."
+msgid "days"
+msgstr "giorni"
 
-msgid "Reservations must be made at least ${n} days in advance."
-msgstr ""
-"Le prenotazioni devono essere effettuate con almeno ${n} giorni di anticipo."
+msgid "hour"
+msgstr "ora"
 
-msgid "Reservations must be made at least ${n} hours in advance."
+msgid "hours"
+msgstr "ore"
+
+msgid "Reservations can only be made at most ${n} ${unit} in advance."
 msgstr ""
-"Le prenotazioni devono essere effettuate con almeno ${n} ore di anticipo."
+"Le prenotazioni possono essere effettuate solo con un anticipo massimo di $"
+"{n} ${unit}."
+
+msgid ""
+"Reservations must be made at least ${n1} ${unit1} and at most ${n2} ${unit2} "
+"in advance."
+msgstr ""
+"Le prenotazioni devono essere effettuate con almeno ${n1} ${unit1} e al "
+"massimo ${n2} ${unit2} di anticipo."
 
 msgid ""
 "Select a free time span in the calendar to create an availability period."
@@ -2248,6 +2287,9 @@ msgid ""
 "Receives notifications for reservations of the day on the following days:"
 msgstr ""
 "Riceve le notifiche per le prenotazioni del giorno nei giorni successivi:"
+
+msgid "Receives notifications for customer messages on reservations."
+msgstr "Riceve notifiche relative ai messaggi dei clienti sulle prenotazioni."
 
 msgid "Receives notifications for internal notes on reservations."
 msgstr "Riceve le notifiche per le note interne sulle prenotazioni."
@@ -2614,11 +2656,31 @@ msgstr "Aggiunta di una nuova riunione"
 msgid "New meeting"
 msgstr "Nuova riunione"
 
+msgid "Listen to parliamentary debate"
+msgstr "Ascolta il dibattito parlamentare"
+
+msgid "Watch parliamentary debate"
+msgstr "Guarda il dibattito parlamentare"
+
 msgid "Edit meeting"
 msgstr "Modifica riunione"
 
 msgid "The meeting has been deleted."
 msgstr "La riunione è stata eliminata."
+
+msgid "No documents are assigned to the following agenda items:"
+msgstr "Nessun documento è assegnato ai seguenti punti all'ordine del giorno:"
+
+msgid "Export meeting documents"
+msgstr "Esporta i documenti della riunione"
+
+msgid ""
+"Select the meeting and agenda item documents you want to export. The "
+"resulting zipfile contains the documents per meeting item."
+msgstr ""
+"Seleziona i documenti della riunione e dell'ordine del giorno che vuoi "
+"esportare. Il file zip risultante contiene i documenti per voce della "
+"riunione."
 
 msgid "The commission membership has been deleted."
 msgstr "L'appartenenza alla commissione è stata eliminata."
@@ -2762,6 +2824,9 @@ msgstr "Sistema di informazione sui ratti (RIS)"
 
 msgid "New Note"
 msgstr "Nuova nota"
+
+#~ msgid "No parliamentarians defined yet."
+#~ msgstr "Nessun parlamentare ancora definito."
 
 #~ msgid "Picture"
 #~ msgstr "Immagine"

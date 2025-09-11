@@ -532,11 +532,11 @@ class AllocationEventInfo:
 
     @property
     def event_classes(self) -> Iterator[str]:
-        if self.allocation.end < sedate.utcnow() or (
-            # if the user can't override the deadline the event should
-            # appear as if it were in the past
-            not self.request.is_manager
-            and self.resource.is_past_deadline(
+        if self.allocation.end < sedate.utcnow():
+            yield 'event-in-past'
+
+        elif not self.request.is_manager and (
+            self.resource.is_past_deadline(
                 # for partly available allocations we use the end of the
                 # allocation, since some small sliver of the allocation
                 # may still be before the deadline, we could get a slightly
@@ -545,9 +545,11 @@ class AllocationEventInfo:
                 self.allocation.end
                 if self.allocation.partly_available
                 else self.allocation.start
+            ) or self.resource.is_before_lead_time(
+                self.allocation.start
             )
         ):
-            yield 'event-in-past'
+            yield 'event-outside-booking-window'
 
         if self.quota > 1:
             if self.quota_left == self.quota:

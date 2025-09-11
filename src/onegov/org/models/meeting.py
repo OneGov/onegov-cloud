@@ -10,6 +10,7 @@ from sedate import utcnow
 from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import dict_property, content_property
 from onegov.core.orm.types import UUID, MarkupText, UTCDateTime
 from onegov.file import MultiAssociatedFiles
 from onegov.org import _
@@ -43,6 +44,7 @@ class Meeting(
 
     __tablename__ = 'par_meetings'
 
+    # polymorphic type of meeting
     type: Column[str] = Column(
         Text,
         nullable=False,
@@ -64,6 +66,11 @@ class Meeting(
     @property
     def title_text(self) -> str:
         return f'{self.title} ({self.start_datetime})'
+
+    @property
+    def display_name(self) -> str:
+        # return title and start_datetime as dmY
+        return f'{self.title} {self.start_datetime:%d.%m.%Y}'
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(
@@ -113,6 +120,12 @@ class Meeting(
         back_populates='meeting',
         order_by='desc(MeetingItem.number)'
     )
+
+    #: link to audio url
+    audio_link: dict_property[str] = content_property(default='')
+
+    #: link to video url
+    video_link: dict_property[str] = content_property(default='')
 
     @hybrid_property
     def past(self):

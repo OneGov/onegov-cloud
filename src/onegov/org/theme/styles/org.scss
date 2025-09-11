@@ -1663,6 +1663,7 @@ $payment-capture-icon: '\f09d';
 $payment-refund-icon: '\f0e2';
 $payment-provider-icon: '\f283';
 $payments-icon: '\f09d';
+$invoice-icon: '\f1ea';
 $rule-link-icon: '\f085';
 $select-icon: '\f14a';
 $send-link-icon: '\f1d9';
@@ -1802,6 +1803,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .paste-link::before { @include icon($paste-link-icon); }
     .payment-provider::before { @include icon($payment-provider-icon); }
     .payments::before { @include icon($payments-icon); }
+    .invoice::before { @include icon($invoice-icon); }
     .select::before { @include icon($select-icon); }
     .send-link::before { @include icon($send-link-icon); }
     .sort-link::before { @include icon($sort-link-icon); }
@@ -3258,7 +3260,7 @@ button {
             }
         }
 
-        .event-in-past {
+        .event-in-past, .event-outside-booking-window {
             filter: grayscale(1);
         }
 
@@ -4773,6 +4775,62 @@ ul.recipients {
 */
 .payments-table {
     width: 100%;
+
+    td {
+        padding-right: 5px;
+        vertical-align: top;
+    }
+}
+
+/*
+    Invoices table
+*/
+#ticket_group_chosen .chosen-results {
+
+    .ticket-group-filter {
+        font-weight: normal;
+        margin-left: 1.4rem;
+    }
+}
+
+.invoices-table {
+    width: 100%;
+
+    tr.paid {
+        &.uninvoiced .invoiced-state {
+            color: get-color(warning);
+            filter: grayscale(1);
+        }
+        &.invoiced .invoiced-state, .paid-state {
+            color: get-color(success);
+        }
+    }
+
+    tr.unpaid.invoiced {
+        .invoiced-state {
+            color: get-color(success);
+        }
+        .paid-state {
+            color: get-color(warning);
+        }
+    }
+
+    tr.unpaid.uninvoiced {
+        .invoiced-state {
+            color: get-color(alert);
+        }
+        .paid-state {
+            color: get-color(warning);
+            filter: grayscale(1);
+        }
+    }
+
+    .invoiced-state, .paid-state {
+        font-size: 1.25rem;
+        text-align: center;
+        white-space: nowrap;
+        width: 1%;
+    }
 
     td {
         padding-right: 5px;

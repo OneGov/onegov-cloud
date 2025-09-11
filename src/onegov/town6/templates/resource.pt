@@ -28,20 +28,46 @@
             data-resources-url="${resources_url}"
             data-resource-active="${resource.name}"
         ></div>
-        <div class="calendar-footer" tal:condition="resource.deadline">
+        <div class="calendar-footer" tal:condition="resource.deadline and not resource.lead_time">
             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-
-            <span i18n:translate tal:condition="resource.deadline[0] == 1 and resource.deadline[1] == 'd'">
-                Reservations must be made at least one day in advance.
+            <span i18n:translate>
+                Reservations must be made at least <tal:b i18n:name="n">${resource.deadline[0]}</tal:b> <tal:b i18n:name="unit">
+                    <tal:b tal:condition="resource.deadline[1] == 'd'">
+                        <tal:b tal:condition="resource.deadline[0] == 1" i18n:translate>day</tal:b>
+                        <tal:b tal:condition="resource.deadline[0] != 1" i18n:translate>days</tal:b>
+                    </tal:b>
+                    <tal:b tal:condition="resource.deadline[1] == 'h'">
+                        <tal:b tal:condition="resource.deadline[0] == 1" i18n:translate>hour</tal:b>
+                        <tal:b tal:condition="resource.deadline[0] != 1" i18n:translate>hours</tal:b>
+                    </tal:b>
+                </tal:b> in advance.
             </span>
-            <span i18n:translate tal:condition="resource.deadline[0] == 1 and resource.deadline[1] == 'h'">
-                Reservations must be made at least one hour in advance.
+        </div>
+        <div class="calendar-footer" tal:condition="not resource.deadline and resource.lead_time">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            <span i18n:translate>
+                Reservations can only be made at most <tal:b i18n:name="n">${resource.lead_time}</tal:b> <tal:b i18n:name="unit">
+                    <tal:b tal:condition="resource.lead_time == 1" i18n:translate>day</tal:b>
+                    <tal:b tal:condition="resource.lead_time != 1" i18n:translate>days</tal:b>
+                </tal:b> in advance.
             </span>
-            <span i18n:translate tal:condition="resource.deadline[0] > 1 and resource.deadline[1] == 'd'">
-                Reservations must be made at least <tal:b i18n:name="n">${resource.deadline[0]}</tal:b> days in advance.
-            </span>
-            <span i18n:translate tal:condition="resource.deadline[0] > 1 and resource.deadline[1] == 'h'">
-                Reservations must be made at least <tal:b i18n:name="n">${resource.deadline[0]}</tal:b> hours in advance.
+        </div>
+        <div class="calendar-footer" tal:condition="resource.deadline and resource.lead_time">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            <span i18n:translate>
+                Reservations must be made at least <tal:b i18n:name="n1">${resource.deadline[0]}</tal:b> <tal:b i18n:name="unit1">
+                    <tal:b tal:condition="resource.deadline[1] == 'd'">
+                        <tal:b tal:condition="resource.deadline[0] == 1" i18n:translate>day</tal:b>
+                        <tal:b tal:condition="resource.deadline[0] != 1" i18n:translate>days</tal:b>
+                    </tal:b>
+                    <tal:b tal:condition="resource.deadline[1] == 'h'">
+                        <tal:b tal:condition="resource.deadline[0] == 1" i18n:translate>hour</tal:b>
+                        <tal:b tal:condition="resource.deadline[0] != 1" i18n:translate>hours</tal:b>
+                    </tal:b>
+                </tal:b> and at most <tal:b i18n:name="n2">${resource.lead_time}</tal:b> <tal:b i18n:name="unit2">
+                    <tal:b tal:condition="resource.lead_time == 1" i18n:translate>day</tal:b>
+                    <tal:b tal:condition="resource.lead_time != 1" i18n:translate>days</tal:b>
+                </tal:b> in advance.
             </span>
         </div>
         <div class="panel" tal:condition="request.is_manager">
