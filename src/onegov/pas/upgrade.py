@@ -45,20 +45,6 @@ def add_party_column_to_pas_parliamentarians(context: UpgradeContext) -> None:
             )
 
 
-@upgrade_task('Add bulk_edit_id column to pas_attendence')
-def add_bulk_edit_id_column_to_pas_attendence(context: UpgradeContext) -> None:
-    if context.has_table('pas_attendence'):
-        if not context.has_column('pas_attendence', 'bulk_edit_id'):
-            context.add_column_with_defaults(
-                'pas_attendence',
-                Column(
-                    'bulk_edit_id',
-                    UUID,
-                    nullable=True
-                ),
-                default=None
-            )
-
 @upgrade_task('Add bulk_edit_id column to par_attendence')
 def add_bulk_edit_id_column_to_par_attendence(context: UpgradeContext) -> None:
     if context.has_table('par_attendence'):
