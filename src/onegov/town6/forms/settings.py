@@ -302,6 +302,6 @@ class RISSettingsForm(Form):
         description=_(
             'Enter a list of categories for interest ties. Each '
             'category should be separated by a semicolon. '
-            'Example: "Cat 1 text; Cat 2 text; Cat 3 text"'),
+            'Example: Cat 1 text; Cat 2 text; Cat 3 text'),
         render_kw={'rows': 12}
     )

@@ -174,10 +174,10 @@ msgstr "Catégories prédéfinies pour les liens d'intérêt"
 
 msgid ""
 "Enter a list of categories for interest ties. Each category should be "
-"separated by a semicolon. Example: \"Cat 1 text; Cat 2 text; Cat 3 text\""
+"separated by a semicolon. Example: Cat 1 text; Cat 2 text; Cat 3 text"
 msgstr ""
 "Saisissez une liste de catégories pour les liens d'intérêt. Chaque catégorie "
-"doit être séparée par un point-virgule. Exemple : \"Cat 1 texte ; Cat 2 texte ; Cat 3 texte\""
+"doit être séparée par un point-virgule. Exemple : Cat 1 texte ; Cat 2 texte ; Cat 3 texte"
 
 msgid "Events"
 msgstr "Événements"
