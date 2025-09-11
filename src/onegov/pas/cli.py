@@ -371,3 +371,122 @@ def import_kub_data(token: str, base_url: str) -> Processor:
             raise
 
     return cli_wrapper
+
+
+@cli.command('update-custom-data')
+@click.option('--token', required=True, help='Authorization token for KUB API')
+@click.option('--base-url', required=True,
+              help='Base URL for the KUB API, ending in /api/v2')
+def update_custom_data(token: str, base_url: str) -> Processor:
+    """
+    Update parliamentarians with customFields data which
+    somehow is not included in the main /people api.
+    Needs to be run after import_kub_data
+
+    Example:
+        onegov-pas --select '/onegov_pas/zug' update-custom-data \
+            --token "your-token-here" \
+            --base-url "url-ending-in/api/v2"
+    """
+
+    def update_data(request: TownRequest, app: PasApp) -> None:
+        from onegov.parliament.models import Parliamentarian
+        field_mappings = {
+            'personalnummer': 'personnel_number',
+            'vertragsnummer': 'contract_number',
+            'wahlkreis': 'district',
+            'beruf': 'occupation',
+            'adress_anrede': 'salutation_for_address',
+            'brief_anrede': 'salutation_for_letter'
+        }
+
+        output_handler = ClickOutputHandler()
+
+        # Disable SSL warnings (self signed)
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+        headers = {
+            'Authorization': f'Token {token}',
+            'Accept': 'application/json'
+        }
+
+        # Get all parliamentarians with external_kub_id
+        parliamentarians = request.session.query(Parliamentarian).filter(
+            Parliamentarian.external_kub_id.isnot(None)
+        ).all()
+
+        if not parliamentarians:
+            output_handler.info(
+                'No parliamentarians with external_kub_id found'
+            )
+            return
+
+        output_handler.info(
+            f'Found {len(parliamentarians)} parliamentarians to update'
+        )
+
+        updated_count = 0
+        error_count = 0
+
+        for parliamentarian in parliamentarians:
+            try:
+                person_id = parliamentarian.external_kub_id
+                url = f'{base_url}/people/{person_id}'
+
+                output_handler.info(
+                    f'Fetching data for {parliamentarian.title} ({person_id})'
+                )
+
+                response = requests.get(
+                    url, headers=headers, verify=False, timeout=30  # nosec: B501
+                )
+                response.raise_for_status()
+
+                person_data = response.json()
+                custom_values = person_data.get('customValues', {})
+
+                # Update parliamentarian with custom values
+                updated_fields = []
+                for custom_key, attr_name in field_mappings.items():
+                    if custom_key in custom_values:
+                        setattr(
+                            parliamentarian, attr_name,
+                            custom_values[custom_key]
+                        )
+                        updated_fields.append(attr_name)
+
+                if updated_fields:
+                    updated_count += 1
+                    output_handler.success(
+                        f'Updated {parliamentarian.title}: '
+                        f'{", ".join(updated_fields)}'
+                    )
+                else:
+                    output_handler.info(
+                        f'No custom data found for {parliamentarian.title}'
+                    )
+
+            except requests.exceptions.RequestException as e:
+                error_count += 1
+                output_handler.error(
+                    f'Failed to fetch data for {parliamentarian.title}: {e}'
+                )
+            except Exception as e:
+                error_count += 1
+                output_handler.error(
+                    f'Error updating {parliamentarian.title}: {e}'
+                )
+
+        # Commit the changes
+        try:
+            request.session.commit()
+            output_handler.success(
+                f'Update completed: {updated_count} updated, '
+                f'{error_count} errors'
+            )
+        except Exception as e:
+            request.session.rollback()
+            output_handler.error(f'Failed to commit changes: {e}')
+            raise
+
+    return update_data
