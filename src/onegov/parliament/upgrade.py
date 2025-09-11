@@ -166,3 +166,16 @@ def remove_old_pas_tables(
         if context.has_table(tablename):
             context.operations.execute(
                 f'DROP TABLE IF EXISTS {tablename} CASCADE')
+
+
+@upgrade_task(
+    'Fix poly type for meeting items',
+    requires='onegov.parliament:Add type column to parliament '
+             'models 2nd attempt')
+def fix_poly_type_for_meeting_items(
+    context: UpgradeContext
+) -> None:
+
+    context.operations.execute(
+        "UPDATE par_meeting_items SET type = 'generic'"
+    )
