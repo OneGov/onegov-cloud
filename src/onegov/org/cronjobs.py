@@ -821,22 +821,23 @@ def delete_content_marked_deletable(request: OrgRequest) -> None:
                         count += 1
 
     # check on past events and its occurrences
+    cutoff = now - timedelta(days=2)  # only delete with cutoff of 2 days
     if request.app.org.delete_past_events:
         query = request.session.query(Occurrence)
-        query = query.filter(Occurrence.end < now)
-        for obj in query:
+        query = query.filter(Occurrence.end < cutoff)
+        for occ in query:
             log.info(f'Cron: Delete past occurrence for {name}: '
-                     f'{obj.title} - {obj.end}')
-            request.session.delete(obj)
+                     f'{occ.title} - {occ.end}')
+            request.session.delete(occ)
             count += 1
 
         query = request.session.query(Event)
-        query = query.filter(Event.end < now)
-        for obj in query:
-            if not obj.future_occurrences(limit=1).all():
+        query = query.filter(Event.end < cutoff)
+        for event in query:
+            if not event.occurrences:
                 log.info(f'Cron: Delete past event for {name}: '
-                         f'{obj.title} - {obj.end}')
-                request.session.delete(obj)
+                         f'{event.title} - {event.end}')
+                request.session.delete(event)
                 count += 1
 
     if count:
