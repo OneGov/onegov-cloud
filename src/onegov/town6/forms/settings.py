@@ -300,8 +300,8 @@ class RISSettingsForm(Form):
     ris_interest_tie_categories = TextAreaField(
         label=_('Predefined categories for interest ties'),
         description=_(
-            'A list of predefined categories for interest ties. '
-            'Each category is a semicolon separated list of interests. '
-            'Example: "A;B;C"'),
-        render_kw={'rows': 8}
+            'Enter a list of categories for interest ties. Each '
+            'category should be separated by a semicolon. '
+            'Example: "Cat 1 text; Cat 2 text; Cat 3 text"'),
+        render_kw={'rows': 12}
     )

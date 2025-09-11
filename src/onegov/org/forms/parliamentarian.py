@@ -200,7 +200,7 @@ class ParliamentarianForm(NamedFileForm):
         self,
         interest_ties: dict[str, Any]
     ) -> str:
-        cats = ['No categories defined']
+        cats = [self.request.translate(_('No categories defined.'))]
 
         interest_tie_cats = self.request.app.org.ris_interest_tie_categories  # type:ignore[attr-defined]
         if interest_tie_cats:

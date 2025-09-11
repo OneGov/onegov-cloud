@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-08-29 08:26+0200\n"
+"POT-Creation-Date: 2025-09-11 12:40+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -165,6 +165,17 @@ msgstr "URL-Pfad für die RIS-Hauptseite"
 
 msgid "The URL path for the RIS main page for non-logged-in users."
 msgstr "Der URL-Pfad für die RIS-Hauptseite für nicht angemeldete Benutzer."
+
+msgid "Predefined categories for interest ties"
+msgstr "Vordefinierte Kategorien für Interessensbindungen"
+
+msgid ""
+"Enter a list of categories for interest ties. Each category should be "
+"separated by a semicolon. Example: \"Cat 1 text; Cat 2 text; Cat 3 text\""
+msgstr ""
+"Geben Sie eine Liste von Kategorien für Interessensbindungen ein. Jede "
+"Kategorie sollte durch ein Semikolon getrennt sein. Beispiel: \"Kat 1 Text; "
+"Kat 2 Text; Kat 3 Text\""
 
 msgid "Events"
 msgstr "Veranstaltungen"
@@ -2749,6 +2760,15 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid ""
+#~ "A list of predefined categories for interest ties. Each category is a "
+#~ "semicolon separated list of interests. Example: \"Cat 1 text; Cat 2 text; "
+#~ "Cat 3 text\""
+#~ msgstr ""
+#~ "Eine Liste vordefinierter Kategorien für Interessensbindungen. Jede "
+#~ "Kategorie ist eine durch Semikolon getrennte Liste von Interessen. "
+#~ "Beispiel: \"Kat 1 Text; Kat 2 Text; Kat 3 Text\""
 
 #~ msgid "Picture"
 #~ msgstr "Bild"
