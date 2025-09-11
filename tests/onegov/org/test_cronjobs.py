@@ -1345,7 +1345,7 @@ def test_delete_content_marked_deletable__events_occurrences(
         return (OccurrenceCollection(org_app.session(), outdated=True)
                 .query().filter_by(title=title).count())
 
-    with (freeze_time(datetime(2024, 4, 18, tzinfo=tz))):
+    with (freeze_time(datetime(2024, 4, 18, 6, 0, tzinfo=tz))):
         # default setting, no deletion of past event and past occurrences
         assert org_app.org.delete_past_events is False
 
@@ -1362,7 +1362,7 @@ def test_delete_content_marked_deletable__events_occurrences(
 
         # ogc-2562
         # switch setting and see nothing gets deleted event without occurrences
-        # and prio end date
+        # and prior end date
         transaction.begin()
         org_app.org.delete_past_events = True
         transaction.commit()
@@ -1374,13 +1374,39 @@ def test_delete_content_marked_deletable__events_occurrences(
         assert count_events(title_2) == 1
         assert count_occurrences(title_2) == 0
 
+    with (freeze_time(datetime(2024, 4, 19, 6, 0, tzinfo=tz))):
+        # nothing gets deleted due to two cutoff days
+        transaction.begin()
+        org_app.org.delete_past_events = True
+        transaction.commit()
+        close_all_sessions()
+
+        client.get(get_cronjob_url(job))
+        assert count_events(title_1) == 1
+        assert count_occurrences(title_1) == 4
+        assert count_events(title_2) == 1
+        assert count_occurrences(title_2) == 0
+
+    with (freeze_time(datetime(2024, 4, 20, 6, 0, tzinfo=tz))):
+        # nothing gets deleted due to two cutoff days
+        transaction.begin()
+        org_app.org.delete_past_events = True
+        transaction.commit()
+        close_all_sessions()
+
+        client.get(get_cronjob_url(job))
+        assert count_events(title_1) == 1
+        assert count_occurrences(title_1) == 4
+        assert count_events(title_2) == 1
+        assert count_occurrences(title_2) == 0
+
+    with (freeze_time(datetime(2024, 4, 21, 6, 0, tzinfo=tz))):
+        # an old occurrence could be deleted, but the setting is not enabled
         transaction.begin()
         org_app.org.delete_past_events = False
         transaction.commit()
         close_all_sessions()
 
-    with (freeze_time(datetime(2024, 4, 19, 6, 0, tzinfo=tz))):
-        # an old occurrence could be deleted, but the setting is not enabled
         client.get(get_cronjob_url(job))
         assert count_events(title_1) == 1
         assert count_occurrences(title_1) == 4
@@ -1399,18 +1425,40 @@ def test_delete_content_marked_deletable__events_occurrences(
         assert count_events(title_2) == 0
         assert count_occurrences(title_2) == 0
 
-    with (freeze_time(datetime(2024, 5, 9, tzinfo=tz))):
+    with (freeze_time(datetime(2024, 4, 27, 6, 0, tzinfo=tz))):
+        client.get(get_cronjob_url(job))
+        assert count_events(title_1) == 1
+        assert count_occurrences(title_1) == 3
+
+    with (freeze_time(datetime(2024, 4, 28, 6, 0, tzinfo=tz))):
+        client.get(get_cronjob_url(job))
+        assert count_events(title_1) == 1
+        assert count_occurrences(title_1) == 2
+
+    with (freeze_time(datetime(2024, 5, 4, 6, 0, tzinfo=tz))):
+        client.get(get_cronjob_url(job))
+        assert count_events(title_1) == 1
+        assert count_occurrences(title_1) == 2
+
+    with (freeze_time(datetime(2024, 5, 5, 6, 0, tzinfo=tz))):
         client.get(get_cronjob_url(job))
         assert count_events(title_1) == 1
         assert count_occurrences(title_1) == 1
 
-    with (freeze_time(datetime(2024, 5, 10, tzinfo=tz))):
-        # finally after all occurrences took place, the event as well as all
-        # occurrences got deleted by the cronjob (April 18th + 3*7 days =
-        # May 10)
+    with (freeze_time(datetime(2024, 5, 11, 6, 0, tzinfo=tz))):
+        client.get(get_cronjob_url(job))
+        assert count_events(title_1) == 1
+        assert count_occurrences(title_1) == 1
+
+    with (freeze_time(datetime(2024, 5, 12, 6, 0, tzinfo=tz))):
+        # finally, after all occurrences took place, the event as well as all
+        # occurrences got deleted by the cronjob
+        # April 18th + 3*7 days + 2 cutoff days = May 11, hence deletion
+        # happens on May 12th
         client.get(get_cronjob_url(job))
         assert count_events(title_1) == 0
         assert count_occurrences(title_1) == 0
+
 
 
 @pytest.mark.parametrize(
