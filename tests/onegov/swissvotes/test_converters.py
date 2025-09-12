@@ -4,9 +4,6 @@ from onegov.swissvotes.converters import policy_area_converter
 def test_policy_area_converter():
     converter = policy_area_converter
 
-    # assert converter.decode(['']) == [None]
-    # assert converter.decode([None]) == [None]
-
     assert converter.decode(['']) == []
     assert converter.decode([None]) == []
     assert converter.decode([]) == []

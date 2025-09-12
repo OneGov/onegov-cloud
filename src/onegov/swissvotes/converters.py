@@ -4,7 +4,7 @@ import re
 from morepath.converter import Converter
 
 
-class PolicyAreaListConverter(Converter):
+class PolicyAreaListConverter(Converter):  # type: ignore[type-arg]
 
     def verify_format(self, s: str) -> bool:
         # verify is a number or in '1.13.136' format,
@@ -31,18 +31,18 @@ class PolicyAreaListConverter(Converter):
 
         return self.verify_format(s) and self.verify_components(s)
 
-    def decode(self, s: str) -> list[str]:
+    def decode(self, s: str) -> list[str]:  # type: ignore[override]
         if not s:
             return []
         return [item for item in s if self.validate(item)]
 
-    def encode(self, l: list[str]) -> str:
+    def encode(self, l: list[str]) -> list[str]:  # type: ignore[override]
         if not l:
             return []
         return [item for item in l if item]
 
 
 policy_area_converter = PolicyAreaListConverter(
-    decode=PolicyAreaListConverter.decode,
-    encode=PolicyAreaListConverter.encode
+    decode=PolicyAreaListConverter,  # type:ignore[arg-type]
+    encode=PolicyAreaListConverter,  # type:ignore[arg-type]
 )
