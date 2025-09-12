@@ -40,7 +40,7 @@ def view_parliamentarians(
     filters['active'] = [
         Link(
             text=request.translate(title),
-            active=self.active == value,
+            active=value in self.active,
             url=request.link(self.for_filter(active=value))
         ) for title, value in (
             (_('Active'), True),
@@ -50,7 +50,7 @@ def view_parliamentarians(
     filters['party'] = [
         Link(
             text=value,
-            active=self.party == value,
+            active=value in self.party,
             url=request.link(self.for_filter(party=value))
         ) for value in self.party_values()
     ]
@@ -79,6 +79,7 @@ def add_parliamentarian(
         return request.redirect(request.link(parliamentarian))
 
     layout.breadcrumbs.append(Link(_('New'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -118,6 +119,7 @@ def edit_parliamentarian(
 
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -168,6 +170,7 @@ def add_parliamentary_group_membership(
     layout.breadcrumbs.append(
         Link(_('New parliamentary group function'), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -200,6 +203,7 @@ def add_commission_membership(
 
     layout.breadcrumbs.append(Link(_('New commission function'), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,

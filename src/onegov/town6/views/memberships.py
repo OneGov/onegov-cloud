@@ -60,6 +60,7 @@ def edit_commission_membership(
     layout = RISCommissionMembershipLayout(self, request)
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'layout': layout,

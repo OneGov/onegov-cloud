@@ -47,6 +47,7 @@ from typing import Any, NamedTuple, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping
     from onegov.core.request import CoreRequest
+    from onegov.core.orm import Base
     from onegov.core.types import JSON_ro
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import ColumnElement
@@ -72,7 +73,9 @@ def test_is_valid_schema(postgres_dsn: str) -> None:
 
 
 def test_independent_sessions(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
         __tablename__ = 'document'
@@ -98,7 +101,9 @@ def test_independent_sessions(postgres_dsn: str) -> None:
 
 
 def test_independent_managers(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
         __tablename__ = 'document'
@@ -129,7 +134,9 @@ def test_independent_managers(postgres_dsn: str) -> None:
 
 
 def test_create_schema(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
         __tablename__ = 'document'
@@ -171,7 +178,9 @@ def test_create_schema(postgres_dsn: str) -> None:
 
 
 def test_schema_bound_session(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -183,7 +192,7 @@ def test_schema_bound_session(postgres_dsn: str) -> None:
     mgr.set_current_schema('foo')
     session = mgr.session()
 
-    session.add(Document(title='Welcome to Foo'))  # type: ignore[call-arg]
+    session.add(Document(title='Welcome to Foo'))
     transaction.commit()
 
     assert session.query(Document).one().title == 'Welcome to Foo'
@@ -202,7 +211,9 @@ def test_schema_bound_session(postgres_dsn: str) -> None:
 
 
 def test_session_scope(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     mgr = SessionManager(postgres_dsn, Base)
 
@@ -229,7 +240,8 @@ def test_session_scope(postgres_dsn: str) -> None:
 def test_orm_scenario(postgres_dsn: str, redis_url: str) -> None:
     # test a somewhat complete ORM scenario in which create and read data
     # for different applications
-    Base = declarative_base(cls=ModelBase)
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class App(Framework):
         pass
@@ -255,7 +267,7 @@ def test_orm_scenario(postgres_dsn: str, redis_url: str) -> None:
             return self.query().filter(Document.id == id).first()
 
         def add(self, title: str) -> Document:
-            document = Document(title=title)  # type: ignore[call-arg]
+            document = Document(title=title)
             self.session.add(document)
             self.session.flush()
 
@@ -331,7 +343,9 @@ def test_orm_scenario(postgres_dsn: str, redis_url: str) -> None:
 
 
 def test_i18n_with_request(postgres_dsn: str, redis_url: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class App(Framework):
         pass
@@ -350,7 +364,7 @@ def test_i18n_with_request(postgres_dsn: str, redis_url: str) -> None:
 
     @App.path(model=Document, path='document')
     def get_document(app: App) -> Document:
-        return app.session().query(Document).first() or Document(id=1)  # type: ignore[call-arg]
+        return app.session().query(Document).first() or Document(id=1)
 
     @App.json(model=Document)
     def view_document(self: Document, request: CoreRequest) -> JSON_ro:
@@ -405,7 +419,9 @@ def test_i18n_with_request(postgres_dsn: str, redis_url: str) -> None:
 
 
 def test_json_type(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Test(Base):
         __tablename__ = 'test'
@@ -418,7 +434,7 @@ def test_json_type(postgres_dsn: str) -> None:
 
     session = mgr.session()
 
-    test = Test(id=1, data=None)  # type: ignore[call-arg]
+    test = Test(id=1, data=None)
     session.add(test)
     transaction.commit()
 
@@ -426,7 +442,7 @@ def test_json_type(postgres_dsn: str) -> None:
     assert session.query(Test).filter(Test.id == 1).one().data == {}
     assert session.execute('SELECT data::text from test').scalar() == '{}'
 
-    test = Test(id=2, data={'foo': 'bar'})  # type: ignore[call-arg]
+    test = Test(id=2, data={'foo': 'bar'})
     session.add(test)
     transaction.commit()
 
@@ -443,7 +459,7 @@ def test_json_type(postgres_dsn: str) -> None:
         'foo': 'rab'
     }
 
-    test = Test(id=3, data={})  # type: ignore[call-arg]
+    test = Test(id=3, data={})
     session.add(test)
     transaction.commit()
 
@@ -453,7 +469,9 @@ def test_json_type(postgres_dsn: str) -> None:
 
 
 def test_session_manager_sharing(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Test(Base):
         __tablename__ = 'test'
@@ -462,7 +480,7 @@ def test_session_manager_sharing(postgres_dsn: str) -> None:
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
 
-    test = Test(id=1)  # type: ignore[call-arg]
+    test = Test(id=1)
 
     # session_manager is a weakref proxy so we need to go through some hoops
     # to get the actual instance for a proper identity test
@@ -477,7 +495,9 @@ def test_session_manager_sharing(postgres_dsn: str) -> None:
 
 
 def test_session_manager_i18n(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Test(Base):
         __tablename__ = 'test'
@@ -490,7 +510,7 @@ def test_session_manager_i18n(postgres_dsn: str) -> None:
     mgr.set_current_schema('testing')
     mgr.set_locale(default_locale='en_us', current_locale='en_us')
 
-    test = Test(id=1, text='no')  # type: ignore[call-arg]
+    test = Test(id=1, text='no')
     assert test.text == 'no'
 
     mgr.set_locale(default_locale='en_us', current_locale='de_ch')
@@ -547,7 +567,9 @@ def test_session_manager_i18n(postgres_dsn: str) -> None:
 
 
 def test_uuid_type(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Test(Base):
         __tablename__ = 'test'
@@ -569,7 +591,9 @@ def test_uuid_type(postgres_dsn: str) -> None:
 
 
 def test_lowercase_text(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Test(Base):
         __tablename__ = 'test'
@@ -594,7 +618,9 @@ def test_lowercase_text(postgres_dsn: str) -> None:
 
 
 def test_markup_text(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Test(Base):
         __tablename__ = 'test'
@@ -638,7 +664,9 @@ def test_markup_text(postgres_dsn: str) -> None:
 
 
 def test_utc_datetime_naive(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Test(Base):
         __tablename__ = 'test'
@@ -652,7 +680,7 @@ def test_utc_datetime_naive(postgres_dsn: str) -> None:
     session = mgr.session()
 
     with pytest.raises(sqlalchemy.exc.StatementError):
-        test = Test(date=datetime.now())  # type: ignore[call-arg]
+        test = Test(date=datetime.now())
         session.add(test)
         session.flush()
 
@@ -660,7 +688,9 @@ def test_utc_datetime_naive(postgres_dsn: str) -> None:
 
 
 def test_utc_datetime_aware(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Test(Base):
         __tablename__ = 'test'
@@ -675,7 +705,7 @@ def test_utc_datetime_aware(postgres_dsn: str) -> None:
 
     tz = timezone('Europe/Zurich')
     date = datetime(2015, 3, 5, 12, 0).replace(tzinfo=tz)
-    test = Test(date=date)  # type: ignore[call-arg]
+    test = Test(date=date)
     session.add(test)
     session.flush()
     transaction.commit()
@@ -686,7 +716,9 @@ def test_utc_datetime_aware(postgres_dsn: str) -> None:
 
 
 def test_timestamp_mixin(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Test(Base, TimestampMixin):
         __tablename__ = 'test'
@@ -723,7 +755,9 @@ def test_timestamp_mixin(postgres_dsn: str) -> None:
 
 
 def test_content_mixin(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Test(Base, ContentMixin):
         __tablename__ = 'test'
@@ -735,7 +769,7 @@ def test_content_mixin(postgres_dsn: str) -> None:
 
     session = mgr.session()
 
-    test = Test(meta={'filename': 'rtfm'}, content={'text': 'RTFM'})  # type: ignore[call-arg]
+    test = Test(meta={'filename': 'rtfm'}, content={'text': 'RTFM'})
     session.add(test)
     session.flush()
     transaction.commit()
@@ -747,7 +781,9 @@ def test_content_mixin(postgres_dsn: str) -> None:
 
 
 def test_extensions_schema(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Data(Base):
         __tablename__ = 'data'
@@ -783,8 +819,9 @@ def test_extensions_schema(postgres_dsn: str) -> None:
 
 
 def test_serialization_failure(postgres_dsn: str) -> None:
-
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Data(Base):
         __tablename__ = 'data'
@@ -846,8 +883,9 @@ def test_application_retries(
     postgres_dsn: str,
     redis_url: str
 ) -> None:
-
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class App(Framework):
         pass
@@ -975,7 +1013,9 @@ def test_application_retries(
 
 
 def test_orm_signals_independence(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -1011,7 +1051,9 @@ def test_orm_signals_independence(postgres_dsn: str) -> None:
 
 
 def test_orm_signals_schema(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -1040,7 +1082,9 @@ def test_orm_signals_schema(postgres_dsn: str) -> None:
 
 
 def test_scoped_signals(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -1068,7 +1112,9 @@ def test_scoped_signals(postgres_dsn: str) -> None:
 
 
 def test_orm_signals_data_flushed(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -1119,7 +1165,9 @@ def test_pickle_model(postgres_dsn: str) -> None:
 
 
 def test_orm_signals(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -1152,8 +1200,8 @@ def test_orm_signals(postgres_dsn: str) -> None:
     session = mgr.session()
 
     # test on_insert
-    session.add(Document(id=1))  # type: ignore[call-arg]
-    session.add(Comment(id=1, document_id=1))  # type: ignore[call-arg]
+    session.add(Document(id=1))
+    session.add(Comment(id=1, document_id=1))
     assert len(inserted) == 0
 
     session.flush()
@@ -1203,8 +1251,8 @@ def test_orm_signals(postgres_dsn: str) -> None:
     del updated[:]
     del deleted[:]
 
-    session.add(Document(id=1))  # type: ignore[call-arg]
-    session.add(Document(id=2))  # type: ignore[call-arg]
+    session.add(Document(id=1))
+    session.add(Document(id=2))
     session.flush()
 
     assert len(inserted) == 2
@@ -1220,8 +1268,8 @@ def test_orm_signals(postgres_dsn: str) -> None:
     transaction.commit()
 
     # test on_delete with bulk delete
-    session.add(Comment(id=1, document_id=2, body='foo'))  # type: ignore[call-arg]
-    session.add(Comment(id=2, document_id=2, body='bar'))  # type: ignore[call-arg]
+    session.add(Comment(id=1, document_id=2, body='foo'))
+    session.add(Comment(id=2, document_id=2, body='bar'))
     transaction.commit()
     session.query(Comment).filter(Comment.document_id == 2).delete()
     assert len(deleted) == 2
@@ -1238,7 +1286,9 @@ def test_orm_signals(postgres_dsn: str) -> None:
 
 
 def test_get_polymorphic_class() -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Plain(Base):
         __tablename__ = 'plain'
@@ -1287,7 +1337,9 @@ def test_get_polymorphic_class() -> None:
 
 
 def test_dict_properties(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Site(Base):
         __tablename__ = 'sites'
@@ -1308,7 +1360,7 @@ def test_dict_properties(postgres_dsn: str) -> None:
 
     session = mgr.session()
 
-    site = Site(id=1)  # type: ignore[call-arg]
+    site = Site(id=1)
     assert site.names == []
     assert site.group is None
     site.names += ['foo', 'bar']
@@ -1344,7 +1396,9 @@ def test_dict_properties(postgres_dsn: str) -> None:
 
 
 def test_content_properties(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Content(Base, ContentMixin):
         __tablename__ = 'content'
@@ -1376,7 +1430,7 @@ def test_content_properties(postgres_dsn: str) -> None:
     assert Content.value is not None
     assert Content.value.hybrid.value_type is int
 
-    content = Content(id=1)  # type: ignore[call-arg]
+    content = Content(id=1)
     session.add(content)
     # NOTE: mypy incorrectly keeps content._type narrowed
     #       so we create a new name which remains unnarrowed
@@ -1420,8 +1474,9 @@ def test_content_properties(postgres_dsn: str) -> None:
 
 
 def test_find_models() -> None:
-
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Mixin:
         pass
@@ -1459,7 +1514,9 @@ def test_sqlalchemy_aggregate(postgres_dsn: str) -> None:
     manager.construct_aggregate_queries = count_calls(  # type: ignore[method-assign]
         manager.construct_aggregate_queries)
 
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Thread(Base):
         __tablename__ = 'thread'
@@ -1489,9 +1546,9 @@ def test_sqlalchemy_aggregate(postgres_dsn: str) -> None:
 
     session = mgr.session()
 
-    thread = Thread(name='SQLAlchemy development')  # type: ignore[call-arg]
-    thread.comments.append(Comment(content='Going good!'))  # type: ignore[call-arg]
-    thread.comments.append(Comment(content='Great new features!'))  # type: ignore[call-arg]
+    thread = Thread(name='SQLAlchemy development')
+    thread.comments.append(Comment(content='Going good!'))
+    thread.comments.append(Comment(content='Great new features!'))
 
     session.add(thread)
 
@@ -1513,8 +1570,9 @@ def test_sqlalchemy_aggregate(postgres_dsn: str) -> None:
 
 
 def test_orm_cache(postgres_dsn: str, redis_url: str) -> None:
-
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     if TYPE_CHECKING:
         class DocumentRow(NamedTuple):
@@ -1609,7 +1667,7 @@ def test_orm_cache(postgres_dsn: str, redis_url: str) -> None:
         'test_orm_cache.<locals>.App.untitled_documents') == []
 
     # if we add a non-secret document all caches update except for the last one
-    app.session().add(Document(id=1, title='Public', body='Lorem Ipsum'))  # type: ignore[call-arg]
+    app.session().add(Document(id=1, title='Public', body='Lorem Ipsum'))
     transaction.commit()
 
     assert app.cache.get('test_orm_cache.<locals>.App.documents') is NO_VALUE
@@ -1652,7 +1710,7 @@ def test_orm_cache(postgres_dsn: str, redis_url: str) -> None:
         'test_orm_cache.<locals>.App.untitled_documents_ts') > ts4
 
     # if we add a secret document all caches change
-    app.session().add(Document(id=2, title='Secret', body='Geheim'))  # type: ignore[call-arg]
+    app.session().add(Document(id=2, title='Secret', body='Geheim'))
     transaction.commit()
 
     assert app.request_cache == {}
@@ -1663,8 +1721,9 @@ def test_orm_cache(postgres_dsn: str, redis_url: str) -> None:
 
 
 def test_orm_cache_flush(postgres_dsn: str, redis_url: str) -> None:
-
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     if TYPE_CHECKING:
         class DocumentRow(NamedTuple):
@@ -1704,7 +1763,7 @@ def test_orm_cache_flush(postgres_dsn: str, redis_url: str) -> None:
     app.set_application_id('foo/bar')
     app.clear_request_cache()
 
-    app.session().add(Document(id=1, title='Yo'))  # type: ignore[call-arg]
+    app.session().add(Document(id=1, title='Yo'))
     transaction.commit()
 
     # both instances get cached
@@ -1723,8 +1782,9 @@ def test_orm_cache_flush(postgres_dsn: str, redis_url: str) -> None:
 
 
 def test_request_cache(postgres_dsn: str, redis_url: str) -> None:
-
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     if TYPE_CHECKING:
         class DocumentRow(NamedTuple):
@@ -1795,8 +1855,8 @@ def test_request_cache(postgres_dsn: str, redis_url: str) -> None:
         'test_request_cache.<locals>.App.untitled_documents': []
     }
 
-    app.session().add(Document(id=1, title='Public', body='Lorem Ipsum'))  # type: ignore[call-arg]
-    app.session().add(Document(id=2, title='Secret', body='Geheim'))  # type: ignore[call-arg]
+    app.session().add(Document(id=1, title='Public', body='Lorem Ipsum'))
+    app.session().add(Document(id=2, title='Secret', body='Geheim'))
     transaction.commit()
     # no influence on same request
     assert app.request_cache == {
@@ -1835,8 +1895,9 @@ def test_request_cache(postgres_dsn: str, redis_url: str) -> None:
 
 
 def test_request_cache_flush(postgres_dsn: str, redis_url: str) -> None:
-
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     if TYPE_CHECKING:
         class DocumentRow(NamedTuple):
@@ -1871,7 +1932,7 @@ def test_request_cache_flush(postgres_dsn: str, redis_url: str) -> None:
     app.set_application_id('foo/bar')
     app.clear_request_cache()
 
-    app.session().add(Document(id=1, title='Yo'))  # type: ignore[call-arg]
+    app.session().add(Document(id=1, title='Yo'))
     transaction.commit()
 
     # instance gets cached
@@ -1889,7 +1950,9 @@ def test_request_cache_flush(postgres_dsn: str, redis_url: str) -> None:
 
 
 def test_associable_one_to_one(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Address(Base, Associable):
         __tablename__ = 'adresses'
@@ -1917,14 +1980,14 @@ def test_associable_one_to_one(postgres_dsn: str) -> None:
 
     session = mgr.session()
 
-    session.add(Company(  # type: ignore[call-arg]
+    session.add(Company(
         name='Seantis GmbH',
-        address=Address(town='6004 Luzern')  # type: ignore[call-arg]
+        address=Address(town='6004 Luzern')
     ))
 
-    session.add(Person(  # type: ignore[call-arg]
+    session.add(Person(
         name='Denis Krienbühl',
-        address=Address(town='6343 Rotkreuz')  # type: ignore[call-arg]
+        address=Address(town='6343 Rotkreuz')
     ))
 
     seantis = session.query(Company).first()
@@ -1960,7 +2023,9 @@ def test_associable_one_to_one(postgres_dsn: str) -> None:
 
 
 def test_associable_one_to_many(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Address(Base, Associable):
         __tablename__ = 'adresses'
@@ -1988,14 +2053,14 @@ def test_associable_one_to_many(postgres_dsn: str) -> None:
 
     session = mgr.session()
 
-    session.add(Company(  # type: ignore[call-arg]
+    session.add(Company(
         name='Seantis GmbH',
-        addresses=[Address(town='6004 Luzern')]  # type: ignore[call-arg]
+        addresses=[Address(town='6004 Luzern')]
     ))
 
-    session.add(Person(  # type: ignore[call-arg]
+    session.add(Person(
         name='Denis Krienbühl',
-        addresses=[Address(town='6343 Rotkreuz')]  # type: ignore[call-arg]
+        addresses=[Address(town='6343 Rotkreuz')]
     ))
 
     seantis = session.query(Company).first()
@@ -2025,7 +2090,9 @@ def test_associable_one_to_many(postgres_dsn: str) -> None:
 
 
 def test_associable_many_to_many(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Address(Base, Associable):
         __tablename__ = 'adresses'
@@ -2053,12 +2120,12 @@ def test_associable_many_to_many(postgres_dsn: str) -> None:
 
     session = mgr.session()
 
-    session.add(Company(  # type: ignore[call-arg]
+    session.add(Company(
         name='Seantis GmbH',
-        addresses=[Address(town='6004 Luzern')]  # type: ignore[call-arg]
+        addresses=[Address(town='6004 Luzern')]
     ))
 
-    session.add(Person(  # type: ignore[call-arg]
+    session.add(Person(
         name='Denis Krienbühl',
         addresses=session.query(Company).first().addresses  # type: ignore[union-attr]
     ))
@@ -2086,7 +2153,9 @@ def test_associable_many_to_many(postgres_dsn: str) -> None:
 
 
 def test_associable_multiple(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Address(Base, Associable):
         __tablename__ = 'adresses'
@@ -2120,13 +2189,13 @@ def test_associable_multiple(postgres_dsn: str) -> None:
 
     session = mgr.session()
 
-    session.add(Company(  # type: ignore[call-arg]
+    session.add(Company(
         id=1,
         name='Engulf & Devour',
-        address=Address(town='Ember'),  # type: ignore[call-arg]
+        address=Address(town='Ember'),
         employee=[
-            Person(name='Alice', address=Address(town='Alicante')),  # type: ignore[call-arg]
-            Person(name='Bob', address=Address(town='Brigadoon'))  # type: ignore[call-arg]
+            Person(name='Alice', address=Address(town='Alicante')),
+            Person(name='Bob', address=Address(town='Brigadoon'))
         ]
     ))
 
@@ -2260,8 +2329,9 @@ def test_i18n_translation_hybrid_independence(
     postgres_dsn: str,
     redis_url: str
 ) -> None:
-
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class App(Framework):
         pass
@@ -2315,7 +2385,7 @@ def test_i18n_translation_hybrid_independence(
 
     for app in (freiburg, biel):
         app.session_manager.activate()
-        app.session().add(Document(id=1, title_translations={  # type: ignore[call-arg]
+        app.session().add(Document(id=1, title_translations={
             'de_CH': 'Dokument',
             'fr_CH': 'Document'
         }))
@@ -2356,7 +2426,9 @@ def test_i18n_translation_hybrid_independence(
 
 
 def test_unaccent_expression(postgres_dsn: str) -> None:
-    Base = declarative_base(cls=ModelBase)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base(cls=ModelBase)
 
     class Test(Base):
         __tablename__ = 'test'
@@ -2367,9 +2439,9 @@ def test_unaccent_expression(postgres_dsn: str) -> None:
     mgr.set_current_schema('testing')
 
     session = mgr.session()
-    session.add(Test(text='Schweiz'))  # type: ignore[call-arg]
-    session.add(Test(text='Deutschland'))  # type: ignore[call-arg]
-    session.add(Test(text='Österreich'))  # type: ignore[call-arg]
+    session.add(Test(text='Schweiz'))
+    session.add(Test(text='Deutschland'))
+    session.add(Test(text='Österreich'))
     transaction.commit()
 
     query = session.query(Test).order_by(unaccent(Test.text))

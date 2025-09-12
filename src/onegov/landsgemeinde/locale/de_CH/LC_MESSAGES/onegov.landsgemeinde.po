@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-04-22 10:49+0200\n"
+"POT-Creation-Date: 2025-09-03 10:24+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -68,6 +68,12 @@ msgstr ""
 
 msgid "Alternatively: Page from the Memorial"
 msgstr "Alternativ: Seite aus dem Memorial"
+
+msgid "Additional documents"
+msgstr "Zusätzliche Dokumente"
+
+msgid "Documents"
+msgstr "Dokumente"
 
 msgid "Start"
 msgstr "Start"
@@ -296,6 +302,9 @@ msgstr "Wortmeldungen des Traktandum ${number} der Landsgemeinde vom ${date}"
 msgid "Vota"
 msgstr "Wortmeldungen"
 
+msgid "draft"
+msgstr "Entwurf"
+
 msgid "scheduled"
 msgstr "geplant"
 
@@ -311,14 +320,17 @@ msgstr "Vorheriges Traktandum"
 msgid "Next agenda item"
 msgstr "Nächstes Traktandum"
 
-msgid "Memorial (PDF)"
-msgstr "Memorial (PDF)"
+msgid "Excerpt from the Memorial.pdf"
+msgstr "Auszug aus dem Memorial.pdf"
 
 msgid "No assemblies defined yet."
 msgstr "Noch keine Landsgemeinden erfasst."
 
 msgid "Downloads, Audio & Assembly items"
 msgstr "Downloads, Audio & Traktanden"
+
+msgid "Memorial (PDF)"
+msgstr "Memorial (PDF)"
 
 msgid "Audio"
 msgstr "Audio"
@@ -407,9 +419,6 @@ msgstr "Resultate der ${title}, strukturiert als JSON"
 
 msgid "Location"
 msgstr "Ort"
-
-msgid "Open Data"
-msgstr "Open Data"
 
 msgid "Added a new votum"
 msgstr "Neue Wortmeldung hinzugefügt"

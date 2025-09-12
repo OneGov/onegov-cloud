@@ -1,9 +1,14 @@
 import pytest
 import json
+import transaction
 from webtest import Upload
 
-
 from typing import Any
+from onegov.pas.collections.commission import PASCommissionCollection
+from onegov.pas.collections import PASParliamentarianCollection
+from onegov.pas.collections.commission_membership import (
+    PASCommissionMembershipCollection
+)
 
 
 @pytest.mark.flaky(reruns=5, only_rerun=None)
@@ -46,22 +51,6 @@ def test_views_manage(client_with_es):
     page.form['cost_of_living_adjustment'] = 2
     page = page.form.submit().follow()
     assert '2%' in page
-    delete.append(page)
-
-    # Legislative Periods
-    page = settings.click('Legislaturen')
-    page = page.click(href='new')
-    page.form['name'] = '2020-2024'
-    page.form['start'] = '2020-01-01'
-    page.form['end'] = '2023-12-31'
-    page = page.form.submit().follow()
-    assert '31.12.2023' in page
-
-    page = page.click('Bearbeiten')
-    page.form['end'] = '2024-12-31'
-    page = page.form.submit().follow()
-    assert '31.12.2024' in page
-
     delete.append(page)
 
     # Settlement Runs
@@ -223,7 +212,6 @@ def test_views_manage(client_with_es):
     assert '0 Resultate' in client.get('/search?q=bb')
     assert '0 Resultate' in client.get('/search?q=cc')
     assert '0 Resultate' in client.get('/search?q=first')
-    assert '0 Resultate' in client.get('/search?q=2020-2024')
     assert '0 Resultate' in client.get('/search?q=Q1')
 
     client.login_admin()
@@ -232,14 +220,12 @@ def test_views_manage(client_with_es):
     assert '1 Resultat' in client.get('/search?q=bb')
     assert '1 Resultat' in client.get('/search?q=cc')
     assert '1 Resultat' in client.get('/search?q=first')
-    assert '1 Resultat' in client.get('/search?q=2020-2024')
     assert '1 Resultat' in client.get('/search?q=Q1')
 
     # Delete
     for page in delete:
         page.click('Löschen')
     assert 'Noch keine Sätze erfasst' in settings.click('Sätze')
-    assert 'Noch keine Legislaturen erfasst' in settings.click('Legislaturen')
     assert 'Noch keine Abrechnungsläufe erfasst' in\
            settings.click('Abrechnungsläufe')
     assert 'Noch keine Parteien erfasst' in settings.click('Parteien')
@@ -398,6 +384,8 @@ def test_view_upload_json(
     assert 'Import Details' in log_detail_page
     status = log_detail_page.pyquery('.import-status').text()
     assert 'completed' in status, f"Import status not 'completed': {status}"
+    # Todo: This should validate all columns on all table
+    # For example address is not checked here.
 
     # --- Second Import (Test idempotency) ---
     # Run the import again with the same data, to test robustness
@@ -461,3 +449,86 @@ def test_copy_rate_set(client):
     copy_page.form['year'] = '2025'
     new_page = copy_page.form.submit().follow()
     assert '2025' in new_page
+
+
+def test_fetch_commissions_parliamentarians_json(client):
+    """Test the commissions-parliamentarians-json endpoint that the JS
+    dropdown uses."""
+
+    session = client.app.session()
+    commissions = PASCommissionCollection(session)
+    commission1 = commissions.add(name='Commission A')
+    commission2 = commissions.add(name='Commission B')
+
+    parliamentarians = PASParliamentarianCollection(session)
+    parl1 = parliamentarians.add(
+        first_name='John',
+        last_name='Doe',
+    )
+    parl2 = parliamentarians.add(
+        first_name='Jane',
+        last_name='Smith',
+    )
+    parl3 = parliamentarians.add(
+        first_name='Bob',
+        last_name='Johnson',
+    )
+
+    memberships = PASCommissionMembershipCollection(session)
+
+    # Commission A has John and Jane
+    memberships.add(commission_id=commission1.id, parliamentarian_id=parl1.id)
+    memberships.add(commission_id=commission1.id, parliamentarian_id=parl2.id)
+
+    # Commission B has Bob
+    memberships.add(commission_id=commission2.id, parliamentarian_id=parl3.id)
+
+    session.flush()
+    commission1_id = str(commission1.id)
+    commission2_id = str(commission2.id)
+    parl1_title = parl1.title
+    parl2_title = parl2.title
+    parl3_title = parl3.title
+    parl3_id = str(parl3.id)
+    transaction.commit()
+
+    response = client.get('/commissions/commissions-parliamentarians-json')
+    assert response.status_code == 200
+    assert response.content_type == 'application/json'
+
+    data = response.json
+
+    assert isinstance(data, dict)
+
+    # Commission A should have John and Jane
+    assert commission1_id in data
+    commission_a_parliamentarians = data[commission1_id]
+    assert len(commission_a_parliamentarians) == 2
+
+    parl_names = [p['title'] for p in commission_a_parliamentarians]
+    assert parl1_title in parl_names
+    assert parl2_title in parl_names
+
+    for parl in commission_a_parliamentarians:
+        assert 'id' in parl
+        assert 'title' in parl
+        assert isinstance(parl['id'], str)  # JS expects string IDs
+        assert isinstance(parl['title'], str)
+
+    # Commission B should have Bob
+    assert commission2_id in data
+    commission_b_parliamentarians = data[commission2_id]
+    assert len(commission_b_parliamentarians) == 1
+    assert commission_b_parliamentarians[0]['title'] == parl3_title
+    assert commission_b_parliamentarians[0]['id'] == parl3_id
+
+    # Test edge cases
+    session = client.app.session()
+    commissions = PASCommissionCollection(session)
+    commission3 = commissions.add(name='Empty Commission')
+    session.flush()
+    commission3_id = str(commission3.id)
+
+    response2 = client.get('/commissions/commissions-parliamentarians-json')
+    data2 = response2.json
+    assert commission3_id not in data2

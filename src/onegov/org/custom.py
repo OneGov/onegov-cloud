@@ -13,10 +13,11 @@ from onegov.org.models import (
 )
 from onegov.pay import PaymentProviderCollection, PaymentCollection
 from onegov.reservation import Reservation, ResourceCollection
-from onegov.ticket import TicketCollection
+from onegov.ticket import TicketCollection, TicketInvoiceCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from purl import URL
+from sqlalchemy import func
 
 
 from typing import Any, TYPE_CHECKING
@@ -37,7 +38,10 @@ def logout_path(request: OrgRequest) -> str:
     return url.path() or '/'
 
 
-def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
+def get_global_tools(
+    request: OrgRequest,
+    invoicing: bool = True
+) -> Iterator[Link | LinkGroup]:
 
     citizen_login_enabled = request.app.org.citizen_login_enabled
 
@@ -136,6 +140,15 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
                 attrs={'class': 'payment'}
             )
         )
+
+        if invoicing:
+            links.append(
+                Link(
+                    _('Invoices'),
+                    request.class_link(TicketInvoiceCollection),
+                    attrs={'class': 'invoice'}
+                )
+            )
 
         links.append(
             Link(
@@ -291,7 +304,7 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
             attributes={'data-count': str(screen_count)}
         )
 
-    if citizen_login_enabled and request.authenticated_email:
+    if citizen_login_enabled and (email := request.authenticated_email):
         # This logout link is specific to citizens, if we're logged
         # in as another user, then we don't need this additional
         # logout link
@@ -317,7 +330,7 @@ def get_global_tools(request: OrgRequest) -> Iterator[Link | LinkGroup]:
         if request.session.query(
             request.session.query(Reservation)
             .filter(Reservation.status == 'approved')
-            .filter(Reservation.email == request.authenticated_email)
+            .filter(func.lower(Reservation.email) == email.lower())
             .exists()
         ).scalar():
             yield Link(

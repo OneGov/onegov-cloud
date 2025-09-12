@@ -535,6 +535,22 @@ class AllocationEventInfo:
         if self.allocation.end < sedate.utcnow():
             yield 'event-in-past'
 
+        elif not self.request.is_manager and (
+            self.resource.is_past_deadline(
+                # for partly available allocations we use the end of the
+                # allocation, since some small sliver of the allocation
+                # may still be before the deadline, we could get a slightly
+                # more accurate result by subtracting the raster, but it
+                # doesn't seem worth the extra CPU cycles.
+                self.allocation.end
+                if self.allocation.partly_available
+                else self.allocation.start
+            ) or self.resource.is_before_lead_time(
+                self.allocation.start
+            )
+        ):
+            yield 'event-outside-booking-window'
+
         if self.quota > 1:
             if self.quota_left == self.quota:
                 yield 'event-available'

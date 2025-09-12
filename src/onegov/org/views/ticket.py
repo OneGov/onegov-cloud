@@ -403,16 +403,13 @@ def send_chat_message_email_if_enabled(
 
         reply_to = None  # default reply-to given by the application
 
-    if not receiver:
-        return
-
     # we show the previous messages by going back until we find a message
     # that is not from the same author as the new message (this should usually
     # be the next message, but might include multiple, if someone sent a bunch
     # of messages in succession without getting a reply)
     #
     # note that the resulting thread has to be reversed for the mail template
-    def thread() -> Iterator[TicketChatMessage]:
+    def generate_thread() -> Iterator[TicketChatMessage]:
         messages.older_than = message.id
         messages.load = 'newer-first'
 
@@ -422,22 +419,90 @@ def send_chat_message_email_if_enabled(
             if m.owner != message.owner:
                 break
 
-    send_ticket_mail(
-        request=request,
-        template='mail_ticket_chat_message.pt',
-        subject=_('Your ticket has a new message'),
-        content={
-            'model': ticket,
-            'message': message,
-            'thread': tuple(reversed(list(thread()))),
-        },
-        ticket=ticket,
-        receivers=(receiver,),
-        reply_to=reply_to,
-        force=True,
-        bcc=bcc,
-        attachments=attachments
+    thread = None
+    if receiver:
+        thread = tuple(reversed(list(generate_thread())))
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_chat_message.pt',
+            subject=_('Your ticket has a new message'),
+            content={
+                'model': ticket,
+                'message': message,
+                'thread': thread,
+            },
+            ticket=ticket,
+            receivers=(receiver,),
+            reply_to=reply_to,
+            force=True,
+            bcc=bcc,
+            attachments=attachments
+        )
+
+    # handle resource recipients for external messages on RSV tickets
+    if origin != 'external':
+        return
+
+    handler = ticket.handler
+    if not isinstance(handler, ReservationHandler) or not handler.resource:
+        return
+
+    if thread is None:
+        thread = tuple(reversed(list(generate_thread())))
+
+    def recipients_which_have_registered_for_mail() -> Iterator[str]:
+        q = ResourceRecipientCollection(request.session).query()
+        q = q.filter(ResourceRecipient.medium == 'email')
+        q = q.order_by(None).order_by(ResourceRecipient.address)
+        q = q.with_entities(ResourceRecipient.address,
+                            ResourceRecipient.content)
+        for r in q:
+            if r.address == receiver:
+                # don't send two notifications to this address
+                continue
+            if handler.reservations[0].resource.hex in r.content[
+                'resources'
+            ] and r.content.get('customer_messages', False):
+                yield r.address
+
+    title = request.translate(
+        _(
+            '${org} New Customer Message in Reservation for ${resource_title}',
+            mapping={
+                'org': request.app.org.title,
+                'resource_title': handler.resource.title,
+            },
+        )
     )
+    assert hasattr(ticket, 'reference')
+    content = render_template(
+        'mail_customer_messages_notification.pt',
+        request,
+        {
+            'layout': DefaultMailLayout(object(), request),
+            'title': title,
+            'model': ticket,
+            'resource': handler.resource,
+            'message': message,
+            'thread': thread,
+            'ticket_reference': ticket.reference(request),
+        },
+    )
+    plaintext = html_to_text(content)
+
+    def email_iter() -> Iterator[EmailJsonDict]:
+        for recipient_addr in recipients_which_have_registered_for_mail():
+
+            yield request.app.prepare_email(
+                receivers=(recipient_addr,),
+                subject=title,
+                content=content,
+                plaintext=plaintext,
+                category='transactional',
+                attachments=(),
+            )
+
+    request.app.send_transactional_email_batch(email_iter())
 
 
 def send_new_note_notification(
@@ -1308,8 +1373,11 @@ def view_ticket_status(
     )
 
     pick_up_hint = None
+    extra_information = None
     if resource := getattr(self.handler, 'resource', None):
         pick_up_hint = resource.pick_up
+        if not self.handler.deleted and not self.handler.undecided:
+            extra_information = resource.confirmation_text
     if submission := getattr(self.handler, 'submission', None):
         if form_definition := getattr(submission, 'form', None):
             pick_up_hint = form_definition.pick_up
@@ -1322,7 +1390,8 @@ def view_ticket_status(
             view_messages_feed(messages, request)
         ) or None,
         'form': form,
-        'pick_up_hint': pick_up_hint
+        'pick_up_hint': pick_up_hint,
+        'extra_information': extra_information,
     }
 
 
@@ -1386,21 +1455,21 @@ def get_filters(
         active=self.state == 'unfinished',
         attrs={'class': 'ticket-filter-my'}
     )
-    for id, text in TICKET_STATES.items():
-        if id != 'archived':
+    for state, text in TICKET_STATES.items():
+        if state != 'archived':
+            coll = self.for_state(state)
+            if self.state == 'unfinished':
+                # FIXME: This is another case where we pass invalid
+                #        state just so the generated URL is shorter
+                #        we should make morepath aware of defaults
+                #        so it can ellide parameters that have been
+                #        set to their default value automatically
+                coll = coll.for_owner(None)  # type: ignore[arg-type]
             yield Link(
                 text=text,
-                url=request.link(
-                    self.for_state(id)
-                    # FIXME: This is another case where we pass invalid
-                    #        state just so the generated URL is shorter
-                    #        we should make morepath aware of defaults
-                    #        so it can ellide parameters that have been
-                    #        set to their default value automatically
-                    .for_owner(None)  # type:ignore[arg-type]
-                ),
-                active=self.state == id,
-                attrs={'class': 'ticket-filter-' + id}
+                url=request.link(coll),
+                active=self.state == state,
+                attrs={'class': 'ticket-filter-' + state}
             )
 
 
@@ -1496,6 +1565,9 @@ def get_submitters(
 ) -> Iterator[Link]:
 
     all_submitters = self.for_submitter('*')
+    if hasattr(self, 'request'):
+        # ensure ticket permission filters are set
+        all_submitters.request = self.request  # type: ignore[union-attr]
     query = (
         all_submitters.subset()
         .with_entities(Ticket.ticket_email.distinct())
@@ -1520,22 +1592,13 @@ def get_submitters(
         )
 
 
-def groups_by_handler_code(session: Session) -> dict[str, list[str]]:
-    query = as_selectable("""
-            SELECT
-                handler_code,                         -- Text
-                ARRAY_AGG(DISTINCT "group") AS groups -- ARRAY(Text)
-            FROM tickets GROUP BY handler_code
-        """)
-
-    groups = {
-        r.handler_code: r.groups
-        for r in session.execute(select(query.c))
+def groups_by_handler_code(
+    self: TicketCollection | ArchivedTicketCollection
+) -> dict[str, list[str]]:
+    return {
+        handler_code: sorted(groups, key=normalize_for_url)
+        for handler_code, groups in self.groups_by_handler_code()
     }
-    for handler in groups:
-        groups[handler].sort(key=lambda g: normalize_for_url(g))
-
-    return groups
 
 
 @OrgApp.html(
@@ -1560,7 +1623,7 @@ def view_tickets(
         'extra_parameters': self.extra_parameters,
     }
 
-    groups = groups_by_handler_code(request.session)
+    groups = groups_by_handler_code(self)
     handlers = tuple(get_handlers(self, request, groups))
     owners = tuple(get_owners(self, request))
     submitters = tuple(get_submitters(self, request))
@@ -1586,7 +1649,16 @@ def view_tickets(
         'has_handler_filter': self.handler != 'ALL',
         'has_owner_filter': self.owner != '*',
         'has_submitter_filter': self.submitter != '*',
-        'handler': handler,
+        'handler': handler.text if handler else self.group or (
+            request.translate(ticket_handlers.registry[self.handler].handler_title)  # type: ignore[attr-defined]
+            if self.handler in ticket_handlers.registry
+            else self.handler
+        ),
+        'handler_class': ' '.join(handler.attrs['class']) if handler else (
+            f'{self.handler}-link'
+            if self.group is None
+            else f'{self.handler}-sub-link ticket-group-filter'
+        ),
         'owner': owner,
         # NOTE: Not all submitters will be valid for every filter so
         #       if it's not valid we fallback to whatever we were given
@@ -1607,7 +1679,7 @@ def view_archived_tickets(
     layout: ArchivedTicketsLayout | None = None
 ) -> RenderData:
 
-    groups = groups_by_handler_code(request.session)
+    groups = groups_by_handler_code(self)
     handlers = tuple(get_handlers(self, request, groups))
     owners = tuple(get_owners(self, request))
     submitters = tuple(get_submitters(self, request))
@@ -1632,7 +1704,16 @@ def view_archived_tickets(
         'has_handler_filter': self.handler != 'ALL',
         'has_owner_filter': self.owner != '*',
         'has_submitter_filter': self.submitter != '*',
-        'handler': handler,
+        'handler': handler.text if handler else self.group or (
+            request.translate(ticket_handlers.registry[self.handler].handler_title)  # type: ignore[attr-defined]
+            if self.handler in ticket_handlers.registry
+            else self.handler
+        ),
+        'handler_class': ' '.join(handler.attrs['class']) if handler else (
+            f'{self.handler}-link'
+            if self.group is None
+            else f'{self.handler}-sub-link ticket-group-filter'
+        ),
         'owner': owner,
         # NOTE: Not all submitters will be valid for every filter so
         #       if it's not valid we fallback to whatever we were given

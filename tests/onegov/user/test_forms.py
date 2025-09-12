@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.core.custom import json
 from onegov.user.auth import Auth
 from onegov.user.collections import UserCollection
@@ -10,37 +12,42 @@ from onegov.user.models import User
 from onegov.user.models import UserGroup
 
 
-class DummyApp():
-    def __init__(self, session, application_id='app'):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+class DummyApp:
+    def __init__(self, session: Session, application_id: str = 'app') -> None:
         self._session = session
         self.application_id = application_id
 
-    def session(self):
+    def session(self) -> Session:
         return self._session
 
 
-class DummyRequest():
-    def __init__(self, session):
+class DummyRequest:
+    def __init__(self, session: Session) -> None:
         self.app = DummyApp(session)
         self.client_addr = '127.0.0.1'
         self.session = session
 
-    def load_url_safe_token(self, token, **kwargs):
+    def load_url_safe_token(self, token: str, **kwargs: object) -> Any:
         if not token:
             return None
 
         return json.loads(token)
 
 
-class DummyPostData(dict):
-    def getlist(self, key):
+class DummyPostData(dict[str, Any]):
+    def getlist(self, key: str) -> list[Any]:
         v = self[key]
         if not isinstance(v, (list, tuple)):
             v = [v]
         return v
 
 
-def test_login_form():
+def test_login_form() -> None:
     # Test validation
     form = LoginForm()
     assert not form.validate()
@@ -69,7 +76,7 @@ def test_login_form():
     }
 
 
-def test_registration_form(session):
+def test_registration_form(session: Session) -> None:
     # Test validation
     form = RegistrationForm()
     assert not form.validate()
@@ -97,13 +104,13 @@ def test_registration_form(session):
     assert form.validate()
 
     # Test register user
-    auth = Auth(DummyApp(session, 'foobar'))
-    auth.register(form, DummyRequest(session))
+    auth = Auth(DummyApp(session, 'foobar'))  # type: ignore[arg-type]
+    auth.register(form, DummyRequest(session))  # type: ignore[arg-type]
 
     assert session.query(User).filter_by(username='info@example.com').one()
 
 
-def test_request_password_reset_form():
+def test_request_password_reset_form() -> None:
     # Test validation
     form = RequestPasswordResetForm()
     assert not form.validate()
@@ -119,9 +126,9 @@ def test_request_password_reset_form():
     assert form.validate()
 
 
-def test_password_reset_form(session):
+def test_password_reset_form(session: Session) -> None:
     # Test validation
-    request = DummyRequest(session)
+    request: Any = DummyRequest(session)
     form = PasswordResetForm()
     assert not form.validate()
 
@@ -214,7 +221,7 @@ def test_password_reset_form(session):
     assert not form.update_password(request)
 
 
-def test_user_group_form():
+def test_user_group_form() -> None:
     # Test apply / update
     form = UserGroupForm()
     group = UserGroup(name='Group X')
@@ -230,5 +237,5 @@ def test_user_group_form():
     form = UserGroupForm()
     assert not form.validate()
 
-    form = UserGroupForm(DummyPostData({'name': 'Group'}))
+    form = UserGroupForm(DummyPostData({'name': 'Group'}))  # type: ignore[arg-type]
     assert form.validate()

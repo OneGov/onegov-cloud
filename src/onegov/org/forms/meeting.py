@@ -2,19 +2,22 @@ from __future__ import annotations
 
 import json
 
+from operator import itemgetter
 from wtforms.validators import Optional, InputRequired
 from wtforms import StringField
 
 from onegov.form import Form
-from onegov.form.fields import TimezoneDateTimeField
+from onegov.form.fields import TimezoneDateTimeField, MultiCheckboxField
 from onegov.org.forms.fields import HtmlField
 from onegov.org import _
+
 
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Collection
     from collections.abc import Sequence
+    from wtforms.fields.choices import _Choice, SelectMultipleField
 
     from onegov.org.models import Meeting
     from onegov.org.models import MeetingItem
@@ -51,6 +54,18 @@ class MeetingForm(Form):
         render_kw={'rows': 5}
     )
 
+    audio_link = StringField(
+        label=_('Audio link to parliamentary debate'),
+        description='https://',
+        validators=[Optional()],
+    )
+
+    video_link = StringField(
+        label=_('Video link to parliamentary debate'),
+        description='https://',
+        validators=[Optional()],
+    )
+
     meeting_items = StringField(
         label=_('New agenda item'),
         fieldset=_('Agenda items'),
@@ -62,7 +77,9 @@ class MeetingForm(Form):
         self.agenda_items_errors: dict[int, str] = {}
 
     def on_request(self) -> None:
-        pass
+        # prevent showing access field as all ris information is public
+        if hasattr(self, 'access'):
+            self.delete_field('access')
 
     def populate_obj(  # type:ignore[override]
         self,
@@ -104,7 +121,7 @@ class MeetingForm(Form):
         for new in new_items:
             number = new.get('number')
             title = new.get('title', '')
-            item_name = new.get('agenda_item')
+            item_name = new.get('agenda_item', '')
 
             if number == '' and title == '' and item_name == '':
                 # skip empty items
@@ -117,10 +134,7 @@ class MeetingForm(Form):
                 items.append(current_items[title])
                 continue
 
-            business = next(
-                (b for b in businesses.query().all()
-                 if b.display_name == item_name), None)
-
+            business = businesses.by_display_name(item_name)
             if business is None:
                 new_item = MeetingItem(
                     title=title,
@@ -144,6 +158,11 @@ class MeetingForm(Form):
 
         meeting.meeting_items = items
 
+        # update links from businesses to meeting
+        for item in meeting.meeting_items:
+            if item.political_business:
+                item.political_business.meeting_items.append(item)
+
     def process_obj(self, obj: Meeting) -> None:  # type:ignore[override]
         from onegov.org.models import PoliticalBusiness
 
@@ -153,6 +172,11 @@ class MeetingForm(Form):
 
         businesses = (
             self.meta.request.session.query(PoliticalBusiness)
+            .with_entities(
+                PoliticalBusiness.number,
+                PoliticalBusiness.title,
+                PoliticalBusiness.display_name
+            )
             .order_by(PoliticalBusiness.number, PoliticalBusiness.title)
             .all()
         )
@@ -211,3 +235,56 @@ class MeetingForm(Form):
                 },
             }
         )
+
+
+class MeetingExportPoliticalBusinessForm(Form):
+
+    meeting_documents = MultiCheckboxField(
+        label=_('Meeting documents'),
+        choices=[],
+        default=[],
+    )
+
+    agenda_item_documents = MultiCheckboxField(
+        label=_('Agenda item documents'),
+        choices=[],
+    )
+
+    def process_obj(self, obj: Meeting) -> None:  # type:ignore[override]
+        super().process_obj(obj)
+
+        self.meeting_documents.choices = [
+            (str(doc.id), doc.name)
+            for doc in obj.files
+        ]
+        self.meeting_documents.choices = sorted(
+            self.meeting_documents.choices, key=itemgetter(1))
+        self.meeting_documents.description = obj.display_name
+
+        choices: list[_Choice] = []
+        for meeting_item in obj.meeting_items:
+            business = meeting_item.political_business
+            if not business:
+                continue
+
+            choices.extend([
+                (str(doc.id), f'{meeting_item.display_name} - {doc.name}')
+                for doc in business.files
+            ])
+        self.agenda_item_documents.choices = sorted(
+            choices, key=itemgetter(1))
+
+        if self.meta.request.method == 'GET':
+            # preselect all files on form get
+            self.select_all(self.meeting_documents)
+            self.select_all(self.agenda_item_documents)
+
+    def select_all(self, field: SelectMultipleField) -> None:
+        if not field.data:
+            field.data = [choice[0] for choice in field.choices]
+
+    def get_selected_meeting_documents_ids(self) -> list[str]:
+        return [str(i) for i in self.meeting_documents.data or []]
+
+    def get_selected_agenda_item_document_ids(self) -> list[str]:
+        return [str(i) for i in self.agenda_item_documents.data or []]

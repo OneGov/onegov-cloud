@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import pytest
 import requests_mock
@@ -13,8 +15,13 @@ from unittest import mock
 from urllib.parse import quote
 
 
-def test_oauth_url():
-    provider = StripeConnect(client_id='foo', client_secret='bar')
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.capturelog import CaptureLogFixture
+
+
+def test_oauth_url() -> None:
+    provider = StripeConnect(client_id='foo', client_secret='bar')  # type: ignore[misc]
 
     url = provider.oauth_url('https://handle-incoming-request')
     assert 'response_type=code' in url
@@ -28,8 +35,8 @@ def test_oauth_url():
     assert 'stripe_user%5Bemail%5D=foo%40bar.org' in url
 
 
-def test_process_oauth_response():
-    provider = StripeConnect(
+def test_process_oauth_response() -> None:
+    provider = StripeConnect(  # type: ignore[misc]
         client_id='foo',
         client_secret='bar',
         oauth_gateway='https://oauth.onegovcloud.ch/',
@@ -64,17 +71,17 @@ def test_process_oauth_response():
         assert provider.access_token == 'atoken'
 
 
-def test_stripe_fee_policy():
+def test_stripe_fee_policy() -> None:
     assert StripeFeePolicy.from_amount(100) == 3.2
     assert StripeFeePolicy.compensate(100) == 103.3
     assert StripeFeePolicy.compensate(33.33) == 34.63
 
 
-def test_stripe_capture_good_charge():
+def test_stripe_capture_good_charge() -> None:
     class GoodCharge:
         captured = False
 
-        def capture(self):
+        def capture(self) -> None:
             self.captured = True
 
     charge = GoodCharge()
@@ -87,11 +94,11 @@ def test_stripe_capture_good_charge():
         assert charge.captured
 
 
-def test_stripe_capture_evil_charge(capturelog):
+def test_stripe_capture_evil_charge(capturelog: CaptureLogFixture) -> None:
     capturelog.setLevel(logging.ERROR, logger='onegov.pay')
 
     class EvilCharge:
-        def capture(self):
+        def capture(self) -> None:
             raise AssertionError()
 
     charge = EvilCharge()
@@ -100,11 +107,11 @@ def test_stripe_capture_evil_charge(capturelog):
         StripeCaptureManager.capture_charge('foo', 'bar')
 
         transaction.commit()
-        assert capturelog.records()[0].message\
-            == 'Stripe charge with capture id bar failed'
+        assert capturelog.records()[0].message == (
+            'Stripe charge with capture id bar failed')
 
 
-def test_stripe_capture_negative_vote():
+def test_stripe_capture_negative_vote() -> None:
     with mock.patch('stripe.Charge.retrieve', side_effect=AssertionError()):
         StripeCaptureManager.capture_charge('foo', 'bar')
 
@@ -112,7 +119,7 @@ def test_stripe_capture_negative_vote():
             transaction.commit()
 
 
-def test_stripe_prepare_oauth_request():
+def test_stripe_prepare_oauth_request() -> None:
     stripe = StripeConnect()
     stripe.oauth_gateway = 'https://oauth.example.org'
     stripe.oauth_gateway_auth = 'gateway_auth'
@@ -133,7 +140,7 @@ def test_stripe_prepare_oauth_request():
 
         assert quote('https://oauth.example.org/redirect', safe='') in url
 
-        url = URL(url)
-        assert url.query_param('state') == '0xdeadbeef'
-        assert url.query_param('scope') == 'read_write'
-        assert url.query_param('client_id') == 'client_id'
+        url_obj = URL(url)
+        assert url_obj.query_param('state') == '0xdeadbeef'
+        assert url_obj.query_param('scope') == 'read_write'
+        assert url_obj.query_param('client_id') == 'client_id'

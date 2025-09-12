@@ -4,35 +4,44 @@
     </tal:b>
 
     <tal:b metal:fill-slot="content">
-        <tal:b metal:use-macro="layout.macros.page_content" />
+        <tal:b metal:use-macro="layout.macros.page_content"
+             tal:define="lead None; text None; people None; coordinates None; contact None; files files; show_side_panel True;">
+            <tal:b metal:fill-slot="before-panels">
+                <div class="side-panel">
+                    <div tal:condition="page.start_datetime">
+                        <h2 i18n:translate class="h3">Date/Time</h2>
+                        <div>
+                            <span tal:condition="page.start_datetime">${layout.format_date(page.start_datetime, 'datetime')}</span>
+                            <span tal:condition="page.end_datetime">- ${layout.format_date(page.end_datetime, 'time')}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="side-panel">
+                    <div tal:condition="page.address">
+                        <h2 i18n:translate class="h3">Location</h2>
+                        <div tal:content="page.address"></div>
+                    </div>
+                </div>
+                <div class="side-panel">
+                    <div tal:condition="page.description">
+                        <h2 i18n:translate class="h3">Description</h2>
+                        <div tal:content="page.description"></div>
+                    </div>
+                </div>
+            </tal:b>
+            <tal:b metal:fill-slot="after-panels">
+            </tal:b>
+        </tal:b>
     </tal:b>
     <tal:b metal:fill-slot="after-text">
-        <dl class="field-display">
-            <div tal:condition="page.start_datetime">
-                <dt i18n:translate>Date/Time</dt>
-                <dd>
-                    <span tal:condition="page.start_datetime">${layout.format_date(page.start_datetime, 'datetime')}</span>
-                    <span tal:condition="page.end_datetime">- ${layout.format_date(page.end_datetime, 'time')}</span>
-                </dd>
-            </div>
-            <div tal:condition="page.address">
-                <dt i18n:translate>Location</dt>
-                <dd><div tal:content="page.address"></div></dd>
-            </div>
-            <div tal:condition="page.description">
-                <dt i18n:translate>Description</dt>
-                <dd><div tal:content="page.description"></div></dd>
-            </div>
-
-            <dt i18n:translate>Agenda</dt>
+        <div>
+            <h2 i18n:translate class="h3">Agenda</h2>
             <p tal:condition="not:meeting_items_with_links" i18n:translate="">No agenda items defined yet.</p>
             <dd tal:condition="meeting_items_with_links">
                 <ul class="more-list">
                     <li tal:repeat="item meeting_items_with_links">
-                        <a tal:omit-tag="not: item.political_business_link"
-                           href="${item.political_business_link}"
-                           class="list-link">
-                            <span class="${'list-title' if item.political_business_link else 'list-link'}">
+                        <a href="${item.political_business_link or '#'}" class="list-link ${'' if item.political_business_link else 'no-link'}">
+                            <span class="list-title">
                                 ${item.number} ${item.title}
                             </span>
                         </a>
@@ -44,7 +53,7 @@
                     </li>
                 </ul>
             </dd>
-        </dl>
+        </div>
     </tal:b>
 </div>
 

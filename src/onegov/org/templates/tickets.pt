@@ -74,7 +74,7 @@
                                 <span>
                                     <button href="#" data-dropdown="handlers" aria-controls="handlers" aria-expanded="false" class="${has_handler_filter and 'tiny primary radius button dropdown' or 'tiny secondary radius button dropdown'} selected-handler">
                                         <span i18n:translate class="show-for-sr">Kind:</span>
-                                        <span class="${' '.join(handler.attrs['class'])}">${handler.text}</span>
+                                        <span class="${handler_class}">${handler}</span>
                                     </button>
                                     <ul id="handlers" data-dropdown-content class="f-dropdown disable-scroll" aria-hidden="true">
                                         <li tal:repeat="link handlers"><tal:b replace="link(layout)"></tal:b></li>

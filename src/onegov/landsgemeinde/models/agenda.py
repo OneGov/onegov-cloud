@@ -29,15 +29,18 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import date as date_t
+    from onegov.file.models.file import File
     from onegov.landsgemeinde.models import Assembly
     from translationstring import TranslationString
     from typing import Literal
     from typing import TypeAlias
 
-    AgendaItemState: TypeAlias = Literal['scheduled', 'ongoing', 'completed']
+    AgendaItemState: TypeAlias = Literal[
+        'draft', 'scheduled', 'ongoing', 'completed']
 
 
 STATES: dict[AgendaItemState, TranslationString] = {
+    'draft': _('draft'),
     'scheduled': _('scheduled'),
     'ongoing': _('ongoing'),
     'completed': _('completed')
@@ -147,3 +150,17 @@ class AgendaItem(
             for line in (self.title or '').splitlines()
             if (stripped_line := line.strip())
         ]
+
+    @property
+    def more_files(self) -> list[File]:
+        files = self.files
+        if self.memorial_pdf:
+            return [file for file in files if file.name != 'memorial_pdf']
+        return files
+
+    @more_files.setter
+    def more_files(self, value: list[File]) -> None:
+        if self.memorial_pdf:
+            self.files = [*value, self.memorial_pdf]
+        else:
+            self.files = value

@@ -10,6 +10,7 @@ from sedate import utcnow
 from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import dict_property, content_property
 from onegov.core.orm.types import UUID, MarkupText, UTCDateTime
 from onegov.file import MultiAssociatedFiles
 from onegov.org import _
@@ -32,7 +33,7 @@ if TYPE_CHECKING:
 
 
 class Meeting(
-    AccessExtension,  # required??
+    AccessExtension,
     MultiAssociatedFiles,
     Base,
     ContentMixin,
@@ -41,17 +42,6 @@ class Meeting(
 ):
 
     __tablename__ = 'par_meetings'
-
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
-
-    __mapper_args__ = {
-        'polymorphic_on': type,
-        'polymorphic_identity': 'generic',
-    }
 
     es_public = True
     es_properties = {'title_text': {'type': 'text'}}
@@ -63,6 +53,11 @@ class Meeting(
     @property
     def title_text(self) -> str:
         return f'{self.title} ({self.start_datetime})'
+
+    @property
+    def display_name(self) -> str:
+        # return title and start_datetime as dmY
+        return f'{self.title} {self.start_datetime:%d.%m.%Y}'
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(
@@ -95,6 +90,12 @@ class Meeting(
         back_populates='meeting',
         order_by='desc(MeetingItem.number)'
     )
+
+    #: link to audio url
+    audio_link: dict_property[str] = content_property(default='')
+
+    #: link to video url
+    video_link: dict_property[str] = content_property(default='')
 
     @hybrid_property
     def past(self):

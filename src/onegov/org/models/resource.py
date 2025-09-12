@@ -71,6 +71,7 @@ class SharedMethods:
 
     lead: dict_property[str | None] = meta_property()
     text = dict_markup_property('content')
+    confirmation_text = dict_markup_property('content')
     occupancy_is_visible_to_members: dict_property[bool | None]
     occupancy_is_visible_to_members = meta_property()
 

@@ -76,7 +76,7 @@ class DepotApp(App):
         depot_backend: str | None = None,
         depot_storage_path: str | None = None,
         frontend_cache_buster: str | None = None,
-        frontend_cache_bust_delay: int = 2,
+        frontend_cache_bust_delay: float = 2,
         signing_services: str | None = None,
         **cfg: Any
     ) -> None:

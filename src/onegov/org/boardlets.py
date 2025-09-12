@@ -297,9 +297,9 @@ class CitizenTicketBoardlet(OrgBoardlet):
                 Ticket.state,
                 func.count(Ticket.id)
             ).filter(
-                Ticket.ticket_email == self.request.authenticated_email
+                func.lower(Ticket.ticket_email) == email.lower()
             ).group_by(Ticket.state)
-        )
+        ) if (email := self.request.authenticated_email) else {}
 
         yield BoardletFact(
             text='',
@@ -339,12 +339,16 @@ class CitizenReservationBoardlet(OrgBoardlet):
 
     @cached_property
     def reservation_counts(self) -> dict[tuple[bool, bool], int]:
+        email = self.request.authenticated_email
+        if not email:
+            return {}
+
         subquery = self.session.query(
             Reservation.id.label('id'),
             (Reservation.start > utcnow()).label('future'),
             Reservation.data['accepted'].isnot(None).label('accepted')
         ).filter(
-            Reservation.email == self.request.authenticated_email
+            func.lower(Reservation.email) == email.lower()
         ).subquery()
         return {
             (future, accepted): count

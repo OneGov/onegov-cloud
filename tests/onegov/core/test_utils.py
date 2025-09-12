@@ -20,10 +20,11 @@ from urlextract import URLExtract
 from uuid import uuid4
 from yubico_client import Yubico  # type: ignore[import-untyped]
 
-
 from typing import Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
+    from onegov.core.orm import Base  # noqa: F401
     from sqlalchemy.orm import Session
 
 
@@ -41,6 +42,56 @@ def test_normalize_for_url() -> None:
     assert utils.normalize_for_url('far (away)') == 'far-away'
     assert utils.normalize_for_url('--ok--') == 'ok'
     assert utils.normalize_for_url('a...b..c.d') == 'a-b-c-d'
+
+
+@pytest.mark.parametrize("input_path, default, expected", [
+    ('', None, '_default_path_'),
+    ('>', None, '_'),
+    ('<:>', None, '___'),
+    ('\\/n', None, '__n'),
+    (' my path  name is great!  ', None, 'my path  name is great!'),
+    ('a/b/c', None, 'a_b_c'),
+    ('.-test.', None, '.-test.'),
+    ('abc:*?', None, 'abc___'),
+    ('\\[hello]|', None, '_[hello]_'),
+    ('a/b/c', 'x', 'a_b_c'),
+    ('<ll', 'x', '_ll'),
+    ('', 'x', 'x'),
+])
+def test_normalize_for_path(
+    input_path: str,
+    default: str,
+    expected: str
+) -> None:
+    if default:
+        assert utils.normalize_for_path(input_path, default) == expected
+    else:
+        assert utils.normalize_for_path(input_path) == expected
+
+
+@pytest.mark.parametrize("input_text, default, expected", [
+    ('', None, '_default_filename_'),
+    ('invalid<>:"/\\|?*chars.txt', None, 'invalid_________chars.txt'),
+    ('  filename  ', None, 'filename'),
+    ('.filename.', None, 'filename'),
+    ('a' * 300, None, 'a' * 255),
+    ('<>:|?*', None, '______'),
+    ('', 'custom_default', 'custom_default'),
+    ('<>:|?*', 'fallback', '______'),
+    ('   ', 'empty_default', 'empty_default'),
+    ('.', 'dot_default', 'dot_default'),
+    ('valid_name', 'ignored_default', 'valid_name'),
+])
+def test_normalize_for_filename(
+    input_text: str,
+    default: str,
+    expected: str
+) -> None:
+    if default:
+        assert utils.normalize_for_filename(
+            input_text, default=default) == expected
+    else:
+        assert utils.normalize_for_filename(input_text) == expected
 
 
 def test_touch(temporary_directory: str) -> None:
@@ -164,7 +215,6 @@ def test_linkify_with_phone_newline() -> None:
 
 
 def test_linkify_with_custom_domains() -> None:
-
     assert utils.linkify(
         "https://forms.gle/123\nfoo@bar.agency\nfoo@bar.co\nfoo@bar.com\n"
         "https://foobar.agency\n+41 41 511 21 21\nfoo@bar.ngo"
@@ -190,7 +240,6 @@ def test_linkify_with_custom_domain_and_with_email_and_links() -> None:
 
 
 def test_linkify_with_custom_domain_and_without_email() -> None:
-
     expected_link = Markup(
         "<a href=\"https://thismatters.agency\" "
         "rel=\"nofollow\">https://thismatters.agency</a>"
@@ -208,7 +257,6 @@ def test_linkify_with_custom_domain_and_without_email() -> None:
 
 
 def test_load_tlds() -> None:
-
     def remove_dots(tlds: list[str]) -> list[str]:
         return [domain[1:] for domain in tlds]
 
@@ -235,8 +283,8 @@ def test_ensure_scheme() -> None:
     assert utils.ensure_scheme('seantis.ch') == 'http://seantis.ch'
     assert utils.ensure_scheme('seantis.ch', 'https') == 'https://seantis.ch'
 
-    assert utils.ensure_scheme('google.ch?q=onegov.cloud')\
-        == 'http://google.ch?q=onegov.cloud'
+    assert utils.ensure_scheme('google.ch?q=onegov.cloud') \
+           == 'http://google.ch?q=onegov.cloud'
 
     assert utils.ensure_scheme('https://abc.xyz') == 'https://abc.xyz'
 
@@ -285,8 +333,9 @@ def test_is_sorted() -> None:
 
 
 def test_get_unique_hstore_keys(postgres_dsn: str) -> None:
-
-    Base = declarative_base()
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -307,9 +356,9 @@ def test_get_unique_hstore_keys(postgres_dsn: str) -> None:
 
     assert utils.get_unique_hstore_keys(mgr.session(), Document._tags) == set()
 
-    mgr.session().add(Document(tags=None))  # type: ignore[call-arg]
-    mgr.session().add(Document(tags=['foo', 'bar']))  # type: ignore[call-arg]
-    mgr.session().add(Document(tags=['foo', 'baz']))  # type: ignore[call-arg]
+    mgr.session().add(Document(tags=None))  # type: ignore[misc]
+    mgr.session().add(Document(tags=['foo', 'bar']))  # type: ignore[misc]
+    mgr.session().add(Document(tags=['foo', 'baz']))  # type: ignore[misc]
 
     transaction.commit()
 
@@ -319,7 +368,6 @@ def test_get_unique_hstore_keys(postgres_dsn: str) -> None:
 
 
 def test_remove_repeated_spaces() -> None:
-
     assert utils.remove_repeated_spaces('  ') == ' '
     assert utils.remove_repeated_spaces('a b') == 'a b'
     assert utils.remove_repeated_spaces('a       b') == 'a b'
@@ -350,7 +398,6 @@ def test_post_thread(session: Session) -> None:
 
 
 def test_binary_dictionary() -> None:
-
     d = utils.binary_to_dictionary(b'foobar')
     assert d['filename'] is None
     assert d['mimetype'] == 'text/plain'
@@ -403,7 +450,6 @@ def test_local_lock() -> None:
 
 
 def test_is_valid_yubikey_otp() -> None:
-
     assert not utils.is_valid_yubikey(
         client_id='abc',
         secret_key='dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE=',
@@ -479,7 +525,6 @@ def test_bunch() -> None:
 
 
 def test_to_html_ul() -> None:
-
     def li(*args: str) -> str:
         if len(args) > 1:
             return "".join(f'<li>{i}</li>' for i in args)

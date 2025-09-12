@@ -63,5 +63,5 @@ class CommissionMembershipAddForm(CommissionMembershipForm):
         self.parliamentarian_id.choices = [
             (parliamentarian.id, parliamentarian.title)
             for parliamentarian
-            in ParliamentarianCollection(self.request.session, True).query()
+            in ParliamentarianCollection(self.request.session, [True]).query()
         ]

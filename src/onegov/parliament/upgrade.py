@@ -101,9 +101,109 @@ def add_start_end_columns_to_meetings(
         )
 
 
+@upgrade_task('Add type column to parliament models 2nd attempt')
+def add_type_column_to_parliament_models_second(
+    context: UpgradeContext
+) -> None:
+    # this is only needed as on the first attempt type columns and
+    # mapper args were missing on quite some models and additional models
+    # were identified afterward
+
+    for table, type_name, poly_type in (
+        ('par_attendence', 'poly_type', 'pas_attendence'),
+        ('par_changes', 'type', 'pas_change'),
+        ('par_commission_memberships', 'type',
+         'pas_commission_membership'),
+        ('par_commissions', 'poly_type', 'pas_commission'),
+        ('par_legislative_periods', 'type', 'pas_legislative_period'),
+        ('par_meeting_items', 'type', 'ris_meeting_item'),
+        ('par_parliamentarian_roles', 'type', 'pas_parliamentarian_role'),
+        ('par_parliamentarians', 'type', 'pas_parliamentarian'),
+        ('par_parliamentary_groups', 'type', 'pas_parliamentary_group'),
+        ('par_parties', 'type', 'pas_party'),
+        ('par_political_businesses', 'type', 'ris_political_business'),
+        ('par_political_business_participants', 'type',
+         'ris_political_business_participant')
+    ):
+        if not context.has_column(table, type_name):
+            context.operations.add_column(
+                table,
+                Column(type_name, Text, nullable=True)
+            )
+
+            context.operations.execute(
+                f"UPDATE {table} SET {type_name} = '{poly_type}'"
+            )
+
+            context.operations.execute(
+                f"ALTER TABLE {table} ALTER COLUMN {type_name} "
+                f"SET DEFAULT 'generic'"
+            )
+
+            context.operations.execute(
+                f'ALTER TABLE {table} ALTER COLUMN {type_name} SET NOT NULL'
+            )
+
+
+@upgrade_task('Remove old pas tables')
+def remove_old_pas_tables(
+    context: UpgradeContext
+) -> None:
+
+    tablenames = [
+        'pas_attendence',
+        'pas_changes',
+        'pas_commission_memberships',
+        'pas_commissions',
+        'pas_legislative_periods',
+        'pas_parliamentarian_roles',
+        'pas_parliamentarians',
+        'pas_parliamentary_groups',
+        'pas_parties',
+    ]
+
+    for tablename in tablenames:
+        if context.has_table(tablename):
+            context.operations.execute(
+                f'DROP TABLE IF EXISTS {tablename} CASCADE')
+
+
+@upgrade_task(
+    'Fix poly type for meeting items',
+    requires='onegov.parliament:Add type column to parliament '
+             'models 2nd attempt')
+def fix_poly_type_for_meeting_items(
+    context: UpgradeContext
+) -> None:
+
+    context.operations.execute(
+        "UPDATE par_meeting_items SET type = 'generic'"
+    )
+
+
+@upgrade_task(
+    'RIS Remove unused type columns',
+    requires='onegov.parliament:Fix poly type for meeting items'
+)
+def remove_unused_type_column(
+    context: UpgradeContext
+) -> None:
+
+    # As these models are only used in RIS
+    # we can safely remove the type columns
+    for table, type_column in (
+        ('par_meetings', 'type'),
+        ('par_meeting_items', 'type'),
+        ('par_political_businesses', 'type'),
+        ('par_political_business_participants', 'type'),
+    ):
+        if context.has_column(table, type_column):
+            context.operations.drop_column(table, type_column)
+
+
 @upgrade_task('Remove unused political businesses relationship from meeting')
 def remove_unused_political_businesses_relationship(
-    context: UpgradeContext
+        context: UpgradeContext
 ) -> None:
     if context.has_column('par_meetings', 'political_business_id'):
         context.operations.drop_column('par_meetings', 'political_business_id')
