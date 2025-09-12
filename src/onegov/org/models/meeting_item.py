@@ -4,7 +4,6 @@ import uuid
 from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
-from onegov.search import ORMSearchable
 from sqlalchemy import Column, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -17,19 +16,9 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
 
 
-class MeetingItem(Base, ORMSearchable):
+class MeetingItem(Base):
 
     __tablename__ = 'par_meeting_items'
-
-    es_public = True
-    es_properties = {
-        'title': {'type': 'text'},
-        'number': {'type': 'text'}
-    }
-
-    @property
-    def es_suggestion(self) -> str:
-        return self.title
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(
