@@ -281,3 +281,16 @@ def test_view_update_external_resources(mfg, sa, bs, swissvotes_app):
 
     assert '15 hinzugefügt, 17 geändert, 19 gelöscht' in manage
     assert 'Quellen konnten nicht aktualisiert werden: 4, 8, 9' in manage
+
+
+def test_view_votes_empty_policy_area(swissvotes_app):
+    """ Ensure that the votes view does not crash when the policy area is empty
+    """
+    client = Client(swissvotes_app)
+    client.get('/locale/de_CH').follow()
+
+    page = client.get('/votes')
+    assert page.status_code == 200
+
+    page = client.get('/votes?term=&policy_area=9&policy_area=')
+    assert page.status_code == 200
