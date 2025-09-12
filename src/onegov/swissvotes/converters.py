@@ -1,10 +1,17 @@
 from __future__ import annotations
 import re
+from typing import TYPE_CHECKING
 
-from morepath.converter import Converter
+import morepath
 
 
-class PolicyAreaListConverter(Converter):  # type: ignore[type-arg]
+if TYPE_CHECKING:
+    PolicyAreaConverterBase = morepath.Converter[str]
+else:
+    PolicyAreaConverterBase = morepath.Converter
+
+
+class PolicyAreaListConverter(PolicyAreaConverterBase):
 
     def verify_format(self, s: str) -> bool:
         # verify is a number or in '1.13.136' format,
@@ -26,6 +33,7 @@ class PolicyAreaListConverter(Converter):  # type: ignore[type-arg]
         return True
 
     def validate(self, s: str) -> bool:
+        """ Basically drops invalid policy areas. """
         if not s:
             return False
 
@@ -40,9 +48,3 @@ class PolicyAreaListConverter(Converter):  # type: ignore[type-arg]
         if not l:
             return []
         return [item for item in l if item]
-
-
-policy_area_converter = PolicyAreaListConverter(
-    decode=PolicyAreaListConverter,  # type:ignore[arg-type]
-    encode=PolicyAreaListConverter,  # type:ignore[arg-type]
-)

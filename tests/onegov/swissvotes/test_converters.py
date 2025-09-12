@@ -1,8 +1,8 @@
-from onegov.swissvotes.converters import policy_area_converter
+from onegov.swissvotes.converters import PolicyAreaListConverter
 
 
 def test_policy_area_converter():
-    converter = policy_area_converter
+    converter = PolicyAreaListConverter(str)
 
     assert converter.decode(['']) == []
     assert converter.decode([None]) == []
