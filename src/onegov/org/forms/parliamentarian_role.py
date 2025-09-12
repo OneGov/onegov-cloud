@@ -37,7 +37,7 @@ class ParliamentarianRoleForm(Form):
 
     start = DateField(
         label=_('Start'),
-        validators=[InputRequired()],
+        validators=[Optional()],
         default=date.today
     )
 

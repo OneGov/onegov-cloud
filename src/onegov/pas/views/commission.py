@@ -1,7 +1,9 @@
 from __future__ import annotations
+from itertools import groupby
 
 from onegov.core.elements import Link
-from onegov.core.security import Private
+from onegov.core.security import Private, Public
+from onegov.org.forms.commission_membership import CommissionMembershipAddForm
 from onegov.town6.views.commission import (
     view_commissions,
     add_commission,
@@ -13,7 +15,6 @@ from onegov.pas import PasApp
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.forms import AttendenceAddCommissionForm
-from onegov.pas.forms import CommissionMembershipAddForm
 from onegov.pas.forms import CommissionForm
 from onegov.pas.layouts import PASCommissionCollectionLayout
 from onegov.pas.layouts import PASCommissionLayout
@@ -23,6 +24,7 @@ from onegov.pas.models import PASCommissionMembership
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.core.types import JSON_ro
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
     from webob import Response
@@ -171,4 +173,36 @@ def pas_add_plenary_attendence(
         'title': _('New commission meeting'),
         'form': form,
         'form_width': 'large'
+    }
+
+
+@PasApp.json(
+    model=PASCommissionCollection,
+    name='commissions-parliamentarians-json',
+    permission=Public,
+)
+def commissions_parliamentarians_json(
+    self: PASCommissionCollection, request: TownRequest
+) -> JSON_ro:
+    """Returns all commissions with their parliamentarians."""
+    session = request.session
+    memberships = session.query(PASCommissionMembership).all()
+
+    valid_memberships = (m for m in memberships if m.parliamentarian)
+
+    def key_func(m: PASCommissionMembership) -> str:
+        return str(m.commission_id)
+
+    # Note: Iterable passed into groupby needs to be sorted
+    sorted_memberships = sorted(valid_memberships, key=key_func)
+
+    return {
+        commission_id: [
+            {
+                'id': str(m.parliamentarian.id),
+                'title': m.parliamentarian.title
+            }
+            for m in group
+        ]
+        for commission_id, group in groupby(sorted_memberships, key=key_func)
     }

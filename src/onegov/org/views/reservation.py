@@ -18,7 +18,7 @@ from onegov.org import utils
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import (
-    KabaEditForm, ReservationAdjustmentForm,
+    AddReservationForm, KabaEditForm, ReservationAdjustmentForm,
     ReservationForm, InternalTicketChatMessageForm)
 from onegov.org.kaba import KabaApiError, KabaClient
 from onegov.org.layout import ReservationLayout, TicketChatMessageLayout
@@ -29,14 +29,15 @@ from onegov.org.models import (
     ReservationMessage, ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ReservationTicket
-from onegov.org.utils import emails_for_new_ticket
-from onegov.pay import PaymentError
+from onegov.org.utils import emails_for_new_ticket, group_invoice_items
+from onegov.pay import InvoiceItemMeta, PaymentError, Price
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.reservation.collection import ResourceCollection
-from onegov.ticket import TicketCollection
+from onegov.ticket import TicketCollection, TicketInvoice
 from onegov.user import Auth
 from onegov.user.collections import TANCollection
 from purl import URL
+from uuid import uuid4
 from webob import exc, Response
 from wtforms import HiddenField
 
@@ -193,12 +194,22 @@ def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
         else:
             raise NotImplementedError()
 
-        err = request.translate(
-            _('Reservations must be made ${n} ${unit} in advance', mapping={
-                'n': n,
-                'unit': unit
-            })
-        )
+        err = request.translate(_(
+            'Reservations must be made at least ${n} ${unit} in advance.',
+            mapping={'n': n, 'unit': unit}
+        ))
+
+        return respond_with_error(request, err)
+
+    # if there's a lead time, make sure to observe it for anonymous users...
+    if not request.is_manager and resource.is_before_lead_time(start):
+        assert resource.lead_time is not None
+        n = resource.lead_time
+        unit = request.translate(_('day') if n == 1 else _('days'))
+        err = request.translate(_(
+            'Reservations can only be made at most ${n} ${unit} in advance.',
+            mapping={'n': n, 'unit': unit}
+        ))
 
         return respond_with_error(request, err)
 
@@ -534,15 +545,21 @@ def confirm_reservation(
 
     if submission:
         form = request.get_form(submission.form_class, data=submission.data)
-        extra_price = form.total()
-        discount = form.total_discount()
+        item_extra = {'submission_id': submission.id}
+        extras = form.invoice_items(extra=item_extra)
+        discounts = form.discount_items(extra=item_extra)
+        credit_card_payment = any(
+            price.credit_card_payment
+            for __, price in form.prices()
+        )
         # TODO: We may want to add an option for whether or not the discount
         #       should apply to extras or not. For now the discount doesn't
         #       apply to extras.
     else:
         form = None
-        extra_price = None
-        discount = None
+        credit_card_payment = False
+        extras = []
+        discounts = []
 
     layout = layout or ReservationLayout(self, request)
     layout.breadcrumbs.append(Link(_('Confirm'), '#'))
@@ -557,11 +574,18 @@ def confirm_reservation(
         if failed and failed.isdigit()
     }
 
-    price = request.app.adjust_price(self.price_of_reservation(
-        token,
-        extra_price,
-        discount,
-    ))
+    invoice_items = self.invoice_items_for_reservation(
+        reservations,
+        extras,
+        discounts,
+        reduced_amount_label=request.translate(_('Discount'))
+    )
+    total_amount = InvoiceItemMeta.total(invoice_items)
+    price = request.app.adjust_price(Price(
+        total_amount,
+        self.currency,
+        credit_card_payment=credit_card_payment
+    ) if total_amount > 0 else None)
 
     assert request.locale is not None
     return {
@@ -576,6 +600,10 @@ def confirm_reservation(
         'complete_link': request.link(self, 'finish'),
         'edit_link': request.link(self, 'form'),
         'price': price,
+        'invoice_items': group_invoice_items(invoice_items),
+        'total_amount': total_amount,
+        # TODO: Once reservations can include VAT, this should change
+        'total_vat': None,
         'checkout_button': price and request.app.checkout_button(
             button_label=request.translate(_('Pay Online and Complete')),
             title=self.title,
@@ -626,17 +654,30 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
         #       apply to extras.
         if submission:
             _form_obj = submission.form_obj
-            extra_price = _form_obj.total()
-            discount = _form_obj.total_discount()
+            item_extra = {'submission_id': submission.id}
+            extras = _form_obj.invoice_items(extra=item_extra)
+            discounts = _form_obj.discount_items(extra=item_extra)
+            credit_card_payment = any(
+                price.credit_card_payment
+                for __, price in _form_obj.prices()
+            )
         else:
-            extra_price = None
-            discount = None
+            credit_card_payment = False
+            extras = []
+            discounts = []
 
-        price = request.app.adjust_price(self.price_of_reservation(
-            token,
-            extra_price,
-            discount,
-        ))
+        invoice_items = self.invoice_items_for_reservation(
+            reservations,
+            extras,
+            discounts,
+            reduced_amount_label=request.translate(_('Discount'))
+        )
+        amount = InvoiceItemMeta.total(invoice_items)
+        price = request.app.adjust_price(Price(
+            amount,
+            self.currency,
+            credit_card_payment=credit_card_payment
+        ) if amount > 0 else None)
 
         payment = self.process_payment(price, provider, payment_token)
 
@@ -661,130 +702,146 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
             'failed_reservations', str(e.reservation.id))
 
         return morepath.redirect(url_obj.as_string())
+
+    if submission:
+        forms.submissions.complete_submission(submission)
+
+    with request.session.no_autoflush:
+        ticket = TicketCollection(request.session).open_ticket(
+            handler_code='RSV', handler_id=token.hex
+        )
+        if getattr(self, 'kaba_components', []):
+            # populate key code defaults
+            ticket.handler_data = {
+                'key_code': KabaClient.random_code(),
+                'key_code_lead_time':
+                    request.app.org.default_key_code_lead_time,
+                'key_code_lag_time':
+                    request.app.org.default_key_code_lag_time,
+            }
+        if data := reservations[0].data:
+            ticket.tag = data.get('ticket_tag')
+            tag_meta = data.get('ticket_tag_meta', {})
+            key_code = tag_meta.pop('Kaba Code', None)
+            tag_meta.pop('Color', None)
+            if key_code and ticket.handler_data:
+                # set associated key code
+                ticket.handler_data['key_code'] = key_code
+            ticket.tag_meta = tag_meta
+
+        if invoice_items:
+            invoice = TicketInvoice(id=uuid4())
+            request.session.add(invoice)
+
+            for item_meta in invoice_items:
+                item = item_meta.add_to_invoice(invoice)
+                if payment is not True:
+                    if provider and payment.source == provider.type:
+                        item.payment_date = date.today()
+                    item.payments.append(payment)
+                    item.paid = payment.state == 'paid'
+
+            ticket.invoice = invoice
+        TicketMessage.create(ticket, request, 'opened', 'external')
+
+    show_submission = request.params.get('send_by_email') == 'yes'
+
+    if submission and show_submission:
+        form = submission.form_obj
     else:
-        if submission:
-            forms.submissions.complete_submission(submission)
-        with forms.session.no_autoflush:
-            ticket = TicketCollection(request.session).open_ticket(
-                handler_code='RSV', handler_id=token.hex
-            )
-            if getattr(self, 'kaba_components', []):
-                # populate key code defaults
-                ticket.handler_data = {
-                    'key_code': KabaClient.random_code(),
-                    'key_code_lead_time':
-                        request.app.org.default_key_code_lead_time,
-                    'key_code_lag_time':
-                        request.app.org.default_key_code_lag_time,
-                }
-            if data := reservations[0].data:
-                ticket.tag = data.get('ticket_tag')
-                tag_meta = data.get('ticket_tag_meta', {})
-                key_code = tag_meta.pop('Kaba Code', None)
-                tag_meta.pop('Color', None)
-                if key_code and ticket.handler_data:
-                    # set associated key code
-                    ticket.handler_data['key_code'] = key_code
-                ticket.tag_meta = tag_meta
-            TicketMessage.create(ticket, request, 'opened', 'external')
+        form = None
 
-        show_submission = request.params.get('send_by_email') == 'yes'
-
-        if submission and show_submission:
-            form = submission.form_obj
-        else:
-            form = None
-
+    send_ticket_mail(
+        request=request,
+        template='mail_ticket_opened.pt',
+        subject=_('Your request has been registered'),
+        receivers=(reservations[0].email,),
+        ticket=ticket,
+        content={
+            'model': ticket,
+            'resource': self,
+            'reservations': reservations,
+            'form': form,
+            'show_submission': show_submission
+        }
+    )
+    for email in emails_for_new_ticket(request, ticket):
         send_ticket_mail(
             request=request,
-            template='mail_ticket_opened.pt',
-            subject=_('Your request has been registered'),
-            receivers=(reservations[0].email,),
+            template='mail_ticket_opened_info.pt',
+            subject=_('New ticket'),
             ticket=ticket,
+            receivers=(email, ),
             content={
                 'model': ticket,
                 'resource': self,
                 'reservations': reservations,
-                'form': form,
-                'show_submission': show_submission
-            }
-        )
-        for email in emails_for_new_ticket(request, ticket):
-            send_ticket_mail(
-                request=request,
-                template='mail_ticket_opened_info.pt',
-                subject=_('New ticket'),
-                ticket=ticket,
-                receivers=(email, ),
-                content={
-                    'model': ticket,
-                    'resource': self,
-                    'reservations': reservations,
-                }
-            )
-
-        request.app.send_websocket(
-            channel=request.app.websockets_private_channel,
-            message={
-                'event': 'browser-notification',
-                'title': request.translate(_('New ticket')),
-                'created': ticket.created.isoformat()
             }
         )
 
-        if request.auto_accept(ticket):
-            try:
-                assert request.auto_accept_user is not None
-                ticket.accept_ticket(request.auto_accept_user)
-                request.view(reservations[0], name='accept')
-            except Exception:
-                request.warning(_('Your request could not be '
-                                  'accepted automatically!'))
-            else:
-                close_ticket(ticket, request.auto_accept_user, request)
+    request.app.send_websocket(
+        channel=request.app.websockets_private_channel,
+        message={
+            'event': 'browser-notification',
+            'title': request.translate(_('New ticket')),
+            'created': ticket.created.isoformat()
+        },
+        groupids=request.app.groupids_for_ticket(ticket),
+    )
 
-        collection = FindYourSpotCollection(
-            request.app.libres_context, self.group)
-        pending: dict[Resource, list[Reservation]] = {
-            resource: bound
-            for resource in request.exclude_invisible(collection.query())
-            if (bound := list(
-                resource.bound_reservations(request)  # type:ignore
-            ))
-        }
+    if request.auto_accept(ticket):
+        try:
+            assert request.auto_accept_user is not None
+            ticket.accept_ticket(request.auto_accept_user)
+            request.view(reservations[0], name='accept')
+        except Exception:
+            request.warning(_('Your request could not be '
+                              'accepted automatically!'))
+        else:
+            close_ticket(ticket, request.auto_accept_user, request)
 
-        # by default we will redirect to the created ticket
-        message = _('Thank you for your reservation!')
-        url = request.link(ticket, 'status')
+    collection = FindYourSpotCollection(
+        request.app.libres_context, self.group)
+    pending: dict[Resource, list[Reservation]] = {
+        resource: bound
+        for resource in request.exclude_invisible(collection.query())
+        if (bound := list(
+            resource.bound_reservations(request)  # type:ignore
+        ))
+    }
 
-        # retrieve remembered tickets
-        tickets: dict[str | None, list[str]]
-        tickets = request.browser_session.get('reservation_tickets', {})
+    # by default we will redirect to the created ticket
+    message = _('Thank you for your reservation!')
+    url = request.link(ticket, 'status')
 
-        # continue to the next resource in this group with pending reservations
-        if pending:
-            resource = get_next_resource_context(pending)
+    # retrieve remembered tickets
+    tickets: dict[str | None, list[str]]
+    tickets = request.browser_session.get('reservation_tickets', {})
 
-            # remember ticket so we can show them all at the end
-            tickets.setdefault(self.group, []).append(str(ticket.id))
-            request.browser_session.reservation_tickets = tickets
+    # continue to the next resource in this group with pending reservations
+    if pending:
+        resource = get_next_resource_context(pending)
 
-            message = _(
-                'Your reservation for ${room} has been submitted. '
-                'Please continue with your reservation for ${next_room}.',
-                mapping={'room': self.title, 'next_room': resource.title})
-            url = request.link(resource, 'form')
+        # remember ticket so we can show them all at the end
+        tickets.setdefault(self.group, []).append(str(ticket.id))
+        request.browser_session.reservation_tickets = tickets
 
-        # if we remembered tickets for this group that means
-        # we never showed them so now we need to show them all
-        elif self.group in tickets:
-            tickets[self.group].append(str(ticket.id))
-            request.browser_session.reservation_tickets = tickets
-            url = request.link(collection, 'tickets')
+        message = _(
+            'Your reservation for ${room} has been submitted. '
+            'Please continue with your reservation for ${next_room}.',
+            mapping={'room': self.title, 'next_room': resource.title})
+        url = request.link(resource, 'form')
 
-        request.success(message)
+    # if we remembered tickets for this group that means
+    # we never showed them so now we need to show them all
+    elif self.group in tickets:
+        tickets[self.group].append(str(ticket.id))
+        request.browser_session.reservation_tickets = tickets
+        url = request.link(collection, 'tickets')
 
-        return morepath.redirect(url)
+    request.success(message)
+
+    return morepath.redirect(url)
 
 
 def get_my_reservations_url(request: OrgRequest, email: str) -> str | None:
@@ -820,29 +877,29 @@ def accept_reservation(
     view_ticket: ReservationTicket | None = None,
 ) -> Response:
 
-    if not self.data or not self.data.get('accepted'):
-        resource = request.app.libres_resources.by_reservation(self)
-        assert resource is not None
-        reservations = resource.scheduler.reservations_by_token(self.token)
-        reservations = reservations.order_by(Reservation.start)
+    resource = request.app.libres_resources.by_reservation(self)
+    assert resource is not None
+    reservations = [
+        reservation
+        for reservation in resource.scheduler
+                           .reservations_by_token(self.token)
+                           .order_by(Reservation.start)
+        if not (reservation.data or {}).get('accepted')
+    ]
 
+    if reservations:
         token = self.token
         tickets = TicketCollection(request.session)
         ticket = tickets.by_handler_id(token.hex)
-        assert ticket is not None
+        assert isinstance(ticket, ReservationTicket)
 
         # if we're accessing this view through the ticket it
         # had better match the ticket we retrieved
         if view_ticket is not None and view_ticket != ticket:
             raise exc.HTTPNotFound()
 
-        forms = FormCollection(request.session)
-        submission = forms.submissions.by_id(token)
-
-        if submission:
-            form = submission.form_obj
-        else:
-            form = None
+        submission = ticket.handler.submission
+        form = submission.form_obj if submission is not None else None
 
         # Include all the forms details to be able to print it out
         show_submission = True
@@ -982,6 +1039,7 @@ def accept_reservation(
             )
         )
 
+        assert hasattr(ticket, 'reference')
         content = render_template(
             'mail_new_reservation_notification.pt',
             request,
@@ -991,6 +1049,7 @@ def accept_reservation(
                 'form': form,
                 'model': self,
                 'ticket': ticket,
+                'ticket_reference': ticket.reference(request),
                 'resource': resource,
                 'reservations': reservations,
                 'show_submission': show_submission,
@@ -1156,9 +1215,9 @@ def reject_reservation(
 
     clients = KabaClient.from_resource(resource, request.app)
 
-    # if there's a captured payment we cannot continue
+    # if there's a invoiced/captured payment we cannot continue
     payment = ticket.handler.payment
-    if payment and payment.state == 'paid':
+    if payment and payment.state in ('invoiced', 'paid'):
         request.alert(_(
             'The payment associated with this reservation needs '
             'to be refunded before the reservation can be rejected'
@@ -1171,13 +1230,7 @@ def reject_reservation(
 
         return None
 
-    # we need to delete the payment at the same time
-    # FIXME: The price may need to be adjusted, should be handled
-    #        through the introduction of an invoice system with
-    #        individual invoice items that can be cancelled
-    if payment and len(excluded) == 0:
-        request.session.delete(payment)
-
+    savepoint = transaction.savepoint()
     ReservationMessage.create(targeted, ticket, request, 'rejected')
 
     message = None
@@ -1232,6 +1285,7 @@ def reject_reservation(
 
         form = submission.form_obj
 
+        assert hasattr(ticket, 'reference')
         content = render_template(
             'mail_rejected_reservation_notification',
             request,
@@ -1243,6 +1297,8 @@ def reject_reservation(
                 'resource': resource,
                 'reservations': targeted,
                 'show_submission': True,
+                'ticket': ticket,
+                'ticket_reference': ticket.reference(request),
                 'message': message,
             },
         )
@@ -1270,7 +1326,7 @@ def reject_reservation(
         ticket.create_snapshot(request)
         ticket.state = orginal_state
 
-    failed_to_revoke = False
+    kaba_visits_to_revoke: list[tuple[str, str]] = []
     for reservation in targeted:
         if payment:
             # remove the link to the payment
@@ -1285,26 +1341,45 @@ def reject_reservation(
             start = reservation.display_start() - lead_delta
             # we can only revoke future visits
             if start > sedate.utcnow():
-                for site_id, visit_id in kaba['visit_ids'].items():
-                    try:
-                        clients[site_id].revoke_visit(visit_id)
-                    except (KeyError, KabaApiError) as exc:
-                        if isinstance(exc, KabaApiError):
-                            log.info('Kaba API error', exc_info=True)
-                        failed_to_revoke = True
+                kaba_visits_to_revoke.extend(kaba['visit_ids'].items())
         resource.scheduler.remove_reservation(token, reservation.id)
 
     if len(excluded) == 0 and submission:
-        forms.submissions.delete(submission)
+        # pretend we already deleted the submission
+        ticket.handler.submission = None  # type: ignore[attr-defined]
 
-    if len(targeted) > 1:
-        request.success(_('The reservations were rejected'))
+    if ticket.handler.refreshing_invoice_is_safe(request):
+        ticket.handler.refresh_invoice_items(request)
+
+        if len(excluded) == 0 and submission:
+            forms.submissions.delete(submission)
+
+        # since we might roll back previous changes we can't revoke
+        # the kaba visits until now, since we didn't hook this change
+        # into the transaction system
+        failed_to_revoke = False
+        for site_id, visit_id in kaba_visits_to_revoke:
+            try:
+                clients[site_id].revoke_visit(visit_id)
+            except (KeyError, KabaApiError) as exc:
+                if isinstance(exc, KabaApiError):
+                    log.info('Kaba API error', exc_info=True)
+                failed_to_revoke = True
+
+        if len(targeted) > 1:
+            request.success(_('The reservations were rejected'))
+        else:
+            request.success(_('The reservation was rejected'))
+
+        if failed_to_revoke:
+            request.warning(_(
+                'Failed to revoke one or more door codes in dormakaba API'
+            ))
     else:
-        request.success(_('The reservation was rejected'))
-
-    if failed_to_revoke:
-        request.warning(_(
-            'Failed to revoke one or more door codes in dormakaba API'
+        savepoint.rollback()
+        request.alert(_(
+            'Your changes would alter the price total '
+            'but the payment is no longer open.'
         ))
 
     # return none on intercooler js requests
@@ -1461,6 +1536,235 @@ def send_reservation_summary(
 
 @OrgApp.form(
     model=Reservation,
+    name='add',
+    permission=Private,
+    form=AddReservationForm,
+    template='form.pt'
+)
+def add_reservation(
+    self: Reservation,
+    request: OrgRequest,
+    form: AddReservationForm,
+    view_ticket: ReservationTicket | None = None,
+    layout: ReservationLayout | TicketLayout | None = None
+) -> RenderData | Response:
+
+    token = self.token
+    resource = request.app.libres_resources.by_reservation(self)
+    assert resource is not None
+
+    tickets = TicketCollection(request.session)
+    ticket = tickets.by_handler_id(token.hex)
+    assert ticket is not None
+
+    # if we're accessing this view through the ticket it
+    # had better match the ticket we retrieved
+    if view_ticket is not None and view_ticket != ticket:
+        raise exc.HTTPNotFound()
+
+    def show_form() -> RenderData:
+        return {
+            'title': _('Add reservation'),
+            'layout': layout or ReservationLayout(resource, request),
+            'form': form,
+        }
+
+    form.apply_resource(resource)
+    if not form.submitted(request):
+        if self.data and self.data.get('accepted'):
+            request.warning(_(
+                'Since the other reservations in this ticket '
+                'have already been accepted, this reservation '
+                'will also be immediately accepted. However '
+                'we will not send a new reservation confirmation.'
+            ))
+        return show_form()
+
+    assert form.date.data is not None
+    assert form.quota.data is not None
+    dt = sedate.replace_timezone(
+        sedate.as_datetime(form.date.data),
+        resource.timezone,
+    )
+    if 'whole_day' in form and form.whole_day.data == 'no':
+        assert form.start_time.data is not None
+        assert form.end_time.data is not None
+        start_time = form.start_time.data
+        end_time = form.end_time.data
+    else:
+        start_time = time(0, 0)
+        end_time = time(23, 59)
+
+    try:
+        start, end = sedate.get_date_range(
+            dt,
+            start_time,
+            end_time,
+            raise_non_existent=True
+        )
+    except pytz.NonExistentTimeError:
+        request.alert(_(
+            'The selected time does not exist on this date due to '
+            'the switch from standard time to daylight saving time.'
+        ))
+        return show_form()
+
+    # if the matched allocation isn't partly available expand it to the
+    # whole allocation for a better user experience, but don't ever shrink
+    # it, since that's most certainly not what they want to have happen.
+    for allocation in resource.scheduler.allocations_in_range(start, end):
+        if not allocation.overlaps(start, end):
+            continue
+
+        if allocation.partly_available:
+            break
+
+        if allocation.contains(start, end):
+            start, end = allocation.start, allocation.end
+        else:
+            request.alert(_(
+                'The targeted availability is not partially reservable '
+                'and does not fully cover the selected time range.'
+            ))
+            return show_form()
+
+    savepoint = transaction.savepoint()
+    try:
+        temp_token = resource.scheduler.reserve(
+            self.email,
+            (start, end),
+            quota=form.quota.data
+        )
+    except LibresError as e:
+        request.alert(utils.get_libres_error(e, request))
+        return show_form()
+
+    reservation: Reservation = (
+        resource.scheduler.reservations_by_token(temp_token).one()  # type:ignore
+    )
+    # change the temporary token back to the shared reservation token
+    reservation.token = token
+    try:
+        resource.scheduler._approve_reservation_record(reservation)
+    except LibresError as e:
+        request.session.flush()
+        savepoint.rollback()
+        request.alert(utils.get_libres_error(e, request))
+        return show_form()
+
+    request.session.flush()
+    if ticket.handler.refreshing_invoice_is_safe(request):
+        ticket.handler.refresh_invoice_items(request)
+    else:
+        request.session.flush()
+        savepoint.rollback()
+        request.alert(_(
+            'Your changes would alter the price total '
+            'but the payment is no longer open.'
+        ))
+        return show_form()
+
+    if self.data and self.data.get('accepted'):
+        # we need to accept the new reservation
+        data = reservation.data
+        if data is None:
+            data = reservation.data = {}
+
+        data['accepted'] = True
+
+        clients = KabaClient.from_resource(resource, request.app)
+        if clients and (lead := timedelta(
+            minutes=ticket.handler.data['key_code_lead_time']
+        )) is not None and (
+            (start := reservation.display_start() - lead) > sedate.utcnow()
+        ):
+            # add visit
+            components: dict[str, list[str]] = {}
+            for site_id, component in resource.kaba_components:  # type: ignore[attr-defined]
+                components.setdefault(site_id, []).append(component)
+
+            code = ticket.handler.data['key_code']
+            lag = timedelta(minutes=ticket.handler.data['key_code_lag_time'])
+            end = reservation.display_end() + lag
+            visit_ids = {}
+            for site_id, group in components.items():
+                try:
+                    visit_ids[site_id] = clients[site_id].create_visit(
+                        code=code,
+                        name=ticket.number,
+                        message='Managed through OneGov Cloud',
+                        start=start,
+                        end=end,
+                        components=group,
+                    )
+                except (KeyError, KabaApiError) as e:
+                    if isinstance(e, KabaApiError):
+                        log.info('Kaba API error', exc_info=True)
+
+                    # roll back previous changes
+                    request.session.flush()
+                    savepoint.rollback()
+                    request.alert(_(
+                        'Failed to create visits using the dormakaba API '
+                        'for site ID ${site_id} please make sure your '
+                        'credentials are still valid.',
+                        mapping={'site_id': site_id}
+                    ))
+                    return show_form()
+
+                data['kaba'] = {
+                    'code': code,
+                    'visit_ids': visit_ids,
+                }
+
+    ReservationMessage.create(
+        [reservation],
+        ticket,
+        request,
+        'added'
+    )
+
+    request.success(_('Added a new reservation'))
+    if view_ticket is not None:
+        return request.redirect(request.link(view_ticket))
+
+    return request.redirect(request.link(self))
+
+
+@OrgApp.form(
+    model=ReservationTicket,
+    name='add-reservation',
+    permission=Private,
+    form=AddReservationForm,
+    template='form.pt'
+)
+def add_reservation_from_ticket(
+    self: ReservationTicket,
+    request: OrgRequest,
+    form: AddReservationForm,
+    layout: TicketLayout | None = None
+) -> RenderData | Response | None:
+
+    if self.handler.deleted:
+        raise exc.HTTPNotFound()
+
+    layout = layout or TicketLayout(self, request)
+    layout.breadcrumbs[-1].attrs['href'] = request.link(self)
+    layout.breadcrumbs.append(
+        Link(_('Add reservation'), '#')
+    )
+
+    return add_reservation(
+        self.handler.reservations[0],
+        request,
+        form,
+        self,
+        layout
+    )
+
+
+@OrgApp.form(
+    model=Reservation,
     name='adjust',
     permission=Private,
     form=ReservationAdjustmentForm,
@@ -1522,6 +1826,23 @@ def adjust_reservation(
             'form': form,
         }
 
+    def show_error(error: str) -> Response | RenderData:
+        if intercooler:
+            if type(error) is not str:
+                error = request.translate(error)
+            ic_data = {'message': error, 'success': False}
+
+            @request.after
+            def trigger(response: Response) -> None:
+                response.headers.add('X-IC-Trigger', 'oc-reservation-error')
+                response.headers.add(
+                    'X-IC-Trigger-Data',
+                    json.dumps(ic_data, ensure_ascii=True)
+                )
+            return Response(json=ic_data)
+        request.alert(error)
+        return show_form()
+
     if intercooler := bool(request.headers.get('X-IC-Request')):
         request.assert_valid_csrf_token()
         new_start = isodate.parse_datetime(request.GET['start'])
@@ -1562,32 +1883,27 @@ def adjust_reservation(
         if payment is None:
             pass
         elif new_reservation is not None:
-            # FIXME: The price may need to be adjusted, should be handled
-            #        through the introduction of an invoice system with
-            #        individual invoice items that can be cancelled
             new_reservation.payment = payment  # type: ignore[attr-defined]
+            if ticket.handler.refreshing_invoice_is_safe(request):
+                ticket.handler.refresh_invoice_items(request)
+            else:
+                request.session.flush()
+                savepoint.rollback()
+                return show_error(_(
+                    'Your changes would alter the price total '
+                    'but the payment is no longer open.'
+                ))
         else:
             # restore the payment link
             reservation.payment = payment
     except LibresError as e:
         # rollback previous changes
+        request.session.flush()
         savepoint.rollback()
-        error = utils.get_libres_error(e, request)
-        if intercooler:
-            ic_data = {'message': error, 'success': False}
-
-            @request.after
-            def trigger(response: Response) -> None:
-                response.headers.add('X-IC-Trigger', 'oc-reservation-error')
-                response.headers.add(
-                    'X-IC-Trigger-Data',
-                    json.dumps(ic_data, ensure_ascii=True)
-                )
-            return Response(json=ic_data)
-        request.alert(error)
-        return show_form()
+        return show_error(utils.get_libres_error(e, request))
 
     if new_reservation is not None:
+        failed_to_revoke = False
         clients = KabaClient.from_resource(resource, request.app)
         data = reservation.data
         if data is None:
@@ -1616,7 +1932,12 @@ def adjust_reservation(
                     # NOTE: We can only revoke existing future visits
                     old_visit_id = old_visit_ids.get(site_id)
                     if old_visit_id and old_start > now:
-                        clients[site_id].revoke_visit(old_visit_id)
+                        try:
+                            clients[site_id].revoke_visit(old_visit_id)
+                        except (KeyError, KabaApiError) as e:
+                            if isinstance(e, KabaApiError):
+                                log.info('Kaba API error', exc_info=True)
+                            failed_to_revoke = True
                     # NOTE: We can only create future visits
                     if start > now:
                         visit_ids[site_id] = clients[site_id].create_visit(
@@ -1632,31 +1953,14 @@ def adjust_reservation(
                         log.info('Kaba API error', exc_info=True)
 
                     # roll back previous changes
+                    request.session.flush()
                     savepoint.rollback()
-                    error = _(
+                    return show_error(_(
                         'Failed to create visits using the dormakaba API '
                         'for site ID ${site_id} please make sure your '
                         'credentials are still valid.',
                         mapping={'site_id': site_id}
-                    )
-                    if intercooler:
-                        error = request.translate(error)
-                        ic_data = {'message': error, 'success': False}
-
-                        @request.after
-                        def trigger(response: Response) -> None:
-                            response.headers.add(
-                                'X-IC-Trigger',
-                                'oc-reservation-error'
-                            )
-                            response.headers.add(
-                                'X-IC-Trigger-Data',
-                                json.dumps(ic_data, ensure_ascii=True)  # noqa: B023
-                            )
-                        return Response(json=ic_data)
-
-                    request.alert(error)
-                    return show_form()
+                    ))
 
                 data['kaba'] = {
                     'code': code,
@@ -1670,6 +1974,10 @@ def adjust_reservation(
             request,
         )
         if not intercooler:
+            if failed_to_revoke:
+                request.warning(_(
+                    'Failed to revoke one or more door codes in dormakaba API'
+                ))
             request.success(_('The reservation was adjusted'))
     elif not intercooler:
         request.warning(_('The reservation was left unchanged'))
@@ -1795,6 +2103,7 @@ def edit_kaba(
     if not form.submitted(request):
         return show_form()
 
+    failed_to_revoke = False
     savepoint = transaction.savepoint()
     if form.data != {
         name: ticket.handler_data.get(name)
@@ -1835,7 +2144,12 @@ def edit_kaba(
                     # if there is an old visit, revoke it
                     old_visit_id = old_visit_ids.get(site_id)
                     if old_visit_id and old_start > now:
-                        clients[site_id].revoke_visit(old_visit_id)
+                        try:
+                            clients[site_id].revoke_visit(old_visit_id)
+                        except (KeyError, KabaApiError) as e:
+                            if isinstance(e, KabaApiError):
+                                log.info('Kaba API error', exc_info=True)
+                            failed_to_revoke = True
 
                     if start > now:
                         visit_ids[site_id] = clients[site_id].create_visit(
@@ -1864,6 +2178,11 @@ def edit_kaba(
                     'code': code,
                     'visit_ids': visit_ids,
                 }
+
+    if failed_to_revoke:
+        request.warning(_(
+            'Failed to revoke one or more door codes in dormakaba API'
+        ))
 
     request.success(_('Your changes were saved'))
 

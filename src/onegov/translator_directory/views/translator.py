@@ -463,7 +463,8 @@ def report_translator_change(
                 'event': 'browser-notification',
                 'title': request.translate(_('New ticket')),
                 'created': ticket.created.isoformat()
-            }
+            },
+            groupids=request.app.groupids_for_ticket(ticket),
         )
 
         request.success(_('Thank you for your submission!'))

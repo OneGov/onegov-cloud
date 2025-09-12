@@ -4,8 +4,8 @@ from onegov.core.security import Private
 from onegov.org.models import Organisation
 from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.collections import PASParliamentarianCollection
+from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 @PasApp.html(
     model=Organisation,
     name='pas-settings',
-    template='dashboard.pt',
+    template='pas_dashboard.pt',
     permission=Private
 )
 def view_pas_settings(
@@ -37,16 +37,16 @@ def view_pas_settings(
 
     shortcuts = [
         {
+            'name': 'attendences',
+            'title': _('Attendences'),
+            'link': request.class_link(AttendenceCollection),
+            'icon': 'fa-clock'
+        },
+        {
             'name': 'rate-sets',
             'title': _('Rate sets'),
             'link': request.class_link(RateSetCollection),
             'icon': 'fa-exchange-alt'
-        },
-        {
-            'name': 'legislative-periods',
-            'title': _('Legislative periods'),
-            'link': request.class_link(LegislativePeriodCollection),
-            'icon': 'fa-calendar-alt'
         },
         {
             'name': 'settlement-runs',

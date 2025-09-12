@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os.path
 import yaml
 
@@ -9,7 +11,17 @@ from unittest.mock import patch
 from transaction import commit
 
 
-def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import SessionManager
+
+
+def test_cli(
+    postgres_dsn: str,
+    session_manager: SessionManager,
+    temporary_directory: str,
+    redis_url: str
+) -> None:
 
     cfg = {
         'applications': [
@@ -33,25 +45,33 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
     with open(cfg_path, 'w') as f:
         f.write(yaml.dump(cfg))
 
-    def login(username, yubikey=None, phone_number=None, totp=None):
+    def login(
+        username: str,
+        yubikey: str | None = None,
+        phone_number: str | None = None,
+        totp: str | None = None
+    ) -> None:
         with patch('onegov.user.models.user.remembered'):
             with patch('onegov.user.models.user.forget'):
                 session = session_manager.session()
                 user = session.query(User).filter_by(username=username).one()
                 if yubikey:
+                    assert user.second_factor is not None
                     assert user.second_factor['type'] == 'yubikey'
                     assert user.second_factor['data'] == yubikey
                 elif phone_number:
+                    assert user.second_factor is not None
                     assert user.second_factor['type'] == 'mtan'
                     assert user.second_factor['data'] == phone_number
                 elif totp:
+                    assert user.second_factor is not None
                     assert user.second_factor['type'] == 'totp'
                     assert user.second_factor['data'] == totp
                 else:
                     assert not user.second_factor
 
                 number = len(user.sessions or {}) + 1
-                user.save_current_session(Bunch(
+                user.save_current_session(Bunch(  # type: ignore[arg-type]
                     browser_session=Bunch(_token=f'session-{number}'),
                     client_addr=f'127.0.0.{number}',
                     user_agent='CLI',
@@ -452,8 +472,12 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
         assert user.phone_number == '0411234567'
 
 
-def test_cli_exists_recursive(postgres_dsn, session_manager,
-                              temporary_directory, redis_url):
+def test_cli_exists_recursive(
+    postgres_dsn: str,
+    session_manager: SessionManager,
+    temporary_directory: str,
+    redis_url: str
+) -> None:
 
     cfg = {
         'applications': [

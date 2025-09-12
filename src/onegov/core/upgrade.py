@@ -333,6 +333,7 @@ def get_tasks(
 
     for task_id, task in tasks.items():
         if task.requires:
+            assert task.requires in tasks, f'Could not find "{task.requires}"'
             assert not tasks[task.requires].raw, 'Raw tasks cannot be required'
 
     graph: dict[str, set[str]] = {}

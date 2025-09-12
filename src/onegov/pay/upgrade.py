@@ -4,7 +4,9 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from __future__ import annotations
 
+
 from onegov.core.upgrade import upgrade_task
+from sqlalchemy import false
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Text
@@ -56,6 +58,48 @@ def add_enabled_to_payment_providers(context: UpgradeContext) -> None:
 @upgrade_task('Add invoiced state to payments')
 def add_invoiced_state_to_payments(context: UpgradeContext) -> None:
     if context.has_table('payments'):
+        # On one of the instances this upgrade step failed (ogc-2335)
+        # Solution: We end the current transaction first
+        # before altering the type
+
+        # End current transaction
+        context.operations.execute('COMMIT')
+
         context.operations.execute(
             "ALTER TYPE payment_state ADD VALUE IF NOT EXISTS 'invoiced'"
         )
+
+        # Start new transaction
+        context.operations.execute('BEGIN')
+
+
+@upgrade_task('Add invoiced column to invoices')
+def add_invoiced_state_to_invoices(context: UpgradeContext) -> None:
+    if not context.has_table('invoices'):
+        return
+
+    if not context.has_column('invoices', 'invoiced'):
+        context.operations.add_column(
+            'invoices',
+            Column(
+                'invoiced',
+                Boolean,
+                nullable=False,
+                server_default=false(),
+                index=True,
+            )
+        )
+
+        context.operations.execute("""
+            UPDATE invoices
+               SET invoiced = TRUE
+             WHERE id IN (
+                SELECT invoice_items.invoice_id
+                  FROM invoice_items
+                  JOIN payments_for_invoice_items_payments AS link
+                    ON link.invoice_items_id = invoice_items.id
+                  JOIN payments
+                    ON payments.id = link.payment_id
+                 WHERE payments.state = 'invoiced'
+            )
+        """)

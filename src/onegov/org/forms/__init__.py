@@ -17,6 +17,7 @@ from onegov.org.forms.form_export import FormSubmissionsExport
 from onegov.org.forms.form_registration import FormRegistrationWindowForm
 from onegov.org.forms.generic import ExportForm, DateRangeForm
 from onegov.org.forms.imageset import ImageSetForm
+from onegov.org.forms.invoice import ManualInvoiceItemForm
 from onegov.org.forms.meeting import MeetingForm
 from onegov.org.forms.mtan import PublicMTANForm
 from onegov.org.forms.mtan import PublicRequestMTANForm
@@ -27,7 +28,10 @@ from onegov.org.forms.page import LinkForm, PageForm, IframeForm
 from onegov.org.forms.parliamentarian import ParliamentarianForm
 from onegov.org.forms.parliamentarian_role import ParliamentarianRoleForm
 from onegov.org.forms.parliamentary_group import ParliamentaryGroupForm
+from onegov.org.forms.payments import PaymentSearchForm
+from onegov.org.forms.payments import TicketInvoiceSearchForm
 from onegov.org.forms.person import PersonForm
+from onegov.org.forms.reservation import AddReservationForm
 from onegov.org.forms.reservation import FindYourSpotForm
 from onegov.org.forms.reservation import KabaEditForm
 from onegov.org.forms.reservation import ReservationAdjustmentForm
@@ -59,6 +63,7 @@ from onegov.org.forms.userprofile import UserProfileForm
 
 
 __all__ = (
+    'AddReservationForm',
     'AllocationRuleForm',
     'AnalyticsSettingsForm',
     'CitizenLoginForm',
@@ -88,6 +93,7 @@ __all__ = (
     'LinkForm',
     'ManageUserForm',
     'ManageUserGroupForm',
+    'ManualInvoiceItemForm',
     'MapSettingsForm',
     'MeetingForm',
     'ModuleSettingsForm',
@@ -99,6 +105,7 @@ __all__ = (
     'ParliamentarianForm',
     'ParliamentarianRoleForm',
     'ParliamentaryGroupForm',
+    'PaymentSearchForm',
     'PersonForm',
     'PublicMTANForm',
     'PublicRequestMTANForm',
@@ -116,6 +123,7 @@ __all__ = (
     'TicketAssignmentForm',
     'TicketChangeTagForm',
     'TicketChatMessageForm',
+    'TicketInvoiceSearchForm',
     'TicketNoteForm',
     'UserProfileForm',
 )

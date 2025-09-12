@@ -5,6 +5,7 @@ import os
 import zipfile
 
 from datetime import date
+from email_validator import validate_email, EmailNotValidError
 from io import BytesIO
 from markupsafe import Markup
 from morepath import Response
@@ -14,13 +15,14 @@ from onegov.core.elements import Link, Intercooler, Confirm
 from onegov.core.html import html_to_text
 from onegov.core.mail import Attachment
 from onegov.core.orm import as_selectable
-from onegov.core.security import Public, Private, Secret
+from onegov.core.security import Public, Personal, Private, Secret
 from onegov.core.templates import render_template
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
 from onegov.org import _, OrgApp
 from onegov.org.constants import TICKET_STATES
 from onegov.org.forms import ExtendedInternalTicketChatMessageForm
+from onegov.org.forms import ManualInvoiceItemForm
 from onegov.org.forms import TicketAssignmentForm
 from onegov.org.forms import TicketChangeTagForm
 from onegov.org.forms import TicketChatMessageForm
@@ -29,9 +31,10 @@ from onegov.org.layout import (
     FindYourSpotLayout, DefaultMailLayout, ArchivedTicketsLayout)
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import TicketChatMessageLayout
+from onegov.org.layout import TicketInvoiceLayout
+from onegov.org.layout import TicketLayout
 from onegov.org.layout import TicketNoteLayout
 from onegov.org.layout import TicketsLayout
-from onegov.org.layout import TicketLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
     CitizenDashboard, TicketChatMessage, TicketMessage, TicketNote,
@@ -39,7 +42,7 @@ from onegov.org.models import (
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter, ReservationHandler
 from onegov.org.pdf.ticket import TicketPdf
-from onegov.org.utils import get_current_tickets_url
+from onegov.org.utils import get_current_tickets_url, group_invoice_items
 from onegov.org.views.message import view_messages_feed
 from onegov.org.views.utils import assert_citizen_logged_in
 from onegov.org.views.utils import show_tags, show_filters
@@ -61,16 +64,18 @@ if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Mapping
     from email.headerregistry import Address
     from onegov.core.request import CoreRequest
-    from onegov.core.types import EmailJsonDict, RenderData, SequenceOrScalar
+    from onegov.core.types import (
+        EmailJsonDict, JSON_ro, RenderData, SequenceOrScalar)
     from onegov.form.fields import UploadFileWithORMSupport
     from onegov.org.layout import Layout
     from onegov.org.request import OrgRequest
     from onegov.pay import Payment
+    from onegov.ticket import TicketInvoiceItem
     from sqlalchemy.orm import Query, Session
     from webob import Response as BaseResponse
 
 
-@OrgApp.html(model=Ticket, template='ticket.pt', permission=Private)
+@OrgApp.html(model=Ticket, template='ticket.pt', permission=Personal)
 def view_ticket(
     self: Ticket,
     request: OrgRequest,
@@ -128,19 +133,23 @@ def view_ticket(
         select(stmt.c).where(stmt.c.channel_id == self.number)).first()
 
     # if we have a payment, show the payment button
+    is_manager = request.is_manager_for_model(self)
     layout = layout or TicketLayout(self, request)
     payment_button = None
     payment = handler.payment
+    edit_email_url = None
     edit_amount_url = None
 
-    if payment and payment.source == 'manual':
-        payment_button = manual_payment_button(payment, layout)
-        if (request.is_manager or request.is_supporter) and not payment.paid:
-            edit_amount_url = layout.csrf_protected_url(
-                request.link(payment, name='change-net-amount')
-            )
+    if is_manager and self.handler.email_changeable:
+        edit_email_url = request.csrf_protected_url(
+            request.link(self, 'change-email'))
 
-    if payment and payment.source in (
+    if is_manager and payment and payment.source == 'manual':
+        payment_button = manual_payment_button(payment, layout)
+        if not payment.paid:
+            edit_amount_url = request.link(self, name='add-invoice-item')
+
+    if is_manager and payment and payment.source in (
         'stripe_connect',
         'datatrans',
         'worldline_saferpay',
@@ -164,6 +173,7 @@ def view_ticket(
         'feed_data': json.dumps(
             view_messages_feed(messages, request)
         ),
+        'edit_email_url': edit_email_url,
         'edit_amount_url': edit_amount_url,
         'show_tags': show_tags(request),
         'show_filters': show_filters(request),
@@ -219,7 +229,8 @@ def delete_ticket(
 #        pure passthrough, then we can pass the request here
 def manual_payment_button(
     payment: Payment,
-    layout: Layout
+    layout: Layout,
+    css_class: str = 'small secondary'
 ) -> Link:
 
     if payment.state == 'open':
@@ -228,7 +239,7 @@ def manual_payment_button(
             url=layout.csrf_protected_url(
                 layout.request.link(payment, 'mark-as-paid'),
             ),
-            attrs={'class': 'mark-as-paid button small secondary'},
+            attrs={'class': f'mark-as-paid button {css_class}'},
             traits=(
                 Intercooler(
                     request_method='POST',
@@ -242,7 +253,7 @@ def manual_payment_button(
         url=layout.csrf_protected_url(
             layout.request.link(payment, 'mark-as-unpaid'),
         ),
-        attrs={'class': 'mark-as-unpaid button small secondary'},
+        attrs={'class': f'mark-as-unpaid button {css_class}'},
         traits=(
             Intercooler(
                 request_method='POST',
@@ -255,7 +266,8 @@ def manual_payment_button(
 # FIXME: same here as for manual_payment_button
 def online_payment_button(
     payment: Payment,
-    layout: Layout
+    layout: Layout,
+    css_class: str = 'small secondary'
 ) -> Link | None:
 
     if payment.state == 'open':
@@ -264,7 +276,7 @@ def online_payment_button(
             url=layout.csrf_protected_url(
                 layout.request.link(payment, 'capture')
             ),
-            attrs={'class': 'payment-capture button small secondary'},
+            attrs={'class': f'payment-capture button {css_class}'},
             traits=(
                 Confirm(
                     _('Do you really want capture the payment?'),
@@ -291,7 +303,7 @@ def online_payment_button(
             url=layout.csrf_protected_url(
                 layout.request.link(payment, 'refund')
             ),
-            attrs={'class': 'payment-refund button small secondary'},
+            attrs={'class': f'payment-refund button {css_class}'},
             traits=(
                 Confirm(
                     _('Do you really want to refund ${amount}?', mapping={
@@ -391,16 +403,13 @@ def send_chat_message_email_if_enabled(
 
         reply_to = None  # default reply-to given by the application
 
-    if not receiver:
-        return
-
     # we show the previous messages by going back until we find a message
     # that is not from the same author as the new message (this should usually
     # be the next message, but might include multiple, if someone sent a bunch
     # of messages in succession without getting a reply)
     #
     # note that the resulting thread has to be reversed for the mail template
-    def thread() -> Iterator[TicketChatMessage]:
+    def generate_thread() -> Iterator[TicketChatMessage]:
         messages.older_than = message.id
         messages.load = 'newer-first'
 
@@ -410,22 +419,90 @@ def send_chat_message_email_if_enabled(
             if m.owner != message.owner:
                 break
 
-    send_ticket_mail(
-        request=request,
-        template='mail_ticket_chat_message.pt',
-        subject=_('Your ticket has a new message'),
-        content={
-            'model': ticket,
-            'message': message,
-            'thread': tuple(reversed(list(thread()))),
-        },
-        ticket=ticket,
-        receivers=(receiver,),
-        reply_to=reply_to,
-        force=True,
-        bcc=bcc,
-        attachments=attachments
+    thread = None
+    if receiver:
+        thread = tuple(reversed(list(generate_thread())))
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_chat_message.pt',
+            subject=_('Your ticket has a new message'),
+            content={
+                'model': ticket,
+                'message': message,
+                'thread': thread,
+            },
+            ticket=ticket,
+            receivers=(receiver,),
+            reply_to=reply_to,
+            force=True,
+            bcc=bcc,
+            attachments=attachments
+        )
+
+    # handle resource recipients for external messages on RSV tickets
+    if origin != 'external':
+        return
+
+    handler = ticket.handler
+    if not isinstance(handler, ReservationHandler) or not handler.resource:
+        return
+
+    if thread is None:
+        thread = tuple(reversed(list(generate_thread())))
+
+    def recipients_which_have_registered_for_mail() -> Iterator[str]:
+        q = ResourceRecipientCollection(request.session).query()
+        q = q.filter(ResourceRecipient.medium == 'email')
+        q = q.order_by(None).order_by(ResourceRecipient.address)
+        q = q.with_entities(ResourceRecipient.address,
+                            ResourceRecipient.content)
+        for r in q:
+            if r.address == receiver:
+                # don't send two notifications to this address
+                continue
+            if handler.reservations[0].resource.hex in r.content[
+                'resources'
+            ] and r.content.get('customer_messages', False):
+                yield r.address
+
+    title = request.translate(
+        _(
+            '${org} New Customer Message in Reservation for ${resource_title}',
+            mapping={
+                'org': request.app.org.title,
+                'resource_title': handler.resource.title,
+            },
+        )
     )
+    assert hasattr(ticket, 'reference')
+    content = render_template(
+        'mail_customer_messages_notification.pt',
+        request,
+        {
+            'layout': DefaultMailLayout(object(), request),
+            'title': title,
+            'model': ticket,
+            'resource': handler.resource,
+            'message': message,
+            'thread': thread,
+            'ticket_reference': ticket.reference(request),
+        },
+    )
+    plaintext = html_to_text(content)
+
+    def email_iter() -> Iterator[EmailJsonDict]:
+        for recipient_addr in recipients_which_have_registered_for_mail():
+
+            yield request.app.prepare_email(
+                receivers=(recipient_addr,),
+                subject=title,
+                content=content,
+                plaintext=plaintext,
+                category='transactional',
+                attachments=(),
+            )
+
+    request.app.send_transactional_email_batch(email_iter())
 
 
 def send_new_note_notification(
@@ -501,7 +578,7 @@ def send_new_note_notification(
 
 
 @OrgApp.form(
-    model=Ticket, name='note', permission=Private,
+    model=Ticket, name='note', permission=Personal,
     template='ticket_note_form.pt', form=TicketNoteForm
 )
 def handle_new_note(
@@ -535,7 +612,7 @@ def handle_new_note(
     }
 
 
-@OrgApp.view(model=TicketNote, permission=Private)
+@OrgApp.view(model=TicketNote, permission=Personal)
 def view_ticket_note(
     self: TicketNote,
     request: OrgRequest
@@ -543,9 +620,18 @@ def view_ticket_note(
     return request.redirect(request.link(self.ticket))
 
 
-@OrgApp.view(model=TicketNote, permission=Private, request_method='DELETE')
+def assert_can_modify_note(self: TicketNote, request: OrgRequest) -> None:
+    if not (
+        self.owner == request.current_username
+        or request.is_manager_for_model(self)
+    ):
+        raise exc.HTTPNotFound()
+
+
+@OrgApp.view(model=TicketNote, permission=Personal, request_method='DELETE')
 def delete_ticket_note(self: TicketNote, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
+    assert_can_modify_note(self, request)
 
     if self.ticket:
         # force a change of the ticket to make sure that it gets reindexed
@@ -556,7 +642,7 @@ def delete_ticket_note(self: TicketNote, request: OrgRequest) -> None:
 
 
 @OrgApp.form(
-    model=TicketNote, name='edit', permission=Private,
+    model=TicketNote, name='edit', permission=Personal,
     template='ticket_note_form.pt', form=TicketNoteForm
 )
 def handle_edit_note(
@@ -565,6 +651,8 @@ def handle_edit_note(
     form: TicketNoteForm,
     layout: TicketNoteLayout | None = None
 ) -> RenderData | BaseResponse:
+
+    assert_can_modify_note(self, request)
 
     assert self.ticket is not None
     if form.submitted(request):
@@ -785,6 +873,44 @@ def assign_ticket(
     }
 
 
+@OrgApp.json(
+    model=Ticket,
+    name='change-email',
+    request_method='POST',
+    permission=Private
+)
+def change_email(self: Ticket, request: OrgRequest) -> JSON_ro:
+    request.assert_valid_csrf_token()
+
+    if not self.handler.email_changeable:
+        raise exc.HTTPForbidden()
+
+    email = request.POST.get('email')
+    if not isinstance(email, str):
+        return {'email': self.ticket_email}
+
+    try:
+        validate_email(
+            email,
+            # NOTE: The Email validator from WTForms doesn't check this either
+            #       although maybe we should check this in the future.
+            check_deliverability=False
+        )
+    except EmailNotValidError:
+        return {'email': self.ticket_email}
+
+    if self.ticket_email != email:
+        TicketMessage.create(
+            self,
+            request,
+            'change-email',
+            old_email=self.ticket_email,
+            new_email=email,
+        )
+        self.handler.change_email(email)
+    return {'email': email}
+
+
 @OrgApp.form(model=Ticket, name='change-tag', permission=Private,
              form=TicketChangeTagForm, template='form.pt')
 def change_tag(
@@ -809,6 +935,9 @@ def change_tag(
                 selected_meta = meta
                 break
 
+        # NOTE: Don't include the E-Mail in the selected meta
+        selected_meta.pop('E-Mail', None)
+
         # NOTE: We don't modify the submission data but we exclude
         #       any metadata that's tied to the submission
         if selected_meta and (
@@ -818,7 +947,6 @@ def change_tag(
             selected_meta = {
                 key: value
                 for key, value in selected_meta.items()
-                if key != 'E-Mail'
                 if not any(
                     True
                     for field in form
@@ -826,11 +954,12 @@ def change_tag(
                 )
             }
 
-            kaba_code = selected_meta.pop('Kaba Code', None)
-            handler_data = self.handler_data or {}
-            if kaba_code and 'key_code' not in handler_data:
-                handler_data['key_code'] = kaba_code
-                self.handler_data = handler_data
+        # update the key code if it's different
+        kaba_code = selected_meta.pop('Kaba Code', None)
+        handler_data = self.handler_data or {}
+        if kaba_code and handler_data.get('key_code') != kaba_code:
+            handler_data['key_code'] = kaba_code
+            self.handler_data = handler_data
 
         self.tag_meta = selected_meta
 
@@ -935,7 +1064,7 @@ def create_attachment_from_uploaded(
     return (attachment,)
 
 
-@OrgApp.view(model=Ticket, name='pdf', permission=Private)
+@OrgApp.view(model=Ticket, name='pdf', permission=Personal)
 def view_ticket_pdf(self: Ticket, request: OrgRequest) -> Response:
     """ View the generated PDF. """
 
@@ -991,6 +1120,193 @@ def view_ticket_files(self: Ticket, request: OrgRequest) -> BaseResponse:
             date.today().strftime('%Y%m%d')
         )
     )
+
+
+@OrgApp.html(
+    model=Ticket,
+    name='invoice',
+    template='ticket_invoice.pt',
+    permission=Private
+)
+def view_ticket_invoice(
+    self: Ticket,
+    request: OrgRequest,
+    layout: TicketInvoiceLayout | None = None
+) -> RenderData:
+
+    invoice = self.invoice
+    if invoice is None:
+        raise exc.HTTPNotFound()
+
+    payment = self.payment
+    if payment is not None and (
+        payment.source != 'manual'
+        or payment.state != 'open'
+    ):
+        request.warning(_(
+            'The payment is no longer open, so the invoice '
+            'cannot be modified.'
+        ))
+
+    payment = self.payment
+
+    def item_actions(item: TicketInvoiceItem) -> list[Link]:
+        if item.group != 'manual':
+            return []
+
+        if payment is not None and (
+            payment.source != 'manual'
+            or payment.state != 'open'
+        ):
+            return []
+
+        return [Link(
+            '',
+            attrs={
+                'class': 'fa fa-trash remove-invoice-item',
+                'title': _('Remove')
+            },
+            url=request.csrf_protected_url(request.link(
+                self,
+                'remove-invoice-item',
+                query_params={'item': item.id.hex}
+            )),
+            traits=(
+                Confirm(
+                    _('Remove Discount') if item.amount < 0 else
+                    _('Remove Surchage'),
+                    _(
+                        'Do you really want to remove "${booking_text}"?',
+                        mapping={'booking_text': item.text}
+                    )
+                ),
+                Intercooler(
+                    request_method='DELETE',
+                    redirect_after=request.url
+                ),
+            )
+        )]
+
+    layout = layout or TicketInvoiceLayout(self, request)
+
+    payment_button: Link | None = None
+    if payment and payment.source == 'manual':
+        payment_button = manual_payment_button(
+            payment, layout, css_class='primary')
+
+    if payment and payment.source in (
+        'stripe_connect',
+        'datatrans',
+        'worldline_saferpay',
+    ):
+        payment_button = online_payment_button(
+            payment, layout, css_class='primary')
+
+    return {
+        'title': _('${ticket} Invoice', mapping={'ticket': self.number}),
+        'layout': layout,
+        'ticket': self,
+        'invoice': invoice,
+        'invoice_items': group_invoice_items(invoice.items),
+        'payment': payment,
+        'payment_button': payment_button,
+        'item_actions': item_actions
+    }
+
+
+@OrgApp.form(
+    model=Ticket,
+    name='add-invoice-item',
+    template='form.pt',
+    permission=Private,
+    form=ManualInvoiceItemForm
+)
+def add_invoice_item(
+    self: Ticket,
+    request: OrgRequest,
+    form: ManualInvoiceItemForm,
+    layout: TicketInvoiceLayout | None = None
+) -> RenderData | BaseResponse:
+
+    invoice = self.invoice
+    if invoice is None:
+        raise exc.HTTPNotFound()
+
+    payment = self.payment
+    if payment is not None and (
+        payment.source != 'manual'
+        or payment.state != 'open'
+    ):
+        return morepath.redirect(request.link(self, 'invoice'))
+
+    if form.submitted(request):
+        assert form.booking_text.data is not None
+        item = invoice.add(
+            text=form.booking_text.data,
+            group='manual',
+            family=form.kind.data,
+            unit=form.amount,
+        )
+        if payment is not None:
+            item.payments.append(payment)
+            item.paid = payment.state == 'paid'
+        request.session.flush()
+        self.handler.refresh_invoice_items(request)
+        return morepath.redirect(request.link(self, 'invoice'))
+
+    layout = layout or TicketInvoiceLayout(self, request)
+
+    return {
+        'title': _('Add Discount / Surcharge'),
+        'layout': layout,
+        'form': form,
+    }
+
+
+@OrgApp.view(
+    model=Ticket,
+    name='remove-invoice-item',
+    permission=Private,
+    request_method='DELETE'
+)
+def remove_invoice_item(
+    self: Ticket,
+    request: OrgRequest,
+    layout: TicketInvoiceLayout | None = None
+) -> None:
+
+    request.assert_valid_csrf_token()
+
+    invoice = self.invoice
+    if invoice is None:
+        raise exc.HTTPNotFound()
+
+    payment = self.payment
+    if payment is not None and (
+        payment.source != 'manual'
+        or payment.state != 'open'
+    ):
+        request.alert(_(
+            'The payment is no longer open, so the invoice '
+            'cannot be modified.'
+        ))
+        return
+
+    target: TicketInvoiceItem | None = None
+    item_id = request.GET.get('item')
+    for item in invoice.items:
+        if item.id.hex == item_id:
+            target = item
+            break
+
+    if target is None or target.group != 'manual':
+        raise exc.HTTPNotFound()
+
+    target.payments = []
+    invoice.items.remove(target)
+    request.session.delete(target)
+    request.session.flush()
+    self.handler.refresh_invoice_items(request)
 
 
 @OrgApp.form(model=Ticket, name='status', template='ticket_status.pt',
@@ -1057,8 +1373,11 @@ def view_ticket_status(
     )
 
     pick_up_hint = None
+    extra_information = None
     if resource := getattr(self.handler, 'resource', None):
         pick_up_hint = resource.pick_up
+        if not self.handler.deleted and not self.handler.undecided:
+            extra_information = resource.confirmation_text
     if submission := getattr(self.handler, 'submission', None):
         if form_definition := getattr(submission, 'form', None):
             pick_up_hint = form_definition.pick_up
@@ -1071,7 +1390,8 @@ def view_ticket_status(
             view_messages_feed(messages, request)
         ) or None,
         'form': form,
-        'pick_up_hint': pick_up_hint
+        'pick_up_hint': pick_up_hint,
+        'extra_information': extra_information,
     }
 
 
@@ -1135,21 +1455,21 @@ def get_filters(
         active=self.state == 'unfinished',
         attrs={'class': 'ticket-filter-my'}
     )
-    for id, text in TICKET_STATES.items():
-        if id != 'archived':
+    for state, text in TICKET_STATES.items():
+        if state != 'archived':
+            coll = self.for_state(state)
+            if self.state == 'unfinished':
+                # FIXME: This is another case where we pass invalid
+                #        state just so the generated URL is shorter
+                #        we should make morepath aware of defaults
+                #        so it can ellide parameters that have been
+                #        set to their default value automatically
+                coll = coll.for_owner(None)  # type: ignore[arg-type]
             yield Link(
                 text=text,
-                url=request.link(
-                    self.for_state(id)
-                    # FIXME: This is another case where we pass invalid
-                    #        state just so the generated URL is shorter
-                    #        we should make morepath aware of defaults
-                    #        so it can ellide parameters that have been
-                    #        set to their default value automatically
-                    .for_owner(None)  # type:ignore[arg-type]
-                ),
-                active=self.state == id,
-                attrs={'class': 'ticket-filter-' + id}
+                url=request.link(coll),
+                active=self.state == state,
+                attrs={'class': 'ticket-filter-' + state}
             )
 
 
@@ -1239,22 +1559,46 @@ def get_owners(
         )
 
 
-def groups_by_handler_code(session: Session) -> dict[str, list[str]]:
-    query = as_selectable("""
-            SELECT
-                handler_code,                         -- Text
-                ARRAY_AGG(DISTINCT "group") AS groups -- ARRAY(Text)
-            FROM tickets GROUP BY handler_code
-        """)
+def get_submitters(
+    self: TicketCollection | ArchivedTicketCollection,
+    request: OrgRequest
+) -> Iterator[Link]:
 
-    groups = {
-        r.handler_code: r.groups
-        for r in session.execute(select(query.c))
+    all_submitters = self.for_submitter('*')
+    if hasattr(self, 'request'):
+        # ensure ticket permission filters are set
+        all_submitters.request = self.request  # type: ignore[union-attr]
+    query = (
+        all_submitters.subset()
+        .with_entities(Ticket.ticket_email.distinct())
+        .order_by(None)
+        .order_by(Ticket.ticket_email)
+    )
+
+    yield Link(
+        text=_('All Submitters'),
+        url=request.link(all_submitters),
+        active=self.submitter == '*'
+    )
+
+    for email, in query:
+        if email is None:
+            # NOTE: Shouldn't happen but let's guard against it just in case
+            continue
+        yield Link(
+            text=email,
+            url=request.link(self.for_submitter(email)),
+            active=self.submitter == email
+        )
+
+
+def groups_by_handler_code(
+    self: TicketCollection | ArchivedTicketCollection
+) -> dict[str, list[str]]:
+    return {
+        handler_code: sorted(groups, key=normalize_for_url)
+        for handler_code, groups in self.groups_by_handler_code()
     }
-    for handler in groups:
-        groups[handler].sort(key=lambda g: normalize_for_url(g))
-
-    return groups
 
 
 @OrgApp.html(
@@ -1274,16 +1618,19 @@ def view_tickets(
         'group': self.group,
         'state': self.state,
         'owner': self.owner,
+        'submitter': self.submitter,
         'page': self.page,
         'extra_parameters': self.extra_parameters,
     }
 
-    groups = groups_by_handler_code(request.session)
+    groups = groups_by_handler_code(self)
     handlers = tuple(get_handlers(self, request, groups))
     owners = tuple(get_owners(self, request))
+    submitters = tuple(get_submitters(self, request))
     filters = tuple(get_filters(self, request))
     handler = next((h for h in handlers if h.active), None)
     owner = next((o for o in owners if o.active), None)
+    submitter = next((s for s in submitters if s.active), None)
     layout = layout or TicketsLayout(self, request)
 
     def archive_link(ticket: Ticket) -> str:
@@ -1296,12 +1643,27 @@ def view_tickets(
         'filters': filters,
         'handlers': handlers,
         'owners': owners,
+        'submitters': submitters,
         'tickets_state': self.state,
         'archive_tickets': self.state == 'closed',
         'has_handler_filter': self.handler != 'ALL',
         'has_owner_filter': self.owner != '*',
-        'handler': handler,
+        'has_submitter_filter': self.submitter != '*',
+        'handler': handler.text if handler else self.group or (
+            request.translate(ticket_handlers.registry[self.handler].handler_title)  # type: ignore[attr-defined]
+            if self.handler in ticket_handlers.registry
+            else self.handler
+        ),
+        'handler_class': ' '.join(handler.attrs['class']) if handler else (
+            f'{self.handler}-link'
+            if self.group is None
+            else f'{self.handler}-sub-link ticket-group-filter'
+        ),
         'owner': owner,
+        # NOTE: Not all submitters will be valid for every filter so
+        #       if it's not valid we fallback to whatever we were given
+        #       there should be zero results, but that's fine
+        'submitter': submitter.text if submitter else self.submitter,
         'action_link': archive_link
     }
 
@@ -1317,11 +1679,13 @@ def view_archived_tickets(
     layout: ArchivedTicketsLayout | None = None
 ) -> RenderData:
 
-    groups = groups_by_handler_code(request.session)
+    groups = groups_by_handler_code(self)
     handlers = tuple(get_handlers(self, request, groups))
     owners = tuple(get_owners(self, request))
+    submitters = tuple(get_submitters(self, request))
     handler = next((h for h in handlers if h.active), None)
     owner = next((o for o in owners if o.active), None)
+    submitter = next((s for s in submitters if s.active), None)
     layout = layout or ArchivedTicketsLayout(self, request)
 
     def action_link(ticket: Ticket) -> str:
@@ -1334,12 +1698,27 @@ def view_archived_tickets(
         'filters': [],
         'handlers': handlers,
         'owners': owners,
+        'submitters': submitters,
         'tickets_state': self.state,
         'archive_tickets': False,
         'has_handler_filter': self.handler != 'ALL',
         'has_owner_filter': self.owner != '*',
-        'handler': handler,
+        'has_submitter_filter': self.submitter != '*',
+        'handler': handler.text if handler else self.group or (
+            request.translate(ticket_handlers.registry[self.handler].handler_title)  # type: ignore[attr-defined]
+            if self.handler in ticket_handlers.registry
+            else self.handler
+        ),
+        'handler_class': ' '.join(handler.attrs['class']) if handler else (
+            f'{self.handler}-link'
+            if self.group is None
+            else f'{self.handler}-sub-link ticket-group-filter'
+        ),
         'owner': owner,
+        # NOTE: Not all submitters will be valid for every filter so
+        #       if it's not valid we fallback to whatever we were given
+        #       there should be zero results, but that's fine
+        'submitter': submitter.text if submitter else self.submitter,
         'action_link': action_link
     }
 

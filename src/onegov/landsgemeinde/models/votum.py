@@ -28,10 +28,12 @@ if TYPE_CHECKING:
     from typing import Literal
     from typing import TypeAlias
 
-    VotumState: TypeAlias = Literal['scheduled', 'ongoing', 'completed']
+    VotumState: TypeAlias = Literal[
+        'draft', 'scheduled', 'ongoing', 'completed']
 
 
 STATES: dict[VotumState, TranslationString] = {
+    'draft': _('draft'),
     'scheduled': _('scheduled'),
     'ongoing': _('ongoing'),
     'completed': _('completed')

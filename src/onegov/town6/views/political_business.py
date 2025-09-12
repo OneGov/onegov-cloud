@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from sqlalchemy import func
+from sqlalchemy.orm import joinedload
 
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
 from onegov.org.forms.political_business import PoliticalBusinessForm
+from onegov.org.models import Meeting
+from onegov.org.models import MeetingItem
 from onegov.org.models import PoliticalBusiness
 from onegov.org.models import PoliticalBusinessCollection
 from onegov.org.models import PoliticalBusinessParticipationCollection
@@ -85,46 +88,41 @@ def view_political_businesses(
     request: TownRequest,
     layout: PoliticalBusinessCollectionLayout | None = None
 ) -> RenderData | Response:
-    types = []
-    status = []
-    years = []
 
     count_per_business_type = count_political_businesses_by_type(request)
-    types = sorted([
+    types = sorted((
         Link(
             text=request.translate(text) +
-                 f' ({count_per_business_type[type]})',
-            active=type in self.types,
-            url=request.link(self.for_filter(type=type)),
+                 f' ({count_per_business_type[type_]})',
+            active=type_ in self.types,
+            url=request.link(self.for_filter(type=type_)),
         )
-        for type, text in POLITICAL_BUSINESS_TYPE.items()
-        if (type in count_per_business_type and
-            count_per_business_type[type] > 0)
-    ], key=lambda x: x.text.lower() if x.text else '')
+        for type_, text in POLITICAL_BUSINESS_TYPE.items()
+        if count_per_business_type.get(type_, 0) > 0
+    ), key=lambda x: (x.text or '').lower())
 
     count_per_status = count_political_businesses_by_status(request)
-    status = sorted([
+    status = sorted((
         Link(
             text=request.translate(text) +
                 f' ({count_per_status[status]})',
             active=status in self.status,
-            url=request.link(self.for_filter(s=status)),
+            url=request.link(self.for_filter(status=status)),
         )
         for status, text in POLITICAL_BUSINESS_STATUS.items()
-        if (status in count_per_status and count_per_status[status] > 0)
-    ], key=lambda x: x.text.lower() if x.text else '')
+        if count_per_status.get(status, 0) > 0
+    ), key=lambda x: (x.text or '').lower())
 
     count_per_year = count_political_businesses_by_year(request)
-    years = [
+    years = (
         Link(
             text=str(year_int) + f' ({count_per_year[str(year_int)]})',
             active=year_int in self.years,
             url=request.link(self.for_filter(year=year_int)),
         )
         for year_int in self.years_for_entries()
-        if (str(year_int) in count_per_year and
-            count_per_year[str(year_int)] > 0)
-    ]
+        if count_per_year.get(str(year_int), 0) > 0
+    )
 
     return {
         # 'add_link': request.link(self, name='new'),
@@ -154,14 +152,17 @@ def view_add_political_business(
     layout = PoliticalBusinessCollectionLayout(self, request)
 
     if form.submitted(request):
-        data = form.get_useful_data()
-        political_business = self.add(**data)
+        political_business = self.add(
+            title=form.title.data,
+            political_business_type=form.political_business_type.data,
+        )
         form.populate_obj(political_business)
         request.success(_('Added a new political business'))
 
         return request.redirect(request.link(political_business))
 
     layout.breadcrumbs.append(Link(_('New'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -194,6 +195,7 @@ def edit_political_business(
 
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -216,10 +218,26 @@ def view_political_business(
     layout = PoliticalBusinessLayout(self, request)
     groups = [self.parliamentary_group] if self.parliamentary_group else []
 
+    participations = self.participants
+    participations.sort(key=lambda x: x.parliamentarian.title)
+    participations.sort(key=lambda x: x.participant_type or '', reverse=True)
+
+    # sort meeting items of this business
+    items = (
+        request.session.query(MeetingItem)
+        .join(Meeting, Meeting.id == MeetingItem.meeting_id)
+        .filter(MeetingItem.political_business_id == self.id)
+        .options(joinedload(MeetingItem.meeting))
+        .order_by(Meeting.start_datetime.desc())
+        .all()
+    )
+    self.meeting_items = items
+
     return {
         'layout': layout,
         'business': self,
         'title': self.title,
+        'participations': participations,
         'type_map': POLITICAL_BUSINESS_TYPE,
         'status_map': POLITICAL_BUSINESS_STATUS,
         'files': getattr(self, 'files', None),

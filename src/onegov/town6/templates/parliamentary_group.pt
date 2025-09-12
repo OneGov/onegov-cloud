@@ -4,44 +4,41 @@
     </tal:b>
 
     <tal:b metal:fill-slot="content">
-        <dl class="field-display">
-            <div tal:condition="parliamentary_group.start">
-                <dt i18n:translate>Start</dt>
-                <dd>${layout.format_date(parliamentary_group.start, 'date')}</dd>
-            </div>
-            <div tal:condition="parliamentary_group.end">
-                <dt i18n:translate>End</dt>
-                <dd>${layout.format_date(parliamentary_group.end, 'date')}</dd>
-            </div>
-            <div tal:condition="parliamentary_group.description">
-                <dt i18n:translate>Description</dt>
-                <dd><div tal:content="parliamentary_group.description"></div></dd>
-            </div>
-            <div tal:condition="parliamentary_group.roles">
-                <dt i18n:translate>Parliamentarians</dt>
-                <dd>
-                    <ul>
-                        <li tal:repeat="role parliamentary_group.roles">
-                            <span tal:condition="request.is_manager">
-                                <a href="${request.link(role.parliamentarian)}">${role.parliamentarian.title}</a>
-                                (<a href="${request.link(role)}">${role.parliamentary_group_role_label}</a>)
-                            </span>
-                            <span tal:condition="not request.is_manager">
-                                <a href="${request.link(role.parliamentarian)}">${role.parliamentarian.title}</a>
-                                (${role.parliamentary_group_role_label})
-                            </span>
-
-                            <span>
-                                <br>${layout.format_date(role.start, 'date')}
-                            </span>
-                            <span tal:condition="role.end">
-                                -
-                                ${layout.format_date(role.end, 'date')}
+        <div class="grid-x grid-padding-x">
+            <div class="large-7 medium-8 cell main-content">
+                <div tal:condition="parliamentary_group.roles">
+                    <h2 i18n:translate class="h3">Parliamentarians</h2>
+                    <ul class="more-list">
+                        <li tal:repeat="role active_roles">
+                            <a href="${request.link(role.parliamentarian)}" class="list-link">
+                                <span class="list-title">${role.parliamentarian.title}</span>
+                            </a>
+                            <span class="list-lead preview">
+                                ${role.parliamentary_group_role_label}
                             </span>
                         </li>
                     </ul>
-                </dd>
+                </div>
             </div>
-        </dl>
+            <div class="large-4 medium-4 cell sidebar filter-panel">
+                <div class="sidebar-wrapper">
+                    <div class="side-panel">
+                        <div tal:condition="parliamentary_group.description">
+                            <h2 i18n:translate class="h3">Description</h2>
+                            <div tal:content="parliamentary_group.description"></div>
+                        </div>
+                        <div tal:condition="parliamentary_group.start">
+                            <h6 i18n:translate>Start</h6>
+                            <span>${layout.format_date(parliamentary_group.start, 'date')}</span>
+                        </div>
+                        <p>
+                        <div tal:condition="parliamentary_group.end">
+                            <h6 i18n:translate>End</h6>
+                            <span>${layout.format_date(parliamentary_group.end, 'date')}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </tal:b>
 </div>

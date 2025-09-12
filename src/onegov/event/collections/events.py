@@ -6,8 +6,10 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 
+import click
 import logging
 import requests
+
 from dateutil.parser import parse
 from html import unescape
 
@@ -499,6 +501,7 @@ class EventCollection(Pagination[Event]):
         organizers = {}
         items = []
         items_to_purge = []
+        source_ids = []
         h2t_config = {'ignore_emphasis': True}
 
         root = etree.fromstring(xml_stream)
@@ -621,7 +624,7 @@ class EventCollection(Pagination[Event]):
                 start = parse(find_element_text(schedule, 'start'))
                 end_text = find_element_text(schedule, 'end')
                 end = (parse(end_text) if end_text else
-                       start + timedelta(hours=1))
+                       start + timedelta(hours=2))
 
                 recurrence_start_dates: list[datetime] = []
                 recurrence = schedule.find('ns:recurrence', namespaces=ns)
@@ -692,6 +695,19 @@ class EventCollection(Pagination[Event]):
                         pdf_filename=None,
                     )
                 )
+
+                source_ids.append(schedule_id)
+
+        # ogc-2447 imported events with source ids not in this `xml_stream`
+        # can be removed to prevent duplicates as the xml stream represents
+        # a complete set of events
+        for event in (
+                self.session.query(Event)
+                .filter(Event.source.notin_(source_ids))):  # type:ignore[union-attr]
+            if event.source:
+                items_to_purge.append(event.source)
+                click.echo(f' - removing event as not in xml stream '
+                           f'{event.title} {event.start}')
 
         return self.from_import(
             items,

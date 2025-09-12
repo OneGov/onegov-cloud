@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-16 11:38+0200\n"
+"POT-Creation-Date: 2025-09-10 15:35+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -53,14 +53,7 @@ msgstr "Kommission"
 msgid "Parliamentarian is not in this commission."
 msgstr "Parlamentarier:in ist nicht in dieser Kommission."
 
-msgid "Function"
-msgstr "Funktion"
 
-msgid "Start"
-msgstr "Start"
-
-msgid "End"
-msgstr "Ende"
 
 msgid "People Data (JSON)"
 msgstr "Personendaten (JSON)"
@@ -305,6 +298,9 @@ msgstr "Sitzung"
 msgid "Plenary session (bulk)"
 msgstr "Massenbuchung Plenarsitzung"
 
+msgid "Commission meeting (bulk)"
+msgstr "Massenbuchung Kommissionssitzung"
+
 msgid "Edit"
 msgstr "Bearbeiten"
 
@@ -458,14 +454,20 @@ msgstr "Dauer"
 msgid "No meeting defined yet."
 msgstr "Noch keine Sitzung erfasst."
 
-msgid "Comission"
-msgstr "Kommission"
+msgid "Bulk edits"
+msgstr "Massenbuchungen"
+
+msgid "edited"
+msgstr "bearbeitet"
 
 msgid "Timestamp"
 msgstr "Zeitpunkt"
 
 msgid "Attendence"
 msgstr "Anwesenheit"
+
+msgid "Comission"
+msgstr "Kommission"
 
 msgid "No changes yet."
 msgstr "Noch keine Aktivitäten."
@@ -578,6 +580,9 @@ msgstr "Betrag"
 msgid "No rate sets defined yet."
 msgstr "Noch keine Sätze erfasst."
 
+msgid "Copy this rate set"
+msgstr "Diesen Satz kopieren"
+
 msgid "Yes"
 msgstr "Ja"
 
@@ -599,6 +604,30 @@ msgstr "Neu"
 msgid "New attendence"
 msgstr "Neue Anwesenheit"
 
+msgid "Added commission session"
+msgstr "Kommissionssitzung hinzugefügt"
+
+msgid "New commission session"
+msgstr "Neue Kommissionssitzung"
+
+msgid "Edited attendences"
+msgstr "Anwesenheiten bearbeitet"
+
+msgid "Edit session"
+msgstr "Sitzung bearbeiten"
+
+msgid "Do you really want to delete this bulk edit?"
+msgstr "Möchten Sie diese Massenbuchung wirklich löschen?"
+
+msgid "Delete Attendencess"
+msgstr "Anwesenheiten löschen"
+
+msgid "Edit plenary session"
+msgstr "Plenarsitzung bearbeiten"
+
+msgid "Edit commission session"
+msgstr "Kommissionssitzung bearbeiten"
+
 msgid "Added plenary session"
 msgstr "Plenarsitzung hinzugefügt"
 
@@ -607,6 +636,10 @@ msgstr "Neue Plenarsitzung"
 
 msgid "Your changes were saved"
 msgstr "Änderungen gespeichert"
+
+#, python-format
+msgid "Deleted ${count} attendeces"
+msgstr "${count} Anwesenheiten gelöscht"
 
 msgid "Added a new parliamentarian"
 msgstr "Parlamentarier:in hinzugefügt"
@@ -679,6 +712,15 @@ msgstr "Neue Sätze hinzugefügt"
 msgid "New rate set"
 msgstr "Neue Sätze"
 
+msgid "The rate set was copied."
+msgstr "Der Satz wurde kopiert"
+
+msgid "Copy"
+msgstr "Kopieren"
+
+msgid "Copy Rate Set"
+msgstr "Satz kopieren"
+
 msgid "Added a new settlement run"
 msgstr "Neuer Abrechnungslauf hinzugefügt"
 
@@ -702,3 +744,6 @@ msgstr "Abrechnungen nach Parlamentarier:in"
 
 msgid "Total all parties"
 msgstr "Total Alle Parteien"
+
+#~ msgid "Edited session"
+#~ msgstr "Sitzung bearbeitet"

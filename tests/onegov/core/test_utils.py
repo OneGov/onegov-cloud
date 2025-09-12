@@ -1,10 +1,9 @@
-import re
-
-from urlextract import URLExtract
+from __future__ import annotations
 
 import onegov.core
 import os.path
 import pytest
+import re
 import transaction
 
 from markupsafe import Markup
@@ -17,11 +16,19 @@ from onegov.core.utils import Bunch, linkify_phone, _phone_ch, to_html_ul
 from sqlalchemy import Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from unittest.mock import patch
+from urlextract import URLExtract
 from uuid import uuid4
-from yubico_client import Yubico
+from yubico_client import Yubico  # type: ignore[import-untyped]
+
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Collection, Mapping
+    from onegov.core.orm import Base  # noqa: F401
+    from sqlalchemy.orm import Session
 
 
-def test_normalize_for_url():
+def test_normalize_for_url() -> None:
     assert utils.normalize_for_url('asdf') == 'asdf'
     assert utils.normalize_for_url('Asdf') == 'asdf'
     assert utils.normalize_for_url('A S d f') == 'a-s-d-f'
@@ -37,7 +44,57 @@ def test_normalize_for_url():
     assert utils.normalize_for_url('a...b..c.d') == 'a-b-c-d'
 
 
-def test_touch(temporary_directory):
+@pytest.mark.parametrize("input_path, default, expected", [
+    ('', None, '_default_path_'),
+    ('>', None, '_'),
+    ('<:>', None, '___'),
+    ('\\/n', None, '__n'),
+    (' my path  name is great!  ', None, 'my path  name is great!'),
+    ('a/b/c', None, 'a_b_c'),
+    ('.-test.', None, '.-test.'),
+    ('abc:*?', None, 'abc___'),
+    ('\\[hello]|', None, '_[hello]_'),
+    ('a/b/c', 'x', 'a_b_c'),
+    ('<ll', 'x', '_ll'),
+    ('', 'x', 'x'),
+])
+def test_normalize_for_path(
+    input_path: str,
+    default: str,
+    expected: str
+) -> None:
+    if default:
+        assert utils.normalize_for_path(input_path, default) == expected
+    else:
+        assert utils.normalize_for_path(input_path) == expected
+
+
+@pytest.mark.parametrize("input_text, default, expected", [
+    ('', None, '_default_filename_'),
+    ('invalid<>:"/\\|?*chars.txt', None, 'invalid_________chars.txt'),
+    ('  filename  ', None, 'filename'),
+    ('.filename.', None, 'filename'),
+    ('a' * 300, None, 'a' * 255),
+    ('<>:|?*', None, '______'),
+    ('', 'custom_default', 'custom_default'),
+    ('<>:|?*', 'fallback', '______'),
+    ('   ', 'empty_default', 'empty_default'),
+    ('.', 'dot_default', 'dot_default'),
+    ('valid_name', 'ignored_default', 'valid_name'),
+])
+def test_normalize_for_filename(
+    input_text: str,
+    default: str,
+    expected: str
+) -> None:
+    if default:
+        assert utils.normalize_for_filename(
+            input_text, default=default) == expected
+    else:
+        assert utils.normalize_for_filename(input_text) == expected
+
+
+def test_touch(temporary_directory: str) -> None:
     path = os.path.join(temporary_directory, 'test.txt')
 
     assert not os.path.isfile(path)
@@ -55,7 +112,7 @@ def test_touch(temporary_directory):
         assert f.read() == 'asdf'
 
 
-def test_module_path():
+def test_module_path() -> None:
     path = utils.module_path('onegov.core', 'utils.py')
     assert path == utils.module_path(onegov.core, 'utils.py')
     assert path == utils.module_path(onegov.core, '/utils.py')
@@ -92,15 +149,16 @@ invalid_test_phone_numbers = [
 
 
 @pytest.mark.parametrize("number", valid_test_phone_numbers)
-def test_phone_regex_groups_valid(number):
+def test_phone_regex_groups_valid(number: str) -> None:
     gr = re.search(_phone_ch, number)
+    assert gr is not None
     assert gr.group(0)
     assert gr.group(1)
     assert gr.group(2)
 
 
 @pytest.mark.parametrize("number", valid_test_phone_numbers)
-def test_phone_linkify_valid(number):
+def test_phone_linkify_valid(number: str) -> None:
     r = linkify_phone(number)
     number = utils.remove_repeated_spaces(number)
     wanted = Markup(
@@ -112,12 +170,12 @@ def test_phone_linkify_valid(number):
 
 
 @pytest.mark.parametrize("number", invalid_test_phone_numbers)
-def test_phone_linkify_invalid(number):
+def test_phone_linkify_invalid(number: str) -> None:
     r = linkify_phone(number)
     assert r == number
 
 
-def test_linkify():
+def test_linkify() -> None:
     # this is really bleach's job, but we want to run the codepath anyway
     assert utils.linkify('info@example.org') == Markup(
         '<a href="mailto:info@example.org">info@example.org</a>'
@@ -146,18 +204,17 @@ def test_linkify():
     ('\nTel. +41 41 728 33 11\n',
      '\nTel. <a href="tel:+41 41 728 33 11">+41 41 728 33 11</a> \n'),
 ])
-def test_linkify_with_phone(tel):
+def test_linkify_with_phone(tel: str) -> None:
     assert utils.linkify(tel[0]) == Markup(tel[1])
 
 
-def test_linkify_with_phone_newline():
+def test_linkify_with_phone_newline() -> None:
     assert utils.linkify('Foo\n041 123 45 67') == Markup(
         'Foo\n<a href="tel:041 123 45 67">041 123 45 67</a> '
     )
 
 
-def test_linkify_with_custom_domains():
-
+def test_linkify_with_custom_domains() -> None:
     assert utils.linkify(
         "https://forms.gle/123\nfoo@bar.agency\nfoo@bar.co\nfoo@bar.com\n"
         "https://foobar.agency\n+41 41 511 21 21\nfoo@bar.ngo"
@@ -172,7 +229,7 @@ def test_linkify_with_custom_domains():
     )
 
 
-def test_linkify_with_custom_domain_and_with_email_and_links():
+def test_linkify_with_custom_domain_and_with_email_and_links() -> None:
     assert utils.linkify(
         "foo@bar.agency\nhttps://thismatters.agency\nhttps://google.com"
     ) == Markup(
@@ -182,8 +239,7 @@ def test_linkify_with_custom_domain_and_with_email_and_links():
         "=\"nofollow\">https://google.com</a>")
 
 
-def test_linkify_with_custom_domain_and_without_email():
-
+def test_linkify_with_custom_domain_and_without_email() -> None:
     expected_link = Markup(
         "<a href=\"https://thismatters.agency\" "
         "rel=\"nofollow\">https://thismatters.agency</a>"
@@ -200,9 +256,8 @@ def test_linkify_with_custom_domain_and_without_email():
     ) == expected
 
 
-def test_load_tlds():
-
-    def remove_dots(tlds):
+def test_load_tlds() -> None:
+    def remove_dots(tlds: list[str]) -> list[str]:
         return [domain[1:] for domain in tlds]
 
     extract = URLExtract()
@@ -216,25 +271,25 @@ def test_load_tlds():
     assert all(domain in tlds for domain in additional_tlds)
 
 
-def test_increment_name():
+def test_increment_name() -> None:
     assert utils.increment_name('test') == 'test-1'
     assert utils.increment_name('test-2') == 'test-3'
     assert utils.increment_name('test2') == 'test2-1'
     assert utils.increment_name('test-1-1') == 'test-1-2'
 
 
-def test_ensure_scheme():
+def test_ensure_scheme() -> None:
     assert utils.ensure_scheme(None) is None
     assert utils.ensure_scheme('seantis.ch') == 'http://seantis.ch'
     assert utils.ensure_scheme('seantis.ch', 'https') == 'https://seantis.ch'
 
-    assert utils.ensure_scheme('google.ch?q=onegov.cloud')\
-        == 'http://google.ch?q=onegov.cloud'
+    assert utils.ensure_scheme('google.ch?q=onegov.cloud') \
+           == 'http://google.ch?q=onegov.cloud'
 
     assert utils.ensure_scheme('https://abc.xyz') == 'https://abc.xyz'
 
 
-def test_is_uuid():
+def test_is_uuid() -> None:
     assert not utils.is_uuid(None)
     assert not utils.is_uuid('')
     assert not utils.is_uuid('asdf')
@@ -244,7 +299,7 @@ def test_is_uuid():
     assert utils.is_uuid(uuid4().hex)
 
 
-def test_is_non_string_iterable():
+def test_is_non_string_iterable() -> None:
     assert utils.is_non_string_iterable([])
     assert utils.is_non_string_iterable(tuple())
     assert utils.is_non_string_iterable({})
@@ -253,7 +308,7 @@ def test_is_non_string_iterable():
     assert not utils.is_non_string_iterable(None)
 
 
-def test_relative_url():
+def test_relative_url() -> None:
     assert utils.relative_url('https://www.google.ch/test') == '/test'
     assert utils.relative_url('https://usr:pwd@localhost:443/test') == '/test'
     assert utils.relative_url('/test') == '/test'
@@ -261,7 +316,7 @@ def test_relative_url():
     assert utils.relative_url('/test?x=1&y=2#link') == '/test?x=1&y=2#link'
 
 
-def test_is_subpath():
+def test_is_subpath() -> None:
     assert utils.is_subpath('/', '/test')
     assert utils.is_subpath('/asdf', '/asdf/asdf')
     assert not utils.is_subpath('/asdf/', '/asdf')
@@ -269,7 +324,7 @@ def test_is_subpath():
     assert not utils.is_subpath('/a', '/a/../b')
 
 
-def test_is_sorted():
+def test_is_sorted() -> None:
     assert utils.is_sorted('abc')
     assert not utils.is_sorted('aBc')
     assert utils.is_sorted('aBc', key=lambda i: i.lower())
@@ -277,22 +332,23 @@ def test_is_sorted():
     assert utils.is_sorted('321', reverse=True)
 
 
-def test_get_unique_hstore_keys(postgres_dsn):
-
-    Base = declarative_base()
+def test_get_unique_hstore_keys(postgres_dsn: str) -> None:
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Document(Base):
         __tablename__ = 'documents'
 
-        id = Column(Integer, primary_key=True)
-        _tags = Column(HSTORE, nullable=True)
+        id: Column[int] = Column(Integer, primary_key=True)
+        _tags: Column[Mapping[str, Any] | None] = Column(HSTORE, nullable=True)
 
         @property
-        def tags(self):
+        def tags(self) -> set[str]:
             return set(self._tags.keys()) if self._tags else set()
 
         @tags.setter
-        def tags(self, value):
+        def tags(self, value: Collection[str]) -> None:
             self._tags = {k: '' for k in value} if value else None
 
     mgr = SessionManager(postgres_dsn, Base)
@@ -300,9 +356,9 @@ def test_get_unique_hstore_keys(postgres_dsn):
 
     assert utils.get_unique_hstore_keys(mgr.session(), Document._tags) == set()
 
-    mgr.session().add(Document(tags=None))
-    mgr.session().add(Document(tags=['foo', 'bar']))
-    mgr.session().add(Document(tags=['foo', 'baz']))
+    mgr.session().add(Document(tags=None))  # type: ignore[misc]
+    mgr.session().add(Document(tags=['foo', 'bar']))  # type: ignore[misc]
+    mgr.session().add(Document(tags=['foo', 'baz']))  # type: ignore[misc]
 
     transaction.commit()
 
@@ -311,8 +367,7 @@ def test_get_unique_hstore_keys(postgres_dsn):
     }
 
 
-def test_remove_repeated_spaces():
-
+def test_remove_repeated_spaces() -> None:
     assert utils.remove_repeated_spaces('  ') == ' '
     assert utils.remove_repeated_spaces('a b') == 'a b'
     assert utils.remove_repeated_spaces('a       b') == 'a b'
@@ -323,14 +378,13 @@ def test_remove_repeated_spaces():
     assert utils.remove_repeated_spaces('       foo    bar') == ' foo bar'
 
 
-def test_post_thread(session):
+def test_post_thread(session: Session) -> None:
     with patch('urllib.request.urlopen') as urlopen:
         url = 'https://example.com/post'
-        data = {'key': 'ä$j', 'b': 2}
-        data = json.dumps(data).encode('utf-8')
+        data = json.dumps({'key': 'ä$j', 'b': 2}).encode('utf-8')
         headers = (
             ('Content-type', 'application/json; charset=utf-8'),
-            ('Content-length', len(data))
+            ('Content-length', str(len(data))),
         )
 
         thread = utils.PostThread(url, data, headers)
@@ -343,8 +397,7 @@ def test_post_thread(session):
         assert urlopen.call_args[0][0].headers == dict(headers)
 
 
-def test_binary_dictionary():
-
+def test_binary_dictionary() -> None:
     d = utils.binary_to_dictionary(b'foobar')
     assert d['filename'] is None
     assert d['mimetype'] == 'text/plain'
@@ -355,10 +408,10 @@ def test_binary_dictionary():
     assert d['mimetype'] == 'text/plain'
     assert d['size'] == 6
 
-    assert utils.dictionary_to_binary(d) == b'foobar'
+    assert utils.dictionary_to_binary(d) == b'foobar'  # type: ignore[arg-type]
 
 
-def test_safe_format():
+def test_safe_format() -> None:
     fmt = utils.safe_format
 
     assert fmt('hello [user]', {'user': 'admin'}) == 'hello admin'
@@ -389,15 +442,14 @@ def test_safe_format():
     assert 'is unknown' in str(e.value)
 
 
-def test_local_lock():
+def test_local_lock() -> None:
     with utils.local_lock('foo', 'bar'):
         with pytest.raises(AlreadyLockedError):
             with utils.local_lock('foo', 'bar'):
                 pass
 
 
-def test_is_valid_yubikey_otp():
-
+def test_is_valid_yubikey_otp() -> None:
     assert not utils.is_valid_yubikey(
         client_id='abc',
         secret_key='dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE=',
@@ -416,28 +468,28 @@ def test_is_valid_yubikey_otp():
         )
 
 
-def test_is_valid_yubikey_format():
+def test_is_valid_yubikey_format() -> None:
     assert utils.is_valid_yubikey_format('ccccccdefghd')
     assert utils.is_valid_yubikey_format('cccccccdefg' * 4)
     assert not utils.is_valid_yubikey_format('ccccccdefghx')
 
 
-def test_yubikey_otp_to_serial():
+def test_yubikey_otp_to_serial() -> None:
     assert utils.yubikey_otp_to_serial(
         'ccccccdefghdefghdefghdefghdefghdefghdefghklv') == 2311522
     assert utils.yubikey_otp_to_serial("ceci n'est pas une yubikey") is None
 
 
-def test_yubikey_public_id():
+def test_yubikey_public_id() -> None:
     assert utils.yubikey_public_id(
         'ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
     ) == 'ccccccbcgujh'
 
     with pytest.raises(TypeError):
-        utils.yubikey_public_id(None)
+        utils.yubikey_public_id(None)  # type: ignore[arg-type]
 
 
-def test_paragraphify():
+def test_paragraphify() -> None:
     assert utils.paragraphify('') == ''
     assert utils.paragraphify('\n') == ''
     assert utils.paragraphify('foo') == '<p>foo</p>'
@@ -447,7 +499,7 @@ def test_paragraphify():
     assert utils.paragraphify('foo\r\n\r\nbar') == '<p>foo</p><p>bar</p>'
 
 
-def test_bunch():
+def test_bunch() -> None:
     bunch = Bunch(a=1, b=2)
     assert bunch.a == 1
     assert bunch.b == 2
@@ -472,9 +524,8 @@ def test_bunch():
     assert (Bunch(x=1, y=2) != Bunch(x=1, y=3)) is True
 
 
-def test_to_html_ul():
-
-    def li(*args):
+def test_to_html_ul() -> None:
+    def li(*args: str) -> str:
         if len(args) > 1:
             return "".join(f'<li>{i}</li>' for i in args)
         return f'<li>{args[0]}</li>'
@@ -488,14 +539,12 @@ def test_to_html_ul():
 
     # list and paragraph combined
     text = "\n".join(('-A', 'B'))
-    assert to_html_ul(text) == f'<ul class="bulleted">{li("A")}</ul>' \
-                               '<p>B</p>'
+    assert to_html_ul(text) == f'<ul class="bulleted">{li("A")}</ul><p>B</p>'
     text = "\n".join(('A', '-B'))
-    assert to_html_ul(text) == '<p>A</p>' \
-                               f'<ul class="bulleted">{li("B")}</ul>'
+    assert to_html_ul(text) == f'<p>A</p><ul class="bulleted">{li("B")}</ul>'
 
 
-def test_batched():
+def test_batched() -> None:
     iterable = utils.batched(range(12), 5)
     assert next(iterable) == (0, 1, 2, 3, 4)
     assert next(iterable) == (5, 6, 7, 8, 9)
@@ -509,7 +558,7 @@ def test_batched():
     ]
 
 
-def test_batched_list_container():
+def test_batched_list_container() -> None:
     iterable = utils.batched(range(12), 5, list)
     assert next(iterable) == [0, 1, 2, 3, 4]
     assert next(iterable) == [5, 6, 7, 8, 9]

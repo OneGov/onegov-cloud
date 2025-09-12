@@ -299,6 +299,9 @@ class Organisation(Base, TimestampMixin):
 
     # RIS settings
     ris_enabled: dict_property[bool] = meta_property(default=False)
+    ris_main_url: dict_property[str | None] = meta_property(default=None)
+    ris_interest_tie_categories: dict_property[list[str] | None] = (
+        meta_property(default=None))
 
     # MTAN Settings
     mtan_access_window_seconds: dict_property[int | None] = meta_property()

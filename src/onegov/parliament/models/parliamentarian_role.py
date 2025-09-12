@@ -115,7 +115,8 @@ class ParliamentarianRole(Base, TimestampMixin):
     #: The parliamentarian
     parliamentarian: relationship[Parliamentarian] = relationship(
         'Parliamentarian',
-        back_populates='roles'
+        back_populates='roles',
+        lazy='joined'
     )
 
     #: The role value

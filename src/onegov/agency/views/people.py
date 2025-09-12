@@ -384,6 +384,10 @@ def do_report_person_change(
             'title': request.translate(_('New ticket')),
             'created': ticket.created.isoformat()
         }
+        # FIXME: set groupids to all groups which are linked
+        #        to the agencies of this person or the first
+        #        parent agency for each agency with links to
+        #        one or more groups, to mirror email notifications
     )
 
     return ticket

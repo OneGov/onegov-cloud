@@ -631,10 +631,16 @@ def test_view_mutations(broadcast, authenticate, connect, client):
     change = change.form.submit().maybe_follow()
     assert "Vielen Dank für Ihre Eingabe!" not in change
 
-    # Details not shown if missing permissions
+    # Can't edit ticket if missing permissions
     client.login('member@example.org', 'hunter2')
-    client.get(agency_ticket_number, status=403)
-    client.get(person_ticket_number, status=403)
+    ticket = client.get(agency_ticket_number)
+    assert 'Ticket annehmen' not in ticket
+    assert 'Ticket zuweisen' not in ticket
+    assert 'Nachricht senden' not in ticket
+    client.get(person_ticket_number)
+    assert 'Ticket annehmen' not in ticket
+    assert 'Ticket zuweisen' not in ticket
+    assert 'Nachricht senden' not in ticket
     page = client.get('/tickets/ALL/closed')
     assert 'ticket-number-plain' in page
     assert 'ticket-state' not in page

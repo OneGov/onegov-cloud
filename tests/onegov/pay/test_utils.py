@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import pytest
 
 from decimal import Decimal
 from onegov.pay import Price
 
 
-def test_price():
+def test_price() -> None:
     assert Price(0, 'CHF') == Price(0, 'CHF')
     assert Price(0, 'CHF') < Price(1, 'CHF')
     assert Price(10, 'CHF') + Price(20, 'CHF') == Price(30, 'CHF')
@@ -30,14 +32,14 @@ def test_price():
     assert repr(Price(10, 'CHF')) == "Price(Decimal('10'), 'CHF')"
 
 
-def test_add_price_currency():
+def test_add_price_currency() -> None:
     assert Price(10, 'CHF') + Price(20, None) == Price(30, 'CHF')
     assert Price(10, None) + Price(20, 'CHF') == Price(30, 'CHF')
     with pytest.raises(AssertionError):
         assert Price(10, None) + Price(20, None) == Price(30, 'CHF')
 
 
-def test_multiply():
+def test_multiply() -> None:
     price = Price(100, 'CHF')
     assert price * Decimal(1) == Price(100, 'CHF')
     assert price * 0.5 == Price(50, 'CHF')
@@ -52,7 +54,7 @@ def test_multiply():
         Price(100, 'CHF', 10) * 5
 
 
-def test_apply_discount():
+def test_apply_discount() -> None:
     price = Price(100, 'CHF')
     assert price.apply_discount(Decimal(1)) == Price(0, 'CHF')
     assert price.apply_discount(Decimal(.75)) == Price(25, 'CHF')

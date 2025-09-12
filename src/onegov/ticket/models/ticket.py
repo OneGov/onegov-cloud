@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.core.orm import observes, Base
+from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.orm.types import UTCDateTime
@@ -8,14 +8,13 @@ from onegov.search import ORMSearchable
 from onegov.ticket import handlers
 from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User
-from onegov.user import UserGroup
 from sedate import utcnow
 from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, Text
-from sqlalchemy import CheckConstraint, Index
+from sqlalchemy import Index
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import backref, deferred, object_session, relationship
+from sqlalchemy.orm import deferred, relationship
 from uuid import uuid4
 
 
@@ -27,6 +26,7 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.core.request import CoreRequest
     from onegov.ticket.handler import Handler
+    from onegov.ticket.models import TicketInvoice
 
     TicketState = Literal[
         'open',
@@ -104,7 +104,22 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     #: tickets. This can be missing, once the ticket has been redacted.
     ticket_email: Column[str | None] = Column(Text, nullable=True, index=True)
 
+    #: an optional link to the invoice record, if there is one
+    invoice_id: Column[uuid.UUID | None] = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey('invoices.id'),
+        nullable=True,
+        index=True
+    )
+
+    invoice: relationship[TicketInvoice | None] = relationship(
+        'TicketInvoice',
+        back_populates='ticket',
+    )
+
     #: an optional link to the payment record, if there is one
+    #: there can be an invoice without a payment, if the invoice
+    #: totals a zero amount
     payment_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('payments.id'),
@@ -114,7 +129,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
     payment: relationship[Payment | None] = relationship(
         'Payment',
-        back_populates='tickets'
+        back_populates='ticket'
     )
 
     #: a snapshot of the ticket containing the last summary that made any sense
@@ -373,115 +388,8 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
         self.snapshot['summary'] = self.handler.get_summary(request)
         self.snapshot['email'] = self.handler.email
+        self.snapshot['reply_to'] = self.handler.reply_to
         for info in ('name', 'address', 'phone'):
             data = getattr(self.handler, f'submitter_{info}')
             if data:
                 self.snapshot[f'submitter_{info}'] = data
-
-
-class TicketPermission(Base, TimestampMixin):
-    """ Defines a custom ticket permission.
-
-    If a ticket permission is defined for ticket handler (and optionally a
-    group), a user has to be in the given user group to access these tickets.
-
-    """
-
-    __tablename__ = 'ticket_permissions'
-
-    #: the id
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
-        primary_key=True,
-        default=uuid4
-    )
-
-    #: the user group needed for accessing the tickets
-    user_group_id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey(UserGroup.id),
-        nullable=False
-    )
-    user_group: relationship[UserGroup] = relationship(
-        UserGroup,
-        backref=backref(
-            'ticket_permissions',
-            cascade='all, delete-orphan',
-        )
-    )
-
-    #: the handler code this permission addresses
-    handler_code: Column[str] = Column(Text, nullable=False)
-
-    #: the group this permission addresses
-    group: Column[str | None] = Column(Text, nullable=True)
-
-    #: whether or not this permission is exclusive
-    #: if a permission is exclusive, the same permission may not
-    #: be given non-exclusively to another group, but multiple groups
-    #: may have the same exclusive or non-exclusive permission
-    exclusive: Column[bool] = Column(
-        Boolean,
-        nullable=False,
-        default=True,
-        index=True
-    )
-
-    #: whether or not to immediately send notifications about new tickets
-    immediate_notification: Column[bool] = Column(
-        Boolean,
-        nullable=False,
-        default=False,
-        index=True
-    )
-
-    __table_args__ = (
-        CheckConstraint(
-            exclusive.isnot_distinct_from(True)
-            | immediate_notification.isnot_distinct_from(True),
-            name='no_redundant_ticket_permissions'
-        ),
-    )
-
-    # NOTE: A unique constraint doesn't work here, since group is nullable
-    @observes('handler_code', 'group')
-    def ensure_uniqueness(
-        self,
-        handler_code: str,
-        group: str | None
-    ) -> None:
-
-        # this should always be set
-        assert self.handler_code
-        if not (user_group_id := (
-            self.user_group_id
-            or (self.user_group and self.user_group.id)
-        )):
-            # this is an incomplete record that should fail in
-            # a different way
-            return
-
-        session = object_session(self)
-        query = session.query(TicketPermission)
-
-        # we can't conflict with ourselves, only with other permissions
-        if self.id is not None:
-            query = query.filter(
-                TicketPermission.id != self.id
-            )
-
-        # this defines whether or not two permissions target the same tickets
-        query = query.filter(
-            TicketPermission.handler_code == self.handler_code
-        )
-        query = query.filter(
-            TicketPermission.group.isnot_distinct_from(self.group)
-        )
-
-        # the exact same permission may only exist once per user group
-        constraint_violated = query.filter(
-            TicketPermission.user_group_id == user_group_id
-        ).exists()
-
-        if session.query(constraint_violated).scalar():
-            raise ValueError('Uniqueness violation in ticket permissions')

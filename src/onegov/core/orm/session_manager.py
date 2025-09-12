@@ -6,6 +6,7 @@ import weakref
 import zope.sqlalchemy
 
 from blinker import Signal
+from contextlib import contextmanager
 from functools import lru_cache
 from onegov.core.custom import json
 from sqlalchemy import create_engine, event, text
@@ -15,7 +16,7 @@ from sqlalchemy.orm.query import Query
 from sqlalchemy_utils.aggregates import manager as aggregates_manager
 
 
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import Any, Self, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from sqlalchemy.engine import Connection, Engine
@@ -230,6 +231,8 @@ class SessionManager:
         self.created_schemas: set[str] = set()
         self.current_schema: str | None = None
 
+        self._ignore_bulk_updates = False
+
         self.on_insert = Signal()
         self.on_update = Signal()
         self.on_delete = Signal()
@@ -280,6 +283,23 @@ class SessionManager:
             scopefunc=self._scopefunc,
         )
         self.register_session(self.session_factory)
+
+    @contextmanager
+    def ignore_bulk_updates(self) -> Iterator[Self]:
+        """ Ensures bulk updates don't get blocked when we can't emit
+        update events for each changed object.
+
+        In some cases we know that a bulk update is fine, even if it
+        doesn't fully propagate through our event hooks. This function
+        should only be rarely used however, where the speed increase
+        outweighs the potential synchrocity issues.
+        """
+        previous_state = self._ignore_bulk_updates
+        self._ignore_bulk_updates = True
+        try:
+            yield self
+        finally:
+            self._ignore_bulk_updates = previous_state
 
     def register_engine(self, engine: Engine) -> None:
         """ Takes the given engine and registers it with the schema
@@ -379,6 +399,9 @@ class SessionManager:
 
         @event.listens_for(session, 'after_bulk_update')  # type:ignore[misc]
         def on_after_bulk_update(update_context: Any) -> None:
+            if self._ignore_bulk_updates:
+                return
+
             prevent_bulk_changes_on_aggregate_modules(
                 update_context.mapper.class_)
 

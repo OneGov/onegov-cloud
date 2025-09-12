@@ -60,6 +60,8 @@ from onegov.org.layout import (
     TextModuleLayout as OrgTextModuleLayout,
     TextModulesLayout as OrgTextModulesLayout,
     TicketChatMessageLayout as OrgTicketChatMessageLayout,
+    TicketInvoiceLayout as OrgTicketInvoiceLayout,
+    TicketInvoiceCollectionLayout as OrgTicketInvoiceCollectionLayout,
     TicketLayout as OrgTicketLayout,
     TicketNoteLayout as OrgTicketNoteLayout,
     TicketsLayout as OrgTicketsLayout,
@@ -239,8 +241,17 @@ class DefaultLayout(OrgDefaultLayout, Layout):
         )
 
     @cached_property
-    def ris_settings_url(self) -> str:
-        return self.request.link(self.request.app.org, 'ris-settings')
+    def ris_overview_url(self) -> str:
+        if self.request.is_logged_in:
+            return self.request.link(self.request.app.org, 'ris-settings')
+
+        if self.request.app.org.ris_main_url:
+            return self.request.link(
+                self.request.app.org, self.request.app.org.ris_main_url
+            )
+
+        # fallback to the homepage
+        return self.request.link(self.request.app.org, '')
 
 
 class DefaultMailLayout(OrgDefaultMailLayout, Layout):
@@ -458,6 +469,12 @@ class TicketLayout(OrgTicketLayout, DefaultLayout):
 
 
 class TicketNoteLayout(OrgTicketNoteLayout, DefaultLayout):
+
+    app: TownApp
+    request: TownRequest
+
+
+class TicketInvoiceLayout(OrgTicketInvoiceLayout, DefaultLayout):
 
     app: TownApp
     request: TownRequest
@@ -727,6 +744,15 @@ class PaymentProviderLayout(OrgPaymentProviderLayout, DefaultLayout):
 
 
 class PaymentCollectionLayout(OrgPaymentCollectionLayout, DefaultLayout):
+
+    app: TownApp
+    request: TownRequest
+
+
+class TicketInvoiceCollectionLayout(
+    OrgTicketInvoiceCollectionLayout,
+    DefaultLayout
+):
 
     app: TownApp
     request: TownRequest
@@ -1049,7 +1075,7 @@ class MeetingCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(self.title, self.request.link(self.model)),
         ]
 
@@ -1089,7 +1115,7 @@ class MeetingLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(_('Meetings'), self.request.class_link(MeetingCollection)),
             Link(self.title, self.request.link(self.model)),
         ]
@@ -1098,25 +1124,15 @@ class MeetingLayout(DefaultLayout):
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
-                LinkGroup(
-                    title=_('Add'),
-                    links=[
-                        Link(
-                            text=_('Meeting'),
-                            url=self.request.link(self.model, 'new'),
-                            attrs={'class': 'new-meeting'},
-                        ),
-                    ],
-                ),
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-meeting'},
+                    attrs={'class': 'edit-link'},
                 ),
                 Link(
                     text=_('Delete'),
                     url=self.csrf_protected_url(self.request.link(self.model)),
-                    attrs={'class': 'delete-meeting'},
+                    attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
                             _(
@@ -1133,6 +1149,11 @@ class MeetingLayout(DefaultLayout):
                             )
                         )
                     )
+                ),
+                Link(
+                    text=_('Export'),
+                    url=self.request.link(self.model, name='+export'),
+                    attrs={'class': 'export-link'}
                 )
             ]
         return None
@@ -1152,7 +1173,7 @@ class RISParliamentarianCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(self.title, self.request.link(self.model))
         ]
 
@@ -1192,7 +1213,7 @@ class RISParliamentarianLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(
                 _('Parliamentarians'),
                 self.request.link(self.collection)
@@ -1204,16 +1225,6 @@ class RISParliamentarianLayout(DefaultLayout):
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
-                LinkGroup(
-                    title=_('Add'),
-                    links=[
-                        Link(
-                            text=_('Role (as a group member)'),
-                            url=self.request.link(self.model, 'new-role'),
-                            attrs={'class': 'new-role'}
-                        ),
-                    ],
-                ),
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
@@ -1243,6 +1254,24 @@ class RISParliamentarianLayout(DefaultLayout):
                         )
                     )
                 ),
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('New parliamentary group function'),
+                            url=self.request.link(
+                                self.model, 'new-role'),
+                            # change to `new-group-role`
+                            attrs={'class': 'new-role'}
+                        ),
+                        Link(
+                            text=_('New commission function'),
+                            url=self.request.link(
+                                self.model, 'new-commission-role'),
+                            attrs={'class': 'new-commission-role'}
+                        )
+                    ],
+                ),
             ]
         return None
 
@@ -1265,7 +1294,7 @@ class RISParliamentarianRoleLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(
                 _('Parliamentarians'),
                 self.request.link(self.parliamentarian_collection)
@@ -1325,7 +1354,7 @@ class RISParliamentaryGroupCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(self.title, self.request.link(self.model))
         ]
 
@@ -1365,7 +1394,7 @@ class RISParliamentaryGroupLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(
                 _('Parliamentary groups'),
                 self.request.link(self.collection)
@@ -1424,7 +1453,7 @@ class RISPartyCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(self.title, self.request.link(self.model)),
         ]
 
@@ -1460,7 +1489,7 @@ class RISCommissionCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(self.title, self.request.link(self.model))
         ]
 
@@ -1500,7 +1529,7 @@ class RISCommissionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(_('Commissions'),
                  self.request.class_link(RISCommissionCollection)),
             Link(self.title, self.request.link(self.model))
@@ -1510,20 +1539,6 @@ class RISCommissionLayout(DefaultLayout):
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
-                # TODO: OGC-2461
-                # LinkGroup(
-                #     title=_('Add'),
-                #     links=[
-                #         Link(
-                #             text=_('Parliamentarian'),
-                #             url=self.request.link(
-                #                 self.model,
-                #                 'new-membership'
-                #             ),
-                #             attrs={'class': 'new-parliamentarian'}
-                #         ),
-                #     ]
-                # ),
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
@@ -1566,7 +1581,7 @@ class PoliticalBusinessCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(self.title, self.request.link(self.model))
         ]
 
@@ -1606,7 +1621,7 @@ class PoliticalBusinessLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('RIS Settings'), self.ris_settings_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
             Link(_('Political Businesses'),
                  self.request.class_link(PoliticalBusinessCollection)),
             Link(self.title, self.request.link(self.model))
@@ -1639,6 +1654,81 @@ class PoliticalBusinessLayout(DefaultLayout):
                             request_method='DELETE',
                             redirect_after=self.request.class_link(
                               PoliticalBusinessCollection)
+                        )
+                    )
+                )
+            ]
+        return None
+
+
+class RISCommissionMembershipLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return self.model.parliamentarian.title
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def commission_collection(self) -> RISCommissionCollection:
+        return RISCommissionCollection(self.request.session)
+
+    @cached_property
+    def parliamentarian_collection(self) -> RISParliamentarianCollection:
+        return RISParliamentarianCollection(self.request.session)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS settings'), self.ris_overview_url),
+
+            Link(
+                _('Parliamentarians'),
+                self.request.link(self.parliamentarian_collection)
+            ),
+            Link(
+                self.model.parliamentarian.title,
+                self.request.link(self.model.parliamentarian)
+            ),
+            Link(
+                _('Commission membership'),
+                self.request.link(self.model)
+            )
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Remove'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to remove this '
+                                'commission membership?'
+                            ),
+                            _('This cannot be undone.'),
+                            _('Remove commission membership'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(
+                                self.model.commission
+                            )
                         )
                     )
                 )

@@ -164,7 +164,7 @@ class PoliticalBusinessForm(Form):
     )
 
     entry_date = DateField(
-        label=_('Entry Date'),
+        label=_('Submission/publication date'),
         validators=[InputRequired()],
         default=date.today,
     )
@@ -207,6 +207,10 @@ class PoliticalBusinessForm(Form):
     )
 
     def on_request(self) -> None:
+        # prevent showing access field as all ris information is public
+        if hasattr(self, 'access'):
+            self.delete_field('access')
+
         selectable_participants = (
             self.request.session.query(RISParliamentarian)
             .filter(RISParliamentarian.active)
@@ -223,7 +227,7 @@ class PoliticalBusinessForm(Form):
             choices: list[_Choice] = [
                 (
                     str(participant.id),
-                    participant.display_name,
+                    participant.title,
                     {'data-role': selected.get(participant.id) or ''}
                 )
                 for participant in selectable_participants
@@ -260,16 +264,9 @@ class PoliticalBusinessForm(Form):
             .all()
         )
         self.parliamentary_group_id.choices = [
-            (str(g.id.hex), g.name) for g in groups
+            (str(g.id), g.name) for g in groups
         ]
         self.parliamentary_group_id.choices.insert(0, ('', '-'))
-
-    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
-        result = super().get_useful_data()
-        result.pop('participants', None)
-        result['parliamentary_group_id'] = (
-            result.get('parliamentary_group_id') or None)
-        return result
 
     def populate_obj(  # type: ignore[override]
         self,
@@ -286,4 +283,5 @@ class PoliticalBusinessForm(Form):
             include=include
         )
 
+        # handles the case when no parliamentary group is selected
         obj.parliamentary_group_id = self.parliamentary_group_id.data or None

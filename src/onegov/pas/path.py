@@ -174,13 +174,19 @@ def get_legislative_period(
 @PasApp.path(
     model=PASParliamentarianCollection,
     path='/parliamentarians',
-    converters={'active': bool}
+    converters={
+        'active': [bool],
+        'party': [str]
+    }
 )
 def get_parliamentarians(
     app: PasApp,
-    active: bool = True
+    active: list[bool] | None = None,
 ) -> PASParliamentarianCollection:
-    return PASParliamentarianCollection(app.session(), active)
+    return PASParliamentarianCollection(
+        app.session(),
+        active=active or [True],
+    )
 
 
 @PasApp.path(
@@ -364,8 +370,8 @@ def get_settlement_run_export(
 
     model_map: dict[str, type] = {
         'Party': Party,
-        'Commission': PASCommission,
-        'Parliamentarian': PASParliamentarian,
+        'PASCommission': PASCommission,
+        'PASParliamentarian': PASParliamentarian,
     }
     entity = (
         session.query(model_map.get(literal_type))

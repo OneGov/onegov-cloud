@@ -58,7 +58,7 @@ from onegov.pay import PaymentCollection, PaymentProviderCollection
 from onegov.people import PersonCollection
 from onegov.qrcode import QrCode
 from onegov.reservation import ResourceCollection
-from onegov.ticket import TicketCollection
+from onegov.ticket import TicketCollection, TicketInvoiceCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from onegov.user.utils import password_reset_url
@@ -1747,9 +1747,8 @@ class TicketLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
-        if self.request.is_manager_for_model(self.model):
-
-            links: list[Link | LinkGroup]
+        links: list[Link | LinkGroup] = []
+        if is_manager := self.request.is_manager_for_model(self.model):
 
             # only show the model related links when the ticket is pending
             if self.model.state == 'pending':
@@ -1830,6 +1829,7 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': ('ticket-button', 'ticket-assign')},
                 ))
 
+        if self.request.is_logged_in:
             # ticket notes are always enabled
             links.append(
                 Link(
@@ -1845,17 +1845,17 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': 'ticket-pdf'}
                 )
             )
-            if self.has_submission_files:
-                links.append(
-                    Link(
-                        text=_('Download files'),
-                        url=self.request.link(self.model, 'files'),
-                        attrs={'class': 'ticket-files'}
-                    )
-                )
 
-            return links
-        return None
+        if is_manager and self.has_submission_files:
+            links.append(
+                Link(
+                    text=_('Download files'),
+                    url=self.request.link(self.model, 'files'),
+                    attrs={'class': 'ticket-files'}
+                )
+            )
+
+        return links or None
 
     @cached_property
     def has_submission_files(self) -> bool:
@@ -1950,6 +1950,50 @@ class TicketChatMessageLayout(DefaultLayout):
             Link(_('Ticket Status'), self.request.link(self.model, 'status')),
             Link(_('New Message'), '#')
         ]
+
+
+class TicketInvoiceLayout(DefaultLayout):
+
+    model: Ticket
+
+    def __init__(self, model: Ticket, request: OrgRequest) -> None:
+        super().__init__(model, request)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Tickets'), get_current_tickets_url(self.request)),
+            Link(self.model.number, self.request.link(self.model)),
+            Link(_('Invoice'), '#')
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager_for_model(self.model):
+            payment = self.model.payment
+            if payment is not None and (
+                payment.source != 'manual'
+                or payment.state != 'open'
+            ):
+                return None
+
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Discount / Surcharge'),
+                            url=self.request.link(
+                                self.model,
+                                name='add-invoice-item'
+                            ),
+                            attrs={'class': 'new-invoice-item'}
+                        )
+                    ]
+                ),
+            ]
+        return None
 
 
 class TextModulesLayout(DefaultLayout):
@@ -3010,7 +3054,10 @@ class UserManagementLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Usermanagement'), self.request.class_link(UserCollection))
+            Link(_('Usermanagement'), self.request.class_link(
+                UserCollection,
+                variables={'active': '1'}
+        )),
         ]
 
     @cached_property
@@ -3060,7 +3107,10 @@ class UserLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Usermanagement'), self.request.class_link(UserCollection)),
+            Link(_('Usermanagement'), self.request.class_link(
+                UserCollection,
+                variables={'active': '1'}
+        )),
             Link(self.model.title, self.request.link(self.model))
         ]
 
@@ -3260,6 +3310,37 @@ class PaymentCollectionLayout(DefaultLayout):
                     text=_('Export'),
                     url=self.request.class_link(OrgExport, {'id': 'payments'}),
                     attrs={'class': 'export-link'}
+                )
+            )
+
+        return links
+
+
+class TicketInvoiceCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Invoices'), self.request.class_link(
+                TicketInvoiceCollection
+            ))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        links: list[Link | LinkGroup] = []
+
+        if self.request.is_manager_for_model(self.model):
+
+            links.append(
+                Link(
+                    text=_('Export Bill run as PDF'),
+                    url=self.request.link(
+                        self.model,
+                        query_params={'format': 'pdf'}
+                    ),
+                    attrs={'class': 'ticket-pdf'}
                 )
             )
 

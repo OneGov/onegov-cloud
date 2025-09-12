@@ -6,6 +6,7 @@ import morepath
 import transaction
 
 from collections import defaultdict
+from decimal import Decimal
 from onegov.core.html import html_to_text
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
@@ -735,7 +736,7 @@ def handle_submit_directory_entry(
 
         # the price per submission
         if self.directory.price == 'paid':
-            amount = self.directory.price_per_submission
+            amount = self.directory.price_per_submission or 0.0
         else:
             amount = 0.0
 
@@ -748,10 +749,13 @@ def handle_submit_directory_entry(
             meta={
                 'handler_code': 'DIR',
                 'directory': self.directory.id.hex,
-                'price': {
-                    'amount': amount,
-                    'currency': self.directory.currency
+                'invoice_item': {
+                    'text': request.translate(_('Lump sum')),
+                    'group': 'submission',
+                    'unit': Decimal(amount),
+                    'quantity': Decimal('1'),
                 },
+                'currency': self.directory.currency,
                 'extensions': tuple(
                     ext for ext in self.directory.extensions
                     if ext != 'submitter'
