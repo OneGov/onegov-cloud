@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     handleBulkAddCommission();
+    handleAttendanceFormSync();
 });
 
 
@@ -67,5 +68,118 @@ function handleBulkAddCommission() {
         }
       }
     });
+  }
+}
+
+
+function handleAttendanceFormSync() {
+  const commissionSelect = document.getElementById("commission_id");
+  const parliamentarianSelect = document.getElementById("parliamentarian_id");
+
+  // Only proceed if both elements exist (not all forms have both)
+  if (!commissionSelect || !parliamentarianSelect) {
+    return;
+  }
+
+  // Store all parliamentarians by commission
+  let commissionParliamentarians = {};
+  let parliamentarianCommissions = {};
+  const baseUrl = window.location.href.split("/").slice(0, -2).join("/");
+
+
+  fetch(`${baseUrl}/commissions/commissions-parliamentarians-json`)
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      commissionParliamentarians = data;
+
+      // Build reverse mapping: parliamentarian -> commissions
+      Object.keys(data).forEach(commissionId => {
+        data[commissionId].forEach(parliamentarian => {
+          if (!parliamentarianCommissions[parliamentarian.id]) {
+            parliamentarianCommissions[parliamentarian.id] = [];
+          }
+          parliamentarianCommissions[parliamentarian.id].push(commissionId);
+        });
+      });
+    })
+    .catch(error => {
+      console.error("DEBUG: Fetch error:", error);
+    });
+
+  // Commission change -> filter parliamentarians
+  $(commissionSelect).on("change", function () {
+    filterParliamentariansByCommission(this.value);
+  });
+
+  // Parliamentarian change -> filter commissions
+  $(parliamentarianSelect).on("change", function () {
+    filterCommissionsByParliamentarian(this.value);
+  });
+
+  function filterParliamentariansByCommission(commissionId) {
+    const parliamentarianOptions = parliamentarianSelect.querySelectorAll('option');
+
+    // Reset all options to visible
+    parliamentarianOptions.forEach(option => {
+      option.style.display = '';
+      option.disabled = false;
+    });
+
+    if (!commissionId) {
+      // Update chosen dropdown
+      $(parliamentarianSelect).trigger('chosen:updated');
+      return;
+    }
+
+    const validParliamentarians = commissionParliamentarians[commissionId] || [];
+    const validIds = validParliamentarians.map(p => p.id.toString());
+
+    parliamentarianOptions.forEach(option => {
+      if (option.value && !validIds.includes(option.value)) {
+        option.style.display = 'none';
+        option.disabled = true;
+        // Unselect if currently selected
+        if (option.selected) {
+          option.selected = false;
+        }
+      }
+    });
+
+    // Update chosen dropdown
+    $(parliamentarianSelect).trigger('chosen:updated');
+  }
+
+  function filterCommissionsByParliamentarian(parliamentarianId) {
+    const commissionOptions = commissionSelect.querySelectorAll('option');
+
+    // Reset all options to visible
+    commissionOptions.forEach(option => {
+      option.style.display = '';
+      option.disabled = false;
+    });
+
+    if (!parliamentarianId) {
+      // Update chosen dropdown
+      $(commissionSelect).trigger('chosen:updated');
+      return;
+    }
+
+    const validCommissions = parliamentarianCommissions[parliamentarianId] || [];
+
+    commissionOptions.forEach(option => {
+      if (option.value && !validCommissions.includes(option.value)) {
+        option.style.display = 'none';
+        option.disabled = true;
+        // Unselect if currently selected
+        if (option.selected) {
+          option.selected = false;
+        }
+      }
+    });
+
+    // Update chosen dropdown
+    $(commissionSelect).trigger('chosen:updated');
   }
 }

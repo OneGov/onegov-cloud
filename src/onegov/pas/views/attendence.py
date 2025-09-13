@@ -52,6 +52,7 @@ def add_attendence(
     request: TownRequest,
     form: AttendenceAddForm
 ) -> RenderData | Response:
+    request.include('custom')
 
     if form.submitted(request):
         attendence = self.add(**form.get_useful_data())
