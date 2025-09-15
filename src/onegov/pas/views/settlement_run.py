@@ -81,13 +81,6 @@ def get_parliamentarian_closure_status(
         dict with structure: {parliamentarian_name:
         {commission_name: is_closed}}
     """
-    # Get all commissions with memberships during the settlement period
-    commissions = session.query(PASCommission).join(
-        PASCommissionMembership
-    ).filter(
-        PASCommissionMembership.start <= settlement_run.end
-    ).distinct().all()
-
     # Get all parliamentarians with commissions during the settlement period
     parliamentarians = session.query(PASParliamentarian).join(
         PASCommissionMembership
@@ -120,7 +113,8 @@ def get_parliamentarian_closure_status(
                 Attendence.abschluss == True
             ).first()
 
-            closure_status[parl_name][commission_name] = bool(closed_attendance)
+            closure_status[parl_name][commission_name] = bool(
+                closed_attendance)
 
     return closure_status
 
@@ -221,18 +215,18 @@ def view_settlement_run(
     if closure_status:
         # Get all commission names across all parliamentarians
         all_commissions = sorted(set().union(
-            *[commissions.keys() for commissions in closure_status.values()]
+            *[comm_dict.keys() for comm_dict in closure_status.values()]
         ))
 
         # Prepare rows for template
         closure_status_rows = []
-        for parliamentarian_name, commissions in closure_status.items():
+        for parliamentarian_name, comm_statuses in closure_status.items():
             row_data = {
                 'parliamentarian_name': parliamentarian_name,
                 'commission_statuses': [
                     {
                         'commission_name': commission_name,
-                        'is_closed': commissions.get(commission_name, False)
+                        'is_closed': comm_statuses.get(commission_name, False)
                     }
                     for commission_name in all_commissions
                 ]
