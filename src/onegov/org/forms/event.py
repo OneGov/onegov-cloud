@@ -81,33 +81,6 @@ TAGS = [
 ]
 
 
-# wil event import, cron job: wil_daily_event_import.
-# event categories as defined https://minasa-demo.ch/wiki/datenhub:schema
-TAGS_MAPPING_WIL = {
-    'Musik': _('Music'),
-    'Bühne': _('Stage'),
-    'Wissen': _('Science'),
-    'Literatur': _('Literature'),
-    'Kunst': _('Art'),
-    'Film': _('Film'),
-    'Brauchtum': _('Tradition'),
-    'Kulinarik': _('Culinary'),
-    'Party': _('Party'),
-    'Kurse': _('Course'),
-    'Ausflug': _('Excursion'),
-    'Excursion': _('Excursion'),
-    'Dating': _('Dating'),
-    'Gesellschaft': _('Society'),
-    'Kongress': _('Congress'),
-    'Markt': _('Market'),
-    'Messe': _('Fair'),
-    'Sport': _('Sports'),
-    'Wirtschaft': _('Economy'),
-    'Politik': _('Politics'),
-    'Diverses': _('Misc'),
-}
-
-
 WEEKDAYS = (
     ('MO', _('Mo')),
     ('TU', _('Tu')),
