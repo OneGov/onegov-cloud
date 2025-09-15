@@ -123,15 +123,16 @@ def generate_abschlussliste_xlsx(
     output = BytesIO()
     workbook = xlsxwriter.Workbook(output)
 
-    # Details tab
-    details_ws = workbook.add_worksheet('Details')
-    details_headers = [
-        'Name', 'Vorname', 'Partei', 'Fraktion',
-        'Plenum / Kommission Zeit', 'Entschädigung',
-        'Aktenstudium Zeit', 'Aktenstudium Entschädigung',
-        'Kürzestsitzungen Zeit', 'Kürzestsitzungen Entschädigung'
-    ]
-    details_ws.write_row(0, 0, details_headers)
+    # Define formats
+    header_format = workbook.add_format({
+        'font_name': 'Arial',
+        'font_size': 11,
+        'bold': True
+    })
+    cell_format = workbook.add_format({
+        'font_name': 'Arial',
+        'font_size': 11
+    })
 
     # Übersicht tab
     overview_ws = workbook.add_worksheet('Übersicht')
@@ -141,7 +142,19 @@ def generate_abschlussliste_xlsx(
         'Kommissionen Zeit', 'Kommissionen Entschädigung',
         'Spesen'
     ]
-    overview_ws.write_row(0, 0, overview_headers)
+    for col, header in enumerate(overview_headers):
+        overview_ws.write(0, col, header, header_format)
+
+    # Details tab
+    details_ws = workbook.add_worksheet('Details')
+    details_headers = [
+        'Name', 'Vorname', 'Partei', 'Fraktion',
+        'Plenum / Kommission Zeit', 'Entschädigung',
+        'Aktenstudium Zeit', 'Aktenstudium Entschädigung',
+        'Kürzestsitzungen Zeit', 'Kürzestsitzungen Entschädigung'
+    ]
+    for col, header in enumerate(details_headers):
+        details_ws.write(0, col, header, header_format)
 
     data = get_abschlussliste_data(settlement_run, request)
 
@@ -157,7 +170,8 @@ def generate_abschlussliste_xlsx(
             row_data['study_duration'], row_data['study_compensation'],
             row_data['shortest_duration'], row_data['shortest_compensation']
         ]
-        details_ws.write_row(row_num, 0, details_row)
+        for col, value in enumerate(details_row):
+            details_ws.write(row_num, col, value, cell_format)
 
         # Übersicht tab row
         overview_row = [
@@ -168,7 +182,8 @@ def generate_abschlussliste_xlsx(
             + row_data['shortest_compensation'],
             row_data['expenses']
         ]
-        overview_ws.write_row(row_num, 0, overview_row)
+        for col, value in enumerate(overview_row):
+            overview_ws.write(row_num, col, value, cell_format)
 
     workbook.close()
     output.seek(0)
