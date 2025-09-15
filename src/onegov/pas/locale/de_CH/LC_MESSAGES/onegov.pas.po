@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-09-15 17:01+0200\n"
+"POT-Creation-Date: 2025-09-15 17:19+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -30,7 +30,7 @@ msgid "PAS settings"
 msgstr "PAS Einstellungen"
 
 msgid "Files"
-msgstr ""
+msgstr "Dateien"
 
 msgid "More settings"
 msgstr "Weitere Einstellungen"
@@ -57,16 +57,16 @@ msgid "Commission"
 msgstr "Kommission"
 
 msgid "Abschluss"
-msgstr ""
+msgstr "Abschluss"
 
 msgid "Mark as completed/closed"
-msgstr ""
+msgstr "Als abgeschlossen markieren"
 
 msgid "Parliamentarian is not in this commission."
 msgstr "Parlamentarier:in ist nicht in dieser Kommission."
 
 msgid "Bulk edit group"
-msgstr ""
+msgstr "Massenbuchungsgruppe"
 
 msgid "People Data (JSON)"
 msgstr "Personendaten (JSON)"
@@ -120,10 +120,10 @@ msgid "Name"
 msgstr "Name"
 
 msgid "Start"
-msgstr ""
+msgstr "Start"
 
 msgid "End"
-msgstr ""
+msgstr "Ende"
 
 msgid "Personnel number"
 msgstr "Personalnummer"
@@ -495,7 +495,7 @@ msgid "Action"
 msgstr "Aktion"
 
 msgid "Function"
-msgstr ""
+msgstr "Funktion"
 
 msgid "No active commissions."
 msgstr "Keine aktiven Kommissionen."
@@ -612,7 +612,50 @@ msgid "No"
 msgstr "Nein"
 
 msgid "Commission Closure Status"
+msgstr "Kommissions-Abschlussstatus"
+
+msgid ""
+"This table shows the attendance closure status for each commission. It "
+"displays how many commission members have marked their attendance as "
+"\"closed\" (abschluss) for this settlement run."
 msgstr ""
+"Diese Tabelle zeigt den Abschlussstatus der Anwesenheit für jede Kommission. "
+"Sie zeigt, wie viele Kommissionsmitglieder ihre Anwesenheit als "
+"\"abgeschlossen\" für diesen Abrechnungslauf markiert haben."
+
+
+msgid "<strong>Complete:</strong> All commission members have closed their attendance"
+msgstr "<strong>Vollständig:</strong> Alle Kommissionsmitglieder haben ihre Anwesenheit abgeschlossen"
+
+msgid "<strong>Incomplete:</strong> Some members have not yet closed their attendance"
+msgstr "<strong>Unvollständig:</strong> Einige Mitglieder haben ihre Anwesenheit noch nicht abgeschlossen"
+
+msgid "<strong>Has attendance:</strong> Member has attendance records but hasn't marked as closed"
+msgstr "<strong>Hat Anwesenheit:</strong> Mitglied hat Anwesenheitsdaten, aber nicht als abgeschlossen markiert"
+
+msgid "<strong>No attendance:</strong> Member has no attendance records for this commission"
+msgstr "<strong>Keine Anwesenheit:</strong> Mitglied hat keine Anwesenheitsdaten für diese Kommission"
+
+msgid "Members who have closed their attendance:"
+msgstr "Mitglieder, die ihre Anwesenheit abgeschlossen haben:"
+
+msgid "✓ (closed)"
+msgstr "✓ (abgeschlossen)"
+
+msgid "Members who have not closed their attendance:"
+msgstr "Mitglieder, die ihre Anwesenheit nicht abgeschlossen haben:"
+
+msgid "(has attendance)"
+msgstr "(hat Anwesenheit)"
+
+msgid "(no attendance)"
+msgstr "(keine Anwesenheit)"
+
+msgid ""
+"No commissions with active memberships found for this settlement period."
+msgstr ""
+"Keine Kommissionen mit aktiven Mitgliedschaften für diesen "
+"Abrechnungszeitraum gefunden."
 
 msgid "No settlement runs defined yet."
 msgstr "Noch keine Abrechnungsläufe erfasst"
@@ -627,7 +670,7 @@ msgid "New attendence"
 msgstr "Neue Anwesenheit"
 
 msgid "No parliamentarians selected"
-msgstr ""
+msgstr "Keine Parlamentarier:innen ausgewählt"
 
 msgid "Added commission session"
 msgstr "Kommissionssitzung hinzugefügt"
@@ -790,6 +833,34 @@ msgstr "Excel Exporte"
 
 msgid "Total all parties"
 msgstr "Total Alle Parteien"
+
+#~ msgid ""
+#~ "<strong>Complete:</strong> All commission members have closed their "
+#~ "attendance"
+#~ msgstr ""
+#~ "<strong>Vollständig:</strong> Alle Kommissionsmitglieder haben ihre "
+#~ "Anwesenheit abgeschlossen"
+
+#~ msgid ""
+#~ "<strong>Incomplete:</strong> Some members have not yet closed their "
+#~ "attendance"
+#~ msgstr ""
+#~ "<strong>Unvollständig:</strong> Einige Mitglieder haben ihre Anwesenheit "
+#~ "noch nicht abgeschlossen"
+
+#~ msgid ""
+#~ "<strong>Has attendance:</strong> Member has attendance records but hasn't "
+#~ "marked as closed"
+#~ msgstr ""
+#~ "<strong>Hat Anwesenheit:</strong> Mitglied hat Anwesenheitsdaten, aber "
+#~ "nicht als abgeschlossen markiert"
+
+#~ msgid ""
+#~ "<strong>No attendance:</strong> Member has no attendance records for this "
+#~ "commission"
+#~ msgstr ""
+#~ "<strong>Keine Anwesenheit:</strong> Mitglied hat keine Anwesenheitsdaten "
+#~ "für diese Kommission"
 
 #, python-format
 #~ msgid "An active settlement run already exists: ${name}"
