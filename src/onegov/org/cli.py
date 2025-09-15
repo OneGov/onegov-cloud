@@ -3114,7 +3114,7 @@ def wil_event_tags_to_german_as_we_use_custom_event_tags(
         occurrences = OccurrenceCollection(request.session).query()
 
         for collection in [events, occurrences]:
-            for item in collection:
+            for item in collection:  # type: ignore[attr-defined]
                 new_tags = []
                 tags = item.tags
                 for tag in tags:
