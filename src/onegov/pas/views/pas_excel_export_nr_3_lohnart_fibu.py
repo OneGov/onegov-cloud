@@ -24,15 +24,15 @@ if TYPE_CHECKING:
 
 
 NEW_LOHNART_MAPPING = {
-    'plenary': {'nr': '2405', 'text': 'Sitzungsentschädigung KR'},
+    'plenary': {'nr': '2405', 'text': 'Plenarsitzungen'},
     'commission': {
         'nr': '2410',
-        'text': 'Kommissionsentschädigung KR inkl. Kürzestsitzungen'
+        'text': 'Kommissionsitzungen'
     },
-    'study': {'nr': '2421', 'text': 'Aktenstudium Kantonsrat'},
+    'study': {'nr': '2421', 'text': 'Aktenstudium'},
     'shortest': {
         'nr': '2410',
-        'text': 'Kommissionsentschädigung KR inkl. Kürzestsitzungen'
+        'text': 'Kommissionsitzungen'
     }
 }
 
@@ -44,6 +44,15 @@ Hier noch die Infos bezüglich den FibU-Konten:
     3170.1 Fahr- und Verpflegungsspesen
 """
 
+FIBU_KONTEN_MAPPING = {
+    'plenary': '3000.2',
+    'commission': '3000.3',
+    'study': '3000.3',
+    'shortest': '3000.3',
+    # Note: 3170.1 for Fahr- und Verpflegungsspesen would need to be mapped
+    # to a specific attendance type. But Spesen (expenses) not yet implemented
+}
+
 
 def generate_fibu_export_rows(
     settlement_run: SettlementRun,
@@ -53,15 +62,17 @@ def generate_fibu_export_rows(
     are empty, this is by choice. This format is precisely
     required. """
 
-    yield [
-        'Personalnummer', 'Vertragsnummer', 'Lohnart / Lohnarten Nr.',
-        '', '', '', '', '', '', '', '', '',  # D-L empty
-        'Betrag', '', '', '',  # M-P empty (M is Betrag)
-        'Bemerkung/Lohnartentext, welche auf der Lohnabrechnung erscheint', '',
-        'Fibu-Konto', 'Kostenstelle / Kostenträger',  # S-T
-        '', '', '', '', '',  # U-Y empty
-        'Angabe zum Jahr und zum Quartal', 'Exportdatum'  # Z-AA
-    ]
+    # Requirement is that this export has no header row, but you
+    # can uncommment this block for debugging purposes.
+    # yield [
+    #     'Personalnummer', 'Vertragsnummer', 'Lohnart / Lohnarten Nr.',
+    #     '', '', '', '', '', '', '', '', '',  # D-L empty
+    #     'Betrag', '', '', '',  # M-P empty (M is Betrag)
+    #     'Bemerkung/Lohnartentext', '',
+    #     'Fibu-Konto', 'Kostenstelle / Kostenträger',  # S-T
+    #     '', '', '', '', '',  # U-Y empty
+    #     'Angabe zum Jahr und zum Quartal', 'Exportdatum'  # Z-AA
+    # ]
 
     session = request.session
     rate_set = get_current_rate_set(session, settlement_run)
@@ -108,10 +119,13 @@ def generate_fibu_export_rows(
             Decimal('0.01'), rounding=ROUND_HALF_UP
         )
 
-        # Some columns are left empty on purpose (this is what is asked)
+        # Get fibu konto based on attendance type
+        fibu_konto = FIBU_KONTEN_MAPPING.get(attendance.type, '')
+
         yield [
-            parliamentarian.personnel_number or '', '', lohnart_nr,
+            parliamentarian.personnel_number or '',
+            parliamentarian.contract_number or '', lohnart_nr,
             '', '', '', '', '', '', '', '', '', rate_with_cola,
-                '', '', '', lohnart_text, '', '', '',
+                '', '', '', lohnart_text, '', fibu_konto, '1000',
             '', '', '', '', '', year_quarter_str, utcnow().strftime('%d.%m.%Y')
         ]
