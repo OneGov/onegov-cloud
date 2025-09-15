@@ -713,7 +713,7 @@ $pageref-color-hover: $iron;
             i.fa,
             i.fas,
             i.far {
-                margin-bottom: .3rem;
+                margin-top: .15rem;
                 margin-right: .3rem;
             }
 
@@ -728,7 +728,6 @@ $pageref-color-hover: $iron;
                 line-height: 1.3;
                 margin-bottom: 0;
                 padding-right: 10%;
-                width: calc(100% - 2rem);
 
                 &.preview {
                     color: $monsoon;
