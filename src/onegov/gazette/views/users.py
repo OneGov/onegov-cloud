@@ -21,7 +21,7 @@ from onegov.user.utils import password_reset_url
 from sedate import utcnow
 from sqlalchemy.orm import contains_eager
 from webob.exc import HTTPForbidden
-from xlsxwriter import Workbook  # type:ignore[import-untyped]
+from xlsxwriter import Workbook
 
 
 from typing import TYPE_CHECKING
@@ -321,8 +321,7 @@ def export_users(
             ('member', request.translate(_('Editors'))),
             ('editor', request.translate(_('Publishers')))
         ):
-            worksheet = workbook.add_worksheet()
-            worksheet.name = name
+            worksheet = workbook.add_worksheet(name)
             worksheet.write_row(0, 0, (
                 request.translate(_('Group')),
                 request.translate(_('Name')),
