@@ -108,7 +108,12 @@ def add_meeting(
     layout = MeetingCollectionLayout(self, request)
 
     if form.submitted(request):
-        meeting = self.add(**form.get_useful_data())
+        meeting = self.add(
+            title=form.title.data,
+            address=form.address.data
+        )
+        form.populate_obj(meeting)
+
         request.success(_('Added a new meeting'))
         return request.redirect(request.link(meeting))
 
@@ -335,6 +340,9 @@ def view_meeting_export(
                 response.content_disposition = (
                     f'attachment; filename="{filename}.zip"')
                 return response
+
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
 
     layout = MeetingLayout(self, request)
     layout.breadcrumbs.append(Link(_('Export'), '#'))

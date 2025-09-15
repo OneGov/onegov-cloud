@@ -41,7 +41,6 @@ from onegov.org.models import (
     ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter, ReservationHandler
-from onegov.org.models.ticket import apply_ticket_permissions
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.utils import get_current_tickets_url, group_invoice_items
 from onegov.org.views.message import view_messages_feed
@@ -54,7 +53,7 @@ from onegov.ticket.errors import InvalidStateChange
 from onegov.gever.gever_client import GeverClientCAS
 from onegov.user import User, UserCollection
 from operator import itemgetter
-from sqlalchemy import func, select
+from sqlalchemy import select
 from webob import exc
 from urllib.parse import urlsplit
 
@@ -404,16 +403,13 @@ def send_chat_message_email_if_enabled(
 
         reply_to = None  # default reply-to given by the application
 
-    if not receiver:
-        return
-
     # we show the previous messages by going back until we find a message
     # that is not from the same author as the new message (this should usually
     # be the next message, but might include multiple, if someone sent a bunch
     # of messages in succession without getting a reply)
     #
     # note that the resulting thread has to be reversed for the mail template
-    def thread() -> Iterator[TicketChatMessage]:
+    def generate_thread() -> Iterator[TicketChatMessage]:
         messages.older_than = message.id
         messages.load = 'newer-first'
 
@@ -423,22 +419,90 @@ def send_chat_message_email_if_enabled(
             if m.owner != message.owner:
                 break
 
-    send_ticket_mail(
-        request=request,
-        template='mail_ticket_chat_message.pt',
-        subject=_('Your ticket has a new message'),
-        content={
-            'model': ticket,
-            'message': message,
-            'thread': tuple(reversed(list(thread()))),
-        },
-        ticket=ticket,
-        receivers=(receiver,),
-        reply_to=reply_to,
-        force=True,
-        bcc=bcc,
-        attachments=attachments
+    thread = None
+    if receiver:
+        thread = tuple(reversed(list(generate_thread())))
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_chat_message.pt',
+            subject=_('Your ticket has a new message'),
+            content={
+                'model': ticket,
+                'message': message,
+                'thread': thread,
+            },
+            ticket=ticket,
+            receivers=(receiver,),
+            reply_to=reply_to,
+            force=True,
+            bcc=bcc,
+            attachments=attachments
+        )
+
+    # handle resource recipients for external messages on RSV tickets
+    if origin != 'external':
+        return
+
+    handler = ticket.handler
+    if not isinstance(handler, ReservationHandler) or not handler.resource:
+        return
+
+    if thread is None:
+        thread = tuple(reversed(list(generate_thread())))
+
+    def recipients_which_have_registered_for_mail() -> Iterator[str]:
+        q = ResourceRecipientCollection(request.session).query()
+        q = q.filter(ResourceRecipient.medium == 'email')
+        q = q.order_by(None).order_by(ResourceRecipient.address)
+        q = q.with_entities(ResourceRecipient.address,
+                            ResourceRecipient.content)
+        for r in q:
+            if r.address == receiver:
+                # don't send two notifications to this address
+                continue
+            if handler.reservations[0].resource.hex in r.content[
+                'resources'
+            ] and r.content.get('customer_messages', False):
+                yield r.address
+
+    title = request.translate(
+        _(
+            '${org} New Customer Message in Reservation for ${resource_title}',
+            mapping={
+                'org': request.app.org.title,
+                'resource_title': handler.resource.title,
+            },
+        )
     )
+    assert hasattr(ticket, 'reference')
+    content = render_template(
+        'mail_customer_messages_notification.pt',
+        request,
+        {
+            'layout': DefaultMailLayout(object(), request),
+            'title': title,
+            'model': ticket,
+            'resource': handler.resource,
+            'message': message,
+            'thread': thread,
+            'ticket_reference': ticket.reference(request),
+        },
+    )
+    plaintext = html_to_text(content)
+
+    def email_iter() -> Iterator[EmailJsonDict]:
+        for recipient_addr in recipients_which_have_registered_for_mail():
+
+            yield request.app.prepare_email(
+                receivers=(recipient_addr,),
+                subject=title,
+                content=content,
+                plaintext=plaintext,
+                category='transactional',
+                attachments=(),
+            )
+
+    request.app.send_transactional_email_batch(email_iter())
 
 
 def send_new_note_notification(
@@ -1309,8 +1373,11 @@ def view_ticket_status(
     )
 
     pick_up_hint = None
+    extra_information = None
     if resource := getattr(self.handler, 'resource', None):
         pick_up_hint = resource.pick_up
+        if not self.handler.deleted and not self.handler.undecided:
+            extra_information = resource.confirmation_text
     if submission := getattr(self.handler, 'submission', None):
         if form_definition := getattr(submission, 'form', None):
             pick_up_hint = form_definition.pick_up
@@ -1323,7 +1390,8 @@ def view_ticket_status(
             view_messages_feed(messages, request)
         ) or None,
         'form': form,
-        'pick_up_hint': pick_up_hint
+        'pick_up_hint': pick_up_hint,
+        'extra_information': extra_information,
     }
 
 
@@ -1527,20 +1595,9 @@ def get_submitters(
 def groups_by_handler_code(
     self: TicketCollection | ArchivedTicketCollection
 ) -> dict[str, list[str]]:
-    query = self.session.query(
-        Ticket.handler_code,
-        func.array_agg(Ticket.group.distinct())
-    ).group_by(Ticket.handler_code)
-
-    # HACK: only apply the ticket permissions filter if there is request
-    #       attribute on the collection. This is a bit fragile, ideally
-    #       we turn this back into a method on `TicketCollection`.
-    if hasattr(self, 'request'):
-        query = apply_ticket_permissions(query, 'ALL', self.request)
-
     return {
         handler_code: sorted(groups, key=normalize_for_url)
-        for handler_code, groups in query
+        for handler_code, groups in self.groups_by_handler_code()
     }
 
 

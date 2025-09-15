@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import random
+import sedate
 
+from functools import cached_property
 from onegov.core.collection import Pagination
 from onegov.core.custom import msgpack
 from onegov.pay.collections import InvoiceCollection
@@ -9,7 +11,6 @@ from onegov.ticket import handlers as global_handlers
 from onegov.ticket.models.invoice import TicketInvoice
 from onegov.ticket.models.invoice_item import TicketInvoiceItem
 from onegov.ticket.models.ticket import Ticket
-from sedate import to_timezone
 from sqlalchemy import desc, func
 from sqlalchemy.orm import contains_eager, joinedload, selectinload, undefer
 from uuid import UUID
@@ -19,6 +20,7 @@ from typing import Any, Literal, NamedTuple, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import date, datetime
     from onegov.ticket.models.ticket import TicketState
+    from sedate.types import Direction, TzInfo
     from sqlalchemy.orm import Query, Session
     from typing import TypeAlias, TypedDict
 
@@ -148,6 +150,12 @@ class TicketCollectionPagination(Pagination[Ticket]):
             submitter, self.extra_parameters
         )
 
+    def groups_by_handler_code(self) -> Query[tuple[str, list[str]]]:
+        return self.query().with_entities(
+            Ticket.handler_code,
+            func.array_agg(Ticket.group.distinct())
+        ).group_by(Ticket.handler_code)
+
 
 @msgpack.make_serializable(tag=60)
 class TicketCount(NamedTuple):
@@ -276,7 +284,7 @@ class TicketCollection(TicketCollectionPagination):
 
     def by_ticket_email(self, ticket_email: str) -> Query[Ticket]:
         return self.query().filter(
-            Ticket.ticket_email == ticket_email)
+            func.lower(Ticket.ticket_email) == ticket_email.lower())
 
 
 # FIXME: Why is this its own subclass? shouldn't this at least override
@@ -295,15 +303,17 @@ class TicketInvoiceCollection(
         self,
         session: Session,
         page: int = 0,
-        ticket_start: datetime | None = None,
-        ticket_end: datetime | None = None,
-        reservation_start: datetime | None = None,
-        reservation_end: datetime | None = None,
+        ticket_group: str | None = None,
+        ticket_start: date | None = None,
+        ticket_end: date | None = None,
+        reservation_start: date | None = None,
+        reservation_end: date | None = None,
         invoiced: bool | None = None,
     ) -> None:
         Pagination.__init__(self, page)
         self.session = session
         self.invoiced = invoiced
+        self.ticket_group = ticket_group
         self.ticket_start = ticket_start
         self.ticket_end = ticket_end
         self.reservation_start = reservation_start
@@ -320,6 +330,17 @@ class TicketInvoiceCollection(
     def query(self) -> Query[TicketInvoice]:
         return self.session.query(TicketInvoice)
 
+    @cached_property
+    def tzinfo(self) -> TzInfo:
+        return sedate.ensure_timezone('Europe/Zurich')
+
+    def align_date(self, value: date, direction: Direction) -> datetime:
+        return sedate.align_date_to_day(
+            sedate.replace_timezone(sedate.as_datetime(value), self.tzinfo),
+            self.tzinfo,
+            direction
+        )
+
     def subset(self) -> Query[TicketInvoice]:
         query = self.query()
 
@@ -333,19 +354,32 @@ class TicketInvoiceCollection(
         if self.invoiced is not None:
             query = query.filter(TicketInvoice.invoiced == self.invoiced)
 
+        if self.ticket_group:
+            handler_code, *remainder = self.ticket_group.split('-', 1)
+            query = query.filter(Ticket.handler_code == handler_code)
+            if remainder:
+                group, = remainder
+                query = query.filter(Ticket.group == group)
+
         # Filter payments by each associated ticket creation date
         if self.ticket_start is not None:
-            query = query.filter(Ticket.created >= self.ticket_start)
+            query = query.filter(Ticket.created >= self.align_date(
+                self.ticket_start,
+                'down'
+            ))
 
         if self.ticket_end is not None:
-            query = query.filter(Ticket.created <= self.ticket_end)
+            query = query.filter(Ticket.created <= self.align_date(
+                self.ticket_end,
+                'up'
+            ))
 
         # Filter payments by the reservation dates it belongs to
         if self.reservation_start or self.reservation_end:
             from onegov.reservation import Reservation
 
-            subquery = self.session.query(Reservation)
-            subquery.join(
+            subquery = self.session.query(Reservation.id)
+            subquery = subquery.join(
                 TicketInvoiceItem,
                 Reservation.id == TicketInvoiceItem.reservation_id
             )
@@ -355,11 +389,17 @@ class TicketInvoiceCollection(
 
             if self.reservation_start is not None:
                 subquery = subquery.filter(
-                    Reservation.end >= self.reservation_start
+                    Reservation.end >= self.align_date(
+                        self.reservation_start,
+                        'down'
+                    )
                 )
             if self.reservation_end is not None:
                 subquery = subquery.filter(
-                    Reservation.start <= self.reservation_end
+                    Reservation.start <= self.align_date(
+                        self.reservation_end,
+                        'up'
+                    )
                 )
 
             query = query.filter(subquery.exists())
@@ -374,6 +414,7 @@ class TicketInvoiceCollection(
         return self.__class__(
             self.session,
             page=index,
+            ticket_group=self.ticket_group,
             ticket_start=self.ticket_start,
             ticket_end=self.ticket_end,
             reservation_start=self.reservation_start,
@@ -387,8 +428,8 @@ class TicketInvoiceCollection(
         from onegov.reservation import Reservation
         return {
             invoice_id: (
-                to_timezone(start, 'Europe/Zurich').date(),
-                to_timezone(end, 'Europe/Zurich').date()
+                sedate.to_timezone(start, self.tzinfo).date(),
+                sedate.to_timezone(end, self.tzinfo).date()
             )
             for invoice_id, start, end in self.session.query(Reservation)
             .join(
@@ -411,6 +452,7 @@ class TicketInvoiceCollection(
             isinstance(other, TicketInvoiceCollection)
             and self.page == other.page
             and self.invoiced is other.invoiced
+            and self.ticket_group == other.ticket_group
             and self.ticket_start == other.ticket_start
             and self.ticket_end == other.ticket_end
             and self.reservation_start == other.reservation_start
@@ -421,6 +463,7 @@ class TicketInvoiceCollection(
         return self.__class__(
             self.session,
             page=0,
+            ticket_group=self.ticket_group,
             ticket_start=self.ticket_start,
             ticket_end=self.ticket_end,
             reservation_start=self.reservation_start,

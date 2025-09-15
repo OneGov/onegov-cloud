@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-09-04 11:56+0200\n"
+"POT-Creation-Date: 2025-09-11 12:40+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -162,6 +162,17 @@ msgstr "Percorso URL per la pagina principale RIS"
 msgid "The URL path for the RIS main page for non-logged-in users."
 msgstr ""
 "Il percorso URL per la pagina principale RIS per gli utenti non registrati."
+
+msgid "Predefined categories for interest ties"
+msgstr "Categorie predefinite per i legami di interesse"
+
+msgid ""
+"Enter a list of categories for interest ties. Each category should be "
+"separated by a semicolon. Example: \"Cat 1 text; Cat 2 text; Cat 3 text\""
+msgstr ""
+"Inserisci un elenco di categorie per i legami di interesse. Ogni categoria "
+"deve essere separata da un punto e virgola. Esempio: Cat 1 text; Cat 2 "
+"text; Cat 3 text"
 
 #, fuzzy
 msgid "Events"
@@ -1398,6 +1409,30 @@ msgstr ""
 "Se non ti sei iscritto a queste notifiche puoi semplicemente ignorare questa "
 "e-mail."
 
+msgid "New customer message in Ticket ${link}"
+msgstr "Nuovo messaggio del cliente nel ticket ${link}"
+
+msgid "${author} wrote"
+msgstr "${author} ha scritto"
+
+#. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
+msgid "Please ${link} to reply."
+msgstr "Per favore ${link} per rispondere."
+
+#. Used in sentence: "Please ${link} to reply."
+msgid "visit the request page"
+msgstr "visita la pagina di richiesta"
+
+msgid ""
+"This is the notification for customer messages on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
+msgstr ""
+"Questa è la notifica relativa ai messaggi dei clienti sulle prenotazioni per "
+"${request.app.org.title}. Se non desideri più ricevere questa e-mail, "
+"contatta un amministratore affinché ti rimuova dall'elenco dei destinatari."
+
 msgid "Good morning,"
 msgstr "Buongiorno,"
 
@@ -1497,9 +1532,6 @@ msgstr "Purtroppo l'evento è stato rifiutato:"
 msgid "New note in Ticket ${link}"
 msgstr "Nuova nota nel ticket ${link}"
 
-msgid "${author} wrote"
-msgstr "${author} ha scritto"
-
 msgid ""
 "This is the notification for notes on reservations for $"
 "{request.app.org.title}. If you no longer want to receive this e-mail please "
@@ -1521,6 +1553,12 @@ msgstr "Non desideri più ricevere queste notifiche?"
 
 msgid "The following reservations have been accepted:"
 msgstr "Sono state accettate le seguenti prenotazioni:"
+
+msgid "Tag"
+msgstr "Tag"
+
+msgid "See Ticket ${link} for additional information."
+msgstr "Per ulteriori informazioni, consultare il biglietto ${link}."
 
 msgid ""
 "This is a notification for the new reservations for ${organisation}. If you "
@@ -1649,18 +1687,9 @@ msgstr "Rifiutata"
 msgid "A message has been sent regarding ${ref}:"
 msgstr "È stato inviato un messaggio relativo a ${ref}:"
 
-#. Canonical text for ${link} is: "visit the request status page"
-#. Canonical text for ${link} is: "visit the request page"
-msgid "Please ${link} to reply."
-msgstr "Per favore ${link} per rispondere."
-
 #. Used in sentence: "Please ${link} to reply."
 msgid "visit the request status page"
 msgstr "visita la pagina di richiesta dello stato"
-
-#. Used in sentence: "Please ${link} to reply."
-msgid "visit the request page"
-msgstr "visita la pagina di richiesta"
 
 msgid "Your request has been closed."
 msgstr "La richiesta è stata chiusa."
@@ -1964,9 +1993,6 @@ msgstr "Questo è un evento importato"
 msgid "General information about the event calendar"
 msgstr "Informazioni generali sul calendario degli eventi"
 
-msgid "Tag"
-msgstr "Tag"
-
 msgid "Date"
 msgstr "Data"
 
@@ -2212,21 +2238,30 @@ msgstr ""
 "potete utilizzare il seguente link. Si noti tuttavia che chiunque condivida "
 "questo link avrà accesso permanente a queste informazioni."
 
-msgid "Reservations must be made at least one day in advance."
+msgid "Reservations must be made at least ${n} ${unit} in advance."
 msgstr ""
-"Le prenotazioni devono essere effettuate con almeno un giorno di anticipo."
+"Le prenotazioni devono essere effettuate con almeno ${n} ${unit} di anticipo."
 
-msgid "Reservations must be made at least one hour in advance."
-msgstr ""
-"Le prenotazioni devono essere effettuate con almeno un'ora di anticipo."
+msgid "days"
+msgstr "giorni"
 
-msgid "Reservations must be made at least ${n} days in advance."
-msgstr ""
-"Le prenotazioni devono essere effettuate con almeno ${n} giorni di anticipo."
+msgid "hour"
+msgstr "ora"
 
-msgid "Reservations must be made at least ${n} hours in advance."
+msgid "hours"
+msgstr "ore"
+
+msgid "Reservations can only be made at most ${n} ${unit} in advance."
 msgstr ""
-"Le prenotazioni devono essere effettuate con almeno ${n} ore di anticipo."
+"Le prenotazioni possono essere effettuate solo con un anticipo massimo di $"
+"{n} ${unit}."
+
+msgid ""
+"Reservations must be made at least ${n1} ${unit1} and at most ${n2} ${unit2} "
+"in advance."
+msgstr ""
+"Le prenotazioni devono essere effettuate con almeno ${n1} ${unit1} e al "
+"massimo ${n2} ${unit2} di anticipo."
 
 msgid ""
 "Select a free time span in the calendar to create an availability period."
@@ -2252,6 +2287,9 @@ msgid ""
 "Receives notifications for reservations of the day on the following days:"
 msgstr ""
 "Riceve le notifiche per le prenotazioni del giorno nei giorni successivi:"
+
+msgid "Receives notifications for customer messages on reservations."
+msgstr "Riceve notifiche relative ai messaggi dei clienti sulle prenotazioni."
 
 msgid "Receives notifications for internal notes on reservations."
 msgstr "Riceve le notifiche per le note interne sulle prenotazioni."

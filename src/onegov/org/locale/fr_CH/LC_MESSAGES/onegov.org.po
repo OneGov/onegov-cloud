@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-09-04 11:50+0200\n"
+"POT-Creation-Date: 2025-09-11 15:42+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -218,6 +218,9 @@ msgstr "Opérateur de paiement"
 
 msgid "Payments"
 msgstr "Paiements"
+
+msgid "Invoices"
+msgstr "Factures"
 
 msgid "Text modules"
 msgstr "Modules de texte"
@@ -1450,6 +1453,9 @@ msgstr "Remarques"
 msgid "Interest ties"
 msgstr "Liens d'intérêt"
 
+msgid "No categories defined."
+msgstr "Aucune catégorie définie."
+
 msgid "Interest tie"
 msgstr "Lien d'intérêt"
 
@@ -1462,11 +1468,17 @@ msgstr "Groupe Parlementaire"
 msgid "Parliamentary group role"
 msgstr "Rôle dans le groupe parlementaire"
 
+msgid "All Tickets"
+msgstr "Tous les tickets"
+
 msgid "Filter Invoices"
 msgstr "Filtrer les factures"
 
 msgid "Uninvoiced"
 msgstr "Non facturé"
+
+msgid "Ticket category"
+msgstr "Catégorie de billet"
 
 msgid "Ticket created from date"
 msgstr "Ticket créé à partir de la date"
@@ -1638,8 +1650,40 @@ msgstr "Utilisé pour grouper la ressource dans la vue d'ensemble"
 msgid "Subgroup"
 msgstr "Sous-groupe"
 
+msgid "Additional information for confirmed reservations"
+msgstr "Informations supplémentaires pour les réservations confirmées"
+
+msgid ""
+"This text will be included in the confirmation and reservation summary e-"
+"mails sent out to customers. As well as displayed on the ticket status page, "
+"once reservations have been accepted."
+msgstr ""
+"Ce texte sera inclus dans les e-mails de confirmation et de résumé de "
+"réservation envoyés aux clients. Il sera également affiché sur la page "
+"d'état des billets, une fois les réservations acceptées."
+
 msgid "Extra Fields Definition"
 msgstr "Définition de champs supplémentaires"
+
+msgid "Extra Field values to include in calendar subscription"
+msgstr "Valeurs supplémentaires à inclure dans l'abonnement au calendrier"
+
+msgid ""
+"By default only the e-mail address and link to the ticket is included. You "
+"may wish to include additional administrative information like a phone "
+"number, name or address. Please be aware however that this data can be "
+"viewed by anyone that knows the subscription URL, so only include what you "
+"must."
+msgstr ""
+"Par défaut, seules l'adresse e-mail et le lien vers le ticket sont inclus. "
+"Vous pouvez ajouter des informations administratives supplémentaires telles "
+"qu'un numéro de téléphone, un nom ou une adresse. Veuillez toutefois noter "
+"que ces données peuvent être consultées par toute personne connaissant l'URL "
+"d'abonnement. Ne fournissez donc que les informations strictement "
+"nécessaires."
+
+msgid "Calendar Subscription"
+msgstr "Abonnement au calendrier"
 
 msgid "Closing date for the public"
 msgstr "Date de clôture pour le public"
@@ -1662,6 +1706,19 @@ msgstr "Heures"
 
 msgid "Days"
 msgstr "Jours"
+
+msgid "Opening date for the public"
+msgstr "Date d'ouverture pour le public"
+
+msgid "Opening date"
+msgstr "Date d'ouverture"
+
+msgid "No opening date"
+msgstr "Pas de date d'ouverture"
+
+msgid "Start accepting reservations days before the allocation"
+msgstr ""
+"Commencez à accepter les réservations quelques jours avant l'attribution."
 
 msgid "Limit reservations to certain zip-codes"
 msgstr "Limiter les réservations à certains codes postaux"
@@ -1757,6 +1814,16 @@ msgid ""
 msgstr ""
 "Pour chaque jour sélectionné ci-dessous, une notification avec les "
 "réservations du jour sera envoyée au destinataire ci-dessus à 6h00.."
+
+msgid "Customer Messages"
+msgstr "Messages des clients"
+
+msgid ""
+"Each time a customer adds a message to the ticket for a reservation, a "
+"notification is sent to the recipient above."
+msgstr ""
+"Chaque fois qu'un client ajoute un message au ticket pour une réservation, "
+"une notification est envoyée au destinataire ci-dessus."
 
 msgid "Internal Notes"
 msgstr "Notes internes"
@@ -2249,9 +2316,6 @@ msgstr ""
 msgid "Accept request and close ticket automatically based on:"
 msgstr ""
 "Accepter la demande et fermer le ticket automatiquement en fonction de :"
-
-msgid "Ticket category"
-msgstr "Catégorie de billet"
 
 msgid "User role"
 msgstr "Rôle d'utilisateur"
@@ -3277,9 +3341,6 @@ msgstr "Opérateurs de paiement"
 
 msgid "Synchronise"
 msgstr "Synchroniser"
-
-msgid "Invoices"
-msgstr "Factures"
 
 msgid "Export Bill run as PDF"
 msgstr "Exporter l'exécution de la facture au format PDF"
@@ -4742,6 +4803,34 @@ msgstr ""
 "Si vous ne vous êtes pas abonné à ces notifications, vous pouvez tout "
 "simplement ignorer cet e-mail."
 
+msgid "New customer message in Ticket ${link}"
+msgstr "Nouveau message du client dans le ticket ${link}"
+
+msgid "${author} wrote"
+msgstr "${author} a écrit"
+
+#. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
+msgid "Please ${link} to reply."
+msgstr "Veuillez vous rendre sur ${link} pour répondre."
+
+#. Used in sentence: "Please ${link} to reply."
+msgid "visit the request page"
+msgstr "visitez la page de la demande"
+
+msgid "Have a great day!"
+msgstr "Passez une bonne journée!"
+
+msgid ""
+"This is the notification for customer messages on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
+msgstr ""
+"Ceci est une notification concernant les messages clients relatifs aux "
+"réservations pour ${request.app.org.title}. Si vous ne souhaitez plus "
+"recevoir cet e-mail, veuillez contacter un administrateur afin qu'il vous "
+"retire de la liste des destinataires."
+
 msgid "Good morning,"
 msgstr "Bonjour,"
 
@@ -4750,9 +4839,6 @@ msgstr "Les réservations suivantes sont programmées pour aujourd'hui."
 
 msgid "No reservations today."
 msgstr "Aucune réservation aujourd'hui."
-
-msgid "Have a great day!"
-msgstr "Passez une bonne journée!"
 
 msgid ""
 "This is the daily reservation overview for ${organisation}. If you no longer "
@@ -4865,9 +4951,6 @@ msgstr "Votre événement a malheureusement été rejeté:"
 msgid "New note in Ticket ${link}"
 msgstr "Nouvelle note dans le billet ${link}"
 
-msgid "${author} wrote"
-msgstr "${author} a écrit"
-
 msgid ""
 "This is the notification for notes on reservations for $"
 "{request.app.org.title}. If you no longer want to receive this e-mail please "
@@ -4903,6 +4986,9 @@ msgstr "Ne souhaitez-vous plus recevoir ces notifications ?"
 
 msgid "The following reservations have been accepted:"
 msgstr "Les réservations suivantes ont été acceptées:"
+
+msgid "See Ticket ${link} for additional information."
+msgstr "Pour plus d'informations, consultez le ticket ${link}."
 
 msgid ""
 "This is the notification for reservations for ${request.app.org.title}. If "
@@ -5033,18 +5119,9 @@ msgstr "Vous avez un nouveau ticket"
 msgid "A message has been sent regarding ${ref}:"
 msgstr "Un message a été envoyé à propos de ${ref}:"
 
-#. Canonical text for ${link} is: "visit the request status page"
-#. Canonical text for ${link} is: "visit the request page"
-msgid "Please ${link} to reply."
-msgstr "Veuillez vous rendre sur ${link} pour répondre."
-
 #. Used in sentence: "Please ${link} to reply."
 msgid "visit the request status page"
 msgstr "visitez la page de statut de la demande"
-
-#. Used in sentence: "Please ${link} to reply."
-msgid "visit the request page"
-msgstr "visitez la page de la demande"
 
 msgid "Your request has been closed."
 msgstr "Votre demande a été complétée."
@@ -5436,21 +5513,35 @@ msgstr ""
 "personne avec laquelle vous partagerez ce lien aura un accès permanent à ces "
 "informations."
 
-msgid "Reservations must be made at least one day in advance."
+#, python-format
+msgid "Reservations must be made at least ${n} ${unit} in advance."
 msgstr ""
-"Les réservations doivent être effectuées au moins une journée à l'avance."
+"Les réservations doivent être effectuées au moins ${n} ${unit} à l'avance."
 
-msgid "Reservations must be made at least one hour in advance."
-msgstr ""
-"Les réservations doivent être effectuées au moins une heure à l'avance."
+msgid "day"
+msgstr "jour"
 
-msgid "Reservations must be made at least ${n} days in advance."
-msgstr ""
-"Les réservations doivent être effectuées au moins ${n} jours à l'avance."
+msgid "days"
+msgstr "jours"
 
-msgid "Reservations must be made at least ${n} hours in advance."
+msgid "hour"
+msgstr "heure"
+
+msgid "hours"
+msgstr "heures"
+
+#, python-format
+msgid "Reservations can only be made at most ${n} ${unit} in advance."
 msgstr ""
-"Les réservations doivent être effectuées au moins ${n} heures à l'avance."
+"Les réservations ne peuvent être effectuées qu'au plus tôt ${n} ${unit} à "
+"l'avance."
+
+msgid ""
+"Reservations must be made at least ${n1} ${unit1} and at most ${n2} ${unit2} "
+"in advance."
+msgstr ""
+"Les réservations doivent être effectuées au moins ${n1} ${unit1} et au plus "
+"tard ${n2} ${unit2} à l'avance."
 
 msgid ""
 "Select a free time span in the calendar to create an availability period."
@@ -5477,6 +5568,11 @@ msgid ""
 "Receives notifications for reservations of the day on the following days:"
 msgstr ""
 "Reçoit des notifications pour les réservations du jour les jours suivants:"
+
+msgid "Receives notifications for customer messages on reservations."
+msgstr ""
+"Reçoit des notifications pour les messages des clients concernant les "
+"réservations."
 
 msgid "Receives notifications for internal notes on reservations."
 msgstr "Reçoit des notifications pour les notes internes sur les réservations."
@@ -5873,11 +5969,11 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Availability period updated. ${deleted} allocations removed, ${created} new "
-"allocations created."
+"Availability period updated. ${deleted} allocations removed, ${updated} "
+"allocations adjusted and ${created} new allocations created."
 msgstr ""
-"Disponibilité mise à jour. ${deleted} allocations supprimées, ${created} "
-"nouvelles allocations créées."
+"Disponibilité mise à jour. ${deleted} allocations supprimées, ${updated} "
+"allocations ajustées et ${created} nouvelles allocations créées."
 
 msgid "Availability period not found"
 msgstr "Période de disponibilité introuvable"
@@ -6862,22 +6958,6 @@ msgstr ""
 "L'heure sélectionnée n'existe pas à cette date en raison du passage de "
 "l'heure normale à l'heure d'été."
 
-msgid "hour"
-msgstr "heure"
-
-msgid "hours"
-msgstr "heures"
-
-msgid "day"
-msgstr "jour"
-
-msgid "days"
-msgstr "jours"
-
-#, python-format
-msgid "Reservations must be made ${n} ${unit} in advance"
-msgstr "Les réservations doivent être effectuées ${n} ${unit} à l'avance"
-
 msgid "This date lies in the past"
 msgstr "Cette date est passée"
 
@@ -7257,6 +7337,11 @@ msgid "Your ticket has a new message"
 msgstr "Votre ticket a un nouveau message"
 
 #, python-format
+msgid "${org} New Customer Message in Reservation for ${resource_title}"
+msgstr ""
+"${org} Nouveau message du client dans la réservation pour ${resource_title}"
+
+#, python-format
 msgid "${org} New Note in Reservation for ${resource_title}"
 msgstr "${org} Nouvelle note dans la réservation pour ${resource_title}"
 
@@ -7391,9 +7476,6 @@ msgstr "Le PDF de ce billet a été téléchargé avec succès vers Gever."
 
 msgid "My"
 msgstr "Mes"
-
-msgid "All Tickets"
-msgstr "Tous les tickets"
 
 msgid "All Users"
 msgstr "Tous les utilisateurs"

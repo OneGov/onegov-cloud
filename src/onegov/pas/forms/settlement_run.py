@@ -7,10 +7,9 @@ from onegov.pas import _
 from onegov.pas.layouts import DefaultLayout
 from onegov.pas.models import SettlementRun
 from wtforms.fields import BooleanField
-from onegov.pas.custom import get_current_settlement_run
 from wtforms.fields import DateField
 from wtforms.fields import StringField
-from wtforms.validators import InputRequired, ValidationError
+from wtforms.validators import InputRequired
 
 
 class SettlementRunForm(Form):
@@ -75,21 +74,3 @@ class SettlementRunForm(Form):
                     return False
 
         return True
-
-    def validate_active(self, field: BooleanField) -> None:
-        if not field.data:
-            return
-
-        session = self.request.session
-        active_run = get_current_settlement_run(session)
-
-        if active_run:
-            # If we are editing the currently active run, it's okay
-            if isinstance(self.model, SettlementRun) \
-                    and self.model.id == active_run.id:
-                return
-
-            raise ValidationError(
-                _('An active settlement run already exists: ${name}',
-                  mapping={'name': active_run.name})
-            )

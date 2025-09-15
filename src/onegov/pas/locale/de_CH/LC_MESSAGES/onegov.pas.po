@@ -29,9 +29,6 @@ msgstr "Aktivitäten"
 msgid "PAS settings"
 msgstr "PAS Einstellungen"
 
-msgid "Files"
-msgstr "Dateien"
-
 msgid "More settings"
 msgstr "Weitere Einstellungen"
 
@@ -58,6 +55,8 @@ msgstr "Kommission"
 
 msgid "Parliamentarian is not in this commission."
 msgstr "Parlamentarier:in ist nicht in dieser Kommission."
+
+
 
 msgid "People Data (JSON)"
 msgstr "Personendaten (JSON)"
@@ -109,12 +108,6 @@ msgstr "Unerwarteter Fehler bei der Verarbeitung der Datei ${name}: ${error}"
 
 msgid "Name"
 msgstr "Name"
-
-msgid "Start"
-msgstr "Start"
-
-msgid "End"
-msgstr "Ende"
 
 msgid "Personnel number"
 msgstr "Personalnummer"
@@ -468,8 +461,11 @@ msgstr "Dauer"
 msgid "No meeting defined yet."
 msgstr "Noch keine Sitzung erfasst."
 
-msgid "Comission"
-msgstr "Kommission"
+msgid "Bulk edits"
+msgstr "Massenbuchungen"
+
+msgid "edited"
+msgstr "bearbeitet"
 
 msgid "Timestamp"
 msgstr "Zeitpunkt"
@@ -477,14 +473,14 @@ msgstr "Zeitpunkt"
 msgid "Attendence"
 msgstr "Anwesenheit"
 
+msgid "Comission"
+msgstr "Kommission"
+
 msgid "No changes yet."
 msgstr "Noch keine Aktivitäten."
 
 msgid "Action"
 msgstr "Aktion"
-
-msgid "Function"
-msgstr "Funktion"
 
 msgid "No active commissions."
 msgstr "Keine aktiven Kommissionen."
@@ -612,14 +608,29 @@ msgstr "Neu"
 msgid "New attendence"
 msgstr "Neue Anwesenheit"
 
-msgid "No parliamentarians selected"
-msgstr "Keine Parliamentarier ausgewählt"
-
 msgid "Added commission session"
 msgstr "Kommissionssitzung hinzugefügt"
 
 msgid "New commission session"
 msgstr "Neue Kommissionssitzung"
+
+msgid "Edited attendences"
+msgstr "Anwesenheiten bearbeitet"
+
+msgid "Edit session"
+msgstr "Sitzung bearbeiten"
+
+msgid "Do you really want to delete this bulk edit?"
+msgstr "Möchten Sie diese Massenbuchung wirklich löschen?"
+
+msgid "Delete Attendencess"
+msgstr "Anwesenheiten löschen"
+
+msgid "Edit plenary session"
+msgstr "Plenarsitzung bearbeiten"
+
+msgid "Edit commission session"
+msgstr "Kommissionssitzung bearbeiten"
 
 msgid "Added plenary session"
 msgstr "Plenarsitzung hinzugefügt"
@@ -629,6 +640,10 @@ msgstr "Neue Plenarsitzung"
 
 msgid "Your changes were saved"
 msgstr "Änderungen gespeichert"
+
+#, python-format
+msgid "Deleted ${count} attendeces"
+msgstr "${count} Anwesenheiten gelöscht"
 
 msgid "Added a new parliamentarian"
 msgstr "Parlamentarier:in hinzugefügt"
@@ -755,5 +770,3 @@ msgstr "Excel Exporte"
 msgid "Total all parties"
 msgstr "Total Alle Parteien"
 
-#~ msgid "Exports Settlement runs"
-#~ msgstr "Exporte Abrechnungsläufe"

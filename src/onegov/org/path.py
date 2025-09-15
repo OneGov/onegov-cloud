@@ -910,10 +910,10 @@ def get_payment(app: OrgApp, id: UUID) -> Payment | None:
         'end': datetime_converter,
         'status': str,
         'payment_type': str,
-        'ticket_start': datetime_converter,
-        'ticket_end': datetime_converter,
-        'reservation_start': datetime_converter,
-        'reservation_end': datetime_converter
+        'ticket_start': extended_date_converter,
+        'ticket_end': extended_date_converter,
+        'reservation_start': extended_date_converter,
+        'reservation_end': extended_date_converter
     }
 )
 def get_payments(
@@ -924,10 +924,11 @@ def get_payments(
     end: datetime | None = None,
     status: str | None = None,
     payment_type: str | None = None,
-    ticket_start: datetime | None = None,
-    ticket_end: datetime | None = None,
-    reservation_start: datetime | None = None,
-    reservation_end: datetime | None = None
+    ticket_group: str | None = None,
+    ticket_start: date | None = None,
+    ticket_end: date | None = None,
+    reservation_start: date | None = None,
+    reservation_end: date | None = None
 ) -> PaymentCollection:
     return PaymentCollection(
         session=app.session(),
@@ -937,6 +938,7 @@ def get_payments(
         end=end,
         status=status,
         payment_type=payment_type,
+        ticket_group=ticket_group,
         ticket_start=ticket_start,
         ticket_end=ticket_end,
         reservation_start=reservation_start,
@@ -949,25 +951,27 @@ def get_payments(
     path='/invoices',
     converters={
         'page': int,
-        'ticket_start': datetime_converter,
-        'ticket_end': datetime_converter,
-        'reservation_start': datetime_converter,
-        'reservation_end': datetime_converter,
+        'ticket_start': extended_date_converter,
+        'ticket_end': extended_date_converter,
+        'reservation_start': extended_date_converter,
+        'reservation_end': extended_date_converter,
         'invoiced': bool,
     }
 )
 def get_invoices(
     app: OrgApp,
     page: int = 0,
-    ticket_start: datetime | None = None,
-    ticket_end: datetime | None = None,
-    reservation_start: datetime | None = None,
-    reservation_end: datetime | None = None,
+    ticket_group: str | None = None,
+    ticket_start: date | None = None,
+    ticket_end: date | None = None,
+    reservation_start: date | None = None,
+    reservation_end: date | None = None,
     invoiced: bool | None = None,
 ) -> TicketInvoiceCollection:
     return TicketInvoiceCollection(
         session=app.session(),
         page=page,
+        ticket_group=ticket_group,
         ticket_start=ticket_start,
         ticket_end=ticket_end,
         reservation_start=reservation_start,

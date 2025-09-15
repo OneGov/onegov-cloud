@@ -135,9 +135,15 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     price_per_item: dict_property[float | None]
     price_per_item = content_property('price_per_reservation')
 
+    #: extra field values to include in the ical event description
+    ical_fields: dict_property[list[str]] = content_property(default=list)
+
     #: reservation deadline (e.g. None, (5, 'd'), (24, 'h'))
     deadline: dict_property[tuple[int, DeadlineUnit] | None]
     deadline = content_property()
+
+    #: reservation lead time (in days)
+    lead_time: dict_property[int | None] = content_property()
 
     #: the pricing method to use for extras defined in formcode
     extras_pricing_method: dict_property[str | None] = content_property()
@@ -372,6 +378,21 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         #        make use of it or can we change this to None?
         return True
 
+    def is_before_lead_time(self, dt: datetime.datetime) -> bool:
+        if not self.lead_time:
+            return False
+
+        if not dt.tzinfo:
+            raise RuntimeError(f'The given date has no timezone: {dt}')
+
+        if not self.timezone:
+            raise RuntimeError('No timezone set on the resource')
+
+        return (
+            align_date_to_day(dt, self.timezone, 'down')
+            - datetime.timedelta(days=self.lead_time)
+        ) > utcnow()
+
     def is_past_deadline(self, dt: datetime.datetime) -> bool:
         if not self.deadline:
             return False
@@ -394,7 +415,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
                 # to the beginning of the date
                 deadline = (
                     align_date_to_day(dt, self.timezone, 'down')
-                    - datetime.timedelta(days=(n - 1))
+                    - datetime.timedelta(days=n - 1)
                 )
 
             case _:  # pragma: unreachable

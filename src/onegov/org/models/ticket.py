@@ -1761,10 +1761,10 @@ class ChatHandler(Handler):
 
 
 def apply_ticket_permissions(
-    query: Query[Ticket],
+    query: _Q,
     filtered_handler: str,
     request: OrgRequest | None,
-) -> Query[Ticket]:
+) -> _Q:
     if request is None or request.is_manager:
         return query
 
@@ -1884,6 +1884,13 @@ class FilteredTicketCollection(TicketCollection):
             self.request
         )
 
+    def groups_by_handler_code(self) -> Query[tuple[str, list[str]]]:
+        return apply_ticket_permissions(
+            super().groups_by_handler_code(),
+            'ALL',
+            self.request
+        )
+
 
 class FilteredArchivedTicketCollection(ArchivedTicketCollection):
 
@@ -1920,5 +1927,12 @@ class FilteredArchivedTicketCollection(ArchivedTicketCollection):
         return apply_ticket_permissions(
             super().subset(),
             self.handler,
+            self.request
+        )
+
+    def groups_by_handler_code(self) -> Query[tuple[str, list[str]]]:
+        return apply_ticket_permissions(
+            super().groups_by_handler_code(),
+            'ALL',
             self.request
         )

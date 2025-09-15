@@ -161,6 +161,7 @@ def view_payments(
         'pdf_export_link': append_query_param(request.class_link(
             TicketInvoiceCollection,
             {
+                'ticket_group': self.ticket_group,
                 'ticket_start': self.ticket_start,
                 'ticket_end': self.ticket_end,
                 'reservation_start': self.reservation_start,

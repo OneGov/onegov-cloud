@@ -1,18 +1,12 @@
 from __future__ import annotations
 
-from wtforms.fields import BooleanField
-from wtforms.fields import DecimalField
-from wtforms.fields import EmailField
-from wtforms.fields import IntegerField
-from wtforms.fields import RadioField
-from wtforms.fields import StringField
-from wtforms.fields import TextAreaField
-from wtforms.validators import InputRequired
-from wtforms.validators import NumberRange
-from wtforms.validators import Optional
-from wtforms.validators import ValidationError
-
-from onegov.form import Form, merge_forms, parse_formcode
+from functools import cached_property
+from onegov.form import as_internal_id
+from onegov.form import flatten_fieldsets
+from onegov.form import merge_forms
+from onegov.form import parse_formcode
+from onegov.form import Form
+from onegov.form.errors import FormError
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.filters import as_float
@@ -27,6 +21,17 @@ from onegov.org.forms.reservation import (
     RESERVED_FIELDS, ExportToExcelWorksheets)
 from onegov.org.forms.util import WEEKDAYS
 from onegov.org.kaba import KabaApiError, KabaClient
+from wtforms.fields import BooleanField
+from wtforms.fields import DecimalField
+from wtforms.fields import EmailField
+from wtforms.fields import IntegerField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.validators import InputRequired
+from wtforms.validators import NumberRange
+from wtforms.validators import Optional
+from wtforms.validators import ValidationError
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -34,6 +39,7 @@ if TYPE_CHECKING:
     from markupsafe import Markup
     from onegov.org.request import OrgRequest
     from onegov.reservation import Resource
+    from wtforms import Field
 
 
 def coerce_component_tuple(value: Any) -> tuple[str, str] | None:
@@ -87,7 +93,16 @@ class ResourceBaseForm(Form):
     )
 
     text = HtmlField(
-        label=_('Text'))
+        label=_('Text')
+    )
+
+    confirmation_text = HtmlField(
+        label=_('Additional information for confirmed reservations'),
+        description=_('This text will be included in the confirmation '
+                      'and reservation summary e-mails sent out to '
+                      'customers. As well as displayed on the ticket '
+                      'status page, once reservations have been accepted.')
+    )
 
     pick_up = TextAreaField(
         label=_('Pick-Up'),
@@ -106,6 +121,19 @@ class ResourceBaseForm(Form):
             )
         ],
         render_kw={'rows': 32, 'data-editor': 'form'}
+    )
+
+    ical_fields = TextAreaField(
+        label=_('Extra Field values to include in calendar subscription'),
+        description=_(
+            'By default only the e-mail address and link to the ticket '
+            'is included. You may wish to include additional administrative '
+            'information like a phone number, name or address. Please be '
+            'aware however that this data can be viewed by anyone that '
+            'knows the subscription URL, so only include what you must.'
+        ),
+        fieldset=_('Calendar Subscription'),
+        render_kw={'class_': 'formcode-select'}
     )
 
     deadline_unit = RadioField(
@@ -138,6 +166,30 @@ class ResourceBaseForm(Form):
         label=_('Days'),
         fieldset=_('Closing date'),
         depends_on=('deadline_unit', 'd'),
+        default=1,
+        validators=[
+            InputRequired(),
+            NumberRange(min=1)
+        ]
+    )
+
+    lead_time_unit = RadioField(
+        label=_('Opening date for the public'),
+        fieldset=_('Opening date'),
+        default='n',
+        validators=[InputRequired()],
+        choices=(
+            ('n', _(
+                'No opening date')),
+            ('d', _(
+                'Start accepting reservations days before the allocation')),
+        )
+    )
+
+    lead_time_days = IntegerField(
+        label=_('Days'),
+        fieldset=_('Opening date'),
+        depends_on=('lead_time_unit', 'd'),
         default=1,
         validators=[
             InputRequired(),
@@ -290,6 +342,28 @@ class ResourceBaseForm(Form):
             ))
             self.delete_field('kaba_components')
 
+    @cached_property
+    def known_field_ids(self) -> set[str] | None:
+        # FIXME: We should probably define this in relation to known_fields
+        #        so we don't parse the form twice if we access both properties
+        try:
+            return {
+                field.id for field in
+                flatten_fieldsets(parse_formcode(self.definition.data))
+            }
+        except FormError:
+            return None
+
+    def extract_field_ids(self, field: Field) -> list[str]:
+        if not self.known_field_ids:
+            return []
+
+        return [
+            name
+            for line in field.data.splitlines()
+            if as_internal_id(name := line.strip()) in self.known_field_ids
+        ]
+
     @property
     def zipcodes(self) -> list[int]:
         assert self.zipcode_list.data is not None
@@ -376,6 +450,17 @@ class ResourceBaseForm(Form):
         else:
             raise NotImplementedError()
 
+    @property
+    def lead_time(self) -> int | None:
+        if self.lead_time_unit.data == 'd':
+            return self.lead_time_days.data
+        return None
+
+    @lead_time.setter
+    def lead_time(self, value: int | None) -> None:
+        self.lead_time_unit.data = 'd' if value else 'n'
+        self.lead_time_days.data = value
+
     # FIXME: Use TypedDict?
     @property
     def zipcode_block(self) -> dict[str, Any] | None:
@@ -402,14 +487,32 @@ class ResourceBaseForm(Form):
             str(i) for i in sorted(value['zipcode_list']))
 
     def populate_obj(self, obj: Resource) -> None:  # type:ignore
-        super().populate_obj(obj, exclude=('deadline', 'zipcode_block'))
+        super().populate_obj(obj, exclude={
+            'deadline',
+            'deadline_unit',
+            'deadline_days',
+            'deadline_hours',
+            'ical_fields',
+            'lead_time',
+            'lead_time_unit',
+            'lead_time_days',
+            'zipcode_block',
+            'zipcode_block_use',
+            'zipcode_field',
+            'zipcode_days',
+            'zipcode_list',
+        })
         obj.deadline = self.deadline
+        obj.lead_time = self.lead_time
         obj.zipcode_block = self.zipcode_block
+        obj.ical_fields = list(self.extract_field_ids(self.ical_fields))
 
     def process_obj(self, obj: Resource) -> None:  # type:ignore
         super().process_obj(obj)
         self.deadline = obj.deadline
+        self.lead_time = obj.lead_time
         self.zipcode_block = obj.zipcode_block
+        self.ical_fields.data = '\n'.join(obj.ical_fields)
 
 
 if TYPE_CHECKING:

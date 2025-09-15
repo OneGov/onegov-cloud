@@ -747,6 +747,15 @@ $pageref-color-hover: $iron;
                 transition: border-top 200ms linear;
                 width: 100%;
 
+                &.no-link {
+                    color: $oil;
+                    cursor: default;
+
+                    &::after {
+                        opacity: 0;
+                    }
+                }
+
                 span {
                     &.h5 {
                         margin-bottom: 0;

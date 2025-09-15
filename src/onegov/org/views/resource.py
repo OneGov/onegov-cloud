@@ -16,7 +16,8 @@ from morepath.request import Response
 from onegov.core.security import Public, Private, Personal
 from onegov.core.utils import module_path, Bunch
 from onegov.core.orm import as_selectable_from_path
-from onegov.form import FormSubmission
+from onegov.core.orm.types import UUID as UUIDType
+from onegov.form import as_internal_id, FormSubmission
 from onegov.org.cli import close_ticket
 from onegov.org.forms.resource import AllResourcesExportForm
 from onegov.org import _, OrgApp, utils
@@ -38,8 +39,8 @@ from onegov.pay import PaymentCollection
 from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
-from sqlalchemy import and_, select
-from sqlalchemy.orm import object_session, undefer
+from sqlalchemy import and_, func, select, cast as sa_cast, Boolean
+from sqlalchemy.orm import undefer
 from webob import exc
 
 
@@ -1213,7 +1214,7 @@ def view_my_reservations_json(
     stmt = as_selectable_from_path(path)
 
     records = request.session.execute(select(stmt.c).where(and_(
-        stmt.c.email == request.authenticated_email,
+        func.lower(stmt.c.email) == request.authenticated_email.lower(),
         start <= stmt.c.start,
         stmt.c.start <= end
     )))
@@ -1390,7 +1391,7 @@ def view_my_reservations_ical(
     stmt = as_selectable_from_path(path)
 
     records = request.session.execute(select(stmt.c).where(and_(
-        stmt.c.email == email,
+        func.lower(stmt.c.email) == email.lower(),
         s <= stmt.c.start, stmt.c.start <= e,
         # only include accepted reservations in ICS file
         stmt.c.accepted.is_(True)
@@ -1472,8 +1473,8 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
     if request.params.get('access-token') != self.access_token:
         raise exc.HTTPForbidden()
 
-    s = utcnow() - timedelta(days=30)
-    e = utcnow() + timedelta(days=30 * 12)
+    start = utcnow() - timedelta(days=30)
+    end = utcnow() + timedelta(days=30 * 12)
 
     cal = icalendar.Calendar()
     cal.add('prodid', '-//OneGov//onegov.org//')
@@ -1488,15 +1489,40 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
 
     # add allocations/reservations
     date = utcnow()
-    path = module_path('onegov.org', 'queries/resource-ical.sql')
-    stmt = as_selectable_from_path(path)
-
-    records = object_session(self).execute(select(stmt.c).where(and_(
-        stmt.c.resource == self.id, s <= stmt.c.start, stmt.c.start <= e
-    )))
+    query = (
+        request.session.query(Reservation)
+        .join(
+            Ticket,
+            sa_cast(Ticket.handler_id, UUIDType) == Reservation.token
+        )
+        .with_entities(
+            Reservation.id.label('id'),
+            Reservation.token.label('token'),
+            Reservation.resource.label('resource'),
+            Ticket.subtitle.label('title'),
+            Ticket.number.label('description'),
+            Reservation.start.label('start'),
+            Reservation.end.label('end'),
+            Ticket.id.label('ticket_id'),
+            Ticket.handler_code.label('handler_code'),
+            *(
+                FormSubmission.data[as_internal_id(field)].astext.label(field)
+                for field in self.ical_fields
+            )
+        )
+        .filter(Reservation.status == 'approved')
+        .filter(sa_cast(Reservation.data['accepted'], Boolean).is_(True))
+        .filter(Reservation.start >= start)
+        .filter(Reservation.start <= end)
+    )
+    if self.ical_fields:
+        query = query.outerjoin(
+            FormSubmission,
+            FormSubmission.id == Reservation.token
+        )
 
     ticket_label = request.translate(_('Ticket'))
-    for r in records:
+    for r in query:
         start = r.start
         end = r.end + timedelta(microseconds=1)
 
@@ -1504,11 +1530,20 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
             'handler_code': r.handler_code,
             'id': r.ticket_id
         })
+        description = '\n'.join((
+            r.description,
+            *(
+                f'{field}: {value}'
+                for field in self.ical_fields
+                if (value := getattr(r, field))
+            ),
+            f'{ticket_label}: {url}'
+        ))
         evt = icalendar.Event()
         evt.add('uid', f'{r.token}-{r.id}')
         evt.add('summary', r.title)
         evt.add('location', self.title)
-        evt.add('description', f'{r.description}\n{ticket_label}: {url}')
+        evt.add('description', description)
         evt.add('dtstart', standardize_date(start, 'UTC'))
         evt.add('dtend', standardize_date(end, 'UTC'))
         evt.add('dtstamp', date)
