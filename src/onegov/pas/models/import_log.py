@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from sqlalchemy.dialects.postgresql.json import JSONB
 import uuid
 from sqlalchemy import Column, Text, ForeignKey
 from sqlalchemy.orm import relationship
@@ -41,5 +42,15 @@ class ImportLog(Base, TimestampMixin):
     # 'completed' or 'failed'
     status: Column[str] = Column(Text, nullable=False)
 
-    # Optional: Add source identifiers like filenames if needed
-    # source_info: Column[str | None] = Column(Text, nullable=True)
+    # 'cli', 'upload', or 'automatic'
+    import_type: Column[str] = Column(Text, nullable=False)
+
+    # This is the json response from the api, we store it to be able to
+    # reconstruct how certain imports were run. This will be useful to
+    # debug issues. But we don't want to store it every time, as these are
+    # several MBs of text and the sync cronjob runs regularly.
+    people_source: Column[Any] = Column(JSONB, nullable=True)
+    organizations_source: Column[Any] = Column(
+        JSONB, nullable=True
+    )
+    memberships_source: Column[Any] = Column(JSONB, nullable=True)
