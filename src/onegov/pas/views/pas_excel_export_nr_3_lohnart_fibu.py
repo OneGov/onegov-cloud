@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from sedate import utcnow
 from collections.abc import Iterator
 
@@ -7,7 +8,7 @@ from onegov.pas.collections import (
     AttendenceCollection,
 )
 from onegov.pas.custom import get_current_rate_set
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from onegov.pas.models.attendence import TYPES
 
 
@@ -19,8 +20,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
 
-# Doc:
-# 'KR-Entschaedigung - 1.Quartal 2024 (1).csv'
+# Document: 'KR-Entschaedigung - 1.Quartal 2024 (1).csv'
 
 
 NEW_LOHNART_MAPPING = {
@@ -50,7 +50,8 @@ def generate_fibu_export_rows(
     request: TownRequest
 ) -> Iterator[list[str | Decimal | date]]:
     """ Finanzbuchhaltung export. Notice a lot of columns
-    are empty, this is by choice."""
+    are empty, this is by choice. This format is precisely
+    required. """
 
     yield [
         'Personalnummer', 'Vertragsnummer', 'Lohnart / Lohnarten Nr.',
@@ -103,12 +104,14 @@ def generate_fibu_export_rows(
                 attendance.commission.type if attendance.commission else None
             )
         )
-        rate_with_cola = Decimal(base_rate * cola_multiplier)
+        rate_with_cola = (Decimal(str(base_rate)) * cola_multiplier).quantize(
+            Decimal('0.01'), rounding=ROUND_HALF_UP
+        )
 
         # Some columns are left empty on purpose (this is what is asked)
         yield [
             parliamentarian.personnel_number or '', '', lohnart_nr,
             '', '', '', '', '', '', '', '', '', rate_with_cola,
-            '', '', '', lohnart_text, '', '', '',
+                '', '', '', lohnart_text, '', '', '',
             '', '', '', '', '', year_quarter_str, utcnow().strftime('%d.%m.%Y')
         ]
