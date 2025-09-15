@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-09-13 22:03+0200\n"
+"POT-Creation-Date: 2025-09-14 00:10+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -743,11 +743,8 @@ msgstr "Buchungen Abrechnungslauf"
 msgid "Buchungen Abrechnungslauf (Kontrollliste)"
 msgstr "Buchungen Abrechnungslauf (Kontrollliste)"
 
-msgid "FiBu Export"
-msgstr "FiBu Export"
-
-msgid "FiBu CSV Export"
-msgstr "FiBU CSV Export"
+msgid "KR-Entschädigungen (CSV)"
+msgstr "KR-Entschädigungen (CSV)"
 
 msgid "PDF Exports"
 msgstr "PDF Exporte"

@@ -256,10 +256,10 @@ def view_settlement_run(
             ]
         },
         'fibu_export': {
-            'title': _('FiBu Export'),
+            'title': _('KR-Entschädigungen (CSV)'),
             'links': [
                 Link(
-                    _('FiBu CSV Export'),
+                    _('KR-Entschädigungen (CSV)'),
                     request.link(
                         SettlementRunAllExport(
                             settlement_run=self,
