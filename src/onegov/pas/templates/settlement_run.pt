@@ -21,7 +21,7 @@
         </dl>
 
         <!-- Closure Status Control List -->
-        <div tal:condition="closure_status" class="closure-status-section">
+        <div tal:condition="closure_status_data" class="closure-status-section">
             <hr class="short-hr">
             <h3 i18n:translate="">Commission Closure Status</h3>
             <hr class="long-hr">
@@ -30,21 +30,20 @@
                 <thead>
                     <tr>
                         <th i18n:translate="">Parliamentarian</th>
-                        <th tal:repeat="commission_name python:sorted(set().union(*[commissions.keys() for commissions in closure_status.values()])) if closure_status else []">
+                        <th tal:repeat="commission_name closure_status_data/commission_names">
                             ${commission_name}
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr tal:repeat="parliamentarian_item closure_status.items()">
-                        <td tal:define="parliamentarian_name python:parliamentarian_item[0]; commissions python:parliamentarian_item[1]">
-                            ${parliamentarian_name}
+                    <tr tal:repeat="row closure_status_data/rows">
+                        <td>
+                            ${row/parliamentarian_name}
                         </td>
-                        <td tal:repeat="commission_name python:sorted(set().union(*[commissions.keys() for commissions in closure_status.values()])) if closure_status else []"
-                            tal:define="is_closed python:commissions.get(commission_name, False)"
-                            class="${python:'closed' if is_closed else 'not-closed'}">
-                            <span tal:condition="is_closed" class="closure-indicator closed">✓</span>
-                            <span tal:condition="not is_closed" class="closure-indicator not-closed">✗</span>
+                        <td tal:repeat="status row/commission_statuses"
+                            class="${python:'closed' if status['is_closed'] else 'not-closed'}">
+                            <span tal:condition="status/is_closed" class="closure-indicator closed">✓</span>
+                            <span tal:condition="not status/is_closed" class="closure-indicator not-closed">✗</span>
                         </td>
                     </tr>
                 </tbody>

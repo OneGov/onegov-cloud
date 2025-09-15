@@ -216,6 +216,34 @@ def view_settlement_run(
     # Get parliamentarian closure status for the control list
     closure_status = get_parliamentarian_closure_status(session, self)
 
+    # Prepare closure status data for template
+    closure_status_data = None
+    if closure_status:
+        # Get all commission names across all parliamentarians
+        all_commissions = sorted(set().union(
+            *[commissions.keys() for commissions in closure_status.values()]
+        ))
+
+        # Prepare rows for template
+        closure_status_rows = []
+        for parliamentarian_name, commissions in closure_status.items():
+            row_data = {
+                'parliamentarian_name': parliamentarian_name,
+                'commission_statuses': [
+                    {
+                        'commission_name': commission_name,
+                        'is_closed': commissions.get(commission_name, False)
+                    }
+                    for commission_name in all_commissions
+                ]
+            }
+            closure_status_rows.append(row_data)
+
+        closure_status_data = {
+            'commission_names': all_commissions,
+            'rows': closure_status_rows
+        }
+
     pdf_categories = {
         'party': {
             'title': _('Settlements by Party'),
@@ -351,6 +379,7 @@ def view_settlement_run(
         'settlement_run': self,
         'export_tabs_data': export_tabs_data,
         'closure_status': closure_status,
+        'closure_status_data': closure_status_data,
         'title': layout.title,
     }
 
