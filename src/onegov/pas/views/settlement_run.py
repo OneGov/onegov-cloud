@@ -9,6 +9,7 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
 
 from onegov.core.elements import Link
 from onegov.core.security import Private
+from onegov.core.utils import normalize_for_filename
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.calculate_pay import calculate_rate
@@ -993,7 +994,8 @@ def view_settlement_run_all_export(
             request=request,
             entity_type='all',
         )
-        filename = request.translate(_('Total all parties'))
+        filename = normalize_for_filename(
+            request.translate(_('Total all parties')))
         return Response(
             pdf_bytes,
             content_type='application/pdf',
@@ -1025,7 +1027,7 @@ def view_settlement_run_export(
             entity_type='party',
             entity=self.entity,
         )
-        filename = f'Partei_{self.entity.name}'
+        filename = normalize_for_filename(f'Partei_{self.entity.name}')
 
     elif self.category == 'commission':
         assert isinstance(self.entity, PASCommission)
@@ -1036,7 +1038,7 @@ def view_settlement_run_export(
             entity_type='commission',
             entity=self.entity,
         )
-        filename = f'commission_{self.entity.name}'
+        filename = normalize_for_filename(f'commission_{self.entity.name}')
 
     elif self.category == 'parliamentarian':
         assert isinstance(self.entity, PASParliamentarian)
@@ -1044,7 +1046,7 @@ def view_settlement_run_export(
         pdf_bytes = generate_parliamentarian_settlement_pdf(
             self.settlement_run, request, self.entity
         )
-        filename = (
+        filename = normalize_for_filename(
             f'Parlamentarier_{self.entity.last_name}_{self.entity.first_name}'
         )
         return Response(
