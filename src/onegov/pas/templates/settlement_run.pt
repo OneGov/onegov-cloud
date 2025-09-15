@@ -20,55 +20,85 @@
             </div>
         </dl>
 
-        <!-- Closure Status Control List -->
-        <div tal:condition="closure_status_data"
-             tal:define="commission_names closure_status_data['commission_names'];
-                         status_rows closure_status_data['rows']"
-             class="closure-status-section">
-            <hr class="short-hr">
-            <h3 i18n:translate="">Commission Closure Status</h3>
-            <hr class="long-hr">
-
-            <table class="closure-status-table">
-                <thead>
-                    <tr>
-                        <th i18n:translate="">Parliamentarian</th>
-                        <th tal:repeat="commission_name commission_names">
-                            ${commission_name}
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr tal:repeat="row status_rows">
-                        <td>
-                            ${row['parliamentarian_name']}
-                        </td>
-                        <td tal:repeat="status row['commission_statuses']"
-                            class="${python:'closed' if status['is_closed'] else 'not-closed'}">
-                            <span tal:condition="status['is_closed']" class="closure-indicator closed">✓</span>
-                            <span tal:condition="not status['is_closed']" class="closure-indicator not-closed">✗</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
         <!-- Tabs Start -->
         <ul class="tabs" data-tabs id="settlement-run-export-tabs" role="tablist">
+            <!-- Commission Closure Status Tab -->
+            <li class="tabs-title is-active" role="presentation">
+                <a href="#panel-closure-status"
+                   aria-controls="panel-closure-status"
+                   aria-selected="true"
+                   role="tab"
+                   i18n:translate="">Commission Closure Status</a>
+            </li>
             <tal:block tal:repeat="tab_item export_tabs_data.values()">
-                <li tal:attributes="class python:'tabs-title ' + ('is-active' if repeat.tab_item.index == 0 else '')" role="presentation">
+                <li class="tabs-title" role="presentation">
                     <a tal:attributes="href '#' + tab_item.panel_id;
-                                       aria-controls tab_item.panel_id;
-                                       aria-selected 'true' if repeat.tab_item.index == 0 else 'false'"
+                                       aria-controls tab_item.panel_id"
+                       aria-selected="false"
                        role="tab">${tab_item.tab_title}</a>
                 </li>
             </tal:block>
         </ul>
 
         <div class="tabs-content" data-tabs-content="settlement-run-export-tabs">
+            <!-- Commission Closure Status Tab Content -->
+            <div class="tabs-panel is-active" id="panel-closure-status" role="tabpanel">
+                <div tal:condition="commission_closure_status" class="closure-status-section">
+                    <div class="explanatory-text">
+                        <p i18n:translate="">
+                            This table shows the attendance closure status for each commission.
+                            It displays how many commission members have marked their attendance as "closed" (abschluss)
+                            for this settlement run. Members who have not yet closed their attendance are listed below each commission.
+                        </p>
+                        <p i18n:translate="">
+                            <strong>Status indicators:</strong>
+                        </p>
+                        <ul>
+                            <li i18n:translate=""><strong>Complete:</strong> All commission members have closed their attendance</li>
+                            <li i18n:translate=""><strong>Incomplete:</strong> Some members have not yet closed their attendance</li>
+                            <li i18n:translate=""><strong>Has attendance:</strong> Member has attendance records but hasn't marked as closed</li>
+                            <li i18n:translate=""><strong>No attendance:</strong> Member has no attendance records for this commission</li>
+                        </ul>
+                    </div>
+
+                    <div tal:repeat="commission commission_closure_status" class="commission-closure-item">
+                        <div class="commission-header"
+                             tal:attributes="class python:'commission-header ' + ('complete' if commission['is_complete'] else 'incomplete')">
+                            <h4>
+                                ${commission['commission_name']}
+                                <span class="completion-ratio">(${commission['completion_ratio']})</span>
+                                <span tal:condition="commission['is_complete']" class="status-indicator complete">✓ Complete</span>
+                                <span tal:condition="not commission['is_complete']" class="status-indicator incomplete">⚠ Incomplete</span>
+                            </h4>
+                        </div>
+
+                        <div tal:condition="commission['incomplete_members']" class="incomplete-members">
+                            <h5 i18n:translate="">Members who have not closed their attendance:</h5>
+                            <ul>
+                                <li tal:repeat="member commission['incomplete_members']"
+                                    tal:attributes="class python:'has-attendance' if member['has_attendance'] else 'no-attendance'">
+                                    ${member['name']}
+                                    <span tal:condition="member['has_attendance']" class="attendance-status" i18n:translate="">(has attendance)</span>
+                                    <span tal:condition="not member['has_attendance']" class="attendance-status" i18n:translate="">(no attendance)</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div tal:condition="commission['is_complete']" class="all-complete">
+                            <p i18n:translate="">✓ All members have closed their attendance for this commission.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div tal:condition="not commission_closure_status" class="no-commissions">
+                    <p i18n:translate="">No commissions with active memberships found for this settlement period.</p>
+                </div>
+            </div>
+
+            <!-- Export Tabs -->
             <tal:block tal:repeat="tab_item export_tabs_data.values()">
-                <div tal:attributes="class python:'tabs-panel ' + ('is-active' if repeat.tab_item.index == 0 else '');
-                                   id tab_item.panel_id"
+                <div class="tabs-panel"
+                     tal:attributes="id tab_item.panel_id"
                      role="tabpanel">
                     <div tal:repeat="category_key tab_item.categories.keys()" class="export-category">
                         <tal:block tal:define="category tab_item.categories[category_key]">

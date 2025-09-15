@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-09-14 00:10+0200\n"
+"POT-Creation-Date: 2025-09-15 17:01+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -29,6 +29,9 @@ msgstr "Aktivitäten"
 msgid "PAS settings"
 msgstr "PAS Einstellungen"
 
+msgid "Files"
+msgstr ""
+
 msgid "More settings"
 msgstr "Weitere Einstellungen"
 
@@ -53,10 +56,17 @@ msgstr "Parlamentarier:in"
 msgid "Commission"
 msgstr "Kommission"
 
+msgid "Abschluss"
+msgstr ""
+
+msgid "Mark as completed/closed"
+msgstr ""
+
 msgid "Parliamentarian is not in this commission."
 msgstr "Parlamentarier:in ist nicht in dieser Kommission."
 
-
+msgid "Bulk edit group"
+msgstr ""
 
 msgid "People Data (JSON)"
 msgstr "Personendaten (JSON)"
@@ -108,6 +118,12 @@ msgstr "Unerwarteter Fehler bei der Verarbeitung der Datei ${name}: ${error}"
 
 msgid "Name"
 msgstr "Name"
+
+msgid "Start"
+msgstr ""
+
+msgid "End"
+msgstr ""
 
 msgid "Personnel number"
 msgstr "Personalnummer"
@@ -288,10 +304,6 @@ msgstr "Ende muss nach dem Start liegen"
 msgid "Dates overlap with existing settlement run: ${start} - ${end}"
 msgstr ""
 "Daten überschneiden sich mit bestehendem Abrechnungslauf: ${start} - ${end}"
-
-#, python-format
-msgid "An active settlement run already exists: ${name}"
-msgstr "Ein aktiver Abrechnungslauf existiert bereits ${name}"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -482,6 +494,9 @@ msgstr "Noch keine Aktivitäten."
 msgid "Action"
 msgstr "Aktion"
 
+msgid "Function"
+msgstr ""
+
 msgid "No active commissions."
 msgstr "Keine aktiven Kommissionen."
 
@@ -596,6 +611,9 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nein"
 
+msgid "Commission Closure Status"
+msgstr ""
+
 msgid "No settlement runs defined yet."
 msgstr "Noch keine Abrechnungsläufe erfasst"
 
@@ -607,6 +625,9 @@ msgstr "Neu"
 
 msgid "New attendence"
 msgstr "Neue Anwesenheit"
+
+msgid "No parliamentarians selected"
+msgstr ""
 
 msgid "Added commission session"
 msgstr "Kommissionssitzung hinzugefügt"
@@ -770,3 +791,6 @@ msgstr "Excel Exporte"
 msgid "Total all parties"
 msgstr "Total Alle Parteien"
 
+#, python-format
+#~ msgid "An active settlement run already exists: ${name}"
+#~ msgstr "Ein aktiver Abrechnungslauf existiert bereits ${name}"
