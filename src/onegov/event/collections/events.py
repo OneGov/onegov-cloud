@@ -579,6 +579,8 @@ class EventCollection(Pagination[Event]):
                 'email': email,
             }
 
+        from onegov.org.forms.event import TAGS_MAPPING_WIL
+
         for event in root.xpath('//ns:event', namespaces=ns):
             title = find_element_text(event, 'title')
             abstract = find_element_text(event, 'abstract')
@@ -614,9 +616,11 @@ class EventCollection(Pagination[Event]):
                 provider_url = find_element_text(provider_ref, 'url')
 
             tags = []
-            if event.find('ns:tags', namespaces=ns) is not None:
-                tags = [
-                    tag.text for tag in event.find('ns:tags', namespaces=ns)]
+            category = event.find('ns:category', namespaces=ns)
+            if category is not None:
+                tag = find_element_text(category, 'mainCategory')
+                tag = TAGS_MAPPING_WIL.get(tag, None)
+                tags.append(tag) if tag else None
 
             timezone = 'Europe/Zurich'
             for schedule in event.find('ns:schedules', namespaces=ns):
