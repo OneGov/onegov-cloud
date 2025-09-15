@@ -54,10 +54,10 @@
                             <strong>Status indicators:</strong>
                         </p>
                         <ul>
-                            <li i18n:translate=""><strong>Complete:</strong> All commission members have closed their attendance</li>
-                            <li i18n:translate=""><strong>Incomplete:</strong> Some members have not yet closed their attendance</li>
-                            <li i18n:translate=""><strong>Has attendance:</strong> Member has attendance records but hasn't marked as closed</li>
-                            <li i18n:translate=""><strong>No attendance:</strong> Member has no attendance records for this commission</li>
+                            <li i18n:translate=""><span><strong>Complete:</strong> All commission members have closed their attendance</span></li>
+                            <li i18n:translate=""><span><strong>Incomplete:</strong> Some members have not yet closed their attendance</span></li>
+                            <li i18n:translate=""><span><strong>Has attendance:</strong> Member has attendance records but hasn't marked as closed</span></li>
+                            <li i18n:translate=""><span><strong>No attendance:</strong> Member has no attendance records for this commission</span></li>
                         </ul>
                     </div>
 
