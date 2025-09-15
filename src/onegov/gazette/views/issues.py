@@ -302,7 +302,9 @@ def export_issue(self: IssueCollection, request: GazetteRequest) -> Response:
     })
     datetime_format = workbook.add_format({'num_format': 'dd.mm.yy hh:mm'})
 
-    worksheet = workbook.add_worksheet(request.translate(_('Issues')))
+    worksheet = workbook.add_worksheet(
+        request.translate(_('Issues'))
+    )
     worksheet.write_row(0, 0, (
         request.translate(_('Year')),
         request.translate(_('Number')),

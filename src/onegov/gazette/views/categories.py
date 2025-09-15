@@ -192,7 +192,9 @@ def export_categories(
     output = BytesIO()
     workbook = Workbook(output)
 
-    worksheet = workbook.add_worksheet(request.translate(_('Categories')))
+    worksheet = workbook.add_worksheet(
+        request.translate(_('Categories'))
+    )
     worksheet.write_row(0, 0, (
         request.translate(_('ID')),
         request.translate(_('Name')),

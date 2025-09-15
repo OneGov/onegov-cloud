@@ -291,7 +291,9 @@ def view_notices_statistics_xlsx(
         (_('Groups'), _('Group'), self.count_by_group),
         (_('Rejected'), _('Name'), self.count_rejected),
     ):
-        worksheet = workbook.add_worksheet(request.translate(title))
+        worksheet = workbook.add_worksheet(
+            request.translate(title)
+        )
         worksheet.write_row(0, 0, (
             request.translate(row),
             request.translate(_('Count'))

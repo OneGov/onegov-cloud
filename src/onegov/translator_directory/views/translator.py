@@ -192,7 +192,8 @@ def export_translator_directory(
         return ', '.join(mapping[n] for n in nationalities)
 
     worksheet = workbook.add_worksheet(
-        request.translate(_('Translator directory')))
+        request.translate(_('Translator directory'))
+    )
     worksheet.write_row(0, 0, (
         request.translate(_('Personal ID')),
         request.translate(_('Admission')),
