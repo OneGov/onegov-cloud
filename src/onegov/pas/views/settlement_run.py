@@ -52,6 +52,7 @@ from onegov.pas.views.pas_excel_export_nr_3_lohnart_fibu import (
 
 from typing import Literal, TypeAlias, TYPE_CHECKING
 if TYPE_CHECKING:
+    from sqlalchemy import Session
     from datetime import date
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
@@ -70,39 +71,40 @@ XLSX_MIMETYPE = (
 
 
 def get_parliamentarian_closure_status(
-    session: 'sqlalchemy.orm.Session',
+    session: Session,
     settlement_run: SettlementRun
 ) -> dict[str, dict[str, bool]]:
     """
     Get closure status for each parliamentarian per commission.
 
     Returns:
-        Dict with structure: {parliamentarian_name: {commission_name: is_closed}}
+        dict with structure: {parliamentarian_name:
+        {commission_name: is_closed}}
     """
     # Get all commissions with memberships during the settlement period
     commissions = session.query(PASCommission).join(
         PASCommissionMembership
     ).filter(
-        PASCommissionMembership.start_date <= settlement_run.end
+        PASCommissionMembership.start <= settlement_run.end
     ).distinct().all()
 
     # Get all parliamentarians with commissions during the settlement period
     parliamentarians = session.query(PASParliamentarian).join(
         PASCommissionMembership
     ).filter(
-        PASCommissionMembership.start_date <= settlement_run.end
+        PASCommissionMembership.start <= settlement_run.end
     ).distinct().all()
 
     closure_status = {}
 
     for parliamentarian in parliamentarians:
-        parl_name = f"{parliamentarian.first_name} {parliamentarian.last_name}"
+        parl_name = f'{parliamentarian.first_name} {parliamentarian.last_name}'
         closure_status[parl_name] = {}
 
         # Get parliamentarian's commissions during settlement period
         memberships = session.query(PASCommissionMembership).filter(
             PASCommissionMembership.parliamentarian_id == parliamentarian.id,
-            PASCommissionMembership.start_date <= settlement_run.end
+            PASCommissionMembership.start <= settlement_run.end
         ).all()
 
         for membership in memberships:
