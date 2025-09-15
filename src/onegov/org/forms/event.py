@@ -80,7 +80,6 @@ TAGS = [
     _('Elderly'),
 ]
 
-
 WEEKDAYS = (
     ('MO', _('Mo')),
     ('TU', _('Tu')),
