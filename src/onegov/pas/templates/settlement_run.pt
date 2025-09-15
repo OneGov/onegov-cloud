@@ -20,6 +20,37 @@
             </div>
         </dl>
 
+        <!-- Closure Status Control List -->
+        <div tal:condition="closure_status" class="closure-status-section">
+            <hr class="short-hr">
+            <h3 i18n:translate="">Commission Closure Status</h3>
+            <hr class="long-hr">
+
+            <table class="closure-status-table">
+                <thead>
+                    <tr>
+                        <th i18n:translate="">Parliamentarian</th>
+                        <th tal:repeat="commission_name python:sorted(set().union(*[commissions.keys() for commissions in closure_status.values()])) if closure_status else []">
+                            ${commission_name}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr tal:repeat="parliamentarian_item closure_status.items()">
+                        <td tal:define="parliamentarian_name python:parliamentarian_item[0]; commissions python:parliamentarian_item[1]">
+                            ${parliamentarian_name}
+                        </td>
+                        <td tal:repeat="commission_name python:sorted(set().union(*[commissions.keys() for commissions in closure_status.values()])) if closure_status else []"
+                            tal:define="is_closed python:commissions.get(commission_name, False)"
+                            class="${python:'closed' if is_closed else 'not-closed'}">
+                            <span tal:condition="is_closed" class="closure-indicator closed">✓</span>
+                            <span tal:condition="not is_closed" class="closure-indicator not-closed">✗</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
         <!-- Tabs Start -->
         <ul class="tabs" data-tabs id="settlement-run-export-tabs" role="tablist">
             <tal:block tal:repeat="tab_item export_tabs_data.values()">

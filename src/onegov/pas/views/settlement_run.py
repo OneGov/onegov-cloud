@@ -30,6 +30,7 @@ from onegov.pas.layouts import SettlementRunLayout
 from onegov.pas.models import (
     Attendence,
     PASCommission,
+    PASCommissionMembership,
     PASParliamentarian,
     Party,
     SettlementRun,
@@ -66,6 +67,60 @@ if TYPE_CHECKING:
 XLSX_MIMETYPE = (
 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 )
+
+
+def get_parliamentarian_closure_status(
+    session: 'sqlalchemy.orm.Session',
+    settlement_run: SettlementRun
+) -> dict[str, dict[str, bool]]:
+    """
+    Get closure status for each parliamentarian per commission.
+
+    Returns:
+        Dict with structure: {parliamentarian_name: {commission_name: is_closed}}
+    """
+    # Get all commissions with memberships during the settlement period
+    commissions = session.query(PASCommission).join(
+        PASCommissionMembership
+    ).filter(
+        PASCommissionMembership.start_date <= settlement_run.end
+    ).distinct().all()
+
+    # Get all parliamentarians with commissions during the settlement period
+    parliamentarians = session.query(PASParliamentarian).join(
+        PASCommissionMembership
+    ).filter(
+        PASCommissionMembership.start_date <= settlement_run.end
+    ).distinct().all()
+
+    closure_status = {}
+
+    for parliamentarian in parliamentarians:
+        parl_name = f"{parliamentarian.first_name} {parliamentarian.last_name}"
+        closure_status[parl_name] = {}
+
+        # Get parliamentarian's commissions during settlement period
+        memberships = session.query(PASCommissionMembership).filter(
+            PASCommissionMembership.parliamentarian_id == parliamentarian.id,
+            PASCommissionMembership.start_date <= settlement_run.end
+        ).all()
+
+        for membership in memberships:
+            commission_name = membership.commission.name
+
+            # Check if parliamentarian has any attendance marked as closed
+            # for this commission in this settlement run
+            closed_attendance = session.query(Attendence).filter(
+                Attendence.parliamentarian_id == parliamentarian.id,
+                Attendence.commission_id == membership.commission_id,
+                Attendence.date >= settlement_run.start,
+                Attendence.date <= settlement_run.end,
+                Attendence.abschluss == True
+            ).first()
+
+            closure_status[parl_name][commission_name] = bool(closed_attendance)
+
+    return closure_status
 
 
 @PasApp.html(
@@ -155,6 +210,9 @@ def view_settlement_run(
     parliamentarians = get_parliamentarians_with_settlements(
         session, self.start, self.end
     )
+
+    # Get parliamentarian closure status for the control list
+    closure_status = get_parliamentarian_closure_status(session, self)
 
     pdf_categories = {
         'party': {
@@ -290,6 +348,7 @@ def view_settlement_run(
         'layout': layout,
         'settlement_run': self,
         'export_tabs_data': export_tabs_data,
+        'closure_status': closure_status,
         'title': layout.title,
     }
 
