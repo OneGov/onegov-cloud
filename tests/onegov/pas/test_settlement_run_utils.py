@@ -7,15 +7,15 @@ from onegov.pas.collections.commission_membership import (
     PASCommissionMembershipCollection
 )
 from onegov.pas.collections import SettlementRunCollection
-from onegov.pas.views.settlement_run import get_parliamentarian_closure_status
+from onegov.pas.views.settlement_run import get_commission_closure_status
 from onegov.pas.models import Attendence
 
 
-def test_get_parliamentarian_closure_status(pas_app):
-    """Test the get_parliamentarian_closure_status function."""
+def test_get_commission_closure_status(pas_app):
+    """Test the get_commission_closure_status function comprehensively."""
     session = pas_app.session()
 
-    # Create test data: settlement run
+    # Create settlement run for specific period
     settlement_runs = SettlementRunCollection(session)
     settlement_run = settlement_runs.add(
         name='Test Settlement Run',
@@ -26,42 +26,72 @@ def test_get_parliamentarian_closure_status(pas_app):
 
     # Create parliamentarians
     parliamentarians = PASParliamentarianCollection(session)
-    parl1 = parliamentarians.add(
+    john = parliamentarians.add(
         first_name='John',
         last_name='Doe',
         personnel_number='123'
     )
-    parl2 = parliamentarians.add(
+    jane = parliamentarians.add(
         first_name='Jane',
         last_name='Smith',
         personnel_number='456'
     )
+    bob = parliamentarians.add(
+        first_name='Bob',
+        last_name='Wilson',
+        personnel_number='789'
+    )
+    alice = parliamentarians.add(
+        first_name='Alice',
+        last_name='Johnson',
+        personnel_number='999'
+    )
 
     # Create commissions
     commissions = PASCommissionCollection(session)
-    commission1 = commissions.add(name='Finance Commission')
-    commission2 = commissions.add(name='Education Commission')
+    finance_commission = commissions.add(name='Finance Commission')
+    education_commission = commissions.add(name='Education Commission')
+    health_commission = commissions.add(name='Health Commission')
+    budget_commission = commissions.add(name='Budget Commission')
 
     # Create commission memberships
     memberships = PASCommissionMembershipCollection(session)
-    # John is in Finance Commission
+
+    # John in Finance Commission
     memberships.add(
-        commission_id=commission1.id,
-        parliamentarian_id=parl1.id,
+        commission_id=finance_commission.id,
+        parliamentarian_id=john.id,
         role='member',
         start=date(2024, 1, 1)
     )
-    # Jane is in both commissions
+
+    # Jane in both Finance and Education
     memberships.add(
-        commission_id=commission1.id,
-        parliamentarian_id=parl2.id,
+        commission_id=finance_commission.id,
+        parliamentarian_id=jane.id,
         role='member',
         start=date(2024, 1, 1)
     )
     memberships.add(
-        commission_id=commission2.id,
-        parliamentarian_id=parl2.id,
+        commission_id=education_commission.id,
+        parliamentarian_id=jane.id,
         role='president',
+        start=date(2024, 1, 1)
+    )
+
+    # Bob in Health Commission (no attendance)
+    memberships.add(
+        commission_id=health_commission.id,
+        parliamentarian_id=bob.id,
+        role='member',
+        start=date(2024, 1, 1)
+    )
+
+    # Alice in Budget Commission (for date filtering test)
+    memberships.add(
+        commission_id=budget_commission.id,
+        parliamentarian_id=alice.id,
+        role='member',
         start=date(2024, 1, 1)
     )
 
@@ -71,8 +101,8 @@ def test_get_parliamentarian_closure_status(pas_app):
         date=date(2024, 6, 15),
         duration=120,
         type='commission',
-        parliamentarian_id=parl1.id,
-        commission_id=commission1.id,
+        parliamentarian_id=john.id,
+        commission_id=finance_commission.id,
         abschluss=True
     )
     session.add(attendance1)
@@ -82,8 +112,8 @@ def test_get_parliamentarian_closure_status(pas_app):
         date=date(2024, 6, 16),
         duration=90,
         type='commission',
-        parliamentarian_id=parl2.id,
-        commission_id=commission1.id,
+        parliamentarian_id=jane.id,
+        commission_id=finance_commission.id,
         abschluss=False
     )
     session.add(attendance2)
@@ -93,168 +123,31 @@ def test_get_parliamentarian_closure_status(pas_app):
         date=date(2024, 6, 17),
         duration=150,
         type='commission',
-        parliamentarian_id=parl2.id,
-        commission_id=commission2.id,
+        parliamentarian_id=jane.id,
+        commission_id=education_commission.id,
         abschluss=True
     )
     session.add(attendance3)
 
-    session.flush()
-    transaction.commit()
-
-    # Refresh the settlement run object to avoid detached instance issues
-    session.refresh(settlement_run)
-
-    # Test the function
-    closure_status = get_parliamentarian_closure_status(session, settlement_run)
-
-    # Verify results
-    assert isinstance(closure_status, dict)
-
-    # Check John Doe's status
-    john_name = "John Doe"
-    assert john_name in closure_status
-    john_status = closure_status[john_name]
-    assert "Finance Commission" in john_status
-    assert john_status["Finance Commission"] is True  # Should be closed
-
-    # Check Jane Smith's status
-    jane_name = "Jane Smith"
-    assert jane_name in closure_status
-    jane_status = closure_status[jane_name]
-    assert "Finance Commission" in jane_status
-    assert jane_status["Finance Commission"] is False  # Should be open
-    assert "Education Commission" in jane_status
-    assert jane_status["Education Commission"] is True  # Should be closed
-
-
-def test_get_parliamentarian_closure_status_no_attendances(pas_app):
-    """Test closure status when parliamentarians have no attendances."""
-    session = pas_app.session()
-
-    # Create settlement run
-    settlement_runs = SettlementRunCollection(session)
-    settlement_run = settlement_runs.add(
-        name='Empty Settlement Run',
-        start=date(2024, 1, 1),
-        end=date(2024, 12, 31),
-        active=True
-    )
-
-    # Create parliamentarian and commission
-    parliamentarians = PASParliamentarianCollection(session)
-    parl = parliamentarians.add(
-        first_name='Bob',
-        last_name='Wilson',
-        personnel_number='789'
-    )
-
-    commissions = PASCommissionCollection(session)
-    commission = commissions.add(name='Health Commission')
-
-    # Create membership but no attendance
-    memberships = PASCommissionMembershipCollection(session)
-    memberships.add(
-        commission_id=commission.id,
-        parliamentarian_id=parl.id,
-        role='member',
-        start=date(2024, 1, 1)
-    )
-
-    session.flush()
-    transaction.commit()
-
-    # Refresh the settlement run object to avoid detached instance issues
-    session.refresh(settlement_run)
-
-    # Test function
-    closure_status = get_parliamentarian_closure_status(session, settlement_run)
-
-    # Verify Bob has commission but no closure (False)
-    bob_name = "Bob Wilson"
-    assert bob_name in closure_status
-    bob_status = closure_status[bob_name]
-    assert "Health Commission" in bob_status
-    assert bob_status["Health Commission"] is False  # No closed attendance
-
-
-def test_get_parliamentarian_closure_status_empty_data(pas_app):
-    """Test closure status with empty data (no parliamentarians/commissions)."""
-    session = pas_app.session()
-
-    # Create settlement run but no data
-    settlement_runs = SettlementRunCollection(session)
-    settlement_run = settlement_runs.add(
-        name='Empty Settlement Run',
-        start=date(2024, 1, 1),
-        end=date(2024, 12, 31),
-        active=True
-    )
-
-    session.flush()
-    transaction.commit()
-
-    # Refresh the settlement run object to avoid detached instance issues
-    session.refresh(settlement_run)
-
-    # Test function with empty data
-    closure_status = get_parliamentarian_closure_status(session, settlement_run)
-
-    # Should return empty dictionary
-    assert isinstance(closure_status, dict)
-    assert len(closure_status) == 0
-
-
-def test_get_parliamentarian_closure_status_date_filtering(pas_app):
-    """Test that closure status only considers attendances within settlement run dates."""
-    session = pas_app.session()
-
-    # Create settlement run for specific period
-    settlement_runs = SettlementRunCollection(session)
-    settlement_run = settlement_runs.add(
-        name='Q1 Settlement Run',
-        start=date(2024, 1, 1),
-        end=date(2024, 3, 31),
-        active=True
-    )
-
-    # Create parliamentarian and commission
-    parliamentarians = PASParliamentarianCollection(session)
-    parl = parliamentarians.add(
-        first_name='Alice',
-        last_name='Johnson',
-        personnel_number='999'
-    )
-
-    commissions = PASCommissionCollection(session)
-    commission = commissions.add(name='Budget Commission')
-
-    memberships = PASCommissionMembershipCollection(session)
-    memberships.add(
-        commission_id=commission.id,
-        parliamentarian_id=parl.id,
-        role='member',
-        start=date(2024, 1, 1)
-    )
-
-    # Create attendance OUTSIDE settlement run period (should be ignored)
+    # Alice has attendance OUTSIDE settlement run period (for next test)
+    # This will be tested in a separate settlement run
     attendance_outside = Attendence(
-        date=date(2024, 5, 15),  # After settlement run end
+        date=date(2025, 5, 15),  # After our settlement run end
         duration=120,
         type='commission',
-        parliamentarian_id=parl.id,
-        commission_id=commission.id,
+        parliamentarian_id=alice.id,
+        commission_id=budget_commission.id,
         abschluss=True
     )
     session.add(attendance_outside)
 
-    # Create attendance INSIDE settlement run period but not closed
+    # Alice has attendance INSIDE settlement run period but not closed
     attendance_inside = Attendence(
         date=date(2024, 2, 15),  # Within settlement run period
         duration=90,
         type='commission',
-        parliamentarian_id=parl.id,
-        commission_id=commission.id,
+        parliamentarian_id=alice.id,
+        commission_id=budget_commission.id,
         abschluss=False
     )
     session.add(attendance_inside)
@@ -262,16 +155,74 @@ def test_get_parliamentarian_closure_status_date_filtering(pas_app):
     session.flush()
     transaction.commit()
 
-    # Refresh the settlement run object to avoid detached instance issues
-    session.refresh(settlement_run)
+    # Re-attach the settlement run object to avoid detached instance issues
+    settlement_run = session.merge(settlement_run)
 
-    # Test function
-    closure_status = get_parliamentarian_closure_status(session, settlement_run)
+    # Test 1: Basic functionality with mixed statuses
+    commission_status = get_commission_closure_status(session, settlement_run)
+    assert isinstance(commission_status, list)
 
-    # Should only consider the attendance within the settlement period
-    alice_name = "Alice Johnson"
-    assert alice_name in closure_status
-    alice_status = closure_status[alice_name]
-    assert "Budget Commission" in alice_status
-    # Should be False because the closed attendance is outside the period
-    assert alice_status["Budget Commission"] is False
+    # Should have 4 commissions
+    assert len(commission_status) == 4
+
+    # Find specific commissions in the results
+    finance_status = next((c for c in commission_status if c['commission_name'] == 'Finance Commission'), None)
+    education_status = next((c for c in commission_status if c['commission_name'] == 'Education Commission'), None)
+    health_status = next((c for c in commission_status if c['commission_name'] == 'Health Commission'), None)
+    budget_status = next((c for c in commission_status if c['commission_name'] == 'Budget Commission'), None)
+
+    assert finance_status is not None
+    assert education_status is not None
+    assert health_status is not None
+    assert budget_status is not None
+
+    # Check Finance Commission (John completed, Jane not completed)
+    assert finance_status['total_members'] == 2
+    assert finance_status['completed_members'] == 1
+    assert finance_status['completion_ratio'] == '1/2'
+    assert finance_status['is_complete'] is False
+    assert len(finance_status['incomplete_members']) == 1
+    assert finance_status['incomplete_members'][0]['name'] == 'Jane Smith'
+    assert finance_status['incomplete_members'][0]['has_attendance'] is True
+
+    # Check Education Commission (only Jane, completed)
+    assert education_status['total_members'] == 1
+    assert education_status['completed_members'] == 1
+    assert education_status['completion_ratio'] == '1/1'
+    assert education_status['is_complete'] is True
+    assert len(education_status['incomplete_members']) == 0
+
+    # Check Health Commission (only Bob, no attendance)
+    assert health_status['total_members'] == 1
+    assert health_status['completed_members'] == 0
+    assert health_status['completion_ratio'] == '0/1'
+    assert health_status['is_complete'] is False
+    assert len(health_status['incomplete_members']) == 1
+    assert health_status['incomplete_members'][0]['name'] == 'Bob Wilson'
+    assert health_status['incomplete_members'][0]['has_attendance'] is False
+
+    # Check Budget Commission (Alice has attendance but not closed)
+    assert budget_status['total_members'] == 1
+    assert budget_status['completed_members'] == 0
+    assert budget_status['completion_ratio'] == '0/1'
+    assert budget_status['is_complete'] is False
+    assert len(budget_status['incomplete_members']) == 1
+    assert budget_status['incomplete_members'][0]['name'] == 'Alice Johnson'
+    assert budget_status['incomplete_members'][0]['has_attendance'] is True
+
+    # Test 2: Empty data scenario
+    empty_settlement = settlement_runs.add(
+        name='Empty Settlement Run',
+        start=date(2025, 1, 1),
+        end=date(2025, 12, 31),
+        active=True
+    )
+    session.flush()
+    transaction.commit()
+    empty_settlement = session.merge(empty_settlement)
+
+    empty_commission_status = get_commission_closure_status(
+        session, empty_settlement
+    )
+    assert isinstance(empty_commission_status, list)
+    assert len(empty_commission_status) == 0
