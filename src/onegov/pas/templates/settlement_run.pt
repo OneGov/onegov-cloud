@@ -72,20 +72,29 @@
                             </h4>
                         </div>
 
-                        <div tal:condition="commission['incomplete_members']" class="incomplete-members">
-                            <h5 i18n:translate="">Members who have not closed their attendance:</h5>
-                            <ul>
-                                <li tal:repeat="member commission['incomplete_members']"
-                                    tal:attributes="class python:'has-attendance' if member['has_attendance'] else 'no-attendance'">
-                                    ${member['name']}
-                                    <span tal:condition="member['has_attendance']" class="attendance-status" i18n:translate="">(has attendance)</span>
-                                    <span tal:condition="not member['has_attendance']" class="attendance-status" i18n:translate="">(no attendance)</span>
-                                </li>
-                            </ul>
-                        </div>
+                        <div class="member-lists">
+                            <div tal:condition="commission['complete_members']" class="complete-members">
+                                <h5 i18n:translate="">Members who have closed their attendance:</h5>
+                                <ul>
+                                    <li tal:repeat="member commission['complete_members']"
+                                        class="completed">
+                                        ${member['name']}
+                                        <span class="attendance-status completed" i18n:translate="">✓ (closed)</span>
+                                    </li>
+                                </ul>
+                            </div>
 
-                        <div tal:condition="commission['is_complete']" class="all-complete">
-                            <p i18n:translate="">✓ All members have closed their attendance for this commission.</p>
+                            <div tal:condition="commission['incomplete_members']" class="incomplete-members">
+                                <h5 i18n:translate="">Members who have not closed their attendance:</h5>
+                                <ul>
+                                    <li tal:repeat="member commission['incomplete_members']"
+                                        tal:attributes="class python:'has-attendance' if member['has_attendance'] else 'no-attendance'">
+                                        ${member['name']}
+                                        <span tal:condition="member['has_attendance']" class="attendance-status" i18n:translate="">(has attendance)</span>
+                                        <span tal:condition="not member['has_attendance']" class="attendance-status" i18n:translate="">(no attendance)</span>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>

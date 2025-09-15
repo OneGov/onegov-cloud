@@ -17,7 +17,6 @@ from onegov.pas import PasApp
 from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import (
     AttendenceCollection,
-    PASCommissionCollection,
     SettlementRunCollection,
 )
 from onegov.pas.custom import get_current_rate_set
@@ -126,6 +125,7 @@ def get_commission_closure_status(
 
         completed_members = 0
         incomplete_members = []
+        complete_members = []
 
         for membership in memberships:
             parliamentarian = membership.parliamentarian
@@ -142,6 +142,9 @@ def get_commission_closure_status(
 
             if closed_attendance:
                 completed_members += 1
+                complete_members.append({
+                    'name': parl_name,
+                })
             else:
                 # Check if they have any attendance at all for this commission
                 has_attendance = session.query(Attendence).filter(
@@ -163,6 +166,7 @@ def get_commission_closure_status(
             'total_members': total_members,
             'completed_members': completed_members,
             'completion_ratio': completion_ratio,
+            'complete_members': complete_members,
             'incomplete_members': incomplete_members,
             'is_complete': completed_members == total_members
         })
