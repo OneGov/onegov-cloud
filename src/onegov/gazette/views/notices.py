@@ -19,7 +19,7 @@ from onegov.gazette.pdf import NoticesPdf
 from onegov.gazette.views import get_user
 from onegov.gazette.views import get_user_and_group
 from sedate import utcnow
-from xlsxwriter import Workbook  # type:ignore[import-untyped]
+from xlsxwriter import Workbook
 
 
 from typing import TYPE_CHECKING
@@ -291,8 +291,7 @@ def view_notices_statistics_xlsx(
         (_('Groups'), _('Group'), self.count_by_group),
         (_('Rejected'), _('Name'), self.count_rejected),
     ):
-        worksheet = workbook.add_worksheet()
-        worksheet.name = request.translate(title)
+        worksheet = workbook.add_worksheet(request.translate(title))
         worksheet.write_row(0, 0, (
             request.translate(row),
             request.translate(_('Count'))

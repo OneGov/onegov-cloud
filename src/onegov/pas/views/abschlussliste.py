@@ -3,7 +3,7 @@ from collections import defaultdict
 from io import BytesIO
 from decimal import Decimal, ROUND_HALF_UP
 from operator import itemgetter
-import xlsxwriter   # type: ignore[import-untyped]
+import xlsxwriter
 
 from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import (

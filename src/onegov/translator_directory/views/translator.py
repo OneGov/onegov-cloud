@@ -35,7 +35,7 @@ from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.utils import country_code_to_name
 
 from uuid import uuid4
-from xlsxwriter import Workbook  # type:ignore[import-untyped]
+from xlsxwriter import Workbook
 from docx.image.exceptions import UnrecognizedImageError
 
 
@@ -191,8 +191,8 @@ def export_translator_directory(
             return ''
         return ', '.join(mapping[n] for n in nationalities)
 
-    worksheet = workbook.add_worksheet()
-    worksheet.name = request.translate(_('Translator directory'))
+    worksheet = workbook.add_worksheet(
+        request.translate(_('Translator directory')))
     worksheet.write_row(0, 0, (
         request.translate(_('Personal ID')),
         request.translate(_('Admission')),
