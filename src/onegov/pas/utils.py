@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.pas import log
+from onegov.pas.log import log
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.party import Party
