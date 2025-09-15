@@ -38,7 +38,7 @@ from onegov.pay import PaymentCollection
 from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
-from sqlalchemy import and_, select
+from sqlalchemy import and_, func, select
 from sqlalchemy.orm import object_session, undefer
 from webob import exc
 
@@ -1213,7 +1213,7 @@ def view_my_reservations_json(
     stmt = as_selectable_from_path(path)
 
     records = request.session.execute(select(stmt.c).where(and_(
-        stmt.c.email == request.authenticated_email,
+        func.lower(stmt.c.email) == request.authenticated_email.lower(),
         start <= stmt.c.start,
         stmt.c.start <= end
     )))
@@ -1390,7 +1390,7 @@ def view_my_reservations_ical(
     stmt = as_selectable_from_path(path)
 
     records = request.session.execute(select(stmt.c).where(and_(
-        stmt.c.email == email,
+        func.lower(stmt.c.email) == email.lower(),
         s <= stmt.c.start, stmt.c.start <= e,
         # only include accepted reservations in ICS file
         stmt.c.accepted.is_(True)

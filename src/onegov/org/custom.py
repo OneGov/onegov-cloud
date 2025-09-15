@@ -17,6 +17,7 @@ from onegov.ticket import TicketCollection, TicketInvoiceCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from purl import URL
+from sqlalchemy import func
 
 
 from typing import Any, TYPE_CHECKING
@@ -303,7 +304,7 @@ def get_global_tools(
             attributes={'data-count': str(screen_count)}
         )
 
-    if citizen_login_enabled and request.authenticated_email:
+    if citizen_login_enabled and (email := request.authenticated_email):
         # This logout link is specific to citizens, if we're logged
         # in as another user, then we don't need this additional
         # logout link
@@ -329,7 +330,7 @@ def get_global_tools(
         if request.session.query(
             request.session.query(Reservation)
             .filter(Reservation.status == 'approved')
-            .filter(Reservation.email == request.authenticated_email)
+            .filter(func.lower(Reservation.email) == email.lower())
             .exists()
         ).scalar():
             yield Link(
