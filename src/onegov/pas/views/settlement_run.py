@@ -206,7 +206,7 @@ def view_settlement_run(
     # Get commissions active during settlement run period
     commissions = PASCommissionCollection(session).query().order_by(
         PASCommission.name
-    )
+    ).all()
 
     # Get parliamentarians active during settlement run period with settlements
     parliamentarians = get_parliamentarians_with_settlements(
