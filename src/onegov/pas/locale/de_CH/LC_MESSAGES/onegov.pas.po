@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-09-10 15:35+0200\n"
+"POT-Creation-Date: 2025-09-14 00:10+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -17,8 +17,8 @@ msgstr "Benutzer"
 msgid "Logout"
 msgstr "Abmelden"
 
-msgid "Management"
-msgstr "Verwaltung"
+msgid "Current Settlement Run"
+msgstr "Aktueller Abrechnungslauf"
 
 msgid "Attendences"
 msgstr "Anwesenheiten"
@@ -31,6 +31,9 @@ msgstr "PAS Einstellungen"
 
 msgid "More settings"
 msgstr "Weitere Einstellungen"
+
+msgid "Management"
+msgstr "Verwaltung"
 
 msgid "No within an active settlement run."
 msgstr "Nicht in einem aktiven Abrechungslauf"
@@ -285,6 +288,10 @@ msgstr "Ende muss nach dem Start liegen"
 msgid "Dates overlap with existing settlement run: ${start} - ${end}"
 msgstr ""
 "Daten überschneiden sich mit bestehendem Abrechnungslauf: ${start} - ${end}"
+
+#, python-format
+msgid "An active settlement run already exists: ${name}"
+msgstr "Ein aktiver Abrechnungslauf existiert bereits ${name}"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -589,9 +596,6 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nein"
 
-msgid "Exports Settlement runs"
-msgstr "Exporte Abrechnungsläufe"
-
 msgid "No settlement runs defined yet."
 msgstr "Noch keine Abrechnungsläufe erfasst"
 
@@ -742,8 +746,27 @@ msgstr "Abrechnungen nach Kommission"
 msgid "Settlements by Parliamentarian"
 msgstr "Abrechnungen nach Parlamentarier:in"
 
+msgid "Abschlussliste"
+msgstr "Abschlussliste"
+
+msgid "Abschlussliste (XLSX)"
+msgstr "Abschlussliste (XLSX)"
+
+msgid "Buchungen Abrechnungslauf"
+msgstr "Buchungen Abrechnungslauf"
+
+msgid "Buchungen Abrechnungslauf (Kontrollliste)"
+msgstr "Buchungen Abrechnungslauf (Kontrollliste)"
+
+msgid "KR-Entschädigungen (CSV)"
+msgstr "KR-Entschädigungen (CSV)"
+
+msgid "PDF Exports"
+msgstr "PDF Exporte"
+
+msgid "Excel Exports"
+msgstr "Excel Exporte"
+
 msgid "Total all parties"
 msgstr "Total Alle Parteien"
 
-#~ msgid "Edited session"
-#~ msgstr "Sitzung bearbeitet"

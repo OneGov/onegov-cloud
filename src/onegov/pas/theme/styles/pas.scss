@@ -12,6 +12,7 @@ $settlement-run-icon: '\f4c0';
 
 .globals {
     .attendences::before { @include icon-bold($attendence-icon); }
+    .attendances::before { @include icon-bold($attendence-icon); }
     .changes::before { @include icon-bold($change-icon); }
     .commissions::before { @include icon-bold($commission-icon); }
     .legislative-periods::before { @include icon($legislative-period-icon); }
@@ -21,6 +22,7 @@ $settlement-run-icon: '\f4c0';
     .rate-sets::before { @include icon-bold($rate-set-icon); }
     .pas-settings::before { @include icon-bold($pas-settings-icon); }
     .settlement-runs::before { @include icon-bold($settlement-run-icon); }
+    .settlement-run::before { @include icon-bold($settlement-run-icon); }
 }
 
 .edit-bar {

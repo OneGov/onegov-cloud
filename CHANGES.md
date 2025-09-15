@@ -1935,7 +1935,7 @@ Fixes a number of issues OGC-2122, OGC-2120, OGC-2119, OGC-2109
 - Preventing duplicates in push notifications
 - Fix default choices not being in nested list
 - Prevent user from being able to submit an empty list if checkbox ticked
-- Fix inconsistent UI labels (Themen-ID ...) 
+- Fix inconsistent UI labels (Themen-ID ...)
 
 The implementation now uses database constraints to ensure notification
  uniqueness even during simultaneous processing.
@@ -1987,7 +1987,7 @@ The implementation now uses database constraints to ensure notification
 - Implement missing cost-of-living adjustment in parliamentarian export
 - Perform the calculation for getting the Quartal with no assumptions
 - Make sure parliamentarians are correctly linked to their parties during
- the times they attended, not just when they first joined. Indeed, party 
+ the times they attended, not just when they first joined. Indeed, party
 changes should be expected and accounted for
 - Ensure role activity is verified at specific attendance times.
 - Replace manual HTML string formatting
