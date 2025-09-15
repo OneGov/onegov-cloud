@@ -59,7 +59,7 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
 
             management_links.extend((
                 Link(
-                    _('Attendances'),
+                    _('Attendences'),
                     request.class_link(AttendenceCollection),
                     attrs={'class': 'attendances'}
                 ),

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from collections import defaultdict
 from io import BytesIO
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from operator import itemgetter
 import xlsxwriter   # type: ignore[import-untyped]
 
@@ -13,6 +13,9 @@ from onegov.pas.custom import get_current_rate_set
 from onegov.pas.utils import (
     get_parliamentarians_with_settlements,
 )
+from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
+from onegov.pas.models.party import Party
+from sqlalchemy import or_
 
 from onegov.pas.models.attendence import TYPES
 
@@ -22,6 +25,7 @@ if TYPE_CHECKING:
     from datetime import date
     from onegov.town6.request import TownRequest
     from onegov.pas.models.settlement_run import SettlementRun
+    from sqlalchemy.orm import Session
 
 
 class BookingRowData(TypedDict):
@@ -33,6 +37,45 @@ class BookingRowData(TypedDict):
     value: Decimal
     chf: Decimal
     chf_with_cola: Decimal
+
+
+def get_party_lookup(
+    session: Session,
+    parliamentarian_ids: set[str],
+    start_date: date,
+    end_date: date
+) -> dict[str, Party | None]:
+    """
+    Bulk fetch party information for parliamentarians during a period.
+    Returns a lookup dictionary to avoid N+1 queries.
+    """
+    # Fetch all relevant roles in one query
+    roles = (
+        session.query(PASParliamentarianRole)
+        .join(Party)
+        .filter(
+            PASParliamentarianRole.parliamentarian_id.in_(parliamentarian_ids),
+            PASParliamentarianRole.party_id.isnot(None),
+            or_(
+                PASParliamentarianRole.end.is_(None),
+                PASParliamentarianRole.end >= start_date,
+            ),
+            PASParliamentarianRole.start <= end_date,
+        )
+        .order_by(PASParliamentarianRole.start.desc())
+        .all()
+    )
+
+    # Build lookup dictionary - take the most recent role for each parl
+    party_lookup: dict[str, Party | None] = {}
+    for parliamentarian_id in parliamentarian_ids:
+        party_lookup[parliamentarian_id] = None
+    for role in roles:
+        parl_id = str(role.parliamentarian_id)
+        if parl_id not in party_lookup or party_lookup[parl_id] is None:
+            party_lookup[parl_id] = role.party
+    return party_lookup
+
 
 # these are the two last exports from email
 # We are writing the abschlussliste export,
@@ -51,6 +94,12 @@ def get_abschlussliste_data(
         session, settlement_run.start, settlement_run.end
     )
 
+    # Get bulk party lookup to avoid N+1 queries
+    parliamentarian_ids = {str(p.id) for p in parliamentarians}
+    party_lookup = get_party_lookup(
+        session, parliamentarian_ids, settlement_run.start, settlement_run.end
+    )
+
     parl_data: defaultdict[str, dict[str, Any]] = defaultdict(
         lambda: {
             'plenum_duration': Decimal('0'),
@@ -65,6 +114,7 @@ def get_abschlussliste_data(
         }
     )
 
+    # Use optimized query with eager loading
     attendances = AttendenceCollection(
         session,
         date_from=settlement_run.start,
@@ -98,9 +148,7 @@ def get_abschlussliste_data(
 
     result = []
     for p in parliamentarians:
-        party = p.get_party_during_period(
-            settlement_run.start, settlement_run.end, session
-        )
+        party = party_lookup[str(p.id)]
         data = parl_data[str(p.id)]
         data['parliamentarian'] = p
         data['party'] = party.name if party else ''
@@ -145,33 +193,70 @@ def generate_abschlussliste_xlsx(
     for col, header in enumerate(overview_headers):
         overview_ws.write(0, col, header, header_format)
 
-    # Details tab
+    # Details tab - individual attendance records
     details_ws = workbook.add_worksheet('Details')
     details_headers = [
-        'Name', 'Vorname', 'Partei', 'Fraktion',
-        'Plenum / Kommission Zeit', 'Entschädigung',
-        'Aktenstudium Zeit', 'Aktenstudium Entschädigung',
-        'Kürzestsitzungen Zeit', 'Kürzestsitzungen Entschädigung'
+        'Datum', 'Name', 'Vorname', 'Partei', 'Fraktion',
+        'Typ', 'Kommission', 'Zeit', 'Entschädigung'
     ]
     for col, header in enumerate(details_headers):
         details_ws.write(0, col, header, header_format)
 
+    # Get aggregated data for Übersicht tab
     data = get_abschlussliste_data(settlement_run, request)
 
-    for row_num, row_data in enumerate(data, 1):
-        p = row_data['parliamentarian']
+    # Get individual attendance records for Details tab
+    session = request.session
+    rate_set = get_current_rate_set(session, settlement_run)
+    attendances = AttendenceCollection(
+        session,
+        date_from=settlement_run.start,
+        date_to=settlement_run.end,
+    ).query().all()
 
-        # Details tab row
+    # Get bulk party lookup for details
+    attendance_parliamentarian_ids = {
+        str(att.parliamentarian.id) for att in attendances
+    }
+    details_party_lookup = get_party_lookup(
+        session,
+        attendance_parliamentarian_ids,
+        settlement_run.start,
+        settlement_run.end
+    )
+
+    # Write Details tab with individual attendance records
+    details_row_num = 1
+    for att in attendances:
+        p = att.parliamentarian
+        party = details_party_lookup[str(p.id)]
+        is_president = any(r.role == 'president' for r in p.roles)
+        compensation = calculate_rate(
+            rate_set=rate_set,
+            attendence_type=att.type,
+            duration_minutes=int(att.duration),
+            is_president=is_president,
+            commission_type=att.commission.type if att.commission else None
+        )
+
         details_row = [
-            p.last_name, p.first_name, row_data['party'], row_data['faction'],
-            row_data['plenum_duration'] + row_data['commission_duration'],
-            row_data['plenum_compensation']
-            + row_data['commission_compensation'],
-            row_data['study_duration'], row_data['study_compensation'],
-            row_data['shortest_duration'], row_data['shortest_compensation']
+            att.date.strftime('%d.%m.%Y'),
+            p.last_name,
+            p.first_name,
+            party.name if party else '',
+            party.name if party else '',  # faction same as party
+            request.translate(TYPES[att.type]),
+            att.commission.name if att.commission else '',
+            att.calculate_value(),
+            compensation
         ]
         for col, value in enumerate(details_row):
-            details_ws.write(row_num, col, value, cell_format)
+            details_ws.write(details_row_num, col, value, cell_format)
+        details_row_num += 1
+
+    # Write Übersicht tab with aggregated data
+    for row_num, row_data in enumerate(data, 1):
+        p = row_data['parliamentarian']
 
         # Übersicht tab row
         overview_row = [
@@ -221,6 +306,17 @@ def generate_buchungen_abrechnungslauf_xlsx(
         date_to=settlement_run.end,
     ).query().all()
 
+    # Get bulk party lookup for buchungen
+    buchungen_parliamentarian_ids = {
+        str(att.parliamentarian.id) for att in attendances
+    }
+    buchungen_party_lookup = get_party_lookup(
+        session,
+        buchungen_parliamentarian_ids,
+        settlement_run.start,
+        settlement_run.end
+    )
+
     cola_multiplier = Decimal(
         str(1 + (rate_set.cost_of_living_adjustment / 100))
     )
@@ -230,12 +326,8 @@ def generate_buchungen_abrechnungslauf_xlsx(
     for att in attendances:
         parliamentarian = att.parliamentarian
 
-        # Get party for this parliamentarian during the settlement period
-        party = parliamentarian.get_party_during_period(
-            settlement_run.start,
-            settlement_run.end,
-            session
-        )
+        # Get party from bulk lookup
+        party = buchungen_party_lookup[str(parliamentarian.id)]
         party_name = party.name if party else ''
 
         # Calculate rates
@@ -251,7 +343,9 @@ def generate_buchungen_abrechnungslauf_xlsx(
                 att.commission.type if att.commission else None
             ),
         )
-        rate_with_cola = Decimal(str(base_rate)) * cola_multiplier
+        rate_with_cola = (Decimal(str(base_rate)) * cola_multiplier).quantize(
+            Decimal('0.01'), rounding=ROUND_HALF_UP
+        )
 
         # Build booking type description
         booking_type = request.translate(TYPES[att.type])
@@ -259,11 +353,8 @@ def generate_buchungen_abrechnungslauf_xlsx(
                 or att.type == 'study' and att.commission):
             booking_type = f'{booking_type} - {att.commission.name}'
 
-        # TODO: Determine source for Wahlkreis/electoral district
-        # This appears to be the municipality/constituency the
-        # parliamentarian represents
-        wahlkreis = ''  # Leave blank until data source is determined
-
+        # TODO: add parliamentarian.district once it's merged
+        wahlkreis = ''
         data_rows.append({
             'date': att.date,
             'person': (f'{parliamentarian.first_name} '
@@ -284,32 +375,38 @@ def generate_buchungen_abrechnungslauf_xlsx(
     workbook = xlsxwriter.Workbook(output)
     worksheet = workbook.add_worksheet('Buchungen Abrechnungslauf')
 
+    # Define formats
+    header_format = workbook.add_format({
+        'font_name': 'Times New Roman',
+        'font_size': 10
+    })
+    cell_format = workbook.add_format({
+        'font_name': 'Times New Roman',
+        'font_size': 10
+    })
+
     # Write headers
     headers = [
         'Datum', 'Person', 'Partei', 'Wahlkreis', 'BuchungsTyp',
         'Wert', 'CHF', 'CHF + TZ'
     ]
-    worksheet.write_row(0, 0, headers)
-
-    # Format headers
-    header_format = workbook.add_format({
-        'bold': True,
-        'bg_color': '#D7E4BC',
-        'border': 1
-    })
     for col, header in enumerate(headers):
         worksheet.write(0, col, header, header_format)
 
     # Write data rows
     for row_num, row_data in enumerate(data_rows, 1):
-        worksheet.write(row_num, 0, row_data['date'].strftime('%d.%m.%Y'))
-        worksheet.write(row_num, 1, row_data['person'])
-        worksheet.write(row_num, 2, row_data['party'])
-        worksheet.write(row_num, 3, row_data['wahlkreis'])
-        worksheet.write(row_num, 4, row_data['booking_type'])
-        worksheet.write(row_num, 5, float(row_data['value']))
-        worksheet.write(row_num, 6, float(row_data['chf']))
-        worksheet.write(row_num, 7, float(row_data['chf_with_cola']))
+        worksheet.write(
+            row_num, 0, row_data['date'].strftime('%d.%m.%Y'), cell_format
+        )
+        worksheet.write(row_num, 1, row_data['person'], cell_format)
+        worksheet.write(row_num, 2, row_data['party'], cell_format)
+        worksheet.write(row_num, 3, row_data['wahlkreis'], cell_format)
+        worksheet.write(row_num, 4, row_data['booking_type'], cell_format)
+        worksheet.write(row_num, 5, float(row_data['value']), cell_format)
+        worksheet.write(row_num, 6, float(row_data['chf']), cell_format)
+        worksheet.write(
+            row_num, 7, float(row_data['chf_with_cola']), cell_format
+        )
 
     # Auto-adjust column widths
     worksheet.set_column('A:A', 12)  # Date
