@@ -166,3 +166,36 @@ def remove_old_pas_tables(
         if context.has_table(tablename):
             context.operations.execute(
                 f'DROP TABLE IF EXISTS {tablename} CASCADE')
+
+
+@upgrade_task(
+    'Fix poly type for meeting items',
+    requires='onegov.parliament:Add type column to parliament '
+             'models 2nd attempt')
+def fix_poly_type_for_meeting_items(
+    context: UpgradeContext
+) -> None:
+
+    context.operations.execute(
+        "UPDATE par_meeting_items SET type = 'generic'"
+    )
+
+
+@upgrade_task(
+    'RIS Remove unused type columns',
+    requires='onegov.parliament:Fix poly type for meeting items'
+)
+def remove_unused_type_column(
+    context: UpgradeContext
+) -> None:
+
+    # As these models are only used in RIS
+    # we can safely remove the type columns
+    for table, type_column in (
+        ('par_meetings', 'type'),
+        ('par_meeting_items', 'type'),
+        ('par_political_businesses', 'type'),
+        ('par_political_business_participants', 'type'),
+    ):
+        if context.has_column(table, type_column):
+            context.operations.drop_column(table, type_column)

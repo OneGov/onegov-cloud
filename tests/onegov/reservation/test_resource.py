@@ -167,3 +167,48 @@ def test_deadline() -> None:
 
     with freeze_time("2018-11-29 13:00"):
         assert resource.is_past_deadline(allocation)
+
+
+def test_lead_time() -> None:
+    resource = Resource(timezone='UTC')
+
+    # by default, no lead time is active
+    with freeze_time("2018-11-28"):
+        assert not resource.is_before_lead_time(
+            datetime(2018, 11, 27, tzinfo=utc))
+        assert not resource.is_before_lead_time(
+            datetime(2018, 11, 28, tzinfo=utc))
+        assert not resource.is_before_lead_time(
+            datetime(2018, 11, 29, tzinfo=utc))
+
+    allocation = datetime(2018, 11, 28, 13, tzinfo=utc)
+
+    resource.lead_time = 1
+
+    # the day before at 00:00, we can still reserve
+    with freeze_time("2018-11-27 00:00"):
+        assert not resource.is_before_lead_time(allocation)
+
+    # on the day or any time therafter is the same
+    with freeze_time("2018-11-28 00:00"):
+        assert not resource.is_before_lead_time(allocation)
+
+    with freeze_time("2018-11-28 13:00"):
+        assert not resource.is_before_lead_time(allocation)
+
+    with freeze_time("2018-11-29 13:00"):
+        assert not resource.is_before_lead_time(allocation)
+
+    # but two days before at 23:59 we cannot yet reserve
+    with freeze_time("2018-11-26 23:59"):
+        assert resource.is_before_lead_time(allocation)
+
+    # any time before that is the same
+    with freeze_time("2018-11-26 13:00"):
+        assert resource.is_before_lead_time(allocation)
+
+    with freeze_time("2018-11-25 13:00"):
+        assert resource.is_before_lead_time(allocation)
+
+    with freeze_time("2018-11-24 13:00"):
+        assert resource.is_before_lead_time(allocation)

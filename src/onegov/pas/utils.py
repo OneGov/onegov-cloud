@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from onegov.pas.log import log
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.party import Party
@@ -52,12 +51,6 @@ def get_parliamentarians_with_settlements(
         PASParliamentarian.first_name
     ).all()
 
-    roles_pretty_print = [
-        f'{p.last_name} {p.first_name}: {p.roles}'
-        for p in active_parliamentarians
-    ]
-    log.info(f'Active parliamentarians: {roles_pretty_print}')
-
     # Get all parliamentarians with attendances in one query
     parliamentarians_with_attendances = {
         pid[0] for pid in
@@ -66,7 +59,6 @@ def get_parliamentarians_with_settlements(
             Attendence.date <= end_date
         ).distinct()
     }
-    log.info(f'Parli with attendances: {parliamentarians_with_attendances}')
 
     # Filter the active parliamentarians to only those with attendances
     return [

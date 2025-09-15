@@ -22,7 +22,7 @@ from itertools import permutations
 from onegov.core import errors
 from ordered_set import OrderedSet
 from unidecode import unidecode
-from xlsxwriter.workbook import Workbook  # type:ignore[import-untyped]
+from xlsxwriter.workbook import Workbook
 from onegov.core.utils import normalize_for_url
 
 

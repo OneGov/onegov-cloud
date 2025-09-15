@@ -624,7 +624,7 @@ class EventCollection(Pagination[Event]):
                 start = parse(find_element_text(schedule, 'start'))
                 end_text = find_element_text(schedule, 'end')
                 end = (parse(end_text) if end_text else
-                       start + timedelta(hours=1))
+                       start + timedelta(hours=2))
 
                 recurrence_start_dates: list[datetime] = []
                 recurrence = schedule.find('ns:recurrence', namespaces=ns)

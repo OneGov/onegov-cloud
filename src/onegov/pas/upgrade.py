@@ -34,14 +34,13 @@ def add_external_id_for_api(context: UpgradeContext) -> None:
 def add_party_column_to_pas_parliamentarians(context: UpgradeContext) -> None:
     if context.has_table('pas_parliamentarians'):
         if not context.has_column('pas_parliamentarians', 'party'):
-            context.add_column_with_defaults(
+            context.operations.add_column(
                 'pas_parliamentarians',
                 Column(
                     'party',
                     Text,
                     nullable=True
-                ),
-                default=None
+                )
             )
 
 
@@ -68,12 +67,22 @@ def add_district_column_to_pas_parliamentarians(
         if not context.has_column('par_parliamentarians', 'district'):
             context.add_column_with_defaults(
                 'par_parliamentarians',
-                Column(
-                    'district',
-                    Text,
-                    nullable=True
-                ),
+                Column('district', Text),
                 default=None
+            )
+
+
+@upgrade_task('Add bulk_edit_id column to par_attendence')
+def add_bulk_edit_id_column_to_par_attendence(context: UpgradeContext) -> None:
+    if context.has_table('par_attendence'):
+        if not context.has_column('par_attendence', 'bulk_edit_id'):
+            context.operations.add_column(
+                'par_attendence',
+                Column(
+                    'bulk_edit_id',
+                    UUID,
+                    nullable=True
+                )
             )
 
 
