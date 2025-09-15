@@ -25,7 +25,6 @@ from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
 from onegov.event.models import Event
 from onegov.gis import Coordinates
-from onegov.org import _
 from pytz import UTC
 from sedate import as_datetime
 from sedate import replace_timezone
@@ -60,33 +59,6 @@ class EventImportItem(NamedTuple):
     image_filename: str | None
     pdf: IO[bytes] | None
     pdf_filename: str | None
-
-
-# wil event import, cron job: wil_daily_event_import.
-# event categories as defined https://minasa-demo.ch/wiki/datenhub:schema
-TAGS_MAPPING_WIL = {
-    'Musik': _('Music'),
-    'Bühne': _('Stage'),
-    'Wissen': _('Science'),
-    'Literatur': _('Literature'),
-    'Kunst': _('Art'),
-    'Film': _('Film'),
-    'Brauchtum': _('Tradition'),
-    'Kulinarik': _('Culinary'),
-    'Party': _('Party'),
-    'Kurse': _('Course'),
-    'Ausflug': _('Excursion'),
-    'Excursion': _('Excursion'),
-    'Dating': _('Dating'),
-    'Gesellschaft': _('Society'),
-    'Kongress': _('Congress'),
-    'Markt': _('Market'),
-    'Messe': _('Fair'),
-    'Sport': _('Sports'),
-    'Wirtschaft': _('Economy'),
-    'Politik': _('Politics'),
-    'Diverses': _('Misc'),
-}
 
 
 class EventCollection(Pagination[Event]):
@@ -645,8 +617,7 @@ class EventCollection(Pagination[Event]):
             category = event.find('ns:category', namespaces=ns)
             if category is not None:
                 tag = find_element_text(category, 'mainCategory')
-                translation = TAGS_MAPPING_WIL.get(tag, None)
-                tags.append(translation) if translation else None
+                tags.append(tag) if tag else None
 
             timezone = 'Europe/Zurich'
             for schedule in event.find('ns:schedules', namespaces=ns):

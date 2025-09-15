@@ -22,6 +22,7 @@ import locale
 import requests
 import transaction
 import yaml
+
 from onegov.core.orm.utils import QueryChain
 from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
                                    TimerangeTooLong)
@@ -32,7 +33,10 @@ from onegov.core.crypto import random_token
 from onegov.core.utils import Bunch
 from onegov.directory import DirectoryEntry
 from onegov.directory.models.directory import DirectoryFile
-from onegov.event import Event, Occurrence, EventCollection
+from onegov.event import Event
+from onegov.event import Occurrence
+from onegov.event import EventCollection
+from onegov.event import OccurrenceCollection
 from onegov.event.collections.events import EventImportItem
 from onegov.file import File
 from onegov.file.collection import FileCollection
@@ -78,8 +82,8 @@ from sqlalchemy.dialects.postgresql import array
 from uuid import uuid4
 from elasticsearch.exceptions import ConnectionError as ESConnectionError
 
-
 from typing import IO, Any, TYPE_CHECKING, TypedDict
+
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from depot.fields.upload import UploadedFile
@@ -3056,3 +3060,69 @@ def ris_wil_meetings_shorten_audio_links(
         transaction.commit()
 
     return ris_wil_meetings_fix_audio_links
+
+
+@cli.command(name='wil-event-tags-to-german-as-we-use-custom-event-tags')
+def wil_event_tags_to_german_as_we_use_custom_event_tags(
+) -> Callable[[OrgRequest, OrgApp], None]:
+
+    map = {
+        'Art': 'Kunst',
+        'Cinema': 'Kino',
+        'Concert': 'Konzert',
+        'Congress': 'Kongress',
+        'Culture': 'Kultur',
+        'Dancing': 'Tanzen',
+        'Education': 'Bildung',
+        'Exhibition': 'Ausstellung',
+        'Gastronomy': 'Gastronomie',
+        'Health': 'Gesundheit',
+        'Library': 'Bibliothek',
+        'Literature': 'Literatur',
+        'Market': 'Markt',
+        'Meetup': 'Treffen',
+        'Misc': 'Verschiedenes',
+        'Music School': 'Musikschule',
+        'Nature': 'Natur',
+        'Music': 'Musik',
+        'Party': 'Party',
+        'Politics': 'Politik',
+        'Reading': 'Lesung',
+        'Religion': 'Religion',
+        'Sports': 'Sport',
+        'Talk': 'Vortrag',
+        'Theater': 'Theater',
+        'Tourism': 'Tourismus',
+        'Toy Library': 'Spielzeugbibliothek',
+        'Tradition': 'Tradition',
+        'Youth': 'Jugend',
+        'Elderly': 'Senioren',
+
+        'Diverses': 'Verschiedenes',
+    }
+
+    def event_tags_to_german(
+        request: OrgRequest,
+        app: OrgApp
+    ) -> None:
+
+        click.secho(f'org name: {request.app.org.name}')
+        if request.app.org.name != 'Stadt Wil':
+            return
+
+        events = EventCollection(request.session).query()
+        occurrences = OccurrenceCollection(request.session).query()
+
+        for collection in [events, occurrences]:
+            for item in collection:
+                new_tags = []
+                tags = item.tags
+                for tag in tags:
+                    translated = map.get(tag, tag)
+                    new_tags.append(translated)
+                click.secho(f'new tags: {new_tags}', fg='green')
+                item.tags = new_tags
+
+            request.session.flush()
+
+    return event_tags_to_german
