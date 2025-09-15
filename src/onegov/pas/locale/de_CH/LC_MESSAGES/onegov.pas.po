@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-08-26 13:44+0200\n"
+"POT-Creation-Date: 2025-09-13 22:03+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -17,8 +17,8 @@ msgstr "Benutzer"
 msgid "Logout"
 msgstr "Abmelden"
 
-msgid "Management"
-msgstr "Verwaltung"
+msgid "Current Settlement Run"
+msgstr "Aktueller Abrechnungslauf"
 
 msgid "Attendences"
 msgstr "Anwesenheiten"
@@ -34,6 +34,9 @@ msgstr "Dateien"
 
 msgid "More settings"
 msgstr "Weitere Einstellungen"
+
+msgid "Management"
+msgstr "Verwaltung"
 
 msgid "No within an active settlement run."
 msgstr "Nicht in einem aktiven Abrechungslauf"
@@ -55,15 +58,6 @@ msgstr "Kommission"
 
 msgid "Parliamentarian is not in this commission."
 msgstr "Parlamentarier:in ist nicht in dieser Kommission."
-
-msgid "Function"
-msgstr "Funktion"
-
-msgid "Start"
-msgstr "Start"
-
-msgid "End"
-msgstr "Ende"
 
 msgid "People Data (JSON)"
 msgstr "Personendaten (JSON)"
@@ -294,9 +288,6 @@ msgstr "Sätze für ${year} bereits erfasst"
 msgid "Active"
 msgstr "Aktiv"
 
-msgid "Only one settlement run can be active at a time"
-msgstr "Nur ein Abrechnungslauf kann gleichzeitig aktiv sein"
-
 msgid "End must be after start"
 msgstr "Ende muss nach dem Start liegen"
 
@@ -304,6 +295,10 @@ msgstr "Ende muss nach dem Start liegen"
 msgid "Dates overlap with existing settlement run: ${start} - ${end}"
 msgstr ""
 "Daten überschneiden sich mit bestehendem Abrechnungslauf: ${start} - ${end}"
+
+#, python-format
+msgid "An active settlement run already exists: ${name}"
+msgstr "Ein aktiver Abrechnungslauf existiert bereits ${name}"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -605,9 +600,6 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nein"
 
-msgid "Exports Settlement runs"
-msgstr "Exporte Abrechnungsläufe"
-
 msgid "No settlement runs defined yet."
 msgstr "Noch keine Abrechnungsläufe erfasst"
 
@@ -739,5 +731,32 @@ msgstr "Abrechnungen nach Kommission"
 msgid "Settlements by Parliamentarian"
 msgstr "Abrechnungen nach Parlamentarier:in"
 
+msgid "Abschlussliste"
+msgstr "Abschlussliste"
+
+msgid "Abschlussliste (XLSX)"
+msgstr "Abschlussliste (XLSX)"
+
+msgid "Buchungen Abrechnungslauf"
+msgstr "Buchungen Abrechnungslauf"
+
+msgid "Buchungen Abrechnungslauf (Kontrollliste)"
+msgstr "Buchungen Abrechnungslauf (Kontrollliste)"
+
+msgid "FiBu Export"
+msgstr "FiBu Export"
+
+msgid "FiBu CSV Export"
+msgstr "FiBU CSV Export"
+
+msgid "PDF Exports"
+msgstr "PDF Exporte"
+
+msgid "Excel Exports"
+msgstr "Excel Exporte"
+
 msgid "Total all parties"
 msgstr "Total Alle Parteien"
+
+#~ msgid "Exports Settlement runs"
+#~ msgstr "Exporte Abrechnungsläufe"
