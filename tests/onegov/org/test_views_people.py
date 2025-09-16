@@ -11,6 +11,12 @@ def test_people_view(client):
     settings = client.get('/people-settings')
     settings.form['hidden_people_fields'] = ['academic_title', 'profession']
     settings.form['organisation_hierarchy'] = """
+    - Organisation 1:
+    """
+
+    assert 'Invalid format.' in settings.form.submit()
+
+    settings.form['organisation_hierarchy'] = """
     - Organisation 1
     - Organisation 2:
       - Sub-Organisation 2.1
@@ -112,7 +118,7 @@ def test_with_people(client):
     assert edit_page.form['people-1-context_specific_function'].value == ''
 
 
-def test_people_view_organisation_fiter(client):
+def test_people_view_organisation_filter(client):
     org_1 = 'The Nexus'
     sub_org_11 = 'Nexus Innovators'
     sub_org_12 = 'Nexus Guardians'
