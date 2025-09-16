@@ -12,6 +12,7 @@ from onegov.pas.collections import (
 from onegov.pas.custom import get_current_rate_set
 from onegov.pas.utils import (
     get_parliamentarians_with_settlements,
+    is_commission_president,
 )
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
 from onegov.pas.models.party import Party
@@ -123,7 +124,7 @@ def get_abschlussliste_data(
 
     for att in attendances:
         p = att.parliamentarian
-        is_president = any(r.role == 'president' for r in p.roles)
+        is_president = is_commission_president(p, att, settlement_run)
         compensation = calculate_rate(
             rate_set=rate_set,
             attendence_type=att.type,
@@ -230,7 +231,7 @@ def generate_abschlussliste_xlsx(
     for att in attendances:
         p = att.parliamentarian
         party = details_party_lookup[str(p.id)]
-        is_president = any(r.role == 'president' for r in p.roles)
+        is_president = is_commission_president(p, att, settlement_run)
         compensation = calculate_rate(
             rate_set=rate_set,
             attendence_type=att.type,
@@ -353,14 +354,12 @@ def generate_buchungen_abrechnungslauf_xlsx(
                 or att.type == 'study' and att.commission):
             booking_type = f'{booking_type} - {att.commission.name}'
 
-        # TODO: add parliamentarian.district once it's merged
-        wahlkreis = ''
         data_rows.append({
             'date': att.date,
             'person': (f'{parliamentarian.first_name} '
                       f'{parliamentarian.last_name}'),
             'party': party_name,
-            'wahlkreis': wahlkreis,
+            'wahlkreis': parliamentarian.district or '',
             'booking_type': booking_type,
             'value': att.calculate_value(),
             'chf': base_rate,

@@ -10,6 +10,7 @@ from onegov.pas.collections import (
 from onegov.pas.custom import get_current_rate_set
 from decimal import Decimal, ROUND_HALF_UP
 from onegov.pas.models.attendence import TYPES
+from onegov.pas.utils import is_commission_president
 
 
 from typing import TYPE_CHECKING
@@ -104,8 +105,9 @@ def generate_fibu_export_rows(
             lohnart_nr = lohnart_info['nr']
             lohnart_text = lohnart_info['text']
 
-        is_president = any(r.role == 'president'
-                           for r in parliamentarian.roles)
+        is_president = is_commission_president(
+            parliamentarian, attendance, settlement_run
+        )
         base_rate = calculate_rate(
             rate_set=rate_set,
             attendence_type=attendance.type,
