@@ -14,7 +14,7 @@ def test_people_view(client):
     - Organisation 1:
     """
 
-    assert 'Invalid format.' in settings.form.submit()
+    assert 'Ungültiges Format.' in settings.form.submit()
 
     settings.form['organisation_hierarchy'] = """
     - Organisation 1
