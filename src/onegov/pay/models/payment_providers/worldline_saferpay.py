@@ -337,14 +337,19 @@ class SaferpayClient:
         ):
             try:
                 tx = self.assert_transaction(session, init_tx.token, init_tx)
-            except Exception:
+            except Exception as exc:
+                if getattr(exc, 'not_started_or_is_expected_failure', False):
+                    # we no longer need to worry about this transaction
+                    init_tx.state = 'processed'
+                    session.flush()
+                    continue
                 # we assume the transaction has already been cancelled
+                init_tx.retry_count += 1
                 log.info(
                     'Failed to assert stale Saferpay transaction '
                     f'{init_tx.order_id} (Attempt {init_tx.retry_count}/3):',
                     exc_info=True
                 )
-                init_tx.retry_count += 1
                 if init_tx.retry_count >= 3:
                     init_tx.state = 'processed'
                 session.flush()
