@@ -4,9 +4,11 @@ from onegov.core.security import Public, Personal, Private
 from onegov.core.security.roles import get_roles_setting as \
     get_roles_setting_base
 from onegov.pas import PasApp
+from onegov.pas.collections import AttendenceCollection, PASCommissionCollection
 from onegov.pas.models.attendence import Attendence
-from onegov.pas.models.commission import Commission
+from onegov.pas.models.commission import Commission, PASCommission
 from onegov.pas.models.parliamentarian import PASParliamentarian
+from onegov.org.models import Organisation
 from onegov.user import User
 from onegov.user import Auth
 
@@ -104,6 +106,76 @@ def has_private_access_to_commission(
             if user.parliamentarian:  # type:ignore
                 membershps =  user.parliamentarian.commission_memberships  # type:ignore
                 for membership in membershps: 
+                    if membership.commission_id == model.id and \
+                            membership.role == 'president':
+                        return True
+    return permission in getattr(app.settings.roles, identity.role)
+
+@PasApp.permission_rule(model=Organisation, permission=Personal)
+def has_personal_access_to_organisation(
+    app: PasApp,
+    identity: Identity,
+    model: Organisation,
+    permission: Intent
+) -> bool:
+    '''Allow parliamentarians and commission presidents to access dashboard'''
+    if identity.role in ('parliamentarian', 'commission_president'):
+        return True
+    return permission in getattr(app.settings.roles, identity.role)
+
+
+@PasApp.permission_rule(model=AttendenceCollection, permission=Private)
+def has_private_access_to_attendence_collection(
+    app: PasApp,
+    identity: Identity,
+    model: AttendenceCollection,
+    permission: Intent
+) -> bool:
+    if identity.role in ('parliamentarian', 'commission_president'):
+        return True
+    return permission in getattr(app.settings.roles, identity.role)
+
+
+@PasApp.permission_rule(model=Attendence, permission=Private)
+def has_private_access_to_attendence(
+    app: PasApp,
+    identity: Identity,
+    model: Attendence,
+    permission: Intent
+) -> bool:
+    if identity.role in ('parliamentarian', 'commission_president'):
+        return True
+    return permission in getattr(app.settings.roles, identity.role)
+
+
+@PasApp.permission_rule(model=PASCommissionCollection, permission=Private)
+def has_private_access_to_commission_collection(
+    app: PasApp,
+    identity: Identity,
+    model: PASCommissionCollection,
+    permission: Intent
+) -> bool:
+    if identity.role in ('parliamentarian', 'commission_president'):
+        return True
+    return permission in getattr(app.settings.roles, identity.role)
+
+
+@PasApp.permission_rule(model=PASCommission, permission=Private)
+def has_private_access_to_pas_commission(
+    app: PasApp,
+    identity: Identity,
+    model: PASCommission,
+    permission: Intent
+) -> bool:
+    """ Grant private access to commission presidents of this commission.
+    """
+    if identity.role == 'commission_president':
+        user = app.session().query(User).filter_by(
+            username=identity.userid).first()
+        if user:
+            if user.parliamentarian:  # type:ignore
+                membershps =  user.parliamentarian.commission_memberships  # type:ignore
+                for membership in membershps:
                     if membership.commission_id == model.id and \
                             membership.role == 'president':
                         return True

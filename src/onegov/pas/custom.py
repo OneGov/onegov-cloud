@@ -4,8 +4,10 @@ from onegov.core.elements import Link
 from onegov.org.custom import logout_path
 from onegov.org.elements import LinkGroup
 from onegov.pas import _
+from onegov.org.models import GeneralFileCollection
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import ChangeCollection
+from onegov.pas.collections import PASCommissionCollection
 from onegov.user import Auth
 from onegov.user import UserCollection
 from onegov.pas.models import SettlementRun, RateSet
@@ -52,6 +54,11 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
                         attrs={'class': 'changes'}
                     ),
                     Link(
+                        _('Files'),
+                        request.class_link(GeneralFileCollection),
+                        attrs={'class': 'files'}
+                    ),
+                    Link(
                         _('PAS settings'),
                         request.link(request.app.org, 'pas-settings'),
                         attrs={'class': 'pas-settings'}
@@ -64,6 +71,29 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
                     Link(
                         _('Users'), request.class_link(UserCollection),
                         attrs={'class': 'user'}
+                    ),
+                )
+            )
+        elif hasattr(request, 'identity') and request.identity.role in (
+            'parliamentarian', 'commission_president'
+        ):
+            yield LinkGroup(
+                _('Management'), classes=('management',),
+                links=(
+                    Link(
+                        _('Attendences'),
+                        request.class_link(AttendenceCollection),
+                        attrs={'class': 'attendences'}
+                    ),
+                    Link(
+                        _('Commissions'),
+                        request.class_link(PASCommissionCollection),
+                        attrs={'class': 'commissions'}
+                    ),
+                    Link(
+                        _('Files'),
+                        request.class_link(GeneralFileCollection),
+                        attrs={'class': 'files'}
                     ),
                 )
             )

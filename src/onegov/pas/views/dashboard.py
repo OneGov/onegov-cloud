@@ -4,6 +4,7 @@ from datetime import date
 
 from onegov.pas import _
 from onegov.pas import PasApp
+from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.layouts import DefaultLayout
 from onegov.org.models import Organisation
@@ -45,6 +46,14 @@ def view_dashboard(
         ]
 
     if request.is_parliamentarian:
+        # Add create attendance shortcut for parliamentarians
+        shortcuts.append({
+            'name': 'create-attendance',
+            'title': _('Create Attendance'),
+            'link': request.class_link(AttendenceCollection, name='new'),
+            'icon': 'fa-plus-circle'
+        })
+
         # For parliamentarians, show only their commissions
         user = request.current_user
         if user and hasattr(user, 'parliamentarian') and user.parliamentarian:
