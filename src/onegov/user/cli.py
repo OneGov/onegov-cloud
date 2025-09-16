@@ -105,7 +105,10 @@ def delete(username: str) -> Callable[[CoreRequest, Framework], None]:
     return delete_user
 
 
-@cli.command(context_settings={'default_selector': '*'})
+@cli.command(context_settings={
+    'default_selector': '*',
+    'skip_es_client': True
+})
 @click.argument('username')
 @click.option('-r', '--recursive', is_flag=True, default=False)
 def exists(
@@ -131,7 +134,7 @@ def exists(
     return find_user
 
 
-@cli.command(context_settings={'singular': True})
+@cli.command(context_settings={'singular': True, 'skip_es_client': True})
 @click.argument('username')
 def activate(username: str) -> Callable[[CoreRequest, Framework], None]:
     """ Activates the given user. """
@@ -148,7 +151,7 @@ def activate(username: str) -> Callable[[CoreRequest, Framework], None]:
     return activate_user
 
 
-@cli.command(context_settings={'singular': True})
+@cli.command(context_settings={'singular': True, 'skip_es_client': True})
 @click.argument('username')
 def deactivate(username: str) -> Callable[[CoreRequest, Framework], None]:
     """ Deactivates the given user. """
@@ -166,7 +169,7 @@ def deactivate(username: str) -> Callable[[CoreRequest, Framework], None]:
     return deactivate_user
 
 
-@cli.command(context_settings={'singular': True})
+@cli.command(context_settings={'singular': True, 'skip_es_client': True})
 @click.argument('username')
 def logout(username: str) -> Callable[[CoreRequest, Framework], None]:
     """ Logs out the given user on all sessions. """
@@ -183,7 +186,10 @@ def logout(username: str) -> Callable[[CoreRequest, Framework], None]:
     return logout_user
 
 
-@cli.command(name='logout-all', context_settings={'singular': True})
+@cli.command(name='logout-all', context_settings={
+    'singular': True,
+    'skip_es_client': True
+})
 def logout_all() -> Callable[[CoreRequest, Framework], None]:
     """ Logs out all users on all sessions. """
 
@@ -196,7 +202,10 @@ def logout_all() -> Callable[[CoreRequest, Framework], None]:
     return logout_user
 
 
-@cli.command(context_settings={'default_selector': '*'})
+@cli.command(context_settings={
+    'default_selector': '*',
+    'skip_es_client': True
+})
 @click.option('--active-only', help='Only show active users', is_flag=True)
 @click.option('--inactive-only', help='Only show inactive users', is_flag=True)
 @click.option('--sources', help='Display sources', is_flag=True, default=False)
@@ -237,7 +246,10 @@ def list(
     return list_users
 
 
-@cli.command(name='change-password', context_settings={'singular': True})
+@cli.command(name='change-password', context_settings={
+    'singular': True,
+    'skip_es_client': True
+})
 @click.argument('username')
 @click.option('--password', help='Password to use', default=None)
 def change_password(
@@ -264,7 +276,10 @@ def change_password(
     return change
 
 
-@cli.command(name='change-yubikey', context_settings={'singular': True})
+@cli.command(name='change-yubikey', context_settings={
+    'singular': True,
+    'skip_es_client': True
+})
 @click.argument('username')
 @click.option('--yubikey', help='Yubikey to use', default=None)
 def change_yubikey(
@@ -298,7 +313,10 @@ def change_yubikey(
     return change
 
 
-@cli.command(name='change-mtan', context_settings={'singular': True})
+@cli.command(name='change-mtan', context_settings={
+    'singular': True,
+    'skip_es_client': True
+})
 @click.argument('username')
 @click.option('--phone-number', help='Phone number to use', default=None)
 def change_mtan(
@@ -347,7 +365,10 @@ def change_mtan(
     return change
 
 
-@cli.command(name='change-totp', context_settings={'singular': True})
+@cli.command(name='change-totp', context_settings={
+    'singular': True,
+    'skip_es_client': True
+})
 @click.argument('username')
 @click.option('--secret', help='TOTP secret to use', default=None)
 @click.option(
@@ -394,7 +415,10 @@ def change_totp(
     return change
 
 
-@cli.command(name='transfer-yubikey', context_settings={'singular': True})
+@cli.command(name='transfer-yubikey', context_settings={
+    'singular': True,
+    'skip_es_client': True
+})
 @click.argument('source')
 @click.argument('target')
 def transfer_yubikey(
@@ -433,7 +457,10 @@ def transfer_yubikey(
     return transfer
 
 
-@cli.command(name='change-role', context_settings={'singular': True})
+@cli.command(name='change-role', context_settings={
+    'singular': True,
+    'skip_es_client': True
+})
 @click.argument('username')
 @click.argument('role')
 def change_role(
@@ -460,7 +487,10 @@ def change_role(
     return change
 
 
-@cli.command(name='list-sessions', context_settings={'singular': True})
+@cli.command(name='list-sessions', context_settings={
+    'singular': True,
+    'skip_es_client': True
+})
 def list_sessions() -> Callable[[CoreRequest, Framework], None]:
     """ Lists all sessions of all users. """
 
