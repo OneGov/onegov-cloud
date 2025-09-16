@@ -1873,6 +1873,17 @@ class EventSettingsForm(Form):
     )
 
 
+class ResourceSettingsForm(Form):
+
+    resource_header_html = HtmlField(
+        label=_('General information above the resource list'),
+    )
+
+    resource_footer_html = HtmlField(
+        label=_('General information below the resource list'),
+    )
+
+
 class DataRetentionPolicyForm(Form):
 
     auto_archive_timespan = RadioField(

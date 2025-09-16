@@ -8,7 +8,35 @@
         <div class="grid-x wrapper" tal:condition="resources">
 
             <div class="cell small-12 medium-7 content">
-                <metal:b use-macro="layout.macros['resource_groups']" tal:define="add_pagerefs request.is_logged_in" />
+                <div tal:condition="header_html|nothing" class="resource-header">
+                    <ul class="accordion" data-accordion data-allow-all-closed="true">
+                        <li class="accordion-item" data-accordion-item>
+                            <a href="#" style="display: flex; align-items: center;">
+                                <tal:b i18n:translate>General information about resources</tal:b>
+                                <i class="fas fa-plus" style="margin-left: auto"></i>
+                            </a>
+                            <div class="accordion-content" data-tab-content>
+                                ${header_html}
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div metal:use-macro="layout.macros['resource_groups']" tal:define="add_pagerefs request.is_logged_in" />
+
+                <div tal:condition="footer_html|nothing" class="resource-footer">
+                    <ul class="accordion" data-accordion data-allow-all-closed="true">
+                        <li class="accordion-item" data-accordion-item>
+                            <a href="#" style="display: flex; align-items: center;">
+                                <tal:b i18n:translate>General information about resources</tal:b>
+                                <i class="fas fa-plus" style="margin-left: auto"></i>
+                            </a>
+                            <div class="accordion-content" data-tab-content>
+                                ${footer_html}
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
 
             <div class="cell small-12 medium-4 medium-offset-1 sidebar">

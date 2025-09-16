@@ -316,6 +316,8 @@ def view_resources(
         'link_func': link_func,
         'edit_link': edit_link,
         'lead_func': lead_func,
+        'header_html': request.app.org.resource_header_html,
+        'footer_html': request.app.org.resource_footer_html,
     }
 
 
