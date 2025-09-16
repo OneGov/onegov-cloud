@@ -9,9 +9,11 @@ from decimal import Decimal
 from babel.numbers import format_decimal
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
+from uuid import UUID
 if TYPE_CHECKING:
     from onegov.pas.models import SettlementRun
+    from onegov.pas.models.attendence import Attendence
     from onegov.town6.request import TownRequest
     from datetime import date
     from sqlalchemy.orm import Session
@@ -25,6 +27,44 @@ def format_swiss_number(value: Decimal | int) -> str:
         value = Decimal(value)
 
     return format_decimal(value, format='#,##0.00', locale='de_CH')
+
+
+def is_commission_president(
+    parliamentarian: PASParliamentarian,
+    attendance_or_commission_id: Union['Attendence', UUID],
+    settlement_run: 'SettlementRun'
+) -> bool:
+    """
+    Check if a parliamentarian is president of the commission for the given
+    attendance or commission_id during the settlement run period.
+    """
+    if isinstance(attendance_or_commission_id, UUID):
+        commission_id = attendance_or_commission_id
+        return any(
+            cm.role == 'president'
+            for cm in parliamentarian.commission_memberships
+            if (
+                cm.commission_id == commission_id and (
+                    cm.end is None or cm.end >= settlement_run.start
+                ) and (
+                    cm.start is None or cm.start <= settlement_run.end
+                )
+            )
+        )
+    else:
+        attendance = attendance_or_commission_id
+        return any(
+            cm.role == 'president'
+            for cm in parliamentarian.commission_memberships
+            if (
+                attendance.commission and
+                cm.commission_id == attendance.commission.id and (
+                    cm.end is None or cm.end >= settlement_run.start
+                ) and (
+                    cm.start is None or cm.start <= settlement_run.end
+                )
+            )
+        )
 
 
 def get_parliamentarians_with_settlements(
