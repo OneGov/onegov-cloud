@@ -65,6 +65,8 @@ module = [
     "isodate.*",
     # FIXME: Remove after https://github.com/lipoja/URLExtract/issues/164
     "urlextract.*",
+    # FIXME: Remove after https://github.com/jmcnamara/XlsxWriter/issues/1123
+    "xlsxwriter.*"
 ]
 ignore_missing_imports = true
 
