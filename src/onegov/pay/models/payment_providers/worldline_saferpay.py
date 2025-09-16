@@ -369,12 +369,10 @@ class SaferpayClient:
                     'Failed to refund stale Saferpay transaction'
                     f' (Attempt {init_tx.retry_count}/3):'
                 )
-                if init_tx.retry_count < 3:
-                    # NOTE: We will retry a cancellation a couple of times
-                    #       but after that we will treat the transaction
-                    #       as cancelled
-                    session.flush()
-                    continue
+                if init_tx.retry_count >= 3:
+                    init_tx.state = 'processed'
+                session.flush()
+                continue
 
             init_tx.state = 'cancelled'
             session.flush()
