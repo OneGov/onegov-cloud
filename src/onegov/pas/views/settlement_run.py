@@ -17,7 +17,6 @@ from onegov.pas import PasApp
 from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import (
     AttendenceCollection,
-    PASCommissionCollection,
     SettlementRunCollection,
 )
 from onegov.pas.custom import get_current_rate_set
@@ -30,6 +29,7 @@ from onegov.pas.layouts import SettlementRunLayout
 from onegov.pas.models import (
     Attendence,
     PASCommission,
+    PASCommissionMembership,
     PASParliamentarian,
     Party,
     SettlementRun,
@@ -38,6 +38,7 @@ from onegov.pas.models.attendence import TYPES
 from onegov.pas.path import SettlementRunExport, SettlementRunAllExport
 from onegov.pas.utils import (
     format_swiss_number,
+    get_commissions_with_memberships,
     get_parliamentarians_with_settlements,
     get_parties_with_settlements,
 )
@@ -49,8 +50,9 @@ from onegov.pas.views.pas_excel_export_nr_3_lohnart_fibu import (
         generate_fibu_export_rows)
 
 
-from typing import Literal, TypeAlias, TYPE_CHECKING
+from typing import Any, Literal, TypeAlias, TYPE_CHECKING
 if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
     from datetime import date
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
@@ -66,6 +68,119 @@ if TYPE_CHECKING:
 XLSX_MIMETYPE = (
 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 )
+
+
+def get_commission_closure_status(
+    session: Session,
+    settlement_run: SettlementRun,
+    commissions: list[PASCommission] | None = None
+) -> list[dict[str, Any]]:
+    """
+    Get closure status organized by commission showing completion summary.
+
+    Args:
+        session: Database session
+        settlement_run: The settlement run to check
+        commissions: Optional pre-fetched list of commissions
+
+    Returns:
+        List of dicts with structure:
+        [
+            {
+                'commission_name': str,
+                'total_members': int,
+                'completed_members': int,
+                'completion_ratio': str,
+                'incomplete_members': [
+                    {'name': str, 'has_attendance': bool}, ...
+                ]
+            }, ...
+        ]
+    """
+    # Query commissions if not provided
+    if commissions is None:
+        commissions = get_commissions_with_memberships(
+            session, settlement_run.start, settlement_run.end
+        )
+
+    commission_status = []
+
+    for commission in commissions:
+        # Get all members of this commission during settlement period
+        memberships = session.query(PASCommissionMembership).filter(
+            PASCommissionMembership.commission_id == commission.id,
+            (
+                PASCommissionMembership.start.is_(None)
+                | (PASCommissionMembership.start <= settlement_run.end)
+            ),
+            (
+                PASCommissionMembership.end.is_(None)
+                | (PASCommissionMembership.end >= settlement_run.start)
+            )
+        ).all()
+
+        total_members = len(memberships)
+        if total_members == 0:
+            continue
+
+        completed_members = 0
+        incomplete_members = []
+        complete_members = []
+
+        for membership in memberships:
+            parliamentarian = membership.parliamentarian
+            parl_name = (
+                f'{parliamentarian.first_name} '
+                f'{parliamentarian.last_name}'
+            )
+
+            # Check if this parliamentarian has closed attendance for this
+            # commission
+            closed_attendance = session.query(Attendence).filter(
+                Attendence.parliamentarian_id == parliamentarian.id,
+                Attendence.commission_id == commission.id,
+                Attendence.date >= settlement_run.start,
+                Attendence.date <= settlement_run.end,
+                Attendence.abschluss == True
+            ).first()
+
+            if closed_attendance:
+                completed_members += 1
+                complete_members.append({
+                    'name': parl_name,
+                })
+            else:
+                # Check if they have any attendance at all for this commission
+                has_attendance = session.query(Attendence).filter(
+                    Attendence.parliamentarian_id == parliamentarian.id,
+                    Attendence.commission_id == commission.id,
+                    Attendence.date >= settlement_run.start,
+                    Attendence.date <= settlement_run.end
+                ).first() is not None
+
+                incomplete_members.append({
+                    'name': parl_name,
+                    'has_attendance': has_attendance
+                })
+
+        completion_ratio = f'{completed_members}/{total_members}'
+
+        commission_status.append({
+            'commission_name': commission.name,
+            'total_members': total_members,
+            'completed_members': completed_members,
+            'completion_ratio': completion_ratio,
+            'complete_members': complete_members,
+            'incomplete_members': incomplete_members,
+            'is_complete': completed_members == total_members
+        })
+
+    # Sort by completion status (incomplete first) then by name
+    commission_status.sort(
+        key=itemgetter('is_complete', 'commission_name')
+    )
+
+    return commission_status
 
 
 @PasApp.html(
@@ -147,13 +262,18 @@ def view_settlement_run(
     parties = get_parties_with_settlements(session, self.start, self.end)
 
     # Get commissions active during settlement run period
-    commissions = PASCommissionCollection(session).query().order_by(
-        PASCommission.name
+    commissions = get_commissions_with_memberships(
+        session, self.start, self.end
     )
 
     # Get parliamentarians active during settlement run period with settlements
     parliamentarians = get_parliamentarians_with_settlements(
         session, self.start, self.end
+    )
+
+    # Get commission closure status for the control list
+    commission_closure_status = get_commission_closure_status(
+        session, self, commissions
     )
 
     pdf_categories = {
@@ -290,6 +410,7 @@ def view_settlement_run(
         'layout': layout,
         'settlement_run': self,
         'export_tabs_data': export_tabs_data,
+        'commission_closure_status': commission_closure_status,
         'title': layout.title,
     }
 
