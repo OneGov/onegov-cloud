@@ -132,9 +132,9 @@ class AssemblyLayout(DefaultLayout):
                             attrs={'class': 'check-list-link'}
                         ),
                         Link(
-                            text=_('XML Upload'),
+                            text=_('ZIP Upload'),
                             url=self.request.link(items, 'new-import'),
-                            attrs={'class': 'new-form'}
+                            attrs={'class': 'ticket-archive'}
                         ),
                     ]
                 )

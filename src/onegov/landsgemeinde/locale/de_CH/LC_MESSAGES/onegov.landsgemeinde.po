@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-09-15 16:57+0200\n"
+"POT-Creation-Date: 2025-09-16 15:49+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -126,10 +126,16 @@ msgid "Invalid timestamp."
 msgstr "Ungültiger Zeitstempel."
 
 msgid "Agenda Item ZIP"
-msgstr ""
+msgstr "Traktandum ZIP"
 
 msgid "Import"
-msgstr ""
+msgstr "Importieren"
+
+msgid "No html directory found in the zip file."
+msgstr "Keine HTML-Dateien im ZIP-Archiv gefunden."
+
+msgid "No file uploaded."
+msgstr "Keine Datei hochgeladen."
 
 msgid "Date"
 msgstr "Datum"
@@ -299,8 +305,8 @@ msgstr "Möchten Sie diese Landsgemeinde wirklich löschen?"
 msgid "Delete assembly"
 msgstr "Landsgemeinde löschen"
 
-msgid "XML Upload"
-msgstr ""
+msgid "ZIP Upload"
+msgstr "ZIP-Upload"
 
 #, python-format
 msgid "Extraodinary ${assembly_type} from ${date}"
@@ -429,7 +435,7 @@ msgid "New agenda item"
 msgstr "Neues Traktandum"
 
 msgid "Imported a new agenda item"
-msgstr ""
+msgstr "Neues Traktandum importiert"
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"

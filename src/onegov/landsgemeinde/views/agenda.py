@@ -81,13 +81,9 @@ def import_agenda_item(
         request.success(_('Imported a new agenda item'))
         return redirect(request.link(agenda_item, 'edit'))
 
-    # form.number.data = form.next_number
-
     layout = AgendaItemCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_('Import'), '#'))
-    layout.include_editor()
-    # layout.edit_mode = True
-    # layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
+    layout.editbar_links = []
 
     return {
         'layout': layout,

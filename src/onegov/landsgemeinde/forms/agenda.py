@@ -229,9 +229,8 @@ class AgendaItemUploadForm(Form):
         ]
     )
 
-    def import_agenda_item(self,
-                           collection: AgendaItemCollection) -> AgendaItem:
-        # Return list of .html files in the html folder of the zip file
+    def import_agenda_item(
+            self, collection: AgendaItemCollection) -> AgendaItem:
 
         temp = TemporaryDirectory()
         temp_path = Path(temp.name)
@@ -264,9 +263,7 @@ class AgendaItemUploadForm(Form):
             raise ValidationError(
                 _('No html directory found in the zip file.'))
 
-        # Get all .html files in the html directory
         html_path = Path(html_dir)
-
         html_files = sorted(
             [f for f in html_path.glob('*.html')
              if f.name != 'combined_clean.html'],
@@ -277,9 +274,9 @@ class AgendaItemUploadForm(Form):
         combined_html = BeautifulSoup(
             '<html><head><meta charset="utf-8"></head><body></body></html>',
             'html.parser')
+        title = ''
 
         for file_path in html_files:
-
             with open(file_path, encoding='utf-8') as f:
                 soup = BeautifulSoup(f.read(), 'html.parser')
 
@@ -340,7 +337,9 @@ class AgendaItemUploadForm(Form):
                     # Determine heading level based on class
                     tag_type = 'p'
                     if '_01-Titel' in p_class:
-                        tag_type = 'h1'
+                        title = p_text.strip()  # type:ignore
+                        i += 1
+                        continue
                     elif '_02-Titel' in p_class:
                         tag_type = 'h2'
                     elif '03-Titel' in p_class in p_class:
@@ -357,7 +356,6 @@ class AgendaItemUploadForm(Form):
                         i += 1
                         continue
 
-                    # Create element
                     element = combined_html.new_tag(tag_type)
                     element.string = p_text.strip()  # type:ignore
                     combined_html.body.append(element)
@@ -373,43 +371,43 @@ class AgendaItemUploadForm(Form):
             text=cleaned_html,
             number=next_number,
             state='draft',
+            title=title,
             assembly_id=self.model.assembly.id
         )
 
         temp.cleanup()
         return agenda_item
 
+    def validate_agenda_item_zip(
+            self,
+            field: UploadField) -> None:
+        if not field.data:
+            raise ValidationError(_('No file uploaded.'))
 
-def validate_zip_and_html(file_storage: dict) -> None:  # type:ignore
-    if not file_storage:
-        raise ValidationError(_('No file uploaded.'))
+        temp = TemporaryDirectory()
+        temp_path = Path(temp.name)
+        zip_content = None
 
-    temp = TemporaryDirectory()
-    temp_path = Path(temp.name)
-    zip_content = None
+        if isinstance(field.data, dict) and 'data' in field.data:
+            encoded_data = field.data['data']
+            decoded_data = base64.b64decode(encoded_data)
 
-    if isinstance(file_storage, dict) and 'data' in file_storage:
-        encoded_data = file_storage['data']
-        decoded_data = base64.b64decode(encoded_data)
+            if decoded_data[:2] == b'\x1f\x8b':
+                decompressed_data = gzip.decompress(decoded_data)
+                zip_content = BytesIO(decompressed_data)
+            else:
+                zip_content = BytesIO(decoded_data)
 
-        if decoded_data[:2] == b'\x1f\x8b':
-            decompressed_data = gzip.decompress(decoded_data)
-            zip_content = BytesIO(decompressed_data)
-        else:
-            zip_content = BytesIO(decoded_data)
+        with zipfile.ZipFile(
+            zip_content, 'r') as zip_ref:  # type:ignore
+            zip_ref.extractall(temp_path)
 
-    # Extract the zip file to temporary directory
-    with zipfile.ZipFile(
-        zip_content, 'r') as zip_ref:  # type:ignore
-        zip_ref.extractall(temp_path)
-
-    # Find the html directory
-    html_dir = None
-    for root, dirs, files in os.walk(temp_path):
-        if 'html' in dirs:
-            html_dir = os.path.join(root, 'html')
-            break
-    if not html_dir:
-        raise ValidationError(
-            _('No html directory found in the zip file.'))
-    temp.cleanup()
+        html_dir = None
+        for root, dirs, files in os.walk(temp_path):
+            if 'html' in dirs:
+                html_dir = os.path.join(root, 'html')
+                break
+        if not html_dir:
+            raise ValidationError(
+                _('No html directory found in the zip file.'))
+        temp.cleanup()
