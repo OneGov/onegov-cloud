@@ -2189,16 +2189,6 @@ class PeopleSettingsForm(Form):
 
         return None
 
-    def validate_organisation_hierarchy(self, field: TextAreaField) -> None:
-        yaml_data = self.organisation_hierarchy.data
-        if yaml_data:
-            try:
-                yaml.safe_load(yaml_data)
-            except yaml.YAMLError as ex:
-                raise ValidationError(
-                    _('Invalid YAML format. Please refer '
-                      'to the example.')) from ex
-
     def populate_obj(self, model: Organisation) -> None:  # type:ignore
         super().populate_obj(model)
 
