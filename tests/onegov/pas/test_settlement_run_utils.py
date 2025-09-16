@@ -166,10 +166,22 @@ def test_get_commission_closure_status(pas_app):
     assert len(commission_status) == 4
 
     # Find specific commissions in the results
-    finance_status = next((c for c in commission_status if c['commission_name'] == 'Finance Commission'), None)
-    education_status = next((c for c in commission_status if c['commission_name'] == 'Education Commission'), None)
-    health_status = next((c for c in commission_status if c['commission_name'] == 'Health Commission'), None)
-    budget_status = next((c for c in commission_status if c['commission_name'] == 'Budget Commission'), None)
+    finance_status = next(
+        (c for c in commission_status
+         if c['commission_name'] == 'Finance Commission'), None
+    )
+    education_status = next(
+        (c for c in commission_status
+         if c['commission_name'] == 'Education Commission'), None
+    )
+    health_status = next(
+        (c for c in commission_status
+         if c['commission_name'] == 'Health Commission'), None
+    )
+    budget_status = next(
+        (c for c in commission_status
+         if c['commission_name'] == 'Budget Commission'), None
+    )
 
     assert finance_status is not None
     assert education_status is not None

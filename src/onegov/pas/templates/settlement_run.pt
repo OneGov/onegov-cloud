@@ -50,15 +50,6 @@
                             It displays how many commission members have marked their attendance as "closed" (abschluss)
                             for this settlement run. Members who have not yet closed their attendance are listed below each commission.
                         </p>
-                        <p i18n:translate="">
-                            <strong>Status indicators:</strong>
-                        </p>
-                        <ul>
-                            <li i18n:translate=""><span><strong>Complete:</strong> All commission members have closed their attendance</span></li>
-                            <li i18n:translate=""><span><strong>Incomplete:</strong> Some members have not yet closed their attendance</span></li>
-                            <li i18n:translate=""><span><strong>Has attendance:</strong> Member has attendance records but hasn't marked as closed</span></li>
-                            <li i18n:translate=""><span><strong>No attendance:</strong> Member has no attendance records for this commission</span></li>
-                        </ul>
                     </div>
 
                     <div tal:repeat="commission commission_closure_status" class="commission-closure-item">
@@ -68,7 +59,7 @@
                                 ${commission['commission_name']}
                                 <span class="completion-ratio">(${commission['completion_ratio']})</span>
                                 <span tal:condition="commission['is_complete']" class="status-indicator complete">✓ Complete</span>
-                                <span tal:condition="not commission['is_complete']" class="status-indicator incomplete">⚠ Incomplete</span>
+                                <span tal:condition="not commission['is_complete']" class="status-indicator incomplete" i18n:translate="">⚠ Incomplete</span>
                             </h4>
                         </div>
 

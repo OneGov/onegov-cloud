@@ -50,9 +50,9 @@ from onegov.pas.views.pas_excel_export_nr_3_lohnart_fibu import (
         generate_fibu_export_rows)
 
 
-from typing import Literal, TypeAlias, TYPE_CHECKING
+from typing import Any, Literal, TypeAlias, TYPE_CHECKING
 if TYPE_CHECKING:
-    from sqlalchemy import Session
+    from sqlalchemy.orm import Session
     from datetime import date
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
@@ -74,7 +74,7 @@ def get_commission_closure_status(
     session: Session,
     settlement_run: SettlementRun,
     commissions: list[PASCommission] | None = None
-) -> list[dict[str, any]]:
+) -> list[dict[str, Any]]:
     """
     Get closure status organized by commission showing completion summary.
 
@@ -129,9 +129,13 @@ def get_commission_closure_status(
 
         for membership in memberships:
             parliamentarian = membership.parliamentarian
-            parl_name = f'{parliamentarian.first_name} {parliamentarian.last_name}'
+            parl_name = (
+                f'{parliamentarian.first_name} '
+                f'{parliamentarian.last_name}'
+            )
 
-            # Check if this parliamentarian has closed attendance for this commission
+            # Check if this parliamentarian has closed attendance for this
+            # commission
             closed_attendance = session.query(Attendence).filter(
                 Attendence.parliamentarian_id == parliamentarian.id,
                 Attendence.commission_id == commission.id,
@@ -172,7 +176,9 @@ def get_commission_closure_status(
         })
 
     # Sort by completion status (incomplete first) then by name
-    commission_status.sort(key=lambda x: (x['is_complete'], x['commission_name']))
+    commission_status.sort(
+        key=itemgetter('is_complete', 'commission_name')
+    )
 
     return commission_status
 
