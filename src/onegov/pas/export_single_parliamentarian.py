@@ -9,6 +9,7 @@ from onegov.pas.collections import (
 from onegov.pas.custom import get_current_rate_set
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.attendence import TYPES
+from onegov.pas.utils import is_commission_president
 from onegov.pas.utils import format_swiss_number
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
@@ -300,8 +301,8 @@ def _get_parliamentarian_settlement_data(
 
     result = []
     for attendence in attendences:
-        is_president = any(
-            r.role == 'president' for r in parliamentarian.roles
+        is_president = is_commission_president(
+            parliamentarian, attendence, settlement_run
         )
         base_rate = calculate_rate(
             rate_set=rate_set,

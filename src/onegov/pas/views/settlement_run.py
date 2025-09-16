@@ -37,6 +37,7 @@ from onegov.pas.utils import (
     format_swiss_number,
     get_parliamentarians_with_settlements,
     get_parties_with_settlements,
+    is_commission_president,
 )
 
 
@@ -386,8 +387,9 @@ def _get_commission_totals(
                 'Final': Decimal('0')
             }
 
-        is_president = any(r.role == 'president'
-                           for r in attendence.parliamentarian.roles)
+        is_president = is_commission_president(
+            attendence.parliamentarian, commission.id, settlement_run
+        )
 
         base_rate = calculate_rate(
             rate_set=rate_set,
@@ -606,8 +608,9 @@ def _get_commission_settlement_data(
 
     result = []
     for attendence in attendences:
-        is_president = any(r.role == 'president'
-                           for r in attendence.parliamentarian.roles)
+        is_president = is_commission_president(
+            attendence.parliamentarian, commission.id, settlement_run
+        )
 
         base_rate = calculate_rate(
             rate_set=rate_set,
@@ -754,8 +757,9 @@ def _get_data_export_all(
     parliamentarian_totals: dict[str, Decimal] = {}
 
     for attendence in attendences.query():
-        is_president = any(r.role == 'president'
-                           for r in attendence.parliamentarian.roles)
+        is_president = is_commission_president(
+            attendence.parliamentarian, attendence, self
+        )
 
         # Calculate base rate
         base_rate = calculate_rate(
@@ -941,8 +945,9 @@ def _get_party_settlement_data(
             continue
 
         # found an export
-        is_president = any(r.role == 'president'
-                           for r in attendence.parliamentarian.roles)
+        is_president = is_commission_president(
+            attendence.parliamentarian, attendence, settlement_run
+        )
 
         base_rate = calculate_rate(
             rate_set=rate_set,

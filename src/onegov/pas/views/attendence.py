@@ -32,10 +32,26 @@ def view_attendences(
 
     layout = AttendenceCollectionLayout(self, request)
 
+    # Filter attendances based on user role
+    if request.is_parliamentarian:
+        # Parliamentarians see only their own attendances
+        user = request.current_user
+        if user and hasattr(user, 'parliamentarian') and user.parliamentarian:
+            collection = AttendenceCollection(
+                request.session,
+                parliamentarian_id=str(user.parliamentarian.id)
+            )
+            attendences = collection.query().all()
+        else:
+            attendences = []
+    else:
+        # Admins see all attendances
+        attendences = self.query().all()
+
     return {
         'add_link': request.link(self, name='new'),
         'layout': layout,
-        'attendences': self.query().all(),
+        'attendences': attendences,
         'title': layout.title,
     }
 
