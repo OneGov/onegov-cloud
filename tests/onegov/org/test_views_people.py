@@ -13,7 +13,13 @@ def test_people_view(client):
     settings.form['organisation_hierarchy'] = """
     - Organisation 1:
     """
+    assert 'Ungültiges Format.' in settings.form.submit()
 
+    settings.form['organisation_hierarchy'] = """
+    - Organisation 1:
+      - a
+      -
+    """
     assert 'Ungültiges Format.' in settings.form.submit()
 
     settings.form['organisation_hierarchy'] = """
