@@ -2306,7 +2306,7 @@ msgid "No reservation resources defined yet."
 msgstr "Nessuna risorsa di prenotazione ancora definita."
 
 msgid "General information about resources"
-msgstr "Informazioni generali sulle risorse"
+msgstr "Informazioni generali sulle prenotazioni"
 
 msgid ""
 "Searching is currently unavailable due to technical difficulties. Please "

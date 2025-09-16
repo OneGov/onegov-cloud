@@ -2654,10 +2654,10 @@ msgid "General event documents"
 msgstr "Documenti generali dell'evento"
 
 msgid "General information above the resource list"
-msgstr "Informazioni generali sopra l'elenco delle risorse"
+msgstr "Informazioni generali sopra l'elenco delle prenotazioni"
 
 msgid "General information below the resource list"
-msgstr "Informazioni generali sotto l'elenco delle risorse"
+msgstr "Informazioni generali sotto l'elenco delle prenotazioni"
 
 msgid "Duration from opening a ticket to its automatic archival"
 msgstr "Durata dall'apertura di un ticket alla sua archiviazione automatica"
