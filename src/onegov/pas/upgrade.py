@@ -5,7 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 from __future__ import annotations
 
-from sqlalchemy import Column, Text
+from sqlalchemy import Boolean, Column, Text
 from onegov.core.orm.types import UUID, JSON
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 
@@ -105,3 +105,18 @@ def add_source_data_columns_to_pas_import_logs(
                         nullable=True
                     )
                 )
+
+
+@upgrade_task('Add abschluss column to par_attendence')
+def add_abschluss_column_to_par_attendence(context: UpgradeContext) -> None:
+    if context.has_table('par_attendence'):
+        if not context.has_column('par_attendence', 'abschluss'):
+            context.add_column_with_defaults(
+                'par_attendence',
+                Column(
+                    'abschluss',
+                    Boolean,
+                    nullable=False
+                ),
+                default=False
+            )

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.models.attendence import Attendence
+from onegov.pas.models.commission import PASCommission
+from onegov.pas.models.commission_membership import PASCommissionMembership
 from onegov.pas.models.party import Party
 from onegov.pas.models.parliamentarian import PASParliamentarian
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
@@ -110,6 +112,43 @@ def get_parties_with_settlements(
             )
         )
         .order_by(Party.name)
+        .all()
+    )
+
+
+def get_commissions_with_memberships(
+    session: Session,
+    start_date: date,
+    end_date: date
+) -> list[PASCommission]:
+    """
+    Get all commissions that had active memberships during the
+    specified period.
+
+    This function ensures accurate commission filtering by checking that
+    commissions had active members during the period, properly handling
+    cases where memberships have changing dates.
+    """
+
+    return (
+        session.query(PASCommission)
+        .filter(
+            PASCommission.id.in_(
+                session.query(PASCommissionMembership.commission_id)
+                .filter(
+                    (
+                        PASCommissionMembership.start.is_(None)
+                        | (PASCommissionMembership.start <= end_date)
+                    ),
+                    (
+                        PASCommissionMembership.end.is_(None)
+                        | (PASCommissionMembership.end >= start_date)
+                    ),
+                )
+                .distinct()
+            )
+        )
+        .order_by(PASCommission.name)
         .all()
     )
 

@@ -5,6 +5,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.pas import _
+from sqlalchemy import Boolean
 from sqlalchemy import Column, Text
 from sqlalchemy import Date
 from sqlalchemy import Enum
@@ -85,6 +86,13 @@ class Attendence(Base, TimestampMixin):
 
     bulk_edit_id: Column[uuid.UUID | None] = Column(
         UUID  # type:ignore[arg-type]
+    )
+
+    #: Whether this attendance submission is closed/completed
+    abschluss: Column[bool] = Column(
+        Boolean,
+        nullable=False,
+        default=False
     )
 
     #: The type as translated text
