@@ -9,7 +9,7 @@ from decimal import Decimal
 from babel.numbers import format_decimal
 
 
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 from uuid import UUID
 if TYPE_CHECKING:
     from onegov.pas.models import SettlementRun
@@ -31,8 +31,8 @@ def format_swiss_number(value: Decimal | int) -> str:
 
 def is_commission_president(
     parliamentarian: PASParliamentarian,
-    attendance_or_commission_id: Union['Attendence', UUID],
-    settlement_run: 'SettlementRun'
+    attendance_or_commission_id: Attendence | UUID,
+    settlement_run: SettlementRun
 ) -> bool:
     """
     Check if a parliamentarian is president of the commission for the given
