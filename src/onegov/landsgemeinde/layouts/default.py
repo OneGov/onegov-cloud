@@ -31,7 +31,7 @@ class DefaultLayout(BaseDefaultLayout):
 
         if assembly.extraordinary:
             return _(
-                'Extraodinary ${assembly_type} from ${date}',
+                'Extraordinary ${assembly_type} from ${date}',
                 mapping={'assembly_type': self.assembly_type,
                          'date': self.format_date(assembly.date, 'date_long')}
             )
