@@ -37,7 +37,7 @@ class AgendaItemCollectionLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(
-                _('Assemblies'),
+                self.assembly_type_plural,
                 self.request.link(self.assembly_collection())
             ),
             Link(
@@ -92,7 +92,7 @@ class AgendaItemLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(
-                _('Assemblies'),
+                self.assembly_type_plural,
                 self.request.link(self.assembly_collection())
             ),
             Link(
