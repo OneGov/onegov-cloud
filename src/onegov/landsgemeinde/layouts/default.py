@@ -28,14 +28,17 @@ class DefaultLayout(BaseDefaultLayout):
         self.custom_body_attributes['data-websocket-channel'] = ''
 
     def assembly_title(self, assembly: Assembly) -> str:
+
         if assembly.extraordinary:
             return _(
-                'Extraodinary assembly from ${date}',
-                mapping={'date': self.format_date(assembly.date, 'date_long')}
+                'Extraodinary ${assembly_type} from ${date}',
+                mapping={'assembly_type': self.assembly_type,
+                         'date': self.format_date(assembly.date, 'date_long')}
             )
         return _(
-            'Assembly from ${date}',
-            mapping={'date': self.format_date(assembly.date, 'date_long')}
+            '${assembly_type} from ${date}',
+            mapping={'assembly_type': self.assembly_type,
+                     'date': self.format_date(assembly.date, 'date_long')}
         )
 
     def agenda_item_title(
@@ -79,3 +82,21 @@ class DefaultLayout(BaseDefaultLayout):
         )
 
         return self.request.link(static_file)
+
+    @property
+    def assembly_type(self) -> str:
+        if self.org.assembly_title == 'general_assembly':
+            return self.request.translate(_('General Assembly'))
+
+        if self.org.assembly_title == 'town_hall_meeting':
+            return self.request.translate(_('Town Hall Meeting'))
+        return self.request.translate(_('Assembly'))
+
+    @property
+    def assembly_type_plural(self) -> str:
+        if self.org.assembly_title == 'general_assembly':
+            return self.request.translate(_('General Assemblies'))
+
+        if self.org.assembly_title == 'town_hall_meeting':
+            return self.request.translate(_('Town Hall Meetings'))
+        return self.request.translate(_('Assemblies'))
