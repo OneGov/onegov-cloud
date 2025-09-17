@@ -4,7 +4,10 @@ from onegov.core.security import Public, Personal, Private
 from onegov.core.security.roles import get_roles_setting as \
     get_roles_setting_base
 from onegov.pas import PasApp
-from onegov.pas.collections import AttendenceCollection, PASCommissionCollection
+from onegov.pas.collections import (
+    AttendenceCollection,
+    PASCommissionCollection
+)
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.commission import Commission, PASCommission
 from onegov.pas.models.parliamentarian import PASParliamentarian
@@ -78,7 +81,7 @@ def restrict_parliamentarian_access(
     app: PasApp,
     identity: Identity,
     model: PASParliamentarian,
-    permission: Intent
+    permission: type[Intent]
 ) -> bool:
     if (
         identity.role == 'parliamentarian'
@@ -104,12 +107,13 @@ def has_private_access_to_commission(
             username=identity.userid).first()
         if user:
             if user.parliamentarian:  # type:ignore
-                membershps =  user.parliamentarian.commission_memberships  # type:ignore
-                for membership in membershps: 
+                membershps = user.parliamentarian.commission_memberships  # type:ignore
+                for membership in membershps:
                     if membership.commission_id == model.id and \
                             membership.role == 'president':
                         return True
     return permission in getattr(app.settings.roles, identity.role)
+
 
 @PasApp.permission_rule(model=Organisation, permission=Personal)
 def has_personal_access_to_organisation(
@@ -118,7 +122,7 @@ def has_personal_access_to_organisation(
     model: Organisation,
     permission: Intent
 ) -> bool:
-    '''Allow parliamentarians and commission presidents to access dashboard'''
+    """Allow parliamentarians and commission presidents to access dashboard"""
     if identity.role in ('parliamentarian', 'commission_president'):
         return True
     return permission in getattr(app.settings.roles, identity.role)
@@ -174,7 +178,7 @@ def has_private_access_to_pas_commission(
             username=identity.userid).first()
         if user:
             if user.parliamentarian:  # type:ignore
-                membershps =  user.parliamentarian.commission_memberships  # type:ignore
+                membershps = user.parliamentarian.commission_memberships  # type:ignore
                 for membership in membershps:
                     if membership.commission_id == model.id and \
                             membership.role == 'president':

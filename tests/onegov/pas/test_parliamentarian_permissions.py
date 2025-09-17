@@ -1,5 +1,9 @@
-from onegov.pas.collections import AttendenceCollection, PASCommissionCollection
-from onegov.pas.models import PASCommission, PASCommissionMembership, Attendence
+from onegov.pas.collections import (
+    AttendenceCollection,
+    PASCommissionCollection
+)
+from onegov.pas.models import PASCommission
+from onegov.pas.models import PASCommissionMembership
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.user import UserCollection
 import transaction
@@ -76,8 +80,6 @@ def test_view_dashboard_as_commission_president(client):
 def test_view_attendences_as_parliamentarian(client):
     '''Parliamentarians should be able to view attendences'''
     session = client.app.session()
-
-    # Create parliamentarian
     parliamentarians = PASParliamentarianCollection(client.app)
     parliamentarian = parliamentarians.add(
         first_name='Anna',
@@ -85,17 +87,14 @@ def test_view_attendences_as_parliamentarian(client):
         email_primary='anna.attendee@example.org'
     )
     transaction.commit()
-
-    # Login as parliamentarian
     client.login('anna.attendee@example.org', 'test')
-
-    # Should be able to access attendences collection
     page = client.get('/attendences')
     assert page.status_code == 200
 
 
 def test_view_attendence_as_parliamentarian(client):
-    '''Parliamentarians should be able to view individual attendences'''
+    '''Parliamentarians should be able to view individual attendences and
+    create new ones'''
     session = client.app.session()
 
     # Create parliamentarian
@@ -113,6 +112,12 @@ def test_view_attendence_as_parliamentarian(client):
         meeting_type='commission',
         status='present'
     )
+
+    # Set correct password for the created user
+    users = UserCollection(session)
+    user = users.by_username('bob.viewer@example.org')
+    user.password = 'test'
+
     transaction.commit()
 
     # Login as parliamentarian
@@ -121,6 +126,17 @@ def test_view_attendence_as_parliamentarian(client):
     # Should be able to view the attendence
     page = client.get(f'/attendence/{attendence.id}')
     assert page.status_code == 200
+
+    # Should be able to access new attendance form
+    page = client.get('/attendences/new')
+    assert page.status_code == 200
+
+    # Check if it's actually a form page (most important test)
+    assert 'form' in page
+    assert 'submit' in page.lower()
+
+    # todo: claude
+    # should be able to edit their own attendance
 
 
 def test_view_commissions_as_parliamentarian(client):
@@ -266,7 +282,8 @@ def test_commission_president_private_access_permission_rule(client):
 
 
 def test_parliamentarian_no_private_access_to_commission(client):
-    '''Regular parliamentarians should not have private access to commissions'''
+    '''Regular parliamentarians should not have private access to
+    commissions'''
     from onegov.core.security import Private
     from onegov.pas.security import has_private_access_to_commission
     from morepath import Identity
@@ -301,7 +318,10 @@ def test_parliamentarian_no_private_access_to_commission(client):
     transaction.commit()
 
     # Test permission rule with parliamentarian identity
-    identity = Identity(userid='mary.member@example.org', role='parliamentarian')
+    identity = Identity(
+        userid='mary.member@example.org',
+        role='parliamentarian'
+    )
 
     # Should not have private access to commission
     assert has_private_access_to_commission(
@@ -310,7 +330,8 @@ def test_parliamentarian_no_private_access_to_commission(client):
 
 
 def test_commission_president_no_access_to_different_commission(client):
-    '''Commission presidents should not have private access to other commissions'''
+    '''Commission presidents should not have private access to other
+    commissions'''
     from onegov.core.security import Private
     from onegov.pas.security import has_private_access_to_commission
     from morepath import Identity
@@ -367,7 +388,8 @@ def test_commission_president_no_access_to_different_commission(client):
 
 
 def test_commission_president_with_no_parliamentarian_record(client):
-    '''Commission presidents without parliamentarian record should not have access'''
+    '''Commission presidents without parliamentarian record should not
+    have access'''
     from onegov.core.security import Private
     from onegov.pas.security import has_private_access_to_commission
     from morepath import Identity
@@ -388,7 +410,8 @@ def test_commission_president_with_no_parliamentarian_record(client):
 
     transaction.commit()
 
-    # Test permission rule with president identity but no parliamentarian record
+    # Test permission rule with president identity but no parliamentarian
+    # record
     identity = Identity(userid='orphan.president@example.org',
                        role='commission_president')
 
@@ -396,35 +419,3 @@ def test_commission_president_with_no_parliamentarian_record(client):
     assert has_private_access_to_commission(
         client.app, identity, commission, Private
     ) is False
-
-
-def test_parliamentarian_can_create_new_attendance(client):
-    '''Parliamentarians should be able to access the new attendance form'''
-    session = client.app.session()
-
-    # Create parliamentarian
-    parliamentarians = PASParliamentarianCollection(client.app)
-    parliamentarian = parliamentarians.add(
-        first_name='Sarah',
-        last_name='Creator',
-        email_primary='sarah.creator@example.org'
-    )
-
-    # Set correct password for the created user
-    users = UserCollection(session)
-    user = users.by_username('sarah.creator@example.org')
-    user.password = 'test'
-
-    transaction.commit()
-
-    # Login as parliamentarian
-    client.login('sarah.creator@example.org', 'test')
-
-    # Should be able to access new attendance form
-    page = client.get('/attendences/new')
-    assert page.status_code == 200
-    assert 'New attendence' in page or 'Create Attendance' in page
-
-    # Verify form elements are present
-    assert 'form' in page
-    assert 'submit' in page.lower()

@@ -14,4 +14,3 @@ class PasRequest(TownRequest):
         if self.current_user.role in parls:
             return True
         return False
-

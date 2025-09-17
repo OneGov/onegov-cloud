@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from functools import cached_property
 from onegov.core.utils import module_path
 from onegov.pas.content import create_new_organisation
 from onegov.pas.custom import get_global_tools

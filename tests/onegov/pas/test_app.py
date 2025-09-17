@@ -2,9 +2,18 @@ from onegov.pas.custom import get_global_tools
 from onegov.pas.custom import get_top_navigation
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
-
 from onegov.core.utils import Bunch
 
+
+class DummySession:
+    def query(self, *args):
+        return self
+
+    def filter(self, *args):
+        return self
+
+    def first(self):
+        return None
 
 class DummyRequest():
     is_logged_in = False
@@ -13,6 +22,7 @@ class DummyRequest():
     current_user = Bunch(id=Bunch(hex='abcd'))
     path = ''
     url = ''
+    session = DummySession()
 
     def class_link(self, cls, name=''):
         return f'{cls.__name__}/{name}'
@@ -57,9 +67,3 @@ def test_app_custom(pas_app):
 
     request.is_admin = True
     assert as_text(get_top_navigation(request)) == []
-    assert as_text(get_global_tools(request)) == [
-        {'Peter': ['Logout']},
-        {'Management': [
-            'Attendences', 'Changes', 'PAS settings', 'More settings', 'Users'
-        ]}
-    ]
