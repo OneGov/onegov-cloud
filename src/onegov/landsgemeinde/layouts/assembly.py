@@ -42,7 +42,7 @@ class AssemblyCollectionLayout(DefaultLayout):
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_('Assembly'),
+                            text=self.assembly_type,
                             url=self.request.link(self.model, 'new'),
                             attrs={'class': 'new-form'}
                         ),

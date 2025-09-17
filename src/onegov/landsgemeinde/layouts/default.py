@@ -31,12 +31,14 @@ class DefaultLayout(BaseDefaultLayout):
 
         if assembly.extraordinary:
             return _(
-                'Extraodinary ${assembly_type} from ${date}',
-                mapping={'assembly_type': self.assembly_type, 'date': self.format_date(assembly.date, 'date_long')}
+                'Extraordinary ${assembly_type} from ${date}',
+                mapping={'assembly_type': self.assembly_type,
+                         'date': self.format_date(assembly.date, 'date_long')}
             )
         return _(
             '${assembly_type} from ${date}',
-            mapping={'assembly_type': self.assembly_type, 'date': self.format_date(assembly.date, 'date_long')}
+            mapping={'assembly_type': self.assembly_type,
+                     'date': self.format_date(assembly.date, 'date_long')}
         )
 
     def agenda_item_title(

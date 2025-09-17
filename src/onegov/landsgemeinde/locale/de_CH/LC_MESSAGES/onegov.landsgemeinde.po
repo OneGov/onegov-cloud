@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-09-16 15:49+0200\n"
+"POT-Creation-Date: 2025-09-17 10:13+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -440,11 +440,13 @@ msgstr "Neues Traktandum importiert"
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
-msgid "Added a new assembly"
-msgstr "Neue Landsgemeinde hinzugefügt"
+#, python-format
+msgid "Added a new ${assembly}"
+msgstr "Neue ${assembly} hinzugefügt"
 
-msgid "New assembly"
-msgstr "Neue Landsgemeinde"
+#, python-format
+msgid "New ${assembly}"
+msgstr "Neue ${assembly}"
 
 msgid "Open Data"
 msgstr "Open Data"

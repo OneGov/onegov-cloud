@@ -42,4 +42,10 @@ def handle_assembly_settings(
     form: AssemblySettingsForm
 ) -> RenderData | Response:
     layout = SettingsLayout(self, request, _('General Assemblies'))
-    return handle_generic_settings(self, request, form, _('General Assemblies'), layout)
+    return handle_generic_settings(
+        self,
+        request,
+        form,
+        _('General Assemblies'),
+        layout
+    )
