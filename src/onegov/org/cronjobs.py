@@ -52,6 +52,7 @@ from onegov.org.views.directory import (
     send_email_notification_for_directory_entry)
 from onegov.org.views.newsletter import send_newsletter
 from onegov.org.views.ticket import delete_tickets_and_related_data
+from onegov.pay.models.payment_providers import WorldlineSaferpay
 from onegov.reservation import Reservation, Resource, ResourceCollection
 from onegov.search import Searchable
 from onegov.ticket import Ticket, TicketCollection
@@ -270,6 +271,20 @@ def delete_old_tan_accesses(request: OrgRequest) -> None:
     # cronjobs happen outside a regular request, so we don't need
     # to synchronize with the session
     query.delete(synchronize_session=False)
+
+
+@OrgApp.cronjob(hour='*', minute='*/15', timezone='UTC')
+def cancel_stale_open_saferpay_transactions(request: OrgRequest) -> None:
+    """
+    Cancels stale open Saferpay transactions.
+    """
+    for provider in request.session.query(WorldlineSaferpay).filter(
+        WorldlineSaferpay.enabled.is_(True)
+    ):
+        if not provider.connected:
+            continue
+
+        provider.client.cancel_stale_open_transactions(request.session)
 
 
 @OrgApp.cronjob(hour=23, minute=45, timezone='Europe/Zurich')

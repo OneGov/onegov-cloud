@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-09-10 15:35+0200\n"
+"POT-Creation-Date: 2025-09-16 07:59+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -17,8 +17,8 @@ msgstr "Benutzer"
 msgid "Logout"
 msgstr "Abmelden"
 
-msgid "Management"
-msgstr "Verwaltung"
+msgid "Current Settlement Run"
+msgstr "Aktueller Abrechnungslauf"
 
 msgid "Attendences"
 msgstr "Anwesenheiten"
@@ -29,8 +29,14 @@ msgstr "Aktivitäten"
 msgid "PAS settings"
 msgstr "PAS Einstellungen"
 
+msgid "Files"
+msgstr "Dateien"
+
 msgid "More settings"
 msgstr "Weitere Einstellungen"
+
+msgid "Management"
+msgstr "Verwaltung"
 
 msgid "No within an active settlement run."
 msgstr "Nicht in einem aktiven Abrechungslauf"
@@ -50,10 +56,17 @@ msgstr "Parlamentarier:in"
 msgid "Commission"
 msgstr "Kommission"
 
+msgid "Abschluss"
+msgstr "Abschluss"
+
+msgid "Mark as completed/closed"
+msgstr "Als abgeschlossen markieren"
+
 msgid "Parliamentarian is not in this commission."
 msgstr "Parlamentarier:in ist nicht in dieser Kommission."
 
-
+msgid "Bulk edit group"
+msgstr "Massenbuchungsgruppe"
 
 msgid "People Data (JSON)"
 msgstr "Personendaten (JSON)"
@@ -105,6 +118,12 @@ msgstr "Unerwarteter Fehler bei der Verarbeitung der Datei ${name}: ${error}"
 
 msgid "Name"
 msgstr "Name"
+
+msgid "Start"
+msgstr "Start"
+
+msgid "End"
+msgstr "Ende"
 
 msgid "Personnel number"
 msgstr "Personalnummer"
@@ -475,6 +494,9 @@ msgstr "Noch keine Aktivitäten."
 msgid "Action"
 msgstr "Aktion"
 
+msgid "Function"
+msgstr "Funktion"
+
 msgid "No active commissions."
 msgstr "Keine aktiven Kommissionen."
 
@@ -589,8 +611,44 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nein"
 
-msgid "Exports Settlement runs"
-msgstr "Exporte Abrechnungsläufe"
+msgid "Commission Closure Status"
+msgstr "Kommissions-Abschlussstatus"
+
+msgid ""
+"This table shows the attendance closure status for each commission. It "
+"displays how many commission members have marked their attendance as "
+"\"closed\" (abschluss) for this settlement run. Members who have not yet "
+"closed their attendance are listed below each commission."
+msgstr ""
+"Diese Tabelle zeigt den Abschlussstatus der Anwesenheit für jede Kommission. "
+"Sie zeigt, wie viele Kommissionsmitglieder ihre Anwesenheit als "
+"\"abgeschlossen\" für diesen Abrechnungslauf markiert haben. Mitglieder, die "
+"ihre Anwesenheit noch nicht abgeschlossen haben, sind unter jeder Kommission "
+"aufgelistet."
+
+msgid "⚠ Incomplete"
+msgstr "⚠ Unvollständig"
+
+msgid "Members who have closed their attendance:"
+msgstr "Mitglieder, die ihre Anwesenheit abgeschlossen haben:"
+
+msgid "✓ (closed)"
+msgstr "✓ (abgeschlossen)"
+
+msgid "Members who have not closed their attendance:"
+msgstr "Mitglieder, die ihre Anwesenheit nicht abgeschlossen haben:"
+
+msgid "(has attendance)"
+msgstr "(hat Anwesenheit)"
+
+msgid "(no attendance)"
+msgstr "(keine Anwesenheit)"
+
+msgid ""
+"No commissions with active memberships found for this settlement period."
+msgstr ""
+"Keine Kommissionen mit aktiven Mitgliedschaften für diesen "
+"Abrechnungszeitraum gefunden."
 
 msgid "No settlement runs defined yet."
 msgstr "Noch keine Abrechnungsläufe erfasst"
@@ -603,6 +661,9 @@ msgstr "Neu"
 
 msgid "New attendence"
 msgstr "Neue Anwesenheit"
+
+msgid "No parliamentarians selected"
+msgstr "Keine Parlamentarier:innen ausgewählt"
 
 msgid "Added commission session"
 msgstr "Kommissionssitzung hinzugefügt"
@@ -742,8 +803,26 @@ msgstr "Abrechnungen nach Kommission"
 msgid "Settlements by Parliamentarian"
 msgstr "Abrechnungen nach Parlamentarier:in"
 
+msgid "Abschlussliste"
+msgstr "Abschlussliste"
+
+msgid "Abschlussliste (XLSX)"
+msgstr "Abschlussliste (XLSX)"
+
+msgid "Buchungen Abrechnungslauf"
+msgstr "Buchungen Abrechnungslauf"
+
+msgid "Buchungen Abrechnungslauf (Kontrollliste)"
+msgstr "Buchungen Abrechnungslauf (Kontrollliste)"
+
+msgid "KR-Entschädigungen (CSV)"
+msgstr "KR-Entschädigungen (CSV)"
+
+msgid "PDF Exports"
+msgstr "PDF Exporte"
+
+msgid "Excel Exports"
+msgstr "Excel Exporte"
+
 msgid "Total all parties"
 msgstr "Total Alle Parteien"
-
-#~ msgid "Edited session"
-#~ msgstr "Sitzung bearbeitet"

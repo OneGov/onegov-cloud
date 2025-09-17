@@ -119,6 +119,12 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
         nullable=True
     )
 
+    #: Wahlkreis
+    district: Column[str | None] = Column(
+        Text,
+        nullable=True
+    )
+
     #: The gender value
     gender: Column[Gender] = Column(
         Enum(

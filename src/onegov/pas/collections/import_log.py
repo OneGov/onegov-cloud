@@ -38,3 +38,10 @@ class ImportLogCollection(GenericCollection[ImportLog]):
         status: str | None = None
     ) -> Self:
         return self.__class__(self.session, status)
+
+    def most_recent_completed_cli_import(self) -> ImportLog | None:
+        """Get the most recent completed CLI import log."""
+        return self.session.query(ImportLog).filter_by(
+            import_type='cli',
+            status='completed'
+        ).order_by(ImportLog.created.desc()).first()

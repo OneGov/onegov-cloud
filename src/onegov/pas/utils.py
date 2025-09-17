@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from onegov.pas import log
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.models.attendence import Attendence
+from onegov.pas.models.commission import PASCommission
+from onegov.pas.models.commission_membership import PASCommissionMembership
 from onegov.pas.models.party import Party
 from onegov.pas.models.parliamentarian import PASParliamentarian
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
@@ -11,8 +12,10 @@ from babel.numbers import format_decimal
 
 
 from typing import TYPE_CHECKING
+from uuid import UUID
 if TYPE_CHECKING:
     from onegov.pas.models import SettlementRun
+    from onegov.pas.models.attendence import Attendence
     from onegov.town6.request import TownRequest
     from datetime import date
     from sqlalchemy.orm import Session
@@ -26,6 +29,44 @@ def format_swiss_number(value: Decimal | int) -> str:
         value = Decimal(value)
 
     return format_decimal(value, format='#,##0.00', locale='de_CH')
+
+
+def is_commission_president(
+    parliamentarian: PASParliamentarian,
+    attendance_or_commission_id: Attendence | UUID,
+    settlement_run: SettlementRun
+) -> bool:
+    """
+    Check if a parliamentarian is president of the commission for the given
+    attendance or commission_id during the settlement run period.
+    """
+    if isinstance(attendance_or_commission_id, UUID):
+        commission_id = attendance_or_commission_id
+        return any(
+            cm.role == 'president'
+            for cm in parliamentarian.commission_memberships
+            if (
+                cm.commission_id == commission_id and (
+                    cm.end is None or cm.end >= settlement_run.start
+                ) and (
+                    cm.start is None or cm.start <= settlement_run.end
+                )
+            )
+        )
+    else:
+        attendance = attendance_or_commission_id
+        return any(
+            cm.role == 'president'
+            for cm in parliamentarian.commission_memberships
+            if (
+                attendance.commission and
+                cm.commission_id == attendance.commission.id and (
+                    cm.end is None or cm.end >= settlement_run.start
+                ) and (
+                    cm.start is None or cm.start <= settlement_run.end
+                )
+            )
+        )
 
 
 def get_parliamentarians_with_settlements(
@@ -52,12 +93,6 @@ def get_parliamentarians_with_settlements(
         PASParliamentarian.first_name
     ).all()
 
-    roles_pretty_print = [
-        f'{p.last_name} {p.first_name}: {p.roles}'
-        for p in active_parliamentarians
-    ]
-    log.info(f'Active parliamentarians: {roles_pretty_print}')
-
     # Get all parliamentarians with attendances in one query
     parliamentarians_with_attendances = {
         pid[0] for pid in
@@ -66,7 +101,6 @@ def get_parliamentarians_with_settlements(
             Attendence.date <= end_date
         ).distinct()
     }
-    log.info(f'Parli with attendances: {parliamentarians_with_attendances}')
 
     # Filter the active parliamentarians to only those with attendances
     return [
@@ -118,6 +152,43 @@ def get_parties_with_settlements(
             )
         )
         .order_by(Party.name)
+        .all()
+    )
+
+
+def get_commissions_with_memberships(
+    session: Session,
+    start_date: date,
+    end_date: date
+) -> list[PASCommission]:
+    """
+    Get all commissions that had active memberships during the
+    specified period.
+
+    This function ensures accurate commission filtering by checking that
+    commissions had active members during the period, properly handling
+    cases where memberships have changing dates.
+    """
+
+    return (
+        session.query(PASCommission)
+        .filter(
+            PASCommission.id.in_(
+                session.query(PASCommissionMembership.commission_id)
+                .filter(
+                    (
+                        PASCommissionMembership.start.is_(None)
+                        | (PASCommissionMembership.start <= end_date)
+                    ),
+                    (
+                        PASCommissionMembership.end.is_(None)
+                        | (PASCommissionMembership.end >= start_date)
+                    ),
+                )
+                .distinct()
+            )
+        )
+        .order_by(PASCommission.name)
         .all()
     )
 

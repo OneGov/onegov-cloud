@@ -2100,12 +2100,12 @@ class PeopleSettingsForm(Form):
             'format. Note: Deeper structures are not supported.'
             '\n'
             '```\n'
-            '- Organisation:\n'
-            '  - Sub-Organisation 1\n'
-            '  - Sub-Organisation 2\n'
-            '- Organisation 2:\n'
-            '  - Sub-Organisation 1\n'
-            '  - Sub-Organisation 2\n'
+            '- Organisation 1:\n'
+            '  - Sub-Organisation 1.1\n'
+            '  - Sub-Organisation 1.2\n'
+            '- Organisation 2\n'
+            '- Organisation 3:\n'
+            '  - Sub-Organisation 3.1\n'
             '```'
         ),
         render_kw={
@@ -2171,9 +2171,11 @@ class PeopleSettingsForm(Form):
                     for topic, sub_topic in item.items():
                         if not isinstance(sub_topic, list):
                             self.organisation_hierarchy.errors.append(
-                                _(f'Invalid format. Please define '
-                                  f"sub-organisations(s) for '{topic}' "
-                                  f"or remove the ':'.")
+                                _('Invalid format. Please define at least '
+                                  "one sub-organisation for '${topic}' "
+                                  "or remove the ':'",
+                                    mapping={'topic': topic}
+                                )
                             )
                             return False
 
@@ -2202,7 +2204,13 @@ class PeopleSettingsForm(Form):
             self.organisation_hierarchy.data = ''
             return
 
-        yaml_data = yaml.safe_dump(categories, default_flow_style=False)
+        yaml_data = yaml.safe_dump(
+            categories,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True,
+            indent=2
+        )
         self.organisation_hierarchy.data = yaml_data
 
 

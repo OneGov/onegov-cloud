@@ -14,6 +14,7 @@ from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.custom import AttendenceCollection
 from onegov.pas.models import PASCommissionMembership, SettlementRun
 from onegov.pas.models.attendence import TYPES
+from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import FloatField
 from wtforms.fields import RadioField
@@ -89,6 +90,11 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
         label=_('Commission'),
         validators=[InputRequired()],
         depends_on=('type', '!plenary'),
+    )
+
+    abschluss = BooleanField(
+        label=_('Abschluss'),
+        description=_('Mark as completed/closed'),
     )
 
     def ensure_commission(self) -> bool:
