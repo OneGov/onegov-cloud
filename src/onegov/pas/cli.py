@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-
 import click
 import logging
 import requests
-import urllib3
 import json
+import urllib3
+from urllib.parse import urlparse, urlunparse
 from onegov.core.cli import command_group
 from onegov.pas.excel_header_constants import (
     commission_expected_headers_variant_1,
@@ -120,11 +120,15 @@ def fetch_api_data_with_pagination(
         endpoint: The API endpoint (e.g., 'people', 'organizations',
                   'memberships')
         token: Authorization token
-        base_url: Base URL for the API
+        base_url: Base URL for the API (should not end with slash)
 
     Returns:
         List of all records from all pages
     """
+
+    # Normalize base URL - remove trailing slash for consistent construction
+    base_url = base_url.rstrip('/')
+
     # Disable SSL warnings (self signed)
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -134,7 +138,12 @@ def fetch_api_data_with_pagination(
     }
 
     all_results = []
-    url = f'{base_url}/{endpoint}'
+    url: str | None = f'{base_url}/{endpoint}'
+
+    # Parse base URL to get correct hostname/scheme for pagination URL fixes
+    # This is necessary because we use a bridge to access the API and need
+    # to dynamically swap the hostname at runtime for pagination URLs
+    base_parsed = urlparse(base_url)
 
     while url:
         try:
@@ -147,8 +156,24 @@ def fetch_api_data_with_pagination(
             results = data.get('results', [])
             all_results.extend(results)
 
-            # Get next page URL
-            url = data.get('next')
+            # Handle pagination: API returns 'next' URLs with bridge hostname
+            # We need to dynamically swap the hostname with our runtime host
+            # from base_url to ensure subsequent requests use correct bridge
+            next_url = data.get('next')
+            if next_url:
+                next_parsed = urlparse(next_url)
+                # Reconstruct URL with correct bridge hostname from base_url
+                # but keeping path, query parameters, etc. from API's next URL
+                url = urlunparse((
+                    base_parsed.scheme,      # Use scheme from base_url (https)
+                    base_parsed.netloc,      # Use bridge hostname
+                    next_parsed.path,        # Keep path (/api/v2/people)
+                    next_parsed.params,      # Keep URL parameters
+                    next_parsed.query,       # Keep query string (page=2, etc.)
+                    next_parsed.fragment     # Keep fragment (usually empty)
+                ))
+            else:
+                url = None
 
         except requests.exceptions.RequestException as e:
             raise click.ClickException(
