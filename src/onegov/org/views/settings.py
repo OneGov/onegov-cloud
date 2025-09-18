@@ -461,7 +461,7 @@ def handle_event_settings(
 @OrgApp.form(
     model=Organisation, name='resource-settings', template='form.pt',
     permission=Secret, form=ResourceSettingsForm, setting=_('Resources'),
-    icon='fa-home')
+    icon='fa-building')
 def handle_resource_settings(
     self: Organisation,
     request: OrgRequest,

@@ -439,7 +439,7 @@ def town_handle_event(
 @TownApp.form(
     model=Organisation, name='resource-settings', template='form.pt',
     permission=Secret, form=ResourceSettingsForm, setting=_('Resources'),
-    icon='fa-home')
+    icon='fa-building')
 def town_handle_resource(
     self: Organisation,
     request: TownRequest,
