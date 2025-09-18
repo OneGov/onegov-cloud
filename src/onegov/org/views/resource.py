@@ -900,6 +900,7 @@ def handle_new_resource(
     layout.include_editor()
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(RESOURCE_TYPES[type]['title'], '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
