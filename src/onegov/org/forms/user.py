@@ -9,10 +9,9 @@ from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import TagsField
 from onegov.form.filters import yubikey_identifier
 from onegov.org import _
-from onegov.ticket import handlers
-from onegov.user import User, UserGroup
-from onegov.ticket import Ticket, TicketPermission
-from onegov.user import UserCollection
+from onegov.reservation import Resource
+from onegov.ticket import handlers, Ticket, TicketPermission
+from onegov.user import User, UserCollection, UserGroup
 from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
 from wtforms.fields import RadioField
@@ -202,7 +201,21 @@ class ManageUserGroupForm(Form):
         label=_(
             'Immediate e-mail notification to members upon ticket submission'
         ),
+        description=_(
+            'Also gives permission to these ticket categories, '
+            'but does not restrict access to other groups.'
+        ),
         choices=[],
+    )
+
+    shared_email = StringField(
+        label=_('Shared e-mail address for ticket submission notifications'),
+        description=_(
+            'When specified, notifications for new tickets will be sent to '
+            'this e-mail address, instead of to individual members. Requires '
+            'that immediate e-mail notifications are turned on for at least '
+            'one kind of ticket.'
+        )
     )
 
     def on_request(self) -> None:
@@ -238,6 +251,21 @@ class ManageUserGroupForm(Form):
             ).union(
                 self.request.session.query(Ticket.group.label('group'))
                 .filter(Ticket.handler_code == 'FRM')
+                .filter(Ticket.group.isnot(None))
+                .distinct()
+            ).order_by('group').distinct()
+        )
+        ticket_choices.extend(
+            (f'RSV-{group}', f'RSV: {group}')
+            for group, in self.request.session.query(
+                Resource.title.label('group')
+            # some groups may get deleted, but as long as there are tickets
+            # we need a corresponding permission
+            ).union(
+                self.request.session.query(
+                    Ticket.group.label('group')
+                )
+                .filter(Ticket.handler_code == 'RSV')
                 .filter(Ticket.group.isnot(None))
                 .distinct()
             ).order_by('group').distinct()
@@ -326,6 +354,14 @@ class ManageUserGroupForm(Form):
 
         model.ticket_permissions = permissions
 
+        if getattr(self, 'shared_email', None):
+            if shared_email := self.shared_email.data:
+                if not model.meta:
+                    model.meta = {}
+                model.meta['shared_email'] = shared_email
+            elif model.meta and 'shared_email' in model.meta:
+                del model.meta['shared_email']
+
     def apply_model(self, model: UserGroup) -> None:
         self.name.data = model.name
         self.users.data = [str(u.id) for u in model.users]
@@ -344,3 +380,6 @@ class ManageUserGroupForm(Form):
                 for permission in model.ticket_permissions
                 if permission.immediate_notification
             ]
+
+        if getattr(self, 'shared_email', None) and model.meta:
+            self.shared_email.data = model.meta.get('shared_email')

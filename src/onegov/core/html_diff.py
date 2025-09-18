@@ -74,7 +74,7 @@ def parse_html(
     wrapper_class: str = 'diff'
 ) -> ET:
     """Parse an HTML fragment into a Genshi stream."""
-    builder = html5lib.getTreeBuilder('etree')  # type: ignore[no-untyped-call]
+    builder = html5lib.getTreeBuilder('etree')
     parser = html5lib.HTMLParser(tree=builder)
     tree = parser.parseFragment(html)
     tree.tag = wrapper_element

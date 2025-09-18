@@ -147,3 +147,20 @@ def migrated_text_based_json_to_jsonb(context: UpgradeContext) -> None:
             type_=JSON,
             postgresql_using='"data"::jsonb'
         )
+
+
+@upgrade_task('Translate default views to their new names')
+def translate_default_views_to_their_new_names(
+    context: UpgradeContext
+) -> None:
+    if context.has_table('resources'):
+        context.operations.execute("""
+            UPDATE resources SET content = jsonb_set(
+                content, '{default_view}', '"dayGridMonth"'
+            ) WHERE content->>'default_view' = 'month';
+        """)
+        context.operations.execute("""
+            UPDATE resources SET content = jsonb_set(
+                content, '{default_view}', '"timeGridWeek"'
+            ) WHERE content->>'default_view' = 'agendaWeek';
+        """)

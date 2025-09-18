@@ -19,6 +19,7 @@ from onegov.org.forms import RoomAllocationForm
 from onegov.org.forms import TicketAssignmentForm
 from onegov.org.forms.allocation import AllocationFormHelpers
 from onegov.org.forms.settings import OrgTicketSettingsForm
+from onegov.reservation import LibresIntegration
 from onegov.ticket import Ticket, TicketPermission
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
@@ -614,7 +615,7 @@ def test_form_registration_window_form_existing(start, end):
     )
 
 
-def test_user_group_form(session):
+def test_user_group_form(session_manager, session):
     users = UserCollection(session)
     user_a = users.add(username='a@example.org', password='a', role='member')
     user_b = users.add(username='b@example.org', password='b', role='member')
@@ -641,6 +642,16 @@ def test_user_group_form(session):
         )
     )
 
+    integration = LibresIntegration()
+    integration.session_manager = session_manager
+    integration.configure_libres()
+    resources = integration.libres_resources
+    resource = resources.add(
+        title='Kitchen',
+        type='room',
+        timezone='Europe/Zurich'
+    )
+
     formdefinition_ticket = Ticket(
         number='1',
         title='Existing FRM',
@@ -665,10 +676,19 @@ def test_user_group_form(session):
         handler_id='deleted-id-2'
     )
 
+    deleted_reservation_ticket = Ticket(
+        number='4',
+        title='Deleted RSV',
+        group='Deleted',
+        handler_code='RSV',
+        handler_id='deleted-id-3'
+    )
+
 
     session.add_all((
-        formdefinition, directory, formdefinition_ticket,
-        deleted_formdefinition_ticket, deleted_directory_ticket
+        formdefinition, directory, resource, formdefinition_ticket,
+        deleted_formdefinition_ticket, deleted_directory_ticket,
+        deleted_reservation_ticket
     ))
     session.flush()
 
@@ -689,6 +709,7 @@ def test_user_group_form(session):
     ]
     assert ('EVN', 'EVN') in form.ticket_permissions.choices
     assert ('FRM', 'FRM') in form.ticket_permissions.choices
+    assert ('RSV', 'RSV') in form.ticket_permissions.choices
     # make sure distinct union query works
     assert form.ticket_permissions.choices.count(('FRM-A-1', 'FRM: A-1')) == 1
     assert ('FRM-A-2', 'FRM: A-2') in form.ticket_permissions.choices
@@ -696,6 +717,8 @@ def test_user_group_form(session):
     assert ('DIR', 'DIR') in form.ticket_permissions.choices
     assert ('DIR-Trainers', 'DIR: Trainers') in form.ticket_permissions.choices
     assert ('DIR-Deleted', 'DIR: Deleted') in form.ticket_permissions.choices
+    assert ('RSV-Kitchen', 'RSV: Kitchen') in form.ticket_permissions.choices
+    assert ('RSV-Deleted', 'RSV: Deleted') in form.ticket_permissions.choices
     assert ('EVN', 'EVN') in form.immediate_notification.choices
     assert ('FRM', 'FRM') in form.immediate_notification.choices
     assert ('FRM-A-1', 'FRM: A-1') in form.immediate_notification.choices
@@ -707,6 +730,12 @@ def test_user_group_form(session):
     ) in form.immediate_notification.choices
     assert (
         'DIR-Deleted', 'DIR: Deleted'
+    ) in form.immediate_notification.choices
+    assert (
+        'RSV-Kitchen', 'RSV: Kitchen'
+    ) in form.immediate_notification.choices
+    assert (
+        'RSV-Deleted', 'RSV: Deleted'
     ) in form.immediate_notification.choices
 
     # apply / update
@@ -722,7 +751,7 @@ def test_user_group_form(session):
     form.name.data = 'A/B'
     form.name.raw_data = ['A/B']
     form.users.data = [str(user_a.id), str(user_b.id)]
-    form.ticket_permissions.data = ['EVN', 'FRM-A-1']
+    form.ticket_permissions.data = ['EVN', 'FRM-A-1', 'RSV-Kitchen']
     form.immediate_notification.data = ['EVN', 'DIR-Trainers']
     assert form.validate()
 
@@ -732,12 +761,14 @@ def test_user_group_form(session):
     assert user_a.logout_all_sessions.called is True
     assert user_b.logout_all_sessions.called is True
     assert user_c.logout_all_sessions.called is False
-    assert session.query(TicketPermission).count() == 3
+    assert session.query(TicketPermission).count() == 4
 
     form.apply_model(group)
     assert form.name.data == 'A/B'
     assert set(form.users.data) == {str(user_a.id), str(user_b.id)}
-    assert set(form.ticket_permissions.data) == {'EVN', 'FRM-A-1'}
+    assert set(form.ticket_permissions.data) == {
+        'EVN', 'FRM-A-1', 'RSV-Kitchen'
+    }
     assert set(form.immediate_notification.data) == {'EVN', 'DIR-Trainers'}
 
     user_a.logout_all_sessions.reset_mock()
@@ -836,6 +867,7 @@ def test_price_submission_vat_not_set(client):
     Email *= @@@
     Betrag mit Preis = 0..8 (64 CHF)
     """
+    assert 'show_vat' not in page
     page = page.form.submit().follow()
     page.form['email'] = 'abbafan@swisscom.ch'
     page.form['betrag_mit_preis'] = '2'
@@ -856,9 +888,9 @@ def test_price_submission_vat_not_set(client):
     assert 'MwSt' not in confirm
 
     # test ticket
-    tickets = client.get('/tickets/ALL/open').click('FRM-')
+    ticket = client.get('/tickets/ALL/open').click('FRM-')
     for value in expected_values:
-        assert value in tickets
+        assert value in ticket
     assert 'MwSt' not in confirm
 
 
@@ -868,8 +900,7 @@ def test_price_submission_vat_set(client):
         '1',
         'Stück(e)',
         'Totalbetrag',
-        '99.00 CHF',
-        '(MwSt 8.1% enthalten: 7.42 CHF)'
+        '99.00 CHF'
     ]
 
     # set vat rate
@@ -884,6 +915,7 @@ def test_price_submission_vat_set(client):
     Email *= @@@
     Betrag mit Preis = 0..5 (99 CHF)
     """
+    page.form['show_vat'].checked = True
     page = page.form.submit().follow()
     page.form['email'] = 'black@bear.ch'
     page.form['betrag_mit_preis'] = '1'
@@ -891,6 +923,8 @@ def test_price_submission_vat_set(client):
 
     for value in expected_values:
         assert value in confirm
+    assert '8.1% enthalten' in confirm
+    assert '8.1% enthalten: 7.42 CHF' not in confirm
     confirm.form.submit().follow()
 
     # test confirmation mail
@@ -899,8 +933,10 @@ def test_price_submission_vat_set(client):
     assert 'Bio Teddybären: Ihre Anfrage wurde erfasst' in mail['Subject']
     for value in expected_values:
         assert value in mail['TextBody']
+    assert '8.1% enthalten: 7.42 CHF' in mail['TextBody']
 
     # test ticket
-    tickets = client.get('/tickets/ALL/open').click('FRM-')
+    ticket = client.get('/tickets/ALL/open').click('FRM-')
     for value in expected_values:
-        assert value in tickets
+        assert value in ticket
+    assert '8.1% enthalten: 7.42 CHF' in ticket

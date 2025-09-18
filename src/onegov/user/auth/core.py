@@ -95,7 +95,7 @@ class Auth:
         signup_token: str | None = None
     ) -> Self:
         return cls.from_request(
-            request, request.transform(request.path), skip, signup_token)
+            request, request.transform(request.path_qs), skip, signup_token)
 
     @property
     def users(self) -> UserCollection:

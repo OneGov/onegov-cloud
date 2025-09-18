@@ -481,18 +481,47 @@ def test_hide_form(client):
     assert response.status_code == 200
 
 
+def test_change_email(client):
+    collection = FormCollection(client.app.session())
+    collection.definitions.add('Newsletter', definition=textwrap.dedent("""
+        E-Mail *= @@@
+    """), type='custom')
+
+    transaction.commit()
+
+    page = client.get('/form/newsletter')
+    page.form['e_mail'] = 'info@example.org'
+    page = page.form.submit().follow().form.submit().follow()
+    assert "Referenz Anfrage" in page
+
+    client.login_supporter()
+    ticket = client.get('/tickets/ALL/open').click("Annehmen").follow()
+    assert ticket.pyquery('.ticket-submitter-email a').text() == (
+        'info@example.org')
+
+    # change the email
+    client.post(
+        ticket.pyquery('.ticket-submitter-email').attr('data-edit'),
+        {'email': 'new@example.org'}
+    )
+    ticket = client.get(ticket.request.url)
+    assert 'E-Mail Adresse des Antragstellers geändert' in ticket
+    assert ticket.pyquery('.ticket-submitter-email a').text() == (
+        'new@example.org')
+
+
 def test_manual_form_payment(client):
     collection = FormCollection(client.app.session())
     collection.definitions.add('Govikon Poster', definition=textwrap.dedent("""
         E-Mail *= @@@
 
         Posters *=
-            [ ] Local Businesses (0 CHF)
+            [ ] Local Businesses
             [ ] Executive Committee (10 CHF)
             [ ] Town Square (20 CHF)
 
         Delivery *=
-            ( ) Pickup (0 CHF)
+            ( ) Pickup
             ( ) Delivery (5 CHF)
     """), type='custom')
 
@@ -520,21 +549,99 @@ def test_manual_form_payment(client):
 
     assert page.pyquery('.payment-state').text() == "Offen"
 
+    # view invoice
+    invoice = page.click('Rechnung anzeigen')
+    assert 'Posters' in invoice
+    assert '30.00' in invoice
+    assert 'Delivery' in invoice
+    assert '5.00' in invoice
+    assert '35.00' in invoice
+    assert invoice.pyquery('.payment-state').text() == "Offen"
+
+    # mark as paid
     client.post(page.pyquery('.mark-as-paid').attr('ic-post-to'))
     page = client.get(page.request.url)
-
     assert page.pyquery('.payment-state').text() == "Bezahlt"
+    invoice = client.get(invoice.request.url)
+    assert invoice.pyquery('.payment-state').text() == "Bezahlt"
 
+    # try to change selections (doesn't work because it would change price)
+    form = page.click('Eingabe bearbeiten')
+    form.select_checkbox('posters', "Local Businesses")
+    form.select_checkbox('posters', "Executive Committee", checked=False)
+    form.select_checkbox('posters', "Town Square", checked=False)
+    form.form['delivery'] = 'Pickup'
+    form = form.form.submit()
+    assert 'die Zahlung ist nicht mehr offen' in form
+
+    # mark as unpaid
     client.post(page.pyquery('.mark-as-unpaid').attr('ic-post-to'))
     page = client.get(page.request.url)
-
     assert page.pyquery('.payment-state').text() == "Offen"
+    invoice = client.get(invoice.request.url)
+    assert invoice.pyquery('.payment-state').text() == "Offen"
+
+    # change selections again
+    form = page.click('Eingabe bearbeiten')
+    form.select_checkbox('posters', "Local Businesses")
+    form.select_checkbox('posters', "Executive Committee", checked=False)
+    form.select_checkbox('posters', "Town Square", checked=False)
+    form.form['delivery'] = 'Pickup'
+    page = form.form.submit().follow()
+    # since we removed all priced options there's no longer a payment
+    # but there's also no invoice
+    assert page.pyquery('.payment-state').text() == ''
+    assert 'Rechnung anzeigen' not in page
+    client.get(invoice.request.url, status=404)
+
+    # let's change them again to be priced
+    form = page.click('Eingabe bearbeiten')
+    form.form['delivery'] = 'Delivery'
+    page = form.form.submit().follow()
+    # now we should once again have a payment and invoice
+    assert page.pyquery('.payment-state').text() == 'Offen'
+    invoice = page.click('Rechnung anzeigen')
+    assert invoice.pyquery('.payment-state').text() == "Offen"
+    assert '5.00' in invoice
+
+    # let's add a surcharge
+    item = invoice.click('Abzug / Zuschlag')
+    item.form['booking_text'] = 'Handling Fee'
+    item.form['kind'] = 'surcharge'
+    item.form['surcharge'] = '5.00'
+    item.form.submit()
+
+    # and change one of the selections again
+    form = page.click('Eingabe bearbeiten')
+    form.select_checkbox('posters', "Executive Committee")
+    page = form.form.submit().follow()
+    invoice = page.click('Rechnung anzeigen')
+    assert 'Posters' in invoice
+    assert '10.00' in invoice
+    assert 'Delivery' in invoice
+    assert '5.00' in invoice
+    assert 'Handling Fee' in invoice
+    assert '20.00' in invoice
+    assert invoice.pyquery('.payment-state').text() == "Offen"
+
+    # let's delete the surcharge
+    client.delete(
+        invoice.pyquery('.remove-invoice-item').attr('ic-delete-from')
+    )
+    invoice = client.get(invoice.request.url)
+    assert 'Posters' in invoice
+    assert '10.00' in invoice
+    assert 'Delivery' in invoice
+    assert '5.00' in invoice
+    assert 'Handling Fee' not in invoice
+    assert '15.00' in invoice
+    assert invoice.pyquery('.payment-state').text() == "Offen"
 
     payments = client.get('/payments')
     assert "FRM-" in payments
     assert "Manuell" in payments
     assert "info@example.org" in payments
-    assert "35.00" in payments
+    assert "15.00" in payments
     assert "Offen" in payments
 
 

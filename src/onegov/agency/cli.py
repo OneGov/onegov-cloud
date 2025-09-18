@@ -323,8 +323,7 @@ def create_pdf(
         agencies = ExtendedAgencyCollection(session)
 
         if root:
-            # FIXME: asymmetric property
-            app.root_pdf = app.pdf_class.from_agencies(  # type:ignore
+            app.root_pdf = app.pdf_class.from_agencies(
                 agencies=agencies.roots,
                 title=app.org.name,
                 toc=True,
@@ -339,8 +338,7 @@ def create_pdf(
 
         if recursive:
             for agency in agencies.query():
-                # FIXME: asymmetric property
-                agency.pdf_file = app.pdf_class.from_agencies(  # type:ignore
+                agency.pdf_file = app.pdf_class.from_agencies(
                     agencies=[agency],
                     title=agency.title,
                     toc=False,
@@ -368,8 +366,7 @@ def export_xlsx(
         session = app.session()
         if people:
             xlsx = export_person_xlsx(session)
-            # FIXME: asymmetric property
-            app.people_xlsx = xlsx  # type:ignore[assignment]
+            app.people_xlsx = xlsx
             click.secho("Created XLSX for people'", fg='green')
     return _export_xlsx
 

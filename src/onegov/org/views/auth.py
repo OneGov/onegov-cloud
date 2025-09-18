@@ -5,17 +5,20 @@ import morepath
 
 from onegov.core.markdown import render_untrusted_markdown
 from onegov.core.security import Public, Personal
+from onegov.core.utils import append_query_param
 from onegov.org import _, OrgApp
 from onegov.org import log
 from onegov.org.auth import MTANAuth
 from onegov.org.elements import Link
 from onegov.org.forms import PublicMTANForm, PublicRequestMTANForm
+from onegov.org.forms import CitizenLoginForm, ConfirmCitizenLoginForm
 from onegov.org.layout import DefaultLayout
 from onegov.org.mail import send_transactional_html_mail
 from onegov.user import Auth, UserCollection
 from onegov.user.auth.provider import OauthProvider
 from onegov.user.auth.second_factor import MTANFactor
 from onegov.user.auth.second_factor import TOTPFactor
+from onegov.user.collections import TANCollection
 from onegov.user.errors import AlreadyActivatedError
 from onegov.user.errors import ExistingUserError
 from onegov.user.errors import ExpiredSignupLinkError
@@ -700,7 +703,7 @@ def handle_authenticate_mtan(
 
     if form.submitted(request):
         assert form.tan.data is not None
-        redirect_to = self.authenticate(request, form.tan.data)
+        redirect_to = self.authenticate(request, form.tan.data.strip())
         if redirect_to is not None:
             request.success(_('Successfully authenticated via mTAN.'))
             return morepath.redirect(request.transform(redirect_to))
@@ -719,3 +722,140 @@ def handle_authenticate_mtan(
         'form': form,
         'form_width': 'small'
     }
+
+
+@OrgApp.form(
+    model=Auth,
+    name='citizen-login',
+    template='form.pt',
+    permission=Public,
+    form=CitizenLoginForm
+)
+def handle_citizen_login(
+    self: Auth,
+    request: OrgRequest,
+    form: CitizenLoginForm,
+    layout: Layout | None = None
+) -> RenderData | Response:
+
+    if not request.app.org.citizen_login_enabled:
+        raise exc.HTTPNotFound()
+
+    if request.authenticated_email:
+        return self.redirect(request, self.to)
+
+    if form.submitted(request):
+        assert form.email.data is not None
+        collection = TANCollection(request.session, scope='citizen-login')
+        tan_obj = collection.add(
+            client=request.client_addr or 'unknown',
+            email=form.email.data,
+            redirect_to=self.to
+        )
+        title = request.translate(_(
+            'Login Token for ${organisation}',
+            mapping={'organisation': request.app.org.title}
+        ))
+        confirm_link = request.link(self, name='confirm-citizen-login')
+        send_transactional_html_mail(
+            request,
+            'mail_citizen_login.pt',
+            content={
+                'model': self,
+                'title': title,
+                'token': tan_obj.tan,
+                'confirm_link': append_query_param(
+                    confirm_link, 'token', tan_obj.tan
+                )
+            },
+            receivers=form.email.data,
+            subject=title,
+        )
+        return morepath.redirect(confirm_link)
+
+    layout = layout or DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Citizen Login'), '#')
+    ]
+
+    return {
+        'layout': layout,
+        'title': _('Citizen Login'),
+        'form': form,
+        'form_width': 'small'
+    }
+
+
+@OrgApp.form(
+    model=Auth,
+    name='confirm-citizen-login',
+    template='form.pt',
+    permission=Public,
+    form=ConfirmCitizenLoginForm
+)
+def handle_confirm_citizen_login(
+    self: Auth,
+    request: OrgRequest,
+    form: ConfirmCitizenLoginForm,
+    layout: Layout | None = None
+) -> RenderData | Response:
+
+    if not request.app.org.citizen_login_enabled:
+        raise exc.HTTPNotFound()
+
+    if request.authenticated_email:
+        return self.redirect(request, self.to)
+
+    if form.submitted(request):
+        assert form.token.data is not None
+        collection = TANCollection(request.session, scope='citizen-login')
+        tan_obj = collection.by_tan(form.token.data.strip())
+        if tan_obj is None or 'email' not in tan_obj.meta:
+            client = request.client_addr or 'unknown'
+            log.info(f'Failed login by {client} (Citizen Login)')
+            request.alert(_('Invalid or expired login token provided.'))
+            return morepath.redirect(request.link(self, 'citizen-login'))
+        else:
+            request.browser_session['authenticated_email'] = (
+                tan_obj.meta['email'])
+            tan_obj.expire()
+            return self.redirect(
+                request,
+                tan_obj.meta.get('redirect_to', self.to)
+            )
+    elif not request.POST and (token := request.GET.get('token')):
+        form.token.data = token
+
+    layout = layout or DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Citizen Login'), request.link(self, name='citizen-login')),
+        Link(_('Confirm'), '#')
+    ]
+
+    return {
+        'layout': layout,
+        'title': _('Confirm Citizen Login'),
+        'form': form,
+        'form_width': 'small'
+    }
+
+
+@OrgApp.view(
+    model=Auth,
+    name='citizen-logout',
+    permission=Public,
+)
+def handle_citizen_logout(
+    self: Auth,
+    request: OrgRequest
+) -> Response:
+
+    if not request.app.org.citizen_login_enabled:
+        raise exc.HTTPNotFound()
+
+    if request.authenticated_email:
+        del request.browser_session['authenticated_email']
+
+    return self.redirect(request, self.to)

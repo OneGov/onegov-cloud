@@ -99,7 +99,7 @@ class OrgRequest(CoreRequest):
 
     @property
     def current_username(self) -> str | None:
-        return self.identity .userid if self.identity else None
+        return self.identity.userid if self.identity else None
 
     @cached_property
     def current_user(self) -> User | None:
@@ -111,6 +111,14 @@ class OrgRequest(CoreRequest):
             .filter_by(username=self.identity.userid)
             .first()
         )
+
+    @cached_property
+    def authenticated_email(self) -> str | None:
+        """
+        Used for granting access to private information that isn't
+        necessarily tied to a registered user.
+        """
+        return self.browser_session.get('authenticated_email')
 
     @cached_property
     def first_admin_available(self) -> User | None:

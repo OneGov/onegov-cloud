@@ -1,21 +1,24 @@
 from __future__ import annotations
 
+import sedate
+
 from collections import defaultdict
+from functools import cached_property
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.pay.models import Payment
-from sqlalchemy import desc
+from onegov.ticket.models.ticket import Ticket
 from sqlalchemy.orm import joinedload
-from sqlalchemy.orm import undefer
+from sqlalchemy import and_, func
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
-    from datetime import datetime
+    from datetime import date, datetime
     from decimal import Decimal
     from onegov.pay.types import AnyPayableBase, PaymentState
+    from sedate.types import Direction, TzInfo
     from sqlalchemy.orm import Query, Session
-    from typing import Self
     from uuid import UUID
 
 
@@ -36,13 +39,27 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         source: str = '*',
         page: int = 0,
         start: datetime | None = None,
-        end: datetime | None = None
+        end: datetime | None = None,
+        ticket_group: str | None = None,
+        ticket_start: date | None = None,
+        ticket_end: date | None = None,
+        reservation_start: date | None = None,
+        reservation_end: date | None = None,
+        status: str | None = None,
+        payment_type: str | None = None
     ):
         GenericCollection.__init__(self, session)
         Pagination.__init__(self, page)
         self.source = source
         self.start = start
         self.end = end
+        self.status = status
+        self.payment_type = payment_type
+        self.ticket_group = ticket_group
+        self.ticket_start = ticket_start
+        self.ticket_end = ticket_end
+        self.reservation_start = reservation_start
+        self.reservation_end = reservation_end
 
     @property
     def model_class(self) -> type[Payment]:
@@ -86,31 +103,139 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             and self.page == other.page
             and self.start == other.start
             and self.end == other.end
+            and self.ticket_group == other.ticket_group
+            and self.ticket_start == other.ticket_start
+            and self.ticket_end == other.ticket_end
+            and self.reservation_start == other.reservation_start
+            and self.reservation_end == other.reservation_end
+            and self.status == other.status
+            and self.payment_type == other.payment_type
+        )
+
+    @cached_property
+    def tzinfo(self) -> TzInfo:
+        return sedate.ensure_timezone('Europe/Zurich')
+
+    def align_date(self, value: date, direction: Direction) -> datetime:
+        return sedate.align_date_to_day(
+            sedate.replace_timezone(sedate.as_datetime(value), self.tzinfo),
+            self.tzinfo,
+            direction
         )
 
     def subset(self) -> Query[Payment]:
-        q = self.query().order_by(desc(Payment.created))
+        query = self.query()
 
         if self.start:
-            q = q.filter(self.start <= Payment.created)
+            query = query.filter(Payment.created >= self.start)
 
         if self.end:
-            q = q.filter(Payment.created <= self.end)
+            query = query.filter(Payment.created <= self.end)
 
-        q = q.options(joinedload(Payment.provider))  # type:ignore[misc]
-        q = q.options(undefer(Payment.created))
-        return q
+        # Filter by payment type
+        if self.payment_type == 'manual':
+            query = query.filter(Payment.provider_id.is_(None))
+        elif self.payment_type == 'provider':
+            query = query.filter(Payment.provider_id.isnot(None))
+
+        # Filter by payment status
+        if self.status:
+            query = query.filter(Payment.state == self.status)
+
+        # Filter payments by each associated ticket creation date
+        if self.ticket_start or self.ticket_end or self.ticket_group:
+            query = query.join(Ticket, Payment.id == Ticket.payment_id)
+            if self.ticket_group:
+                handler_code, *remainder = self.ticket_group.split('-', 1)
+                query = query.filter(Ticket.handler_code == handler_code)
+                if remainder:
+                    group, = remainder
+                    query = query.filter(Ticket.group == group)
+            if self.ticket_start:
+                query = query.filter(Ticket.created >= self.align_date(
+                    self.ticket_start,
+                    'down'
+                ))
+            if self.ticket_end:
+                query = query.filter(Ticket.created <= self.align_date(
+                    self.ticket_end,
+                    'up'
+                ))
+
+        # Filter payments by the reservation dates it belongs to
+        if self.reservation_start or self.reservation_end:
+            from onegov.reservation import Reservation
+
+            conditions = []
+            if self.reservation_start:
+                conditions.append(Reservation.end >= self.align_date(
+                    self.reservation_start,
+                    'down'
+                ))
+            if self.reservation_end:
+                conditions.append(Reservation.start <= self.align_date(
+                    self.reservation_end,
+                    'up'
+                ))
+            query = query.filter(
+                Payment.linked_reservations.any(and_(*conditions))  # type: ignore[attr-defined]
+            )
+
+        return query.order_by(Payment.created.desc())
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> Self:
-        return self.__class__(self.session, self.source, index)
+    def page_by_index(self, index: int) -> PaymentCollection:
+        return self.__class__(
+            self.session,
+            page=index,
+            start=self.start,
+            end=self.end,
+            ticket_group=self.ticket_group,
+            ticket_start=self.ticket_start,
+            ticket_end=self.ticket_end,
+            reservation_start=self.reservation_start,
+            reservation_end=self.reservation_end,
+            payment_type=self.payment_type,
+            source=self.source,
+            status=self.status
+        )
+
+    def tickets_by_batch(self) -> dict[UUID, Ticket]:
+        if not self.batch:
+            return {}
+        session = self.session
+        return {ticket.payment_id: ticket  # type: ignore[misc]
+            for ticket in session.query(Ticket).filter(
+            Ticket.payment_id.in_([el.id for el in self.batch]))
+        }
+
+    def reservation_dates_by_batch(self) -> dict[UUID, tuple[date, date]]:
+        if not self.batch:
+            return {}
+        from onegov.reservation import Reservation
+        session = self.session
+        return {
+            payment_id: (
+                sedate.to_timezone(start_date, self.tzinfo).date(),
+                sedate.to_timezone(end_date, self.tzinfo).date()
+            )
+            for payment_id, start_date, end_date in session.query(Reservation)
+            .join(Reservation.payment)
+            .filter(Payment.id.in_([el.id for el in self.batch]))
+            .group_by(Payment.id)
+            .with_entities(
+                Payment.id,
+                func.min(Reservation.start),
+                func.max(Reservation.end)
+            )
+        }
 
     def payment_links_for(
         self,
-        items: Iterable[Payment]
+        items: Collection[Payment]
     ) -> dict[UUID, list[AnyPayableBase]]:
         """ A more efficient way of loading all links of the given batch
         (compared to loading payment.links one by one).
@@ -148,8 +273,8 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         self,
         subset: Iterable[Payment] | None = None
     ) -> dict[UUID, list[AnyPayableBase]]:
-        subset = subset or self.subset()
-        return self.payment_links_for(subset)
+        subset_iterable = subset or self.subset()
+        return self.payment_links_for(list(subset_iterable))
 
     def payment_links_by_batch(
         self,
@@ -161,3 +286,17 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             return None
 
         return self.payment_links_for(batch)
+
+    def by_state(self, state: PaymentState) -> PaymentCollection:
+        """ Returns a new collection that only contains payments with the
+        given state. Resets all other filters.
+        """
+        return self.__class__(
+            self.session,
+            page=0,
+            start=None,
+            end=None,
+            ticket_start=None,
+            ticket_end=None,
+            source=self.source,
+            status=state)

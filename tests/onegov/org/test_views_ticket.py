@@ -8,6 +8,7 @@ import os
 
 import pytest
 import transaction
+from freezegun import freeze_time
 from webtest import Upload
 
 from onegov.chat import MessageCollection
@@ -338,7 +339,7 @@ def test_send_ticket_email(client):
     def submit_event(client, email):
         start = date.today() + timedelta(days=1)
 
-        page = client.get('/events').click("Veranstaltung vorschlagen")
+        page = client.get('/events').click("Veranstaltung erfassen")
         page.form['email'] = email
         page.form['title'] = "My Event"
         page.form['description'] = "My event is an event."
@@ -464,7 +465,7 @@ def test_email_for_new_tickets(client):
     # same for new events
     start = date.today() + timedelta(days=1)
 
-    page = client.get('/events').click("Veranstaltung vorschlagen")
+    page = client.get('/events').click("Veranstaltung erfassen")
     page.form['email'] = "person@example.org"
     page.form['title'] = "My Event"
     page.form['description'] = "My event is an event."
@@ -787,7 +788,8 @@ def test_disable_tickets(client):
     client.login_editor()
     page = client.get('/tickets/ALL/open')
     assert ticket_number in page
-    assert 'hans.maulwurf@simpsons.com' not in page
+    assert 'hans.maulwurf@simpsons.com' not in page.pyquery(
+        '.ticket-group').text()
     assert 'Annehmen' not in page
 
     client.logout()
@@ -795,7 +797,7 @@ def test_disable_tickets(client):
     client.login_admin()
     page = client.get('/tickets/ALL/open')
     assert ticket_number in page
-    assert 'hans.maulwurf@simpsons.com' in page
+    assert 'hans.maulwurf@simpsons.com' in page.pyquery('.ticket-group').text()
     assert 'hans.maulwurf@simpsons.com' in page.click('Annehmen').follow()
 
 
@@ -892,7 +894,7 @@ def test_bcc_field_in_ticket_message(client):
     status_link = extract_link(body)
 
     status_page = client.get(status_link)
-    assert 'Fügen Sie der Anfrage eine Nachricht hinzu' in status_page.text
+    assert 'fügen Sie der Anfrage eine Nachricht hinzu' in status_page.text
 
     # test the reply feature now
     msg = 'Hello from the other side, or should I say, Bcc-side?'
@@ -1032,3 +1034,40 @@ def test_hide_personal_mail_in_tickets(client):
 
     assert 'info@organisation.org' in mails[2]['TextBody']
     assert 'admin@example' not in mails[2]['TextBody']
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_my_tickets_view(client):
+    admin = client.spawn()
+    admin.login_admin()
+
+    # create a form
+    form_page = admin.get('/forms/new')
+    form_page.form['title'] = "Newsletter"
+    form_page.form['definition'] = "E-Mail *= @@@"
+    form_page = form_page.form.submit()
+
+    # create a submission
+    form_page = client.get('/form/newsletter')
+    form_page.form['e_mail'] = 'info@seantis.ch'
+    status_page = form_page.form.submit().follow().form.submit().follow()
+
+    # by default this view is disabled
+    client.get('/tickets/ALL/all/my-tickets', status=404)
+
+    # let's enable it
+    settings = admin.get('/').click('Einstellungen').click('Kunden-Login')
+    settings.form['citizen_login_enabled'].checked = True
+    settings.form.submit().follow()
+
+    # now we don't have access yet
+    login = client.get('/tickets/ALL/all/my-tickets').follow()
+    login.form['email'] = 'info@seantis.ch'
+    confirm = login.form.submit().follow()
+    assert len(os.listdir(client.app.maildir)) == 2
+    message = client.get_email(1)['TextBody']
+    token = re.search(r'&token=([^)]+)', message).group(1)
+    confirm.form['token'] = token
+    tickets = confirm.form.submit().follow()
+    assert tickets.request.path_qs == '/tickets/ALL/all/my-tickets'
+    assert 'Offen' in tickets

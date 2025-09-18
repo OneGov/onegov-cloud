@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import overload, TypeVar, TYPE_CHECKING
+from typing import overload, Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-_T = TypeVar('_T')
+_F = TypeVar('_F', bound='Callable[..., Any]')
 
 
 class DuplicatedStepError(Exception):
@@ -173,12 +173,12 @@ class StepSequenceRegistry:
         return steps
 
     def register(
-            self,
-            cls_name: str,
-            position: int,
-            title: str | None = None,
-            cls_before: str | None = None,
-            cls_after: str | None = None
+        self,
+        cls_name: str,
+        position: int,
+        title: str | None = None,
+        cls_before: str | None = None,
+        cls_after: str | None = None
     ) -> Step:
         """ Registers a step by its position, and the class names that come
         before and after. """
@@ -201,7 +201,7 @@ class StepSequenceRegistry:
         title: str | None = None,
         cls_before: str | None = None,
         cls_after: str | None = None
-    ) -> Callable[[type[_T]], type[_T]]:
+    ) -> Callable[[_F], _F]:
 
         """ A decorator to register part of a full step sequence.
 
@@ -213,7 +213,7 @@ class StepSequenceRegistry:
                 pass
 
         """
-        def wrapper(model_class: type[_T]) -> type[_T]:
+        def wrapper(model_class: _F) -> _F:
             self.register(
                 title=title,
                 position=position,

@@ -20,7 +20,7 @@ from onegov.core.widgets import transform_structure
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.gis import MapboxApp
-from onegov.org import directives
+from onegov.org import _, directives
 from onegov.org.auth import MTANAuth
 from onegov.org.exceptions import MTANAccessLimitExceeded
 from onegov.org.initial_content import create_new_organisation
@@ -50,6 +50,7 @@ if TYPE_CHECKING:
     from onegov.core.mail import Attachment
     from onegov.core.types import EmailJsonDict, SequenceOrScalar
     from onegov.pay import Price
+    from onegov.ticket import Ticket
     from onegov.ticket.collection import TicketCount
     from reg.dispatch import _KeyLookup
 
@@ -240,15 +241,35 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
 
         return {
             handler_code: {
-                group: group_perms
+                group: group_perms if exclusive else
+                # if we treated a non-exclusive group as exclusive it also
+                # needs to include all of the members of the exclusive handler
+                # scoped group, otherwise we'll incorrectly restrict their
+                # access to these groups.
+                list({*group_perms, *handler_perms[None][1]})
                 for group, (exclusive, group_perms) in handler_perms.items()
                 # the permission is only exclusive, if at least one user group
                 # has exclusive permissions. But user groups with non-exclusive
                 # permissions still have permission to access the ticket.
-                if exclusive
+                if exclusive or (
+                    # if there is exclusive access to the whole handler code
+                    # we need to treat non-exclusive access to a group as
+                    # exclusive, so the users with non-exclusive access
+                    # to this group keep their access rights.
+                    group is not None
+                    and handler_perms.get(None, (False, ))[0]
+                )
             }
             for handler_code, handler_perms in permissions.items()
         }
+
+    def groupids_for_ticket(self, ticket: Ticket) -> list[str] | None:
+        handler_perms = self.ticket_permissions.get(ticket.handler_code)
+        if handler_perms is None:
+            return None
+
+        group_perms = handler_perms.get(ticket.group)
+        return handler_perms.get(None) if group_perms is None else group_perms
 
     @orm_cached(policy='on-table-change:files')
     def publications_count(self) -> int:
@@ -397,6 +418,23 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
         if self.org.square_logo_url:
             extra['image'] = self.org.square_logo_url
 
+        if provider.type == 'worldline_saferpay':
+            # add confirm dialog
+            extra['confirm'] = request.translate(
+                _('Important information regarding online payments')
+            )
+            extra['confirm_extra'] = request.translate(_(
+                'The payment process is only complete once you are '
+                'redirected back to our site and receive a request number. '
+                'Any success messages the payment provider generates '
+                'before then, do not indicate completion. Transactions '
+                'in this semi-successful state will usually be refunded '
+                'within one hour, although it might take longer depending '
+                'on the chosen payment method.'
+            ))
+            extra['confirm_yes'] = request.translate(_('Ok'))
+            extra['confirm_no'] = request.translate(_('Cancel'))
+
         try:
             return provider.checkout_button(
                 label=button_label,
@@ -468,6 +506,7 @@ def get_i18n_localedirs() -> list[str]:
     return [
         utils.module_path('onegov.org', 'locale'),
         utils.module_path('onegov.form', 'locale'),
+        utils.module_path('onegov.parliament', 'locale'),
         utils.module_path('onegov.user', 'locale')
     ]
 
@@ -613,6 +652,11 @@ def get_disabled_extensions() -> Collection[str]:
     return ()
 
 
+@OrgApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return True
+
+
 @OrgApp.setting(section='org', name='render_mtan_access_limit_exceeded')
 def get_render_mtan_access_limit_exceeded(
 ) -> Callable[[MTANAccessLimitExceeded, OrgRequest], Response]:
@@ -703,12 +747,17 @@ def get_sortable_asset() -> Iterator[str]:
 
 @OrgApp.webasset('fullcalendar')
 def get_fullcalendar_asset() -> Iterator[str]:
-    yield 'fullcalendar.css'
     yield 'fullcalendar.js'
     yield 'fullcalendar.de.js'
     yield 'fullcalendar.fr.js'
     yield 'reservationcalendar.jsx'
     yield 'reservationcalendar_custom.js'
+
+
+@OrgApp.webasset('occupancycalendar')
+def get_occupancycalendar_asset() -> Iterator[str]:
+    yield 'occupancycalendar.jsx'
+    yield 'occupancycalendar_custom.js'
 
 
 @OrgApp.webasset('reservationlist')
@@ -869,10 +918,30 @@ def people_select_asset() -> Iterator[str]:
     yield 'people-select.js'
 
 
+@OrgApp.webasset('participant-select')
+def particpant_select_asset() -> Iterator[str]:
+    yield 'participant-select.js'
+
+
+@OrgApp.webasset('kaba-configurations')
+def kaba_configurations_asset() -> Iterator[str]:
+    yield 'kaba-configurations.js'
+
+
 @OrgApp.webasset('mapbox_address_autofill')
 def mapbox_address_autofill() -> Iterator[str]:
     yield 'mapbox-search-web.js'  # implicit dependency
     yield 'mapbox_address_autofill.js'
+
+
+@OrgApp.webasset('payments')
+def get_payments() -> Iterator[str]:
+    yield 'payments.js'
+
+
+@OrgApp.webasset('invoicing')
+def get_invoicing() -> Iterator[str]:
+    yield 'invoicing.js'
 
 
 def wrap_with_mtan_hook(

@@ -73,6 +73,8 @@ class ReservationForm(Form):
 
         choices.insert(0, ('', ''))
 
+        self.css_class = 'resettable'
+
         auto_fill_data = {
             tag: filtered_meta
             for item in self.request.app.org.ticket_tags
@@ -118,6 +120,76 @@ class ReservationAdjustmentForm(Form):
         validators=[InputRequired()],
         fieldset=_('Time'),
     )
+
+
+class AddReservationForm(Form):
+
+    date = DateField(
+        label=_('Date'),
+        description=_('HH:MM'),
+        validators=[InputRequired()],
+        fieldset=_('Date'),
+    )
+
+    whole_day = RadioField(
+        label=_('Whole day'),
+        choices=[
+            ('yes', _('Yes')),
+            ('no', _('No'))
+        ],
+        default='no',
+        fieldset=_('Time'),
+    )
+
+    start_time = TimeField(
+        label=_('Starting at'),
+        description=_('HH:MM'),
+        fieldset=_('Time'),
+        validators=[InputRequired()],
+        depends_on=('whole_day', 'no')
+    )
+
+    end_time = TimeField(
+        label=_('Ending at'),
+        description=_('HH:MM'),
+        fieldset=_('Time'),
+        validators=[InputRequired()],
+        depends_on=('whole_day', 'no')
+    )
+
+    quota_room = IntegerField(
+        label=_('Quota'),
+        validators=[
+            InputRequired(),
+            NumberRange(1, 999)
+        ],
+        fieldset=_('Time'),
+        default=1,
+        depends_on=('whole_day', 'no')
+    )
+
+    quota_other = IntegerField(
+        label=_('Quota'),
+        validators=[
+            InputRequired(),
+            NumberRange(1, 999)
+        ],
+        fieldset=_('Time'),
+        default=1,
+    )
+
+    def apply_resource(self, resource: Resource) -> None:
+        if resource.type == 'room':
+            self.delete_field('quota_other')
+        else:
+            self.delete_field('start_time')
+            self.delete_field('end_time')
+            self.delete_field('whole_day')
+            self.delete_field('quota_room')
+
+    @property
+    def quota(self) -> IntegerField:
+        return self.quota_room if 'quota_room' in self else self.quota_other
 
 
 class KabaEditForm(Form):

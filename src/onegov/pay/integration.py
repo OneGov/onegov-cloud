@@ -101,14 +101,15 @@ def get_js_path() -> str:
 def get_pay_assets() -> Iterator[str]:
     yield 'datatrans.js'
     yield 'stripe.js'
-    yield 'worldline_saferpay.js'
 
 
 class PaymentError(IntEnum):
     INSUFFICIENT_FUNDS = 1
+    TRANSACTION_ABORTED = 2
 
 
 INSUFFICIENT_FUNDS = PaymentError.INSUFFICIENT_FUNDS
+TRANSACTION_ABORTED = PaymentError.TRANSACTION_ABORTED
 
 
 def process_payment(
@@ -168,8 +169,16 @@ def process_payment(
             )
         except CARD_ERRORS as e:
 
-            if 'insufficient funds' in str(e):
+            err = str(e).lower()
+
+            if 'insufficient funds' in err:
                 return INSUFFICIENT_FUNDS
+
+            if (
+                getattr(e, 'is_expected_failure', False)
+                or 'transaction aborted' in err
+            ):
+                return TRANSACTION_ABORTED
 
             log.exception(
                 f'Processing {price} through {provider.title} '

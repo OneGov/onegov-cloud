@@ -4,6 +4,7 @@ from morepath import redirect
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.core.security import Public
+from onegov.core.templates import render_macro
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde import LandsgemeindeApp
 from onegov.landsgemeinde.collections import AgendaItemCollection
@@ -13,6 +14,7 @@ from onegov.landsgemeinde.layouts import AssemblyCollectionLayout
 from onegov.landsgemeinde.layouts import AssemblyLayout
 from onegov.landsgemeinde.layouts import AssemblyTickerLayout
 from onegov.landsgemeinde.models import Assembly
+from onegov.landsgemeinde.models.assembly import STATES
 from onegov.landsgemeinde.utils import ensure_states
 from onegov.landsgemeinde.utils import update_ticker
 
@@ -59,20 +61,22 @@ def add_assembly(
     form: AssemblyForm
 ) -> RenderData | Response:
 
-    if form.submitted(request):
-        assembly = self.add(**form.get_useful_data())
-        request.success(_('Added a new assembly'))
-
-        return redirect(request.link(assembly))
-
     layout = AssemblyCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
     layout.edit_mode = True
 
+    if form.submitted(request):
+        assembly = self.add(**form.get_useful_data())
+        request.success(_('Added a new ${assembly}',
+                          mapping={'assembly': layout.assembly_type}))
+
+        return redirect(request.link(assembly))
+
     return {
         'layout': layout,
-        'title': _('New assembly'),
+        'title': _('New ${assembly}',
+                   mapping={'assembly': layout.assembly_type}),
         'form': form,
     }
 
@@ -321,3 +325,38 @@ def view_assembly_json(
             } for votum in item.vota]
         } for item in agenda_items]
     }
+
+
+@LandsgemeindeApp.view(
+    model=Assembly,
+    name='change-state',
+    request_method='POST',
+    permission=Private
+)
+def change_assembly_state(
+    self: Assembly,
+    request: LandsgemeindeRequest
+) -> str:
+    layout = AssemblyCollectionLayout(self, request)
+    request.assert_valid_csrf_token()
+
+    i = list(STATES).index(self.state)
+    self.state = list(STATES)[(i + 1) % len(STATES)]
+
+    updated = ensure_states(self)
+    updated.add(self)
+    update_ticker(request, updated)
+
+    agenda_items = (
+        AgendaItemCollection(request.session)
+        .preloaded_by_assembly(self).all()
+    )
+
+    return render_macro(
+        layout.macros['states-list'],
+        request,
+        {'assembly': self,
+         'agenda_items': agenda_items,
+         'layout': layout,
+         'state': self.state}
+    )

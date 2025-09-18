@@ -6,8 +6,10 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 
+import click
 import logging
 import requests
+
 from dateutil.parser import parse
 from html import unescape
 
@@ -499,6 +501,7 @@ class EventCollection(Pagination[Event]):
         organizers = {}
         items = []
         items_to_purge = []
+        source_ids = []
         h2t_config = {'ignore_emphasis': True}
 
         root = etree.fromstring(xml_stream)
@@ -593,21 +596,28 @@ class EventCollection(Pagination[Event]):
                 location_data[i] for i in ['title', 'street', 'zip', 'city']
                 if location_data[i]
             )
-            coordinates = Coordinates(
-                lat=float(
-                    location_data['lat']) if location_data.get('lat') else 0.0,
-                lon=float(
-                    location_data['lon']) if location_data.get('lon') else 0.0
-            )
+            coordinates = None
+            if (location_data.get('lat', None) and
+                    location_data.get('lon', None)):
+                coordinates = Coordinates(
+                    lat=float(location_data['lat']),
+                    lon=float(location_data['lon'])
+                )
             event_image, event_image_name = get_event_image(event)
 
             ticket_price = find_element_text(event, 'ticketPrice')
-            event_url = find_element_text(event, 'originalEventUrl') or None
+            event_url = find_element_text(event, 'originalEventUrl') or ''
+
+            provider_url = ''
+            provider_ref = event.find('ns:providerReference', namespaces=ns)
+            if provider_ref is not None:
+                provider_url = find_element_text(provider_ref, 'url')
 
             tags = []
-            if event.find('ns:tags', namespaces=ns) is not None:
-                tags = [
-                    tag.text for tag in event.find('ns:tags', namespaces=ns)]
+            category = event.find('ns:category', namespaces=ns)
+            if category is not None:
+                tag = find_element_text(category, 'mainCategory')
+                tags.append(tag) if tag else None
 
             timezone = 'Europe/Zurich'
             for schedule in event.find('ns:schedules', namespaces=ns):
@@ -615,7 +625,7 @@ class EventCollection(Pagination[Event]):
                 start = parse(find_element_text(schedule, 'start'))
                 end_text = find_element_text(schedule, 'end')
                 end = (parse(end_text) if end_text else
-                       start + timedelta(hours=1))
+                       start + timedelta(hours=2))
 
                 recurrence_start_dates: list[datetime] = []
                 recurrence = schedule.find('ns:recurrence', namespaces=ns)
@@ -675,7 +685,7 @@ class EventCollection(Pagination[Event]):
                             location=location,
                             coordinates=coordinates,
                             price=ticket_price,
-                            external_event_url=event_url,
+                            external_event_url=event_url or provider_url,
                             tags=tags,
                             filter_keywords=None,
                             source=schedule_id,
@@ -686,6 +696,19 @@ class EventCollection(Pagination[Event]):
                         pdf_filename=None,
                     )
                 )
+
+                source_ids.append(schedule_id)
+
+        # ogc-2447 imported events with source ids not in this `xml_stream`
+        # can be removed to prevent duplicates as the xml stream represents
+        # a complete set of events
+        for event in (
+                self.session.query(Event)
+                .filter(Event.source.notin_(source_ids))):  # type:ignore[union-attr]
+            if event.source:
+                items_to_purge.append(event.source)
+                click.echo(f' - removing event as not in xml stream '
+                           f'{event.title} {event.start}')
 
         return self.from_import(
             items,
@@ -775,7 +798,7 @@ class EventCollection(Pagination[Event]):
                 desc = e.description
                 if len(e.description) > 10000:
                     desc = e.description[:9995] + '..'
-                text_mobile.text = CDATA(  # type: ignore[assignment]
+                text_mobile.text = CDATA(
                     desc.replace('\r\n', '<br>'))
 
             for occ in e.occurrences:
@@ -788,7 +811,7 @@ class EventCollection(Pagination[Event]):
 
             if e.price:
                 price = SubElement(event, 'sf01')
-                price.text = CDATA(  # type: ignore[assignment]
+                price.text = CDATA(
                     e.price.replace('\r\n', '<br>'))
 
             if e.external_event_url:

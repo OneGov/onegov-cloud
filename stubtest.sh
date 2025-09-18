@@ -73,6 +73,11 @@ stubtest webcolors \
          --mypy-config-file pyproject.toml \
          --ignore-missing-stub
 
+echo "Running stubtest on webtest"
+stubtest webtest \
+         --mypy-config-file pyproject.toml \
+         --allowlist tests/stubtest/webtest_allowlist.txt
+
 echo "Running stubtest on wtforms"
 stubtest wtforms \
          --mypy-config-file pyproject.toml \

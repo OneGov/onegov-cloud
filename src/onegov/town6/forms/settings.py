@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from wtforms.fields import BooleanField, RadioField
+from wtforms.fields.simple import TextAreaField
 from wtforms.validators import InputRequired
 
 from onegov.form import Form
@@ -277,3 +278,30 @@ class ChatSettingsForm(Form):
 
     def on_request(self) -> None:
         self.populate_chat_staff()
+
+
+class RISSettingsForm(Form):
+
+    ris_enabled = BooleanField(
+        label=_('Enable RIS'),
+        description=_('Enables the RIS integration for this organisation.'),
+        default=False
+    )
+
+    # the url breadcrumbs shall point to for non-logged-in users
+    ris_main_url = StringField(
+        label=_('URL path for the RIS main page'),
+        description=_(
+            'The URL path for the RIS main page for non-logged-in users.'),
+        default='',
+    )
+
+    # predefined categories for interest ties
+    ris_interest_tie_categories = TextAreaField(
+        label=_('Predefined categories for interest ties'),
+        description=_(
+            'Enter a list of categories for interest ties. Each '
+            'category should be separated by a semicolon. '
+            'Example: Cat 1 text; Cat 2 text; Cat 3 text'),
+        render_kw={'rows': 12}
+    )

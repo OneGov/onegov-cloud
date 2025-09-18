@@ -8,7 +8,7 @@
 var expressions = [
     /https?:\/\/(www\.youtube\.com)\/watch\?v=([^&]+)/i,
     /https?:\/\/(youtu\.be)\/([^&]+)/i,
-    /https?:\/\/([w]{0,3}\.?vimeo\.com).*?\/([0-9]+)/i
+    /https?:\/\/([w]{0,3}\.?vimeo\.com).*?\/([0-9]+(?:\/[a-zA-Z0-9]+)?)/i
 ];
 
 var getVideoId = function(url) {
@@ -51,7 +51,14 @@ var getVideoUrl = function(host, id) {
 
     if (host.match(/vimeo\.com/gi)) {
         var color = rgb2hex($('a:first').css('color')).replace('#', '');
-        return "https://player.vimeo.com/video/" + id + '?badge=0&byline=0&portrait=0&title=0&color=' + color;
+        var token = '';
+        console.log(id);
+        if (id.split('/').length > 1) {
+            token = '&h=' + id.split('/')[1];
+            id = id.split('/')[0];
+        }
+        console.log(token);
+        return "https://player.vimeo.com/video/" + id + '?badge=0&byline=0&portrait=0&title=0&color=' + color + token;
     }
 
     return null;

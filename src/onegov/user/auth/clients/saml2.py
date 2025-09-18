@@ -148,6 +148,12 @@ class SAML2Client:
     slo_enabled: bool = attrib(default=True)
     """ Whether or not to enable the SLO service """
 
+    client_key_file: str | None = attrib(default=None)
+    """ Path to the client key for signing requests. """
+
+    client_cert_file: str | None = attrib(default=None)
+    """ Path to the client certifcate for signing requests. """
+
     _connections: dict[str, Connection] = attrib(factory=dict, init=False)
 
     def get_binding(self, request: CoreRequest) -> str:
@@ -223,6 +229,18 @@ class SAML2Client:
                         (slo_url, BINDING_HTTP_REDIRECT),
                         (slo_url, BINDING_HTTP_POST)
                     ]
+
+                if self.client_key_file and self.client_cert_file:
+                    saml_settings['key_file'] = self.client_key_file
+                    saml_settings['cert_file'] = self.client_cert_file
+                    saml_settings['signing_algorithm'] = (
+                        'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512')
+                    saml_settings['digest_algorithm'] = (
+                        'http://www.w3.org/2001/04/xmlenc#sha512')
+                    sp_settings = saml_settings['service']['sp']
+                    sp_settings['authn_requests_signed'] = True
+                    sp_settings['logout_requests_signed'] = True
+                    sp_settings['logout_responses_signed'] = True
 
                 config = Config()
                 config.load(saml_settings)
@@ -427,6 +445,8 @@ class SAML2Connections:
                     cfg.get('attributes', {})),
                 primary=cfg.get('primary', False),
                 slo_enabled=cfg.get('slo_enabled', True),
+                client_key_file=cfg.get('client_key_file', None),
+                client_cert_file=cfg.get('client_cert_file', None),
             ) for app_id, cfg in config.items()
         }
         return cls(connections=clients)

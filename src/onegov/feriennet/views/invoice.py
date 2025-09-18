@@ -4,7 +4,8 @@ from decimal import Decimal
 from datetime import date
 from markupsafe import Markup
 from onegov.activity import (
-    Period, Invoice, InvoiceItem, InvoiceCollection, PeriodCollection)
+    ActivityInvoiceItem, BookingPeriod, BookingPeriodCollection,
+    BookingPeriodInvoice, BookingPeriodInvoiceCollection)
 from onegov.core.security import Personal, Secret
 from onegov.core.templates import render_macro
 from onegov.feriennet import FeriennetApp, _
@@ -14,7 +15,7 @@ from onegov.feriennet.layout import DonationLayout
 from onegov.feriennet.layout import InvoiceLayout
 from onegov.feriennet.qrbill import generate_qr_bill
 from onegov.feriennet.views.shared import users_for_select_element
-from onegov.pay import process_payment, INSUFFICIENT_FUNDS
+from onegov.pay import process_payment, PaymentError, INSUFFICIENT_FUNDS
 from onegov.user import User
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm.exc import NoResultFound
@@ -32,16 +33,16 @@ if TYPE_CHECKING:
 
 
 @FeriennetApp.view(
-    model=InvoiceItem,
+    model=ActivityInvoiceItem,
     permission=Personal,
 )
 def redirect_to_invoice_view(
-    self: InvoiceItem,
+    self: ActivityInvoiceItem,
     request: FeriennetRequest
 ) -> Response:
     return request.redirect(
         request.link(
-            InvoiceCollection(
+            BookingPeriodInvoiceCollection(
                 request.session,
                 user_id=self.invoice.user_id,
                 period_id=self.invoice.period_id
@@ -51,12 +52,12 @@ def redirect_to_invoice_view(
 
 
 @FeriennetApp.view(
-    model=InvoiceItem,
+    model=ActivityInvoiceItem,
     permission=Secret,
     name='online-payments'
 )
 def view_creditcard_payments(
-    self: InvoiceItem,
+    self: ActivityInvoiceItem,
     request: FeriennetRequest
 ) -> Response:
     return request.redirect(request.class_link(
@@ -69,11 +70,11 @@ def view_creditcard_payments(
 
 
 @FeriennetApp.html(
-    model=InvoiceCollection,
+    model=BookingPeriodInvoiceCollection,
     template='invoices.pt',
     permission=Personal)
 def view_my_invoices(
-    self: InvoiceCollection,
+    self: BookingPeriodInvoiceCollection,
     request: FeriennetRequest
 ) -> RenderData | Response:
 
@@ -83,8 +84,8 @@ def view_my_invoices(
         if token:
             return handle_payment(self, request, token)
 
-    query = PeriodCollection(request.session).query()
-    query = query.filter(Period.finalized == True)
+    query = BookingPeriodCollection(request.session).query()
+    query = query.filter(BookingPeriod.finalized == True)
     periods = {p.id.hex: p for p in query}
 
     # By default, we want to see all the invoices, unless a specific one
@@ -93,22 +94,22 @@ def view_my_invoices(
     show_all_invoices = 'invoice' not in request.params
 
     q = self.query(ignore_period_id=show_all_invoices is True)
-    q = q.filter(Invoice.period_id.in_(periods.keys()))
-    q = q.outerjoin(Period)
-    q = q.outerjoin(InvoiceItem)
-    q = q.options(contains_eager(Invoice.items))
+    q = q.filter(BookingPeriodInvoice.period_id.in_(periods.keys()))
+    q = q.outerjoin(BookingPeriod)
+    q = q.outerjoin(ActivityInvoiceItem)
+    q = q.options(contains_eager(BookingPeriodInvoice.items))
     q = q.order_by(
-        Period.execution_start,
-        Invoice.id,
+        BookingPeriod.execution_start,
+        BookingPeriodInvoice.id,
         case(
             [
-                (InvoiceItem.group == 'donation', 2),
-                (InvoiceItem.family != None, 1),
+                (ActivityInvoiceItem.group == 'donation', 2),
+                (ActivityInvoiceItem.family != None, 1),
             ],
             else_=0
         ),
-        InvoiceItem.group,
-        InvoiceItem.text
+        ActivityInvoiceItem.group,
+        ActivityInvoiceItem.text
     )
 
     invoices = tuple(q)
@@ -167,11 +168,11 @@ def view_my_invoices(
         )
 
     def user_select_link(user: User) -> str:
-        return request.class_link(InvoiceCollection, {
+        return request.class_link(BookingPeriodInvoiceCollection, {
             'username': user.username,
         })
 
-    def qr_bill(invoice: Invoice) -> bytes | None:
+    def qr_bill(invoice: BookingPeriodInvoice) -> bytes | None:
         return generate_qr_bill(self.schema.name, request, user, invoice)
 
     return {
@@ -192,12 +193,12 @@ def view_my_invoices(
 
 
 @FeriennetApp.view(
-    model=InvoiceCollection,
+    model=BookingPeriodInvoiceCollection,
     template='invoices.pt',
     permission=Personal,
     request_method='POST')
 def handle_payment(
-    self: InvoiceCollection,
+    self: BookingPeriodInvoiceCollection,
     request: FeriennetRequest,
     token: str | None = None
 ) -> Response:
@@ -216,7 +217,7 @@ def handle_payment(
 
     invoice = (
         self.for_period_id(period_id=period_id).query()
-        .outerjoin(InvoiceItem)
+        .outerjoin(ActivityInvoiceItem)
         .one()
     )
 
@@ -224,9 +225,9 @@ def handle_payment(
     assert price is not None
     payment = process_payment('cc', price, provider, token)
 
-    if payment == INSUFFICIENT_FUNDS:
+    if payment is INSUFFICIENT_FUNDS:
         request.alert(_('Your card has insufficient funds'))
-    elif payment is None:
+    elif payment is None or isinstance(payment, PaymentError):
         request.alert(_('Your payment could not be processed'))
     else:
         for item in invoice.items:
@@ -245,13 +246,13 @@ def handle_payment(
 
 
 @FeriennetApp.form(
-    model=InvoiceCollection,
+    model=BookingPeriodInvoiceCollection,
     form=DonationForm,
     template='donation.pt',
     permission=Personal,
     name='donation')
 def handle_donation(
-    self: InvoiceCollection,
+    self: BookingPeriodInvoiceCollection,
     request: FeriennetRequest,
     form: DonationForm
 ) -> RenderData | Response:
@@ -295,13 +296,13 @@ def handle_donation(
     elif not request.POST:
 
         donation = (
-            request.session.query(InvoiceItem)
-            .filter(InvoiceItem.group == 'donation')
+            request.session.query(ActivityInvoiceItem)
+            .filter(ActivityInvoiceItem.group == 'donation')
             .filter(
-                InvoiceItem.invoice_id.in_(
-                    request.session.query(Invoice.id)
-                    .filter(Invoice.period_id == self.period_id)
-                    .filter(Invoice.user_id == self.user_id)
+                ActivityInvoiceItem.invoice_id.in_(
+                    request.session.query(BookingPeriodInvoice.id)
+                    .filter(BookingPeriodInvoice.period_id == self.period_id)
+                    .filter(BookingPeriodInvoice.user_id == self.user_id)
                 )
             ).first()
         )
@@ -330,12 +331,12 @@ def handle_donation(
 
 
 @FeriennetApp.view(
-    model=InvoiceCollection,
+    model=BookingPeriodInvoiceCollection,
     permission=Personal,
     name='donation',
     request_method='DELETE')
 def handle_delete_donation(
-    self: InvoiceCollection,
+    self: BookingPeriodInvoiceCollection,
     request: FeriennetRequest
 ) -> None:
 

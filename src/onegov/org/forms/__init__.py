@@ -5,6 +5,9 @@ from onegov.org.forms.allocation import DaypassAllocationEditForm
 from onegov.org.forms.allocation import DaypassAllocationForm
 from onegov.org.forms.allocation import RoomAllocationEditForm
 from onegov.org.forms.allocation import RoomAllocationForm
+from onegov.org.forms.citizen_login import CitizenLoginForm
+from onegov.org.forms.citizen_login import ConfirmCitizenLoginForm
+from onegov.org.forms.commission import CommissionForm
 from onegov.org.forms.directory import DirectoryForm
 from onegov.org.forms.directory import DirectoryImportForm
 from onegov.org.forms.event import EventForm
@@ -14,13 +17,21 @@ from onegov.org.forms.form_export import FormSubmissionsExport
 from onegov.org.forms.form_registration import FormRegistrationWindowForm
 from onegov.org.forms.generic import ExportForm, DateRangeForm
 from onegov.org.forms.imageset import ImageSetForm
+from onegov.org.forms.invoice import ManualInvoiceItemForm
+from onegov.org.forms.meeting import MeetingForm
 from onegov.org.forms.mtan import PublicMTANForm
 from onegov.org.forms.mtan import PublicRequestMTANForm
 from onegov.org.forms.newsletter import NewsletterForm
 from onegov.org.forms.newsletter import NewsletterSendForm
 from onegov.org.forms.newsletter import NewsletterTestForm
 from onegov.org.forms.page import LinkForm, PageForm, IframeForm
+from onegov.org.forms.parliamentarian import ParliamentarianForm
+from onegov.org.forms.parliamentarian_role import ParliamentarianRoleForm
+from onegov.org.forms.parliamentary_group import ParliamentaryGroupForm
+from onegov.org.forms.payments import PaymentSearchForm
+from onegov.org.forms.payments import TicketInvoiceSearchForm
 from onegov.org.forms.person import PersonForm
+from onegov.org.forms.reservation import AddReservationForm
 from onegov.org.forms.reservation import FindYourSpotForm
 from onegov.org.forms.reservation import KabaEditForm
 from onegov.org.forms.reservation import ReservationAdjustmentForm
@@ -52,8 +63,12 @@ from onegov.org.forms.userprofile import UserProfileForm
 
 
 __all__ = (
+    'AddReservationForm',
     'AllocationRuleForm',
     'AnalyticsSettingsForm',
+    'CitizenLoginForm',
+    'ConfirmCitizenLoginForm',
+    'CommissionForm',
     'DateRangeForm',
     'DaypassAllocationEditForm',
     'DaypassAllocationForm',
@@ -70,6 +85,7 @@ __all__ = (
     'GeneralSettingsForm',
     'HolidaySettingsForm',
     'HomepageSettingsForm',
+    'IframeForm',
     'ImageSetForm',
     'InternalTicketChatMessageForm',
     'ExtendedInternalTicketChatMessageForm',
@@ -77,13 +93,19 @@ __all__ = (
     'LinkForm',
     'ManageUserForm',
     'ManageUserGroupForm',
+    'ManualInvoiceItemForm',
     'MapSettingsForm',
+    'MeetingForm',
     'ModuleSettingsForm',
     'NewsletterForm',
     'NewsletterSendForm',
     'NewsletterTestForm',
     'NewUserForm',
     'PageForm',
+    'ParliamentarianForm',
+    'ParliamentarianRoleForm',
+    'ParliamentaryGroupForm',
+    'PaymentSearchForm',
     'PersonForm',
     'PublicMTANForm',
     'PublicRequestMTANForm',
@@ -101,7 +123,7 @@ __all__ = (
     'TicketAssignmentForm',
     'TicketChangeTagForm',
     'TicketChatMessageForm',
+    'TicketInvoiceSearchForm',
     'TicketNoteForm',
     'UserProfileForm',
-    'IframeForm',
 )

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-04-21 23:39+0200\n"
+"POT-Creation-Date: 2025-09-16 07:59+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -17,8 +17,8 @@ msgstr "Benutzer"
 msgid "Logout"
 msgstr "Abmelden"
 
-msgid "Management"
-msgstr "Verwaltung"
+msgid "Current Settlement Run"
+msgstr "Aktueller Abrechnungslauf"
 
 msgid "Attendences"
 msgstr "Anwesenheiten"
@@ -29,8 +29,14 @@ msgstr "Aktivitäten"
 msgid "PAS settings"
 msgstr "PAS Einstellungen"
 
+msgid "Files"
+msgstr "Dateien"
+
 msgid "More settings"
 msgstr "Weitere Einstellungen"
+
+msgid "Management"
+msgstr "Verwaltung"
 
 msgid "No within an active settlement run."
 msgstr "Nicht in einem aktiven Abrechungslauf"
@@ -50,23 +56,17 @@ msgstr "Parlamentarier:in"
 msgid "Commission"
 msgstr "Kommission"
 
+msgid "Abschluss"
+msgstr "Abschluss"
+
+msgid "Mark as completed/closed"
+msgstr "Als abgeschlossen markieren"
+
 msgid "Parliamentarian is not in this commission."
 msgstr "Parlamentarier:in ist nicht in dieser Kommission."
 
-msgid "Name"
-msgstr "Name"
-
-msgid "Start"
-msgstr "Start"
-
-msgid "End"
-msgstr "Ende"
-
-msgid "Description"
-msgstr "Beschreibung"
-
-msgid "Function"
-msgstr "Funktion"
+msgid "Bulk edit group"
+msgstr "Massenbuchungsgruppe"
 
 msgid "People Data (JSON)"
 msgstr "Personendaten (JSON)"
@@ -88,6 +88,14 @@ msgid ""
 msgstr ""
 "JSON-Datei mit Mitgliedschaftsdaten (wer ist Mitglied welcher Organisation)."
 
+msgid "Validate JSON Schema"
+msgstr "JSON-Schema validieren"
+
+msgid "Check if the uploaded JSON files match the expected structure."
+msgstr ""
+"Überprüft ob die hochgeladenen JSON-Dateien der erwarteten Struktur "
+"entsprechen."
+
 #, python-format
 msgid "File ${name} is missing the \"results\" list."
 msgstr "Datei ${name} fehlt die \"results\"-Liste."
@@ -107,6 +115,15 @@ msgstr "Fehler beim Lesen der Datei ${name}: ${error}"
 #, python-format
 msgid "Unexpected error processing file ${name}: ${error}"
 msgstr "Unerwarteter Fehler bei der Verarbeitung der Datei ${name}: ${error}"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Start"
+msgstr "Start"
+
+msgid "End"
+msgstr "Ende"
 
 msgid "Personnel number"
 msgstr "Personalnummer"
@@ -201,23 +218,17 @@ msgstr "Webseite"
 msgid "Remarks"
 msgstr "Bemerkungen"
 
-msgid "Role"
-msgstr "Rolle"
-
-msgid "Party"
+msgid "Political Party"
 msgstr "Partei"
 
 msgid "Party role"
 msgstr "Rolle in der Partei"
 
-msgid "Parliamentary group"
-msgstr "Fraktion"
-
-msgid "Parliamentary group role"
-msgstr "Rolle in der Fraktion"
-
 msgid "Portrait"
 msgstr "Portrait"
+
+msgid "Description"
+msgstr "Beschreibung"
 
 msgid "Year"
 msgstr "Jahr"
@@ -305,6 +316,9 @@ msgstr "Sitzung"
 
 msgid "Plenary session (bulk)"
 msgstr "Massenbuchung Plenarsitzung"
+
+msgid "Commission meeting (bulk)"
+msgstr "Massenbuchung Kommissionssitzung"
 
 msgid "Edit"
 msgstr "Bearbeiten"
@@ -396,6 +410,9 @@ msgstr "Rolle entfernen"
 msgid "Parliamentary groups"
 msgstr "Fraktionen"
 
+msgid "Parliamentary group"
+msgstr "Fraktion"
+
 msgid "Do you really want to delete this parliamentary group?"
 msgstr "Möchten Sie diese Fraktion wirklich löschen?"
 
@@ -404,6 +421,9 @@ msgstr "Fraktion löschen"
 
 msgid "Parties"
 msgstr "Parteien"
+
+msgid "Party"
+msgstr "Partei"
 
 msgid "Do you really want to delete this party?"
 msgstr "Möchten Sie diese Partei wirklich löschen?"
@@ -447,59 +467,17 @@ msgstr "Anwesenheit bearbeitet"
 msgid "Attendence removed"
 msgstr "Anwesenheit gelöscht"
 
-msgid "normal"
-msgstr "normal"
-
-msgid "intercantonal"
-msgstr "interkantonal"
-
-msgid "Guest"
-msgstr "Gast"
-
-msgid "Extended Member"
-msgstr "erweitertes Mitglied"
-
-msgid "male"
-msgstr "männlich"
-
-msgid "female"
-msgstr "weiblich"
-
-msgid "A mail"
-msgstr "A-Post"
-
-msgid "A mail plus"
-msgstr "A-Post Plus"
-
-msgid "registered"
-msgstr "eingeschrieben"
-
-msgid "confidential"
-msgstr "vertraulich"
-
-msgid "personal / confidential"
-msgstr "persönlich / vertraulich"
-
-msgid "none"
-msgstr "keine"
-
-msgid "Vote counter"
-msgstr "Stimmenzähler"
-
-msgid "Media Manager"
-msgstr "Leiter Medien und Kampagnen"
-
-msgid "President of the parliamentary group"
-msgstr "Fraktionsschef"
-
 msgid "Duration"
 msgstr "Dauer"
 
 msgid "No meeting defined yet."
 msgstr "Noch keine Sitzung erfasst."
 
-msgid "Comission"
-msgstr "Kommission"
+msgid "Bulk edits"
+msgstr "Massenbuchungen"
+
+msgid "edited"
+msgstr "bearbeitet"
 
 msgid "Timestamp"
 msgstr "Zeitpunkt"
@@ -507,11 +485,17 @@ msgstr "Zeitpunkt"
 msgid "Attendence"
 msgstr "Anwesenheit"
 
+msgid "Comission"
+msgstr "Kommission"
+
 msgid "No changes yet."
 msgstr "Noch keine Aktivitäten."
 
 msgid "Action"
 msgstr "Aktion"
+
+msgid "Function"
+msgstr "Funktion"
 
 msgid "No active commissions."
 msgstr "Keine aktiven Kommissionen."
@@ -528,28 +512,19 @@ msgstr "Import Fehler"
 msgid "Import Results"
 msgstr "Import-Ergebnisse"
 
-#. Default: Processed ${total_processed} items in total: ${total_created}
-#. created, ${total_updated} updated.
-msgid "msg_import_summary"
-msgstr "Insgesamt ${total_processed} Elemente verarbeitet: ${total_created} erstellt, ${total_updated} aktualisiert."
-
-msgid ""
-"No items were processed. The uploaded files might be empty or incorrectly "
-"formatted."
-msgstr ""
-"Es wurden keine Elemente verarbeitet. Die hochgeladenen Dateien könnten leer oder falsch formatiert sein."
-
 msgid ""
 "${category_details[1]['category_title']} Created (${category_details[1]"
 "['created_count']}/${category_details[1]['processed']})"
 msgstr ""
-"${category_details[1]['category_title']} Erstellt (${category_details[1]['created_count']}/${category_details[1]['processed']})"
+"${category_details[1]['category_title']} Erstellt (${category_details[1]"
+"['created_count']}/${category_details[1]['processed']})"
 
 msgid ""
 "${category_details[1]['category_title']} Updated (${category_details[1]"
 "['updated_count']}/${category_details[1]['processed']})"
 msgstr ""
-"${category_details[1]['category_title']} Aktualisiert (${category_details[1]['updated_count']}/${category_details[1]['processed']})"
+"${category_details[1]['category_title']} Aktualisiert (${category_details[1]"
+"['updated_count']}/${category_details[1]['processed']})"
 
 msgid "No changes needed for this category."
 msgstr "Keine Änderungen für diese Kategorie erforderlich."
@@ -609,6 +584,9 @@ msgstr "Rollen"
 msgid "Parliament"
 msgstr "Parlament"
 
+msgid "Role"
+msgstr "Rolle"
+
 msgid "No parliamentarians defined yet."
 msgstr "Noch keine Parlamentarier:innen erfasst."
 
@@ -624,14 +602,53 @@ msgstr "Betrag"
 msgid "No rate sets defined yet."
 msgstr "Noch keine Sätze erfasst."
 
+msgid "Copy this rate set"
+msgstr "Diesen Satz kopieren"
+
 msgid "Yes"
 msgstr "Ja"
 
 msgid "No"
 msgstr "Nein"
 
-msgid "Exports Settlement runs"
-msgstr "Exporte Abrechnungsläufe"
+msgid "Commission Closure Status"
+msgstr "Kommissions-Abschlussstatus"
+
+msgid ""
+"This table shows the attendance closure status for each commission. It "
+"displays how many commission members have marked their attendance as "
+"\"closed\" (abschluss) for this settlement run. Members who have not yet "
+"closed their attendance are listed below each commission."
+msgstr ""
+"Diese Tabelle zeigt den Abschlussstatus der Anwesenheit für jede Kommission. "
+"Sie zeigt, wie viele Kommissionsmitglieder ihre Anwesenheit als "
+"\"abgeschlossen\" für diesen Abrechnungslauf markiert haben. Mitglieder, die "
+"ihre Anwesenheit noch nicht abgeschlossen haben, sind unter jeder Kommission "
+"aufgelistet."
+
+msgid "⚠ Incomplete"
+msgstr "⚠ Unvollständig"
+
+msgid "Members who have closed their attendance:"
+msgstr "Mitglieder, die ihre Anwesenheit abgeschlossen haben:"
+
+msgid "✓ (closed)"
+msgstr "✓ (abgeschlossen)"
+
+msgid "Members who have not closed their attendance:"
+msgstr "Mitglieder, die ihre Anwesenheit nicht abgeschlossen haben:"
+
+msgid "(has attendance)"
+msgstr "(hat Anwesenheit)"
+
+msgid "(no attendance)"
+msgstr "(keine Anwesenheit)"
+
+msgid ""
+"No commissions with active memberships found for this settlement period."
+msgstr ""
+"Keine Kommissionen mit aktiven Mitgliedschaften für diesen "
+"Abrechnungszeitraum gefunden."
 
 msgid "No settlement runs defined yet."
 msgstr "Noch keine Abrechnungsläufe erfasst"
@@ -645,6 +662,33 @@ msgstr "Neu"
 msgid "New attendence"
 msgstr "Neue Anwesenheit"
 
+msgid "No parliamentarians selected"
+msgstr "Keine Parlamentarier:innen ausgewählt"
+
+msgid "Added commission session"
+msgstr "Kommissionssitzung hinzugefügt"
+
+msgid "New commission session"
+msgstr "Neue Kommissionssitzung"
+
+msgid "Edited attendences"
+msgstr "Anwesenheiten bearbeitet"
+
+msgid "Edit session"
+msgstr "Sitzung bearbeiten"
+
+msgid "Do you really want to delete this bulk edit?"
+msgstr "Möchten Sie diese Massenbuchung wirklich löschen?"
+
+msgid "Delete Attendencess"
+msgstr "Anwesenheiten löschen"
+
+msgid "Edit plenary session"
+msgstr "Plenarsitzung bearbeiten"
+
+msgid "Edit commission session"
+msgstr "Kommissionssitzung bearbeiten"
+
 msgid "Added plenary session"
 msgstr "Plenarsitzung hinzugefügt"
 
@@ -654,14 +698,9 @@ msgstr "Neue Plenarsitzung"
 msgid "Your changes were saved"
 msgstr "Änderungen gespeichert"
 
-msgid "Inactive"
-msgstr "Inaktiv"
-
-msgid "Added a new commission"
-msgstr "Kommission hinzugefügt"
-
-msgid "New commission"
-msgstr "Neue Kommission"
+#, python-format
+msgid "Deleted ${count} attendeces"
+msgstr "${count} Anwesenheiten gelöscht"
 
 msgid "Added a new parliamentarian"
 msgstr "Parlamentarier:in hinzugefügt"
@@ -686,16 +725,16 @@ msgid ""
 "Data import completed. Processed ${processed} items: ${created} created, "
 "${updated} updated."
 msgstr ""
-"Datenimport abgeschlossen. ${processed} Elemente verarbeitet: ${created} erstellt, "
-"${updated} aktualisiert."
+"Datenimport abgeschlossen. ${processed} Elemente verarbeitet: ${created} "
+"erstellt, ${updated} aktualisiert."
 
 #, python-format
 msgid ""
 "Data import completed. Processed ${processed} items. No changes were needed "
 "- data is already up to date."
 msgstr ""
-"Datenimport abgeschlossen. ${processed} Elemente verarbeitet. Keine Änderungen erforderlich "
-"- Daten sind bereits aktuell."
+"Datenimport abgeschlossen. ${processed} Elemente verarbeitet. Keine "
+"Änderungen erforderlich - Daten sind bereits aktuell."
 
 msgid "Import result"
 msgstr "Importresultat"
@@ -713,23 +752,14 @@ msgstr "Übersicht Importe"
 msgid "Import Log Details"
 msgstr "Details zum Importlog"
 
+msgid "Inactive"
+msgstr "Inaktiv"
+
 msgid "Added a new legislative period"
 msgstr "Legislatur hinzugefügt"
 
 msgid "New legislative period"
 msgstr "Neue Legislatur"
-
-msgid "Added a new role"
-msgstr "Neue Rolle hinzugefügt"
-
-msgid "New role"
-msgstr "Neue Rolle"
-
-msgid "Added a new parliamentary group"
-msgstr "Fraktion hinzugefügt"
-
-msgid "New parliamentary group"
-msgstr "Neue Fraktion"
 
 msgid "Added a new party"
 msgstr "Partei hinzugefügt"
@@ -742,6 +772,15 @@ msgstr "Neue Sätze hinzugefügt"
 
 msgid "New rate set"
 msgstr "Neue Sätze"
+
+msgid "The rate set was copied."
+msgstr "Der Satz wurde kopiert"
+
+msgid "Copy"
+msgstr "Kopieren"
+
+msgid "Copy Rate Set"
+msgstr "Satz kopieren"
 
 msgid "Added a new settlement run"
 msgstr "Neuer Abrechnungslauf hinzugefügt"
@@ -764,50 +803,26 @@ msgstr "Abrechnungen nach Kommission"
 msgid "Settlements by Parliamentarian"
 msgstr "Abrechnungen nach Parlamentarier:in"
 
+msgid "Abschlussliste"
+msgstr "Abschlussliste"
+
+msgid "Abschlussliste (XLSX)"
+msgstr "Abschlussliste (XLSX)"
+
+msgid "Buchungen Abrechnungslauf"
+msgstr "Buchungen Abrechnungslauf"
+
+msgid "Buchungen Abrechnungslauf (Kontrollliste)"
+msgstr "Buchungen Abrechnungslauf (Kontrollliste)"
+
+msgid "KR-Entschädigungen (CSV)"
+msgstr "KR-Entschädigungen (CSV)"
+
+msgid "PDF Exports"
+msgstr "PDF Exporte"
+
+msgid "Excel Exports"
+msgstr "Excel Exporte"
+
 msgid "Total all parties"
 msgstr "Total Alle Parteien"
-
-#~ msgid "No changes were made. All data is already up to date."
-#~ msgstr ""
-#~ "Es wurden keine Änderungen vorgenommen. Alle Daten sind bereits auf dem "
-#~ "neuesten Stand."
-
-#~ msgid "Data import completed successfully with changes."
-#~ msgstr "Datenimport mit Änderungen erfolgreich abgeschlossen."
-
-#~ msgid ""
-#~ "Data import completed. No changes were needed - data is already up to "
-#~ "date."
-#~ msgstr ""
-#~ "Datenimport abgeschlossen. Es waren keine Änderungen erforderlich - die "
-#~ "Daten sind bereits auf dem neuesten Stand."
-
-#~ msgid "Export All (xlsx)"
-#~ msgstr "Alle exportieren (xlsx)"
-
-#~ msgid "Usermanagement"
-#~ msgstr "Benutzerverwaltung"
-
-#~ msgid "Date from"
-#~ msgstr "Datum von"
-
-#~ msgid "Date to"
-#~ msgstr "Datum bis"
-
-#~ msgid "All Settlement runs"
-#~ msgstr "Alle Abrechnungsläufe"
-
-#~ msgid "All Parliamentarians"
-#~ msgstr "Alle Parlamentarier:innen"
-
-#~ msgid "All Commissions"
-#~ msgstr "Alle Kommissionen"
-
-#~ msgid "All Types"
-#~ msgstr "Alle Arten"
-
-#~ msgid "Filter"
-#~ msgstr "Filter"
-
-#~ msgid "Apply Filter"
-#~ msgstr "Filter anwenden"

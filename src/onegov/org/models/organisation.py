@@ -1,6 +1,7 @@
 """ Contains the model describing the organisation proper. """
 from __future__ import annotations
 
+from cryptography.fernet import InvalidToken
 from datetime import date, timedelta
 from functools import cached_property, lru_cache
 from hashlib import sha256
@@ -19,13 +20,38 @@ from sqlalchemy import Column, Text
 from uuid import uuid4
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Iterator
     from markupsafe import Markup
+    from onegov.core.framework import Framework
     from onegov.form.parser.core import ParsedField
     from onegov.org.request import OrgRequest
+
+
+class KabaConfiguration(NamedTuple):
+    site_id: str
+    api_key: str
+    api_secret: str
+
+
+class RawKabaConfiguration(NamedTuple):
+    site_id: str
+    api_key: str
+    api_secret: str
+
+    def decrypt(self, app: Framework) -> KabaConfiguration | None:
+        try:
+            api_secret = app.decrypt(bytes.fromhex(self.api_secret))
+        except InvalidToken:
+            return None
+
+        return KabaConfiguration(
+            site_id=self.site_id,
+            api_key=self.api_key,
+            api_secret=api_secret
+        )
 
 
 class Organisation(Base, TimestampMixin):
@@ -114,6 +140,10 @@ class Organisation(Base, TimestampMixin):
     event_filter_definition: dict_property[str | None] = meta_property()
     event_filter_configuration: dict_property[dict[str, Any]]
     event_filter_configuration = meta_property(default=dict)
+    event_header_html: dict_markup_property[Markup | None]
+    event_header_html = dict_markup_property('meta')
+    event_footer_html: dict_markup_property[Markup | None]
+    event_footer_html = dict_markup_property('meta')
     event_files = associated(File, 'event_files', 'many-to-many')
 
     # social media
@@ -240,10 +270,25 @@ class Organisation(Base, TimestampMixin):
     gever_password: dict_property[str | None] = meta_property()
     gever_endpoint: dict_property[str | None] = meta_property()
 
+    assembly_title: dict_property[str | None] = meta_property()
+
     # Kaba settings
-    kaba_site_id: dict_property[str | None] = meta_property()
-    kaba_api_key: dict_property[str | None] = meta_property()
-    kaba_api_secret: dict_property[str | None] = meta_property()
+    @property
+    def kaba_configurations(self) -> list[RawKabaConfiguration]:
+        return [
+            RawKabaConfiguration(**config)
+            for config in self.meta.get('kaba_configurations', ())
+        ]
+
+    def get_kaba_configuration(
+        self,
+        site_id: str
+    ) -> RawKabaConfiguration | None:
+        for config in self.meta.get('kaba_configurations', ()):
+            if config.get('site_id') == site_id:
+                return RawKabaConfiguration(**config)
+        return None
+
     default_key_code_lead_time: dict_property[int] = meta_property(default=30)
     default_key_code_lag_time: dict_property[int] = meta_property(default=30)
 
@@ -254,10 +299,19 @@ class Organisation(Base, TimestampMixin):
     # vat
     vat_rate: dict_property[float | None] = meta_property(default=0.0)
 
+    # RIS settings
+    ris_enabled: dict_property[bool] = meta_property(default=False)
+    ris_main_url: dict_property[str | None] = meta_property(default=None)
+    ris_interest_tie_categories: dict_property[list[str] | None] = (
+        meta_property(default=None))
+
     # MTAN Settings
     mtan_access_window_seconds: dict_property[int | None] = meta_property()
     mtan_access_window_requests: dict_property[int | None] = meta_property()
     mtan_session_duration_seconds: dict_property[int | None] = meta_property()
+
+    # Citizen Login
+    citizen_login_enabled: dict_property[bool] = meta_property(default=False)
 
     # Open Data
     ogd_publisher_mail: dict_property[str | None] = meta_property()

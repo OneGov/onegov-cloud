@@ -3,12 +3,13 @@ from __future__ import annotations
 import morepath
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
-from onegov.core.security import Public
+from onegov.core.security import Public, Secret
 from onegov.user.auth.core import Auth
 from onegov.user.auth.provider import (
     AUTHENTICATION_PROVIDERS, AuthenticationProvider,
     AzureADProvider, SAML2Provider, Conclusion)
-from webob.exc import HTTPUnauthorized
+from saml2.metadata import create_metadata_string
+from webob.exc import HTTPNotFound, HTTPUnauthorized
 from webob.response import Response
 
 
@@ -253,6 +254,31 @@ def handle_provider_logout(
         return client.handle_slo(self, request)
 
     raise NotImplementedError
+
+
+# NOTE: For now we only allow superusers to access the metadata
+#       even though there should technically be no private information
+#       containted therein. We don't really do auto-configuration
+#       so we don't need a public access point for this metadata
+#       it's purely for our convenience.
+@UserApp.view(
+    model=SAML2Provider,
+    permission=Secret,
+    name='sp.xml'
+)
+def sp_metadata(
+    self: SAML2Provider,
+    request: CoreRequest
+) -> Response:
+    client = self.tenants.client(request.app)
+    if client is None:
+        raise HTTPNotFound()
+
+    config = client.connection(self, request).config
+    return Response(
+        body=create_metadata_string(None, config),
+        content_type='application/samlmetadata+xml',
+    )
 
 
 @UserApp.webasset_path()

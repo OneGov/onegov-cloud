@@ -1,17 +1,23 @@
 from freezegun import freeze_time
 from datetime import date
 from onegov.core.utils import Bunch
-from onegov.pas.models import Attendence
-from onegov.pas.models import Change
-from onegov.pas.models import Commission
-from onegov.pas.models import CommissionMembership
-from onegov.pas.models import LegislativePeriod
-from onegov.pas.models import Parliamentarian
-from onegov.pas.models import ParliamentarianRole
-from onegov.pas.models import ParliamentaryGroup
-from onegov.pas.models import Party
-from onegov.pas.models import RateSet
-from onegov.pas.models import SettlementRun
+from onegov.pas.models import (
+    Attendence,
+    Change,
+    LegislativePeriod,
+    PASCommission,
+    PASCommissionMembership,
+    PASParliamentarian,
+    PASParliamentarianRole,
+    PASParliamentaryGroup,
+    Party,
+    RateSet,
+    SettlementRun
+)
+from onegov.pas.models.attendence import TYPES
+from onegov.pas.views.pas_excel_export_nr_3_lohnart_fibu import (
+    FIBU_KONTEN_MAPPING
+)
 
 
 @freeze_time('2022-06-06')
@@ -28,13 +34,13 @@ def test_models(session):
         end=date(2022, 3, 31),
         active=True
     )
-    parliamentary_group = ParliamentaryGroup(name='Group')
+    parliamentary_group = PASParliamentaryGroup(name='Group')
     party = Party(name='Party')
-    commission = Commission(
+    commission = PASCommission(
         name='Official Commission',
         type='official'
     )
-    parliamentarian = Parliamentarian(
+    parliamentarian = PASParliamentarian(
         first_name='First',
         last_name='Last',
         gender='female',
@@ -49,7 +55,7 @@ def test_models(session):
     session.add(parliamentarian)
     session.flush()
 
-    parliamentarian_role = ParliamentarianRole(
+    parliamentarian_role = PASParliamentarianRole(
         parliamentarian_id=parliamentarian.id,
         role='vice_president',
         party_id=party.id,
@@ -57,7 +63,7 @@ def test_models(session):
         parliamentary_group_id=parliamentary_group.id,
         parliamentary_group_role='vote_counter'
     )
-    commission_membership = CommissionMembership(
+    commission_membership = PASCommissionMembership(
         role='president',
         commission_id=commission.id,
         parliamentarian_id=parliamentarian.id
@@ -118,8 +124,10 @@ def test_models(session):
     # ... parliamentarian.active
     assert parliamentarian.active is True
     parliamentarian_role.end = date(2022, 5, 5)
+    commission_membership.end = date(2022, 5, 5)
     assert parliamentarian.active is False
     parliamentarian.roles = []
+    parliamentarian.commission_memberships = []
     assert parliamentarian.active is True
 
     # commission.end_observer
@@ -127,3 +135,15 @@ def test_models(session):
     commission.end = date(2022, 5, 5)
     session.flush()
     assert commission_membership.end == date(2022, 5, 5)
+
+
+def test_fibu_konten_mapping_completeness():
+    """Test that FIBU_KONTEN_MAPPING has all keys from TYPES.
+
+    This ensures that if new attendance types are added to TYPES,
+    they must also be mapped in FIBU_KONTEN_MAPPING.
+    """
+    missing_keys = set(TYPES.keys()) - set(FIBU_KONTEN_MAPPING.keys())
+    assert not missing_keys, (
+        f"FIBU_KONTEN_MAPPING is missing keys: {missing_keys}"
+    )

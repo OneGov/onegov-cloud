@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 import re
 
@@ -33,21 +35,21 @@ from onegov.form.parser.grammar import (
 from pyparsing import ParseFatalException
 
 
-def test_text_without():
+def test_text_without() -> None:
     assert text_without('?!').parseString('what')[0] == 'what'
     assert text_without('?!').parseString('what what?')[0] == 'what'
     assert text_without('?!').parseString('what!')[0] == 'what'
     assert text_without('?').parseString('what!')[0] == 'what!'
 
 
-def test_with_whitespace_inside():
+def test_with_whitespace_inside() -> None:
     text = text_without('')
     assert with_whitespace_inside(text).parseString("a b")[0] == "a b"
     assert with_whitespace_inside(text).parseString("a b ")[0] == "a b"
     assert with_whitespace_inside(text).parseString("a  b ")[0] == "a"
 
 
-def test_field_identifier():
+def test_field_identifier() -> None:
     parse = field_identifier().parseString
 
     assert parse("Yes?=").asDict() == {'required': False, 'label': 'Yes?'}
@@ -70,7 +72,7 @@ def test_field_identifier():
     assert parse("What* =").required
 
 
-def test_textfield():
+def test_textfield() -> None:
 
     field = textfield()
 
@@ -108,7 +110,7 @@ def test_textfield():
     }
 
 
-def test_textarea():
+def test_textarea() -> None:
 
     field = textarea()
 
@@ -123,7 +125,7 @@ def test_textarea():
     assert f.asDict() == {'rows': 15, 'type': 'textarea'}
 
 
-def test_password():
+def test_password() -> None:
 
     field = password()
 
@@ -132,7 +134,7 @@ def test_password():
     assert f.asDict() == {'type': 'password'}
 
 
-def test_email():
+def test_email() -> None:
 
     field = email()
 
@@ -141,7 +143,7 @@ def test_email():
     assert f.asDict() == {'type': 'email'}
 
 
-def test_url():
+def test_url() -> None:
 
     field = url()
 
@@ -154,7 +156,7 @@ def test_url():
     assert f.asDict() == {'type': 'url'}
 
 
-def test_video_url():
+def test_video_url() -> None:
 
     field = video_url()
 
@@ -163,7 +165,7 @@ def test_video_url():
     assert f.asDict() == {'type': 'video_url'}
 
 
-def test_valid_date_range():
+def test_valid_date_range() -> None:
     dr = valid_date_range().parseString('(..today)')
     assert dr.valid_date_range.start is None
     assert dr.valid_date_range.stop == relativedelta()
@@ -181,17 +183,17 @@ def test_valid_date_range():
     assert dr.valid_date_range.stop == dateobj(2020, 1, 1)
 
 
-def test_valid_date_range_invalid_date():
+def test_valid_date_range_invalid_date() -> None:
     with pytest.raises(ParseFatalException):
         valid_date_range().parseString('(..2000.20.45)')
 
 
-def test_valid_date_range_invalid_mixed_range():
+def test_valid_date_range_invalid_mixed_range() -> None:
     with pytest.raises(ParseFatalException):
         valid_date_range().parseString('(2010.01.01..today)')
 
 
-def test_valid_date_range_invalid_range_order():
+def test_valid_date_range_invalid_range_order() -> None:
     with pytest.raises(ParseFatalException):
         valid_date_range().parseString('(today..today)')
 
@@ -202,7 +204,7 @@ def test_valid_date_range_invalid_range_order():
         valid_date_range().parseString('(2020.01.01..2010.01.01)')
 
 
-def test_dates():
+def test_dates() -> None:
     field = date().parseString('YYYY.MM.DD')
     assert field.asDict() == {'type': 'date'}
 
@@ -213,7 +215,7 @@ def test_dates():
     assert field.asDict() == {'type': 'time'}
 
 
-def test_dates_with_valid_date_range():
+def test_dates_with_valid_date_range() -> None:
     field = date().parseString('YYYY.MM.DD (today..)')
     assert field.asDict() == {
         'type': 'date',
@@ -227,7 +229,7 @@ def test_dates_with_valid_date_range():
     }
 
 
-def test_dates_with_invalid_date_range():
+def test_dates_with_invalid_date_range() -> None:
     with pytest.raises(ParseFatalException):
         date().parseString('YYYY.MM.DD (-350 days..-1 years)')
 
@@ -235,7 +237,7 @@ def test_dates_with_invalid_date_range():
         datetime().parseString('YYYY.MM.DD HH:MM (today..today)')
 
 
-def test_stdnum():
+def test_stdnum() -> None:
     field = stdnum()
 
     f = field.parseString("#test")
@@ -254,7 +256,7 @@ def test_stdnum():
     assert f.asDict() == {'type': 'stdnum', 'format': 'asdf.asdf'}
 
 
-def test_radio():
+def test_radio() -> None:
 
     field = radio()
 
@@ -269,7 +271,7 @@ def test_radio():
     assert f.checked
 
 
-def test_checkbox():
+def test_checkbox() -> None:
 
     field = checkbox()
 
@@ -283,8 +285,16 @@ def test_checkbox():
     assert f.label == 'Swiss German'
     assert not f.checked
 
+    # non-latin1 character in label (en dash)
+    # FIXME: Long-term we want this to be an error, but not for
+    #        existing form code
+    f = field.parseString("[ ] Read–only")
+    assert f.type == 'checkbox'
+    assert f.label == 'Read'
+    assert not f.checked
 
-def test_fileinput():
+
+def test_fileinput() -> None:
 
     field = fileinput()
 
@@ -309,7 +319,7 @@ def test_fileinput():
     assert f.extensions == ['pdf']
 
 
-def test_prices():
+def test_prices() -> None:
     field = radio()
 
     f = field.parseString("( ) Default Choice (100 CHF)")
@@ -339,6 +349,15 @@ def test_prices():
     assert f.pricing.credit_card_payment
     assert not f.dicount
 
+    f = field.parseString("(x) Mail delivery (Local) (5 CHF!)")
+    assert f.type == 'radio'
+    assert f.label == 'Mail delivery (Local)'
+    assert f.checked
+    assert f.pricing.amount == Decimal('5.00')
+    assert f.pricing.currency == 'CHF'
+    assert f.pricing.credit_card_payment
+    assert not f.dicount
+
     field = checkbox()
 
     f = field.parseString("[x] Extra Luggage (150.50 USD)")
@@ -362,6 +381,15 @@ def test_prices():
     f = field.parseString("[ ] Discount (-5.00 USD)")
     assert f.type == 'checkbox'
     assert f.label == 'Discount'
+    assert not f.checked
+    assert f.pricing.amount == Decimal('-5.00')
+    assert f.pricing.currency == 'USD'
+    assert not f.pricing.credit_card_payment
+    assert not f.dicount
+
+    f = field.parseString("[ ] Discount (For Kids) (-5.00 USD)")
+    assert f.type == 'checkbox'
+    assert f.label == 'Discount (For Kids)'
     assert not f.checked
     assert f.pricing.amount == Decimal('-5.00')
     assert f.pricing.currency == 'USD'
@@ -398,7 +426,7 @@ def test_prices():
     assert not f.pricing
 
 
-def test_discount():
+def test_discount() -> None:
     field = radio()
 
     f = field.parseString("( ) Default Choice (25%)")
@@ -416,6 +444,28 @@ def test_discount():
     assert not f.pricing
 
     f = field.parseString("(x) Mail delivery (33.3 %)")
+    assert f.type == 'radio'
+    assert f.label == 'Mail delivery'
+    assert f.checked
+    assert f.discount.amount == Decimal('33.3')
+    assert not f.pricing
+
+    f = field.parseString("(x) Mail delivery (Local) (33.3 %)")
+    assert f.type == 'radio'
+    assert f.label == 'Mail delivery (Local)'
+    assert f.checked
+    assert f.discount.amount == Decimal('33.3')
+    assert not f.pricing
+
+    f = field.parseString("(x) Mail delivery (33.3%) (Local)")
+    assert f.type == 'radio'
+    assert f.label == 'Mail delivery'
+    assert f.checked
+    assert f.discount.amount == Decimal('33.3')
+    assert not f.pricing
+
+    # relaxed end line requirement
+    f = field.parseString("(x) Mail delivery (33.3%)   ")
     assert f.type == 'radio'
     assert f.label == 'Mail delivery'
     assert f.checked
@@ -445,8 +495,30 @@ def test_discount():
     assert f.discount.amount == Decimal('50')
     assert not f.pricing
 
+    f = field.parseString("[ ] Discount (For Kids) (50%)")
+    assert f.type == 'checkbox'
+    assert f.label == 'Discount (For Kids)'
+    assert not f.checked
+    assert f.discount.amount == Decimal('50')
+    assert not f.pricing
 
-def test_non_prices():
+    f = field.parseString("[ ] Discount (50%) (For Kids)")
+    assert f.type == 'checkbox'
+    assert f.label == 'Discount'
+    assert not f.checked
+    assert f.discount.amount == Decimal('50')
+    assert not f.pricing
+
+    # relaxed end line requirement
+    f = field.parseString("[ ] Discount (50%)    ")
+    assert f.type == 'checkbox'
+    assert f.label == 'Discount'
+    assert not f.checked
+    assert f.discount.amount == Decimal('50')
+    assert not f.pricing
+
+
+def test_non_prices() -> None:
     field = radio()
 
     f = field.parseString("( ) Foobar (Some Information)")
@@ -459,7 +531,7 @@ def test_non_prices():
     assert f.label == 'Foobar'
 
 
-def test_decimal():
+def test_decimal() -> None:
     field = decimal()
 
     assert field.parseString('123.45')[0] == Decimal('123.45')
@@ -468,7 +540,7 @@ def test_decimal():
     assert field.parseString('-10.0')[0] == Decimal('-10.0')
 
 
-def test_currency():
+def test_currency() -> None:
     field = currency()
 
     assert field.parseString('CHF')[0] == 'CHF'
@@ -476,7 +548,7 @@ def test_currency():
     assert field.parseString('Cny')[0] == 'CNY'
 
 
-def test_integer_range():
+def test_integer_range() -> None:
     field = integer_range_field()
 
     assert field.parseString('0..10')[0] == range(0, 10)
@@ -485,27 +557,27 @@ def test_integer_range():
     assert field.parseString('-10..-20')[0] == range(-10, -20)
 
 
-def test_decimal_range():
+def test_decimal_range() -> None:
     field = decimal_range_field()
 
-    assert field.parseString('0.00..10.00')[0] \
-        == decimal_range('0.0', '10.0')
-    assert field.parseString('-10.00..100.00')[0] \
-        == decimal_range('-10.0', '100.0')
-    assert field.parseString('0.00..-20.00')[0] \
-        == decimal_range('0.0', '-20.0')
-    assert field.parseString('-10.00..-20.00')[0] \
-        == decimal_range('-10.0', '-20.0')
+    assert field.parseString(
+        '0.00..10.00')[0] == decimal_range('0.0', '10.0')
+    assert field.parseString(
+        '-10.00..100.00')[0] == decimal_range('-10.0', '100.0')
+    assert field.parseString(
+        '0.00..-20.00')[0] == decimal_range('0.0', '-20.0')
+    assert field.parseString(
+        '-10.00..-20.00')[0] == decimal_range('-10.0', '-20.0')
 
 
-def test_code():
+def test_code() -> None:
     field = code()
 
     assert field.parseString('<markdown>').syntax == 'markdown'
     assert field.parseString('<markdown>').type == 'code'
 
 
-def test_chip_nr():
+def test_chip_nr() -> None:
     field = chip_nr()
 
     f = field.parseString("chip-nr")

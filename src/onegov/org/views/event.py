@@ -412,7 +412,8 @@ def view_event(
                         'event': 'browser-notification',
                         'title': request.translate(_('New ticket')),
                         'created': ticket.created.isoformat()
-                    }
+                    },
+                    groupids=request.app.groupids_for_ticket(ticket),
                 )
 
                 if request.auto_accept(ticket):
@@ -649,6 +650,10 @@ def view_latest_event(self: Event, request: OrgRequest) -> BaseResponse:
     future events.
 
     """
+
+    if not self.occurrences:
+        # redirect to the event instead
+        return morepath.redirect(request.link(self))
 
     now = utcnow()
 

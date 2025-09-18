@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-04-22 10:49+0200\n"
+"POT-Creation-Date: 2025-09-17 10:13+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -68,6 +68,12 @@ msgstr ""
 
 msgid "Alternatively: Page from the Memorial"
 msgstr "Alternativ: Seite aus dem Memorial"
+
+msgid "Additional documents"
+msgstr "Zusätzliche Dokumente"
+
+msgid "Documents"
+msgstr "Dokumente"
 
 msgid "Start"
 msgstr "Start"
@@ -178,6 +184,21 @@ msgstr "ID"
 msgid "Name"
 msgstr "Name"
 
+msgid "The title of the assemblies."
+msgstr "Der Titel der Versammlungen."
+
+msgid "Assembly settings"
+msgstr "Einstellungen für Versammlungen"
+
+msgid "Assembly"
+msgstr "Landsgemeinde"
+
+msgid "General Assembly"
+msgstr "Versammlung"
+
+msgid "Town Hall Meeting"
+msgstr "Gemeindeversammlung"
+
 msgid "Person"
 msgstr "Person"
 
@@ -224,9 +245,6 @@ msgstr "Traktanden der Landsgemeinde vom ${date}"
 msgid "Homepage"
 msgstr "Startseite"
 
-msgid "Assemblies"
-msgstr "Landsgemeinden"
-
 msgid "Agenda items"
 msgstr "Traktanden"
 
@@ -263,9 +281,6 @@ msgstr "Möchten Sie diese Wortmeldung wirklich löschen?"
 msgid "Delete votum"
 msgstr "Wortmeldung löschen"
 
-msgid "Assembly"
-msgstr "Landsgemeinde"
-
 msgid "States"
 msgstr "Status"
 
@@ -279,15 +294,24 @@ msgid "Delete assembly"
 msgstr "Landsgemeinde löschen"
 
 #, python-format
-msgid "Extraodinary assembly from ${date}"
-msgstr "Ausserordentliche Landsgemeinde vom ${date}"
+msgid "Extraodinary ${assembly_type} from ${date}"
+msgstr "Ausserordentliche ${assembly_type} vom ${date}"
 
 #, python-format
-msgid "Assembly from ${date}"
-msgstr "Landsgemeinde vom ${date}"
+msgid "${assembly_type} from ${date}"
+msgstr "${assembly_type} vom ${date}"
 
 msgid "Irrelevant motion"
 msgstr "Unerheblicher Antrag"
+
+msgid "General Assemblies"
+msgstr "Versammlungen"
+
+msgid "Town Hall Meetings"
+msgstr "Gemeindeversammlungen"
+
+msgid "Assemblies"
+msgstr "Landsgemeinden"
 
 #, python-format
 msgid "Vota of agenda items ${number} of assembly from ${date}"
@@ -295,6 +319,9 @@ msgstr "Wortmeldungen des Traktandum ${number} der Landsgemeinde vom ${date}"
 
 msgid "Vota"
 msgstr "Wortmeldungen"
+
+msgid "draft"
+msgstr "Entwurf"
 
 msgid "scheduled"
 msgstr "geplant"
@@ -311,14 +338,17 @@ msgstr "Vorheriges Traktandum"
 msgid "Next agenda item"
 msgstr "Nächstes Traktandum"
 
-msgid "Memorial (PDF)"
-msgstr "Memorial (PDF)"
+msgid "Excerpt from the Memorial.pdf"
+msgstr "Auszug aus dem Memorial.pdf"
 
 msgid "No assemblies defined yet."
 msgstr "Noch keine Landsgemeinden erfasst."
 
 msgid "Downloads, Audio & Assembly items"
 msgstr "Downloads, Audio & Traktanden"
+
+msgid "Memorial (PDF)"
+msgstr "Memorial (PDF)"
 
 msgid "Audio"
 msgstr "Audio"
@@ -392,11 +422,13 @@ msgstr "Neues Traktandum"
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
-msgid "Added a new assembly"
-msgstr "Neue Landsgemeinde hinzugefügt"
+#, python-format
+msgid "Added a new ${assembly}"
+msgstr "Neue ${assembly} hinzugefügt"
 
-msgid "New assembly"
-msgstr "Neue Landsgemeinde"
+#, python-format
+msgid "New ${assembly}"
+msgstr "Neue ${assembly}"
 
 msgid "Open Data"
 msgstr "Open Data"
@@ -408,14 +440,25 @@ msgstr "Resultate der ${title}, strukturiert als JSON"
 msgid "Location"
 msgstr "Ort"
 
-msgid "Open Data"
-msgstr "Open Data"
-
 msgid "Added a new votum"
 msgstr "Neue Wortmeldung hinzugefügt"
 
 msgid "New votum"
 msgstr "Neue Wortmeldung"
+
+#~ msgid "Added a new assembly"
+#~ msgstr "Neue Landsgemeinde hinzugefügt"
+
+#~ msgid "New assembly"
+#~ msgstr "Neue Landsgemeinde"
+
+#, python-format
+#~ msgid "Extraodinary assembly from ${date}"
+#~ msgstr "Ausserordentliche Landsgemeinde vom ${date}"
+
+#, python-format
+#~ msgid "Assembly from ${date}"
+#~ msgstr "Landsgemeinde vom ${date}"
 
 #~ msgid "Assembly items & downloads"
 #~ msgstr "Traktanden & Downloads"

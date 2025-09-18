@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from functools import cached_property
 from markupsafe import Markup
-from onegov.activity import (
-    Period, PeriodCollection, PeriodMeta, InvoiceCollection)
-from onegov.activity.models.invoice_reference import Schema
+from onegov.activity import BookingPeriod
+from onegov.activity import BookingPeriodMeta
+from onegov.activity import BookingPeriodCollection
+from onegov.activity import BookingPeriodInvoiceCollection
 from onegov.core import utils
 from onegov.org.app import org_content_security_policy
 from onegov.core.orm import orm_cached
@@ -18,6 +19,7 @@ from onegov.org.app import get_common_asset as default_common_asset
 from onegov.org.app import get_i18n_localedirs as default_i18n_localedirs
 from onegov.org.app import (
     get_public_ticket_messages as default_public_ticket_messages)
+from onegov.pay.models.invoice_reference import Schema
 from onegov.user import User, UserCollection
 
 
@@ -54,50 +56,50 @@ class FeriennetApp(OrgApp):
         return request.is_admin
 
     @orm_cached(policy='on-table-change:periods')
-    def active_period(self) -> PeriodMeta | None:
+    def active_period(self) -> BookingPeriodMeta | None:
         for period in self.periods:
             if period.active:
                 return period
         return None
 
     @orm_cached(policy='on-table-change:periods')
-    def periods(self) -> tuple[PeriodMeta, ...]:
-        query: Query[PeriodMeta] = (
-            PeriodCollection(self.session())
+    def periods(self) -> tuple[BookingPeriodMeta, ...]:
+        query: Query[BookingPeriodMeta] = (
+            BookingPeriodCollection(self.session())
             .query()
-            .order_by(Period.execution_start)
+            .order_by(BookingPeriod.execution_start)
             .with_entities(
-                Period.id,
-                Period.title,
-                Period.active,
-                Period.confirmed,
-                Period.confirmable,
-                Period.finalized,
-                Period.finalizable,
-                Period.archived,
-                Period.prebooking_start,
-                Period.prebooking_end,
-                Period.booking_start,
-                Period.booking_end,
-                Period.execution_start,
-                Period.execution_end,
-                Period.max_bookings_per_attendee,
-                Period.booking_cost,
-                Period.all_inclusive,
-                Period.pay_organiser_directly,
-                Period.minutes_between,
-                Period.alignment,
-                Period.deadline_days,
-                Period.book_finalized,
-                Period.cancellation_date,
-                Period.cancellation_days,
-                Period.age_barrier_type,
+                BookingPeriod.id,
+                BookingPeriod.title,
+                BookingPeriod.active,
+                BookingPeriod.confirmed,
+                BookingPeriod.confirmable,
+                BookingPeriod.finalized,
+                BookingPeriod.finalizable,
+                BookingPeriod.archived,
+                BookingPeriod.prebooking_start,
+                BookingPeriod.prebooking_end,
+                BookingPeriod.booking_start,
+                BookingPeriod.booking_end,
+                BookingPeriod.execution_start,
+                BookingPeriod.execution_end,
+                BookingPeriod.max_bookings_per_attendee,
+                BookingPeriod.booking_cost,
+                BookingPeriod.all_inclusive,
+                BookingPeriod.pay_organiser_directly,
+                BookingPeriod.minutes_between,
+                BookingPeriod.alignment,
+                BookingPeriod.deadline_days,
+                BookingPeriod.book_finalized,
+                BookingPeriod.cancellation_date,
+                BookingPeriod.cancellation_days,
+                BookingPeriod.age_barrier_type,
             )
         )
-        return tuple(PeriodMeta(*row) for row in query)
+        return tuple(BookingPeriodMeta(*row) for row in query)
 
     @orm_cached(policy='on-table-change:periods')
-    def periods_by_id(self) -> dict[str, PeriodMeta]:
+    def periods_by_id(self) -> dict[str, BookingPeriodMeta]:
         return {
             p.id.hex: p for p in self.periods
         }
@@ -129,7 +131,7 @@ class FeriennetApp(OrgApp):
         return sponsors
 
     @property
-    def default_period(self) -> PeriodMeta | None:
+    def default_period(self) -> BookingPeriodMeta | None:
         if self.active_period:
             return self.active_period
         return self.periods[0] if self.periods else None
@@ -210,14 +212,14 @@ class FeriennetApp(OrgApp):
         self,
         period_id: UUID | None = None,
         user_id: UUID | None = None
-    ) -> InvoiceCollection:
+    ) -> BookingPeriodInvoiceCollection:
         """ Returns the invoice collection guaranteed to be configured
         according to the organisation's settings.
 
         """
         schema_name, schema_config = self.invoice_schema_config()
 
-        return InvoiceCollection(
+        return BookingPeriodInvoiceCollection(
             self.session(),
             period_id=period_id,
             user_id=user_id,
@@ -314,6 +316,12 @@ def get_is_complete_userprofile_handler(
         return form.validate()
 
     return is_complete_userprofile
+
+
+# NOTE: Feriennet doesn't need a citizen login
+@FeriennetApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return False
 
 
 @FeriennetApp.setting(section='i18n', name='localedirs')

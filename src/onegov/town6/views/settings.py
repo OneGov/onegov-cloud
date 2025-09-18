@@ -15,8 +15,9 @@ from onegov.org.forms.settings import (
     LinkHealthCheckForm, PeopleSettingsForm, SocialMediaSettingsForm,
     EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm,
     DataRetentionPolicyForm, FirebaseSettingsForm, VATSettingsForm,
-    KabaSettingsForm)
+    KabaSettingsForm, CitizenLoginSettingsForm)
 from onegov.org.models import Organisation
+from onegov.town6.forms.settings import RISSettingsForm
 from onegov.org.views.settings import (
     handle_homepage_settings, handle_people_settings, view_settings,
     handle_ticket_settings, preview_holiday_settings, handle_general_settings,
@@ -26,7 +27,7 @@ from onegov.org.views.settings import (
     handle_newsletter_settings, handle_generic_settings, handle_migrate_links,
     handle_link_health_check, handle_social_media_settings,
     handle_event_settings, handle_api_keys, handle_chat_settings,
-    handle_kaba_settings)
+    handle_kaba_settings, handle_citizen_login_settings)
 
 from onegov.town6.app import TownApp
 from onegov.town6.forms.settings import (
@@ -500,12 +501,41 @@ def handle_vat_settings(
 
 @TownApp.form(
     model=Organisation, name='people-settings', template='form.pt',
-    permission=Secret, form=PeopleSettingsForm, setting='People',
+    permission=Secret, form=PeopleSettingsForm, setting=_('People'),
     icon='fa-users', order=400,
 )
 def town_handle_people_settings(
     self: Organisation, request: TownRequest, form: PeopleSettingsForm
 ) -> RenderData | Response:
     return handle_people_settings(
+        self, request, form, SettingsLayout(self, request)
+    )
+
+
+@TownApp.form(
+    model=Organisation, name='ris-enable', template='form.pt',
+    permission=Secret, form=RISSettingsForm,
+    setting=_('Ratsinformationssystem'), icon='fa-landmark', order=500
+)
+def town_handle_ris_enable(
+    self: Organisation,
+    request: TownRequest,
+    form: RISSettingsForm
+) -> RenderData | Response:
+    return handle_generic_settings(
+        self, request, form, _('Ratsinformationssystem (RIS)'),
+        SettingsLayout(self, request)
+    )
+
+
+@TownApp.form(
+    model=Organisation, name='citizen-login-settings', template='form.pt',
+    permission=Secret, form=CitizenLoginSettingsForm,
+    setting=_('Citizen Login'), icon='fa-id-card', order=480,
+)
+def town_handle_citizen_login_settings(
+    self: Organisation, request: TownRequest, form: CitizenLoginSettingsForm
+) -> RenderData | Response:
+    return handle_citizen_login_settings(
         self, request, form, SettingsLayout(self, request)
     )

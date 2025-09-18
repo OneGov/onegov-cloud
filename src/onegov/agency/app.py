@@ -167,6 +167,14 @@ def get_disabled_extensions() -> tuple[str, ...]:
     return ('PersonLinkExtension', )
 
 
+# NOTE: A citizen login doesn't make a ton of sense here, given the
+#       simplicity of the tickets processed in this system, but we
+#       can think about enabling it in the future.
+@AgencyApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return False
+
+
 @AgencyApp.webasset_output()
 def get_webasset_output() -> str:
     return 'assets/bundles'

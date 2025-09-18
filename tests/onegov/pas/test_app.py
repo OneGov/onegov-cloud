@@ -5,6 +5,16 @@ from onegov.core.elements import LinkGroup
 from onegov.core.utils import Bunch
 
 
+class DummySession:
+    def query(self, *args):
+        return self
+
+    def filter(self, *args):
+        return self
+
+    def first(self):
+        return None
+
 class DummyRequest():
     is_logged_in = False
     is_manager = False
@@ -12,6 +22,7 @@ class DummyRequest():
     current_user = Bunch(id=Bunch(hex='abcd'))
     path = ''
     url = ''
+    session = DummySession()
 
     def class_link(self, cls, name=''):
         return f'{cls.__name__}/{name}'
@@ -59,6 +70,6 @@ def test_app_custom(pas_app):
     assert as_text(get_global_tools(request)) == [
         {'Peter': ['Logout']},
         {'Management': [
-            'Attendences', 'Changes', 'PAS settings', 'More settings'
+            'Attendences', 'Changes', 'PAS settings', 'Files', 'More settings'
         ]}
     ]

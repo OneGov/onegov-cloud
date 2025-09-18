@@ -207,7 +207,9 @@ class DeleteLink(Link):
         redirect_after: str | None = None,
         request_method: str = 'DELETE',
         classes: Collection[str] = ('confirm', 'delete-link'),
-        target: str | None = None
+        target: str | None = None,
+        items: str | None = None,
+        scroll_hint: str | None = None,
     ) -> None:
 
         attr = {
@@ -241,6 +243,10 @@ class DeleteLink(Link):
             pass
         else:
             raise NotImplementedError
+
+        if items:
+            attr['data-confirm-items'] = items
+            attr['data-scroll-hint'] = scroll_hint or ''
 
         super().__init__(
             text=text,

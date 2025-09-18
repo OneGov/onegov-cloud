@@ -1,13 +1,16 @@
 from __future__ import annotations
+import json
 
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link, LinkGroup, IFrameLink
 from onegov.org.models import Organisation
 from onegov.org.models.clipboard import Clipboard
 from onegov.org.models.editor import Editor
+from onegov.page import Page
 
 
 from typing import Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
     from onegov.core.elements import Link as BaseLink
@@ -220,15 +223,28 @@ class TraitInfo:
             safe_delete = not self.children  # type:ignore
 
             if safe_delete or request.current_role == 'admin':
-
                 extra_warning: str
                 if not safe_delete:
                     extra_warning = _(
-                        'Please note that this page has subpages '
-                        'which will also be deleted!'
+                        'Please note that this page has the following '
+                        'subpages which will also be deleted:'
                     )
                 else:
                     extra_warning = ''
+                if isinstance(self, Page):
+                    def get_all_children_titles_json(
+                            page: TraitInfo) -> list[dict[str, Any]]:
+                        return [
+                            {
+                                'title': child.title,
+                                'children': get_all_children_titles_json(child)
+                            }
+                            for child in page.children  # type:ignore
+                        ]
+
+                    children = json.dumps(get_all_children_titles_json(self))
+
+                items = children
 
                 yield DeleteLink(
                     _('Delete'), request.link(self),
@@ -241,7 +257,10 @@ class TraitInfo:
                         request.link(self.parent)  # type:ignore[attr-defined]
                         if self.parent is not None  # type:ignore[attr-defined]
                         else request.class_link(Organisation)
-                    )
+                    ),
+                    items=items,
+                    scroll_hint=_('Please scroll to the bottom to enable the '
+                        'confirm button.')
                 )
             else:
                 yield DeleteLink(

@@ -199,7 +199,7 @@ from onegov.server.core import Server
 from sqlalchemy.pool import NullPool
 from sqlalchemy import create_engine
 from uuid import uuid4
-from webtest import TestApp as Client  # type:ignore[import-untyped]
+from webtest import TestApp as Client
 
 
 from typing import Any, NoReturn, TYPE_CHECKING
@@ -224,12 +224,14 @@ if TYPE_CHECKING:
         matches_required: bool
         singular: bool
         creates_path: bool
+        skip_es_client: bool
 
     class ContextSpecificSettings(TypedDict, total=False):
         default_selector: str
         creates_path: bool
         singular: bool
         matches_required: bool
+        skip_es_client: bool
 
 else:
     _GroupContextAttrs = object
@@ -240,7 +242,8 @@ CONTEXT_SPECIFIC_SETTINGS = (
     'default_selector',
     'creates_path',
     'singular',
-    'matches_required'
+    'matches_required',
+    'skip_es_client'
 )
 
 
@@ -362,6 +365,11 @@ class GroupContext(GroupContextGuard):
     :param singular:
         True if the selector may not match multiple applications.
 
+    :param skip_es_client:
+        True if no ElasticSearch integration is required. Should result
+        in a free speed-up in commands that don't modify data that's also
+        stored in the search index.
+
     :param matches_required:
         True if the selector *must* match at least one application.
 
@@ -374,6 +382,7 @@ class GroupContext(GroupContextGuard):
         default_selector: str | None = None,
         creates_path: bool = False,
         singular: bool = False,
+        skip_es_client: bool = False,
         matches_required: bool = True
     ):
 
@@ -384,6 +393,7 @@ class GroupContext(GroupContextGuard):
 
         self.selector = selector or default_selector
         self.creates_path = creates_path
+        self.skip_es_client = skip_es_client
 
         if self.creates_path:
             self.singular = True
@@ -594,6 +604,11 @@ def run_processors(
                 # disable debug options in cli (like query output)
                 pass
 
+            if group_context.skip_es_client:
+                def configure_search(self, **cfg: Any) -> None:
+                    # disable search options in cli
+                    self.es_client = None
+
         @CliApplication.path(path=view_path)
         class Model:
             pass
@@ -631,7 +646,12 @@ def run_processors(
         Config({
             'applications': applications,
         }),
-        configure_morepath=False,
+        # NOTE: For commands that create a new schema this is essential
+        #       otherwise the SQLAlchemy metadata may be incomplete
+        # FIXME: For some reason when this is enabled we get noisy logging
+        #        related to i18n, so we should replace the affected logger
+        #        with a NullHandler...
+        configure_morepath=group_context.creates_path,
         configure_logging=False
     )
 

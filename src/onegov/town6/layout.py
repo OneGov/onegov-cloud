@@ -60,6 +60,8 @@ from onegov.org.layout import (
     TextModuleLayout as OrgTextModuleLayout,
     TextModulesLayout as OrgTextModulesLayout,
     TicketChatMessageLayout as OrgTicketChatMessageLayout,
+    TicketInvoiceLayout as OrgTicketInvoiceLayout,
+    TicketInvoiceCollectionLayout as OrgTicketInvoiceCollectionLayout,
     TicketLayout as OrgTicketLayout,
     TicketNoteLayout as OrgTicketNoteLayout,
     TicketsLayout as OrgTicketsLayout,
@@ -67,7 +69,12 @@ from onegov.org.layout import (
     UserGroupLayout as OrgUserGroupLayout,
     UserGroupCollectionLayout as OrgUserGroupCollectionLayout,
     UserManagementLayout as OrgUserManagementLayout)
+from onegov.org.models import MeetingCollection
 from onegov.org.models import PageMove
+from onegov.org.models import PoliticalBusinessCollection
+from onegov.org.models import RISCommissionCollection
+from onegov.org.models import RISParliamentarianCollection
+from onegov.org.models import RISParliamentaryGroupCollection
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.page import PageCollection
 from onegov.stepsequence import step_sequences
@@ -232,6 +239,19 @@ class DefaultLayout(OrgDefaultLayout, Layout):
                 }
             )
         )
+
+    @cached_property
+    def ris_overview_url(self) -> str:
+        if self.request.is_logged_in:
+            return self.request.link(self.request.app.org, 'ris-settings')
+
+        if self.request.app.org.ris_main_url:
+            return self.request.link(
+                self.request.app.org, self.request.app.org.ris_main_url
+            )
+
+        # fallback to the homepage
+        return self.request.link(self.request.app.org, '')
 
 
 class DefaultMailLayout(OrgDefaultMailLayout, Layout):
@@ -449,6 +469,12 @@ class TicketLayout(OrgTicketLayout, DefaultLayout):
 
 
 class TicketNoteLayout(OrgTicketNoteLayout, DefaultLayout):
+
+    app: TownApp
+    request: TownRequest
+
+
+class TicketInvoiceLayout(OrgTicketInvoiceLayout, DefaultLayout):
 
     app: TownApp
     request: TownRequest
@@ -718,6 +744,15 @@ class PaymentProviderLayout(OrgPaymentProviderLayout, DefaultLayout):
 
 
 class PaymentCollectionLayout(OrgPaymentCollectionLayout, DefaultLayout):
+
+    app: TownApp
+    request: TownRequest
+
+
+class TicketInvoiceCollectionLayout(
+    OrgTicketInvoiceCollectionLayout,
+    DefaultLayout
+):
 
     app: TownApp
     request: TownRequest
@@ -1024,3 +1059,678 @@ class ArchivedChatsLayout(DefaultLayout):
             )
 
         return bc
+
+
+class MeetingCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Meetings')
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(self.title, self.request.link(self.model)),
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Meeting'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-meeting'},
+                        ),
+                    ],
+                ),
+            ]
+        return None
+
+
+class MeetingLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self) -> MeetingCollection:
+        return MeetingCollection(self.request.session)
+
+    @cached_property
+    def title(self) -> str:
+        return self.model.title
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(_('Meetings'), self.request.class_link(MeetingCollection)),
+            Link(self.title, self.request.link(self.model)),
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'},
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(self.request.link(self.model)),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to delete this meeting?'
+                            ),
+                            _('This cannot be undone.'),
+                            _('Delete meeting'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(
+                                self.collection
+                            )
+                        )
+                    )
+                ),
+                Link(
+                    text=_('Export'),
+                    url=self.request.link(self.model, name='+export'),
+                    attrs={'class': 'export-link'}
+                )
+            ]
+        return None
+
+
+class RISParliamentarianCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Parliamentarians')
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Parliamentarian'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-parliamentarian'},
+                        ),
+                    ],
+                ),
+            ]
+        return None
+
+
+class RISParliamentarianLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self) -> RISParliamentarianCollection:
+        return RISParliamentarianCollection(self.request.session)
+
+    @cached_property
+    def title(self) -> str:
+        return f'{self.model.first_name} {self.model.last_name}'
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(
+                _('Parliamentarians'),
+                self.request.link(self.collection)
+            ),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to delete this '
+                                'parliamentarian?'
+                            ),
+                            _('This cannot be undone.'),
+                            _('Delete parliamentarian'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(
+                                self.collection
+                            )
+                        )
+                    )
+                ),
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('New parliamentary group function'),
+                            url=self.request.link(
+                                self.model, 'new-role'),
+                            # change to `new-group-role`
+                            attrs={'class': 'new-role'}
+                        ),
+                        Link(
+                            text=_('New commission function'),
+                            url=self.request.link(
+                                self.model, 'new-commission-role'),
+                            attrs={'class': 'new-commission-role'}
+                        )
+                    ],
+                ),
+            ]
+        return None
+
+
+class RISParliamentarianRoleLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return self.model.role_label
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def parliamentarian_collection(self) -> RISParliamentarianCollection:
+        return RISParliamentarianCollection(self.request.session)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(
+                _('Parliamentarians'),
+                self.request.link(self.parliamentarian_collection)
+            ),
+            Link(
+                self.model.parliamentarian.title,
+                self.request.link(self.model.parliamentarian)
+            ),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Remove'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _('Do you really want to remove this role?'),
+                            _('This cannot be undone.'),
+                            _('Remove role'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(
+                                self.model.parliamentarian
+                            )
+                        )
+                    )
+                )
+            ]
+        return None
+
+
+class RISParliamentaryGroupCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Parliamentary groups')
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Parliamentary group'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-parliamentary-group'}
+                        ),
+                    ]
+                ),
+            ]
+        return None
+
+
+class RISParliamentaryGroupLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self) -> RISParliamentaryGroupCollection:
+        return RISParliamentaryGroupCollection(self.request.session)
+
+    @cached_property
+    def title(self) -> str:
+        return self.model.name
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(
+                _('Parliamentary groups'),
+                self.request.link(self.collection)
+            ),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to delete this '
+                                'parliamentary group?'
+                            ),
+                            _('This cannot be undone.'),
+                            _('Delete parliamentary group'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(
+                                self.collection
+                            )
+                        )
+                    )
+                )
+            ]
+        return None
+
+
+class RISPartyCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Parties')
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(self.title, self.request.link(self.model)),
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Political Party'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-party'},
+                        ),
+                    ],
+                ),
+            ]
+        return None
+
+
+class RISCommissionCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Commissions')
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Commission'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-commission'}
+                        ),
+                    ]
+                ),
+            ]
+        return None
+
+
+class RISCommissionLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self) -> RISCommissionCollection:
+        return RISCommissionCollection(self.request.session)
+
+    @cached_property
+    def title(self) -> str:
+        return self.model.name
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(_('Commissions'),
+                 self.request.class_link(RISCommissionCollection)),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _('Do you really want to delete this commission?'),
+                            _('This cannot be undone.'),
+                            _('Delete commission'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(RISCommissionCollection)
+                        )
+                    )
+                )
+            ]
+        return None
+
+
+class PoliticalBusinessCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return _('Political Businesses')
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Political Business'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-political-business'}
+                        ),
+                    ]
+                ),
+            ]
+        return None
+
+
+class PoliticalBusinessLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self) -> PoliticalBusinessCollection:
+        return PoliticalBusinessCollection(self.request.session)
+
+    @cached_property
+    def title(self) -> str:
+        return self.model.title
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(_('Political Businesses'),
+                 self.request.class_link(PoliticalBusinessCollection)),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _('Do you really want to delete this '
+                              'political business?'),
+                            _('This cannot be undone.'),
+                            _('Delete political business'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(
+                              PoliticalBusinessCollection)
+                        )
+                    )
+                )
+            ]
+        return None
+
+
+class RISCommissionMembershipLayout(DefaultLayout):
+
+    @cached_property
+    def title(self) -> str:
+        return self.model.parliamentarian.title
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def commission_collection(self) -> RISCommissionCollection:
+        return RISCommissionCollection(self.request.session)
+
+    @cached_property
+    def parliamentarian_collection(self) -> RISParliamentarianCollection:
+        return RISParliamentarianCollection(self.request.session)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS settings'), self.ris_overview_url),
+
+            Link(
+                _('Parliamentarians'),
+                self.request.link(self.parliamentarian_collection)
+            ),
+            Link(
+                self.model.parliamentarian.title,
+                self.request.link(self.model.parliamentarian)
+            ),
+            Link(
+                _('Commission membership'),
+                self.request.link(self.model)
+            )
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Remove'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to remove this '
+                                'commission membership?'
+                            ),
+                            _('This cannot be undone.'),
+                            _('Remove commission membership'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(
+                                self.model.commission
+                            )
+                        )
+                    )
+                )
+            ]
+        return None

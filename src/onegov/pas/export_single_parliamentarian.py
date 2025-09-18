@@ -1,25 +1,27 @@
 from __future__ import annotations
 
-from onegov.pas.calculate_pay import calculate_rate
 from dataclasses import dataclass
-from typing import cast
+from decimal import Decimal
+from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import (
     AttendenceCollection,
 )
 from onegov.pas.custom import get_current_rate_set
-from decimal import Decimal
+from onegov.pas.models.attendence import Attendence
+from onegov.pas.models.attendence import TYPES
+from onegov.core.utils import module_path
+from onegov.pas.utils import format_swiss_number, is_commission_president
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration,
 )
-from onegov.pas.models.attendence import TYPES, Attendence
 from datetime import date  # noqa: TC003
-from onegov.pas.utils import format_swiss_number
 
 
 from typing import TYPE_CHECKING, Literal, TypedDict
 if TYPE_CHECKING:
-    from onegov.pas.models import Parliamentarian, RateSet
+    from datetime import date
+    from onegov.pas.models import PASParliamentarian, RateSet
     from onegov.pas.models.settlement_run import SettlementRun
 
 
@@ -52,115 +54,21 @@ if TYPE_CHECKING:
 def generate_parliamentarian_settlement_pdf(
     settlement_run: SettlementRun,
     request: TownRequest,
-    parliamentarian: Parliamentarian,
+    parliamentarian: PASParliamentarian,
 ) -> bytes:
     """Generate PDF for parliamentarian settlement data."""
     font_config = FontConfiguration()
     session = request.session
-
     rate_set = get_current_rate_set(session, settlement_run)
     cola_multiplier = Decimal(
         str(1 + (rate_set.cost_of_living_adjustment / 100))
     )
-
     quarter = settlement_run.get_run_number_for_year(settlement_run.end)
-    css = CSS(
-        string="""
-@page {
-    size: A4;
-    margin: 2.5cm 0.75cm 2cm 0.75cm;  /* top right bottom left */
-    @top-right {
-        content: "Staatskanzlei";
-        font-family: Helvetica, Arial, sans-serif;
-        font-size: 8pt;
-    }
-}
-
-body {
-    font-family: Helvetica, Arial, sans-serif;
-    font-size: 7pt;
-    line-height: 1.0;
-}
-
-.first-line {
-    font-size: 7pt;
-    text-decoration: underline;
-    margin-left: 1.0cm;
-    margin-bottom: 0.2cm;
-}
-
-.address {
-    margin-left: 1.0cm;
-    margin-bottom: 0.5cm;
-    font-size: 8pt;
-    line-height: 1.4;
-}
-
-.date {
-    margin-left: 1.0cm;
-    margin-bottom: 2cm;
-    font-size: 8pt;
-}
-
-table {
-    border-collapse: collapse;
-    width: 100%;
-    table-layout: auto;
-    white-space: nowrap;
-}
-
-.col-types {
-    background-color: #d5d7d9;
-}
-
-.header-row td {
-    background-color: #d5d7d9;
-    font-weight: bold;
-}
-
-*/ Makes the text sit on the line of the cell.
-Workaround for `vertical-align` not working. */
-table td th {
-    padding-top: 7pt;
-    padding-bottom: 1pt;
-}
-
-th, td {
-    padding: 2pt;
-    border: 1pt solid #000;
-}
-
-/* Column widths for main table */
-.first-table td:first-child { width: 20%; }
-.first-table td:nth-child(2) { width: 50%; } /* Type  */
-.first-table td:nth-child(3) { width: 15%; }  /* Value column */
-.first-table td:last-child { width: 15%; }    /* CHF column */
-
-.parliamentarian-summary-table td:first-child { width: 70%; }
-.parliamentarian-summary-table td:nth-child(2) { width: 15%; }
-.parliamentarian-summary-table td:last-child { width: 15%; }
-
-.numeric { text-align: right; }
-
-.first-table tr:nth-child(2) td {
-    background-color: #d5d7d9;
-}
-
-.first-table tr:nth-child(even):not(.total-row) td {
-    background-color: #f3f3f3;
-}
-
-.parliamentarian-summary-table {
-    page-break-inside: avoid;
-    margin-top: 1cm;
-}
-
-.parliamentarian-summary-table td {
-    font-weight: bold;
-    background-color: #d5d7d9;
-}
-    """
+    css_path = module_path(
+        'onegov.pas', 'views/templates/parliamentarian_settlement_pdf.css'
     )
+    with open(css_path) as f:
+        css = CSS(string=f.read())
 
     data = _get_parliamentarian_settlement_data(
         settlement_run, request, parliamentarian, rate_set
@@ -201,12 +109,11 @@ th, td {
     """
 
     type_totals: dict[TotalType, TypeTotal] = {
-        cast('TotalType', 'plenary'): {'entries': [], 'total': Decimal('0')},
-        cast('TotalType', 'commission'): {'entries': [],
-                                          'total': Decimal('0')},
-        cast('TotalType', 'study'): {'entries': [], 'total': Decimal('0')},
-        cast('TotalType', 'shortest'): {'entries': [], 'total': Decimal('0')},
-        cast('TotalType', 'expenses'): {'entries': [], 'total': Decimal('0')},
+        'plenary': {'entries': [], 'total': Decimal('0')},
+        'commission': {'entries': [], 'total': Decimal('0')},
+        'study': {'entries': [], 'total': Decimal('0')},
+        'shortest': {'entries': [], 'total': Decimal('0')},
+        'expenses': {'entries': [], 'total': Decimal('0')},
     }
 
     for entry in data['entries']:
@@ -234,17 +141,21 @@ th, td {
     # Now, start building the second part of the report document. Notice that
     # this one now is *with* cost of living adjustment.
     total = Decimal('0')
-    type_mappings = [
+    total = Decimal('0')
+    cola_multiplier = Decimal(
+        str(1 + (rate_set.cost_of_living_adjustment / 100))
+    )
+    type_mappings: list[tuple[str, TotalType]] = [
         ('Total aller Plenarsitzungen inkl. Teuerungszulage',
-         cast('TotalType', 'plenary')),
+         'plenary'),
         ('Total aller Kommissionssitzungen inkl. Teuerungszulage',
-         cast('TotalType', 'commission')),
+         'commission'),
         ('Total aller Aktenstudium inkl. Teuerungszulage',
-         cast('TotalType', 'study')),
+         'study'),
         ('Total aller Kürzestsitzungen inkl. Teuerungszulage',
-         cast('TotalType', 'shortest')),
+         'shortest'),
         ('Total Spesen inkl. Teuerungszulage',
-         cast('TotalType', 'expenses')),
+         'expenses'),
     ]
     for type_name, type_key in type_mappings:
         total_value = sum(
@@ -284,7 +195,7 @@ th, td {
 def _get_parliamentarian_settlement_data(
     settlement_run: SettlementRun,
     request: TownRequest,
-    parliamentarian: Parliamentarian,
+    parliamentarian: PASParliamentarian,
     rate_set: RateSet,
 ) -> dict[str, list[ParliamentarianEntry]]:
     """Get settlement data for a specific parliamentarian."""
@@ -302,8 +213,8 @@ def _get_parliamentarian_settlement_data(
 
     result = []
     for attendence in attendences:
-        is_president = any(
-            r.role == 'president' for r in parliamentarian.roles
+        is_president = is_commission_president(
+            parliamentarian, attendence, settlement_run
         )
         base_rate = calculate_rate(
             rate_set=rate_set,

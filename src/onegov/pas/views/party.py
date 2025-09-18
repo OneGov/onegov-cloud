@@ -22,13 +22,10 @@ if TYPE_CHECKING:
     template='parties.pt',
     permission=Private
 )
-def view_parties(
+def pas_view_parties(
     self: PartyCollection,
     request: TownRequest
 ) -> RenderData:
-
-    layout = PartyCollectionLayout(self, request)
-
     filters = {}
     filters['active'] = [
         Link(
@@ -41,6 +38,7 @@ def view_parties(
         )
     ]
 
+    layout = PartyCollectionLayout(self, request)
     return {
         'add_link': request.link(self, name='new'),
         'filters': filters,
@@ -57,12 +55,11 @@ def view_parties(
     permission=Private,
     form=PartyForm
 )
-def add_party(
+def pas_add_party(
     self: PartyCollection,
     request: TownRequest,
     form: PartyForm
 ) -> RenderData | Response:
-
     if form.submitted(request):
         party = self.add(**form.get_useful_data())
         request.success(_('Added a new party'))
@@ -86,13 +83,12 @@ def add_party(
     template='party.pt',
     permission=Private
 )
-def view_party(
+def pas_view_party(
     self: Party,
     request: TownRequest
 ) -> RenderData:
 
     layout = PartyLayout(self, request)
-
     return {
         'layout': layout,
         'party': self,
@@ -105,9 +101,10 @@ def view_party(
     name='edit',
     template='form.pt',
     permission=Private,
-    form=PartyForm
+    form=PartyForm,
+    pass_model=True
 )
-def edit_party(
+def pas_edit_party(
     self: Party,
     request: TownRequest,
     form: PartyForm
@@ -117,8 +114,6 @@ def edit_party(
         form.populate_obj(self)
         request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
-
-    form.process(obj=self)
 
     layout = PartyLayout(self, request)
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
@@ -138,12 +133,10 @@ def edit_party(
     request_method='DELETE',
     permission=Private
 )
-def delete_party(
+def pas_delete_party(
     self: Party,
     request: TownRequest
 ) -> None:
-
-    request.assert_valid_csrf_token()
 
     collection = PartyCollection(request.session)
     collection.delete(self)

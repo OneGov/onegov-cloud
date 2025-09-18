@@ -8,6 +8,8 @@ from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import ChangeCollection
 from onegov.user import Auth
 from onegov.pas.models import SettlementRun, RateSet
+from sqlalchemy.orm.exc import MultipleResultsFound
+
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -37,30 +39,56 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
 
         # Management Dropdown
         if request.is_admin:
+
+            session = request.session
+            management_links: list[Link] = []
+            try:
+                current_run = get_current_settlement_run(session)
+                if current_run:
+                    management_links.append(
+                        Link(
+                            _('Current Settlement Run'),
+                            request.link(current_run),
+                            attrs={'class': 'settlement-run'}
+                        )
+                    )
+            except MultipleResultsFound:
+                # If multiple active runs exist (should not happen), but
+                # just to # be safe
+                pass
+
+            management_links.extend((
+                Link(
+                    _('Attendences'),
+                    request.class_link(AttendenceCollection),
+                    attrs={'class': 'attendances'}
+                ),
+                Link(
+                    _('Changes'),
+                    request.class_link(ChangeCollection),
+                    attrs={'class': 'changes'}
+                ),
+                Link(
+                    _('PAS settings'),
+                    request.link(request.app.org, 'pas-settings'),
+                    attrs={'class': 'pas-settings'}
+                ),
+                Link(
+                    _('Files'),
+                    request.link(request.app.org, 'files'),
+                    attrs={'class': 'files'}
+                ),
+                Link(
+                    _('More settings'),
+                    request.link(request.app.org, 'settings'),
+                    attrs={'class': 'settings'}
+                ),
+            ))
+
             yield LinkGroup(
-                _('Management'), classes=('management',),
-                links=(
-                    Link(
-                        _('Attendences'),
-                        request.class_link(AttendenceCollection),
-                        attrs={'class': 'attendences'}
-                    ),
-                    Link(
-                        _('Changes'),
-                        request.class_link(ChangeCollection),
-                        attrs={'class': 'changes'}
-                    ),
-                    Link(
-                        _('PAS settings'),
-                        request.link(request.app.org, 'pas-settings'),
-                        attrs={'class': 'pas-settings'}
-                    ),
-                    Link(
-                        _('More settings'),
-                        request.link(request.app.org, 'settings'),
-                        attrs={'class': 'settings'}
-                    ),
-                )
+                _('Management'),
+                classes=('management',),
+                links=tuple(management_links)
             )
 
 
@@ -68,10 +96,10 @@ def get_top_navigation(request: TownRequest) -> list[Link]:
     return []
 
 
-def get_current_settlement_run(session: Session) -> SettlementRun:
+def get_current_settlement_run(session: Session) -> SettlementRun | None:
     query = session.query(SettlementRun)
     query = query.filter(SettlementRun.active == True)
-    return query.one()
+    return query.first()
 
 
 def get_current_rate_set(session: Session, run: SettlementRun) -> RateSet:

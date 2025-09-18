@@ -33,8 +33,9 @@ if TYPE_CHECKING:
         | ColumnElement[Markup | None]
     )
 
-
-_N = TypeVar('_N', bound=OfficialNotice)
+    _N = TypeVar('_N', bound=OfficialNotice, default=OfficialNotice)
+else:
+    _N = TypeVar('_N', bound=OfficialNotice)
 
 
 def get_unique_notice_name(

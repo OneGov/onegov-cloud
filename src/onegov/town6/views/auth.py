@@ -3,12 +3,14 @@ from __future__ import annotations
 
 from onegov.core.security import Public
 from onegov.org.auth import MTANAuth
+from onegov.org.forms import CitizenLoginForm, ConfirmCitizenLoginForm
 from onegov.org.forms import PublicMTANForm, PublicRequestMTANForm
 from onegov.org.views.auth import (
     handle_login, handle_registration, handle_password_reset,
     handle_password_reset_request, handle_mtan_second_factor,
     handle_mtan_second_factor_setup, handle_request_mtan,
-    handle_authenticate_mtan, handle_totp_second_factor
+    handle_authenticate_mtan, handle_totp_second_factor,
+    handle_citizen_login, handle_confirm_citizen_login
 )
 from onegov.town6 import TownApp
 from onegov.town6.layout import DefaultLayout
@@ -190,6 +192,46 @@ def town_handle_authenticate_mtan(
     form: PublicMTANForm
 ) -> RenderData | Response:
     return handle_authenticate_mtan(
+        self,
+        request,
+        form,
+        DefaultLayout(self, request)
+    )
+
+
+@TownApp.form(
+    model=Auth,
+    name='citizen-login',
+    template='form.pt',
+    permission=Public,
+    form=CitizenLoginForm
+)
+def town_handle_citizen_login(
+    self: Auth,
+    request: TownRequest,
+    form: CitizenLoginForm
+) -> RenderData | Response:
+    return handle_citizen_login(
+        self,
+        request,
+        form,
+        DefaultLayout(self, request)
+    )
+
+
+@TownApp.form(
+    model=Auth,
+    name='confirm-citizen-login',
+    template='form.pt',
+    permission=Public,
+    form=ConfirmCitizenLoginForm
+)
+def town_handle_confirm_citizen_login(
+    self: Auth,
+    request: TownRequest,
+    form: ConfirmCitizenLoginForm
+) -> RenderData | Response:
+    return handle_confirm_citizen_login(
         self,
         request,
         form,

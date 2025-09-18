@@ -1,4 +1,7 @@
 from __future__ import annotations
+from datetime import datetime
+
+import pytz
 
 from onegov.form.fields import TagsField
 from onegov.form.fields import TimeField
@@ -8,10 +11,11 @@ from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.layouts import DefaultLayout
-from onegov.landsgemeinde.models import AgendaItem
+from onegov.landsgemeinde.models import AgendaItem, LandsgemeindeFile
 from onegov.landsgemeinde.models.agenda import STATES
 from onegov.landsgemeinde.utils import timestamp_to_seconds
 from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.fields import UploadMultipleFilesWithORMSupport
 from sqlalchemy import func
 from wtforms.fields import BooleanField
 from wtforms.fields import IntegerField
@@ -80,6 +84,12 @@ class AgendaItemForm(NamedFileForm):
             NumberRange(min=1),
             Optional()
         ],
+    )
+
+    more_files = UploadMultipleFilesWithORMSupport(
+        label=_('Additional documents'),
+        fieldset=_('Documents'),
+        file_class=LandsgemeindeFile,
     )
 
     start_time = TimeField(
@@ -163,7 +173,6 @@ class AgendaItemForm(NamedFileForm):
         self.request.include('redactor')
         self.request.include('editor')
         self.request.include('tags-input')
-        self.request.include('start_time')
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         data = super().get_useful_data(exclude={'calculated_timestamp'})
@@ -189,3 +198,7 @@ class AgendaItemForm(NamedFileForm):
 
     def populate_obj(self, obj: AgendaItem) -> None:  # type:ignore[override]
         super().populate_obj(obj, exclude={'calculated_timestamp'})
+        if not obj.start_time and self.state.data == 'ongoing':
+            tz = pytz.timezone('Europe/Zurich')
+            now = datetime.now(tz=tz).time()
+            obj.start_time = now

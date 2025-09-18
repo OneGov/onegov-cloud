@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 from onegov.form import Form, merge_forms, move_fields
 from onegov.form.fields import HoneyPotField, TimeField
@@ -10,8 +12,11 @@ from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 
 
-class DummyPostData(dict):
-    def getlist(self, key):
+from typing import Any
+
+
+class DummyPostData(dict[str, Any]):
+    def getlist(self, key: str) -> list[Any]:
         v = self[key]
         if not isinstance(v, (list, tuple)):
             v = [v]
@@ -19,33 +24,33 @@ class DummyPostData(dict):
 
 
 class DummyRequest:
-    def __init__(self, POST):
+    def __init__(self, POST: dict[str, Any]) -> None:
         self.POST = DummyPostData(POST)
 
 
 class DummyField:
-    def __init__(self, id, name, value):
+    def __init__(self, id: str, name: str, value: str) -> None:
         self.id = id
         self.name = name
         self.value = value
 
-    def _value(self):
+    def _value(self) -> str:
         return self.value
 
 
-def test_submitted():
+def test_submitted() -> None:
 
     class TestForm(Form):
         test = StringField("Test", [DataRequired()])
 
-    request = DummyRequest({})
+    request: Any = DummyRequest({})
     assert not TestForm(request.POST).submitted(request)
 
     request = DummyRequest({'test': 'Test'})
     assert TestForm(request.POST).submitted(request)
 
 
-def test_useful_data():
+def test_useful_data() -> None:
 
     class TestForm(Form):
         a = StringField("a")
@@ -53,12 +58,13 @@ def test_useful_data():
         c = StringField("c")
         d = HoneyPotField()
 
-    request = DummyRequest({'a': 'A', 'b': 'B', 'c': 'C', 'd': 'D'})
-    assert TestForm(request.POST).get_useful_data(exclude={'a', 'b'}) \
-        == {'c': 'C'}
+    request: Any = DummyRequest({'a': 'A', 'b': 'B', 'c': 'C', 'd': 'D'})
+    assert TestForm(request.POST).get_useful_data(
+        exclude={'a', 'b'}
+    ) == {'c': 'C'}
 
 
-def test_match_fields():
+def test_match_fields() -> None:
 
     class TestForm(Form):
         name = StringField("Name", [DataRequired()])
@@ -77,7 +83,7 @@ def test_match_fields():
         == ['name', 'email']
 
 
-def test_dependent_field():
+def test_dependent_field() -> None:
 
     class TestForm(Form):
         switch = RadioField(
@@ -94,7 +100,7 @@ def test_dependent_field():
             depends_on=('switch', 'on')
         )
 
-    request = DummyRequest({'switch': 'off'})
+    request: Any = DummyRequest({'switch': 'off'})
     form = TestForm(request.POST)
     assert form.validate()
 
@@ -131,7 +137,7 @@ def test_dependent_field():
     assert form.validate()
 
 
-def test_dependent_field_inverted():
+def test_dependent_field_inverted() -> None:
 
     class TestForm(Form):
         switch = RadioField(
@@ -148,7 +154,7 @@ def test_dependent_field_inverted():
             depends_on=('switch', '!off')
         )
 
-    request = DummyRequest({'switch': 'off'})
+    request: Any = DummyRequest({'switch': 'off'})
     form = TestForm(request.POST)
     assert form.validate()
 
@@ -185,7 +191,7 @@ def test_dependent_field_inverted():
     assert form.validate()
 
 
-def test_dependent_field_multiple():
+def test_dependent_field_multiple() -> None:
 
     class TestForm(Form):
         switch_1 = RadioField(
@@ -211,7 +217,7 @@ def test_dependent_field_multiple():
         )
 
     # optional not present
-    request = DummyRequest({'switch_1': 'on', 'switch_2': 'on'})
+    request: Any = DummyRequest({'switch_1': 'on', 'switch_2': 'on'})
     form = TestForm(request.POST)
     assert form.validate()
     request = DummyRequest({'switch_1': 'off', 'switch_2': 'off'})
@@ -282,13 +288,13 @@ def test_dependent_field_multiple():
     assert form.validate()
 
 
-def test_merge_forms():
+def test_merge_forms() -> None:
 
     class Name(Form):
         form = 'Name'
         name = StringField("Name")
 
-        def is_valid_name(self):
+        def is_valid_name(self) -> bool:
             return True
 
     class Location(Form):
@@ -296,17 +302,17 @@ def test_merge_forms():
         lat = StringField("Lat")
         lon = StringField("Lat")
 
-        def is_valid_coordinate(self):
+        def is_valid_coordinate(self) -> bool:
             return True
 
     class User(Form):
         form = 'User'
         name = StringField("User")
 
-        def is_valid_user(self):
+        def is_valid_user(self) -> bool:
             return True
 
-    full = merge_forms(Name, Location, User)()
+    full: Any = merge_forms(Name, Location, User)()
     assert list(full._fields.keys()) == ['name', 'lat', 'lon']
     assert full.name.label.text == "Name"
     assert full.form == 'Name'
@@ -331,7 +337,7 @@ def test_merge_forms():
     assert full.is_valid_user()
 
 
-def test_move_fields():
+def test_move_fields() -> None:
 
     class Test(Form):
         a = StringField('a')
@@ -344,7 +350,7 @@ def test_move_fields():
     assert list(Moved()._fields.keys()) == ['b', 'c', 'a']
 
 
-def test_delete_fields():
+def test_delete_fields() -> None:
 
     class Test(Form):
         a = StringField('a', fieldset='Letters')
@@ -360,19 +366,19 @@ def test_delete_fields():
     form.delete_field('one')
 
     assert form.a.name == 'a'
-    assert form.one is None
+    assert 'one' not in form
     assert form.two.name == 'two'
     assert len(form.fieldsets) == 2
 
     form.delete_field('two')
 
     assert form.a.name == 'a'
-    assert form.one is None
-    assert form.two is None
+    assert 'one' not in form
+    assert 'two' not in form
     assert len(form.fieldsets) == 1
 
 
-def test_ensurances():
+def test_ensurances() -> None:
 
     class EnsuredForm(Form):
         foo = StringField('foo')
@@ -382,20 +388,22 @@ def test_ensurances():
         ensure_foo_or_bar_called = 0
 
         @property
-        def ensure_not_triggered(self):
+        def ensure_not_triggered(self) -> bool | None:
             raise AssertionError()
 
-        def ensure_foo_and_bar(self):
+        def ensure_foo_and_bar(self) -> bool | None:
             self.ensure_foo_and_bar_called += 1
 
             if not (self.foo.data and self.bar.data):
                 return False
+            return None
 
-        def ensure_foo_or_bar(self):
+        def ensure_foo_or_bar(self) -> bool | None:
             self.ensure_foo_or_bar_called += 1
 
             if not (self.foo.data or self.bar.data):
                 return False
+            return None
 
     form = EnsuredForm()
 
@@ -412,7 +420,7 @@ def test_ensurances():
     assert form.ensure_foo_or_bar_called == 2
 
 
-def test_pricing():
+def test_pricing() -> None:
 
     class TestForm(Form):
         ticket_insurance = RadioField('Option', choices=[
@@ -426,7 +434,7 @@ def test_pricing():
             'FOO': (-5.0, 'CHF')
         })
 
-    def post(data):
+    def post(data: dict[str, Any]) -> Any:
         return DummyRequest(data).POST
 
     form = TestForm(post({}))
@@ -457,7 +465,7 @@ def test_pricing():
     ]
 
 
-def test_dependent_pricing():
+def test_dependent_pricing() -> None:
 
     class TestForm(Form):
 
@@ -476,7 +484,7 @@ def test_dependent_pricing():
             'give_donation', 'yes'
         ))
 
-    def post(data):
+    def post(data: dict[str, Any]) -> Any:
         return DummyRequest(data).POST
 
     form = TestForm(post({'give_donation': 'yes', 'donation': 'small'}))
@@ -500,7 +508,7 @@ def test_dependent_pricing():
     assert form.prices() == []
 
 
-def test_nested_dependent_pricing():
+def test_nested_dependent_pricing() -> None:
 
     class TestForm(Form):
 
@@ -524,7 +532,7 @@ def test_nested_dependent_pricing():
             'really_give', 'yes'
         ))
 
-    def post(data):
+    def post(data: dict[str, Any]) -> Any:
         return DummyRequest(data).POST
 
     assert TestForm(post({
@@ -546,7 +554,7 @@ def test_nested_dependent_pricing():
     })).total() == Price(Decimal(10.0), 'CHF')
 
 
-def test_clone_form():
+def test_clone_form() -> None:
 
     class FooForm(Form):
         base = StringField('123')

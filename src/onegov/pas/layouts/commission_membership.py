@@ -5,11 +5,11 @@ from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.pas import _
-from onegov.pas.collections import CommissionCollection
+from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.layouts.default import DefaultLayout
 
 
-class CommissionMembershipLayout(DefaultLayout):
+class PASCommissionMembershipLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
@@ -20,8 +20,8 @@ class CommissionMembershipLayout(DefaultLayout):
         return self.request.translate(self.title)
 
     @cached_property
-    def commission_collection(self) -> CommissionCollection:
-        return CommissionCollection(self.request.session)
+    def commission_collection(self) -> PASCommissionCollection:
+        return PASCommissionCollection(self.request.session)
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:

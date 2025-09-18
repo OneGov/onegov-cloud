@@ -746,7 +746,8 @@ class TypeMappingRegistry:
         As a consequence, a change in the mapping requires a reindex.
 
         """
-        assert type_name not in self.mappings
+        assert type_name not in self.mappings, \
+            f"Type '{type_name}' already registered"
         self.mappings[type_name] = TypeMapping(type_name, mapping, model)
 
     @property

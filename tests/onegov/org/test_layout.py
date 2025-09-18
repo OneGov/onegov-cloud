@@ -27,7 +27,7 @@ class MockRequest:
     app = Bunch(
         org=Bunch(
             geo_provider='geo-mapbox',
-            open_files_target_blank=True
+            open_files_target_blank=True,
         ),
         version='1.0',
         sentry_dsn=None
@@ -173,6 +173,7 @@ def test_template_layout(postgres_dsn, redis_url):
         org.open_files_target_blank = True
         org.header_options = header_options
         org.analytics_code = None
+        org.citizen_login_enabled = False
 
         # disable LibresIntegration for this test
         def configure_libres(self, **cfg):

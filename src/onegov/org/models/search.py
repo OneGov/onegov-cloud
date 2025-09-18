@@ -104,6 +104,8 @@ class Search(Pagination[_M]):
         future_events = []
         others = []
 
+        # FIXME: this event sorting happens on batch level instead of all
+        # search results.
         for search_result in batch:
             if isinstance(search_result, Event):
                 future_events.append(search_result)

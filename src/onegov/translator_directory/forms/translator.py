@@ -7,7 +7,8 @@ from functools import cached_property
 
 from onegov.form import Form
 from onegov.form.fields import (
-    ChosenSelectMultipleField, ChosenSelectField, PlaceAutocompleteField
+    ChosenSelectField, ChosenSelectMultipleField,
+    PlaceAutocompleteField,
 )
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TagsField

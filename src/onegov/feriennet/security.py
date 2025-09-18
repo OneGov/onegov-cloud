@@ -11,7 +11,8 @@ from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.const import VISIBLE_ACTIVITY_STATES
 from onegov.feriennet.const import OWNER_EDITABLE_STATES
 from onegov.feriennet.models import NotificationTemplate
-from onegov.org.models import ImageFileCollection, SiteCollection
+from onegov.org.models import ImageFileCollection, SiteCollection, TicketNote
+from onegov.ticket import Ticket
 
 
 from typing import Any, TYPE_CHECKING
@@ -255,3 +256,21 @@ def has_private_permission_occasion_attendee_collection(
         return True
 
     return local_has_permission_logged_in(app, identity, model, permission)
+
+
+@FeriennetApp.permission_rule(model=Ticket, permission=Personal)
+@FeriennetApp.permission_rule(model=TicketNote, permission=Personal)
+def restrict_personal_ticket_views(
+    app: FeriennetApp,
+    identity: Identity,
+    model: Ticket | TicketNote,
+    permission: type[Personal]
+) -> bool:
+    """
+    Ensure that only managers may view ticket details.
+
+    Since members in feriennet are customers which shouldn't be able to
+    view other customer's private information.
+    """
+
+    return identity.role in ('admin', 'editor')

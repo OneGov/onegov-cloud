@@ -71,6 +71,7 @@ class SharedMethods:
 
     lead: dict_property[str | None] = meta_property()
     text = dict_markup_property('content')
+    confirmation_text = dict_markup_property('content')
     occupancy_is_visible_to_members: dict_property[bool | None]
     occupancy_is_visible_to_members = meta_property()
 
@@ -105,11 +106,19 @@ class SharedMethods:
         else:
             date = sedate.to_timezone(sedate.utcnow(), self.timezone)
 
-        if self.view == 'month':
+        if self.view in ('multiMonthYear', 'listYear'):
+            return sedate.replace_timezone(
+                datetime(date.year, 1, 1),
+                self.timezone
+            ), sedate.replace_timezone(
+                datetime(date.year, 12, 31, 23, 59, 59, 999999),
+                self.timezone
+            )
+        elif self.view in ('dayGridMonth', 'listMonth'):
             return sedate.align_range_to_month(date, date, self.timezone)
-        elif self.view == 'agendaWeek':
+        elif self.view in ('timeGridWeek', 'listWeek'):
             return sedate.align_range_to_week(date, date, self.timezone)
-        elif self.view == 'agendaDay':
+        elif self.view in ('timeGridDay', 'listDay'):
             return sedate.align_range_to_day(date, date, self.timezone)
         else:
             raise NotImplementedError()
@@ -160,7 +169,7 @@ class SharedMethods:
         if with_data:
             res = res.options(undefer(Reservation.data))
 
-        return res  # type:ignore[return-value]
+        return res
 
     def bound_session_id(self, request: OrgRequest) -> uuid.UUID:
         """ The session id associated with this resource and user. """
@@ -194,7 +203,7 @@ class SharedMethods:
         if exclude_pending:
             query = query.filter(Reservation.data['accepted'] == True)
 
-        return query  # type:ignore[return-value]
+        return query
 
     def reservation_title(self, reservation: Reservation) -> str:
         title = self.title_template.format(
@@ -218,7 +227,7 @@ class DaypassResource(Resource, AccessExtension, SearchableContent,
     es_type_name = 'daypasses'
 
     # the selected view
-    view = 'month'
+    view = 'dayGridMonth'
 
     # show or hide quota numbers in reports
     show_quota = True
@@ -244,7 +253,8 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
     # used to render the reservation title
     title_template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M}'
 
-    kaba_components: dict_property[list[str]] = meta_property(default=list)
+    kaba_components: dict_property[list[tuple[str, str]]]
+    kaba_components = meta_property(default=list)
 
     @property
     def deletable(self) -> bool:
@@ -272,4 +282,5 @@ class ItemResource(Resource, AccessExtension, SearchableContent,
 
     title_template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M} ({quota})'
 
-    kaba_components: dict_property[list[str]] = meta_property(default=list)
+    kaba_components: dict_property[list[tuple[str, str]]]
+    kaba_components = meta_property(default=list)
