@@ -290,3 +290,24 @@ def test_view_iframe_button_on_page(client):
     page = client.get('/news')
     assert ('&lt;iframe src="http://localhost/news" width="100%" height="800" '
             'frameborder="0"&gt;&lt;/iframe&gt;') in page
+
+
+def test_footer_settings_custom_links(client) -> None:
+    client.login_admin()
+
+    # footer settings custom links
+    settings = client.get('/footer-settings')
+    impressum_url = 'https://my.impressum.io'
+    custom_url = 'https://custom.com/1'
+    custom_name = 'Custom1'
+
+    settings.form['impressum_url'] = impressum_url
+    settings.form['custom_link_1_name'] = custom_name
+    settings.form['custom_link_1_url'] = custom_url
+    settings.form['custom_link_2_name'] = 'Custom2'
+    settings.form['custom_link_2_url'] = None
+
+    page = settings.form.submit().follow()
+    assert f'<a href="{impressum_url}">Impressum</a>' in page
+    assert f'<a href="{custom_url}">{custom_name}</a>' in page
+    assert 'Custom2' not in page
