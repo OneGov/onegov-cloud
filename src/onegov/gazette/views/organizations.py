@@ -13,7 +13,7 @@ from onegov.gazette.layout import Layout
 from onegov.gazette.models import Organization
 from onegov.gazette.models import OrganizationMove
 from sedate import utcnow
-from xlsxwriter import Workbook  # type:ignore[import-untyped]
+from xlsxwriter import Workbook
 
 
 from typing import TYPE_CHECKING
@@ -239,8 +239,9 @@ def export_organizations(
     output = BytesIO()
     workbook = Workbook(output)
 
-    worksheet = workbook.add_worksheet()
-    worksheet.name = request.translate(_('Organizations'))
+    worksheet = workbook.add_worksheet(
+        request.translate(_('Organizations'))
+    )
     worksheet.write_row(0, 0, (
         request.translate(_('ID')),
         request.translate(_('Name')),

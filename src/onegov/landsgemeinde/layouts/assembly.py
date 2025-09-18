@@ -42,7 +42,7 @@ class AssemblyCollectionLayout(DefaultLayout):
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_('Assembly'),
+                            text=self.assembly_type,
                             url=self.request.link(self.model, 'new'),
                             attrs={'class': 'new-form'}
                         ),
@@ -76,7 +76,7 @@ class AssemblyLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(
-                _('Archive'),
+                self.assembly_type_plural,
                 self.request.link(self.assembly_collection())
             ),
             Link(self.title, self.request.link(self.model))
@@ -130,7 +130,7 @@ class AssemblyLayout(DefaultLayout):
                             text=_('Agenda item'),
                             url=self.request.link(items, 'new'),
                             attrs={'class': 'check-list-link'}
-                        ),
+                        )
                     ]
                 )
             ]

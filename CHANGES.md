@@ -1,8 +1,80 @@
 # Changes
 
+## 2025.50
+
+`2025-09-16` | [01fda37130...e4fc70350e](https://github.com/OneGov/onegov-cloud/compare/01fda37130^...e4fc70350e)
+
+**Upgrade hints**
+- onegov-org --select /onegov_town6/wil wil-event-tags-to-german-as-we-use-custom-event-tags
+### Core
+
+##### Fixes making ElasticSearch unavailable in all CLI commands
+
+This adds a new context specific setting `skip_es_client` which allows
+skipping initializing ElasticSearch for commands that don't need it.
+
+`Bugfix` | [2b4c28235d](https://github.com/onegov/onegov-cloud/commit/2b4c28235da9c3ec60a69df5f652108bda08ad77)
+
+### Org
+
+##### Xlsxwriter to specify worksheet title on creation call, fixes mypy issues
+
+`Feature` | [NONE](#NONE) | [3a63298f53](https://github.com/onegov/onegov-cloud/commit/3a63298f5327248a639e4855d3158a0696519257)
+
+### Pas
+
+##### Resolve PDF download failures from invalid filenames.
+
+Chromium Content-Disposition header broke
+on filenames with commas.
+
+`Feature` | [OGC-2620](https://linear.app/onegovcloud/issue/OGC-2620) | [74b5f88ba3](https://github.com/onegov/onegov-cloud/commit/74b5f88ba3821f21e86316c1cf44bdbd8422c89b)
+
+##### Bidirectional sync of attendance choices.
+
+`Feature` | [OGC-2607](https://linear.app/onegovcloud/issue/OGC-2607) | [0724604c9d](https://github.com/onegov/onegov-cloud/commit/0724604c9dfb60903a53578537e9346de367292f)
+
+##### Adds the remaining three exports.
+
+`Feature` | [OGC-1878](https://linear.app/onegovcloud/issue/OGC-1878) | [2be81c42f0](https://github.com/onegov/onegov-cloud/commit/2be81c42f09073f945ae98c00cf834a7384d6f79)
+
+##### Add CLI for data import via API.
+
+`Feature` | [OGC-2091](https://linear.app/onegovcloud/issue/OGC-2091) | [ef0df66086](https://github.com/onegov/onegov-cloud/commit/ef0df660868228481e65ef323033b8dd2f8619e3)
+
+##### Allow parliamentarians to mark attendance complete per commission.
+
+We're not closing commissions themselves. We're allowing
+parliamentarians mark their attendance submission
+as closed for a specific commission within a settlement run.
+
+`Feature` | [OGC-2585](https://linear.app/onegovcloud/issue/OGC-2585) | [b5a72f0193](https://github.com/onegov/onegov-cloud/commit/b5a72f0193ff3ee55682688d7d1de488610907cc)
+
+##### Fixes president query.
+
+`Bugfix` | [OGC-2512](https://linear.app/onegovcloud/issue/OGC-2512) | [64a2d5d9b3](https://github.com/onegov/onegov-cloud/commit/64a2d5d9b3a7c388fe04c736551068c358b7c8bb)
+
+### People
+
+##### Fix yaml representation in text field
+
+`Bugfix` | [NONE](#NONE) | [e4fc70350e](https://github.com/onegov/onegov-cloud/commit/e4fc70350e64ac7348ce9bfcba7c7794be5b735a)
+
+### Ris
+
+##### Switch back to round parliamentarian image
+
+`Feature` | [OGC-2635](https://linear.app/onegovcloud/issue/OGC-2635) | [512498b575](https://github.com/onegov/onegov-cloud/commit/512498b57572aa2a6b3f9cfc94d222501b60515e)
+
+### Wil
+
+##### Event import: Switch to event categories from minasa and prevent duplicates in tag list
+
+`Feature` | [OGC-2635](https://linear.app/onegovcloud/issue/OGC-2635) | [94c567a63a](https://github.com/onegov/onegov-cloud/commit/94c567a63af31d4354979df65dcbdb1e2ae11f9b)
+
 ## 2025.49
 
-`2025-09-12` | [5231bc06ae...8340cc5676](https://github.com/OneGov/onegov-cloud/compare/5231bc06ae^...8340cc5676)
+`2025-09-12` | [5231bc06ae...6aa4133c66](https://github.com/OneGov/onegov-cloud/compare/5231bc06ae^...6aa4133c66)
 
 ### Cronjob
 
@@ -2195,78 +2267,4 @@ Also includes a small extension to the existing news/events endpoint
 ##### Makes `at_hash` optional in OpenID Connect provider
 
 `Bugfix` | [OGC-1767](https://linear.app/onegovcloud/issue/OGC-1767) | [5189b63bf7](https://github.com/onegov/onegov-cloud/commit/5189b63bf79c2d8569ae91aade8070f709f8911e)
-
-## 2025.4
-
-`2025-01-31` | [c0942af43d...0c5beb8230](https://github.com/OneGov/onegov-cloud/compare/c0942af43d^...0c5beb8230)
-
-### Api
-
-##### Add documentation
-
-`Feature` | [OGC-2036](https://linear.app/onegovcloud/issue/OGC-2036) | [42524e6d9a](https://github.com/onegov/onegov-cloud/commit/42524e6d9a5f091e0c0bdeb0b8ccf5e55a36916f)
-
-### Directories
-
-##### Only send delayed email notifications for 'public' and 'mtan' access levels.
-
-`Bugfix` | [OGC-2044](https://linear.app/onegovcloud/issue/OGC-2044) | [41b2f79431](https://github.com/onegov/onegov-cloud/commit/41b2f79431f89896b6c3d3baea0b34a0cc1a04ca)
-
-### Feriennet
-
-##### Google Tag Manager
-
-Replace script
-
-`Feature` | [OGC-1353](https://linear.app/onegovcloud/issue/OGC-1353) | [40481da20c](https://github.com/onegov/onegov-cloud/commit/40481da20ca8e140655dbc7cb694ad5562089080)
-
-### Form
-
-##### Add formcode definitions
-
-Add more possible definitions in the form editor to choose from.
-
-`Feature` | [OGC-1942](https://linear.app/onegovcloud/issue/OGC-1942) | [382bcc60b5](https://github.com/onegov/onegov-cloud/commit/382bcc60b5f945b067a2920bb8eacd9b71f0cf87)
-
-### Gis
-
-##### Prevents accidentally changing the zoom on the map.
-
-`Feature` | [OGC-1944](https://linear.app/onegovcloud/issue/OGC-1944) | [a91c91e17b](https://github.com/onegov/onegov-cloud/commit/a91c91e17b51db7b96bd6f959c4db653bfb6b0d4)
-
-### Newsletter
-
-##### Adds option to notify admins if a user unsubscribes from the newsletter subscription list
-
-`Feature` | [OGC-2037](https://linear.app/onegovcloud/issue/OGC-2037) | [08e795f772](https://github.com/onegov/onegov-cloud/commit/08e795f772d3bb0c322fb7e1693bb412c0fcbe88)
-
-### Org
-
-##### Collect inactive email addresses daily and indicate delivery failures for newsletter recipients
-
-`Feature` | [OGC-1896](https://linear.app/onegovcloud/issue/OGC-1896) | [821ff43296](https://github.com/onegov/onegov-cloud/commit/821ff43296c1ab9ce88297a1e17cac3b647252e9)
-
-### Pay
-
-##### Adds Datatrans payment provider
-
-`Feature` | [OGC-2007](https://linear.app/onegovcloud/issue/OGC-2007) | [cdf4acbdd8](https://github.com/onegov/onegov-cloud/commit/cdf4acbdd8fe3a3b15f10929342189be13a743e7)
-
-### Town6
-
-##### Show creation date in imagesets.
-
-`Feature` | [OGC-1901](https://linear.app/onegovcloud/issue/OGC-1901) | [4507af6c4c](https://github.com/onegov/onegov-cloud/commit/4507af6c4ccf8f32fda65be79792e3f9ed369e30)
-
-##### Add text_link in homepage widget markdown file
-
-`Feature` | [cf0b91c727](https://github.com/onegov/onegov-cloud/commit/cf0b91c727bb962297278d089552ecee796002d0)
-
-##### Add option for label text
-
-`Feature` | [OGC-2040](https://linear.app/onegovcloud/issue/OGC-2040) | [e59d03389d](https://github.com/onegov/onegov-cloud/commit/e59d03389dc422d3d91abed86e9e4ee9dbd540aa)
-
-##### Make deleting a link more accessible.
-
-`Bugfix` | [OGC-739](https://linear.app/onegovcloud/issue/OGC-739) | [4d318fc9bf](https://github.com/onegov/onegov-cloud/commit/4d318fc9bf898c38fa34f747fee7698f2bb14a08)
 

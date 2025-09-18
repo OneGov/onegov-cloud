@@ -14,6 +14,10 @@ from onegov.pas.models import (
     RateSet,
     SettlementRun
 )
+from onegov.pas.models.attendence import TYPES
+from onegov.pas.views.pas_excel_export_nr_3_lohnart_fibu import (
+    FIBU_KONTEN_MAPPING
+)
 
 
 @freeze_time('2022-06-06')
@@ -131,3 +135,15 @@ def test_models(session):
     commission.end = date(2022, 5, 5)
     session.flush()
     assert commission_membership.end == date(2022, 5, 5)
+
+
+def test_fibu_konten_mapping_completeness():
+    """Test that FIBU_KONTEN_MAPPING has all keys from TYPES.
+
+    This ensures that if new attendance types are added to TYPES,
+    they must also be mapped in FIBU_KONTEN_MAPPING.
+    """
+    missing_keys = set(TYPES.keys()) - set(FIBU_KONTEN_MAPPING.keys())
+    assert not missing_keys, (
+        f"FIBU_KONTEN_MAPPING is missing keys: {missing_keys}"
+    )

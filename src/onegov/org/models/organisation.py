@@ -270,6 +270,8 @@ class Organisation(Base, TimestampMixin):
     gever_password: dict_property[str | None] = meta_property()
     gever_endpoint: dict_property[str | None] = meta_property()
 
+    assembly_title: dict_property[str | None] = meta_property()
+
     # Kaba settings
     @property
     def kaba_configurations(self) -> list[RawKabaConfiguration]:

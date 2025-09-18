@@ -61,20 +61,22 @@ def add_assembly(
     form: AssemblyForm
 ) -> RenderData | Response:
 
-    if form.submitted(request):
-        assembly = self.add(**form.get_useful_data())
-        request.success(_('Added a new assembly'))
-
-        return redirect(request.link(assembly))
-
     layout = AssemblyCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
     layout.edit_mode = True
 
+    if form.submitted(request):
+        assembly = self.add(**form.get_useful_data())
+        request.success(_('Added a new ${assembly}',
+                          mapping={'assembly': layout.assembly_type}))
+
+        return redirect(request.link(assembly))
+
     return {
         'layout': layout,
-        'title': _('New assembly'),
+        'title': _('New ${assembly}',
+                   mapping={'assembly': layout.assembly_type}),
         'form': form,
     }
 

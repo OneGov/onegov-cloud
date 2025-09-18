@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from io import BytesIO
 from webob import Response
+from onegov.core.utils import module_path
 from decimal import Decimal
 from operator import itemgetter
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
@@ -9,12 +11,12 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
 
 from onegov.core.elements import Link
 from onegov.core.security import Private
+from onegov.core.utils import normalize_for_filename
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import (
     AttendenceCollection,
-    PASCommissionCollection,
     SettlementRunCollection,
 )
 from onegov.pas.custom import get_current_rate_set
@@ -27,6 +29,7 @@ from onegov.pas.layouts import SettlementRunLayout
 from onegov.pas.models import (
     Attendence,
     PASCommission,
+    PASCommissionMembership,
     PASParliamentarian,
     Party,
     SettlementRun,
@@ -35,13 +38,22 @@ from onegov.pas.models.attendence import TYPES
 from onegov.pas.path import SettlementRunExport, SettlementRunAllExport
 from onegov.pas.utils import (
     format_swiss_number,
+    get_commissions_with_memberships,
     get_parliamentarians_with_settlements,
     get_parties_with_settlements,
+    is_commission_president,
 )
+from onegov.pas.views.abschlussliste import (
+    generate_abschlussliste_xlsx,
+    generate_buchungen_abrechnungslauf_xlsx
+)
+from onegov.pas.views.pas_excel_export_nr_3_lohnart_fibu import (
+        generate_fibu_export_rows)
 
 
-from typing import Literal, TypeAlias, TYPE_CHECKING
+from typing import Any, Literal, TypeAlias, TYPE_CHECKING
 if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
     from datetime import date
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
@@ -54,120 +66,122 @@ if TYPE_CHECKING:
     ]
 
 
-PDF_CSS = """
-@page {
-    size: A4;
-    margin: 2.5cm 0.75cm 2cm 0.75cm;  /* top right bottom left */
-    @top-right {
-        content: "Staatskanzlei";
-        font-family: Helvetica, Arial, sans-serif;
-        font-size: 8pt;
-    }
-}
+XLSX_MIMETYPE = (
+'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+)
 
-body {
-    font-family: Helvetica, Arial, sans-serif;
-    font-size: 7pt;
-    line-height: 1.2;
-}
 
-table {
-    border-collapse: collapse;
-    margin-top: 1cm;
-    width: 100%;
-    table-layout: fixed;
-}
-
-/* Journal entries table - updated column widths */
-.journal-table th:nth-child(1), /* Date */
-.journal-table td:nth-child(1) {
-    width: 20pt;
-}
-
-.journal-table th:nth-child(2), /* Personnel Number */
-.journal-table td:nth-child(2) {
-    width: 20pt;
-}
-
-.journal-table th:nth-child(3), /* Person */
-.journal-table td:nth-child(3) {
-    width: 80pt;
-}
-
-.journal-table th:nth-child(4), /* Type */
-.journal-table td:nth-child(4) {
-    width: 170pt;
-}
-
-.journal-table th:nth-child(5), /* Value */
-.journal-table td:nth-child(5),
-.journal-table th:nth-child(6), /* CHF */
-.journal-table td:nth-child(6),
-.journal-table th:nth-child(7), /* CHF + TZ */
-.journal-table td:nth-child(7) {
-    width: 30pt;
-}
-
-/* Party summary table */
-.summary-table th:nth-child(1), /* Name */
-.summary-table td:nth-child(1) {
-    width: 120pt;
-}
-
-.summary-table th:nth-child(2), /* Meetings */
-.summary-table td:nth-child(2),
-.summary-table th:nth-child(3), /* Expenses */
-.summary-table td:nth-child(3),
-.summary-table th:nth-child(4), /* Total */
-.summary-table td:nth-child(4),
-.summary-table th:nth-child(5), /* COLA */
-.summary-table td:nth-child(5),
-.summary-table th:nth-child(6), /* Final */
-.summary-table td:nth-child(6) {
-    width: 60pt;
-}
-
-/* Dark header for title row */
-th[colspan="6"] {
-    background-color: #707070;
-    color: white;
-    font-weight: bold;
-    text-align: left;
-    padding: 2pt;
-    border: 1pt solid #000;
-}
-
-th:not([colspan]) {
-    background-color: #d5d7d9;
-    font-weight: bold;
-    text-align: left;
-    padding: 2pt;
-    border: 1pt solid #000;
-}
-
-td {
-    padding: 2pt;
-    border: 1pt solid #000;
-}
-
-tr:nth-child(even):not(.total-row) td {
-    background-color: #f3f3f3;
-}
-
-.numeric {
-    text-align: right;
-}
-
-.total-row {
-    font-weight: bold;
-    background-color: #d5d7d9;
-}
-
-.summary-table {
-    margin-top: 2cm;
-    /* page-break-before: always; */
-}
+def get_commission_closure_status(
+    session: Session,
+    settlement_run: SettlementRun,
+    commissions: list[PASCommission] | None = None
+) -> list[dict[str, Any]]:
     """
+    Get closure status organized by commission showing completion summary.
+
+    Args:
+        session: Database session
+        settlement_run: The settlement run to check
+        commissions: Optional pre-fetched list of commissions
+
+    Returns:
+        List of dicts with structure:
+        [
+            {
+                'commission_name': str,
+                'total_members': int,
+                'completed_members': int,
+                'completion_ratio': str,
+                'incomplete_members': [
+                    {'name': str, 'has_attendance': bool}, ...
+                ]
+            }, ...
+        ]
+    """
+    # Query commissions if not provided
+    if commissions is None:
+        commissions = get_commissions_with_memberships(
+            session, settlement_run.start, settlement_run.end
+        )
+
+    commission_status = []
+
+    for commission in commissions:
+        # Get all members of this commission during settlement period
+        memberships = session.query(PASCommissionMembership).filter(
+            PASCommissionMembership.commission_id == commission.id,
+            (
+                PASCommissionMembership.start.is_(None)
+                | (PASCommissionMembership.start <= settlement_run.end)
+            ),
+            (
+                PASCommissionMembership.end.is_(None)
+                | (PASCommissionMembership.end >= settlement_run.start)
+            )
+        ).all()
+
+        total_members = len(memberships)
+        if total_members == 0:
+            continue
+
+        completed_members = 0
+        incomplete_members = []
+        complete_members = []
+
+        for membership in memberships:
+            parliamentarian = membership.parliamentarian
+            parl_name = (
+                f'{parliamentarian.first_name} '
+                f'{parliamentarian.last_name}'
+            )
+
+            # Check if this parliamentarian has closed attendance for this
+            # commission
+            closed_attendance = session.query(Attendence).filter(
+                Attendence.parliamentarian_id == parliamentarian.id,
+                Attendence.commission_id == commission.id,
+                Attendence.date >= settlement_run.start,
+                Attendence.date <= settlement_run.end,
+                Attendence.abschluss == True
+            ).first()
+
+            if closed_attendance:
+                completed_members += 1
+                complete_members.append({
+                    'name': parl_name,
+                })
+            else:
+                # Check if they have any attendance at all for this commission
+                has_attendance = session.query(Attendence).filter(
+                    Attendence.parliamentarian_id == parliamentarian.id,
+                    Attendence.commission_id == commission.id,
+                    Attendence.date >= settlement_run.start,
+                    Attendence.date <= settlement_run.end
+                ).first() is not None
+
+                incomplete_members.append({
+                    'name': parl_name,
+                    'has_attendance': has_attendance
+                })
+
+        completion_ratio = f'{completed_members}/{total_members}'
+
+        commission_status.append({
+            'commission_name': commission.name,
+            'total_members': total_members,
+            'completed_members': completed_members,
+            'completion_ratio': completion_ratio,
+            'complete_members': complete_members,
+            'incomplete_members': incomplete_members,
+            'is_complete': completed_members == total_members
+        })
+
+    # Sort by completion status (incomplete first) then by name
+    commission_status.sort(
+        key=itemgetter('is_complete', 'commission_name')
+    )
+
+    return commission_status
 
 
 @PasApp.html(
@@ -203,8 +217,7 @@ def view_settlement_runs(
     }
 
 
-@PasApp.form(
-    model=SettlementRunCollection,
+@PasApp.form(model=SettlementRunCollection,
     name='new',
     template='form.pt',
     permission=Private,
@@ -250,8 +263,8 @@ def view_settlement_run(
     parties = get_parties_with_settlements(session, self.start, self.end)
 
     # Get commissions active during settlement run period
-    commissions = PASCommissionCollection(session).query().order_by(
-        PASCommission.name
+    commissions = get_commissions_with_memberships(
+        session, self.start, self.end
     )
 
     # Get parliamentarians active during settlement run period with settlements
@@ -259,7 +272,12 @@ def view_settlement_run(
         session, self.start, self.end
     )
 
-    categories = {
+    # Get commission closure status for the control list
+    commission_closure_status = get_commission_closure_status(
+        session, self, commissions
+    )
+
+    pdf_categories = {
         'party': {
             'title': _('Settlements by Party'),
             'links': [
@@ -278,7 +296,7 @@ def view_settlement_run(
             ],
         },
         'all': {
-            'title': _('All Settlements'),  # Gesamtabrechnung
+            'title': _('All Settlements'),
             'links': [
                 Link(
                     _('All Parties'),
@@ -289,7 +307,7 @@ def view_settlement_run(
                         ),
                         name='run-export'
                     ),
-                )
+                ),
             ],
         },
         'commissions': {
@@ -328,10 +346,72 @@ def view_settlement_run(
         },
     }
 
+    excel_categories = {
+        'abschlussliste_export': {
+            'title': _('Abschlussliste'),
+            'links': [
+                Link(
+                    _('Abschlussliste (XLSX)'),
+                    request.link(
+                        SettlementRunAllExport(
+                            settlement_run=self,
+                            category='abschlussliste-xlsx-export'
+                        ),
+                        name='run-export'
+                    ),
+                )
+            ]
+        },
+        'salary_export': {
+            'title': _('Buchungen Abrechnungslauf'),
+            'links': [
+                Link(
+                    _('Buchungen Abrechnungslauf (Kontrollliste)'),
+                    request.link(
+                        SettlementRunAllExport(
+                            settlement_run=self,
+                            category='buchungen-abrechnungslauf-kontroll-xlsx-export'
+                        ),
+                        name='run-export'
+                    ),
+                ),
+            ]
+        },
+        'fibu_export': {
+            'title': _('KR-Entschädigungen (CSV)'),
+            'links': [
+                Link(
+                    _('KR-Entschädigungen (CSV)'),
+                    request.link(
+                        SettlementRunAllExport(
+                            settlement_run=self,
+                            category='fibu-csv-export'
+                        ),
+                        name='run-export'
+                    ),
+                )
+            ]
+        }
+    }
+
+    export_tabs_data = {
+        'pdf': {
+            'tab_title': _('PDF Exports'),
+            'panel_id': 'panel-pdf-exports',
+            'categories': pdf_categories
+        },
+        'excel': {
+            'tab_title': _('Excel Exports'),
+            'panel_id': 'panel-excel-exports',
+            'categories': excel_categories
+        }
+    }
+
     return {
         'layout': layout,
         'settlement_run': self,
-        'categories': categories,
+        'export_tabs_data': export_tabs_data,
+        'commission_closure_status': commission_closure_status,
         'title': layout.title,
     }
 
@@ -386,8 +466,9 @@ def _get_commission_totals(
                 'Final': Decimal('0')
             }
 
-        is_president = any(r.role == 'president'
-                           for r in attendence.parliamentarian.roles)
+        is_president = is_commission_president(
+            attendence.parliamentarian, commission.id, settlement_run
+        )
 
         base_rate = calculate_rate(
             rate_set=rate_set,
@@ -549,7 +630,9 @@ def generate_settlement_pdf(
 ) -> bytes:
     """ Entry point for almost all settlement PDF generations. """
     font_config = FontConfiguration()
-    css = CSS(string=PDF_CSS)
+    css_path = module_path('onegov.pas', 'views/templates/settlement_pdf.css')
+    with open(css_path) as f:
+        css = CSS(string=f.read())
 
     if entity_type == 'commission' and isinstance(entity, PASCommission):
         settlement_data = _get_commission_settlement_data(
@@ -606,8 +689,9 @@ def _get_commission_settlement_data(
 
     result = []
     for attendence in attendences:
-        is_president = any(r.role == 'president'
-                           for r in attendence.parliamentarian.roles)
+        is_president = is_commission_president(
+            attendence.parliamentarian, commission.id, settlement_run
+        )
 
         base_rate = calculate_rate(
             rate_set=rate_set,
@@ -754,8 +838,9 @@ def _get_data_export_all(
     parliamentarian_totals: dict[str, Decimal] = {}
 
     for attendence in attendences.query():
-        is_president = any(r.role == 'president'
-                           for r in attendence.parliamentarian.roles)
+        is_president = is_commission_president(
+            attendence.parliamentarian, attendence, self
+        )
 
         # Calculate base rate
         base_rate = calculate_rate(
@@ -941,8 +1026,9 @@ def _get_party_settlement_data(
             continue
 
         # found an export
-        is_president = any(r.role == 'president'
-                           for r in attendence.parliamentarian.roles)
+        is_president = is_commission_president(
+            attendence.parliamentarian, attendence, settlement_run
+        )
 
         base_rate = calculate_rate(
             rate_set=rate_set,
@@ -993,14 +1079,70 @@ def view_settlement_run_all_export(
             request=request,
             entity_type='all',
         )
-        filename = request.translate(_('Total all parties'))
+        filename = normalize_for_filename(
+            request.translate(_('Total all parties')))
         return Response(
             pdf_bytes,
             content_type='application/pdf',
             content_disposition=f'attachment; filename={filename}.pdf'
         )
+    elif self.category == 'abschlussliste-xlsx-export':
+        filename = 'Abschlussliste.xlsx'
+        output = generate_abschlussliste_xlsx(self.settlement_run, request)
+        return Response(
+            output.read(),
+            content_type=XLSX_MIMETYPE,
+            content_disposition=f'attachment; filename="{filename}"'
+        )
+    elif self.category == 'buchungen-abrechnungslauf-kontroll-xlsx-export':
+        filename = 'Buchungen_Abrechnungslauf.xlsx'
+        output = generate_buchungen_abrechnungslauf_xlsx(
+            self.settlement_run, request)
+        return Response(
+            output.read(),
+            content_type=XLSX_MIMETYPE,
+            content_disposition=f'attachment; filename="{filename}"'
+        )
+    elif self.category == 'fibu-csv-export':
+        year = self.settlement_run.end.year
+        filename = f'KR-Entschaedigung - {year}.csv'
+
+        output = BytesIO()
+        # Use utf-8-sig to ensure proper Excel compatibility with BOM
+        csv_data = list(generate_fibu_export_rows(
+            self.settlement_run, request))
+
+        # Create CSV content as string
+        csv_string = ''
+        for row in csv_data:
+            # Convert all values to strings and escape quotes
+            row_strings = []
+            for value in row:
+                if value is None:
+                    row_strings.append('')  # type: ignore[unreachable]
+                else:
+                    # Convert to string and handle quotes
+                    str_value = str(value)
+                    if '"' in str_value:
+                        str_value = str_value.replace('"', '""')
+                    if (',' in str_value or '"' in str_value or
+                            '\n' in str_value):
+                        str_value = f'"{str_value}"'
+                    row_strings.append(str_value)
+            csv_string += ','.join(row_strings) + '\n'
+
+        # Encode to bytes with BOM for Excel compatibility
+        csv_bytes = '\ufeff'.encode('utf-8') + csv_string.encode('utf-8')
+
+        return Response(
+            csv_bytes,
+            content_type='text/csv; charset=utf-8',
+            content_disposition=f'attachment; filename="{filename}"'
+        )
     else:
-        raise NotImplementedError()
+        raise NotImplementedError(
+            f'Export category {self.category} not implemented for all exports'
+        )
 
 
 @PasApp.view(
@@ -1025,7 +1167,7 @@ def view_settlement_run_export(
             entity_type='party',
             entity=self.entity,
         )
-        filename = f'Partei_{self.entity.name}'
+        filename = normalize_for_filename(f'Partei_{self.entity.name}')
 
     elif self.category == 'commission':
         assert isinstance(self.entity, PASCommission)
@@ -1036,7 +1178,7 @@ def view_settlement_run_export(
             entity_type='commission',
             entity=self.entity,
         )
-        filename = f'commission_{self.entity.name}'
+        filename = normalize_for_filename(f'commission_{self.entity.name}')
 
     elif self.category == 'parliamentarian':
         assert isinstance(self.entity, PASParliamentarian)
@@ -1044,7 +1186,7 @@ def view_settlement_run_export(
         pdf_bytes = generate_parliamentarian_settlement_pdf(
             self.settlement_run, request, self.entity
         )
-        filename = (
+        filename = normalize_for_filename(
             f'Parlamentarier_{self.entity.last_name}_{self.entity.first_name}'
         )
         return Response(

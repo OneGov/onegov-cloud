@@ -12,6 +12,7 @@ $settlement-run-icon: '\f4c0';
 
 .globals {
     .attendences::before { @include icon-bold($attendence-icon); }
+    .attendances::before { @include icon-bold($attendence-icon); }
     .changes::before { @include icon-bold($change-icon); }
     .commissions::before { @include icon-bold($commission-icon); }
     .legislative-periods::before { @include icon($legislative-period-icon); }
@@ -21,6 +22,7 @@ $settlement-run-icon: '\f4c0';
     .rate-sets::before { @include icon-bold($rate-set-icon); }
     .pas-settings::before { @include icon-bold($pas-settings-icon); }
     .settlement-runs::before { @include icon-bold($settlement-run-icon); }
+    .settlement-run::before { @include icon-bold($settlement-run-icon); }
 }
 
 .edit-bar {
@@ -44,6 +46,54 @@ $settlement-run-icon: '\f4c0';
     .typeahead {
         z-index: 5000;
         top: 1.2rem;
+    }
+}
+
+// Closure Status Table Styles
+.closure-status-section {
+    margin: 2rem 0;
+
+    .closure-status-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+
+            &:first-child {
+                text-align: left;
+                font-weight: bold;
+            }
+        }
+
+        th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+
+        .closure-indicator {
+            font-size: 1.2em;
+            font-weight: bold;
+
+            &.closed {
+                color: #28a745; // Green checkmark
+            }
+
+            &.not-closed {
+                color: #dc3545; // Red X
+            }
+        }
+
+        .closed {
+            background-color: #d4edda; // Light green background
+        }
+
+        .not-closed {
+            background-color: #f8d7da; // Light red background
+        }
     }
 }
 

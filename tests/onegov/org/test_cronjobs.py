@@ -2260,7 +2260,6 @@ def test_wil_daily_event_import(wil_app, capturelog):
           <uuid7>E132456</uuid7>
           <locationUuid7>L132456</locationUuid7>
           <organizerUuid7>O789565</organizerUuid7>
-          <category>Sport</category>
           <title>Pole Vault Lesson</title>
           <description>Pole Vault description</description>
           <originalEventUrl>polevaultassociation.sport/first-lession</originalEventUrl>
@@ -2280,13 +2279,12 @@ def test_wil_daily_event_import(wil_app, capturelog):
           <uuid7>E132499</uuid7>
           <locationUuid7>L132488</locationUuid7>
           <organizerUuid7>O789588</organizerUuid7>
-          <category>Literatur</category>
           <title>Reading with Johanna Beehrens</title>
           <abstract>Best book reader in town</abstract>
           <description>Reading a Book</description>
-          <tags>
-            <tag>Library</tag>
-          </tags>
+          <category>
+            <mainCategory>Literature</mainCategory>
+          </category>
           <originalEventUrl></originalEventUrl>
           <providerReference>
             <url>https://www.lemington.ch/events/reading-johanna-beehrens</url>
@@ -2311,13 +2309,11 @@ def test_wil_daily_event_import(wil_app, capturelog):
           <uuid7>E132500</uuid7>
           <locationUuid7>L132456</locationUuid7>
           <organizerUuid7>O789565</organizerUuid7>
-          <category>Sport</category>
           <title>100 Meter Race of the Year</title>
           <description>Event of the year!</description>
-          <tags>
-            <tag>Sport</tag>
-            <tag>Race</tag>
-          </tags>
+          <category>
+            <mainCategory>Sports</mainCategory>
+          </category>
           <originalEventUrl>www.100race.org</originalEventUrl>
           <schedules>
             <schedule>
@@ -2436,7 +2432,7 @@ def test_wil_daily_event_import(wil_app, capturelog):
     assert events[1].title == 'Reading with Johanna Beehrens'
     assert (events[1].description ==
             'Best book reader in town\n\nReading a Book')
-    assert events[1].tags == ['Library']
+    assert events[1].tags == ['Literature']
     assert events[1].start == start_dates[1]
     assert events[1].end == start_dates[1] + timedelta(hours=2)
     assert events[1].recurrence == '\n'.join([
@@ -2463,6 +2459,7 @@ def test_wil_daily_event_import(wil_app, capturelog):
     ):
         assert events[i] == added[i]
         assert events[i].title == '100 Meter Race of the Year'
+        assert events[i].tags == ['Sports']
         assert events[i].start == start
         assert events[i].end == start + timedelta(minutes=100)
         assert events[i].recurrence == None

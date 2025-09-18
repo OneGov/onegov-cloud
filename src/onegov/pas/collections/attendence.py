@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from sqlalchemy import desc, or_
+from sqlalchemy.orm import joinedload
 
 from onegov.core.collection import GenericCollection
 from onegov.pas.models import (
@@ -44,6 +45,12 @@ class AttendenceCollection(GenericCollection[Attendence]):
 
     def query(self) -> Query[Attendence]:
         query = super().query()
+
+        # Eagerly load related data to prevent N+1 queries
+        query = query.options(
+            joinedload(Attendence.parliamentarian).joinedload(PASParliamentarian.roles),
+            joinedload(Attendence.commission)
+        )
 
         if self.settlement_run_id:
             settlement_run = self.session.query(SettlementRun).get(
