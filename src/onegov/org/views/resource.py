@@ -1501,7 +1501,6 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
         .with_entities(
             Reservation.id.label('id'),
             Reservation.token.label('token'),
-            Reservation.resource.label('resource'),
             Ticket.subtitle.label('title'),
             Ticket.number.label('description'),
             Reservation.start.label('start'),
@@ -1514,6 +1513,7 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
             )
         )
         .filter(Reservation.status == 'approved')
+        .filter(Reservation.resource == self.id)
         .filter(sa_cast(Reservation.data['accepted'], Boolean).is_(True))
         .filter(Reservation.start >= start)
         .filter(Reservation.start <= end)

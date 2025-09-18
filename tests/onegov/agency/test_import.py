@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from onegov.agency.data_import import (split_address_on_new_line,
@@ -13,7 +15,7 @@ from onegov.agency.data_import import (split_address_on_new_line,
      'M de H<br>H d V<br>B p 3<br>F-68333 H C'),
 
 ])
-def test_parse_address_bs(addr, result):
+def test_parse_address_bs(addr: str, result: str) -> None:
     assert result == split_address_on_new_line(addr)
 
 
@@ -28,5 +30,9 @@ def test_parse_address_bs(addr, result):
     ('Achermann-Bachmann Carmen Daria', '',
      ('Achermann-Bachmann', 'Carmen Daria')),
 ])
-def test_parse_alliance_name(alliance_name, first_name, result):
+def test_parse_alliance_name(
+    alliance_name: str,
+    first_name: str,
+    result: tuple[str, str]
+) -> None:
     assert parse_alliance_name(alliance_name, first_name) == result

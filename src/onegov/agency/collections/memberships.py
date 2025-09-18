@@ -13,17 +13,18 @@ from sqlalchemy.orm import joinedload
 from typing import Self
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from datetime import datetime
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import TypedDict
     from typing_extensions import Unpack
 
     class FilterParams(TypedDict, total=False):
-        updated_gt: str | None
-        updated_ge: str | None
-        updated_eq: str | None
-        updated_le: str | None
-        updated_lt: str | None
+        updated_gt: datetime | str | None
+        updated_ge: datetime | str | None
+        updated_eq: datetime | str | None
+        updated_le: datetime | str | None
+        updated_lt: datetime | str | None
 
 
 class PaginatedMembershipCollection(
@@ -37,11 +38,11 @@ class PaginatedMembershipCollection(
         page: int = 0,
         agency: str | None = None,
         person: str | None = None,
-        updated_gt: str | None = None,
-        updated_ge: str | None = None,
-        updated_eq: str | None = None,
-        updated_le: str | None = None,
-        updated_lt: str | None = None,
+        updated_gt: datetime | str | None = None,
+        updated_ge: datetime | str | None = None,
+        updated_eq: datetime | str | None = None,
+        updated_le: datetime | str | None = None,
+        updated_lt: datetime | str | None = None,
         exclude_hidden: bool = True
     ) -> None:
         super().__init__(session)
