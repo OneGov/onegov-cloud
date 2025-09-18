@@ -60,7 +60,9 @@ def has_permission_logged_in(
         if getattr(model, 'access', None) == 'private':
             return False
 
-    return permission in getattr(app.settings.roles, identity.role)
+    return permission in getattr(app.settings. roles, identity.role)
+
+    return False
 
 
 @Framework.permission_rule(

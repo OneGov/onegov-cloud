@@ -16,7 +16,7 @@ from onegov.pas.models import Change
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
-    from onegov.town6.request import TownRequest
+    from onegov.pas.request import PasRequest
     from webob import Response
 
 
@@ -27,26 +27,11 @@ if TYPE_CHECKING:
 )
 def view_attendences(
     self: AttendenceCollection,
-    request: TownRequest
+    request: PasRequest
 ) -> RenderData:
 
     layout = AttendenceCollectionLayout(self, request)
-
-    # Filter attendances based on user role
-    if request.is_parliamentarian:
-        # Parliamentarians see only their own attendances
-        user = request.current_user
-        if user and hasattr(user, 'parliamentarian') and user.parliamentarian:
-            collection = AttendenceCollection(
-                request.session,
-                parliamentarian_id=str(user.parliamentarian.id)
-            )
-            attendences = collection.query().all()
-        else:
-            attendences = []
-    else:
-        # Admins see all attendances
-        attendences = self.query().all()
+    attendences = self.view_for_parliamentarian(request)
 
     return {
         'add_link': request.link(self, name='new'),
@@ -64,7 +49,7 @@ def view_attendences(
 )
 def add_attendence(
     self: AttendenceCollection,
-    request: TownRequest,
+    request: PasRequest,
     form: AttendenceAddForm
 ) -> RenderData | Response:
 
@@ -92,9 +77,8 @@ def add_attendence(
     template='form.pt',
     form=AttendenceAddPlenaryForm
 )
-def add_plenary_attendence(
-    self: AttendenceCollection,
-    request: TownRequest,
+def add_plenary_attendence(self: AttendenceCollection,
+    request: PasRequest,
     form: AttendenceAddPlenaryForm
 ) -> RenderData | Response:
 
@@ -128,7 +112,7 @@ def add_plenary_attendence(
 )
 def view_attendence(
     self: Attendence,
-    request: TownRequest
+    request: PasRequest
 ) -> RenderData:
 
     layout = AttendenceLayout(self, request)
@@ -149,7 +133,7 @@ def view_attendence(
 )
 def edit_attendence(
     self: Attendence,
-    request: TownRequest,
+    request: PasRequest,
     form: AttendenceForm
 ) -> RenderData | Response:
 
@@ -179,7 +163,7 @@ def edit_attendence(
 )
 def delete_attendence(
     self: Attendence,
-    request: TownRequest
+    request: PasRequest
 ) -> None:
 
     request.assert_valid_csrf_token()

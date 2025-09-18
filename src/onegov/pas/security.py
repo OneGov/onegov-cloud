@@ -115,16 +115,20 @@ def has_private_access_to_commission(
     return permission in getattr(app.settings.roles, identity.role)
 
 
-@PasApp.permission_rule(model=Organisation, permission=Personal)
-def has_personal_access_to_organisation(
+@PasApp.permission_rule(model=Organisation, permission=object)
+def has_access_to_organisation(
     app: PasApp,
     identity: Identity,
     model: Organisation,
     permission: Intent
 ) -> bool:
     if identity.role in ('parliamentarian', 'commission_president'):
-        return True
-    return permission in getattr(app.settings.roles, identity.role)
+        return isinstance(permission, (Public, Personal))
+
+    if hasattr(app.settings.roles, identity.role):
+        return permission in getattr(app.settings.roles, identity.role)
+
+    return False
 
 
 @PasApp.permission_rule(model=AttendenceCollection, permission=Private)
