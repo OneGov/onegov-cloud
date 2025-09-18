@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from datetime import date
-
+from onegov.pas.app import PasApp
 from onegov.pas import _
-from onegov.pas import PasApp
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.layouts import DefaultLayout
+from onegov.pas.utils import get_active_commission_memberships
 from onegov.org.models import Organisation
 from onegov.core.security import Personal
+
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -56,20 +56,15 @@ def view_dashboard(
 
         # For parliamentarians, show only their commissions
         user = request.current_user
-        if user and hasattr(user, 'parliamentarian') and user.parliamentarian:
-            parliamentarian = user.parliamentarian
-            active_memberships = [
-                m for m in parliamentarian.commission_memberships
-                if not m.end or m.end >= date.today()
-            ]
-            for membership in active_memberships:
-                commission = membership.commission
-                shortcuts.append({
-                    'name': f'commission-{commission.id}',
-                    'title': commission.name,
-                    'link': request.link(commission),
-                    'icon': 'fa-user-friends'
-                })
+        active_memberships = get_active_commission_memberships(user)
+        for membership in active_memberships:
+            commission = membership.commission
+            shortcuts.append({
+                'name': f'commission-{commission.id}',
+                'title': commission.name,
+                'link': request.link(commission),
+                'icon': 'fa-user-friends'
+            })
 
     return {
         'layout': layout,

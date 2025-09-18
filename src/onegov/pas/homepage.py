@@ -23,4 +23,4 @@ def view_org(
     if not request.is_logged_in:
         return redirect(request.class_link(Auth, name='login'))
 
-    return redirect(request.class_link(Organisation, name='pas'))
+    return redirect(request.class_link(Organisation, name='pas-settings'))

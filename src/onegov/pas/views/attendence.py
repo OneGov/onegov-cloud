@@ -128,7 +128,8 @@ def view_attendence(
     model=Attendence,
     name='edit',
     template='form.pt',
-    form=AttendenceForm
+    form=AttendenceForm,
+    permission=Private
 )
 def edit_attendence(
     self: Attendence,

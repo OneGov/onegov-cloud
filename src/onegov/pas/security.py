@@ -11,7 +11,7 @@ from onegov.pas.collections import (
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.commission import Commission, PASCommission
 from onegov.pas.models.parliamentarian import PASParliamentarian
-from onegov.org.models import Organisation
+from onegov.org.models import Organisation, GeneralFileCollection
 from onegov.user import User
 from onegov.user import Auth
 
@@ -122,7 +122,6 @@ def has_personal_access_to_organisation(
     model: Organisation,
     permission: Intent
 ) -> bool:
-    """Allow parliamentarians and commission presidents to access dashboard"""
     if identity.role in ('parliamentarian', 'commission_president'):
         return True
     return permission in getattr(app.settings.roles, identity.role)
@@ -191,6 +190,18 @@ def has_attendence_permission(
     app: PasApp,
     identity: Identity,
     model: Attendence,
+    permission: object
+) -> bool:
+    return identity.role in {
+        'admin', 'parliamentarian', 'commission_president'
+    }
+
+
+@PasApp.permission_rule(model=GeneralFileCollection, permission=object)
+def has_general_file_collection_permission(
+    app: PasApp,
+    identity: Identity,
+    model: GeneralFileCollection,
     permission: object
 ) -> bool:
     return identity.role in {

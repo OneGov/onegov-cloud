@@ -748,7 +748,7 @@ def _get_data_export_all(
         str(1 + (rate_set.cost_of_living_adjustment / 100))
     )
 
-    settlement_data: list[SettlementDataRow] = []  # Add type hint here
+    settlement_data: list[SettlementDataRow] = []
 
     # Group by parliamentarian for summary
     parliamentarian_totals: dict[str, Decimal] = {}

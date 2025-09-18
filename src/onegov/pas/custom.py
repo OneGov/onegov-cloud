@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.pas.utils import is_parliamentarian_role
 from onegov.core.elements import Link
 from onegov.org.custom import logout_path
 from onegov.org.elements import LinkGroup
@@ -76,8 +77,7 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
             )
         elif (request.is_logged_in
               and hasattr(request.identity, 'role')
-              and request.identity.role in ('parliamentarian',
-                                           'commission_president')):
+              and is_parliamentarian_role(request.identity.role)):
             yield LinkGroup(
                 _('Management'), classes=('management',),
                 links=(

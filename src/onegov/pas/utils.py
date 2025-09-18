@@ -8,13 +8,15 @@ from onegov.pas.models.parliamentarian import PASParliamentarian
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
 from decimal import Decimal
 from babel.numbers import format_decimal
+from datetime import date
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.pas.models import SettlementRun
+    from onegov.pas.models.commission_membership import PASCommissionMembership
     from onegov.town6.request import TownRequest
-    from datetime import date
+    from onegov.user import User
     from sqlalchemy.orm import Session
 
 
@@ -120,6 +122,37 @@ def get_parties_with_settlements(
         .order_by(Party.name)
         .all()
     )
+
+
+def is_parliamentarian(user: User | None) -> bool:
+    """Check if a user has parliamentarian role."""
+    parls = {'parliamentarian', 'commission_president'}
+    if not user:
+        return False
+    if user.role in parls:
+        return True
+    return False
+
+
+def is_parliamentarian_role(role: str | None) -> bool:
+    """Check if a role is a parliamentarian role."""
+    parls = {'parliamentarian', 'commission_president'}
+    return role in parls if role else False
+
+
+def get_active_commission_memberships(
+    user: User | None
+) -> list[PASCommissionMembership]:
+    """Get active commission memberships for a parliamentarian user."""
+    if (not user or not hasattr(user, 'parliamentarian')
+            or not user.parliamentarian):
+        return []
+
+    parliamentarian = user.parliamentarian
+    return [
+        m for m in parliamentarian.commission_memberships
+        if not m.end or m.end >= date.today()
+    ]
 
 
 # FIXME: Should these two functions be a CLI command instead? Maybe switch

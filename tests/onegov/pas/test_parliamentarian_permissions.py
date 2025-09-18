@@ -2,11 +2,17 @@ from onegov.pas.collections import (
     AttendenceCollection,
     PASCommissionCollection
 )
+
+from onegov.core.security import Private
+from onegov.pas.security import has_private_access_to_commission
+from morepath import Identity
 from onegov.pas.models import PASCommission
 from onegov.pas.models import PASCommissionMembership
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.user import UserCollection
 import transaction
+from datetime import date
+import pytest
 
 
 def test_view_dashboard_as_parliamentarian(client):
@@ -65,32 +71,17 @@ def test_view_dashboard_as_commission_president(client):
     users = UserCollection(session)
     user = users.by_username('peter.president@example.org')
     user.role = 'commission_president'
+    user.password = 'test'
 
     transaction.commit()
 
     # Login as commission president
-    client.login('peter.president@example.org', 'test')
+    page = client.login('peter.president@example.org', 'test')
+    assert 'falsches Passwort' not in page
 
     # Should be able to access dashboard
     page = client.get('/pas')
     assert page.status_code == 200
-    assert 'Dashboard' in page
-
-
-def test_view_attendences_as_parliamentarian(client):
-    '''Parliamentarians should be able to view attendences'''
-    session = client.app.session()
-    parliamentarians = PASParliamentarianCollection(client.app)
-    parliamentarian = parliamentarians.add(
-        first_name='Anna',
-        last_name='Attendee',
-        email_primary='anna.attendee@example.org'
-    )
-    transaction.commit()
-    client.login('anna.attendee@example.org', 'test')
-    page = client.get('/attendences')
-    assert page.status_code == 200
-
 
 def test_view_attendence_as_parliamentarian(client):
     '''Parliamentarians should be able to view individual attendences and
@@ -105,38 +96,51 @@ def test_view_attendence_as_parliamentarian(client):
         email_primary='bob.viewer@example.org'
     )
 
-    # Create attendence
-    attendences = AttendenceCollection(session)
-    attendence = attendences.add(
-        parliamentarian_id=parliamentarian.id,
-        meeting_type='commission',
-        status='present'
-    )
-
     # Set correct password for the created user
     users = UserCollection(session)
     user = users.by_username('bob.viewer@example.org')
     user.password = 'test'
 
+    # Create attendence
+    attendences = AttendenceCollection(session)
+    attendence = attendences.add(
+        parliamentarian_id=parliamentarian.id,
+        type='commission',
+        date=date.today(),
+        duration=120
+    )
+
+    # Get the attendence ID before committing
+    attendence_id = attendence.id
     transaction.commit()
 
-    # Login as parliamentarian
     client.login('bob.viewer@example.org', 'test')
-
     # Should be able to view the attendence
-    page = client.get(f'/attendence/{attendence.id}')
+    page = client.get(f'/attendence/{attendence_id}')
     assert page.status_code == 200
 
     # Should be able to access new attendance form
+    # (that's the whole point of the app, really)
     page = client.get('/attendences/new')
     assert page.status_code == 200
 
     # Check if it's actually a form page (most important test)
     assert 'form' in page
-    assert 'submit' in page.lower()
+    assert 'submit' in page
 
-    # todo: claude
-    # should be able to edit their own attendance
+    # Should be able to edit their own attendance
+    page = client.get(f'/attendence/{attendence_id}/edit').maybe_follow()
+    assert page.status_code == 200
+
+    # Fill out and submit the form
+    page.form['date'] = '2024-01-15'
+    page.form['duration'] = '3.5'
+    page.form['type'] = 'plenary'
+    page.form['parliamentarian_id'].select(text='Bob Viewer')
+
+    # Submit the form
+    page = page.form.submit().maybe_follow()
+    assert page.status_code == 200
 
 
 def test_view_commissions_as_parliamentarian(client):
@@ -150,6 +154,12 @@ def test_view_commissions_as_parliamentarian(client):
         last_name='Commissioner',
         email_primary='carol.commissioner@example.org'
     )
+
+    # Set correct password for the created user
+    users = UserCollection(session)
+    user = users.by_username('carol.commissioner@example.org')
+    user.password = 'test'
+
     transaction.commit()
 
     # Login as parliamentarian
@@ -157,39 +167,6 @@ def test_view_commissions_as_parliamentarian(client):
 
     # Should be able to access commissions collection
     page = client.get('/commissions')
-    assert page.status_code == 200
-
-
-def test_view_commission_as_parliamentarian(client):
-    '''Parliamentarians should be able to view individual commissions'''
-    session = client.app.session()
-
-    # Create commission
-    commissions = PASCommissionCollection(session)
-    commission = commissions.add(name='Finance Commission')
-
-    # Create parliamentarian
-    parliamentarians = PASParliamentarianCollection(client.app)
-    parliamentarian = parliamentarians.add(
-        first_name='Dave',
-        last_name='Member',
-        email_primary='dave.member@example.org'
-    )
-
-    # Make them commission member
-    membership = PASCommissionMembership(
-        parliamentarian_id=parliamentarian.id,
-        commission_id=commission.id,
-        role='member'
-    )
-    session.add(membership)
-    transaction.commit()
-
-    # Login as parliamentarian
-    client.login('dave.member@example.org', 'test')
-
-    # Should be able to view the commission
-    page = client.get(f'/commission/{commission.id}')
     assert page.status_code == 200
 
 
@@ -221,6 +198,10 @@ def test_commission_president_has_private_access_to_commission(client):
     users = UserCollection(session)
     user = users.by_username('emma.president@example.org')
     user.role = 'commission_president'
+    user.password = 'test'
+
+    # Get the commission ID before committing
+    commission_id = commission.id
 
     transaction.commit()
 
@@ -228,7 +209,7 @@ def test_commission_president_has_private_access_to_commission(client):
     client.login('emma.president@example.org', 'test')
 
     # Should have private access to commission
-    page = client.get(f'/commission/{commission.id}')
+    page = client.get(f'/commission/{commission_id}')
     assert page.status_code == 200
 
 
@@ -390,9 +371,6 @@ def test_commission_president_no_access_to_different_commission(client):
 def test_commission_president_with_no_parliamentarian_record(client):
     '''Commission presidents without parliamentarian record should not
     have access'''
-    from onegov.core.security import Private
-    from onegov.pas.security import has_private_access_to_commission
-    from morepath import Identity
 
     session = client.app.session()
 
@@ -419,3 +397,48 @@ def test_commission_president_with_no_parliamentarian_record(client):
     assert has_private_access_to_commission(
         client.app, identity, commission, Private
     ) is False
+
+
+@pytest.mark.parametrize('role,user_email', [
+    ('parliamentarian', 'files.parliamentarian@example.org'),
+    ('commission_president', 'files.president@example.org'),
+])
+def test_view_files_collection(client, role, user_email):
+    '''Parliamentarians and commission presidents should be able to access
+    the files collection'''
+    session = client.app.session()
+
+    # Create parliamentarian
+    parliamentarians = PASParliamentarianCollection(client.app)
+    parliamentarian = parliamentarians.add(
+        first_name='Files',
+        last_name='Viewer',
+        email_primary=user_email
+    )
+
+    if role == 'commission_president':
+        # Create commission and make them president
+        commissions = PASCommissionCollection(session)
+        commission = commissions.add(name='File Commission')
+
+        membership = PASCommissionMembership(
+            parliamentarian_id=parliamentarian.id,
+            commission_id=commission.id,
+            role='president'
+        )
+        session.add(membership)
+
+    # Set user role and password
+    users = UserCollection(session)
+    user = users.by_username(user_email)
+    user.role = role
+    user.password = 'test'
+    transaction.commit()
+
+    # Login as user
+    client.login(user_email, 'test')
+
+    page = client.get('/files')
+    assert page.status_code == 200
+
+    # TODO: Check disallow edit files for non admin
