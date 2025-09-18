@@ -8,7 +8,7 @@ from onegov.feriennet.models import VacationActivity
 from onegov.user import User
 from pytest_localserver.http import WSGIServer
 from sqlalchemy.orm.session import close_all_sessions
-from tests.onegov.activity.fixtures.scenario import Scenario
+from tests.onegov.activity.conftest import Scenario
 from tests.shared import Client as BaseClient
 from tests.shared.utils import create_app
 

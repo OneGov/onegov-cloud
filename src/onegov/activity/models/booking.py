@@ -18,7 +18,7 @@ from sqlalchemy_utils import aggregated
 from uuid import uuid4
 
 
-from typing import Literal, TYPE_CHECKING
+from typing import Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Collection
@@ -287,7 +287,7 @@ class Booking(Base, TimestampMixin):
 
     def overlaps(
         self,
-        other: Booking,
+        other: Self,
         with_anti_affinity_check: bool = False
     ) -> bool:
         # XXX circular import
