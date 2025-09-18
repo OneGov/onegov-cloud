@@ -240,6 +240,11 @@
                 Privacy Protection
             </a>
         </span>
+        <span tal:condition="request.app.org.impressum_url|None">
+            <a href="${request.app.org.impressum_url}" i18n:translate>
+                Impressum
+            </a>
+        </span>
     </tal:b>
     <span tal:condition="not request.is_logged_in">
         <a href="${layout.login_from_path()}" i18n:translate>

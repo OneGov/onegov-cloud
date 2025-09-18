@@ -160,6 +160,7 @@ class Organisation(Base, TimestampMixin):
     og_logo_default: dict_property[str | None] = meta_property()
 
     # custom links
+    impressum_url: dict_property[str | None] = meta_property()
     custom_link_1_name: dict_property[str | None] = meta_property()
     custom_link_1_url: dict_property[str | None] = meta_property()
     custom_link_2_name: dict_property[str | None] = meta_property()
