@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from __future__ import annotations
 
 import pytest
 import sqlalchemy
@@ -8,8 +8,7 @@ from datetime import datetime, date, timedelta
 from decimal import Decimal
 from freezegun import freeze_time
 from markupsafe import Markup
-from sedate import standardize_date
-
+from onegov.activity import Activity
 from onegov.activity import ActivityCollection, OccasionNeed, Volunteer
 from onegov.activity import ActivityFilter
 from onegov.activity import Attendee
@@ -26,14 +25,31 @@ from onegov.activity.models import DAYS
 from onegov.core.utils import Bunch
 from onegov.pay.models.invoice_reference import FeriennetSchema
 from onegov.pay.models.invoice_reference import ESRSchema
+from sedate import as_datetime, replace_timezone, standardize_date
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from psycopg2.extras import NumericRange
 from pytz import utc
+from unittest.mock import patch
 from uuid import uuid4
 
 
-def test_year_age_barrier():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.user import User
+    from sqlalchemy.orm import Query, Session
+    from tests.onegov.activity.conftest import Collections, Scenario
+    from typing import TypeAlias
+    from uuid import UUID
+
+    DatetimeTuple: TypeAlias = tuple[int, int, int, int, int]
+
+
+def as_utc(date: date) -> datetime:
+    return replace_timezone(as_datetime(date), 'UTC')
+
+
+def test_year_age_barrier() -> None:
 
     age_barrier = YearAgeBarrier()
 
@@ -69,7 +85,7 @@ def test_year_age_barrier():
     assert age_barrier.is_too_young(birth_day, occasion_date, 5)
 
 
-def test_add_activity(session, owner):
+def test_add_activity(session: Session, owner: User) -> None:
 
     collection = ActivityCollection(session)
     collection.add(
@@ -77,19 +93,22 @@ def test_add_activity(session, owner):
         username=owner.username,
         lead="Come visit the butcher with us and kill your own baby pig",
         text=Markup("<h1>Babe was such an overrated movie</h1>"),
-        tags=('butcher', 'killing', 'blood', 'fun'),
+        tags={'butcher', 'killing', 'blood', 'fun'},
     )
 
     activity = collection.by_name('visit-the-butcher')
+    assert activity is not None
     assert activity.title == "Visit the Butcher"
     assert activity.username == owner.username
     assert activity.reporter == owner.username
+    assert activity.lead is not None
     assert activity.lead.startswith("Come visit the butcher")
+    assert activity.text is not None
     assert activity.text.startswith(Markup("<h1>Babe was such a"))
     assert activity.tags == {'butcher', 'killing', 'blood', 'fun'}
 
 
-def test_unique_activity(session, owner):
+def test_unique_activity(session: Session, owner: User) -> None:
 
     collection = ActivityCollection(session)
     assert collection.get_unique_name("Möped Lads") == 'moeped-lads'
@@ -101,7 +120,7 @@ def test_unique_activity(session, owner):
     assert collection.get_unique_name("Möped Lads") == 'moeped-lads-2'
 
 
-def test_activity_order(session, owner):
+def test_activity_order(session: Session, owner: User) -> None:
 
     collection = ActivityCollection(session)
     collection.add(title="C", username=owner.username)
@@ -111,7 +130,7 @@ def test_activity_order(session, owner):
     assert [a.title for a in collection.query().all()] == ["Ä", "B", "C"]
 
 
-def test_activity_states(session, owner):
+def test_activity_states(session: Session, owner: User) -> None:
 
     c = ActivityCollection(session)
     c.add("A", username=owner.username)
@@ -119,34 +138,34 @@ def test_activity_states(session, owner):
     c.add("C", username=owner.username).propose().accept()
     c.add("D", username=owner.username).propose().accept().archive()
 
-    c.filter.states = ('preview', )
+    c.filter.states = {'preview'}
     assert c.query().count() == 1
 
-    c.filter.states = ('preview', 'proposed')
+    c.filter.states = {'preview', 'proposed'}
     assert c.query().count() == 2
 
-    c.filter.states = ('preview', 'proposed', 'accepted')
+    c.filter.states = {'preview', 'proposed', 'accepted'}
     assert c.query().count() == 3
 
-    c.filter.states = ('preview', 'proposed', 'accepted', 'archived')
+    c.filter.states = {'preview', 'proposed', 'accepted', 'archived'}
     assert c.query().count() == 4
 
-    c.filter.states = None
+    c.filter.states = set()
     assert c.query().count() == 4
 
 
-def test_activity_used_tags(session, owner):
+def test_activity_used_tags(session: Session, owner: User) -> None:
 
     c = ActivityCollection(session)
 
     activities = (
-        c.add("Paintball", username=owner.username, tags=('sport', 'fun')),
-        c.add("Dancing", username=owner.username, tags=('dance', 'fun'))
+        c.add("Paintball", username=owner.username, tags={'sport', 'fun'}),
+        c.add("Dancing", username=owner.username, tags={'dance', 'fun'})
     )
 
     assert c.used_tags == {'sport', 'dance', 'fun'}
 
-    c.states = ('proposed', )
+    c.filter.states = {'proposed'}
 
     assert c.used_tags == {'sport', 'dance', 'fun'}
 
@@ -154,9 +173,9 @@ def test_activity_used_tags(session, owner):
 
     assert c.used_tags == {'sport', 'dance', 'fun'}
 
-    class LimitedActivityCollection(ActivityCollection):
+    class LimitedActivityCollection(ActivityCollection[Activity]):
 
-        def query_base(self):
+        def query_base(self) -> Query[Activity]:
             return self.session.query(self.model_class).filter(
                 self.model_class.state == 'proposed')
 
@@ -166,7 +185,7 @@ def test_activity_used_tags(session, owner):
     assert c.used_tags == {'sport', 'fun'}
 
 
-def test_occasions(session, owner):
+def test_occasions(session: Session, owner: User) -> None:
 
     activities = ActivityCollection(session)
     occasions = OccasionCollection(session)
@@ -201,8 +220,8 @@ def test_occasions(session, owner):
     assert tournament.dates[0].duration_in_seconds == 3600
     assert tournament.meeting_point == "Lucerne"
     assert tournament.note == "Bring game-face"
-    assert tournament.activity_id == activities.query().first().id
-    assert tournament.period_id == periods.query().first().id
+    assert tournament.activity_id == activities.query().first().id  # type: ignore[union-attr]
+    assert tournament.period_id == periods.query().first().id  # type: ignore[union-attr]
 
     # postgres ranges are coerced into half-open intervals
     assert tournament.age.lower == 6
@@ -212,14 +231,19 @@ def test_occasions(session, owner):
 
     transaction.commit()
 
-    tournament = occasions.query().first()
+    tournament = occasions.query().first()  # type: ignore[assignment]
     assert tournament.age.lower == 6
     assert tournament.age.upper == 10
     assert tournament.spots.lower == 2
     assert tournament.spots.upper == 11
 
 
-def test_activity_date_ranges(session, owner, collections):
+def test_activity_date_ranges(
+    session: Session,
+    owner: User,
+    collections: Collections
+) -> None:
+
     sport = collections.activities.add("Sport", username=owner.username)
     police = collections.activities.add("Police", username=owner.username)
 
@@ -297,7 +321,12 @@ def test_activity_date_ranges(session, owner, collections):
     assert a.query().count() == 1
 
 
-def test_activity_weekdays(session, owner, collections):
+def test_activity_weekdays(
+    session: Session,
+    owner: User,
+    collections: Collections
+) -> None:
+
     sport = collections.activities.add("Sport", username=owner.username)
     police = collections.activities.add("Police", username=owner.username)
 
@@ -366,7 +395,7 @@ def test_activity_weekdays(session, owner, collections):
     assert a.query().count() == 0
 
 
-def test_profiles(session, owner):
+def test_profiles(session: Session, owner: User) -> None:
 
     activities = ActivityCollection(session)
     occasions = OccasionCollection(session)
@@ -424,7 +453,7 @@ def test_profiles(session, owner):
 
     transaction.commit()
 
-    sport = activities.query().first()
+    sport = activities.query().first()  # type: ignore[assignment]
     period_ids = set(o.period_id for o in sport.occasions)
 
     assert len(period_ids) == 2
@@ -433,17 +462,17 @@ def test_profiles(session, owner):
 
     # drop the winter occasion
     occasions.delete(
-        occasions.query().filter(Occasion.period_id == winter_id).first())
+        occasions.query().filter(Occasion.period_id == winter_id).first())  # type: ignore[arg-type]
     transaction.commit()
 
-    sport = activities.query().first()
+    sport = activities.query().first()  # type: ignore[assignment]
     period_ids = set(o.period_id for o in sport.occasions)
 
     assert len(period_ids) == 1
     assert autumn_id in period_ids
 
 
-def test_occasion_daterange_constraint(session, owner):
+def test_occasion_daterange_constraint(session: Session, owner: User) -> None:
     period = BookingPeriodCollection(session).add(
         title="Autumn 2016",
         prebooking=(datetime(2000, 1, 1), datetime(2000, 1, 1)),
@@ -464,7 +493,7 @@ def test_occasion_daterange_constraint(session, owner):
         )
 
 
-def test_no_orphan_bookings(session, owner):
+def test_no_orphan_bookings(session: Session, owner: User) -> None:
 
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
@@ -503,7 +532,7 @@ def test_no_orphan_bookings(session, owner):
         occasions.delete(tournament)
 
 
-def test_no_orphan_occasions(session, owner):
+def test_no_orphan_occasions(session: Session, owner: User) -> None:
 
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
@@ -538,7 +567,7 @@ def test_no_orphan_occasions(session, owner):
 
     # Test volunteer and occasion need
     assert tournament.id
-    need = OccasionNeed(
+    need = OccasionNeed(  # type: ignore[misc]
         id=uuid4(),
         name='Helpers',
         number=NumericRange(1, 2),
@@ -567,10 +596,10 @@ def test_no_orphan_occasions(session, owner):
     assert not session.query(Volunteer).first()
 
     with pytest.raises(sqlalchemy.exc.IntegrityError):
-        activities.delete(activities.query().first())
+        activities.delete(activities.query().first())  # type: ignore[arg-type]
 
 
-def test_occasion_duration(session, owner):
+def test_occasion_duration(session: Session, owner: User) -> None:
 
     activities = ActivityCollection(session)
     periods = BookingPeriodCollection(session)
@@ -578,12 +607,14 @@ def test_occasion_duration(session, owner):
 
     retreat = activities.add("Management Retreat", username=owner.username)
 
-    def durations(activity):
-        occasions = session.query(Occasion)\
-            .with_entities(Occasion.duration)\
+    def durations(activity: Activity) -> int:
+        occasions = (
+            session.query(Occasion)
+            .with_entities(Occasion.duration)
             .filter_by(activity_id=activity.id)
+        )
 
-        return sum(set(o.duration for o in occasions))
+        return sum({o.duration for o in occasions})
 
     assert not DAYS.has(durations(retreat), DAYS.half)
     assert not DAYS.has(durations(retreat), DAYS.full)
@@ -603,11 +634,11 @@ def test_occasion_duration(session, owner):
         end=datetime(2016, 10, 3, 16),
         timezone="Europe/Zurich",
         activity=retreat,
-        period=periods.active()
+        period=periods.active()  # type: ignore[arg-type]
     )
     transaction.commit()
 
-    retreat = activities.query().first()
+    retreat = activities.query().first()  # type: ignore[assignment]
     assert DAYS.has(durations(retreat), DAYS.half)
     assert not DAYS.has(durations(retreat), DAYS.full)
     assert not DAYS.has(durations(retreat), DAYS.many)
@@ -618,11 +649,11 @@ def test_occasion_duration(session, owner):
         end=datetime(2016, 10, 4, 16),
         timezone="Europe/Zurich",
         activity=retreat,
-        period=periods.active()
+        period=periods.active()  # type: ignore[arg-type]
     )
     transaction.commit()
 
-    retreat = activities.query().first()
+    retreat = activities.query().first()  # type: ignore[assignment]
     assert DAYS.has(durations(retreat), DAYS.half)
     assert not DAYS.has(durations(retreat), DAYS.full)
     assert not DAYS.has(durations(retreat), DAYS.many)
@@ -633,11 +664,11 @@ def test_occasion_duration(session, owner):
         end=datetime(2016, 10, 5, 16),
         timezone="Europe/Zurich",
         activity=retreat,
-        period=periods.active()
+        period=periods.active()  # type: ignore[arg-type]
     )
     transaction.commit()
 
-    retreat = activities.query().first()
+    retreat = activities.query().first()  # type: ignore[assignment]
     assert DAYS.has(durations(retreat), DAYS.half)
     assert DAYS.has(durations(retreat), DAYS.full)
     assert not DAYS.has(durations(retreat), DAYS.many)
@@ -648,11 +679,11 @@ def test_occasion_duration(session, owner):
         end=datetime(2016, 10, 9, 16),
         timezone="Europe/Zurich",
         activity=retreat,
-        period=periods.active()
+        period=periods.active()  # type: ignore[arg-type]
     )
     transaction.commit()
 
-    retreat = activities.query().first()
+    retreat = activities.query().first()  # type: ignore[assignment]
     assert DAYS.has(durations(retreat), DAYS.half)
     assert DAYS.has(durations(retreat), DAYS.full)
     assert DAYS.has(durations(retreat), DAYS.many)
@@ -661,7 +692,7 @@ def test_occasion_duration(session, owner):
     occasions.delete(monday)
     transaction.commit()
 
-    retreat = activities.query().first()
+    retreat = activities.query().first()  # type: ignore[assignment]
     assert DAYS.has(durations(retreat), DAYS.half)
     assert DAYS.has(durations(retreat), DAYS.full)
     assert DAYS.has(durations(retreat), DAYS.many)
@@ -670,7 +701,7 @@ def test_occasion_duration(session, owner):
     occasions.delete(tuesday)
     transaction.commit()
 
-    retreat = activities.query().first()
+    retreat = activities.query().first()  # type: ignore[assignment]
     assert not DAYS.has(durations(retreat), DAYS.half)
     assert DAYS.has(durations(retreat), DAYS.full)
     assert DAYS.has(durations(retreat), DAYS.many)
@@ -679,7 +710,7 @@ def test_occasion_duration(session, owner):
     occasions.delete(wednesday)
     transaction.commit()
 
-    retreat = activities.query().first()
+    retreat = activities.query().first()  # type: ignore[assignment]
     assert not DAYS.has(durations(retreat), DAYS.half)
     assert not DAYS.has(durations(retreat), DAYS.full)
     assert DAYS.has(durations(retreat), DAYS.many)
@@ -688,7 +719,7 @@ def test_occasion_duration(session, owner):
     occasions.delete(weekend)
     transaction.commit()
 
-    retreat = activities.query().first()
+    retreat = activities.query().first()  # type: ignore[assignment]
     assert not DAYS.has(durations(retreat), DAYS.half)
     assert not DAYS.has(durations(retreat), DAYS.full)
     assert not DAYS.has(durations(retreat), DAYS.many)
@@ -699,17 +730,21 @@ def test_occasion_duration(session, owner):
         end=datetime(2018, 10, 2, 10),
         timezone="Europe/Zurich",
         activity=retreat,
-        period=periods.active()
+        period=periods.active()  # type: ignore[arg-type]
     )
     transaction.commit()
 
-    retreat = activities.query().first()
+    retreat = activities.query().first()  # type: ignore[assignment]
     assert not DAYS.has(durations(retreat), DAYS.half)
     assert not DAYS.has(durations(retreat), DAYS.full)
     assert DAYS.has(durations(retreat), DAYS.many)
 
 
-def test_occasion_duration_with_multiple_dates(collections, owner):
+def test_occasion_duration_with_multiple_dates(
+    collections: Collections,
+    owner: User
+) -> None:
+
     period = collections.periods.add(
         "Summer 2018", (
             datetime(2018, 5, 1),
@@ -723,7 +758,7 @@ def test_occasion_duration_with_multiple_dates(collections, owner):
         )
     )
 
-    def with_dates(*ranges):
+    def with_dates(*ranges: tuple[DatetimeTuple, DatetimeTuple]) -> Occasion:
         a = collections.activities.add(uuid4().hex, username=owner.username)
 
         first, *rest = ranges
@@ -736,8 +771,8 @@ def test_occasion_duration_with_multiple_dates(collections, owner):
             period=period
         )
 
-        for s, e in rest:
-            s, e = datetime(*s), datetime(*e)
+        for s_t, e_t in rest:
+            s, e = datetime(*s_t), datetime(*e_t)
             collections.occasions.add_date(occasion, s, e, 'Europe/Zurich')
 
         return occasion
@@ -778,7 +813,7 @@ def test_occasion_duration_with_multiple_dates(collections, owner):
     assert occasion.duration == DAYS.many
 
 
-def test_occasion_durations_query(session, owner):
+def test_occasion_durations_query(session: Session, owner: User) -> None:
 
     activities = ActivityCollection(session)
     periods = BookingPeriodCollection(session)
@@ -801,7 +836,7 @@ def test_occasion_durations_query(session, owner):
         end=datetime(2016, 10, 9, 16),
         timezone="Europe/Zurich",
         activity=retreat,
-        period=periods.active()
+        period=periods.active()  # type: ignore[arg-type]
     )
 
     # the meeting has a day and a half-day occasion
@@ -810,7 +845,7 @@ def test_occasion_durations_query(session, owner):
         end=datetime(2016, 10, 10, 12),
         timezone="Europe/Zurich",
         activity=meeting,
-        period=periods.active()
+        period=periods.active()  # type: ignore[arg-type]
     )
 
     occasions.add(
@@ -818,7 +853,7 @@ def test_occasion_durations_query(session, owner):
         end=datetime(2016, 10, 11, 16),
         timezone="Europe/Zurich",
         activity=meeting,
-        period=periods.active()
+        period=periods.active()  # type: ignore[arg-type]
     )
 
     transaction.commit()
@@ -828,21 +863,27 @@ def test_occasion_durations_query(session, owner):
     assert activities.for_filter(duration=DAYS.full).query().count() == 1
     assert activities.for_filter(duration=DAYS.many).query().count() == 1
 
-    assert activities\
-        .for_filter(duration=DAYS.half)\
-        .for_filter(duration=DAYS.full)\
-        .query().count() == 1
+    assert (
+        activities
+        .for_filter(duration=DAYS.half)
+        .for_filter(duration=DAYS.full)
+        .query().count()
+    ) == 1
 
-    assert activities\
-        .for_filter(duration=DAYS.half)\
-        .for_filter(duration=DAYS.full)\
-        .for_filter(duration=DAYS.many)\
-        .query().count() == 2
+    assert (
+        activities
+        .for_filter(duration=DAYS.half)
+        .for_filter(duration=DAYS.full)
+        .for_filter(duration=DAYS.many)
+        .query().count()
+    ) == 2
 
-    assert activities\
-        .for_filter(duration=DAYS.half)\
-        .for_filter(duration=DAYS.many)\
-        .query().count() == 2
+    assert (
+        activities
+        .for_filter(duration=DAYS.half)
+        .for_filter(duration=DAYS.many)
+        .query().count()
+    ) == 2
 
     # add an occasion with overnight stay which should be categorised as 'many'
     assert activities.for_filter(duration=DAYS.half).query().count() == 1
@@ -854,7 +895,7 @@ def test_occasion_durations_query(session, owner):
         end=datetime(2018, 10, 2, 10),
         timezone="Europe/Zurich",
         activity=meeting,
-        period=periods.active()
+        period=periods.active()  # type: ignore[arg-type]
     )
     transaction.commit()
 
@@ -863,7 +904,7 @@ def test_occasion_durations_query(session, owner):
     assert activities.for_filter(duration=DAYS.many).query().count() == 2
 
 
-def test_occasion_ages(session, owner):
+def test_occasion_ages(session: Session, owner: User) -> None:
 
     activities = ActivityCollection(session)
     periods = BookingPeriodCollection(session)
@@ -886,7 +927,7 @@ def test_occasion_ages(session, owner):
         timezone="Europe/Zurich",
         age=(1, 10),
         activity=retreat,
-        period=periods.active()
+        period=periods.active()  # type: ignore[arg-type]
     )
     occasions.add(
         start=datetime(2018, 2, 19, 8),
@@ -894,7 +935,7 @@ def test_occasion_ages(session, owner):
         timezone="Europe/Zurich",
         age=(10, 20),
         activity=meeting,
-        period=periods.active()
+        period=periods.active()  # type: ignore[arg-type]
     )
 
     transaction.commit()
@@ -909,39 +950,63 @@ def test_occasion_ages(session, owner):
     assert activities.for_filter(age_range=(4, 4)).query().count() == 1
     assert activities.for_filter(age_range=(15, 15)).query().count() == 1
     assert activities.for_filter(age_range=(0, 0)).query().count() == 0
-    assert activities.for_filter(age_range=(1, 5))\
-        .for_filter(age_range=(5, 15)).query().count() == 2
+    assert (
+        activities
+        .for_filter(age_range=(1, 5))
+        .for_filter(age_range=(5, 15))
+        .query().count()
+    ) == 2
 
-    assert activities.for_filter(age_range=(1, 1))\
+    assert (
+        activities.for_filter(age_range=(1, 1))
         .filter.contains_age_range((0, 2))
-    assert activities.for_filter(age_range=(1, 1))\
+    )
+    assert (
+        activities.for_filter(age_range=(1, 1))
         .filter.contains_age_range((1, 1))
-    assert activities.for_filter(age_range=(1, 1))\
+    )
+    assert (
+        activities.for_filter(age_range=(1, 1))
         .filter.contains_age_range((1, 2))
+    )
 
-    assert not activities.for_filter(age_range=(1, 1))\
+    assert not (
+        activities.for_filter(age_range=(1, 1))
         .filter.contains_age_range((0, 0))
+    )
 
-    assert not activities.for_filter(age_range=(1, 10))\
+    assert not (
+        activities.for_filter(age_range=(1, 10))
         .filter.contains_age_range((20, 30))
+    )
 
-    assert activities\
-        .for_filter(age_range=(1, 10))\
-        .for_filter(age_range=(20, 30))\
+    assert (
+        activities
+        .for_filter(age_range=(1, 10))
+        .for_filter(age_range=(20, 30))
         .filter.contains_age_range((10, 15))
+    )
 
-    assert activities\
-        .for_filter(age_range=(1, 10))\
-        .for_filter(age_range=(20, 30))\
+    assert (
+        activities
+        .for_filter(age_range=(1, 10))
+        .for_filter(age_range=(20, 30))
         .filter.contains_age_range((10, 20))
+    )
 
-    assert not activities\
-        .for_filter(age_range=(1, 10))\
-        .for_filter(age_range=(20, 30))\
+    assert not (
+        activities
+        .for_filter(age_range=(1, 10))
+        .for_filter(age_range=(20, 30))
         .filter.contains_age_range((15, 16))
+    )
 
 
-def test_occasion_owners(session, owner, secondary_owner):
+def test_occasion_owners(
+    session: Session,
+    owner: User,
+    secondary_owner: User
+) -> None:
 
     activities = ActivityCollection(session)
 
@@ -950,23 +1015,28 @@ def test_occasion_owners(session, owner, secondary_owner):
 
     transaction.commit()
 
-    assert activities\
-        .for_filter(owner='owner@example.org')\
-        .query().count() == 1
-    assert activities\
-        .for_filter(owner='owner@example.org')\
-        .for_filter(owner='secondary@example.org')\
-        .query().count() == 2
+    assert (
+        activities
+        .for_filter(owner='owner@example.org')
+        .query().count()
+    ) == 1
+    assert (
+        activities
+        .for_filter(owner='owner@example.org')
+        .for_filter(owner='secondary@example.org')
+        .query().count()
+    ) == 2
+    assert (
+        activities
+        .for_filter(owner='secondary@example.org')
+        .query().count()
+    ) == 1
 
-    assert activities\
-        .for_filter(owner='secondary@example.org')\
-        .query().count() == 1
 
-
-def test_attendee_age(session, owner):
+def test_attendee_age(session: Session, owner: User) -> None:
     with freeze_time('2025-02-28'):
 
-        def age(years):
+        def age(years: int) -> date:
             return date.today().replace(year=date.today().year - years)
 
         attendees = AttendeeCollection(session)
@@ -980,7 +1050,7 @@ def test_attendee_age(session, owner):
         assert attendees.query().filter(Attendee.age <= 14).count() == 2
 
 
-def test_booking_collection(session, owner):
+def test_booking_collection(session: Session, owner: User) -> None:
 
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
@@ -1023,13 +1093,13 @@ def test_booking_collection(session, owner):
     assert len(all_bookings) == 2
     assert all_bookings == sorted(all_bookings, key=lambda b: b.priority)
 
-    assert bookings.for_period(Bunch(id=uuid4())).query().count() == 0
+    assert bookings.for_period(Bunch(id=uuid4())).query().count() == 0  # type: ignore[arg-type]
     assert bookings.for_username('foobar').query().count() == 0
-    assert bookings.for_period(Bunch(id=uuid4())).count(owner.username) == 0
+    assert bookings.for_period(Bunch(id=uuid4())).count(owner.username) == 0  # type: ignore[arg-type]
     assert bookings.booking_count(owner.username) == 2
 
 
-def test_star_nobble_booking(session, owner):
+def test_star_nobble_booking(session: Session, owner: User) -> None:
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
     periods = BookingPeriodCollection(session)
@@ -1092,12 +1162,16 @@ def test_star_nobble_booking(session, owner):
     assert b1.nobbled is True
 
     b1.unstar()
-    assert b1.starred is False
-    assert b1.nobbled is True
+    # undo mypy narrowing
+    b1_ = b1
+    assert b1_.starred is False
+    assert b1_.nobbled is True
 
     b1.unnobble()
-    assert b1.starred is False
-    assert b1.nobbled is False
+    # undo mypy narrowing
+    b1_ = b1
+    assert b1_.starred is False
+    assert b1_.nobbled is False
 
     b1.nobble()
     b1.star()
@@ -1136,7 +1210,7 @@ def test_star_nobble_booking(session, owner):
     assert b1.priority == 2
 
 
-def test_booking_period_id_reference(session, owner):
+def test_booking_period_id_reference(session: Session, owner: User) -> None:
 
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
@@ -1171,7 +1245,7 @@ def test_booking_period_id_reference(session, owner):
 
     transaction.commit()
 
-    assert bookings.query().first().period_id == period.id
+    assert bookings.query().first().period_id == period.id  # type: ignore[union-attr]
 
     new = periods.add(
         title="Autumn 2016",
@@ -1181,15 +1255,15 @@ def test_booking_period_id_reference(session, owner):
         active=False
     )
 
-    tournament = occasions.query().first()
+    tournament = occasions.query().first()  # type: ignore[assignment]
     tournament.period_id = new.id
 
     transaction.commit()
 
-    assert bookings.query().first().period_id == new.id
+    assert bookings.query().first().period_id == new.id  # type: ignore[union-attr]
 
 
-def test_happiness(session, owner):
+def test_happiness(session: Session, owner: User) -> None:
 
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
@@ -1240,15 +1314,17 @@ def test_happiness(session, owner):
 
     transaction.commit()
 
-    def assert_happiness(period_id, value):
+    def assert_happiness(period_id: UUID, value: float | None) -> None:
 
-        def equal(result):
+        def equal(result: float | None) -> bool:
             if value is None:
                 return result is None
             else:
+                assert result is not None
                 return round(result, 3) == value
 
         dustin = attendees.query().first()
+        assert dustin is not None
         assert equal(dustin.happiness(period_id))
 
         q = attendees.query().with_entities(Attendee.happiness(period_id))
@@ -1336,7 +1412,7 @@ def test_happiness(session, owner):
     assert_happiness(period.id, 0.8)
 
 
-def test_attendees_count(session, owner):
+def test_attendees_count(session: Session, owner: User) -> None:
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
     periods = BookingPeriodCollection(session)
@@ -1442,7 +1518,7 @@ def test_attendees_count(session, owner):
     assert q.with_entities(Occasion.available_spots).one()[0] == 0
 
 
-def test_accept_booking(session, owner):
+def test_accept_booking(session: Session, owner: User) -> None:
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
     periods = BookingPeriodCollection(session)
@@ -1523,7 +1599,7 @@ def test_accept_booking(session, owner):
     assert "The period has not yet been confirmed" in str(e.value)
     transaction.abort()
 
-    periods.active().confirmed = True
+    periods.active().confirmed = True  # type: ignore[union-attr]
     transaction.commit()
 
     # adding bookings works until the occasion is full
@@ -1570,13 +1646,15 @@ def test_accept_booking(session, owner):
 
     bookings.accept_booking(b2)
 
-    assert b2.state == 'accepted'
-    assert b1.state == 'blocked'
+    # undo mypy narrowing
+    b1_, b2_ = b1, b2
+    assert b2_.state == 'accepted'
+    assert b1_.state == 'blocked'
 
     transaction.abort()
 
     # if there's a booking limit we ensure it isn't violated
-    period = periods.active()
+    period = periods.active()  # type: ignore[assignment]
     period.all_inclusive = True
     period.max_bookings_per_attendee = 1
 
@@ -1592,7 +1670,7 @@ def test_accept_booking(session, owner):
 
     # there was a regression which lead to an error before the booking limit
     # was reached (accepted bookings were assumed to be in conflict)
-    period = periods.active()
+    period = periods.active()  # type: ignore[assignment]
     period.all_inclusive = True
     period.max_bookings_per_attendee = 2
 
@@ -1612,7 +1690,7 @@ def test_accept_booking(session, owner):
     a1 = attendees.query().filter(Attendee.name == "Dustin Henderson").one()
     a1.limit = 1
 
-    period = periods.active()
+    period = periods.active()  # type: ignore[assignment]
     period.max_bookings_per_attendee = 2
 
     bookings.accept_booking(bookings.add(owner, a1, o1))
@@ -1625,7 +1703,7 @@ def test_accept_booking(session, owner):
     transaction.abort()
 
     # if accepting the booking leads to the booking limit, the rest is blocked
-    period = periods.active()
+    period = periods.active()  # type: ignore[assignment]
     period.all_inclusive = True
     period.max_bookings_per_attendee = 1
 
@@ -1639,7 +1717,7 @@ def test_accept_booking(session, owner):
     assert b2.state == 'blocked'
 
 
-def test_booking_limit_exemption(session, owner):
+def test_booking_limit_exemption(session: Session, owner: User) -> None:
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
     periods = BookingPeriodCollection(session)
@@ -1712,7 +1790,7 @@ def test_booking_limit_exemption(session, owner):
     # none of these methods should throw an error, then we're good
 
 
-def test_cancel_booking(session, owner):
+def test_cancel_booking(session: Session, owner: User) -> None:
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
     periods = BookingPeriodCollection(session)
@@ -1793,7 +1871,7 @@ def test_cancel_booking(session, owner):
     assert "The period has not yet been confirmed" in str(e.value)
     transaction.abort()
 
-    periods.active().confirmed = True
+    periods.active().confirmed = True  # type: ignore[union-attr]
     transaction.commit()
 
     # cancelling a booking will automatically accept the blocked ones
@@ -1811,9 +1889,11 @@ def test_cancel_booking(session, owner):
 
     bookings.cancel_booking(b2, cascade=True)
 
-    assert b1.state == 'accepted'
-    assert b2.state == 'cancelled'
-    assert b3.state == 'accepted'
+    # undo mypy narrowing
+    b1_, b2_, b3_ = b1, b2, b3
+    assert b1_.state == 'accepted'
+    assert b2_.state == 'cancelled'
+    assert b3_.state == 'accepted'
 
     transaction.abort()
 
@@ -1830,9 +1910,11 @@ def test_cancel_booking(session, owner):
 
     bookings.cancel_booking(b1, cascade=True)
 
-    assert b1.state == 'cancelled'
-    assert b2.state == 'accepted'
-    assert b3.state == 'blocked'
+    # undo mypy narrowing
+    b1_, b2_, b3_ = b1, b2, b3
+    assert b1_.state == 'cancelled'
+    assert b2_.state == 'accepted'
+    assert b3_.state == 'blocked'
 
     transaction.abort()
 
@@ -1850,8 +1932,10 @@ def test_cancel_booking(session, owner):
 
     bookings.cancel_booking(b2, cascade=True)
 
-    assert b1.state == 'denied'
-    assert b2.state == 'cancelled'
+    # undo mypy narrowing
+    b1_, b2_ = b1, b2
+    assert b1_.state == 'denied'
+    assert b2_.state == 'cancelled'
 
     transaction.abort()
 
@@ -1869,9 +1953,11 @@ def test_cancel_booking(session, owner):
 
     bookings.cancel_booking(b2, cascade=True)
 
-    assert b1.state == 'accepted'
-    assert b2.state == 'cancelled'
-    assert b3.state == 'accepted'
+    # undo mypy narrowing
+    b1_, b2_, b3_ = b1, b2, b3
+    assert b1_.state == 'accepted'
+    assert b2_.state == 'cancelled'
+    assert b3_.state == 'accepted'
 
     transaction.abort()
 
@@ -1888,14 +1974,16 @@ def test_cancel_booking(session, owner):
 
     bookings.cancel_booking(b1, cascade=True)
 
-    assert b1.state == 'cancelled'
-    assert b2.state == 'accepted'
-    assert b3.state == 'open'
+    # undo mypy narrowing
+    b1_, b2_, b3_ = b1, b2, b3
+    assert b1_.state == 'cancelled'
+    assert b2_.state == 'accepted'
+    assert b3_.state == 'open'
 
     transaction.abort()
 
     # make sure the booking limit is honored
-    period = periods.active()
+    period = periods.active()  # type: ignore[assignment]
     period.all_inclusive = True
     period.max_bookings_per_attendee = 1
 
@@ -1913,23 +2001,27 @@ def test_cancel_booking(session, owner):
 
     bookings.cancel_booking(b1, cascade=True)
 
-    assert b1.state == 'cancelled'
-    assert b2.state == 'accepted'
-    assert b3.state == 'blocked'
-    assert b4.state == 'blocked'
+    # undo mypy narrowing
+    b1_, b2_, b3_, b4_ = b1, b2, b3, b4
+    assert b1_.state == 'cancelled'
+    assert b2_.state == 'accepted'
+    assert b3_.state == 'blocked'
+    assert b4_.state == 'blocked'
 
     bookings.cancel_booking(b2, cascade=True)
 
-    assert b1.state == 'cancelled'
-    assert b2.state == 'cancelled'
-    assert b3.state == 'accepted'
-    assert b4.state == 'blocked'
+    # undo mypy narrowing
+    b1_, b2_, b3_, b4_ = b1, b2, b3, b4
+    assert b1_.state == 'cancelled'
+    assert b2_.state == 'cancelled'
+    assert b3_.state == 'accepted'
+    assert b4_.state == 'blocked'
 
     transaction.abort()
 
     # make sure accepting a previously denied booking of the same occasion will
     # will be skipped if doing so would conflict with the limit
-    period = periods.active()
+    period = periods.active()  # type: ignore[assignment]
     period.all_inclusive = True
     period.max_bookings_per_attendee = 1
 
@@ -1945,12 +2037,14 @@ def test_cancel_booking(session, owner):
 
     bookings.cancel_booking(b1, cascade=True)
 
-    assert b1.state == 'cancelled'
-    assert b2.state == 'accepted'
-    assert b3.state == 'denied'
+    # undo mypy narrowing
+    b1_, b2_, b3_ = b1, b2, b3
+    assert b1_.state == 'cancelled'
+    assert b2_.state == 'accepted'
+    assert b3_.state == 'denied'
 
 
-def test_period_phases(session):
+def test_period_phases(session: Session) -> None:
     periods = BookingPeriodCollection(session)
 
     period = periods.add(
@@ -2032,7 +2126,13 @@ def test_period_phases(session):
     # attribute for the phase
 
 
-def test_invoices(session, owner, prebooking_period, inactive_period):
+def test_invoices(
+    session: Session,
+    owner: User,
+    prebooking_period: BookingPeriod,
+    inactive_period: BookingPeriod
+) -> None:
+
     p1 = prebooking_period
     p2 = inactive_period
 
@@ -2082,11 +2182,11 @@ def test_invoices(session, owner, prebooking_period, inactive_period):
     assert i1.paid == False
 
     assert session.query(func.sum(BookingPeriodInvoice.total_amount)
-        ).first()[0] == Decimal('270.5')
+        ).scalar() == Decimal('270.5')
     assert session.query(func.sum(BookingPeriodInvoice.outstanding_amount)
-        ).first()[0] == Decimal('170.5')
+        ).scalar() == Decimal('170.5')
     assert session.query(func.sum(BookingPeriodInvoice.paid_amount)
-        ).first()[0] == Decimal('100')
+        ).scalar() == Decimal('100')
 
     assert BookingPeriodInvoiceCollection(session, period_id=p1.id
         ).outstanding_amount == Decimal('137.5')
@@ -2107,7 +2207,12 @@ def test_invoices(session, owner, prebooking_period, inactive_period):
     assert BookingPeriodInvoiceCollection(session).unpaid_count() == 1
 
 
-def test_invoice_reference(session, owner, prebooking_period):
+def test_invoice_reference(
+    session: Session,
+    owner: User,
+    prebooking_period: BookingPeriod
+) -> None:
+
     invoices = BookingPeriodInvoiceCollection(
         session, user_id=owner.id, period_id=prebooking_period.id)
 
@@ -2173,25 +2278,25 @@ def test_invoice_reference(session, owner, prebooking_period):
     assert i1.references[2].bucket != i1.references[3].bucket
 
 
-def test_invoice_reference_format_esr():
+def test_invoice_reference_format_esr() -> None:
 
     schema = ESRSchema()
 
-    assert schema.format('000127131108141601011502061')\
-        == '1271 31108 14160 10115 02061'
+    assert schema.format('000127131108141601011502061') == (
+        '1271 31108 14160 10115 02061')
 
-    assert schema.format('127131108141601011502061')\
-        == '1271 31108 14160 10115 02061'
+    assert schema.format('127131108141601011502061') == (
+        '1271 31108 14160 10115 02061')
 
     assert schema.checksum('96111690000000660000000928') == '4'
     assert schema.checksum('12000000000023447894321689') == '9'
 
 
-def test_invoice_reference_format_feriennet():
+def test_invoice_reference_format_feriennet() -> None:
     assert FeriennetSchema().format('qeb3afd0e43') == 'Q-EB3AF-D0E43'
 
 
-def test_invoice_reference_extract_feriennet_schema():
+def test_invoice_reference_extract_feriennet_schema() -> None:
     extract_code = FeriennetSchema().extract
 
     assert extract_code('') is None
@@ -2206,7 +2311,12 @@ def test_invoice_reference_extract_feriennet_schema():
     assert extract_code('Code: q-70171-292fa') == 'q70171292fa'
 
 
-def test_invoice_reference_uniqueness(session, owner, prebooking_period):
+def test_invoice_reference_uniqueness(
+    session: Session,
+    owner: User,
+    prebooking_period: BookingPeriod
+) -> None:
+
     invoices = BookingPeriodInvoiceCollection(
         session, user_id=owner.id, period_id=prebooking_period.id)
 
@@ -2216,7 +2326,7 @@ def test_invoice_reference_uniqueness(session, owner, prebooking_period):
         invoices.schema.link(session, i1, optimistic=True)
 
 
-def test_confirm_period(session, owner):
+def test_confirm_period(session: Session, owner: User) -> None:
 
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
@@ -2231,7 +2341,7 @@ def test_confirm_period(session, owner):
         execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
         active=True)
     period.all_inclusive = False
-    period.booking_cost = 10
+    period.booking_cost = Decimal('10')
 
     sport = activities.add("Sport", username=owner.username)
 
@@ -2242,7 +2352,7 @@ def test_confirm_period(session, owner):
         activity=sport,
         period=period,
         spots=(0, 2))
-    o.cost = 20
+    o.cost = Decimal('20')
 
     a1 = attendees.add(
         user=owner,
@@ -2277,7 +2387,7 @@ def test_confirm_period(session, owner):
 
     period = periods.query().one()
     period.all_inclusive = True
-    period.booking_cost = 10
+    period.booking_cost = Decimal('10')
 
     b1 = bookings.add(owner, a1, o)
 
@@ -2286,7 +2396,7 @@ def test_confirm_period(session, owner):
     assert bookings.query().one().cost == 20.0
 
 
-def test_cancel_occasion(session, owner):
+def test_cancel_occasion(session: Session, owner: User) -> None:
 
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
@@ -2344,7 +2454,7 @@ def test_cancel_occasion(session, owner):
 
     transaction.abort()
 
-    periods.active().confirmed = True
+    periods.active().confirmed = True  # type: ignore[union-attr]
     o1, o2 = occasions.query().all()
 
     b1 = bookings.add(owner, a1, o1)
@@ -2355,18 +2465,26 @@ def test_cancel_occasion(session, owner):
 
     o1.cancel()
 
-    assert b1.state == 'cancelled'
-    assert b2.state == 'blocked'
+    # undo mypy narrowing
+    b1_, b2_ = b1, b2
+    assert b1_.state == 'cancelled'
+    assert b2_.state == 'blocked'
     assert o1.cancelled
     assert not o2.cancelled
 
 
-def test_no_overlapping_dates(session, collections, prebooking_period, owner):
+def test_no_overlapping_dates(
+    session: Session,
+    collections: Collections,
+    prebooking_period: BookingPeriod,
+    owner: User
+) -> None:
+
     period = prebooking_period
 
     o = collections.occasions.add(
-        start=period.execution_start,
-        end=period.execution_start + timedelta(hours=2),
+        start=as_utc(period.execution_start),
+        end=as_utc(period.execution_start) + timedelta(hours=2),
         timezone="Europe/Zurich",
         activity=collections.activities.add("Sport", username=owner.username),
         period=period
@@ -2375,18 +2493,24 @@ def test_no_overlapping_dates(session, collections, prebooking_period, owner):
     with pytest.raises(AssertionError):
         collections.occasions.add_date(
             occasion=o,
-            start=period.execution_start + timedelta(hours=1),
-            end=period.execution_start + timedelta(hours=3),
+            start=as_utc(period.execution_start) + timedelta(hours=1),
+            end=as_utc(period.execution_start) + timedelta(hours=3),
             timezone="Europe/Zurich"
         )
 
 
-def test_no_occasion_orphans(session, collections, prebooking_period, owner):
+def test_no_occasion_orphans(
+    session: Session,
+    collections: Collections,
+    prebooking_period: BookingPeriod,
+    owner: User
+) -> None:
+
     period = prebooking_period
 
     collections.occasions.add(
-        start=period.execution_start,
-        end=period.execution_start + timedelta(hours=2),
+        start=as_utc(period.execution_start),
+        end=as_utc(period.execution_start) + timedelta(hours=2),
         timezone="Europe/Zurich",
         activity=collections.activities.add("Sport", username=owner.username),
         period=period
@@ -2397,7 +2521,7 @@ def test_no_occasion_orphans(session, collections, prebooking_period, owner):
     assert collections.occasions.query().count() == 1
     assert session.query(OccasionDate).count() == 1
 
-    collections.occasions.delete(collections.occasions.query().first())
+    collections.occasions.delete(collections.occasions.query().first())  # type: ignore[arg-type]
     transaction.commit()
 
     assert collections.occasions.query().count() == 0
@@ -2405,12 +2529,18 @@ def test_no_occasion_orphans(session, collections, prebooking_period, owner):
 
 
 @pytest.mark.skip_night_hours
-def test_date_changes(session, collections, prebooking_period, owner):
+def test_date_changes(
+    session: Session,
+    collections: Collections,
+    prebooking_period: BookingPeriod,
+    owner: User
+) -> None:
+
 
     period = prebooking_period
     collections.occasions.add(
-        start=period.execution_start,
-        end=period.execution_start + timedelta(hours=2),
+        start=as_utc(period.execution_start),
+        end=as_utc(period.execution_start) + timedelta(hours=2),
         timezone="Europe/Zurich",
         activity=collections.activities.add("Sport", username=owner.username),
         period=period
@@ -2418,6 +2548,8 @@ def test_date_changes(session, collections, prebooking_period, owner):
     transaction.commit()
 
     o = collections.occasions.query().first()
+    assert o is not None
+    assert o.duration is not None
     assert DAYS.has(o.duration, DAYS.half)
     assert not DAYS.has(o.duration, DAYS.full)
     assert not DAYS.has(o.duration, DAYS.many)
@@ -2434,10 +2566,10 @@ def test_date_changes(session, collections, prebooking_period, owner):
     assert not DAYS.has(o.duration, DAYS.many)
 
 
-def test_age_barriers(prebooking_period):
+def test_age_barriers(prebooking_period: BookingPeriod) -> None:
     period = prebooking_period
 
-    o = Occasion(age=NumericRange(6, 9), period=period, dates=[
+    o = Occasion(age=NumericRange(6, 9), period=period, dates=[  # type: ignore[misc]
         OccasionDate(
             start=datetime(2017, 7, 26, 10),
             end=datetime(2017, 7, 26, 16),
@@ -2477,12 +2609,18 @@ def test_age_barriers(prebooking_period):
     assert o.is_too_old(date(2007, 12, 31))
 
 
-def test_deadline(session, collections, prebooking_period, owner):
+def test_deadline(
+    session: Session,
+    collections: Collections,
+    prebooking_period: BookingPeriod,
+    owner: User
+) -> None:
+
     period = prebooking_period
 
     start, end = (
-        period.execution_start,
-        period.execution_start + timedelta(hours=2)
+        as_utc(period.execution_start),
+        as_utc(period.execution_start) + timedelta(hours=2)
     )
 
     occasion = collections.occasions.add(
@@ -2492,18 +2630,24 @@ def test_deadline(session, collections, prebooking_period, owner):
         activity=collections.activities.add("Sport", username=owner.username),
         period=period
     )
-    assert occasion.deadline == period.booking_end.date()
+    assert occasion.deadline == period.booking_end
 
     period.deadline_days = 1
     assert occasion.deadline == (start - timedelta(days=2)).date()
 
 
-def test_cancellation_deadline(session, collections, prebooking_period, owner):
+def test_cancellation_deadline(
+    session: Session,
+    collections: Collections,
+    prebooking_period: BookingPeriod,
+    owner: User
+) -> None:
+
     period = prebooking_period
 
     start, end = (
-        period.execution_start,
-        period.execution_start + timedelta(hours=2)
+        as_utc(period.execution_start),
+        as_utc(period.execution_start) + timedelta(hours=2)
     )
 
     occasion = collections.occasions.add(
@@ -2522,14 +2666,14 @@ def test_cancellation_deadline(session, collections, prebooking_period, owner):
     assert occasion.cancellation_deadline == date(2017, 2, 23)
 
 
-def test_prebooking_phases():
+def test_prebooking_phases() -> None:
     period = BookingPeriod()
 
     period.prebooking_start = date(2017, 5, 1)
     period.prebooking_end = date(2017, 5, 2)
     period.booking_start = date(2017, 5, 3)
 
-    def standardize(string):
+    def standardize(string: str) -> datetime:
         dt = datetime.strptime(string, '%Y-%m-%d %H:%M:%S')
         return standardize_date(dt, 'Europe/Zurich')
 
@@ -2537,28 +2681,34 @@ def test_prebooking_phases():
         assert period.is_prebooking_in_future
 
     with freeze_time(standardize('2017-05-01 00:00:00')):
-        assert not period.is_prebooking_in_future
+        # undo mypy narrowing
+        period_ = period
+        assert not period_.is_prebooking_in_future
 
         period.active = False
         assert not period.is_currently_prebooking
 
         period.active = True
-        assert period.is_currently_prebooking
+        assert period_.is_currently_prebooking
 
     with freeze_time(standardize('2017-05-05 00:00:00')):
-        assert not period.is_prebooking_in_future
-        assert not period.is_currently_prebooking
-        assert period.is_prebooking_in_past
+        # undo mypy narrowing
+        period_ = period
+        assert not period_.is_prebooking_in_future
+        assert not period_.is_currently_prebooking
+        assert period_.is_prebooking_in_past
 
     with freeze_time(standardize('2017-05-02 23:59:59')):
-        assert period.is_currently_prebooking
+        # undo mypy narrowing
+        period_ = period
+        assert period_.is_currently_prebooking
 
         period.confirmed = True
         assert not period.is_currently_prebooking
         assert period.is_prebooking_in_past
 
 
-def test_publication_request(session, owner):
+def test_publication_request(session: Session, owner: User) -> None:
 
     activities = ActivityCollection(session)
     requests = PublicationRequestCollection(session)
@@ -2580,12 +2730,12 @@ def test_publication_request(session, owner):
     request = requests.add(activity=activity, period=period)
     session.flush()
 
-    request = requests.query().first()
+    request = requests.query().first()  # type: ignore[assignment]
     assert request.activity.title == "Sport"
     assert request.period.title == "Autumn 2016"
 
 
-def test_archive_period(session, owner):
+def test_archive_period(session: Session, owner: User) -> None:
 
     activities = ActivityCollection(session)
     occasions = OccasionCollection(session)
@@ -2660,14 +2810,14 @@ def test_archive_period(session, owner):
     assert empty.state == 'archived'
 
 
-def test_activity_filter_toggle():
+def test_activity_filter_toggle() -> None:
     f = ActivityFilter(tags=['Foo'])
 
     assert not f.toggled(tag='Foo').tags
     assert f.toggled(tag='Bar').tags == {'Foo', 'Bar'}
 
 
-def test_activity_period_filter(scenario):
+def test_activity_period_filter(scenario: Scenario) -> None:
     # an activity fully booked in the previous period...
     scenario.add_period(title="Prev", active=False, confirmed=True)
     scenario.add_activity(title="Running", state='accepted')
@@ -2710,7 +2860,7 @@ def test_activity_period_filter(scenario):
     ).query().count() == 0
 
 
-def test_activity_cost_filter(scenario):
+def test_activity_cost_filter(scenario: Scenario) -> None:
     scenario.add_period()
 
     scenario.add_activity()
@@ -2731,8 +2881,9 @@ def test_activity_cost_filter(scenario):
     assert a.for_filter(price_range=(100, 1000)).query().count() == 1
     assert a.for_filter(price_range=(101, 1000)).query().count() == 0
 
+    assert scenario.latest_period is not None
     scenario.latest_period.all_inclusive = False
-    scenario.latest_period.booking_cost = 1
+    scenario.latest_period.booking_cost = Decimal('1')
 
     assert a.for_filter(price_range=(0, 0)).query().count() == 0
     assert a.for_filter(price_range=(1, 1)).query().count() == 1
@@ -2752,7 +2903,7 @@ def test_activity_cost_filter(scenario):
     assert a.for_filter(price_range=(101, 1000)).query().count() == 0
 
 
-def test_timeline_filter(scenario):
+def test_timeline_filter(scenario: Scenario) -> None:
     with freeze_time('2018-02-01'):
         scenario.add_period(active=False)
         scenario.add_activity(title="Winter")
@@ -2814,7 +2965,7 @@ def test_timeline_filter(scenario):
         assert a.for_filter(timeline='undated').query().count() == 1
 
 
-def test_no_occasion_in_period_filter(scenario):
+def test_no_occasion_in_period_filter(scenario: Scenario) -> None:
     # an activity with an occasion in one period
     scenario.add_period(title="Previous", active=False, confirmed=True)
     scenario.add_activity(title="Running", state='accepted')
@@ -2839,7 +2990,7 @@ def test_no_occasion_in_period_filter(scenario):
     assert a.for_filter(period_id=scenario.periods[1].id).query().count() == 2
 
 
-def test_occasion_costs_all_inclusive_free(scenario):
+def test_occasion_costs_all_inclusive_free(scenario: Scenario) -> None:
     scenario.add_period(all_inclusive=True, booking_cost=10)
     scenario.add_activity(state='accepted')
     scenario.add_occasion()
@@ -2849,11 +3000,12 @@ def test_occasion_costs_all_inclusive_free(scenario):
     cost = scenario.session.query(Occasion.total_cost).scalar()
     assert cost == 0
 
-    cost = scenario.session.query(Occasion).first().total_cost
-    assert cost == 0
+    occasion = scenario.session.query(Occasion).first()
+    assert occasion is not None
+    assert occasion.total_cost == 0
 
 
-def test_occasion_costs_all_inclusive_paid(scenario):
+def test_occasion_costs_all_inclusive_paid(scenario: Scenario) -> None:
     scenario.add_period(all_inclusive=True, booking_cost=10)
     scenario.add_activity(state='accepted')
     scenario.add_occasion(cost=20)
@@ -2863,11 +3015,12 @@ def test_occasion_costs_all_inclusive_paid(scenario):
     cost = scenario.session.query(Occasion.total_cost).scalar()
     assert cost == 20
 
-    cost = scenario.session.query(Occasion).first().total_cost
-    assert cost == 20
+    occasion = scenario.session.query(Occasion).first()
+    assert occasion is not None
+    assert occasion.total_cost == 20
 
 
-def test_occasion_costs_free(scenario):
+def test_occasion_costs_free(scenario: Scenario) -> None:
     scenario.add_period(all_inclusive=False, booking_cost=0)
     scenario.add_activity(state='accepted')
     scenario.add_occasion()
@@ -2877,11 +3030,12 @@ def test_occasion_costs_free(scenario):
     cost = scenario.session.query(Occasion.total_cost).scalar()
     assert cost == 0
 
-    cost = scenario.session.query(Occasion).first().total_cost
-    assert cost == 0
+    occasion = scenario.session.query(Occasion).first()
+    assert occasion is not None
+    assert occasion.total_cost == 0
 
 
-def test_occasion_costs_partial(scenario):
+def test_occasion_costs_partial(scenario: Scenario) -> None:
     scenario.add_period(all_inclusive=False, booking_cost=10)
     scenario.add_activity(state='accepted')
     scenario.add_occasion()
@@ -2891,11 +3045,12 @@ def test_occasion_costs_partial(scenario):
     cost = scenario.session.query(Occasion.total_cost).scalar()
     assert cost == 10
 
-    cost = scenario.session.query(Occasion).first().total_cost
-    assert cost == 10
+    occasion = scenario.session.query(Occasion).first()
+    assert occasion is not None
+    assert occasion.total_cost == 10
 
 
-def test_occasion_costs_full(scenario):
+def test_occasion_costs_full(scenario: Scenario) -> None:
     scenario.add_period(all_inclusive=False, booking_cost=10)
     scenario.add_activity(state='accepted')
     scenario.add_occasion(cost=20)
@@ -2905,11 +3060,12 @@ def test_occasion_costs_full(scenario):
     cost = scenario.session.query(Occasion.total_cost).scalar()
     assert cost == 30
 
-    cost = scenario.session.query(Occasion).first().total_cost
-    assert cost == 30
+    occasion = scenario.session.query(Occasion).first()
+    assert occasion is not None
+    assert occasion.total_cost == 30
 
 
-def test_occasion_costs_custom(scenario):
+def test_occasion_costs_custom(scenario: Scenario) -> None:
     scenario.add_period(all_inclusive=False, booking_cost=10)
     scenario.add_activity(state='accepted')
     scenario.add_occasion(cost=20, booking_cost=5)
@@ -2919,5 +3075,6 @@ def test_occasion_costs_custom(scenario):
     cost = scenario.session.query(Occasion.total_cost).scalar()
     assert cost == 25
 
-    cost = scenario.session.query(Occasion).first().total_cost
-    assert cost == 25
+    occasion = scenario.session.query(Occasion).first()
+    assert occasion is not None
+    assert occasion.total_cost == 25

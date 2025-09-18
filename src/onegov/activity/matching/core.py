@@ -10,25 +10,30 @@ from onegov.activity import Attendee, Booking, Occasion, BookingPeriod
 from onegov.activity.matching.score import Scoring
 from onegov.activity.matching.utils import overlaps, LoopBudget, HashableID
 from onegov.activity.matching.utils import booking_order, unblockable
-from onegov.core.utils import Bunch
 from itertools import groupby, product
 from sortedcontainers import SortedSet
 from sqlalchemy.orm import joinedload, defer
 
 
-from typing import Literal, TYPE_CHECKING
+from typing import Any, Literal, Generic, NamedTuple, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterable, Sequence
     from decimal import Decimal
+    from onegov.activity.matching.interfaces import MatchableBooking
+    from onegov.activity.matching.interfaces import MatchableOccasion
     from onegov.activity.models.booking import BookingState
     from sqlalchemy.orm import Session
     from typing import TypeAlias
     from uuid import UUID
 
-    ScoreFunction: TypeAlias = Callable[[Booking], Decimal]
+    ScoreFunction: TypeAlias = Callable[['BookingT'], Decimal]
 
 
-class AttendeeAgent(HashableID):
+BookingT = TypeVar('BookingT', bound='Booking | MatchableBooking')
+OccasionT = TypeVar('OccasionT', bound='Occasion | MatchableOccasion')
+
+
+class AttendeeAgent(HashableID, Generic[BookingT]):
     """ Acts on behalf of the attendee with the goal to get a stable booking
     with an occasion.
 
@@ -42,31 +47,35 @@ class AttendeeAgent(HashableID):
 
     __slots__ = ('id', 'wishlist', 'accepted', 'blocked')
 
-    accepted: set[Booking]
-    blocked: set[Booking]
+    accepted: set[BookingT]
+    blocked: set[BookingT]
 
     def __init__(
         self,
         id: UUID,
-        bookings: Iterable[Booking],
+        bookings: Iterable[BookingT],
         limit: int | None = None,
         minutes_between: float = 0,
         alignment: Literal['day', 'week', 'month'] | None = None
-    ):
+    ) -> None:
         self.id = id
         self.limit = limit
-        self.wishlist = SortedSet(bookings, key=booking_order)
+        self.wishlist = SortedSet(bookings, key=booking_order)  # type: ignore[arg-type]
         self.accepted = set()
         self.blocked = set()
         self.minutes_between = minutes_between
         self.alignment = alignment
 
-    def blocks(self, subject: Booking, other: Booking | Occasion) -> bool:
+    def blocks(
+        self,
+        subject: BookingT,
+        other: BookingT | Occasion | MatchableOccasion
+    ) -> bool:
         return overlaps(
             subject, other, self.minutes_between, self.alignment,
             with_anti_affinity_check=True)
 
-    def accept(self, booking: Booking) -> None:
+    def accept(self, booking: BookingT) -> None:
         """ Accepts the given booking. """
 
         self.wishlist.remove(booking)
@@ -81,7 +90,7 @@ class AttendeeAgent(HashableID):
 
         self.wishlist -= self.blocked
 
-    def deny(self, booking: Booking) -> None:
+    def deny(self, booking: BookingT) -> None:
         """ Removes the given booking from the accepted bookings. """
 
         self.wishlist.add(booking)
@@ -109,7 +118,7 @@ class AttendeeAgent(HashableID):
         return True
 
 
-class OccasionAgent(HashableID):
+class OccasionAgent(HashableID, Generic[OccasionT, BookingT]):
     """ Represents the other side of the Attendee/Occasion pair.
 
     While the attende agent will try to get the best possible occasion
@@ -123,17 +132,17 @@ class OccasionAgent(HashableID):
 
     __slots__ = ('occasion', 'bookings', 'attendees', 'score_function')
 
-    bookings: set[Booking]
-    attendees: dict[Booking, AttendeeAgent]
-    score_function: ScoreFunction
+    bookings: set[BookingT]
+    attendees: dict[BookingT, AttendeeAgent[BookingT]]
+    score_function: ScoreFunction[BookingT]
 
     def __init__(
         self,
-        occasion: Occasion,
-        score_function: ScoreFunction | None = None
+        occasion: OccasionT,
+        score_function: ScoreFunction[BookingT] | None = None
     ) -> None:
 
-        self.id = occasion.id
+        self.id = occasion.id  # type: ignore[assignment]
         self.occasion = occasion
         self.bookings = set()
         self.attendees = {}
@@ -143,7 +152,7 @@ class OccasionAgent(HashableID):
     def full(self) -> bool:
         return len(self.bookings) >= (self.occasion.max_spots)
 
-    def preferred(self, booking: Booking) -> Booking | None:
+    def preferred(self, booking: BookingT) -> BookingT | None:
         """ Returns the first booking with a lower score than the given
         booking (which indicates that the given booking is preferred over
         the returned item).
@@ -159,17 +168,25 @@ class OccasionAgent(HashableID):
             None
         )
 
-    def accept(self, attendee: AttendeeAgent, booking: Booking) -> None:
+    def accept(
+        self,
+        attendee: AttendeeAgent[BookingT],
+        booking: BookingT
+    ) -> None:
         self.attendees[booking] = attendee
         self.bookings.add(booking)
         attendee.accept(booking)
 
-    def deny(self, booking: Booking) -> None:
+    def deny(self, booking: BookingT) -> None:
         self.attendees[booking].deny(booking)
         self.bookings.remove(booking)
         del self.attendees[booking]
 
-    def match(self, attendee: AttendeeAgent, booking: Booking) -> bool:
+    def match(
+        self,
+        attendee: AttendeeAgent[BookingT],
+        booking: BookingT
+    ) -> bool:
 
         # as long as there are spots, automatically accept new requests
         if not self.full:
@@ -190,19 +207,25 @@ class OccasionAgent(HashableID):
         return False
 
 
+class DeferredAcceptanceResult(NamedTuple, Generic[BookingT]):
+    open: set[BookingT]
+    accepted: set[BookingT]
+    blocked: set[BookingT]
+
+
 def deferred_acceptance(
-    bookings: Sequence[Booking],
-    occasions: Iterable[Occasion],
-    score_function: ScoreFunction | None = None,
+    bookings: Sequence[BookingT],
+    occasions: Iterable[OccasionT],
+    score_function: ScoreFunction[BookingT] | None = None,
     validity_check: bool = True,
     stability_check: bool = False,
     hard_budget: bool = True,
     default_limit: int | None = None,
-    attendee_limits: dict[UUID, int] | None = None,
+    attendee_limits: dict[Any, int] | None = None,
     minutes_between: float = 0,
     alignment: Literal['day'] | None = None,
     sort_bookings: bool = True
-) -> Bunch:  # FIXME: Return NamedTuple
+) -> DeferredAcceptanceResult[BookingT]:
     """ Matches bookings with occasions.
 
     :score_function:
@@ -271,9 +294,13 @@ def deferred_acceptance(
 
     attendee_limits = attendee_limits or {}
 
-    # pre-calculate the booking scores
-    score_function = score_function or Scoring()
+    if score_function is None:
+        if TYPE_CHECKING:
+            score_function = Scoring[BookingT]()
+        else:
+            score_function = Scoring()
 
+    # pre-calculate the booking scores
     for booking in bookings:
         booking.score = score_function(booking)
 
@@ -281,6 +308,7 @@ def deferred_acceptance(
     # should no longer be used for performance reasons
     score_function = None
 
+    occasions_: dict[object, OccasionAgent[OccasionT, BookingT]]
     occasions_ = {o.id: OccasionAgent(o) for o in occasions}
 
     attendees = {
@@ -329,7 +357,7 @@ def deferred_acceptance(
     if stability_check:
         assert is_stable(attendees.values(), occasions_.values())
 
-    return Bunch(
+    return DeferredAcceptanceResult(
         open={b for a in attendees.values() for b in a.wishlist},
         accepted={b for a in attendees.values() for b in a.accepted},
         blocked={b for a in attendees.values() for b in a.blocked},
@@ -340,7 +368,7 @@ def deferred_acceptance_from_database(
     session: Session,
     period_id: UUID,
     *,
-    score_function: ScoreFunction | None = None,
+    score_function: ScoreFunction[Booking] | None = None,
     validity_check: bool = True,
     stability_check: bool = False,
     hard_budget: bool = True,
@@ -409,8 +437,8 @@ def deferred_acceptance_from_database(
 
 
 def is_stable(
-    attendees: Iterable[AttendeeAgent],
-    occasions: Collection[OccasionAgent]
+    attendees: Iterable[AttendeeAgent[BookingT]],
+    occasions: Collection[OccasionAgent[Any, BookingT]]
 ) -> bool:
     """ Returns true if the matching between attendees and occasions is
     stable.
