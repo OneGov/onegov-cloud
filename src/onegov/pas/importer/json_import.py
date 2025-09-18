@@ -339,6 +339,21 @@ class PeopleImporter(DataImporter):
                     exc_info=True,
                 )
 
+        # Log individual details of new parliamentarians
+        if new_parliamentarians:
+            emails_or_names = []
+            for p in new_parliamentarians:
+                identifier = p.email_primary or (
+                    f'{p.first_name} {p.last_name}'.strip()
+                )
+                if identifier:
+                    emails_or_names.append(identifier)
+
+            if emails_or_names:
+                log.info(
+                    f'New parliamentarians created: {", ".join(emails_or_names)}'
+                )
+
         self._bulk_save(new_parliamentarians, 'new parliamentarians')
 
         # Filter out any objects that failed to save

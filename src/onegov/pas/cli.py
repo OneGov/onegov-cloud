@@ -5,6 +5,10 @@ import logging
 import requests
 import json
 import urllib3
+import threading
+import queue
+import warnings
+from dataclasses import dataclass
 from urllib.parse import urlparse, urlunparse
 from onegov.core.cli import command_group
 from onegov.pas.excel_header_constants import (
@@ -34,6 +38,67 @@ if TYPE_CHECKING:
 log = logging.getLogger('onegov.org.cli')
 
 cli = command_group()
+
+# Disable SSL warnings for self-signed certificates
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+# Suppress Fontconfig error messages
+warnings.filterwarnings('ignore', message='.*Fontconfig error.*')
+warnings.filterwarnings('ignore', message='.*No writable cache directories.*')
+
+
+@dataclass
+class UpdateResult:
+    parliamentarian_id: str
+    title: str
+    custom_values: dict[str, str]
+    error: str | None = None
+
+
+def _fetch_custom_data_worker(
+    parliamentarian_queue: queue.Queue[Any],
+    result_queue: queue.Queue[UpdateResult],
+    token: str,
+    base_url: str
+) -> None:
+    """Worker thread that fetches API data for parliamentarians."""
+    headers = {
+        'Authorization': f'Token {token}',
+        'Accept': 'application/json'
+    }
+
+    while True:
+        try:
+            parliamentarian = parliamentarian_queue.get_nowait()
+        except queue.Empty:
+            break
+
+        try:
+            person_id = parliamentarian.external_kub_id
+            url = f'{base_url}/people/{person_id}'
+
+            response = requests.get(
+                url, headers=headers, verify=False, timeout=30  # nosec: B501
+            )
+            response.raise_for_status()
+
+            person_data = response.json()
+            custom_values = person_data.get('customValues', {})
+
+            result_queue.put(UpdateResult(
+                parliamentarian_id=parliamentarian.id,
+                title=parliamentarian.title,
+                custom_values=custom_values
+            ))
+        except Exception as e:
+            result_queue.put(UpdateResult(
+                parliamentarian_id=parliamentarian.id,
+                title=parliamentarian.title,
+                custom_values={},
+                error=str(e)
+            ))
+        finally:
+            parliamentarian_queue.task_done()
 
 
 @cli.command('import-commission-data')
@@ -197,6 +262,167 @@ def create_mock_file_data(
     return file_dict  # type: ignore[return-value]
 
 
+def perform_custom_data_update(
+    request: TownRequest,
+    app: PasApp,
+    token: str,
+    base_url: str,
+    output: OutputHandler | None = None,
+    max_workers: int = 3
+) -> tuple[int, int]:
+    """
+    Multi-threaded function that updates parliamentarians with custom field
+    data.
+
+    Uses a queue-based approach where worker threads fetch API data
+    concurrently while the main thread handles all database updates to
+    maintain thread safety.
+
+    Args:
+        request: TownRequest object
+        app: PasApp object
+        token: Authorization token for KUB API
+        base_url: Base URL for the KUB API
+        output: Optional output handler for progress messages
+        max_workers: Maximum number of concurrent API worker threads
+            (default: 3)
+
+    Returns:
+        Tuple of (updated_count, error_count)
+    """
+    from onegov.parliament.models import Parliamentarian
+
+    field_mappings = {
+        'personalnummer': 'personnel_number',
+        'vertragsnummer': 'contract_number',
+        'wahlkreis': 'district',
+        'beruf': 'occupation',
+        'adress_anrede': 'salutation_for_address',
+        'brief_anrede': 'salutation_for_letter'
+    }
+
+    # Get all parliamentarians (single DB query)
+    all_parliamentarians = request.session.query(Parliamentarian).all()
+
+    # Separate parliamentarians with and without external_kub_id
+    parliamentarians_with_id = [
+        p for p in all_parliamentarians if p.external_kub_id is not None
+    ]
+    parliamentarians_without_id = [
+        p for p in all_parliamentarians if p.external_kub_id is None
+    ]
+
+    # Log warning if parliamentarians without external_kub_id exist
+    if parliamentarians_without_id:
+        missing_names = [p.title for p in parliamentarians_without_id]
+        warning_msg = (
+            f'Warning: {len(parliamentarians_without_id)} parliamentarians '
+            f'found without external_kub_id: {", ".join(missing_names)}. '
+            f'These will not be synchronized.'
+        )
+        if output:
+            output.error(warning_msg)
+        log.warning(
+            f'Found {len(parliamentarians_without_id)} parliamentarians '
+            f'without external_kub_id: {missing_names}. '
+            f'These will not be synchronized.'
+        )
+
+    if not parliamentarians_with_id:
+        if output:
+            output.info('No parliamentarians with external_kub_id found')
+        return 0, 0
+
+    # Use only parliamentarians with external_kub_id for processing
+    parliamentarians = parliamentarians_with_id
+
+    if output:
+        output.info(
+            f'Found {len(parliamentarians)} parliamentarians to update '
+            f'with custom data using {max_workers} workers'
+        )
+
+    # Set up queues for thread communication
+    parliamentarian_queue: queue.Queue[Any] = queue.Queue()
+    result_queue: queue.Queue[UpdateResult] = queue.Queue()
+
+    # Fill work queue with parliamentarians
+    for p in parliamentarians:
+        parliamentarian_queue.put(p)
+
+    # Start worker threads (API fetching only)
+    threads = []
+    for i in range(max_workers):
+        t = threading.Thread(
+            target=_fetch_custom_data_worker,
+            args=(parliamentarian_queue, result_queue, token, base_url)
+        )
+        t.start()
+        threads.append(t)
+
+    # Main thread handles all DB updates (single session, thread-safe)
+    updated_count = 0
+    error_count = 0
+    processed = 0
+
+    # Process results as they come in from worker threads
+    while processed < len(parliamentarians):
+        try:
+            # Wait for next result with timeout
+            result = result_queue.get(timeout=120)  # 2 min timeout
+            processed += 1
+
+            if result.error:
+                error_count += 1
+                if output:
+                    output.error(
+                        f'✗ Failed to fetch {result.title}: {result.error}'
+                    )
+            else:
+                # Update parliamentarian in main thread's session
+                parliamentarian = request.session.query(
+                    Parliamentarian).filter(
+                    Parliamentarian.id == result.parliamentarian_id
+                ).first()
+
+                if parliamentarian:
+                    updated_fields = []
+                    for custom_key, attr_name in field_mappings.items():
+                        if custom_key in result.custom_values:
+                            setattr(
+                                parliamentarian, attr_name,
+                                result.custom_values[custom_key]
+                            )
+                            updated_fields.append(attr_name)
+
+                    if updated_fields:
+                        updated_count += 1
+                        if output:
+                            output.success(
+                                f'✓ Updated {result.title}: '
+                                f'{", ".join(updated_fields)}'
+                            )
+                    else:
+                        if output:
+                            output.info(
+                                f'No custom data found for {result.title}'
+                            )
+
+            result_queue.task_done()
+
+        except queue.Empty:
+            if output:
+                output.error('Timeout waiting for API results')
+            error_count += (len(parliamentarians) - processed)
+            break
+
+    # Wait for all worker threads to complete
+    for t in threads:
+        t.join(timeout=10)  # Give threads 10s to finish up
+
+    return updated_count, error_count
+
+
 def perform_kub_import(
     request: TownRequest,
     app: PasApp,
@@ -340,16 +566,34 @@ def perform_kub_import(
 @cli.command('import-kub-data')
 @click.option('--token', required=True, help='Authorization token for KUB API')
 @click.option('--base-url', help='Base URL for the KUB API, ending in /api/v2')
-def import_kub_data(token: str, base_url: str) -> Processor:
+@click.option('--update-custom/--no-update-custom', default=True,
+              help='Update parliamentarians with custom field data after '
+                   'import (default: enabled)')
+@click.option('--max-workers', default=3, type=int,
+              help='Maximum number of concurrent workers for custom data '
+                   'update (default: 3)')
+def import_kub_data(
+    token: str, base_url: str, update_custom: bool, max_workers: int
+) -> Processor:
     """
     Import data from the KUB API endpoints.
 
     Fetches data from /people, /organizations, and /memberships endpoints
-    and imports them using the existing import logic.
+    and imports them using the existing import logic. Optionally updates
+    parliamentarians with custom field data from individual API calls using
+    multi-threaded processing for improved performance.
 
     Example:
         onegov-pas --select '/onegov_pas/zug' import-kub-data \
             --token "your-token-here"
+
+        # Skip custom data update:
+        onegov-pas --select '/onegov_pas/zug' import-kub-data \
+            --token "your-token-here" --no-update-custom
+
+        # Use more workers for faster custom data processing:
+        onegov-pas --select '/onegov_pas/zug' import-kub-data \
+            --token "your-token-here" --max-workers 5
     """
 
     def cli_wrapper(request: TownRequest, app: PasApp) -> None:
@@ -391,6 +635,26 @@ def import_kub_data(token: str, base_url: str) -> Processor:
                         f'{updated_count} updated, {processed_count} processed'
                     )
 
+            # Update parliamentarians with custom data if requested
+            if update_custom:
+                output_handler.info('Starting custom data update...')
+                try:
+                    custom_updated, custom_errors = perform_custom_data_update(
+                        request, app, token, base_url, output_handler,
+                        max_workers
+                    )
+                    output_handler.success(
+                        f'Custom data update completed: {custom_updated} '
+                        f'updated, {custom_errors} errors'
+                    )
+                except Exception as e:
+                    output_handler.error(f'Custom data update failed: {e}')
+                    raise
+            else:
+                output_handler.info(
+                    'Skipping custom data update (--no-update-custom)'
+                )
+
         except Exception as e:
             output_handler.error(f'Import failed: {e}')
             raise
@@ -402,116 +666,44 @@ def import_kub_data(token: str, base_url: str) -> Processor:
 @click.option('--token', required=True, help='Authorization token for KUB API')
 @click.option('--base-url', required=True,
               help='Base URL for the KUB API, ending in /api/v2')
-def update_custom_data(token: str, base_url: str) -> Processor:
+@click.option('--max-workers', default=3, type=int,
+              help='Maximum number of concurrent workers (default: 3)')
+def update_custom_data(
+    token: str, base_url: str, max_workers: int
+) -> Processor:
     """
     Update parliamentarians with customFields data which
     somehow is not included in the main /people api.
     Needs to be run after import_kub_data
 
+    Uses multi-threading to fetch custom data concurrently from the API
+    while maintaining thread-safe database operations.
+
     Example:
         onegov-pas --select '/onegov_pas/zug' update-custom-data \
             --token "your-token-here" \
             --base-url "url-ending-in/api/v2"
+
+        # Use more workers for faster processing:
+        onegov-pas --select '/onegov_pas/zug' update-custom-data \
+            --token "your-token-here" \
+            --base-url "url-ending-in/api/v2" \
+            --max-workers 5
     """
 
     def update_data(request: TownRequest, app: PasApp) -> None:
-        from onegov.parliament.models import Parliamentarian
-        field_mappings = {
-            'personalnummer': 'personnel_number',
-            'vertragsnummer': 'contract_number',
-            'wahlkreis': 'district',
-            'beruf': 'occupation',
-            'adress_anrede': 'salutation_for_address',
-            'brief_anrede': 'salutation_for_letter'
-        }
-
         output_handler = ClickOutputHandler()
 
-        # Disable SSL warnings (self signed)
-        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-        headers = {
-            'Authorization': f'Token {token}',
-            'Accept': 'application/json'
-        }
-
-        # Get all parliamentarians with external_kub_id
-        parliamentarians = request.session.query(Parliamentarian).filter(
-            Parliamentarian.external_kub_id.isnot(None)
-        ).all()
-
-        if not parliamentarians:
-            output_handler.info(
-                'No parliamentarians with external_kub_id found'
-            )
-            return
-
-        output_handler.info(
-            f'Found {len(parliamentarians)} parliamentarians to update'
-        )
-
-        updated_count = 0
-        error_count = 0
-
-        for parliamentarian in parliamentarians:
-            try:
-                person_id = parliamentarian.external_kub_id
-                url = f'{base_url}/people/{person_id}'
-
-                output_handler.info(
-                    f'Fetching data for {parliamentarian.title} ({person_id})'
-                )
-
-                response = requests.get(
-                    url, headers=headers, verify=False, timeout=30  # nosec: B501
-                )
-                response.raise_for_status()
-
-                person_data = response.json()
-                custom_values = person_data.get('customValues', {})
-
-                # Update parliamentarian with custom values
-                updated_fields = []
-                for custom_key, attr_name in field_mappings.items():
-                    if custom_key in custom_values:
-                        setattr(
-                            parliamentarian, attr_name,
-                            custom_values[custom_key]
-                        )
-                        updated_fields.append(attr_name)
-
-                if updated_fields:
-                    updated_count += 1
-                    output_handler.success(
-                        f'Updated {parliamentarian.title}: '
-                        f'{", ".join(updated_fields)}'
-                    )
-                else:
-                    output_handler.info(
-                        f'No custom data found for {parliamentarian.title}'
-                    )
-
-            except requests.exceptions.RequestException as e:
-                error_count += 1
-                output_handler.error(
-                    f'Failed to fetch data for {parliamentarian.title}: {e}'
-                )
-            except Exception as e:
-                error_count += 1
-                output_handler.error(
-                    f'Error updating {parliamentarian.title}: {e}'
-                )
-
-        # Commit the changes
         try:
-            request.session.commit()
+            updated_count, error_count = perform_custom_data_update(
+                request, app, token, base_url, output_handler, max_workers
+            )
             output_handler.success(
                 f'Update completed: {updated_count} updated, '
                 f'{error_count} errors'
             )
         except Exception as e:
-            request.session.rollback()
-            output_handler.error(f'Failed to commit changes: {e}')
+            output_handler.error(f'Custom data update failed: {e}')
             raise
 
     return update_data
