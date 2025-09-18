@@ -2,31 +2,39 @@ from __future__ import annotations
 
 import platform
 import re
+from uuid import UUID
+
 import sqlalchemy
 
 from copy import deepcopy
+
+from collections.abc import Iterable
 from elasticsearch.exceptions import NotFoundError
 from elasticsearch.helpers import streaming_bulk
-from itertools import groupby
-from operator import itemgetter
+from itertools import groupby, chain, repeat
 from queue import Queue, Empty, Full
+from operator import itemgetter
+from sqlalchemy import func, Table, delete, MetaData
+from sqlalchemy.sql import Delete
+from unidecode import unidecode
 
 from sqlalchemy.orm.exc import ObjectDeletedError
 
 from onegov.core.utils import hash_dictionary, is_non_string_iterable
 from onegov.search import index_log, log, Searchable, utils
 from onegov.search.errors import SearchOfflineError
-
+from onegov.search.search_index import SearchIndex
 
 from typing import Any, Literal, NamedTuple, TYPE_CHECKING
+
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Iterator, Sequence
+    from collections.abc import Callable, Iterator, Sequence
+    from datetime import datetime
     from elasticsearch import Elasticsearch
     from sqlalchemy.engine import Engine
     from sqlalchemy.orm import Session
     from typing import TypeAlias
     from typing import TypedDict
-    from uuid import UUID
 
     class IndexTask(TypedDict):
         action: Literal['index']
@@ -35,7 +43,13 @@ if TYPE_CHECKING:
         schema: str
         type_name: str  # FIXME: not needed for fts
         tablename: str
+        owner_type: str
+        owner_id: UUID | str | int
         language: str
+        access: str
+        suggestion: str | list[str]
+        publication_start: datetime | None
+        publication_end: datetime | None
         properties: dict[str, Any]
 
     class DeleteTask(TypedDict):  # FIXME: not needed for fts
@@ -46,7 +60,6 @@ if TYPE_CHECKING:
         tablename: str
 
     Task: TypeAlias = IndexTask | DeleteTask
-
 
 ES_ANALYZER_MAP = {
     'en': 'english',
@@ -295,14 +308,6 @@ class Indexer(IndexerBase):
                         '_id': task['id'],
                         'doc': task['properties']
                     }
-                elif task['action'] == 'delete':
-                    # FIXME: I'm unsure about how this ever worked...
-                    yield {
-                        '_op_type': 'delete',
-                        '_index': self.ensure_index(task),  # type:ignore
-                        '_id': task['id'],
-                        'doc': task['properties']  # type:ignore
-                    }
                 else:
                     raise NotImplementedError
 
@@ -359,10 +364,12 @@ class Indexer(IndexerBase):
                 except NotFoundError:
                     pass
 
+    def update(self, task: IndexTask) -> None:
+        self.index(task)
+
 
 class PostgresIndexer(IndexerBase):
 
-    TEXT_SEARCH_COLUMN_NAME = 'fts_idx'
     idx_language_mapping = {
         'de': 'german',
         'fr': 'french',
@@ -383,10 +390,10 @@ class PostgresIndexer(IndexerBase):
     def index(
         self,
         tasks: list[IndexTask] | IndexTask,
-        session: Session | None = None
+        session: Session | None = None,
     ) -> bool:
-        """ Update the 'fts_idx' column (full text search index) of the given
-        object(s)/task(s).
+        """ Update the 'search_index' table (full text search index) of
+        the given object(s)/task(s).
 
         In case of a bunch of tasks we are assuming they are all from the
         same schema and table in order to optimize the indexing process.
@@ -398,8 +405,9 @@ class PostgresIndexer(IndexerBase):
         :param tasks: A list of tasks to index
         :param session: Supply an active session
         :return: True if the indexing was successful, False otherwise
+
         """
-        content = []
+        params = []
 
         if not isinstance(tasks, list):
             tasks = [tasks]
@@ -409,45 +417,163 @@ class PostgresIndexer(IndexerBase):
                 language = (
                     self.idx_language_mapping.get(task['language'], 'simple'))
                 data = {
-                    k: str(v)
+                    k: unidecode(str(v)) if v else ''
                     for k, v in task['properties'].items()
                     if not k.startswith('es_')}
-                _id = task['id']
-                content.append(
-                    {'language': language, 'data': data, '_id': _id})
+                _owner_id: int | UUID | str = task['owner_id']
+                _tags = (
+                    dict.fromkeys(task['properties'].get('es_tags') or [], ''))
+
+                params.append({
+                    '_language': language,
+                    '_data': data,
+                    '_owner_id_int':
+                        _owner_id if isinstance(_owner_id, int) else None,
+                    '_owner_id_uuid':
+                        _owner_id if isinstance(_owner_id, UUID) else None,
+                    '_owner_id_str':
+                        _owner_id if isinstance(_owner_id, str) else None,
+                    '_owner_type': task['owner_type'],  # class name
+                    '_public': task['properties']['es_public'],
+                    '_access': task.get('access', 'public'),
+                    '_last_change': task['properties']['es_last_change'],
+                    '_tags': _tags,
+                    '_suggestion': task['suggestion'],
+                    '_publication_start':
+                        task.get('publication_start', None),
+                    '_publication_end':
+                        task.get('publication_end', None),
+                    **{f'_{k}': v for k, v in data.items()}
+                })
+
+            weighted_vector = [
+                func.setweight(
+                    func.to_tsvector(
+                        sqlalchemy.bindparam('_language',
+                                             type_=sqlalchemy.String),
+                        sqlalchemy.bindparam(f'_{field}',
+                                             type_=sqlalchemy.String)
+                    ),
+                    weight
+                )
+                for field, weight in zip(
+                    tasks[0]['properties'].keys(),
+                    chain('A', repeat('D')))
+                if not field.startswith('es_')  # TODO: rename to fts_
+            ]
+
+            combined_vector = weighted_vector[0]
+            for vector in weighted_vector[1:]:
+                combined_vector = combined_vector.op('||')(vector)
 
             schema = tasks[0]['schema']
-            tablename = tasks[0]['tablename']
-            id_key = tasks[0]['id_key']
-            table = sqlalchemy.table(
-                tablename,
-                (id_col := sqlalchemy
-                    .column(id_key)),  # type: ignore[var-annotated]
-                sqlalchemy.column(self.TEXT_SEARCH_COLUMN_NAME),
-                schema=schema  # type: ignore
-            )
-            tsvector_expr = sqlalchemy.text(
-                'to_tsvector(:language, :data)').bindparams(
-                sqlalchemy.bindparam('language', type_=sqlalchemy.String),
-                sqlalchemy.bindparam('data', type_=sqlalchemy.JSON)
-            )
+
             stmt = (
-                sqlalchemy.update(table)
-                .where(id_col == sqlalchemy.bindparam('_id'))
-                .values({self.TEXT_SEARCH_COLUMN_NAME: tsvector_expr})
+                sqlalchemy.insert(SearchIndex.__table__)
+                .values(
+                    {
+                        SearchIndex.__table__.c.owner_id_int:
+                            sqlalchemy.bindparam('_owner_id_int'),
+                        SearchIndex.__table__.c.owner_id_uuid:
+                            sqlalchemy.bindparam('_owner_id_uuid'),
+                        SearchIndex.__table__.c.owner_id_str:
+                            sqlalchemy.bindparam('_owner_id_str'),
+                        SearchIndex.__table__.c.owner_type:
+                            sqlalchemy.bindparam('_owner_type'),
+                        SearchIndex.__table__.c.publication_start:
+                            sqlalchemy.bindparam('_publication_start'),
+                        SearchIndex.__table__.c.publication_end:
+                            sqlalchemy.bindparam('_publication_end'),
+                        SearchIndex.__table__.c.public:
+                            sqlalchemy.bindparam('_public'),
+                        SearchIndex.__table__.c.access:
+                            sqlalchemy.bindparam('_access'),
+                        SearchIndex.__table__.c.last_change:
+                            sqlalchemy.bindparam('_last_change'),
+                        SearchIndex.__table__.c.tags:
+                            sqlalchemy.bindparam('_tags'),
+                        SearchIndex.__table__.c.suggestion:
+                            sqlalchemy.bindparam('_suggestion'),
+                        SearchIndex.__table__.c.fts_idx_data:
+                            sqlalchemy.bindparam('_data'),
+                        SearchIndex.__table__.c.fts_idx: combined_vector,
+                    }
+                )
             )
-            if session is None:
-                connection = self.engine.connect()
-                with connection.begin():
-                    connection.execute(stmt, content)
-            else:
-                # use a savepoint instead
-                with session.begin_nested():
-                    session.execute(stmt, content)
+
+            self.execute_statement(session, schema, stmt, params)
         except Exception as ex:
-            index_log.error(f"Error '{ex}' indexing schema "
-                            f'{tasks[0]["schema"]} table '
-                            f'{tasks[0]["tablename"]}')
+            index_log.error(
+                f'Error "{ex}" creating index schema {tasks[0]["schema"]} of '
+                f'type {tasks[0]["owner_type"]}, tasks:',
+                [t['id'] for t in tasks],
+            )
+            return False
+
+        return True
+
+    def execute_statement(
+        self,
+        session: Session | None,
+        schema: str,
+        stmt: sqlalchemy.sql.expression.Executable,
+        params: list[dict[str, Any]]
+    ) -> None:
+
+        if session is None:
+            connection = self.engine.connect()
+            connection = connection.execution_options(
+                schema_translate_map={None: schema}
+            )
+            with connection.begin():
+                connection.execute(stmt, params)
+        else:
+            # use a savepoint instead
+            with session.begin_nested():
+                session.execute(stmt, params)
+
+    def update(
+        self,
+        tasks: list[IndexTask] | IndexTask,
+        session: Session | None = None
+    ) -> bool:
+
+        return self.index(tasks, session)
+
+    def delete(
+        self,
+        tasks: list[IndexTask] | IndexTask,
+        session: Session | None = None
+    ) -> bool:
+
+        if not isinstance(tasks, list):
+            tasks = [tasks]
+
+        try:
+            for task in tasks:
+                _owner_id = task['id']
+                stmt: Delete | None = None
+
+                if isinstance(_owner_id, UUID):
+                    stmt = (
+                        sqlalchemy.delete(SearchIndex.__table__)
+                        .where(SearchIndex.owner_id_uuid == _owner_id)
+                    )
+                elif isinstance(_owner_id, int):
+                    stmt = (
+                        sqlalchemy.delete(SearchIndex.__table__)
+                        .where(SearchIndex.owner_id_int == _owner_id)
+                    )
+                elif isinstance(_owner_id, str):
+                    stmt = (
+                        sqlalchemy.delete(SearchIndex.__table__)
+                        .where(SearchIndex.owner_id_str == _owner_id)
+                    )
+
+                self.execute_statement(session, tasks[0]['schema'], stmt, [{}])
+        except Exception as ex:
+            index_log.error(f'Error "{ex}" deleting index schema '
+                            f'{tasks[0]["schema"]} tasks {tasks}')
             return False
 
         return True
@@ -469,14 +595,31 @@ class PostgresIndexer(IndexerBase):
                 self.queue.task_done()
                 yield task
 
-        grouped_tasks = groupby(task_generator(), key=itemgetter('action',
-                                                                 'tablename'))
-        for (action, tablename), tasks in grouped_tasks:
+        grouped_tasks = groupby(
+            task_generator(),
+            key=itemgetter('action', 'type_name')
+        )
+        for (action, _), tasks in grouped_tasks:
             task_list = list(tasks)
+
             if action == 'index':
                 self.index(task_list, session)
+            elif action == 'delete':
+                self.delete(task_list, session)
             else:
-                raise NotImplementedError(f"Action '{action}' not implemented")
+                raise NotImplementedError(
+                    f"Action '{action}' not implemented for {self.__class__}")
+
+    def delete_search_index(self, schema: str) -> None:
+        """ Delete all records in search index table of the given `schema`. """
+
+        metadata = MetaData(schema=schema)
+        search_index_table = Table(SearchIndex.__tablename__, metadata)
+        stmt = delete(search_index_table)
+
+        connection = self.engine.connect()
+        with connection.begin():
+            connection.execute(stmt)
 
 
 class TypeMapping:
@@ -897,16 +1040,22 @@ class ORMEventTranslator:
             if isinstance(obj, Searchable):
                 self.delete(schema, obj)
 
-    def put(self, translation: Task) -> None:
+    def put(self, translation: IndexTask) -> None:
         try:
             self.es_queue.put_nowait(translation)
-            if translation['action'] == 'index':
-                # we only need to provide index tasks for fts
-                self.psql_queue.put_nowait(translation)
+            self.psql_queue.put_nowait(translation)
+
         except Full:
             log.error('The orm event translator queue is full!')
 
-    def index(self, schema: str, obj: Searchable) -> None:
+    def index(
+        self, schema: str,
+        obj: Searchable,
+    ) -> None:
+        """
+        Creates or updates index for the given object
+
+        """
         try:
             if obj.es_skip:
                 return
@@ -921,44 +1070,56 @@ class ORMEventTranslator:
                 'id': getattr(obj, obj.es_id),
                 'id_key': obj.es_id,
                 'schema': schema,
-                'type_name': obj.es_type_name,  # FIXME: not needed for fts
+                'type_name': obj.es_type_name,
+                # FIXME: tablename not needed for fts
                 'tablename': obj.__tablename__,  # type:ignore[attr-defined]
+                'owner_type': obj.__class__.__name__,
+                'owner_id': getattr(obj, obj.es_id),
                 'language': language,
-                'properties': {}
+                'access': '',
+                'suggestion': '',
+                'publication_start': None,
+                'publication_end': None,
+                'properties': {},
             }
 
             mapping_ = self.mappings[obj.es_type_name].for_language(language)
 
-            for prop, mapping in mapping_.items():
-
+            for prop in mapping_.keys():
                 if prop == 'es_suggestion':
                     continue
 
-                convert = self.converters.get(mapping['type'], lambda v: v)
                 raw = getattr(obj, prop)
-
                 if is_non_string_iterable(raw):
-                    translation['properties'][prop] = [convert(v) for v in raw]
+                    translation['properties'][prop] = list(raw)
                 else:
-                    translation['properties'][prop] = convert(raw)
+                    translation['properties'][prop] = raw
 
+            for attr in ['access', 'publication_start', 'publication_end']:
+                if hasattr(obj, attr):
+                    translation[attr] = getattr(obj, attr)  # type:ignore[literal-required]
+
+            # FIXME: remove once es is migrated to postgres
             if obj.es_public:
                 contexts = {'es_suggestion_context': ['public']}
             else:
                 contexts = {'es_suggestion_context': ['private']}
 
-            suggestion = obj.es_suggestion
+            translation['properties']['es_suggestion'] = {
+                'input': obj.es_suggestion,
+                'contexts': contexts
+            }
+            # end FIXME
 
-            if is_non_string_iterable(suggestion):
-                translation['properties']['es_suggestion'] = {
-                    'input': suggestion,
-                    'contexts': contexts
-                }
-            else:
-                translation['properties']['es_suggestion'] = {
-                    'input': [suggestion],
-                    'contexts': contexts
-                }
+            # fts suggestion
+            suggestion = obj.es_suggestion
+            if suggestion:
+                if isinstance(suggestion, str):
+                    suggestion = [s.strip() for s in suggestion.split(',')]
+                elif isinstance(suggestion, Iterable):
+                    suggestion = list(suggestion)
+
+                translation['suggestion'] = suggestion
 
             self.put(translation)
         except ObjectDeletedError as ex:
@@ -968,13 +1129,17 @@ class ORMEventTranslator:
                 log.info(f'Object {obj} was deleted before indexing: {ex}')
 
     def delete(self, schema: str, obj: Searchable) -> None:
+        """
+        Deletes index of the given object
 
+        """
         translation: DeleteTask = {
             'action': 'delete',
             'schema': schema,
             'type_name': obj.es_type_name,
+            # FIXME: tablename not needed for fts
             'tablename': obj.__tablename__,  # type:ignore[attr-defined]
             'id': getattr(obj, obj.es_id)
         }
 
-        self.put(translation)
+        self.put(translation)  # type:ignore[arg-type]

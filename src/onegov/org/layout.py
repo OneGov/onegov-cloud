@@ -51,6 +51,7 @@ from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.external_link import ExternalLinkCollection
 from onegov.org.models.form import submission_deletable
+from onegov.org.models.search import SearchPostgres
 from onegov.org.open_graph import OpenGraphMixin
 from onegov.org.theme.org_theme import user_options
 from onegov.org.utils import IMG_URLS, get_current_tickets_url
@@ -346,11 +347,19 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     @cached_property
     def search_url(self) -> str:
         """ Returns the url to the search page. """
+        # Allows using postgres search while es search remains default
+        if (self.request.path_info
+                and 'search-postgres' in self.request.path_info):
+            return self.request.class_link(SearchPostgres)
         return self.request.class_link(Search)
 
     @cached_property
     def suggestions_url(self) -> str:
         """ Returns the url to the suggestions json view. """
+        # Allows using postgres search while es search remains default
+        if (self.request.path_info
+                and 'search-postgres' in self.request.path_info):
+            return self.request.class_link(SearchPostgres, name='suggest')
         return self.request.class_link(Search, name='suggest')
 
     @cached_property

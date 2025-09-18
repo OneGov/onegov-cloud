@@ -32,9 +32,9 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     __tablename__ = 'directory_entries'
 
     es_properties = {
-        'keywords': {'type': 'keyword'},
         'title': {'type': 'localized'},
         'lead': {'type': 'localized'},
+        'keywords': {'type': 'keyword'},
         'directory_id': {'type': 'keyword'},
 
         # since the searchable text might include html, we remove it
