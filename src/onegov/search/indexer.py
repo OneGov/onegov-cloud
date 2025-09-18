@@ -392,8 +392,8 @@ class PostgresIndexer(IndexerBase):
         tasks: list[IndexTask] | IndexTask,
         session: Session | None = None,
     ) -> bool:
-        """ Update the 'fts_idx' column (full text search index) of the given
-        object(s)/task(s).
+        """ Update the 'search_index' table (full text search index) of
+        the given object(s)/task(s).
 
         In case of a bunch of tasks we are assuming they are all from the
         same schema and table in order to optimize the indexing process.
