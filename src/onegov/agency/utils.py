@@ -115,7 +115,7 @@ def ticket_groups(
     ]
 
 
-def get_html_paragraph_with_line_breaks(text: str | None) -> Markup:
+def get_html_paragraph_with_line_breaks(text: object) -> Markup:
     if not text:
         return Markup('')
     return Markup('<p>{}</p>').format(
