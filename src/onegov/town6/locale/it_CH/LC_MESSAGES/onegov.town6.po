@@ -2830,14 +2830,6 @@ msgstr "Sistema di informazione sui ratti (RIS)"
 msgid "New Note"
 msgstr "Nuova nota"
 
-#~ msgid ""
-#~ "Enter a list of categories for interest ties. Each category should be "
-#~ "separated by a semicolon. Example: \"Cat 1 text; Cat 2 text; Cat 3 text\""
-#~ msgstr ""
-#~ "Inserisci un elenco di categorie per i legami di interesse. Ogni "
-#~ "categoria deve essere separata da un punto e virgola. Esempio: Cat 1 "
-#~ "text; Cat 2 text; Cat 3 text"
-
 #~ msgid "No parliamentarians defined yet."
 #~ msgstr "Nessun parlamentare ancora definito."
 
