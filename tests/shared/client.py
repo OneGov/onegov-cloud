@@ -37,7 +37,7 @@ EXTRACT_HREF = re.compile(
 
 
 class Client(TestApp[_AppT]):
-    skip_n_forms = False
+    skip_n_forms = 0
     use_intercooler = False
 
     def spawn(self) -> Self:

@@ -13,6 +13,7 @@ from typing import Literal, Self
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
+    from datetime import datetime
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import TypedDict
@@ -20,11 +21,11 @@ if TYPE_CHECKING:
 
     class FilterParams(TypedDict, total=False):
         title: str | None
-        updated_gt: str | None
-        updated_ge: str | None
-        updated_eq: str | None
-        updated_le: str | None
-        updated_lt: str | None
+        updated_gt: datetime | str | None
+        updated_ge: datetime | str | None
+        updated_eq: datetime | str | None
+        updated_le: datetime | str | None
+        updated_lt: datetime | str | None
 
 
 class ExtendedAgencyCollection(AdjacencyListCollection[ExtendedAgency]):
@@ -58,11 +59,11 @@ class PaginatedAgencyCollection(
         exclude_hidden: bool = True,
         joinedload: Collection[str] | None = None,
         title: str | None = None,
-        updated_gt: str | None = None,
-        updated_ge: str | None = None,
-        updated_eq: str | None = None,
-        updated_le: str | None = None,
-        updated_lt: str | None = None,
+        updated_gt: datetime | str | None = None,
+        updated_ge: datetime | str | None = None,
+        updated_eq: datetime | str | None = None,
+        updated_le: datetime | str | None = None,
+        updated_lt: datetime | str | None = None,
         undefer: Collection[str] | None = None
     ) -> None:
 

@@ -73,7 +73,6 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 # very lax rules for tests that don't have type hints yet
 module = [
-    "tests.onegov.agency.*",
     "tests.onegov.election_day.*",
     "tests.onegov.feriennet.*",
     "tests.onegov.fsi.*",

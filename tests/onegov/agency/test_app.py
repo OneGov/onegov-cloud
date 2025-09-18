@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from io import BytesIO
 from onegov.agency.custom import get_global_tools
 from onegov.agency.custom import get_top_navigation
@@ -9,7 +11,16 @@ from onegov.core.elements import LinkGroup
 from onegov.core.utils import Bunch
 
 
-class DummyRequest():
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from onegov.agency import AgencyApp
+    from typing import TypeAlias
+
+    TextLinkGroup: TypeAlias = dict[str, list['TextLinkGroup | str | None']]
+
+
+class DummyRequest:
     is_logged_in = False
     is_manager = False
     is_admin = False
@@ -21,25 +32,32 @@ class DummyRequest():
     path_qs = ''
     url = ''
 
-    def class_link(self, cls, name='', variables: dict = None):
+    def class_link(
+        self,
+        cls: type[object],
+        name: str = '',
+        variables: object = None
+    ) -> str:
         return f'{cls.__name__}/{name}'
 
-    def link(self, target, name=None):
+    def link(self, target: str, name: str | None = None) -> str:
         return f"{target.__class__.__name__}/{name}"
 
-    def transform(self, url):
+    def transform(self, url: str) -> str:
         return url
 
-    def include(self, asset):
+    def include(self, asset: object) -> None:
         pass
 
-    def exclude_invisible(self, items):
-        return
+    def exclude_invisible(self, items: object) -> None:
+        pass
 
 
-def test_app_custom(agency_app):
-    def as_text(items):
-        result = []
+def test_app_custom(agency_app: AgencyApp) -> None:
+    def as_text(
+        items: Iterable[Link | LinkGroup]
+    ) -> list[TextLinkGroup | str | None]:
+        result: list[TextLinkGroup | str | None] = []
         for item in items:
             if isinstance(item, Link):
                 result.append(item.text)
@@ -47,7 +65,7 @@ def test_app_custom(agency_app):
                 result.append({item.title: as_text(item.links)})
         return result
 
-    request = DummyRequest()
+    request: Any = DummyRequest()
     request.app = agency_app
 
     assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
@@ -84,7 +102,7 @@ def test_app_custom(agency_app):
     ]
 
 
-def test_app_root_pdf(agency_app):
+def test_app_root_pdf(agency_app: AgencyApp) -> None:
     assert agency_app.root_pdf is None
     assert agency_app.root_pdf_exists is False
 
@@ -93,7 +111,7 @@ def test_app_root_pdf(agency_app):
     assert agency_app.root_pdf_exists is True
 
 
-def test_app_pdf_class(agency_app):
+def test_app_pdf_class(agency_app: AgencyApp) -> None:
     assert agency_app.pdf_class == AgencyPdfDefault
 
     agency_app.org.meta['pdf_layout'] = 'default'
@@ -112,12 +130,14 @@ def test_app_pdf_class(agency_app):
     assert agency_app.pdf_class == AgencyPdfDefault
 
 
-def test_app_enable_yubikey(agency_app):
+def test_app_enable_yubikey(agency_app: AgencyApp) -> None:
     assert 'enable_yubikey' not in agency_app.org.meta
     assert agency_app.enable_yubikey is False
 
     agency_app.org.meta['enable_yubikey'] = True
-    assert agency_app.enable_yubikey is True
+    # undo mypy narrowing
+    agency_app_ = agency_app
+    assert agency_app_.enable_yubikey is True
 
     agency_app._enable_yubikey = True
     agency_app.org.meta['enable_yubikey'] = False
