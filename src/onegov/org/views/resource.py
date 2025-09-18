@@ -1626,6 +1626,7 @@ def view_export_all(
     self.title = _('Export All')  # type:ignore
     layout = layout or ResourceLayout(self, request)  # type:ignore
     layout.editbar_links = None
+    layout.edit_mode = True
 
     if form.submitted(request):
 
