@@ -2664,6 +2664,12 @@ msgstr "Dokumente"
 msgid "General event documents"
 msgstr "Allgemeine Veranstaltungsdokumente"
 
+msgid "General information above the resource list"
+msgstr "Allgemeine Informationen über der Reservationen-Liste"
+
+msgid "General information below the resource list"
+msgstr "Allgemeine Informationen unterhalb der Reservationen-Liste"
+
 msgid "Duration from opening a ticket to its automatic archival"
 msgstr ""
 "Dauer vom Öffnen eines Tickets bis zu seiner automatischen Archivierung"

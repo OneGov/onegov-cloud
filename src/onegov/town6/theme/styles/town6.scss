@@ -1324,7 +1324,9 @@ ul.recipients {
 }
 
 .event-header,
-.event-footer {
+.event-footer,
+.resource-header,
+.resource-footer {
     .accordion {
         border-top: 1px solid $gray;
         border-bottom: 1px solid $gray;

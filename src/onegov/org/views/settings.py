@@ -23,7 +23,7 @@ from onegov.org.forms.settings import (
     LinkHealthCheckForm, PeopleSettingsForm, SocialMediaSettingsForm,
     GeverSettingsForm, OneGovApiSettingsForm, DataRetentionPolicyForm,
     VATSettingsForm, EventSettingsForm, KabaSettingsForm,
-    CitizenLoginSettingsForm)
+    CitizenLoginSettingsForm, ResourceSettingsForm)
 from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
@@ -456,6 +456,19 @@ def handle_event_settings(
     layout: SettingsLayout | None = None
 ) -> RenderData | Response:
     return handle_generic_settings(self, request, form, _('Events'), layout)
+
+
+@OrgApp.form(
+    model=Organisation, name='resource-settings', template='form.pt',
+    permission=Secret, form=ResourceSettingsForm, setting=_('Resources'),
+    icon='fa-building')
+def handle_resource_settings(
+    self: Organisation,
+    request: OrgRequest,
+    form: ResourceSettingsForm,
+    layout: SettingsLayout | None = None
+) -> RenderData | Response:
+    return handle_generic_settings(self, request, form, _('Resources'), layout)
 
 
 @OrgApp.form(

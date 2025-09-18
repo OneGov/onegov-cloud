@@ -1869,7 +1869,7 @@ msgid "Send on"
 msgstr "Envoyer sur"
 
 msgid "Resources"
-msgstr "Ressources"
+msgstr "Reservations"
 
 msgid "Please add at least one notification."
 msgstr "Veuillez ajouter au moins une notification."
@@ -2667,6 +2667,12 @@ msgstr "Documents"
 
 msgid "General event documents"
 msgstr "Documents généraux de l'événement"
+
+msgid "General information above the resource list"
+msgstr "Informations générales au-dessus de la liste des ressources"
+
+msgid "General information below the resource list"
+msgstr "Informations générales en dessous de la liste des ressources"
 
 msgid "Duration from opening a ticket to its automatic archival"
 msgstr "Durée entre l'ouverture d'un ticket et son archivage automatique"
