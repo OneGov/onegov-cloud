@@ -763,6 +763,9 @@ msgstr "Sie sind hier"
 msgid "Privacy Protection"
 msgstr "Datenschutz"
 
+msgid "Impressum"
+msgstr "Impressum"
+
 msgid "Login"
 msgstr "Anmelden"
 

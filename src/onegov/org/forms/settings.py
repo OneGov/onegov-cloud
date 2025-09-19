@@ -292,6 +292,13 @@ class FooterSettingsForm(Form):
         validators=[Optional()]
     )
 
+    impressum_url = URLField(
+        label=_('Impressum'),
+        description=_('URL pointing to the Impressum site'),
+        fieldset=_('Impressum'),
+        validators=[Optional()]
+    )
+
     custom_link_1_name = StringField(
         label=_('Name'),
         description='Name of the Label',
