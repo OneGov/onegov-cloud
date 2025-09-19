@@ -14,6 +14,16 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
 
 
+def translate_import_type(import_type: str, request: TownRequest) -> str:
+    """Translate import_type values to German."""
+    translations = {
+        'cli': 'Manuell auf dem Server',
+        'automatic': 'Automatisch',
+        'upload': 'Auf App hochgeladen'
+    }
+    return translations.get(import_type, import_type)
+
+
 @PasApp.html(
     model=ImportLogCollection,
     template='import_logs.pt',
@@ -28,7 +38,10 @@ def view_import_logs(
     return {
         'layout': layout,
         'title': _('Import History'),
-        'logs': self.query().limit(50).all()
+        'logs': self.query().limit(50).all(),
+        'translate_import_type': lambda import_type: translate_import_type(
+            import_type, request
+        )
     }
 
 

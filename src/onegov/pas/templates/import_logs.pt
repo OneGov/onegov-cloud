@@ -9,6 +9,7 @@
                 <tr>
                     <th i18n:translate="">Timestamp</th>
                     <th i18n:translate="">User</th>
+                    <th i18n:translate="">Type</th>
                     <th i18n:translate="">Status</th>
                     <th i18n:translate="">Details</th>
                 </tr>
@@ -17,6 +18,7 @@
                 <tr tal:repeat="log logs">
                     <td>${layout.format_date(log.created, 'datetime_long')}</td>
                     <td>${log.user.username if log.user else request.translate('System')}</td>
+                    <td>${translate_import_type(log.import_type)}</td>
                     <td>
                         <span class="import-status ${log.status}" tal:content="log.status"></span>
                     </td>
@@ -25,7 +27,7 @@
                     </td>
                 </tr>
                 <tr tal:condition="not logs">
-                    <td colspan="4" i18n:translate="">No import logs found.</td>
+                    <td colspan="5" i18n:translate="">No import logs found.</td>
                 </tr>
             </tbody>
         </table>

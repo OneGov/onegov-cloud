@@ -351,7 +351,8 @@ class PeopleImporter(DataImporter):
 
             if emails_or_names:
                 log.info(
-                    f'New parliamentarians created: {", ".join(emails_or_names)}'
+                    'New parliamentarians '
+                    f'created: {", ".join(emails_or_names)}'
                 )
 
         self._bulk_save(new_parliamentarians, 'new parliamentarians')
