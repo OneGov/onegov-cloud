@@ -1387,6 +1387,15 @@ class NewsletterSettingsForm(Form):
         default=False
     )
 
+    show_news_as_tiles = BooleanField(
+        label=_('Show news as tiles'),
+        description=_(
+            'If checked, news are displayed as tiles. Otherwise, '
+            'news are listed in full length.'),
+        fieldset=_('Automatic newsletters'),
+        default=True
+    )
+
     newsletter_times = TagsField(
         label=_('Newsletter sending times (24h format)'),
         fieldset=_('Automatic newsletters'),

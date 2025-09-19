@@ -9,7 +9,7 @@
         <tal:b condition="news">
             <h2 i18n:translate>Latest news</h2>
 
-            <tal:b repeat="item news">
+            <tal:b repeat="item news" tal:condition="not: request.app.org.show_news_as_tiles|False">
                 <strong><a href="${request.link(item)}">${item.title}</a></strong>
                 <tal:b tal:switch="item.text_in_newsletter">
                     <tal:b tal:case="False">
@@ -18,7 +18,25 @@
                     <tal:b tal:case="True" tal:content="item.text">
                     </tal:b>
                 </tal:b>
-
+            </tal:b>
+            <tal:b tal:condition="request.app.org.show_news_as_tiles|False and news">
+                <div class="newslist" tal:condition="news">
+                    <div class="row">
+                        <div class="small-12 columns news-list-item" tal:repeat="item news">
+                            <hr>
+                            <div class="row">
+                                <div class="small-12 medium-6 columns">
+                                    <div tal:condition="item.page_image and item.show_preview_image" style="width: 100%; padding-bottom: 50%; background-image: url(${item.page_image}); background-size: cover;"></div>
+                                </div>
+                            </div>
+                            <a tal:attributes="href request.link(item)">
+                                <h2 tal:condition="heading == 'h2'|True">${item.title}</h2>
+                            </a>
+                            <p class="news-date" tal:condition="not:hide_date|False">${layout.format_date(item.published_or_created, 'relative')}</p>
+                            <p class="news-lead">${item.lead}</p>
+                        </div>
+                    </div>
+                </div>
             </tal:b>
         </tal:b>
 

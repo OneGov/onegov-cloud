@@ -255,6 +255,8 @@ class Organisation(Base, TimestampMixin):
     notify_on_unsubscription: dict_property[list[str] | None] = meta_property()
     enable_automatic_newsletters: dict_property[bool] = meta_property(
         default=False)
+    # News in automatic newsletters shall be shown as tiles
+    show_news_as_tiles: dict_property[bool] = meta_property(default=True)
     newsletter_times: dict_property[list[str] | None] = meta_property()
 
     # Chat Settings

@@ -779,6 +779,7 @@ def test_send_daily_newsletter(es_org_app):
 
     session = org_app.session()
     org_app.org.enable_automatic_newsletters = True
+    org_app.org.show_news_as_tiles = False
     org_app.org.newsletter_times = '10', '11', '16'
 
     news = PageCollection(session)
@@ -805,11 +806,15 @@ def test_send_daily_newsletter(es_org_app):
     with freeze_time(datetime(2018, 3, 5, 10, 0, tzinfo=tz)):
         # Created today at 10:00, published immediately
         news.add(
-            parent=news_parent, title='News3', type='news', access='public')
+            parent=news_parent, title='News3', type='news', access='public',
+            lead='Lead of News 3',
+        )
         # Created today at 10:00, published today 10:01
         news.add(
             parent=news_parent, title='News4', type='news', access='public',
-            publication_start=utcnow() + timedelta(minutes=1))
+            publication_start=utcnow() + timedelta(minutes=1),
+            lead='Lead of News 4',
+        )
 
     transaction.commit()
 
@@ -823,10 +828,13 @@ def test_send_daily_newsletter(es_org_app):
         assert newsletter.title == 'Täglicher Newsletter 05.03.2018, 10:00'
         assert len(os.listdir(client.app.maildir)) == 1
         mail = client.get_email(0)
-        assert "News1" in mail['TextBody']
-        assert "News2" in mail['TextBody']
-        assert "News3" not in mail['TextBody']
-        assert "News4" not in mail['TextBody']
+        assert 'News1' in mail['TextBody']
+        assert 'News2' in mail['TextBody']
+        assert 'News3' not in mail['TextBody']
+        assert 'News4' not in mail['TextBody']
+
+    org_app.org.show_news_as_tiles = True
+    transaction.commit()
 
     with freeze_time(datetime(2018, 3, 5, 11, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
@@ -836,10 +844,12 @@ def test_send_daily_newsletter(es_org_app):
         assert 'Täglicher Newsletter 05.03.2018, 11:00' in newsletter.title
         assert len(os.listdir(client.app.maildir)) == 2
         mail = client.get_email(1)
-        assert "News1" not in mail['TextBody']
-        assert "News2" not in mail['TextBody']
-        assert "News3" in mail['TextBody']
-        assert "News4" in mail['TextBody']
+        assert 'News1' not in mail['TextBody']
+        assert 'News2' not in mail['TextBody']
+        assert 'News3' in mail['TextBody']
+        assert 'Lead of News 3' in mail['TextBody']
+        assert 'News4' in mail['TextBody']
+        assert 'Lead of News 4' in mail['TextBody']
 
     with freeze_time(datetime(2018, 3, 5, 16, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
