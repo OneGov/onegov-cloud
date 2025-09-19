@@ -6,6 +6,7 @@ from onegov.pas.models import ImportLog
 
 from typing import TYPE_CHECKING, Any, cast
 if TYPE_CHECKING:
+    import logging
     from uuid import UUID
     from collections.abc import Sequence
     from sqlalchemy.orm import Session
@@ -24,6 +25,7 @@ def import_zug_kub_data(
     membership_data: Sequence[MembershipData],
     user_id: UUID | None = None,
     import_type: str = 'cli',
+    logger: logging.Logger | None = None,
 ) -> dict[str, ImportCategoryResult]:
     """
     Imports data from KUB JSON files within a single transaction,
@@ -37,6 +39,7 @@ def import_zug_kub_data(
         membership_data: Membership data to import
         user_id: ID of user performing the import (optional)
         import_type: Type of import ('cli', 'upload', or 'automatic')
+        logger: Optional logger to use instead of module logger
 
     Returns a dictionary where keys are categories (e.g., 'parliamentarians')
     and values are dictionaries containing 'created' (list), 'updated' (list),
@@ -56,10 +59,14 @@ def import_zug_kub_data(
     log_details: dict[str, Any] = {}
     final_error: Exception | None = None
 
+    # Use provided logger or default to module logger
+    if logger is None:
+        logger = log
+
     try:
         # Use a savepoint; rollback occurs automatically on exception
         with session.begin_nested():
-            people_importer = PeopleImporter(session)
+            people_importer = PeopleImporter(session, logger)
             (parliamentarian_map, people_details, people_processed) = (
                 people_importer.bulk_import(people_data)
             )
@@ -69,7 +76,7 @@ def import_zug_kub_data(
                 'processed': people_processed,
             }
 
-            organization_importer = OrganizationImporter(session)
+            organization_importer = OrganizationImporter(session, logger)
             (
                 commission_map,
                 parliamentary_group_map,
@@ -98,7 +105,7 @@ def import_zug_kub_data(
                 org_processed_counts.get('parliamentary_groups', 0)
             )
 
-            membership_importer = MembershipImporter(session)
+            membership_importer = MembershipImporter(session, logger)
             membership_importer.init(
                 session,
                 parliamentarian_map,
@@ -154,14 +161,14 @@ def import_zug_kub_data(
             ]
 
             log_status = 'completed'
-            log.info(
+            logger.info(
                 'KUB data import processing successful within transaction.'
             )
     except Exception as e:
         final_error = e
         log_status = 'failed'
         log_details['error'] = str(e)
-        log.error(f'KUB data import failed: {e}', exc_info=True)
+        logger.exception('KUB data import failed')
 
     finally:
         try:
@@ -174,12 +181,12 @@ def import_zug_kub_data(
             session.add(import_log)
             if session.is_active:
                 session.flush()
-            log.info(
+            logger.info(
                 f'KUB data import attempt logged with status: {log_status}'
             )
-        except Exception as log_e:
-            log.error(
-                f'Failed to log import status: {log_e}', exc_info=True
+        except Exception:
+            logger.exception(
+                'Failed to log import status'
             )
 
         if final_error:

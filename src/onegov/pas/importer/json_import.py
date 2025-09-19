@@ -1,3 +1,12 @@
+"""
+Complex JSON import system with interdependent importers.
+
+WARNING: PeopleImporter, OrganizationImporter, and MembershipImporter must be
+used together in the correct order, otherwise database foreign key violations
+will occur.
+The importers cannot work independently due to tight coupling between entities.
+"""
+
 from __future__ import annotations
 
 from datetime import date, datetime
@@ -14,163 +23,15 @@ from onegov.pas.models import (
 )
 from sqlalchemy.orm import selectinload
 
+from onegov.pas.importer.types import (
+    MembershipData,
+    OrganizationData,
+    PersonData,
+)
 
-from typing import Any, Literal, TypedDict
-
-
-# Define TypedDicts for data structures used in JSON import
-# These are defined outside TYPE_CHECKING to be available at runtime
-# Because we validate the json structure has actually these fields
-class OrganizationData(TypedDict):
-    created: str
-    description: str
-    htmlUrl: str
-    id: str
-    isActive: bool
-    memberCount: int
-    modified: str
-    name: str
-    organizationTypeTitle: (
-        Literal['Kommission', 'Fraktion', 'Kantonsrat', 'Sonstige'] | None
-    )
-    primaryEmail: None
-    status: int
-    thirdPartyId: str | None
-    url: str
-
-
-class EmailData(TypedDict):
-    id: str
-    label: str
-    email: str
-    isDefault: bool
-    thirdPartyId: str | None
-    modified: str
-    created: str
-
-
-class AddressData(TypedDict):
-    formattedAddress: str
-    id: str
-    label: str
-    isDefault: bool
-    organisationName: str
-    organisationNameAddOn1: str
-    organisationNameAddOn2: str
-    addressLine1: str
-    addressLine2: str
-    street: str
-    houseNumber: str
-    dwellingNumber: str
-    postOfficeBox: str
-    swissZipCode: str
-    swissZipCodeAddOn: str
-    swissZipCodeId: str
-    foreignZipCode: str
-    locality: str
-    town: str
-    countryIdISO2: str
-    countryName: str
-    thirdPartyId: str | None
-    modified: str
-    created: str
-
-
-class PhoneNumberData(TypedDict):
-    id: str
-    label: str
-    phoneNumber: str
-    phoneCategory: int
-    otherPhoneCategory: str | None
-    phoneCategoryText: str
-    isDefault: bool
-    thirdPartyId: str | None
-    modified: str
-    created: str
-
-
-class UrlData(TypedDict):
-    id: str
-    label: str
-    url: str | None
-    isDefault: bool
-    thirdPartyId: str | None
-    modified: str
-    created: str
-
-
-class OrganizationDataWithinMembership(TypedDict):
-    created: str
-    description: str
-    htmlUrl: str
-    id: str
-    isActive: bool
-    memberCount: int
-    modified: str
-    name: str
-    organizationTypeTitle: (
-        Literal['Kommission', 'Fraktion', 'Kantonsrat', 'Sonstige'] | None
-    )
-    primaryEmail: EmailData | None
-    status: int
-    thirdPartyId: str | None
-    url: str
-    organizationType: int
-    primaryAddress: AddressData | None
-    primaryPhoneNumber: PhoneNumberData | None
-    primaryUrl: UrlData | None
-    statusDisplay: str
-    tags: list[str]
-    type: str
-
-
-class PersonData(TypedDict):
-    created: str
-    firstName: str
-    fullName: str
-    htmlUrl: str
-    id: str
-    isActive: bool
-    modified: str
-    officialName: str
-    personTypeTitle: str | None
-    primaryEmail: EmailData | None
-    salutation: str
-    tags: list[str]
-    thirdPartyId: str
-    title: str
-    url: str
-    username: str | None
-
-
-class MembershipData(TypedDict):
-    department: str
-    description: str
-    emailReceptionType: str
-    end: str | bool | None
-    id: str
-    isDefault: bool
-    organization: OrganizationDataWithinMembership
-    person: PersonData
-    primaryAddress: AddressData | None
-    primaryEmail: EmailData | None
-    primaryPhoneNumber: PhoneNumberData | None
-    primaryUrl: UrlData | None
-    email: EmailData | None
-    phoneNumber: PhoneNumberData | None
-    address: AddressData | None
-    urlField: UrlData | None
-    role: str
-    start: str | bool | None
-    text: str
-    thirdPartyId: str | None
-    type: str
-    typedId: str
-    url: str
-
-
-from typing import TYPE_CHECKING, TypedDict
+from typing import Any, Literal, TYPE_CHECKING, TypedDict
 if TYPE_CHECKING:
+    import logging
     from onegov.parliament.models.parliamentarian_role import (
         ParliamentaryGroupRole, PartyRole, Role)
     from collections.abc import Sequence
@@ -185,8 +46,11 @@ if TYPE_CHECKING:
 class DataImporter:
     """Base class for all importers with common functionality."""
 
-    def __init__(self, session: Session) -> None:
+    def __init__(
+        self, session: Session, logger: logging.Logger | None = None
+    ) -> None:
         self.session = session
+        self.logger = logger if logger is not None else log
 
     def parse_date(
         self,
@@ -201,7 +65,7 @@ class DataImporter:
             dt = datetime.fromisoformat(date_string)
             return dt.date()
         except ValueError:
-            log.warning(f'Could not parse date string: {date_string}')
+            self.logger.warning(f'Could not parse date string: {date_string}')
             return None
 
     def _bulk_save(self, objects: list[Any], object_type: str) -> int:
@@ -212,11 +76,11 @@ class DataImporter:
                 count = len(objects)
                 self.session.add_all(objects)
                 # Flush is removed, commit at the end of import_zug_kub_data
-                log.info(f'Saved {count} new {object_type}')
+                self.logger.info(f'Saved {count} new {object_type}')
             return count
         except Exception as e:
-            log.error(
-                f'Error saving {count} {object_type}: {e}', exc_info=True
+            self.logger.exception(
+                f'Error saving {count} {object_type}'
             )
             self.session.rollback()
             raise RuntimeError(f'Error bulk saving {object_type}') from e
@@ -286,7 +150,7 @@ class PeopleImporter(DataImporter):
             processed_count += 1  # Count each record we attempt to process
             person_id = person_data.get('id')
             if not person_id:
-                log.warning(
+                self.logger.warning(
                     f'Skipping person entry due to missing ID: '
                     f'{person_data.get("fullName")}'
                 )
@@ -296,7 +160,7 @@ class PeopleImporter(DataImporter):
                 # Check if this person ID has already been processed in this
                 # batch
                 if person_id in result_map:
-                    log.warning(
+                    self.logger.warning(
                         f'Skipping duplicate person ID within import batch: '
                         f'{person_id}'
                     )
@@ -306,7 +170,7 @@ class PeopleImporter(DataImporter):
                 try:
                     person_uuid = UUID(person_id)
                 except ValueError:
-                    log.exception(
+                    self.logger.exception(
                         f'Skipping person due to invalid UUID format: '
                         f'{person_id} - {person_data.get("fullName")}'
                     )
@@ -319,7 +183,7 @@ class PeopleImporter(DataImporter):
                     was_updated = self._update_parliamentarian_attributes(
                         parliamentarian, person_data
                     )
-                    log.debug(
+                    self.logger.debug(
                         f'Updating existing parliamentarian: {person_id}'
                     )
                     if was_updated:
@@ -329,14 +193,15 @@ class PeopleImporter(DataImporter):
                     parliamentarian = self._create_parliamentarian(person_data)
                     if not parliamentarian:
                         continue
-                    log.debug(f'Creating new parliamentarian: {person_id}')
+                    self.logger.debug(
+                        f'Creating new parliamentarian: {person_id}'
+                    )
                     new_parliamentarians.append(parliamentarian)
                     result_map[person_id] = parliamentarian
                     # Add to new list, _bulk_save confirms DB insert
-            except Exception as e:
-                log.error(
-                    f'Error processing person with id {person_id}: {e}',
-                    exc_info=True,
+            except Exception:
+                self.logger.exception(
+                    f'Error processing person with id {person_id}'
                 )
 
         # Log individual details of new parliamentarians
@@ -350,7 +215,7 @@ class PeopleImporter(DataImporter):
                     emails_or_names.append(identifier)
 
             if emails_or_names:
-                log.info(
+                self.logger.info(
                     'New parliamentarians '
                     f'created: {", ".join(emails_or_names)}'
                 )
@@ -363,7 +228,7 @@ class PeopleImporter(DataImporter):
         updated_list = [p for p in updated_parliamentarians if p.id]
 
         details = {'created': created_list, 'updated': updated_list}
-        log.info(
+        self.logger.info(
             f'Parliamentarian import details: '
             f'Created: {len(details["created"])}, '
             f'Updated: {len(details["updated"])}, '
@@ -404,7 +269,7 @@ class PeopleImporter(DataImporter):
         person_id = person_data.get('id')
         person_id = person_data.get('id')
         if not person_id:
-            log.error(
+            self.logger.error(
                 f'Skipping person creation due to missing ID: '
                 f'{person_data.get("fullName")}'
             )
@@ -499,7 +364,7 @@ class OrganizationImporter(DataImporter):
         for org_data in organizations_data:
             org_id = org_data.get('id')
             if not org_id:
-                log.warning(  # Downgrade to warning
+                self.logger.warning(  # Downgrade to warning
                     f'Skipping organization without ID: {org_data.get("name")}'
                 )
                 continue
@@ -516,7 +381,7 @@ class OrganizationImporter(DataImporter):
                     try:
                         org_uuid = UUID(org_id)
                     except ValueError:
-                        log.exception(
+                        self.logger.exception(
                             f'Invalid UUID for commission ID: {org_id}'
                         )
                         continue
@@ -530,7 +395,7 @@ class OrganizationImporter(DataImporter):
                             updated = True
                         if updated:
                             commissions_to_update.append(commission)
-                            log.debug(
+                            self.logger.debug(
                                 f'Updating commission (from initial query): '
                                 f'{org_id}'
                             )
@@ -541,7 +406,7 @@ class OrganizationImporter(DataImporter):
                             name=org_name,
                             type='normal',
                         )
-                        log.debug(f'Creating new commission: {org_id}')
+                        self.logger.debug(f'Creating new commission: {org_id}')
                         # Only add *new* commissions to the save list
                         commissions_to_create.append(commission)
 
@@ -556,7 +421,7 @@ class OrganizationImporter(DataImporter):
                     try:
                         org_uuid = UUID(org_id)
                     except ValueError:
-                        log.exception(
+                        self.logger.exception(
                             f'Invalid UUID for party/Fraktion ID: {org_id}'
                         )
                         continue
@@ -571,7 +436,7 @@ class OrganizationImporter(DataImporter):
                             updated = True
                         if updated:
                             parties_to_update.append(party)
-                            log.debug(
+                            self.logger.debug(
                                 f'Updating party (from Fraktion, initial '
                                 f'query): {org_id}'
                             )
@@ -580,7 +445,7 @@ class OrganizationImporter(DataImporter):
                         # Create new party (since not found in initial map)
                         party = (
                             Party(external_kub_id=org_uuid, name=org_name))
-                        log.debug(
+                        self.logger.debug(
                             f'Creating party (from Fraktion): {org_id}'
                         )
                         # Only add *new* parties to the save list
@@ -602,16 +467,15 @@ class OrganizationImporter(DataImporter):
                 else:
                     # Count unknown types as 'other' as well
                     processed_counts['other'] += 1
-                    log.warning(
+                    self.logger.warning(
                         f'Unknown organization type: {organization_type_title}'
                         f' for {org_name}'
                     )
 
-            except Exception as e:
-                log.error(
+            except Exception:
+                self.logger.exception(
                     f'Error importing organization '
-                    f'{org_data.get("name")}: {e}',
-                    exc_info=True,
+                    f'{org_data.get("name")}'
                 )
 
         # Save newly created objects
@@ -630,7 +494,7 @@ class OrganizationImporter(DataImporter):
         details['commissions']['updated'] = list(commissions_to_update)
         details['parties']['created'] = list(parties_to_create)
         details['parties']['updated'] = list(parties_to_update)
-        log.info(
+        self.logger.info(
             f'Organization import details: '
             f'Commissions(C:{len(details["commissions"]["created"])}, '
             f'U:{len(details["commissions"]["updated"])}, '
@@ -686,8 +550,10 @@ class MembershipImporter(DataImporter):
 
     """
 
-    def __init__(self, session: Session) -> None:
-        self.session = session
+    def __init__(
+        self, session: Session, logger: logging.Logger | None = None
+    ) -> None:
+        super().__init__(session, logger)
         self.parliamentarian_map: dict[str, PASParliamentarian] = {}
         self.commission_map: dict[str, PASCommission] = {}
         self.parliamentary_group_map: dict[str, PASParliamentaryGroup] = {}
@@ -742,7 +608,7 @@ class MembershipImporter(DataImporter):
         }
 
         if not missing_person_ids:
-            log.debug(
+            self.logger.debug(
                 'No missing parliamentarians found only in membership data.'
             )
             return {'created': [], 'updated': []}
@@ -755,7 +621,7 @@ class MembershipImporter(DataImporter):
         existing_db_map = {
             p.external_kub_id: p for p in existing_db_parliamentarians
         }
-        log.debug(
+        self.logger.debug(
             f'Found {len(existing_db_map)} existing parliamentarians in DB '
             f'matching missing IDs.'
         )
@@ -773,7 +639,7 @@ class MembershipImporter(DataImporter):
                     person_uuid = UUID(person_id)
                     existing_parliamentarian = existing_db_map.get(person_uuid)
                 except ValueError:
-                    log.warning(
+                    self.logger.warning(
                         f'Invalid UUID format for person ID: {person_id}'
                     )
                     existing_parliamentarian = None
@@ -788,7 +654,7 @@ class MembershipImporter(DataImporter):
                         parliamentarians_to_update.add(
                             existing_parliamentarian
                         )
-                        log.info(
+                        self.logger.info(
                             f'Updated existing parliamentarian '
                             f'(ID: {person_id}) found via membership data.'
                         )
@@ -800,7 +666,7 @@ class MembershipImporter(DataImporter):
                 else:
                     # Create new parliamentarian
                     full_name = person_data.get('fullName', 'N/A')
-                    log.info(
+                    self.logger.info(
                         f'Creating new parliamentarian (ID: {person_id}) '
                         f'found only in membership data: {full_name}'
                     )
@@ -815,13 +681,12 @@ class MembershipImporter(DataImporter):
                             new_parliamentarian
                         )
 
-            except Exception as e:
+            except Exception:
                 # Use the initialized person_id here
                 log_person_id = person_id if person_id else 'unknown'
-                log.error(
+                self.logger.exception(
                     f'Error processing potential missing parliamentarian from '
-                    f'membership (Person ID: {log_person_id}): {e}',
-                    exc_info=True,
+                    f'membership (Person ID: {log_person_id})'
                 )
 
         # Save new parliamentarians
@@ -841,7 +706,7 @@ class MembershipImporter(DataImporter):
 
             created_count = len(parliamentarians_to_create)
             updated_count = len(parliamentarians_to_update)
-            log.info(
+            self.logger.info(
                 f'Created {created_count} and updated {updated_count} '
                 f'parliamentarians based *only* on membership data.'
             )
@@ -857,9 +722,8 @@ class MembershipImporter(DataImporter):
             updated_list = list(parliamentarians_to_update)
 
         except Exception:
-            log.error(
-                'Error flushing parliamentarians from membership data',
-                exc_info=True,
+            self.logger.exception(
+                'Error flushing parliamentarians from membership data'
             )
             self.session.rollback()
             # Return empty lists on error
@@ -938,7 +802,7 @@ class MembershipImporter(DataImporter):
         """
         person_id = person_data.get('id')
         if not person_id:
-            log.error(
+            self.logger.error(
                 'Cannot create parliamentarian from membership: '
                 'Missing person ID.'
             )
@@ -975,11 +839,10 @@ class MembershipImporter(DataImporter):
                 )
 
             return parliamentarian
-        except Exception as e:
-            log.error(
+        except Exception:
+            self.logger.exception(
                 f'Error creating parliamentarian from membership data '
-                f'(Person ID: {person_id}): {e}',
-                exc_info=True,
+                f'(Person ID: {person_id})'
             )
             return None
 
@@ -1064,7 +927,7 @@ class MembershipImporter(DataImporter):
                 (cm.parliamentarian_id, cm.commission_id): cm
                 for cm in existing_cms
             }
-            log.debug(
+            self.logger.debug(
                 f'Pre-fetched {len(existing_commission_memberships_map)} '
                 f'existing commission memberships.'
             )
@@ -1122,7 +985,7 @@ class MembershipImporter(DataImporter):
                         None,  # Placeholder for additional_information
                     )
                 existing_roles_map[current_role_key] = role_obj
-            log.debug(
+            self.logger.debug(
                 f'Pre-fetched {len(existing_roles_map)} existing '
                 f'parliamentarian roles.'
             )
@@ -1135,34 +998,34 @@ class MembershipImporter(DataImporter):
                 # Safely access nested keys
                 person_data = membership.get('person')
                 if not person_data:
-                    log.warning(
+                    self.logger.warning(
                         'Skipping membership: Missing person data.'
                     )
                     continue
                 person_id = person_data.get('id')
                 if not person_id:
-                    log.warning(
+                    self.logger.warning(
                         'Skipping membership: Missing person ID in data.'
                     )
                     continue
 
                 org_data = membership.get('organization')
                 if not org_data:
-                    log.warning(
+                    self.logger.warning(
                         f'Skipping membership for person {person_id}: '
                         f'Missing organization data.'
                     )
                     continue
                 org_id = org_data.get('id')
                 if not org_id:
-                    log.warning(
+                    self.logger.warning(
                         f'Skipping membership for person {person_id}: '
                         f'Missing organization ID.'
                     )
                     continue
                 parliamentarian = self.parliamentarian_map.get(person_id)
                 if not parliamentarian:
-                    log.warning(
+                    self.logger.warning(
                         f'Skipping membership: Parliamentarian with external '
                         f'KUB ID {person_id} not found.'
                     )
@@ -1177,7 +1040,7 @@ class MembershipImporter(DataImporter):
                     processed_membership_type = True
                     commission = self.commission_map.get(org_id)
                     if not commission:
-                        log.warning(
+                        self.logger.warning(
                             f'Skipping commission membership: Commission with '
                             f'external KUB ID {org_id} not found.'
                         )
@@ -1198,7 +1061,7 @@ class MembershipImporter(DataImporter):
                             commission_memberships_to_update.append(
                                 existing_membership
                             )
-                            log.debug(
+                            self.logger.debug(
                                 f'Updating commission membership for '
                                 f'{parliamentarian.id} in {commission.id}'
                             )
@@ -1220,7 +1083,7 @@ class MembershipImporter(DataImporter):
                                 existing_commission_memberships_map[
                                     new_key
                                 ] = membership_obj
-                            log.debug(
+                            self.logger.debug(
                                 f'Creating commission membership for '
                                 f'{parliamentarian.id} in {commission.id}'
                             )
@@ -1230,7 +1093,7 @@ class MembershipImporter(DataImporter):
                     processed_membership_type = True
                     party = self.party_map.get(org_id)
                     if not party:
-                        log.warning(
+                        self.logger.warning(
                             f'Skipping Fraktion role: Party with external KUB '
                             f'ID {org_id} not found (created from Fraktion).'
                         )
@@ -1278,7 +1141,7 @@ class MembershipImporter(DataImporter):
                             parliamentarian_roles_to_update.append(
                                 existing_role
                             )
-                            log.debug(
+                            self.logger.debug(
                                 f'Updating Fraktion/Party role for '
                                 f'{parliamentarian.id}'
                             )
@@ -1314,7 +1177,7 @@ class MembershipImporter(DataImporter):
                                 existing_roles_map[
                                     current_role_key_after_create
                                 ] = role_obj
-                            log.debug(
+                            self.logger.debug(
                                 f'Creating Fraktion/Party role for '
                                 f'{parliamentarian.id}'
                             )
@@ -1356,7 +1219,7 @@ class MembershipImporter(DataImporter):
                             parliamentarian_roles_to_update.append(
                                 existing_role
                             )
-                            log.debug(
+                            self.logger.debug(
                                 f'Updating Kantonsrat role ({role}) for '
                                 f'{parliamentarian.id}'
                             )
@@ -1383,7 +1246,7 @@ class MembershipImporter(DataImporter):
                                 existing_roles_map[
                                     current_role_key_after_create
                                 ] = role_obj
-                            log.debug(
+                            self.logger.debug(
                                 f'Creating Kantonsrat role ({role}) for '
                                 f'{parliamentarian.id}'
                             )
@@ -1426,7 +1289,7 @@ class MembershipImporter(DataImporter):
                             parliamentarian_roles_to_update.append(
                                 existing_role
                             )
-                            log.debug(
+                            self.logger.debug(
                                 f'Updating Sonstige role for '
                                 f'{parliamentarian.id}: {additional_info}'
                             )
@@ -1454,7 +1317,7 @@ class MembershipImporter(DataImporter):
                                 existing_roles_map[
                                     current_role_key_after_create
                                 ] = role_obj
-                            log.debug(
+                            self.logger.debug(
                                 f'Creating Sonstige role for '
                                 f'{parliamentarian.id}: {additional_info}'
                             )
@@ -1462,19 +1325,18 @@ class MembershipImporter(DataImporter):
                     # Count skipped/unknown types
                     if not processed_membership_type:
                         processed_counts['skipped'] += 1
-                    log.warning(
+                    self.logger.warning(
                         f'Skipping membership: Unknown organization type '
                         f"'{org_type_title}' "
                         f'for organization {org_name}'
                     )
 
-            except Exception as e:
+            except Exception:
                 # Use initialized person_id for logging
                 log_person_id = person_id if person_id else 'unknown'
-                log.error(
+                self.logger.exception(
                     f'Error creating membership for '
-                    f'person_id {log_person_id}: {e}',
-                    exc_info=True,
+                    f'person_id {log_person_id}'
                 )
                 # Count errors as skipped if not already counted
                 if not processed_membership_type:
@@ -1516,7 +1378,9 @@ class MembershipImporter(DataImporter):
             ]
 
         except Exception:
-            log.error('Error flushing memberships/roles', exc_info=True)
+            self.logger.exception(
+                'Error flushing memberships/roles'
+            )
             self.session.rollback()
             # Clear lists on error, but keep processed counts
             details['commission_memberships'] = {
@@ -1530,7 +1394,7 @@ class MembershipImporter(DataImporter):
                 'processed': processed_counts['parliamentarian_roles'],
             }
 
-        log.info(
+        self.logger.info(
             f'Membership/Role import details: '
             f'CMs(C:{len(details["commission_memberships"]["created"])}, '
             f'U:{len(details["commission_memberships"]["updated"])}, '
@@ -1551,7 +1415,7 @@ class MembershipImporter(DataImporter):
         """Create a CommissionMembership object."""
         try:
             if not parliamentarian.id or not commission.id:
-                log.warning(
+                self.logger.warning(
                     f'Missing ID: Parliamentarian={parliamentarian.id}, '
                     f'Commission={commission.id}'
                 )
@@ -1581,9 +1445,9 @@ class MembershipImporter(DataImporter):
                 start=start_date,
                 end=end_date,
             )
-        except Exception as e:
-            log.error(
-                f'Error creating commission membership: {e}', exc_info=True
+        except Exception:
+            self.logger.exception(
+                'Error creating commission membership'
             )
             return None
 
@@ -1638,7 +1502,7 @@ class MembershipImporter(DataImporter):
         try:
             # Ensure parliamentarian has an ID
             if not parliamentarian.id:
-                log.warning(
+                self.logger.warning(
                     'Skipping parliamentarian role: '
                     'PASParliamentarian missing '
                     f'ID: {parliamentarian.first_name} '
@@ -1659,9 +1523,9 @@ class MembershipImporter(DataImporter):
                 start=self.parse_date(start_date),
                 end=self.parse_date(end_date),
             )
-        except Exception as e:
-            log.error(
-                f'Error creating parliamentarian role: {e}', exc_info=True
+        except Exception:
+            self.logger.exception(
+                'Error creating parliamentarian role'
             )
             return None
 
