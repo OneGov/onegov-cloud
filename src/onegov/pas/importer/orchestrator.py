@@ -232,10 +232,7 @@ class KubImporter:
             'brief_anrede': 'salutation_for_letter'
         }
 
-        # Get all parliamentarians (single DB query)
         all_parliamentarians = request.session.query(Parliamentarian).all()
-
-        # Separate parliamentarians with and without external_kub_id
         parliamentarians_with_id = [
             p for p in all_parliamentarians if p.external_kub_id is not None
         ]
@@ -266,7 +263,6 @@ class KubImporter:
                 )
             return 0, 0, []
 
-        # Use only parliamentarians with external_kub_id for processing
         parliamentarians = parliamentarians_with_id
 
         if self.output:
@@ -275,11 +271,9 @@ class KubImporter:
                 f'with custom data using {max_workers} workers'
             )
 
-        # Set up queues for thread communication
         parliamentarian_queue: queue.Queue[Any] = queue.Queue()
         result_queue: queue.Queue[UpdateResult] = queue.Queue()
 
-        # Fill work queue with parliamentarians
         for p in parliamentarians:
             parliamentarian_queue.put(p)
 
@@ -372,7 +366,9 @@ class KubImporter:
             import_log = request.session.query(ImportLog).filter(
                 ImportLog.id == import_log_id
             ).first()
+
             if import_log and hasattr(self.output, 'get_messages'):
+                # DatabaseOutputHandler
                 output_messages = self.output.get_messages()  # type: ignore
 
                 # Update ImportLog with custom data results

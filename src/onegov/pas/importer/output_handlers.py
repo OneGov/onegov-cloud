@@ -5,7 +5,10 @@ from typing import Any
 
 
 class DatabaseOutputHandler:
-    """OutputHandler that collects messages for database storage."""
+    """Collects import messages for database storage in ImportLog.
+
+    Facilitates dataflow by capturing detailed logging separately.
+    """
 
     def __init__(self) -> None:
         self.messages: list[dict[str, Any]] = []

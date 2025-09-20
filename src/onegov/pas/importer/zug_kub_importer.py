@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.pas import log
+from onegov.pas.log import log
 from onegov.pas.models import ImportLog
 
 
@@ -16,6 +16,34 @@ if TYPE_CHECKING:
         OrganizationData,
         MembershipData,
     )
+
+
+def _serialize_model_objects(obj_list: list[Any]) -> list[dict[str, Any]]:
+    """Convert model objects to JSON-serializable dictionaries."""
+    serialized = []
+    for obj in obj_list:
+        if hasattr(obj, '__tablename__'):
+            # SQLAlchemy model object
+            result = {
+                'id': str(obj.id) if obj.id else None,
+                'type': obj.__class__.__name__,
+            }
+            # Add identifying fields based on model type
+            if hasattr(obj, 'last_name') and hasattr(obj, 'first_name'):
+                result.update({
+                    'last_name': obj.last_name,
+                    'first_name': obj.first_name,
+                    'email': getattr(obj, 'email', None)
+                })
+            elif hasattr(obj, 'name'):
+                result['name'] = obj.name
+            elif hasattr(obj, 'title'):
+                result['title'] = obj.title
+            serialized.append(result)
+        else:
+            # For non-model objects, keep as-is
+            serialized.append(obj)
+    return serialized
 
 
 def import_zug_kub_data(
@@ -71,8 +99,8 @@ def import_zug_kub_data(
                 people_importer.bulk_import(people_data)
             )
             import_details['parliamentarians'] = {
-                'created': people_details['created'],
-                'updated': people_details['updated'],
+                'created': _serialize_model_objects(people_details['created']),
+                'updated': _serialize_model_objects(people_details['updated']),
                 'processed': people_processed,
             }
 
@@ -91,9 +119,11 @@ def import_zug_kub_data(
                 # Only add categories that have actual ORM objects
                 # (Commissions, Parties)
                 if category in ('commissions', 'parties'):
+                    created_objs = details_list_dict.get('created', [])
+                    updated_objs = details_list_dict.get('updated', [])
                     import_details[category] = {
-                        'created': details_list_dict.get('created', []),
-                        'updated': details_list_dict.get('updated', []),
+                        'created': _serialize_model_objects(created_objs),
+                        'updated': _serialize_model_objects(updated_objs),
                         'processed': processed_count,
                     }
 
@@ -123,19 +153,27 @@ def import_zug_kub_data(
                     if isinstance(
                         details_dict, dict
                     ):
+                        created_parl = details_dict.get('created', [])
+                        updated_parl = details_dict.get('updated', [])
                         import_details['parliamentarians']['created'].extend(
-                            details_dict.get('created', [])
+                            _serialize_model_objects(created_parl)
                         )
                         import_details['parliamentarians']['updated'].extend(
-                            details_dict.get('updated', [])
+                            _serialize_model_objects(updated_parl)
                         )
 
                 elif category in (
                     'commission_memberships',
                     'parliamentarian_roles',
                 ):
+                    created_items = details_dict.get('created', [])
+                    updated_items = details_dict.get('updated', [])
                     import_details[category] = cast(
-                        'ImportCategoryResult', details_dict
+                        'ImportCategoryResult', {
+                            'created': _serialize_model_objects(created_items),
+                            'updated': _serialize_model_objects(updated_items),
+                            'processed': details_dict.get('processed', 0)
+                        }
                     )
 
             log_details['skipped_memberships'] = (

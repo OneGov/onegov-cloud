@@ -12,7 +12,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from uuid import UUID
 
-from onegov.pas import log
+from onegov.pas.log import log
 from onegov.pas.models import (
     PASCommission,
     PASCommissionMembership,
@@ -23,7 +23,7 @@ from onegov.pas.models import (
 )
 from sqlalchemy.orm import selectinload
 
-from onegov.pas.importer.types import (
+from onegov.pas.importer.types import (  # noqa: TC002
     MembershipData,
     OrganizationData,
     PersonData,
