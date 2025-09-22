@@ -10,6 +10,7 @@ from onegov.pas.collections import (
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.commission import Commission
 from onegov.org.models import Organisation
+from onegov.org.models.file import GeneralFileCollection
 from onegov.user import User
 
 
@@ -85,11 +86,43 @@ def restrict_attendence_access(
     model: Attendence,
     permission: Intent
 ) -> bool:
-    # Parliamentarians and commission presidents can access attendance records
+    # Check basic role permissions first
+    if identity.role not in ('parliamentarian', 'commission_president'):
+        return permission in getattr(app.settings.roles, identity.role)
+
+    # For parliamentarians and commission presidents, check ownership
     if identity.role in ('parliamentarian', 'commission_president'):
-        # Allow Private permission for attendance access
+        # Allow Private permission only if they have access to this record
         if isinstance(permission, type) and issubclass(permission, Private):
-            return True
+            user = app.session().query(User).filter_by(
+                username=identity.userid).first()
+            if not user or not user.parliamentarian:
+                return False
+
+            parliamentarian = user.parliamentarian
+
+            # Regular parliamentarians can only access their own records
+            if identity.role == 'parliamentarian':
+                return model.parliamentarian_id == str(parliamentarian.id)
+
+            # Commission presidents can access their own + commission members'
+            elif identity.role == 'commission_president':
+                # Always allow own records
+                if model.parliamentarian_id == str(parliamentarian.id):
+                    return True
+
+                # Check if they are president of the commission for this record
+                if model.commission_id:
+                    from datetime import date
+                    for membership in parliamentarian.commission_memberships:
+                        if (membership.commission_id == model.commission_id
+                            and membership.role == 'president'
+                            and (membership.end is None
+                                 or membership.end >= date.today())):
+                            return True
+
+                return False
+
         return permission in getattr(app.settings.roles, identity.role)
 
     return permission in getattr(app.settings.roles, identity.role)
@@ -104,6 +137,23 @@ def restrict_organisation_access(
 ) -> bool:
     # Allow parliamentarians to access pas-settings via Organisation model
     if identity.role in ('parliamentarian', 'commission_president'):
+        return permission in getattr(app.settings.roles, identity.role)
+
+    return permission in getattr(app.settings.roles, identity.role)
+
+
+@PasApp.permission_rule(model=GeneralFileCollection, permission=object)
+def restrict_files_collection_access(
+    app: PasApp,
+    identity: Identity,
+    model: GeneralFileCollection,
+    permission: Intent
+) -> bool:
+    # Allow parliamentarians and commission presidents to access files
+    if identity.role in ('parliamentarian', 'commission_president'):
+        # Allow Private permission for files collection access
+        if isinstance(permission, type) and issubclass(permission, Private):
+            return True
         return permission in getattr(app.settings.roles, identity.role)
 
     return permission in getattr(app.settings.roles, identity.role)

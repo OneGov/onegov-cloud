@@ -92,7 +92,7 @@ msgid "Validate JSON Schema"
 msgstr "JSON-Schema validieren"
 
 msgid "Check if the uploaded JSON files match the expected structure."
-msgstr ""
+msgstr "Überprüft ob die hochgeladenen JSON-Dateien der erwarteten Struktur entsprechen."
 "Überprüft ob die hochgeladenen JSON-Dateien der erwarteten Struktur "
 "entsprechen."
 
