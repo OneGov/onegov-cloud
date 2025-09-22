@@ -108,7 +108,21 @@ def handle_data_import(
 
     # Helper function to get display title for various imported objects
     def get_item_display_title(item: Any) -> str:
-        if isinstance(item, PASParliamentarian):
+        # Handle serialized dictionaries
+        if isinstance(item, dict):
+            if item.get('type') == 'PASParliamentarian':
+                first_name = item.get('first_name', '')
+                last_name = item.get('last_name', '')
+                return f'{first_name} {last_name}'.strip()
+            elif 'name' in item:
+                return item['name']
+            elif 'title' in item:
+                return item['title']
+            else:
+                return f'Unknown Object (Type: {item.get("type", "dict")})'
+
+        # Handle model objects (original code)
+        elif isinstance(item, PASParliamentarian):
             return item.title  # Already includes first/last name etc.
         elif isinstance(item, (PASCommission, Party)):
             return item.name
