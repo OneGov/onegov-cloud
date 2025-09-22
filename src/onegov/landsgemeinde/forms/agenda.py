@@ -229,17 +229,15 @@ class AgendaItemUploadForm(Form):
         ]
     )
 
-    def import_agenda_item(
-            self, collection: AgendaItemCollection) -> AgendaItem:
+    def get_html_dir(self,
+                     temp: TemporaryDirectory[str],
+                     field: UploadField) -> str | None:
 
-        temp = TemporaryDirectory()
         temp_path = Path(temp.name)
-        file_storage = self.agenda_item_zip.data
-
         zip_content = None
 
-        if isinstance(file_storage, dict) and 'data' in file_storage:
-            encoded_data = file_storage['data']
+        if isinstance(field.data, dict) and 'data' in field.data:
+            encoded_data = field.data['data']
             decoded_data = base64.b64decode(encoded_data)
 
             if decoded_data[:2] == b'\x1f\x8b':
@@ -248,22 +246,24 @@ class AgendaItemUploadForm(Form):
             else:
                 zip_content = BytesIO(decoded_data)
 
-        # Extract the zip file to temporary directory
         with zipfile.ZipFile(
             zip_content, 'r') as zip_ref:  # type:ignore
             zip_ref.extractall(temp_path)
 
-        # Find the html directory
         html_dir = None
         for root, dirs, files in os.walk(temp_path):
             if 'html' in dirs:
                 html_dir = os.path.join(root, 'html')
                 break
-        if not html_dir:
-            raise ValidationError(
-                _('No html directory found in the zip file.'))
 
-        html_path = Path(html_dir)
+        return html_dir
+
+    def import_agenda_item(
+            self, collection: AgendaItemCollection) -> AgendaItem:
+
+        temp = TemporaryDirectory()
+        html_dir = self.get_html_dir(temp, self.agenda_item_zip)
+        html_path = Path(html_dir)  # type:ignore
         html_files = sorted(
             [f for f in html_path.glob('*.html')
              if f.name != 'combined_clean.html'],
@@ -296,8 +296,8 @@ class AgendaItemUploadForm(Form):
                     if not parent_inline_style:
                         p_class = 'table'
 
-                    for span in p_tag.find_all(
-                        'span', id=re.compile(r'^_idTextSpan\d+')):
+                    regex = re.compile(r'^_idTextSpan\d+')
+                    for span in p_tag.find_all('span', id=regex):
                         text = span.get_text().strip()
                         if text:
                             spans_text.append(text)
@@ -385,28 +385,7 @@ class AgendaItemUploadForm(Form):
             raise ValidationError(_('No file uploaded.'))
 
         temp = TemporaryDirectory()
-        temp_path = Path(temp.name)
-        zip_content = None
-
-        if isinstance(field.data, dict) and 'data' in field.data:
-            encoded_data = field.data['data']
-            decoded_data = base64.b64decode(encoded_data)
-
-            if decoded_data[:2] == b'\x1f\x8b':
-                decompressed_data = gzip.decompress(decoded_data)
-                zip_content = BytesIO(decompressed_data)
-            else:
-                zip_content = BytesIO(decoded_data)
-
-        with zipfile.ZipFile(
-            zip_content, 'r') as zip_ref:  # type:ignore
-            zip_ref.extractall(temp_path)
-
-        html_dir = None
-        for root, dirs, files in os.walk(temp_path):
-            if 'html' in dirs:
-                html_dir = os.path.join(root, 'html')
-                break
+        html_dir = self.get_html_dir(temp, field)
         if not html_dir:
             raise ValidationError(
                 _('No html directory found in the zip file.'))
