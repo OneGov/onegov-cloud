@@ -5,15 +5,12 @@ from onegov.core.security.roles import get_roles_setting as \
     get_roles_setting_base
 from onegov.pas import PasApp
 from onegov.pas.collections import (
-    AttendenceCollection,
-    PASCommissionCollection
+    AttendenceCollection
 )
 from onegov.pas.models.attendence import Attendence
-from onegov.pas.models.commission import Commission, PASCommission
-from onegov.pas.models.parliamentarian import PASParliamentarian
-from onegov.org.models import Organisation, GeneralFileCollection
+from onegov.pas.models.commission import Commission
+from onegov.org.models import Organisation
 from onegov.user import User
-from onegov.user import Auth
 
 
 from typing import TYPE_CHECKING
@@ -35,8 +32,8 @@ PAS is fully internal.
 @PasApp.replace_setting_section(section='roles')
 def get_roles_setting() -> dict[str, set[type[Intent]]]:
     result = get_roles_setting_base()
-    # All parliamentarians are basically members, plus a few domain-specific
-    # permissions
+    # All parliamentarians are basically members, plus a few
+    # specific permissions
     result['parliamentarian'] = {Public, Personal}
     result['commission_president'] = {Public, Personal}
     return result
@@ -63,36 +60,56 @@ def has_permission_logged_in(
     return permission in getattr(app.settings.roles, identity.role)
 
 
-@PasApp.permission_rule(model=Auth, permission=object)
-def restrict_auth_access(
+@PasApp.permission_rule(model=AttendenceCollection, permission=object)
+def restrict_attendence_collection_access(
     app: PasApp,
     identity: Identity,
-    model: Auth,
-    permission: object
+    model: AttendenceCollection,
+    permission: Intent
 ) -> bool:
-    if permission == Personal and identity.role == 'parliamentarian':
-        return True
+    # Parliamentarians and commission presidents can access attendance
+    # collection
+    if identity.role in ('parliamentarian', 'commission_president'):
+        # Allow Private permission for attendance collection access
+        if isinstance(permission, type) and issubclass(permission, Private):
+            return True
+        return permission in getattr(app.settings.roles, identity.role)
 
     return permission in getattr(app.settings.roles, identity.role)
 
 
-@PasApp.permission_rule(model=PASParliamentarian, permission=object)
-def restrict_parliamentarian_access(
+@PasApp.permission_rule(model=Attendence, permission=object)
+def restrict_attendence_access(
     app: PasApp,
     identity: Identity,
-    model: PASParliamentarian,
-    permission: type[Intent]
+    model: Attendence,
+    permission: Intent
 ) -> bool:
-    if (
-        identity.role == 'parliamentarian'
-        and identity.userid == model.email_primary
-        and permission == Personal
-    ):
-        return True
+    # Parliamentarians and commission presidents can access attendance records
+    if identity.role in ('parliamentarian', 'commission_president'):
+        # Allow Private permission for attendance access
+        if isinstance(permission, type) and issubclass(permission, Private):
+            return True
+        return permission in getattr(app.settings.roles, identity.role)
 
     return permission in getattr(app.settings.roles, identity.role)
 
 
+@PasApp.permission_rule(model=Organisation, permission=object)
+def restrict_organisation_access(
+    app: PasApp,
+    identity: Identity,
+    model: Organisation,
+    permission: Intent
+) -> bool:
+    # Allow parliamentarians to access pas-settings via Organisation model
+    if identity.role in ('parliamentarian', 'commission_president'):
+        return permission in getattr(app.settings.roles, identity.role)
+
+    return permission in getattr(app.settings.roles, identity.role)
+
+
+# todo: test this
 @PasApp.permission_rule(model=Commission, permission=Private)
 def has_private_access_to_commission(
     app: PasApp,
@@ -113,101 +130,3 @@ def has_private_access_to_commission(
                             membership.role == 'president':
                         return True
     return permission in getattr(app.settings.roles, identity.role)
-
-
-@PasApp.permission_rule(model=Organisation, permission=object)
-def has_access_to_organisation(
-    app: PasApp,
-    identity: Identity,
-    model: Organisation,
-    permission: Intent
-) -> bool:
-    if identity.role in ('parliamentarian', 'commission_president'):
-        return isinstance(permission, (Public, Personal))
-
-    if hasattr(app.settings.roles, identity.role):
-        return permission in getattr(app.settings.roles, identity.role)
-
-    return False
-
-
-@PasApp.permission_rule(model=AttendenceCollection, permission=Private)
-def has_private_access_to_attendence_collection(
-    app: PasApp,
-    identity: Identity,
-    model: AttendenceCollection,
-    permission: Intent
-) -> bool:
-    if identity.role in ('parliamentarian', 'commission_president'):
-        return True
-    return permission in getattr(app.settings.roles, identity.role)
-
-
-@PasApp.permission_rule(model=Attendence, permission=Private)
-def has_private_access_to_attendence(
-    app: PasApp,
-    identity: Identity,
-    model: Attendence,
-    permission: Intent
-) -> bool:
-    if identity.role in ('parliamentarian', 'commission_president'):
-        return True
-    return permission in getattr(app.settings.roles, identity.role)
-
-
-@PasApp.permission_rule(model=PASCommissionCollection, permission=Private)
-def has_private_access_to_commission_collection(
-    app: PasApp,
-    identity: Identity,
-    model: PASCommissionCollection,
-    permission: Intent
-) -> bool:
-    if identity.role in ('parliamentarian', 'commission_president'):
-        return True
-    return permission in getattr(app.settings.roles, identity.role)
-
-
-@PasApp.permission_rule(model=PASCommission, permission=Private)
-def has_private_access_to_pas_commission(
-    app: PasApp,
-    identity: Identity,
-    model: PASCommission,
-    permission: Intent
-) -> bool:
-    """ Grant private access to commission presidents of this commission.
-    """
-    if identity.role == 'commission_president':
-        user = app.session().query(User).filter_by(
-            username=identity.userid).first()
-        if user:
-            if user.parliamentarian:  # type:ignore
-                membershps = user.parliamentarian.commission_memberships  # type:ignore
-                for membership in membershps:
-                    if membership.commission_id == model.id and \
-                            membership.role == 'president':
-                        return True
-    return permission in getattr(app.settings.roles, identity.role)
-
-
-@PasApp.permission_rule(model=Attendence, permission=object)
-def has_attendence_permission(
-    app: PasApp,
-    identity: Identity,
-    model: Attendence,
-    permission: object
-) -> bool:
-    return identity.role in {
-        'admin', 'parliamentarian', 'commission_president'
-    }
-
-
-@PasApp.permission_rule(model=GeneralFileCollection, permission=object)
-def has_general_file_collection_permission(
-    app: PasApp,
-    identity: Identity,
-    model: GeneralFileCollection,
-    permission: object
-) -> bool:
-    return identity.role in {
-        'admin', 'parliamentarian', 'commission_president'
-    }
