@@ -47,6 +47,19 @@ class AttendenceCollectionLayout(DefaultLayout):
                     ]
                 ),
             ]
+        elif self.request.is_parliamentarian:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('New Attendence'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-attendence'}
+                        ),
+                    ]
+                ),
+            ]
         return None
 
 

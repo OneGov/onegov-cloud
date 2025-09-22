@@ -38,7 +38,7 @@ def test_view_dashboard_as_parliamentarian(client):
     client.login('pia.parliamentarian@example.org', 'test')
 
     # Should be able to access dashboard
-    page = client.get('/pas')
+    page = client.get('/pas-settings')
     assert page.status_code == 200
     # The page loads successfully - permission test passed!
 
@@ -80,7 +80,7 @@ def test_view_dashboard_as_commission_president(client):
     assert 'falsches Passwort' not in page
 
     # Should be able to access dashboard
-    page = client.get('/pas')
+    page = client.get('/pas-settings')
     assert page.status_code == 200
 
 def test_view_attendence_as_parliamentarian(client):
