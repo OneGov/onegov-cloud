@@ -53,6 +53,7 @@ def import_zug_kub_data(
     user_id: UUID | None = None,
     import_type: str = 'cli',
     logger: logging.Logger | None = None,
+    create_import_log: bool = True,
 ) -> dict[str, ImportCategoryResult]:
     """
     Imports data from KUB JSON files within a single transaction,
@@ -67,6 +68,8 @@ def import_zug_kub_data(
         user_id: ID of user performing the import (optional)
         import_type: Type of import ('cli', 'upload', or 'automatic')
         logger: Optional logger to use instead of module logger
+        create_import_log: Whether to create ImportLog (True for web form,
+                          False for CLI/orchestrator)
 
     Returns a dictionary where keys are categories (e.g., 'parliamentarians')
     and values are dictionaries containing 'created' (list), 'updated' (list),
@@ -208,10 +211,31 @@ def import_zug_kub_data(
         logger.exception('KUB data import failed')
 
     finally:
-        # ImportLog creation is now handled by the orchestrator
-        logger.info(
-            f'KUB data import completed with status: {log_status}'
-        )
+        # Create ImportLog if requested (for web form imports)
+        if create_import_log:
+            try:
+                from onegov.pas.models import ImportLog
+                import_log = ImportLog(
+                    user_id=user_id,
+                    details=log_details,
+                    status=log_status,
+                    import_type=import_type
+                )
+                session.add(import_log)
+                if session.is_active:
+                    session.flush()
+                logger.info(
+                    f'KUB data import attempt logged with status: {log_status}'
+                )
+            except Exception:
+                logger.exception(
+                    'Failed to log import status'
+                )
+        else:
+            # ImportLog creation is handled by the orchestrator
+            logger.info(
+                f'KUB data import completed with status: {log_status}'
+            )
 
         if final_error:
             raise RuntimeError('KUB data import failed.') from final_error

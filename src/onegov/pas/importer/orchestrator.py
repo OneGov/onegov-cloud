@@ -635,7 +635,8 @@ class KubImporter:
                         if request.current_user
                         else None
                     ),
-                    logger=import_logger
+                    logger=import_logger,
+                    create_import_log=False  # Orchestrator handles ImportLog
                 )
             finally:
                 # Clean up the temporary logger
