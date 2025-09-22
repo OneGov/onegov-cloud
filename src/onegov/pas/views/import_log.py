@@ -6,6 +6,7 @@ from onegov.pas import PasApp, _
 from onegov.pas.collections import ImportLogCollection
 from onegov.pas.layouts.default import DefaultLayout
 from onegov.pas.models import ImportLog
+from webob import Response
 from typing import TYPE_CHECKING
 
 
@@ -64,3 +65,51 @@ def view_import_log(
         'log': self,
         'details_formatted': details_formatted,
     }
+
+
+@PasApp.view(
+    model=ImportLog,
+    name='download-source',
+    permission=Private
+)
+def download_source_data(
+    self: ImportLog, request: TownRequest
+) -> Response:
+    """Download source JSON data based on type parameter."""
+    source_type = request.params.get('type')
+
+    if source_type == 'people':
+        if not self.people_source:
+            return Response(
+                status=404, text='No people source data available'
+            )
+        json_data = json.dumps(
+            self.people_source, indent=2, ensure_ascii=False
+        )
+        filename = f'import-log-{self.id}-people-source.json'
+    elif source_type == 'organizations':
+        if not self.organizations_source:
+            return Response(
+                status=404, text='No organizations source data available'
+            )
+        json_data = json.dumps(
+            self.organizations_source, indent=2, ensure_ascii=False
+        )
+        filename = f'import-log-{self.id}-organizations-source.json'
+    elif source_type == 'memberships':
+        if not self.memberships_source:
+            return Response(
+                status=404, text='No memberships source data available'
+            )
+        json_data = json.dumps(
+            self.memberships_source, indent=2, ensure_ascii=False
+        )
+        filename = f'import-log-{self.id}-memberships-source.json'
+    else:
+        return Response(status=400, text='Invalid source type')
+
+    return Response(
+        body=json_data.encode('utf-8'),
+        content_type='application/json; charset=utf-8',
+        content_disposition=f'attachment; filename="{filename}"'
+    )
