@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from onegov.pas.log import log
-from onegov.pas.models import ImportLog
 
 
 from typing import TYPE_CHECKING, Any, cast
@@ -209,23 +208,10 @@ def import_zug_kub_data(
         logger.exception('KUB data import failed')
 
     finally:
-        try:
-            import_log = ImportLog(
-                user_id=user_id,
-                details=log_details,
-                status=log_status,
-                import_type=import_type
-            )
-            session.add(import_log)
-            if session.is_active:
-                session.flush()
-            logger.info(
-                f'KUB data import attempt logged with status: {log_status}'
-            )
-        except Exception:
-            logger.exception(
-                'Failed to log import status'
-            )
+        # ImportLog creation is now handled by the orchestrator
+        logger.info(
+            f'KUB data import completed with status: {log_status}'
+        )
 
         if final_error:
             raise RuntimeError('KUB data import failed.') from final_error
