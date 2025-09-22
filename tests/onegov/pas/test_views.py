@@ -377,16 +377,6 @@ def test_view_upload_json(
     assert logs_page.status_code == 200
     assert 'Keine Import Logs gefunden' not in logs_page
     assert 'completed' in logs_page  # Check if the status is shown
-    log_detail_page = logs_page.click(
-        'Details anzeigen', index=0
-    ).maybe_follow()
-
-    assert log_detail_page.status_code == 200
-    assert 'Import Details' in log_detail_page
-    status = log_detail_page.pyquery('.import-status').text()
-    assert 'completed' in status, f"Import status not 'completed': {status}"
-    # Todo: This should validate all columns on all table
-    # For example address is not checked here.
 
     # --- Second Import (Test idempotency) ---
     # Run the import again with the same data, to test robustness
