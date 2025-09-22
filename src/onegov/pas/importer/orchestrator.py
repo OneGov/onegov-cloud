@@ -651,21 +651,6 @@ class KubImporter:
             })
             import_log.status = 'completed'
 
-            # Store output messages if available
-            if hasattr(self.output, 'get_messages'):
-                output_messages = self.output.get_messages()  # type: ignore
-                import_log.details['output_messages'] = output_messages
-
-            if import_log.import_type != 'automatic':
-                # Store response json for finding issues quickly, but
-                # not the automatic ones, as this would just fill up
-                # disk space
-                import_log.people_source = people_data
-                import_log.organizations_source = organization_data
-                import_log.memberships_source = membership_data
-
-            request.session.flush()
-
             # Display results
             if self.output:
                 total_created = 0
@@ -709,16 +694,24 @@ class KubImporter:
             })
             import_log.status = 'failed'
 
-            # Store output messages if available
+            if self.output:
+                self.output.error(f'Import failed: {e}')
+            raise
+        finally:
+            # Always store output messages and source data for debugging
             if hasattr(self.output, 'get_messages'):
                 output_messages = self.output.get_messages()  # type: ignore
                 import_log.details['output_messages'] = output_messages
 
-            request.session.flush()
+            if import_log.import_type != 'automatic':
+                # Store response json for finding issues quickly, but
+                # not the automatic ones, as this would just fill up
+                # disk space
+                import_log.people_source = people_data
+                import_log.organizations_source = organization_data
+                import_log.memberships_source = membership_data
 
-            if self.output:
-                self.output.error(f'Import failed: {e}')
-            raise
+            request.session.flush()
 
     def run_full_sync(
         self,
