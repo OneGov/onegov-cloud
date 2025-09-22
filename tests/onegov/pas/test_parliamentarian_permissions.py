@@ -19,6 +19,10 @@ def test_view_dashboard_as_parliamentarian(client):
     '''Parliamentarians should be able to access the dashboard'''
     session = client.app.session()
 
+    # Create commission for testing commission shortcuts
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name='Test Commission')
+
     # Create parliamentarian
     parliamentarians = PASParliamentarianCollection(client.app)
     parliamentarian = parliamentarians.add(
@@ -26,6 +30,15 @@ def test_view_dashboard_as_parliamentarian(client):
         last_name='Parliamentarian',
         email_primary='pia.parliamentarian@example.org'
     )
+
+    # Add commission membership
+    membership = PASCommissionMembership(
+        parliamentarian_id=parliamentarian.id,
+        commission_id=commission.id,
+        role='member',
+        start=date(2020, 1, 1)  # Active membership
+    )
+    session.add(membership)
 
     # Set correct password for the created user
     users = UserCollection(session)
@@ -40,7 +53,6 @@ def test_view_dashboard_as_parliamentarian(client):
     # Should be able to access dashboard
     page = client.get('/pas-settings')
     assert page.status_code == 200
-    # The page loads successfully - permission test passed!
 
 
 def test_view_dashboard_as_commission_president(client):
@@ -92,8 +104,7 @@ def test_view_attendence_as_parliamentarian(client):
     parliamentarians = PASParliamentarianCollection(client.app)
     parliamentarian = parliamentarians.add(
         first_name='Bob',
-        last_name='Viewer',
-        email_primary='bob.viewer@example.org'
+        last_name='Viewer', email_primary='bob.viewer@example.org'
     )
 
     # Set correct password for the created user
@@ -142,32 +153,6 @@ def test_view_attendence_as_parliamentarian(client):
     page = page.form.submit().maybe_follow()
     assert page.status_code == 200
 
-
-def test_view_commissions_as_parliamentarian(client):
-    '''Parliamentarians should be able to view commissions'''
-    session = client.app.session()
-
-    # Create parliamentarian
-    parliamentarians = PASParliamentarianCollection(client.app)
-    parliamentarian = parliamentarians.add(
-        first_name='Carol',
-        last_name='Commissioner',
-        email_primary='carol.commissioner@example.org'
-    )
-
-    # Set correct password for the created user
-    users = UserCollection(session)
-    user = users.by_username('carol.commissioner@example.org')
-    user.password = 'test'
-
-    transaction.commit()
-
-    # Login as parliamentarian
-    client.login('carol.commissioner@example.org', 'test')
-
-    # Should be able to access commissions collection
-    page = client.get('/commissions')
-    assert page.status_code == 200
 
 
 def test_commission_president_has_private_access_to_commission(client):

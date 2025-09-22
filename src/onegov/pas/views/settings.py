@@ -34,6 +34,7 @@ def view_pas_settings(
     self: Organisation,
     request: TownRequest
 ) -> RenderData:
+    """ Dashboard, it's the landing page. """
 
     layout = DefaultLayout(self, request)
     shortcuts = []
@@ -95,7 +96,7 @@ def view_pas_settings(
         # Add view attendances shortcut for parliamentarians
         shortcuts.append({
             'name': 'view-attendances',
-            'title': _('Attendances'),
+            'title': _('Attendences'),
             'link': request.class_link(AttendenceCollection),
             'icon': 'fa-calendar-check'
         })
@@ -103,7 +104,7 @@ def view_pas_settings(
         # Add create attendance shortcut for parliamentarians
         shortcuts.append({
             'name': 'create-attendance',
-            'title': _('Create Attendance'),
+            'title': _('Create Attendence'),
             'link': request.class_link(AttendenceCollection, name='new'),
             'icon': 'fa-plus-circle'
         })

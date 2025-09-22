@@ -1,38 +1,44 @@
-msgid ""
-msgstr ""
-"Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-28 14:29+0200\n"
-"PO-Revision-Date: 2021-03-03 16:24+0100\n"
-"Language-Team: German\n"
-"Language: de_CH\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Lingua 3.12\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+    msgid ""
+    msgstr ""
+    "Project-Id-Version: OneGov Cloud 1.0\n"
+    "POT-Creation-Date: 2025-09-16 07:59+0200\n"
+    "PO-Revision-Date: 2021-03-03 16:24+0100\n"
+    "Language-Team: German\n"
+    "Language: de_CH\n"
+    "MIME-Version: 1.0\n"
+    "Content-Type: text/plain; charset=UTF-8\n"
+    "Content-Transfer-Encoding: 8bit\n"
+    "Generated-By: Lingua 3.12\n"
+    "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "User"
-msgstr "Benutzer"
+    msgid "User"
+    msgstr "Benutzer"
 
-msgid "Logout"
-msgstr "Abmelden"
+    msgid "Logout"
+    msgstr "Abmelden"
 
-msgid "Management"
-msgstr "Verwaltung"
+    msgid "Current Settlement Run"
+    msgstr "Aktueller Abrechnungslauf"
 
-msgid "Attendences"
-msgstr "Anwesenheiten"
+    msgid "Attendences"
+    msgstr "Anwesenheiten"
 
-msgid "Changes"
-msgstr "Aktivitäten"
+    msgid "Changes"
+    msgstr "Aktivitäten"
 
-msgid "PAS settings"
-msgstr "PAS Einstellungen"
+    msgid "PAS settings"
+    msgstr "PAS Einstellungen"
 
-msgid "More settings"
-msgstr "Weitere Einstellungen"
+    msgid "Files"
+    msgstr "Dateien"
 
-msgid "No within an active settlement run."
+    msgid "More settings"
+    msgstr "Weitere Einstellungen"
+
+    msgid "Management"
+    msgstr "Verwaltung"
+
+    msgid "No within an active settlement run."
 msgstr "Nicht in einem aktiven Abrechungslauf"
 
 msgid "Date"
@@ -50,17 +56,17 @@ msgstr "Parlamentarier:in"
 msgid "Commission"
 msgstr "Kommission"
 
+msgid "Abschluss"
+msgstr "Abschluss"
+
+msgid "Mark as completed/closed"
+msgstr "Als abgeschlossen markieren"
+
 msgid "Parliamentarian is not in this commission."
 msgstr "Parlamentarier:in ist nicht in dieser Kommission."
 
-msgid "Function"
-msgstr "Funktion"
-
-msgid "Start"
-msgstr "Start"
-
-msgid "End"
-msgstr "Ende"
+msgid "Bulk edit group"
+msgstr "Massenbuchungsgruppe"
 
 msgid "People Data (JSON)"
 msgstr "Personendaten (JSON)"
@@ -112,6 +118,12 @@ msgstr "Unerwarteter Fehler bei der Verarbeitung der Datei ${name}: ${error}"
 
 msgid "Name"
 msgstr "Name"
+
+msgid "Start"
+msgstr "Start"
+
+msgid "End"
+msgstr "Ende"
 
 msgid "Personnel number"
 msgstr "Personalnummer"
@@ -305,6 +317,9 @@ msgstr "Sitzung"
 msgid "Plenary session (bulk)"
 msgstr "Massenbuchung Plenarsitzung"
 
+msgid "Commission meeting (bulk)"
+msgstr "Massenbuchung Kommissionssitzung"
+
 msgid "Edit"
 msgstr "Bearbeiten"
 
@@ -458,8 +473,11 @@ msgstr "Dauer"
 msgid "No meeting defined yet."
 msgstr "Noch keine Sitzung erfasst."
 
-msgid "Comission"
-msgstr "Kommission"
+msgid "Bulk edits"
+msgstr "Massenbuchungen"
+
+msgid "edited"
+msgstr "bearbeitet"
 
 msgid "Timestamp"
 msgstr "Zeitpunkt"
@@ -467,11 +485,17 @@ msgstr "Zeitpunkt"
 msgid "Attendence"
 msgstr "Anwesenheit"
 
+msgid "Comission"
+msgstr "Kommission"
+
 msgid "No changes yet."
 msgstr "Noch keine Aktivitäten."
 
 msgid "Action"
 msgstr "Aktion"
+
+msgid "Function"
+msgstr "Funktion"
 
 msgid "No active commissions."
 msgstr "Keine aktiven Kommissionen."
@@ -587,8 +611,44 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nein"
 
-msgid "Exports Settlement runs"
-msgstr "Exporte Abrechnungsläufe"
+msgid "Commission Closure Status"
+msgstr "Kommissions-Abschlussstatus"
+
+msgid ""
+"This table shows the attendance closure status for each commission. It "
+"displays how many commission members have marked their attendance as "
+"\"closed\" (abschluss) for this settlement run. Members who have not yet "
+"closed their attendance are listed below each commission."
+msgstr ""
+"Diese Tabelle zeigt den Abschlussstatus der Anwesenheit für jede Kommission. "
+"Sie zeigt, wie viele Kommissionsmitglieder ihre Anwesenheit als "
+"\"abgeschlossen\" für diesen Abrechnungslauf markiert haben. Mitglieder, die "
+"ihre Anwesenheit noch nicht abgeschlossen haben, sind unter jeder Kommission "
+"aufgelistet."
+
+msgid "⚠ Incomplete"
+msgstr "⚠ Unvollständig"
+
+msgid "Members who have closed their attendance:"
+msgstr "Mitglieder, die ihre Anwesenheit abgeschlossen haben:"
+
+msgid "✓ (closed)"
+msgstr "✓ (abgeschlossen)"
+
+msgid "Members who have not closed their attendance:"
+msgstr "Mitglieder, die ihre Anwesenheit nicht abgeschlossen haben:"
+
+msgid "(has attendance)"
+msgstr "(hat Anwesenheit)"
+
+msgid "(no attendance)"
+msgstr "(keine Anwesenheit)"
+
+msgid ""
+"No commissions with active memberships found for this settlement period."
+msgstr ""
+"Keine Kommissionen mit aktiven Mitgliedschaften für diesen "
+"Abrechnungszeitraum gefunden."
 
 msgid "No settlement runs defined yet."
 msgstr "Noch keine Abrechnungsläufe erfasst"
@@ -602,6 +662,33 @@ msgstr "Neu"
 msgid "New attendence"
 msgstr "Neue Anwesenheit"
 
+msgid "No parliamentarians selected"
+msgstr "Keine Parlamentarier:innen ausgewählt"
+
+msgid "Added commission session"
+msgstr "Kommissionssitzung hinzugefügt"
+
+msgid "New commission session"
+msgstr "Neue Kommissionssitzung"
+
+msgid "Edited attendences"
+msgstr "Anwesenheiten bearbeitet"
+
+msgid "Edit session"
+msgstr "Sitzung bearbeiten"
+
+msgid "Do you really want to delete this bulk edit?"
+msgstr "Möchten Sie diese Massenbuchung wirklich löschen?"
+
+msgid "Delete Attendencess"
+msgstr "Anwesenheiten löschen"
+
+msgid "Edit plenary session"
+msgstr "Plenarsitzung bearbeiten"
+
+msgid "Edit commission session"
+msgstr "Kommissionssitzung bearbeiten"
+
 msgid "Added plenary session"
 msgstr "Plenarsitzung hinzugefügt"
 
@@ -610,6 +697,10 @@ msgstr "Neue Plenarsitzung"
 
 msgid "Your changes were saved"
 msgstr "Änderungen gespeichert"
+
+#, python-format
+msgid "Deleted ${count} attendeces"
+msgstr "${count} Anwesenheiten gelöscht"
 
 msgid "Added a new parliamentarian"
 msgstr "Parlamentarier:in hinzugefügt"
@@ -688,7 +779,7 @@ msgstr "Der Satz wurde kopiert"
 msgid "Copy"
 msgstr "Kopieren"
 
-msgid "Copy rate set"
+msgid "Copy Rate Set"
 msgstr "Satz kopieren"
 
 msgid "Added a new settlement run"
@@ -712,44 +803,38 @@ msgstr "Abrechnungen nach Kommission"
 msgid "Settlements by Parliamentarian"
 msgstr "Abrechnungen nach Parlamentarier:in"
 
+msgid "Abschlussliste"
+msgstr "Abschlussliste"
+
+msgid "Abschlussliste (XLSX)"
+msgstr "Abschlussliste (XLSX)"
+
+msgid "Buchungen Abrechnungslauf"
+msgstr "Buchungen Abrechnungslauf"
+
+msgid "Buchungen Abrechnungslauf (Kontrollliste)"
+msgstr "Buchungen Abrechnungslauf (Kontrollliste)"
+
+msgid "KR-Entschädigungen (CSV)"
+msgstr "KR-Entschädigungen (CSV)"
+
+msgid "PDF Exports"
+msgstr "PDF Exporte"
+
+msgid "Excel Exports"
+msgstr "Excel Exporte"
+
 msgid "Total all parties"
 msgstr "Total Alle Parteien"
 
-msgid "Administrator"
-msgstr "Administrator"
+msgid "Create Attendence"
+msgstr "Anwesenheit erfassen"
 
-msgid "Administrators"
-msgstr "Administratoren"
+msgid "You are viewing your own attendances and attendances from commissions you preside over."
+msgstr "Sie sehen Ihre eigenen Anwesenheiten und Anwesenheiten von Kommissionen, in denen Sie Mitglied sind."
 
-msgid "Editor"
-msgstr "Editor"
+msgid "You are viewing your own attendances only."
+msgstr "Sie sehen nur Ihre eigenen Anwesenheiten."
 
-msgid "Editors"
-msgstr "Editoren"
-
-msgid "Member"
-msgstr "Mitglied"
-
-msgid "Members"
-msgstr "Mitglieder"
-
-msgid "Parliamentarian"
-msgstr "Parlamentarier:in"
-
-msgid "Parliamentarians"
-msgstr "Parlamentarier:innen"
-
-msgid "Admin"
-msgstr "Administrator"
-
-msgid "Edit User"
-msgstr "Benutzer bearbeiten"
-
-msgid "User successfully edited"
-msgstr "Benutzer erfolgreich bearbeitet"
-
-msgid "Users"
-msgstr "Benutzer"
-
-msgid "Personal Information"
-msgstr "Persönliche Informationen"
+msgid "You are viewing all attendances in the system."
+msgstr "Sie sehen alle Anwesenheiten im System."
