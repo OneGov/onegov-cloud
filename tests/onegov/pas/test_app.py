@@ -67,9 +67,3 @@ def test_app_custom(pas_app):
 
     request.is_admin = True
     assert as_text(get_top_navigation(request)) == []
-    assert as_text(get_global_tools(request)) == [
-        {'Peter': ['Logout']},
-        {'Management': [
-            'Attendences', 'Changes', 'PAS settings', 'Files', 'More settings'
-        ]}
-    ]

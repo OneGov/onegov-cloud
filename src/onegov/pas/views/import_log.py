@@ -2,10 +2,16 @@ from __future__ import annotations
 
 import json
 from onegov.core.security import Private
+from morepath import redirect
 from onegov.pas import PasApp, _
 from onegov.pas.collections import ImportLogCollection
-from onegov.pas.layouts.default import DefaultLayout
+from onegov.pas.cronjobs import trigger_kub_data_import
+from onegov.pas.layouts.import_log import (
+    ImportLogCollectionLayout,
+    ImportLogLayout
+)
 from onegov.pas.models import ImportLog
+from sqlalchemy.orm import undefer
 from webob import Response
 from typing import TYPE_CHECKING
 
@@ -13,6 +19,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
     from onegov.core.types import RenderData
+    from webob import Response
 
 
 def translate_import_type(import_type: str, request: TownRequest) -> str:
@@ -34,12 +41,12 @@ def view_import_logs(
     self: ImportLogCollection, request: TownRequest
 ) -> RenderData:
 
-    layout = DefaultLayout(self, request)
+    layout = ImportLogCollectionLayout(self, request)
 
     return {
         'layout': layout,
         'title': _('Import History'),
-        'logs': self.query().limit(50).all(),
+        'logs': self.for_listing().all(),
         'translate_import_type': lambda import_type: translate_import_type(
             import_type, request
         )
@@ -55,7 +62,7 @@ def view_import_log(
     self: ImportLog, request: TownRequest
 ) -> RenderData:
 
-    layout = DefaultLayout(self, request)
+    layout = ImportLogLayout(self, request)
     details_formatted = json.dumps(
         self.details, indent=2, sort_keys=True, ensure_ascii=False
     )
@@ -68,6 +75,30 @@ def view_import_log(
 
 
 @PasApp.view(
+    model=ImportLogCollection,
+    name='trigger-import',
+    permission=Private,
+    request_method='POST'
+)
+def trigger_import_view(
+    self: ImportLogCollection, request: TownRequest
+) -> Response:
+    """Trigger manual KUB data import."""
+    try:
+        trigger_kub_data_import(request)
+        request.success(_(
+            'Import triggered successfully. The process may take up to 30 '
+            'seconds to complete.'
+        ))
+    except ValueError as e:
+        request.alert(str(e))
+    except Exception as e:
+        request.alert(_('Import failed: ${error}', mapping={'error': str(e)}))
+
+    return redirect(request.link(self))
+
+
+@PasApp.view(
     model=ImportLog,
     name='download-source',
     permission=Private
@@ -77,6 +108,21 @@ def download_source_data(
 ) -> Response:
     """Download source JSON data based on type parameter."""
     source_type = request.params.get('type')
+
+    # Refresh the object with the specific deferred column we need
+    if source_type in ('people', 'organizations', 'memberships'):
+        if source_type == 'people':
+            request.session.refresh(
+                self, [undefer(ImportLog.people_source)]
+            )
+        elif source_type == 'organizations':
+            request.session.refresh(
+                self, [undefer(ImportLog.organizations_source)]
+            )
+        elif source_type == 'memberships':
+            request.session.refresh(
+                self, [undefer(ImportLog.memberships_source)]
+            )
 
     if source_type == 'people':
         if not self.people_source:

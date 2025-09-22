@@ -3,11 +3,12 @@ from __future__ import annotations
 from sqlalchemy.dialects.postgresql.json import JSONB
 import uuid
 from sqlalchemy import Column, Text, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, deferred
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.core.orm.types import JSON
+from onegov.pas import _
 
 
 from typing import Any
@@ -20,6 +21,12 @@ class ImportLog(Base, TimestampMixin):
     """ Logs the summary of a KUB data import attempt. """
 
     __tablename__ = 'pas_import_logs'
+
+    # Status translations for .po file extraction
+    _('completed')
+    _('failed')
+    _('pending')
+    _('timeout')
 
     id: Column[uuid.UUID] = Column(
         UUID,  # type: ignore[arg-type]
@@ -49,8 +56,9 @@ class ImportLog(Base, TimestampMixin):
     # reconstruct how certain imports were run. This will be useful to
     # debug issues. But we don't want to store it every time, as these are
     # several MBs of text and the sync cronjob runs regularly.
-    people_source: Column[Any] = Column(JSONB, nullable=True)
-    organizations_source: Column[Any] = Column(
+    # These are deferred by default to avoid loading large JSON data
+    people_source: Column[Any] = deferred(Column(JSONB, nullable=True))
+    organizations_source: Column[Any] = deferred(Column(
         JSONB, nullable=True
-    )
-    memberships_source: Column[Any] = Column(JSONB, nullable=True)
+    ))
+    memberships_source: Column[Any] = deferred(Column(JSONB, nullable=True))

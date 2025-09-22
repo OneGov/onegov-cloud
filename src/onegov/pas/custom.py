@@ -6,6 +6,7 @@ from onegov.org.elements import LinkGroup
 from onegov.pas import _
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import ChangeCollection
+from onegov.pas.collections import ImportLogCollection
 from onegov.user import Auth
 from onegov.pas.models import SettlementRun, RateSet
 from sqlalchemy.orm.exc import MultipleResultsFound
@@ -67,6 +68,11 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
                     _('Changes'),
                     request.class_link(ChangeCollection),
                     attrs={'class': 'changes'}
+                ),
+                Link(
+                    _('Import History'),
+                    request.class_link(ImportLogCollection),
+                    attrs={'class': 'import-logs'}
                 ),
                 Link(
                     _('PAS settings'),
