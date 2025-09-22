@@ -375,6 +375,7 @@ def test_view_upload_json(
     # Check the import logs after first import
     logs_page = client.get('/import-logs')
     assert logs_page.status_code == 200
+    assert 'Keine Import Logs gefunden' not in logs_page
     assert 'completed' in logs_page  # Check if the status is shown
     log_detail_page = logs_page.click(
         'Details anzeigen', index=0

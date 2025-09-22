@@ -48,3 +48,22 @@ class LogOutputHandler:
 
     def error(self, message: str) -> None:
         log.error(message)
+
+
+class CompositeOutputHandler:
+    """OutputHandler that forwards messages to multiple handlers."""
+
+    def __init__(self, *handlers: OutputHandler):
+        self.handlers = handlers
+
+    def info(self, message: str) -> None:
+        for handler in self.handlers:
+            handler.info(message)
+
+    def success(self, message: str) -> None:
+        for handler in self.handlers:
+            handler.success(message)
+
+    def error(self, message: str) -> None:
+        for handler in self.handlers:
+            handler.error(message)
