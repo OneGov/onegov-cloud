@@ -223,6 +223,7 @@ def test_parliamentarian_cannot_view_other_parliamentarian_details(client):
 
     client.login('alice.parl@example.org', 'test')
 
+    # expect alice to be able to viwe their own attendence
     page = client.get(f'/parliamentarian/{parl_a_id}')
     # already this fails
     assert page.status_code == 200
