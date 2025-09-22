@@ -89,6 +89,9 @@ class Attendence(Base, TimestampMixin):
     )
 
     #: Whether this attendance submission is closed/completed
+    #: This is only relevant for commission attendance, not plenary sessions.
+    #: Parliamentarians use this to signal they have recorded all their
+    #: commission activities for a settlement run.
     abschluss: Column[bool] = Column(
         Boolean,
         nullable=False,

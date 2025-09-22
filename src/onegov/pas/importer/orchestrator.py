@@ -651,13 +651,13 @@ class KubImporter:
             })
             import_log.status = 'completed'
 
+            # Store output messages if available
             if hasattr(self.output, 'get_messages'):
-                # Store output messages if available
                 output_messages = self.output.get_messages()  # type: ignore
                 import_log.details['output_messages'] = output_messages
 
             if import_log.import_type != 'automatic':
-                # Store response json for finding issues quikcly, but
+                # Store response json for finding issues quickly, but
                 # not the automatic ones, as this would just fill up
                 # disk space
                 import_log.people_source = people_data
