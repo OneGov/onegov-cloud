@@ -859,3 +859,6 @@ msgstr "Ausstehend"
 
 msgid "timeout"
 msgstr "Zeitüberschreitung"
+
+msgid "Trigger Import"
+msgstr "Import andstossen (dauert ca. 20 Sekunden)"
