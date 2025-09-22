@@ -86,7 +86,10 @@ def trigger_import_view(
     """Trigger manual KUB data import."""
     try:
         trigger_kub_data_import(request)
-        request.success(_('Import triggered successfully'))
+        request.success(_(
+            'Import triggered successfully. The process may take up to 30 '
+            'seconds to complete.'
+        ))
     except ValueError as e:
         request.alert(str(e))
     except Exception as e:

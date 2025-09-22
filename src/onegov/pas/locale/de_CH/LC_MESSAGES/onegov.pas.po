@@ -835,3 +835,27 @@ msgstr "Letzter Import:"
 
 msgid "No imports yet"
 msgstr "Noch keine Importe"
+
+msgid "Are you sure you want to trigger a manual import?"
+msgstr "Sind Sie sicher, dass Sie einen manuellen Import auslösen möchten?"
+
+msgid "This will start a new KUB data import process."
+msgstr "Dies startet einen neuen KUB-Datenimportprozess."
+
+msgid "Import Started..."
+msgstr "Import gestartet..."
+
+msgid "Import triggered successfully. The process may take up to 30 seconds to complete."
+msgstr "Import erfolgreich ausgelöst. Der Vorgang kann bis zu 30 Sekunden dauern."
+
+msgid "completed"
+msgstr "Abgeschlossen"
+
+msgid "failed"
+msgstr "Fehlgeschlagen"
+
+msgid "pending"
+msgstr "Ausstehend"
+
+msgid "timeout"
+msgstr "Zeitüberschreitung"

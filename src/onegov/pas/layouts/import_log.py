@@ -47,7 +47,11 @@ class ImportLogCollectionLayout(DefaultLayout):
             url=self.csrf_protected_url(
                 self.request.link(self.model, 'trigger-import')
             ),
-            attrs={'class': 'button success large'},
+            attrs={
+                'class': 'button success large',
+                'id': 'trigger-import-btn',
+                'data-import-started-text': _('Import Started...')
+            },
             traits=(
                 Confirm(
                     _('Are you sure you want to trigger a manual import?'),
