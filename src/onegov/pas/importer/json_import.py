@@ -90,20 +90,21 @@ class PeopleImporter(DataImporter):
     """Importer for Parliamentarian data from api/v2/people endpoint
         (People.json)
 
-
     API Inconsistency Note:
-    The API design is inconsistent regarding address information.
-    While 'people.json', which is expected to be the primary source
-    for person details, *lacks* address information, 'memberships.json'
-    *does* embed address data within the 'person' object and sometimes
-    at the membership level. This requires us to extract address data
-    from 'memberships.json' instead of the more logical 'people.json'
-    endpoint.
+    Adresses are not imported here. The source of the address
+    in the API is convoluted:
+    While 'people.json', is expected to be the primary source
+    for person details, it *lacks* address information.
+    The memberships.json embeds inconsistent address data - sometimes in
+    the person object, sometimes at membership level. This differs from
+    the canonical address returned by api/v2/people/<uuid>. We must use
+    the direct API endpoint's address, requiring
+    KubImporter.update_custom_data for a second pass to fetch correct
+    addresses for exports.
 
-    Whatever the reasons for this, we need to be careful to avoid potential
-    inconsistencies if addresses are not carefully managed across both
-    endpoints in the source system
-
+    Whatever the reasons for this, we need to be careful to avoid
+    potential inconsistencies if addresses are not carefully managed
+    across both endpoints in the source system.
     """
 
     person_attribute_map: dict[str, str] = {
@@ -769,28 +770,6 @@ class MembershipImporter(DataImporter):
             parliamentarian.email_primary = new_email
             changed = True
 
-        # Update address if missing or different
-        address_data = membership_data.get('primaryAddress')
-        if address_data:
-            street = address_data.get('street', '')
-            house_num = address_data.get('houseNumber', '')
-            new_address = f'{street} {house_num}'.strip()
-            new_zip = address_data.get('swissZipCode')
-            new_city = address_data.get('town')
-
-            if new_address and parliamentarian.shipping_address != new_address:
-                parliamentarian.shipping_address = new_address
-                changed = True
-            if (
-                new_zip
-                and parliamentarian.shipping_address_zip_code != new_zip
-            ):
-                parliamentarian.shipping_address_zip_code = new_zip
-                changed = True
-            if new_city and parliamentarian.shipping_address_city != new_city:
-                parliamentarian.shipping_address_city = new_city
-                changed = True
-
         return changed
 
     def _create_parliamentarian_from_membership(
@@ -822,21 +801,6 @@ class MembershipImporter(DataImporter):
             primary_email_data = person_data.get('primaryEmail')
             if primary_email_data and primary_email_data.get('email'):
                 parliamentarian.email_primary = primary_email_data['email']
-
-            # Handle address
-            address_data = membership_data.get('primaryAddress')
-            if address_data:
-                street = address_data.get('street', '')
-                house_num = address_data.get('houseNumber', '')
-                parliamentarian.shipping_address = (
-                    f'{street} {house_num}'.strip()
-                )
-                parliamentarian.shipping_address_zip_code = address_data.get(
-                    'swissZipCode'
-                )
-                parliamentarian.shipping_address_city = address_data.get(
-                    'town'
-                )
 
             return parliamentarian
         except Exception:

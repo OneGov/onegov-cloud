@@ -37,6 +37,8 @@ class UpdateResult:
     parliamentarian_id: str
     title: str
     custom_values: dict[str, str]
+    addresses: list[dict[str, Any]]
+    sex: int | None
     error: str | None = None
 
 
@@ -62,17 +64,23 @@ def _fetch_custom_data_worker(
 
             person_data = response.json()
             custom_values = person_data.get('customValues', {})
+            addresses = person_data.get('addresses', [])
+            sex = person_data.get('sex')
 
             result_queue.put(UpdateResult(
                 parliamentarian_id=parliamentarian.id,
                 title=parliamentarian.title,
-                custom_values=custom_values
+                custom_values=custom_values,
+                addresses=addresses,
+                sex=sex
             ))
         except Exception as e:
             result_queue.put(UpdateResult(
                 parliamentarian_id=parliamentarian.id,
                 title=parliamentarian.title,
                 custom_values={},
+                addresses=[],
+                sex=None,
                 error=str(e)
             ))
         finally:
@@ -142,6 +150,98 @@ class KubImporter:
                 self.output.success('API is accessible')
         except requests.exceptions.RequestException as e:
             raise RuntimeError(f'API check failed: {e}') from e
+
+    def _update_address_fields(
+        self,
+        parliamentarian: Any,
+        addresses: list[dict[str, Any]]
+    ) -> list[str]:
+        """
+        Update parliamentarian address fields based on addresses data.
+
+        Returns list of updated field names.
+        """
+        updated_fields: list[str] = []
+
+        # Find default address (isDefault=True) or first address
+        default_address = None
+        for address in addresses:
+            if address.get('isDefault', False):
+                default_address = address
+                break
+
+        if not default_address and addresses:
+            default_address = addresses[0]
+
+        if not default_address:
+            return updated_fields
+
+        # Update shipping address (street + house number)
+        street = default_address.get('street', '')
+        house_number = default_address.get('houseNumber', '')
+        if street or house_number:
+            if street and house_number:
+                address_value = f'{street} {house_number}'
+            elif street:
+                address_value = street
+            else:
+                address_value = house_number
+
+            current_value = getattr(parliamentarian, 'shipping_address', None)
+            if current_value != address_value:
+                parliamentarian.shipping_address = address_value
+                updated_fields.append('shipping_address')
+
+        # Update address addition (addressLine1)
+        address_line1 = default_address.get('addressLine1', '')
+        if address_line1:
+            current_value = getattr(
+                parliamentarian, 'shipping_address_addition', None
+            )
+            if current_value != address_line1:
+                parliamentarian.shipping_address_addition = address_line1
+                updated_fields.append('shipping_address_addition')
+
+        # Update zip code
+        zip_code = default_address.get('swissZipCode', '')
+        if zip_code:
+            current_value = getattr(
+                parliamentarian, 'shipping_address_zip_code', None
+            )
+            if current_value != zip_code:
+                parliamentarian.shipping_address_zip_code = zip_code
+                updated_fields.append('shipping_address_zip_code')
+
+        # Update city
+        city = default_address.get('town', '')
+        if city:
+            current_value = getattr(
+                parliamentarian, 'shipping_address_city', None
+            )
+            if current_value != city:
+                parliamentarian.shipping_address_city = city
+                updated_fields.append('shipping_address_city')
+
+        return updated_fields
+
+    def _update_gender_field(
+        self, parliamentarian: Any, sex: int
+    ) -> bool:
+        gender_mapping = {
+            1: 'male',
+            2: 'female'
+        }
+
+        new_gender = gender_mapping.get(sex)
+        if new_gender is None:
+            return False
+
+        current_gender = getattr(parliamentarian, 'gender', None)
+        if current_gender != new_gender:
+            parliamentarian.gender = new_gender
+            return True
+
+        return False
 
     def _fetch_api_data_with_pagination(
         self, endpoint: str
@@ -325,6 +425,21 @@ class KubImporter:
                                     result.custom_values[custom_key]
                                 )
                                 updated_fields.append(attr_name)
+
+                        # Process address data
+                        if result.addresses:
+                            address_updated = self._update_address_fields(
+                                parliamentarian, result.addresses
+                            )
+                            updated_fields.extend(address_updated)
+
+                        # Process gender from sex field
+                        if result.sex is not None:
+                            gender_updated = self._update_gender_field(
+                                parliamentarian, result.sex
+                            )
+                            if gender_updated:
+                                updated_fields.append('gender')
 
                         if updated_fields:
                             updated_count += 1
