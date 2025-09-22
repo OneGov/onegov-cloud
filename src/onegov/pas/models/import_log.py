@@ -8,6 +8,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.core.orm.types import JSON
+from onegov.pas import _
 
 
 from typing import Any
@@ -20,6 +21,12 @@ class ImportLog(Base, TimestampMixin):
     """ Logs the summary of a KUB data import attempt. """
 
     __tablename__ = 'pas_import_logs'
+
+    # Status translations for .po file extraction
+    _('completed')
+    _('failed')
+    _('pending')
+    _('timeout')
 
     id: Column[uuid.UUID] = Column(
         UUID,  # type: ignore[arg-type]
