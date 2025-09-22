@@ -4,6 +4,16 @@
     </tal:b>
 
     <tal:b metal:fill-slot="content">
+        <div class="row" tal:condition="kub_token_configured">
+            <div class="small-12 columns">
+                <form method="POST" action="${request.link(context, 'trigger-import')}" style="display: inline;">
+                    <button type="submit" class="button alert" onclick="return confirm('Are you sure you want to trigger a manual import?');" i18n:translate="">
+                        Trigger Manual Import
+                    </button>
+                </form>
+            </div>
+        </div>
+
         <table class="inline-table">
             <thead>
                 <tr>

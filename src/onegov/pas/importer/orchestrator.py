@@ -650,15 +650,18 @@ class KubImporter:
             })
             import_log.status = 'completed'
 
-            # Store output messages if available
             if hasattr(self.output, 'get_messages'):
+                # Store output messages if available
                 output_messages = self.output.get_messages()  # type: ignore
                 import_log.details['output_messages'] = output_messages
 
-            # Store source data
-            import_log.people_source = people_data
-            import_log.organizations_source = organization_data
-            import_log.memberships_source = membership_data
+            if import_log.import_type != 'automatic':
+                # Store response json for finding issues quikcly, but
+                # not the automatic ones, as this would just fill up
+                # disk space
+                import_log.people_source = people_data
+                import_log.organizations_source = organization_data
+                import_log.memberships_source = membership_data
 
             request.session.flush()
 
@@ -780,68 +783,3 @@ class KubImporter:
                 self.output.info('Skipping custom data update')
 
         return combined_results, log_id
-
-
-# Legacy functions for backward compatibility
-def fetch_api_data_with_pagination(
-    endpoint: str, token: str, base_url: str
-) -> list[dict[str, Any]]:
-    """
-    Legacy function for backward compatibility.
-
-    Fetches all data from a paginated API endpoint.
-
-    Args:
-        endpoint: The API endpoint (e.g., 'people', 'organizations',
-                  'memberships')
-        token: Authorization token
-        base_url: Base URL for the API (should not end with slash)
-
-    Returns:
-        List of all records from all pages
-    """
-    with KubImporter(token, base_url) as importer:
-        return importer._fetch_api_data_with_pagination(endpoint)
-
-
-def perform_custom_data_update(
-    request: TownRequest,
-    app: PasApp,
-    token: str,
-    base_url: str,
-    output: OutputHandler | None = None,
-    max_workers: int = 3,
-    import_log_id: uuid.UUID | None = None
-) -> tuple[int, int, list[dict[str, Any]]]:
-    """Legacy function for backward compatibility."""
-    with KubImporter(token, base_url, output) as importer:
-        return importer.update_custom_data(
-            request, app, max_workers, import_log_id
-        )
-
-
-def perform_kub_import(
-    request: TownRequest,
-    app: PasApp,
-    token: str,
-    base_url: str,
-    output: OutputHandler | None = None,
-    import_log_id: uuid.UUID | None = None
-) -> tuple[dict[str, Any], list[Any], list[Any], list[Any], uuid.UUID]:
-    """Legacy function for backward compatibility."""
-    with KubImporter(token, base_url, output) as importer:
-        return importer.import_data(request, app, import_log_id)
-
-
-def run_full_kub_sync(
-    request: TownRequest,
-    app: PasApp,
-    token: str,
-    base_url: str,
-    output: OutputHandler | None = None,
-    update_custom: bool = True,
-    max_workers: int = 3
-) -> tuple[dict[str, Any], uuid.UUID]:
-    """Legacy function for backward compatibility."""
-    with KubImporter(token, base_url, output) as importer:
-        return importer.run_full_sync(request, app, update_custom, max_workers)
