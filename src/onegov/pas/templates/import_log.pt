@@ -12,6 +12,22 @@
             <strong i18n:translate="">Status:</strong> <span class="import-status ${log.status}" tal:content="log.status"></span>
         </p>
 
+        <div tal:condition="python: log.people_source or log.organizations_source or log.memberships_source">
+            <p><strong i18n:translate="">Source Data Files:</strong>
+                <tal:block tal:condition="log.people_source">
+                    <a tal:attributes="href string:${request.link(log, 'download-source')}?type=people" i18n:translate="">People</a>
+                </tal:block>
+                <tal:block tal:condition="python: log.people_source and (log.organizations_source or log.memberships_source)"> | </tal:block>
+                <tal:block tal:condition="log.organizations_source">
+                    <a tal:attributes="href string:${request.link(log, 'download-source')}?type=organizations" i18n:translate="">Organizations</a>
+                </tal:block>
+                <tal:block tal:condition="python: log.organizations_source and log.memberships_source"> | </tal:block>
+                <tal:block tal:condition="log.memberships_source">
+                    <a tal:attributes="href string:${request.link(log, 'download-source')}?type=memberships" i18n:translate="">Memberships</a>
+                </tal:block>
+            </p>
+        </div>
+
         <h3 i18n:translate="">Summary</h3>
         <pre tal:content="details_formatted"></pre>
 
