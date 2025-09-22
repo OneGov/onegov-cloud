@@ -126,7 +126,7 @@ def test_view_attendence_as_parliamentarian(client):
     transaction.commit()
 
     client.login('bob.viewer@example.org', 'test')
-    # Should be able to view the attendence
+    # Should be able to view their own
     page = client.get(f'/attendence/{attendence_id}')
     assert page.status_code == 200
 
