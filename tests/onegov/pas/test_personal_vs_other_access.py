@@ -8,40 +8,112 @@ from onegov.user import UserCollection
 import transaction
 from datetime import date
 
+"""
+  1. Own attendance: Parliamentarians can edit their own attendance
+  2. Other's attendance: Parliamentarians CANNOT edit other parliamentarian's
+     attendance
+  3. Commission president powers: Can edit their commission members' attendance
+  4. Commission boundaries: Cannot edit attendance from other commissions
+  5. Personal details: Cannot view other parliamentarians' personal info
+
+"""
+
+
+def create_parliamentarian_with_user(client, first_name: str, last_name: str,
+                                    email: str, role: str = 'parliamentarian',
+                                    password: str = 'test'):
+    """Helper to create a parliamentarian and set up their user account."""
+    session = client.app.session()
+    parliamentarians = PASParliamentarianCollection(client.app)
+
+    parl = parliamentarians.add(
+        first_name=first_name,
+        last_name=last_name,
+        email_primary=email
+    )
+
+    users = UserCollection(session)
+    user = users.by_username(email)
+    user.role = role
+    user.password = password
+
+    return parl, user
+
+
+def create_attendance_for_parliamentarian(session, parliamentarian_id: str,
+                                        attendance_type: str = 'commission',
+                                        duration: int = 120):
+    """Helper to create attendance record for a parliamentarian."""
+    attendences = AttendenceCollection(session)
+    return attendences.add(
+        parliamentarian_id=parliamentarian_id,
+        type=attendance_type,
+        date=date.today(),
+        duration=duration
+    )
+
+
+def setup_commission_with_members(session, commission_name: str,
+                                president_parl, member_parl):
+    """Helper to create commission and set up memberships."""
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name=commission_name)
+
+    president_membership = PASCommissionMembership(
+        parliamentarian_id=president_parl.id,
+        commission_id=commission.id,
+        role='president'
+    )
+    session.add(president_membership)
+
+    member_membership = PASCommissionMembership(
+        parliamentarian_id=member_parl.id,
+        commission_id=commission.id,
+        role='member'
+    )
+    session.add(member_membership)
+
+    return commission
+
+
+def setup_two_separate_commissions(session, president_parl, president_comm,
+                                 member_parl, member_comm):
+    """Helper to create two separate commissions with different members."""
+    commissions = PASCommissionCollection(session)
+    commission1 = commissions.add(name=president_comm)
+    commission2 = commissions.add(name=member_comm)
+
+    president_membership = PASCommissionMembership(
+        parliamentarian_id=president_parl.id,
+        commission_id=commission1.id,
+        role='president'
+    )
+    session.add(president_membership)
+
+    member_membership = PASCommissionMembership(
+        parliamentarian_id=member_parl.id,
+        commission_id=commission2.id,
+        role='member'
+    )
+    session.add(member_membership)
+
+    return commission1, commission2
+
 
 def test_parliamentarian_can_edit_own_attendance(client):
     '''Parliamentarians should be able to edit their own attendance'''
     session = client.app.session()
 
-    # Create parliamentarian A
-    parliamentarians = PASParliamentarianCollection(client.app)
-    parl_a = parliamentarians.add(
-        first_name='Alice',
-        last_name='Parliamentarian',
-        email_primary='alice.parl@example.org'
+    parl_a, _ = create_parliamentarian_with_user(
+        client, 'Alice', 'Parliamentarian', 'alice.parl@example.org'
     )
 
-    # Set password for user A
-    users = UserCollection(session)
-    user_a = users.by_username('alice.parl@example.org')
-    user_a.password = 'test'
-
-    # Create attendance for parliamentarian A
-    attendences = AttendenceCollection(session)
-    attendance_a = attendences.add(
-        parliamentarian_id=parl_a.id,
-        type='commission',
-        date=date.today(),
-        duration=120
-    )
-
+    attendance_a = create_attendance_for_parliamentarian(session, parl_a.id)
     attendance_id_a = attendance_a.id
     transaction.commit()
 
-    # Login as parliamentarian A
     client.login('alice.parl@example.org', 'test')
 
-    # Should be able to edit their own attendance
     page = client.get(f'/attendence/{attendance_id_a}/edit')
     assert page.status_code == 200
     assert 'form' in page
@@ -52,50 +124,26 @@ def test_parliamentarian_cannot_edit_other_attendance(client):
     attendance'''
     session = client.app.session()
 
-    # Create parliamentarian A
-    parliamentarians = PASParliamentarianCollection(client.app)
-    parl_a = parliamentarians.add(
-        first_name='Alice',
-        last_name='Parliamentarian',
-        email_primary='alice.parl@example.org'
+    parl_a, _ = create_parliamentarian_with_user(
+        client, 'Alice', 'Parliamentarian', 'alice.parl@example.org'
+    )
+    parl_b, _ = create_parliamentarian_with_user(
+        client, 'Bob', 'Parliamentarian', 'bob.parl@example.org'
     )
 
-    # Create parliamentarian B
-    parl_b = parliamentarians.add(
-        first_name='Bob',
-        last_name='Parliamentarian',
-        email_primary='bob.parl@example.org'
+    attendance_b = create_attendance_for_parliamentarian(
+        session, parl_b.id, duration=90
     )
-
-    # Set passwords
-    users = UserCollection(session)
-    user_a = users.by_username('alice.parl@example.org')
-    user_a.password = 'test'
-    user_b = users.by_username('bob.parl@example.org')
-    user_b.password = 'test'
-
-    # Create attendance for parliamentarian B
-    attendences = AttendenceCollection(session)
-    attendance_b = attendences.add(
-        parliamentarian_id=parl_b.id,
-        type='commission',
-        date=date.today(),
-        duration=90
-    )
-
     attendance_id_b = attendance_b.id
     transaction.commit()
 
-    # Login as parliamentarian A
     client.login('alice.parl@example.org', 'test')
 
-    # Should NOT be able to edit parliamentarian B's attendance
     page = client.get(
         f'/attendence/{attendance_id_b}/edit', expect_errors=True
     )
-    assert page.status_code in (403, 302)  # Forbidden or redirect
+    assert page.status_code in (403, 302)
 
-    # Should also NOT be able to view B's attendance details
     page = client.get(f'/attendence/{attendance_id_b}', expect_errors=True)
     assert page.status_code in (403, 302)
 
@@ -105,66 +153,25 @@ def test_commission_president_can_edit_member_attendance(client):
     commission members'''
     session = client.app.session()
 
-    # Create commission
-    commissions = PASCommissionCollection(session)
-    commission = commissions.add(name='Finance Commission')
-
-    # Create commission president
-    parliamentarians = PASParliamentarianCollection(client.app)
-    president = parliamentarians.add(
-        first_name='President',
-        last_name='Leader',
-        email_primary='president.leader@example.org'
+    president, _ = create_parliamentarian_with_user(
+        client, 'President', 'Leader', 'president.leader@example.org',
+        role='commission_president'
+    )
+    member, _ = create_parliamentarian_with_user(
+        client, 'Member', 'Follower', 'member.follower@example.org'
     )
 
-    # Create commission member
-    member = parliamentarians.add(
-        first_name='Member',
-        last_name='Follower',
-        email_primary='member.follower@example.org'
+    setup_commission_with_members(session, 'Finance Commission',
+                                president, member)
+
+    member_attendance = create_attendance_for_parliamentarian(
+        session, member.id, duration=180
     )
-
-    # Set up commission memberships
-    president_membership = PASCommissionMembership(
-        parliamentarian_id=president.id,
-        commission_id=commission.id,
-        role='president'
-    )
-    session.add(president_membership)
-
-    member_membership = PASCommissionMembership(
-        parliamentarian_id=member.id,
-        commission_id=commission.id,
-        role='member'
-    )
-    session.add(member_membership)
-
-    # Set user roles and passwords
-    users = UserCollection(session)
-    president_user = users.by_username('president.leader@example.org')
-    president_user.role = 'commission_president'
-    president_user.password = 'test'
-
-    member_user = users.by_username('member.follower@example.org')
-    member_user.role = 'parliamentarian'
-    member_user.password = 'test'
-
-    # Create attendance for the member
-    attendences = AttendenceCollection(session)
-    member_attendance = attendences.add(
-        parliamentarian_id=member.id,
-        type='commission',
-        date=date.today(),
-        duration=180
-    )
-
     attendance_id = member_attendance.id
     transaction.commit()
 
-    # Login as commission president
     client.login('president.leader@example.org', 'test')
 
-    # Should be able to edit member's attendance
     page = client.get(f'/attendence/{attendance_id}/edit')
     assert page.status_code == 200
     assert 'form' in page
@@ -175,67 +182,27 @@ def test_commission_president_cannot_edit_other_commission_attendance(client):
     members from other commissions'''
     session = client.app.session()
 
-    # Create two commissions
-    commissions = PASCommissionCollection(session)
-    finance_commission = commissions.add(name='Finance Commission')
-    education_commission = commissions.add(name='Education Commission')
-
-    # Create commission president of finance commission
-    parliamentarians = PASParliamentarianCollection(client.app)
-    finance_president = parliamentarians.add(
-        first_name='Finance',
-        last_name='President',
-        email_primary='finance.president@example.org'
+    finance_president, _ = create_parliamentarian_with_user(
+        client, 'Finance', 'President', 'finance.president@example.org',
+        role='commission_president'
+    )
+    education_member, _ = create_parliamentarian_with_user(
+        client, 'Education', 'Member', 'education.member@example.org'
     )
 
-    # Create member of education commission
-    education_member = parliamentarians.add(
-        first_name='Education',
-        last_name='Member',
-        email_primary='education.member@example.org'
+    setup_two_separate_commissions(
+        session, finance_president, 'Finance Commission',
+        education_member, 'Education Commission'
     )
 
-    # Set up commission memberships
-    finance_membership = PASCommissionMembership(
-        parliamentarian_id=finance_president.id,
-        commission_id=finance_commission.id,
-        role='president'
+    education_attendance = create_attendance_for_parliamentarian(
+        session, education_member.id, duration=150
     )
-    session.add(finance_membership)
-
-    education_membership = PASCommissionMembership(
-        parliamentarian_id=education_member.id,
-        commission_id=education_commission.id,
-        role='member'
-    )
-    session.add(education_membership)
-
-    # Set user roles and passwords
-    users = UserCollection(session)
-    finance_user = users.by_username('finance.president@example.org')
-    finance_user.role = 'commission_president'
-    finance_user.password = 'test'
-
-    education_user = users.by_username('education.member@example.org')
-    education_user.role = 'parliamentarian'
-    education_user.password = 'test'
-
-    # Create attendance for education member
-    attendences = AttendenceCollection(session)
-    education_attendance = attendences.add(
-        parliamentarian_id=education_member.id,
-        type='commission',
-        date=date.today(),
-        duration=150
-    )
-
     attendance_id = education_attendance.id
     transaction.commit()
 
-    # Login as finance commission president
     client.login('finance.president@example.org', 'test')
 
-    # Should NOT be able to edit education member's attendance
     page = client.get(f'/attendence/{attendance_id}/edit', expect_errors=True)
     assert page.status_code in (403, 302)
 
@@ -243,40 +210,79 @@ def test_commission_president_cannot_edit_other_commission_attendance(client):
 def test_parliamentarian_cannot_view_other_parliamentarian_details(client):
     '''Parliamentarians should not be able to view other
     parliamentarians\' personal details'''
-    session = client.app.session()
-
-    # Create parliamentarian A and B
-    parliamentarians = PASParliamentarianCollection(client.app)
-    parl_a = parliamentarians.add(
-        first_name='Alice',
-        last_name='Parliamentarian',
-        email_primary='alice.parl@example.org'
+    parl_a, _ = create_parliamentarian_with_user(
+        client, 'Alice', 'Parliamentarian', 'alice.parl@example.org'
     )
-
-    parl_b = parliamentarians.add(
-        first_name='Bob',
-        last_name='Parliamentarian',
-        email_primary='bob.parl@example.org'
+    parl_b, _ = create_parliamentarian_with_user(
+        client, 'Bob', 'Parliamentarian', 'bob.parl@example.org'
     )
-
-    # Set passwords
-    users = UserCollection(session)
-    user_a = users.by_username('alice.parl@example.org')
-    user_a.password = 'test'
-    user_b = users.by_username('bob.parl@example.org')
-    user_b.password = 'test'
 
     parl_a_id = parl_a.id
     parl_b_id = parl_b.id
     transaction.commit()
 
-    # Login as parliamentarian A
     client.login('alice.parl@example.org', 'test')
 
-    # Should be able to view their own details
     page = client.get(f'/parliamentarian/{parl_a_id}')
     assert page.status_code == 200
 
-    # Should NOT be able to view parliamentarian B's details
     page = client.get(f'/parliamentarian/{parl_b_id}', expect_errors=True)
     assert page.status_code in (403, 302)
+
+
+def test_attendance_collection_shows_only_own_records(client):
+    session = client.app.session()
+
+    parl_a, _ = create_parliamentarian_with_user(
+        client, 'Alice', 'Parliamentarian', 'alice.parl@example.org'
+    )
+    parl_b, _ = create_parliamentarian_with_user(
+        client, 'Bob', 'Parliamentarian', 'bob.parl@example.org'
+    )
+
+    create_attendance_for_parliamentarian(session, parl_a.id)
+    create_attendance_for_parliamentarian(
+        session, parl_b.id, attendance_type='plenary', duration=180
+    )
+
+    transaction.commit()
+
+    client.login('alice.parl@example.org', 'test')
+    page = client.get('/attendences')
+    assert page.status_code == 200
+
+    assert 'Alice' in page
+    assert 'Bob' not in page
+    assert ('Bob' not in page.text if hasattr(page, 'text')
+            else 'Bob' not in str(page))
+
+
+def test_admin_sees_all_attendance_records(client):
+    '''Admins should see all attendance records in /attendences'''
+    session = client.app.session()
+
+    parl_a, _ = create_parliamentarian_with_user(
+        client, 'Alice', 'Parliamentarian', 'alice.parl@example.org'
+    )
+    parl_b, _ = create_parliamentarian_with_user(
+        client, 'Bob', 'Parliamentarian', 'bob.parl@example.org'
+    )
+
+    users = UserCollection(session)
+    admin_user = users.by_username('admin@example.org')
+    admin_user.password = 'test'
+
+    create_attendance_for_parliamentarian(session, parl_a.id)
+    create_attendance_for_parliamentarian(
+        session, parl_b.id, attendance_type='plenary', duration=180
+    )
+
+    transaction.commit()
+
+    client.login('admin@example.org', 'test')
+
+    page = client.get('/attendences')
+    assert page.status_code == 200
+
+    assert 'Alice' in page
+    assert 'Bob' in page

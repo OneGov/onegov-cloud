@@ -6,10 +6,10 @@ from webtest import Upload
 from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from webtest.response import TestResponse
+    pass
 
 
-def add_rate_set(settings: 'TestResponse', delete: list['TestResponse']) -> None:
+def add_rate_set(settings, delete) -> None:
     """Adds a rate set via the UI."""
     page = settings.click('Sätze')
     page = page.click(href='new')
@@ -50,7 +50,7 @@ def test_views_manage(client_with_es):
     client = client_with_es
     client.login_admin()
 
-    settings = client.get('/').click('PAS Einstellungen')
+    settings = client.get('/').follow().click('PAS Einstellungen')
     delete = []
 
     add_rate_set(settings, delete)
@@ -170,7 +170,9 @@ def test_views_manage(client_with_es):
 
     # ... attendence
     # this fails now? why
-    page = client.get('/').click('Anwesenheiten').click(href='new', index=0)
+    page = client.get('/').follow().click('Anwesenheiten').click(
+        href='new', index=0
+    )
     page.form['date'] = '2024-02-03'
     page.form['duration'] = '2'
     page.form['type'] = 'study'
@@ -186,19 +188,21 @@ def test_views_manage(client_with_es):
     delete.insert(0, page)
 
     # ... plenary
-    page = client.get('/').click('Anwesenheiten').click(href='new', index=1)
+    page = client.get('/').follow().click('Anwesenheiten').click(
+        href='new', index=1
+    )
     page.form['date'] = '2024-02-04'
     page.form['duration'] = '3'
     page = page.form.submit().follow()
     assert 'Plenarsitzung hinzugefügt' in page
 
-    page = client.get('/').click('Anwesenheiten')
+    page = client.get('/').follow().click('Anwesenheiten')
     assert '02.02.2024' in page
     assert '03.02.2024' in page
     assert '04.02.2024' in page
 
     # Changes
-    page = client.get('/').click('Aktivitäten')
+    page = client.get('/').follow().click('Aktivitäten')
     assert '02.02.2024' in page
     assert '03.02.2024' in page
     assert '04.02.2024' in page
@@ -413,8 +417,9 @@ def test_view_upload_json(
 def test_copy_rate_set(client):
     client.login_admin()
 
-    settings = client.get('/').click('PAS Einstellungen')
-    add_rate_set()
+    settings = client.get('/').follow().click('PAS Einstellungen')
+    delete = []
+    add_rate_set(settings, delete)
 
     page = client.get('/rate-sets')
     page = page.click('Inaktiv')
@@ -431,8 +436,7 @@ def test_copy_rate_set(client):
 
 def test_simple_attendence_add(client):
     client.login_admin()
-
-    settings = client.get('/').click('PAS Einstellungen')
+    settings = client.get('/').follow().click('PAS Einstellungen')
     delete = []
 
     add_rate_set(settings, delete)
@@ -511,7 +515,9 @@ def test_simple_attendence_add(client):
     return
 
     # ... attendence
-    page = client.get('/').click('Anwesenheiten').click(href='new', index=0)
+    page = client.get('/').follow().click('Anwesenheiten').click(
+        href='new', index=0
+    )
     page.form['date'] = '2024-02-03'
     page.form['duration'] = '2'
     page.form['type'] = 'study'

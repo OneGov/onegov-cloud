@@ -23,6 +23,7 @@ class DummyRequest():
     path = ''
     url = ''
     session = DummySession()
+    identity = None
 
     def class_link(self, cls, name=''):
         return f'{cls.__name__}/{name}'
