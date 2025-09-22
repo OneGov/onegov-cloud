@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from typing import Any
     from onegov.core.security.roles import Intent
     from morepath import Identity
+    from onegov.pas.models.parliamentarian import PASParliamentarian
 
 
 """
@@ -96,10 +97,10 @@ def restrict_attendence_access(
         if isinstance(permission, type) and issubclass(permission, Private):
             user = app.session().query(User).filter_by(
                 username=identity.userid).first()
-            if not user or not user.parliamentarian:
+            if not user or not user.parliamentarian:  # type: ignore
                 return False
 
-            parliamentarian = user.parliamentarian
+            parliamentarian: PASParliamentarian = user.parliamentarian  # type: ignore
 
             # Regular parliamentarians can only access their own records
             if identity.role == 'parliamentarian':
