@@ -6,8 +6,12 @@ from morepath import redirect
 from onegov.pas import PasApp, _
 from onegov.pas.collections import ImportLogCollection
 from onegov.pas.cronjobs import trigger_kub_data_import
-from onegov.pas.layouts.default import DefaultLayout
+from onegov.pas.layouts.import_log import (
+    ImportLogCollectionLayout,
+    ImportLogLayout
+)
 from onegov.pas.models import ImportLog
+from sqlalchemy.orm import undefer
 from webob import Response
 from typing import TYPE_CHECKING
 
@@ -37,16 +41,15 @@ def view_import_logs(
     self: ImportLogCollection, request: TownRequest
 ) -> RenderData:
 
-    layout = DefaultLayout(self, request)
+    layout = ImportLogCollectionLayout(self, request)
 
     return {
         'layout': layout,
         'title': _('Import History'),
-        'logs': self.query().limit(50).all(),
+        'logs': self.for_listing().all(),
         'translate_import_type': lambda import_type: translate_import_type(
             import_type, request
-        ),
-        'kub_token_configured': bool(getattr(request.app, 'kub_token', None))
+        )
     }
 
 
@@ -59,7 +62,7 @@ def view_import_log(
     self: ImportLog, request: TownRequest
 ) -> RenderData:
 
-    layout = DefaultLayout(self, request)
+    layout = ImportLogLayout(self, request)
     details_formatted = json.dumps(
         self.details, indent=2, sort_keys=True, ensure_ascii=False
     )
@@ -102,6 +105,21 @@ def download_source_data(
 ) -> Response:
     """Download source JSON data based on type parameter."""
     source_type = request.params.get('type')
+
+    # Refresh the object with the specific deferred column we need
+    if source_type in ('people', 'organizations', 'memberships'):
+        if source_type == 'people':
+            request.session.refresh(
+                self, [undefer(ImportLog.people_source)]
+            )
+        elif source_type == 'organizations':
+            request.session.refresh(
+                self, [undefer(ImportLog.organizations_source)]
+            )
+        elif source_type == 'memberships':
+            request.session.refresh(
+                self, [undefer(ImportLog.memberships_source)]
+            )
 
     if source_type == 'people':
         if not self.people_source:

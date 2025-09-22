@@ -43,6 +43,10 @@ $settlement-run-icon: '\f4c0';
         position: relative;
     }
 
+    .input-group-field {
+        border-radius: $global-radius !important;
+    }
+
     .typeahead {
         z-index: 5000;
         top: 1.2rem;
@@ -209,10 +213,10 @@ pre {
 }
 
 #parliamentarian_id li.animate-in {
-    animation: bubbleIn 0.4s ease forwards;
+    animation: bubble-in 0.4s ease forwards;
 }
 
-@keyframes bubbleIn {
+@keyframes bubble-in {
     from {
         opacity: 0;
         transform: scale(0.5);

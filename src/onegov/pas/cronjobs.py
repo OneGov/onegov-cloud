@@ -3,11 +3,8 @@ from __future__ import annotations
 import logging
 from onegov.pas.app import PasApp
 from onegov.pas.importer.orchestrator import KubImporter
-from onegov.pas.log import CompositeOutputHandler
-from onegov.pas.importer.output_handlers import (
-    DatabaseOutputHandler,
-    LogOutputHandler
-)
+from onegov.pas.log import CompositeOutputHandler, LogOutputHandler
+from onegov.pas.importer.output_handlers import DatabaseOutputHandler
 
 from typing import Any, TYPE_CHECKING, cast
 if TYPE_CHECKING:
@@ -19,18 +16,6 @@ log = logging.getLogger('onegov.pas.cronjobs')
 
 @PasApp.cronjob(hour='*', minute=0, timezone='UTC')
 def hourly_kub_data_import(request: TownRequest) -> None:
-    """
-    Hourly KUB data import cronjob.
-
-    Imports data from KUB API using the token from configuration.
-    Runs every hour on the hour.
-    """
-    kub_token = getattr(request.app, 'kub_token', None)
-    if not kub_token:
-        log.warning('KUB token not configured - skipping import')
-        return
-
-    log.info('Starting hourly KUB data import')
 
     try:
         trigger_kub_data_import(request)
@@ -42,25 +27,22 @@ def hourly_kub_data_import(request: TownRequest) -> None:
         raise
 
 
-def trigger_kub_data_import(request: TownRequest) -> dict[str, Any]:
+def trigger_kub_data_import(request: TownRequest) -> dict[str, Any] | None:
     app = request.app
-    kub_token = getattr(app, 'kub_test_api_token', None)
-    if not kub_token:
-        kub_token = getattr(app, 'kub_api_token', None)
-    if not kub_token:
-        raise ValueError('KUB token not configured')
-    kub_base_url = getattr(app, 'kub_test_base_url', None)
-    if not kub_base_url:
-        kub_base_url = getattr(app, 'kub_base_url', None)
-    if not kub_base_url:
-        raise ValueError('KUB base URL not configured')
+    if not (kub_token := getattr(app, 'kub_test_api_token', None)):
+        if not (kub_token := getattr(app, 'kub_api_token', None)):
+            return None
+
+    if not (kub_base_url := getattr(app, 'kub_test_base_url', None)):
+        if not (kub_base_url := getattr(app, 'kub_base_url', None)):
+            raise ValueError('KUB base URL not configured')
     # FIXME: this is a bit crude, this will have to add
     # a conditional statement in puppet
 
     log.info('Starting KUB data import')
 
     db_handler = DatabaseOutputHandler()
-    log_handler = LogOutputHandler(log)
+    log_handler = LogOutputHandler()
     output_handler = CompositeOutputHandler(db_handler, log_handler)
 
     with KubImporter(kub_token, kub_base_url, output_handler) as importer:

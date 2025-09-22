@@ -826,3 +826,12 @@ msgstr "Excel Exporte"
 
 msgid "Total all parties"
 msgstr "Total Alle Parteien"
+
+msgid "Trigger Manual Import"
+msgstr "Manuellen Import auslösen"
+
+msgid "Last import:"
+msgstr "Letzter Import:"
+
+msgid "No imports yet"
+msgstr "Noch keine Importe"

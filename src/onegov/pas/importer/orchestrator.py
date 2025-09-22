@@ -499,6 +499,7 @@ class KubImporter:
                 # Append output messages
                 if 'output_messages' not in import_log.details:
                     import_log.details['output_messages'] = []
+
                 import_log.details['output_messages'].extend(output_messages)
 
                 # If timeout occurred, update the status to 'timeout'

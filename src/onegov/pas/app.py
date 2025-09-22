@@ -21,12 +21,16 @@ class PasApp(TownApp):
     def configure_kub_api(
         self,
         *,
-        kub_token: str = '',
-        kub_base_url: str = 'https://api.kub.ch/api/v2',
+        kub_test_api_token: str = '',
+        kub_test_base_url: str = '',
+        kub_api_token: str = '',
+        kub_base_url: str = '',
         **cfg: Any
     ) -> None:
         """Configure KUB API settings for data import."""
-        self.kub_token = kub_token
+        self.kub_test_api_token = kub_test_api_token
+        self.kub_test_base_url = kub_test_base_url
+        self.kub_api_token = kub_api_token
         self.kub_base_url = kub_base_url
 
 
