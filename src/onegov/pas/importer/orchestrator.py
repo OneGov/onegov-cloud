@@ -541,7 +541,7 @@ class KubImporter:
                 ),
                 details={'status': 'started'},
                 status='in_progress',
-                import_type='cli'
+                import_type='automatic'
             )
             request.session.add(import_log)
             request.session.flush()
