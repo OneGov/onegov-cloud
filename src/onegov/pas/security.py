@@ -163,6 +163,9 @@ def restrict_organisation_access(
 ) -> bool:
     # Allow parliamentarians to access pas-settings via Organisation model
     if identity.role in ('parliamentarian', 'commission_president'):
+        # Allow Private permission for accessing pas-settings dashboard
+        if isinstance(permission, type) and issubclass(permission, Private):
+            return True
         return permission in getattr(app.settings.roles, identity.role)
 
     return permission in getattr(app.settings.roles, identity.role)
