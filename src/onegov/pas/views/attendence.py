@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 from itertools import groupby
 from operator import attrgetter
 import uuid
@@ -22,7 +21,6 @@ from onegov.pas.layouts import AttendenceCollectionLayout
 from onegov.pas.layouts import AttendenceLayout
 from onegov.pas.models import Attendence
 from onegov.pas.models import Change
-from sqlalchemy import desc
 from onegov.pas.models.commission_membership import PASCommissionMembership
 
 
@@ -45,9 +43,14 @@ def view_attendences(
 ) -> RenderData:
 
     layout = AttendenceCollectionLayout(self, request)
-    bulk_edit_attendences = self.query().order_by(
-        desc(Attendence.bulk_edit_id),
-    ).all()
+
+    # Apply role-based filtering, then re-sort for bulk edit grouping
+    filtered_attendences = self.view_for_parliamentarian(request)
+    bulk_edit_attendences = sorted(
+        filtered_attendences,
+        key=lambda x: (x.bulk_edit_id or '', x.created or x.modified),
+        reverse=True
+    )
 
     bulk_edit_groups = [
         sorted(group, key=attrgetter('created', 'modified'), reverse=True)

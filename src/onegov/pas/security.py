@@ -7,10 +7,11 @@ from onegov.pas import PasApp
 from onegov.pas.collections import (
     AttendenceCollection
 )
+
+from datetime import date
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.commission import Commission
 from onegov.org.models import Organisation
-from onegov.org.models.file import GeneralFileCollection
 from onegov.user import User
 
 
@@ -114,7 +115,6 @@ def restrict_attendence_access(
 
                 # Check if the parliamentarian owning this attendance record
                 # is a member of any commission this president leads
-                from datetime import date
                 # Get attendance record owner
                 attendance_owner = app.session().query(User).join(
                     User.parliamentarian
@@ -164,23 +164,6 @@ def restrict_organisation_access(
     # Allow parliamentarians to access pas-settings via Organisation model
     if identity.role in ('parliamentarian', 'commission_president'):
         # Allow Private permission for accessing pas-settings dashboard
-        if isinstance(permission, type) and issubclass(permission, Private):
-            return True
-        return permission in getattr(app.settings.roles, identity.role)
-
-    return permission in getattr(app.settings.roles, identity.role)
-
-
-@PasApp.permission_rule(model=GeneralFileCollection, permission=object)
-def restrict_files_collection_access(
-    app: PasApp,
-    identity: Identity,
-    model: GeneralFileCollection,
-    permission: Intent
-) -> bool:
-    # Allow parliamentarians and commission presidents to access files
-    if identity.role in ('parliamentarian', 'commission_president'):
-        # Allow Private permission for files collection access
         if isinstance(permission, type) and issubclass(permission, Private):
             return True
         return permission in getattr(app.settings.roles, identity.role)
