@@ -6,15 +6,15 @@ from elasticsearch_dsl.query import Match
 from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch
 from functools import cached_property
-from sedate import utcnow
-from sqlalchemy import func, cast, or_, Text, case
-
-from sqlalchemy.dialects.postgresql import UUID
-
+from libres.db.models import ORMBase
 from onegov.core.collection import Pagination, _M
 from onegov.core.orm import Base
 from onegov.event.models import Event
 from onegov.search.search_index import SearchIndex
+from sedate import utcnow
+from sqlalchemy import func, cast, or_, Text, case
+from sqlalchemy.dialects.postgresql import UUID
+
 
 from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
@@ -101,25 +101,20 @@ class Search(Pagination[_M]):
 
         assert self.batch is not None
         batch = self.batch.load()
-        future_events = []
-        others = []
-
-        # FIXME: this event sorting happens on batch level instead of all
-        # search results.
+        events = []
+        non_events = []
         for search_result in batch:
             if isinstance(search_result, Event):
-                future_events.append(search_result)
+                events.append(search_result)
             else:
-                others.append(search_result)
-
-        if not future_events:
+                non_events.append(search_result)
+        if not events:
             return batch
-
         sorted_events = sorted(
-            future_events,
+            events,
             key=get_sort_key
         )
-        return sorted_events + others
+        return sorted_events + non_events
 
     def generic_search(
         self,
@@ -160,7 +155,7 @@ class Search(Pagination[_M]):
             first_entry = self.batch[0].load()
 
             # XXX the default view to the event should be doing the redirect
-            if first_entry.es_type_name == 'events':
+            if first_entry.__tablename__ == 'events':
                 return self.request.link(first_entry, 'latest')
             else:
                 return self.request.link(first_entry)
@@ -293,16 +288,18 @@ class SearchPostgres(Pagination[_M]):
 
     @staticmethod
     def get_model_by_class_name(class_name: str) -> type[Any] | None:
-        for cls in Base._decl_class_registry.values():  # type: ignore[attr-defined]
-            if not hasattr(cls, '__name__'):
-                continue
-            if cls.__name__ == class_name:
-                return cls
-        return None
+        cls = Base._decl_class_registry.get(class_name)  # type: ignore[attr-defined]
+        if cls is None:
+            cls = ORMBase._decl_class_registry.get(class_name)  # type: ignore[attr-defined]
+        return cls
 
     def generic_search(self) -> list[Searchable]:
         language = locale_mapping(self.request.locale or 'de_CH')
         ts_query = func.websearch_to_tsquery(
+            # FIXME: I think we should use unidecode here, like we do
+            #        when generating the TSVECTOR, otherwise we will run
+            #        into issues where the two functions don't generate
+            #        the same output
             language, func.unaccent(self.query))
         now = utcnow()
         results = []
@@ -313,6 +310,8 @@ class SearchPostgres(Pagination[_M]):
 
         query = self.request.session.query(
             SearchIndex,
+            # FIXME: Make this the order_by, so we don't have to do the
+            #        ordering in Python
             (
                 func.ts_rank_cd(SearchIndex.fts_idx, ts_query, 0) *
                 func.least(
@@ -329,6 +328,11 @@ class SearchPostgres(Pagination[_M]):
 
         # Dynamically join with the appropriate model table based on owner_type
         subquery = query.subquery()
+        # FIXME: Figure out which distinct model classes there actually are in
+        #        the result set and only emit subqueries for them, we also
+        #        should emit a select in, rather than a subquery join, we did
+        #        the expensive query and we know all the object ids, we don't
+        #        want to duplicate that work load for every model type
         for model_class in Base._decl_class_registry.values():  # type: ignore[attr-defined]
             if (hasattr(model_class, '__tablename__') and
                     hasattr(model_class, 'id')):
@@ -337,6 +341,9 @@ class SearchPostgres(Pagination[_M]):
                         model_class, subquery.c.rank.label('rank'))
                     .join(
                         subquery,
+                        # FIXME: Determine which column to using introspection
+                        #        on the model_class, then we also don't need to
+                        #        perform any casts
                         cast(model_class.id, Text) == case(
                             [
                                 (
@@ -357,7 +364,7 @@ class SearchPostgres(Pagination[_M]):
                     .filter(subquery.c.owner_type == model_class.__name__)
                 )
 
-                results.extend(model_query.all())
+                results.extend(model_query)
 
         self.number_of_results = len(results)
 
@@ -375,8 +382,11 @@ class SearchPostgres(Pagination[_M]):
 
         query = self.request.session.query(SearchIndex)
         query = self.filter_user_level(query)
-        query = query.filter(SearchIndex._tags.contains({q, ''}))
+        query = query.filter(SearchIndex._tags.has_key(q))  # type: ignore[attr-defined]
 
+        # FIXME: refactor this result loading into a common utility function
+        #        since both search function need to do this and they're
+        #        currently not doing the same thing.
         for index_entry in query:
             model = self.get_model_by_class_name(index_entry.owner_type)
 
@@ -400,6 +410,7 @@ class SearchPostgres(Pagination[_M]):
         return results
 
     def feeling_lucky(self) -> str | None:
+        # FIXME: make this actually return a random result
         if self.batch:
             first_entry = self.batch[0]
 
@@ -421,18 +432,14 @@ class SearchPostgres(Pagination[_M]):
         filtered by user level.
 
         """
-        all_tags: set[str] = set()
 
         query = self.filter_user_level(
-            self.request.session.query(SearchIndex._tags.distinct())
-        )
-        for tag_list in query:
-            all_tags.update(tag_list[0]) if tag_list[0] else None
+            self.request.session.query(func.skeys(SearchIndex._tags))
+        ).distinct()
 
         # mark tags as hashtags; it also helps ot remain with the hashtag
         # search (url) when clicking on a suggestion
-        all_tags = {f'#{tag}' for tag in all_tags}
-        return sorted(all_tags)
+        return sorted({f'#{tag}' for tag, in query})
 
     def suggestions(self) -> tuple[str, ...]:
         suggestions = []
@@ -448,11 +455,22 @@ class SearchPostgres(Pagination[_M]):
             suggestions = [tag for tag in tags if q in tag]
 
         else:
+            # FIXME: This is really inefficient we first generate all the
+            #        suggestions and then remove the ones we don't need
+            #        We also may not want to rely on the generic search
+            #        for this, we could try to do something using similarity
+            #        search on a separate table that contains all the
+            #        suggestions and return the most similar suggestions.
             for element in self.generic_search():
+                # FIXME: Why are we special casing files? Too much noise?
+                #        then maybe we shouldn't provide suggestions for
+                #        files...
                 if element.es_type_name == 'files':
                     continue
                 suggest = getattr(element, 'es_suggestion', '')
                 if isinstance(suggest, tuple):
+                    # FIXME: Return the first suggestion that contains
+                    #        our search term
                     suggest = suggest[0]
                 suggestions.append(suggest)
 

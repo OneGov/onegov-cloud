@@ -13,20 +13,17 @@ from elasticsearch.exceptions import NotFoundError
 from elasticsearch.helpers import streaming_bulk
 from itertools import groupby, chain, repeat
 from queue import Queue, Empty, Full
-from operator import itemgetter
-from sqlalchemy import func, Table, delete, MetaData
-from sqlalchemy.sql import Delete
-from unidecode import unidecode
-
-from sqlalchemy.orm.exc import ObjectDeletedError
-
 from onegov.core.utils import hash_dictionary, is_non_string_iterable
 from onegov.search import index_log, log, Searchable, utils
 from onegov.search.errors import SearchOfflineError
 from onegov.search.search_index import SearchIndex
+from operator import itemgetter
+from sqlalchemy import func, or_, Table, delete, MetaData
+from sqlalchemy.orm.exc import ObjectDeletedError
+from unidecode import unidecode
+
 
 from typing import Any, Literal, NamedTuple, TYPE_CHECKING
-
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from datetime import datetime
@@ -52,7 +49,7 @@ if TYPE_CHECKING:
         publication_end: datetime | None
         properties: dict[str, Any]
 
-    class DeleteTask(TypedDict):  # FIXME: not needed for fts
+    class DeleteTask(TypedDict):
         action: Literal['delete']
         id: UUID | str | int
         schema: str
@@ -517,7 +514,7 @@ class PostgresIndexer(IndexerBase):
         session: Session | None,
         schema: str,
         stmt: sqlalchemy.sql.expression.Executable,
-        params: list[dict[str, Any]]
+        params: list[dict[str, Any]] | None = None
     ) -> None:
 
         if session is None:
@@ -549,31 +546,48 @@ class PostgresIndexer(IndexerBase):
         if not isinstance(tasks, list):
             tasks = [tasks]
 
+        owner_id_uuids = set()
+        owner_id_strs = set()
+        owner_id_ints = set()
+        schema: str | None = None
+        for task in tasks:
+            if schema is not None:
+                if schema != task['schema']:
+                    index_log.error(
+                        'Received mixed schemas in search delete queue.'
+                    )
+                    return False
+            else:
+                schema = task['schema']
+
+            _owner_id = task['id']
+            if isinstance(_owner_id, UUID):
+                owner_id_uuids.add(_owner_id)
+            elif isinstance(_owner_id, int):
+                owner_id_ints.add(_owner_id)
+            elif isinstance(_owner_id, str):
+                owner_id_strs.add(_owner_id)
+
+        conditions = []
+        if owner_id_uuids:
+            conditions.append(SearchIndex.owner_id_uuid.in_(owner_id_uuids))
+        if owner_id_ints:
+            conditions.append(SearchIndex.owner_id_int.in_(owner_id_ints))
+        if owner_id_strs:
+            conditions.append(SearchIndex.owner_id_str.in_(owner_id_strs))
+
+        if not conditions:
+            # nothing to do
+            return True
+
         try:
-            for task in tasks:
-                _owner_id = task['id']
-                stmt: Delete | None = None
-
-                if isinstance(_owner_id, UUID):
-                    stmt = (
-                        sqlalchemy.delete(SearchIndex.__table__)
-                        .where(SearchIndex.owner_id_uuid == _owner_id)
-                    )
-                elif isinstance(_owner_id, int):
-                    stmt = (
-                        sqlalchemy.delete(SearchIndex.__table__)
-                        .where(SearchIndex.owner_id_int == _owner_id)
-                    )
-                elif isinstance(_owner_id, str):
-                    stmt = (
-                        sqlalchemy.delete(SearchIndex.__table__)
-                        .where(SearchIndex.owner_id_str == _owner_id)
-                    )
-
-                self.execute_statement(session, tasks[0]['schema'], stmt, [{}])
+            assert schema is not None
+            stmt = SearchIndex.__table__.delete().where(or_(*conditions))
+            self.execute_statement(session, schema, stmt)
         except Exception as ex:
-            index_log.error(f'Error "{ex}" deleting index schema '
-                            f'{tasks[0]["schema"]} tasks {tasks}')
+            index_log.error(
+                f'Error "{ex}" deleting index schema {schema} tasks {tasks}'
+            )
             return False
 
         return True

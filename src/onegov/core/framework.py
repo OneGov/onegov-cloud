@@ -46,7 +46,6 @@ from more.transaction.main import transaction_tween_factory
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
-
 from onegov.core import cache, log, utils
 from onegov.core import directives
 from onegov.core.crypto import stored_random_token
@@ -69,7 +68,6 @@ from webob.exc import HTTPConflict, HTTPServiceUnavailable
 
 
 from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
-
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from _typeshed.wsgi import WSGIApplication, WSGIEnvironment, StartResponse
@@ -1535,7 +1533,7 @@ class Framework(
 
 @Framework.webasset_url()
 def get_webasset_url() -> str:
-    """The webassets url needs to be unique so we can fix it before
+    """ The webassets url needs to be unique so we can fix it before
     returning the generated html. See :func:`fix_webassets_url_factory`.
 
     """

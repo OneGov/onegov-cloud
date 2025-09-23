@@ -257,8 +257,9 @@ def session_manager(postgres_dsn: str) -> Iterator[SessionManager]:
     mgr.dispose()
 
 
+# FIXME: I'm not convinced we need this fixture, let's try to get rid of it
 @pytest.fixture(scope="function")
-def session_manager_fts(postgres_dsn):
+def session_manager_fts(postgres_dsn: str) -> Iterator[SessionManager]:
     """ Provides a :class:`onegov.core.orm.session_manager.SessionManager`
     setup with :func:`postgres_dsn` and a schema `bar` as well as the
     `search_index` table.

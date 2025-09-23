@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from onegov.core.security import Personal
 from onegov.fsi import FsiApp
-from onegov.fsi.layout import DefaultLayout
 from onegov.org.models import Search, SearchPostgres
-from onegov.org.views.search import (search, search_postgres,
-                                     suggestions, suggestions_postgres)
+from onegov.org.views.search import suggestions, suggestions_postgres
+from onegov.town6.views.search import town_search, town_search_postgres
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -24,7 +23,7 @@ def fsi_search(
     self: Search[Base],
     request: FsiRequest
 ) -> RenderData | Response:
-    return search(self, request, DefaultLayout(self, request))
+    return town_search(self, request)
 
 
 @FsiApp.html(
@@ -36,7 +35,7 @@ def fsi_search_postgres(
     self: SearchPostgres[Base],
     request: FsiRequest
 ) -> RenderData | Response:
-    return search_postgres(self, request, DefaultLayout(self, request))
+    return town_search_postgres(self, request)
 
 
 @FsiApp.json(model=Search, name='suggest', permission=Personal)
