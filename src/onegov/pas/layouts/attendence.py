@@ -29,7 +29,9 @@ class AttendenceCollectionLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[LinkGroup] | None:
-        if self.request.is_manager:
+        if (self.request.is_manager
+            or (hasattr(self.request.identity, 'role')
+                and self.request.identity.role == 'commission_president')):
             return [
                 LinkGroup(
                     title=_('Add'),

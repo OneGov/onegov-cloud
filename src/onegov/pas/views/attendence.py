@@ -77,7 +77,7 @@ def view_attendences(
     return {
         'add_link': request.link(self, name='new'),
         'layout': layout,
-        'attendences': flatten(bulk_edit_groups),
+        'attendences': list(flatten(bulk_edit_groups)),
         'title': layout.title,
         'bulk_edit_groups': bulk_edit_groups
     }

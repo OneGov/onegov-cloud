@@ -828,7 +828,7 @@ msgid "Total all parties"
 msgstr "Total Alle Parteien"
 
 msgid "Create Attendence"
-msgstr "Anwesenheit erfassen"
+msgstr "Sitzung erfassen"
 
 msgid "You are viewing your own attendances and attendances from commissions you preside over."
 msgstr "Sie sehen Ihre eigenen Anwesenheiten und Anwesenheiten von Kommissionen, in denen Sie Mitglied sind."

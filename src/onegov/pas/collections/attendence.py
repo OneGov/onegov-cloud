@@ -180,8 +180,9 @@ class AttendenceCollection(GenericCollection[Attendence]):
         parliamentarian = user.parliamentarian
 
         if user.role == 'commission_president':
-            # Commission presidents see own + commission members' attendances
             from datetime import date
+            # Commission presidents see own + commission members' attendances
+            # We have to check all but usually president of just one
             active_presidencies = [
                 cm.commission_id
                 for cm in parliamentarian.commission_memberships
