@@ -1,10 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    import logging
+from typing import Any
 
 
 class DatabaseOutputHandler:
@@ -40,19 +37,3 @@ class DatabaseOutputHandler:
     def clear_messages(self) -> None:
         """Clear all collected messages."""
         self.messages.clear()
-
-
-class LogOutputHandler:
-    """Logs import messages using Python logging."""
-
-    def __init__(self, logger: logging.Logger) -> None:
-        self.logger = logger
-
-    def info(self, message: str) -> None:
-        self.logger.info(message)
-
-    def success(self, message: str) -> None:
-        self.logger.info(f'SUCCESS: {message}')
-
-    def error(self, message: str) -> None:
-        self.logger.error(message)

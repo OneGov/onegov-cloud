@@ -5,31 +5,129 @@
     </tal:b>
 
     <tal:b metal:fill-slot="content">
-        <h2 i18n:translate="">Import Details</h2>
-        <p>
-            <strong i18n:translate="">Timestamp:</strong> ${layout.format_date(log.created, 'datetime_long')} <br />
-            <strong i18n:translate="">User:</strong> ${log.user.username if log.user else request.translate('System')} <br />
-            <strong i18n:translate="">Status:</strong> <span class="import-status ${log.status}" tal:content="log.status"></span>
-        </p>
+        <div class="import-log-header">
+            <p>
+                <strong i18n:translate="">Timestamp:</strong> ${layout.format_date(log.created, 'datetime_long')} <br />
+                <strong i18n:translate="">User:</strong> ${log.user.username if log.user else request.translate('System')} <br />
+                <strong i18n:translate="">Status:</strong> <span class="import-status ${log.status}" tal:content="log.status"></span>
+            </p>
 
-        <div tal:condition="python: log.people_source or log.organizations_source or log.memberships_source">
-            <p><strong i18n:translate="">Source Data Files:</strong>
+            <div tal:condition="python: log.people_source or log.organizations_source or log.memberships_source" class="source-files">
+                <strong i18n:translate="">Source Data Files:</strong>
                 <tal:block tal:condition="log.people_source">
-                    <a tal:attributes="href string:${request.link(log, 'download-source')}?type=people" i18n:translate="">People</a>
+                    <a tal:attributes="href string:${request.link(log, 'download-source')}?type=people">
+                        <i class="fa fa-file-code-o"></i> <span i18n:translate="">People</span>.json
+                    </a>
                 </tal:block>
                 <tal:block tal:condition="python: log.people_source and (log.organizations_source or log.memberships_source)"> | </tal:block>
                 <tal:block tal:condition="log.organizations_source">
-                    <a tal:attributes="href string:${request.link(log, 'download-source')}?type=organizations" i18n:translate="">Organizations</a>
+                    <a tal:attributes="href string:${request.link(log, 'download-source')}?type=organizations">
+                        <i class="fa fa-file-code-o"></i> <span i18n:translate="">Organizations</span>.json
+                    </a>
                 </tal:block>
                 <tal:block tal:condition="python: log.organizations_source and log.memberships_source"> | </tal:block>
                 <tal:block tal:condition="log.memberships_source">
-                    <a tal:attributes="href string:${request.link(log, 'download-source')}?type=memberships" i18n:translate="">Memberships</a>
+                    <a tal:attributes="href string:${request.link(log, 'download-source')}?type=memberships">
+                        <i class="fa fa-file-code-o"></i> <span i18n:translate="">Memberships</span>.json
+                    </a>
                 </tal:block>
-            </p>
+            </div>
         </div>
 
-        <h3 i18n:translate="">Summary</h3>
-        <pre tal:content="details_formatted"></pre>
+        <ul class="tabs" data-tabs id="import-log-tabs" role="tablist">
+            <li class="tabs-title is-active" role="presentation">
+                <a href="#panel-logs"
+                   aria-controls="panel-logs"
+                   aria-selected="true"
+                   role="tab"
+                   i18n:translate="">Logs</a>
+            </li>
+            <li class="tabs-title" role="presentation">
+                <a href="#panel-json"
+                   aria-controls="panel-json"
+                   role="tab"
+                   i18n:translate="">Raw JSON</a>
+            </li>
+        </ul>
+
+        <div class="tabs-content" data-tabs-content="import-log-tabs">
+            <!-- Logs Tab - -->
+            <div class="tabs-panel is-active" id="panel-logs" role="tabpanel">
+                <div tal:condition="summary">
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h4 i18n:translate="">Overall Status</h4>
+                            <p tal:content="summary.get('overall_status', 'N/A')" class="status-text"></p>
+                        </div>
+
+                        <!-- Import Results -->
+                        <div class="summary-card" tal:condition="import_categories">
+                            <h4 i18n:translate="">Import Results</h4>
+                            <ul class="stats-list">
+                                <li tal:repeat="category import_categories">
+                                    <strong tal:content="category.name"></strong>
+                                    <span tal:content="category.display_text"></span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Total Summary -->
+                        <div class="summary-card" tal:condition="python: log.details and log.details.get('import_results', {}).get('total_import_summary')">
+                            <h4 i18n:translate="">Total Summary</h4>
+                            <ul class="stats-list">
+                                <tal:block tal:define="total python: log.details.get('import_results', {}).get('total_import_summary', {})">
+                                    <li><span>Created:</span> <strong tal:content="total.get('created', 0)"></strong></li>
+                                    <li><span>Updated:</span> <strong tal:content="total.get('updated', 0)"></strong></li>
+                                    <li><span>Processed:</span> <strong tal:content="total.get('processed', 0)"></strong></li>
+                                </tal:block>
+                            </ul>
+                        </div>
+
+                        <!-- Custom Data Update -->
+                        <div class="summary-card" tal:condition="python: log.details and log.details.get('custom_data_update')">
+                            <h4 i18n:translate="">Custom Data Update</h4>
+                            <ul class="stats-list">
+                                <tal:block tal:define="custom python: log.details.get('custom_data_update', {})">
+                                    <li><span>Processed:</span> <strong tal:content="custom.get('processed_for_custom_data', 0)"></strong></li>
+                                    <li><span>Updated:</span> <strong tal:content="custom.get('updated_with_custom_data', 0)"></strong></li>
+                                    <li><span>Errors:</span> <strong tal:content="custom.get('errors', 0)"></strong></li>
+                                </tal:block>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logs Section -->
+                <div tal:condition="processed_logs" style="margin-top: 30px;">
+                    <h3 i18n:translate="">Import Logs</h3>
+                    <div class="log-filters" style="margin-bottom: 15px;">
+                        <button class="log-filter log-level active" data-level="all" i18n:translate="">All</button>
+                        <button class="log-filter log-level log-error" data-level="error" i18n:translate="">Errors</button>
+                        <button class="log-filter log-level log-warning" data-level="warning" i18n:translate="">Warnings</button>
+                        <button class="log-filter log-level log-info" data-level="info" i18n:translate="">Info</button>
+                    </div>
+                    <div class="import-logs">
+                        <div class="log-entry" tal:repeat="log processed_logs" tal:attributes="data-level log.level.lower()">
+                            <span tal:attributes="class log.css_class" tal:content="log.level"></span>
+                            <div class="log-message" tal:content="log.message"></div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div tal:condition="not summary and not processed_logs">
+                    <p i18n:translate="">No log data available</p>
+                </div>
+            </div>
+
+            <!-- Raw JSON Tab -->
+            <div class="tabs-panel" id="panel-json" role="tabpanel">
+                <div class="json-viewer">
+                    <pre tal:content="details_formatted"></pre>
+                </div>
+            </div>
+        </div>
 
     </tal:b>
 </div>

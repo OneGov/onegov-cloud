@@ -28,6 +28,11 @@ class ImportLog(Base, TimestampMixin):
     _('pending')
     _('timeout')
 
+    # Import type translations for .po file extraction
+    _('cli')
+    _('automatic')
+    _('upload')
+
     id: Column[uuid.UUID] = Column(
         UUID,  # type: ignore[arg-type]
         nullable=False,

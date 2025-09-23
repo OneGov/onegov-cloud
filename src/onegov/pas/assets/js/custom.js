@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     handleBulkAddCommission();
     handleAttendanceFormSync();
+    handleImportButton();
 });
 
 
@@ -184,36 +185,3 @@ function handleAttendanceFormSync() {
   }
 }
 
-function handleImportButton() {
-
-    if (!window.location.href.includes('/import-logs')) {
-        return
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-        const triggerBtn = document.getElementById('trigger-import-btn');
-        if (triggerBtn) {
-            // Store original text
-            const originalText = triggerBtn.textContent;
-
-            // Listen for intercooler requests
-            triggerBtn.addEventListener('beforeSend.ic', function() {
-                // Disable button and change text
-                triggerBtn.disabled = true;
-                triggerBtn.textContent = triggerBtn.dataset.importStartedText;
-                triggerBtn.classList.add('disabled');
-
-                // Auto-refresh after 30 seconds
-                setTimeout(function() {
-                    window.location.reload();
-                }, 30000);
-            });
-
-            // Handle errors - restore button
-            triggerBtn.addEventListener('error.ic', function() {
-                triggerBtn.disabled = false;
-                triggerBtn.textContent = originalText;
-                triggerBtn.classList.remove('disabled');
-            });
-        }
-    });
-}
