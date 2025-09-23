@@ -130,7 +130,12 @@ class AssemblyLayout(DefaultLayout):
                             text=_('Agenda item'),
                             url=self.request.link(items, 'new'),
                             attrs={'class': 'check-list-link'}
-                        )
+                        ),
+                        Link(
+                            text=_('ZIP Upload'),
+                            url=self.request.link(items, 'new-import'),
+                            attrs={'class': 'ticket-archive'}
+                        ),
                     ]
                 )
             ]

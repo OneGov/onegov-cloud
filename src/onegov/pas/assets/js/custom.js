@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     handleBulkAddCommission();
     handleAttendanceFormSync();
-    handleImportButton();
 });
 
 
@@ -184,4 +183,3 @@ function handleAttendanceFormSync() {
     $(commissionSelect).trigger('chosen:updated');
   }
 }
-

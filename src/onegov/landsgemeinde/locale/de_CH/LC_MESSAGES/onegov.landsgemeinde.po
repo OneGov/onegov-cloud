@@ -125,6 +125,18 @@ msgstr "Nummer wird bereits verwendet."
 msgid "Invalid timestamp."
 msgstr "Ungültiger Zeitstempel."
 
+msgid "Agenda Item ZIP"
+msgstr "Traktandum ZIP"
+
+msgid "Import"
+msgstr "Importieren"
+
+msgid "No html directory found in the zip file."
+msgstr "Keine HTML-Dateien im ZIP-Archiv gefunden."
+
+msgid "No file uploaded."
+msgstr "Keine Datei hochgeladen."
+
 msgid "Date"
 msgstr "Datum"
 
@@ -293,6 +305,9 @@ msgstr "Möchten Sie diese Landsgemeinde wirklich löschen?"
 msgid "Delete assembly"
 msgstr "Landsgemeinde löschen"
 
+msgid "ZIP Upload"
+msgstr "ZIP-Upload"
+
 #, python-format
 msgid "Extraodinary ${assembly_type} from ${date}"
 msgstr "Ausserordentliche ${assembly_type} vom ${date}"
@@ -419,6 +434,9 @@ msgstr "Neu"
 msgid "New agenda item"
 msgstr "Neues Traktandum"
 
+msgid "Imported a new agenda item"
+msgstr "Neues Traktandum importiert"
+
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
@@ -445,12 +463,6 @@ msgstr "Neue Wortmeldung hinzugefügt"
 
 msgid "New votum"
 msgstr "Neue Wortmeldung"
-
-#~ msgid "Added a new assembly"
-#~ msgstr "Neue Landsgemeinde hinzugefügt"
-
-#~ msgid "New assembly"
-#~ msgstr "Neue Landsgemeinde"
 
 #, python-format
 #~ msgid "Extraodinary assembly from ${date}"
