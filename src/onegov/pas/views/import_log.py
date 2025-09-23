@@ -22,16 +22,6 @@ if TYPE_CHECKING:
     from webob import Response
 
 
-def translate_import_type(import_type: str, request: TownRequest) -> str:
-    """Translate import_type values to German."""
-    translations = {
-        'cli': 'Manuell auf dem Server',
-        'automatic': 'Automatisch',
-        'upload': 'Auf App hochgeladen'
-    }
-    return translations.get(import_type, import_type)
-
-
 @PasApp.html(
     model=ImportLogCollection,
     template='import_logs.pt',
@@ -40,6 +30,7 @@ def translate_import_type(import_type: str, request: TownRequest) -> str:
 def view_import_logs(
     self: ImportLogCollection, request: TownRequest
 ) -> RenderData:
+    request.include('importlog')
 
     layout = ImportLogCollectionLayout(self, request)
 
@@ -47,8 +38,8 @@ def view_import_logs(
         'layout': layout,
         'title': _('Import History'),
         'logs': self.for_listing().all(),
-        'translate_import_type': lambda import_type: translate_import_type(
-            import_type, request
+        'translate_import_type': lambda import_type: request.translate(
+            _(import_type)
         )
     }
 
@@ -61,16 +52,50 @@ def view_import_logs(
 def view_import_log(
     self: ImportLog, request: TownRequest
 ) -> RenderData:
-
+    request.include('importlog')
     layout = ImportLogLayout(self, request)
     details_formatted = json.dumps(
         self.details, indent=2, sort_keys=True, ensure_ascii=False
     )
+
+    details = self.details or {}
+    summary = details.get('summary', {})
+    output_messages = details.get('output_messages', [])
+
+    import_categories = []
+    import_results = details.get('import_results', {})
+    if import_results:
+        for category, stats in import_results.items():
+            if category != 'total_import_summary':
+                updated_count = len(stats.get('updated', []))
+                created_count = len(stats.get('created', []))
+                processed_count = stats.get('processed', 0)
+                import_categories.append({
+                    'name': category,
+                    'display_text': f'Updated: {updated_count}, '
+                                  f'Created: {created_count}, '
+                                  f'Processed: {processed_count}'
+                })
+
+    processed_logs = []
+    for log_entry in output_messages:
+        if isinstance(log_entry, dict) and 'level' in log_entry:
+            level = log_entry.get('level', 'info')
+            message = log_entry.get('message', '')
+            processed_logs.append({
+                'level': level.upper(),
+                'css_class': f'log-level log-{level}',
+                'message': message
+            })
+
     return {
         'layout': layout,
         'title': _('Import Log Details'),
         'log': self,
         'details_formatted': details_formatted,
+        'summary': summary,
+        'import_categories': import_categories,
+        'processed_logs': processed_logs,
     }
 
 

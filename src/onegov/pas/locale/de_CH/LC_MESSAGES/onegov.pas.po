@@ -752,6 +752,24 @@ msgstr "Übersicht Importe"
 msgid "Import Log Details"
 msgstr "Details zum Importlog"
 
+msgid "Source Data Files:"
+msgstr "Quelldateien:"
+
+msgid "Raw JSON"
+msgstr "JSON Rohdaten"
+
+msgid "All"
+msgstr "Alle"
+
+msgid "Errors"
+msgstr "Fehler"
+
+msgid "Warnings"
+msgstr "Warnungen"
+
+msgid "Info"
+msgstr "Info"
+
 msgid "Inactive"
 msgstr "Inaktiv"
 
@@ -862,3 +880,15 @@ msgstr "Zeitüberschreitung"
 
 msgid "Trigger Import"
 msgstr "Import andstossen (dauert ca. 20 Sekunden)"
+
+msgid "cli"
+msgstr "Manuell auf dem Server"
+
+msgid "automatic"
+msgstr "Automatisch"
+
+msgid "upload"
+msgstr "Auf App hochgeladen"
+
+msgid "No log data available"
+msgstr "Keine Log-Daten verfügbar"
