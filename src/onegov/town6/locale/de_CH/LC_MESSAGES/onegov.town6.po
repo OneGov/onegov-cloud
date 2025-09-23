@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-09-11 12:40+0200\n"
+"POT-Creation-Date: 2025-09-23 14:08+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -763,6 +763,9 @@ msgstr "Sie sind hier"
 msgid "Privacy Protection"
 msgstr "Datenschutz"
 
+msgid "Impressum"
+msgstr "Impressum"
+
 msgid "Login"
 msgstr "Anmelden"
 
@@ -1291,6 +1294,9 @@ msgstr "In die Zwischenablage kopieren"
 
 msgid "Booking Text"
 msgstr "Buchungstext"
+
+msgid "Cost center / cost unit"
+msgstr "Kostenstelle / Kostenträger"
 
 msgid "Unit"
 msgstr "Einheit"
@@ -2307,6 +2313,9 @@ msgstr "Erhält Benachrichtigungen für neue Reservationen."
 msgid "Notifications for following Resources"
 msgstr "Benachrichtigungen für die folgenden Reservationen"
 
+msgid "General information about resources"
+msgstr "Allgemeine Informationen zu Reservationen"
+
 msgid "No reservation resources defined yet."
 msgstr "Es wurden noch keine Ressourcen hinzugefügt."
 
@@ -2797,6 +2806,9 @@ msgstr "Newsletter"
 
 msgid "Link Migration"
 msgstr "Migration Links"
+
+msgid "Resources"
+msgstr "Reservationen"
 
 msgid "OneGov API"
 msgstr "OneGov API"

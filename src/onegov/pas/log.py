@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import click
 import logging
-from typing import Protocol
+from typing import Protocol, Any
 
 
 log = logging.getLogger('onegov.org.cronjobs')
@@ -48,3 +48,29 @@ class LogOutputHandler:
 
     def error(self, message: str) -> None:
         log.error(message)
+
+
+class CompositeOutputHandler:
+    """OutputHandler that forwards messages to multiple handlers."""
+
+    def __init__(self, *handlers: OutputHandler):
+        self.handlers = handlers
+
+    def info(self, message: str) -> None:
+        for handler in self.handlers:
+            handler.info(message)
+
+    def success(self, message: str) -> None:
+        for handler in self.handlers:
+            handler.success(message)
+
+    def error(self, message: str) -> None:
+        for handler in self.handlers:
+            handler.error(message)
+
+    def get_messages(self) -> list[dict[str, Any]]:
+        """Get messages from the first handler that supports it."""
+        for handler in self.handlers:
+            if hasattr(handler, 'get_messages'):
+                return handler.get_messages()
+        return []

@@ -95,6 +95,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
     abschluss = BooleanField(
         label=_('Abschluss'),
         description=_('Mark as completed/closed'),
+        depends_on=('type', '!plenary'),
     )
 
     def ensure_commission(self) -> bool:
@@ -225,6 +226,11 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
         validators=[InputRequired()],
     )
 
+    abschluss = BooleanField(
+        label=_('Abschluss'),
+        description=_('Mark as completed/closed'),
+    )
+
     parliamentarian_id = MultiCheckboxField(
         label=_('Parliamentarian'),
         validators=[InputRequired()],
@@ -286,6 +292,11 @@ class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):
         validators=[InputRequired()],
     )
 
+    abschluss = BooleanField(
+        label=_('Abschluss'),
+        description=_('Mark as completed/closed'),
+    )
+
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()
         result['duration'] = int(60 * (result.get('duration') or 0))
@@ -329,6 +340,7 @@ class AttendenceCommissionBulkEditForm(AttendenceEditBulkForm):
         ]
 
         self.duration.data = obj.duration / 60
+        self.abschluss.data = obj.abschluss
 
         attendences = AttendenceCollection(
                 self.request.session).query().filter_by(
@@ -355,6 +367,7 @@ class AttendenceCommissionBulkEditForm(AttendenceEditBulkForm):
         obj.duration = int(60 * (self.duration.data or 0))
         obj.date = self.date.data  # type: ignore[assignment]
         obj.commission_id = self.commission_id.data
+        obj.abschluss = self.abschluss.data
 
 
 class AttendencePlenaryBulkEditForm(AttendenceEditBulkForm):
@@ -425,6 +438,11 @@ class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):
     parliamentarian_id = MultiCheckboxField(
         label=_('Parliamentarian'),
         validators=[InputRequired()],
+    )
+
+    abschluss = BooleanField(
+        label=_('Abschluss'),
+        description=_('Mark as completed/closed'),
     )
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]

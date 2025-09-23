@@ -171,7 +171,8 @@ def send_daily_newsletter(request: OrgRequest) -> None:
                 )
                 newsletters = NewsletterCollection(request.session)
                 newsletter = newsletters.add(title=title, html=Markup(''))
-                newsletter.lead = _('New news since the last newsletter:')
+                newsletter.lead = request.translate(
+                    _('New news since the last newsletter:'))
                 newsletter.content['news'] = [n.id for n in news.all()]
 
                 send_newsletter(request=request, newsletter=newsletter,

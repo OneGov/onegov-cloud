@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-09-11 12:40+0200\n"
+"POT-Creation-Date: 2025-09-23 14:08+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -177,7 +177,8 @@ msgid ""
 "separated by a semicolon. Example: Cat 1 text; Cat 2 text; Cat 3 text"
 msgstr ""
 "Saisissez une liste de catégories pour les liens d'intérêt. Chaque catégorie "
-"doit être séparée par un point-virgule. Exemple : Cat 1 texte ; Cat 2 texte ; Cat 3 texte"
+"doit être séparée par un point-virgule. Exemple : Cat 1 texte ; Cat 2 "
+"texte ; Cat 3 texte"
 
 msgid "Events"
 msgstr "Événements"
@@ -766,6 +767,9 @@ msgstr "Vous êtes ici"
 msgid "Privacy Protection"
 msgstr "Protection des données"
 
+msgid "Impressum"
+msgstr "Mentions légales"
+
 msgid "Login"
 msgstr "Connexion"
 
@@ -1291,6 +1295,9 @@ msgstr "Copier dans le presse-papiers"
 
 msgid "Booking Text"
 msgstr "Message/notification"
+
+msgid "Cost center / cost unit"
+msgstr "Objet de coût"
 
 msgid "Unit"
 msgstr "Unité"
@@ -2315,6 +2322,9 @@ msgstr "Recevoir des notifications pour les nouvelles réservations."
 msgid "Notifications for following Resources"
 msgstr "Notifications pour les ressources suivantes"
 
+msgid "General information about resources"
+msgstr "Informations générales sur les ressources"
+
 msgid "No reservation resources defined yet."
 msgstr "Aucune ressource de réservation n'est encore définie."
 
@@ -2807,6 +2817,9 @@ msgstr "Newsletter"
 
 msgid "Link Migration"
 msgstr "Migration des liens"
+
+msgid "Resources"
+msgstr "Reservations"
 
 msgid "OneGov API"
 msgstr "API OneGov"

@@ -316,6 +316,8 @@ def view_resources(
         'link_func': link_func,
         'edit_link': edit_link,
         'lead_func': lead_func,
+        'header_html': request.app.org.resource_header_html,
+        'footer_html': request.app.org.resource_footer_html,
     }
 
 
@@ -898,6 +900,7 @@ def handle_new_resource(
     layout.include_editor()
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(RESOURCE_TYPES[type]['title'], '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -1623,6 +1626,7 @@ def view_export_all(
     self.title = _('Export All')  # type:ignore
     layout = layout or ResourceLayout(self, request)  # type:ignore
     layout.editbar_links = None
+    layout.edit_mode = True
 
     if form.submitted(request):
 

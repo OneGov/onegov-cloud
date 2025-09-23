@@ -1245,6 +1245,7 @@ def add_invoice_item(
             text=form.booking_text.data,
             group='manual',
             family=form.kind.data,
+            cost_object=form.cost_object.data,
             unit=form.amount,
         )
         if payment is not None:

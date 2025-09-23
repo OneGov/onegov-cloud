@@ -1,34 +1,46 @@
+from __future__ import annotations
+
 import json
 from base64 import b64encode
 from unittest.mock import patch
 
-from collection_json import Collection, Template
+from collection_json import Collection, Template  # type: ignore[import-untyped]
 from freezegun import freeze_time
 
 
-def get_base64_encoded_json_string(data):
-    data = json.dumps(data)
-    data = b64encode(data.encode('ascii'))
-    data = data.decode('ascii')
-    return data
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.agency import AgencyApp
+    from tests.shared.client import Client
+    from unittest.mock import MagicMock
+
+
+def get_base64_encoded_json_string(data: Any) -> str:
+    return b64encode(json.dumps(data).encode('ascii')).decode('ascii')
 
 
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.broadcast')
 @patch('onegov.websockets.integration.authenticate')
-def test_view_api(authenticate, broadcast, connect, client):
+def test_view_api(
+    authenticate: MagicMock,
+    broadcast: MagicMock,
+    connect: MagicMock,
+    client: Client[AgencyApp]
+) -> None:
+
     client.login_admin()  # prevent rate limit
 
-    def collection(url):
+    def collection(url: str) -> Collection:
         return Collection.from_json(client.get(url).body)
 
-    def data(item):
+    def data(item: Any) -> Any:
         return {x.name: x.value for x in item.data}
 
-    def links(item):
+    def links(item: Any) -> Any:
         return {x.rel: x.href for x in item.links}
 
-    def template(item):
+    def template(item: Any) -> Any:
         return {x.name for x in item.template.data}
 
     # Endpoints with query hints

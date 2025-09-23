@@ -823,6 +823,7 @@ def test_send_daily_newsletter(es_org_app):
         assert newsletter.title == 'Täglicher Newsletter 05.03.2018, 10:00'
         assert len(os.listdir(client.app.maildir)) == 1
         mail = client.get_email(0)
+        assert "Neue Einträge seit dem letzten Newsletter" in mail['TextBody']
         assert "News1" in mail['TextBody']
         assert "News2" in mail['TextBody']
         assert "News3" not in mail['TextBody']
@@ -836,6 +837,7 @@ def test_send_daily_newsletter(es_org_app):
         assert 'Täglicher Newsletter 05.03.2018, 11:00' in newsletter.title
         assert len(os.listdir(client.app.maildir)) == 2
         mail = client.get_email(1)
+        assert "Neue Einträge seit dem letzten Newsletter" in mail['TextBody']
         assert "News1" not in mail['TextBody']
         assert "News2" not in mail['TextBody']
         assert "News3" in mail['TextBody']

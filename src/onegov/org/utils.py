@@ -31,6 +31,7 @@ from onegov.ticket import Ticket, TicketCollection, TicketPermission
 from onegov.user import User, UserGroup
 from operator import add, attrgetter
 from sqlalchemy import case, nullsfirst  # type:ignore[attr-defined]
+from webob.exc import HTTPBadRequest
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
@@ -294,14 +295,19 @@ def parse_fullcalendar_request(
 
     if start_str and end_str:
         if 'T' in start_str:
-            start = parse_datetime(start_str)
-            end = parse_datetime(end_str)
+            try:
+                start = parse_datetime(start_str)
+                end = parse_datetime(end_str)
+            except Exception:
+                raise HTTPBadRequest() from None
         else:
-            start = datetime.combine(parse_date(start_str), time(0, 0))
-            end = datetime.combine(
-                parse_date(end_str),
-                time(23, 59, 59, 999999)
-            )
+            try:
+                start_date = parse_date(start_str)
+                end_date = parse_date(end_str)
+            except Exception:
+                raise HTTPBadRequest() from None
+            start = datetime.combine(start_date, time(0, 0))
+            end = datetime.combine(end_date, time(23, 59, 59, 999999))
 
         start = sedate.replace_timezone(start, timezone)
         end = sedate.replace_timezone(end, timezone)

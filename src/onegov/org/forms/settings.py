@@ -292,6 +292,13 @@ class FooterSettingsForm(Form):
         validators=[Optional()]
     )
 
+    impressum_url = URLField(
+        label=_('Impressum'),
+        description=_('URL pointing to the Impressum site'),
+        fieldset=_('Impressum'),
+        validators=[Optional()]
+    )
+
     custom_link_1_name = StringField(
         label=_('Name'),
         description='Name of the Label',
@@ -1870,6 +1877,17 @@ class EventSettingsForm(Form):
     event_files = UploadOrSelectExistingMultipleFilesField(
         label=_('Documents'),
         fieldset=_('General event documents')
+    )
+
+
+class ResourceSettingsForm(Form):
+
+    resource_header_html = HtmlField(
+        label=_('General information above the resource list'),
+    )
+
+    resource_footer_html = HtmlField(
+        label=_('General information below the resource list'),
     )
 
 

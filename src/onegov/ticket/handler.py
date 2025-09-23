@@ -117,6 +117,9 @@ class Handler:
         invoice = self.ticket.invoice
         if invoice is None:
             expected = Decimal('0')
+        elif invoice.invoiced:
+            # If it has already been invoiced no changes should be made
+            return False
         else:
             expected = invoice.total_excluding_manual_entries
 

@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-09-11 12:40+0200\n"
+"POT-Creation-Date: 2025-09-23 14:08+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -168,11 +168,11 @@ msgstr "Categorie predefinite per i legami di interesse"
 
 msgid ""
 "Enter a list of categories for interest ties. Each category should be "
-"separated by a semicolon. Example: \"Cat 1 text; Cat 2 text; Cat 3 text\""
+"separated by a semicolon. Example: Cat 1 text; Cat 2 text; Cat 3 text"
 msgstr ""
 "Inserisci un elenco di categorie per i legami di interesse. Ogni categoria "
-"deve essere separata da un punto e virgola. Esempio: Cat 1 text; Cat 2 "
-"text; Cat 3 text"
+"deve essere separata da un punto e virgola. Esempio: Testo Cat 1; Testo Cat "
+"2; Testo Cat 3"
 
 #, fuzzy
 msgid "Events"
@@ -763,6 +763,9 @@ msgstr "Ti trovi qui"
 msgid "Privacy Protection"
 msgstr "Tutela della privacy"
 
+msgid "Impressum"
+msgstr "Colophon"
+
 msgid "Login"
 msgstr "Accedi"
 
@@ -1290,6 +1293,9 @@ msgstr "Copia negli appunti"
 
 msgid "Booking Text"
 msgstr "Testo prenotazione"
+
+msgid "Cost center / cost unit"
+msgstr "Unità di costo"
 
 msgid "Unit"
 msgstr "Unità"
@@ -2303,6 +2309,9 @@ msgstr "Riceve le notifiche per le nuove prenotazioni."
 msgid "Notifications for following Resources"
 msgstr "Notifiche per le seguenti risorse"
 
+msgid "General information about resources"
+msgstr "Informazioni generali sulle prenotazioni"
+
 msgid "No reservation resources defined yet."
 msgstr "Nessuna risorsa di prenotazione ancora definita."
 
@@ -2799,6 +2808,9 @@ msgstr "Abbonamento alla newsletter"
 
 msgid "Link Migration"
 msgstr "Migrazione dei link"
+
+msgid "Resources"
+msgstr "Prenotazioni"
 
 msgid "OneGov API"
 msgstr "API OneGov"

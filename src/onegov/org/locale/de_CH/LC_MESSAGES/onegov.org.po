@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-09-16 15:15+0200\n"
+"POT-Creation-Date: 2025-09-23 14:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1245,6 +1245,9 @@ msgstr "Nach Zeitpunkt der letzten Änderung"
 msgid "Booking Text"
 msgstr "Buchungstext"
 
+msgid "Cost center / cost unit"
+msgstr "Kostenstelle / Kostenträger"
+
 msgid "Kind"
 msgstr "Art"
 
@@ -1767,6 +1770,22 @@ msgstr "Monatsansicht"
 msgid "Doors"
 msgstr "Türen"
 
+msgid "Invoicing party"
+msgstr "Rechnungssteller"
+
+msgid "Invoicing"
+msgstr "Fakturierung"
+
+msgid "Will be displayed in invoices"
+msgstr "Wird in Rechnungen angezeigt"
+
+msgid ""
+"Will be displayed in invoices for any costs directly associated with "
+"reservations on this resource."
+msgstr ""
+"Wird bei allen Rechnugnspositionen angezeigt, die direkt mit der Reservation "
+"von diesem Objekt im Zusammenhang stehen."
+
 msgid "Per item"
 msgstr "Pro Eintrag"
 
@@ -2001,6 +2020,12 @@ msgstr "TikTok"
 
 msgid "URL pointing to the TikTok site"
 msgstr "Link zu TikTok"
+
+msgid "Impressum"
+msgstr "Impressum"
+
+msgid "URL pointing to the Impressum site"
+msgstr "Link zum Impressum"
 
 msgid "Custom Link 1"
 msgstr "Benutzerdefinierter Link 1"
@@ -2663,6 +2688,12 @@ msgstr "Dokumente"
 
 msgid "General event documents"
 msgstr "Allgemeine Veranstaltungsdokumente"
+
+msgid "General information above the resource list"
+msgstr "Allgemeine Informationen über der Reservationen-Liste"
+
+msgid "General information below the resource list"
+msgstr "Allgemeine Informationen unterhalb der Reservationen-Liste"
 
 msgid "Duration from opening a ticket to its automatic archival"
 msgstr ""

@@ -1,8 +1,101 @@
 # Changes
 
+## 2025.51
+
+`2025-09-23` | [b9c65577c5...60a58f1e22](https://github.com/OneGov/onegov-cloud/compare/b9c65577c5^...60a58f1e22)
+
+### Cronjob
+
+##### Fix missing translation in daily newsletter
+
+`Bugfix` | [OGC-2590](https://linear.app/onegovcloud/issue/OGC-2590) | [2c2f4b9485](https://github.com/onegov/onegov-cloud/commit/2c2f4b94855c90f180a9cf82d07fb58348162cd2)
+
+### Landsgemeinde
+
+##### Multiple Name Options
+
+Add setting for different names for assemblies
+
+`Feature` | [OGC-2265](https://linear.app/onegovcloud/issue/OGC-2265) | [c0be3d5bdc](https://github.com/onegov/onegov-cloud/commit/c0be3d5bdc2e3455aaf7981194999329ac4e6ebb)
+
+### Org
+
+##### Fixes resource iCal no longer filtering to the resource
+
+`Bugfix` | [OGC-2640](https://linear.app/onegovcloud/issue/OGC-2640) | [35eee6e387](https://github.com/onegov/onegov-cloud/commit/35eee6e3875867844049d77913e52a8852d31514)
+
+### Pas
+
+##### Refactors the import and fixes some issues.
+
+- Prepares the import to be easily usable in cronjob.
+- Use strategy pattern for logging, we potentially want 
+  to have better debugging ability and show some logging
+  in a view, to see what was imported.
+- Get address of parliamentarian by calling `/people/{id}`
+  endpoint directly. This we need to do anyhow for `customFields`.
+
+`Feature` | [OGC-2021](https://linear.app/onegovcloud/issue/OGC-2021) | [23bdba011d](https://github.com/onegov/onegov-cloud/commit/23bdba011d705fac16b0a1bc69806efb365916da)
+
+##### Add cronjob for import plus manual trigger.
+
+`Feature` | [OGC-2091](https://linear.app/onegovcloud/issue/OGC-2091) | [8056ea8204](https://github.com/onegov/onegov-cloud/commit/8056ea82046d36d1090ab7d23f41ea9877f928da)
+
+##### Dynamic hostname replacement for pagination URLs.
+
+Fix a pagination issue where Kub API returns URLs with
+different hostnames than the one used for initial requests.
+Now dynamically replaces hostname in 'next' URLs with
+the correct bridge.
+
+`Bugfix` | [OGC-2091](https://linear.app/onegovcloud/issue/OGC-2091) | [f04c0584bc](https://github.com/onegov/onegov-cloud/commit/f04c0584bcedf641f8fa63eb98ad6b610480a1e2)
+
+##### Mark commission attendance complete for bulk as well.
+
+`Bugfix` | [OGC-2585](https://linear.app/onegovcloud/issue/OGC-2585) | [a7047e1268](https://github.com/onegov/onegov-cloud/commit/a7047e1268f75fee6c5fc1177000883ff8f151f8)
+
+##### Show JSON import source in overview
+
+`Bugfix` | [a4b56c35c9](https://github.com/onegov/onegov-cloud/commit/a4b56c35c96e6b93599397746d5d252aaee5366c)
+
+##### Speed up api calls and make some corrections.
+
+- Warn for parliamentarians without external IDs
+- Log warnings for parliamentarians that won't be synchronized
+
+`Other` | [a96bc88bee](https://github.com/onegov/onegov-cloud/commit/a96bc88beeb09aa6edfa056a47f0044c37a74241)
+
+### Pay
+
+##### Adds cronjob to cancel stale Worldline Saferpay transactions
+
+This only applies to new transactions initiated after this change.
+
+`Bugfix` | [OGC-2609](https://linear.app/onegovcloud/issue/OGC-2609) | [b9c65577c5](https://github.com/onegov/onegov-cloud/commit/b9c65577c595499f30d17409a69bf8971211ea19)
+
+### Resources
+
+##### Adds general information to resource view and resource settings
+
+`Feature` | [OGC-2632](https://linear.app/onegovcloud/issue/OGC-2632) | [3c99c6d901](https://github.com/onegov/onegov-cloud/commit/3c99c6d9017730e4aee1cfe7f07ff40fac378446)
+
+### Town6
+
+##### Style links
+
+`Feature` | [OGC-2398](https://linear.app/onegovcloud/issue/OGC-2398) | [1bae607dda](https://github.com/onegov/onegov-cloud/commit/1bae607dda2f67fec5154e79afb77b8a54fe74ab)
+
+##### Adds impressum link to footer
+
+`Feature` | [OGC-2448](https://linear.app/onegovcloud/issue/OGC-2448) | [8354caed88](https://github.com/onegov/onegov-cloud/commit/8354caed887fff1db0511dda87f17ca862ca790c)
+
+##### More-list styling
+
+`Bugfix` | [d9677ce4a7](https://github.com/onegov/onegov-cloud/commit/d9677ce4a779140f09165d830a71aa078c722cd3)
+
 ## 2025.50
 
-`2025-09-16` | [01fda37130...e4fc70350e](https://github.com/OneGov/onegov-cloud/compare/01fda37130^...e4fc70350e)
+`2025-09-16` | [01fda37130...f31113771d](https://github.com/OneGov/onegov-cloud/compare/01fda37130^...f31113771d)
 
 **Upgrade hints**
 - onegov-org --select /onegov_town6/wil wil-event-tags-to-german-as-we-use-custom-event-tags
@@ -2202,69 +2295,4 @@ Uses a meta field for the external_user_id (So we don't have a specific column
     Make sure hidden_people_fields is honoured everywhere
 
 `Bugfix` | [OGC-2061](https://linear.app/onegovcloud/issue/OGC-2061) | [4a8ed94cb1](https://github.com/onegov/onegov-cloud/commit/4a8ed94cb12db893dc3de0fb73fb4b3c7d1db309)
-
-## 2025.5
-
-`2025-02-13` | [e8c813d38e...2046905863](https://github.com/OneGov/onegov-cloud/compare/e8c813d38e^...2046905863)
-
-### Agency
-
-##### Staka LU Skip personal email addresses
-
-`Feature` | [OGC-1952](https://linear.app/onegovcloud/issue/OGC-1952) | [59d5e5c77a](https://github.com/onegov/onegov-cloud/commit/59d5e5c77a26313d8d6eb41a830cf99e6b37d3c8)
-
-##### Staka LU Adds function and academic title fields to pdf export
-
-`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [02332a8ba7](https://github.com/onegov/onegov-cloud/commit/02332a8ba73b8d5de77c5134cebe7917e46f8502)
-
-### Api
-
-##### Add external_id for Person. Used in agency.
-
-Also had to refactor the Api such that request is in scope.
-
-`Feature` | [OGC-2061](https://linear.app/onegovcloud/issue/OGC-2061) | [73d7b015ae](https://github.com/onegov/onegov-cloud/commit/73d7b015aecbf8e89702d0ac6a95bbf04fe18784)
-
-### Directory
-
-##### Ensure all Directory Entry Subscribers are listed
-
-`Bugfix` | [OGC-2063](https://linear.app/onegovcloud/issue/OGC-2063) | [956bda24aa](https://github.com/onegov/onegov-cloud/commit/956bda24aab6f9d8d3f57da20aab1e5a968d278e)
-
-### Org
-
-##### Moves contact inherit functionality to base `ContactExtension`
-
-This means resources, forms and directories can now inherit their
-contact information from a topic as well.
-
-`Feature` | [OGC-2049](https://linear.app/onegovcloud/issue/OGC-2049) | [7e9659342c](https://github.com/onegov/onegov-cloud/commit/7e9659342ce8243668811990f88dcbd8fccf4855)
-
-##### Api Access
-
-`Bugfix` | [OGC-2075](https://linear.app/onegovcloud/issue/OGC-2075) | [21bff15e86](https://github.com/onegov/onegov-cloud/commit/21bff15e86b2151544c89ad4783e1da76f12d6fb)
-
-### Pay
-
-##### Adds Worldline Saferpay payment provider
-
-`Feature` | [OGC-2068](https://linear.app/onegovcloud/issue/OGC-2068) | [f841f76e6c](https://github.com/onegov/onegov-cloud/commit/f841f76e6c11155c6e62699387a2d1c910705f38)
-
-### Town6
-
-##### Adds a topics API endpoint
-
-Also includes a small extension to the existing news/events endpoint
-
-`Feature` | [OGC-2058](https://linear.app/onegovcloud/issue/OGC-2058) | [6f5f3b9b64](https://github.com/onegov/onegov-cloud/commit/6f5f3b9b6400ff7b3cde9b3f8ac9cbd2eedd4088)
-
-##### Adds an additional contact link.
-
-`Feature` | [OGC-1940](https://linear.app/onegovcloud/issue/OGC-1940) | [8b138e5965](https://github.com/onegov/onegov-cloud/commit/8b138e596506df91d8bd15fb2539b6e73848b46d)
-
-### User
-
-##### Makes `at_hash` optional in OpenID Connect provider
-
-`Bugfix` | [OGC-1767](https://linear.app/onegovcloud/issue/OGC-1767) | [5189b63bf7](https://github.com/onegov/onegov-cloud/commit/5189b63bf79c2d8569ae91aade8070f709f8911e)
 

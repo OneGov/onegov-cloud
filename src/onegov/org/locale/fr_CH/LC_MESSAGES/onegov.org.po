@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-09-16 15:15+0200\n"
+"POT-Creation-Date: 2025-09-23 14:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1243,6 +1243,9 @@ msgstr "Par date de dernière modification"
 msgid "Booking Text"
 msgstr "Message/notification"
 
+msgid "Cost center / cost unit"
+msgstr "Objet de coût"
+
 msgid "Kind"
 msgstr "Type"
 
@@ -1768,6 +1771,22 @@ msgstr "Affichage du mois"
 msgid "Doors"
 msgstr "Portes"
 
+msgid "Invoicing party"
+msgstr "Partie facturante"
+
+msgid "Invoicing"
+msgstr "Facturation"
+
+msgid "Will be displayed in invoices"
+msgstr "Sera affiché sur les factures"
+
+msgid ""
+"Will be displayed in invoices for any costs directly associated with "
+"reservations on this resource."
+msgstr ""
+"Sera indiqué sur les factures pour tous les coûts directement liés aux "
+"réservations sur cette ressource."
+
 msgid "Per item"
 msgstr "Par article"
 
@@ -1869,7 +1888,7 @@ msgid "Send on"
 msgstr "Envoyer sur"
 
 msgid "Resources"
-msgstr "Ressources"
+msgstr "Reservations"
 
 msgid "Please add at least one notification."
 msgstr "Veuillez ajouter au moins une notification."
@@ -1998,6 +2017,12 @@ msgstr "TikTok"
 
 msgid "URL pointing to the TikTok site"
 msgstr "Lien vers la page TikTok"
+
+msgid "Impressum"
+msgstr "Mentions légales"
+
+msgid "URL pointing to the Impressum site"
+msgstr "Lien vers le site mentions légales"
 
 msgid "Custom Link 1"
 msgstr "Lien personnalisé 1"
@@ -2667,6 +2692,12 @@ msgstr "Documents"
 
 msgid "General event documents"
 msgstr "Documents généraux de l'événement"
+
+msgid "General information above the resource list"
+msgstr "Informations générales au-dessus de la liste des ressources"
+
+msgid "General information below the resource list"
+msgstr "Informations générales en dessous de la liste des ressources"
 
 msgid "Duration from opening a ticket to its automatic archival"
 msgstr "Durée entre l'ouverture d'un ticket et son archivage automatique"

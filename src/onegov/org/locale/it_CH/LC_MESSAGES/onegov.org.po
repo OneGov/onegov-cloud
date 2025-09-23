@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-09-16 15:15+0200\n"
+"POT-Creation-Date: 2025-09-23 14:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1248,6 +1248,9 @@ msgstr "Per data dell'ultima modifica"
 msgid "Booking Text"
 msgstr "Testo prenotazione"
 
+msgid "Cost center / cost unit"
+msgstr "Unità di costo"
+
 msgid "Kind"
 msgstr "Tipo"
 
@@ -1772,6 +1775,22 @@ msgstr "Visualizzazione mensile"
 msgid "Doors"
 msgstr "Porte"
 
+msgid "Invoicing party"
+msgstr "Soggetto emittente la fattura"
+
+msgid "Invoicing"
+msgstr "Fatturazione"
+
+msgid "Will be displayed in invoices"
+msgstr "Verrà visualizzato nelle fatture"
+
+msgid ""
+"Will be displayed in invoices for any costs directly associated with "
+"reservations on this resource."
+msgstr ""
+"Verrà indicato nelle fatture per eventuali costi direttamente associati alle "
+"prenotazioni su questa risorsa."
+
 msgid "Per item"
 msgstr "Per elemento"
 
@@ -1872,7 +1891,7 @@ msgid "Send on"
 msgstr "Invia il"
 
 msgid "Resources"
-msgstr "Risorse"
+msgstr "Prenotazioni"
 
 msgid "Please add at least one notification."
 msgstr "Aggiungere almeno una notifica."
@@ -2002,6 +2021,12 @@ msgstr "TikTok"
 
 msgid "URL pointing to the TikTok site"
 msgstr "URL che punta al sito di TikTok"
+
+msgid "Impressum"
+msgstr "Colophon"
+
+msgid "URL pointing to the Impressum site"
+msgstr "URL che punta al sito di Colophon"
 
 msgid "Custom Link 1"
 msgstr "Collegamento personalizzato 1"
@@ -2673,6 +2698,12 @@ msgstr "Documenti"
 
 msgid "General event documents"
 msgstr "Documenti generali dell'evento"
+
+msgid "General information above the resource list"
+msgstr "Informazioni generali sopra l'elenco delle prenotazioni"
+
+msgid "General information below the resource list"
+msgstr "Informazioni generali sotto l'elenco delle prenotazioni"
 
 msgid "Duration from opening a ticket to its automatic archival"
 msgstr "Durata dall'apertura di un ticket alla sua archiviazione automatica"

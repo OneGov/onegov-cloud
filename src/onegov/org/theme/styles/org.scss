@@ -4845,7 +4845,7 @@ ul.recipients {
     position: relative;
     width: 100%;
 
-    thead th:not(:first-child) {
+    thead th.centered {
         text-align: center !important;
     }
 

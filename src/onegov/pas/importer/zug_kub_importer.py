@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from onegov.pas import log
-from onegov.pas.models import ImportLog
+from onegov.pas.log import log
 
 
 from typing import TYPE_CHECKING, Any, cast
 if TYPE_CHECKING:
+    import logging
     from uuid import UUID
     from collections.abc import Sequence
     from sqlalchemy.orm import Session
@@ -17,6 +17,34 @@ if TYPE_CHECKING:
     )
 
 
+def _serialize_model_objects(obj_list: list[Any]) -> list[dict[str, Any]]:
+    """Convert model objects to JSON-serializable dictionaries."""
+    serialized = []
+    for obj in obj_list:
+        if hasattr(obj, '__tablename__'):
+            # SQLAlchemy model object
+            result = {
+                'id': str(obj.id) if obj.id else None,
+                'type': obj.__class__.__name__,
+            }
+            # Add identifying fields based on model type
+            if hasattr(obj, 'last_name') and hasattr(obj, 'first_name'):
+                result.update({
+                    'last_name': obj.last_name,
+                    'first_name': obj.first_name,
+                    'email': getattr(obj, 'email', None)
+                })
+            elif hasattr(obj, 'name'):
+                result['name'] = obj.name
+            elif hasattr(obj, 'title'):
+                result['title'] = obj.title
+            serialized.append(result)
+        else:
+            # For non-model objects, keep as-is
+            serialized.append(obj)
+    return serialized
+
+
 def import_zug_kub_data(
     session: Session,
     people_data: Sequence[PersonData],
@@ -24,6 +52,8 @@ def import_zug_kub_data(
     membership_data: Sequence[MembershipData],
     user_id: UUID | None = None,
     import_type: str = 'cli',
+    logger: logging.Logger | None = None,
+    create_import_log: bool = True,
 ) -> dict[str, ImportCategoryResult]:
     """
     Imports data from KUB JSON files within a single transaction,
@@ -37,6 +67,9 @@ def import_zug_kub_data(
         membership_data: Membership data to import
         user_id: ID of user performing the import (optional)
         import_type: Type of import ('cli', 'upload', or 'automatic')
+        logger: Optional logger to use instead of module logger
+        create_import_log: Whether to create ImportLog (True for web form,
+                          False for CLI/orchestrator)
 
     Returns a dictionary where keys are categories (e.g., 'parliamentarians')
     and values are dictionaries containing 'created' (list), 'updated' (list),
@@ -56,20 +89,24 @@ def import_zug_kub_data(
     log_details: dict[str, Any] = {}
     final_error: Exception | None = None
 
+    # Use provided logger or default to module logger
+    if logger is None:
+        logger = log
+
     try:
         # Use a savepoint; rollback occurs automatically on exception
         with session.begin_nested():
-            people_importer = PeopleImporter(session)
+            people_importer = PeopleImporter(session, logger)
             (parliamentarian_map, people_details, people_processed) = (
                 people_importer.bulk_import(people_data)
             )
             import_details['parliamentarians'] = {
-                'created': people_details['created'],
-                'updated': people_details['updated'],
+                'created': _serialize_model_objects(people_details['created']),
+                'updated': _serialize_model_objects(people_details['updated']),
                 'processed': people_processed,
             }
 
-            organization_importer = OrganizationImporter(session)
+            organization_importer = OrganizationImporter(session, logger)
             (
                 commission_map,
                 parliamentary_group_map,
@@ -84,9 +121,11 @@ def import_zug_kub_data(
                 # Only add categories that have actual ORM objects
                 # (Commissions, Parties)
                 if category in ('commissions', 'parties'):
+                    created_objs = details_list_dict.get('created', [])
+                    updated_objs = details_list_dict.get('updated', [])
                     import_details[category] = {
-                        'created': details_list_dict.get('created', []),
-                        'updated': details_list_dict.get('updated', []),
+                        'created': _serialize_model_objects(created_objs),
+                        'updated': _serialize_model_objects(updated_objs),
                         'processed': processed_count,
                     }
 
@@ -98,7 +137,7 @@ def import_zug_kub_data(
                 org_processed_counts.get('parliamentary_groups', 0)
             )
 
-            membership_importer = MembershipImporter(session)
+            membership_importer = MembershipImporter(session, logger)
             membership_importer.init(
                 session,
                 parliamentarian_map,
@@ -116,19 +155,27 @@ def import_zug_kub_data(
                     if isinstance(
                         details_dict, dict
                     ):
+                        created_parl = details_dict.get('created', [])
+                        updated_parl = details_dict.get('updated', [])
                         import_details['parliamentarians']['created'].extend(
-                            details_dict.get('created', [])
+                            _serialize_model_objects(created_parl)
                         )
                         import_details['parliamentarians']['updated'].extend(
-                            details_dict.get('updated', [])
+                            _serialize_model_objects(updated_parl)
                         )
 
                 elif category in (
                     'commission_memberships',
                     'parliamentarian_roles',
                 ):
+                    created_items = details_dict.get('created', [])
+                    updated_items = details_dict.get('updated', [])
                     import_details[category] = cast(
-                        'ImportCategoryResult', details_dict
+                        'ImportCategoryResult', {
+                            'created': _serialize_model_objects(created_items),
+                            'updated': _serialize_model_objects(updated_items),
+                            'processed': details_dict.get('processed', 0)
+                        }
                     )
 
             log_details['skipped_memberships'] = (
@@ -154,32 +201,44 @@ def import_zug_kub_data(
             ]
 
             log_status = 'completed'
-            log.info(
+            logger.info(
                 'KUB data import processing successful within transaction.'
             )
     except Exception as e:
         final_error = e
         log_status = 'failed'
         log_details['error'] = str(e)
-        log.error(f'KUB data import failed: {e}', exc_info=True)
+        logger.exception('KUB data import failed')
 
     finally:
-        try:
-            import_log = ImportLog(
-                user_id=user_id,
-                details=log_details,
-                status=log_status,
-                import_type=import_type
-            )
-            session.add(import_log)
-            if session.is_active:
-                session.flush()
-            log.info(
-                f'KUB data import attempt logged with status: {log_status}'
-            )
-        except Exception as log_e:
-            log.error(
-                f'Failed to log import status: {log_e}', exc_info=True
+        # Create ImportLog if requested (for web form imports)
+        if create_import_log:
+            try:
+                from onegov.pas.models import ImportLog
+                import_log = ImportLog(
+                    user_id=user_id,
+                    details=log_details,
+                    status=log_status,
+                    import_type=import_type
+                )
+                session.add(import_log)
+                if session.is_active:
+                    session.flush()
+
+                # Add import log ID to import details for redirect
+                import_details['_import_log_id'] = import_log.id  # type: ignore
+
+                logger.info(
+                    f'KUB data import attempt logged with status: {log_status}'
+                )
+            except Exception:
+                logger.exception(
+                    'Failed to log import status'
+                )
+        else:
+            # ImportLog creation is handled by the orchestrator
+            logger.info(
+                f'KUB data import completed with status: {log_status}'
             )
 
         if final_error:

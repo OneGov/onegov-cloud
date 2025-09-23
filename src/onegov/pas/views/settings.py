@@ -6,6 +6,7 @@ from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections import AttendenceCollection
+from onegov.pas.collections import ImportLogCollection
 from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
@@ -83,6 +84,12 @@ def view_pas_settings(
             'title': _('Data Import (JSON)'),
             'link': request.link(request.app.org, 'pas-import'),
             'icon': 'fa-file-import'
+        },
+        {
+            'name': 'import-logs',
+            'title': _('Import History'),
+            'link': request.class_link(ImportLogCollection),
+            'icon': 'fa-history'
         },
     ]
 
