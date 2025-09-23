@@ -7,10 +7,12 @@ from onegov.pas import PasApp
 from onegov.pas.collections import (
     AttendenceCollection
 )
+from onegov.org.models import GeneralFileCollection
 
 from datetime import date
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.commission import Commission
+from onegov.pas.models.parliamentarian import PASParliamentarian
 from onegov.org.models import Organisation
 from onegov.user import User
 
@@ -154,6 +156,60 @@ def restrict_attendence_access(
     return permission in getattr(app.settings.roles, identity.role)
 
 
+@PasApp.permission_rule(model=PASParliamentarian, permission=object)
+def restrict_parliamentarian_access(
+    app: PasApp,
+    identity: Identity,
+    model: PASParliamentarian,
+    permission: Intent
+) -> bool:
+    # Check basic role permissions first
+    if identity.role not in ('parliamentarian', 'commission_president'):
+        return permission in getattr(app.settings.roles, identity.role)
+
+    # For parliamentarians and commission presidents, check ownership
+    if identity.role in ('parliamentarian', 'commission_president'):
+        # Allow Private permission only if they have access to this record
+        if isinstance(permission, type) and issubclass(permission, Private):
+            user = app.session().query(User).filter_by(
+                username=identity.userid).first()
+            if not user or not user.parliamentarian:
+                return False
+
+            parliamentarian: PASParliamentarian = user.parliamentarian
+
+            # Regular parliamentarians can only access their own profile
+            if identity.role == 'parliamentarian':
+                return model.id == parliamentarian.id
+
+            # Commission presidents can access their own + commission members'
+            elif identity.role == 'commission_president':
+                # Always allow own profile
+                if model.id == parliamentarian.id:
+                    return True
+
+                # Check if the target parliamentarian is a member of any
+                # commission this president leads
+                for pres_membership in parliamentarian.commission_memberships:
+                    if (pres_membership.role == 'president'
+                        and (pres_membership.end is None
+                             or pres_membership.end >= date.today())):
+
+                        # Check if target parliamentarian is member of this
+                        # commission
+                        for member_membership in model.commission_memberships:
+                            if (member_membership.commission_id == pres_membership.commission_id
+                                and (member_membership.end is None
+                                     or member_membership.end >= date.today())):
+                                return True
+
+                return False
+
+        return permission in getattr(app.settings.roles, identity.role)
+
+    return permission in getattr(app.settings.roles, identity.role)
+
+
 @PasApp.permission_rule(model=Organisation, permission=object)
 def restrict_organisation_access(
     app: PasApp,
@@ -164,6 +220,23 @@ def restrict_organisation_access(
     # Allow parliamentarians to access pas-settings via Organisation model
     if identity.role in ('parliamentarian', 'commission_president'):
         # Allow Private permission for accessing pas-settings dashboard
+        if isinstance(permission, type) and issubclass(permission, Private):
+            return True
+        return permission in getattr(app.settings.roles, identity.role)
+
+    return permission in getattr(app.settings.roles, identity.role)
+
+
+@PasApp.permission_rule(model=GeneralFileCollection, permission=object)
+def restrict_files_collection_access(
+    app: PasApp,
+    identity: Identity,
+    model: GeneralFileCollection,
+    permission: Intent
+) -> bool:
+    """ Grant parliamentarians and commission presidents access to files """
+    if identity.role in ('parliamentarian', 'commission_president'):
+        # Allow Private permission for files collection access
         if isinstance(permission, type) and issubclass(permission, Private):
             return True
         return permission in getattr(app.settings.roles, identity.role)

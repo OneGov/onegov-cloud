@@ -7,7 +7,6 @@ from onegov.pas import PasApp
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.collections import PASParliamentarianCollection
-from onegov.pas.collections import ImportLogCollection
 from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
