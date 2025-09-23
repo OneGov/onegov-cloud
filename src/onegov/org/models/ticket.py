@@ -624,9 +624,16 @@ class ReservationHandler(Handler):
                 self.submission.form_class,
                 data=self.submission.data
             )
+            cost_object = self.resource.cost_object if self.resource else None
             item_extra = {'submission_id': self.submission.id}
-            extras = form.invoice_items(extra=item_extra)
-            discounts = form.discount_items(extra=item_extra)
+            extras = form.invoice_items(
+                cost_object=cost_object,
+                extra=item_extra
+            )
+            discounts = form.discount_items(
+                cost_object=cost_object,
+                extra=item_extra
+            )
         else:
             extras = []
             discounts = []
@@ -663,6 +670,10 @@ class ReservationHandler(Handler):
             invoice = TicketInvoice(id=uuid4())
             request.session.add(invoice)
             self.ticket.invoice = invoice
+
+        # update the invoicing party
+        if self.resource:
+            invoice.invoicing_party = self.resource.invoicing_party
 
         old_items = sorted(invoice.items, key=attrgetter('group'))
         new_items: list[InvoiceItem] = []

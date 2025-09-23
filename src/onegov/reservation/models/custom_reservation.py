@@ -72,6 +72,7 @@ class CustomReservation(Reservation, ModelBase, Payable):
             return InvoiceItemMeta(
                 text=resource.title,
                 group='reservation',
+                cost_object=resource.cost_object,
                 extra={'reservation_id': self.id},
                 unit=Decimal(resource.price_per_hour),
                 quantity=hours,
@@ -84,6 +85,7 @@ class CustomReservation(Reservation, ModelBase, Payable):
             return InvoiceItemMeta(
                 text=resource.title,
                 group='reservation',
+                cost_object=resource.cost_object,
                 extra={'reservation_id': self.id},
                 unit=Decimal(resource.price_per_item),
                 quantity=Decimal(count),
