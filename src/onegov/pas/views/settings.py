@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.core.security import Private
 from onegov.org.models import Organisation
 from onegov.pas import _
 from onegov.pas import PasApp

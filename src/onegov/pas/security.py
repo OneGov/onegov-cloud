@@ -125,16 +125,26 @@ def restrict_attendence_access(
                 if attendance_owner and attendance_owner.parliamentarian:
                     # Check if president leads any commission where attendance
                     # owner is a member
-                    for pres_membership in parliamentarian.commission_memberships:
+                    for pres_membership in (
+                        parliamentarian.commission_memberships
+                    ):
                         if (pres_membership.role == 'president'
                             and (pres_membership.end is None
                                  or pres_membership.end >= date.today())):
 
-                            # Check if attendance owner is member of this commission
-                            for member_membership in attendance_owner.parliamentarian.commission_memberships:
-                                if (member_membership.commission_id == pres_membership.commission_id
+                            # Check if attendance owner is member of this
+                            # commission
+                            for member_membership in (
+                                attendance_owner.parliamentarian
+                                .commission_memberships
+                            ):
+                                if (
+                                    member_membership.commission_id
+                                    == pres_membership.commission_id
                                     and (member_membership.end is None
-                                         or member_membership.end >= date.today())):
+                                         or member_membership.end
+                                         >= date.today())
+                                ):
                                     return True
 
                 return False
