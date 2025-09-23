@@ -40,10 +40,11 @@ def test_view_dashboard_as_parliamentarian(client):
     )
     session.add(membership)
 
-    # Set correct password for the created user
+    # Set correct password and role for the created user
     users = UserCollection(session)
     user = users.by_username('pia.parliamentarian@example.org')
     user.password = 'test'
+    user.role = 'parliamentarian'
 
     transaction.commit()
 

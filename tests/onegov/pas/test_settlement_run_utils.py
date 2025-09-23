@@ -25,7 +25,7 @@ def test_get_commission_closure_status(pas_app):
     )
 
     # Create parliamentarians
-    parliamentarians = PASParliamentarianCollection(session)
+    parliamentarians = PASParliamentarianCollection(pas_app)
     john = parliamentarians.add(
         first_name='John',
         last_name='Doe',

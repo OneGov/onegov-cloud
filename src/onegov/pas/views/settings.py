@@ -121,62 +121,6 @@ def view_pas_settings(
                 'link': request.link(commission),
                 'icon': 'fa-user-friends'
             })
-    shortcuts = [
-        {
-            'name': 'attendences',
-            'title': _('Attendences'),
-            'link': request.class_link(AttendenceCollection),
-            'icon': 'fa-clock'
-        },
-        {
-            'name': 'rate-sets',
-            'title': _('Rate sets'),
-            'link': request.class_link(RateSetCollection),
-            'icon': 'fa-exchange-alt'
-        },
-        {
-            'name': 'settlement-runs',
-            'title': _('Settlement runs'),
-            'link': request.class_link(SettlementRunCollection),
-            'icon': 'fa-hand-holding-usd'
-        },
-        {
-            'name': 'parties',
-            'title': _('Parties'),
-            'link': request.class_link(PartyCollection),
-            'icon': 'fa-users'
-        },
-        {
-            'name': 'parliamentary-groups',
-            'title': _('Parliamentary groups'),
-            'link': request.class_link(PASParliamentaryGroupCollection),
-            'icon': 'fa-handshake'
-        },
-        {
-            'name': 'commissions',
-            'title': _('Commissions'),
-            'link': request.class_link(PASCommissionCollection),
-            'icon': 'fa-user-friends'
-        },
-        {
-            'name': 'parliamentarians',
-            'title': _('Parliamentarians'),
-            'link': request.class_link(PASParliamentarianCollection),
-            'icon': 'fa-user-tie'
-        },
-        {
-            'name': 'import',
-            'title': _('Data Import (JSON)'),
-            'link': request.link(request.app.org, 'pas-import'),
-            'icon': 'fa-file-import'
-        },
-        {
-            'name': 'import-logs',
-            'title': _('Import History'),
-            'link': request.class_link(ImportLogCollection),
-            'icon': 'fa-history'
-        },
-    ]
 
     return {
         'layout': layout,

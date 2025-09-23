@@ -67,7 +67,8 @@ def test_admin_only_individual_items_denied(client, role, user_email):
     import_logs = ImportLogCollection(session)
     import_log = import_logs.add(
         details={'filename': 'test_import.csv'},
-        status='completed'
+        status='completed',
+        import_type='upload'
     )
 
     # Get IDs before creating users
@@ -117,7 +118,8 @@ def test_admin_can_access_admin_only_items(client):
     import_logs = ImportLogCollection(session)
     import_log = import_logs.add(
         details={'filename': 'admin_test_import.csv'},
-        status='completed'
+        status='completed',
+        import_type='upload'
     )
 
     # Get IDs

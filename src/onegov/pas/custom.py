@@ -93,6 +93,11 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
                 ),
             ))
 
+            yield LinkGroup(
+                _('Management'), classes=('management',),
+                links=management_links
+            )
+
         elif (request.is_logged_in
               and hasattr(request.identity, 'role')
               and is_parliamentarian_role(request.identity.role)):
