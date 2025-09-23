@@ -288,3 +288,130 @@ def test_admin_sees_all_attendance_records(client):
 
     assert 'Alice' in page
     assert 'Bob' in page
+
+
+def test_parliamentarian_cannot_add_attendance_for_others(client):
+    '''Parliamentarians should not be able to add attendance for other
+    parliamentarians'''
+    session = client.app.session()
+
+    parl_a, _ = create_parliamentarian_with_user(
+        client, 'Alice', 'Parliamentarian', 'alice.parl@example.org'
+    )
+    parl_b, _ = create_parliamentarian_with_user(
+        client, 'Bob', 'Parliamentarian', 'bob.parl@example.org'
+    )
+
+    parl_b_id = parl_b.id
+    transaction.commit()
+
+    client.login('alice.parl@example.org', 'test')
+
+    # Get the form page first to extract CSRF token
+    form_page = client.get('/attendences/new')
+    assert form_page.status_code == 200
+
+    # Try to submit form with Bob's ID (form manipulation)
+    page = client.post('/attendences/new', {
+        'parliamentarian_id': str(parl_b_id),
+        'date': '2024-01-15',
+        'duration': '2.0',
+        'type': 'plenary',
+    })
+
+    # Should get validation error
+    assert 'You can only add attendance for yourself' in page
+
+
+def test_parliamentarian_can_only_see_self_in_dropdown(client):
+    '''Parliamentarians should only see themselves in the dropdown'''
+    session = client.app.session()
+
+    parl_a, _ = create_parliamentarian_with_user(
+        client, 'Alice', 'Parliamentarian', 'alice.parl@example.org'
+    )
+    parl_b, _ = create_parliamentarian_with_user(
+        client, 'Bob', 'Parliamentarian', 'bob.parl@example.org'
+    )
+
+    transaction.commit()
+
+    client.login('alice.parl@example.org', 'test')
+
+    page = client.get('/attendences/new')
+    assert page.status_code == 200
+
+    # Should only contain Alice's name, not Bob's
+    assert 'Alice' in page
+    assert 'Bob' not in page
+
+
+def test_commission_president_can_add_for_commission_members(client):
+    '''Commission presidents should be able to add attendance for their
+    commission members'''
+    session = client.app.session()
+
+    president, _ = create_parliamentarian_with_user(
+        client, 'President', 'Leader', 'president.leader@example.org',
+        role='commission_president'
+    )
+    member, _ = create_parliamentarian_with_user(
+        client, 'Member', 'Follower', 'member.follower@example.org'
+    )
+
+    setup_commission_with_members(session, 'Finance Commission',
+                                president, member)
+
+    member_id = member.id
+    transaction.commit()
+
+    client.login('president.leader@example.org', 'test')
+
+    # Should be able to add attendance for commission member
+    page = client.post('/attendences/new', {
+        'parliamentarian_id': str(member_id),
+        'date': '2024-01-15',
+        'duration': '2.0',
+        'type': 'plenary',
+    })
+
+    # Should not get our specific validation error
+    error_msg = ('You can only add attendance for yourself or your '
+                 'commission members')
+    assert error_msg not in str(page)
+
+
+def test_commission_president_cannot_add_for_other_commission_members(client):
+    '''Commission presidents should NOT be able to add attendance for members
+    of other commissions'''
+    session = client.app.session()
+
+    finance_president, _ = create_parliamentarian_with_user(
+        client, 'Finance', 'President', 'finance.president@example.org',
+        role='commission_president'
+    )
+    education_member, _ = create_parliamentarian_with_user(
+        client, 'Education', 'Member', 'education.member@example.org'
+    )
+
+    setup_two_separate_commissions(
+        session, finance_president, 'Finance Commission',
+        education_member, 'Education Commission'
+    )
+
+    education_member_id = education_member.id
+    transaction.commit()
+
+    client.login('finance.president@example.org', 'test')
+
+    # Try to submit form for member of different commission
+    page = client.post('/attendences/new', {
+        'parliamentarian_id': str(education_member_id),
+        'date': '2024-01-15',
+        'duration': '2.0',
+        'type': 'plenary',
+    })
+
+    # Should get validation error
+    assert ('You can only add attendance for yourself or your commission '
+            'members') in page

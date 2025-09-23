@@ -198,9 +198,11 @@ def restrict_parliamentarian_access(
                         # Check if target parliamentarian is member of this
                         # commission
                         for member_membership in model.commission_memberships:
-                            if (member_membership.commission_id == pres_membership.commission_id
+                            if (member_membership.commission_id
+                                == pres_membership.commission_id
                                 and (member_membership.end is None
-                                     or member_membership.end >= date.today())):
+                                     or member_membership.end
+                                     >= date.today())):
                                 return True
 
                 return False
