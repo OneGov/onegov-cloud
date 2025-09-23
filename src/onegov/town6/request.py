@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from onegov.org.request import OrgRequest
+from functools import cached_property
 
 
 from typing import TYPE_CHECKING
@@ -13,3 +14,11 @@ if TYPE_CHECKING:
 class TownRequest(OrgRequest):
     if TYPE_CHECKING:
         app: TownApp
+
+    @cached_property
+    def is_parliamentarian(self) -> bool:
+        """Check if current user has parliamentarian role."""
+        parls = {'parliamentarian', 'commission_president'}
+        if not self.current_user:
+            return False
+        return self.current_user.role in parls

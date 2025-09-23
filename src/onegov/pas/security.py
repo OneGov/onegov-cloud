@@ -97,10 +97,10 @@ def restrict_attendence_access(
         if isinstance(permission, type) and issubclass(permission, Private):
             user = app.session().query(User).filter_by(
                 username=identity.userid).first()
-            if not user or not user.parliamentarian:  # type: ignore
+            if not user or not user.parliamentarian:
                 return False
 
-            parliamentarian: PASParliamentarian = user.parliamentarian  # type: ignore
+            parliamentarian: PASParliamentarian = user.parliamentarian
 
             # Regular parliamentarians can only access their own records
             if identity.role == 'parliamentarian':
@@ -199,8 +199,8 @@ def has_private_access_to_commission(
         user = app.session().query(User).filter_by(
             username=identity.userid).first()
         if user:
-            if user.parliamentarian:  # type:ignore
-                membershps = user.parliamentarian.commission_memberships  # type:ignore
+            if user.parliamentarian:
+                membershps = user.parliamentarian.commission_memberships
                 for membership in membershps:
                     if membership.commission_id == model.id and \
                             membership.role == 'president':

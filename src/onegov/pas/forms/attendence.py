@@ -255,7 +255,7 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
             (str(parliamentarian.id), parliamentarian.title)
             for parliamentarian
             in PASParliamentarianCollection(
-                self.request.session, [True]).query()
+                self.request.app, active=[True]).query()
         ]
         # JavaScript will handle selection based on commission
         self.parliamentarian_id.data = []
@@ -314,7 +314,7 @@ class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):
             (str(parliamentarian.id), parliamentarian.title)
             for parliamentarian
             in PASParliamentarianCollection(
-                self.request.session, [True]).query()
+                self.request.app, active=[True]).query()
         ]
 
 
@@ -397,7 +397,7 @@ class AttendencePlenaryBulkEditForm(AttendenceEditBulkForm):
             (str(parliamentarian.id), parliamentarian.title)
             for parliamentarian
             in PASParliamentarianCollection(
-                self.request.session, [True]).query()
+                self.request.app, active=[True]).query()
         ]
 
         self.parliamentarian_id.data = [

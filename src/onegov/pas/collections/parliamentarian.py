@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import logging
 from onegov.core.utils import toggle
 from onegov.core.crypto import random_password
 from onegov.parliament.collections import ParliamentarianCollection
 from onegov.pas.models import PASParliamentarian
-from onegov.pas import log
 from onegov.user import UserCollection
+
+log = logging.getLogger('onegov.pas.collections.parliamentarian')
 
 
 from typing import TYPE_CHECKING

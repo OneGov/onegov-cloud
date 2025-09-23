@@ -177,7 +177,7 @@ def edit_plenary_bulk_attendence(
         str(parliamentarian.id)
         for parliamentarian
         in PASParliamentarianCollection(
-            request.session, [True]).query()
+            request.app, active=[True]).query()
     ]
 
     if form.submitted(request):
