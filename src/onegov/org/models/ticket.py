@@ -1159,7 +1159,13 @@ class ReservationHandler(Handler):
         advanced_links.append(Link(
             text=_('Reject all with message'),
             url=request.link(self.ticket, 'reject-reservation-with-message'),
-            attrs={'class': 'delete-link'},
+            attrs={'class': ('delete-link', 'border')},
+        ))
+
+        advanced_links.append(Link(
+            text=_('Add reservation'),
+            url=request.link(self.ticket, 'add-reservation'),
+            attrs={'class': 'new-reservation'}
         ))
 
         links.append(LinkGroup(
@@ -1755,10 +1761,10 @@ class ChatHandler(Handler):
 
 
 def apply_ticket_permissions(
-    query: Query[Ticket],
+    query: _Q,
     filtered_handler: str,
     request: OrgRequest | None,
-) -> Query[Ticket]:
+) -> _Q:
     if request is None or request.is_manager:
         return query
 
@@ -1878,6 +1884,13 @@ class FilteredTicketCollection(TicketCollection):
             self.request
         )
 
+    def groups_by_handler_code(self) -> Query[tuple[str, list[str]]]:
+        return apply_ticket_permissions(
+            super().groups_by_handler_code(),
+            'ALL',
+            self.request
+        )
+
 
 class FilteredArchivedTicketCollection(ArchivedTicketCollection):
 
@@ -1914,5 +1927,12 @@ class FilteredArchivedTicketCollection(ArchivedTicketCollection):
         return apply_ticket_permissions(
             super().subset(),
             self.handler,
+            self.request
+        )
+
+    def groups_by_handler_code(self) -> Query[tuple[str, list[str]]]:
+        return apply_ticket_permissions(
+            super().groups_by_handler_code(),
+            'ALL',
             self.request
         )

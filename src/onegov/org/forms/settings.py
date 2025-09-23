@@ -292,6 +292,13 @@ class FooterSettingsForm(Form):
         validators=[Optional()]
     )
 
+    impressum_url = URLField(
+        label=_('Impressum'),
+        description=_('URL pointing to the Impressum site'),
+        fieldset=_('Impressum'),
+        validators=[Optional()]
+    )
+
     custom_link_1_name = StringField(
         label=_('Name'),
         description='Name of the Label',
@@ -1873,6 +1880,17 @@ class EventSettingsForm(Form):
     )
 
 
+class ResourceSettingsForm(Form):
+
+    resource_header_html = HtmlField(
+        label=_('General information above the resource list'),
+    )
+
+    resource_footer_html = HtmlField(
+        label=_('General information below the resource list'),
+    )
+
+
 class DataRetentionPolicyForm(Form):
 
     auto_archive_timespan = RadioField(
@@ -2100,12 +2118,12 @@ class PeopleSettingsForm(Form):
             'format. Note: Deeper structures are not supported.'
             '\n'
             '```\n'
-            '- Organisation:\n'
-            '  - Sub-Organisation 1\n'
-            '  - Sub-Organisation 2\n'
-            '- Organisation 2:\n'
-            '  - Sub-Organisation 1\n'
-            '  - Sub-Organisation 2\n'
+            '- Organisation 1:\n'
+            '  - Sub-Organisation 1.1\n'
+            '  - Sub-Organisation 1.2\n'
+            '- Organisation 2\n'
+            '- Organisation 3:\n'
+            '  - Sub-Organisation 3.1\n'
             '```'
         ),
         render_kw={
@@ -2171,9 +2189,11 @@ class PeopleSettingsForm(Form):
                     for topic, sub_topic in item.items():
                         if not isinstance(sub_topic, list):
                             self.organisation_hierarchy.errors.append(
-                                _(f'Invalid format. Please define '
-                                  f"sub-organisations(s) for '{topic}' "
-                                  f"or remove the ':'.")
+                                _('Invalid format. Please define at least '
+                                  "one sub-organisation for '${topic}' "
+                                  "or remove the ':'",
+                                    mapping={'topic': topic}
+                                )
                             )
                             return False
 
@@ -2202,7 +2222,13 @@ class PeopleSettingsForm(Form):
             self.organisation_hierarchy.data = ''
             return
 
-        yaml_data = yaml.safe_dump(categories, default_flow_style=False)
+        yaml_data = yaml.safe_dump(
+            categories,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True,
+            indent=2
+        )
         self.organisation_hierarchy.data = yaml_data
 
 

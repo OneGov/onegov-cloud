@@ -33,7 +33,6 @@ def pas_view_parliamentarians(
     self: PASParliamentarianCollection,
     request: TownRequest
 ) -> RenderData | Response:
-
     layout = PASParliamentarianCollectionLayout(self, request)
     return view_parliamentarians(self, request, layout)
 

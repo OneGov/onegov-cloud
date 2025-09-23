@@ -7,7 +7,8 @@ from onegov.org.app import OrgApp
 from onegov.org.models import Export, TicketNote
 from onegov.org.views.directory import DirectorySubmissionAction
 from onegov.pay import Payment, PaymentCollection
-from onegov.ticket import Ticket, TicketCollection, TicketInvoice
+from onegov.ticket import Ticket, TicketCollection
+from onegov.ticket import TicketInvoice, TicketInvoiceCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 
 
@@ -133,14 +134,15 @@ def has_permission_ticket_collection(
 
 
 @OrgApp.permission_rule(model=PaymentCollection, permission=object)
+@OrgApp.permission_rule(model=TicketInvoiceCollection, permission=object)
 def has_permission_payment_collection(
     app: OrgApp,
     identity: Identity,
-    model: Payment | PaymentCollection,
+    model: PaymentCollection | TicketInvoiceCollection,
     permission: object
 ) -> bool:
 
-    # Supporter has elevated permissions for payments
+    # Supporter has elevated permissions for payments/invoices
     if identity.role == 'supporter':
         return permission in {Public, Private, Personal}
 

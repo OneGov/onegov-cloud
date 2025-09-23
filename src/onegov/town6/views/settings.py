@@ -15,9 +15,9 @@ from onegov.org.forms.settings import (
     LinkHealthCheckForm, PeopleSettingsForm, SocialMediaSettingsForm,
     EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm,
     DataRetentionPolicyForm, FirebaseSettingsForm, VATSettingsForm,
-    KabaSettingsForm, CitizenLoginSettingsForm)
+    KabaSettingsForm, CitizenLoginSettingsForm, ResourceSettingsForm)
 from onegov.org.models import Organisation
-from onegov.town6.forms.settings import RISEnableForm
+from onegov.town6.forms.settings import RISSettingsForm
 from onegov.org.views.settings import (
     handle_homepage_settings, handle_people_settings, view_settings,
     handle_ticket_settings, preview_holiday_settings, handle_general_settings,
@@ -27,7 +27,8 @@ from onegov.org.views.settings import (
     handle_newsletter_settings, handle_generic_settings, handle_migrate_links,
     handle_link_health_check, handle_social_media_settings,
     handle_event_settings, handle_api_keys, handle_chat_settings,
-    handle_kaba_settings, handle_citizen_login_settings)
+    handle_kaba_settings, handle_citizen_login_settings,
+    handle_resource_settings)
 
 from onegov.town6.app import TownApp
 from onegov.town6.forms.settings import (
@@ -436,6 +437,20 @@ def town_handle_event(
 
 
 @TownApp.form(
+    model=Organisation, name='resource-settings', template='form.pt',
+    permission=Secret, form=ResourceSettingsForm, setting=_('Resources'),
+    icon='fa-building')
+def town_handle_resource(
+    self: Organisation,
+    request: TownRequest,
+    form: ResourceSettingsForm,
+    layout: SettingsLayout | None = None
+) -> RenderData | Response:
+    return handle_resource_settings(
+        self, request, form, SettingsLayout(self, request))
+
+
+@TownApp.form(
     model=Organisation, name='api-keys', template='api_keys.pt',
     permission=Secret, form=OneGovApiSettingsForm, icon='fa-key',
     setting=_('OneGov API'), order=1)
@@ -514,13 +529,13 @@ def town_handle_people_settings(
 
 @TownApp.form(
     model=Organisation, name='ris-enable', template='form.pt',
-    permission=Secret, form=RISEnableForm, setting=_('Ratsinformationssystem'),
-    icon='fa-landmark', order=500
+    permission=Secret, form=RISSettingsForm,
+    setting=_('Ratsinformationssystem'), icon='fa-landmark', order=500
 )
 def town_handle_ris_enable(
     self: Organisation,
     request: TownRequest,
-    form: RISEnableForm
+    form: RISSettingsForm
 ) -> RenderData | Response:
     return handle_generic_settings(
         self, request, form, _('Ratsinformationssystem (RIS)'),

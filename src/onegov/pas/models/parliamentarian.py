@@ -60,7 +60,11 @@ class PASParliamentarian(Parliamentarian, ORMSearchable):
         self, start_date: date, end_date: date, session: Session
     ) -> Party | None:
         """Get the party this parliamentarian belonged to during a specific
-        period."""
+        period.
+
+        Note: If you find yourself calling this in a loop, it's not
+            recommended. Pre-fetch `PASParliamentarianRole` first.
+        """
 
         role = (
             session.query(PASParliamentarianRole)

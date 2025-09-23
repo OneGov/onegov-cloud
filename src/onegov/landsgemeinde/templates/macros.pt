@@ -95,7 +95,7 @@
                     ic-target="#states-list"
                     ic-select-from-response="#states-list"
                     >
-                    <tal:b i18n:translate>
+                    <tal:b>
                         <tal:block metal:use-macro="layout.macros['state']" tal:define="state assembly.state"/>
                     </tal:b>
                 </a>
@@ -116,9 +116,7 @@
                         ic-target="#states-list"
                         ic-select-from-response="#states-list"
                         >
-                        <tal:b i18n:translate>
-                            <tal:block metal:use-macro="layout.macros['state']" tal:define="state agenda_item.state"/>
-                        </tal:b>
+                        <tal:block metal:use-macro="layout.macros['state']" tal:define="state agenda_item.state"/>
                     </a>
                 </li>
                 <li tal:repeat="votum agenda_item.vota" class="votum">
@@ -131,9 +129,7 @@
                         ic-target="#states-list"
                         ic-select-from-response="#states-list"
                         >
-                        <tal:b i18n:translate>
-                            <tal:block metal:use-macro="layout.macros['state']" tal:define="state votum.state"/>
-                        </tal:b>
+                        <tal:block metal:use-macro="layout.macros['state']" tal:define="state votum.state"/>
                     </a>
                 </li>
             </tal:block>

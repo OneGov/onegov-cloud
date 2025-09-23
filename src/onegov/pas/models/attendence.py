@@ -5,7 +5,8 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.pas import _
-from sqlalchemy import Column
+from sqlalchemy import Boolean
+from sqlalchemy import Column, Text
 from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
@@ -42,6 +43,18 @@ class Attendence(Base, TimestampMixin):
 
     __tablename__ = 'par_attendence'
 
+    #: The polymorphic type of attendence
+    poly_type: Column[str] = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
+
+    __mapper_args__ = {
+        'polymorphic_on': poly_type,
+        'polymorphic_identity': 'pas_attendence',
+    }
+
     #: Internal ID
     id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
@@ -69,6 +82,20 @@ class Attendence(Base, TimestampMixin):
         ),
         nullable=False,
         default='plenary'
+    )
+
+    bulk_edit_id: Column[uuid.UUID | None] = Column(
+        UUID  # type:ignore[arg-type]
+    )
+
+    #: Whether this attendance submission is closed/completed
+    #: This is only relevant for commission attendance, not plenary sessions.
+    #: Parliamentarians use this to signal they have recorded all their
+    #: commission activities for a settlement run.
+    abschluss: Column[bool] = Column(
+        Boolean,
+        nullable=False,
+        default=False
     )
 
     #: The type as translated text

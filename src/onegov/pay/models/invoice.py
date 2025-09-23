@@ -10,6 +10,7 @@ from onegov.pay.utils import Price
 from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import select
+from sqlalchemy import Boolean
 from sqlalchemy import CheckConstraint
 from sqlalchemy import Column
 from sqlalchemy import Text
@@ -74,6 +75,14 @@ class Invoice(Base, TimestampMixin):
         default=uuid4
     )
 
+    #: true if invoiced
+    invoiced: Column[bool] = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+        index=True,
+    )
+
     #: the specific items linked with this invoice
     items: relationship[list[InvoiceItem]] = relationship(
         InvoiceItem,
@@ -92,7 +101,7 @@ class Invoice(Base, TimestampMixin):
     #       constaints on the columns.
     __table_args__ = (
         CheckConstraint(
-            '(period_id IS NOT NULL AND user_id IS NOT NULL)'
+            '(period_id IS NOT NULL AND user_id IS NOT NULL) '
             "OR type != 'booking_period'",
             name='ck_booking_period_required_columns'
         ),

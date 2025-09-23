@@ -1,8 +1,15 @@
+from __future__ import annotations
+
 from onegov.recipient.collection import GenericRecipientCollection
 from onegov.recipient.model import GenericRecipient
 
 
-def test_recipient_model_order(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_recipient_model_order(session: Session) -> None:
     session.add(GenericRecipient(
         name="Peter's Url",
         medium="http",
@@ -23,14 +30,15 @@ def test_recipient_model_order(session):
 
     session.flush()
 
-    collection = GenericRecipientCollection(session, type=None)
+    collection: GenericRecipientCollection[GenericRecipient]
+    collection = GenericRecipientCollection(session, type='generic')
     email, phone, url = collection.query().all()
     assert email.order == 'peter-s-cellphone'
     assert phone.order == 'peter-s-e-mail'
     assert url.order == 'peter-s-url'
 
 
-def test_recipient_collection(session):
+def test_recipient_collection(session: Session) -> None:
 
     class FooRecipient(GenericRecipient):
         __mapper_args__ = {'polymorphic_identity': 'foo'}
@@ -38,6 +46,7 @@ def test_recipient_collection(session):
     class BarRecipient(GenericRecipient):
         __mapper_args__ = {'polymorphic_identity': 'bar'}
 
+    bar_recipients: GenericRecipientCollection[BarRecipient]
     bar_recipients = GenericRecipientCollection(session, type='bar')
     bar_recipients.add(
         name="Hidden recipient",
@@ -45,6 +54,7 @@ def test_recipient_collection(session):
         address="+12 345 67 89"
     )
 
+    foo_recipients: GenericRecipientCollection[FooRecipient]
     foo_recipients = GenericRecipientCollection(session, type='foo')
     foo = foo_recipients.add(
         name="Peter's Cellphone",
@@ -55,7 +65,7 @@ def test_recipient_collection(session):
     assert foo_recipients.query().count() == 1
     assert bar_recipients.query().count() == 1
 
-    for obj in (foo, foo_recipients.query().first()):
+    for obj in (foo, foo_recipients.query().one()):
         assert obj.type == 'foo'
         assert isinstance(obj, FooRecipient)
 

@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import pytest
 
+from decimal import Decimal
 from onegov.core.orm import Base
 from onegov.core.orm import SessionManager
 from onegov.core.orm.types import UUID
@@ -12,11 +15,18 @@ from sqlalchemy.ext.declarative import declarative_base
 from uuid import uuid4
 
 
-def test_payment_collection_pagination(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from onegov.core.orm import Base as MyBase  # noqa: F401
+    from sqlalchemy.orm import Session
+
+
+def test_payment_collection_pagination(session: Session) -> None:
     provider = PaymentProvider()
 
     session.add_all(
-        provider.payment(amount=amount)
+        provider.payment(amount=Decimal(amount))
         for amount in range(100, 2000, 100)
     )
 
@@ -27,7 +37,7 @@ def test_payment_collection_pagination(session):
     assert len(payments.page_by_index(1).batch) == 9
 
 
-def test_payment_pagination_negative_page_index(session):
+def test_payment_pagination_negative_page_index(session: Session) -> None:
     payments = PaymentCollection(session, page=-1)
     assert payments.page == 0
     assert payments.page_index == 0
@@ -35,14 +45,14 @@ def test_payment_pagination_negative_page_index(session):
     assert payments.page_by_index(-3).page_index == 0
 
     with pytest.raises(AssertionError):
-        PaymentCollection(session, page=None)
+        PaymentCollection(session, page=None)  # type: ignore[arg-type]
 
 
-def test_payment_collection_crud(session):
+def test_payment_collection_crud(session: Session) -> None:
     payments = PaymentCollection(session)
-    payment = payments.add(amount=100, provider=PaymentProvider())
+    payment = payments.add(amount=Decimal('100'), provider=PaymentProvider())
 
-    assert payment.amount == 100
+    assert payment.amount == Decimal('100')
     assert payments.query().count() == 1
 
     payments.delete(payment)
@@ -51,21 +61,23 @@ def test_payment_collection_crud(session):
 
 # FIXME: flaky test
 @pytest.mark.flaky(reruns=5, only_rerun=None)
-def test_payable_collection(postgres_dsn):
+def test_payable_collection(postgres_dsn: str) -> None:
 
-    MyBase = declarative_base()
+    # avoid confusing mypy
+    if not TYPE_CHECKING:
+        MyBase = declarative_base()
 
     class Order(MyBase, Payable):
         __tablename__ = 'orders'
 
-        id = Column(UUID, primary_key=True, default=uuid4)
-        title = Column(Text)
+        id: Column[uuid.UUID] = Column(UUID, primary_key=True, default=uuid4)  # type: ignore[arg-type]
+        title: Column[str | None] = Column(Text)
 
     class Newspaper(MyBase, Payable):
         __tablename__ = 'newspapers'
 
-        id = Column(UUID, primary_key=True, default=uuid4)
-        title = Column(Text)
+        id: Column[uuid.UUID] = Column(UUID, primary_key=True, default=uuid4)  # type: ignore[arg-type]
+        title: Column[str | None] = Column(Text)
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.bases.append(MyBase)
@@ -80,9 +92,11 @@ def test_payable_collection(postgres_dsn):
     the_wapo = Newspaper(title="The Washington Post")
     ny_times = Newspaper(title="The New York Times")
 
-    carbonara.payment = coca_cola.payment = provider.payment(amount=25)
-    the_wapo.payment = provider.payment(amount=4.50)
-    ny_times.payment = provider.payment(amount=5.50)
+    carbonara.payment = coca_cola.payment = provider.payment(
+        amount=Decimal(25)
+    )
+    the_wapo.payment = provider.payment(amount=Decimal(4.50))
+    ny_times.payment = provider.payment(amount=Decimal(5.50))
 
     session.add_all((carbonara, coca_cola, the_wapo, ny_times))
     session.flush()

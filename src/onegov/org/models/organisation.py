@@ -145,6 +145,10 @@ class Organisation(Base, TimestampMixin):
     event_footer_html: dict_markup_property[Markup | None]
     event_footer_html = dict_markup_property('meta')
     event_files = associated(File, 'event_files', 'many-to-many')
+    resource_header_html: dict_markup_property[Markup | None]
+    resource_header_html = dict_markup_property('meta')
+    resource_footer_html: dict_markup_property[Markup | None]
+    resource_footer_html = dict_markup_property('meta')
 
     # social media
     facebook_url: dict_property[str | None] = meta_property()
@@ -156,6 +160,7 @@ class Organisation(Base, TimestampMixin):
     og_logo_default: dict_property[str | None] = meta_property()
 
     # custom links
+    impressum_url: dict_property[str | None] = meta_property()
     custom_link_1_name: dict_property[str | None] = meta_property()
     custom_link_1_url: dict_property[str | None] = meta_property()
     custom_link_2_name: dict_property[str | None] = meta_property()
@@ -270,6 +275,8 @@ class Organisation(Base, TimestampMixin):
     gever_password: dict_property[str | None] = meta_property()
     gever_endpoint: dict_property[str | None] = meta_property()
 
+    assembly_title: dict_property[str | None] = meta_property()
+
     # Kaba settings
     @property
     def kaba_configurations(self) -> list[RawKabaConfiguration]:
@@ -300,6 +307,8 @@ class Organisation(Base, TimestampMixin):
     # RIS settings
     ris_enabled: dict_property[bool] = meta_property(default=False)
     ris_main_url: dict_property[str | None] = meta_property(default=None)
+    ris_interest_tie_categories: dict_property[list[str] | None] = (
+        meta_property(default=None))
 
     # MTAN Settings
     mtan_access_window_seconds: dict_property[int | None] = meta_property()

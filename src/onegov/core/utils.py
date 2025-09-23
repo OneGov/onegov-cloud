@@ -68,6 +68,7 @@ _unwanted_url_chars = re.compile(r'[\.\(\)\\/\s<>\[\]{},:;?!@&=+$#@%|\*"\'`]+')
 _double_dash = re.compile(r'[-]+')
 _number_suffix = re.compile(r'-([0-9]+)$')
 _repeated_spaces = re.compile(r'\s\s+')
+_repeated_dots = re.compile(r'\.\.+')
 _uuid = re.compile(
     r'^[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}$')
 
@@ -149,6 +150,36 @@ def normalize_for_url(text: str) -> str:
     return clean
 
 
+def normalize_for_path(
+    text: str,
+    default: str = '_default_path_'
+) -> str:
+    """
+    Takes the given text and makes it fit to be used for a path. It replaces
+    invalid characters (for windows and linux systems) with underscores.
+    """
+    sanitized = re.sub(r'[<>:"/\\|?*]', '_', text).strip()
+    return sanitized or default
+
+
+def normalize_for_filename(
+    text: str,
+    default: str = '_default_filename_'
+) -> str:
+    """
+    Takes the given text and makes it fit to be used as a filename for windows
+    and linux systems. Replaces invalid characters with underscores.
+    """
+    sanitized = re.sub(r'[<>:"/\\|?*\x00-\x1F]', '_', text)
+    sanitized = sanitized.strip().strip('.')
+    sanitized = sanitized or default
+
+    max_length = 255
+    if len(sanitized) > max_length:
+        sanitized = sanitized[:max_length]
+    return sanitized
+
+
 def increment_name(name: str) -> str:
     """ Takes the given name and adds a numbered suffix beginning at 1.
 
@@ -172,6 +203,12 @@ def remove_repeated_spaces(text: str) -> str:
     """ Removes repeated spaces in the text ('a  b' -> 'a b'). """
 
     return _repeated_spaces.sub(' ', text)
+
+
+def remove_repeated_dots(text: str) -> str:
+    """ Removes repeated dots in the text ('a..b' -> 'a.b'). """
+
+    return _repeated_dots.sub('.', text)
 
 
 @contextmanager

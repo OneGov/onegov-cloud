@@ -12,6 +12,7 @@ $settlement-run-icon: '\f4c0';
 
 .globals {
     .attendences::before { @include icon-bold($attendence-icon); }
+    .attendances::before { @include icon-bold($attendence-icon); }
     .changes::before { @include icon-bold($change-icon); }
     .commissions::before { @include icon-bold($commission-icon); }
     .legislative-periods::before { @include icon($legislative-period-icon); }
@@ -21,6 +22,7 @@ $settlement-run-icon: '\f4c0';
     .rate-sets::before { @include icon-bold($rate-set-icon); }
     .pas-settings::before { @include icon-bold($pas-settings-icon); }
     .settlement-runs::before { @include icon-bold($settlement-run-icon); }
+    .settlement-run::before { @include icon-bold($settlement-run-icon); }
 }
 
 .edit-bar {
@@ -41,9 +43,61 @@ $settlement-run-icon: '\f4c0';
         position: relative;
     }
 
+    .input-group-field {
+        border-radius: $global-radius !important;
+    }
+
     .typeahead {
         z-index: 5000;
         top: 1.2rem;
+    }
+}
+
+// Closure Status Table Styles
+.closure-status-section {
+    margin: 2rem 0;
+
+    .closure-status-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+
+            &:first-child {
+                text-align: left;
+                font-weight: bold;
+            }
+        }
+
+        th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+
+        .closure-indicator {
+            font-size: 1.2em;
+            font-weight: bold;
+
+            &.closed {
+                color: #28a745; // Green checkmark
+            }
+
+            &.not-closed {
+                color: #dc3545; // Red X
+            }
+        }
+
+        .closed {
+            background-color: #d4edda; // Light green background
+        }
+
+        .not-closed {
+            background-color: #f8d7da; // Light red background
+        }
     }
 }
 
@@ -97,33 +151,59 @@ table.changes span {
 // Import Log Styling
 .import-status {
     display: inline-block;
-    padding: 0.2rem 0.5rem;
+    padding: 0.3rem 0.6rem;
     border-radius: $global-radius;
-    font-size: 0.8rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    color: $white;
+    font-size: 0.85rem;
+    font-weight: normal;
+    text-transform: capitalize;
 
-    &.success {
-        background-color: $success-color;
+    &.success, &.completed {
+        background-color: #28a745;
+        color: $white;
     }
 
     &.failed {
         background-color: $alert-color;
+        color: $white;
     }
 
     &.pending {
         background-color: $warning-color;
-        color: $black; // Warning color might be light
+        color: $black;
     }
 
-    // Add more statuses as needed
+    // Ensure status is readable on blue rows
+    .clickable-row:nth-child(even) & {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
 }
 
 // Improve table padding
 .inline-table {
     td, th {
         padding: 0.8rem 0.5rem; // Add more vertical padding
+    }
+
+    // Clickable rows styling
+    &.clickable-rows {
+        .clickable-row {
+            transition: background-color 0.2s ease;
+
+            &:nth-child(even) {
+                background-color: rgba(0, 111, 186, 0.1);
+                color: $black;
+            }
+
+            &:hover {
+                background-color: $light-gray;
+                color: $black;
+            }
+
+            &:active {
+                background-color: $medium-gray;
+                color: $black;
+            }
+        }
     }
 }
 
@@ -156,4 +236,19 @@ pre {
     color: $black;
     background-color: $light-gray;
     transform: scale(1.1);
+}
+
+#parliamentarian_id li.animate-in {
+    animation: bubble-in 0.4s ease forwards;
+}
+
+@keyframes bubble-in {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }

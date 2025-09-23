@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.pas.importer.zug_kub_importer import import_zug_kub_data
 import json
 import logging
 
@@ -9,7 +10,6 @@ from onegov.core.utils import dictionary_to_binary
 from onegov.org.models import Organisation
 from onegov.pas import _, PasApp
 from onegov.pas.forms.data_import import DataImportForm
-from onegov.pas.importer.json_import import import_zug_kub_data
 from onegov.pas.layouts import ImportLayout
 from onegov.pas.models import (
     PASCommission,
@@ -108,7 +108,21 @@ def handle_data_import(
 
     # Helper function to get display title for various imported objects
     def get_item_display_title(item: Any) -> str:
-        if isinstance(item, PASParliamentarian):
+        # Handle serialized dictionaries
+        if isinstance(item, dict):
+            if item.get('type') == 'PASParliamentarian':
+                first_name = item.get('first_name', '')
+                last_name = item.get('last_name', '')
+                return f'{first_name} {last_name}'.strip()
+            elif 'name' in item:
+                return item['name']
+            elif 'title' in item:
+                return item['title']
+            else:
+                return f'Unknown Object (Type: {item.get("type", "dict")})'
+
+        # Handle model objects (original code)
+        elif isinstance(item, PASParliamentarian):
             return item.title  # Already includes first/last name etc.
         elif isinstance(item, (PASCommission, Party)):
             return item.name

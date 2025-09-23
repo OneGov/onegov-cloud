@@ -41,6 +41,10 @@ h6,
     @include prefix(hyphens, auto);
 }
 
+h6 {
+  margin-top: .5rem;
+}
+
 /*
     Disable hyphenation in e-mail links and make them breakable
 */
@@ -81,6 +85,11 @@ main {
     display: flex;
     flex-direction: column;
     min-height: 100%;
+}
+
+.main-content,
+.page-content-main {
+    padding-right: 2rem !important;
 }
 
 .content {
@@ -185,11 +194,56 @@ footer {
 }
 
 /*
+    links
+*/
+
+.page-text,
+.footer-container,
+.breadcrumbs,
+.contact-panel {
+    a {
+        position: relative;
+        transition: all 250ms;
+        z-index: 2;
+
+        &::before {
+            background: rgba(lighten($primary-color, 20%), .16);
+            bottom: .1em;
+            content: "";
+            height: 0%;
+            left: 0;
+            position: absolute;
+            transition: height 250ms;
+            width: 100%;
+            z-index: -1;
+        }
+
+        &:hover {
+            border-color: transparent;
+
+            &::before {
+                height: 1em;
+            }
+        }
+    }
+}
+
+/*
     page text
 */
 
 .page-text {
     margin-bottom: 2rem;
+
+    a {
+        display: inline-block;
+        text-decoration: underline !important;
+        text-underline-offset: .15em;
+
+        &::before {
+            bottom: .3em;
+        }
+    }
 
     blockquote {
         background-color: $topbar-bg-color;
@@ -514,13 +568,39 @@ $table-border-color: smart-scale($table-background, $table-color-scale);
 
 table {
     font-family: $header-font-family;
+
+    td p {
+        hyphens: none;
+        margin-bottom: 0;
+    }
+}
+
+/* Gradient overlay for scrollable tables */
+.table-container {
+    position: relative;
+    width: 100%;
+}
+
+.scroll-gradient {
+    background: linear-gradient(to right, transparent, #e0e0e0);
+    bottom: 0;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: opacity .3s ease;
+    width: 30px;
+
+    &.show {
+        opacity: 1;
+    }
 }
 
 table tr th,
 table tr td {
     font-size: .875rem;
 }
-
 
 /*
     Pagination customisations
@@ -678,6 +758,7 @@ $pageref-color-hover: $iron;
             i.fa,
             i.fas,
             i.far {
+                margin-top: .15rem;
                 margin-right: .3rem;
             }
 
@@ -699,22 +780,35 @@ $pageref-color-hover: $iron;
                 }
             }
 
-            .list-title {
-                @include more-link-after;
-
-                &::after {
-                    padding-right: 6%;
-                    right: 0;
-                }
-            }
-
             .list-link {
+                @include more-link-after;
+                align-items: start;
                 border-top: 1px solid #f5f5f5;
-                display: inline-block;
+                display: flex;
                 font-weight: bold;
+                justify-content: space-between;
                 padding-top: .5rem;
                 transition: border-top 200ms linear;
                 width: 100%;
+
+                &.no-link {
+                    color: $oil;
+                    cursor: default;
+
+                    &::after {
+                        opacity: 0;
+                    }
+                }
+
+                span {
+                    &.h5 {
+                        margin-bottom: 0;
+                    }
+
+                    + i {
+                        margin-left: .5rem;
+                    }
+                }
 
                 &.multi-line {
                     display: flex;
@@ -729,9 +823,9 @@ $pageref-color-hover: $iron;
             &:hover {
                 background: $ghost;
 
-                .list-title::after {
-                    opacity: 1 !important;
-                    padding-right: 3%;
+                .list-link::after {
+                    padding-left: 1.5rem;
+                    padding-right: 0;
                 }
             }
         }
@@ -751,6 +845,15 @@ $pageref-color-hover: $iron;
             }
         }
     }
+
+    > li:last-child {
+        margin-bottom: 1rem;
+    }
+}
+
+.side-panel {
+    // reduce margin-bottom
+    margin-bottom: 2rem !important;
 }
 
 .side-panel .more-list {
@@ -764,7 +867,6 @@ $pageref-color-hover: $iron;
         .list-link::after,
         .list-title::after {
             opacity: 0;
-            position: absolute;
             transition: all 200ms linear;
         }
 
@@ -1266,7 +1368,9 @@ ul.recipients {
 }
 
 .event-header,
-.event-footer {
+.event-footer,
+.resource-header,
+.resource-footer {
     .accordion {
         border-top: 1px solid $gray;
         border-bottom: 1px solid $gray;
@@ -1463,9 +1567,39 @@ p.full-text-width {
 /* RIS */
 
 .business-participants {
-    margin-bottom: 0rem;
+    margin-bottom: 0;
+}
+
+.anchor-link {
+    display: none !important;
+}
+
+.main-content .anchor-link {
+    color: $aluminum;
+    display: inline !important;
+    opacity: 0;
+    padding-left: .5rem;
+    position: absolute;
+    font-size: 80%;
+    transition: opacity 200ms linear;
+
+    &:hover {
+        opacity: 1;
+    }
 }
 
 .absolute {
     position: absolute;
+}
+
+a.category-anchor {
+    display: block;
+    position: relative;
+    top: -115px;
+    visibility: hidden;
+}
+
+.content-panel .level-3 {
+    font-weight: normal !important;
+    padding-left: .5rem;
 }

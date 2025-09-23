@@ -614,9 +614,10 @@ class EventCollection(Pagination[Event]):
                 provider_url = find_element_text(provider_ref, 'url')
 
             tags = []
-            if event.find('ns:tags', namespaces=ns) is not None:
-                tags = [
-                    tag.text for tag in event.find('ns:tags', namespaces=ns)]
+            category = event.find('ns:category', namespaces=ns)
+            if category is not None:
+                tag = find_element_text(category, 'mainCategory')
+                tags.append(tag) if tag else None
 
             timezone = 'Europe/Zurich'
             for schedule in event.find('ns:schedules', namespaces=ns):
@@ -624,7 +625,7 @@ class EventCollection(Pagination[Event]):
                 start = parse(find_element_text(schedule, 'start'))
                 end_text = find_element_text(schedule, 'end')
                 end = (parse(end_text) if end_text else
-                       start + timedelta(hours=1))
+                       start + timedelta(hours=2))
 
                 recurrence_start_dates: list[datetime] = []
                 recurrence = schedule.find('ns:recurrence', namespaces=ns)

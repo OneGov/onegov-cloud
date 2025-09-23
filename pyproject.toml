@@ -52,7 +52,7 @@ implicit_reexport = true
 warn_unreachable = true
 warn_return_any = false
 # FIXME: remove sqlalchemy when upgrading to SQlAlchemy 2.0
-untyped_calls_exclude = "sqlalchemy,pycurl,onegov.core.types"
+untyped_calls_exclude = "sqlalchemy,pycurl,onegov.core.types,selenium.webdriver.chrome.webdriver"
 plugins = "sqlmypy"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
@@ -65,38 +65,25 @@ module = [
     "isodate.*",
     # FIXME: Remove after https://github.com/lipoja/URLExtract/issues/164
     "urlextract.*",
+    # FIXME: Remove after https://github.com/jmcnamara/XlsxWriter/issues/1123
+    "xlsxwriter.*"
 ]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 # very lax rules for tests that don't have type hints yet
 module = [
-    "tests.onegov.activity.*",
-    "tests.onegov.agency.*",
-    "tests.onegov.api.*",
     "tests.onegov.election_day.*",
     "tests.onegov.feriennet.*",
-    "tests.onegov.form.*",
     "tests.onegov.fsi.*",
     "tests.onegov.gazette.*",
     "tests.onegov.landsgemeinde.*",
     "tests.onegov.org.*",
-    "tests.onegov.parliament.*",
     "tests.onegov.pas.*",
-    "tests.onegov.pay.*",
-    "tests.onegov.quill.*",
-    "tests.onegov.recipient.*",
-    "tests.onegov.reservation.*",
     "tests.onegov.search.*",
-    "tests.onegov.server.*",
-    "tests.onegov.shared.*",
-    "tests.onegov.stepsequence.*",
     "tests.onegov.swissvotes.*",
-    "tests.onegov.ticket.*",
     "tests.onegov.town6.*",
     "tests.onegov.translator_directory.*",
-    "tests.onegov.user.*",
-    "tests.onegov.websockets.*",
     "tests.onegov.winterthur.*",
 ]
 check_untyped_defs = false

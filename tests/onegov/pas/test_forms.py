@@ -50,9 +50,9 @@ def dummy_request(session):
         include=lambda x: x,
         is_manager=True,
         locale='de_CH',
-        session=session
+        session=session,
+        method='GET'  # not dynamic but doenst matter our purposess
     )
-
 
 @freeze_time('2024-01-01')
 def test_attendence_forms(session, dummy_request):

@@ -139,6 +139,10 @@ configuration: &global-config
   # To test mapbox integration, a mapbox token has to be provided
   # mapbox_token:
 
+  # To test pas api locally you can put the test url and token here
+  # kub_test_api_token: ''
+  # kub_test_base_url: ''
+
   # API rate limit, default is 100 requests per 15 Minutes
   # api_rate_limit:
   # requests: 100

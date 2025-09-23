@@ -61,6 +61,7 @@ from onegov.org.layout import (
     TextModulesLayout as OrgTextModulesLayout,
     TicketChatMessageLayout as OrgTicketChatMessageLayout,
     TicketInvoiceLayout as OrgTicketInvoiceLayout,
+    TicketInvoiceCollectionLayout as OrgTicketInvoiceCollectionLayout,
     TicketLayout as OrgTicketLayout,
     TicketNoteLayout as OrgTicketNoteLayout,
     TicketsLayout as OrgTicketsLayout,
@@ -748,6 +749,15 @@ class PaymentCollectionLayout(OrgPaymentCollectionLayout, DefaultLayout):
     request: TownRequest
 
 
+class TicketInvoiceCollectionLayout(
+    OrgTicketInvoiceCollectionLayout,
+    DefaultLayout
+):
+
+    app: TownApp
+    request: TownRequest
+
+
 class MessageCollectionLayout(OrgMessageCollectionLayout, DefaultLayout):
 
     app: TownApp
@@ -1117,12 +1127,12 @@ class MeetingLayout(DefaultLayout):
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-meeting'},
+                    attrs={'class': 'edit-link'},
                 ),
                 Link(
                     text=_('Delete'),
                     url=self.csrf_protected_url(self.request.link(self.model)),
-                    attrs={'class': 'delete-meeting'},
+                    attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
                             _(
@@ -1139,6 +1149,11 @@ class MeetingLayout(DefaultLayout):
                             )
                         )
                     )
+                ),
+                Link(
+                    text=_('Export'),
+                    url=self.request.link(self.model, name='+export'),
+                    attrs={'class': 'export-link'}
                 )
             ]
         return None

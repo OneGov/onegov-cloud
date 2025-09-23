@@ -1,15 +1,15 @@
-    msgid ""
-    msgstr ""
-    "Project-Id-Version: OneGov Cloud 1.0\n"
-    "POT-Creation-Date: 2025-09-16 07:59+0200\n"
-    "PO-Revision-Date: 2021-03-03 16:24+0100\n"
-    "Language-Team: German\n"
-    "Language: de_CH\n"
-    "MIME-Version: 1.0\n"
-    "Content-Type: text/plain; charset=UTF-8\n"
-    "Content-Transfer-Encoding: 8bit\n"
-    "Generated-By: Lingua 3.12\n"
-    "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgid ""
+msgstr ""
+"Project-Id-Version: OneGov Cloud 1.0\n"
+"POT-Creation-Date: 2025-09-16 07:59+0200\n"
+"PO-Revision-Date: 2021-03-03 16:24+0100\n"
+"Language-Team: German\n"
+"Language: de_CH\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Lingua 3.12\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
     msgid "User"
     msgstr "Benutzer"
@@ -17,8 +17,8 @@
     msgid "Logout"
     msgstr "Abmelden"
 
-    msgid "Current Settlement Run"
-    msgstr "Aktueller Abrechnungslauf"
+msgid "Current Settlement Run"
+msgstr "Aktueller Abrechnungslauf"
 
     msgid "Attendences"
     msgstr "Anwesenheiten"
@@ -29,16 +29,16 @@
     msgid "PAS settings"
     msgstr "PAS Einstellungen"
 
-    msgid "Files"
-    msgstr "Dateien"
+msgid "Files"
+msgstr "Dateien"
 
-    msgid "More settings"
-    msgstr "Weitere Einstellungen"
+msgid "More settings"
+msgstr "Weitere Einstellungen"
 
-    msgid "Management"
-    msgstr "Verwaltung"
+msgid "Management"
+msgstr "Verwaltung"
 
-    msgid "No within an active settlement run."
+msgid "No within an active settlement run."
 msgstr "Nicht in einem aktiven Abrechungslauf"
 
 msgid "Date"
@@ -838,3 +838,39 @@ msgstr "Sie sehen nur Ihre eigenen Anwesenheiten."
 
 msgid "You are viewing all attendances in the system."
 msgstr "Sie sehen alle Anwesenheiten im System."
+
+msgid "Trigger Manual Import"
+msgstr "Manuellen Import auslösen"
+
+msgid "Last import:"
+msgstr "Letzter Import:"
+
+msgid "No imports yet"
+msgstr "Noch keine Importe"
+
+msgid "Are you sure you want to trigger a manual import?"
+msgstr "Sind Sie sicher, dass Sie einen manuellen Import auslösen möchten?"
+
+msgid "This will start a new KUB data import process."
+msgstr "Dies startet einen neuen KUB-Datenimportprozess."
+
+msgid "Import Started..."
+msgstr "Import gestartet..."
+
+msgid "Import triggered successfully. The process may take up to 30 seconds to complete."
+msgstr "Import erfolgreich ausgelöst. Der Vorgang kann bis zu 30 Sekunden dauern."
+
+msgid "completed"
+msgstr "Abgeschlossen"
+
+msgid "failed"
+msgstr "Fehlgeschlagen"
+
+msgid "pending"
+msgstr "Ausstehend"
+
+msgid "timeout"
+msgstr "Zeitüberschreitung"
+
+msgid "Trigger Import"
+msgstr "Import andstossen (dauert ca. 20 Sekunden)"

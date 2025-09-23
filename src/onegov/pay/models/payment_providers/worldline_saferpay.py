@@ -3,12 +3,15 @@ from __future__ import annotations
 import requests
 import transaction
 
-from datetime import datetime  # noqa: TC003
+from datetime import datetime, timedelta
 from decimal import Decimal
 from functools import cached_property
 from markupsafe import Markup
 from onegov.core.crypto import random_token
+from onegov.core.orm import Base
 from onegov.core.orm.mixins import dict_property, meta_property
+from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import UUID as UUIDType
 from onegov.core.utils import append_query_param
 from onegov.pay import log
 from onegov.pay.errors import SaferpayPaymentError, SaferpayApiError
@@ -25,9 +28,11 @@ from pydantic import (
 )
 from pydantic.alias_generators import to_pascal
 from pydantic_extra_types.currency_code import Currency  # noqa: TC002
+from sedate import utcnow
+from sqlalchemy import Column, Enum, Integer, Text
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm.attributes import flag_modified
-from uuid import UUID, uuid4, uuid5
+from uuid import uuid4, uuid5, UUID
 from wtforms.widgets import html_params
 
 
@@ -35,7 +40,7 @@ from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.pay.types import FeePolicy
-    from sqlalchemy.orm import relationship
+    from sqlalchemy.orm import relationship, Session
     from transaction.interfaces import ITransaction
 
 
@@ -96,6 +101,37 @@ class SaferpayTransaction(BaseModel):
             raise SaferpayPaymentError('incorrect transaction type')
         if self.status != 'AUTHORIZED':
             raise SaferpayPaymentError('payment was not authorized')
+
+
+class InitiatedSaferpayTransaction(Base, TimestampMixin):
+    """ Represents an initiated Saferpay transaction. """
+
+    __tablename__ = 'initiated_saferpay_transactions'
+
+    #: the order id of the transaction (set by us)
+    order_id: Column[UUID] = Column(
+        UUIDType,  # type: ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
+
+    #: the token of the transaction (set by them)
+    token: Column[str] = Column(Text, nullable=False)
+
+    #: the customer e-mail, mostly useful for error reporting
+    email: Column[str | None] = Column(Text)
+
+    retry_count: Column[int] = Column(Integer, nullable=False, default=0)
+
+    #: the state of the transaction
+    state: Column[Literal['open', 'processed', 'cancelled']] = Column(
+        Enum(  # type:ignore[arg-type]
+            'open', 'processed', 'cancelled',
+            name='saferpay_transaction_state'
+        ),
+        nullable=False,
+        default='open'
+    )
 
 
 class SaferpayClient:
@@ -191,13 +227,21 @@ class SaferpayClient:
 
     def init(
         self,
+        session: Session,
         amount: Decimal,
         currency: str,
         return_url: str,
         description: str,
+        email: str | None,
         **extra: Any,
-    ) -> tuple[str, str]:
-        """ Initializes a transaction and returns a token and redirect url. """
+    ) -> tuple[InitiatedSaferpayTransaction, str]:
+        """
+        Initializes a transaction.
+
+        Returns a tuple containing a `InitiatedSaferpayTransaction`
+        and the redirect url.
+        """
+        order_id = uuid4()
         res = self.session.post(
             f'{self.base_url}/Payment/v1/PaymentPage/Initialize',
             json={
@@ -205,7 +249,7 @@ class SaferpayClient:
                 'TerminalId': self.terminal_id,
                 'Payment': {
                     'Description': description,
-                    'OrderId': str(uuid4()),
+                    'OrderId': str(order_id),
                     'Amount': {
                         'Value': str(round(amount * 100)),
                         'CurrencyCode': currency,
@@ -220,9 +264,21 @@ class SaferpayClient:
         )
         self.raise_for_status(res)
         data = res.json()
-        return data['Token'], data['RedirectUrl']
+        redirect_url = data['RedirectUrl']
+        result = InitiatedSaferpayTransaction(
+            order_id=order_id,
+            token=data['Token'],
+            email=email
+        )
+        session.add(result)
+        return result, redirect_url
 
-    def assert_transaction(self, token: str) -> SaferpayTransaction:
+    def assert_transaction(
+        self,
+        session: Session,
+        token: str,
+        init_tx: InitiatedSaferpayTransaction | None = None
+    ) -> SaferpayTransaction:
         """ Check the status of a transaction using its token. """
         res = self.session.post(
             f'{self.base_url}/Payment/v1/PaymentPage/Assert',
@@ -233,7 +289,16 @@ class SaferpayClient:
             timeout=(5, 10)
         )
         self.raise_for_status(res)
-        return SaferpayTransaction.model_validate_json(res.content)
+        tx = SaferpayTransaction.model_validate_json(res.content)
+        if init_tx is None:
+            init_tx = session.query(
+                InitiatedSaferpayTransaction
+            ).get(tx.order_id)
+            if init_tx is not None:
+                init_tx.state = 'processed'
+        else:
+            assert tx.order_id == str(init_tx.order_id)
+        return tx
 
     def capture(
         self,
@@ -262,6 +327,55 @@ class SaferpayClient:
         self.raise_for_status(res)
         data = res.json()
         return data['Status'] == 'CAPTURED', data.get('CaptureId')
+
+    def cancel_stale_open_transactions(self, session: Session) -> None:
+        cutoff = utcnow() - timedelta(minutes=30)
+        for init_tx in (
+            session.query(InitiatedSaferpayTransaction)
+            .filter(InitiatedSaferpayTransaction.state == 'open')
+            .filter(InitiatedSaferpayTransaction.created < cutoff)
+        ):
+            try:
+                tx = self.assert_transaction(session, init_tx.token, init_tx)
+            except Exception as exc:
+                if getattr(exc, 'not_started_or_is_expected_failure', False):
+                    # we no longer need to worry about this transaction
+                    init_tx.state = 'processed'
+                    session.flush()
+                    continue
+                # we assume the transaction has already been cancelled
+                init_tx.retry_count += 1
+                log.info(
+                    'Failed to assert stale Saferpay transaction '
+                    f'{init_tx.order_id} (Attempt {init_tx.retry_count}/3):',
+                    exc_info=True
+                )
+                if init_tx.retry_count >= 3:
+                    init_tx.state = 'processed'
+                session.flush()
+                continue
+
+            init_tx.retry_count = 0
+            if tx.status in ('CANCELED', 'CAPTURED'):
+                init_tx.state = 'processed'
+                session.flush()
+                continue
+
+            try:
+                self.refund(tx)
+            except Exception:
+                init_tx.retry_count += 1
+                log.exception(
+                    'Failed to refund stale Saferpay transaction'
+                    f' (Attempt {init_tx.retry_count}/3):'
+                )
+                if init_tx.retry_count >= 3:
+                    init_tx.state = 'processed'
+                session.flush()
+                continue
+
+            init_tx.state = 'cancelled'
+            session.flush()
 
     def assert_capture(
         self,
@@ -702,8 +816,10 @@ class WorldlineSaferpay(PaymentProvider[SaferpayPayment]):
         token: str  # transaction_id
     ) -> SaferpayPayment:
 
+        session = object_session(self)
+
         # ensure the transaction can be settled
-        tx = self.client.assert_transaction(token)
+        tx = self.client.assert_transaction(session, token)
         if tx.type != 'PAYMENT' or tx.status not in ('AUTHORIZED', 'CAPTURED'):
             raise SaferpayPaymentError('Invalid transaction type')
         if (
@@ -714,7 +830,6 @@ class WorldlineSaferpay(PaymentProvider[SaferpayPayment]):
         if not tx.order_id:
             raise SaferpayPaymentError('order_id is missing')
 
-        session = object_session(self)
         payment = self.payment(
             id=uuid5(WORLDLINE_NAMESPACE, tx.order_id),
             amount=amount,
@@ -778,20 +893,28 @@ class WorldlineSaferpay(PaymentProvider[SaferpayPayment]):
             signed_nonce
         )
 
-        token, redirect_url = self.client.init(
+        init_tx, redirect_url = self.client.init(
+            session=request.session,
             amount=amount,
             currency=currency,
             return_url=complete_url,
             description=extra['description'],
+            email=extra.get('email')
         )
         # store the token using the nonce
-        app.cache.set(nonce, app.sign(token, salt))
+        app.cache.set(nonce, app.sign(init_tx.token, salt))
 
-        params: dict[str, Any] = {'data-redirect-url': redirect_url}
+        params: dict[str, Any] = {
+            'href': redirect_url,
+            'data-confirm': extra['confirm'],
+            'data-confirm-extra': extra['confirm_extra'],
+            'data-confirm-yes': extra['confirm_yes'],
+            'data-confirm-no': extra['confirm_no'],
+        }
 
         return Markup(
-            '<button class="checkout-button saferpay button"'
-            '{html_params}>{label}</button>'
+            '<a class="checkout-button saferpay confirm no-icon button"'
+            '{html_params}>{label}</a>'
         ).format(
             label=label,
             html_params=Markup(html_params(**params))  # nosec: B704

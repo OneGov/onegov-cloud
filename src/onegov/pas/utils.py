@@ -1,21 +1,21 @@
 from __future__ import annotations
 
-from onegov.pas import log
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.models.attendence import Attendence
+from onegov.pas.models.commission import PASCommission
+from onegov.pas.models.commission_membership import PASCommissionMembership
 from onegov.pas.models.party import Party
 from onegov.pas.models.parliamentarian import PASParliamentarian
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
 from decimal import Decimal
 from babel.numbers import format_decimal
 from datetime import date
+from uuid import UUID
 
 
 from typing import TYPE_CHECKING
-from uuid import UUID
 if TYPE_CHECKING:
     from onegov.pas.models import SettlementRun
-    from onegov.pas.models.commission_membership import PASCommissionMembership
     from onegov.pas.models.attendence import Attendence
     from onegov.town6.request import TownRequest
     from onegov.user import User
@@ -94,12 +94,6 @@ def get_parliamentarians_with_settlements(
         PASParliamentarian.first_name
     ).all()
 
-    roles_pretty_print = [
-        f'{p.last_name} {p.first_name}: {p.roles}'
-        for p in active_parliamentarians
-    ]
-    log.info(f'Active parliamentarians: {roles_pretty_print}')
-
     # Get all parliamentarians with attendances in one query
     parliamentarians_with_attendances = {
         pid[0] for pid in
@@ -108,7 +102,6 @@ def get_parliamentarians_with_settlements(
             Attendence.date <= end_date
         ).distinct()
     }
-    log.info(f'Parli with attendances: {parliamentarians_with_attendances}')
 
     # Filter the active parliamentarians to only those with attendances
     return [
@@ -193,6 +186,43 @@ def get_active_commission_memberships(
         m for m in parliamentarian.commission_memberships
         if not m.end or m.end >= date.today()
     ]
+
+
+def get_commissions_with_memberships(
+    session: Session,
+    start_date: date,
+    end_date: date
+) -> list[PASCommission]:
+    """
+    Get all commissions that had active memberships during the
+    specified period.
+
+    This function ensures accurate commission filtering by checking that
+    commissions had active members during the period, properly handling
+    cases where memberships have changing dates.
+    """
+
+    return (
+        session.query(PASCommission)
+        .filter(
+            PASCommission.id.in_(
+                session.query(PASCommissionMembership.commission_id)
+                .filter(
+                    (
+                        PASCommissionMembership.start.is_(None)
+                        | (PASCommissionMembership.start <= end_date)
+                    ),
+                    (
+                        PASCommissionMembership.end.is_(None)
+                        | (PASCommissionMembership.end >= start_date)
+                    ),
+                )
+                .distinct()
+            )
+        )
+        .order_by(PASCommission.name)
+        .all()
+    )
 
 
 # FIXME: Should these two functions be a CLI command instead? Maybe switch

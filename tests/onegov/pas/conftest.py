@@ -1,3 +1,4 @@
+from pytest_localserver.http import WSGIServer
 from onegov.core.orm.observer import ScopedPropertyObserver
 from os import path
 from yaml import dump
@@ -502,6 +503,23 @@ def client_with_es(es_pas_app):
     client.skip_n_forms = 1
     client.use_intercooler = True
     return client
+
+
+@fixture(scope='function')
+def wsgi_server(request):
+    app = create_pas_app(request, False)
+    app.print_exceptions = True
+    server = WSGIServer(application=app)
+    server.start()
+    yield server
+    server.stop()
+
+
+@fixture(scope='function')
+def browser(request, browser, wsgi_server):
+    browser.baseurl = wsgi_server.url
+    browser.wsgi_server = wsgi_server
+    yield browser
 
 
 @fixture(scope='session', autouse=True)

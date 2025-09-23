@@ -8,6 +8,7 @@ from onegov.ticket.models import TicketInvoice
 from onegov.ticket.models import TicketInvoiceItem
 from onegov.ticket.models import TicketPermission
 from onegov.ticket.collection import TicketCollection
+from onegov.ticket.collection import TicketInvoiceCollection
 
 
 __all__ = (
@@ -16,6 +17,7 @@ __all__ = (
     'Ticket',
     'TicketCollection',
     'TicketInvoice',
+    'TicketInvoiceCollection',
     'TicketInvoiceItem',
     'TicketPermission',
 )

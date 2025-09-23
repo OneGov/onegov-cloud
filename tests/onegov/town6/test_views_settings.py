@@ -146,3 +146,18 @@ def test_firebase_settings(client):
 
     settings = settings.form.submit().maybe_follow()
     assert 'Ihre Änderungen wurden gespeichert' in settings
+
+
+def test_resource_settings(client):
+    client.login_admin()
+
+    settings = client.get('/settings').click('Reservationen')
+    settings.form['resource_header_html'] = '<h1>foo</h1>'
+    settings.form['resource_footer_html'] = '<p>bar</p>'
+    assert ('Ihre Änderungen wurden gespeichert' in
+            settings.form.submit().maybe_follow())
+
+    page = client.get('/resources')
+    assert 'Allgemeine Informationen zu Reservationen' in page
+    assert '<h1>foo</h1>' in page
+    assert '<p>bar</p>' in page

@@ -52,6 +52,7 @@ from onegov.org.views.directory import (
     send_email_notification_for_directory_entry)
 from onegov.org.views.newsletter import send_newsletter
 from onegov.org.views.ticket import delete_tickets_and_related_data
+from onegov.pay.models.payment_providers import WorldlineSaferpay
 from onegov.reservation import Reservation, Resource, ResourceCollection
 from onegov.search import Searchable
 from onegov.ticket import Ticket, TicketCollection
@@ -170,7 +171,8 @@ def send_daily_newsletter(request: OrgRequest) -> None:
                 )
                 newsletters = NewsletterCollection(request.session)
                 newsletter = newsletters.add(title=title, html=Markup(''))
-                newsletter.lead = _('New news since the last newsletter:')
+                newsletter.lead = request.translate(
+                    _('New news since the last newsletter:'))
                 newsletter.content['news'] = [n.id for n in news.all()]
 
                 send_newsletter(request=request, newsletter=newsletter,
@@ -270,6 +272,20 @@ def delete_old_tan_accesses(request: OrgRequest) -> None:
     # cronjobs happen outside a regular request, so we don't need
     # to synchronize with the session
     query.delete(synchronize_session=False)
+
+
+@OrgApp.cronjob(hour='*', minute='*/15', timezone='UTC')
+def cancel_stale_open_saferpay_transactions(request: OrgRequest) -> None:
+    """
+    Cancels stale open Saferpay transactions.
+    """
+    for provider in request.session.query(WorldlineSaferpay).filter(
+        WorldlineSaferpay.enabled.is_(True)
+    ):
+        if not provider.connected:
+            continue
+
+        provider.client.cancel_stale_open_transactions(request.session)
 
 
 @OrgApp.cronjob(hour=23, minute=45, timezone='Europe/Zurich')
@@ -804,6 +820,7 @@ def delete_content_marked_deletable(request: OrgRequest) -> None:
     now = to_timezone(utcnow(), 'Europe/Zurich')
     count = 0
 
+    name = request.app.org.title or 'unknown'
     for base in request.app.session_manager.bases:
         for model in find_models(base, lambda cls: issubclass(
                 cls, DeletableContentExtension)):
@@ -811,24 +828,32 @@ def delete_content_marked_deletable(request: OrgRequest) -> None:
             query = request.session.query(model)
             query = query.filter(model.delete_when_expired == True)
             for obj in query:
-                # delete entry if end date passed
+                # delete entry if the end date passed
                 if isinstance(obj, (News, ExtendedDirectoryEntry)):
                     if obj.publication_end and obj.publication_end < now:
+                        log.info(f'Cron: Delete expired obj for {name}: '
+                                 f'{obj.title}')
                         request.session.delete(obj)
                         count += 1
 
     # check on past events and its occurrences
+    cutoff = now - timedelta(days=2)  # only delete with cutoff of 2 days
     if request.app.org.delete_past_events:
         query = request.session.query(Occurrence)
-        query = query.filter(Occurrence.end < now)
-        for obj in query:
-            request.session.delete(obj)
+        query = query.filter(Occurrence.end < cutoff)
+        for occ in query:
+            log.info(f'Cron: Delete past occurrence for {name}: '
+                     f'{occ.title} - {occ.end}')
+            request.session.delete(occ)
             count += 1
 
         query = request.session.query(Event)
-        for obj in query:
-            if not obj.future_occurrences(limit=1).all():
-                request.session.delete(obj)
+        query = query.filter(Event.end < cutoff)
+        for event in query:
+            if not event.occurrences:
+                log.info(f'Cron: Delete past event for {name}: '
+                         f'{event.title} - {event.end}')
+                request.session.delete(event)
                 count += 1
 
     if count:

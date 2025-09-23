@@ -15,7 +15,7 @@ from onegov.gazette.models import Issue
 from onegov.gazette.pdf import IssuePrintOnlyPdf
 from sedate import to_timezone
 from sedate import utcnow
-from xlsxwriter import Workbook  # type:ignore[import-untyped]
+from xlsxwriter import Workbook
 
 
 from typing import TYPE_CHECKING
@@ -302,8 +302,9 @@ def export_issue(self: IssueCollection, request: GazetteRequest) -> Response:
     })
     datetime_format = workbook.add_format({'num_format': 'dd.mm.yy hh:mm'})
 
-    worksheet = workbook.add_worksheet()
-    worksheet.name = request.translate(_('Issues'))
+    worksheet = workbook.add_worksheet(
+        request.translate(_('Issues'))
+    )
     worksheet.write_row(0, 0, (
         request.translate(_('Year')),
         request.translate(_('Number')),

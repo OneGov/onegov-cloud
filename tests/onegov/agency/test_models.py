@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+from markupsafe import Markup
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.models import AgencyMembershipMoveWithinAgency
 from onegov.agency.models import AgencyMove
@@ -18,15 +21,21 @@ from onegov.user.models import User
 from onegov.user.models import UserGroup
 
 
-def test_extended_agency(agency_app):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.agency import AgencyApp
+    from sqlalchemy.orm import Session
+
+
+def test_extended_agency(agency_app: AgencyApp) -> None:
     session = agency_app.session()
 
-    agency = ExtendedAgency(
+    agency_ = ExtendedAgency(
         title="Test Agency",
         name="test-agency",
-        portrait="This is a test\nagency."
+        portrait=Markup("This is a test\nagency.")
     )
-    session.add(agency)
+    session.add(agency_)
     session.flush()
 
     agency = session.query(Agency).one()
@@ -44,21 +53,25 @@ def test_extended_agency(agency_app):
     assert agency.access == 'public'
     assert agency.es_public is True
 
+    # undo mypy narrowing
+    agency_ = agency
     agency.pdf_file = b'PDF'
-    assert agency.pdf_file.read() == b'PDF'
-    assert agency.pdf_file.filename == 'test-agency.pdf'
-    assert agency.pdf.name == 'test-agency.pdf'
+    assert agency_.pdf_file is not None
+    assert agency_.pdf_file.read() == b'PDF'
+    assert agency_.pdf_file.filename == 'test-agency.pdf'
+    assert agency_.pdf is not None
+    assert agency_.pdf.name == 'test-agency.pdf'
 
     agency.pdf_file = b'PDF2'
-    assert agency.pdf_file.read() == b'PDF2'
-    assert agency.pdf_file.filename == 'test-agency.pdf'
-    assert agency.pdf.name == 'test-agency.pdf'
+    assert agency_.pdf_file.read() == b'PDF2'
+    assert agency_.pdf_file.filename == 'test-agency.pdf'
+    assert agency_.pdf.name == 'test-agency.pdf'
 
     agency.access = 'private'
-    assert agency.es_public is False
+    assert agency_.es_public is False
 
-    assert agency.deletable(Bunch(is_admin=False)) is True
-    assert agency.deletable(Bunch(is_admin=True)) is True
+    assert agency.deletable(Bunch(is_admin=False)) is True  # type: ignore[arg-type]
+    assert agency.deletable(Bunch(is_admin=True)) is True  # type: ignore[arg-type]
 
     session.add(
         ExtendedAgency(
@@ -68,11 +81,11 @@ def test_extended_agency(agency_app):
         )
     )
     session.flush()
-    assert agency.deletable(Bunch(is_admin=False)) is False
-    assert agency.deletable(Bunch(is_admin=True)) is True
+    assert agency.deletable(Bunch(is_admin=False)) is False  # type: ignore[arg-type]
+    assert agency.deletable(Bunch(is_admin=True)) is True  # type: ignore[arg-type]
 
 
-def test_extended_agency_add_person(session):
+def test_extended_agency_add_person(session: Session) -> None:
     agency = ExtendedAgency(title="Agency", name="agency")
     person = ExtendedPerson(first_name="A", last_name="Person")
     session.add(agency)
@@ -88,7 +101,7 @@ def test_extended_agency_add_person(session):
     assert membership.prefix == "*"
 
 
-def test_extended_agency_role_mappings(session):
+def test_extended_agency_role_mappings(session: Session) -> None:
     agency = ExtendedAgency(
         title='Agency',
         name='agency'
@@ -125,8 +138,8 @@ def test_extended_agency_role_mappings(session):
     assert group.role_mappings.one().content_id == str(agency.id)
 
 
-def test_extended_person(session):
-    person = ExtendedPerson(
+def test_extended_person(session: Session) -> None:
+    person_ = ExtendedPerson(
         first_name="Hans",
         last_name="Maulwurf",
         academic_title="Dr.",
@@ -143,7 +156,7 @@ def test_extended_person(session):
         website="www.unterbau.ch",
         notes="This is\na note."
     )
-    session.add(person)
+    session.add(person_)
     session.flush()
 
     person = session.query(Person).one()
@@ -172,13 +185,15 @@ def test_extended_person(session):
     assert person.es_public is True
 
     person.access = 'private'
-    assert person.es_public is False
+    # undo mypy narrowing
+    person_ = person
+    assert person_.es_public is False
 
-    assert person.deletable(Bunch(is_admin=False)) is True
-    assert person.deletable(Bunch(is_admin=True)) is True
+    assert person.deletable(Bunch(is_admin=False)) is True  # type: ignore[arg-type]
+    assert person.deletable(Bunch(is_admin=True)) is True  # type: ignore[arg-type]
 
 
-def test_extended_membership(session):
+def test_extended_membership(session: Session) -> None:
     agency = ExtendedAgency(title='agency', name='agency')
     person = ExtendedPerson(first_name='a', last_name='person')
     session.add(agency)
@@ -186,7 +201,7 @@ def test_extended_membership(session):
     session.flush()
 
     session.add(
-        ExtendedAgencyMembership(
+        ExtendedAgencyMembership(  # type: ignore[misc]
             title="Director",
             order_within_agency=12,
             order_within_person=12,
@@ -219,23 +234,25 @@ def test_extended_membership(session):
     assert person.memberships.one() == membership
 
     membership.access = 'private'
-    assert membership.es_public is False
+    # undo mypy narrowing
+    membership_ = membership
+    assert membership_.es_public is False
 
     membership.access = 'public'
     membership.agency.meta['access'] = 'private'
-    assert membership.es_public is False
+    assert membership_.es_public is False
 
     membership.agency.meta['access'] = 'public'
     membership.person.meta['access'] = 'private'
-    assert membership.es_public is False
+    assert membership_.es_public is False
 
-    assert agency.deletable(Bunch(is_admin=False)) is False
-    assert agency.deletable(Bunch(is_admin=True)) is True
-    assert person.deletable(Bunch(is_admin=False)) is False
-    assert person.deletable(Bunch(is_admin=True)) is True
+    assert agency.deletable(Bunch(is_admin=False)) is False  # type: ignore[arg-type]
+    assert agency.deletable(Bunch(is_admin=True)) is True  # type: ignore[arg-type]
+    assert person.deletable(Bunch(is_admin=False)) is False  # type: ignore[arg-type]
+    assert person.deletable(Bunch(is_admin=True)) is True  # type: ignore[arg-type]
 
 
-def test_agency_move(session):
+def test_agency_move(session: Session) -> None:
     # test execute
     collection = ExtendedAgencyCollection(session)
     collection.add_root(title='2', id=2, order=2)
@@ -244,35 +261,35 @@ def test_agency_move(session):
     collection.add(parent=parent, title='5', id=5, order=2)
     collection.add(parent=parent, title='4', id=4, order=1)
 
-    def tree():
+    def tree() -> list[tuple[str, list[str]]]:
         return [
-            [o.title, [c.title for c in o.children]]
+            (o.title, [c.title for c in o.children])
             for o in collection.query().filter_by(parent_id=None)
         ]
 
-    assert tree() == [['1', []], ['2', []], ['3', ['4', '5']]]
+    assert tree() == [('1', []), ('2', []), ('3', ['4', '5'])]
 
     AgencyMove(session, 1, 2, MoveDirection.below).execute()
-    assert tree() == [['2', []], ['1', []], ['3', ['4', '5']]]
+    assert tree() == [('2', []), ('1', []), ('3', ['4', '5'])]
 
     AgencyMove(session, 3, 1, MoveDirection.above).execute()
-    assert tree() == [['2', []], ['3', ['4', '5']], ['1', []]]
+    assert tree() == [('2', []), ('3', ['4', '5']), ('1', [])]
 
     AgencyMove(session, 5, 4, MoveDirection.above).execute()
     session.flush()
     session.expire_all()
-    assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
+    assert tree() == [('2', []), ('3', ['5', '4']), ('1', [])]
 
     # invalid
     AgencyMove(session, 8, 9, MoveDirection.above).execute()
-    assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
+    assert tree() == [('2', []), ('3', ['5', '4']), ('1', [])]
 
     AgencyMove(session, 5, 2, MoveDirection.above).execute()
     session.expire_all()
-    assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
+    assert tree() == [('2', []), ('3', ['5', '4']), ('1', [])]
 
 
-def test_membership_move_within_agency(session):
+def test_membership_move_within_agency(session: Session) -> None:
     # test execute
     agency_a = ExtendedAgency(title="A", name="a",)
     agency_b = ExtendedAgency(title="B", name="b",)
@@ -315,7 +332,7 @@ def test_membership_move_within_agency(session):
     assert [m.title for m in agency_a.memberships] == ['Y', 'W', 'Z', 'X']
 
 
-def test_membership_move_within_person(session):
+def test_membership_move_within_person(session: Session) -> None:
     agency_a = ExtendedAgency(title="A", name="a")
     agency_b = ExtendedAgency(title="B", name="b")
     person = ExtendedPerson(first_name="P", last_name="P")
@@ -364,11 +381,11 @@ def test_membership_move_within_person(session):
     assert len(siblings) == 3
 
 
-def test_agency_muation(session):
+def test_agency_muation(session: Session) -> None:
     agency = ExtendedAgency(
         title='Test Agency',
         name='test-agency',
-        portrait='This is a test\nagency.'
+        portrait=Markup('This is a test\nagency.')
     )
     ticket = Ticket(
         number='AGN-1000-0000',
@@ -397,7 +414,7 @@ def test_agency_muation(session):
     assert ticket.handler_data['state'] == 'applied'
 
 
-def test_person_mutation(session):
+def test_person_mutation(session: Session) -> None:
     person = ExtendedPerson(
         first_name='Test First Name',
         last_name='Test Last Name',

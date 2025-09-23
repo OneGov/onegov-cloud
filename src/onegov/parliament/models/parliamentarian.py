@@ -119,6 +119,12 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
         nullable=True
     )
 
+    #: Wahlkreis
+    district: Column[str | None] = Column(
+        Text,
+        nullable=True
+    )
+
     #: The gender value
     gender: Column[Gender] = Column(
         Enum(
@@ -315,7 +321,8 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
         'ParliamentarianRole',
         cascade='all, delete-orphan',
         back_populates='parliamentarian',
-        order_by='desc(ParliamentarianRole.start)'
+        lazy='joined',
+        order_by='desc(ParliamentarianRole.start)',
     )
 
     #: A parliamentarian's interest ties
@@ -395,7 +402,8 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
     commission_memberships = relationship(
         'CommissionMembership',
         cascade='all, delete-orphan',
-        back_populates='parliamentarian'
+        back_populates='parliamentarian',
+        lazy='joined',
     )
 
     def __repr__(self) -> str:

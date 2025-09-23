@@ -14,6 +14,7 @@ from onegov.core.orm.types import UUID
 from onegov.core.utils import toggle
 from onegov.file import MultiAssociatedFiles
 from onegov.org import _
+from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.search import ORMSearchable
 
@@ -94,6 +95,7 @@ POLITICAL_BUSINESS_STATUS: dict[PoliticalBusinessStatus, str] = {
 
 
 class PoliticalBusiness(
+    AccessExtension,
     MultiAssociatedFiles,
     Base,
     ContentMixin,
@@ -258,12 +260,14 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
     political_business = relationship(
         'PoliticalBusiness',
         back_populates='participants',
+        lazy='joined',
     )
 
     #: the related parliamentarian
     parliamentarian: relationship[RISParliamentarian] = relationship(
         'RISParliamentarian',
         back_populates='political_businesses',
+        lazy='joined',
     )
 
     def __repr__(self) -> str:

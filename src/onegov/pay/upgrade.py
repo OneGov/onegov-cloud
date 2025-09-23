@@ -6,6 +6,7 @@ from __future__ import annotations
 
 
 from onegov.core.upgrade import upgrade_task
+from sqlalchemy import false
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Text
@@ -70,3 +71,35 @@ def add_invoiced_state_to_payments(context: UpgradeContext) -> None:
 
         # Start new transaction
         context.operations.execute('BEGIN')
+
+
+@upgrade_task('Add invoiced column to invoices')
+def add_invoiced_state_to_invoices(context: UpgradeContext) -> None:
+    if not context.has_table('invoices'):
+        return
+
+    if not context.has_column('invoices', 'invoiced'):
+        context.operations.add_column(
+            'invoices',
+            Column(
+                'invoiced',
+                Boolean,
+                nullable=False,
+                server_default=false(),
+                index=True,
+            )
+        )
+
+        context.operations.execute("""
+            UPDATE invoices
+               SET invoiced = TRUE
+             WHERE id IN (
+                SELECT invoice_items.invoice_id
+                  FROM invoice_items
+                  JOIN payments_for_invoice_items_payments AS link
+                    ON link.invoice_items_id = invoice_items.id
+                  JOIN payments
+                    ON payments.id = link.payment_id
+                 WHERE payments.state = 'invoiced'
+            )
+        """)

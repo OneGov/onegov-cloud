@@ -23,7 +23,7 @@ def test_layouts(assembly):
 
     assert a(assembly) == 'Assembly from 07. Mai 2023'
     assembly.extraordinary = True
-    assert a(assembly) == 'Extraodinary assembly from 07. Mai 2023'
+    assert a(assembly) == 'Extraordinary Assembly from 07. Mai 2023'
 
     agenda_item = assembly.agenda_items[0]
     assert ai(agenda_item) == 'Agenda item 2'

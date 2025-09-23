@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import pytest
 import transaction
 
 from datetime import date, timedelta
+from onegov.form import Form
 from onegov.form import FormCollection
 from onegov.form import FormExtension
 from onegov.form import FormRegistrationWindow
@@ -12,11 +15,17 @@ from webob.multidict import MultiDict
 from wtforms.validators import ValidationError
 
 
-def days(d):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.form.types import RegistrationState
+    from sqlalchemy.orm import Session
+
+
+def days(d: int) -> timedelta:
     return timedelta(days=d)
 
 
-def test_has_submissions(session):
+def test_has_submissions(session: Session) -> None:
     collection = FormCollection(session)
     form = collection.definitions.add('Newsletter', definition="E-Mail = @@@")
 
@@ -34,24 +43,27 @@ def test_has_submissions(session):
     assert form.has_submissions()
 
 
-def test_form_extensions(session):
+def test_form_extensions(session: Session) -> None:
     collection = FormCollection(session)
 
     members = collection.definitions.add('Members', definition="E-Mail = @@@")
 
     class CorporateOnly:
 
-        def validate_e_mail(self, value):
+        def validate_e_mail(self, value: Any) -> None:
             # note, you probably don't want to do this in a real world
             # project as the name of the e-mail field might change and
             # the validation would not be triggered!
             if not value.data.endswith('seantis.ch'):
                 raise ValidationError("Only seantis.ch e-mails are allowed")
 
-    class CorporateOnlyExtension(FormExtension, name='corporate-emails-only'):
+    class CorporateOnlyExtension(
+        FormExtension[Form],
+        name='corporate-emails-only'
+    ):
 
-        def create(self):
-            class ExtendedForm(self.form_class, CorporateOnly):
+        def create(self) -> type[Form]:
+            class ExtendedForm(self.form_class, CorporateOnly):  # type: ignore[misc, name-defined]
                 pass
 
             return ExtendedForm
@@ -90,7 +102,7 @@ def test_form_extensions(session):
     assert issubclass(submission.form_class, CorporateOnly)
 
 
-def test_registration_window_adjacent(session):
+def test_registration_window_adjacent(session: Session) -> None:
     forms = FormCollection(session)
 
     summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
@@ -122,7 +134,7 @@ def test_registration_window_adjacent(session):
     assert 'no_adjacent_registration_windows' in str(e.value)
 
 
-def test_registration_window_overlaps(session):
+def test_registration_window_overlaps(session: Session) -> None:
     forms = FormCollection(session)
 
     summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
@@ -142,7 +154,7 @@ def test_registration_window_overlaps(session):
     assert 'no_overlapping_registration_windows' in str(e.value)
 
 
-def test_registration_window_end_before_start(session):
+def test_registration_window_end_before_start(session: Session) -> None:
     camp = FormCollection(session).definitions.add(
         'Camp', definition="E-Mail = @@@")
 
@@ -154,7 +166,7 @@ def test_registration_window_end_before_start(session):
     assert 'start_smaller_than_end' in str(e.value)
 
 
-def test_current_registration_window_bound_to_form(session):
+def test_current_registration_window_bound_to_form(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
@@ -164,11 +176,13 @@ def test_current_registration_window_bound_to_form(session):
     summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
     summer.add_registration_window(today - days(100), today - days(10))
 
+    assert winter.current_registration_window is not None
     assert winter.current_registration_window.start == today - days(1)
+    assert summer.current_registration_window is not None
     assert summer.current_registration_window.start == today - days(100)
 
 
-def test_current_registration_window_end_date(session):
+def test_current_registration_window_end_date(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
@@ -178,11 +192,12 @@ def test_current_registration_window_end_date(session):
     summer.add_registration_window(today - days(10), today - days(1))
     summer.add_registration_window(today + days(5), today + days(10))
 
+    assert summer.current_registration_window is not None
     assert summer.current_registration_window.start == today - days(10)
 
 
 @pytest.mark.skip_night_hours
-def test_registration_window_spots(session):
+def test_registration_window_spots(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
@@ -263,7 +278,7 @@ def test_registration_window_spots(session):
     assert window.accepts_submissions()
 
 
-def test_registration_claims_with_no_limit(session):
+def test_registration_claims_with_no_limit(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
@@ -338,7 +353,7 @@ def test_registration_claims_with_no_limit(session):
     assert window.requested_spots == 0
 
 
-def test_registration_claims_with_a_limit(session):
+def test_registration_claims_with_a_limit(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
@@ -376,7 +391,7 @@ def test_registration_claims_with_a_limit(session):
     assert window.available_spots == 10
 
 
-def test_register_more_than_allowed(session):
+def test_register_more_than_allowed(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
@@ -410,7 +425,7 @@ def test_register_more_than_allowed(session):
     session.flush()
 
 
-def test_undo_registration(session):
+def test_undo_registration(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
@@ -445,7 +460,7 @@ def test_undo_registration(session):
     assert window.available_spots == 1
 
 
-def test_registration_window_queue(session):
+def test_registration_window_queue(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
@@ -490,7 +505,7 @@ def test_registration_window_queue(session):
     assert window.next_submission is None
 
 
-def test_require_spots_if_registration_window(session):
+def test_require_spots_if_registration_window(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
@@ -516,7 +531,7 @@ def test_require_spots_if_registration_window(session):
         )
 
 
-def test_registration_submission_state(session):
+def test_registration_submission_state(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
@@ -529,7 +544,7 @@ def test_registration_submission_state(session):
         state='complete',
     )
 
-    def query_registration_state():
+    def query_registration_state() -> RegistrationState:
         q = forms.submissions.query()
         q = q.with_entities(FormSubmission.registration_state)
         q = q.order_by(desc(FormSubmission.created))
@@ -539,7 +554,7 @@ def test_registration_submission_state(session):
     assert submission.registration_state is None
     assert query_registration_state() is None
 
-    summer = forms.definitions.by_name('summercamp')
+    summer = forms.definitions.by_name('summercamp')  # type: ignore[assignment]
     summer.add_registration_window(today - days(5), today + days(5), limit=10)
 
     session.flush()
@@ -547,7 +562,7 @@ def test_registration_submission_state(session):
     # required here for some reason, otherwise there's no current window
     transaction.commit()
 
-    summer = forms.definitions.by_name('summercamp')
+    summer = forms.definitions.by_name('summercamp')  # type: ignore[assignment]
     submission = forms.submissions.add(
         name='summercamp',
         form=summer.form_class(data={'e_mail': 'info@example.org'}),
@@ -561,15 +576,21 @@ def test_registration_submission_state(session):
 
     submission.claim(1)
 
-    assert submission.registration_state == 'partial'
+    # undo mypy narrowing of registration_state
+    submission2 = submission
+    assert submission2.registration_state == 'partial'
     assert query_registration_state() == 'partial'
 
     submission.claim(1)
-    assert submission.registration_state == 'confirmed'
+    # undo mypy narrowing of registration_state
+    submission2 = submission
+    assert submission2.registration_state == 'confirmed'
     assert query_registration_state() == 'confirmed'
 
     submission.disclaim()
-    assert submission.registration_state == 'cancelled'
+    # undo mypy narrowing of registration_state
+    submission2 = submission
+    assert submission2.registration_state == 'cancelled'
     assert query_registration_state() == 'cancelled'
 
     # test deletion cascading to registration windows

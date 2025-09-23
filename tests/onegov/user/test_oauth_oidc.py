@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import textwrap
 
@@ -8,13 +10,18 @@ import yaml
 from onegov.core import Framework
 from onegov.core.utils import scan_morepath_modules, Bunch
 from onegov.user import UserApp
+from onegov.user.auth.provider import OIDCProvider
+
+
+from typing import Any
+
+
+class App(Framework, UserApp):
+    pass
 
 
 @pytest.fixture(scope='function')
-def app(postgres_dsn, redis_url):
-
-    class App(Framework, UserApp):
-        pass
+def app(postgres_dsn: str, redis_url: str) -> App:
 
     scan_morepath_modules(App)
     morepath.commit(App)
@@ -31,11 +38,16 @@ def app(postgres_dsn, redis_url):
 
 
 @pytest.fixture(autouse=True)
-def no_requests(monkeypatch):
+def no_requests(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delattr('requests.sessions.Session.request')
 
 
-def configure_provider(app, metadata=None, primary=False):
+def configure_provider(
+    app: App,
+    metadata: dict[str, Any] | None = None,
+    primary: bool = False
+) -> None:
+
     config = textwrap.dedent(f"""
         authentication_providers:
           idp:
@@ -61,11 +73,13 @@ def configure_provider(app, metadata=None, primary=False):
     app.configure_authentication_providers(**yaml.safe_load(config))
 
 
-def test_oidc_configuration(app):
+def test_oidc_configuration(app: App) -> None:
     configure_provider(app)
 
     provider = app.providers['idp']
+    assert isinstance(provider, OIDCProvider)
     client = provider.tenants.client(app)
+    assert client is not None
 
     # Test default configuration of the commented blocks
     assert client.attributes.source_id == 'sub'
@@ -83,11 +97,13 @@ def test_oidc_configuration(app):
     assert provider.is_primary(app) is False
 
 
-def test_oidc_configuration_primary(app):
+def test_oidc_configuration_primary(app: App) -> None:
     configure_provider(app, primary=True)
 
     provider = app.providers['idp']
+    assert isinstance(provider, OIDCProvider)
     client = provider.tenants.client(app)
+    assert client is not None
 
     # Test default configuration of the commented blocks
     assert client.attributes.source_id == 'sub'
@@ -105,7 +121,7 @@ def test_oidc_configuration_primary(app):
     assert provider.is_primary(app) is True
 
 
-def test_oidc_static_metadata(app):
+def test_oidc_static_metadata(app: App) -> None:
     static_metadata = {
         'issuer': 'https://oidc.test/',
         'authorization_endpoint': 'https://oidc.test/authorize',
@@ -133,14 +149,16 @@ def test_oidc_static_metadata(app):
     configure_provider(app, static_metadata)
 
     provider = app.providers['idp']
+    assert isinstance(provider, OIDCProvider)
     client = provider.tenants.client(app)
-    metadata = client.metadata(Bunch(app=app))
+    assert client is not None
+    metadata = client.metadata(Bunch(app=app))  # type: ignore[arg-type]
     # not technically part of the metadata...
     metadata.pop('jwks_client')
     assert static_metadata == metadata
 
 
-def test_oicd_authenticate_request(app):
+def test_oicd_authenticate_request(app: App) -> None:
 
     configure_provider(app, {
         'issuer': 'https://oidc.test/',
@@ -168,11 +186,12 @@ def test_oicd_authenticate_request(app):
     })
 
     provider = app.providers['idp']
+    assert isinstance(provider, OIDCProvider)
     provider.to = '/'
 
     # test authenticate request
-    browser_session = {}
-    request = Bunch(
+    browser_session: dict[str, Any] = {}
+    request: Any = Bunch(
         app=app,
         application_url='http://example.com/',
         url='http://example.com/auth/provider/idp',
@@ -182,13 +201,13 @@ def test_oicd_authenticate_request(app):
         csrf_salt='salt',
         new_url_safe_token=lambda data, salt: 'oauth_state')
     response = provider.authenticate_request(request)
-    assert response.status_code == 302
-    location = response.headers['Location']
+    assert response.status_code == 302  # type: ignore[union-attr]
+    location = response.headers['Location']  # type: ignore[union-attr]
     assert location.startswith('https://oidc.test/authorize')
     assert 'state=oauth_state' in location
     assert 'scope=openid+profile+email' in location
     assert browser_session['login_to'] == '/'
 
 
-def test_oidc_client(app):
+def test_oidc_client(app: App) -> None:
     pass

@@ -1,13 +1,21 @@
+from __future__ import annotations
+
+import pytest
+
 from onegov.websockets.client import authenticate
 from onegov.websockets.client import broadcast
 from onegov.websockets.client import status
-from pytest import mark
 from tests.onegov.websockets.conftest import WebsocketsRoot
 from websockets import connect
 
 
-@mark.asyncio
-async def test_browser_integration(browser):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import WebsocketBrowser
+
+
+@pytest.mark.asyncio
+async def test_browser_integration(browser: WebsocketBrowser) -> None:
 
     WebsocketsRoot.html = f"""
         <!doctype html>
@@ -39,6 +47,7 @@ async def test_browser_integration(browser):
         await authenticate(manage, 'super-super-secret-token')
 
         response = await status(manage)
+        assert response is not None
         assert response['connections'].get('schema-two') == 1
 
         await broadcast(manage, 'schema', 'two', {'schema': 'two'})

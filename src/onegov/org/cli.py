@@ -22,6 +22,7 @@ import locale
 import requests
 import transaction
 import yaml
+
 from onegov.core.orm.utils import QueryChain
 from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
                                    TimerangeTooLong)
@@ -32,7 +33,10 @@ from onegov.core.crypto import random_token
 from onegov.core.utils import Bunch
 from onegov.directory import DirectoryEntry
 from onegov.directory.models.directory import DirectoryFile
-from onegov.event import Event, Occurrence, EventCollection
+from onegov.event import Event
+from onegov.event import Occurrence
+from onegov.event import EventCollection
+from onegov.event import OccurrenceCollection
 from onegov.event.collections.events import EventImportItem
 from onegov.file import File
 from onegov.file.collection import FileCollection
@@ -78,8 +82,8 @@ from sqlalchemy.dialects.postgresql import array
 from uuid import uuid4
 from elasticsearch.exceptions import ConnectionError as ESConnectionError
 
-
 from typing import IO, Any, TYPE_CHECKING, TypedDict
+
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from depot.fields.upload import UploadedFile
@@ -2966,3 +2970,159 @@ def ris_rebuild_political_business_links_to_meetings(
         transaction.commit()
 
     return rebuild_political_business_links
+
+
+@cli.command(name='ris-make-imported-files-general-file')
+def ris_make_imported_files_general_file(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    onegov-org --select /onegov_town6/wil ris-make-imported-files-general-file
+    """
+
+    def make_general_file(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        businesses = PoliticalBusinessCollection(session)
+        meetings = MeetingCollection(session)
+
+        counter = 0
+        for business in businesses.query():
+            for file in business.files:
+                if file.type == 'generic':
+                    file.type = 'general'
+                    counter += 1
+        click.secho(f'Set {counter} political business files to '
+                    f'type "general"', fg='green')
+        transaction.commit()
+
+        counter = 0
+        for meeting in meetings.query():
+            for file in meeting.files:
+                if file.type == 'generic':
+                    file.type = 'general'
+                    counter += 1
+        click.secho(f'Set {counter} meeting files to type "general"',
+                    fg='green')
+
+    return make_general_file
+
+
+@cli.command(name='ris-wil-meetings-fix-audio-links')
+def ris_wil_meetings_shorten_audio_links(
+) -> Callable[[OrgRequest, OrgApp], None]:
+
+    def ris_wil_meetings_fix_audio_links(
+        request: OrgRequest,
+        app: OrgApp
+    ) -> None:
+
+        meetings = MeetingCollection(request.session)
+        recapp_counter = 0
+        http_counter = 0
+        for meeting in meetings.query():
+            if not meeting.audio_link:
+                continue
+
+            if (meeting.audio_link ==
+                    'https://wil.recapp.ch/viewer/default/timeline'):
+                meeting.audio_link = 'https://wil.recapp.ch'
+                recapp_counter += 1
+                continue
+
+            if 'http://wil.recapp.ch' in meeting.audio_link:
+                meeting.audio_link = (
+                    meeting.audio_link.replace('http', 'https'))
+                http_counter += 1
+                continue
+
+            if meeting.audio_link == 'https://wil.recapp.ch':
+                continue
+
+            if 'http://verbalix.stadtwil.ch' in meeting.audio_link:
+                meeting.audio_link = (
+                    meeting.audio_link.replace('http', 'https'))
+                http_counter += 1
+                continue
+
+            if meeting.audio_link == 'https://verbalix.stadtwil.ch/':
+                continue
+
+            if 'https://verbalix.stadtwil.ch/' in meeting.audio_link:
+                continue
+
+            click.secho(
+                f'audio link for meeting {meeting.title} vom '
+                f'{meeting.start_datetime}: {meeting.audio_link}', fg='yellow')
+
+        click.secho(f'Fixed recapp audio links for {recapp_counter} '
+                    f'meetings', fg='green')
+        click.secho(f'Fixed verbalix http audio links for {http_counter} '
+                    f'meetings', fg='green')
+        transaction.commit()
+
+    return ris_wil_meetings_fix_audio_links
+
+
+@cli.command(name='wil-event-tags-to-german-as-we-use-custom-event-tags')
+def wil_event_tags_to_german_as_we_use_custom_event_tags(
+) -> Callable[[OrgRequest, OrgApp], None]:
+
+    map = {
+        'Art': 'Kunst',
+        'Cinema': 'Kino',
+        'Concert': 'Konzert',
+        'Congress': 'Kongress',
+        'Culture': 'Kultur',
+        'Dancing': 'Tanzen',
+        'Education': 'Bildung',
+        'Exhibition': 'Ausstellung',
+        'Gastronomy': 'Gastronomie',
+        'Health': 'Gesundheit',
+        'Library': 'Bibliothek',
+        'Literature': 'Literatur',
+        'Market': 'Markt',
+        'Meetup': 'Treffen',
+        'Misc': 'Verschiedenes',
+        'Music School': 'Musikschule',
+        'Nature': 'Natur',
+        'Music': 'Musik',
+        'Party': 'Party',
+        'Politics': 'Politik',
+        'Reading': 'Lesung',
+        'Religion': 'Religion',
+        'Sports': 'Sport',
+        'Talk': 'Vortrag',
+        'Theater': 'Theater',
+        'Tourism': 'Tourismus',
+        'Toy Library': 'Spielzeugbibliothek',
+        'Tradition': 'Tradition',
+        'Youth': 'Jugend',
+        'Elderly': 'Senioren',
+
+        'Diverses': 'Verschiedenes',
+    }
+
+    def event_tags_to_german(
+        request: OrgRequest,
+        app: OrgApp
+    ) -> None:
+
+        click.secho(f'org name: {request.app.org.name}')
+        if request.app.org.name != 'Stadt Wil':
+            return
+
+        events = EventCollection(request.session).query()
+        occurrences = OccurrenceCollection(request.session).query()
+
+        for collection in [events, occurrences]:
+            for item in collection:  # type: ignore[attr-defined]
+                new_tags = []
+                tags = item.tags
+                for tag in tags:
+                    translated = map.get(tag, tag)
+                    new_tags.append(translated)
+                click.secho(f'new tags: {new_tags}', fg='green')
+                item.tags = new_tags
+
+            request.session.flush()
+
+    return event_tags_to_german
