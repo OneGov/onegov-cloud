@@ -111,10 +111,10 @@ def view_pas_settings(
         })
 
         # For parliamentarians, show their specific commissions
-        user = request.current_user
-        active_memberships = get_active_commission_memberships(user)
-        # Currently unclear is this is a requirement to add a 
-        # shortcut for these
+        # Currently unclear is this is a requirement to add a
+        # shortcut for these. Leaving it here for future reference.
+        # user = request.current_user
+        # active_memberships = get_active_commission_memberships(user)
         # Will update in future, leaving it here for now
         # for membership in active_memberships:
         #     commission = membership.commission

@@ -84,6 +84,8 @@ class Attendence(Base, TimestampMixin):
         default='plenary'
     )
 
+    #: Tracks grouped attendance records to enable future batch 
+    #: modifications. Only relevant if added in bulk.
     bulk_edit_id: Column[uuid.UUID | None] = Column(
         UUID  # type:ignore[arg-type]
     )
