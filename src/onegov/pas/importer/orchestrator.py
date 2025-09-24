@@ -293,13 +293,17 @@ class KubImporter:
                     url = None
 
             except requests.exceptions.RequestException as e:
-                raise RuntimeError(
-                    f'Failed to fetch from {endpoint}: {e}'
-                ) from e
+                log.warning(f'Failed to fetch from {endpoint}: {e}')
+                if self.output:
+                    self.output.error(f'Failed to fetch from {endpoint}: {e}')
+                break
             except ValueError as e:
-                raise RuntimeError(
-                    f'Invalid JSON response from {endpoint}: {e}'
-                ) from e
+                log.warning(f'Invalid JSON response from {endpoint}: {e}')
+                if self.output:
+                    self.output.error(
+                        f'Invalid JSON response from {endpoint}: {e}'
+                    )
+                break
 
         return all_results
 
@@ -537,7 +541,7 @@ class KubImporter:
                 ),
                 details={'status': 'started'},
                 status='in_progress',
-                import_type='cli'
+                import_type='automatic'
             )
             request.session.add(import_log)
             request.session.flush()

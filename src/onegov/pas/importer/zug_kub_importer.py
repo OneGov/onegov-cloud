@@ -224,6 +224,10 @@ def import_zug_kub_data(
                 session.add(import_log)
                 if session.is_active:
                     session.flush()
+
+                # Add import log ID to import details for redirect
+                import_details['_import_log_id'] = import_log.id  # type: ignore
+
                 logger.info(
                     f'KUB data import attempt logged with status: {log_status}'
                 )

@@ -77,6 +77,11 @@ def get_custom_webasset() -> Iterator[str]:
     yield 'custom.js'
 
 
+@PasApp.webasset('importlog')
+def get_logfilter_webasset() -> Iterator[str]:
+    yield 'importlog.js'
+
+
 @PasApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     mine = module_path('onegov.pas', 'locale')

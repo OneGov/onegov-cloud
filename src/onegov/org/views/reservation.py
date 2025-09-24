@@ -546,8 +546,14 @@ def confirm_reservation(
     if submission:
         form = request.get_form(submission.form_class, data=submission.data)
         item_extra = {'submission_id': submission.id}
-        extras = form.invoice_items(extra=item_extra)
-        discounts = form.discount_items(extra=item_extra)
+        extras = form.invoice_items(
+            cost_object=self.cost_object,
+            extra=item_extra
+        )
+        discounts = form.discount_items(
+            cost_object=self.cost_object,
+            extra=item_extra
+        )
         credit_card_payment = any(
             price.credit_card_payment
             for __, price in form.prices()
@@ -655,8 +661,14 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
         if submission:
             _form_obj = submission.form_obj
             item_extra = {'submission_id': submission.id}
-            extras = _form_obj.invoice_items(extra=item_extra)
-            discounts = _form_obj.discount_items(extra=item_extra)
+            extras = _form_obj.invoice_items(
+                cost_object=self.cost_object,
+                extra=item_extra
+            )
+            discounts = _form_obj.discount_items(
+                cost_object=self.cost_object,
+                extra=item_extra
+            )
             credit_card_payment = any(
                 price.credit_card_payment
                 for __, price in _form_obj.prices()
@@ -730,7 +742,10 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
             ticket.tag_meta = tag_meta
 
         if invoice_items:
-            invoice = TicketInvoice(id=uuid4())
+            invoice = TicketInvoice(
+                id=uuid4(),
+                invoicing_party=self.invoicing_party
+            )
             request.session.add(invoice)
 
             for item_meta in invoice_items:

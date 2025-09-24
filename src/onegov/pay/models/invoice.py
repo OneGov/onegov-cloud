@@ -75,6 +75,9 @@ class Invoice(Base, TimestampMixin):
         default=uuid4
     )
 
+    #: the entity the invoice is created for
+    invoicing_party: Column[str | None] = Column(Text, nullable=True)
+
     #: true if invoiced
     invoiced: Column[bool] = Column(
         Boolean,
@@ -135,6 +138,7 @@ class Invoice(Base, TimestampMixin):
         *,
         type: str = 'generic',
         family: str | None = None,
+        cost_object: str | None = None,
         vat_rate: Decimal | None = None,
         tid: str | None = None,
         source: str | None = None,
@@ -145,6 +149,7 @@ class Invoice(Base, TimestampMixin):
         item = InvoiceItem.get_polymorphic_class(type)(
             group=group,
             family=family,
+            cost_object=cost_object,
             text=text,
             unit=unit,
             quantity=quantity,
