@@ -29,7 +29,6 @@ from urllib3.exceptions import HTTPError
 
 
 from typing import Any, Literal, TYPE_CHECKING
-
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
     from datetime import datetime

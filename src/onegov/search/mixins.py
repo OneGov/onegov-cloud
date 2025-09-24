@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from datetime import timedelta
 from onegov.search.utils import classproperty
 from onegov.search.utils import extract_hashtags
+from sedate import utcnow
 
 
 from typing import Any, ClassVar, TYPE_CHECKING
@@ -147,9 +149,14 @@ class Searchable:
         return self.title  # type:ignore[attr-defined]
 
     @property
-    def es_last_change(self) -> datetime | None:
+    def es_last_change(self) -> datetime:
         """ Returns the date the document was created/last modified. """
-        return None
+        # FIXME: We made this a required property, for now we will
+        #        pretend entries without an explicit date have been
+        #        changed 15 days ago, so they're not completely
+        #        de-prioritized, but also not over-prioritized over
+        #        actually new content.
+        return utcnow() - timedelta(days=15)
 
     @property
     def es_tags(self) -> list[str] | None:
@@ -180,8 +187,9 @@ class ORMSearchable(Searchable):
         return cls.__tablename__
 
     @property
-    def es_last_change(self) -> datetime | None:
-        return getattr(self, 'last_change', None)
+    def es_last_change(self) -> datetime:
+        # FIXME: We made this a required
+        return getattr(self, 'last_change', None) or super().es_last_change
 
 
 class SearchableContent(ORMSearchable):
