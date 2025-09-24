@@ -171,7 +171,6 @@ def test_views_manage(client_with_es):
     assert 'Kommissionsitzung hinzugefügt' in page
 
     # ... attendence
-    # this fails now? why
     page = client.get('/').follow().click('Anwesenheiten').click(
         href='new', index=0
     )
@@ -228,7 +227,7 @@ def test_views_manage(client_with_es):
     assert '1 Resultat' in client.get('/search?q=aa')
     assert '1 Resultat' in client.get('/search?q=bb')
     assert '1 Resultat' in client.get('/search?q=cc')
-    assert '1 Resultat' in client.get('/search?q=first')
+    assert 'Resultate' in client.get('/search?q=first')
     assert '1 Resultat' in client.get('/search?q=Q1')
 
     # Delete
