@@ -3,7 +3,6 @@ from __future__ import annotations
 import platform
 import re
 
-from collections.abc import Iterable
 from copy import deepcopy
 from elasticsearch.exceptions import NotFoundError
 from elasticsearch.helpers import streaming_bulk
@@ -23,7 +22,7 @@ from uuid import UUID
 
 from typing import Any, Literal, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator, Sequence
+    from collections.abc import Callable, Iterable, Iterator, Sequence
     from datetime import datetime
     from elasticsearch import Elasticsearch
     from sqlalchemy.engine import Engine
@@ -43,9 +42,11 @@ if TYPE_CHECKING:
         owner_type: str
         language: str
         access: str
-        suggestion: str | list[str]
+        suggestion: list[str]
         publication_start: datetime | None
         publication_end: datetime | None
+        # TODO: We only need the raw properties once we get rid of ES
+        raw_properties: dict[str, Any]
         properties: dict[str, Any]
 
     class DeleteTask(TypedDict):
@@ -379,11 +380,11 @@ class PostgresIndexer(IndexerBase):
         'en': 'english',
     }
 
-    queue: Queue[IndexTask]
+    queue: Queue[Task]
 
     def __init__(
         self,
-        queue: Queue[IndexTask],
+        queue: Queue[Task],
         engine: Engine,
     ) -> None:
         self.queue = queue
@@ -463,10 +464,10 @@ class PostgresIndexer(IndexerBase):
                     self.idx_language_mapping.get(task['language'], 'simple'))
                 data = {
                     k: unidecode(str(v)) if v else ''
-                    for k, v in task['properties'].items()
+                    for k, v in task['raw_properties'].items()
                     if not k.startswith('es_')
                 }
-                _tags_list = task['properties'].get('es_tags')
+                _tags_list = task['raw_properties'].get('es_tags')
                 _tags = dict.fromkeys(_tags_list, '') if _tags_list else None
 
                 # NOTE: We use a dictionary to avoid duplicate updates for
@@ -477,9 +478,9 @@ class PostgresIndexer(IndexerBase):
                     '_owner_id': _owner_id,
                     '_owner_type': task['owner_type'],  # class name
                     '_owner_tablename': tablename,
-                    '_public': task['properties']['es_public'],
+                    '_public': task['raw_properties']['es_public'],
                     '_access': task.get('access', 'public'),
-                    '_last_change': task['properties']['es_last_change'],
+                    '_last_change': task['raw_properties']['es_last_change'],
                     '_tags': _tags,
                     '_suggestion': task['suggestion'],
                     '_publication_start':
@@ -500,8 +501,9 @@ class PostgresIndexer(IndexerBase):
                     weight
                 )
                 for field, weight in zip(
-                    tasks[0]['properties'].keys(),
-                    chain('A', repeat('D')))
+                    tasks[0]['raw_properties'].keys(),
+                    chain('A', repeat('D'))
+                )
                 if not field.startswith('es_')  # TODO: rename to fts_
             ]
 
@@ -583,11 +585,11 @@ class PostgresIndexer(IndexerBase):
                 schema_translate_map={None: schema}
             )
             with connection.begin():
-                connection.execute(stmt, params)
+                connection.execute(stmt, params or [{}])
         else:
             # use a savepoint instead
             with session.begin_nested():
-                session.execute(stmt, params)
+                session.execute(stmt, params or [{}])
 
     def update(
         self,
@@ -664,9 +666,9 @@ class PostgresIndexer(IndexerBase):
                 ))
             )
             self.execute_statement(session, schema, stmt)
-        except Exception as ex:
-            index_log.error(
-                f'Error "{ex}" deleting index schema {schema} tasks {tasks}'
+        except Exception:
+            index_log.exception(
+                f'Error deleting index schema {schema} tasks {tasks}:'
             )
             return False
 
@@ -681,7 +683,7 @@ class PostgresIndexer(IndexerBase):
         Gathers all tasks and groups them by action and owner type
         """
 
-        def task_generator() -> Iterator[IndexTask]:
+        def task_generator() -> Iterator[Task]:
             while not self.queue.empty():
                 task = self.queue.get(block=False, timeout=None)
                 self.queue.task_done()
@@ -700,9 +702,9 @@ class PostgresIndexer(IndexerBase):
             task_list = list(tasks)
 
             if action == 'index':
-                self.index(task_list, session)
+                self.index(task_list, session)  # type: ignore[arg-type]
             elif action == 'delete':
-                self.delete(task_list, session)
+                self.delete(task_list, session)  # type: ignore[arg-type]
             else:
                 raise NotImplementedError(
                     f"Action '{action}' not implemented for {self.__class__}")
@@ -1107,7 +1109,7 @@ class ORMEventTranslator:
     }
 
     es_queue: Queue[Task]
-    psql_queue: Queue[IndexTask]
+    psql_queue: Queue[Task]
 
     def __init__(
         self,
@@ -1137,13 +1139,16 @@ class ORMEventTranslator:
             if isinstance(obj, Searchable):
                 self.delete(schema, obj)
 
-    def put(self, translation: IndexTask) -> None:
+    def put(self, translation: Task) -> None:
         try:
             self.es_queue.put_nowait(translation)
-            self.psql_queue.put_nowait(translation)
-
         except Full:
-            log.error('The orm event translator queue is full!')
+            log.error('The es orm event translator queue is full!')
+
+        try:
+            self.psql_queue.put_nowait(translation)
+        except Full:
+            log.error('The psql orm event translator queue is full!')
 
     def index(
         self,
@@ -1172,57 +1177,57 @@ class ORMEventTranslator:
                 'tablename': obj.__tablename__,
                 'owner_type': obj.__class__.__name__,
                 'language': language,
-                'access': '',
-                'suggestion': '',
-                'publication_start': None,
-                'publication_end': None,
+                'access': getattr(obj, 'access', 'public'),
+                'suggestion': [],
+                'publication_start': getattr(obj, 'publication_start', None),
+                'publication_end': getattr(obj, 'publication_end', None),
+                'raw_properties': {},
                 'properties': {},
             }
 
             mapping_ = self.mappings[obj.es_type_name].for_language(language)
 
-            for prop in mapping_.keys():
+            for prop, mapping in mapping_.items():
                 if prop == 'es_suggestion':
                     continue
 
+                convert = self.converters.get(mapping['type'], lambda v: v)
                 raw = getattr(obj, prop)
                 if is_non_string_iterable(raw):
-                    translation['properties'][prop] = list(raw)
+                    translation['properties'][prop] = [convert(v) for v in raw]
+                    # TODO: Do we actually need to coerce to list?
+                    #       that seems potentially dangerous for dictionaries
+                    translation['raw_properties'][prop] = list(raw)
                 else:
-                    translation['properties'][prop] = raw
+                    translation['properties'][prop] = convert(raw)
+                    translation['raw_properties'][prop] = raw
 
-            for attr in ['access', 'publication_start', 'publication_end']:
-                if hasattr(obj, attr):
-                    translation[attr] = getattr(obj, attr)  # type:ignore[literal-required]
-
-            # FIXME: remove once es is migrated to postgres
             if obj.es_public:
                 contexts = {'es_suggestion_context': ['public']}
             else:
                 contexts = {'es_suggestion_context': ['private']}
 
-            translation['properties']['es_suggestion'] = {
-                'input': obj.es_suggestion,
-                'contexts': contexts
-            }
-            # end FIXME
-
-            # fts suggestion
             suggestion = obj.es_suggestion
             if suggestion:
                 if isinstance(suggestion, str):
-                    suggestion = [s.strip() for s in suggestion.split(',')]
-                elif isinstance(suggestion, Iterable):
+                    suggestion = [suggestion]
+                else:
                     suggestion = list(suggestion)
 
                 translation['suggestion'] = suggestion
 
+            translation['properties']['es_suggestion'] = {
+                'input': suggestion,
+                'contexts': contexts
+            }
+
             self.put(translation)
-        except ObjectDeletedError as ex:
-            if hasattr(obj, 'id'):
-                log.info(f'Object {obj.id} was deleted before indexing: {ex}')
-            else:
-                log.info(f'Object {obj} was deleted before indexing: {ex}')
+        except ObjectDeletedError:
+            obj_id = getattr(obj, 'id', obj)
+            log.info(
+                f'Object {obj_id} was deleted before indexing:',
+                exc_info=True
+            )
 
     def delete(self, schema: str, obj: Searchable) -> None:
         """
@@ -1238,4 +1243,4 @@ class ORMEventTranslator:
             'id': getattr(obj, obj.es_id)
         }
 
-        self.put(translation)  # type:ignore[arg-type]
+        self.put(translation)

@@ -280,9 +280,13 @@ class SearchPostgres(Pagination[_M]):
         }.get(role, ('mtan', 'public'))
         if available_accesses:
             query = query.filter(or_(
-                SearchIndex.public == 'true',
+                # FIXME: This should either be an and_ or we get rid of
+                #        public entirely, since it should be redundant
+                #        and will probably go out of date
+                SearchIndex.public.is_(True),
                 SearchIndex.access.in_(available_accesses)
             ))
+            query = query.filter(SearchIndex.published)
 
         return query
 

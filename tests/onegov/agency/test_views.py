@@ -787,25 +787,25 @@ def test_basic_search(client_with_es: Client[AgencyApp]) -> None:
     assert 'Rivera' in anom.get('/search?q=Nick')
     assert 'Nick' in anom.get('/search?q=Rivera')
     assert 'Nick' in anom.get('/search?q=Doctor')
-    assert 'Nick' in anom.get('/search?q=+12345678901')
-    assert 'Nick' in anom.get('/search?q=0345678901')
-    assert 'Nick' in anom.get('/search?q=8911')
+    assert 'Nick' in anom.get('/search?q=%2B41234567890')
+    assert 'Nick' in anom.get('/search?q=4567890')
+    assert 'Nick' in anom.get('/search?q=7890')
     assert 'Hospital Springfield' in anom.get('/search?q=Hospital')
     assert 'Nick' in anom.get('/search?q=Anesthetist')
 
     # Test suggestions
     assert 'Nick Rivera (Doctor)' in anom.get('/search/suggest?q=Nic').json
     assert 'Rivera Nick (Doctor)' in anom.get('/search/suggest?q=Riv').json
-    assert '8911 Rivera Nick (Doctor)' in anom.get(
-        '/search/suggest?q=89').json
+    assert '7899 Rivera Nick (Doctor)' in anom.get(
+        '/search/suggest?q=78').json
 
     # postgres
     assert 'Rivera' in anom.get('/search-postgres?q=Nick')
     assert 'Nick' in anom.get('/search-postgres?q=Rivera')
     assert 'Nick' in anom.get('/search-postgres?q=Doctor')
-    assert 'Nick' in anom.get('/search-postgres?q=345678901')
-    assert 'Nick' in anom.get('/search-postgres?q=345678911')
-    assert 'Nick' in anom.get('/search-postgres?q=8911')
+    assert 'Nick' in anom.get('/search-postgres?q=%2B41234567890')
+    assert 'Nick' in anom.get('/search-postgres?q=4567890')
+    assert 'Nick' in anom.get('/search-postgres?q=7890')
     assert 'Hospital Springfield' in anom.get('/search-postgres?q=Hospital')
     assert 'Nick' in anom.get('/search-postgres?q=Anesthetist')
 
@@ -815,7 +815,7 @@ def test_basic_search(client_with_es: Client[AgencyApp]) -> None:
                for v in expected)
     assert all(v in anom.get('/search-postgres/suggest?q=Rivera').json[0]
                for v in expected)
-    assert all(v in anom.get('/search-postgres/suggest?q=8911').json[0]
+    assert all(v in anom.get('/search-postgres/suggest?q=7890').json[0]
                for v in expected)
 
 
