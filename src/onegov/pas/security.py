@@ -100,10 +100,10 @@ def restrict_attendence_access(
         if isinstance(permission, type) and issubclass(permission, Private):
             user = app.session().query(User).filter_by(
                 username=identity.userid).first()
-            if not user or not user.parliamentarian:
+            if not user or not user.parliamentarian:  # type: ignore[attr-defined]
                 return False
 
-            parliamentarian: PASParliamentarian = user.parliamentarian
+            parliamentarian: PASParliamentarian = user.parliamentarian  # type: ignore[attr-defined]
 
             # Regular parliamentarians can only access their own records
             if identity.role == 'parliamentarian':
@@ -119,9 +119,9 @@ def restrict_attendence_access(
                 # is a member of any commission this president leads
                 # Get attendance record owner
                 attendance_owner = app.session().query(User).join(
-                    User.parliamentarian
+                    User.parliamentarian  # type: ignore[attr-defined]
                 ).filter(
-                    User.parliamentarian.has(id=model.parliamentarian_id)
+                    User.parliamentarian.has(id=model.parliamentarian_id)  # type: ignore[attr-defined]
                 ).first()
 
                 if attendance_owner and attendance_owner.parliamentarian:
@@ -173,10 +173,10 @@ def restrict_parliamentarian_access(
         if isinstance(permission, type) and issubclass(permission, Private):
             user = app.session().query(User).filter_by(
                 username=identity.userid).first()
-            if not user or not user.parliamentarian:
+            if not user or not user.parliamentarian:  # type: ignore[attr-defined]
                 return False
 
-            parliamentarian: PASParliamentarian = user.parliamentarian
+            parliamentarian: PASParliamentarian = user.parliamentarian  # type: ignore[attr-defined]
 
             # Regular parliamentarians can only access their own profile
             if identity.role == 'parliamentarian':
@@ -257,8 +257,8 @@ def has_private_access_to_commission(
         user = app.session().query(User).filter_by(
             username=identity.userid).first()
         if user:
-            if user.parliamentarian:
-                membershps = user.parliamentarian.commission_memberships
+            if user.parliamentarian:  # type: ignore[attr-defined]
+                membershps = user.parliamentarian.commission_memberships  # type: ignore[attr-defined]
                 for membership in membershps:
                     if membership.commission_id == model.id and \
                             membership.role == 'president':

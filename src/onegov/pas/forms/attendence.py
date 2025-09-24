@@ -180,9 +180,9 @@ class AttendenceAddForm(AttendenceForm):
             # Commission presidents can add for themselves + commission members
             user = self.request.session.query(User).filter_by(
                 username=self.request.identity.userid).first()
-            if user and user.parliamentarian:
+            if user and user.parliamentarian:  # type: ignore[attr-defined]
                 # Check if they're trying to add for themselves (always OK)
-                if field.data == str(user.parliamentarian.id):
+                if field.data == str(user.parliamentarian.id):  # type: ignore[attr-defined]
                     return
 
                 # Check if target is a member of a commission they president
@@ -190,7 +190,7 @@ class AttendenceAddForm(AttendenceForm):
                     self.request.app).by_id(field.data)
                 if target_parl:
                     for pres_membership in (
-                        user.parliamentarian.commission_memberships
+                        user.parliamentarian.commission_memberships  # type: ignore[attr-defined]
                     ):
                         if (pres_membership.role == 'president'
                             and (pres_membership.end is None
@@ -220,9 +220,9 @@ class AttendenceAddForm(AttendenceForm):
             # Regular parliamentarians can only select themselves
             user = self.request.session.query(User).filter_by(
                 username=self.request.identity.userid).first()
-            if user and user.parliamentarian:
+            if user and user.parliamentarian:  # type: ignore[attr-defined]
                 self.parliamentarian_id.choices = [
-                    (str(user.parliamentarian.id), user.parliamentarian.title)
+                    (str(user.parliamentarian.id), user.parliamentarian.title)  # type: ignore[attr-defined]
                 ]
             else:
                 self.parliamentarian_id.choices = []
@@ -231,12 +231,12 @@ class AttendenceAddForm(AttendenceForm):
             # Commission presidents can select themselves + commission members
             user = self.request.session.query(User).filter_by(
                 username=self.request.identity.userid).first()
-            if user and user.parliamentarian:
-                choices = [(str(user.parliamentarian.id),
-                           user.parliamentarian.title)]
+            if user and user.parliamentarian:  # type: ignore[attr-defined]
+                choices = [(str(user.parliamentarian.id),  # type: ignore[attr-defined]
+                           user.parliamentarian.title)]  # type: ignore[attr-defined]
 
                 # Add commission members
-                for membership in user.parliamentarian.commission_memberships:
+                for membership in user.parliamentarian.commission_memberships:  # type: ignore[attr-defined]
                     if (membership.role == 'president'
                         and (membership.end is None
                              or membership.end >= date.today())):
@@ -249,7 +249,7 @@ class AttendenceAddForm(AttendenceForm):
                                       >= date.today()))
                         ):
                             if (member_membership.parliamentarian_id
-                                != user.parliamentarian.id):
+                                != user.parliamentarian.id):  # type: ignore[attr-defined]
                                 member = member_membership.parliamentarian
                                 choices.append((str(member.id), member.title))
 

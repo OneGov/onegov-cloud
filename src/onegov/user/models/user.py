@@ -353,7 +353,3 @@ class User(Base, TimestampMixin, ORMSearchable):
         self.cleanup_sessions(app)
 
         return count
-
-    if TYPE_CHECKING:
-        # Note: This relationship is created by backref in PAS app
-        parliamentarian: Any
