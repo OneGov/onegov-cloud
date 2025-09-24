@@ -1,17 +1,15 @@
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, String, Boolean, Index
-from sqlalchemy.dialects.postgresql import ARRAY, HSTORE, JSONB, TSVECTOR
-
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID, UTCDateTime
-from sqlalchemy import text
+from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy import CheckConstraint, Index
+from sqlalchemy.dialects.postgresql import ARRAY, HSTORE, JSONB, TSVECTOR
 from sqlalchemy.ext.mutable import MutableDict
 
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
@@ -31,7 +29,10 @@ class SearchIndex(Base, UTCPublicationMixin):
     id = Column(Integer, primary_key=True)
 
     #: Class name of the original model associated with the index entry
-    owner_type = Column(String, nullable=False)
+    owner_type = Column(String, nullable=False, index=True)
+
+    #: Table name of the original model associated with the index entry
+    owner_tablename = Column(String, nullable=False, index=True)
 
     #: Integer id of the original model if applicable
     owner_id_int = Column(Integer, nullable=True)
@@ -46,10 +47,10 @@ class SearchIndex(Base, UTCPublicationMixin):
     public = Column(Boolean, nullable=False, default=False)
 
     #: Access level of entry (AccessExtension::access)
-    access = Column(String, nullable=False, default='public')
+    access = Column(String, nullable=False, default='public', index=True)
 
     #: Timestamp of the last change to the entry (Searchable::es_last_change)
-    last_change = Column(UTCDateTime, nullable=False)
+    last_change = Column(UTCDateTime, nullable=False, index=True)
 
     #: Tags associated with the entry (Searchable::es_tags)
     _tags: Column[dict[str, str] | None] = Column(  # type:ignore
@@ -72,54 +73,96 @@ class SearchIndex(Base, UTCPublicationMixin):
     }
 
     __table_args__ = (
-        # compound indexes for owner lookups
+        # unique partial indeces for ensuring we have no duplicates
+        # NOTE: If we lift our minimum Postgres version to 15 we
+        #       can replace this with a single unique constraint
+        #       using NULLS NOT DISTINCT, but we may still want
+        #       partial indeces in addition to the shared unique index
+        Index(
+            'uq_search_index_owner_tablename_id_int',
+            owner_tablename,
+            owner_id_int,
+            unique=True,
+            postgresql_where=owner_id_int.isnot(None)
+        ),
+        Index(
+            'uq_search_index_owner_tablename_id_uuid',
+            owner_tablename,
+            owner_id_uuid,
+            unique=True,
+            postgresql_where=owner_id_uuid.isnot(None),
+        ),
+        Index(
+            'uq_search_index_owner_tablename_id_str',
+            owner_tablename,
+            owner_id_str,
+            unique=True,
+            postgresql_where=owner_id_str.isnot(None),
+        ),
+        # avoid more than one owner_id being set per row
+        CheckConstraint(
+            """
+                (
+                        owner_id_int IS NOT NULL
+                    AND owner_id_uuid IS NULL
+                    AND owner_id_str IS NULL
+                ) OR (
+                        owner_id_int IS NULL
+                    AND owner_id_uuid IS NOT NULL
+                    AND owner_id_str IS NULL
+                ) OR (
+                        owner_id_int IS NULL
+                    AND owner_id_uuid IS NULL
+                    AND owner_id_str IS NOT NULL
+                )
+            """,
+            'ck_search_index_exactly_one_owner_id_set',
+        ),
+        # partial compound indeces for owner type lookups
         Index(
             'ix_search_index_owner_type_id_int',
-            'owner_type', 'owner_id_int',
-            postgresql_where=text('owner_id_int IS NOT NULL')
+            owner_type,
+            owner_id_int,
+            postgresql_where=owner_id_int.isnot(None)
         ),
         Index(
             'ix_search_index_owner_type_id_uuid',
-            'owner_type',
-            'owner_id_uuid',
-            postgresql_where=text('owner_id_uuid IS NOT NULL'),
+            owner_type,
+            owner_id_uuid,
+            postgresql_where=owner_id_uuid.isnot(None),
         ),
         Index(
             'ix_search_index_owner_type_id_str',
-            'owner_type',
-            'owner_id_str',
-            postgresql_where=text('owner_id_str IS NOT NULL'),
+            owner_type,
+            owner_id_str,
+            postgresql_where=owner_id_str.isnot(None),
         ),
         # compound index for public and access lookups
         Index(
             'ix_search_index_public_access',
-            'public', 'access'
+            public,
+            access
         ),
-
-        # regular indexes for filtering
-        # no index for column public due to low cardinality
-        Index('ix_search_index_access', 'access'),
-        Index('ix_search_index_last_change', 'last_change'),
-
-        # gin indexes for complex types
+        # gin indeces for complex types
         Index(
             'ix_search_index_tags',
-            'tags', postgresql_using='gin'
+            _tags,
+            postgresql_using='gin'
         ),
         Index(
             'ix_search_index_suggestion',
-            'suggestion',
+            suggestion,
             postgresql_using='gin'
         ),
         Index(
             'ix_search_index_fts_idx_data',
-            'fts_idx_data',
+            fts_idx_data,
             postgresql_using='gin',
             postgresql_ops={'fts_idx_data': 'jsonb_ops'},
         ),
         Index(
             'ix_search_index_fts_idx',
-            'fts_idx',
+            fts_idx,
             postgresql_using='gin'
         ),
     )
@@ -128,7 +171,6 @@ class SearchIndex(Base, UTCPublicationMixin):
     def tags(self) -> set[str]:
         return set(self._tags.keys()) if self._tags else set()
 
-    # FIXME: asymmetric property
     @tags.setter
     def tags(self, value: Iterable[str]) -> None:
         self._tags = dict.fromkeys(value, '') if value else {}

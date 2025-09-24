@@ -2,13 +2,9 @@ from __future__ import annotations
 
 import platform
 import re
-from uuid import UUID
-
-import sqlalchemy
-
-from copy import deepcopy
 
 from collections.abc import Iterable
+from copy import deepcopy
 from elasticsearch.exceptions import NotFoundError
 from elasticsearch.helpers import streaming_bulk
 from itertools import groupby, chain, repeat
@@ -18,9 +14,11 @@ from onegov.search import index_log, log, Searchable, utils
 from onegov.search.errors import SearchOfflineError
 from onegov.search.search_index import SearchIndex
 from operator import itemgetter
-from sqlalchemy import func, or_, Table, delete, MetaData
+from sqlalchemy import and_, bindparam, func, String, Table, MetaData
 from sqlalchemy.orm.exc import ObjectDeletedError
+from sqlalchemy.dialects.postgresql import insert, HSTORE
 from unidecode import unidecode
+from uuid import UUID
 
 
 from typing import Any, Literal, NamedTuple, TYPE_CHECKING
@@ -30,6 +28,8 @@ if TYPE_CHECKING:
     from elasticsearch import Elasticsearch
     from sqlalchemy.engine import Engine
     from sqlalchemy.orm import Session
+    from sqlalchemy.sql import ColumnElement
+    from sqlalchemy.sql.expression import Executable
     from typing import TypeAlias
     from typing import TypedDict
 
@@ -38,10 +38,9 @@ if TYPE_CHECKING:
         id: UUID | str | int
         id_key: str
         schema: str
-        type_name: str  # FIXME: not needed for fts
+        type_name: str
         tablename: str
         owner_type: str
-        owner_id: UUID | str | int
         language: str
         access: str
         suggestion: str | list[str]
@@ -54,9 +53,15 @@ if TYPE_CHECKING:
         id: UUID | str | int
         schema: str
         type_name: str
+        owner_type: str
         tablename: str
 
     Task: TypeAlias = IndexTask | DeleteTask
+    PKColumn: TypeAlias = (
+        ColumnElement[UUID | None]
+        | ColumnElement[int | None]
+        | ColumnElement[str | None]
+    )
 
 ES_ANALYZER_MAP = {
     'en': 'english',
@@ -404,33 +409,74 @@ class PostgresIndexer(IndexerBase):
         :return: True if the indexing was successful, False otherwise
 
         """
-        params = []
+        params_dict = {}
 
         if not isinstance(tasks, list):
             tasks = [tasks]
 
+        if not tasks:
+            # nothing to do
+            return True
+
+        tablename: str | None = None
+        schema: str | None = None
+        owner_id_column: PKColumn | None = None
         try:
             for task in tasks:
+                if schema is not None:
+                    if schema != task['schema']:
+                        index_log.error(
+                            'Received mixed schemas in search delete tasks.'
+                        )
+                        return False
+                else:
+                    schema = task['schema']
+
+                if tablename is not None:
+                    if tablename != task['tablename']:
+                        index_log.error(
+                            'Received mixed tables in search delete tasks.'
+                        )
+                        return False
+                else:
+                    tablename = task['tablename']
+
+                _owner_id = task['id']
+                _owner_id_column: PKColumn
+                if isinstance(_owner_id, UUID):
+                    _owner_id_column = SearchIndex.owner_id_uuid
+                elif isinstance(_owner_id, int):
+                    _owner_id_column = SearchIndex.owner_id_int
+                elif isinstance(_owner_id, str):
+                    _owner_id_column = SearchIndex.owner_id_str
+
+                if owner_id_column is not None:
+                    if owner_id_column is not _owner_id_column:
+                        index_log.error(
+                            'Received mixed id types in search delete tasks.'
+                        )
+                        return False
+                else:
+                    owner_id_column = _owner_id_column
+
                 language = (
                     self.idx_language_mapping.get(task['language'], 'simple'))
                 data = {
                     k: unidecode(str(v)) if v else ''
                     for k, v in task['properties'].items()
-                    if not k.startswith('es_')}
-                _owner_id: int | UUID | str = task['owner_id']
-                _tags = (
-                    dict.fromkeys(task['properties'].get('es_tags') or [], ''))
+                    if not k.startswith('es_')
+                }
+                _tags_list = task['properties'].get('es_tags')
+                _tags = dict.fromkeys(_tags_list, '') if _tags_list else None
 
-                params.append({
+                # NOTE: We use a dictionary to avoid duplicate updates for
+                #       the same model, only the latest update will count
+                params_dict[_owner_id] = {
                     '_language': language,
                     '_data': data,
-                    '_owner_id_int':
-                        _owner_id if isinstance(_owner_id, int) else None,
-                    '_owner_id_uuid':
-                        _owner_id if isinstance(_owner_id, UUID) else None,
-                    '_owner_id_str':
-                        _owner_id if isinstance(_owner_id, str) else None,
+                    '_owner_id': _owner_id,
                     '_owner_type': task['owner_type'],  # class name
+                    '_owner_tablename': tablename,
                     '_public': task['properties']['es_public'],
                     '_access': task.get('access', 'public'),
                     '_last_change': task['properties']['es_last_change'],
@@ -441,15 +487,15 @@ class PostgresIndexer(IndexerBase):
                     '_publication_end':
                         task.get('publication_end', None),
                     **{f'_{k}': v for k, v in data.items()}
-                })
+                }
 
+            assert schema is not None
+            assert owner_id_column is not None
             weighted_vector = [
                 func.setweight(
                     func.to_tsvector(
-                        sqlalchemy.bindparam('_language',
-                                             type_=sqlalchemy.String),
-                        sqlalchemy.bindparam(f'_{field}',
-                                             type_=sqlalchemy.String)
+                        bindparam('_language', type_=String),
+                        bindparam(f'_{field}', type_=String)
                     ),
                     weight
                 )
@@ -463,46 +509,60 @@ class PostgresIndexer(IndexerBase):
             for vector in weighted_vector[1:]:
                 combined_vector = combined_vector.op('||')(vector)
 
-            schema = tasks[0]['schema']
-
             stmt = (
-                sqlalchemy.insert(SearchIndex.__table__)
+                insert(SearchIndex.__table__)
                 .values(
                     {
-                        SearchIndex.__table__.c.owner_id_int:
-                            sqlalchemy.bindparam('_owner_id_int'),
-                        SearchIndex.__table__.c.owner_id_uuid:
-                            sqlalchemy.bindparam('_owner_id_uuid'),
-                        SearchIndex.__table__.c.owner_id_str:
-                            sqlalchemy.bindparam('_owner_id_str'),
-                        SearchIndex.__table__.c.owner_type:
-                            sqlalchemy.bindparam('_owner_type'),
-                        SearchIndex.__table__.c.publication_start:
-                            sqlalchemy.bindparam('_publication_start'),
-                        SearchIndex.__table__.c.publication_end:
-                            sqlalchemy.bindparam('_publication_end'),
-                        SearchIndex.__table__.c.public:
-                            sqlalchemy.bindparam('_public'),
-                        SearchIndex.__table__.c.access:
-                            sqlalchemy.bindparam('_access'),
-                        SearchIndex.__table__.c.last_change:
-                            sqlalchemy.bindparam('_last_change'),
-                        SearchIndex.__table__.c.tags:
-                            sqlalchemy.bindparam('_tags'),
-                        SearchIndex.__table__.c.suggestion:
-                            sqlalchemy.bindparam('_suggestion'),
-                        SearchIndex.__table__.c.fts_idx_data:
-                            sqlalchemy.bindparam('_data'),
-                        SearchIndex.__table__.c.fts_idx: combined_vector,
+                        owner_id_column: bindparam('_owner_id'),
+                        SearchIndex.owner_type: bindparam('_owner_type'),
+                        SearchIndex.owner_tablename:
+                            bindparam('_owner_tablename'),
+                        SearchIndex.publication_start:
+                            bindparam('_publication_start'),
+                        SearchIndex.publication_end:
+                            bindparam('_publication_end'),
+                        SearchIndex.public: bindparam('_public'),
+                        SearchIndex.access: bindparam('_access'),
+                        SearchIndex.last_change: bindparam('_last_change'),
+                        SearchIndex._tags: bindparam('_tags', type_=HSTORE),
+                        SearchIndex.suggestion: bindparam('_suggestion'),
+                        SearchIndex.fts_idx_data: bindparam('_data'),
+                        SearchIndex.fts_idx: combined_vector,
                     }
                 )
+                # we may have already indexed this model
+                # so perform an update instead
+                .on_conflict_do_update(
+                    index_elements=[
+                        SearchIndex.owner_tablename,
+                        owner_id_column
+                    ],
+                    set_={
+                        # the owner_type can change, although uncommon
+                        'owner_type': bindparam('_owner_type'),
+                        'publication_start': bindparam('_publication_start'),
+                        'publication_end': bindparam('_publication_end'),
+                        'public': bindparam('_public'),
+                        'access': bindparam('_access'),
+                        'last_change': bindparam('_last_change'),
+                        'tags': bindparam('_tags', type_=HSTORE),
+                        'suggestion': bindparam('_suggestion'),
+                        'fts_idx_data': bindparam('_data'),
+                        'fts_idx': combined_vector,
+                    },
+                    # since our unique constraints are partial indeces
+                    # we need this index_where clause, otherwise postgres
+                    # will not be able to infer the matching constraint
+                    index_where=owner_id_column.isnot(None)  # type: ignore[no-untyped-call]
+                )
             )
+            params = list(params_dict.values())
 
             self.execute_statement(session, schema, stmt, params)
-        except Exception as ex:
-            index_log.error(
-                f'Error "{ex}" creating index schema {tasks[0]["schema"]} of '
-                f'type {tasks[0]["owner_type"]}, tasks:',
+        except Exception:
+            index_log.exception(
+                f'Error creating index schema {schema} of '
+                f'table {tablename}, tasks:',
                 [t['id'] for t in tasks],
             )
             return False
@@ -513,7 +573,7 @@ class PostgresIndexer(IndexerBase):
         self,
         session: Session | None,
         schema: str,
-        stmt: sqlalchemy.sql.expression.Executable,
+        stmt: Executable,
         params: list[dict[str, Any]] | None = None
     ) -> None:
 
@@ -546,43 +606,63 @@ class PostgresIndexer(IndexerBase):
         if not isinstance(tasks, list):
             tasks = [tasks]
 
-        owner_id_uuids = set()
-        owner_id_strs = set()
-        owner_id_ints = set()
         schema: str | None = None
+        tablename: str | None = None
+        owner_ids: set[UUID | int | str] = set()
+        owner_id_column: PKColumn | None = None
         for task in tasks:
             if schema is not None:
                 if schema != task['schema']:
                     index_log.error(
-                        'Received mixed schemas in search delete queue.'
+                        'Received mixed schemas in search delete tasks.'
                     )
                     return False
             else:
                 schema = task['schema']
 
+            if tablename is not None:
+                if tablename != task['tablename']:
+                    index_log.error(
+                        'Received mixed tables in search delete tasks.'
+                    )
+                    return False
+            else:
+                tablename = task['tablename']
+
             _owner_id = task['id']
+            _owner_id_column: PKColumn
+            owner_ids.add(_owner_id)
             if isinstance(_owner_id, UUID):
-                owner_id_uuids.add(_owner_id)
+                _owner_id_column = SearchIndex.owner_id_uuid
             elif isinstance(_owner_id, int):
-                owner_id_ints.add(_owner_id)
+                _owner_id_column = SearchIndex.owner_id_int
             elif isinstance(_owner_id, str):
-                owner_id_strs.add(_owner_id)
+                _owner_id_column = SearchIndex.owner_id_str
 
-        conditions = []
-        if owner_id_uuids:
-            conditions.append(SearchIndex.owner_id_uuid.in_(owner_id_uuids))
-        if owner_id_ints:
-            conditions.append(SearchIndex.owner_id_int.in_(owner_id_ints))
-        if owner_id_strs:
-            conditions.append(SearchIndex.owner_id_str.in_(owner_id_strs))
+            if owner_id_column is not None:
+                if owner_id_column is not _owner_id_column:
+                    index_log.error(
+                        'Received mixed id types in search delete tasks.'
+                    )
+                    return False
+            else:
+                owner_id_column = _owner_id_column
 
-        if not conditions:
-            # nothing to do
+        if not owner_ids:
+            # nothing to delete
             return True
 
         try:
             assert schema is not None
-            stmt = SearchIndex.__table__.delete().where(or_(*conditions))
+            assert tablename is not None
+            assert owner_id_column is not None
+            stmt = (
+                SearchIndex.__table__.delete()
+                .where(and_(
+                    SearchIndex.owner_tablename == tablename,
+                    owner_id_column.in_(owner_ids)
+                ))
+            )
             self.execute_statement(session, schema, stmt)
         except Exception as ex:
             index_log.error(
@@ -596,11 +676,9 @@ class PostgresIndexer(IndexerBase):
     #        the Postgres indexer, we don't have to worry about individual
     #        transactions failing as much
     def bulk_process(self, session: Session | None = None) -> None:
-        """ Processes the queue in bulk. This offers better performance but it
-        is less safe at the moment and should only be used as part of
-        reindexing.
+        """ Processes the queue in bulk.
 
-        Gather all index tasks, group them by model and index batch-wise
+        Gathers all tasks and groups them by action and owner type
         """
 
         def task_generator() -> Iterator[IndexTask]:
@@ -611,9 +689,14 @@ class PostgresIndexer(IndexerBase):
 
         grouped_tasks = groupby(
             task_generator(),
-            key=itemgetter('action', 'type_name')
+            # NOTE: We could group by tablename for delete actions
+            #       which could yield slightly larger batches in
+            #       some cases, but for indexing we currently
+            #       can't do that, because properties may differ
+            #       between multiple polymorphic variants
+            key=itemgetter('schema', 'action', 'owner_type')
         )
-        for (action, _), tasks in grouped_tasks:
+        for (_, action, _), tasks in grouped_tasks:
             task_list = list(tasks)
 
             if action == 'index':
@@ -629,7 +712,7 @@ class PostgresIndexer(IndexerBase):
 
         metadata = MetaData(schema=schema)
         search_index_table = Table(SearchIndex.__tablename__, metadata)
-        stmt = delete(search_index_table)
+        stmt = search_index_table.delete()
 
         connection = self.engine.connect()
         with connection.begin():
@@ -1063,7 +1146,8 @@ class ORMEventTranslator:
             log.error('The orm event translator queue is full!')
 
     def index(
-        self, schema: str,
+        self,
+        schema: str,
         obj: Searchable,
     ) -> None:
         """
@@ -1085,10 +1169,8 @@ class ORMEventTranslator:
                 'id_key': obj.es_id,
                 'schema': schema,
                 'type_name': obj.es_type_name,
-                # FIXME: tablename not needed for fts
-                'tablename': obj.__tablename__,  # type:ignore[attr-defined]
+                'tablename': obj.__tablename__,
                 'owner_type': obj.__class__.__name__,
-                'owner_id': getattr(obj, obj.es_id),
                 'language': language,
                 'access': '',
                 'suggestion': '',
@@ -1151,8 +1233,8 @@ class ORMEventTranslator:
             'action': 'delete',
             'schema': schema,
             'type_name': obj.es_type_name,
-            # FIXME: tablename not needed for fts
-            'tablename': obj.__tablename__,  # type:ignore[attr-defined]
+            'tablename': obj.__tablename__,
+            'owner_type': obj.__class__.__name__,
             'id': getattr(obj, obj.es_id)
         }
 

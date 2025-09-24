@@ -11,15 +11,17 @@ from elasticsearch import Transport
 from elasticsearch import TransportError
 from elasticsearch.connection import create_ssl_context
 from more.transaction.main import transaction_tween_factory
-from sqlalchemy import inspect
 
 from onegov.search import Search, log, index_log, Searchable
 from onegov.search.errors import SearchOfflineError
 from onegov.search.indexer import Indexer, PostgresIndexer
 from onegov.search.indexer import ORMEventTranslator
 from onegov.search.indexer import TypeMappingRegistry
-from onegov.search.utils import (searchable_sqlalchemy_models,
-                                 filter_for_base_models)
+from onegov.search.utils import (
+    apply_searchable_polymorphic_filter,
+    get_polymorphic_base,
+    searchable_sqlalchemy_models,
+)
 from sortedcontainers import SortedSet
 from sedate import utcnow
 from sqlalchemy.orm import undefer
@@ -417,6 +419,13 @@ class SearchApp(morepath.App):
         """
         return request.is_logged_in
 
+    def indexable_base_models(self) -> set[type[Searchable | Base]]:
+        return {
+            get_polymorphic_base(model)
+            for base in self.session_manager.bases
+            for model in searchable_sqlalchemy_models(base)
+        }
+
     def perform_reindex(self, fail: bool = False) -> None:
         """ Re-indexes all content.
 
@@ -449,38 +458,35 @@ class SearchApp(morepath.App):
             """ Load all database objects and index them. """
             session = self.session()
             try:
-                q = session.query(model).options(undefer('*'))
-                i = inspect(model)
+                query = session.query(model).options(undefer('*'))
+                query = apply_searchable_polymorphic_filter(query, model)
 
-                if i.polymorphic_on is not None:
-                    q = q.filter(i.polymorphic_on.in_({
-                        m.polymorphic_identity for m in i.self_and_descendants
-                        if issubclass(m.class_, Searchable)}))
-
-                for obj in q:
+                for obj in query:
+                    # NOTE: Avoid polluting the queue with objects we're
+                    #       not going to put in the index at the end
+                    # FIXME: We can put this condition into the query
+                    #        if we make es_skip a hybrid_property
+                    if obj.es_skip:
+                        continue
                     self.fts_orm_events.index(schema, obj)
 
-            except Exception as e:
+                self.psql_indexer.bulk_process()
+            except Exception:
                 index_log.info(
-                    f"Error psql indexing model '{model.__name__}': {e}")
+                    f"Error psql indexing model '{model.__name__}'",
+                    exc_info=True
+                )
             finally:
                 session.invalidate()
                 session.bind.dispose()
 
-        models = {
-            model
-            for base in self.session_manager.bases
-            for model in searchable_sqlalchemy_models(base)
-        }
-        models = filter_for_base_models(models)
-
         with ThreadPoolExecutor() as executor:
-            results = executor.map(reindex_model, models)
+            results = executor.map(reindex_model, self.indexable_base_models())
             if fail:
                 index_log.info('Failed reindexing:', tuple(results))
 
-        self.es_indexer.bulk_process()
         self.psql_indexer.bulk_process()
+        self.es_indexer.bulk_process()
 
 
 @SearchApp.tween_factory(over=transaction_tween_factory)

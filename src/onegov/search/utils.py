@@ -7,12 +7,14 @@ from sqlalchemy import inspect
 from lingua import IsoCode639_1, LanguageDetectorBuilder
 from onegov.core.orm import find_models
 
-from typing import Any, Generic, TypeVar, TYPE_CHECKING
 
+from typing import Any, Generic, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator, Sequence, Iterable
+    from collections.abc import Callable, Iterator, Sequence
     from lingua import ConfidenceValue
+    from onegov.core.orm import Base
     from onegov.search.mixins import Searchable
+    from sqlalchemy.orm import Query
 
 
 T = TypeVar('T')
@@ -41,22 +43,43 @@ def searchable_sqlalchemy_models(
     )
 
 
-def filter_for_base_models(
-    models: Iterable[type[Searchable]]
-) -> set[type[Searchable]]:
+def get_polymorphic_base(
+    model: type[Searchable]
+) -> type[Base | Searchable]:
     """
     Filter out models that are polymorphic subclasses of other
     models in order to save on queries.
 
     """
-    new_models = set()
+    mapper = inspect(model)
+    if mapper.polymorphic_on is None:
+        return model
+    return mapper.base_mapper.class_
 
-    for model in models:
-        i = inspect(model)
-        new_models.add(
-            model if i.polymorphic_on is None else i.base_mapper.class_)
 
-    return new_models
+def apply_searchable_polymorphic_filter(
+    query: Query[T],
+    model: Any
+) -> Query[T]:
+    """
+    Given a query and the corresponding model add a filter
+    that excludes any polymorphic variants, that are not
+    searchable.
+    """
+
+    # XXX circular imports
+    from onegov.search import Searchable
+
+    mapper = inspect(model)
+    if mapper.polymorphic_on is not None:
+        # only include the polymorphic identities that
+        # are actually searchable
+        return query.filter(mapper.polymorphic_on.in_({
+            m.polymorphic_identity
+            for m in mapper.self_and_descendants
+            if issubclass(m.class_, Searchable)
+        }))
+    return query
 
 
 _invalid_index_characters = re.compile(r'[\\/?"<>|\s,A-Z:]+')

@@ -54,6 +54,7 @@ class Searchable:
         es_properties: ClassVar[dict[str, Any]]
         es_type_name: ClassVar[str]
         es_id: ClassVar[str]
+        __tablename__: ClassVar[str]
 
     # TODO: rename to fts_properties
     @classproperty  # type:ignore[no-redef]
@@ -176,7 +177,7 @@ class ORMSearchable(Searchable):
     @classproperty  # type:ignore[no-redef]
     @classmethod
     def es_type_name(cls) -> str:
-        return cls.__tablename__  # type:ignore[attr-defined]
+        return cls.__tablename__
 
     @property
     def es_last_change(self) -> datetime | None:

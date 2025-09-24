@@ -4,55 +4,72 @@ from __future__ import annotations
 import click
 
 from onegov.core.cli import command_group, pass_group_context
+from onegov.search.search_index import SearchIndex
+from onegov.search.utils import apply_searchable_polymorphic_filter
+from operator import attrgetter
 from sedate import utcnow
 from sqlalchemy import func
 
+
 from typing import TYPE_CHECKING
-
-from onegov.search.search_index import SearchIndex
-
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.cli.core import GroupContext
     from onegov.core.framework import Framework
     from onegov.core.request import CoreRequest
+    from onegov.search.integration import SearchApp
+
 
 cli = command_group()
 
 
-def psql_index_status(app: Framework) -> None:
+def psql_index_status(app: SearchApp) -> None:
     """ Prints the percentage of indexed documents per model. """
 
     success = 1  # 1 = OK, 2 = WARNING, 3 = ERROR
     session = app.session()
 
-    try:
-        q = session.query(SearchIndex.fts_idx)
-    except Exception as e:
-        click.secho(f'ERROR {e} {SearchIndex} has no fts_idx column ('
-                    f'Hint: has upgrade step been executed?)', fg='red')
-        success = 3
+    index_counts = dict(session.query(
+        SearchIndex.owner_tablename,
+        func.count(SearchIndex.id)
+    ).group_by(SearchIndex.owner_tablename))
 
-    count = session.query(func.count(SearchIndex.id)).scalar() or 0.001
-    q = session.query(func.count(SearchIndex.fts_idx))
-    ftx_set = q.filter(SearchIndex.fts_idx.isnot(None)).scalar()
-    percentage = ftx_set / count * 100
+    click.echo(f'| Status | {"Tablename": <40} | Indexed | No. docs |')
+    click.echo(f'|--------|-{"---------":-<40}-|---------|----------|')
 
-    if 10 <= percentage < 90:
-        click.secho(f'WARNING Percentage of {count} indexed '
-                    f'documents of model {SearchIndex} is low: '
-                    f'{percentage:.2f}% (Hint: has reindex step been '
-                    f'executed?)')
-        success = max(success, 2)
-    elif percentage < 10:
-        click.secho(f'ERROR Percentage of {count} indexed '
-                    f'documents of model {SearchIndex} is very low: '
-                    f'{percentage:.2f}% (Hint: has reindex step been '
-                    f'executed?)')
-        success = max(success, 3)
-    else:
-        click.secho(f'Model {SearchIndex.__name__} has {percentage:.2f}% of'
-                    f' {count} documents indexed')
+    for model in sorted(
+        app.indexable_base_models(),
+        key=attrgetter('__tablename__')
+    ):
+        tablename = model.__tablename__
+        # FIXME: Replace this with a func.count query too by replacing
+        #        es_skip with a hybrid_property
+        count = sum(
+            1
+            for obj in apply_searchable_polymorphic_filter(
+                session.query(model),
+                model
+            )
+            if not getattr(obj, 'es_skip', False)
+        )
+        if not count:
+            # nothing to index, so we indexed it all
+            percentage = 100.0
+        else:
+            percentage = index_counts.get(tablename, 0) / count * 100.0
+
+        if 10.0 <= percentage < 90.0:
+            status = click.style(' WARN ', fg='yellow')
+            success = max(success, 2)
+        elif percentage < 10.0:
+            status = click.style('  ERR ', fg='red')
+            success = max(success, 3)
+        else:
+            status = click.style('  OK  ', fg='green')
+        click.echo(
+            f'| {status} | {tablename:<40} | {percentage: >6.2f}% | '
+            f' {count:>7} |',
+        )
 
     if success == 1:
         click.secho('Indexing status check OK', fg='green')
@@ -97,9 +114,9 @@ def index_status(
         if not hasattr(request.app, 'es_client'):
             return
 
-        title = f'Index status of {request.app.application_id}'
+        title = f'Index status of {app.application_id}'
         click.secho(title, underline=True)
 
-        psql_index_status(app)
+        psql_index_status(app)  # type: ignore[arg-type]
 
     return run_index_status
