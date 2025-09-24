@@ -863,6 +863,9 @@ msgstr "Import erfolgreich ausgelöst. Der Vorgang kann bis zu 30 Sekunden dauer
 msgid "completed"
 msgstr "Abgeschlossen"
 
+msgid "Profile"
+msgstr "Profil"
+
 msgid "failed"
 msgstr "Fehlgeschlagen"
 

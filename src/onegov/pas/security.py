@@ -52,16 +52,6 @@ def has_permission_logged_in(
     model: Any,
     permission: Intent
 ) -> bool:
-    if getattr(model, 'access', None) == 'private':
-        if identity.role not in ('admin'):
-            return False
-
-    if getattr(model, 'access', None) == 'member':
-        if identity.role not in (
-            'admin', 'parliamentarian', 'commission_president'
-        ):
-            return False
-
     return permission in getattr(app.settings.roles, identity.role)
 
 
@@ -72,13 +62,10 @@ def restrict_attendence_collection_access(
     model: AttendenceCollection,
     permission: Intent
 ) -> bool:
-    # Parliamentarians and commission presidents can access attendance
-    # collection
     if identity.role in ('parliamentarian', 'commission_president'):
         # Allow Private permission for attendance collection access
         if isinstance(permission, type) and issubclass(permission, Private):
             return True
-        return permission in getattr(app.settings.roles, identity.role)
 
     return permission in getattr(app.settings.roles, identity.role)
 
@@ -151,8 +138,6 @@ def restrict_attendence_access(
 
                 return False
 
-        return permission in getattr(app.settings.roles, identity.role)
-
     return permission in getattr(app.settings.roles, identity.role)
 
 
@@ -206,8 +191,6 @@ def restrict_parliamentarian_access(
                                 return True
 
                 return False
-
-        return permission in getattr(app.settings.roles, identity.role)
 
     return permission in getattr(app.settings.roles, identity.role)
 

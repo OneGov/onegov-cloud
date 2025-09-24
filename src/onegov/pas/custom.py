@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from onegov.pas.utils import is_parliamentarian_role
 from onegov.core.elements import Link
 from onegov.org.custom import logout_path
 from onegov.org.elements import LinkGroup
