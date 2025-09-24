@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from onegov.core.security import Private
+from onegov.core.security.permissions import Personal
+
 from onegov.org.models import Organisation
 from onegov.pas import _
 from onegov.pas import PasApp
@@ -28,7 +29,7 @@ if TYPE_CHECKING:
     model=Organisation,
     name='pas-settings',
     template='pas_dashboard.pt',
-    permission=Private
+    permission=Personal
 )
 def view_pas_settings(
     self: Organisation,

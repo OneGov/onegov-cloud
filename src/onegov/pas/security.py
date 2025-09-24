@@ -31,6 +31,7 @@ PAS is fully internal.
     - Parliamentarians can report attendance, view limited data.
     - Commission presidents can same as parliamentarians + edit attendance of
       peers in their commission.
+    - Editors and Members in the usual sense don't exist.
 """
 
 
@@ -52,13 +53,12 @@ def has_permission_logged_in(
     permission: Intent
 ) -> bool:
     if getattr(model, 'access', None) == 'private':
-        if identity.role not in ('admin', 'editor'):
+        if identity.role not in ('admin'):
             return False
 
     if getattr(model, 'access', None) == 'member':
         if identity.role not in (
-            'admin', 'editor', 'member', 'parliamentarian',
-            'commission_president'
+            'admin', 'parliamentarian', 'commission_president'
         ):
             return False
 
@@ -220,9 +220,6 @@ def restrict_organisation_access(
     permission: Intent
 ) -> bool:
     # Allow parliamentarians to access pas-settings via Organisation model
-    if identity.role in ('parliamentarian', 'commission_president'):
-        return permission in getattr(app.settings.roles, identity.role)
-
     return permission in getattr(app.settings.roles, identity.role)
 
 
@@ -234,16 +231,14 @@ def restrict_files_collection_access(
     permission: Intent
 ) -> bool:
     """ Grant parliamentarians and commission presidents access to files """
-    if identity.role in ('parliamentarian', 'commission_president'):
-        # Allow Private permission for files collection access
-        if isinstance(permission, type) and issubclass(permission, Private):
-            return True
-        return permission in getattr(app.settings.roles, identity.role)
-
+    # Special case: auto-grant Private access to these roles
+    if (identity.role in ('parliamentarian', 'commission_president') and
+        isinstance(permission, type) and issubclass(permission, Private)):
+        return True
+    # Default: check role permissions
     return permission in getattr(app.settings.roles, identity.role)
 
 
-# todo: test this
 @PasApp.permission_rule(model=Commission, permission=Private)
 def has_private_access_to_commission(
     app: PasApp,
@@ -251,7 +246,12 @@ def has_private_access_to_commission(
     model: Commission,
     permission: Intent
 ) -> bool:
-    """ Grant private access to commission presidents of this commission.
+    """
+    -Looks up the User from database by username
+    - Verifies they're actually a parliamentarian
+    - Checks their commission memberships to see if they're the
+    - president of THIS specific commission
+    If yes → grants access
     """
     if identity.role == 'commission_president':
         user = app.session().query(User).filter_by(
