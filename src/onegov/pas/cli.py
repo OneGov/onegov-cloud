@@ -47,7 +47,10 @@ warnings.filterwarnings('ignore', message='.*No writable cache directories.*')
 def import_commission_data(
     excel_file: str,
 ) -> Processor:
-    """Import commission data from an Excel or csv file.
+    """
+    Note: This is deprecated, not really used, as we have the JSON import.
+
+    Import commission data from an Excel or csv file.
 
     Assumes that the name of the commission is the filename.
 

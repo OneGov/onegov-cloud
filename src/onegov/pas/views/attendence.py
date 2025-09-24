@@ -48,7 +48,8 @@ def view_attendences(
     filtered_attendences = self.view_for_parliamentarian(request)
     bulk_edit_attendences = sorted(
         filtered_attendences,
-        key=lambda x: (x.bulk_edit_id or '', x.created or x.modified),
+        key=lambda x: (str(x.bulk_edit_id) if x.bulk_edit_id else '',
+                      x.created or x.modified),
         reverse=True
     )
 

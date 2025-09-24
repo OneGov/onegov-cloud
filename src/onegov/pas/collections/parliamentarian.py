@@ -44,6 +44,12 @@ class PASParliamentarianCollection(
 
     def add(self, **kwargs: Any) -> PASParliamentarian:
         item = super().add(**kwargs)
+        if not item.email_primary:
+            log.warning(
+                f'Creating parliamentarian {item.title} without email_primary. '
+                'This will prevent user account creation and may cause '
+                'permission-related failures.'
+            )
         self.update_user(item, item.email_primary)
         self.session.flush()
         return item

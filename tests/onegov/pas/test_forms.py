@@ -51,14 +51,19 @@ def dummy_request(session):
         is_manager=True,
         locale='de_CH',
         session=session,
-        method='GET'  # not dynamic but doenst matter our purposess
+        method='GET',  # not dynamic but doenst matter our purposess
+        identity=Bunch(role='parliamentarian', userid='test-user@example.com')  # same here
     )
 
 @freeze_time('2024-01-01')
 def test_attendence_forms(session, dummy_request):
 
     parliamentarians = PASParliamentarianCollection(DummyApp(session=session))
-    parliamentarian = parliamentarians.add(first_name='a', last_name='b')
+    parliamentarian = parliamentarians.add(
+        first_name='a',
+        last_name='b',
+        email_primary='test-user@example.com'
+    )
     parliamentarians.add(first_name='p', last_name='q')
 
     roles = PASParliamentarianRoleCollection(session)
