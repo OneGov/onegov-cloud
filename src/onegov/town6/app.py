@@ -13,8 +13,10 @@ from onegov.core.utils import module_path
 from onegov.foundation6.integration import FoundationApp
 from onegov.org.app import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.org.models.directory import ExtendedDirectory
 from onegov.town6.api import (
-    EventApiEndpoint, NewsApiEndpoint, TopicApiEndpoint)
+    EventApiEndpoint, NewsApiEndpoint, TopicApiEndpoint,
+    DirectoryEntryApiEndpoint)
 from onegov.town6.custom import get_global_tools
 from onegov.town6.initial_content import create_new_organisation
 from onegov.town6.theme import TownTheme
@@ -224,12 +226,23 @@ def get_render_mtan_access_limit_exceeded(
 
 
 @TownApp.setting(section='api', name='endpoints')
-def get_api_endpoints() -> list[type[ApiEndpoint[Any]]]:
-    return [
-        EventApiEndpoint,
-        NewsApiEndpoint,
-        TopicApiEndpoint,
-    ]
+def get_api_endpoints_handler(
+) -> Callable[[TownRequest], Iterator[ApiEndpoint[Any]]]:
+
+    def get_api_endpoints(
+            request: TownRequest
+    ) -> Iterator[ApiEndpoint[Any]]:
+        yield EventApiEndpoint(request)
+        yield NewsApiEndpoint(request)
+        yield TopicApiEndpoint(request)
+        directories = request.exclude_invisible(
+            request.session.query(ExtendedDirectory).all())
+        for directory in directories:
+            yield DirectoryEntryApiEndpoint(
+                request=request,
+                directory=directory)
+
+    return get_api_endpoints
 
 
 @TownApp.webasset_path()

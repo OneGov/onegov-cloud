@@ -3,11 +3,15 @@ from __future__ import annotations
 from onegov.api.models import ApiEndpoint, ApiEndpointItem
 from onegov.event.collections import OccurrenceCollection
 from onegov.gis import Coordinates
+from sqlalchemy.exc import SQLAlchemyError
 
 
-from typing import Any
+from typing import Any, Self
 from typing import TYPE_CHECKING
 
+from onegov.org.models.directory import (ExtendedDirectory,
+                                        ExtendedDirectoryEntry,
+                                        ExtendedDirectoryEntryCollection)
 from onegov.org.models.page import News, NewsCollection, Topic, TopicCollection
 
 if TYPE_CHECKING:
@@ -17,6 +21,7 @@ if TYPE_CHECKING:
     from onegov.core.orm.mixins import ContentMixin
     from onegov.core.orm.mixins import TimestampMixin
     from typing import TypeVar
+    from onegov.core.collection import PKType
 
     T = TypeVar('T')
 
@@ -166,3 +171,75 @@ class TopicApiEndpoint(ApiEndpoint[Topic]):
                 self.request, self.endpoint, str(item.parent_id)
             ) if item.parent_id is not None else None,
         }
+
+
+class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
+    request: TownRequest
+    app: TownApp
+    filters = set()
+    endpoint: str
+
+    def __init__(
+        self,
+        request: TownRequest,
+        directory: ExtendedDirectory,
+        extra_parameters: dict[str, str | None] | None = None,
+        page: int | None = None,
+    ):
+        super().__init__(request, extra_parameters, page)
+        self.endpoint = directory.name
+        self.directory = directory
+
+    @property
+    def collection(self) -> Any:
+        result = ExtendedDirectoryEntryCollection(
+            self.directory,
+            page=self.page or 0,
+            published_only=True
+        )
+        result.batch_size = 25
+        return result
+
+    def for_page(self, page: int | None) -> Self | None:
+        """ Return a new endpoint instance with the given page while keeping
+        the current filters.
+
+        """
+
+        return self.__class__(self.request, self.directory,
+                              self.extra_parameters, page)
+
+    def for_filter(self, **filters: Any) -> Self:
+        """ Return a new endpoint instance with the given filters while
+        discarding the current filters and page.
+
+        """
+
+        return self.__class__(self.request, self.directory, filters)
+
+    def by_id(
+            self, id: PKType
+              ) -> ExtendedDirectoryEntry | None:
+        """ Return the item with the given ID from the collection. """
+
+        try:
+            return self.__class__(self.request, self.directory
+                                  ).collection.by_id(id)
+        except SQLAlchemyError:
+            return None
+
+    def item_data(self, item: ExtendedDirectoryEntry) -> dict[str, Any]:
+        data = item.content['values'].copy() or {}
+        data['coordinates'] = get_geo_location(item)
+
+        for field in item.directory.fields:
+            if any(type in field.type for type in ['fileinput', 'url']):
+                data.pop(field.id, None)
+
+        return data
+
+    def item_links(self, item: ExtendedDirectoryEntry) -> dict[str, Any]:
+        data = {(f.note or 'file'): f for f in item.files.copy()}
+        data['html'] = item  # type: ignore
+
+        return data

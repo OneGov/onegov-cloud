@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING, Any
 
 from onegov.api import ApiApp
 from onegov.api.models import ApiEndpoint, ApiException, AuthEndpoint
@@ -12,7 +13,6 @@ from webob.exc import HTTPMethodNotAllowed, HTTPNotFound, HTTPUnauthorized
 from wtforms import HiddenField
 
 
-from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Generator, Sequence
     from onegov.core.request import CoreRequest
@@ -59,7 +59,7 @@ def view_api_endpoints(
             'href': request.link(self),
             'queries': [
                 {
-                    'href': request.link(endpoint(request)),
+                    'href': request.link(endpoint),
                     'rel': endpoint.endpoint,
                     'data': [
                         {'name': name}
