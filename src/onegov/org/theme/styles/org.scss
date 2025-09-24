@@ -122,6 +122,7 @@ h6,
 /*
     Disable hyphenation in e-mail links and make them breakable
 */
+
 a[href^="mailto:"] {
     @include prefix(hyphens, none);
     @include prefix(word-break, break-all);
@@ -3695,6 +3696,14 @@ button {
         }
     }
 
+}
+
+.accordion .accordion-navigation dl {
+    margin-bottom: 1rem;
+}
+.accordion .accordion-navigation dd a {
+    padding: 0;
+    display: inline;
 }
 
 /*
