@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
-    from onegov.town6.request import TownRequest
+    from onegov.pas.request import PasRequest
     from onegov.core.types import RenderData
     from webob import Response
 
@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     permission=Private
 )
 def view_import_logs(
-    self: ImportLogCollection, request: TownRequest
+    self: ImportLogCollection, request: PasRequest
 ) -> RenderData:
     request.include('importlog')
 
@@ -50,7 +50,7 @@ def view_import_logs(
     permission=Private
 )
 def view_import_log(
-    self: ImportLog, request: TownRequest
+    self: ImportLog, request: PasRequest
 ) -> RenderData:
     request.include('importlog')
     layout = ImportLogLayout(self, request)
@@ -106,7 +106,7 @@ def view_import_log(
     request_method='POST'
 )
 def trigger_import_view(
-    self: ImportLogCollection, request: TownRequest
+    self: ImportLogCollection, request: PasRequest
 ) -> Response:
     """Trigger manual KUB data import."""
     try:
@@ -129,7 +129,7 @@ def trigger_import_view(
     permission=Private
 )
 def download_source_data(
-    self: ImportLog, request: TownRequest
+    self: ImportLog, request: PasRequest
 ) -> Response:
     """Download source JSON data based on type parameter."""
     source_type = request.params.get('type')

@@ -4,6 +4,7 @@ from onegov.core.elements import Link
 from onegov.org.custom import logout_path
 from onegov.org.elements import LinkGroup
 from onegov.pas import _
+from onegov.org.models import GeneralFileCollection
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import ChangeCollection
 from onegov.pas.collections import ImportLogCollection
@@ -15,11 +16,11 @@ from sqlalchemy.orm.exc import MultipleResultsFound
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from onegov.town6.request import TownRequest
+    from onegov.pas.request import PasRequest
     from sqlalchemy.orm import Session
 
 
-def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
+def get_global_tools(request: PasRequest) -> Iterator[Link | LinkGroup]:
 
     if request.is_logged_in:
 
@@ -89,16 +90,54 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
                     request.link(request.app.org, 'settings'),
                     attrs={'class': 'settings'}
                 ),
+                Link(
+                    _('User Management'),
+                    request.link(request.app.org, 'usermanagement'),
+                    attrs={'class': 'usermanagement'}
+                ),
             ))
 
             yield LinkGroup(
-                _('Management'),
-                classes=('management',),
-                links=tuple(management_links)
+                _('Management'), classes=('management',),
+                links=management_links
+            )
+
+        elif request.is_parliamentarian:
+            links = []
+
+            # Add Profile link
+            parliamentarian = request.current_user.parliamentarian  # type: ignore[union-attr]
+            if parliamentarian:
+                profile_url = request.link(parliamentarian)
+                if profile_url:
+                    links.append(
+                        Link(
+                            _('Profile'),
+                            profile_url,
+                            attrs={'class': 'profile'}
+                        )
+                    )
+
+            links.extend([
+                Link(
+                    _('Attendences'),
+                    request.class_link(AttendenceCollection),
+                    attrs={'class': 'attendences'}
+                ),
+                Link(
+                    _('Files'),
+                    request.class_link(GeneralFileCollection),
+                    attrs={'class': 'files'}
+                ),
+            ])
+
+            yield LinkGroup(
+                _('Management'), classes=('management',),
+                links=links
             )
 
 
-def get_top_navigation(request: TownRequest) -> list[Link]:
+def get_top_navigation(request: PasRequest) -> list[Link]:
     return []
 
 

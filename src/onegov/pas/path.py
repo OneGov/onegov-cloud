@@ -184,7 +184,7 @@ def get_parliamentarians(
     active: list[bool] | None = None,
 ) -> PASParliamentarianCollection:
     return PASParliamentarianCollection(
-        app.session(),
+        app,
         active=active or [True],
     )
 
@@ -198,7 +198,7 @@ def get_parliamentarian(
     app: PasApp,
     id: UUID
 ) -> PASParliamentarian | None:
-    return PASParliamentarianCollection(app.session()).by_id(id)
+    return PASParliamentarianCollection(app).by_id(id)
 
 
 @PasApp.path(

@@ -11,23 +11,23 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "User"
-msgstr "Benutzer"
+    msgid "User"
+    msgstr "Benutzer"
 
-msgid "Logout"
-msgstr "Abmelden"
+    msgid "Logout"
+    msgstr "Abmelden"
 
 msgid "Current Settlement Run"
 msgstr "Aktueller Abrechnungslauf"
 
-msgid "Attendences"
-msgstr "Anwesenheiten"
+    msgid "Attendences"
+    msgstr "Anwesenheiten"
 
-msgid "Changes"
-msgstr "Aktivitäten"
+    msgid "Changes"
+    msgstr "Aktivitäten"
 
-msgid "PAS settings"
-msgstr "PAS Einstellungen"
+    msgid "PAS settings"
+    msgstr "PAS Einstellungen"
 
 msgid "Files"
 msgstr "Dateien"
@@ -92,7 +92,7 @@ msgid "Validate JSON Schema"
 msgstr "JSON-Schema validieren"
 
 msgid "Check if the uploaded JSON files match the expected structure."
-msgstr ""
+msgstr "Überprüft ob die hochgeladenen JSON-Dateien der erwarteten Struktur entsprechen."
 "Überprüft ob die hochgeladenen JSON-Dateien der erwarteten Struktur "
 "entsprechen."
 
@@ -845,6 +845,18 @@ msgstr "Excel Exporte"
 msgid "Total all parties"
 msgstr "Total Alle Parteien"
 
+msgid "Create Attendence"
+msgstr "Sitzung erfassen"
+
+msgid "You are viewing your own attendances and attendances from commissions you preside over."
+msgstr "Sie sehen Ihre eigenen Anwesenheiten und Anwesenheiten von Kommissionen, in denen Sie Mitglied sind."
+
+msgid "You are viewing your own attendances only."
+msgstr "Sie sehen nur Ihre eigenen Anwesenheiten."
+
+msgid "You are viewing all attendances in the system."
+msgstr "Sie sehen alle Anwesenheiten im System."
+
 msgid "Trigger Manual Import"
 msgstr "Manuellen Import auslösen"
 
@@ -868,6 +880,9 @@ msgstr "Import erfolgreich ausgelöst. Der Vorgang kann bis zu 30 Sekunden dauer
 
 msgid "completed"
 msgstr "Abgeschlossen"
+
+msgid "Profile"
+msgstr "Profil"
 
 msgid "failed"
 msgstr "Fehlgeschlagen"

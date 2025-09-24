@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from itertools import groupby
 from operator import attrgetter
 import uuid
@@ -20,14 +21,14 @@ from onegov.pas.layouts import AttendenceCollectionLayout
 from onegov.pas.layouts import AttendenceLayout
 from onegov.pas.models import Attendence
 from onegov.pas.models import Change
-from sqlalchemy import desc
+from onegov.pas.models.commission_membership import PASCommissionMembership
+
 
 from typing import TYPE_CHECKING
-
-from onegov.pas.models.commission_membership import PASCommissionMembership
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
+    from onegov.pas.request import PasRequest
     from webob import Response
 
 
@@ -38,14 +39,19 @@ if TYPE_CHECKING:
 )
 def view_attendences(
     self: AttendenceCollection,
-    request: TownRequest
+    request: PasRequest
 ) -> RenderData:
 
     layout = AttendenceCollectionLayout(self, request)
 
-    bulk_edit_attendences = self.query().order_by(
-        desc(Attendence.bulk_edit_id),
-    ).all()
+    # Apply role-based filtering, then re-sort for bulk edit grouping
+    filtered_attendences = self.view_for_parliamentarian(request)
+    bulk_edit_attendences = sorted(
+        filtered_attendences,
+        key=lambda x: (str(x.bulk_edit_id) if x.bulk_edit_id else '',
+                      x.created or x.modified),
+        reverse=True
+    )
 
     bulk_edit_groups = [
         sorted(group, key=attrgetter('created', 'modified'), reverse=True)
@@ -72,7 +78,7 @@ def view_attendences(
     return {
         'add_link': request.link(self, name='new'),
         'layout': layout,
-        'attendences': flatten(bulk_edit_groups),
+        'attendences': list(flatten(bulk_edit_groups)),
         'title': layout.title,
         'bulk_edit_groups': bulk_edit_groups
     }
@@ -82,12 +88,11 @@ def view_attendences(
     model=AttendenceCollection,
     name='new',
     template='form.pt',
-    permission=Private,
     form=AttendenceAddForm
 )
 def add_attendence(
     self: AttendenceCollection,
-    request: TownRequest,
+    request: PasRequest,
     form: AttendenceAddForm
 ) -> RenderData | Response:
     request.include('custom')
@@ -176,7 +181,7 @@ def edit_plenary_bulk_attendence(
         str(parliamentarian.id)
         for parliamentarian
         in PASParliamentarianCollection(
-            request.session, [True]).query()
+            request.app, active=[True]).query()
     ]
 
     if form.submitted(request):
@@ -365,12 +370,10 @@ def edit_commission_bulk_attendence(
     model=AttendenceCollection,
     name='new-bulk',
     template='form.pt',
-    permission=Private,
     form=AttendenceAddPlenaryForm
 )
-def add_plenary_attendence(
-    self: AttendenceCollection,
-    request: TownRequest,
+def add_plenary_attendence(self: AttendenceCollection,
+    request: PasRequest,
     form: AttendenceAddPlenaryForm
 ) -> RenderData | Response:
 
@@ -409,7 +412,7 @@ def add_plenary_attendence(
 )
 def view_attendence(
     self: Attendence,
-    request: TownRequest
+    request: PasRequest
 ) -> RenderData:
 
     layout = AttendenceLayout(self, request)
@@ -425,12 +428,12 @@ def view_attendence(
     model=Attendence,
     name='edit',
     template='form.pt',
-    permission=Private,
-    form=AttendenceForm
+    form=AttendenceForm,
+    permission=Private
 )
 def edit_attendence(
     self: Attendence,
-    request: TownRequest,
+    request: PasRequest,
     form: AttendenceForm
 ) -> RenderData | Response:
 
@@ -457,11 +460,10 @@ def edit_attendence(
 @PasApp.view(
     model=Attendence,
     request_method='DELETE',
-    permission=Private
 )
 def delete_attendence(
     self: Attendence,
-    request: TownRequest
+    request: PasRequest
 ) -> None:
 
     request.assert_valid_csrf_token()

@@ -9,13 +9,13 @@ from onegov.pas.importer.output_handlers import DatabaseOutputHandler
 from typing import Any, TYPE_CHECKING, cast
 if TYPE_CHECKING:
     from onegov.pas.app import PasApp as PasAppType
-    from onegov.town6.request import TownRequest
+    from onegov.pas.request import PasRequest
 
 log = logging.getLogger('onegov.pas.cronjobs')
 
 
 @PasApp.cronjob(hour='*', minute=0, timezone='UTC')
-def hourly_kub_data_import(request: TownRequest) -> None:
+def hourly_kub_data_import(request: PasRequest) -> None:
 
     try:
         trigger_kub_data_import(request)
@@ -27,7 +27,7 @@ def hourly_kub_data_import(request: TownRequest) -> None:
         raise
 
 
-def trigger_kub_data_import(request: TownRequest) -> dict[str, Any] | None:
+def trigger_kub_data_import(request: PasRequest) -> dict[str, Any] | None:
     app = request.app
     if not (kub_token := getattr(app, 'kub_test_api_token', None)):
         if not (kub_token := getattr(app, 'kub_api_token', None)):

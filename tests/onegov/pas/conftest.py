@@ -3,6 +3,7 @@ from onegov.core.orm.observer import ScopedPropertyObserver
 from os import path
 from yaml import dump
 
+from onegov.core.utils import Bunch
 from onegov.core.utils import module_path
 from onegov.pas.app import PasApp
 from onegov.pas.content.initial import create_new_organisation
@@ -532,3 +533,17 @@ def commission_test_files():
     csv = module_path('tests.onegov.pas', '/fixtures/commission_test.csv')
     xlsx = module_path('tests.onegov.pas', '/fixtures/commission_test.xlsx')
     return {'csv': csv, 'xlsx': xlsx}
+
+
+class DummyApp:
+
+    def __init__(self, session, application_id='my-app'):
+        self._session = session
+        self.application_id = application_id
+        self.org = Bunch(
+            geo_provider='none',
+            open_files_target_blank=True
+        )
+
+    def session(self):
+        return self._session
