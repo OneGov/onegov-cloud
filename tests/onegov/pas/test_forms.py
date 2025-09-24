@@ -52,7 +52,8 @@ def dummy_request(session):
         locale='de_CH',
         session=session,
         method='GET',  # not dynamic but doenst matter our purposess
-        identity=Bunch(role='parliamentarian', userid='test-user@example.com')  # same here
+        identity=Bunch(role='parliamentarian',
+                       userid='test-user@example.com')  # same here
     )
 
 @freeze_time('2024-01-01')
