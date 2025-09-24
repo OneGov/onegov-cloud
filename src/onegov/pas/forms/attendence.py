@@ -170,8 +170,8 @@ class AttendenceAddForm(AttendenceForm):
             and self.request.identity.role == 'parliamentarian'):
             user = self.request.session.query(User).filter_by(
                 username=self.request.identity.userid).first()
-            if user and user.parliamentarian:
-                if field.data != str(user.parliamentarian.id):
+            if user and user.parliamentarian:  # type: ignore[attr-defined]
+                if field.data != str(user.parliamentarian.id):  # type: ignore[attr-defined]
                     raise ValidationError(
                         _('You can only add attendance for yourself.')
                     )

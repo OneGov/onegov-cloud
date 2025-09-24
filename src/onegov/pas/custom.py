@@ -91,6 +91,11 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
                     request.link(request.app.org, 'settings'),
                     attrs={'class': 'settings'}
                 ),
+                Link(
+                    _('User Management'),
+                    request.link(request.app.org, 'usermanagement'),
+                    attrs={'class': 'usermanagement'}
+                ),
             ))
 
             yield LinkGroup(
@@ -98,23 +103,38 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
                 links=management_links
             )
 
-        elif (request.is_logged_in
-              and hasattr(request.identity, 'role')
-              and is_parliamentarian_role(request.identity.role)):
+        elif request.is_parliamentarian:
+            links = []
+
+            # Add Profile link
+            parliamentarian = request.current_user.parliamentarian  # type: ignore[union-attr]
+            if parliamentarian:
+                profile_url = request.link(parliamentarian)
+                if profile_url:
+                    links.append(
+                        Link(
+                            _('Profile'),
+                            profile_url,
+                            attrs={'class': 'profile'}
+                        )
+                    )
+
+            links.extend([
+                Link(
+                    _('Attendences'),
+                    request.class_link(AttendenceCollection),
+                    attrs={'class': 'attendences'}
+                ),
+                Link(
+                    _('Files'),
+                    request.class_link(GeneralFileCollection),
+                    attrs={'class': 'files'}
+                ),
+            ])
+
             yield LinkGroup(
                 _('Management'), classes=('management',),
-                links=(
-                    Link(
-                        _('Attendences'),
-                        request.class_link(AttendenceCollection),
-                        attrs={'class': 'attendences'}
-                    ),
-                    Link(
-                        _('Files'),
-                        request.class_link(GeneralFileCollection),
-                        attrs={'class': 'files'}
-                    ),
-                )
+                links=links
             )
 
 
