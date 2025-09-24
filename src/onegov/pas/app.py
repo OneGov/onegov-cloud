@@ -8,13 +8,16 @@ from onegov.pas.request import PasRequest
 from onegov.pas.theme import PasTheme
 from onegov.town6 import TownApp
 from onegov.town6.app import get_i18n_localedirs as get_i18n_localedirs_base
+from purl import URL
+from onegov.org.models import Organisation
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from onegov.core.types import RenderData
-    from onegov.org.models import Organisation
+    from morepath.authentication import NoIdentity
+    from morepath.authentication import Identity
 
 
 class PasApp(TownApp):
@@ -34,6 +37,17 @@ class PasApp(TownApp):
         self.kub_test_base_url = kub_test_base_url
         self.kub_api_token = kub_api_token
         self.kub_base_url = kub_base_url
+
+    def redirect_after_login(
+        self,
+        identity: Identity | NoIdentity,
+        request: PasRequest,  # type:ignore[override]
+        default: str
+    ) -> str | None:
+
+        if default != '/' and '/auth/login' not in str(default):
+            return None
+        return URL(request.class_link(Organisation)).path()
 
 
 @PasApp.setting(section='org', name='create_new_organisation')

@@ -23,4 +23,5 @@ def view_org(
     if not request.is_logged_in:
         return redirect(request.class_link(Auth, name='login'))
 
+    # FIXME: no need for 302 Redirect, This can be returning the view.
     return redirect(request.class_link(Organisation, name='pas-settings'))
