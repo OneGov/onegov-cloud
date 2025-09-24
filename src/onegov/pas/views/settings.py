@@ -16,13 +16,12 @@ from onegov.pas.collections.parliamentary_group import (
     PASParliamentaryGroupCollection
 )
 from onegov.pas.layouts import DefaultLayout
-from onegov.pas.utils import get_active_commission_memberships
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
-    from onegov.town6.request import TownRequest
+    from onegov.pas.request import PasRequest
 
 
 @PasApp.html(
@@ -33,7 +32,7 @@ if TYPE_CHECKING:
 )
 def view_pas_settings(
     self: Organisation,
-    request: TownRequest
+    request: PasRequest
 ) -> RenderData:
     """ Dashboard, it's the landing page. """
 

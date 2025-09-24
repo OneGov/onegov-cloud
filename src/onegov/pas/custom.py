@@ -16,11 +16,11 @@ from sqlalchemy.orm.exc import MultipleResultsFound
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from onegov.town6.request import TownRequest
+    from onegov.pas.request import PasRequest
     from sqlalchemy.orm import Session
 
 
-def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
+def get_global_tools(request: PasRequest) -> Iterator[Link | LinkGroup]:
 
     if request.is_logged_in:
 
@@ -137,7 +137,7 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
             )
 
 
-def get_top_navigation(request: TownRequest) -> list[Link]:
+def get_top_navigation(request: PasRequest) -> list[Link]:
     return []
 
 

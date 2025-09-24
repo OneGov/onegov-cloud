@@ -15,7 +15,6 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from onegov.core.types import RenderData
     from onegov.org.models import Organisation
-    from onegov.town6.request import TownRequest
 
 
 class PasApp(TownApp):
@@ -50,7 +49,7 @@ def get_citizen_login_enabled() -> bool:
 
 
 @PasApp.template_variables()
-def get_template_variables(request: TownRequest) -> RenderData:
+def get_template_variables(request: PasRequest) -> RenderData:
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),

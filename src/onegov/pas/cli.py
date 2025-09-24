@@ -24,10 +24,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.pas.app import PasApp
-    from onegov.pas.app import TownRequest
+    from onegov.pas.request import PasRequest
     from typing import TypeAlias
 
-    Processor: TypeAlias = Callable[[TownRequest, PasApp], None]
+    Processor: TypeAlias = Callable[[PasRequest, PasApp], None]
 
 
 log = logging.getLogger('onegov.org.cli')
@@ -62,7 +62,7 @@ def import_commission_data(
             "Kommission_Gesundheit_und_Soziales.xlsx"
     """
 
-    def import_data(request: TownRequest, app: PasApp) -> None:
+    def import_data(request: PasRequest, app: PasApp) -> None:
 
         try:
             import_commissions_excel(
@@ -90,7 +90,7 @@ def import_commission_data(
 def update_accounts_cli(dry_run: bool) -> Processor:
     """ Updates user accounts for parliamentarians. """
 
-    def do_update_accounts(request: TownRequest, app: PasApp) -> None:
+    def do_update_accounts(request: PasRequest, app: PasApp) -> None:
 
         parliamentarians = PASParliamentarianCollection(app)
         for parliamentarian in parliamentarians.query():
@@ -176,7 +176,7 @@ def import_kub_data(
             --token "your-token-here" --max-workers 5
     """
 
-    def cli_wrapper(request: TownRequest, app: PasApp) -> None:
+    def cli_wrapper(request: PasRequest, app: PasApp) -> None:
         """CLI wrapper that calls the orchestrator."""
         # Create composite output handler for both CLI and database
         click_handler = ClickOutputHandler()
@@ -250,7 +250,7 @@ def update_custom_data(
             --max-workers 5
     """
 
-    def update_data(request: TownRequest, app: PasApp) -> None:
+    def update_data(request: PasRequest, app: PasApp) -> None:
         # Create composite output handler for both CLI and database
         click_handler = ClickOutputHandler()
         db_handler = DatabaseOutputHandler()
