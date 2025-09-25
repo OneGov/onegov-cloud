@@ -28,6 +28,8 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
 
     @property
     def es_public(self) -> bool:  # type:ignore[override]
+        # FIXME: This es_public is redundant once we get rid of ES
+        #        we include access and publication dates in the fts
         return self.access == 'public' and self.published
 
     es_properties = {
@@ -68,8 +70,9 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
 
     @property
     def phone_fts(self) -> list[str]:
-        numbers = (self.phone_internal, self.phone, self.phone_direct)
-        return generate_fts_phonenumbers(numbers)
+        numbers = generate_fts_phonenumbers((self.phone, self.phone_direct))
+        numbers.insert(0, self.phone_internal)
+        return numbers
 
     @property
     def location_address_html(self) -> Markup:

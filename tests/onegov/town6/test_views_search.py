@@ -18,7 +18,7 @@ from sedate import utcnow
 from webtest import Upload
 
 
-@pytest.mark.flaky(reruns=3, only_rerun=None)
+@pytest.mark.flaky(reruns=3)
 def test_basic_search(client_with_es):
     client = client_with_es
     client.login_admin()
@@ -71,8 +71,20 @@ def test_basic_search(client_with_es):
     assert (client.get('/search-postgres/suggest?q=fulltext').json == [
         'Now supporting fulltext search'])
 
+    # delete News item
+    news.click("Löschen")
 
-@pytest.mark.flaky(reruns=3, only_rerun=None)
+    client.app.es_client.indices.refresh(index='_all')
+
+    # elasticsearch
+    assert "0 Resultate" in client.get('/search?q=fulltext')
+    assert "0 Resultate" in anom.get('/search?q=fulltext')
+    # postgres
+    assert "0 Resultate" in client.get('/search-postgres?q=fulltext')
+    assert "0 Resultate" in anom.get('/search-postgres?q=fulltext')
+
+
+@pytest.mark.flaky(reruns=3)
 def test_view_search_is_limiting(client_with_es):
     # ensures that the search doesn't just return all results
     # a regression that occurred for anonymous uses only
@@ -107,7 +119,7 @@ def test_view_search_is_limiting(client_with_es):
     assert "1 Resultat" in search_page
 
 
-@pytest.mark.flaky(reruns=3, only_rerun=None)
+@pytest.mark.flaky(reruns=3)
 def test_search_recently_published_object(client_with_es):
     client = client_with_es
     client.login_admin()
@@ -212,7 +224,7 @@ def test_search_recently_published_object(client_with_es):
     assert 'is pretty awesome' not in anom.get('/search-postgres?q=fulltext')
 
 
-@pytest.mark.flaky(reruns=3, only_rerun=None)
+@pytest.mark.flaky(reruns=3)
 def test_search_for_page_with_member_access(client_with_es):
     client = client_with_es
     client.login_admin()
@@ -239,7 +251,7 @@ def test_search_for_page_with_member_access(client_with_es):
     assert 'Test' not in anom.get('/search-postgres?q=Memberius')
 
 
-@pytest.mark.flaky(reruns=3, only_rerun=None)
+@pytest.mark.flaky(reruns=3)
 def test_basic_autocomplete(client_with_es):
     client = client_with_es
     client.login_editor()
@@ -270,7 +282,8 @@ def test_search_publication_files(client_with_es):
     path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
     with (open(path, 'rb') as f):
         page = client.get('/files')
-        page.form['file'] = [Upload('Sample.pdf', f.read(), 'application/pdf')]
+        page.form['file'] = [Upload(
+            'Sample.pdf', f.read(), 'application/pdf')]
         page.form.submit()
 
     client.app.es_indexer.process()
@@ -311,10 +324,7 @@ def test_search_hashtags(client_with_es):
     page.form['lead'] = "It is very good"
     page.form['text'] = "It is lots of fun #newhomepage"
 
-    page = page.form.submit().follow()
-
-    client.app.es_indexer.process()
-    client.app.es_client.indices.refresh(index='_all')
+    assert page.form.submit().follow().status_code == 200
 
     assert 'We have a new homepage' in client.get(
         '/search-postgres?q=%23newhomepage')
@@ -345,7 +355,7 @@ def test_ticket_chat_search(client_with_es):
 
     # send a message that should be findable through the search
     page.form['text'] = "I spelt my name wrong: it's deadbeef"
-    page = page.form.submit().follow()
+    assert page.form.submit().follow().status_code == 200
 
     # at this point logged in users should find the ticket by 'deadbeef'
     client.app.es_client.indices.refresh(index='_all')
@@ -419,14 +429,15 @@ def test_search_future_events_are_sorted_by_occurrence_date(client_with_es):
         events_redirect = form_page.form.submit().follow().follow()
         assert "erfolgreich erstellt" in events_redirect
 
+    client.app.es_indexer.process()
     client.app.es_client.indices.refresh(index='_all')
 
     # elasticsearch even sorts past events by occurrence date
     for current_client in (client, member, anom):
         results = current_client.get('/search?q=Concert')
         # Expect ordered by occurrence date, for all search results of 'Event'
-        assert [a.text.strip() for a in
-                results.pyquery('li.search-result-events a')] == [
+        assert [t.text.strip() for t in
+                results.pyquery('li.search-result-events a h5')] == [
             'Not sorted Concert', 'First Concert', 'Second Concert',
             'Third Concert', 'Forth Concert'
         ]
@@ -436,8 +447,8 @@ def test_search_future_events_are_sorted_by_occurrence_date(client_with_es):
         results = current_client.get('/search-postgres?q=Concert')
         # Expect future events ordered by occurrence date, far future first.
         # Past events are not sorted by occurrence date.
-        assert [a.text.strip() for a in
-                results.pyquery('li.search-result-events a')] == [
+        assert [t.text.strip() for t in
+                results.pyquery('li.search-result-events a h5')] == [
             'Forth Concert', 'Third Concert', 'Second Concert',
             'First Concert', 'Not sorted Concert'
         ]
