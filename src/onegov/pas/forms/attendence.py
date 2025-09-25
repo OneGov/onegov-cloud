@@ -58,7 +58,7 @@ class SettlementRunBoundMixin:
             return
 
         settlement_run = get_current_settlement_run(self.request.session)
-        if settlement_run:
+        if settlement_run is not None:
             self.date.data = settlement_run.start
 
 

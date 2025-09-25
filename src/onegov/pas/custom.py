@@ -43,23 +43,16 @@ def get_global_tools(request: PasRequest) -> Iterator[Link | LinkGroup]:
 
         # Management Dropdown
         if request.is_admin:
-
             session = request.session
             management_links: list[Link] = []
-            try:
-                current_run = get_current_settlement_run(session)
-                if current_run:
-                    management_links.append(
-                        Link(
-                            _('Current Settlement Run'),
-                            request.link(current_run),
-                            attrs={'class': 'settlement-run'}
-                        )
+            if current_run := get_current_settlement_run(session):
+                management_links.append(
+                    Link(
+                        _('Current Settlement Run'),
+                        request.link(current_run),
+                        attrs={'class': 'settlement-run'}
                     )
-            except MultipleResultsFound:
-                # If multiple active runs exist (should not happen), but
-                # just to # be safe
-                pass
+                )
 
             management_links.extend((
                 Link(
@@ -146,7 +139,12 @@ def get_top_navigation(request: PasRequest) -> list[Link]:
 def get_current_settlement_run(session: Session) -> SettlementRun | None:
     query = session.query(SettlementRun)
     query = query.filter(SettlementRun.active.is_(True))
-    return query.first()
+    try:
+        return query.one_or_none()
+    except MultipleResultsFound:
+        # If multiple active runs exist (happens in testing)
+        # The caller must handle the None case
+        return None
 
 
 def check_attendance_in_closed_settlement_run(
