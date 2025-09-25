@@ -12,6 +12,7 @@ from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import (AttendenceCollection,
                                     PASParliamentarianCollection)
+from onegov.pas.custom import check_attendance_in_closed_settlement_run
 from onegov.pas.forms import AttendenceAddCommissionBulkForm, AttendenceAddForm
 from onegov.pas.forms import AttendenceAddPlenaryForm
 from onegov.pas.forms import AttendenceForm
@@ -21,6 +22,7 @@ from onegov.pas.layouts import AttendenceCollectionLayout
 from onegov.pas.layouts import AttendenceLayout
 from onegov.pas.models import Attendence
 from onegov.pas.models import Change
+from onegov.pas.models import SettlementRun
 from onegov.pas.models.commission_membership import PASCommissionMembership
 
 
@@ -98,6 +100,21 @@ def add_attendence(
     request.include('custom')
 
     if form.submitted(request):
+        # Check if attendance date is in a closed settlement run
+        if form.date.data:
+            if check_attendance_in_closed_settlement_run(
+                request.session, form.date.data
+            ):
+                request.alert(
+                    _('Cannot create attendance in closed settlement run.')
+                )
+                return {
+                    'layout': AttendenceCollectionLayout(self, request),
+                    'title': _('New attendence'),
+                    'form': form,
+                    'form_width': 'large'
+                }
+
         attendence = self.add(**form.get_useful_data())
         Change.add(request, 'add', attendence)
         request.success(_('Added a new attendence'))
@@ -131,6 +148,20 @@ def add_bulk_attendence(
     request.include('custom')
 
     if form.submitted(request):
+        # Check if attendance date is in a closed settlement run
+        if form.date.data:
+            if check_attendance_in_closed_settlement_run(
+                request.session, form.date.data
+            ):
+                request.alert(
+                    _('Cannot create attendance in closed settlement run.')
+                )
+                return {
+                    'layout': AttendenceCollectionLayout(self, request),
+                    'title': _('New commission session'),
+                    'form': form,
+                    'form_width': 'large'
+                }
 
         data = form.get_useful_data()
         if raw_parl_ids := request.POST.getall('parliamentarian_id'):
@@ -185,6 +216,20 @@ def edit_plenary_bulk_attendence(
     ]
 
     if form.submitted(request):
+        # Check if attendance date is in a closed settlement run
+        if form.date.data:
+            if check_attendance_in_closed_settlement_run(
+                request.session, form.date.data
+            ):
+                request.alert(
+                    _('Cannot edit attendance in closed settlement run.')
+                )
+                return {
+                    'layout': AttendenceCollectionLayout(self, request),
+                    'title': _('Edit plenary session'),
+                    'form': form,
+                    'form_width': 'large'
+                }
 
         data = form.get_useful_data()
         raw_parl_ids = request.POST.getall('parliamentarian_id')
@@ -278,6 +323,20 @@ def edit_commission_bulk_attendence(
     request.include('custom')
 
     if form.submitted(request):
+        # Check if attendance date is in a closed settlement run
+        if form.date.data:
+            if check_attendance_in_closed_settlement_run(
+                request.session, form.date.data
+            ):
+                request.alert(
+                    _('Cannot edit attendance in closed settlement run.')
+                )
+                return {
+                    'layout': AttendenceCollectionLayout(self, request),
+                    'title': _('Edit commission session'),
+                    'form': form,
+                    'form_width': 'large'
+                }
 
         data = form.get_useful_data()
         if raw_parl_ids := request.POST.getall('parliamentarian_id'):
@@ -378,6 +437,21 @@ def add_plenary_attendence(self: AttendenceCollection,
 ) -> RenderData | Response:
 
     if form.submitted(request):
+        # Check if attendance date is in a closed settlement run
+        if form.date.data:
+            if check_attendance_in_closed_settlement_run(
+                request.session, form.date.data
+            ):
+                request.alert(
+                    _('Cannot create attendance in closed settlement run.')
+                )
+                return {
+                    'layout': AttendenceCollectionLayout(self, request),
+                    'title': _('New plenary session'),
+                    'form': form,
+                    'form_width': 'large'
+                }
+
         data = form.get_useful_data()
         if raw_parl_ids := request.POST.getall('parliamentarian_id'):
             # Remove static field; choices are set dynamically via JS
@@ -438,6 +512,21 @@ def edit_attendence(
 ) -> RenderData | Response:
 
     if form.submitted(request):
+        # Check if attendance date is in a closed settlement run
+        if form.date.data:
+            if check_attendance_in_closed_settlement_run(
+                request.session, form.date.data
+            ):
+                request.alert(
+                    _('Cannot edit attendance in closed settlement run.')
+                )
+                return {
+                    'layout': AttendenceLayout(self, request),
+                    'title': AttendenceLayout(self, request).title,
+                    'form': form,
+                    'form_width': 'large'
+                }
+
         form.populate_obj(self)
         Change.add(request, 'edit', self)
         request.success(_('Your changes were saved'))
@@ -468,6 +557,19 @@ def delete_attendence(
 
     request.assert_valid_csrf_token()
 
+    # Check if attendance is in a closed settlement run
+    settlement_run = request.session.query(SettlementRun).filter(
+        SettlementRun.start <= self.date,
+        SettlementRun.end >= self.date,
+        SettlementRun.closed == True
+    ).first()
+
+    if settlement_run:
+        request.alert(
+            _('Cannot delete attendance in closed settlement run.')
+        )
+        return
+
     Change.add(request, 'delete', self)
     collection = AttendenceCollection(request.session)
     collection.delete(self)
@@ -489,6 +591,20 @@ def delete_attendences(
     attendences = request.session.query(Attendence).filter(
         Attendence.bulk_edit_id == self.bulk_edit_id
     ).all()
+
+    # Check if any attendance is in a closed settlement run
+    for attendence in attendences:
+        settlement_run = request.session.query(SettlementRun).filter(
+            SettlementRun.start <= attendence.date,
+            SettlementRun.end >= attendence.date,
+            SettlementRun.closed == True
+        ).first()
+
+        if settlement_run:
+            request.alert(
+                _('Cannot delete attendance in closed settlement run.')
+            )
+            return
 
     for attendence in attendences:
         Change.add(request, 'delete', attendence)

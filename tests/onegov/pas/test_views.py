@@ -63,7 +63,7 @@ def test_views_manage(client_with_es):
     page.form['name'] = 'Q1'
     page.form['start'] = '2024-01-01'
     page.form['end'] = '2024-12-31'
-    page.form['active'] = True
+    page.form['closed'] = False
     page = page.form.submit().follow()
     assert '31.12.2024' in page
 
@@ -438,7 +438,7 @@ def test_simple_attendence_add(client):
     page.form['name'] = 'Q1'
     page.form['start'] = '2024-01-01'
     page.form['end'] = '2024-03-31'
-    page.form['active'] = True
+    page.form['closed'] = False
     page = page.form.submit().follow()
 
     # parties
