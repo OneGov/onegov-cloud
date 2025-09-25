@@ -28,6 +28,8 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
 
     @property
     def es_public(self) -> bool:  # type:ignore[override]
+        # FIXME: This es_public is redundant once we get rid of ES
+        #        we include access and publication dates in the fts
         return self.access == 'public' and self.published
 
     es_properties = {

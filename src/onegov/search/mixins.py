@@ -153,10 +153,10 @@ class Searchable:
         """ Returns the date the document was created/last modified. """
         # FIXME: We made this a required property, for now we will
         #        pretend entries without an explicit date have been
-        #        changed 15 days ago, so they're not completely
+        #        changed 30 days ago, so they're not completely
         #        de-prioritized, but also not over-prioritized over
         #        actually new content.
-        return utcnow() - timedelta(days=15)
+        return utcnow() - timedelta(days=30)
 
     @property
     def es_tags(self) -> list[str] | None:
@@ -188,7 +188,7 @@ class ORMSearchable(Searchable):
 
     @property
     def es_last_change(self) -> datetime:
-        # FIXME: We made this a required
+        # FIXME: We made this a required field
         return getattr(self, 'last_change', None) or super().es_last_change
 
 
@@ -206,6 +206,8 @@ class SearchableContent(ORMSearchable):
 
     @property
     def es_public(self) -> bool:
+        # FIXME: This es_public is redundant once we get rid of ES
+        #        we include access and publication dates in the fts
         return self.access == 'public'  # type:ignore[attr-defined]
 
     @property

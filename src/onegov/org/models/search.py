@@ -12,7 +12,7 @@ from onegov.core.orm import Base
 from onegov.event.models import Event
 from onegov.search.search_index import SearchIndex
 from sedate import utcnow
-from sqlalchemy import func, cast, or_, Text, case
+from sqlalchemy import func, cast, Text, case
 from sqlalchemy.dialects.postgresql import UUID
 
 
@@ -276,17 +276,23 @@ class SearchPostgres(Pagination[_M]):
         available_accesses = {
             'admin': (),  # can see everything
             'editor': (),  # can see everything
-            'member': ('member', 'mtan', 'public')
-        }.get(role, ('mtan', 'public'))
+            # FIXME: For mtan access to work properly we probably need to
+            #        split public and private content, so you can still find
+            #        an object by it's public name, but not via data that
+            #        should only be visible once authenticated.
+            'member': ('member', 'public')  # TODO: 'mtan'
+        }.get(role, ('public',))  # TODO: 'mtan'
         if available_accesses:
-            query = query.filter(or_(
-                # FIXME: This should either be an and_ or we get rid of
-                #        public entirely, since it should be redundant
-                #        and will probably go out of date
-                SearchIndex.public.is_(True),
-                SearchIndex.access.in_(available_accesses)
-            ))
+            query = query.filter(SearchIndex.access.in_(available_accesses))
             query = query.filter(SearchIndex.published)
+
+        # FIXME: We may need to redesign this a little, for starters we
+        #        probably want to flip this boolean from public to private
+        #        in order to make it less confusing and make sure that
+        #        the boolean is only set for models we want to be affected
+        #        by the outcome of this method.
+        if not self.request.app.es_may_use_private_search(self.request):
+            query = query.filter(SearchIndex.public)
 
         return query
 
@@ -320,12 +326,20 @@ class SearchPostgres(Pagination[_M]):
                 func.ts_rank_cd(SearchIndex.fts_idx, ts_query, 0) *
                 func.least(
                     func.greatest(
-                        func.exp(-func.extract(
-                            'epoch', now - SearchIndex.last_change)),
-                        1e-10
+                        # TODO: This is quite a dramatic decay, we
+                        #       may want something more gradual, so
+                        #       the ts_rank_cd still plays enough of
+                        #       a role, compared to the time factor
+                        func.exp(
+                            func.extract(
+                                'epoch',
+                                SearchIndex.last_change - now
+                            ) / (30 * 24 * 3600)  # 30 days decay period
+                        ),
+                        1e-6
                     ),
                     1.0
-                ) / (30 * 24 * 3600)  # 30 days decay period
+                )
             ).label('rank')
         ).filter(SearchIndex.fts_idx.op('@@')(ts_query))
         query = self.filter_user_level(query)

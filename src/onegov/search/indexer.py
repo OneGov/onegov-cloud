@@ -367,9 +367,6 @@ class Indexer(IndexerBase):
                 except NotFoundError:
                     pass
 
-    def update(self, task: IndexTask) -> None:
-        self.index(task)
-
 
 class PostgresIndexer(IndexerBase):
 
@@ -590,14 +587,6 @@ class PostgresIndexer(IndexerBase):
             # use a savepoint instead
             with session.begin_nested():
                 session.execute(stmt, params or [{}])
-
-    def update(
-        self,
-        tasks: list[IndexTask] | IndexTask,
-        session: Session | None = None
-    ) -> bool:
-
-        return self.index(tasks, session)
 
     def delete(
         self,
