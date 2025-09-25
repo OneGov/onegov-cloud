@@ -502,6 +502,7 @@ def test_orm_event_translator_delete():
         'schema': 'foobar',
         'tablename': 'my-pages',
         'type_name': 'page',
+        'owner_type': 'Page',
         'id': 123
     }
     assert translator.es_queue.get() == expected
@@ -575,15 +576,14 @@ def test_type_mapping_registry():
     }
 
 
-def test_indexer_process(es_client, session_manager_fts):
-    session_manager = session_manager_fts
+def test_indexer_process(es_client, session_manager, session):
     engine = session_manager.engine
     mappings = TypeMappingRegistry()
     mappings.register_type('page', {
         'title': {'type': 'localized'},
     })
-
-    es_index = "foo-fts-en-page"  # hostname-schema-language-type
+    # hostname-schema-language-type
+    es_index = f"foo-{session_manager.current_schema}-en-page"
     es_indexer = Indexer(
         mappings, Queue(), hostname='foo', es_client=es_client)
     psql_indexer = PostgresIndexer(Queue(), engine)
@@ -777,15 +777,13 @@ def test_extra_analyzers(es_client):
     ]
 
 
-def test_tags(es_client, session_manager_fts):
-    session_manager = session_manager_fts
-
+def test_tags(es_client, session_manager, session):
     mappings = TypeMappingRegistry()
     mappings.register_type('page', {
         'tags': {'type': 'text', 'analyzer': 'tags'}
     })
-
-    es_index = "foo-fts-en-page"  # hostname-schema-language-type
+    # hostname-schema-language-type
+    es_index = f"foo-{session_manager.current_schema}-en-page"
     schema = session_manager.current_schema
     es_indexer = Indexer(mappings, Queue(), es_client, hostname='foo')
     psql_indexer = PostgresIndexer(Queue(), session_manager.engine)

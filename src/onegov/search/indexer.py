@@ -1131,6 +1131,9 @@ class ORMEventTranslator:
     def on_update(self, schema: str, obj: object) -> None:
         if not self.stopped:
             if isinstance(obj, Searchable):
+                # FIXME: We should be able to get rid of this delete
+                #        once we get rid of ES, since we implemented
+                #        upserting for our Postgres indexer.
                 self.delete(schema, obj)
                 self.index(schema, obj)
 
