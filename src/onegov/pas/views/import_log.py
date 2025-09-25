@@ -11,7 +11,6 @@ from onegov.pas.layouts.import_log import (
     ImportLogLayout
 )
 from onegov.pas.models import ImportLog
-from sqlalchemy.orm import undefer
 from webob import Response
 from typing import TYPE_CHECKING
 
@@ -134,20 +133,23 @@ def download_source_data(
     """Download source JSON data based on type parameter."""
     source_type = request.params.get('type')
 
-    # Refresh the object with the specific deferred column we need
+    # Load only the specific deferred column we need
     if source_type in ('people', 'organizations', 'memberships'):
         if source_type == 'people':
-            request.session.refresh(
-                self, [undefer(ImportLog.people_source)]
-            )
+            result = request.session.query(ImportLog.people_source).filter(
+                ImportLog.id == self.id
+            ).scalar()
+            self.people_source = result
         elif source_type == 'organizations':
-            request.session.refresh(
-                self, [undefer(ImportLog.organizations_source)]
-            )
+            result = request.session.query(
+                ImportLog.organizations_source
+            ).filter(ImportLog.id == self.id).scalar()
+            self.organizations_source = result
         elif source_type == 'memberships':
-            request.session.refresh(
-                self, [undefer(ImportLog.memberships_source)]
-            )
+            result = request.session.query(
+                ImportLog.memberships_source
+            ).filter(ImportLog.id == self.id).scalar()
+            self.memberships_source = result
 
     if source_type == 'people':
         if not self.people_source:
