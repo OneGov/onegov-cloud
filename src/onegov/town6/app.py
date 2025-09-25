@@ -230,17 +230,21 @@ def get_api_endpoints_handler(
 ) -> Callable[[TownRequest], Iterator[ApiEndpoint[Any]]]:
 
     def get_api_endpoints(
-            request: TownRequest
+            request: TownRequest,
+            page: int = 0,
+            extra_parameters: dict[str, Any] | None = None
     ) -> Iterator[ApiEndpoint[Any]]:
-        yield EventApiEndpoint(request)
-        yield NewsApiEndpoint(request)
-        yield TopicApiEndpoint(request)
+        yield EventApiEndpoint(request, extra_parameters, page)
+        yield NewsApiEndpoint(request, extra_parameters, page)
+        yield TopicApiEndpoint(request, extra_parameters, page)
         directories = request.exclude_invisible(
             request.session.query(ExtendedDirectory).all())
         for directory in directories:
             yield DirectoryEntryApiEndpoint(
                 request=request,
-                directory=directory)
+                page=page,
+                name=directory.name,
+                extra_parameters=extra_parameters)
 
     return get_api_endpoints
 

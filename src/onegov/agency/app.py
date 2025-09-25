@@ -212,10 +212,12 @@ def get_api_endpoints_handler(
 ) -> Callable[[AgencyRequest], Iterator[ApiEndpoint[Any]]]:
 
     def get_api_endpoints(
-            request: AgencyRequest
+            request: AgencyRequest,
+            page: int = 0,
+            extra_parameters: dict[str, Any] | None = None
     ) -> Iterator[ApiEndpoint[Any]]:
-        yield AgencyApiEndpoint(request)
-        yield PersonApiEndpoint(request)
-        yield MembershipApiEndpoint(request)
+        yield AgencyApiEndpoint(request, extra_parameters, page)
+        yield PersonApiEndpoint(request, extra_parameters, page)
+        yield MembershipApiEndpoint(request, extra_parameters, page)
 
     return get_api_endpoints

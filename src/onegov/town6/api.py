@@ -182,13 +182,15 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
     def __init__(
         self,
         request: TownRequest,
-        directory: ExtendedDirectory,
+        name: str,
         extra_parameters: dict[str, str | None] | None = None,
         page: int | None = None,
     ):
         super().__init__(request, extra_parameters, page)
-        self.endpoint = directory.name
-        self.directory = directory
+        self.endpoint = name
+        self.directory = request.session.query(ExtendedDirectory).filter_by(
+            name=name
+        ).one()
 
     @property
     def collection(self) -> Any:
@@ -206,7 +208,7 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
 
         """
 
-        return self.__class__(self.request, self.directory,
+        return self.__class__(self.request, self.endpoint,
                               self.extra_parameters, page)
 
     def for_filter(self, **filters: Any) -> Self:
@@ -215,7 +217,7 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
 
         """
 
-        return self.__class__(self.request, self.directory, filters)
+        return self.__class__(self.request, self.endpoint, filters)
 
     def by_id(
             self, id: PKType
@@ -223,7 +225,7 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
         """ Return the item with the given ID from the collection. """
 
         try:
-            return self.__class__(self.request, self.directory
+            return self.__class__(self.request, self.endpoint
                                   ).collection.by_id(id)
         except SQLAlchemyError:
             return None

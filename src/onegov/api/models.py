@@ -144,7 +144,7 @@ class ApiEndpointItem(Generic[_M]):
     @cached_property
     def api_endpoint(self) -> ApiEndpoint[_M] | None:
         endpoint = ApiEndpointCollection(
-            self.request, self.app).endpoints.get(self.endpoint)
+            self.request).endpoints.get(self.endpoint)
         return endpoint if endpoint else None
 
     @cached_property
@@ -461,9 +461,9 @@ class ApiEndpoint(Generic[_M]):
 class ApiEndpointCollection:
     """ A collection of all available API endpoints. """
 
-    def __init__(self, request: CoreRequest, app: Framework):
+    def __init__(self, request: CoreRequest):
         self.request = request
-        self.app = app
+        self.app = request.app
 
     @cached_property
     def endpoints(self) -> dict[str, ApiEndpoint[Any]]:
@@ -473,6 +473,22 @@ class ApiEndpointCollection:
                 request=self.request
             )
         }
+
+    def get_endpoint(
+            self,
+            name: str,
+            page: int = 0,
+            extra_parameters: dict[str, Any] | None = None
+    ) -> ApiEndpoint[Any] | None:
+        endpoints = self.app.config.setting_registry.api.endpoints(
+            request=self.request,
+            extra_parameters=extra_parameters,
+            page=page
+        )
+        return next((
+            endpoint for endpoint in endpoints
+            if endpoint.endpoint == name
+        ), None)
 
 
 class AuthEndpoint:
