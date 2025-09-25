@@ -222,10 +222,10 @@ def test_views_general(client: Client[AgencyApp]) -> None:
     edit_membership = agency.click("Standerat für Zug").click("Bearbeiten")
     edit_membership.form['title'] = "Ständerat für Zug"
     edit_membership.form['person_id'].select(text="Eder Joachim")
-    agency = edit_membership.form.submit().follow()
+    membership = edit_membership.form.submit().follow()
 
-    assert "Ständerat für Zug" in agency
-    assert "Eder Joachim" in agency
+    assert "Ständerat für Zug" in membership
+    assert "Eder Joachim" in membership
 
     # ... sort memberships
     new_membership = sr.click("Mitgliedschaft", href='new')
