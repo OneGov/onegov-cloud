@@ -20,6 +20,40 @@
             </div>
         </dl>
 
+        <!-- Closure Status Control List -->
+        <div tal:condition="closure_status_data"
+             tal:define="commission_names closure_status_data['commission_names'];
+                         status_rows closure_status_data['rows']"
+             class="closure-status-section">
+            <hr class="short-hr">
+            <h3 i18n:translate="">Commission Closure Status</h3>
+            <hr class="long-hr">
+
+            <table class="closure-status-table">
+                <thead>
+                    <tr>
+                        <th i18n:translate="">Parliamentarian</th>
+                        <th tal:repeat="commission_name commission_names">
+                            ${commission_name}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr tal:repeat="row status_rows">
+                        <td>
+                            ${row['parliamentarian_name']}
+                        </td>
+                        <td tal:repeat="status row['commission_statuses']"
+                            class="${python:'closed' if status['is_closed'] else 'not-closed'}">
+                            <span tal:condition="status['is_closed']" class="closure-indicator closed">✓</span>
+                            <span tal:condition="not status['is_closed']" class="closure-indicator not-closed">✗</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
         <!-- Tabs Start -->
         <ul class="tabs" data-tabs id="settlement-run-export-tabs" role="tablist">
             <!-- Commission Closure Status Tab -->
