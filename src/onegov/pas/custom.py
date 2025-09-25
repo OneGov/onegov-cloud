@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from onegov.core.elements import Link
+from sqlalchemy import exists
 from onegov.org.custom import logout_path
 from onegov.org.elements import LinkGroup
 from onegov.pas import _
@@ -17,6 +18,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.pas.request import PasRequest
+    from datetime import date
     from sqlalchemy.orm import Session
 
 
@@ -143,8 +145,28 @@ def get_top_navigation(request: PasRequest) -> list[Link]:
 
 def get_current_settlement_run(session: Session) -> SettlementRun | None:
     query = session.query(SettlementRun)
-    query = query.filter(SettlementRun.active == True)
+    query = query.filter(SettlementRun.active.is_(True))
     return query.first()
+
+
+def check_attendance_in_closed_settlement_run(
+    session: Session,
+    attendance_date: date
+) -> bool:
+    """ Check if attendance date is in a closed settlement run.
+
+    NOTE: This approach is somewhat not as efficient as it could
+    be. A better approach would be:
+    - Add settlement_run_id FK to attendances table
+    - Direct relationship: attendance.settlement_run
+    - No date range queries needed
+    We currently have *a lot* of these date range queries
+    """
+    return session.query(exists().where(
+        (SettlementRun.start <= attendance_date) &
+        (SettlementRun.end >= attendance_date) &
+        (SettlementRun.closed == True)
+    )).scalar()
 
 
 def get_current_rate_set(session: Session, run: SettlementRun) -> RateSet:

@@ -41,9 +41,8 @@ class SettlementRunBoundMixin:
         if self.date.data:
             query = self.request.session.query(SettlementRun)
             query = query.filter(
-                SettlementRun.active == True,
+                SettlementRun.active.is_(True),
                 SettlementRun.start <= self.date.data,
-                SettlementRun.end >= self.date.data,
             )
             if not query.first():
                 assert isinstance(self.date.errors, list)

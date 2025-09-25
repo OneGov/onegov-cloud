@@ -7,6 +7,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.search import ORMSearchable
 from sqlalchemy import Boolean, Column, Date, Text
+from sqlalchemy.ext.hybrid import hybrid_property
 from uuid import uuid4
 
 
@@ -58,14 +59,30 @@ class SettlementRun(Base, ContentMixin, TimestampMixin, ORMSearchable):
         nullable=False
     )
 
-    #: Whether this settlement run is active
-    active: Column[bool] = Column(
+    #: Whether this settlement run is closed
+    closed: Column[bool] = Column(
         Boolean,
-        nullable=False
+        nullable=False,
+        default=False
     )
 
     #: The description
     description: dict_property[str | None] = content_property()
+
+    if TYPE_CHECKING:
+        active: Column[bool]
+    else:
+        @hybrid_property
+        def active(self) -> bool:
+            return not self.closed
+
+        @active.setter
+        def active(self, value: bool) -> None:
+            self.closed = not value
+
+        @active.expression
+        def active(cls):
+            return ~cls.closed
 
     @classmethod
     def get_run_number_for_year(cls, input_date: date) -> int:
