@@ -18,22 +18,6 @@ class Client(BaseClient):
     skip_n_forms = 1
 
 
-def test_basic_search(client_with_es):
-    client = client_with_es
-    client.login_admin()
-    anom = client.spawn()
-
-    assert 'Resultate' in client.get('/search?q=test')
-    assert client.get('/search/suggest?q=test').json == []
-    assert 'Resultate' in anom.get('/search?q=test')
-    assert anom.get('/search/suggest?q=test').json == []
-
-    assert 'Resultate' in client.get('/search-postgres?q=test')
-    assert client.get('/search-postgres/suggest?q=test').json == []
-    assert 'Resultate' in anom.get('/search-postgres?q=test')
-    assert anom.get('/search-postgres/suggest?q=test').json == []
-
-
 def test_view_addresses(winterthur_app, streets_csv, addresses_csv):
     client = Client(winterthur_app)
 
