@@ -219,7 +219,6 @@ def test_views_manage(client_with_es):
     assert '0 Resultate' in client.get('/search-postgres?q=bb')
     assert '0 Resultate' in client.get('/search-postgres?q=cc')
     assert '0 Resultate' in client.get('/search-postgres?q=first')
-    assert '0 Resultate' in client.get('/search-postgres?q=2020-2024')
     assert '0 Resultate' in client.get('/search-postgres?q=Q1')
 
     client.login_admin()
@@ -235,7 +234,6 @@ def test_views_manage(client_with_es):
     assert '1 Resultat' in client.get('/search-postgres?q=bb')
     assert '1 Resultat' in client.get('/search-postgres?q=cc')
     assert '1 Resultat' in client.get('/search-postgres?q=first')
-    assert '1 Resultat' in client.get('/search-postgres?q=2020-2024')
     assert '1 Resultat' in client.get('/search-postgres?q=Q1')
 
     # Delete

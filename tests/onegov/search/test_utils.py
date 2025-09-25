@@ -50,7 +50,7 @@ def test_get_searchable_sqlalchemy_models_inheritance():
     ]
 
 
-def test_filter_for_base_models():
+def test_get_polymorphic_base():
     Base = declarative_base()
 
     class Ticket(Base, ORMSearchable):
@@ -72,7 +72,10 @@ def test_filter_for_base_models():
     class YTicket(Ticket):
         __mapper_args__ = {'polymorphic_identity': 'ticketi-y'}  # type:ignore
 
-    assert utils.filter_for_base_models({XTicket, YTicket, Ticket}) == {Ticket}
+    def filter_for_base_models(models):
+        return {utils.get_polymorphic_base(model) for model in models}
+
+    assert filter_for_base_models({XTicket, YTicket, Ticket}) == {Ticket}
 
     class Letter(Base, Searchable):
         __tablename__ = 'letter'
@@ -103,7 +106,7 @@ def test_filter_for_base_models():
     class CC(C):
         __mapper_args__ = {'polymorphic_identity': 'cc'}  # type:ignore
 
-    assert utils.filter_for_base_models({Letter, A, AA, B, C, CC}) == {Letter}
+    assert filter_for_base_models({Letter, A, AA, B, C, CC}) == {Letter}
 
     class AdjacencyList(Base):
         __abstract__ = True
@@ -128,11 +131,11 @@ def test_filter_for_base_models():
     class News(Page, SearchableContent):
         __mapper_args__ = {'polymorphic_identity': 'news'}
 
-    assert utils.filter_for_base_models({Page, Topic, News}) == {Page}
+    assert filter_for_base_models({Page, Topic, News}) == {Page}
 
     searchable_models = {
         m for m in utils.searchable_sqlalchemy_models(Base)}
-    assert utils.filter_for_base_models(searchable_models) == {
+    assert filter_for_base_models(searchable_models) == {
         Ticket, Letter, Page}
 
 

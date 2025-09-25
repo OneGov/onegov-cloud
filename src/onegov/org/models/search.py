@@ -173,12 +173,6 @@ class Search(Pagination[_M]):
         ))
 
 
-def locale_mapping(locale: str) -> str:
-    mapping = {'de_CH': 'german', 'fr_CH': 'french', 'it_CH': 'italian',
-               'rm_CH': 'english'}
-    return mapping.get(locale, 'simple')
-
-
 class SearchPostgres(Pagination[_M]):
     """
     Implements searching in postgres db based on the gin index

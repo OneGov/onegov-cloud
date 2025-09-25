@@ -374,14 +374,29 @@ def test_orm_event_translator_properties():
         'type_name': 'page',
         'id': 1,
         'id_key': 'id',
-        'owner_id': 1,
         'owner_type': 'Page',
         'language': 'en',
-        'access': '',
+        'access': 'public',
         'suggestion': ['About'],
         'publication_start': None,
         'publication_end': None,
         'properties': {
+            'title': 'About',
+            'body': 'We are Pied Piper',
+            'date': '2015-09-11T00:00:00',
+            'likes': 1000,
+            'published': True,
+            'es_tags': ['aboutus', 'company'],
+            'es_public': True,
+            'es_last_change': '2015-09-11T00:00:00',
+            'es_suggestion': {
+                'input': ['About'],
+                'contexts': {
+                    'es_suggestion_context': ['public']
+                }
+            }
+        },
+        'raw_properties': {
             'title': 'About',
             'body': 'We are Pied Piper',
             'date': creation_date,
@@ -390,12 +405,6 @@ def test_orm_event_translator_properties():
             'es_tags': ['aboutus', 'company'],
             'es_public': True,
             'es_last_change': creation_date,
-            'es_suggestion': {
-                'input': 'About',
-                'contexts': {
-                    'es_suggestion_context': ['public']
-                }
-            }
         }
     }
     assert translator.es_queue.qsize() == 1
@@ -427,14 +436,29 @@ def test_orm_event_translator_properties():
         'type_name': 'page',
         'id': 1,
         'id_key': 'id',
-        'owner_id': 1,
         'owner_type': 'Page',
         'language': 'en',
-        'access': '',
+        'access': 'public',
         'suggestion': ['About'],
         'publication_start': None,
         'publication_end': None,
         'properties': {
+            'title': 'About',
+            'body': 'We are Pied Piper',
+            'date': '2015-09-11T00:00:00',
+            'likes': 1000,
+            'published': True,
+            'es_tags': ['aboutus', 'company'],
+            'es_public': True,
+            'es_last_change': '2015-09-11T00:00:00',
+            'es_suggestion': {
+                'input': ['About'],
+                'contexts': {
+                    'es_suggestion_context': ['public']
+                }
+            }
+        },
+        'raw_properties': {
             'title': 'About',
             'body': 'We are Pied Piper',
             'date': creation_date,
@@ -442,13 +466,7 @@ def test_orm_event_translator_properties():
             'published': True,
             'es_tags': ['aboutus', 'company'],
             'es_public': True,
-            'es_last_change': creation_date,
-            'es_suggestion': {
-                'input': 'About',
-                'contexts': {
-                    'es_suggestion_context': ['public']
-                }
-            }
+            'es_last_change': creation_date
         }
     }
     delete_task = translator.es_queue.get()
@@ -525,9 +543,11 @@ def test_orm_event_queue_overflow(capturelog):
 
     translator.on_insert('foobar', Tweet(4))
 
-    assert len(capturelog.records(logging.ERROR)) == 1
-    assert capturelog.records(logging.ERROR)[0].message == \
-        'The orm event translator queue is full!'
+    assert len(capturelog.records(logging.ERROR)) == 2
+    assert capturelog.records(logging.ERROR)[0].message == (
+        'The es orm event translator queue is full!')
+    assert capturelog.records(logging.ERROR)[1].message == (
+        'The psql orm event translator queue is full!')
 
 
 def test_type_mapping_registry():
@@ -574,13 +594,16 @@ def test_indexer_process(es_client, session_manager_fts):
         'tablename': 'my-pages',
         'type_name': 'page',
         'id': 1,
-        'owner_id': 1,
         'owner_type': 'Page',
         'language': 'en',
         'properties': {
             'title': 'Go ahead and jump',
             'es_public': True
-        }
+        },
+        'raw_properties': {
+            'title': 'Go ahead and jump',
+            'es_public': True
+        },
     }
     es_indexer.queue.put(task)
     psql_indexer.queue.put(task)
@@ -616,6 +639,7 @@ def test_indexer_process(es_client, session_manager_fts):
     task = {
         'action': 'delete',
         'schema': 'my-schema',
+        'tablename': 'my-pages',
         'type_name': 'page',
         'id': 1
     }
@@ -653,6 +677,11 @@ def test_indexer_bulk_process_mid_transaction(session_manager, session):
             'title': person1.title,
             'es_public': True,
             'es_last_change': person1.last_change
+        },
+        'raw_properties': {
+            'title': person1.title,
+            'es_public': True,
+            'es_last_change': person1.last_change
         }
     })
     person2 = people.add(first_name='Jane', last_name='Doe')
@@ -668,6 +697,11 @@ def test_indexer_bulk_process_mid_transaction(session_manager, session):
         'language': 'en',
         'suggestion': 'Jane Doe',
         'properties': {
+            'title': person2.title,
+            'es_public': True,
+            'es_last_change': person2.last_change
+        },
+        'raw_properties': {
             'title': person2.title,
             'es_public': True,
             'es_last_change': person2.last_change
@@ -687,6 +721,11 @@ def test_indexer_bulk_process_mid_transaction(session_manager, session):
         'language': 'en',
         'suggestion': ['Paul Atishon', 'Atishon Paul'],
         'properties': {
+            'title': person3.title,
+            'es_public': True,
+            'es_last_change': person3.last_change
+        },
+        'raw_properties': {
             'title': person3.title,
             'es_public': True,
             'es_last_change': person3.last_change
@@ -762,6 +801,10 @@ def test_tags(es_client, session_manager_fts):
         'owner_type': 'Page',
         'language': 'en',
         'properties': {
+            'tags': ['foo', 'BAR', 'baz'],
+            'es_public': True
+        },
+        'raw_properties': {
             'tags': ['foo', 'BAR', 'baz'],
             'es_public': True
         }

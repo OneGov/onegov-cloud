@@ -573,8 +573,7 @@ class PostgresIndexer(IndexerBase):
         except Exception:
             index_log.exception(
                 f'Error creating index schema {schema} of '
-                f'table {tablename}, tasks:',
-                [t['id'] for t in tasks],
+                f'table {tablename}, tasks: {[t["id"] for t in tasks]}',
             )
             return False
 
@@ -1210,10 +1209,10 @@ class ORMEventTranslator:
 
             suggestion = obj.es_suggestion
             if suggestion:
-                if isinstance(suggestion, str):
-                    suggestion = [suggestion]
-                else:
+                if is_non_string_iterable(suggestion):
                     suggestion = list(suggestion)
+                else:
+                    suggestion = [str(suggestion)]
 
                 translation['suggestion'] = suggestion
 
