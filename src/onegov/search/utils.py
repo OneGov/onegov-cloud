@@ -24,6 +24,22 @@ T_co = TypeVar('T_co', covariant=True)
 # XXX this is doubly defined in onegov.org.utils, maybe move to a common
 # regex module in in onegov.core
 HASHTAG = re.compile(r'(?<![\w/])#\w{3,}')
+LANGUAGE_MAP = {
+    'de_CH': 'german',
+    'de': 'german',
+    'fr_CH': 'french',
+    'fr': 'french',
+    'it_CH': 'italian',
+    'it': 'italian',
+    'rm_CH': 'english',
+    'rm': 'english',
+}
+
+
+def language_from_locale(locale: str | None) -> str:
+    if locale is None:
+        return 'simple'
+    return LANGUAGE_MAP.get(locale, 'simple')
 
 
 def searchable_sqlalchemy_models(

@@ -10,8 +10,8 @@ from elasticsearch import Elasticsearch
 from elasticsearch import Transport
 from elasticsearch import TransportError
 from elasticsearch.connection import create_ssl_context
+from functools import cached_property
 from more.transaction.main import transaction_tween_factory
-
 from onegov.search import Search, log, index_log, Searchable
 from onegov.search.errors import SearchOfflineError
 from onegov.search.indexer import Indexer, PostgresIndexer
@@ -20,6 +20,7 @@ from onegov.search.indexer import TypeMappingRegistry
 from onegov.search.utils import (
     apply_searchable_polymorphic_filter,
     get_polymorphic_base,
+    language_from_locale,
     searchable_sqlalchemy_models,
 )
 from sortedcontainers import SortedSet
@@ -137,6 +138,8 @@ class SearchApp(morepath.App):
         def session(self) -> Callable[[], Session]: ...
         @property
         def has_database_connection(self) -> bool: ...
+        @cached_property
+        def locales(self) -> set[str]: ...
 
     es_client: Elasticsearch | None
 
@@ -233,6 +236,7 @@ class SearchApp(morepath.App):
             self.psql_indexer = PostgresIndexer(
                 self.fts_orm_events.psql_queue,
                 self.session_manager.engine,
+                self.fts_languages
             )
 
             self.session_manager.on_insert.connect(
@@ -417,6 +421,13 @@ class SearchApp(morepath.App):
 
         """
         return request.is_logged_in
+
+    @cached_property
+    def fts_languages(self) -> set[str]:
+        return {
+            language_from_locale(locale)
+            for locale in self.locales
+        } or {'simple'}
 
     def indexable_base_models(self) -> set[type[Searchable | Base]]:
         return {

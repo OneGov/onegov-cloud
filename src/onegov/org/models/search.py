@@ -11,9 +11,11 @@ from onegov.core.collection import Pagination, _M
 from onegov.core.orm import Base
 from onegov.event.models import Event
 from onegov.search.search_index import SearchIndex
+from onegov.search.utils import language_from_locale
 from sedate import utcnow
 from sqlalchemy import func, cast, Text, case
 from sqlalchemy.dialects.postgresql import UUID
+from unidecode import unidecode
 
 
 from typing import TYPE_CHECKING, Any
@@ -304,13 +306,9 @@ class SearchPostgres(Pagination[_M]):
         return cls
 
     def generic_search(self) -> list[Searchable]:
-        language = locale_mapping(self.request.locale or 'de_CH')
+        language = language_from_locale(self.request.locale)
         ts_query = func.websearch_to_tsquery(
-            # FIXME: I think we should use unidecode here, like we do
-            #        when generating the TSVECTOR, otherwise we will run
-            #        into issues where the two functions don't generate
-            #        the same output
-            language, func.unaccent(self.query))
+            language, unidecode(self.query))
         now = utcnow()
         results = []
 

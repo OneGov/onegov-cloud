@@ -12,6 +12,7 @@ from onegov.core.utils import hash_dictionary, is_non_string_iterable
 from onegov.search import index_log, log, Searchable, utils
 from onegov.search.errors import SearchOfflineError
 from onegov.search.search_index import SearchIndex
+from onegov.search.utils import language_from_locale
 from operator import itemgetter
 from sqlalchemy import and_, bindparam, func, String, Table, MetaData
 from sqlalchemy.orm.exc import ObjectDeletedError
@@ -370,22 +371,17 @@ class Indexer(IndexerBase):
 
 class PostgresIndexer(IndexerBase):
 
-    idx_language_mapping = {
-        'de': 'german',
-        'fr': 'french',
-        'it': 'italian',
-        'en': 'english',
-    }
-
     queue: Queue[Task]
 
     def __init__(
         self,
         queue: Queue[Task],
         engine: Engine,
+        languages: set[str] | None = None
     ) -> None:
         self.queue = queue
         self.engine = engine
+        self.languages = languages or {'simple'}
 
     def index(
         self,
@@ -457,8 +453,24 @@ class PostgresIndexer(IndexerBase):
                 else:
                     owner_id_column = _owner_id_column
 
-                language = (
-                    self.idx_language_mapping.get(task['language'], 'simple'))
+                # FIXME: We may want to create a TSVECTOR for more than one
+                #        language rather than rely on language detection
+                #        most of our sites are single language anyways, so
+                #        even if there is some foreign language content, you
+                #        would still want to be able to find it.
+                detected_language = language_from_locale(task['language'])
+                if detected_language not in self.languages:
+                    if len(self.languages) == 1:
+                        language = next(iter(self.languages))
+                    elif 'german' in self.languages:
+                        language = 'german'
+                    elif 'french' in self.languages:
+                        language = 'french'
+                    else:
+                        # HACK: just take one
+                        language = next(iter(self.languages), 'simple')
+                else:
+                    language = detected_language
                 data = {
                     k: unidecode(str(v)) if v else ''
                     for k, v in task['raw_properties'].items()
