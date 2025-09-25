@@ -200,7 +200,7 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
         result.batch_size = 25
         return result
 
-    def for_page(self, page: int | None) -> Self | None:
+    def for_page(self, page: int | None) -> DirectoryEntryApiEndpoint:
         """ Return a new endpoint instance with the given page while keeping
         the current filters.
 
@@ -229,17 +229,22 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
             return None
 
     def item_data(self, item: ExtendedDirectoryEntry) -> dict[str, Any]:
-        data = item.content['values'].copy() or {}
+        data = item.content['values'] or {}
         data['coordinates'] = get_geo_location(item)
 
         for field in item.directory.fields:
-            if any(type in field.type for type in ['fileinput', 'url']):
+            if any(field_type in field.type for field_type in [
+                'fileinput', 'url']):
                 data.pop(field.id, None)
+            if any(field_type in field.type for field_type in [
+                'date', 'datetime']):
+                if data.get(field.id):
+                    data[field.id] = data[field.id].isoformat()
 
         return data
 
     def item_links(self, item: ExtendedDirectoryEntry) -> dict[str, Any]:
-        data = {(f.note or 'file'): f for f in item.files.copy()}
+        data = {(f.note or 'file'): f for f in item.files}
         data['html'] = item  # type: ignore
 
         return data
