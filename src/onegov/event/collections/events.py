@@ -519,8 +519,10 @@ class EventCollection(Pagination[Event]):
             if not dates:
                 return None
 
-            rdates = [start.strftime('%Y%m%dT%H%M%SZ') for start in dates]
-            return '\n'.join(f'RDATE:{start}' for start in rdates)
+            return '\n'.join(
+                f'RDATE:{to_timezone(start, "UTC"):%Y%m%dT%H%M%SZ}'
+                for start in dates
+            )
 
         def find_element_text(parent: etree._Element, key: str) -> str:
             element = parent.find(f'ns:{key}', namespaces=ns)

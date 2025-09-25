@@ -232,6 +232,7 @@ def session_manager(postgres_dsn: str) -> Iterator[SessionManager]:
     setup with :func:`postgres_dsn`.
 
     """
+
     # in testing we often reuse loaded values after commiting a transaction,
     # so we set expire_on_commit to False. The test applications will still
     # use the default value of True however. This only affects unit tests
