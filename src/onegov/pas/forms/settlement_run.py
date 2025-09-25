@@ -38,6 +38,7 @@ class SettlementRunForm(Form):
 
     closed = BooleanField(
         label=_('Closed'),
+        default=False
     )
 
     description = HtmlField(

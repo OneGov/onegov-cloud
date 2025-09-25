@@ -320,7 +320,7 @@ def test_parliamentarian_cannot_add_attendance_for_others(client):
     })
 
     # Should get validation error
-    assert 'You can only add attendance for yourself' in page
+    assert 'Sie können nur für sich selbst Anwesenheiten hinzufügen.' in page
 
 
 def test_parliamentarian_can_only_see_self_in_dropdown(client):
@@ -413,5 +413,5 @@ def test_commission_president_cannot_add_for_other_commission_members(client):
     })
 
     # Should get validation error
-    assert ('You can only add attendance for yourself or your commission '
-            'members') in page
+    assert ('Sie können nur für sich selbst oder Ihre Kommissionsmitglieder '
+            'Anwesenheiten hinzufügen.') in page

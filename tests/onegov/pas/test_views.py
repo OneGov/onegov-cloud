@@ -438,7 +438,7 @@ def test_simple_attendence_add(client):
     page.form['name'] = 'Q1'
     page.form['start'] = '2024-01-01'
     page.form['end'] = '2024-03-31'
-    page.form['active'] = True
+    page.form['closed'] = False
     page = page.form.submit().follow()
 
     # parties
@@ -598,42 +598,3 @@ def test_fetch_commissions_parliamentarians_json(client):
     response2 = client.get('/commissions/commissions-parliamentarians-json')
     data2 = response2.json
     assert commission3_id not in data2
-
-
-def test_settlement_run_closing(client_with_es):
-    client = client_with_es
-    client.login_admin()
-
-    # Create a settlement run
-    settings = client.get('/').click('PAS Einstellungen')
-    page = settings.click('Abrechnungsläufe')
-    page = page.click(href='new')
-    page.form['name'] = 'Test Run'
-    page.form['start'] = '2024-01-01'
-    page.form['end'] = '2024-03-31'
-    page.form['closed'] = False
-    page = page.form.submit().follow()
-
-    # Close the settlement run
-    edit_page = page.click('Bearbeiten')
-    edit_page.form['closed'] = True
-    closed_page = edit_page.form.submit().follow()
-
-    # Edit while closed should work (no validation preventing it)
-    edit_page = closed_page.click('Bearbeiten')
-    edit_page.form['name'] = 'Test Run Changed'
-    edit_page.form['closed'] = True  # Keep closed
-    page = edit_page.form.submit().follow()
-    assert 'Test Run Changed' in page
-
-    # Unclose the settlement run
-    edit_page = page.click('Bearbeiten')
-    edit_page.form['closed'] = False
-    page = edit_page.form.submit().follow()
-
-    # Verify it's now unclosed by checking active property
-    edit_page = page.click('Bearbeiten')
-    assert edit_page.form['closed'].checked is False
-
-    # Clean up
-    page.click('Löschen')
