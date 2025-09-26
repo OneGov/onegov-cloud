@@ -208,9 +208,14 @@ def get_editor_assets() -> Iterator[str]:
 
 
 @AgencyApp.setting(section='api', name='endpoints')
-def get_api_endpoints() -> list[type[ApiEndpoint[Any]]]:
-    return [
-        AgencyApiEndpoint,
-        PersonApiEndpoint,
-        MembershipApiEndpoint
-    ]
+def get_api_endpoints_handler(
+) -> Callable[[AgencyRequest], Iterator[ApiEndpoint[Any]]]:
+
+    def get_api_endpoints(
+            request: AgencyRequest
+    ) -> Iterator[ApiEndpoint[Any]]:
+        yield AgencyApiEndpoint(request)
+        yield PersonApiEndpoint(request)
+        yield MembershipApiEndpoint(request)
+
+    return get_api_endpoints
