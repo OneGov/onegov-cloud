@@ -135,6 +135,12 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     price_per_item: dict_property[float | None]
     price_per_item = content_property('price_per_reservation')
 
+    #: the invoicing party for this resource
+    invoicing_party: dict_property[str | None] = content_property()
+
+    #: the cost center / cost unit identifier for this resource
+    cost_object: dict_property[str | None] = content_property()
+
     #: extra field values to include in the ical event description
     ical_fields: dict_property[list[str]] = content_property(default=list)
 
@@ -356,6 +362,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
             items.append(InvoiceItemMeta(
                 text=reduced_amount_label,
                 group='reduced_amount',
+                cost_object=self.cost_object,
                 unit=reduced_amount-total
             ))
 

@@ -9,8 +9,9 @@ from onegov.pas.collections import (
 from onegov.pas.custom import get_current_rate_set
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.attendence import TYPES
+from onegov.pas.utils import is_commission_president
+from onegov.pas.utils import format_swiss_number
 from onegov.core.utils import module_path
-from onegov.pas.utils import format_swiss_number, is_commission_president
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration,

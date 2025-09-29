@@ -67,6 +67,9 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
     #: a secondary group who is not necessarily grouped visually
     family: Column[str | None] = Column(Text, nullable=True)
 
+    #: the cost center / cost unit identifier of this invoice item
+    cost_object: Column[str | None] = Column(Text, nullable=True)
+
     #: the item text
     text: Column[str] = Column(Text, nullable=False)
 

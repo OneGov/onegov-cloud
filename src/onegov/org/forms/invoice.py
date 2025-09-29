@@ -26,6 +26,10 @@ class ManualInvoiceItemForm(Form):
         validators=(InputRequired(), )
     )
 
+    cost_object = StringField(
+        label=_('Cost center / cost unit')
+    )
+
     kind = RadioField(
         label=_('Kind'),
         default='discount',

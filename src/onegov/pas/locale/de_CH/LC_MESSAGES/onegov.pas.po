@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-09-16 07:59+0200\n"
+"POT-Creation-Date: 2025-09-25 16:15+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -26,6 +26,9 @@ msgstr "Anwesenheiten"
 msgid "Changes"
 msgstr "Aktivitäten"
 
+msgid "Import History"
+msgstr "Übersicht Importe"
+
 msgid "PAS settings"
 msgstr "PAS Einstellungen"
 
@@ -35,8 +38,14 @@ msgstr "Dateien"
 msgid "More settings"
 msgstr "Weitere Einstellungen"
 
+msgid "User Management"
+msgstr "Benutzerverwaltung"
+
 msgid "Management"
 msgstr "Verwaltung"
+
+msgid "Profile"
+msgstr "Profil"
 
 msgid "No within an active settlement run."
 msgstr "Nicht in einem aktiven Abrechungslauf"
@@ -64,6 +73,14 @@ msgstr "Als abgeschlossen markieren"
 
 msgid "Parliamentarian is not in this commission."
 msgstr "Parlamentarier:in ist nicht in dieser Kommission."
+
+msgid "You can only add attendance for yourself."
+msgstr "Sie können nur für sich selbst Anwesenheiten hinzufügen."
+
+msgid "You can only add attendance for yourself or your commission members."
+msgstr ""
+"Sie können nur für sich selbst oder Ihre Kommissionsmitglieder Anwesenheiten "
+"hinzufügen."
 
 msgid "Bulk edit group"
 msgstr "Massenbuchungsgruppe"
@@ -94,7 +111,8 @@ msgstr "JSON-Schema validieren"
 msgid "Check if the uploaded JSON files match the expected structure."
 msgstr ""
 "Überprüft ob die hochgeladenen JSON-Dateien der erwarteten Struktur "
-"entsprechen."
+"entsprechen.Überprüft ob die hochgeladenen JSON-Dateien der erwarteten "
+"Struktur entsprechen."
 
 #, python-format
 msgid "File ${name} is missing the \"results\" list."
@@ -294,8 +312,8 @@ msgstr "Kürzestsitzung"
 msgid "Rate set for ${year} alredy exists"
 msgstr "Sätze für ${year} bereits erfasst"
 
-msgid "Active"
-msgstr "Aktiv"
+msgid "Closed"
+msgstr "Geschlossen"
 
 msgid "End must be after start"
 msgstr "Ende muss nach dem Start liegen"
@@ -304,6 +322,12 @@ msgstr "Ende muss nach dem Start liegen"
 msgid "Dates overlap with existing settlement run: ${start} - ${end}"
 msgstr ""
 "Daten überschneiden sich mit bestehendem Abrechnungslauf: ${start} - ${end}"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Editor"
+msgstr "Editor"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -371,6 +395,24 @@ msgstr "${minutes} Minuten"
 msgid "JSON Import"
 msgstr "JSON-Import"
 
+msgid "Trigger Manual Import"
+msgstr "Manuellen Import auslösen"
+
+msgid "Import Started..."
+msgstr "Import gestartet..."
+
+msgid "Are you sure you want to trigger a manual import?"
+msgstr "Sind Sie sicher, dass Sie einen manuellen Import auslösen möchten?"
+
+msgid "This will start a new KUB data import process."
+msgstr "Dies startet einen neuen KUB-Datenimportprozess."
+
+msgid "Trigger Import"
+msgstr "Import andstossen (dauert ca. 20 Sekunden)"
+
+msgid "Import Log Details"
+msgstr "Details zum Importlog"
+
 msgid "Legislative periods"
 msgstr "Legislaturen"
 
@@ -394,12 +436,6 @@ msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
 
 msgid "Delete parliamentarian"
 msgstr "Parlamentarier:in löschen"
-
-msgid "Export"
-msgstr "Export"
-
-msgid "CSV billing export"
-msgstr "Abrechnungsexport (CSV)"
 
 msgid "Do you really want to remove this role?"
 msgstr "Rolle wirklich entfernen?"
@@ -467,6 +503,27 @@ msgstr "Anwesenheit bearbeitet"
 msgid "Attendence removed"
 msgstr "Anwesenheit gelöscht"
 
+msgid "completed"
+msgstr "Abgeschlossen"
+
+msgid "failed"
+msgstr "Fehlgeschlagen"
+
+msgid "pending"
+msgstr "Ausstehend"
+
+msgid "timeout"
+msgstr "Zeitüberschreitung"
+
+msgid "cli"
+msgstr "Manuell auf dem Server"
+
+msgid "automatic"
+msgstr "Automatisch"
+
+msgid "upload"
+msgstr "Auf App hochgeladen"
+
 msgid "Duration"
 msgstr "Dauer"
 
@@ -509,29 +566,6 @@ msgstr "Bitte korrigieren Sie die nachstehenden Fehler:"
 msgid "Import Error"
 msgstr "Import Fehler"
 
-msgid "Import Results"
-msgstr "Import-Ergebnisse"
-
-msgid ""
-"${category_details[1]['category_title']} Created (${category_details[1]"
-"['created_count']}/${category_details[1]['processed']})"
-msgstr ""
-"${category_details[1]['category_title']} Erstellt (${category_details[1]"
-"['created_count']}/${category_details[1]['processed']})"
-
-msgid ""
-"${category_details[1]['category_title']} Updated (${category_details[1]"
-"['updated_count']}/${category_details[1]['processed']})"
-msgstr ""
-"${category_details[1]['category_title']} Aktualisiert (${category_details[1]"
-"['updated_count']}/${category_details[1]['processed']})"
-
-msgid "No changes needed for this category."
-msgstr "Keine Änderungen für diese Kategorie erforderlich."
-
-msgid "Import Details"
-msgstr "Import Details"
-
 msgid "Timestamp:"
 msgstr "Zeitstempel:"
 
@@ -541,17 +575,62 @@ msgstr "Benutzer:"
 msgid "Status:"
 msgstr "Status:"
 
-msgid "Summary"
-msgstr "Zusammenfassung"
+msgid "Source Data Files:"
+msgstr "Quelldateien:"
+
+msgid "People"
+msgstr "Personen"
+
+msgid "Organizations"
+msgstr "Organisationen"
+
+msgid "Memberships"
+msgstr "Mitgliedschaften"
+
+msgid "Logs"
+msgstr "Protokolle"
+
+msgid "Raw JSON"
+msgstr "JSON Rohdaten"
+
+msgid "Overall Status"
+msgstr "Gesamtstatus"
+
+msgid "Import Results"
+msgstr "Import-Ergebnisse"
+
+msgid "Total Summary"
+msgstr "Gesamtzusammenfassung"
+
+msgid "Custom Data Update"
+msgstr "Benutzerdefinierte Datenaktualisierung"
+
+msgid "Import Logs"
+msgstr "Import-Protokolle"
+
+msgid "All"
+msgstr "Alle"
+
+msgid "Errors"
+msgstr "Fehler"
+
+msgid "Warnings"
+msgstr "Warnungen"
+
+msgid "Info"
+msgstr "Info"
+
+msgid "No log data available"
+msgstr "Keine Log-Daten verfügbar"
+
+msgid "Last import:"
+msgstr "Letzter Import:"
+
+msgid "No imports yet"
+msgstr "Noch keine Importe"
 
 msgid "Status"
 msgstr "Status"
-
-msgid "Details"
-msgstr "Details"
-
-msgid "View Details"
-msgstr "Details anzeigen"
 
 msgid "No import logs found."
 msgstr "Keine Import Logs gefunden"
@@ -577,6 +656,18 @@ msgstr "In die Zwischenablage kopiert!"
 
 msgid "No legislative periods defined yet."
 msgstr "Noch keine Legislaturen erfasst."
+
+msgid "Administrator"
+msgstr "Administrator"
+
+msgid "Administrators"
+msgstr "Administratoren"
+
+msgid "Editors"
+msgstr "Bearbeiter"
+
+msgid "Members"
+msgstr "Mitglieder"
 
 msgid "Roles"
 msgstr "Rollen"
@@ -604,6 +695,9 @@ msgstr "Noch keine Sätze erfasst."
 
 msgid "Copy this rate set"
 msgstr "Diesen Satz kopieren"
+
+msgid "Active"
+msgstr "Aktiv"
 
 msgid "Yes"
 msgstr "Ja"
@@ -653,14 +747,22 @@ msgstr ""
 msgid "No settlement runs defined yet."
 msgstr "Noch keine Abrechnungsläufe erfasst"
 
+msgid "Cannot create attendance in closed settlement run."
+msgstr ""
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
+
+msgid "New attendence"
+msgstr "Neue Anwesenheit"
+
 msgid "Added a new attendence"
 msgstr "Neue Anwesenheit hinzugefügt"
 
 msgid "New"
 msgstr "Neu"
 
-msgid "New attendence"
-msgstr "Neue Anwesenheit"
+msgid "New commission session"
+msgstr "Neue Kommissionssitzung"
 
 msgid "No parliamentarians selected"
 msgstr "Keine Parlamentarier:innen ausgewählt"
@@ -668,8 +770,13 @@ msgstr "Keine Parlamentarier:innen ausgewählt"
 msgid "Added commission session"
 msgstr "Kommissionssitzung hinzugefügt"
 
-msgid "New commission session"
-msgstr "Neue Kommissionssitzung"
+msgid "Cannot edit attendance in closed settlement run."
+msgstr ""
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht bearbeitet werden."
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht bearbeitet werden."
+
+msgid "Edit plenary session"
+msgstr "Plenarsitzung bearbeiten"
 
 msgid "Edited attendences"
 msgstr "Anwesenheiten bearbeitet"
@@ -683,20 +790,22 @@ msgstr "Möchten Sie diese Massenbuchung wirklich löschen?"
 msgid "Delete Attendencess"
 msgstr "Anwesenheiten löschen"
 
-msgid "Edit plenary session"
-msgstr "Plenarsitzung bearbeiten"
-
 msgid "Edit commission session"
 msgstr "Kommissionssitzung bearbeiten"
-
-msgid "Added plenary session"
-msgstr "Plenarsitzung hinzugefügt"
 
 msgid "New plenary session"
 msgstr "Neue Plenarsitzung"
 
+msgid "Added plenary session"
+msgstr "Plenarsitzung hinzugefügt"
+
 msgid "Your changes were saved"
 msgstr "Änderungen gespeichert"
+
+msgid "Cannot delete attendance in closed settlement run."
+msgstr ""
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht gelöscht werden."
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht gelöscht werden."
 
 #, python-format
 msgid "Deleted ${count} attendeces"
@@ -708,11 +817,11 @@ msgstr "Parlamentarier:in hinzugefügt"
 msgid "New parliamentarian"
 msgstr "Neue:r Parlamentarier:in"
 
-msgid "Added commission meeting"
-msgstr "Kommissionsitzung hinzugefügt"
-
 msgid "New commission meeting"
 msgstr "Neue Kommissionsitzung"
+
+msgid "Added commission meeting"
+msgstr "Kommissionsitzung hinzugefügt"
 
 msgid "Data Import (JSON)"
 msgstr "Import (JSON)"
@@ -720,24 +829,8 @@ msgstr "Import (JSON)"
 msgid "Dashboard"
 msgstr "Startseite"
 
-#, python-format
-msgid ""
-"Data import completed. Processed ${processed} items: ${created} created, "
-"${updated} updated."
-msgstr ""
-"Datenimport abgeschlossen. ${processed} Elemente verarbeitet: ${created} "
-"erstellt, ${updated} aktualisiert."
-
-#, python-format
-msgid ""
-"Data import completed. Processed ${processed} items. No changes were needed "
-"- data is already up to date."
-msgstr ""
-"Datenimport abgeschlossen. ${processed} Elemente verarbeitet. Keine "
-"Änderungen erforderlich - Daten sind bereits aktuell."
-
-msgid "Import result"
-msgstr "Importresultat"
+msgid "Import completed successfully"
+msgstr "Import erfolgreich abgeschlossen"
 
 #, python-format
 msgid "Data import failed: ${error}"
@@ -746,11 +839,15 @@ msgstr "Datenimport fehlgeschlagen: ${error}"
 msgid "Import"
 msgstr "Import"
 
-msgid "Import History"
-msgstr "Übersicht Importe"
+msgid ""
+"Import triggered successfully. The process may take up to 30 seconds to "
+"complete."
+msgstr ""
+"Import erfolgreich ausgelöst. Der Vorgang kann bis zu 30 Sekunden dauern."
 
-msgid "Import Log Details"
-msgstr "Details zum Importlog"
+#, python-format
+msgid "Import failed: ${error}"
+msgstr "Import fehlgeschlagen: ${error}"
 
 msgid "Inactive"
 msgstr "Inaktiv"
@@ -760,6 +857,9 @@ msgstr "Legislatur hinzugefügt"
 
 msgid "New legislative period"
 msgstr "Neue Legislatur"
+
+msgid "The parliamentarian has been deleted."
+msgstr "Der/Die Parlamentarier:in wurde gelöscht."
 
 msgid "Added a new party"
 msgstr "Partei hinzugefügt"
@@ -781,6 +881,9 @@ msgstr "Kopieren"
 
 msgid "Copy Rate Set"
 msgstr "Satz kopieren"
+
+msgid "Create Attendence"
+msgstr "Sitzung erfassen"
 
 msgid "Added a new settlement run"
 msgstr "Neuer Abrechnungslauf hinzugefügt"
@@ -827,38 +930,17 @@ msgstr "Excel Exporte"
 msgid "Total all parties"
 msgstr "Total Alle Parteien"
 
-msgid "Trigger Manual Import"
-msgstr "Manuellen Import auslösen"
+msgid "closed"
+msgstr "geschlossen"
 
-msgid "Last import:"
-msgstr "Letzter Import:"
+msgid "reopened"
+msgstr "geöffnet"
 
-msgid "No imports yet"
-msgstr "Noch keine Importe"
+#, python-format
+msgid "Settlement run ${name} has been ${action}"
+msgstr "Abrechnungslauf ${name} wurde ${action}"
 
-msgid "Are you sure you want to trigger a manual import?"
-msgstr "Sind Sie sicher, dass Sie einen manuellen Import auslösen möchten?"
-
-msgid "This will start a new KUB data import process."
-msgstr "Dies startet einen neuen KUB-Datenimportprozess."
-
-msgid "Import Started..."
-msgstr "Import gestartet..."
-
-msgid "Import triggered successfully. The process may take up to 30 seconds to complete."
-msgstr "Import erfolgreich ausgelöst. Der Vorgang kann bis zu 30 Sekunden dauern."
-
-msgid "completed"
-msgstr "Abgeschlossen"
-
-msgid "failed"
-msgstr "Fehlgeschlagen"
-
-msgid "pending"
-msgstr "Ausstehend"
-
-msgid "timeout"
-msgstr "Zeitüberschreitung"
-
-msgid "Trigger Import"
-msgstr "Import andstossen (dauert ca. 20 Sekunden)"
+msgid "Cannot delete closed settlement run. Please reopen it first."
+msgstr ""
+"Geschlossener Abrechnungslauf kann nicht gelöscht werden. Bitte zuerst "
+"öffnen."

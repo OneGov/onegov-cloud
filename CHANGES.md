@@ -1,8 +1,58 @@
 # Changes
 
+## 2025.52
+
+`2025-09-26` | [9548576332...fee7408fcf](https://github.com/OneGov/onegov-cloud/compare/9548576332^...fee7408fcf)
+
+### Landsgemeinde
+
+##### Import assembly as zip file
+
+`Feature` | [OGC-2272](https://linear.app/onegovcloud/issue/OGC-2272) | [26390a491f](https://github.com/onegov/onegov-cloud/commit/26390a491fff68634612e364a7f3cbc4e7400c5c)
+
+### Org
+
+##### Adds invoicing parties and cost objects to invoices
+
+`Feature` | [OGC-2643](https://linear.app/onegovcloud/issue/OGC-2643) | [392e16754b](https://github.com/onegov/onegov-cloud/commit/392e16754be0c5010bf127e654a9485c1f02cc29)
+
+##### Fixes crash when an expired transient reservation contains files
+
+`Bugfix` | [OGC-2645](https://linear.app/onegovcloud/issue/OGC-2645) | [9548576332](https://github.com/onegov/onegov-cloud/commit/9548576332d26e560807b37d65585898676e4103)
+
+##### Avoids crashes in `parse_fullcalendar_request` for invalid dates
+
+Instead we raise `HTTPBadRequest` which returns a 400 response
+
+`Bugfix` | [SEA-1855](https://linear.app/seantis/issue/SEA-1855) | [21487f788e](https://github.com/onegov/onegov-cloud/commit/21487f788eaa392ad83263cbdaba8a6eb23857bf)
+
+### Pas
+
+##### Improve log overview with client side filtering, simplify.
+
+`Feature` | [5addd8e640](https://github.com/onegov/onegov-cloud/commit/5addd8e640b298ed0e17744cf236afcd1ca4daa7)
+
+##### Add permission system and user accounts for parliamentarians.
+
+This is similar to 4f8e72cda44115127614b6184b35af45f5f53e06.
+
+`Feature` | [OGC-2573](https://linear.app/onegovcloud/issue/OGC-2573) | [da76354d61](https://github.com/onegov/onegov-cloud/commit/da76354d61e778c70d3be841ac793c4a3a34025d)
+
+##### Create ability to close settlement run.
+
+`Feature` | [OGC-2586](https://linear.app/onegovcloud/issue/OGC-2586) | [a688f56b33](https://github.com/onegov/onegov-cloud/commit/a688f56b335fe13374808749fcf684e93f3adc48)
+
+##### Fixes `KeyError` in `/import_logs` download
+
+`Bugfix` | [OGC-2652](https://linear.app/onegovcloud/issue/OGC-2652) | [030cbbea8a](https://github.com/onegov/onegov-cloud/commit/030cbbea8a3ec157007d801af584ec29bb6ced98)
+
+##### Fixes a couple of minor issues.
+
+`Bugfix` | [fee7408fcf](https://github.com/onegov/onegov-cloud/commit/fee7408fcf487e7579a8d20b401328e39d29b171)
+
 ## 2025.51
 
-`2025-09-23` | [b9c65577c5...60a58f1e22](https://github.com/OneGov/onegov-cloud/compare/b9c65577c5^...60a58f1e22)
+`2025-09-23` | [b9c65577c5...2315af674a](https://github.com/OneGov/onegov-cloud/compare/b9c65577c5^...2315af674a)
 
 ### Cronjob
 
@@ -2279,20 +2329,4 @@ JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 ##### Adds provisional import script.
 
 `Feature` | [OGC-1878](https://linear.app/onegovcloud/issue/OGC-1878) | [9bafe68736](https://github.com/onegov/onegov-cloud/commit/9bafe687361c7160c869fd0269b656b9d82d2e16)
-
-## 2025.6
-
-`2025-02-13` | [4a8ed94cb1...952fb7d12f](https://github.com/OneGov/onegov-cloud/compare/4a8ed94cb1^...952fb7d12f)
-
-### Agency
-
-##### Clean up previous implementation.
-
-Uses a meta field for the external_user_id (So we don't have a specific column
-    in org for a specific feature of agency)
-    Make sure the api uses it's own mutation form such that it's seperated form
-    public facing mutations.
-    Make sure hidden_people_fields is honoured everywhere
-
-`Bugfix` | [OGC-2061](https://linear.app/onegovcloud/issue/OGC-2061) | [4a8ed94cb1](https://github.com/onegov/onegov-cloud/commit/4a8ed94cb12db893dc3de0fb73fb4b3c7d1db309)
 

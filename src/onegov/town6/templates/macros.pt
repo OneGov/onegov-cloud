@@ -3287,15 +3287,16 @@
 </metal:b>
 
 <metal:invoice_items define-macro="invoice_items" i18n:domain="onegov.town6">
-    <table class="invoice-items" tal:define="total_amount total_amount|None; total_vat total_vat|None; total_paid total_paid|False; show_vat total_vat or any(item.vat for items in invoice_items.values() for item in items); show_quantity any(item.quantity != 1.0 for items in invoice_items.values() for item in items); item_actions item_actions|None; show_payment_state show_payment_state|False">
+    <table class="invoice-items" tal:define="total_amount total_amount|None; total_vat total_vat|None; total_paid total_paid|False; show_cost_object any(item.cost_object for items in invoice_items.values() for item in items); show_vat total_vat or any(item.vat for items in invoice_items.values() for item in items); show_quantity any(item.quantity != 1.0 for items in invoice_items.values() for item in items); item_actions item_actions|None; show_payment_state show_payment_state|False">
         <thead>
             <tr>
                 <th i18n:translate>Booking Text</th>
-                <th tal:condition="show_quantity" i18n:translate>Unit</th>
-                <th tal:condition="show_quantity" i18n:translate>Quantity</th>
-                <th tal:condition="show_vat" i18n:translate>VAT Rate</th>
-                <th tal:condition="show_vat" i18n:translate>VAT</th>
-                <th i18n:translate>Amount</th>
+                <th tal:condition="show_cost_object" i18n:translate>Cost center / cost unit</th>
+                <th tal:condition="show_quantity" class="centered" i18n:translate>Unit</th>
+                <th tal:condition="show_quantity" class="centered" i18n:translate>Quantity</th>
+                <th tal:condition="show_vat" class="centered" i18n:translate>VAT Rate</th>
+                <th tal:condition="show_vat" class="centered" i18n:translate>VAT</th>
+                <th class="centered" i18n:translate>Amount</th>
                 <th tal:condition="item_actions">
                     <span i18n:translate class="show-for-sr">Actions</span>
                 </th>
@@ -3304,7 +3305,7 @@
         <tal:b tal:repeat="(group, items) invoice_items.items()">
             <thead>
                 <tr class="group">
-                    <th tal:switch="group" colspan="${2 + (2 if show_quantity else 0) + (2 if show_vat else 0) + (1 if item_actions else 0)}">
+                    <th tal:switch="group" colspan="${2 + (1 if show_cost_object else 0) + (2 if show_quantity else 0) + (2 if show_vat else 0) + (1 if item_actions else 0)}">
                         <tal:b tal:case="'reservation'" i18n:translate>
                             Reservations
                         </tal:b>
@@ -3329,9 +3330,8 @@
             <tbody>
                 <tal:b tal:repeat="item items">
                     <tr tal:define="groupid hash(str(item.group) + str(repeat.item.index)); paid total_paid or item.paid|False" tal:attributes="class ('paid' if paid else 'unpaid') if show_payment_state else None">
-                        <td>
-                            ${item.text}
-                        </td>
+                        <td>${item.text}</td>
+                        <td tal:condition="show_cost_object" class="cost-object">${item.cost_object}</td>
                         <td tal:condition="show_quantity" class="unit">${'{:.2f}'.format(item.unit)}</td>
                         <td tal:condition="show_quantity" class="quantity">${'{:.2f}'.format(item.quantity)}</td>
                         <td tal:condition="show_vat" class="vat-rate">${'{:.1f}%'.format(item.vat_rate or 0.0)}</td>
@@ -3359,6 +3359,7 @@
         <tfoot tal:condition="total_amount is not None">
             <tr class="total${(' paid' if total_paid else ' unpaid') if show_payment_state else ''}">
                 <td i18n:translate>Total</td>
+                <td tal:condition="show_cost_object"></td>
                 <td tal:condition="show_quantity" class="unit"></td>
                 <td tal:condition="show_quantity" class="quantity"></td>
                 <td tal:condition="show_vat" class="vat-rate"></td>

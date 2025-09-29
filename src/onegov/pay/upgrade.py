@@ -103,3 +103,23 @@ def add_invoiced_state_to_invoices(context: UpgradeContext) -> None:
                  WHERE payments.state = 'invoiced'
             )
         """)
+
+
+@upgrade_task('Add invoicing party and cost object column to invoices')
+def add_invoicing_party_and_cost_center_to_invoices(
+    context: UpgradeContext
+) -> None:
+    if not context.has_table('invoices'):
+        return
+
+    if not context.has_column('invoices', 'invoicing_party'):
+        context.operations.add_column(
+            'invoices',
+            Column('invoicing_party', Text, nullable=True)
+        )
+
+    if not context.has_column('invoice_items', 'cost_object'):
+        context.operations.add_column(
+            'invoice_items',
+            Column('cost_object', Text, nullable=True)
+        )

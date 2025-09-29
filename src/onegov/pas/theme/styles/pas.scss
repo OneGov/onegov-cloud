@@ -9,6 +9,8 @@ $rate-set-icon: '\f362';
 $role-icon: '\f02b';
 $pas-settings-icon: '\f7d9';
 $settlement-run-icon: '\f4c0';
+$import-icon: '\f56f';
+$import-logs-icon: '\f1da';
 
 .globals {
     .attendences::before { @include icon-bold($attendence-icon); }
@@ -23,6 +25,8 @@ $settlement-run-icon: '\f4c0';
     .pas-settings::before { @include icon-bold($pas-settings-icon); }
     .settlement-runs::before { @include icon-bold($settlement-run-icon); }
     .settlement-run::before { @include icon-bold($settlement-run-icon); }
+    .import::before { @include icon-bold($import-icon); }
+    .import-logs::before { @include icon-bold($import-logs-icon); }
 }
 
 .edit-bar {
@@ -251,4 +255,233 @@ pre {
         opacity: 1;
         transform: scale(1);
     }
+}
+
+// Import Log Detail Styles
+.import-log-header {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+
+    p {
+        margin: 0;
+    }
+
+    .source-files {
+        margin-top: 10px;
+
+        a {
+            margin-left: 10px;
+        }
+    }
+}
+
+// Import log tabs use Foundation's built-in tabs
+#import-log-tabs {
+    margin-bottom: 20px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.summary-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+
+    h4 {
+        margin-top: 0;
+        color: #495057;
+    }
+
+    .status-text {
+        font-weight: bold;
+        text-transform: capitalize;
+    }
+}
+
+.stats-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        border-bottom: 1px solid #e9ecef;
+
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+}
+
+.events-log {
+    max-height: 500px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.event-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.event-level {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 60px;
+    text-align: center;
+
+    &.info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    &.success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    &.error {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    &.warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+}
+
+.event-message {
+    flex: 1;
+    line-height: 1.4;
+}
+
+.output-messages {
+    max-height: 400px;
+    overflow-y: auto;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.json-viewer {
+    max-height: 600px;
+    overflow-y: auto;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+}
+
+// Import logs styling
+.import-logs-entry {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    padding: 15px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 13px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.log-entry {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    padding: 4px 0;
+}
+
+.log-filters {
+    margin-bottom: 15px;
+
+    .log-filter {
+        margin-right: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            filter: brightness(1.1);
+        }
+
+        &.active {
+            border: 2px solid #333;
+            box-shadow: 0 0 0 1px rgba(51, 51, 51, 0.3);
+            font-weight: bold;
+        }
+    }
+}
+
+.log-level {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: bold;
+    min-width: 50px;
+    text-align: center;
+    margin-right: 12px;
+    flex-shrink: 0;
+
+    &.log-info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+    }
+
+    &.log-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    &.log-warning, &.log-warn {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+
+    &.log-debug {
+        background-color: #e2e3e5;
+        color: #383d41;
+        border: 1px solid #d6d8db;
+    }
+
+    &.log-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+}
+
+.log-message {
+    flex: 1;
+    line-height: 1.4;
+    overflow-wrap: break-word;
 }

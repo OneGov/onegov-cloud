@@ -8,6 +8,7 @@ from io import BytesIO, StringIO
 from bleach import Cleaner
 from bleach.linkifier import LinkifyFilter
 from lxml import etree
+from markupsafe import Markup
 from onegov.chat import MessageCollection
 from onegov.org import _
 from onegov.org.constants import (
@@ -354,6 +355,7 @@ class TicketPdf(Pdf):
         if not invoice:
             return
 
+        show_cost_object = any(item.cost_object for item in invoice.items)
         show_quantity = any(item.quantity != 1.0 for item in invoice.items)
         show_vat = any(item.vat for item in invoice.items)
         item_groups = group_invoice_items(invoice.items)
@@ -365,6 +367,10 @@ class TicketPdf(Pdf):
             )
         ]
         ratios: list[float] = []
+        if show_cost_object:
+            headers.append(_('Cost center / cost unit'))
+            totals.append('')
+            ratios.append(20.0)
         if show_quantity:
             headers.extend((
                 _('Unit'),
@@ -393,8 +399,8 @@ class TicketPdf(Pdf):
             ('RIGHTPADDING', (-2, 0), (-2, -1), 0),
             ('FIRSTLINEINDENT', (0, 0), (-1, -1), 0),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-            ('ALIGN', (0, 0), (1, -1), 'LEFT'),
-            ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
+            ('ALIGN', (0, 0), (1 + show_cost_object, -1), 'LEFT'),
+            ('ALIGN', (1 + show_cost_object, 0), (-1, -1), 'RIGHT'),
         ]
         head_style = base_style[:]
         head_style.extend((
@@ -420,6 +426,14 @@ class TicketPdf(Pdf):
 
         with self.keep_together():
             self.h2(_('Invoice'))
+            if invoice.invoicing_party:
+                self.table([[
+                    self.translate(_('Invoicing party')),
+                    MarkupParagraph(Markup('<br/>').join(
+                        invoice.invoicing_party.splitlines()
+                    ))
+                ]], [ratios[0], 100 - ratios[0]], ratios=True, border=False)
+                self.spacer()
             self.table(
                 [[
                     MarkupParagraph(
@@ -444,6 +458,8 @@ class TicketPdf(Pdf):
                 ]]
                 for item in items:
                     column = [item.text]
+                    if show_cost_object:
+                        column.append(item.cost_object or '')
                     if show_quantity:
                         column.extend((
                             layout.format_number(item.unit, 2),
