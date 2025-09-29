@@ -231,22 +231,37 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
             return None
 
     def item_data(self, item: ExtendedDirectoryEntry) -> dict[str, Any]:
-        data = item.content['values'] or {}
-        data['coordinates'] = get_geo_location(item)
+        data: dict[str, Any] = {}
 
-        for field in item.directory.fields:
-            if any(field_type in field.type for field_type in [
-                'fileinput', 'url']):
-                data.pop(field.id, None)
-            if any(field_type in field.type for field_type in [
-                'date', 'datetime']):
-                if data.get(field.id):
-                    data[field.id] = data[field.id].isoformat()
+        if item.access == 'public':
+            if item.content_fields:
+                data = {f.name: f.object_data for f in item.content_fields}
+
+            for field in item.directory.fields:
+                if any(field_type in field.type for field_type in [
+                    'fileinput', 'url']):
+                    data.pop(field.id, None)
+                if any(field_type in field.type for field_type in [
+                    'date', 'datetime']):
+                    if data.get(field.id):
+                        data[field.id] = data[field.id].isoformat()
+
+            data['coordinates'] = get_geo_location(item)
+        elif item.access == 'mtan':
+            data['title'] = item.title
+            data['lead'] = item.lead
 
         return data
 
     def item_links(self, item: ExtendedDirectoryEntry) -> dict[str, Any]:
-        data = {(f.note or 'file'): f for f in item.files}
+        data = {}
+        if item.access == 'public':
+            content_field_names = []
+            if item.content_fields:
+                content_field_names = [i.name for i in item.content_fields]
+            data = {(f.note or 'file'): f for f in item.files
+            if f.note and f.note.split(':')[0] in content_field_names}
+
         data['html'] = item  # type: ignore
 
         return data
