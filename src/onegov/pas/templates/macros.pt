@@ -31,6 +31,34 @@
             </tal:b>
         </div>
     </metal:fields>
+
+    <metal:role_singular define-macro="role-singular" i18n:domain="onegov.pas">
+        <tal:b switch="role">
+            <tal:b case="'admin'" i18n:translate>Administrator</tal:b>
+            <tal:b case="'editor'" i18n:translate>Editor</tal:b>
+            <tal:b case="'member'" i18n:translate>Member</tal:b>
+            <tal:b case="'parliamentarian'" i18n:translate>Parliamentarian</tal:b>
+        </tal:b>
+    </metal:role_singular>
+
+    <metal:role_plural define-macro="role-plural" i18n:domain="onegov.pas">
+        <tal:b switch="role">
+            <tal:b case="'admin'" i18n:translate>Administrators</tal:b>
+            <tal:b case="'editor'" i18n:translate>Editors</tal:b>
+            <tal:b case="'member'" i18n:translate>Members</tal:b>
+            <tal:b case="'parliamentarian'" i18n:translate>Parliamentarians</tal:b>
+        </tal:b>
+    </metal:role_plural>
+
+    <metal:b define-macro="extra_usermanagement_fields">
+        <div tal:condition="user.parliamentarian">
+            <dt i18n:translate>Parliamentarian</dt>
+            <dd>
+                <a href="${request.link(user.parliamentarian)}">${user.parliamentarian.title}</a>
+            </dd>
+        </div>
+    </metal:b>
+
 </body>
 
 <html>

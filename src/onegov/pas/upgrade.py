@@ -120,3 +120,25 @@ def add_abschluss_column_to_par_attendence(context: UpgradeContext) -> None:
                 ),
                 default=False
             )
+
+
+@upgrade_task('Add closed column to pas_settlements')
+def add_closed_column_to_pas_settlements(context: UpgradeContext) -> None:
+    if context.has_table('pas_settlements'):
+        if not context.has_column('pas_settlements', 'closed'):
+            context.add_column_with_defaults(
+                'pas_settlements',
+                Column(
+                    'closed',
+                    Boolean,
+                    nullable=False
+                ),
+                default=False
+            )
+
+
+@upgrade_task('Drop active column from pas_settlements')
+def drop_active_column_from_pas_settlements(context: UpgradeContext) -> None:
+    if context.has_table('pas_settlements'):
+        if context.has_column('pas_settlements', 'active'):
+            context.operations.drop_column('pas_settlements', 'active')

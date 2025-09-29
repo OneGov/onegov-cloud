@@ -23,18 +23,18 @@
         <!-- Tabs Start -->
         <ul class="tabs" data-tabs id="settlement-run-export-tabs" role="tablist">
             <!-- Commission Closure Status Tab -->
-            <li class="tabs-title is-active" role="presentation">
+            <li class="tabs-title" role="presentation">
                 <a href="#panel-closure-status"
                    aria-controls="panel-closure-status"
-                   aria-selected="true"
+                   aria-selected="false"
                    role="tab"
                    i18n:translate="">Commission Closure Status</a>
             </li>
             <tal:block tal:repeat="tab_item export_tabs_data.values()">
-                <li class="tabs-title" role="presentation">
+                <li tal:attributes="class python:'tabs-title' + (' is-active' if repeat.tab_item.start else '')" role="presentation">
                     <a tal:attributes="href '#' + tab_item.panel_id;
-                                       aria-controls tab_item.panel_id"
-                       aria-selected="false"
+                                       aria-controls tab_item.panel_id;
+                                       aria-selected python:'true' if repeat.tab_item.start else 'false'"
                        role="tab">${tab_item.tab_title}</a>
                 </li>
             </tal:block>
@@ -42,7 +42,7 @@
 
         <div class="tabs-content" data-tabs-content="settlement-run-export-tabs">
             <!-- Commission Closure Status Tab Content -->
-            <div class="tabs-panel is-active" id="panel-closure-status" role="tabpanel">
+            <div class="tabs-panel" id="panel-closure-status" role="tabpanel">
                 <div tal:condition="commission_closure_status" class="closure-status-section">
                     <div class="explanatory-text">
                         <p i18n:translate="">
@@ -97,8 +97,8 @@
 
             <!-- Export Tabs -->
             <tal:block tal:repeat="tab_item export_tabs_data.values()">
-                <div class="tabs-panel"
-                     tal:attributes="id tab_item.panel_id"
+                <div tal:attributes="class python:'tabs-panel' + (' is-active' if repeat.tab_item.start else '');
+                                    id tab_item.panel_id"
                      role="tabpanel">
                     <div tal:repeat="category_key tab_item.categories.keys()" class="export-category">
                         <tal:block tal:define="category tab_item.categories[category_key]">

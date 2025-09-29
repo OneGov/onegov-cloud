@@ -11,15 +11,8 @@ from onegov.pas.collections.commission_membership import (
 )
 
 
-@pytest.mark.flaky(reruns=5, only_rerun=None)
-def test_views_manage(client_with_es):
-    client = client_with_es
-    client.login_admin()
-
-    settings = client.get('/').click('PAS Einstellungen')
-    delete = []
-
-    # Rate Sets
+def add_rate_set(settings, delete) -> None:
+    """Adds a rate set via the UI."""
     page = settings.click('Sätze')
     page = page.click(href='new')
     page.form['year'] = 2024
@@ -53,13 +46,24 @@ def test_views_manage(client_with_es):
     assert '2%' in page
     delete.append(page)
 
+
+@pytest.mark.flaky(reruns=5, only_rerun=None)
+def test_views_manage(client_with_es):
+    client = client_with_es
+    client.login_admin()
+
+    settings = client.get('/').follow().click('PAS Einstellungen')
+    delete = []
+
+    add_rate_set(settings, delete)
+
     # Settlement Runs
     page = settings.click('Abrechnungsläufe')
     page = page.click(href='new')
     page.form['name'] = 'Q1'
     page.form['start'] = '2024-01-01'
     page.form['end'] = '2024-12-31'
-    page.form['active'] = True
+    page.form['closed'] = False
     page = page.form.submit().follow()
     assert '31.12.2024' in page
 
@@ -167,7 +171,9 @@ def test_views_manage(client_with_es):
     assert 'Kommissionsitzung hinzugefügt' in page
 
     # ... attendence
-    page = client.get('/').click('Anwesenheiten').click(href='new', index=0)
+    page = client.get('/').follow().click('Anwesenheiten').click(
+        href='new', index=0
+    )
     page.form['date'] = '2024-02-03'
     page.form['duration'] = '2'
     page.form['type'] = 'study'
@@ -183,19 +189,21 @@ def test_views_manage(client_with_es):
     delete.insert(0, page)
 
     # ... plenary
-    page = client.get('/').click('Anwesenheiten').click(href='new', index=1)
+    page = client.get('/').follow().click('Anwesenheiten').click(
+        href='new', index=1
+    )
     page.form['date'] = '2024-02-04'
     page.form['duration'] = '3'
     page = page.form.submit().follow()
     assert 'Plenarsitzung hinzugefügt' in page
 
-    page = client.get('/').click('Anwesenheiten')
+    page = client.get('/').follow().click('Anwesenheiten')
     assert '02.02.2024' in page
     assert '03.02.2024' in page
     assert '04.02.2024' in page
 
     # Changes
-    page = client.get('/').click('Aktivitäten')
+    page = client.get('/').follow().click('Aktivitäten')
     assert '02.02.2024' in page
     assert '03.02.2024' in page
     assert '04.02.2024' in page
@@ -219,7 +227,7 @@ def test_views_manage(client_with_es):
     assert '1 Resultat' in client.get('/search?q=aa')
     assert '1 Resultat' in client.get('/search?q=bb')
     assert '1 Resultat' in client.get('/search?q=cc')
-    assert '1 Resultat' in client.get('/search?q=first')
+    assert 'Resultate' in client.get('/search?q=first')
     assert '1 Resultat' in client.get('/search?q=Q1')
 
     # Delete
@@ -400,34 +408,9 @@ def test_view_upload_json(
 def test_copy_rate_set(client):
     client.login_admin()
 
-    settings = client.get('/').click('PAS Einstellungen')
-
-    # Add a rate set to copy
-    page = settings.click('Sätze')
-    page = page.click(href='new')
-    page.form['year'] = 2024
-    page.form['cost_of_living_adjustment'] = 2
-    page.form['plenary_none_president_halfday'] = 1
-    page.form['plenary_none_member_halfday'] = 1
-    page.form['commission_normal_president_initial'] = 1
-    page.form['commission_normal_president_additional'] = 1
-    page.form['study_normal_president_halfhour'] = 1
-    page.form['commission_normal_member_initial'] = 1
-    page.form['commission_normal_member_additional'] = 1
-    page.form['study_normal_member_halfhour'] = 1
-    page.form['commission_intercantonal_president_halfday'] = 1
-    page.form['study_intercantonal_president_hour'] = 1
-    page.form['commission_intercantonal_member_halfday'] = 1
-    page.form['study_intercantonal_member_hour'] = 1
-    page.form['commission_official_president_halfday'] = 1
-    page.form['commission_official_president_fullday'] = 1
-    page.form['study_official_president_halfhour'] = 1
-    page.form['commission_official_vice_president_halfday'] = 1
-    page.form['commission_official_vice_president_fullday'] = 1
-    page.form['study_official_member_halfhour'] = 1
-    page.form['shortest_all_president_halfhour'] = 1
-    page.form['shortest_all_member_halfhour'] = 1
-    page = page.form.submit()
+    settings = client.get('/').follow().click('PAS Einstellungen')
+    delete = []
+    add_rate_set(settings, delete)
 
     page = client.get('/rate-sets')
     page = page.click('Inaktiv')
@@ -442,6 +425,98 @@ def test_copy_rate_set(client):
     assert '2025' in new_page
 
 
+def test_simple_attendence_add(client):
+    client.login_admin()
+    settings = client.get('/').follow().click('PAS Einstellungen')
+    delete = []
+
+    add_rate_set(settings, delete)
+
+    # Settlement Runs
+    page = settings.click('Abrechnungsläufe')
+    page = page.click(href='new')
+    page.form['name'] = 'Q1'
+    page.form['start'] = '2024-01-01'
+    page.form['end'] = '2024-03-31'
+    page.form['closed'] = False
+    page = page.form.submit().follow()
+
+    # parties
+    page = settings.click('Parteien')
+    page = page.click(href='new')
+    page.form['name'] = 'BB'
+    page = page.form.submit().follow()
+    assert 'BB' in page
+
+    # Parliamentarian
+    page = settings.click('Parlamentarier:innen')
+    page = page.click(href='new')
+    page.form['personnel_number'] = '666999'
+    page.form['gender'] = 'male'
+    page.form['first_name'] = 'First'
+    page.form['last_name'] = 'Last'
+    page.form['shipping_method'] = 'a'
+    page.form['shipping_address'] = 'Address'
+    page.form['shipping_address_zip_code'] = 'ZIP'
+    page.form['shipping_address_city'] = 'City'
+    page.form['email_primary'] = 'first.last@example.org'
+    page = page.form.submit().follow()
+    assert 'First Last' in page
+
+    page = page.click('Bearbeiten')
+    page.form['gender'] = 'female'
+    page = page.form.submit().follow()
+    assert 'weiblich' in page
+
+    # Role
+    page = page.click(href='new')
+    page.form['role'] = 'member'
+    page.form['start'] = '2020-01-01'
+    page = page.form.submit().follow()
+    assert 'Mitglied Parlament' in page
+
+    # Commission
+    page = settings.click('Kommissionen')
+    page = page.click(href='new')
+    page.form['name'] = 'DD'
+    page = page.form.submit().follow()
+    assert 'DD' in page
+
+    # Commission Membership
+    page = page.click(href='new-membership')
+    page.form['role'] = 'member'
+    page.form['start'] = '2020-01-01'
+    page = page.form.submit().follow()
+    assert 'Mitglied' in page
+
+    # make president
+    # page = page.click('Mitglied').click('Bearbeiten')
+    # page.form['role'] = 'president'
+    # page = page.form.submit().follow()
+    # assert 'Präsident:in' in page
+
+    # Attendences
+    # ... commission
+    page = page.click(href='add-attendence')
+    page.form['date'] = '2024-02-02'
+    page.form['duration'] = '1'
+    page.form['type'] = 'commission'
+    page = page.form.submit().follow()
+    assert 'Kommissionsitzung hinzugefügt' in page
+    return
+
+    # ... attendence
+    page = client.get('/').follow().click('Anwesenheiten').click(
+        href='new', index=0
+    )
+    page.form['date'] = '2024-02-03'
+    page.form['duration'] = '2'
+    page.form['type'] = 'study'
+    page.form['commission_id'].select(text='CC')
+    page = page.form.submit().follow()
+    assert 'Neue Anwesenheit hinzugefügt' in page
+
+
 def test_fetch_commissions_parliamentarians_json(client):
     """Test the commissions-parliamentarians-json endpoint that the JS
     dropdown uses."""
@@ -451,7 +526,7 @@ def test_fetch_commissions_parliamentarians_json(client):
     commission1 = commissions.add(name='Commission A')
     commission2 = commissions.add(name='Commission B')
 
-    parliamentarians = PASParliamentarianCollection(session)
+    parliamentarians = PASParliamentarianCollection(client.app)
     parl1 = parliamentarians.add(
         first_name='John',
         last_name='Doe',

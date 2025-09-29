@@ -106,7 +106,7 @@
                         <button class="log-filter log-level log-warning" data-level="warning" i18n:translate="">Warnings</button>
                         <button class="log-filter log-level log-info" data-level="info" i18n:translate="">Info</button>
                     </div>
-                    <div class="import-logs">
+                    <div class="import-logs-entry">
                         <div class="log-entry" tal:repeat="log processed_logs" tal:attributes="data-level log.level.lower()">
                             <span tal:attributes="class log.css_class" tal:content="log.level"></span>
                             <div class="log-message" tal:content="log.message"></div>
