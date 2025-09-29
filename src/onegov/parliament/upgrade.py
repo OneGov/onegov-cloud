@@ -199,3 +199,11 @@ def remove_unused_type_column(
     ):
         if context.has_column(table, type_column):
             context.operations.drop_column(table, type_column)
+
+
+@upgrade_task('Remove unused political businesses relationship from meeting')
+def remove_unused_political_businesses_relationship(
+        context: UpgradeContext
+) -> None:
+    if context.has_column('par_meetings', 'political_business_id'):
+        context.operations.drop_column('par_meetings', 'political_business_id')
