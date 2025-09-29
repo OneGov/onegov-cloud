@@ -776,7 +776,6 @@ msgstr "Kommissionssitzung hinzugefügt"
 msgid "Cannot edit attendance in closed settlement run."
 msgstr ""
 "Anwesenheit in geschlossenem Abrechnungslauf kann nicht bearbeitet werden."
-"Anwesenheit in geschlossenem Abrechnungslauf kann nicht bearbeitet werden."
 
 msgid "Edit plenary session"
 msgstr "Plenarsitzung bearbeiten"
