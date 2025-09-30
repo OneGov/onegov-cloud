@@ -25,12 +25,14 @@ if TYPE_CHECKING:
     from onegov.pas.forms.parliamentarian import PASParliamentarianForm
     from onegov.parliament.models import Parliamentarian
     from onegov.pas.layouts import PASParliamentarianCollectionLayout
+    from onegov.pas.collections.parliamentarian import (
+            PASParliamentarianCollection)
     from onegov.pas.layouts import PASParliamentarianLayout
     from onegov.town6.request import TownRequest
 
 
 def view_parliamentarians(
-    self: ParliamentarianCollection,
+    self: ParliamentarianCollection | PASParliamentarianCollection,
     request: TownRequest,
     layout: RISParliamentarianCollectionLayout
             | PASParliamentarianCollectionLayout

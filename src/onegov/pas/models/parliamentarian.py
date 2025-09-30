@@ -4,7 +4,7 @@ from onegov.parliament.models import Parliamentarian
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
 from onegov.search import ORMSearchable
 from sqlalchemy import or_
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
 
 from typing import TYPE_CHECKING
@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from datetime import date
     from onegov.pas.models import Attendence
     from onegov.pas.models import Party
+    from onegov.user import User
     from sqlalchemy.orm import Session
 
 
@@ -40,6 +41,16 @@ class PASParliamentarian(Parliamentarian, ORMSearchable):
         'Attendence',
         cascade='all, delete-orphan',
         back_populates='parliamentarian'
+    )
+
+    # the user account related to this parliamentarian
+    user: relationship[User] = relationship(
+        'User',
+        primaryjoin='foreign(PASParliamentarian.email_primary) == '
+                    'User.username',
+        uselist=False,
+        backref=backref('parliamentarian', uselist=False,
+                        passive_deletes='all')
     )
 
     if TYPE_CHECKING:

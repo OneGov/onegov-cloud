@@ -21,7 +21,7 @@ from onegov.pas.forms import SettlementRunForm
 from onegov.pas.models import RateSet
 from onegov.pas.models import SettlementRun
 from pytest import fixture
-
+from tests.onegov.pas.conftest import DummyApp
 
 
 class DummyPostData(dict):
@@ -44,19 +44,54 @@ def dummy_request(session):
             sentry_dsn=None,
             version='1.0',
             websockets_client_url=lambda x: x,
-            websockets_private_channel=None
+            websockets_private_channel=None,
+            session=lambda: session
         ),
         include=lambda x: x,
         is_manager=True,
         locale='de_CH',
         session=session,
-        method='GET'  # not dynamic but doenst matter our purposess
+        method='GET',  # not dynamic but doenst matter our purposess
+        identity=Bunch(role='parliamentarian',
+                       userid='test-user@example.com')  # same here
     )
 
+
+@fixture(scope='function')
+def dummy_admin_request(session):
+    return Bunch(
+        app=Bunch(
+            org=Bunch(
+                geo_provider=None,
+                open_files_target_blank=False
+            ),
+            schema='foo',
+            sentry_dsn=None,
+            version='1.0',
+            websockets_client_url=lambda x: x,
+            websockets_private_channel=None,
+            session=lambda: session
+        ),
+        include=lambda x: x,
+        is_manager=True,
+        is_admin=True,
+        locale='de_CH',
+        session=session,
+        method='GET',  # not dynamic but doenst matter our purposess
+        identity=Bunch(role='admin',
+                       userid='admin@example.com')
+    )
+
+
 @freeze_time('2024-01-01')
-def test_attendence_forms(session, dummy_request):
-    parliamentarians = PASParliamentarianCollection(session)
-    parliamentarian = parliamentarians.add(first_name='a', last_name='b')
+def test_attendence_forms(session, dummy_admin_request):
+
+    parliamentarians = PASParliamentarianCollection(DummyApp(session=session))
+    parliamentarian = parliamentarians.add(
+        first_name='a',
+        last_name='b',
+        email_primary='test-user@example.com'
+    )
     parliamentarians.add(first_name='p', last_name='q')
 
     roles = PASParliamentarianRoleCollection(session)
@@ -69,14 +104,14 @@ def test_attendence_forms(session, dummy_request):
 
     # on request
     form = AttendenceForm()
-    form.request = dummy_request
+    form.request = dummy_admin_request
     form.on_request()
 
     assert len(form.parliamentarian_id.choices) == 2
     assert len(form.commission_id.choices) == 4
 
     form = AttendenceAddForm()
-    form.request = dummy_request
+    form.request = dummy_admin_request
     form.on_request()
 
     assert len(form.parliamentarian_id.choices) == 1
@@ -109,13 +144,13 @@ def test_attendence_forms(session, dummy_request):
 
     # ensure date
     form = AttendenceForm(DummyPostData({'date': '2024-01-01'}))
-    form.request = dummy_request
+    form.request = dummy_admin_request
     form.on_request()
     assert not form.validate()
     assert form.errors['date'][0] == 'No within an active settlement run.'
 
     form = AttendenceAddForm(DummyPostData({'date': '2024-01-01'}))
-    form.request = dummy_request
+    form.request = dummy_admin_request
     form.on_request()
     assert not form.validate()
     assert form.errors['date'][0] == 'No within an active settlement run.'
@@ -146,7 +181,7 @@ def test_attendence_forms(session, dummy_request):
         'parliamentarian_id': parliamentarian.id,
         'commission_id': commission.id
     }))
-    form.request = dummy_request
+    form.request = dummy_admin_request
     form.on_request()
     assert not form.validate()
     assert 'commission_id' not in form.errors
@@ -156,7 +191,7 @@ def test_attendence_forms(session, dummy_request):
         'parliamentarian_id': parliamentarian.id,
         'commission_id': commission.id
     }))
-    form.request = dummy_request
+    form.request = dummy_admin_request
     form.on_request()
     assert not form.validate()
     assert form.errors['commission_id'][0] == \
@@ -174,7 +209,7 @@ def test_attendence_forms(session, dummy_request):
 
 @freeze_time('2024-01-01')
 def test_add_plenary_attendence_form(session, dummy_request):
-    parliamentarians = PASParliamentarianCollection(session)
+    parliamentarians = PASParliamentarianCollection(DummyApp(session=session))
     parliamentarian = parliamentarians.add(first_name='a', last_name='b')
     parliamentarians.add(first_name='p', last_name='q')
 
@@ -202,7 +237,8 @@ def test_add_plenary_attendence_form(session, dummy_request):
 
 @freeze_time('2024-01-01')
 def test_add_commission_attendence_form(session, dummy_request):
-    parliamentarians = PASParliamentarianCollection(session)
+
+    parliamentarians = PASParliamentarianCollection(DummyApp(session=session))
     parliamentarian = parliamentarians.add(first_name='a', last_name='b')
     parliamentarians.add(first_name='p', last_name='q')
 
@@ -239,7 +275,7 @@ def test_add_commission_attendence_form(session, dummy_request):
 
 @freeze_time('2024-01-01')
 def test_commission_membership_forms(session, dummy_request):
-    parliamentarians = PASParliamentarianCollection(session)
+    parliamentarians = PASParliamentarianCollection(DummyApp(session=session))
     parliamentarian = parliamentarians.add(first_name='a', last_name='b')
     parliamentarians.add(first_name='p', last_name='q')
 
@@ -268,7 +304,7 @@ def test_commission_membership_forms(session, dummy_request):
 
 
 def test_parliamentarian_role_form(session, dummy_request):
-    parliamentarians = PASParliamentarianCollection(session)
+    parliamentarians = PASParliamentarianCollection(DummyApp(session=session))
     parliamentarians.add(first_name='p', last_name='q')
 
     groups = PASParliamentaryGroupCollection(session)

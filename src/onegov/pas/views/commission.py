@@ -18,6 +18,7 @@ from onegov.pas.forms import AttendenceAddCommissionForm
 from onegov.pas.forms import CommissionForm
 from onegov.pas.layouts import PASCommissionCollectionLayout
 from onegov.pas.layouts import PASCommissionLayout
+from onegov.pas.custom import check_attendance_in_closed_settlement_run
 from onegov.pas.models import Change
 from onegov.pas.models import PASCommission
 from onegov.pas.models import PASCommissionMembership
@@ -71,10 +72,21 @@ def pas_view_commission(
 
     layout = PASCommissionLayout(self, request)
 
+    president = None
+    other_members = []
+
+    for membership in self.memberships:
+        if membership.role == 'president':
+            president = membership
+        else:
+            other_members.append(membership)
+
     return {
         'layout': layout,
         'commission': self,
         'title': layout.title,
+        'president': president,
+        'other_members': other_members,
     }
 
 
@@ -152,6 +164,21 @@ def pas_add_plenary_attendence(
 ) -> RenderData | Response:
 
     if form.submitted(request):
+        # Check if attendance date is in a closed settlement run
+        if form.date.data:
+            if check_attendance_in_closed_settlement_run(
+                request.session, form.date.data
+            ):
+                request.alert(
+                    _('Cannot create attendance in closed settlement run.')
+                )
+                return {
+                    'layout': PASCommissionLayout(self, request),
+                    'title': _('New commission meeting'),
+                    'form': form,
+                    'form_width': 'large'
+                }
+
         data = form.get_useful_data()
         parliamentarian_ids = data.pop('parliamentarian_id')
         collection = AttendenceCollection(request.session)
