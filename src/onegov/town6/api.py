@@ -1,13 +1,18 @@
 from __future__ import annotations
+from functools import cached_property
 
 from onegov.api.models import ApiEndpoint, ApiEndpointItem
 from onegov.event.collections import OccurrenceCollection
 from onegov.gis import Coordinates
+from sqlalchemy.exc import SQLAlchemyError
 
 
-from typing import Any
+from typing import Any, Self
 from typing import TYPE_CHECKING
 
+from onegov.org.models.directory import (ExtendedDirectory,
+                                        ExtendedDirectoryEntry,
+                                        ExtendedDirectoryEntryCollection)
 from onegov.org.models.page import News, NewsCollection, Topic, TopicCollection
 
 if TYPE_CHECKING:
@@ -17,6 +22,7 @@ if TYPE_CHECKING:
     from onegov.core.orm.mixins import ContentMixin
     from onegov.core.orm.mixins import TimestampMixin
     from typing import TypeVar
+    from onegov.core.collection import PKType
 
     T = TypeVar('T')
 
@@ -166,3 +172,108 @@ class TopicApiEndpoint(ApiEndpoint[Topic]):
                 self.request, self.endpoint, str(item.parent_id)
             ) if item.parent_id is not None else None,
         }
+
+
+class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
+    request: TownRequest
+    app: TownApp
+    filters = set()
+    endpoint: str
+
+    def __init__(
+        self,
+        request: TownRequest,
+        name: str,
+        extra_parameters: dict[str, str | None] | None = None,
+        page: int | None = None,
+    ):
+        super().__init__(request, extra_parameters, page)
+        self.endpoint = name
+
+    @cached_property
+    def directory(self) -> ExtendedDirectory:
+        return self.request.session.query(ExtendedDirectory).filter_by(
+            name=self.endpoint
+        ).one()
+
+    @property
+    def collection(self) -> Any:
+        result = ExtendedDirectoryEntryCollection(
+            self.directory,
+            page=self.page or 0,
+            published_only=True
+        )
+        result.batch_size = 25
+        return result
+
+    def for_page(self, page: int | None) -> DirectoryEntryApiEndpoint:
+        """ Return a new endpoint instance with the given page while keeping
+        the current filters.
+
+        """
+
+        return self.__class__(self.request, self.endpoint,
+                              self.extra_parameters, page)
+
+    def for_filter(self, **filters: Any) -> Self:
+        """ Return a new endpoint instance with the given filters while
+        discarding the current filters and page.
+
+        """
+
+        return self.__class__(self.request, self.endpoint, filters)
+
+    def by_id(
+            self, id: PKType
+              ) -> ExtendedDirectoryEntry | None:
+        """ Return the item with the given ID from the collection. """
+
+        try:
+            return self.collection.by_id(id)
+        except SQLAlchemyError:
+            return None
+
+    def item_data(self, item: ExtendedDirectoryEntry) -> dict[str, Any]:
+        data: dict[str, Any] = {}
+        data['title'] = item.title
+        data['lead'] = item.lead
+
+        if item.access == 'public':
+            if item.content_fields:
+                data = {f.name: f.object_data for f in item.content_fields}
+
+            for field in item.directory.fields:
+                if any(field_type in field.type for field_type in [
+                    'fileinput', 'url']):
+                    data.pop(field.id, None)
+                if any(field_type in field.type for field_type in [
+                    'date', 'time']):
+                    if data.get(field.id):
+                        data[field.id] = data[field.id].isoformat()
+                if 'decimal_range' in field.type:
+                    if data.get(field.id) is not None:
+                        data[field.id] = float(data[field.id])
+
+            data['coordinates'] = get_geo_location(item)
+            data['contact'] = item.contact
+
+        return data
+
+    def item_links(self, item: ExtendedDirectoryEntry) -> dict[str, Any]:
+        data = {}
+        if item.access == 'public':
+            content_field_names = []
+            if item.content_fields:
+                content_field_names = [i.name for i in item.content_fields]
+            data = {
+                (file.note or 'file'): file
+                for file in item.files
+                if file.note
+                if file.note.split(':', 1)[0] in content_field_names
+            }
+            for field in item.content_fields or []:
+                if field.type == 'URLField':
+                    data[field.name] = field.data
+        data['html'] = item  # type: ignore
+
+        return data

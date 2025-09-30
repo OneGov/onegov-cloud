@@ -46,7 +46,7 @@ def test_view_api(
     # Endpoints with query hints
     endpoints = collection('/api')
     assert endpoints.queries[0].rel == 'agencies'
-    assert endpoints.queries[0].href == 'http://localhost/api/agencies'
+    assert endpoints.queries[0].href == 'http://localhost/api/agencies?page=0'
     assert data(endpoints.queries[0]) == {
         'parent': None,
         'title': None,
@@ -57,7 +57,7 @@ def test_view_api(
         'updated_lt': None,
     }
     assert endpoints.queries[1].rel == 'people'
-    assert endpoints.queries[1].href == 'http://localhost/api/people'
+    assert endpoints.queries[1].href == 'http://localhost/api/people?page=0'
     assert data(endpoints.queries[1]) == {
         'first_name': None,
         'last_name': None,
@@ -68,7 +68,9 @@ def test_view_api(
         'updated_lt': None
     }
     assert endpoints.queries[2].rel == 'memberships'
-    assert endpoints.queries[2].href == 'http://localhost/api/memberships'
+    assert endpoints.queries[2].href == (
+        'http://localhost/api/memberships?page=0'
+    )
     assert data(endpoints.queries[2]) == {
         'agency': None,
         'person': None,

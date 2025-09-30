@@ -97,7 +97,7 @@ def test_view_api(client: Client, app: App) -> None:
     assert response.json == {
         'collection': {
             'version': '1.0',
-            'href': 'http://localhost/api/endpoint',
+            'href': 'http://localhost/api/endpoint?page=0',
             'items': [
                 {
                     'href': 'http://localhost/api/endpoint/1',
@@ -187,7 +187,7 @@ def test_view_api(client: Client, app: App) -> None:
         assert Collection.from_json(response.body).version == '1.0'
 
     with patch('onegov.api.models.ApiEndpointCollection'):
-        for url in ('/api', '/api/endpoint', '/api/endpoint/1'):
+        for url in ('/api', '/api/endpoint?page=0', '/api/endpoint/1'):
             response = client.get('/api/endpoint/1', status=500)
             headers = response.headers
             assert headers['Content-Type'] == 'application/vnd.collection+json'

@@ -143,8 +143,9 @@ class ApiEndpointItem(Generic[_M]):
 
     @cached_property
     def api_endpoint(self) -> ApiEndpoint[_M] | None:
-        cls = ApiEndpointCollection(self.app).endpoints.get(self.endpoint)
-        return cls(self.request) if cls else None
+        endpoint = ApiEndpointCollection(
+            self.request).endpoints.get(self.endpoint)
+        return endpoint if endpoint else None
 
     @cached_property
     def item(self) -> _M | None:
@@ -183,8 +184,7 @@ class ApiEndpoint(Generic[_M]):
 
     """
 
-    name: ClassVar[str] = ''  # FIXME: Do we ever use this?
-    endpoint: ClassVar[str] = ''
+    endpoint: str = ''
     filters: ClassVar[set[str]] = set()
     form_class: ClassVar[type[Form] | None] = None
 
@@ -461,15 +461,34 @@ class ApiEndpoint(Generic[_M]):
 class ApiEndpointCollection:
     """ A collection of all available API endpoints. """
 
-    def __init__(self, app: Framework):
-        self.app = app
+    def __init__(self, request: CoreRequest):
+        self.request = request
+        self.app = request.app
 
     @cached_property
-    def endpoints(self) -> dict[str, type[ApiEndpoint[Any]]]:
+    def endpoints(self) -> dict[str, ApiEndpoint[Any]]:
         return {
             endpoint.endpoint: endpoint
-            for endpoint in self.app.config.setting_registry.api.endpoints
+            for endpoint in self.app.config.setting_registry.api.endpoints(
+                request=self.request
+            )
         }
+
+    def get_endpoint(
+            self,
+            name: str,
+            page: int = 0,
+            extra_parameters: dict[str, Any] | None = None
+    ) -> ApiEndpoint[Any] | None:
+        endpoints = self.app.config.setting_registry.api.endpoints(
+            request=self.request,
+            extra_parameters=extra_parameters,
+            page=page
+        )
+        return next((
+            endpoint for endpoint in endpoints
+            if endpoint.endpoint == name
+        ), None)
 
 
 class AuthEndpoint:
