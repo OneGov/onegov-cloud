@@ -6,9 +6,7 @@ from elasticsearch_dsl.query import Match
 from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch
 from functools import cached_property
-from libres.db.models import ORMBase
 from onegov.core.collection import Pagination, _M
-from onegov.core.orm import Base
 from onegov.event.models import Event
 from onegov.search.search_index import SearchIndex
 from onegov.search.utils import language_from_locale
@@ -223,14 +221,11 @@ class SearchPostgres(Pagination[_M]):
 
     @cached_property
     def batch(self) -> list[Searchable]:  # type:ignore[override]
-        if not self.query:
+        if not self.query.lstrip('#'):
             self.number_of_results = 0
             return []
 
         if self.query.startswith('#'):
-            if not self.query.lstrip('#'):
-                return []
-
             query = self.hashtag_search()
         else:
             query = self.generic_search()
@@ -258,7 +253,7 @@ class SearchPostgres(Pagination[_M]):
         #        we should apply the same Gaussian decay we did before but
         #        make sure we only do that for records where the time portion
         #        actually is an indicator for relevancy, some documents will
-        #        never or rarely change and remein eternally relevant)
+        #        never or rarely change and remain eternally relevant)
         future_events: list[Event] = []
         other: list[Searchable] = []
         for search_result in batch:
@@ -310,13 +305,6 @@ class SearchPostgres(Pagination[_M]):
             query = query.filter(SearchIndex.public)
 
         return query
-
-    @staticmethod
-    def get_model_by_class_name(class_name: str) -> type[Any] | None:
-        cls = Base._decl_class_registry.get(class_name)  # type: ignore[attr-defined]
-        if cls is None:
-            cls = ORMBase._decl_class_registry.get(class_name)  # type: ignore[attr-defined]
-        return cls
 
     def generic_search(self) -> Query[SearchIndex]:
         language = language_from_locale(self.request.locale)
@@ -420,6 +408,10 @@ class SearchPostgres(Pagination[_M]):
         for tablename, table_batch in table_batches.items():
             base_model = indexable_base_models.get(tablename)
             if base_model is None:
+                # NOTE: We might want to log this, although this should
+                #       only ever happen if the search index is out of
+                #       date and contains entries for tables that have
+                #       since been removed.
                 continue
 
             primary_key, = inspect(base_model).primary_key
