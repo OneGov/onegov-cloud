@@ -82,10 +82,14 @@ def get_api_endpoints_handler(
 ) -> Callable[[pytest.FixtureRequest], Iterator[ApiEndpoint[Any]]]:
 
     def get_api_endpoints(
-            request: pytest.FixtureRequest
+            request: pytest.FixtureRequest,
+            page: int = 0,
+            extra_parameters: dict[str, Any] | None = None
     ) -> Iterator[ApiEndpoint[Any]]:
-        yield Endpoint(request)  # type: ignore[arg-type]
-        yield PersonApiEndpoint(request)  # type: ignore[arg-type]
+        yield Endpoint(
+            request, extra_parameters, page)  # type: ignore[arg-type]
+        yield PersonApiEndpoint(
+            request, extra_parameters, page)  # type: ignore[arg-type]
 
     return get_api_endpoints
 
