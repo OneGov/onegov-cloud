@@ -233,7 +233,7 @@ def add_unique_constraint_to_parliamentarian_fields(
             'UNIQUE'):
             context.operations.execute(
                 "UPDATE par_parliamentarians SET external_kub_id=NULL "
-                "WHERE external_kub_id='';"
+                "WHERE external_kub_id::text='';"
             )
             context.operations.create_unique_constraint(
                 'unique_parliamentarian_external_kub_id',
