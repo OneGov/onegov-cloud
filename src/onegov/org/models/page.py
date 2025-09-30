@@ -68,6 +68,8 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
     @property
     def es_public(self) -> bool:
+        # FIXME: This es_public is redundant once we get rid of ES
+        #        we include access and publication dates in the fts
         return self.access == 'public' and self.published
 
     @property
@@ -175,6 +177,8 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
     @property
     def es_public(self) -> bool:
+        # FIXME: This es_public is redundant once we get rid of ES
+        #        we include access and publication dates in the fts
         return self.access == 'public' and self.published
 
     @observes('content')

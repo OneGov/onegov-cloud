@@ -72,10 +72,21 @@ def pas_view_commission(
 
     layout = PASCommissionLayout(self, request)
 
+    president = None
+    other_members = []
+
+    for membership in self.memberships:
+        if membership.role == 'president':
+            president = membership
+        else:
+            other_members.append(membership)
+
     return {
         'layout': layout,
         'commission': self,
         'title': layout.title,
+        'president': president,
+        'other_members': other_members,
     }
 
 

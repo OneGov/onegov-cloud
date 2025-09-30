@@ -10,17 +10,21 @@ from elasticsearch import Elasticsearch
 from elasticsearch import Transport
 from elasticsearch import TransportError
 from elasticsearch.connection import create_ssl_context
+from functools import cached_property
 from more.transaction.main import transaction_tween_factory
-
-from onegov.search import Search, log, index_log
+from onegov.search import Search, log, index_log, Searchable
 from onegov.search.errors import SearchOfflineError
 from onegov.search.indexer import Indexer, PostgresIndexer
 from onegov.search.indexer import ORMEventTranslator
 from onegov.search.indexer import TypeMappingRegistry
-from onegov.search.utils import searchable_sqlalchemy_models
+from onegov.search.utils import (
+    apply_searchable_polymorphic_filter,
+    get_polymorphic_base,
+    language_from_locale,
+    searchable_sqlalchemy_models,
+)
 from sortedcontainers import SortedSet
 from sedate import utcnow
-from sqlalchemy import inspect
 from sqlalchemy.orm import undefer
 from urllib3.exceptions import HTTPError
 
@@ -31,7 +35,6 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.core.orm import Base, SessionManager
     from onegov.core.request import CoreRequest
-    from onegov.search.mixins import Searchable
     from sqlalchemy.orm import Session
     from webob import Response
 
@@ -111,9 +114,8 @@ def is_5xx_error(error: TransportError) -> bool:
     return False
 
 
-# TODO rename to SearchApp
-class ElasticsearchApp(morepath.App):
-    """ Provides elasticsearch integration for
+class SearchApp(morepath.App):
+    """ Provides elasticsearch and postgres integration for
     :class:`onegov.core.framework.Framework` based applications.
 
     The application must be connected to a database.
@@ -136,6 +138,8 @@ class ElasticsearchApp(morepath.App):
         def session(self) -> Callable[[], Session]: ...
         @property
         def has_database_connection(self) -> bool: ...
+        @cached_property
+        def locales(self) -> set[str]: ...
 
     es_client: Elasticsearch | None
 
@@ -181,6 +185,8 @@ class ElasticsearchApp(morepath.App):
                 - fr
         """
 
+        # TODO: set default to False once fully switched to psql (or remove
+        # es stuff entirely)
         if not cfg.get('enable_elasticsearch', True):
             self.es_client = None
             return
@@ -209,14 +215,14 @@ class ElasticsearchApp(morepath.App):
 
         if self.has_database_connection:
             max_queue_size = int(cfg.get(
-                'elasticsarch_max_queue_size', '10000'))
+                'elasticsarch_max_queue_size', '20000'))
 
             self.es_mappings = TypeMappingRegistry()
 
             for base in self.session_manager.bases:
                 self.es_mappings.register_orm_base(base)
 
-            self.es_orm_events = ORMEventTranslator(
+            self.fts_orm_events = ORMEventTranslator(
                 self.es_mappings,
                 max_queue_size=max_queue_size
             )
@@ -224,22 +230,23 @@ class ElasticsearchApp(morepath.App):
             assert self.es_client is not None
             self.es_indexer = Indexer(
                 self.es_mappings,
-                self.es_orm_events.es_queue,
+                self.fts_orm_events.es_queue,
                 self.es_client
             )
             self.psql_indexer = PostgresIndexer(
-                self.es_orm_events.psql_queue,
+                self.fts_orm_events.psql_queue,
                 self.session_manager.engine,
+                self.fts_languages
             )
 
             self.session_manager.on_insert.connect(
-                self.es_orm_events.on_insert)
+                self.fts_orm_events.on_insert)
 
             self.session_manager.on_update.connect(
-                self.es_orm_events.on_update)
+                self.fts_orm_events.on_update)
 
             self.session_manager.on_delete.connect(
-                self.es_orm_events.on_delete)
+                self.fts_orm_events.on_delete)
 
     def es_configure_client(
         self,
@@ -415,14 +422,21 @@ class ElasticsearchApp(morepath.App):
         """
         return request.is_logged_in
 
-    def get_searchable_models(self) -> list[type[Searchable]]:
-        return [
-            model
+    @cached_property
+    def fts_languages(self) -> set[str]:
+        return {
+            language_from_locale(locale)
+            for locale in self.locales
+        } or {'simple'}
+
+    def indexable_base_models(self) -> set[type[Searchable | Base]]:
+        return {
+            get_polymorphic_base(model)
             for base in self.session_manager.bases
             for model in searchable_sqlalchemy_models(base)
-        ]
+        }
 
-    def es_perform_reindex(self, fail: bool = False) -> None:
+    def perform_reindex(self, fail: bool = False) -> None:
         """ Re-indexes all content.
 
         This is a heavy operation and should be run with consideration.
@@ -430,8 +444,6 @@ class ElasticsearchApp(morepath.App):
         By default, all exceptions during reindex are silently ignored.
 
         """
-        # prevent tables get re-indexed twice
-        index_done = []
         schema = self.schema
         index_log.info(f'Indexing schema {schema}..')
 
@@ -443,58 +455,58 @@ class ElasticsearchApp(morepath.App):
         ixs = self.es_indexer.ixmgr.get_managed_indices_wildcard(schema)
         self.es_client.indices.delete(index=ixs)
 
+        # psql delete table search_index
+        self.psql_indexer.delete_search_index(schema)
+
         # have no queue limit for reindexing (that we're able to change
         # this here is a bit of a CPython implementation detail) - we can't
         # necessarily always rely on being able to change this property
-        self.es_orm_events.es_queue.maxsize = 0
-        self.es_orm_events.psql_queue.maxsize = 0
+        self.fts_orm_events.es_queue.maxsize = 0
+        self.fts_orm_events.psql_queue.maxsize = 0
 
         def reindex_model(model: type[Base]) -> None:
             """ Load all database objects and index them. """
-            if model.__name__ in index_done:
-                return
-
-            index_done.append(model.__name__)
-
             session = self.session()
             try:
-                q = session.query(model).options(undefer('*'))
-                i = inspect(model)
+                query = session.query(model).options(undefer('*'))
+                query = apply_searchable_polymorphic_filter(query, model)
 
-                if i.polymorphic_on is not None:
-                    q = q.filter(i.polymorphic_on == i.polymorphic_identity)
+                for obj in query:
+                    # NOTE: Avoid polluting the queue with objects we're
+                    #       not going to put in the index at the end
+                    # FIXME: We can put this condition into the query
+                    #        if we make es_skip a hybrid_property
+                    if obj.es_skip:
+                        continue
+                    self.fts_orm_events.index(schema, obj)
 
-                for obj in q:
-                    self.es_orm_events.index(schema, obj)
-
-            except Exception as e:
-                index_log.info(f"Error psql indexing model '{model}': {e}")
+                self.psql_indexer.bulk_process()
+            except Exception:
+                index_log.info(
+                    f"Error psql indexing model '{model.__name__}'",
+                    exc_info=True
+                )
             finally:
                 session.invalidate()
                 session.bind.dispose()
 
-        models = self.get_searchable_models()
-        index_log.info(f'Number of models to be indexed: {len(models)}')
-
         with ThreadPoolExecutor() as executor:
-            results = executor.map(
-                reindex_model, (model for model in models)
-            )
+            results = executor.map(reindex_model, self.indexable_base_models())
             if fail:
-                index_log.info(tuple(results))
+                index_log.info('Failed reindexing:', tuple(results))
 
-        self.es_indexer.bulk_process()
         self.psql_indexer.bulk_process()
+        self.es_indexer.bulk_process()
 
 
-@ElasticsearchApp.tween_factory(over=transaction_tween_factory)
+@SearchApp.tween_factory(over=transaction_tween_factory)
 def process_indexer_tween_factory(
-    app: ElasticsearchApp,
+    app: SearchApp,
     handler: Callable[[CoreRequest], Response]
 ) -> Callable[[CoreRequest], Response]:
     def process_indexer_tween(request: CoreRequest) -> Response:
 
-        app: ElasticsearchApp = request.app  # type:ignore[assignment]
+        app: SearchApp = request.app  # type:ignore[assignment]
 
         if not app.es_client:
             return handler(request)

@@ -56,8 +56,35 @@ def dummy_request(session):
                        userid='test-user@example.com')  # same here
     )
 
+
+@fixture(scope='function')
+def dummy_admin_request(session):
+    return Bunch(
+        app=Bunch(
+            org=Bunch(
+                geo_provider=None,
+                open_files_target_blank=False
+            ),
+            schema='foo',
+            sentry_dsn=None,
+            version='1.0',
+            websockets_client_url=lambda x: x,
+            websockets_private_channel=None,
+            session=lambda: session
+        ),
+        include=lambda x: x,
+        is_manager=True,
+        is_admin=True,
+        locale='de_CH',
+        session=session,
+        method='GET',  # not dynamic but doenst matter our purposess
+        identity=Bunch(role='admin',
+                       userid='admin@example.com')
+    )
+
+
 @freeze_time('2024-01-01')
-def test_attendence_forms(session, dummy_request):
+def test_attendence_forms(session, dummy_admin_request):
 
     parliamentarians = PASParliamentarianCollection(DummyApp(session=session))
     parliamentarian = parliamentarians.add(
@@ -77,14 +104,14 @@ def test_attendence_forms(session, dummy_request):
 
     # on request
     form = AttendenceForm()
-    form.request = dummy_request
+    form.request = dummy_admin_request
     form.on_request()
 
     assert len(form.parliamentarian_id.choices) == 2
     assert len(form.commission_id.choices) == 4
 
     form = AttendenceAddForm()
-    form.request = dummy_request
+    form.request = dummy_admin_request
     form.on_request()
 
     assert len(form.parliamentarian_id.choices) == 1
@@ -117,13 +144,13 @@ def test_attendence_forms(session, dummy_request):
 
     # ensure date
     form = AttendenceForm(DummyPostData({'date': '2024-01-01'}))
-    form.request = dummy_request
+    form.request = dummy_admin_request
     form.on_request()
     assert not form.validate()
     assert form.errors['date'][0] == 'No within an active settlement run.'
 
     form = AttendenceAddForm(DummyPostData({'date': '2024-01-01'}))
-    form.request = dummy_request
+    form.request = dummy_admin_request
     form.on_request()
     assert not form.validate()
     assert form.errors['date'][0] == 'No within an active settlement run.'
@@ -154,7 +181,7 @@ def test_attendence_forms(session, dummy_request):
         'parliamentarian_id': parliamentarian.id,
         'commission_id': commission.id
     }))
-    form.request = dummy_request
+    form.request = dummy_admin_request
     form.on_request()
     assert not form.validate()
     assert 'commission_id' not in form.errors
@@ -164,7 +191,7 @@ def test_attendence_forms(session, dummy_request):
         'parliamentarian_id': parliamentarian.id,
         'commission_id': commission.id
     }))
-    form.request = dummy_request
+    form.request = dummy_admin_request
     form.on_request()
     assert not form.validate()
     assert form.errors['commission_id'][0] == \

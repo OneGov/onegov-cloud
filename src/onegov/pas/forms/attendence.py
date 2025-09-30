@@ -153,11 +153,44 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
             for parliamentarian
             in PASParliamentarianCollection(self.request.app).query()
         ]
-        self.commission_id.choices = [
-            (commission.id, commission.title)
-            for commission
-            in PASCommissionCollection(self.request.session).query()
-        ]
+
+        # Filter commission choices based on user role
+        if hasattr(
+            self.request.identity, 'role'
+        ) and self.request.identity.role in (
+            'parliamentarian',
+            'commission_president',
+        ):
+            # Non-admin users: only show commissions they're members of
+            user = (
+                self.request.session.query(User)
+                .filter_by(username=self.request.identity.userid)
+                .first()
+            )
+            if user and user.parliamentarian:  # type: ignore[attr-defined]
+                memberships = user.parliamentarian.commission_memberships  # type: ignore[attr-defined]
+                commission_ids = [
+                    membership.commission_id
+                    for membership in memberships
+                    if membership.end is None or membership.end >= date.today()
+                ]
+                self.commission_id.choices = [
+                    (commission.id, commission.title)
+                    for commission in PASCommissionCollection(
+                        self.request.session
+                    ).query()
+                    if commission.id in commission_ids
+                ]
+            else:
+                self.commission_id.choices = []
+        else:
+            # Admin/editor users: show all commissions
+            self.commission_id.choices = [
+                (commission.id, commission.title)
+                for commission in PASCommissionCollection(
+                    self.request.session
+                ).query()
+            ]
         self.commission_id.choices.insert(0, ('', '-'))
 
 

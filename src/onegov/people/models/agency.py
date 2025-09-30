@@ -16,6 +16,7 @@ from onegov.gis import CoordinatesMixin
 from onegov.people.models.membership import AgencyMembership
 from onegov.search import ORMSearchable
 from decimal import Decimal
+from sqlalchemy import func
 from sqlalchemy import Column
 from sqlalchemy import Text
 from sqlalchemy.orm import object_session
@@ -165,38 +166,40 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
         order_within_agency: int = 2 ** 16,
         # FIXME: Specify the arguments supported by AgencyMembership
         **kwargs: Any
-    ) -> None:
+    ) -> AgencyMembership:
         """ Appends a person to the agency with the given title. """
 
         session = object_session(self)
 
-        orders_for_person_q = session.query(
-            AgencyMembership.order_within_person
-        ).filter_by(person_id=person_id)
+        order_within_person = session.query(
+            func.coalesce(func.max(AgencyMembership.order_within_person), -1)
+        ).filter_by(person_id=person_id).scalar() + 1
 
-        orders_for_person = [order for order, in orders_for_person_q]
+        next_order_within_agency = session.query(
+            func.coalesce(func.max(AgencyMembership.order_within_agency), -1)
+        ).filter_by(agency_id=self.id).scalar() + 1
 
-        if orders_for_person:
-            try:
-                order_within_person = max(orders_for_person) + 1
-            except ValueError:
-                order_within_person = 0
-            assert len(orders_for_person) == max(orders_for_person) + 1
+        if order_within_agency > next_order_within_agency:
+            # just use the next available number
+            order_within_agency = next_order_within_agency
         else:
-            order_within_person = 0
+            # move everyone after the desired position up by one
+            for membership in self.memberships:
+                if membership.order_within_agency >= order_within_agency:
+                    membership.order_within_agency += 1
 
-        self.memberships.append(
-            AgencyMembership(
-                person_id=person_id,
-                title=title,
-                order_within_agency=order_within_agency,
-                order_within_person=order_within_person,
-                **kwargs
-            )
+        membership = AgencyMembership(
+            person_id=person_id,
+            title=title,
+            order_within_agency=order_within_agency,
+            order_within_person=order_within_person,
+            **kwargs
         )
+        self.memberships.append(membership)
 
-        for order, membership in enumerate(self.memberships):
-            membership.order_within_agency = order
+        session.flush()
+
+        return membership
 
     def sort_children(
         self,

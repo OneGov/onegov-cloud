@@ -19,7 +19,6 @@ def hourly_kub_data_import(request: PasRequest) -> None:
 
     try:
         trigger_kub_data_import(request)
-        log.info('KUB import completed')
     except ValueError as e:
         log.warning(f'KUB import skipped: {e}')
     except Exception:
@@ -29,6 +28,8 @@ def hourly_kub_data_import(request: PasRequest) -> None:
 
 def trigger_kub_data_import(request: PasRequest) -> dict[str, Any] | None:
     app = request.app
+    # FIXME: this is a bit crude, this will have to be
+    # a conditional statement in puppet
     if not (kub_token := getattr(app, 'kub_test_api_token', None)):
         if not (kub_token := getattr(app, 'kub_api_token', None)):
             return None
@@ -36,10 +37,6 @@ def trigger_kub_data_import(request: PasRequest) -> dict[str, Any] | None:
     if not (kub_base_url := getattr(app, 'kub_test_base_url', None)):
         if not (kub_base_url := getattr(app, 'kub_base_url', None)):
             raise ValueError('KUB base URL not configured')
-    # FIXME: this is a bit crude, this will have to add
-    # a conditional statement in puppet
-
-    log.info('Starting KUB data import')
 
     db_handler = DatabaseOutputHandler()
     log_handler = LogOutputHandler()
