@@ -598,3 +598,31 @@ def test_fetch_commissions_parliamentarians_json(client):
     response2 = client.get('/commissions/commissions-parliamentarians-json')
     data2 = response2.json
     assert commission3_id not in data2
+
+
+def test_add_new_user_without_activation_email(client):
+    client.login_admin()
+
+    client.app.enable_yubikey = True
+
+    new = client.get('/usermanagement').click('Benutzer', href='new')
+    new.form['username'] = 'admin@example.org'
+
+    assert "existiert bereits" in new.form.submit()
+
+    new.form['username'] = 'secondadmin@example.org'
+    new.form['role'] = 'admin'
+
+    assert "müssen zwingend einen YubiKey" in new.form.submit()
+
+    new.form['role'] = 'parliamentarian'
+    new.form['send_activation_email'] = False
+    added = new.form.submit()
+
+    assert "Passwort" in added
+    password = added.pyquery('.panel strong').text()
+
+    login = client.spawn().get('/auth/login')
+    login.form['username'] = 'secondadmin@example.org'
+    login.form['password'] = password
+    assert login.form.submit().status_code == 302
