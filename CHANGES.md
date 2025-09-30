@@ -1,8 +1,22 @@
 # Changes
 
+## 2025.54
+
+`2025-09-30` | [71f05ef6f4...71f05ef6f4](https://github.com/OneGov/onegov-cloud/compare/71f05ef6f4^...71f05ef6f4)
+
+## 2025.53
+
+`2025-09-30` | [bfc3672deb...34dd4cdab5](https://github.com/OneGov/onegov-cloud/compare/bfc3672deb^...34dd4cdab5)
+
+### Pas
+
+##### Adds custom user management and minor fixes.
+
+`Feature` | [8166891e79](https://github.com/onegov/onegov-cloud/commit/8166891e79beea53a496a6a91c860b385312a26b)
+
 ## 2025.52
 
-`2025-09-26` | [9548576332...fee7408fcf](https://github.com/OneGov/onegov-cloud/compare/9548576332^...fee7408fcf)
+`2025-09-26` | [9548576332...dbe3704f11](https://github.com/OneGov/onegov-cloud/compare/9548576332^...dbe3704f11)
 
 ### Landsgemeinde
 
@@ -2242,91 +2256,4 @@ No changes since last release
 Remove unconfirmed subscribers after 7 days of initial subscription. Also display date of subscription on recipients-view and export.
 
 `Feature` | [OGC-2017](https://linear.app/onegovcloud/issue/OGC-2017) | [b76a07b02c](https://github.com/onegov/onegov-cloud/commit/b76a07b02c2e6d8385b97694edd24c6f6955df71)
-
-## 2025.8
-
-`2025-02-20` | [7b612693f4...d2765ca4af](https://github.com/OneGov/onegov-cloud/compare/7b612693f4^...d2765ca4af)
-
-### Agency
-
-##### Make the `--clean` option significantly faster.
-
-`Feature` | [OGC-2081](https://linear.app/onegovcloud/issue/OGC-2081) | [7a0f68d105](https://github.com/onegov/onegov-cloud/commit/7a0f68d10518736048552d8668b34aef5be13226)
-
-##### Staka LU PDF with proper spacer
-
-`Bugfix` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [7b612693f4](https://github.com/onegov/onegov-cloud/commit/7b612693f48a8a9484e65558d948e9eb39cfdbe7)
-
-##### Be slighly more robust with added None check.
-
-`Bugfix` | [OGC-2083](https://linear.app/onegovcloud/issue/OGC-2083) | [e74895ad7a](https://github.com/onegov/onegov-cloud/commit/e74895ad7aebdedb89013f8029aa0dd14de56c25)
-
-### Feriennet
-
-##### New weights for admin and organizer children and groups in matching
-
-`Feature` | [PRO-1360](https://linear.app/projuventute/issue/PRO-1360) | [3a359413f1](https://github.com/onegov/onegov-cloud/commit/3a359413f1b649c8b4283a387c70f41a648d86b3)
-
-### Org
-
-##### Improves the ergonomics of find my spot reservations
-
-`Feature` | [OGC-2023](https://linear.app/onegovcloud/issue/OGC-2023) | [e873821c01](https://github.com/onegov/onegov-cloud/commit/e873821c01cd2bd68572bbfaad7cb65e88f22888)
-
-### Town6
-
-##### Slider
-
-Fix bug where sizing of slider only worked after resizing the header.
-
-`Bugfix` | [OGC-2056](https://linear.app/onegovcloud/issue/OGC-2056) | [d1c071cdd2](https://github.com/onegov/onegov-cloud/commit/d1c071cdd2f13de7f629bdd069c6d2253b83da3f)
-
-##### Add missing translation
-
-`Bugfix` | [OGC-2064](https://linear.app/onegovcloud/issue/OGC-2064) | [ebdff10ca3](https://github.com/onegov/onegov-cloud/commit/ebdff10ca304caf485c4b81ae7a219c9118828f0)
-
-##### Fixes sidebar contact.
-
-Go this error:
-JSONDecodeError: Expecting value: line 1 column 1 (char 0)
-
-`Bugfix` | [OGC-2089](https://linear.app/onegovcloud/issue/OGC-2089) | [cc8c03ba1a](https://github.com/onegov/onegov-cloud/commit/cc8c03ba1aea0a05b4cfec1fc13658104426f787)
-
-### User
-
-##### Fixes isolation bug between multiple SAML2 providers
-
-`Bugfix` | [e11229b408](https://github.com/onegov/onegov-cloud/commit/e11229b408fe31ab2672f12027f0a9080d698ebf)
-
-## 2025.7
-
-`2025-02-17` | [4297221960...2458cd0a05](https://github.com/OneGov/onegov-cloud/compare/4297221960^...2458cd0a05)
-
-### Agency
-
-##### Staka LU No hierarchical numbering in pdf
-
-`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [4297221960](https://github.com/onegov/onegov-cloud/commit/4297221960bd639331463f584ea63829e4dd9aa0)
-
-##### Staka LU Add logo to pdf
-
-`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [f60df0f84e](https://github.com/onegov/onegov-cloud/commit/f60df0f84e4ddf5eb2674398d3d6279b5f603be9)
-
-##### Staka LU Support alliance names in import
-
-`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [4c79c0cf51](https://github.com/onegov/onegov-cloud/commit/4c79c0cf516473c7b00db7e264eaa2bde7485fcf)
-
-##### Staka LU Use alternative dienststelle name over dienstelle
-
-`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [37d46a2e26](https://github.com/onegov/onegov-cloud/commit/37d46a2e26d743e4002c9d067dcb1ca5662dabdf)
-
-##### Staka LU pdf shows now organisation information
-
-`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [e0ee4b0c7f](https://github.com/onegov/onegov-cloud/commit/e0ee4b0c7f39105e5aa30f4a640bb0ea91d70fbe)
-
-### Pas
-
-##### Adds provisional import script.
-
-`Feature` | [OGC-1878](https://linear.app/onegovcloud/issue/OGC-1878) | [9bafe68736](https://github.com/onegov/onegov-cloud/commit/9bafe687361c7160c869fd0269b656b9d82d2e16)
 

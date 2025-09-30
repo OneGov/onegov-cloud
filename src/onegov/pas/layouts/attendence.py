@@ -99,7 +99,7 @@ class AttendenceLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[Link] | None:
-        if self.request.is_manager:
+        if self.request.is_admin:
             return [
                 Link(
                     text=_('Edit'),
@@ -126,6 +126,17 @@ class AttendenceLayout(DefaultLayout):
                             )
                         )
                     )
+                )
+            ]
+        elif (self.request.is_parliamentarian
+              and self.request.current_parliamentarian
+              and str(self.request.current_parliamentarian.id)
+              == str(self.model.parliamentarian_id)):
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
                 )
             ]
         return None

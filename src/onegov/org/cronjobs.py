@@ -184,7 +184,7 @@ def publish_files(request: OrgRequest) -> None:
 def handle_publication_models(request: OrgRequest, now: datetime) -> None:
     """
     Reindexes all recently published/unpublished objects
-    in the elasticsearch database.
+    in the elasticsearch and postgres database.
 
     For pages it also updates the propagated access to any
     associated files.
@@ -230,7 +230,7 @@ def handle_publication_models(request: OrgRequest, now: datetime) -> None:
             obj.files_observer(obj.files, set(), None, None)
 
         if isinstance(obj, Searchable):
-            request.app.es_orm_events.index(request.app.schema, obj)
+            request.app.fts_orm_events.index(request.app.schema, obj)
 
         if (isinstance(obj, ExtendedDirectoryEntry) and
                 obj.published and

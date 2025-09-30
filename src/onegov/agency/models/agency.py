@@ -13,6 +13,7 @@ from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PublicationExtension
 from onegov.people import Agency
 from onegov.user import RoleMapping
+from sqlalchemy import func
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
@@ -44,6 +45,8 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
     @property
     def es_public(self) -> bool:  # type:ignore[override]
+        # FIXME: This es_public is redundant once we get rid of ES
+        #        we include access and publication dates in the fts
         return self.access == 'public' and self.published
 
     #: Defines which fields of a membership and person should be exported to
@@ -142,7 +145,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
         return AgencyProxy(self)
 
-    def add_person(  # type:ignore[override]
+    def add_person(
         self,
         person_id: UUID,
         title: str,
@@ -153,15 +156,29 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         """ Appends a person to the agency with the given title. """
 
         session = object_session(self)
-        orders_for_person = session.query(
-            ExtendedAgencyMembership.order_within_person
-        ).filter_by(person_id=person_id)
 
-        order_within_person = max(
-            (order for order, in orders_for_person),
-            # if this person has no memberships yet, then we start at 0
-            default=-1
-        ) + 1
+        order_within_person = session.query(func.coalesce(
+            func.max(ExtendedAgencyMembership.order_within_person),
+            -1
+        )).filter_by(person_id=person_id).scalar() + 1
+
+        next_order_within_agency = session.query(func.coalesce(
+            func.max(ExtendedAgencyMembership.order_within_agency),
+            -1
+        )).filter_by(agency_id=self.id).scalar() + 1
+
+        if order_within_agency > next_order_within_agency:
+            # just use the next available number
+            order_within_agency = next_order_within_agency
+
+        # re-order all memberships cannot be done here, because the order
+        # within the agency is not yet set. do be done once all memberships
+        # are added to the agency.
+        # else:
+        #    # move everything after up by one
+        #    for membership in self.memberships:
+        #        if membership.order_within_agency >= order_within_agency:
+        #            membership.order_within_agency += 1
 
         membership = ExtendedAgencyMembership(
             person_id=person_id,
@@ -171,12 +188,6 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
             **kwargs
         )
         self.memberships.append(membership)
-
-        # re-order all memberships cannot be done here, because the order
-        # within the agency is not yet set. do be done once all memberships
-        # are added to the agency.
-        # for order, _membership in enumerate(self.memberships):
-        #     _membership.order_within_agency = order
 
         session.flush()
 

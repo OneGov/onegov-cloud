@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-from sqlalchemy import Column
-from sqlalchemy.dialects.postgresql import TSVECTOR
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import deferred
-
+from datetime import timedelta
 from onegov.search.utils import classproperty
 from onegov.search.utils import extract_hashtags
+from sedate import utcnow
 
 
 from typing import Any, ClassVar, TYPE_CHECKING
@@ -53,29 +50,13 @@ class Searchable:
 
     """
 
-    TEXT_SEARCH_COLUMN_NAME = 'fts_idx'
-    TEXT_SEARCH_DATA_COLUMN_NAME = 'fts_idx_data'
-
     if TYPE_CHECKING:
-        # NOTE: This doesn't really have a Python representation, unless
-        #       it is converted to a `str` or `list[str]`? This may depend
-        #       on the SQLAlchemy version as well.
-        fts_idx: Column[object]
         # FIXME: Gross classproperty vs. ClassVar is a mess, we should
         #        consistently use one or the other
         es_properties: ClassVar[dict[str, Any]]
         es_type_name: ClassVar[str]
         es_id: ClassVar[str]
-
-    @declared_attr  # type:ignore[no-redef]
-    def fts_idx(cls) -> Column[object]:
-        """ The column for the full text search index.
-        """
-
-        col_name = Searchable.TEXT_SEARCH_COLUMN_NAME
-        if hasattr(cls, '__table__') and hasattr(cls.__table__.c, col_name):
-            return deferred(cls.__table__.c.fts_idx)
-        return deferred(Column(col_name, TSVECTOR))
+        __tablename__: ClassVar[str]
 
     # TODO: rename to fts_properties
     @classproperty  # type:ignore[no-redef]
@@ -168,9 +149,14 @@ class Searchable:
         return self.title  # type:ignore[attr-defined]
 
     @property
-    def es_last_change(self) -> datetime | None:
+    def es_last_change(self) -> datetime:
         """ Returns the date the document was created/last modified. """
-        return None
+        # FIXME: We made this a required property, for now we will
+        #        pretend entries without an explicit date have been
+        #        changed 30 days ago, so they're not completely
+        #        de-prioritized, but also not over-prioritized over
+        #        actually new content.
+        return utcnow() - timedelta(days=30)
 
     @property
     def es_tags(self) -> list[str] | None:
@@ -198,11 +184,12 @@ class ORMSearchable(Searchable):
     @classproperty  # type:ignore[no-redef]
     @classmethod
     def es_type_name(cls) -> str:
-        return cls.__tablename__  # type:ignore[attr-defined]
+        return cls.__tablename__
 
     @property
-    def es_last_change(self) -> datetime | None:
-        return getattr(self, 'last_change', None)
+    def es_last_change(self) -> datetime:
+        # FIXME: We made this a required field
+        return getattr(self, 'last_change', None) or super().es_last_change
 
 
 class SearchableContent(ORMSearchable):
@@ -219,6 +206,8 @@ class SearchableContent(ORMSearchable):
 
     @property
     def es_public(self) -> bool:
+        # FIXME: This es_public is redundant once we get rid of ES
+        #        we include access and publication dates in the fts
         return self.access == 'public'  # type:ignore[attr-defined]
 
     @property
