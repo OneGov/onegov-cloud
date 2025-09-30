@@ -1,15 +1,13 @@
 import json
 import logging
 import os
-from pathlib import Path
-from unittest.mock import patch, Mock
-
 import pytest
 import requests
 import transaction
-from datetime import datetime, timedelta, timezone
-from freezegun import freeze_time
 
+from datetime import datetime, timedelta, timezone
+from decimal import Decimal
+from freezegun import freeze_time
 from onegov.core.utils import Bunch, normalize_for_url
 from onegov.directory import (DirectoryEntryCollection,
                               DirectoryConfiguration,
@@ -32,12 +30,13 @@ from onegov.newsletter import (Newsletter, NewsletterCollection,
                                RecipientCollection)
 from onegov.reservation import ResourceCollection
 from onegov.user.collections import TANCollection
-from sedate import ensure_timezone, utcnow
+from pathlib import Path
+from sedate import ensure_timezone, to_timezone, utcnow
 from sqlalchemy.orm import close_all_sessions
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
-from decimal import Decimal
 from tests.shared import Client
 from tests.shared.utils import add_reservation
+from unittest.mock import patch, Mock
 
 
 class EchoTicket(Ticket):
@@ -2204,6 +2203,7 @@ def test_wil_daily_event_import_wrong_app(org_app):
     client.get(get_cronjob_url(org_job))
 
 
+@freeze_time('2025-09-01', tick=True)
 def test_wil_daily_event_import(wil_app, capturelog):
     client = Client(wil_app)
     session = wil_app.session()
@@ -2437,12 +2437,12 @@ def test_wil_daily_event_import(wil_app, capturelog):
     assert events[1].tags == ['Literature']
     assert events[1].start == start_dates[1]
     assert events[1].end == start_dates[1] + timedelta(hours=2)
-    assert events[1].recurrence == '\n'.join([
-        f'RDATE:'
-        f'{(start_dates[1] + timedelta(weeks=2)).strftime("%Y%m%dT%H%M%SZ")}',
-        f'RDATE:'
-        f'{(start_dates[1] + timedelta(weeks=4)).strftime("%Y%m%dT%H%M%SZ")}'
-    ])
+    recurrence1 = to_timezone(start_dates[1] + timedelta(weeks=2), 'UTC')
+    recurrence2 = to_timezone(start_dates[1] + timedelta(weeks=4), 'UTC')
+    assert events[1].recurrence == (
+        f'RDATE:{recurrence1:%Y%m%dT%H%M%SZ}\n'
+        f'RDATE:{recurrence2:%Y%m%dT%H%M%SZ}'
+    )
     assert events[1].occurrence_dates() == [
         start_dates[1],
         start_dates[1] + timedelta(weeks=2),

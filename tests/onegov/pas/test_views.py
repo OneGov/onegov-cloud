@@ -216,30 +216,44 @@ def test_views_manage(client_with_es):
     client.app.es_client.indices.refresh(index='_all')
     client = client.spawn()
 
+    # elasticsearch
     assert '0 Resultate' in client.get('/search?q=aa')
     assert '0 Resultate' in client.get('/search?q=bb')
     assert '0 Resultate' in client.get('/search?q=cc')
     assert '0 Resultate' in client.get('/search?q=first')
     assert '0 Resultate' in client.get('/search?q=Q1')
+    # postgres
+    assert '0 Resultate' in client.get('/search-postgres?q=aa')
+    assert '0 Resultate' in client.get('/search-postgres?q=bb')
+    assert '0 Resultate' in client.get('/search-postgres?q=cc')
+    assert '0 Resultate' in client.get('/search-postgres?q=first')
+    assert '0 Resultate' in client.get('/search-postgres?q=Q1')
 
     client.login_admin()
 
+    # elasticsearch
     assert '1 Resultat' in client.get('/search?q=aa')
     assert '1 Resultat' in client.get('/search?q=bb')
     assert '1 Resultat' in client.get('/search?q=cc')
-    assert 'Resultate' in client.get('/search?q=first')
+    assert '2 Resultate' in client.get('/search?q=first')
     assert '1 Resultat' in client.get('/search?q=Q1')
+    # postgres
+    assert '1 Resultat' in client.get('/search-postgres?q=aa')
+    assert '1 Resultat' in client.get('/search-postgres?q=bb')
+    assert '1 Resultat' in client.get('/search-postgres?q=cc')
+    assert '2 Resultate' in client.get('/search-postgres?q=first')
+    assert '1 Resultat' in client.get('/search-postgres?q=Q1')
 
     # Delete
     for page in delete:
         page.click('Löschen')
     assert 'Noch keine Sätze erfasst' in settings.click('Sätze')
-    assert 'Noch keine Abrechnungsläufe erfasst' in\
-           settings.click('Abrechnungsläufe')
+    assert 'Noch keine Abrechnungsläufe erfasst' in (
+           settings.click('Abrechnungsläufe'))
     assert 'Noch keine Parteien erfasst' in settings.click('Parteien')
     assert 'Noch keine Fraktionen erfasst' in settings.click('Fraktionen')
-    assert 'Noch keine Parlamentarier:innen erfasst' in\
-           settings.click('Parlamentarier:innen')
+    assert 'Noch keine Parlamentarier:innen erfasst' in (
+           settings.click('Parlamentarier:innen'))
 
 
 def test_view_upload_json(
