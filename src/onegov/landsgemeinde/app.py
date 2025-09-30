@@ -105,7 +105,7 @@ def pages_cache_tween_factory(
     """ Cache pages for 5 minutes. """
 
     cache_paths = (
-        '/landsgemeinde/.*/ticker',
+        '/assembly/.*/ticker',
     )
     cache_paths_re = compile(r'^({})$'.format('|'.join(cache_paths)))
 
