@@ -311,35 +311,7 @@ class SearchPostgres(Pagination[_M]):
         ts_query = func.websearch_to_tsquery(
             language, unidecode(self.query))
 
-        query = self.request.session.query(
-            SearchIndex,
-            # FIXME: Make this the order_by, so we don't have to do the
-            #        ordering in Python
-            (
-                func.ts_rank_cd(SearchIndex.fts_idx, ts_query, 0)
-                # FIXME: Wheter or not we apply a time decay should depend
-                #        on the type of content, there's content that remains
-                #        relevant no matter how old it is, e.g. people, but
-                #        there's also content that does get less relevant
-                #        with time e.g. news. For now we apply no time decay.
-                # * func.least(
-                #     func.greatest(
-                #         # TODO: This is quite a dramatic decay, we
-                #         #       may want something more gradual, so
-                #         #       the ts_rank_cd still plays enough of
-                #         #       a role, compared to the time factor
-                #         func.exp(
-                #             func.extract(
-                #                 'epoch',
-                #                 SearchIndex.last_change - utcnow()
-                #             ) / (30 * 24 * 3600)  # 30 days decay period
-                #         ),
-                #         1e-6
-                #     ),
-                #     1.0
-                # )
-            ).label('rank')
-        ).filter(
+        query = self.request.session.query(SearchIndex).filter(
             SearchIndex.fts_idx.op('@@')(ts_query)
         ).order_by(
             (
