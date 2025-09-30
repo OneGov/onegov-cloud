@@ -443,19 +443,6 @@ class SearchPostgres(Pagination[_M]):
     def subset_count(self) -> int:
         return self.available_results
 
-    def all_hashtags_query(self) -> Query[tuple[str]]:
-        """
-        Returns all hashtags from the database in alphabetical order
-        filtered by user level.
-
-        """
-
-        return self.filter_user_level(
-            self.request.session.query(
-                func.skeys(SearchIndex._tags).distinct().label('tag')
-            ).order_by(func.skeys(SearchIndex._tags).asc())
-        )
-
     def suggestions(self) -> tuple[str, ...]:
         if not self.query:
             return ()
