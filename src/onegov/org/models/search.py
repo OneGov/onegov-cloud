@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 from elasticsearch_dsl.function import SF  # type:ignore
 from elasticsearch_dsl.query import FunctionScore  # type:ignore
 from elasticsearch_dsl.query import Match
@@ -311,32 +313,37 @@ class SearchPostgres(Pagination[_M]):
         ts_query = func.websearch_to_tsquery(
             language, unidecode(self.query))
 
+        decay = 0.99
+        scale = (90 * 24 * 3600)  # 90 days to reach target decay
+        offset = (7 * 24 * 3600)  # 7 days without decay
+        two_times_variance_squared = -(scale**2 / math.log(decay))
         query = self.request.session.query(SearchIndex).filter(
             SearchIndex.fts_idx.op('@@')(ts_query)
         ).order_by(
             (
                 func.ts_rank_cd(SearchIndex.fts_idx, ts_query, 0)
-                # FIXME: Wheter or not we apply a time decay should depend
+                # FIXME: Whether or not we apply a time decay should depend
                 #        on the type of content, there's content that remains
                 #        relevant no matter how old it is, e.g. people, but
                 #        there's also content that does get less relevant
-                #        with time e.g. news. For now we apply no time decay.
-                # * func.least(
-                #     func.greatest(
-                #         # TODO: This is quite a dramatic decay, we
-                #         #       may want something more gradual, so
-                #         #       the ts_rank_cd still plays enough of
-                #         #       a role, compared to the time factor
-                #         func.exp(
-                #             func.extract(
-                #                 'epoch',
-                #                 SearchIndex.last_change - utcnow()
-                #             ) / (30 * 24 * 3600)  # 30 days decay period
-                #         ),
-                #         1e-6
-                #     ),
-                #     1.0
-                # )
+                #        with time e.g. news.
+                # FIXME: We could probably improve performance a lot if
+                #        we stored the time decay in the search table and
+                #        recomputed it once a day in a crobjob
+                * func.greatest(
+                    func.exp(
+                        -func.greatest(
+                            func.abs(
+                                func.extract(
+                                    'epoch',
+                                    SearchIndex.last_change - utcnow()
+                                )
+                            ) - offset,
+                            0
+                        ).op('^')(2) / two_times_variance_squared
+                    ),
+                    1e-6
+                )
             ).desc().label('rank')
         )
         return self.filter_user_level(query)
