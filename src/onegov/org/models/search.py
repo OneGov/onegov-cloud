@@ -421,12 +421,11 @@ class SearchPostgres(Pagination[_M]):
             if base_model is None:
                 continue
 
-            primary_keys = inspect(base_model).primary_key
-            assert len(primary_keys) == 1
+            primary_key, = inspect(base_model).primary_key
 
             results_by_id.update(
-                self.request.session.query(primary_keys[0], base_model)
-                .filter(primary_keys[0].in_(table_batch))
+                self.request.session.query(primary_key, base_model)
+                .filter(primary_key.in_(table_batch))
             )
 
         return [
