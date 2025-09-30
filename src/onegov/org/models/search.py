@@ -268,6 +268,11 @@ class SearchPostgres(Pagination[_M]):
     def filter_user_level(self, query: Any) -> Any:
         """ Filters search content according to user level """
 
+        # FIXME: This doesn't handle elevated/downgaraded permissions properly
+        #        yet like access to tickets by user group. We could add a new
+        #        column `groupids` to the search index if a particular result
+        #        should bypass regular access checks for non-admins and check
+        #        if at least one of the groups match instead.
         role = getattr(self.request.identity, 'role', 'anonymous')
         available_accesses = {
             'admin': (),  # can see everything
@@ -276,6 +281,7 @@ class SearchPostgres(Pagination[_M]):
             #        split public and private content, so you can still find
             #        an object by it's public name, but not via data that
             #        should only be visible once authenticated.
+            'supporter': ('member', 'public'),  # TODO: 'mtan'
             'member': ('member', 'public')  # TODO: 'mtan'
         }.get(role, ('public',))  # TODO: 'mtan'
         if available_accesses:
@@ -303,7 +309,6 @@ class SearchPostgres(Pagination[_M]):
         language = language_from_locale(self.request.locale)
         ts_query = func.websearch_to_tsquery(
             language, unidecode(self.query))
-        now = utcnow()
         results = []
 
         self.number_of_docs = self.filter_user_level(
@@ -315,23 +320,28 @@ class SearchPostgres(Pagination[_M]):
             # FIXME: Make this the order_by, so we don't have to do the
             #        ordering in Python
             (
-                func.ts_rank_cd(SearchIndex.fts_idx, ts_query, 0) *
-                func.least(
-                    func.greatest(
-                        # TODO: This is quite a dramatic decay, we
-                        #       may want something more gradual, so
-                        #       the ts_rank_cd still plays enough of
-                        #       a role, compared to the time factor
-                        func.exp(
-                            func.extract(
-                                'epoch',
-                                SearchIndex.last_change - now
-                            ) / (30 * 24 * 3600)  # 30 days decay period
-                        ),
-                        1e-6
-                    ),
-                    1.0
-                )
+                func.ts_rank_cd(SearchIndex.fts_idx, ts_query, 0)
+                # FIXME: Wheter or not we apply a time decay should depend
+                #        on the type of content, there's content that remains
+                #        relevant no matter how old it is, e.g. people, but
+                #        there's also content that does get less relevant
+                #        with time e.g. news. For now we apply no time decay.
+                # * func.least(
+                #     func.greatest(
+                #         # TODO: This is quite a dramatic decay, we
+                #         #       may want something more gradual, so
+                #         #       the ts_rank_cd still plays enough of
+                #         #       a role, compared to the time factor
+                #         func.exp(
+                #             func.extract(
+                #                 'epoch',
+                #                 SearchIndex.last_change - utcnow()
+                #             ) / (30 * 24 * 3600)  # 30 days decay period
+                #         ),
+                #         1e-6
+                #     ),
+                #     1.0
+                # )
             ).label('rank')
         ).filter(SearchIndex.fts_idx.op('@@')(ts_query))
         query = self.filter_user_level(query)
