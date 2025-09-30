@@ -11,7 +11,6 @@ from onegov.pas.collections import ChangeCollection
 from onegov.pas.collections import ImportLogCollection
 from onegov.user import Auth
 from onegov.pas.models import SettlementRun, RateSet
-from sqlalchemy.orm.exc import MultipleResultsFound
 
 
 from typing import TYPE_CHECKING
@@ -137,14 +136,16 @@ def get_top_navigation(request: PasRequest) -> list[Link]:
 
 
 def get_current_settlement_run(session: Session) -> SettlementRun | None:
+    from datetime import date
+
+    today = date.today()
     query = session.query(SettlementRun)
-    query = query.filter(SettlementRun.active.is_(True))
-    try:
-        return query.one_or_none()
-    except MultipleResultsFound:
-        # If multiple active runs exist (happens in testing)
-        # The caller must handle the None case
-        return None
+    query = query.filter(
+        SettlementRun.start <= today, SettlementRun.end >= today
+    )
+    # With overlap validation, there can be at most one settlement run
+    # containing today's date, so we can safely use first()
+    return query.first()
 
 
 def check_attendance_in_closed_settlement_run(

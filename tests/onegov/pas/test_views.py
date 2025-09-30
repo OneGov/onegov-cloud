@@ -216,30 +216,44 @@ def test_views_manage(client_with_es):
     client.app.es_client.indices.refresh(index='_all')
     client = client.spawn()
 
+    # elasticsearch
     assert '0 Resultate' in client.get('/search?q=aa')
     assert '0 Resultate' in client.get('/search?q=bb')
     assert '0 Resultate' in client.get('/search?q=cc')
     assert '0 Resultate' in client.get('/search?q=first')
     assert '0 Resultate' in client.get('/search?q=Q1')
+    # postgres
+    assert '0 Resultate' in client.get('/search-postgres?q=aa')
+    assert '0 Resultate' in client.get('/search-postgres?q=bb')
+    assert '0 Resultate' in client.get('/search-postgres?q=cc')
+    assert '0 Resultate' in client.get('/search-postgres?q=first')
+    assert '0 Resultate' in client.get('/search-postgres?q=Q1')
 
     client.login_admin()
 
+    # elasticsearch
     assert '1 Resultat' in client.get('/search?q=aa')
     assert '1 Resultat' in client.get('/search?q=bb')
     assert '1 Resultat' in client.get('/search?q=cc')
-    assert 'Resultate' in client.get('/search?q=first')
+    assert '2 Resultate' in client.get('/search?q=first')
     assert '1 Resultat' in client.get('/search?q=Q1')
+    # postgres
+    assert '1 Resultat' in client.get('/search-postgres?q=aa')
+    assert '1 Resultat' in client.get('/search-postgres?q=bb')
+    assert '1 Resultat' in client.get('/search-postgres?q=cc')
+    assert '2 Resultate' in client.get('/search-postgres?q=first')
+    assert '1 Resultat' in client.get('/search-postgres?q=Q1')
 
     # Delete
     for page in delete:
         page.click('Löschen')
     assert 'Noch keine Sätze erfasst' in settings.click('Sätze')
-    assert 'Noch keine Abrechnungsläufe erfasst' in\
-           settings.click('Abrechnungsläufe')
+    assert 'Noch keine Abrechnungsläufe erfasst' in (
+           settings.click('Abrechnungsläufe'))
     assert 'Noch keine Parteien erfasst' in settings.click('Parteien')
     assert 'Noch keine Fraktionen erfasst' in settings.click('Fraktionen')
-    assert 'Noch keine Parlamentarier:innen erfasst' in\
-           settings.click('Parlamentarier:innen')
+    assert 'Noch keine Parlamentarier:innen erfasst' in (
+           settings.click('Parlamentarier:innen'))
 
 
 def test_view_upload_json(
@@ -598,3 +612,31 @@ def test_fetch_commissions_parliamentarians_json(client):
     response2 = client.get('/commissions/commissions-parliamentarians-json')
     data2 = response2.json
     assert commission3_id not in data2
+
+
+def test_add_new_user_without_activation_email(client):
+    client.login_admin()
+
+    client.app.enable_yubikey = True
+
+    new = client.get('/usermanagement').click('Benutzer', href='new')
+    new.form['username'] = 'admin@example.org'
+
+    assert "existiert bereits" in new.form.submit()
+
+    new.form['username'] = 'secondadmin@example.org'
+    new.form['role'] = 'admin'
+
+    assert "müssen zwingend einen YubiKey" in new.form.submit()
+
+    new.form['role'] = 'parliamentarian'
+    new.form['send_activation_email'] = False
+    added = new.form.submit()
+
+    assert "Passwort" in added
+    password = added.pyquery('.panel strong').text()
+
+    login = client.spawn().get('/auth/login')
+    login.form['username'] = 'secondadmin@example.org'
+    login.form['password'] = password
+    assert login.form.submit().status_code == 302

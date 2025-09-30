@@ -1,7 +1,7 @@
+import pytest
+
 from webtest import Upload
 from tests.shared.utils import create_image
-
-import pytest
 
 
 @pytest.mark.skip('Passes locally, but not in CI, skip for now')
@@ -34,11 +34,22 @@ def test_search_excluding_image(client_with_es):
 
     client.app.es_client.indices.refresh(index='_all')
 
+    # elasticsearch
     search_page = client.get(
         '/directories/clubs?search=inline&search_query={"term"%3A"201-B"}')
     assert "Pilatus" in search_page
 
     search_page = client.get(
         '/directories/clubs?search=inline&search_query={"term"%3A"pretty"}')
+    assert "Keine Eintr\xc3\xa4ge gefunden." not in search_page
 
+    # postgres
+    search_page = client.get(
+        '/directories/clubs?search-postgres=inline'
+        '&search_query={"term"%3A"201-B"}')
+    assert "Pilatus" in search_page
+
+    search_page = client.get(
+        '/directories/clubs?search-postgres=inline'
+        '&search_query={"term"%3A"pretty"}')
     assert "Keine Eintr\xc3\xa4ge gefunden." not in search_page

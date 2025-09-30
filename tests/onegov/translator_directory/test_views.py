@@ -1929,3 +1929,19 @@ def test_mail_templates_with_hometown_and_ticket_nr(client):
                 found_variables_in_docx.add(target)
 
     assert expected_variables_in_docx == found_variables_in_docx
+
+
+def test_basic_search(client_with_es):
+    client = client_with_es
+    client.login_admin()
+    anom = client.spawn()
+
+    assert 'Resultate' in client.get('/search?q=test')
+    assert client.get('/search/suggest?q=test').json == []
+    assert 'Resultate' in anom.get('/search?q=test')
+    assert anom.get('/search/suggest?q=test').json == []
+
+    assert 'Resultate' in client.get('/search-postgres?q=test')
+    assert client.get('/search-postgres/suggest?q=test').json == []
+    assert 'Resultate' in anom.get('/search-postgres?q=test')
+    assert anom.get('/search-postgres/suggest?q=test').json == []

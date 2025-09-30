@@ -31,6 +31,10 @@ from onegov.pas.layouts.rate_set import RateSetCollectionLayout
 from onegov.pas.layouts.rate_set import RateSetLayout
 from onegov.pas.layouts.settlement_run import SettlementRunCollectionLayout
 from onegov.pas.layouts.settlement_run import SettlementRunLayout
+from onegov.pas.layouts.user import UserManagementLayout
+from onegov.pas.layouts.user import UserLayout
+from onegov.pas.layouts.user import UserGroupCollectionLayout
+from onegov.pas.layouts.user import UserGroupLayout
 
 
 __all__ = (
@@ -57,4 +61,8 @@ __all__ = (
     'RateSetLayout',
     'SettlementRunCollectionLayout',
     'SettlementRunLayout',
+    'UserManagementLayout',
+    'UserLayout',
+    'UserGroupCollectionLayout',
+    'UserGroupLayout',
 )

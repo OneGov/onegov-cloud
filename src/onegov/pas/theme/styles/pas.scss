@@ -11,6 +11,7 @@ $pas-settings-icon: '\f7d9';
 $settlement-run-icon: '\f4c0';
 $import-icon: '\f56f';
 $import-logs-icon: '\f1da';
+$user-management-icon: '\f0c0';
 
 .globals {
     .attendences::before { @include icon-bold($attendence-icon); }
@@ -27,6 +28,8 @@ $import-logs-icon: '\f1da';
     .settlement-run::before { @include icon-bold($settlement-run-icon); }
     .import::before { @include icon-bold($import-icon); }
     .import-logs::before { @include icon-bold($import-logs-icon); }
+    .user-management::before { @include icon-bold($user-management-icon); }
+    .usermanagement::before { @include icon-bold($user-management-icon); }
 }
 
 .edit-bar {

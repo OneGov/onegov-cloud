@@ -58,7 +58,7 @@ def test_views(client_with_es):
         page.form['number'] = 5
         page.form['state'] = 'completed'
         page.form['title'] = 'A. consectetur adipiscing\nB. tempor incididunt'
-        page.form['overview'] = '<p>Dolore magna aliqua.</p>'
+        page.form['overview'] = '<p>Dolore magnolia aliqua.</p>'
         page.form['text'] = '<p>Ad minim veniam.</p>'
         page.form['resolution'] = '<p>Nostrud exercitation.</p>'
         page = page.form.submit().follow()
@@ -68,7 +68,7 @@ def test_views(client_with_es):
         'B. tempor incididunt</span>'
     ) in page
     assert 'A. consectetur adipiscing\nB. tempor incididunt' in page
-    assert '<p>Dolore magna aliqua.</p>' in page
+    assert '<p>Dolore magnolia aliqua.</p>' in page
     assert '<p>Ad minim veniam.</p>' in page
     assert '<p>Nostrud exercitation.</p>' in page
     assert_last_modified()
@@ -144,17 +144,41 @@ def test_views(client_with_es):
     # search
     client_with_es.app.es_client.indices.refresh(index='_all')
     client = client_with_es.spawn()
+    # elasticsearch
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=ipsum')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=adipiscing')
-    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=aliqua')
-    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=magna')
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=dolore')
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=magnoli')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=veniam')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=nostrud')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=quimby')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=mayor')
-    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=laboris')
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=ullamco')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=aliquip')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=consequat')
+    # postgres
+    assert 'Landsgemeinde vom 07. Mai' in client.get(
+        '/search-postgres?q=ipsum')
+    assert 'Landsgemeinde vom 07. Mai' in client.get(
+        '/search-postgres?q=adipiscing')
+    assert 'Landsgemeinde vom 07. Mai' in client.get(
+        '/search-postgres?q=dolore')
+    assert 'Landsgemeinde vom 07. Mai' in client.get(
+        '/search-postgres?q=magnoli')
+    assert 'Landsgemeinde vom 07. Mai' in client.get(
+        '/search-postgres?q=veniam')
+    assert 'Landsgemeinde vom 07. Mai' in client.get(
+        '/search-postgres?q=nostrud')
+    assert 'Landsgemeinde vom 07. Mai' in client.get(
+        '/search-postgres?q=quimby')
+    assert 'Landsgemeinde vom 07. Mai' in client.get(
+        '/search-postgres?q=mayor')
+    assert 'Landsgemeinde vom 07. Mai' in client.get(
+        '/search-postgres?q=ullamco')
+    assert 'Landsgemeinde vom 07. Mai' in client.get(
+        '/search-postgres?q=aliquip')
+    assert 'Landsgemeinde vom 07. Mai' in client.get(
+        '/search-postgres?q=consequat')
 
     # states view
     page = client_with_es.get('/assembly/2023-05-07/states')
@@ -192,7 +216,7 @@ def test_views(client_with_es):
         page = client_with_es.get('/traktandum/2023-05-07/6')
         page.click('Löschen', href='votum')
         page = page.click('A. consectetur adipiscing', index=0)
-    assert '<p>Dolore magna aliqua.</p>' in page
+    assert '<p>Dolore magnolia aliqua.</p>' in page
     assert 'Joe Quimby' not in page
     assert_last_modified()
 

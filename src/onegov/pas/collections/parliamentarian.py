@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import date
 from onegov.core.utils import toggle
 from onegov.core.crypto import random_password
 from onegov.parliament.collections import ParliamentarianCollection
@@ -59,6 +60,20 @@ class PASParliamentarianCollection(
         self.session.delete(item)
         self.session.flush()
 
+    def _is_current_commission_president(
+        self,
+        item: PASParliamentarian
+    ) -> bool:
+        """Check if the parliamentarian is currently a president of any
+        commission."""
+        today = date.today()
+        return any(
+            membership.role == 'president' and
+            (membership.start is None or membership.start <= today) and
+            (membership.end is None or membership.end >= today)
+            for membership in item.commission_memberships
+        )
+
     def update_user(
         self,
         item: PASParliamentarian,
@@ -106,16 +121,26 @@ class PASParliamentarianCollection(
 
         if create:
             assert new_email is not None
-            log.info(f'Creating user {new_email}')
+            role = (
+                'commission_president'
+                 if self._is_current_commission_president(item)
+                 else 'parliamentarian'
+            )
+            log.info(f'Creating user {new_email} with role {role}')
             users.add(
-                new_email, random_password(16), role='parliamentarian',
+                new_email, random_password(16), role=role,
                 realname=item.title
             )
 
         if enable:
+            role = (
+                'commission_president'
+                if self._is_current_commission_president(item)
+                else 'parliamentarian'
+            )
             corrections = {
                 'username': new_email,
-                'role': 'parliamentarian',
+                'role': role,
                 'active': True,
                 'source': None,
                 'source_id': None
