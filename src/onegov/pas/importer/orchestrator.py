@@ -4,11 +4,16 @@ import json
 import logging
 import queue
 import requests
+import socket
+import ssl
 import threading
 import urllib3
 import uuid
 from dataclasses import dataclass
 from urllib.parse import urlparse, urlunparse
+from urllib3.connection import HTTPSConnection
+from urllib3.connectionpool import HTTPSConnectionPool
+from requests.adapters import HTTPAdapter
 
 from onegov.core.utils import binary_to_dictionary
 from onegov.pas.models.import_log import ImportLog
@@ -30,6 +35,96 @@ log = logging.getLogger('onegov.pas.orchestrator')
 
 # Disable SSL warnings for self-signed certificates
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+
+class SNIHTTPSConnection(HTTPSConnection):
+    """Custom HTTPS connection that can disable SNI."""
+
+    def __init__(
+        self, *args, sni: str | None = None, no_sni: bool = False, **kwargs
+    ):
+        self._sni = sni
+        self._no_sni = no_sni
+        kwargs.pop('scheme', None)
+        kwargs.pop('strict', None)
+        super().__init__(*args, **kwargs)
+
+    def connect(self):
+        sock = socket.create_connection(
+            (self.host, self.port), self.timeout, self.source_address
+        )
+        context = ssl.create_default_context()
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE
+
+        # Disable SNI by setting server_hostname to None
+        if self._no_sni:
+            server_hostname = None
+        else:
+            server_hostname = self.host if self._sni is None else self._sni
+        self.sock = context.wrap_socket(sock, server_hostname=server_hostname)
+
+
+class SNIHTTPSConnectionPool(HTTPSConnectionPool):
+    """Custom connection pool that uses SNIHTTPSConnection."""
+
+    def __init__(
+        self, *args, sni: str | None = None, no_sni: bool = False, **kwargs
+    ):
+        self._sni = sni
+        self._no_sni = no_sni
+        super().__init__(*args, **kwargs)
+
+    def _new_conn(self):
+        self.num_connections += 1
+        return SNIHTTPSConnection(
+            host=self.host,
+            port=self.port,
+            timeout=self.timeout,
+            sni=self._sni,
+            no_sni=self._no_sni,
+        )
+
+
+class SNIAdapter(HTTPAdapter):
+    """ Adapter that disables SNI for self-signed certs without CN/SAN."""
+
+    def __init__(self, sni: str | None = None, no_sni: bool = False, **kwargs):
+        self._sni = sni
+        self._no_sni = no_sni
+        super().__init__(**kwargs)
+
+    def init_poolmanager(
+        self, connections, maxsize, block=False, **pool_kwargs
+    ):
+        sni = self._sni
+        no_sni = self._no_sni
+
+        class CustomHTTPSConnection(SNIHTTPSConnection):
+            def __init__(self, *args, **conn_kwargs):
+                super().__init__(*args, sni=sni, no_sni=no_sni, **conn_kwargs)
+
+        class CustomHTTPSConnectionPool(HTTPSConnectionPool):
+            ConnectionCls = CustomHTTPSConnection
+
+        class CustomPoolManager(urllib3.poolmanager.PoolManager):
+            def _new_pool(self, scheme, host, port, request_context=None):
+                if scheme == 'https':
+                    request_context = request_context or {}
+                    request_context = request_context.copy()
+                    request_context.pop('host', None)
+                    request_context.pop('port', None)
+                    return CustomHTTPSConnectionPool(
+                        host=host, port=port, **request_context
+                    )
+                return super()._new_pool(scheme, host, port, request_context)
+
+        self.poolmanager = CustomPoolManager(
+            num_pools=connections,
+            maxsize=maxsize,
+            block=block,
+            **pool_kwargs,
+        )
 
 
 @dataclass
@@ -122,6 +217,11 @@ class KubImporter:
         # Disable SSL verification for self-signed certificates
         self.session.verify = False
 
+        # Disable SNI for API server with cert that has no CN/SAN
+        # causing 421 "Misdirected Request" errors
+        self.session.mount('https://', SNIAdapter(no_sni=True))
+        self.session.mount('http://', HTTPAdapter())
+
     def __enter__(self) -> Self:
         return self
 
@@ -139,7 +239,9 @@ class KubImporter:
             self.output.info('Checking API accessibility...')
 
         test_url = f'{self.base_url}/people'
+        log.info(f'Testing API URL: {test_url}')
         try:
+            # Use session with SNIAdapter
             response = self.session.get(test_url, timeout=10)
             if response.status_code != 200:
                 raise RuntimeError(
@@ -686,8 +788,11 @@ class KubImporter:
                 )
 
             return (
-                import_results, people_data, organization_data,
-                membership_data, import_log_id
+                import_results,
+                people_data,
+                organization_data,
+                membership_data,
+                import_log.id,
             )
 
         except Exception as e:
