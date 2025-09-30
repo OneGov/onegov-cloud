@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-09-30 14:59+0200\n"
+"POT-Creation-Date: 2025-09-30 16:02+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1303,6 +1303,21 @@ msgstr "Fokus"
 
 msgid "Available options for the focus widget:"
 msgstr "Verfügbare Optionen für das Fokus-Widget:"
+
+msgid "Experimental AI Chatbot"
+msgstr "Experimenteller AI-Chatbot"
+
+msgid ""
+"This chatbot is experimental and may produce incorrect or misleading "
+"information. Please verify any information provided by the chatbot with "
+"official sources."
+msgstr ""
+"Dieser Chatbot ist experimentell und kann ungenaue oder irreführende "
+"Informationen liefern. Bitte überprüfen Sie alle vom Chatbot "
+"bereitgestellten Informationen mit offiziellen Quellen."
+
+msgid "Try it out"
+msgstr "Ausprobieren"
 
 msgid "Copy to clipboard"
 msgstr "In die Zwischenablage kopieren"
@@ -2860,6 +2875,16 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid ""
+#~ "This chatbot is experimental and may produce incorrect or misleading "
+#~ "information. It does not reflect the views of ${layout.org.name}. Please "
+#~ "verify any information provided by the chatbot with official sources."
+#~ msgstr ""
+#~ "Dieser Chatbot ist experimentell und kann falsche oder irreführende "
+#~ "Informationen liefern. Er spiegelt nicht die Ansichten von ${layout.org."
+#~ "name} wider. Bitte überprüfen Sie alle vom Chatbot bereitgestellten "
+#~ "Informationen mit offiziellen Quellen."
 
 #~ msgid "Meeting documents"
 #~ msgstr "Sitzungsdokumente"
