@@ -2972,9 +2972,9 @@
 </metal:focus>
 
 <metal:chat define-macro="chat">
-    <div tal:condition="layout.org.meta.get('enable_chat', False) and (layout.app.chat_open(request) or request.is_logged_in)" class="sticky floaty-chat" data-sticky  data-sticky-on="small" data-stick-to="bottom">
+    <div tal:condition="layout.org.meta.get('enable_chat', 'disabled') == 'chatbot' or layout.org.meta.get('enable_chat', 'disabled') == 'people_chat' and (layout.app.chat_open(request) or request.is_logged_in)" class="sticky floaty-chat" data-sticky  data-sticky-on="small" data-stick-to="bottom">
         <div class="grid-container">
-            <a class="chat-button" href="${chat_link}">
+            <a class="chat-button no-icon" href="${chat_link}">
                 <p><i class="fas fa-comments"></i> Chat</p>
             </a>
         </div>
