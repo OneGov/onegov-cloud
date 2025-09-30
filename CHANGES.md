@@ -1,8 +1,32 @@
 # Changes
 
+## 2025.55
+
+`2025-09-30` | [3a7211c7b1...3acba4b816](https://github.com/OneGov/onegov-cloud/compare/3a7211c7b1^...3acba4b816)
+
+### Api
+
+##### Add Directories to API endpoints
+
+`Feature` | [OGC-2628](https://linear.app/onegovcloud/issue/OGC-2628) | [3acba4b816](https://github.com/onegov/onegov-cloud/commit/3acba4b81657ace78851185eeedc82eb2fe6833b)
+
+### Landsgemeinde
+
+##### Add assembly redirect
+
+`Feature` | [735e0caaa3](https://github.com/onegov/onegov-cloud/commit/735e0caaa3a9c26112e71f6554547d4ac8c0868e)
+
+### Town6
+
+##### Tag translation
+
+No automatic translation for custom tags
+
+`Bugfix` | [OGC-2646](https://linear.app/onegovcloud/issue/OGC-2646) | [87b7579b78](https://github.com/onegov/onegov-cloud/commit/87b7579b78461abd9a18faea6a0d9d6451d869ff)
+
 ## 2025.54
 
-`2025-09-30` | [71f05ef6f4...71f05ef6f4](https://github.com/OneGov/onegov-cloud/compare/71f05ef6f4^...71f05ef6f4)
+`2025-09-30` | [71f05ef6f4...c64c9d7060](https://github.com/OneGov/onegov-cloud/compare/71f05ef6f4^...c64c9d7060)
 
 ## 2025.53
 
@@ -2244,16 +2268,4 @@ Town6: Adds firebase push notifications.
 ## test
 
 No changes since last release
-
-## test
-
-`2025-02-24` | [9c3aee5da3...0b99952075](https://github.com/OneGov/onegov-cloud/compare/9c3aee5da3^...0b99952075)
-
-### Org
-
-##### Remove unconfirmed subscribers
-
-Remove unconfirmed subscribers after 7 days of initial subscription. Also display date of subscription on recipients-view and export.
-
-`Feature` | [OGC-2017](https://linear.app/onegovcloud/issue/OGC-2017) | [b76a07b02c](https://github.com/onegov/onegov-cloud/commit/b76a07b02c2e6d8385b97694edd24c6f6955df71)
 
