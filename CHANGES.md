@@ -1,8 +1,12 @@
 # Changes
 
+## 2025.54
+
+`2025-09-30` | [71f05ef6f4...71f05ef6f4](https://github.com/OneGov/onegov-cloud/compare/71f05ef6f4^...71f05ef6f4)
+
 ## 2025.53
 
-`2025-09-30` | [bfc3672deb...8166891e79](https://github.com/OneGov/onegov-cloud/compare/bfc3672deb^...8166891e79)
+`2025-09-30` | [bfc3672deb...34dd4cdab5](https://github.com/OneGov/onegov-cloud/compare/bfc3672deb^...34dd4cdab5)
 
 ### Pas
 
@@ -2252,59 +2256,4 @@ No changes since last release
 Remove unconfirmed subscribers after 7 days of initial subscription. Also display date of subscription on recipients-view and export.
 
 `Feature` | [OGC-2017](https://linear.app/onegovcloud/issue/OGC-2017) | [b76a07b02c](https://github.com/onegov/onegov-cloud/commit/b76a07b02c2e6d8385b97694edd24c6f6955df71)
-
-## 2025.8
-
-`2025-02-20` | [7b612693f4...d2765ca4af](https://github.com/OneGov/onegov-cloud/compare/7b612693f4^...d2765ca4af)
-
-### Agency
-
-##### Make the `--clean` option significantly faster.
-
-`Feature` | [OGC-2081](https://linear.app/onegovcloud/issue/OGC-2081) | [7a0f68d105](https://github.com/onegov/onegov-cloud/commit/7a0f68d10518736048552d8668b34aef5be13226)
-
-##### Staka LU PDF with proper spacer
-
-`Bugfix` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [7b612693f4](https://github.com/onegov/onegov-cloud/commit/7b612693f48a8a9484e65558d948e9eb39cfdbe7)
-
-##### Be slighly more robust with added None check.
-
-`Bugfix` | [OGC-2083](https://linear.app/onegovcloud/issue/OGC-2083) | [e74895ad7a](https://github.com/onegov/onegov-cloud/commit/e74895ad7aebdedb89013f8029aa0dd14de56c25)
-
-### Feriennet
-
-##### New weights for admin and organizer children and groups in matching
-
-`Feature` | [PRO-1360](https://linear.app/projuventute/issue/PRO-1360) | [3a359413f1](https://github.com/onegov/onegov-cloud/commit/3a359413f1b649c8b4283a387c70f41a648d86b3)
-
-### Org
-
-##### Improves the ergonomics of find my spot reservations
-
-`Feature` | [OGC-2023](https://linear.app/onegovcloud/issue/OGC-2023) | [e873821c01](https://github.com/onegov/onegov-cloud/commit/e873821c01cd2bd68572bbfaad7cb65e88f22888)
-
-### Town6
-
-##### Slider
-
-Fix bug where sizing of slider only worked after resizing the header.
-
-`Bugfix` | [OGC-2056](https://linear.app/onegovcloud/issue/OGC-2056) | [d1c071cdd2](https://github.com/onegov/onegov-cloud/commit/d1c071cdd2f13de7f629bdd069c6d2253b83da3f)
-
-##### Add missing translation
-
-`Bugfix` | [OGC-2064](https://linear.app/onegovcloud/issue/OGC-2064) | [ebdff10ca3](https://github.com/onegov/onegov-cloud/commit/ebdff10ca304caf485c4b81ae7a219c9118828f0)
-
-##### Fixes sidebar contact.
-
-Go this error:
-JSONDecodeError: Expecting value: line 1 column 1 (char 0)
-
-`Bugfix` | [OGC-2089](https://linear.app/onegovcloud/issue/OGC-2089) | [cc8c03ba1a](https://github.com/onegov/onegov-cloud/commit/cc8c03ba1aea0a05b4cfec1fc13658104426f787)
-
-### User
-
-##### Fixes isolation bug between multiple SAML2 providers
-
-`Bugfix` | [e11229b408](https://github.com/onegov/onegov-cloud/commit/e11229b408fe31ab2672f12027f0a9080d698ebf)
 
