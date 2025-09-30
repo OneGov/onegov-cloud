@@ -1,8 +1,18 @@
 # Changes
 
+## 2025.53
+
+`2025-09-30` | [bfc3672deb...8166891e79](https://github.com/OneGov/onegov-cloud/compare/bfc3672deb^...8166891e79)
+
+### Pas
+
+##### Adds custom user management and minor fixes.
+
+`Feature` | [8166891e79](https://github.com/onegov/onegov-cloud/commit/8166891e79beea53a496a6a91c860b385312a26b)
+
 ## 2025.52
 
-`2025-09-26` | [9548576332...fee7408fcf](https://github.com/OneGov/onegov-cloud/compare/9548576332^...fee7408fcf)
+`2025-09-26` | [9548576332...dbe3704f11](https://github.com/OneGov/onegov-cloud/compare/9548576332^...dbe3704f11)
 
 ### Landsgemeinde
 
@@ -2297,36 +2307,4 @@ JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 ##### Fixes isolation bug between multiple SAML2 providers
 
 `Bugfix` | [e11229b408](https://github.com/onegov/onegov-cloud/commit/e11229b408fe31ab2672f12027f0a9080d698ebf)
-
-## 2025.7
-
-`2025-02-17` | [4297221960...2458cd0a05](https://github.com/OneGov/onegov-cloud/compare/4297221960^...2458cd0a05)
-
-### Agency
-
-##### Staka LU No hierarchical numbering in pdf
-
-`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [4297221960](https://github.com/onegov/onegov-cloud/commit/4297221960bd639331463f584ea63829e4dd9aa0)
-
-##### Staka LU Add logo to pdf
-
-`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [f60df0f84e](https://github.com/onegov/onegov-cloud/commit/f60df0f84e4ddf5eb2674398d3d6279b5f603be9)
-
-##### Staka LU Support alliance names in import
-
-`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [4c79c0cf51](https://github.com/onegov/onegov-cloud/commit/4c79c0cf516473c7b00db7e264eaa2bde7485fcf)
-
-##### Staka LU Use alternative dienststelle name over dienstelle
-
-`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [37d46a2e26](https://github.com/onegov/onegov-cloud/commit/37d46a2e26d743e4002c9d067dcb1ca5662dabdf)
-
-##### Staka LU pdf shows now organisation information
-
-`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [e0ee4b0c7f](https://github.com/onegov/onegov-cloud/commit/e0ee4b0c7f39105e5aa30f4a640bb0ea91d70fbe)
-
-### Pas
-
-##### Adds provisional import script.
-
-`Feature` | [OGC-1878](https://linear.app/onegovcloud/issue/OGC-1878) | [9bafe68736](https://github.com/onegov/onegov-cloud/commit/9bafe687361c7160c869fd0269b656b9d82d2e16)
 
