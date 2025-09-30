@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from types import TracebackType
     from onegov.core.types import LaxFileDict
     from onegov.pas.app import PasApp
-    from onegov.pas.app import TownRequest
+    from onegov.pas.request import PasRequest
     from onegov.pas.log import OutputHandler
 
 
@@ -309,7 +309,7 @@ class KubImporter:
 
     def update_custom_data(
         self,
-        request: TownRequest,
+        request: PasRequest,
         app: PasApp,
         max_workers: int = 3,
         import_log_id: uuid.UUID | None = None
@@ -516,7 +516,7 @@ class KubImporter:
 
     def import_data(
         self,
-        request: TownRequest,
+        request: PasRequest,
         app: PasApp,
         import_log_id: uuid.UUID | None = None
     ) -> tuple[dict[str, Any], list[Any], list[Any], list[Any], uuid.UUID]:
@@ -524,7 +524,7 @@ class KubImporter:
         Performs KUB data import using the shared session.
 
         Args:
-            request: TownRequest object
+            request: PasRequest object
             app: PasApp object
             import_log_id: Optional existing ImportLog ID to update
 
@@ -719,7 +719,7 @@ class KubImporter:
 
     def run_full_sync(
         self,
-        request: TownRequest,
+        request: PasRequest,
         app: PasApp,
         update_custom: bool = True,
         max_workers: int = 3
@@ -730,7 +730,7 @@ class KubImporter:
         This is the main entry point for cronjobs and automated imports.
 
         Args:
-            request: TownRequest object
+            request: PasRequest object
             app: PasApp object
             update_custom: Whether to update custom data after import
             max_workers: Maximum number of concurrent workers for custom data

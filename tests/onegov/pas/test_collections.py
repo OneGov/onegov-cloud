@@ -1,4 +1,7 @@
+from datetime import date
+
 from freezegun import freeze_time
+
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import ChangeCollection
 from onegov.pas.collections import PASCommissionCollection
@@ -9,13 +12,13 @@ from onegov.pas.collections import PASParliamentaryGroupCollection
 from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
-from datetime import date
+from tests.onegov.pas.conftest import DummyApp
 
 
 
 @freeze_time('2024-01-01')
 def test_attendence_collection(session):
-    parliamentarians = PASParliamentarianCollection(session)
+    parliamentarians = PASParliamentarianCollection(DummyApp(session=session))
     parliamentarian1 = parliamentarians.add(
         first_name='John', last_name='Doe'
     )
@@ -156,7 +159,7 @@ def test_legiaslative_period_collection(session):
 
 @freeze_time('2024-01-01')
 def test_parliamentarian_collection(session):
-    parliamentarians = PASParliamentarianCollection(session)
+    parliamentarians = PASParliamentarianCollection(DummyApp(session=session))
     a = parliamentarians.add(
         first_name='a',
         last_name='b'

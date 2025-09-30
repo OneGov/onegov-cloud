@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import click
+import transaction
 import logging
 import requests
 import urllib3
 import warnings
 from onegov.core.cli import command_group
+from onegov.pas.collections.parliamentarian import PASParliamentarianCollection
 from onegov.pas.excel_header_constants import (
     commission_expected_headers_variant_1,
     commission_expected_headers_variant_2,
@@ -22,10 +24,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.pas.app import PasApp
-    from onegov.pas.app import TownRequest
+    from onegov.pas.request import PasRequest
     from typing import TypeAlias
 
-    Processor: TypeAlias = Callable[[TownRequest, PasApp], None]
+    Processor: TypeAlias = Callable[[PasRequest, PasApp], None]
 
 
 log = logging.getLogger('onegov.org.cli')
@@ -45,7 +47,10 @@ warnings.filterwarnings('ignore', message='.*No writable cache directories.*')
 def import_commission_data(
     excel_file: str,
 ) -> Processor:
-    """Import commission data from an Excel or csv file.
+    """
+    Note: This is deprecated, not really used, as we have the JSON import.
+
+    Import commission data from an Excel or csv file.
 
     Assumes that the name of the commission is the filename.
 
@@ -57,7 +62,7 @@ def import_commission_data(
             "Kommission_Gesundheit_und_Soziales.xlsx"
     """
 
-    def import_data(request: TownRequest, app: PasApp) -> None:
+    def import_data(request: PasRequest, app: PasApp) -> None:
 
         try:
             import_commissions_excel(
@@ -78,6 +83,30 @@ def import_commission_data(
             click.echo('Ok.')
 
     return import_data
+
+
+@cli.command(name='update-accounts', context_settings={'singular': True})
+@click.option('--dry-run/-no-dry-run', default=False)
+def update_accounts_cli(dry_run: bool) -> Processor:
+    """ Updates user accounts for parliamentarians. """
+
+    def do_update_accounts(request: PasRequest, app: PasApp) -> None:
+
+        parliamentarians = PASParliamentarianCollection(app)
+        for parliamentarian in parliamentarians.query():
+            if not parliamentarian.email_primary:
+                click.echo(
+                    f'Skipping {parliamentarian.title}, no primary email.'
+                )
+                continue
+            parliamentarians.update_user(
+                parliamentarian, parliamentarian.email_primary
+            )
+
+        if dry_run:
+            transaction.abort()
+
+    return do_update_accounts
 
 
 @cli.command('check-api')
@@ -147,7 +176,7 @@ def import_kub_data(
             --token "your-token-here" --max-workers 5
     """
 
-    def cli_wrapper(request: TownRequest, app: PasApp) -> None:
+    def cli_wrapper(request: PasRequest, app: PasApp) -> None:
         """CLI wrapper that calls the orchestrator."""
         # Create composite output handler for both CLI and database
         click_handler = ClickOutputHandler()
@@ -221,7 +250,7 @@ def update_custom_data(
             --max-workers 5
     """
 
-    def update_data(request: TownRequest, app: PasApp) -> None:
+    def update_data(request: PasRequest, app: PasApp) -> None:
         # Create composite output handler for both CLI and database
         click_handler = ClickOutputHandler()
         db_handler = DatabaseOutputHandler()

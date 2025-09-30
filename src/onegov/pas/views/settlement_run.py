@@ -832,7 +832,7 @@ def _get_data_export_all(
         str(1 + (rate_set.cost_of_living_adjustment / 100))
     )
 
-    settlement_data: list[SettlementDataRow] = []  # Add type hint here
+    settlement_data: list[SettlementDataRow] = []
 
     # Group by parliamentarian for summary
     parliamentarian_totals: dict[str, Decimal] = {}
@@ -1241,6 +1241,29 @@ def edit_settlement_run(
 
 @PasApp.view(
     model=SettlementRun,
+    name='toggle-close',
+    request_method='POST',
+    permission=Private
+)
+def toggle_close_settlement_run(
+    self: SettlementRun,
+    request: TownRequest
+) -> Response:
+
+    request.assert_valid_csrf_token()
+
+    self.closed = not self.closed
+    action = _('closed') if self.closed else _('reopened')
+    request.success(
+        _('Settlement run ${name} has been ${action}',
+          mapping={'name': self.name, 'action': action})
+    )
+
+    return request.redirect(request.link(self))
+
+
+@PasApp.view(
+    model=SettlementRun,
     request_method='DELETE',
     permission=Private
 )
@@ -1250,6 +1273,13 @@ def delete_settlement_run(
 ) -> None:
 
     request.assert_valid_csrf_token()
+
+    if self.closed:
+        request.alert(
+            _('Cannot delete closed settlement run. '
+              'Please reopen it first.')
+        )
+        return
 
     collection = SettlementRunCollection(request.session)
     collection.delete(self)
