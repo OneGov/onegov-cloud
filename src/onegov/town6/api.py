@@ -1,4 +1,5 @@
 from __future__ import annotations
+from functools import cached_property
 
 from onegov.api.models import ApiEndpoint, ApiEndpointItem
 from onegov.event.collections import OccurrenceCollection
@@ -188,8 +189,11 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
     ):
         super().__init__(request, extra_parameters, page)
         self.endpoint = name
-        self.directory = request.session.query(ExtendedDirectory).filter_by(
-            name=name
+
+    @cached_property
+    def directory(self) -> ExtendedDirectory:
+        return self.request.session.query(ExtendedDirectory).filter_by(
+            name=self.endpoint
         ).one()
 
     @property
@@ -225,13 +229,14 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
         """ Return the item with the given ID from the collection. """
 
         try:
-            return self.__class__(self.request, self.endpoint
-                                  ).collection.by_id(id)
+            return self.collection.by_id(id)
         except SQLAlchemyError:
             return None
 
     def item_data(self, item: ExtendedDirectoryEntry) -> dict[str, Any]:
         data: dict[str, Any] = {}
+        data['title'] = item.title
+        data['lead'] = item.lead
 
         if item.access == 'public':
             if item.content_fields:
@@ -247,9 +252,7 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
                         data[field.id] = data[field.id].isoformat()
 
             data['coordinates'] = get_geo_location(item)
-        elif item.access == 'mtan':
-            data['title'] = item.title
-            data['lead'] = item.lead
+            data['contact'] = item.contact
 
         return data
 
@@ -259,9 +262,15 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
             content_field_names = []
             if item.content_fields:
                 content_field_names = [i.name for i in item.content_fields]
-            data = {(f.note or 'file'): f for f in item.files
-            if f.note and f.note.split(':')[0] in content_field_names}
-
+            data = {
+                (file.note or 'file'): file
+                for file in item.files
+                if file.note
+                if file.note.split(':', 1)[0] in content_field_names
+            }
+            for field in item.content_fields or []:
+                if field.type == 'URLField':
+                    data[field.name] = field.data
         data['html'] = item  # type: ignore
 
         return data
