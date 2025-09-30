@@ -15,6 +15,7 @@ from onegov.search.utils import language_from_locale
 from sedate import utcnow
 from sqlalchemy import func, inspect
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy_utils import escape_like
 from unidecode import unidecode
 
 
@@ -471,21 +472,39 @@ class SearchPostgres(Pagination[_M]):
 
         if self.query.startswith('#'):  # hashtag search
             q = self.query.lstrip('#').lower()
-            query = self.all_hashtags_query()
+            query = self.filter_user_level(
+                self.request.session.query(
+                    func.skeys(SearchIndex._tags).distinct().label('tag')
+                ).order_by(func.skeys(SearchIndex._tags).asc())
+            )
             if len(q) >= 0:
                 subquery = query.subquery()
-                query = (
-                    self.request.session.query(subquery.c.tag)
-                    .filter(subquery.c.tag.ilike(f'%{q}%'))
+                query = self.request.session.query(subquery.c.tag).filter(
+                    subquery.c.tag.ilike(f'{escape_like(q)}%', '*')
                 )
             return tuple(
                 f'#{tag}'
                 for tag, in query.limit(number_of_suggestions)
             )
         else:
-            # FIXME: We probably want to perform a similarity search on
-            #        the suggestions so we return the most similar
-            #        suggestion per result, rather than the first one
-            return tuple(self.generic_search().with_entities(
-                func.unnest(SearchIndex.suggestion[0:1])
-            ).limit(number_of_suggestions))
+            subquery = self.filter_user_level(
+                self.request.session.query(
+                    func.unnest(
+                        SearchIndex.suggestion
+                    ).distinct().label('suggestion')
+                )
+            ).subquery()
+            # FIXME: This could be a lot faster if suggestions were
+            #        their own table, we also don't handle normalization
+            #        of accents/umlauts yet for auto-complete
+            return tuple(
+                suggestion
+                for suggestion, in self.request.session
+                .query(subquery.c.suggestion)
+                .filter(subquery.c.suggestion.ilike(
+                    f'{escape_like(self.query)}%',
+                    '*'
+                ))
+                .order_by(subquery.c.suggestion.asc())
+                .limit(number_of_suggestions)
+            )
