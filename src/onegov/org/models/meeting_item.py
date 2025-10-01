@@ -68,7 +68,6 @@ class MeetingItem(Base, ORMSearchable):
     political_business: relationship[PoliticalBusiness | None] = relationship(
         'PoliticalBusiness',
         foreign_keys=[political_business_id],
-        lazy='joined'
     )
 
     #: link ID only used for mapping after import
