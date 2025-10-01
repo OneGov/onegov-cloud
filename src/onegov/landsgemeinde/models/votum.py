@@ -49,13 +49,13 @@ class Votum(
 
     es_public = True
     es_properties = {
-        'text': {'type': 'localized_html'},
-        'motion': {'type': 'localized_html'},
-        'statement_of_reasons': {'type': 'localized_html'},
-        'person_name': {'type': 'text'},
-        'person_function': {'type': 'text'},
-        'person_place': {'type': 'text'},
-        'person_political_affiliation': {'type': 'text'},
+        'text': {'type': 'localized_html', 'weight': 'A'},
+        'motion': {'type': 'localized_html', 'weight': 'A'},
+        'statement_of_reasons': {'type': 'localized_html', 'weight': 'C'},
+        'person_name': {'type': 'text', 'weight': 'A'},
+        'person_function': {'type': 'text', 'weight': 'B'},
+        'person_place': {'type': 'text', 'weight': 'D'},
+        'person_political_affiliation': {'type': 'text', 'weight': 'C'},
     }
 
     @property

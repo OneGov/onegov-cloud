@@ -809,14 +809,13 @@ def test_basic_search(client_with_es: Client[AgencyApp]) -> None:
     assert 'Hospital Springfield' in anom.get('/search-postgres?q=Hospital')
     assert 'Nick' in anom.get('/search-postgres?q=Anesthetist')
 
-    # Test suggestions (no autocomplete)
-    expected = ['Nick', 'Rivera', '(Doctor)']  # word order in json is changing
-    assert all(v in anom.get('/search-postgres/suggest?q=Nick').json[0]
-               for v in expected)
-    assert all(v in anom.get('/search-postgres/suggest?q=Rivera').json[0]
-               for v in expected)
-    assert all(v in anom.get('/search-postgres/suggest?q=7890').json[0]
-               for v in expected)
+    # Test suggestions (no partial matches yet)
+    assert 'Nick Rivera (Doctor)' in anom.get(
+        '/search-postgres/suggest?q=Nic').json
+    assert 'Rivera Nick (Doctor)' in anom.get(
+        '/search-postgres/suggest?q=Riv').json
+    assert '7899 Rivera Nick (Doctor)' in anom.get(
+        '/search-postgres/suggest?q=78').json
 
 
 @mark.flaky(reruns=3, only_rerun=None)

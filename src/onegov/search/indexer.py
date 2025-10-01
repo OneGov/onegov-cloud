@@ -6,7 +6,7 @@ import re
 from copy import deepcopy
 from elasticsearch.exceptions import NotFoundError
 from elasticsearch.helpers import streaming_bulk
-from itertools import groupby, chain, repeat
+from itertools import groupby
 from queue import Queue, Empty, Full
 from onegov.core.utils import hash_dictionary, is_non_string_iterable
 from onegov.search import index_log, log, Searchable, utils
@@ -375,10 +375,12 @@ class PostgresIndexer(IndexerBase):
 
     def __init__(
         self,
+        mappings: TypeMappingRegistry,
         queue: Queue[Task],
         engine: Engine,
         languages: set[str] | None = None
     ) -> None:
+        self.mappings = mappings
         self.queue = queue
         self.engine = engine
         self.languages = languages or {'simple'}
@@ -435,7 +437,9 @@ class PostgresIndexer(IndexerBase):
                 else:
                     tablename = task['tablename']
 
+                _mapping = self.mappings[task['type_name']]
                 _owner_id = task['id']
+                _owner_type = task['owner_type']  # class name
                 _owner_id_column: PKColumn
                 if isinstance(_owner_id, UUID):
                     _owner_id_column = SearchIndex.owner_id_uuid
@@ -453,11 +457,6 @@ class PostgresIndexer(IndexerBase):
                 else:
                     owner_id_column = _owner_id_column
 
-                # FIXME: We may want to create a TSVECTOR for more than one
-                #        language rather than rely on language detection
-                #        most of our sites are single language anyways, so
-                #        even if there is some foreign language content, you
-                #        would still want to be able to find it.
                 detected_language = language_from_locale(task['language'])
                 if detected_language not in self.languages:
                     if len(self.languages) == 1:
@@ -472,9 +471,11 @@ class PostgresIndexer(IndexerBase):
                 else:
                     language = detected_language
                 data = {
-                    k: unidecode(str(v)) if v else ''
+                    k: unidecode(
+                        ' '.join(v) if isinstance(v, list) else str(v)
+                    ) if v else ''
                     for k, v in task['raw_properties'].items()
-                    if not k.startswith('es_')
+                    if k == 'es_tags' or not k.startswith('es_')
                 }
                 _tags_list = task['raw_properties'].get('es_tags')
                 _tags = dict.fromkeys(_tags_list, '') if _tags_list else None
@@ -482,10 +483,9 @@ class PostgresIndexer(IndexerBase):
                 # NOTE: We use a dictionary to avoid duplicate updates for
                 #       the same model, only the latest update will count
                 params_dict[_owner_id] = {
-                    '_language': language,
                     '_data': data,
                     '_owner_id': _owner_id,
-                    '_owner_type': task['owner_type'],  # class name
+                    '_owner_type': _owner_type,
                     '_owner_tablename': tablename,
                     '_public': task['raw_properties']['es_public'],
                     '_access': task.get('access', 'public'),
@@ -496,24 +496,48 @@ class PostgresIndexer(IndexerBase):
                         task.get('publication_start', None),
                     '_publication_end':
                         task.get('publication_end', None),
-                    **{f'_{k}': v for k, v in data.items()}
+                    **{
+                        f'_lang__{lang}': lang
+                        for lang in self.languages
+                    },
+                    **{
+                        f'_{k}': v
+                        for k, v in data.items()
+                    }
                 }
+                for field in data.keys():
+                    _config = _mapping.raw_mapping.get(field, {})
+                    _weight = _config.get('weight')
+                    if _weight not in ('A', 'B', 'C', 'D'):
+                        index_log.warn(
+                            f'Invalid weight for property "{field}" on type '
+                            f'"{_owner_type}", falling back to weight "C".'
+                        )
+                        _weight = 'C'
+                    for lang in self.languages:
+                        params_dict[_owner_id][
+                            f'_weight__{field}__{lang}'
+                        ] = chr(ord(_weight) + 1) if (
+                            'localized' in _config.get('type', '')
+                            and lang != language
+                            # TODO: Do we want to emit a warning if we can't
+                            #       deprioritize non-matching languages?
+                            and _weight != 'D'
+                        ) else _weight
 
             assert schema is not None
             assert owner_id_column is not None
             weighted_vector = [
                 func.setweight(
                     func.to_tsvector(
-                        bindparam('_language', type_=String),
+                        bindparam(f'_lang__{language}', type_=String),
                         bindparam(f'_{field}', type_=String)
                     ),
-                    weight
+                    bindparam(f'_weight__{field}__{language}')
                 )
-                for field, weight in zip(
-                    tasks[0]['raw_properties'].keys(),
-                    chain('A', repeat('D'))
-                )
-                if not field.startswith('es_')  # TODO: rename to fts_
+                for field in tasks[0]['raw_properties'].keys()
+                if field == 'es_tags' or not field.startswith('es_')
+                for language in self.languages
             ]
 
             combined_vector = weighted_vector[0]
@@ -722,7 +746,7 @@ class PostgresIndexer(IndexerBase):
 
 
 class TypeMapping:
-    __slots__ = ('name', 'mapping', 'version', 'model')
+    __slots__ = ('name', 'mapping', 'raw_mapping', 'version', 'model')
 
     def __init__(
         self,
@@ -732,10 +756,23 @@ class TypeMapping:
     ) -> None:
         self.name = name
         self.mapping = self.add_defaults(mapping)
+        self.raw_mapping = mapping
+        self.raw_mapping['es_tags'] = {'type': 'text', 'weight': 'A'}
         self.version = hash_dictionary(mapping)
         self.model = model
 
     def add_defaults(self, mapping: dict[str, Any]) -> dict[str, Any]:
+        # HACK: remove the weight key for ElasticSearch, eventually
+        #       we can refactor all of this when ElasticSearch goes
+        #       away.
+        mapping = {
+            key: {
+                config_key: value
+                for config_key, value in config.items()
+                if config_key != 'weight'
+            }
+            for key, config in mapping.items()
+        }
         mapping['es_public'] = {
             'type': 'boolean'
         }

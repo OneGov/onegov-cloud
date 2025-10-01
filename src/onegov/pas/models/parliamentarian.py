@@ -25,8 +25,9 @@ class PASParliamentarian(Parliamentarian, ORMSearchable):
     es_type_name = 'pas_parliamentarian'
     es_public = False
     es_properties = {
-        'first_name': {'type': 'text'},
-        'last_name': {'type': 'text'},
+        # FIXME: A fullname property may yield better results
+        'first_name': {'type': 'text', 'weight': 'A'},
+        'last_name': {'type': 'text', 'weight': 'A'},
     }
 
     @property

@@ -48,7 +48,7 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     es_public = True
     es_properties = {
-        'title': {'type': 'text'},
+        'title': {'type': 'localized', 'weight': 'A'},
     }
 
     #: the unique id, part of the url
