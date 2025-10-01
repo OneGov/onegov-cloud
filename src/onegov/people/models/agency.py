@@ -75,6 +75,12 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
         'portrait': {'type': 'localized_html'},
     }
 
+    # NOTE: When an agency was last changed should not influence how
+    #       relevant it is in the search results
+    @property
+    def es_last_change(self) -> None:
+        return None
+
     #: a short description of the agency
     description: Column[str | None] = Column(Text, nullable=True)
 

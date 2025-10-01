@@ -50,7 +50,7 @@ class SearchIndex(Base, UTCPublicationMixin):
     access = Column(String, nullable=False, default='public', index=True)
 
     #: Timestamp of the last change to the entry (Searchable::es_last_change)
-    last_change = Column(UTCDateTime, nullable=False, index=True)
+    last_change = Column(UTCDateTime, nullable=True, index=True)
 
     #: Tags associated with the entry (Searchable::es_tags)
     _tags: Column[dict[str, str] | None] = Column(  # type:ignore

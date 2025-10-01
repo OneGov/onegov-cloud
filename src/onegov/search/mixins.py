@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from datetime import timedelta
 from onegov.search.utils import classproperty
 from onegov.search.utils import extract_hashtags
-from sedate import utcnow
 
 
 from typing import Any, ClassVar, TYPE_CHECKING
@@ -110,7 +108,7 @@ class Searchable:
         texts are not detected easily.
 
         When 'auto' is used, expect some content to be misclassified. You
-        should then search over all languages, not just the epxected one.
+        should then search over all languages, not just the expected one.
 
         This property can be used to manually set the language.
 
@@ -149,14 +147,9 @@ class Searchable:
         return self.title  # type:ignore[attr-defined]
 
     @property
-    def es_last_change(self) -> datetime:
+    def es_last_change(self) -> datetime | None:
         """ Returns the date the document was created/last modified. """
-        # FIXME: We made this a required property, for now we will
-        #        pretend entries without an explicit date have been
-        #        changed 30 days ago, so they're not completely
-        #        de-prioritized, but also not over-prioritized over
-        #        actually new content.
-        return utcnow() - timedelta(days=30)
+        return None
 
     @property
     def es_tags(self) -> list[str] | None:
@@ -187,9 +180,8 @@ class ORMSearchable(Searchable):
         return cls.__tablename__
 
     @property
-    def es_last_change(self) -> datetime:
-        # FIXME: We made this a required field
-        return getattr(self, 'last_change', None) or super().es_last_change
+    def es_last_change(self) -> datetime | None:
+        return getattr(self, 'last_change', None)
 
 
 class SearchableContent(ORMSearchable):
@@ -199,9 +191,9 @@ class SearchableContent(ORMSearchable):
     """
 
     es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
-        'text': {'type': 'localized_html'}
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'},
+        'text': {'type': 'localized_html', 'weight': 'C'}
     }
 
     @property

@@ -52,9 +52,9 @@ class User(Base, TimestampMixin, ORMSearchable):
     }
 
     es_properties = {
-        'username': {'type': 'text'},
-        'realname': {'type': 'text'},
-        'userprofile': {'type': 'text'}
+        'username': {'type': 'text', 'weight': 'A'},
+        'realname': {'type': 'text', 'weight': 'A'},
+        'userprofile': {'type': 'text', 'weight': 'B'}
     }
     es_public = False
 

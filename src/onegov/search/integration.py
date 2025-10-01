@@ -234,6 +234,7 @@ class SearchApp(morepath.App):
                 self.es_client
             )
             self.psql_indexer = PostgresIndexer(
+                self.es_mappings,
                 self.fts_orm_events.psql_queue,
                 self.session_manager.engine,
                 self.fts_languages

@@ -108,8 +108,8 @@ class Directory(Base, ContentMixin, TimestampMixin,
     __tablename__ = 'directories'
 
     es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'}
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'}
     }
 
     @property

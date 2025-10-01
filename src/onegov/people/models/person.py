@@ -51,15 +51,21 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     es_public = True
     es_properties = {
-        'title': {'type': 'text'},
-        'function': {'type': 'localized'},
-        'email': {'type': 'text'},
-        'phone_fts': {'type': 'text'},
+        'title': {'type': 'text', 'weight': 'A'},
+        'function': {'type': 'localized', 'weight': 'B'},
+        'email': {'type': 'text', 'weight': 'A'},
+        'phone_fts': {'type': 'text', 'weight': 'A'},
     }
 
     @property
     def es_suggestion(self) -> tuple[str, ...]:
         return (self.title, f'{self.first_name} {self.last_name}')
+
+    # NOTE: When a person was last changed should not influence how
+    #       relevant they are in the search results
+    @property
+    def es_last_change(self) -> None:
+        return None
 
     @property
     def phone_fts(self) -> list[str]:

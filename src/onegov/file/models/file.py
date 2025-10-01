@@ -101,9 +101,9 @@ class SearchableFile(ORMSearchable):
     """
 
     es_properties = {
-        'name': {'type': 'text'},
-        'note': {'type': 'localized'},
-        'extract': {'type': 'localized'}
+        'name': {'type': 'text', 'weight': 'A'},
+        'note': {'type': 'localized', 'weight': 'B'},
+        'extract': {'type': 'localized', 'weight': 'C'}
     }
 
     if TYPE_CHECKING:

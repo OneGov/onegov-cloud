@@ -52,9 +52,9 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
 
     es_id = 'name'
     es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
-        'html': {'type': 'localized_html'}
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'},
+        'html': {'type': 'localized_html', 'weight': 'C'}
     }
 
     @property
