@@ -32,7 +32,7 @@ class RISCommission(Commission, ORMSearchable):
 
     es_type_name = 'ris_commission'
     es_public = True
-    es_properties = {'name': {'type': 'text'}}
+    es_properties = {'name': {'type': 'text', 'weight': 'A'}}
 
     @property
     def es_suggestion(self) -> str:
@@ -103,8 +103,9 @@ class RISParliamentarian(Parliamentarian, ORMSearchable):
     es_type_name = 'ris_parliamentarian'
     es_public = False
     es_properties = {
-        'first_name': {'type': 'text'},
-        'last_name': {'type': 'text'},
+        # FIXME: A single fullname property may yield better results
+        'first_name': {'type': 'text', 'weight': 'A'},
+        'last_name': {'type': 'text', 'weight': 'A'},
     }
 
     @property
@@ -200,7 +201,7 @@ class RISParliamentaryGroup(ParliamentaryGroup, ORMSearchable):
 
     es_type_name = 'ris_parliamentary_group'
     es_public = True
-    es_properties = {'name': {'type': 'text'}}
+    es_properties = {'name': {'type': 'text', 'weight': 'A'}}
 
     political_businesses: relationship[list[PoliticalBusiness]]
     political_businesses = relationship(

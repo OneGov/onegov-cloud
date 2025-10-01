@@ -586,7 +586,7 @@ def test_indexer_process(es_client, session_manager, session):
     es_index = f"foo-{session_manager.current_schema}-en-page"
     es_indexer = Indexer(
         mappings, Queue(), hostname='foo', es_client=es_client)
-    psql_indexer = PostgresIndexer(Queue(), engine)
+    psql_indexer = PostgresIndexer(mappings, Queue(), engine)
 
     task = {
         'action': 'index',
@@ -657,8 +657,12 @@ def test_indexer_process(es_client, session_manager, session):
 
 
 def test_indexer_bulk_process_mid_transaction(session_manager, session):
+    mappings = TypeMappingRegistry()
+    mappings.register_type('person', {
+        'title': {'type': 'text'},
+    })
     engine = session_manager.engine
-    psql_indexer = PostgresIndexer(Queue(), engine)
+    psql_indexer = PostgresIndexer(mappings, Queue(), engine)
 
     people = PersonCollection(session)
     person1 = people.add(first_name='John', last_name='Doe')
@@ -786,7 +790,7 @@ def test_tags(es_client, session_manager, session):
     es_index = f"foo-{session_manager.current_schema}-en-page"
     schema = session_manager.current_schema
     es_indexer = Indexer(mappings, Queue(), es_client, hostname='foo')
-    psql_indexer = PostgresIndexer(Queue(), session_manager.engine)
+    psql_indexer = PostgresIndexer(mappings, Queue(), session_manager.engine)
 
     task = {
         'action': 'index',

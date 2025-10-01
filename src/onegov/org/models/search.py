@@ -13,7 +13,7 @@ from onegov.event.models import Event
 from onegov.search.search_index import SearchIndex
 from onegov.search.utils import language_from_locale
 from sedate import utcnow
-from sqlalchemy import func, inspect
+from sqlalchemy import case, func, inspect
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy_utils import escape_like
 from unidecode import unidecode
@@ -321,7 +321,7 @@ class SearchPostgres(Pagination[_M]):
             SearchIndex.fts_idx.op('@@')(ts_query)
         ).order_by(
             (
-                func.ts_rank_cd(SearchIndex.fts_idx, ts_query, 0)
+                func.ts_rank_cd(SearchIndex.fts_idx, ts_query, 2 | 4 | 16)
                 # FIXME: Whether or not we apply a time decay should depend
                 #        on the type of content, there's content that remains
                 #        relevant no matter how old it is, e.g. people, but
@@ -336,13 +336,31 @@ class SearchPostgres(Pagination[_M]):
                             func.abs(
                                 func.extract(
                                     'epoch',
-                                    SearchIndex.last_change - utcnow()
+                                    utcnow() - func.coalesce(
+                                        SearchIndex.last_change,
+                                        utcnow()
+                                    )
                                 )
                             ) - offset,
                             0
                         ).op('^')(2) / two_times_variance_squared
                     ),
                     1e-6
+                )
+                # HACK: We may want to add some fts_rank_modifier property
+                #       to searchable models instead and add a column to
+                #       the index for that, that would allow us to weigh
+                #       results per type more effectively. Currently files
+                #       are he most egregious offender though, so we just
+                #       hardcode this into the query.
+                * case(
+                    [
+                        (SearchIndex.owner_tablename == 'files', 0.1),
+                        # NOTE: Tickets may be excluded entirely in the
+                        #       future but for now we'll de-prioritize them
+                        (SearchIndex.owner_tablename == 'tickets', 0.2),
+                    ],
+                    else_=1.0
                 )
             ).desc().label('rank')
         )

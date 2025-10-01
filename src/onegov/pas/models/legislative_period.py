@@ -22,7 +22,7 @@ class LegislativePeriod(Base, TimestampMixin, ORMSearchable):
 
     es_type_name = 'pas_legislative_period'
     es_public = False
-    es_properties = {'name': {'type': 'text'}}
+    es_properties = {'name': {'type': 'text', 'weight': 'A'}}
 
     #: The polymorphic type of legislative period
     type: Column[str] = Column(
