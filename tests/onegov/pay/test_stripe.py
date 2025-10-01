@@ -23,12 +23,12 @@ if TYPE_CHECKING:
 def test_oauth_url() -> None:
     provider = StripeConnect(client_id='foo', client_secret='bar')  # type: ignore[misc]
 
-    url = provider.oauth_url('https://handle-incoming-request')
+    url = provider.oauth_url('https://handle-incoming-request', '', {})
     assert 'response_type=code' in url
     assert 'handle-incoming-request' in url
     assert 'scope=read_write' in url
     assert 'client_id=foo' in url
-    assert 'client_secret=bar' in url
+    assert 'client_secret=bar' not in url
 
     url = provider.oauth_url('https://foo', 'bar', {'email': 'foo@bar.org'})
     assert 'state=bar' in url
