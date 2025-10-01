@@ -329,6 +329,12 @@ def render_time_range(start: datetime | time, end: datetime | time) -> str:
     return f'{start:%H:%M} - {end_str}'
 
 
+def complete_url(url: str | None) -> str | None:
+    if url is None or url.startswith(('http://', 'https://', '/')):
+        return url
+    return f'https://{url}'
+
+
 class ReservationInfo:
 
     __slots__ = ('resource', 'reservation', 'request', 'translate')
