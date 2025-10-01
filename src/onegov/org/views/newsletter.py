@@ -692,6 +692,7 @@ def handle_preview_newsletter(
         'publications': publications_by_newsletter(self, request),
         'name_without_extension': name_without_extension,
         'closing_remark': self.closing_remark,
+        'daily': False
     }
 
 
