@@ -123,7 +123,6 @@ class RISParliamentarian(Parliamentarian, ORMSearchable):
     political_businesses = relationship(
         'PoliticalBusinessParticipation',
         back_populates='parliamentarian',
-        lazy='joined'
     )
 
     @hybrid_property

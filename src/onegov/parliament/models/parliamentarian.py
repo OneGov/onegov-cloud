@@ -321,7 +321,6 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
         'ParliamentarianRole',
         cascade='all, delete-orphan',
         back_populates='parliamentarian',
-        lazy='joined',
         order_by='desc(ParliamentarianRole.start)',
     )
 
@@ -403,7 +402,6 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
         'CommissionMembership',
         cascade='all, delete-orphan',
         back_populates='parliamentarian',
-        lazy='joined',
     )
 
     def __repr__(self) -> str:
