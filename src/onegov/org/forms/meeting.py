@@ -14,6 +14,8 @@ from onegov.org import _
 
 from typing import TYPE_CHECKING, Any
 
+from onegov.org.utils import complete_url
+
 if TYPE_CHECKING:
     from collections.abc import Collection
     from collections.abc import Sequence
@@ -162,6 +164,9 @@ class MeetingForm(Form):
         for item in meeting.meeting_items:
             if item.political_business:
                 item.political_business.meeting_items.append(item)
+
+        obj.audio_link = complete_url(self.audio_link.data) or ''
+        obj.video_link = complete_url(self.video_link.data) or ''
 
     def process_obj(self, obj: Meeting) -> None:  # type:ignore[override]
         from onegov.org.models import PoliticalBusiness
