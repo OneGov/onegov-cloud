@@ -28,10 +28,13 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
     es_type_name = 'vacation'
 
     es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
-        'text': {'type': 'localized_html'},
-        'organiser': {'type': 'text'}
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'},
+        'text': {'type': 'localized_html', 'weight': 'C'},
+        # FIXME: We may want to split this into more properties
+        #        the organiser's name definitely seems more important
+        #        than their bank account or emergency contact for searching
+        'organiser_text': {'type': 'text', 'weight': 'B'}
     }
 
     @property
@@ -72,6 +75,10 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
                 organiser.append(value)
 
         return organiser
+
+    @property
+    def organiser_text(self) -> str:
+        return ' '.join(self.organiser)
 
     def ordered_tags(
         self,

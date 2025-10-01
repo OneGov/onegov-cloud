@@ -32,15 +32,16 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     __tablename__ = 'directory_entries'
 
     es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
-        'keywords': {'type': 'keyword'},
-        'directory_id': {'type': 'keyword'},
+        # FIXME: We may want to include the directory title, so you can
+        #        find entries by the kind of directory they are in
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'},
+        'keywords': {'type': 'keyword', 'weight': 'A'},
 
         # since the searchable text might include html, we remove it
         # even if there's no html -> possibly decreasing the search
         # quality a bit
-        'text': {'type': 'localized_html'}
+        'text': {'type': 'localized_html', 'weight': 'C'}
     }
 
     @property

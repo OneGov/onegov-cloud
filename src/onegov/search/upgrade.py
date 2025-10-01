@@ -18,3 +18,13 @@ def remove_fts_index_columns(context: UpgradeContext) -> None:
     for table in tables:
         if context.has_column(table, 'fts_idx'):
             context.operations.drop_column(table, 'fts_idx')
+
+
+@upgrade_task('Make last_change nullable')
+def make_last_change_nullable(context: UpgradeContext) -> None:
+    if context.has_table('search_index'):
+        context.operations.alter_column(
+            'search_index',
+            'last_change',
+            nullable=True
+        )

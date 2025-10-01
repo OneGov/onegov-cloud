@@ -124,8 +124,8 @@ class PoliticalBusiness(
     es_type_name = 'ris_political_business'
     es_public = True
     es_properties = {
-        'title': {'type': 'text'},
-        'number': {'type': 'text'}
+        'title': {'type': 'text', 'weight': 'A'},
+        'number': {'type': 'text', 'weight': 'A'}
     }
 
     @property

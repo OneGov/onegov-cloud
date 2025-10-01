@@ -68,8 +68,7 @@ def test_basic_search(client_with_es):
     assert "Now supporting" not in anom.get('/search-postgres?q=fulltext')
     assert anom.get('/search-postgres/suggest?q=fulltext').json == []
     assert "Now supporting" in client.get('/search-postgres?q=fulltext')
-    assert (client.get('/search-postgres/suggest?q=fulltext').json == [
-        'Now supporting fulltext search'])
+    assert client.get('/search-postgres/suggest?q=fulltext').json == []
 
 
 @pytest.mark.flaky(reruns=3, only_rerun=None)
@@ -256,11 +255,9 @@ def test_basic_autocomplete(client_with_es):
     assert client.get('/search/suggest?q=Go').json == ["Gordon Flash"]
     assert client.get('/search/suggest?q=Fl').json == ["Flash Gordon"]
 
-    # postgres has no auto-complete
-    assert (client.get('/search-postgres/suggest?q=Gordon').
-            json == ["Gordon Flash"])
-    assert (client.get('/search-postgres/suggest?q=Flash').
-            json == ["Gordon Flash"])
+    # postgres
+    assert client.get('/search-postgres/suggest?q=Go').json == ["Gordon Flash"]
+    assert client.get('/search-postgres/suggest?q=Fl').json == ["Flash Gordon"]
 
 
 def test_search_publication_files(client_with_es):

@@ -33,8 +33,8 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
     __tablename__ = 'external_links'
 
     es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'},
     }
 
     id: Column[uuid.UUID] = Column(

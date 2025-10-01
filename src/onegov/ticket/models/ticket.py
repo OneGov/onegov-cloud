@@ -205,13 +205,13 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     # limit the search to the ticket number -> the rest can be found
     es_public = False
     es_properties = {
-        'number': {'type': 'text'},
-        'title': {'type': 'text'},
-        'subtitle': {'type': 'text'},
-        'group': {'type': 'text'},
-        'ticket_email': {'type': 'keyword'},
-        'ticket_data': {'type': 'localized_html'},
-        'extra_localized_text': {'type': 'localized'}
+        'number': {'type': 'text', 'weight': 'A'},
+        'title': {'type': 'text', 'weight': 'B'},
+        'subtitle': {'type': 'text', 'weight': 'C'},
+        'group': {'type': 'text', 'weight': 'B'},
+        'ticket_email': {'type': 'keyword', 'weight': 'A'},
+        'ticket_data': {'type': 'localized_html', 'weight': 'B'},
+        'extra_localized_text': {'type': 'localized', 'weight': 'B'}
     }
 
     # NOTE: For now we only allow setting a single tag, in order to
@@ -236,10 +236,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
     @property
     def es_suggestion(self) -> list[str]:
-        return [
-            self.number,
-            self.number.replace('-', '')
-        ]
+        return [self.number]
 
     @property
     def ticket_data(self) -> Sequence[str] | None:

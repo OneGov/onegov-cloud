@@ -18,7 +18,7 @@ class PASCommission(Commission, ORMSearchable):
 
     es_type_name = 'pas_commission'
     es_public = False
-    es_properties = {'name': {'type': 'text'}}
+    es_properties = {'name': {'type': 'text', 'weight': 'A'}}
 
     @property
     def es_suggestion(self) -> str:
