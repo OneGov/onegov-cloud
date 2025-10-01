@@ -41,6 +41,17 @@ def test_setup_stripe(client):
     assert provider.refresh_token == 'refresh_token'
     assert provider.access_token == 'access_token'
 
+    # test new format for business name
+    with requests_mock.Mocker() as m:
+        m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
+            'business_profile': {'name': 'Govikon City'},
+            'email': 'info@example.org'
+        })
+
+        page = client.get('/payment-provider')
+        assert 'Govikon City / info@example.org' in page
+
+    # test old format
     with requests_mock.Mocker() as m:
         m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
             'business_name': 'Govikon City',

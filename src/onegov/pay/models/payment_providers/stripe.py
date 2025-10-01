@@ -287,8 +287,9 @@ class StripeConnect(PaymentProvider[StripePayment]):
         #       but we'll keep it here just in case it does still
         #       work on some requests.
         business_name = getattr(account, 'business_name', None)
-        if business_name is None and account.business_profile is not None:
-            business_name = account.business_profile.name
+        business_profile = getattr(account, 'business_profile', None)
+        if business_name is None and business_profile is not None:
+            business_name = business_profile.name
         if business_name:
             return f'{business_name} / {account.email}'
         return account.email or ''
