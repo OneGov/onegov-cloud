@@ -139,8 +139,11 @@ def view_occurrences(
 
     layout = layout or OccurrencesLayout(self, request)
 
-    translated_tags = sorted((
-        (tag, request.translate(_(tag))) for tag in self.used_tags
+    custom_tags = bool(request.app.custom_event_tags)
+
+    used_tags = sorted((
+        (tag, (tag if custom_tags else request.translate(_(tag))))
+        for tag in self.used_tags
     ), key=itemgetter(1))
 
     if (
@@ -159,7 +162,7 @@ def view_occurrences(
                 text=translation + f' ({self.tag_counts[tag]})',
                 url=request.link(self.for_filter(tag=tag)),
                 active=tag in self.tags
-            ) for tag, translation in translated_tags if self.tag_counts[tag]
+            ) for tag, translation in used_tags if self.tag_counts[tag]
         ]
 
     locations = [

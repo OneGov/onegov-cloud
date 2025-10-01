@@ -43,9 +43,9 @@ class FormDocument(Base, ContentMixin, TimestampMixin, AccessExtension,
     __tablename__ = 'form_documents'
 
     es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
-        'pdf_extract': {'type': 'localized'},
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'},
+        'pdf_extract': {'type': 'localized', 'weight': 'C'},
     }
 
     #: An internal id for references (not public)

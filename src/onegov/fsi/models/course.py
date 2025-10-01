@@ -24,8 +24,8 @@ class Course(Base, ORMSearchable):
     __tablename__ = 'fsi_courses'
 
     es_properties = {
-        'name': {'type': 'localized'},
-        'description': {'type': 'localized'},
+        'name': {'type': 'localized', 'weight': 'A'},
+        'description': {'type': 'localized', 'weight': 'B'},
     }
     es_public = True
 

@@ -33,11 +33,11 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
         return self.access == 'public' and self.published
 
     es_properties = {
-        'title': {'type': 'text'},
-        'function': {'type': 'localized'},
-        'email': {'type': 'text'},
-        'phone_internal': {'type': 'text'},
-        'phone_fts': {'type': 'text'}
+        'title': {'type': 'text', 'weight': 'A'},
+        'function': {'type': 'localized', 'weight': 'B'},
+        'email': {'type': 'text', 'weight': 'A'},
+        'phone_internal': {'type': 'text', 'weight': 'A'},
+        'phone_fts': {'type': 'text', 'weight': 'A'}
     }
 
     external_user_id: dict_property[str | None] = meta_property()

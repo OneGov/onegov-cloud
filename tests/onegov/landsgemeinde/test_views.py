@@ -11,7 +11,7 @@ def test_views(client_with_es):
     last_modified = []
 
     def assert_last_modified():
-        response = client_with_es.head('/landsgemeinde/2023-05-07/ticker')
+        response = client_with_es.head('/assembly/2023-05-07/ticker')
         last_modified.append(parser.parse(response.headers['Last-Modified']))
         assert sorted(last_modified) == last_modified
         assert len(set(last_modified)) == len(last_modified)
@@ -40,7 +40,7 @@ def test_views(client_with_es):
     assert 'Landsgemeinde vom 07. Mai 2023' in page
     assert 'Zum Liveticker' not in page
 
-    page = client_with_es.get('/landsgemeinden')
+    page = client_with_es.get('/assemblies')
     assert 'Landsgemeinde vom 07. Mai 2023' in page
     page = page.click('Landsgemeinde vom 07. Mai 2023')
 
@@ -132,7 +132,7 @@ def test_views(client_with_es):
     assert_last_modified()
 
     # open data
-    assert client_with_es.get('/landsgemeinde/2023-05-07/json').json
+    assert client_with_es.get('/assembly/2023-05-07/json').json
     assert client_with_es.get('/catalog.rdf', status=501)
     setting = client_with_es.get('/open-data-settings')
     setting.form['ogd_publisher_mail'] = 'staatskanzlei@govikon.ch'
@@ -181,32 +181,32 @@ def test_views(client_with_es):
         '/search-postgres?q=consequat')
 
     # states view
-    page = client_with_es.get('/landsgemeinde/2023-05-07/states')
+    page = client_with_es.get('/assembly/2023-05-07/states')
     assert 'abgeschlossen' in page
     assert 'geplant' not in page
 
     state_url = page.pyquery('.votum a[ic-post-to]').attr['ic-post-to']
     client_with_es.post(state_url)
-    page = client_with_es.get('/landsgemeinde/2023-05-07/states')
+    page = client_with_es.get('/assembly/2023-05-07/states')
     assert 'Entwurf' in page
     assert 'laufend' not in page
     assert 'abgeschlossen' not in page
 
     ai_url = page.pyquery('.agenda-item a[ic-post-to]').attr['ic-post-to']
     client_with_es.post(ai_url)
-    page = client_with_es.get('/landsgemeinde/2023-05-07/states')
+    page = client_with_es.get('/assembly/2023-05-07/states')
     assert 'geplant' in page
     assert 'Entwurf' in page  # Votum state shouldn't change
 
     ai_url = page.pyquery('.agenda-item a[ic-post-to]').attr['ic-post-to']
     client_with_es.post(ai_url)
-    page = client_with_es.get('/landsgemeinde/2023-05-07/states')
+    page = client_with_es.get('/assembly/2023-05-07/states')
     assert 'laufend' in page
     assert 'Entwurf' in page  # Votum state still shouldn't change
 
     assembly_url = page.pyquery('.assembly a[ic-post-to]').attr['ic-post-to']
     client_with_es.post(assembly_url)
-    page = client_with_es.get('/landsgemeinde/2023-05-07/states')
+    page = client_with_es.get('/assembly/2023-05-07/states')
     assert 'abgeschlossen' in page
     assert 'geplant' not in page
     assert 'laufend' not in page
@@ -239,7 +239,7 @@ def test_view_pages_cache(landsgemeinde_app):
 
     # make sure codes != 200 are not cached
     anonymous = Client(landsgemeinde_app)
-    anonymous.get('/landsgemeinde/2023-05-07/ticker', status=404)
+    anonymous.get('/assembly/2023-05-07/ticker', status=404)
     assert len(landsgemeinde_app.pages_cache.keys()) == 0
 
     # add assembly
@@ -253,22 +253,22 @@ def test_view_pages_cache(landsgemeinde_app):
 
     # make sure set-cookies are not cached
     anonymous = Client(landsgemeinde_app)
-    response = anonymous.get('/landsgemeinde/2023-05-07/ticker')
+    response = anonymous.get('/assembly/2023-05-07/ticker')
     assert 'Set-Cookie' in response.headers  # session_id
     assert len(landsgemeinde_app.pages_cache.keys()) == 0
 
     # make sure HEAD request are cached without qs
-    anonymous.head('/landsgemeinde/2023-05-07/ticker')
+    anonymous.head('/assembly/2023-05-07/ticker')
     assert len(landsgemeinde_app.pages_cache.keys()) == 1
 
-    anonymous.head('/landsgemeinde/2023-05-07/ticker?now')
+    anonymous.head('/assembly/2023-05-07/ticker?now')
     assert len(landsgemeinde_app.pages_cache.keys()) == 1
 
     # Create cache entries
-    assert 'Lorem' in anonymous.get('/landsgemeinde/2023-05-07/ticker')
+    assert 'Lorem' in anonymous.get('/assembly/2023-05-07/ticker')
     assert len(landsgemeinde_app.pages_cache.keys()) == 2
 
-    anonymous.get('/landsgemeinde/2023-05-07/ticker?now')
+    anonymous.get('/assembly/2023-05-07/ticker?now')
     assert len(landsgemeinde_app.pages_cache.keys()) == 3
 
     # Modify without invalidating the cache
@@ -276,16 +276,16 @@ def test_view_pages_cache(landsgemeinde_app):
     landsgemeinde_app.session().query(Assembly).one().overview = 'Ipsum'
     commit()
 
-    assert 'Ipsum' not in anonymous.get('/landsgemeinde/2023-05-07/ticker')
-    assert 'Ipsum' in client.get('/landsgemeinde/2023-05-07/ticker')
+    assert 'Ipsum' not in anonymous.get('/assembly/2023-05-07/ticker')
+    assert 'Ipsum' in client.get('/assembly/2023-05-07/ticker')
 
     # Modify with invalidating the cache
-    edit = client.get('/landsgemeinde/2023-05-07/edit')
+    edit = client.get('/assembly/2023-05-07/edit')
     edit.form['overview'] = 'Adipiscing'
     edit.form.submit()
 
-    assert 'Adipiscing' in anonymous.get('/landsgemeinde/2023-05-07/ticker')
-    assert 'Adipiscing' in client.get('/landsgemeinde/2023-05-07/ticker')
+    assert 'Adipiscing' in anonymous.get('/assembly/2023-05-07/ticker')
+    assert 'Adipiscing' in client.get('/assembly/2023-05-07/ticker')
 
 
 def test_view_suggestions(landsgemeinde_app):

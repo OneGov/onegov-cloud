@@ -262,8 +262,8 @@ class ImageSet(FileSet, AccessExtension, ORMSearchable):
     __mapper_args__ = {'polymorphic_identity': 'image'}
 
     es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'}
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'}
     }
 
     @property

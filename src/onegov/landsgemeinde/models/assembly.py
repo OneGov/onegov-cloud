@@ -52,7 +52,7 @@ class Assembly(
 
     es_public = True
     es_properties = {
-        'overview': {'type': 'localized_html'},
+        'overview': {'type': 'localized_html', 'weight': 'A'},
     }
 
     @property

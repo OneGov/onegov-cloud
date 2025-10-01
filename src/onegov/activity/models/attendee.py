@@ -63,9 +63,9 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
     __tablename__ = 'attendees'
 
     es_properties = {
-        'username': {'type': 'text'},
-        'name': {'type': 'text'},
-        'notes': {'type': 'localized'}
+        'username': {'type': 'text', 'weight': 'A'},
+        'name': {'type': 'text', 'weight': 'A'},
+        'notes': {'type': 'localized', 'weight': 'C'}
     }
     es_public = False
 

@@ -14,7 +14,7 @@ from wtforms import StringField
 from wtforms.validators import InputRequired
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING, Callable
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
@@ -78,8 +78,21 @@ class Endpoint(ApiEndpoint[Bunch]):  # type: ignore[type-var]
 
 
 @App.setting(section='api', name='endpoints')
-def api_endpoints() -> list[type[ApiEndpoint[Any]]]:
-    return [Endpoint, PersonApiEndpoint]
+def get_api_endpoints_handler(
+) -> Callable[[pytest.FixtureRequest], Iterator[ApiEndpoint[Any]]]:
+
+    def get_api_endpoints(
+            request: pytest.FixtureRequest,
+            page: int = 0,
+            extra_parameters: dict[str, Any] | None = None
+    ) -> Iterator[ApiEndpoint[Any]]:
+        yield Endpoint(
+            request, extra_parameters, page)  # type: ignore[arg-type]
+        yield PersonApiEndpoint(
+            request, extra_parameters, page)  # type: ignore[arg-type]
+
+    return get_api_endpoints
+
 
 @App.permission_rule(model=Bunch, permission=object)
 @App.permission_rule(model=Bunch, permission=object, identity=None)

@@ -57,7 +57,7 @@ class DirectoryEntryCollection(
         type: Literal['*', 'generic'] = '*',
         keywords: Mapping[str, list[str]] | None = None,
         page: int = 0,
-        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None
+        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None,
     ) -> None: ...
 
     @overload
@@ -67,7 +67,7 @@ class DirectoryEntryCollection(
         type: str,
         keywords: Mapping[str, list[str]] | None = None,
         page: int = 0,
-        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None
+        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None,
     ) -> None: ...
 
     def __init__(
@@ -76,7 +76,7 @@ class DirectoryEntryCollection(
         type: str = '*',
         keywords: Mapping[str, list[str]] | None = None,
         page: int = 0,
-        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None
+        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None,
     ) -> None:
 
         super().__init__(object_session(directory))
@@ -119,7 +119,7 @@ class DirectoryEntryCollection(
             self.directory,
             self.type,
             self.keywords,
-            page=index
+            page=index,
         )
 
     def by_name(self, name: str) -> DirectoryEntryT | None:
@@ -231,7 +231,7 @@ class DirectoryEntryCollection(
             directory=self.directory,
             type=self.type,
             search_widget=self.search_widget,
-            keywords=keywords
+            keywords=keywords,
         )
 
     def for_toggled_keyword_value(
@@ -262,7 +262,7 @@ class DirectoryEntryCollection(
             directory=self.directory,
             type=self.type,
             search_widget=self.search_widget,
-            keywords=parameters
+            keywords=parameters,
         )
 
     def without_keywords(self) -> Self:
@@ -270,5 +270,5 @@ class DirectoryEntryCollection(
             directory=self.directory,
             type=self.type,
             page=self.page,
-            search_widget=self.search_widget
+            search_widget=self.search_widget,
         )

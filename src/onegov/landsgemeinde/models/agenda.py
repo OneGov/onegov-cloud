@@ -56,10 +56,10 @@ class AgendaItem(
 
     es_public = True
     es_properties = {
-        'title': {'type': 'text'},
-        'overview': {'type': 'localized_html'},
-        'text': {'type': 'localized_html'},
-        'resolution': {'type': 'localized_html'},
+        'title': {'type': 'text', 'weight': 'A'},
+        'overview': {'type': 'localized_html', 'weight': 'B'},
+        'text': {'type': 'localized_html', 'weight': 'C'},
+        'resolution': {'type': 'localized_html', 'weight': 'C'},
     }
 
     #: the internal id of the agenda item
