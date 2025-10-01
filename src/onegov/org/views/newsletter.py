@@ -501,18 +501,23 @@ def send_newsletter(
     else:
         news = newsletter_news_by_access(newsletter, request, access='public')
 
+    title = newsletter.title
+    if daily and request.app.org.daily_newsletter_title:
+        title = request.app.org.daily_newsletter_title
+
     _html = render_template(
         'mail_newsletter.pt', request, {
             'layout': layout,
             'lead': layout.linkify(newsletter.lead or ''),
             'newsletter': newsletter,
-            'title': newsletter.title,
+            'title': title,
             'unsubscribe': '$unsubscribe',
             'news': news,
             'occurrences': occurrences_by_newsletter(newsletter, request),
             'publications': publications_by_newsletter(newsletter, request),
             'name_without_extension': name_without_extension,
             'closing_remark': newsletter.closing_remark,
+            'daily': daily
         }
     )
     html = Template(_html)
@@ -547,7 +552,7 @@ def send_newsletter(
 
             count += 1
             yield request.app.prepare_email(
-                subject=newsletter.title,
+                subject=title,
                 receivers=(recipient.address,),
                 content=html.substitute(unsubscribe=unsubscribe),
                 plaintext=plaintext.substitute(unsubscribe=unsubscribe),
@@ -687,6 +692,7 @@ def handle_preview_newsletter(
         'publications': publications_by_newsletter(self, request),
         'name_without_extension': name_without_extension,
         'closing_remark': self.closing_remark,
+        'daily': False
     }
 
 

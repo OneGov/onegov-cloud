@@ -7,7 +7,7 @@
         <p tal:condition="lead" tal:content="lead"></p>
 
         <tal:b condition="news">
-            <h2 i18n:translate>Latest news</h2>
+            <h2 i18n:translate tal:condition="not: daily">Latest news</h2>
 
             <tal:b repeat="item news">
                 <hr>
