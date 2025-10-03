@@ -1,14 +1,23 @@
-from click.testing import CliRunner
-from sedate import utcnow
+from __future__ import annotations
 
+import pytest
+
+from click.testing import CliRunner
 from onegov.event import Event
 from onegov.search.cli import cli
-from pytest import mark
+from sedate import utcnow
 
 
-# FIXME
-@mark.skip('Passes locally, but not in CI, skip for now')
-def test_search_cli_index_status(cfg_path, session_manager):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import SessionManager
+
+
+@pytest.mark.skip('Currently broken on CI')  # FIXME
+def test_search_cli_index_status(
+    cfg_path: str,
+    session_manager: SessionManager
+) -> None:
     # add anything to the database
     event = Event(
         state='published',

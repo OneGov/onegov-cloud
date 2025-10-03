@@ -1,39 +1,50 @@
+from __future__ import annotations
+
 from onegov.search import ORMSearchable, Searchable, SearchableContent
 from onegov.search import utils
 from sqlalchemy import Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 
 
-def test_get_searchable_sqlalchemy_models():
-    Foo = declarative_base()
-    Bar = declarative_base()
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import Base, Base as Foo, Base as Bar  # noqa: F401
+
+
+def test_get_searchable_sqlalchemy_models() -> None:
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Foo = declarative_base()
+        Bar = declarative_base()
 
     class A(Foo):
         __tablename__ = 'as'
-        id = Column(Integer, primary_key=True)
+        id: Column[int] = Column(Integer, primary_key=True)
 
     class B(Foo, Searchable):
         __tablename__ = 'bs'
-        id = Column(Integer, primary_key=True)
+        id: Column[int] = Column(Integer, primary_key=True)
 
     class C(Bar):
         __tablename__ = 'cs'
-        id = Column(Integer, primary_key=True)
+        id: Column[int] = Column(Integer, primary_key=True)
 
     class D(Bar, Searchable):
         __tablename__ = 'ds'
-        id = Column(Integer, primary_key=True)
+        id: Column[int] = Column(Integer, primary_key=True)
 
     assert list(utils.searchable_sqlalchemy_models(Foo)) == [B]
     assert list(utils.searchable_sqlalchemy_models(Bar)) == [D]
 
 
-def test_get_searchable_sqlalchemy_models_inheritance():
-    Base = declarative_base()
+def test_get_searchable_sqlalchemy_models_inheritance() -> None:
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Page(Base, Searchable):
         __tablename__ = 'pages'
-        id = Column(Integer, primary_key=True)
+        id: Column[int] = Column(Integer, primary_key=True)
 
     class Topic(Page):
         pass
@@ -42,7 +53,7 @@ def test_get_searchable_sqlalchemy_models_inheritance():
         pass
 
     class B(Base):
-        id = Column(Integer, primary_key=True)
+        id: Column[int] = Column(Integer, primary_key=True)
         __tablename__ = 'b'
 
     assert list(utils.searchable_sqlalchemy_models(Base)) == [
@@ -50,13 +61,15 @@ def test_get_searchable_sqlalchemy_models_inheritance():
     ]
 
 
-def test_get_polymorphic_base():
-    Base = declarative_base()
+def test_get_polymorphic_base() -> None:
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Ticket(Base, ORMSearchable):
         __tablename__ = 'tickets'
         id = Column(Integer, primary_key=True)
-        type: 'Column[str]' = Column(
+        type: Column[str] = Column(
             Text, nullable=False, default=lambda: 'ticketi')
 
         @declared_attr
@@ -67,12 +80,12 @@ def test_get_polymorphic_base():
             }
 
     class XTicket(Ticket):
-        __mapper_args__ = {'polymorphic_identity': 'ticketi-x'}  # type:ignore
+        __mapper_args__ = {'polymorphic_identity': 'ticketi-x'}
 
     class YTicket(Ticket):
-        __mapper_args__ = {'polymorphic_identity': 'ticketi-y'}  # type:ignore
+        __mapper_args__ = {'polymorphic_identity': 'ticketi-y'}
 
-    def filter_for_base_models(models):
+    def filter_for_base_models(models: set[type[Any]]) -> set[type[Any]]:
         return {utils.get_polymorphic_base(model) for model in models}
 
     assert filter_for_base_models({XTicket, YTicket, Ticket}) == {Ticket}
@@ -80,12 +93,12 @@ def test_get_polymorphic_base():
     class Letter(Base, Searchable):
         __tablename__ = 'letter'
 
-        id = Column(Integer, primary_key=True)
-        type: 'Column[str]' = Column(
+        id: Column[int] = Column(Integer, primary_key=True)
+        type: Column[str] = Column(
             Text, nullable=False, default=lambda: 'type')
 
         @declared_attr
-        def __mapper_args__(cls):  # type:ignore
+        def __mapper_args__(cls) -> dict[str, Any]:
             return {
                 'polymorphic_on': 'type',
                 'polymorphic_identity': 'letter'
@@ -95,28 +108,28 @@ def test_get_polymorphic_base():
         __mapper_args__ = {'polymorphic_identity': 'a'}
 
     class AA(A):
-        __mapper_args__ = {'polymorphic_identity': 'aa'}  # type:ignore
+        __mapper_args__ = {'polymorphic_identity': 'aa'}
 
     class B(Letter, Searchable):
-        __mapper_args__ = {'polymorphic_identity': 'b'}  # type:ignore
+        __mapper_args__ = {'polymorphic_identity': 'b'}
 
     class C(Letter, Searchable):
-        __mapper_args__ = {'polymorphic_identity': 'c'}  # type:ignore
+        __mapper_args__ = {'polymorphic_identity': 'c'}
 
     class CC(C):
-        __mapper_args__ = {'polymorphic_identity': 'cc'}  # type:ignore
+        __mapper_args__ = {'polymorphic_identity': 'cc'}
 
     assert filter_for_base_models({Letter, A, AA, B, C, CC}) == {Letter}
 
     class AdjacencyList(Base):
         __abstract__ = True
 
-        id: 'Column[int]' = Column(Integer, primary_key=True)
-        type: 'Column[str]' = Column(
+        id: Column[int] = Column(Integer, primary_key=True)
+        type: Column[str] = Column(
             Text, nullable=False, default=lambda: 'generic')
 
         @declared_attr
-        def __mapper_args__(cls):  # type:ignore
+        def __mapper_args__(cls) -> dict[str, Any]:
             return {
                 'polymorphic_on': cls.type,
                 'polymorphic_identity': 'generic'
@@ -139,14 +152,16 @@ def test_get_polymorphic_base():
         Ticket, Letter, Page}
 
 
-def test_related_types():
+def test_related_types() -> None:
 
-    Base = declarative_base()
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Page(Base, ORMSearchable):
         __tablename__ = 'pages'
-        id = Column(Integer, primary_key=True)
-        type = Column(Text, nullable=False)
+        id: Column[int] = Column(Integer, primary_key=True)
+        type: Column[str] = Column(Text, nullable=False)
 
         __mapper_args__ = {
             "polymorphic_on": 'type'
@@ -162,7 +177,7 @@ def test_related_types():
 
     class Temp(Page):
         __mapper_args__ = {'polymorphic_identity': 'temp'}
-        es_type_name = None
+        es_type_name = None  # type: ignore[assignment]
 
     assert utils.related_types(Page) == {'pages', 'topic', 'news'}
     assert utils.related_types(Topic) == {'pages', 'topic', 'news'}
@@ -170,15 +185,17 @@ def test_related_types():
     assert utils.related_types(Temp) == {'pages', 'topic', 'news'}
 
 
-def test_related_types_unsearchable_base():
+def test_related_types_unsearchable_base() -> None:
 
-    Base = declarative_base()
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     # compared to test_related_types, this base class is not searchable
     class Page(Base):
         __tablename__ = 'pages'
-        id = Column(Integer, primary_key=True)
-        type = Column(Text, nullable=False)
+        id: Column[int] = Column(Integer, primary_key=True)
+        type: Column[str] = Column(Text, nullable=False)
 
         __mapper_args__ = {
             "polymorphic_on": 'type'

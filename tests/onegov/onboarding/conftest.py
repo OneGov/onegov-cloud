@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import morepath
-import onegov.core
 import onegov.onboarding
 import os.path
 import pytest

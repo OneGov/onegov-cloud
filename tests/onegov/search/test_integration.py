@@ -1,11 +1,12 @@
+from __future__ import annotations
+
 import morepath
 import sedate
 import transaction
 
 from datetime import timedelta
-from elasticsearch_dsl.function import SF
-from elasticsearch_dsl.query import MatchPhrase, FunctionScore
-
+from elasticsearch_dsl.function import SF  # type: ignore[import-untyped]
+from elasticsearch_dsl.query import MatchPhrase, FunctionScore  # type: ignore[import-untyped]
 from onegov.core import Framework
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.utils import scan_morepath_modules
@@ -16,7 +17,13 @@ from webtest import TestApp as Client
 from time import sleep
 
 
-def test_app_integration(es_url):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import Base  # noqa: F401
+    from onegov.core.request import CoreRequest
+
+
+def test_app_integration(es_url: str) -> None:
 
     class App(Framework, SearchApp):
         pass
@@ -25,29 +32,33 @@ def test_app_integration(es_url):
     app.namespace = 'test'
     app.configure_application(elasticsearch_hosts=[es_url])
 
+    assert app.es_client is not None
     assert app.es_client.ping()
 
     # make sure we got the testing host
+    assert app.es_client.transport.hosts is not None
     assert len(app.es_client.transport.hosts) == 1
-    assert app.es_client.transport.hosts[0]['port'] \
-        == int(es_url.split(':')[-1])
+    assert app.es_client.transport.hosts[0]['port'] == int(
+        es_url.split(':')[-1])
 
 
-def test_search_query(es_url, postgres_dsn):
+def test_search_query(es_url: str, postgres_dsn: str) -> None:
 
     class App(Framework, SearchApp):
         pass
 
-    Base = declarative_base()
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Document(Base, ORMSearchable):
         __tablename__ = 'documents'
 
-        id = Column(Integer, primary_key=True)
-        title = Column(Text, nullable=False)
-        body = Column(Text, nullable=True)
-        public = Column(Boolean, nullable=False)
-        language = Column(Text, nullable=False)
+        id: Column[int] = Column(Integer, primary_key=True)
+        title: Column[str] = Column(Text, nullable=False)
+        body: Column[str | None] = Column(Text, nullable=True)
+        public: Column[bool] = Column(Boolean, nullable=False)
+        language: Column[str] = Column(Text, nullable=False)
 
         es_properties = {
             'title': {'type': 'localized'},
@@ -55,15 +66,15 @@ def test_search_query(es_url, postgres_dsn):
         }
 
         @property
-        def es_suggestion(self):
+        def es_suggestion(self) -> str:
             return self.title
 
         @property
-        def es_public(self):
+        def es_public(self) -> bool:
             return self.public
 
         @property
-        def es_language(self):
+        def es_language(self) -> str:
             return self.language
 
     scan_morepath_modules(App)
@@ -80,6 +91,7 @@ def test_search_query(es_url, postgres_dsn):
     app.session_manager.bases.pop()
 
     app.set_application_id('documents/home')
+    assert app.es_client is not None
 
     session = app.session()
     session.add(Document(
@@ -111,8 +123,8 @@ def test_search_query(es_url, postgres_dsn):
     app.es_client.indices.refresh(index='_all')
 
     assert app.es_search().execute().hits.total.value == 2
-    assert app.es_search(include_private=True)\
-        .execute().hits.total.value == 4
+    assert app.es_search(include_private=True).execute(
+        ).hits.total.value == 4
 
     result = app.es_search(languages=['en']).execute()
     assert result.hits.total.value == 1
@@ -121,12 +133,12 @@ def test_search_query(es_url, postgres_dsn):
     assert result.hits.total.value == 2
 
     search = app.es_search(languages=['de'])
-    assert search.query('match', body='Dokumente')\
-        .execute().hits.total.value == 1
+    assert search.query('match', body='Dokumente').execute(
+        ).hits.total.value == 1
 
     search = app.es_search(languages=['de'], include_private=True)
-    assert search.query('match', body='Dokumente')\
-        .execute().hits.total.value == 2
+    assert search.query('match', body='Dokumente').execute(
+        ).hits.total.value == 2
 
     # test result loading in one query
     result = app.es_search(languages=['de'], include_private=True).execute()
@@ -153,32 +165,36 @@ def test_search_query(es_url, postgres_dsn):
     assert document.public
 
 
-def test_orm_integration(es_url, postgres_dsn, redis_url):
+def test_orm_integration(
+    es_url: str,
+    postgres_dsn: str,
+    redis_url: str
+) -> None:
 
     class App(Framework, SearchApp):
         pass
 
-    Base = declarative_base()
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Document(Base, ORMSearchable):
         __tablename__ = 'documents'
 
-        id = Column(Integer, primary_key=True)
-        title = Column(Text, nullable=False)
-        body = Column(Text, nullable=True)
+        id: Column[int] = Column(Integer, primary_key=True)
+        title: Column[str] = Column(Text, nullable=False)
+        body: Column[str | None] = Column(Text, nullable=True)
 
         @property
-        def es_suggestion(self):
+        def es_suggestion(self) -> str:
             return self.title
 
         @property
-        def es_tags(self):
-            if not isinstance(self.body, str):
-                body = ''.join(self.body)
-            else:
-                body = self.body
+        def es_tags(self) -> list[str]:
+            if not self.body:
+                return []
 
-            return [word for word in body.split(' ') if len(word) > 3]
+            return [word for word in self.body.split(' ') if len(word) > 3]
 
         es_public = True
         es_language = 'en'
@@ -192,12 +208,14 @@ def test_orm_integration(es_url, postgres_dsn, redis_url):
         pass
 
     @App.json(model=Root)
-    def view_documents(self, request):
+    def view_documents(self: Root, request: CoreRequest) -> Any:
+        assert isinstance(request.app, App)
+        assert request.app.es_client is not None
 
         # make sure the changes are propagated in testing
         request.app.es_client.indices.refresh(index='_all')
 
-        query = request.params.get('q')
+        query = request.GET.get('q')
         if query:
             if query.startswith('#'):
                 return request.app.es_client.search(
@@ -222,26 +240,26 @@ def test_orm_integration(es_url, postgres_dsn, redis_url):
             return request.app.es_client.search(index='_all')
 
     @App.json(model=Root, name='new')
-    def view_add_document(self, request):
+    def view_add_document(self: Root, request: CoreRequest) -> None:
         session = request.session
         session.add(Document(
-            id=request.params.get('id'),
-            title=request.params.get('title'),
-            body=request.params.get('body')
+            id=int(request.GET['id']),
+            title=request.GET['title'],
+            body=request.GET.get('body')
         ))
 
     @App.json(model=Root, name='update')
-    def view_update_document(self, request):
+    def view_update_document(self: Root, request: CoreRequest) -> None:
         session = request.session
         query = session.query(Document)
-        query = query.filter(Document.id == request.params.get('id'))
+        query = query.filter(Document.id == request.GET['id'])
 
         document = query.one()
-        document.title = request.params.get('title')
-        document.body = request.params.get('body')
+        document.title = request.GET.get('title', document.title)
+        document.body = request.GET.get('body', document.body)
 
     @App.json(model=Root, name='delete')
-    def view_delete_document(self, request):
+    def view_delete_document(self: Root, request: CoreRequest) -> None:
         session = request.session
         query = session.query(Document)
         query = query.filter(Document.id == request.params.get('id'))
@@ -298,21 +316,23 @@ def test_orm_integration(es_url, postgres_dsn, redis_url):
     assert documents['hits']['total']['value'] == 1
 
 
-def test_alternate_id_property(es_url, postgres_dsn):
+def test_alternate_id_property(es_url: str, postgres_dsn: str) -> None:
 
     class App(Framework, SearchApp):
         pass
 
-    Base = declarative_base()
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class User(Base, ORMSearchable):
         __tablename__ = 'users'
 
-        name = Column(Text, primary_key=True)
-        fullname = Column(Text, nullable=False)
+        name: Column[str] = Column(Text, primary_key=True)
+        fullname: Column[str] = Column(Text, nullable=False)
 
         @property
-        def es_suggestion(self):
+        def es_suggestion(self) -> str:
             return self.name
 
         es_id = 'name'
@@ -336,6 +356,7 @@ def test_alternate_id_property(es_url, postgres_dsn):
     app.session_manager.bases.pop()
 
     app.set_application_id('users/corporate')
+    assert app.es_client is not None
 
     session = app.session()
     session.add(User(
@@ -362,12 +383,14 @@ def test_alternate_id_property(es_url, postgres_dsn):
     assert root.load().fullname == "Lil' Root"
 
 
-def test_orm_polymorphic(es_url, postgres_dsn):
+def test_orm_polymorphic(es_url: str, postgres_dsn: str) -> None:
 
     class App(Framework, SearchApp):
         pass
 
-    Base = declarative_base()
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Page(Base, ORMSearchable):
         __tablename__ = 'pages'
@@ -379,12 +402,12 @@ def test_orm_polymorphic(es_url, postgres_dsn):
         es_public = True
 
         @property
-        def es_suggestion(self):
-            return self.content
+        def es_suggestion(self) -> str:
+            return self.content or ''
 
-        id = Column(Integer, primary_key=True)
-        content = Column(Text, nullable=True)
-        type = Column(Text, nullable=False)
+        id: Column[int] = Column(Integer, primary_key=True)
+        content: Column[str | None] = Column(Text, nullable=True)
+        type: Column[str] = Column(Text, nullable=False)
 
         __mapper_args__ = {
             "polymorphic_on": 'type'
@@ -422,7 +445,8 @@ def test_orm_polymorphic(es_url, postgres_dsn):
     session.add(News(content="News", type='news'))
     session.add(Breaking(content="Breaking", type='breaking'))
 
-    def update():
+    def update() -> None:
+        assert app.es_client is not None
         transaction.commit()
         app.es_indexer.process()
         app.es_client.indices.refresh(index='_all')
@@ -450,19 +474,21 @@ def test_orm_polymorphic(es_url, postgres_dsn):
     assert app.es_search().count() == 0
 
 
-def test_orm_polymorphic_sublcass_only(es_url, postgres_dsn):
+def test_orm_polymorphic_sublcass_only(es_url: str, postgres_dsn: str) -> None:
 
     class App(Framework, SearchApp):
         pass
 
-    Base = declarative_base()
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Secret(Base):
         __tablename__ = 'secrets'
 
-        id = Column(Integer, primary_key=True)
-        content = Column(Text, nullable=True)
-        type = Column(Text, nullable=True)
+        id: Column[int] = Column(Integer, primary_key=True)
+        content: Column[str | None] = Column(Text, nullable=True)
+        type: Column[str | None] = Column(Text, nullable=True)
 
         __mapper_args__ = {
             "polymorphic_on": 'type'
@@ -477,8 +503,8 @@ def test_orm_polymorphic_sublcass_only(es_url, postgres_dsn):
         }
 
         @property
-        def es_suggestion(self):
-            return self.content
+        def es_suggestion(self) -> str:
+            return self.content or ''
 
     scan_morepath_modules(App)
     morepath.commit()
@@ -494,6 +520,7 @@ def test_orm_polymorphic_sublcass_only(es_url, postgres_dsn):
     app.session_manager.bases.pop()
 
     app.set_application_id('pages/site')
+    assert app.es_client is not None
 
     session = app.session()
 
@@ -508,41 +535,43 @@ def test_orm_polymorphic_sublcass_only(es_url, postgres_dsn):
     assert app.es_search().query('match', content='everybody').count() == 1
 
 
-def test_suggestions(es_url, postgres_dsn):
+def test_suggestions(es_url: str, postgres_dsn: str) -> None:
 
     class App(Framework, SearchApp):
         pass
 
-    Base = declarative_base()
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Document(Base, ORMSearchable):
         __tablename__ = 'documents'
 
-        id = Column(Integer, primary_key=True)
-        title = Column(Text, nullable=False)
-        public = Column(Boolean, nullable=False)
-        language = Column(Text, nullable=False)
+        id: Column[int] = Column(Integer, primary_key=True)
+        title: Column[str] = Column(Text, nullable=False)
+        public: Column[bool] = Column(Boolean, nullable=False)
+        language: Column[str] = Column(Text, nullable=False)
 
         es_properties = {
             'title': {'type': 'localized'}
         }
 
         @property
-        def es_public(self):
+        def es_public(self) -> bool:
             return self.public
 
         @property
-        def es_language(self):
+        def es_language(self) -> str:
             return self.language
 
     class Person(Base, ORMSearchable):
         __tablename__ = 'people'
-        id = Column(Integer, primary_key=True)
-        first_name = Column(Text, nullable=False)
-        last_name = Column(Text, nullable=False)
+        id: Column[int] = Column(Integer, primary_key=True)
+        first_name: Column[str] = Column(Text, nullable=False)
+        last_name: Column[str] = Column(Text, nullable=False)
 
         @property
-        def title(self):
+        def title(self) -> str:
             return ' '.join((self.first_name, self.last_name))
 
         es_properties = {'title': {'type': 'localized'}}
@@ -550,7 +579,7 @@ def test_suggestions(es_url, postgres_dsn):
         es_language = 'en'
 
         @property
-        def es_suggestion(self):
+        def es_suggestion(self) -> list[str]:
             return [
                 ' '.join((self.first_name, self.last_name)),
                 ' '.join((self.last_name, self.first_name))
@@ -570,6 +599,7 @@ def test_suggestions(es_url, postgres_dsn):
     app.session_manager.bases.pop()
 
     app.set_application_id('documents/home')
+    assert app.es_client is not None
 
     session = app.session()
     session.add(Document(
@@ -629,18 +659,20 @@ def test_suggestions(es_url, postgres_dsn):
     }
 
 
-def test_language_detection(es_url, postgres_dsn):
+def test_language_detection(es_url: str, postgres_dsn: str) -> None:
 
     class App(Framework, SearchApp):
         pass
 
-    Base = declarative_base()
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Document(Base, ORMSearchable):
         __tablename__ = 'documents'
 
-        id = Column(Integer, primary_key=True)
-        title = Column(Text, nullable=False)
+        id: Column[int] = Column(Integer, primary_key=True)
+        title: Column[str] = Column(Text, nullable=False)
 
         es_properties = {
             'title': {'type': 'localized'}
@@ -662,6 +694,7 @@ def test_language_detection(es_url, postgres_dsn):
     app.session_manager.bases.pop()
 
     app.set_application_id('documents/home')
+    assert app.es_client is not None
 
     session = app.session()
     session.add(Document(title="Mein Dokument"))
@@ -685,17 +718,19 @@ def test_language_detection(es_url, postgres_dsn):
     assert french[0].title == "Mon document"
 
 
-def test_language_update(es_url, postgres_dsn):
+def test_language_update(es_url: str, postgres_dsn: str) -> None:
     class App(Framework, SearchApp):
         pass
 
-    Base = declarative_base()
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Document(Base, ORMSearchable):
         __tablename__ = 'documents'
 
-        id = Column(Integer, primary_key=True)
-        title = Column(Text, nullable=False)
+        id: Column[int] = Column(Integer, primary_key=True)
+        title: Column[str] = Column(Text, nullable=False)
 
         es_properties = {
             'title': {'type': 'localized'}
@@ -717,6 +752,7 @@ def test_language_update(es_url, postgres_dsn):
     app.session_manager.bases.pop()
 
     app.set_application_id('documents/home')
+    assert app.es_client is not None
 
     session = app.session()
     session.add(Document(title="Mein Dokument"))
@@ -740,19 +776,21 @@ def test_language_update(es_url, postgres_dsn):
     assert french
 
 
-def test_date_decay(es_url, postgres_dsn):
+def test_date_decay(es_url: str, postgres_dsn: str) -> None:
 
     class App(Framework, SearchApp):
         pass
 
-    Base = declarative_base()
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Document(Base, ORMSearchable, TimestampMixin):
         __tablename__ = 'documents'
 
-        id = Column(Integer, primary_key=True)
-        title = Column(Text, nullable=False)
-        body = Column(Text, nullable=False)
+        id: Column[int] = Column(Integer, primary_key=True)
+        title: Column[str] = Column(Text, nullable=False)
+        body: Column[str] = Column(Text, nullable=False)
 
         es_properties = {'title': {'type': 'localized'}}
         es_public = True
@@ -785,7 +823,8 @@ def test_date_decay(es_url, postgres_dsn):
 
     transaction.commit()
 
-    def search(title):
+    def search(title: str) -> Any:
+        assert app.es_client is not None
         app.es_indexer.process()
         app.es_client.indices.refresh(index='_all')
         app.es_client.indices.flush(index='_all')
