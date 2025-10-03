@@ -1,4 +1,3 @@
-import onegov.core
 import onegov.org
 from tests.shared import utils
 

@@ -1,4 +1,3 @@
-import onegov.core
 import onegov.org
 from pytest import mark
 from tests.shared import utils
