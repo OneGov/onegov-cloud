@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 import logging
 import pytest
 import transaction
 
 from datetime import datetime
-
 from onegov.people import PersonCollection
 from onegov.search import Searchable, SearchOfflineError, utils
 from onegov.search.indexer import parse_index_name, PostgresIndexer
@@ -14,13 +15,22 @@ from onegov.search.indexer import (
     TypeMapping,
     TypeMappingRegistry
 )
+from onegov.search.search_index import SearchIndex
 from queue import Queue
 from unittest.mock import Mock
 
-from onegov.search.search_index import SearchIndex
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from elasticsearch import Elasticsearch
+    from onegov.core.orm import SessionManager
+    from onegov.search.indexer import Task
+    from sqlalchemy.orm import Session
+    from tests.shared.capturelog import CaptureLogFixture
 
 
-def test_index_manager_assertions(es_client):
+def test_index_manager_assertions(es_client: Elasticsearch) -> None:
 
     with pytest.raises(AssertionError):
         IndexManager(hostname='', es_client=es_client)
@@ -38,21 +48,21 @@ def test_index_manager_assertions(es_client):
         ixmgr.ensure_index(schema='asdf', language='', mapping=page)
 
     with pytest.raises(AssertionError):
-        ixmgr.ensure_index(schema='asdf', language='de', mapping='')
+        ixmgr.ensure_index(schema='asdf', language='de', mapping='')  # type: ignore[arg-type]
 
     with pytest.raises(AssertionError):
         ixmgr.ensure_index(schema='asdf', language='deu', mapping=page)
 
     with pytest.raises(AssertionError):
-        ixmgr.ensure_index(schema='asdf', language='de', mapping='')
+        ixmgr.ensure_index(schema='asdf', language='de', mapping='')  # type: ignore[arg-type]
 
 
-def test_index_manager_connection(es_client):
+def test_index_manager_connection(es_client: Elasticsearch) -> None:
     ixmgr = IndexManager(hostname='foobar', es_client=es_client)
     assert ixmgr.es_client.ping()
 
 
-def test_index_manager_separation(es_client):
+def test_index_manager_separation(es_client: Elasticsearch) -> None:
     foo = IndexManager(hostname='foo', es_client=es_client)
     bar = IndexManager(hostname='bar', es_client=es_client)
 
@@ -69,7 +79,7 @@ def test_index_manager_separation(es_client):
     assert bar.query_aliases() == {'bar-bar-en-page'}
 
 
-def test_index_creation(es_client):
+def test_index_creation(es_client: Elasticsearch) -> None:
     ixmgr = IndexManager(hostname='example.org', es_client=es_client)
 
     page = TypeMapping('page', {
@@ -121,7 +131,7 @@ def test_index_creation(es_client):
     assert ixmgr.remove_expired_indices(current_mappings=[new_page]) == 1
 
 
-def test_parse_index_name(es_client):
+def test_parse_index_name(es_client: Elasticsearch) -> None:
     result = parse_index_name('hostname_org-my_schema-de-posts')
     assert result.hostname == 'hostname_org'
     assert result.schema == 'my_schema'
@@ -148,7 +158,7 @@ def test_parse_index_name(es_client):
     utils.is_valid_index_name,
     utils.is_valid_type_name
 ])
-def test_is_valid_name(is_valid):
+def test_is_valid_name(is_valid: Callable[[str], bool]) -> None:
     assert is_valid('asdf')
     assert is_valid('asdf.asdf')
     assert is_valid('asdf_asdf')
@@ -170,7 +180,7 @@ def test_is_valid_name(is_valid):
     assert not is_valid('a,b')
 
 
-def test_mapping_for_language():
+def test_mapping_for_language() -> None:
 
     mapping = TypeMapping('foo', {
         'title': {
@@ -307,7 +317,7 @@ def test_mapping_for_language():
     }
 
 
-def test_orm_event_translator_properties():
+def test_orm_event_translator_properties() -> None:
 
     class Page(Searchable):
 
@@ -323,7 +333,7 @@ def test_orm_event_translator_properties():
             'likes': {'type': 'long'}
         }
 
-        def __init__(self, id, **kwargs):
+        def __init__(self, id: int, **kwargs: Any) -> None:
             self.id = id
             self.language = kwargs.pop('language', 'en')
             self.public = kwargs.pop('public', True)
@@ -332,24 +342,24 @@ def test_orm_event_translator_properties():
                 setattr(self, k, v)
 
         @property
-        def es_language(self):
+        def es_language(self) -> str:
             return self.language
 
         @property
-        def es_public(self):
+        def es_public(self) -> bool:
             return self.public
 
         @property
-        def es_suggest(self):
-            return self.title
+        def es_suggest(self) -> str:
+            return self.title  # type: ignore[attr-defined]
 
         @property
-        def es_last_change(self):
-            return self.date
+        def es_last_change(self) -> datetime | None:
+            return self.date  # type: ignore[attr-defined]
 
         @property
-        def es_tags(self):
-            return self.tags
+        def es_tags(self) -> list[str]:
+            return self.tags  # type: ignore[attr-defined]
 
     mappings = TypeMappingRegistry()
     mappings.register_type('page', Page.es_properties)
@@ -479,13 +489,13 @@ def test_orm_event_translator_properties():
     assert translator.psql_queue.empty()
 
 
-def test_orm_event_translator_delete():
+def test_orm_event_translator_delete() -> None:
 
     class Page(Searchable):
 
         __tablename__ = 'my-pages'
 
-        def __init__(self, id):
+        def __init__(self, id: int) -> None:
             self.id = id
 
         es_id = 'id'
@@ -511,7 +521,7 @@ def test_orm_event_translator_delete():
     assert translator.psql_queue.empty()
 
 
-def test_orm_event_queue_overflow(capturelog):
+def test_orm_event_queue_overflow(capturelog: CaptureLogFixture) -> None:
 
     capturelog.setLevel(logging.ERROR, logger='onegov.search')
 
@@ -519,12 +529,12 @@ def test_orm_event_queue_overflow(capturelog):
 
         __tablename__ = 'my-tweets'
 
-        def __init__(self, id):
+        def __init__(self, id: int) -> None:
             self.id = id
 
         @property
-        def es_suggestion(self):
-            return self.id
+        def es_suggestion(self) -> str:
+            return str(self.id)
 
         es_id = 'id'
         es_type_name = 'tweet'
@@ -551,7 +561,7 @@ def test_orm_event_queue_overflow(capturelog):
         'The psql orm event translator queue is full!')
 
 
-def test_type_mapping_registry():
+def test_type_mapping_registry() -> None:
 
     registry = TypeMappingRegistry()
     registry.register_type('page', {
@@ -576,7 +586,13 @@ def test_type_mapping_registry():
     }
 
 
-def test_indexer_process(es_client, session_manager, session):
+def test_indexer_process(
+    es_client: Elasticsearch,
+    session_manager: SessionManager,
+    session: Session
+) -> None:
+
+    assert session_manager.current_schema is not None
     engine = session_manager.engine
     mappings = TypeMappingRegistry()
     mappings.register_type('page', {
@@ -588,13 +604,18 @@ def test_indexer_process(es_client, session_manager, session):
         mappings, Queue(), hostname='foo', es_client=es_client)
     psql_indexer = PostgresIndexer(mappings, Queue(), engine)
 
-    task = {
+    task: Task = {
         'action': 'index',
         'schema': session_manager.current_schema,
         'tablename': 'my-pages',
         'type_name': 'page',
         'id': 1,
+        'id_key': 'id',
         'owner_type': 'Page',
+        'access': 'public',
+        'publication_start': None,
+        'publication_end': None,
+        'suggestion': [],
         'language': 'en',
         'properties': {
             'title': 'Go ahead and jump',
@@ -641,6 +662,7 @@ def test_indexer_process(es_client, session_manager, session):
         'schema': 'my-schema',
         'tablename': 'my-pages',
         'type_name': 'page',
+        'owner_type': 'Page',
         'id': 1
     }
     es_indexer.queue.put(task)
@@ -656,7 +678,12 @@ def test_indexer_process(es_client, session_manager, session):
     assert search['hits']['total']['value'] == 1
 
 
-def test_indexer_bulk_process_mid_transaction(session_manager, session):
+def test_indexer_bulk_process_mid_transaction(
+    session_manager: SessionManager,
+    session: Session
+) -> None:
+
+    assert session_manager.current_schema is not None
     mappings = TypeMappingRegistry()
     mappings.register_type('person', {
         'title': {'type': 'text'},
@@ -673,10 +700,12 @@ def test_indexer_bulk_process_mid_transaction(session_manager, session):
         'type_name': 'person',
         'id': person1.id,
         'id_key': 'id',
-        'owner_id': 1,
         'owner_type': 'Person',
         'language': 'en',
-        'suggestion': 'John Doe',
+        'suggestion': ['John Doe'],
+        'access': 'public',
+        'publication_start': None,
+        'publication_end': None,
         'properties': {
             'title': person1.title,
             'es_public': True,
@@ -696,10 +725,12 @@ def test_indexer_bulk_process_mid_transaction(session_manager, session):
         'type_name': 'person',
         'id': person2.id,
         'id_key': 'id',
-        'owner_id': 2,
         'owner_type': 'Person',
         'language': 'en',
-        'suggestion': 'Jane Doe',
+        'suggestion': ['Jane Doe'],
+        'access': 'public',
+        'publication_start': None,
+        'publication_end': None,
         'properties': {
             'title': person2.title,
             'es_public': True,
@@ -720,10 +751,12 @@ def test_indexer_bulk_process_mid_transaction(session_manager, session):
         'type_name': 'person',
         'id': person3.id,
         'id_key': 'id',
-        'owner_id': 3,
         'owner_type': 'Person',
         'language': 'en',
         'suggestion': ['Paul Atishon', 'Atishon Paul'],
+        'access': 'public',
+        'publication_start': None,
+        'publication_end': None,
         'properties': {
             'title': person3.title,
             'es_public': True,
@@ -745,7 +778,7 @@ def test_indexer_bulk_process_mid_transaction(session_manager, session):
             filter(SearchIndex.fts_idx.isnot(None)).count() == 3)
 
 
-def test_extra_analyzers(es_client):
+def test_extra_analyzers(es_client: Elasticsearch) -> None:
 
     page = TypeMapping('page', {
         'title': {'type': 'text'}
@@ -781,7 +814,12 @@ def test_extra_analyzers(es_client):
     ]
 
 
-def test_tags(es_client, session_manager, session):
+def test_tags(
+    es_client: Elasticsearch,
+    session_manager: SessionManager,
+    session: Session
+) -> None:
+
     mappings = TypeMappingRegistry()
     mappings.register_type('page', {
         'tags': {'type': 'text', 'analyzer': 'tags'}
@@ -789,19 +827,23 @@ def test_tags(es_client, session_manager, session):
     # hostname-schema-language-type
     es_index = f"foo-{session_manager.current_schema}-en-page"
     schema = session_manager.current_schema
+    assert schema is not None
     es_indexer = Indexer(mappings, Queue(), es_client, hostname='foo')
     psql_indexer = PostgresIndexer(mappings, Queue(), session_manager.engine)
 
-    task = {
+    task: Task = {
         'action': 'index',
         'schema': schema,
         'tablename': 'my-bar',
         'type_name': 'page',
         'id': 1,
         'id_key': 'id',
-        'owner_id': 1,
         'owner_type': 'Page',
         'language': 'en',
+        'suggestion': [],
+        'access': 'public',
+        'publication_start': None,
+        'publication_end': None,
         'properties': {
             'tags': ['foo', 'BAR', 'baz'],
             'es_public': True
@@ -840,7 +882,7 @@ def test_tags(es_client, session_manager, session):
     assert search['hits']['total']['value'] == 0
 
 
-def test_elasticsearch_outage(es_client, es_url):
+def test_elasticsearch_outage(es_client: Elasticsearch, es_url: str) -> None:
     mappings = TypeMappingRegistry()
     mappings.register_type('page', {
         'title': {'type': 'localized'},
@@ -852,17 +894,28 @@ def test_elasticsearch_outage(es_client, es_url):
     indexer.queue.put({
         'action': 'index',
         'schema': 'my-schema',
+        'tablename': 'pages',
         'type_name': 'page',
         'id': 1,
+        'id_key': 'id',
+        'owner_type': 'Page',
         'language': 'en',
+        'suggestion': [],
+        'access': 'public',
+        'publication_start': None,
+        'publication_end': None,
         'properties': {
+            'title': 'Foo',
+            'es_public': True
+        },
+        'raw_properties': {
             'title': 'Foo',
             'es_public': True
         }
     })
 
     original = indexer.es_client.transport.perform_request
-    indexer.es_client.transport.perform_request = Mock(
+    indexer.es_client.transport.perform_request = Mock(  # type: ignore[method-assign]
         side_effect=SearchOfflineError)
 
     for i in range(0, 2):
@@ -873,10 +926,21 @@ def test_elasticsearch_outage(es_client, es_url):
     indexer.queue.put({
         'action': 'index',
         'schema': 'my-schema',
+        'tablename': 'pages',
         'type_name': 'page',
         'id': 2,
+        'id_key': 'id',
+        'owner_type': 'Page',
         'language': 'en',
+        'suggestion': [],
+        'access': 'public',
+        'publication_start': None,
+        'publication_end': None,
         'properties': {
+            'title': 'Bar',
+            'es_public': True
+        },
+        'raw_properties': {
             'title': 'Bar',
             'es_public': True
         }
@@ -887,15 +951,15 @@ def test_elasticsearch_outage(es_client, es_url):
         assert not indexer.queue.empty()
         assert indexer.failed_task is not None
 
-    indexer.es_client.transport.perform_request = original
+    indexer.es_client.transport.perform_request = original  # type: ignore[method-assign]
 
     indexer.es_client.indices.refresh(index='_all')
-    assert indexer.es_client\
-        .search(index='_all')['hits']['total']['value'] == 0
+    assert indexer.es_client.search(
+        index='_all')['hits']['total']['value'] == 0
 
     assert indexer.process() == 2
     assert indexer.failed_task is None
 
     indexer.es_client.indices.refresh(index='_all')
-    assert indexer.es_client\
-        .search(index='_all')['hits']['total']['value'] == 2
+    assert indexer.es_client.search(
+        index='_all')['hits']['total']['value'] == 2
