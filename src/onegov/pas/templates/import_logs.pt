@@ -28,7 +28,7 @@
                 <tr>
                     <th i18n:translate="">Timestamp</th>
                     <th i18n:translate="">User</th>
-                    <th i18n:translate="">Type</th>
+                    <th style="display: none;" i18n:translate="">Type</th>
                     <th i18n:translate="">Status</th>
                 </tr>
             </thead>
@@ -39,7 +39,9 @@
                     style="cursor: pointer;">
                     <td>${layout.format_date(log.created, 'datetime_long')}</td>
                     <td>${log.user.username if log.user else request.translate('System')}</td>
-                    <td>${translate_import_type(log.import_type)}</td>
+                    <td style="display: none;">
+                        <span class="import-type ${log.import_type}" tal:content="translate_import_type(log.import_type)"></span>
+                    </td>
                     <td>
                         <span class="import-status ${log.status}" i18n:translate="" tal:content="log.status"></span>
                     </td>
