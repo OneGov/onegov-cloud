@@ -22,9 +22,10 @@ class AgendaItemCollectionLayout(DefaultLayout):
     @cached_property
     def title(self) -> str:
         return _(
-            'Agenda items of assembly from ${date}',
+            'Agenda items of ${assembly_type} from ${date}',
             mapping={
-                'date': self.format_date(self.model.date, 'date_long')
+                'date': self.format_date(self.model.date, 'date_long'),
+                'assembly_type': self.assembly_type
             }
         )
 

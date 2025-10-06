@@ -110,9 +110,12 @@ class AssemblyLayout(DefaultLayout):
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _('Do you really want to delete this assembly?'),
+                            _('Do you really want to delete this '
+                              '${assembly_type}?',
+                              mapping={'assembly_type': self.assembly_type}),
                             _('This cannot be undone.'),
-                            _('Delete assembly'),
+                            _('Delete ${assembly_type}',
+                              mapping={'assembly_type': self.assembly_type}),
                             _('Cancel')
                         ),
                         Intercooler(

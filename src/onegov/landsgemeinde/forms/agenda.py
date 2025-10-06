@@ -86,10 +86,6 @@ class AgendaItemForm(NamedFileForm):
     )
 
     memorial_page = IntegerField(
-        description=_(
-            'Links to the whole memorial (if there is one linked to the '
-            'assembly), but opens it on the chosen page number'
-        ),
         label=_('Alternatively: Page from the Memorial'),
         fieldset=_('Memorial'),
         validators=[
@@ -122,15 +118,6 @@ class AgendaItemForm(NamedFileForm):
     calculated_timestamp = StringField(
         label=_('Calculated video timestamp'),
         fieldset=_('Progress'),
-        render_kw={
-            'long_description': _(
-                'Calculated automatically based on the start time of the '
-                'agenda item and the start time of of the livestream of the '
-                'assembly .'
-            ),
-            'readonly': True,
-            'step': 1
-        },
         validators=[
             Optional()
         ],
@@ -181,10 +168,25 @@ class AgendaItemForm(NamedFileForm):
         return (query.scalar() or 0) + 1
 
     def on_request(self) -> None:
-        DefaultLayout(self.model, self.request)
+        layout = DefaultLayout(self.model, self.request)
         self.request.include('redactor')
         self.request.include('editor')
         self.request.include('tags-input')
+        self.memorial_page.description = _(
+            'Links to the whole memorial (if there is one linked to the '
+            '${assembly_type}), but opens it on the chosen page number',
+            mapping={'assembly_type': layout.assembly_type}
+        )
+        self.calculated_timestamp.render_kw = {
+            'long_description': _(
+                'Calculated automatically based on the start time of the '
+                'agenda item and the start time of of the livestream of the '
+                '${assembly_type}.',
+                mapping={'assembly_type': layout.assembly_type}
+            ),
+            'readonly': True,
+            'step': 1
+        }
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         data = super().get_useful_data(exclude={'calculated_timestamp'})
