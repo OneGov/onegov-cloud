@@ -10,6 +10,7 @@ from onegov.translator_directory.models.ticket import AccreditationTicket
 from onegov.translator_directory.models.translator import Translator
 from os.path import basename
 from onegov.file import FileCollection
+from onegov.file import File
 from tests.onegov.translator_directory.shared import iter_block_items
 from onegov.gis import Coordinates
 from onegov.pdf import Pdf
@@ -1413,6 +1414,121 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert 'BBBB' in page
     assert 'CCCC' in page
     assert 'Kein Kommentar' not in page
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_translator_mutation_with_document_upload(
+    broadcast, authenticate, connect, client
+):
+    session = client.app.session()
+    languages = create_languages(session)
+    certs = create_certificates(session)
+    cert_ids = [str(cert.id) for cert in certs]
+    language_ids = [str(lang.id) for lang in languages]
+    transaction.commit()
+
+    client.login_admin()
+
+    settings = client.get('/directory-settings')
+    settings.form['coordinates'] = encode_map_value({
+        'lat': 46, 'lon': 7, 'zoom': 12
+    })
+    settings.form.submit()
+
+    # Create a new translator
+    page = client.get('/translators/new')
+    page.form['first_name'] = 'Uncle'
+    page.form['last_name'] = 'Bob'
+    page.form['pers_id'] = 978654
+    page.form['admission'] = 'uncertified'
+    page.form['gender'] = 'M'
+    page.form['withholding_tax'] = False
+    page.form['self_employed'] = False
+    page.form['date_of_birth'] = '1970-01-01'
+    page.form['nationalities'] = ['CH']
+    page.form['coordinates'] = encode_map_value({
+        'lat': 46, 'lon': 7, 'zoom': 12
+    })
+    page.form['address'] = 'Fakestreet 123'
+    page.form['zip_code'] = '6000'
+    page.form['city'] = 'Luzern'
+    page.form['email'] = 'translator@test.com'
+    page.form['tel_private'] = '+41412223344'
+    page.form['tel_mobile'] = '+41412223345'
+    page.form['tel_office'] = '+41412223346'
+    page.form['availability'] = 'Always'
+    page.form['mother_tongues_ids'] = language_ids[0:1]
+    page.form['spoken_languages_ids'] = language_ids[1:2]
+    page.form['written_languages_ids'] = language_ids[2:3]
+    page.form['monitoring_languages_ids'] = language_ids[3:4]
+    page.form.get('expertise_professional_guilds', index=0).checked = True
+    page.form['expertise_professional_guilds_other'] = ['Psychologie']
+    page.form.get('expertise_interpreting_types', index=0).checked = True
+    page.form['social_sec_number'] = '756.1234.5678.97'
+    page.form['bank_name'] = 'Luzerner Bank'
+    page.form['bank_address'] = 'Bankplatz Luzern'
+    page.form['account_owner'] = 'Uncle Bob'
+    page.form['iban'] = 'DE07 1234 1234 1234 1234 12'
+    page.form['operation_comments'] = 'No operation comments'
+    page.form['confirm_name_reveal'] = False
+    page.form['date_of_application'] = '2020-01-01'
+    page.form['profession'] = 'Handwerker'
+    page.form['occupation'] = 'Bäcker'
+    page.form['agency_references'] = 'All okay'
+    page.form['education_as_interpreter'] = False
+    page.form['certificates_ids'] = cert_ids[0:1]
+    page.form['comments'] = 'No comments'
+    with patch(
+        'onegov.gis.utils.MapboxRequests.directions',
+        return_value=FakeResponse({
+            'code': 'Ok',
+            'routes': [{'distance': 1000}]
+        })
+    ):
+        assert 'hinzugefügt' in page.form.submit().follow()
+
+    initial_file_count = session.query(File).count()
+
+    client.logout()
+    client.login_member()
+    page = client.get('/').maybe_follow().click('BOB, Uncle')
+    page = page.click('Mutation melden')
+    page.form['submitter_message'] = 'Uploading new certificate!'
+
+    assert 'uploaded_certificates' in page.form.fields, \
+        f"Field not in form. Available: {list(page.form.fields.keys())}"
+
+    page.form['uploaded_certificates'] = upload_pdf('certificate.pdf')
+    page = page.form.submit().follow()
+    assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
+
+    client.logout()
+    client.login_admin()
+    page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert 'Uploading new certificate!' in page
+    assert 'Dokumente' in page
+    assert '.pdf' in page
+
+    session = client.app.session()
+    from onegov.ticket import TicketCollection
+
+    new_file_count = session.query(File).count()
+    assert new_file_count > initial_file_count, \
+        f"File count should increase: {initial_file_count} -> {new_file_count}"
+
+    tickets = TicketCollection(session).by_handler_code('TRN')
+    ticket = tickets[-1] if tickets else None
+    assert ticket is not None, "No ticket found"
+
+    handler_data = ticket.handler_data.get('handler_data', {})
+    file_ids = handler_data.get('file_ids', [])
+    assert len(file_ids) > 0, "No file_ids found in ticket"
+
+    uploaded_file = session.query(File).filter_by(id=file_ids[0]).first()
+    assert uploaded_file is not None
+    assert uploaded_file.name.endswith('.pdf')
 
 
 @patch('onegov.websockets.integration.connect')
