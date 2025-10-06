@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-08-06 11:05+0200\n"
+"POT-Creation-Date: 2025-10-06 10:39+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -376,9 +376,6 @@ msgstr "Ein(e) Übersetzer/in mit dieser E-Mail existiert bereits"
 msgid "Please confirm the correctness of the above data."
 msgstr "Bitte bestätigen Sie die Richtigkeit der vorstehenden Daten."
 
-msgid "Please provide at least one phone number."
-msgstr "Bitte geben Sie mindestens eine Telefonnummer an."
-
 msgid "Create a user account and publish the translator."
 msgstr "Benutzerkonto erstellen und Übersetzereintrag veröffentlichen."
 
@@ -456,16 +453,30 @@ msgstr ""
 "Wenn Sie die E-Mail Adresse ändern möchten, vermerken Sie dies bitte in "
 "Ihrer Nachricht."
 
-msgid "Please enter a message or suggest some changes using the fields below."
+msgid ""
+"You can upload supporting documents (e.g. updated certificates, ID scans) as "
+"PDFs."
 msgstr ""
-"Bitte geben Sie entweder eine Nachricht oder mindestens einen "
-"Änderungsvorschlag in die unten stehenden Felder ein."
+"Sie können unterstützende Dokumente (z.B. aktualisierte Zertifikate, "
+"Ausweiskopien) als PDFs hochladen."
+
+msgid "Please enter a message, suggest changes, or upload documents."
+msgstr ""
+"Bitte geben Sie eine Nachricht ein, schlagen Sie Änderungen vor oder laden "
+"Sie Dokumente hoch."
 
 msgid "Your message"
 msgstr "Ihre Nachricht"
 
 msgid "Message"
 msgstr "Nachricht"
+
+msgid ""
+"Upload supporting documents (e.g. updated certificates, ID scans). Maximum "
+"file size: 100 MB per file."
+msgstr ""
+"Laden Sie unterstützende Dokumente hoch (z.B. aktualisierte Zertifikate, "
+"Ausweiskopien). Maximale Dateigrösse: 100 MB pro Datei."
 
 msgid "Proposed changes"
 msgstr "Vorgeschlagene Änderungen"
@@ -539,6 +550,9 @@ msgstr "Versteckt"
 msgid "Search in first and last name"
 msgstr "Suche in Vor- und Nachname"
 
+msgid "Hidden only"
+msgstr "Nur versteckte anzeigen"
+
 msgid "Order by"
 msgstr "Sortiere nach"
 
@@ -610,9 +624,6 @@ msgstr "Vorgeschlagene Änderungen übernehmen"
 
 msgid "Search for translators"
 msgstr "Suche nach Übersetzer/in"
-
-msgid "Export Excel"
-msgstr "Export Excel"
 
 msgid "Mail to all translators"
 msgstr "Rundschreiben an alle Übersetzer"
@@ -745,8 +756,14 @@ msgstr "Zertifikate"
 msgid "User"
 msgstr "Benutzer"
 
+msgid "Export Excel (from filter)"
+msgstr "Excel Export (mit Filter)"
+
 msgid "Phone numbers"
 msgstr "Telefonischer Kontakt"
+
+msgid "Error: No custom texts found"
+msgstr "Fehler: Keine benutzerdefinierten Texte gefunden"
 
 msgid "Your ticket has been opened"
 msgstr "Ihr Ticket wurde eröffnet"
@@ -834,11 +851,17 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 msgid "Download"
 msgstr "Herunterladen"
 
-msgid "Export Excel (from filter)"
-msgstr "Excel Export (mit Filter)"
+#~ msgid "Please provide at least one phone number."
+#~ msgstr "Bitte geben Sie mindestens eine Telefonnummer an."
 
-msgid "Hidden only"
-msgstr "Nur versteckte anzeigen"
+#~ msgid ""
+#~ "Please enter a message or suggest some changes using the fields below."
+#~ msgstr ""
+#~ "Bitte geben Sie entweder eine Nachricht oder mindestens einen "
+#~ "Änderungsvorschlag in die unten stehenden Felder ein."
+
+#~ msgid "Export Excel"
+#~ msgstr "Export Excel"
 
 #~ msgid ""
 #~ "In order for your application for inclusion in the directory to be "

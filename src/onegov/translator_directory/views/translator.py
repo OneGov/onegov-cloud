@@ -426,6 +426,15 @@ def report_translator_change(
     if form.submitted(request):
         assert request.current_username is not None
         session = request.session
+
+        # Get uploaded files from the form
+        uploaded_files = form.get_files()
+        file_ids: list[str] = []
+        if uploaded_files:
+            self.files.extend(uploaded_files)
+            session.flush()
+            file_ids = [f.id for f in uploaded_files]
+
         with session.no_autoflush:
             ticket = TicketCollection(session).open_ticket(
                 handler_code='TRN',
@@ -434,8 +443,9 @@ def report_translator_change(
                     'id': str(self.id),
                     'submitter_email': request.current_username,
                     'submitter_message': form.submitter_message.data,
-                    'proposed_changes': form.proposed_changes
-                }
+                    'proposed_changes': form.proposed_changes,
+                    'file_ids': file_ids,
+                },
             )
             TicketMessage.create(ticket, request, 'opened', 'external')
             ticket.create_snapshot(request)

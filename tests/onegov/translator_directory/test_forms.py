@@ -173,7 +173,7 @@ def test_translator_mutation_form(translator_app):
     form.request.is_admin = False
     form.request.is_translator = True
     form.on_request()
-    assert len(form._fields) == 44
+    assert len(form._fields) == 55
     assert len(form.proposal_fields) == 43
 
     form = TranslatorMutationForm()
@@ -182,7 +182,7 @@ def test_translator_mutation_form(translator_app):
     form.request.is_translator = False
     form.request.is_editor = True
     form.on_request()
-    assert len(form._fields) == 33
+    assert len(form._fields) == 44
     assert len(form.proposal_fields) == 32
     assert form.operation_comments is None
     assert form.confirm_name_reveal is None
@@ -200,7 +200,7 @@ def test_translator_mutation_form(translator_app):
     form.request.is_editor = False
     form.request.is_member = True
     form.on_request()
-    assert len(form._fields) == 28
+    assert len(form._fields) == 39
     assert len(form.proposal_fields) == 27
     assert form.operation_comments is None
     assert form.confirm_name_reveal is None
@@ -222,8 +222,7 @@ def test_translator_mutation_form(translator_app):
     assert not form.validate()
     assert form.errors == {
         'submitter_message': [
-            'Please enter a message or suggest some changes using the '
-            'fields below.'
+            'Please enter a message, suggest changes, or upload ' 'documents.'
         ]
     }
     assert form.proposed_changes == {}
@@ -285,8 +284,7 @@ def test_translator_mutation_form(translator_app):
     assert not form.validate()
     assert form.errors == {
         'submitter_message': [
-            'Please enter a message or suggest some changes using the '
-            'fields below.'
+            'Please enter a message, suggest changes, or upload ' 'documents.'
         ]
     }
     assert form.proposed_changes == {}
@@ -344,6 +342,38 @@ def test_translator_mutation_form(translator_app):
         'certificates': [str(x.id) for x in certificates[0:2]],
         'comments': 'Some other comment',
     }
+
+    # Test document uploads
+    form = TranslatorMutationForm(
+        DummyPostData(
+            {
+                'uploaded_certificates': create_file('certificate.pdf'),
+                'passport': create_file('passport.pdf'),
+            }
+        )
+    )
+    form.request = request
+    assert form.validate()
+    files = form.get_files()
+    assert len(files) == 2
+    assert files[0].note == 'Mutationsmeldung'
+    assert files[1].note == 'Mutationsmeldung'
+
+    # Test document upload with empty data
+    form = TranslatorMutationForm(DummyPostData({}))
+    form.request = request
+    files = form.get_files()
+    assert files == []
+
+    # Test valid submission with only documents (no message or changes)
+    form = TranslatorMutationForm(
+        DummyPostData({'resume': create_file('resume.pdf')})
+    )
+    form.request = request
+    assert form.validate()
+    assert form.proposed_changes == {}
+    files = form.get_files()
+    assert len(files) == 1
 
 
 def test_accreditation_form(translator_app):
