@@ -66,7 +66,7 @@ def import_zug_kub_data(
         organization_data: Organization data to import
         membership_data: Membership data to import
         user_id: ID of user performing the import (optional)
-        import_type: Type of import ('cli', 'upload', or 'automatic')
+        import_type: Type of import
         logger: Optional logger to use instead of module logger
         create_import_log: Whether to create ImportLog (True for web form,
                           False for CLI/orchestrator)

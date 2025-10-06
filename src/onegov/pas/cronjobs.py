@@ -18,7 +18,7 @@ log = logging.getLogger('onegov.pas.cronjobs')
 def hourly_kub_data_import(request: PasRequest) -> None:
 
     try:
-        trigger_kub_data_import(request)
+        trigger_kub_data_import(request, import_type='automatic')
     except ValueError as e:
         log.warning(f'KUB import skipped: {e}')
     except Exception:
@@ -26,7 +26,9 @@ def hourly_kub_data_import(request: PasRequest) -> None:
         raise
 
 
-def trigger_kub_data_import(request: PasRequest) -> dict[str, Any] | None:
+def trigger_kub_data_import(
+    request: PasRequest, import_type: str
+) -> dict[str, Any] | None:
     app = request.app
     # FIXME: this is a bit crude, this will have to be
     # a conditional statement in puppet
@@ -44,7 +46,7 @@ def trigger_kub_data_import(request: PasRequest) -> dict[str, Any] | None:
 
     with KubImporter(kub_token, kub_base_url, output_handler) as importer:
         combined_results, import_log_id = importer.run_full_sync(
-            request, cast('PasAppType', app), update_custom=True, max_workers=3
+            request, cast('PasAppType', app), import_type
         )
 
     # Return results for UI display (if applicable)

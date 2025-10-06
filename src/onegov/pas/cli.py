@@ -186,7 +186,7 @@ def import_kub_data(
         try:
             with KubImporter(token, base_url, output_handler) as importer:
                 combined_results, import_log_id = importer.run_full_sync(
-                    request, app, update_custom, max_workers
+                    request, app, 'cli', update_custom, max_workers
                 )
 
             # Display summary

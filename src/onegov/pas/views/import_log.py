@@ -109,7 +109,7 @@ def trigger_import_view(
 ) -> Response:
     """Trigger manual KUB data import."""
     try:
-        trigger_kub_data_import(request)
+        trigger_kub_data_import(request, import_type='upload')
         request.success(_(
             'Import triggered successfully. The process may take up to 30 '
             'seconds to complete.'

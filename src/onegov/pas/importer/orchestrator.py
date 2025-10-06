@@ -15,6 +15,7 @@ from onegov.pas.models.import_log import ImportLog
 from onegov.pas.views.data_import import load_and_concatenate_json
 from onegov.pas.importer.zug_kub_importer import import_zug_kub_data
 from onegov.pas.importer.types import OutputLogHandler
+from sqlalchemy.orm.attributes import flag_modified
 
 
 from typing import TYPE_CHECKING, Any, Self
@@ -499,12 +500,10 @@ class KubImporter:
                     'errors': error_count,
                     'processed': len(parliamentarians)
                 }
-
-                # Append output messages
-                if 'output_messages' not in import_log.details:
-                    import_log.details['output_messages'] = []
-
-                import_log.details['output_messages'].extend(output_messages)
+                import_log.details.setdefault('output_messages', []).extend(
+                    output_messages
+                )
+                flag_modified(import_log, 'details')
 
                 # If timeout occurred, update the status to 'timeout'
                 if timed_out:
@@ -515,46 +514,32 @@ class KubImporter:
         return updated_count, error_count, output_messages
 
     def import_data(
-        self,
-        request: PasRequest,
-        app: PasApp,
-        import_log_id: uuid.UUID | None = None
+        self, request: PasRequest, app: PasApp, import_type: str = 'automatic'
     ) -> tuple[dict[str, Any], list[Any], list[Any], list[Any], uuid.UUID]:
         """
         Performs KUB data import using the shared session.
-
-        Args:
-            request: PasRequest object
-            app: PasApp object
-            import_log_id: Optional existing ImportLog ID to update
 
         Returns:
             Tuple of (import_results, people_data, organization_data,
                       membership_data, import_log_id)
         """
 
-        # Create or get ImportLog
-        if import_log_id is None:
-            import_log = ImportLog(
-                user_id=(
-                    request.current_user.id if request.current_user else None
-                ),
-                details={'status': 'started'},
-                status='in_progress',
-                import_type='automatic'
-            )
-            request.session.add(import_log)
-            request.session.flush()
-            import_log_id = import_log.id
-        else:
-            import_log_result = request.session.query(ImportLog).filter(
-                ImportLog.id == import_log_id
-            ).first()
-            if not import_log_result:
-                raise ValueError(
-                    f'ImportLog with ID {import_log_id} not found'
-                )
-            import_log = import_log_result
+        people_data: list[Any] = []
+        organization_data: list[Any] = []
+        membership_data: list[Any] = []
+        import_results: dict[str, Any] = {}
+
+        import_log = ImportLog(
+            user_id=(
+                request.current_user.id if request.current_user else None
+            ),
+            details={'status': 'started'},
+            status='in_progress',
+            import_type=import_type,
+        )
+        request.session.add(import_log)
+        request.session.flush()
+        import_log_id = import_log.id
 
         try:
             self._check_api_accessibility()
@@ -587,30 +572,27 @@ class KubImporter:
                     f'Fetched {len(memberships_raw)} membership records'
                 )
 
-            # Create mock file data structures for load_and_concatenate_json
-            # We use this so we can use the same method as in form upload
-            people_mock_files = [
-                create_mock_file_data(people_raw, 'people.json')
-            ]
-            organizations_mock_files = [
-                create_mock_file_data(
-                    organizations_raw, 'organizations.json'
-                )
-            ]
-            memberships_mock_files = [
-                create_mock_file_data(memberships_raw, 'memberships.json')
-            ]
+            # Process raw data through load_and_concatenate_json
+            # We wrap API responses to use the same method as form upload
             if self.output:
                 self.output.info('Processing people data...')
-            people_data = load_and_concatenate_json(people_mock_files)
+            people_data = load_and_concatenate_json(
+                [create_mock_file_data(people_raw, 'people.json')]
+            )
             if self.output:
                 self.output.info('Processing organizations data...')
             organization_data = load_and_concatenate_json(
-                organizations_mock_files
+                [
+                    create_mock_file_data(
+                        organizations_raw, 'organizations.json'
+                    )
+                ]
             )
             if self.output:
                 self.output.info('Processing memberships data...')
-            membership_data = load_and_concatenate_json(memberships_mock_files)
+            membership_data = load_and_concatenate_json(
+                [create_mock_file_data(memberships_raw, 'memberships.json')]
+            )
 
             # Perform the import
             if self.output:
@@ -653,6 +635,7 @@ class KubImporter:
                 'import_results': import_results,
                 'status': 'completed'
             })
+            flag_modified(import_log, 'details')
             import_log.status = 'completed'
 
             # Display results
@@ -685,17 +668,12 @@ class KubImporter:
                     f'{total_processed} processed'
                 )
 
-            return (
-                import_results, people_data, organization_data,
-                membership_data, import_log_id
-            )
-
         except Exception as e:
-            # Update ImportLog with error
             import_log.details.update({
                 'error': str(e),
                 'status': 'failed'
             })
+            flag_modified(import_log, 'details')
             import_log.status = 'failed'
 
             if self.output:
@@ -706,6 +684,7 @@ class KubImporter:
             if hasattr(self.output, 'get_messages'):
                 output_messages = self.output.get_messages()  # type: ignore
                 import_log.details['output_messages'] = output_messages
+                flag_modified(import_log, 'details')
 
             if import_log.import_type != 'automatic':
                 # Store response json for finding issues quickly, but
@@ -717,30 +696,32 @@ class KubImporter:
 
             request.session.flush()
 
+        return (
+            import_results,
+            people_data,
+            organization_data,
+            membership_data,
+            import_log_id,
+        )
+
     def run_full_sync(
         self,
         request: PasRequest,
         app: PasApp,
+        import_type: str,
         update_custom: bool = True,
-        max_workers: int = 3
+        max_workers: int = 3,
     ) -> tuple[dict[str, Any], uuid.UUID]:
         """
-        Complete KUB synchronization including import and custom data update.
-
         This is the main entry point for cronjobs and automated imports.
-
-        Args:
-            request: PasRequest object
-            app: PasApp object
-            update_custom: Whether to update custom data after import
-            max_workers: Maximum number of concurrent workers for custom data
+        Complete KUB synchronization including import and custom data update.
 
         Returns:
             Tuple of (combined_results, import_log_id)
         """
         # Perform main import
         import_results, _people_data, _org_data, _membership_data, log_id = (
-            self.import_data(request, app)
+            self.import_data(request, app, import_type=import_type)
         )
 
         combined_results = {
