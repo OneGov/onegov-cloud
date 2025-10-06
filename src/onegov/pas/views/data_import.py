@@ -114,7 +114,8 @@ def handle_data_import(
                 membership_data=membership_data,
                 user_id=(request.current_user.id
                          if request.current_user else None),
-                import_type='upload'
+                import_type='upload',
+                create_import_log=True
             )
 
             # Check if import log ID was returned and redirect to it
