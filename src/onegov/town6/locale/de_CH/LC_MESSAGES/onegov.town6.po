@@ -2027,7 +2027,7 @@ msgid "Interest ties"
 msgstr "Interessensbindungen"
 
 msgid "Personal details"
-msgstr "Personenalien"
+msgstr "Personalien"
 
 msgid "First name"
 msgstr "Vorname"
