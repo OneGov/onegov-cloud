@@ -629,6 +629,9 @@ class Pdf(PDFDocument):
         if body is None:
             return
 
+        if body.text:
+            self.p(body.text, self.style.paragraph)
+
         for element in body:
             if element.tag == 'p':
                 self.p_markup(self.inner_html(element), self.style.paragraph)
@@ -671,3 +674,6 @@ class Pdf(PDFDocument):
                         )
                     )
                 )
+
+            if element.tail:
+                self.p(element.tail, self.style.paragraph)
