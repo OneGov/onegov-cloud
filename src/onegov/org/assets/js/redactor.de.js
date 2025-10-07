@@ -47,6 +47,7 @@ $.Redactor.opts.langs['de'] = {
 	title: 'Title',
     subtitle: 'Untertitel',
 	subsubtitle: 'Sub-Untertitel',
+	editnote: 'Editierhinweis',
 	image_view: 'Bilder',
 	image_position: 'Textumbruch',
 	none: 'Keine',

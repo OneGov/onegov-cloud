@@ -47,6 +47,7 @@ $.Redactor.opts.langs['fr'] = {
     title: 'Titre',
     subtitle: 'Sous-titre',
     subsubtitle: 'Sous-Sous-titre',
+    editnote: 'Note de modification',
     image_view: 'Voir l\'image',
     image_position: 'Position de l\'image',
     none: 'aucun',
