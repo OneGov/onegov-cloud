@@ -99,7 +99,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        group: [1, 2, 3, 4, 5, 6]
 
     runs-on: ubuntu-24.04
 
@@ -201,7 +201,7 @@ jobs:
           -o cache_dir=/tmp/pytest \
           -r fER \
           --dist loadgroup \
-          --splits "9" \
+          --splits "6" \
           --group "${{matrix.group}}" \
           --reruns 3 \
           --reruns-delay 1 \

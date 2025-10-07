@@ -264,7 +264,7 @@ def test_posters_parse_xml(session):
 
     # parse xml
     posters = MyPosters()
-    with raises(ValueError):
+    with raises(TypeError):
         posters.parse_xml(Bunch(content=None))
     with raises(XMLSyntaxError):
         posters.parse_xml(Bunch(content=''))
