@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import pytest
-
 from click.testing import CliRunner
 from onegov.event import Event
 from onegov.search.cli import cli
@@ -13,7 +11,6 @@ if TYPE_CHECKING:
     from onegov.core.orm import SessionManager
 
 
-@pytest.mark.skip('Currently broken on CI')  # FIXME
 def test_search_cli_index_status(
     cfg_path: str,
     session_manager: SessionManager
