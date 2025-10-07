@@ -44,6 +44,7 @@ $.Redactor.opts.langs['it'] = {
 	title: 'Titolo',
 	subtitle: 'Sottotitolo',
 	subsubtitle: 'Sotto-Sottotitolo',
+	editnote: 'Nota di modifica',
 	image_position: 'Posizione',
 	none: 'Nessuno',
 	left: 'Sinistra',
