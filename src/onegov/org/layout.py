@@ -3480,6 +3480,9 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
         elif self.directory.numbering == 'custom':
             self.custom_body_attributes['data-default-marker-icon'] = 'custom'
 
+    def show_label(self, field: Field) -> bool:
+        return False
+
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [

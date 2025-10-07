@@ -179,34 +179,84 @@ def test_directory_entry_subscription(client):
 
 def test_create_directory_accordion_layout(client):
 
-    def create_directory(client, title):
-        page = (client.get('/directories').
-                click('Verzeichnis'))
+    def create_directory(client, title, structure):
+        page = (client.get('/directories').click('Verzeichnis'))
         page.form['title'] = title
-        page.form['structure'] = "Question *= ___\nAnswer *= ___"
+        page.form['structure'] = structure
         page.form['title_format'] = '[Question]'
+        page.form['content_fields'] = 'Question\nAnswer'
         page.form['layout'] = 'accordion'
         return page.form.submit().follow()
 
-    client.login_admin()
-    title = "Questions and Answers about smurfs"
+    def edit_directory(client, dir_url_name, structure):
+        page = client.get(f'/directories/{dir_url_name}')
+        page = page.click('Konfigurieren')
+        page.form['structure'] = structure
+        return page.form.submit().form.submit().follow()
 
-    faq_dir = create_directory(client, title)
+    def create_directory_entry(directory, question, answer):
+        page = directory.click('Eintrag')
+        page.form['question'] = question
+        page.form['answer'] = answer
+        return page.form.submit().follow()
+
+    client.login_admin()
+
+    title = "Questions and Answers about smurfs"
+    structure = "Question *= ___\nAnswer *= ___"
+    faq_dir = create_directory(client, title, structure)
     assert title in faq_dir
 
-    question = "Are smurfs real?"
-    answer = "Yes, they are."
-    q1 = faq_dir.click('Eintrag')
-    q1.form['question'] = question
-    q1.form['answer'] = answer
-    q1 = q1.form.submit().follow()
-    assert question in q1
-    assert answer not in q1
+    question_1 = "Are smurfs real?"
+    answer_1 = "Yes, they are."
+    page = create_directory_entry(faq_dir, question_1, answer_1)
+    assert question_1 in page
+    assert answer_1 in page
 
-    question = "Who is the boss of the smurfs?"
-    q2 = faq_dir.click('Eintrag')
-    q2.form['question'] = question
-    q2.form['answer'] = 'Papa Schlumpf'
-    q2 = q2.form.submit().follow()
-    assert question in q2
-    assert answer not in q2
+    question_2 = "Who is the boss of the smurfs?"
+    answer_2 = "Papa Smurf"
+    page = create_directory_entry(faq_dir, question_2, answer_2)
+    assert question_2 in page
+    assert answer_2 in page
+
+    question_3 = "How many smurfs are there?"
+    answer_3 = '- Papa Smurf\n- Smurfette\n- Brainy Smurf\n- Grouchy Smurf'
+    q3 = create_directory_entry(faq_dir, question_3, answer_3)
+    assert question_3 in q3
+    for smurf in answer_3.split('\n'):
+        assert smurf in q3
+
+    page = client.get('/directories/questions-and-answers-about-smurfs')
+    assert question_1 in page
+    assert answer_1 in page
+    assert question_2 in page
+    assert answer_2 in page
+    assert question_3 in page
+    for smurf in answer_3.split('\n'):
+        assert smurf in page
+
+    # with multiline answers
+    structure = "Question *= ___\nAnswer *= ...[10]"
+    page = edit_directory(
+        client, 'questions-and-answers-about-smurfs', structure)
+    assert question_1 in page
+    assert answer_1 in page
+    assert question_2 in page
+    assert answer_2 in page
+    assert question_3 in page
+    for smurf in answer_3.split('\n'):
+        assert smurf in page
+
+    # with markdown answers
+    structure = "Question *= ___\nAnswer *= <markdown>"
+    page = edit_directory(
+        client, 'questions-and-answers-about-smurfs', structure)
+    assert question_1 in page
+    assert answer_1 in page
+    assert question_2 in page
+    assert answer_2 in page
+    assert question_3 in page
+    for smurf in answer_3.replace('- ', '').split('\n'):
+        assert smurf in page
+        # ensure markdown rendered each smurf in separate li tag
+        assert f'<li>{smurf}</li>' in page
