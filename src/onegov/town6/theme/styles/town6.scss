@@ -226,6 +226,10 @@ footer {
             }
         }
     }
+
+    .video-link a::before {
+        display: none;
+    }
 }
 
 /*
