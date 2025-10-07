@@ -263,7 +263,7 @@ def test_view_translator(client):
     page.form['zip_code'] = '4052'
     page.form['city'] = 'Somecity'
     page.form['drive_distance'] = drive_distance
-    page.form['social_sec_number'] = '756.1111.1111.11'
+    page.form['social_sec_number'] = '756.1111.1111.13'
     page.form['bank_name'] = 'Abank'
     page.form['bank_address'] = 'AB Address'
     page.form['account_owner'] = 'AccountOwner'
@@ -317,7 +317,7 @@ def test_view_translator(client):
     assert len(values) == 42
     assert values['Nachname'] == 'MAGGIE'
     assert values['Vorname'] == 'Aunt'
-    assert values['AHV-Nr.'] == '756.1111.1111.11'
+    assert values['AHV-Nr.'] == '756.1111.1111.13'
     assert values['Anschrift'] == 'Somestreet'
     assert values['Ausbildung Dolmetscher'] == 'Ja'
     assert values['Bank Adresse'] == 'AB Address'
@@ -527,7 +527,7 @@ def test_view_export_translators(client):
     assert sheet.cell(2, 12).value == '4000'
     assert sheet.cell(2, 13).value == 'Luzern'
     assert sheet.cell(2, 14).value is None
-    assert sheet.cell(2, 15).value == '756.1234.4568.90'
+    assert sheet.cell(2, 15).value == '756.1234.4568.94'
     assert sheet.cell(2, 16).value == 'R-BS'
     assert sheet.cell(2, 17).value == 'Bullstreet 5'
     assert sheet.cell(2, 18).value == 'Hugo Benito'
@@ -1569,7 +1569,7 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
         page.form['drive_distance'] = '1.1'
         page.form['withholding_tax'] = False
         page.form['self_employed'] = True
-        page.form['social_sec_number'] = '756.1234.4568.90'
+        page.form['social_sec_number'] = '756.1234.4568.94'
         page.form['bank_name'] = 'R-BS'
         page.form['bank_address'] = 'Bullstreet 5'
         page.form['account_owner'] = 'Hugo Benito'
@@ -1650,7 +1650,7 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
         assert '1.1' in page
         assert '"withholding-tax">Nein' in page
         assert '"self-employed">Ja' in page
-        assert '756.1234.4568.90' in page
+        assert '756.1234.4568.94' in page
         assert 'R-BS' in page
         assert 'Bullstreet 5' in page
         assert 'Hugo Benito' in page
@@ -1742,7 +1742,7 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
 
     page = page.click('BENITO, Hugo')
     assert 'BENITO, Hugo' in page
-    assert '756.1234.4568.90' in page
+    assert '756.1234.4568.94' in page
 
     client.logout()
 
@@ -1755,7 +1755,7 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
     page = client.login('hugo.benito@translators.com', 'p@ssw0rd', None)
     page = page.maybe_follow()
     assert 'BENITO, Hugo' in page
-    assert '756.1234.4568.90' in page
+    assert '756.1234.4568.94' in page
 
 
 @patch(
@@ -1823,7 +1823,7 @@ def test_view_accreditation_errors(directions, client):
     page.form['drive_distance'] = '1.1'
     page.form['withholding_tax'] = False
     page.form['self_employed'] = False
-    page.form['social_sec_number'] = '756.1234.4568.90'
+    page.form['social_sec_number'] = '756.1234.4568.94'
     page.form['bank_name'] = 'R-BS'
     page.form['bank_address'] = 'Bullstreet 5'
     page.form['account_owner'] = 'Hugo Benito'
@@ -1882,7 +1882,7 @@ def test_view_accreditation_errors(directions, client):
     assert '1.1' in page
     assert '"withholding-tax">Nein' in page
     assert '"self-employed">Nein' in page
-    assert '756.1234.4568.90' in page
+    assert '756.1234.4568.94' in page
     assert 'R-BS' in page
     assert 'Bullstreet 5' in page
     assert 'Hugo Benito' in page
