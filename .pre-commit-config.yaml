@@ -27,7 +27,7 @@ repos:
         additional_dependencies:
         - flake8-type-checking>=3.0.0
   - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-    rev: v16.24.0
+    rev: v16.25.0
     hooks:
     - id: stylelint
       files: '^src/.*\.scss'
@@ -35,7 +35,7 @@ repos:
         - stylelint@16.19.1
         - stylelint-config-standard-scss@15.0.0
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.36.0
+    rev: v9.37.0
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'

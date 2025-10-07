@@ -76,7 +76,6 @@ module = [
     "tests.onegov.election_day.*",
     "tests.onegov.feriennet.*",
     "tests.onegov.fsi.*",
-    "tests.onegov.gazette.*",
     "tests.onegov.landsgemeinde.*",
     "tests.onegov.org.*",
     "tests.onegov.pas.*",
