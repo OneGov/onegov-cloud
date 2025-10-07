@@ -629,7 +629,7 @@ class Pdf(PDFDocument):
         if body is None:
             return
 
-        if body.text:
+        if body.text and body.text.strip():
             self.p(body.text, self.style.paragraph)
 
         for element in body:
@@ -675,5 +675,5 @@ class Pdf(PDFDocument):
                     )
                 )
 
-            if element.tail:
+            if element.tail and element.tail.strip():
                 self.p(element.tail, self.style.paragraph)
