@@ -1603,3 +1603,38 @@ a.category-anchor {
     font-weight: normal !important;
     padding-left: .5rem;
 }
+
+.political-businesses .card {
+    height: auto;
+    margin-bottom: 1.5rem;
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem;
+        padding-bottom: 0;
+
+        .info {
+            padding-top: .5rem;
+        }
+
+        .tags {
+            text-align: right;
+        }
+    }
+
+    .card-section {
+        padding: 1rem !important;
+        padding-top: .7rem !important;
+    }
+
+    .blank-label {
+        border-radius: .7rem;
+        padding-bottom: .5rem;
+    }
+
+    .title {
+        color: $primary-color;
+        font-weight: bold !important;
+    }
+}
