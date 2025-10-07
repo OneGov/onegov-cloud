@@ -102,7 +102,7 @@ def test_chat_opening_hours(client):
         assert "Chat" not in page
 
         settings = admin.get('/chat-settings')
-        settings.form['enable_chat'] = True
+        settings.form['enable_chat'] = 'people_chat'
         settings.form.submit()
 
         page = anon.get('/')
@@ -110,7 +110,7 @@ def test_chat_opening_hours(client):
 
         # Set opening hours that include friday, 9:00
         settings = admin.get('/chat-settings')
-        settings.form['enable_chat'] = True
+        settings.form['enable_chat'] = 'people_chat'
         settings.form['specific_opening_hours'] = True
         settings.form['opening_hours_chat'] = '''
             {"labels":
@@ -132,7 +132,7 @@ def test_chat_opening_hours(client):
 
         # Set opening hours that exclude friday, 9:00
         settings = admin.get('/chat-settings')
-        settings.form['enable_chat'] = True
+        settings.form['enable_chat'] = 'people_chat'
         settings.form['specific_opening_hours'] = True
         settings.form['opening_hours_chat'] = '''
             {"labels":

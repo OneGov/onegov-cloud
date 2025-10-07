@@ -261,7 +261,8 @@ class Organisation(Base, TimestampMixin):
 
     # Chat Settings
     chat_staff: dict_property[list[str] | None] = meta_property()
-    enable_chat: dict_property[bool] = meta_property(default=False)
+    enable_chat: dict_property[str] = meta_property(default='disabled')
+    chat_link: dict_property[str | None] = meta_property()
     specific_opening_hours: dict_property[bool] = meta_property(default=False)
     opening_hours_chat: dict_property[list[list[str]] | None] = meta_property()
     chat_topics: dict_property[list[str] | None] = meta_property()

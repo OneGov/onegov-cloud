@@ -228,7 +228,7 @@ def test_chat_archive(client):
     client.login_admin()
 
     settings = client.get('/chat-settings')
-    settings.form['enable_chat'] = True
+    settings.form['enable_chat'] = 'people_chat'
     settings.form.submit()
 
     page = client.get('/chats/+initiate')
@@ -260,7 +260,7 @@ def test_chat_topics(client):
     client.login_admin()
 
     settings = client.get('/chat-settings')
-    settings.form['enable_chat'] = True
+    settings.form['enable_chat'] = 'people_chat'
     settings.form['chat_topics'] = 'Steuern, Bau'
     settings.form.submit()
 
