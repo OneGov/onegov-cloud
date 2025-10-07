@@ -60,7 +60,7 @@ def test_translator_mutation_form(translator_app):
         tel_private='041 444 44 45',
         nationalities=['CH'],
         tel_mobile='079 123 45 67',
-        social_sec_number='756.1234.4568.95',
+        social_sec_number='756.1234.4568.94',
     )
     translator.certificates = certificates[0:2]
     translator.mother_tongues = languages[0:2]
@@ -102,7 +102,7 @@ def test_translator_mutation_form(translator_app):
     assert form.zip_code.long_description == '4000'
     assert form.city.long_description == 'Luzern'
     assert form.drive_distance.long_description == '1.1'
-    assert form.social_sec_number.long_description == '756.1234.4568.95'
+    assert form.social_sec_number.long_description == '756.1234.4568.94'
     assert form.bank_name.long_description == 'R-BS'
     assert form.bank_address.long_description == 'Bullstreet 5'
     assert form.account_owner.long_description == 'Hugo Benito'
@@ -248,7 +248,7 @@ def test_translator_mutation_form(translator_app):
         'zip_code': '4000',
         'city': 'Luzern',
         'drive_distance': 1.1,
-        'social_sec_number': '756.1234.4568.95',
+        'social_sec_number': '756.1234.4568.94',
         'bank_name': 'R-BS',
         'bank_address': 'Bullstreet 5',
         'account_owner': 'Hugo Benito',
@@ -314,7 +314,7 @@ def test_translator_mutation_form(translator_app):
         'zip_code': '4000',
         'city': 'Luzern',
         'drive_distance': 1.1,
-        'social_sec_number': '756.1234.4568.95',
+        'social_sec_number': '756.1234.4568.94',
         'bank_name': 'R-BS',
         'bank_address': 'Bullstreet 5',
         'account_owner': 'Hugo Benito',
@@ -452,7 +452,7 @@ def test_accreditation_form(translator_app):
         'drive_distance': 1.1,
         'withholding_tax': False,
         'self_employed': False,
-        'social_sec_number': '756.1234.4568.90',
+        'social_sec_number': '756.1234.4568.94',
         'bank_name': 'R-BS',
         'bank_address': 'Bullstreet 5',
         'account_owner': 'Hugo Benito',
@@ -515,7 +515,7 @@ def test_accreditation_form(translator_app):
         'drive_distance': 1.1,
         'withholding_tax': False,
         'self_employed': False,
-        'social_sec_number': '756.1234.4568.90',
+        'social_sec_number': '756.1234.4568.94',
         'bank_name': 'R-BS',
         'bank_address': 'Bullstreet 5',
         'account_owner': 'Hugo Benito',
