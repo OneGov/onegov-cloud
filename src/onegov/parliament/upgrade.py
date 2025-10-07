@@ -240,3 +240,21 @@ def add_unique_constraint_to_parliamentarian_fields(
                 'par_parliamentarians',
                 ['external_kub_id']
             )
+
+
+@upgrade_task('Drop personnel_number unique constraint')
+def drop_personnel_number_unique_constraint(
+    context: UpgradeContext
+) -> None:
+    if not context.has_table('par_parliamentarians'):
+        return
+
+    if context.has_constraint(
+        'par_parliamentarians',
+        'unique_parliamentarian_personnel_number',
+        'UNIQUE'):
+        context.operations.drop_constraint(
+            'unique_parliamentarian_personnel_number',
+            'par_parliamentarians',
+            type_='unique'
+        )

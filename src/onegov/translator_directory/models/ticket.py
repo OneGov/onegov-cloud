@@ -83,6 +83,18 @@ class TranslatorMutationHandler(Handler):
     def state(self) -> str | None:
         return self.data.get('state')
 
+    @cached_property
+    def uploaded_files(self) -> list[Any]:
+        from onegov.file import File
+
+        file_ids = self.data['handler_data'].get('file_ids', [])
+        if not file_ids:
+            return []
+        return [
+            self.session.query(File).filter_by(id=fid).first()
+            for fid in file_ids
+        ]
+
     @property
     def title(self) -> str:
         return self.translator.title if self.translator else '<Deleted>'
@@ -111,8 +123,9 @@ class TranslatorMutationHandler(Handler):
                 'translator': self.translator,
                 'message': linkify(self.message).replace('\n', Markup('<br>')),
                 'changes': changes,
-                'layout': layout
-            }
+                'layout': layout,
+                'uploaded_files': self.uploaded_files,
+            },
         )
 
     def get_links(  # type:ignore[override]
