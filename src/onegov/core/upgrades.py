@@ -246,3 +246,17 @@ def change_adjacency_list_order_to_numeric(context: UpgradeContext) -> None:
                 type_=Numeric(30, 15),
                 postgresql_using='"order"::numeric'
             )
+
+
+@upgrade_task('Drop remaining gazette and notices tables')
+def drop_remaining_gazette_and_notices_tables(context: UpgradeContext) -> None:
+    for table in (
+        'files_for_gazette_issues_files',
+        'files_for_official_notices_files',
+        'gazette_categories',
+        'gazette_issues',
+        'gazette_organizations',
+        'official_notices',
+    ):
+        if context.has_table(table):
+            context.operations.drop_table(table)
