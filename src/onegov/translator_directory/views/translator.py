@@ -22,6 +22,9 @@ from onegov.translator_directory.collections.translator import (
 from onegov.translator_directory.constants import (
     PROFESSIONAL_GUILDS, INTERPRETING_TYPES, ADMISSIONS, GENDERS, GENDER_MAP)
 from onegov.translator_directory.forms.mutation import TranslatorMutationForm
+from onegov.translator_directory.forms.time_report import (
+    TranslatorTimeReportForm,
+)
 from onegov.translator_directory.forms.translator import (
     TranslatorForm, TranslatorSearchForm,
     EditorTranslatorForm, MailTemplatesForm)
@@ -29,8 +32,14 @@ from onegov.translator_directory.generate_docx import (
     fill_docx_with_variables, signature_for_mail_templates,
     parse_from_filename, get_ticket_nr_of_translator)
 from onegov.translator_directory.layout import (
-    AddTranslatorLayout, TranslatorCollectionLayout, TranslatorLayout,
-    EditTranslatorLayout, ReportTranslatorChangesLayout, MailTemplatesLayout)
+    AddTranslatorLayout,
+    TranslatorCollectionLayout,
+    TranslatorLayout,
+    EditTranslatorLayout,
+    ReportTranslatorChangesLayout,
+    MailTemplatesLayout,
+)
+from onegov.translator_directory.models.time_report import TranslatorTimeReport
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.utils import country_code_to_name
 
@@ -503,6 +512,39 @@ def confirm_current_data(
     TranslatorCollection(request.app).confirm_current_data(self)
     request.success(_('Your data has been confirmed'))
     return redirect(request.link(self))
+
+
+@TranslatorDirectoryApp.form(
+    model=Translator,
+    template='form.pt',
+    name='add-time-report',
+    form=TranslatorTimeReportForm,
+    permission=Secret,
+)
+def add_time_report(
+    self: Translator,
+    request: TranslatorAppRequest,
+    form: TranslatorTimeReportForm,
+) -> RenderData | BaseResponse:
+    """Add a new time report for this translator (admin only)."""
+
+    if form.submitted(request):
+        report = TranslatorTimeReport()
+        report.translator = self
+        form.update_model(report)
+        request.session.add(report)
+        request.success(_('Time report added successfully'))
+        return request.redirect(request.link(self))
+
+    layout = TranslatorLayout(self, request)
+    layout.edit_mode = True
+
+    return {
+        'layout': layout,
+        'model': self,
+        'form': form,
+        'title': _('Add Time Report'),
+    }
 
 
 @TranslatorDirectoryApp.form(

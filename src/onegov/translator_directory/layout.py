@@ -91,6 +91,13 @@ class DefaultLayout(BaseLayout):
             return self.request.translate(INTERPRETING_TYPES[key])
         return key
 
+    @staticmethod
+    def format_currency(amount: float | None) -> str:
+        """Format amount as Swiss Francs."""
+        if amount is None:
+            return 'CHF 0.00'
+        return f'CHF {amount:.2f}'
+
 
 class TranslatorLayout(DefaultLayout):
 
@@ -178,6 +185,11 @@ class TranslatorLayout(DefaultLayout):
                         self.model, name='mail-templates'
                     ),
                     attrs={'class': 'envelope'}
+                ),
+                Link(
+                    _('Add Time Report'),
+                    url=self.request.link(self.model, name='add-time-report'),
+                    attrs={'class': 'plus'},
                 ),
             ]
         elif self.request.is_editor:
