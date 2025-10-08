@@ -809,6 +809,30 @@ def test_file_security(client):
     client.get(translator_file, status=403)
 
 
+def test_translator_file_access_forbidden(client):
+    client.login_admin()
+    page = client.get('/files')
+    page.form['file'] = [upload_pdf('test.pdf')]
+    page = page.form.submit()
+    url = page.pyquery('div[ic-get-from]')[0].attrib['ic-get-from']
+    file_url = url.replace('/details', '')
+    client.logout()
+
+    client.login_translator()
+    client.get(file_url, status=403)
+    client.get(f'{file_url}/thumbnail', status=403)
+    client.get(f'{file_url}/small', status=403)
+    client.get(f'{file_url}/medium', status=403)
+    client.get(file_url, status=403, extra_environ={'REQUEST_METHOD': 'HEAD'})
+    thumbnail_url = f'{file_url}/thumbnail'
+    client.get(
+        thumbnail_url,
+        status=403,
+        extra_environ={'REQUEST_METHOD': 'HEAD'}
+    )
+    client.logout()
+
+
 def test_translator_directory_settings(client):
     client.login_admin()
     settings = client.get('/').follow().click('Verzeichniseinstellungen')
