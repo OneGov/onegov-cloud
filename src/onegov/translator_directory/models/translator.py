@@ -123,7 +123,7 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     )
 
     # AHV-Nr.
-    social_sec_number: Column[str | None] = Column(Text)
+    social_sec_number = Column(Text)
 
     # Bank information
     bank_name: Column[str | None] = Column(Text)
