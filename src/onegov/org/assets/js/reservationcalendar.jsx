@@ -410,7 +410,7 @@ rc.shouldRenderReservationForm = function(event, previousReservationState) {
             previousReservationState.end !== moment(event.end).format('HH:mm')
         );
     const showPreviousTime = (showTimeRange || showWholeDay) && hasPreviousTimeToOffer;
-    const showQuota = !event.extendedProps.partlyAvailable && (event.extendedProps.quotaLeft > 1);
+    const showQuota = !event.extendedProps.partlyAvailable && (event.extendedProps.quotaLeft >= 1);
 
     // Determine if any fields need to be rendered
     return (

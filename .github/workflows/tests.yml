@@ -49,6 +49,7 @@ jobs:
           fonts-liberation \
           libappindicator3-1 \
           libasound2t64 \
+          libcairo2-dev \
           libdrm2 \
           libgbm1 \
           libnspr4 \
@@ -59,6 +60,7 @@ jobs:
           libxcb-dri3-0 \
           libxshmfence1 \
           libxss1 \
+          libxt-dev \
           xdg-utils
 
     - name: Checkout repo
@@ -97,7 +99,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        group: [1, 2, 3, 4, 5, 6, 7, 8]
 
     runs-on: ubuntu-24.04
 
@@ -133,6 +135,7 @@ jobs:
           fonts-liberation \
           libappindicator3-1 \
           libasound2t64 \
+          libcairo2-dev \
           libdrm2 \
           libgbm1 \
           libnspr4 \
@@ -143,6 +146,7 @@ jobs:
           libxcb-dri3-0 \
           libxshmfence1 \
           libxss1 \
+          libxt-dev \
           unzip \
           xdg-utils
 
@@ -197,7 +201,7 @@ jobs:
           -o cache_dir=/tmp/pytest \
           -r fER \
           --dist loadgroup \
-          --splits "9" \
+          --splits "8" \
           --group "${{matrix.group}}" \
           --reruns 3 \
           --reruns-delay 1 \

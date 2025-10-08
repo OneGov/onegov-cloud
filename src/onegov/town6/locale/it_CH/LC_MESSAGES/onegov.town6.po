@@ -78,6 +78,21 @@ msgstr "Usato per tutti i titoli"
 msgid "Enable the chat"
 msgstr "Attivare la chat"
 
+msgid "Disable chat"
+msgstr "Disattiva chat"
+
+msgid "Enable chat for chosen people"
+msgstr "Attiva chat per le seguenti persone"
+
+msgid "Enable AI chatbot"
+msgstr "Attiva chatbot AI"
+
+msgid "Link to chat service"
+msgstr "Collegamento al servizio di chat"
+
+msgid "https://govikonchatbot.seantis.ch"
+msgstr "https://govikonchatbot.seantis.ch"
+
 msgid "Show chat for chosen people"
 msgstr "Mostra la chat per le seguenti persone"
 
@@ -1287,6 +1302,21 @@ msgstr "Messa a fuoco"
 
 msgid "Available options for the focus widget:"
 msgstr "Opzioni disponibili per il widget di messa a fuoco:"
+
+msgid "Experimental AI Chatbot"
+msgstr "Chatbot AI sperimentale"
+
+msgid ""
+"This chatbot is experimental and may produce incorrect or misleading "
+"information. Please verify any information provided by the chatbot with "
+"official sources."
+msgstr ""
+"Questo chatbot è sperimentale e può produrre informazioni errate o "
+"fuorvianti. Si prega di verificare qualsiasi informazione fornita dal "
+"chatbot con fonti ufficiali."
+
+msgid "Try it out"
+msgstr "Provalo"
 
 msgid "Copy to clipboard"
 msgstr "Copia negli appunti"
@@ -2852,6 +2882,15 @@ msgstr "Sistema di informazione sui ratti (RIS)"
 
 msgid "New Note"
 msgstr "Nuova nota"
+
+#~ msgid ""
+#~ "This chatbot is experimental and may produce incorrect or misleading "
+#~ "information. It does not reflect the views of ${layout.org.name}. Please "
+#~ "verify any information provided by the chatbot with official sources."
+#~ msgstr ""
+#~ "Questo chatbot è sperimentale e può produrre informazioni errate o "
+#~ "fuorvianti. Non riflette le opinioni di ${layout.org.name}. Si prega di "
+#~ "verificare qualsiasi informazione fornita dal chatbot con fonti ufficiali."
 
 #~ msgid "No parliamentarians defined yet."
 #~ msgstr "Nessun parlamentare ancora definito."

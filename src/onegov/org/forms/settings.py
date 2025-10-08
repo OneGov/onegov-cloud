@@ -1394,6 +1394,13 @@ class NewsletterSettingsForm(Form):
         default=False
     )
 
+    daily_newsletter_title = StringField(
+        label=_('Title for daily newsletters'),
+        fieldset=_('Automatic newsletters'),
+        description=_('Daily news from our town'),
+        depends_on=('enable_automatic_newsletters', 'y'),
+    )
+
     newsletter_times = TagsField(
         label=_('Newsletter sending times (24h format)'),
         fieldset=_('Automatic newsletters'),

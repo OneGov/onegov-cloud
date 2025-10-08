@@ -303,12 +303,6 @@ applications:
     configuration:
       <<: *global-config
 
-  - path: /onegov_gazette/*
-    application: onegov.gazette.GazetteApp
-    namespace: onegov_gazette
-    configuration:
-      <<: *global-config
-
   - path: /onegov_intranet/*
     application: onegov.intranet.IntranetApp
     namespace: onegov_intranet

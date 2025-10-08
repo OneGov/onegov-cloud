@@ -84,6 +84,21 @@ msgstr "Wird für alle Titel verwendet"
 msgid "Enable the chat"
 msgstr "Chat aktivieren"
 
+msgid "Disable chat"
+msgstr "Chat deaktivieren"
+
+msgid "Enable chat for chosen people"
+msgstr "Chat für ausgewählte Personen aktivieren"
+
+msgid "Enable AI chatbot"
+msgstr "KI-Chatbot aktivieren"
+
+msgid "Link to chat service"
+msgstr "Link zum Chat-Service"
+
+msgid "https://govikonchatbot.seantis.ch"
+msgstr "https://govikonchatbot.seantis.ch"
+
 msgid "Show chat for chosen people"
 msgstr "Chat für folgende Personen anzeigen"
 
@@ -1288,6 +1303,21 @@ msgstr "Fokus"
 
 msgid "Available options for the focus widget:"
 msgstr "Verfügbare Optionen für das Fokus-Widget:"
+
+msgid "Experimental AI Chatbot"
+msgstr "Experimenteller AI-Chatbot"
+
+msgid ""
+"This chatbot is experimental and may produce incorrect or misleading "
+"information. Please verify any information provided by the chatbot with "
+"official sources."
+msgstr ""
+"Dieser Chatbot ist experimentell und kann ungenaue oder irreführende "
+"Informationen liefern. Bitte überprüfen Sie alle vom Chatbot "
+"bereitgestellten Informationen mit offiziellen Quellen."
+
+msgid "Try it out"
+msgstr "Ausprobieren"
 
 msgid "Copy to clipboard"
 msgstr "In die Zwischenablage kopieren"
@@ -2852,6 +2882,16 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid ""
+#~ "This chatbot is experimental and may produce incorrect or misleading "
+#~ "information. It does not reflect the views of ${layout.org.name}. Please "
+#~ "verify any information provided by the chatbot with official sources."
+#~ msgstr ""
+#~ "Dieser Chatbot ist experimentell und kann falsche oder irreführende "
+#~ "Informationen liefern. Er spiegelt nicht die Ansichten von ${layout.org."
+#~ "name} wider. Bitte überprüfen Sie alle vom Chatbot bereitgestellten "
+#~ "Informationen mit offiziellen Quellen."
 
 #~ msgid "Meeting documents"
 #~ msgstr "Sitzungsdokumente"
