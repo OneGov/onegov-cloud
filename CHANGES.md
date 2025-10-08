@@ -1,8 +1,101 @@
 # Changes
 
+## 2025.56
+
+`2025-10-08` | [613f9d83db...8204b85ef2](https://github.com/OneGov/onegov-cloud/compare/613f9d83db^...8204b85ef2)
+
+### Gazette
+
+##### Deletes `onegov.gazette` and `onegov.notice`
+
+Gazette has been decommissioned, so these packages are no longer needed
+
+`Feature` | [OGC-2678](https://linear.app/onegovcloud/issue/OGC-2678) | [2bbc479c71](https://github.com/onegov/onegov-cloud/commit/2bbc479c71bddf08aaf4f71e7d835c7f1c3ae487)
+
+### Landsgemeinde
+
+##### Political Business Styling
+
+`Feature` | [OGC-2471](https://linear.app/onegovcloud/issue/OGC-2471) | [8204b85ef2](https://github.com/onegov/onegov-cloud/commit/8204b85ef2def53ddfdf431b0376c1c9ec7f520a)
+
+##### Assembly name
+
+`Bugfix` | [OGC-2674](https://linear.app/onegovcloud/issue/OGC-2674) | [ed7ebd0174](https://github.com/onegov/onegov-cloud/commit/ed7ebd0174086870c83eb629e4a6991b0682a90e)
+
+### Org
+
+##### Automatically complete incomplete URLs for Events
+
+`Feature` | [OGC-2622](https://linear.app/onegovcloud/issue/OGC-2622) | [869fc78799](https://github.com/onegov/onegov-cloud/commit/869fc787991fa72f0484445aa4215babc4b77d07)
+
+### Pas
+
+##### Minor fixes.
+
+`Bugfix` | [d744470a3a](https://github.com/onegov/onegov-cloud/commit/d744470a3a30860ee9fde5b6ec6b74a4c6f15742)
+
+##### Minor fixes and refactoring.
+
+Fixes a bug where default argument `import_type` (fallback
+value) would be incorrectly applied.
+
+`Bugfix` | [2bb86fe8d4](https://github.com/onegov/onegov-cloud/commit/2bb86fe8d48cef343438ee8db3f56665e3b49c0d)
+
+### Pay
+
+##### Upgrades to Stripe v13.0.0
+
+`Feature` | [OGC-2658](https://linear.app/onegovcloud/issue/OGC-2658) | [2f4594a845](https://github.com/onegov/onegov-cloud/commit/2f4594a845912a461ddeb474dbc2cd4a8df2403b)
+
+### Pdf
+
+##### Removes lxml version pin
+
+`Feature` | [OGC-2363](https://linear.app/onegovcloud/issue/OGC-2363) | [bb0d23ad7f](https://github.com/onegov/onegov-cloud/commit/bb0d23ad7fa62968b3f4f4dd5490829ec23e7a28)
+
+### Search
+
+##### Improves relevancy of search results in Postgres search
+
+`Feature` | [OGC-1161](https://linear.app/onegovcloud/issue/OGC-1161) | [24c88cc69b](https://github.com/onegov/onegov-cloud/commit/24c88cc69bb51d0452259ec5e723fc847f18474a)
+
+##### Fixes broken tests due to improper SQLAlchemy metadata isolation
+
+`Bugfix` | [6950a3f9b0](https://github.com/onegov/onegov-cloud/commit/6950a3f9b0c89ffe039c45f036f7b83199cfea5d)
+
+##### Improves result loading of Postgres search results
+
+`Performance` | [OGC-508](https://linear.app/onegovcloud/issue/OGC-508) | [613f9d83db](https://github.com/onegov/onegov-cloud/commit/613f9d83dbafe81d09a310807fe837bd0b20a720)
+
+### Town6
+
+##### Add edit note as a format option
+
+`Feature` | [OGC-2274](https://linear.app/onegovcloud/issue/OGC-2274) | [d9276e56ef](https://github.com/onegov/onegov-cloud/commit/d9276e56ef5969e1d4cf38ec35f570424ed732c4)
+
+##### Option for custom daily newsletter name
+
+`Feature` | [OGC-2344](https://linear.app/onegovcloud/issue/OGC-2344) | [71e0027835](https://github.com/onegov/onegov-cloud/commit/71e0027835a8c133db5b9ea5aa15cb113d44b22f)
+
+##### Integration for external Chat links
+
+`Feature` | [OGC-2470](https://linear.app/onegovcloud/issue/OGC-2470) | [a460e8939d](https://github.com/onegov/onegov-cloud/commit/a460e8939d176ee44455b9f75f32da5aa41baf01)
+
+##### Fix order of political businesses
+
+`Bugfix` | [OGC-2657](https://linear.app/onegovcloud/issue/OGC-2657) | [9390dcac1e](https://github.com/onegov/onegov-cloud/commit/9390dcac1ebe3faef3848341fa5be229780ec1c6)
+
+##### Fix Typo
+
+`Bugfix` | [OGC-2673](https://linear.app/onegovcloud/issue/OGC-2673) | [2d7b6c670c](https://github.com/onegov/onegov-cloud/commit/2d7b6c670cef0defc146454352c3f958576d2f8c)
+
+##### Fix not being able to make reservation
+
+`Bugfix` | [OGC-2681](https://linear.app/onegovcloud/issue/OGC-2681) | [9068a7980c](https://github.com/onegov/onegov-cloud/commit/9068a7980cb53197495d5dd211313d98be2ac905)
+
 ## 2025.55
 
-`2025-09-30` | [3a7211c7b1...3acba4b816](https://github.com/OneGov/onegov-cloud/compare/3a7211c7b1^...3acba4b816)
+`2025-09-30` | [3a7211c7b1...0c1abb0734](https://github.com/OneGov/onegov-cloud/compare/3a7211c7b1^...0c1abb0734)
 
 ### Api
 
@@ -2264,8 +2357,4 @@ Town6: Adds firebase push notifications.
 ##### Switches away from the deprecated legacy websockets
 
 `Feature` | [OGC-1735](https://linear.app/onegovcloud/issue/OGC-1735) | [61931a3714](https://github.com/onegov/onegov-cloud/commit/61931a3714f26baa84312a2a69f87250b52f4686)
-
-## test
-
-No changes since last release
 
