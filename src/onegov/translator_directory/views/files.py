@@ -27,6 +27,18 @@ if TYPE_CHECKING:
     from webob import Response
 
 
+"""
+This is basically the file views from org, but consists of a change made
+to restrict translator `GeneralFile` view permissions.
+For private files, even knowing the unguessable URL should still return
+403 Forbidden when accessed.
+
+While some duplication is regrettable, putting this in org would pollute
+the generic module with translator-specific checks at runtime that don't
+exist for the majority of onegov apps.
+"""
+
+
 @TranslatorDirectoryApp.html(model=File, permission=Secret, name='details')
 def view_file_details(self: File, request: TranslatorAppRequest) -> str:
     layout = DefaultLayout(self, request)
