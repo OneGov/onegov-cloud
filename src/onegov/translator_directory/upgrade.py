@@ -116,3 +116,13 @@ def remove_nationality_column(context: UpgradeContext) -> None:
         return
     if context.has_column('translators', 'nationality'):
         context.operations.drop_column('translators', 'nationality')
+
+
+@upgrade_task('Add personal number column')
+def add_personal_number_column(context: UpgradeContext) -> None:
+    if not context.has_table('translators'):
+        return
+    if not context.has_column('translators', 'personal_number'):
+        context.operations.add_column(
+            'translators', Column('personal_number', Text)
+        )

@@ -85,6 +85,9 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     # Personal-Nr.
     pers_id: Column[int | None] = Column(Integer)
 
+    # Personalnummer
+    personal_number: Column[str | None] = Column(Text)
+
     # Zulassung / admission
     admission: Column[AdmissionState] = Column(
         Enum(*ADMISSIONS, name='admission_state'),  # type:ignore[arg-type]
@@ -120,7 +123,7 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     )
 
     # AHV-Nr.
-    social_sec_number = Column(Text)
+    social_sec_number: Column[str | None] = Column(Text)
 
     # Bank information
     bank_name: Column[str | None] = Column(Text)
