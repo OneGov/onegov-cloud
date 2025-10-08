@@ -18,6 +18,7 @@ $dark-orange:  #be860e;
     .create-excel::before { @include icon('\f1c3'); }
     .documents::before { @include icon-bold('\f15b')}
     .report-change::before { @include icon-bold('\f044')}
+    .plus::before { @include icon-bold('\f017')}
 }
 
 .location-settings {
