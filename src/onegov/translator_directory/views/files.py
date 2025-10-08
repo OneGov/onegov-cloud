@@ -1,10 +1,19 @@
 from __future__ import annotations
 
-from uuid import uuid4
+import morepath
 
-from onegov.core.security import Secret
+from uuid import uuid4
+from webob.exc import HTTPForbidden
+
+from onegov.core.security import Public, Secret
 from onegov.core.templates import render_macro
 from onegov.file import File
+from onegov.file.integration import (
+    render_depot_file,
+    respond_with_alt_text,
+    respond_with_caching_header,
+    respond_with_x_robots_tag_header,
+)
 from onegov.file.utils import extension_for_content_type
 from onegov.org import utils
 from onegov.translator_directory import TranslatorDirectoryApp
@@ -13,6 +22,7 @@ from onegov.translator_directory.layout import DefaultLayout
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from depot.io.interfaces import StoredFile
     from onegov.translator_directory.request import TranslatorAppRequest
     from webob import Response
 
@@ -47,3 +57,99 @@ def view_file_details(self: File, request: TranslatorAppRequest) -> str:
             'hide_publication': True
         }
     )
+
+
+@TranslatorDirectoryApp.view(
+    model=File, render=render_depot_file, permission=Public
+)
+def view_file(self: File, request: TranslatorAppRequest) -> StoredFile:
+    if request.is_translator:
+        raise HTTPForbidden()
+
+    respond_with_alt_text(self, request)
+    respond_with_caching_header(self, request)
+    respond_with_x_robots_tag_header(self, request)
+    return self.reference.file
+
+
+@TranslatorDirectoryApp.view(
+    model=File, name='thumbnail', permission=Public, render=render_depot_file
+)
+@TranslatorDirectoryApp.view(
+    model=File, name='small', permission=Public, render=render_depot_file
+)
+@TranslatorDirectoryApp.view(
+    model=File, name='medium', permission=Public, render=render_depot_file
+)
+def view_thumbnail(
+    self: File, request: TranslatorAppRequest
+) -> StoredFile | Response:
+    if request.is_translator:
+        raise HTTPForbidden()
+
+    if request.view_name in ('small', 'medium'):
+        size = request.view_name
+    else:
+        size = 'small'
+
+    respond_with_alt_text(self, request)
+    respond_with_caching_header(self, request)
+    respond_with_x_robots_tag_header(self, request)
+
+    thumbnail_id = self.get_thumbnail_id(size)
+
+    if not thumbnail_id:
+        return morepath.redirect(request.link(self))
+
+    return request.app.bound_depot.get(thumbnail_id)  # type:ignore
+
+
+@TranslatorDirectoryApp.view(
+    model=File,
+    render=render_depot_file,
+    permission=Public,
+    request_method='HEAD',
+)
+def view_file_head(self: File, request: TranslatorAppRequest) -> StoredFile:
+    if request.is_translator:
+        raise HTTPForbidden()
+
+    @request.after
+    def set_cache(response: Response) -> None:
+        response.cache_control.max_age = 60
+
+    return view_file(self, request)
+
+
+@TranslatorDirectoryApp.view(
+    model=File,
+    name='thumbnail',
+    render=render_depot_file,
+    permission=Public,
+    request_method='HEAD',
+)
+@TranslatorDirectoryApp.view(
+    model=File,
+    name='small',
+    render=render_depot_file,
+    permission=Public,
+    request_method='HEAD',
+)
+@TranslatorDirectoryApp.view(
+    model=File,
+    name='medium',
+    render=render_depot_file,
+    permission=Public,
+    request_method='HEAD',
+)
+def view_thumbnail_head(
+    self: File, request: TranslatorAppRequest
+) -> StoredFile | Response:
+    if request.is_translator:
+        raise HTTPForbidden()
+
+    @request.after
+    def set_cache(response: Response) -> None:
+        response.cache_control.max_age = 60
+
+    return view_thumbnail(self, request)
