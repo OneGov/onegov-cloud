@@ -8,7 +8,7 @@ from onegov.translator_directory import _
 from onegov.translator_directory.constants import INTERPRETING_TYPES
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
-from wtforms.fields import IntegerField
+from wtforms.fields import DecimalField
 from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
@@ -39,13 +39,13 @@ class TranslatorTimeReportForm(Form):
         validators=[Optional()],
     )
 
-    duration = IntegerField(
-        label=_('Duration (minutes)'),
+    duration = DecimalField(
+        label=_('Duration (hours)'),
         validators=[
             InputRequired(),
-            NumberRange(min=30, message=_('Minimum 30 minutes')),
+            NumberRange(min=0.5, message=_('Minimum 0.5 hours')),
         ],
-        render_kw={'step': '30', 'min': '30'},
+        render_kw={'step': '0.5', 'min': '0.5'},
     )
 
     case_number = StringField(
@@ -114,6 +114,25 @@ class TranslatorTimeReportForm(Form):
             surcharge += 25.0
         return surcharge
 
+    def populate_obj(  # type: ignore[override]
+        self, obj: TranslatorTimeReport  # type: ignore[override]
+    ) -> None:
+        """Populate the model from form, converting hours to minutes."""
+        if self.duration.data is not None:
+            hours = float(self.duration.data)
+            rounded_hours = math.ceil(hours * 2) / 2
+            obj.duration = int(rounded_hours * 60)
+
+    def process(  # type: ignore[override]
+        self, formdata: object = None, obj: object = None, **kwargs: object
+    ) -> None:
+        """Process form data, converting minutes to hours for display."""
+        super().process(formdata, obj, **kwargs)  # type: ignore[arg-type]
+        if formdata is None and obj is not None and hasattr(obj, 'duration'):
+            duration_minutes = getattr(obj, 'duration', None)
+            if duration_minutes is not None:
+                self.duration.data = duration_minutes / 60.0
+
     def update_model(self, model: TranslatorTimeReport) -> None:
         """Update the time report model with form data."""
         assert self.duration.data is not None
@@ -121,9 +140,9 @@ class TranslatorTimeReportForm(Form):
 
         model.assignment_type = self.assignment_type.data or None
 
-        # Round up to nearest half hour (30 minutes) as per PDF
-        rounded_duration = math.ceil(self.duration.data / 30) * 30
-        model.duration = rounded_duration
+        hours = float(self.duration.data)
+        rounded_hours = math.ceil(hours * 2) / 2
+        model.duration = int(rounded_hours * 60)
 
         model.case_number = self.case_number.data or None
         model.assignment_date = self.assignment_date.data
