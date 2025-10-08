@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import math
+
 from onegov.form import Form
+from onegov.form.fields import ChosenSelectField
 from onegov.translator_directory import _
+from onegov.translator_directory.constants import INTERPRETING_TYPES
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import IntegerField
@@ -29,8 +33,10 @@ class TranslatorTimeReportForm(Form):
 
     request: TranslatorAppRequest
 
-    assignment_type = StringField(
-        label=_('Type of translation/interpreting'), validators=[Optional()]
+    assignment_type = ChosenSelectField(
+        label=_('Type of translation/interpreting'),
+        choices=[],
+        validators=[Optional()],
     )
 
     duration = IntegerField(
@@ -73,7 +79,15 @@ class TranslatorTimeReportForm(Form):
     )
 
     def on_request(self) -> None:
+        self.assignment_type.choices = self.get_assignment_type_choices()
         self.travel_distance.choices = self.get_travel_choices()
+
+    def get_assignment_type_choices(self) -> list[_Choice]:
+        """Return assignment type choices."""
+        return [
+            (key, self.request.translate(value))
+            for key, value in INTERPRETING_TYPES.items()
+        ]
 
     def get_travel_choices(self) -> list[_Choice]:
         """Return travel distance choices with compensation."""
@@ -106,7 +120,11 @@ class TranslatorTimeReportForm(Form):
         assert self.assignment_date.data is not None
 
         model.assignment_type = self.assignment_type.data or None
-        model.duration = self.duration.data
+
+        # Round up to nearest half hour (30 minutes) as per PDF
+        rounded_duration = math.ceil(self.duration.data / 30) * 30
+        model.duration = rounded_duration
+
         model.case_number = self.case_number.data or None
         model.assignment_date = self.assignment_date.data
         model.notes = self.notes.data or None
