@@ -115,6 +115,7 @@ def test_views_manage(client_with_es):
     page.form['email_primary'] = 'first.last@example.org'
     page = page.form.submit().follow()
     assert 'First Last' in page
+    assert ' Das Parlamentsmitglied wurde automatisch für den' in page
 
     page = page.click('Bearbeiten')
     page.form['gender'] = 'female'
