@@ -3158,7 +3158,5 @@ def subscribe_parliamentarians_to_newsletter(
                     confirmed=True
                 )
                 click.secho(f'Subscribed {p.email_primary}', fg='green')
-
-            subscribe_counter += 1
-
+                subscribe_counter += 1
     return subscribe_parliamentarians
