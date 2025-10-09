@@ -9,7 +9,7 @@
             <p>
                 <strong i18n:translate="">Timestamp:</strong> ${layout.format_date(log.created, 'datetime_long')} <br />
                 <strong i18n:translate="">User:</strong> ${log.user.username if log.user else request.translate('System')} <br />
-                <strong i18n:translate="">Status:</strong> <span class="import-status ${log.status}" tal:content="log.status"></span>
+                <strong i18n:translate="">Status:</strong> <span class="import-status ${log.status}" tal:content="translated_status"></span>
             </p>
 
             <div tal:condition="python: log.people_source or log.organizations_source or log.memberships_source" class="source-files">
@@ -55,9 +55,9 @@
             <div class="tabs-panel is-active" id="panel-logs" role="tabpanel">
                 <div tal:condition="summary">
                     <div class="summary-grid">
-                        <div class="summary-card">
+                        <div class="summary-card" tal:condition="translated_overall_status">
                             <h4 i18n:translate="">Overall Status</h4>
-                            <p tal:content="summary.get('overall_status', 'N/A')" class="status-text"></p>
+                            <p tal:content="translated_overall_status" class="status-text"></p>
                         </div>
 
                         <!-- Import Results -->

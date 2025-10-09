@@ -360,7 +360,7 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
     parliamentarian_id = MultiCheckboxField(
         label=_('Parliamentarian'),
         validators=[InputRequired()],
-        choices=[]  # are set with in custom.js
+        choices=[]  # are set with in src/pas/assets/custom.js
     )
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]

@@ -33,13 +33,20 @@ def view_import_logs(
 
     layout = ImportLogCollectionLayout(self, request)
 
+    # Prepare logs with translated fields
+    logs = [
+        {
+            'log': log,
+            'translated_status': request.translate(_(log.status)),
+            'translated_import_type': request.translate(_(log.import_type))
+        }
+        for log in self.for_listing().all()
+    ]
+
     return {
         'layout': layout,
         'title': _('Import History'),
-        'logs': self.for_listing().all(),
-        'translate_import_type': lambda import_type: request.translate(
-            _(import_type)
-        )
+        'logs': logs
     }
 
 
@@ -87,10 +94,22 @@ def view_import_log(
                 'message': message
             })
 
+    # Translate status for display
+    translated_status = request.translate(_(self.status))
+
+    # Translate overall_status if it exists in summary
+    translated_overall_status = None
+    if 'overall_status' in summary:
+        translated_overall_status = request.translate(
+            _(summary['overall_status'])
+        )
+
     return {
         'layout': layout,
         'title': _('Import Log Details'),
         'log': self,
+        'translated_status': translated_status,
+        'translated_overall_status': translated_overall_status,
         'details_formatted': details_formatted,
         'summary': summary,
         'import_categories': import_categories,

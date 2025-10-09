@@ -33,17 +33,17 @@
                 </tr>
             </thead>
             <tbody>
-                <tr tal:repeat="log logs"
+                <tr tal:repeat="log_entry logs"
                     class="clickable-row"
-                    onclick="window.location.href='${request.link(log)}'"
+                    onclick="window.location.href='${request.link(log_entry.log)}'"
                     style="cursor: pointer;">
-                    <td>${layout.format_date(log.created, 'datetime_long')}</td>
-                    <td>${log.user.username if log.user else request.translate('System')}</td>
+                    <td>${layout.format_date(log_entry.log.created, 'datetime_long')}</td>
+                    <td>${log_entry.log.user.username if log_entry.log.user else request.translate('System')}</td>
                     <td style="display: none;">
-                        <span class="import-type ${log.import_type}" tal:content="translate_import_type(log.import_type)"></span>
+                        <span class="import-type ${log_entry.log.import_type}" tal:content="log_entry.translated_import_type"></span>
                     </td>
                     <td>
-                        <span class="import-status ${log.status}" i18n:translate="" tal:content="log.status"></span>
+                        <span class="import-status ${log_entry.log.status}" tal:content="log_entry.translated_status"></span>
                     </td>
                 </tr>
                 <tr tal:condition="not logs">
