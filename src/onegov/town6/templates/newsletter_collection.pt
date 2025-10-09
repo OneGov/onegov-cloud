@@ -34,7 +34,7 @@
 
             <ul class="more-list page-links limit-line-width">
                 <li tal:repeat="newsletter newsletters">
-                    <div><strong><a href="${request.link(newsletter)}">${newsletter.title}</a></strong></div>
+                    <div><strong><a class="list-link" href="${request.link(newsletter)}">${newsletter.title}</a></strong></div>
                     <div tal:condition="newsletter.sent">${layout.format_date(newsletter.sent, 'relative')}</div>
                     <div tal:condition="not:newsletter.sent" i18n:translate>Not yet sent.</div>
                 </li>
