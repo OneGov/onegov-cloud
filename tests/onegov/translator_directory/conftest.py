@@ -22,6 +22,9 @@ class Client(BaseClient):
     def login_member(self, to=None):
         return self.login('member@example.org', 'hunter2', to)
 
+    def login_translator(self, to=None):
+        return self.login('translator@example.org', 'hunter2', to)
+
 
 @pytest.fixture(scope='function')
 def translator_app(request):
@@ -82,6 +85,12 @@ def create_translator_app(request, use_elasticsearch):
         username='member@example.org',
         password_hash=hash_password('hunter2'),
         role='member'
+    ))
+
+    session.add(User(
+        username='translator@example.org',
+        password_hash=hash_password('hunter2'),
+        role='translator'
     ))
 
     transaction.commit()

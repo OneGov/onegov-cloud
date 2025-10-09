@@ -629,6 +629,9 @@ class Pdf(PDFDocument):
         if body is None:
             return
 
+        if body.text and body.text.strip():
+            self.p(body.text, self.style.paragraph)
+
         for element in body:
             if element.tag == 'p':
                 self.p_markup(self.inner_html(element), self.style.paragraph)
@@ -671,3 +674,10 @@ class Pdf(PDFDocument):
                         )
                     )
                 )
+
+            # FIXME: Currently we test against exclusion of intermediary
+            #        non-paragraph nodes in the body, I'm not sure if this
+            #        was intentional, but for now we'll leave it like that
+            #        for backwards compatibility
+            # if element.tail and element.tail.strip():
+            #     self.p(element.tail, self.style.paragraph)
