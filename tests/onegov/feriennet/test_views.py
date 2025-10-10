@@ -294,33 +294,33 @@ def test_activity_search(client_with_fts, scenario):
     editor.login_editor()
 
     # in preview, activities can't be found
-    assert 'search-result-vacation' not in admin.get('/search?q=Learn')
-    assert 'search-result-vacation' not in editor.get('/search?q=Learn')
-    assert 'search-result-vacation' not in client.get('/search?q=Learn')
+    assert 'search-result-activities' not in admin.get('/search?q=Learn')
+    assert 'search-result-activities' not in editor.get('/search?q=Learn')
+    assert 'search-result-activities' not in client.get('/search?q=Learn')
 
     url = '/activity/learn-how-to-program'
     editor.get(url).click("Publikation beantragen")
 
     # once proposed, activities can be found by the admin only
-    assert 'search-result-vacation' in admin.get('/search?q=Learn')
-    assert 'search-result-vacation' not in editor.get('/search?q=Learn')
-    assert 'search-result-vacation' not in client.get('/search?q=Learn')
+    assert 'search-result-activities' in admin.get('/search?q=Learn')
+    assert 'search-result-activities' not in editor.get('/search?q=Learn')
+    assert 'search-result-activities' not in client.get('/search?q=Learn')
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     ticket.click("Veröffentlichen")
 
     # once accepted, activities can be found by anyone
-    assert 'search-result-vacation' in admin.get('/search?q=Learn')
-    assert 'search-result-vacation' in editor.get('/search?q=Learn')
-    assert 'search-result-vacation' in client.get('/search?q=Learn')
+    assert 'search-result-activities' in admin.get('/search?q=Learn')
+    assert 'search-result-activities' in editor.get('/search?q=Learn')
+    assert 'search-result-activities' in client.get('/search?q=Learn')
 
     ticket = admin.get(ticket.request.url)
     ticket.click("Archivieren")
 
     # archived the search will fail again, except for admins
-    assert 'search-result-vacation' in admin.get('/search?q=Learn')
-    assert 'search-result-vacation' not in editor.get('/search?q=Learn')
-    assert 'search-result-vacation' not in client.get('/search?q=Learn')
+    assert 'search-result-activities' in admin.get('/search?q=Learn')
+    assert 'search-result-activities' not in editor.get('/search?q=Learn')
+    assert 'search-result-activities' not in client.get('/search?q=Learn')
 
 
 def test_activity_filter_tags(client, scenario):

@@ -151,12 +151,6 @@ class SearchApp(morepath.App):
                 query = apply_searchable_polymorphic_filter(query, model)
 
                 for obj in query:
-                    # NOTE: Avoid polluting the queue with objects we're
-                    #       not going to put in the index at the end
-                    # FIXME: We can put this condition into the query
-                    #        if we make fts_skip a hybrid_property
-                    if obj.fts_skip:
-                        continue
                     self.fts_orm_events.index(schema, obj)
 
                 self.fts_indexer.process()

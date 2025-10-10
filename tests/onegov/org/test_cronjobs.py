@@ -34,7 +34,7 @@ from pathlib import Path
 from sedate import ensure_timezone, to_timezone, utcnow
 from sqlalchemy.orm import close_all_sessions
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
-from tests.onegov.org.commong import register_echo_handler
+from tests.onegov.org.common import register_echo_handler
 from tests.shared import Client
 from tests.shared.utils import add_reservation
 from unittest.mock import patch, Mock

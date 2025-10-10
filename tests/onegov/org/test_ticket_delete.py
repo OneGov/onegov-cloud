@@ -13,7 +13,7 @@ from onegov.core.utils import Bunch
 from onegov.ticket import TicketCollection, Ticket
 from onegov.user import UserCollection
 from sedate import ensure_timezone
-from tests.onegov.org.commong import register_echo_handler
+from tests.onegov.org.common import register_echo_handler
 from tests.shared import Client as BaseClient
 
 

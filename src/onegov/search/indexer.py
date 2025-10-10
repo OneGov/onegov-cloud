@@ -572,7 +572,12 @@ class ORMEventTranslator:
     def on_update(self, schema: str, obj: object) -> None:
         if not self.stopped:
             if isinstance(obj, Searchable):
-                self.index(schema, obj)
+                if obj.fts_skip:
+                    # NOTE: We need to emit a delete in case this
+                    #       model previously wasn't skipped
+                    self.delete(schema, obj)
+                else:
+                    self.index(schema, obj)
 
     def on_delete(self, schema: str, obj: object) -> None:
         if not self.stopped:

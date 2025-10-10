@@ -87,9 +87,6 @@ class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
         person: relationship[ExtendedPerson]
 
     # force fts update when access/published of agency/person changes
-    # FIXME: We probably also need a cronjob, unless we let searchable
-    #        models overwrite the access/publication_start/publication_end
-    #        they're indexed with.
     @observes(
         'agency.meta',
         'agency.publication_start',
