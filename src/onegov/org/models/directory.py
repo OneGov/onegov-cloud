@@ -21,6 +21,8 @@ from onegov.org.models.extensions import (
     DeletableContentExtension)
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.message import DirectoryMessage
+from onegov.org.observer import observes
+from onegov.org.utils import narrowest_access
 from onegov.pay import Price
 from onegov.ticket import Ticket
 from sqlalchemy import and_
@@ -500,9 +502,26 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
         # technically not enforced, but it should be a given
         directory: relationship[ExtendedDirectory]
 
+    fts_public = True
+
     @property
-    def fts_public(self) -> bool:  # type: ignore[override]
-        return self.directory.access == 'public'
+    def fts_access(self) -> str:
+        self._fetch_if_necessary()
+        return narrowest_access(self.access, self.directory.access)
+
+    # force fts update when access of directory changes
+    @observes('directory.meta')
+    def _force_fts_update(self, *_ignored: object) -> None:
+        self.modified = self.modified
+
+    def _fetch_if_necessary(self) -> None:
+        session = object_session(self)
+        if session is None:
+            return
+
+        if self.directory_id is not None and self.directory is None:
+            self.directory = session.query(  # type: ignore[unreachable]
+                ExtendedDirectory).get(self.directory_id)
 
     @property
     def display_config(self) -> dict[str, Any]:

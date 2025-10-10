@@ -86,10 +86,10 @@ def reindex(
     group_context: GroupContext,
     fail: bool
 ) -> Callable[[CoreRequest, Framework], None]:
-    """ Reindexes all objects in the elasticsearch and psql database. """
+    """ Reindexes all objects in the search index. """
 
     def run_reindex(request: CoreRequest, app: Framework) -> None:
-        if not hasattr(request.app, 'es_client'):
+        if not getattr(request.app, 'fts_search_enabled', False):
             return
 
         title = f'Reindexing {request.app.application_id}'
@@ -108,7 +108,7 @@ def reindex(
 def index_status(
     group_context: GroupContext
 ) -> Callable[[CoreRequest, Framework], None]:
-    """ Prints the status of the psql index. """
+    """ Prints the status of the search index. """
 
     def run_index_status(request: CoreRequest, app: Framework) -> None:
         if not getattr(request.app, 'fts_search_enabled', False):

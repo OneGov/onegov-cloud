@@ -18,7 +18,6 @@ from sedate import utcnow
 from webtest import Upload
 
 
-@pytest.mark.flaky(reruns=3)
 def test_basic_search(client_with_fts):
     client = client_with_fts
     client.login_admin()
@@ -63,7 +62,6 @@ def test_basic_search(client_with_fts):
     assert "0 Resultate" in anom.get('/search?q=fulltext')
 
 
-@pytest.mark.flaky(reruns=3)
 def test_view_search_is_limiting(client_with_fts):
     # ensures that the search doesn't just return all results
     # a regression that occurred for anonymous uses only
@@ -96,7 +94,6 @@ def test_view_search_is_limiting(client_with_fts):
     assert "1 Resultat" in search_page
 
 
-@pytest.mark.flaky(reruns=3)
 def test_search_recently_published_object(client_with_fts):
     client = client_with_fts
     client.login_admin()
@@ -118,7 +115,6 @@ def test_search_recently_published_object(client_with_fts):
     ).one()
     assert page.access == 'public'
     assert page.published == False
-    assert page.fts_public == False
 
     assert 'fulltext' in client.get('/search?q=wow')
     assert 'fulltext' not in anom.get('/search?q=wow')
@@ -145,7 +141,6 @@ def test_search_recently_published_object(client_with_fts):
     ).one()
     assert page.access == 'public'
     assert page.published == True
-    assert page.fts_public == True
 
     assert 'fulltext' in client.get('/search?q=wow')
     assert 'fulltext' in anom.get('/search?q=wow')
@@ -170,7 +165,6 @@ def test_search_recently_published_object(client_with_fts):
     ).one()
     assert page.access == 'public'
     assert page.published == False
-    assert page.fts_public == False
 
     assert 'fulltext' in client.get('/search?q=wow')
     assert 'fulltext' not in anom.get('/search?q=wow')
@@ -178,7 +172,6 @@ def test_search_recently_published_object(client_with_fts):
     assert 'is pretty awesome' not in anom.get('/search?q=fulltext')
 
 
-@pytest.mark.flaky(reruns=3)
 def test_search_for_page_with_member_access(client_with_fts):
     client = client_with_fts
     client.login_admin()

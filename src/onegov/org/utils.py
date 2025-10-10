@@ -1594,7 +1594,7 @@ def widest_access(*accesses: str) -> str:
 
 def narrowest_access(*accesses: str) -> str:
     index = len(ORDERED_ACCESS) - 1
-    for access in reversed(accesses):
+    for access in accesses:
         try:
             # we only want to look at indexes starting with the one
             # we're already at, otherwise we're lowering the access

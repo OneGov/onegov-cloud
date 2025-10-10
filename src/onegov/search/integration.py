@@ -134,6 +134,9 @@ class SearchApp(morepath.App):
         if not self.fts_search_enabled:
             return
 
+        # psql delete table search_index
+        self.fts_indexer.delete_search_index(self.schema)
+
         schema = self.schema
         index_log.info(f'Indexing schema {schema}..')
 

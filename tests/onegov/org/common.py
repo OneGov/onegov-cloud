@@ -16,7 +16,7 @@ def get_cronjob_by_name(app: Framework, name: str) -> Job[Any] | None:
 
 
 def get_cronjob_url(cronjob: Job[Any]) -> str:
-    return '/cronjobs/{}'.format(cronjob.id)
+    return f'/cronjobs/{cronjob.id}'
 
 
 def edit_bar_links(page: Any, attrib: str | None = None) -> list[Any]:
@@ -60,14 +60,6 @@ class EchoHandler(Handler):
 
     def get_links(self, request):
         return self.data.get('links')
-
-    @property
-    def ticket_deletable(self):
-        return self.ticket.state == 'archived'
-
-    def prepare_delete_ticket(self):
-        assert self.ticket_deletable
-        pass
 
 
 def register_echo_handler(handlers):

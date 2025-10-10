@@ -17,7 +17,7 @@ from urllib3.util import Retry
 
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
-from onegov.core.orm import find_models, Base
+from onegov.core.orm import find_models
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
@@ -55,6 +55,7 @@ from onegov.org.views.ticket import delete_tickets_and_related_data
 from onegov.pay.models.payment_providers import WorldlineSaferpay
 from onegov.reservation import Reservation, Resource, ResourceCollection
 from onegov.search import Searchable
+from onegov.search.utils import get_polymorphic_base
 from onegov.ticket import Ticket, TicketCollection
 from onegov.user import User, UserCollection
 from onegov.user.models import TAN
@@ -68,7 +69,6 @@ from uuid import UUID
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator
     from onegov.core.types import RenderData
     from sqlalchemy.orm import Session
     from sqlalchemy.orm import Query
@@ -184,7 +184,7 @@ def publish_files(request: OrgRequest) -> None:
 def handle_publication_models(request: OrgRequest, now: datetime) -> None:
     """
     Reindexes all recently published/unpublished objects
-    in the elasticsearch and postgres database.
+    in the search index.
 
     For pages it also updates the propagated access to any
     associated files.
@@ -193,50 +193,53 @@ def handle_publication_models(request: OrgRequest, now: datetime) -> None:
     published within the last hour.
     """
 
-    if not hasattr(request.app, 'es_client'):
-        return
-
-    def publication_models(
-        base: type[Base]
-        # NOTE: This should be Iterator[type[Base & UTCPublicationMixin]]
-    ) -> Iterator[type[UTCPublicationMixin]]:
-        yield from find_models(base, lambda cls: issubclass(  # type:ignore
-            cls, UTCPublicationMixin)
+    search_enabled = getattr(request.app, 'fts_search_enabled', False)
+    publication_models: set[type[UTCPublicationMixin]] = {
+        poly_base if issubclass(
+            poly_base := get_polymorphic_base(model),
+            UTCPublicationMixin
+        ) else model
+        for base in request.app.session_manager.bases
+        for model in find_models(
+            base,
+            lambda cls: issubclass(cls, UTCPublicationMixin)
         )
+    }
 
-    objects = set()
+    objects: set[UTCPublicationMixin] = set()
     session = request.app.session()
     then = request.app.org.meta.get('hourly_maintenance_tasks_last_run',
                                     now - timedelta(hours=1))
-    for base in request.app.session_manager.bases:
-        for model in publication_models(base):
-            query = session.query(model).filter(
-                or_(
-                    and_(
-                        then <= model.publication_start,
-                        now >= model.publication_start
-                    ),
-                    and_(
-                        then <= model.publication_end,
-                        now >= model.publication_end
-                    )
+    for model in publication_models:
+        query = session.query(model).filter(
+            or_(
+                and_(
+                    then <= model.publication_start,
+                    now >= model.publication_start
+                ),
+                and_(
+                    then <= model.publication_end,
+                    now >= model.publication_end
                 )
             )
-            objects.update(query.all())
+        )
+        objects.update(query)
 
     for obj in objects:
         if isinstance(obj, GeneralFileLinkExtension):
             # manually invoke the files observer which updates access
             obj.files_observer(obj.files, set(), None, None)
 
-        if isinstance(obj, Searchable):
+        if search_enabled and isinstance(obj, Searchable):
             # FIXME: We probably no longer need this
             request.app.fts_orm_events.index(request.app.schema, obj)
 
-        if (isinstance(obj, ExtendedDirectoryEntry) and
-                obj.published and
-                obj.access in ('public', 'mtan') and
-                obj.directory.enable_update_notifications):
+        if (
+            isinstance(obj, ExtendedDirectoryEntry)
+            and obj.published
+            and obj.fts_access in ('public', 'mtan')
+            and obj.directory.enable_update_notifications
+        ):
             send_email_notification_for_directory_entry(
                 obj.directory, obj, request)
 

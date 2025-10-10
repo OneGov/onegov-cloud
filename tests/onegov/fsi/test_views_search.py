@@ -9,8 +9,3 @@ def test_basic_search(client_with_fts):
     assert client.get('/search/suggest?q=test').json == []
     anom.get('/search?q=test', status=403)  # forbidden
     assert anom.get('/search/suggest?q=test', status=403)  # forbidden
-
-    assert 'Resultate' in client.get('/search-postgres?q=test')
-    assert client.get('/search/suggest?q=test').json == []
-    anom.get('/search-postgres?q=test', status=403)  # forbidden
-    assert anom.get('/search/suggest?q=test', status=403)  # forbidden
