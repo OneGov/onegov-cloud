@@ -193,7 +193,7 @@ def test_orm_integration(
                 ))
             else:
                 search = search.filter(
-                    SearchIndex._tags.has_key(query.lstrip('#'))  # type: ignore[attr-defined]
+                    SearchIndex._tags.any_() == query.lstrip('#')
                 )
         return search.scalar()
 

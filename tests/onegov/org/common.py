@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from onegov.ticket import Handler, Ticket
+
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -24,3 +26,49 @@ def edit_bar_links(page: Any, attrib: str | None = None) -> list[Any]:
             return [li.text for li in links]
         return [li.attrib[attrib] for li in links]
     return links
+
+
+class EchoTicket(Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'EHO'}
+
+
+class EchoHandler(Handler):
+    handler_title = "Echo"
+
+    @property
+    def deleted(self):
+        return False
+
+    @property
+    def email(self):
+        return self.data.get('email')
+
+    @property
+    def title(self):
+        return self.data.get('title')
+
+    @property
+    def subtitle(self):
+        return self.data.get('subtitle')
+
+    @property
+    def group(self):
+        return self.data.get('group')
+
+    def get_summary(self, request):
+        return self.data.get('summary')
+
+    def get_links(self, request):
+        return self.data.get('links')
+
+    @property
+    def ticket_deletable(self):
+        return self.ticket.state == 'archived'
+
+    def prepare_delete_ticket(self):
+        assert self.ticket_deletable
+        pass
+
+
+def register_echo_handler(handlers):
+    handlers.register('EHO', EchoHandler)

@@ -24,7 +24,7 @@ from onegov.org.models.ticket import ReservationHandler, DirectoryEntryHandler
 from onegov.org.notification_service import (
     TestNotificationService, set_test_notification_service)
 from onegov.page import PageCollection
-from onegov.ticket import Handler, Ticket, TicketCollection
+from onegov.ticket import Ticket, TicketCollection
 from onegov.user import UserCollection
 from onegov.newsletter import (Newsletter, NewsletterCollection,
                                RecipientCollection)
@@ -34,47 +34,10 @@ from pathlib import Path
 from sedate import ensure_timezone, to_timezone, utcnow
 from sqlalchemy.orm import close_all_sessions
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
+from tests.onegov.org.commong import register_echo_handler
 from tests.shared import Client
 from tests.shared.utils import add_reservation
 from unittest.mock import patch, Mock
-
-
-class EchoTicket(Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'EHO'}
-
-
-class EchoHandler(Handler):
-    handler_title = "Echo"
-
-    @property
-    def deleted(self):
-        return False
-
-    @property
-    def email(self):
-        return self.data.get('email')
-
-    @property
-    def title(self):
-        return self.data.get('title')
-
-    @property
-    def subtitle(self):
-        return self.data.get('subtitle')
-
-    @property
-    def group(self):
-        return self.data.get('group')
-
-    def get_summary(self, request):
-        return self.data.get('summary')
-
-    def get_links(self, request):
-        return self.data.get('links')
-
-
-def register_echo_handler(handlers):
-    handlers.register('EHO', EchoHandler)
 
 
 def register_reservation_handler(handlers):

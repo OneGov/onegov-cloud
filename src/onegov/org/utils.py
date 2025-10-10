@@ -1598,7 +1598,7 @@ def narrowest_access(*accesses: str) -> str:
         try:
             # we only want to look at indexes starting with the one
             # we're already at, otherwise we're lowering the access
-            index = ORDERED_ACCESS.index(access, index)
+            index = ORDERED_ACCESS.index(access, 0, index)
         except ValueError:
             pass
     return ORDERED_ACCESS[index]

@@ -224,7 +224,7 @@ class Search(Pagination[Any]):
     def hashtag_search(self) -> Query[SearchIndex]:
         tag = self.query.lstrip('#')
         query = self.request.session.query(SearchIndex)
-        query = query.filter(SearchIndex._tags.has_key(tag))  # type: ignore[attr-defined]
+        query = query.filter(SearchIndex._tags.any_() == tag)
         # TODO: Do we want to order results in some way?
         return self.apply_common_filters(query)
 
@@ -303,19 +303,23 @@ class Search(Pagination[Any]):
 
         if self.query.startswith('#'):  # hashtag search
             q = self.query.lstrip('#').lower()
-            query = self.apply_common_filters(
+            subquery = self.apply_common_filters(
                 self.request.session.query(
-                    func.skeys(SearchIndex._tags).distinct().label('tag')
-                ).order_by(func.skeys(SearchIndex._tags).asc())
-            )
+                    func.unnest(
+                        SearchIndex._tags
+                    ).distinct().label('tag')
+                )
+            ).subquery()
+            query = self.request.session.query(subquery.c.tag)
             if len(q) >= 0:
-                subquery = query.subquery()
-                query = self.request.session.query(subquery.c.tag).filter(
+                query = query.filter(
                     subquery.c.tag.ilike(f'{escape_like(q)}%', '*')
                 )
             return tuple(
                 f'#{tag}'
-                for tag, in query.limit(number_of_suggestions)
+                for tag, in query
+                .order_by(subquery.c.tag.asc())
+                .limit(number_of_suggestions)
             )
         else:
             subquery = self.apply_common_filters(

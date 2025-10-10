@@ -11,7 +11,7 @@ from onegov.search.utils import language_from_locale, normalize_text
 from operator import itemgetter
 from sqlalchemy import and_, bindparam, func, String, Table, MetaData
 from sqlalchemy.orm.exc import ObjectDeletedError
-from sqlalchemy.dialects.postgresql import insert, ARRAY, HSTORE
+from sqlalchemy.dialects.postgresql import insert, ARRAY
 from uuid import UUID
 
 
@@ -159,8 +159,7 @@ class Indexer:
                 else:
                     language = detected_language
                 _properties = task['properties']
-                _tags_list = task['tags']
-                _tags = dict.fromkeys(_tags_list, '') if _tags_list else None
+                _tags = task['tags']
 
                 # NOTE: We use a dictionary to avoid duplicate updates for
                 #       the same model, only the latest update will count
@@ -173,7 +172,6 @@ class Indexer:
                     '_access': task.get('access', 'public'),
                     '_last_change': task['last_change'],
                     '_tags': _tags,
-                    '_tags_list': _tags_list,
                     '_suggestion': task['suggestion'],
                     '_publication_start':
                         task.get('publication_start', None),
@@ -212,7 +210,7 @@ class Indexer:
             assert owner_id_column is not None
             combined_vector = func.setweight(
                 func.array_to_tsvector(
-                    bindparam('_tags_list', type_=ARRAY(String))
+                    bindparam('_tags', type_=ARRAY(String))
                 ),
                 'A'
             )
@@ -243,7 +241,8 @@ class Indexer:
                         SearchIndex.public: bindparam('_public'),
                         SearchIndex.access: bindparam('_access'),
                         SearchIndex.last_change: bindparam('_last_change'),
-                        SearchIndex._tags: bindparam('_tags', type_=HSTORE),
+                        SearchIndex._tags:
+                            bindparam('_tags', type_=ARRAY(String)),
                         SearchIndex.suggestion: bindparam('_suggestion'),
                         SearchIndex.fts_idx_data: bindparam('_data'),
                         SearchIndex.fts_idx: combined_vector,
@@ -264,7 +263,7 @@ class Indexer:
                         'public': bindparam('_public'),
                         'access': bindparam('_access'),
                         'last_change': bindparam('_last_change'),
-                        'tags': bindparam('_tags', type_=HSTORE),
+                        'tags': bindparam('_tags', type_=ARRAY(String)),
                         'suggestion': bindparam('_suggestion'),
                         'fts_idx_data': bindparam('_data'),
                         'fts_idx': combined_vector,
