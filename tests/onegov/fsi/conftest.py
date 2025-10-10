@@ -59,12 +59,12 @@ def fsi_app_mocked(request, hashed_password):
 
 
 @pytest.fixture(scope='function')
-def es_fsi_app(request, hashed_password):
+def fts_fsi_app(request, hashed_password):
     yield create_fsi_app(request, True, hashed_password)
 
 
 @pytest.fixture(scope='function')
-def es_fsi_app_mocked(request, hashed_password):
+def fts_fsi_app_mocked(request, hashed_password):
     yield create_fsi_app(request, True, hashed_password, mock_db=True)
 
 
@@ -74,8 +74,8 @@ def client(fsi_app):
 
 
 @pytest.fixture(scope='function')
-def client_with_es(es_fsi_app):
-    return Client(es_fsi_app)
+def client_with_fts(fts_fsi_app):
+    return Client(fts_fsi_app)
 
 
 @pytest.fixture(scope='function')
@@ -84,8 +84,8 @@ def client_with_db(fsi_app_mocked):
 
 
 @pytest.fixture(scope='function')
-def client_with_es_db(es_fsi_app_mocked):
-    return Client(es_fsi_app_mocked)
+def client_with_fts_db(fts_fsi_app_mocked):
+    return Client(fts_fsi_app_mocked)
 
 
 @pytest.fixture(scope='function')
@@ -183,12 +183,12 @@ def db_mock_session(course_event, attendee):
     return _db_mock_session
 
 
-def create_fsi_app(request, use_elasticsearch, hashed_password, mock_db=False):
+def create_fsi_app(request, enable_search, hashed_password, mock_db=False):
 
     app = create_app(
         app_class=FsiApp,
         request=request,
-        use_elasticsearch=use_elasticsearch,
+        enable_search=enable_search,
         websockets={
             'client_url': 'ws://localhost:8766',
             'manage_url': 'ws://localhost:8766',
@@ -426,7 +426,7 @@ class FsiScenario(BaseScenario):
 @pytest.fixture(scope='function')
 def scenario(request, session, hashed_password):
     for name in request.fixturenames:
-        if name in ('fsi_app', 'es_fsi_app'):
+        if name in ('fsi_app', 'fts_fsi_app'):
             session = request.getfixturevalue(name).session()
 
     yield FsiScenario(session, hashed_password)

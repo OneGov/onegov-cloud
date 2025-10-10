@@ -10,67 +10,10 @@ from onegov.org.models.ticket import FormSubmissionHandler
 import transaction
 from datetime import datetime
 from onegov.core.utils import Bunch
-from onegov.ticket import TicketCollection, Handler, Ticket
+from onegov.ticket import TicketCollection, Ticket
 from onegov.user import UserCollection
 from sedate import ensure_timezone
-from tests.shared import Client as BaseClient
-
-
-class Client(BaseClient):
-    skip_n_forms = 1
-
-
-class TicketDeletionMixin:
-
-    @property
-    def ticket_deletable(self):
-        return self.ticket.state == 'archived'
-
-    def prepare_delete_ticket(self):
-        """The handler knows best what to do when a ticket is called for
-        deletion. """
-        assert self.ticket_deletable
-        pass
-
-
-class EchoHandler(Handler, TicketDeletionMixin):
-    handler_title = "Echo"
-
-    @property
-    def deleted(self):
-        return False
-
-    @property
-    def email(self):
-        return self.data.get('email')
-
-    @property
-    def title(self):
-        return self.data.get('title')
-
-    @property
-    def subtitle(self):
-        return self.data.get('subtitle')
-
-    @property
-    def group(self):
-        return self.data.get('group')
-
-    def get_summary(self, request):
-        return self.data.get('summary')
-
-    def get_links(self, request):
-        return self.data.get('links')
-
-
-# This is used implicitly to check for polymorphic identity
-class EchoTicket(Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'ECH'}
-    es_type_name = 'frr_tickets'
-
-
-def register_echo_handler(handlers):
-    handlers.register('ECH', EchoHandler)
+from tests.onegov.org.common import register_echo_handler
 
 
 def archive_all_tickets(session, tickets, tz):
@@ -86,21 +29,20 @@ def archive_all_tickets(session, tickets, tz):
         t.modified = datetime(2016, 1, 2, 10, tzinfo=tz)
 
 
-def test_delete_ticket_without_submission(org_app, handlers):
+def test_delete_ticket_without_submission(client, handlers):
     register_echo_handler(handlers)
 
-    client = Client(org_app)
     tz = ensure_timezone('Europe/Zurich')
 
     transaction.begin()
 
-    session = org_app.session()
+    session = client.app.session()
     collection = TicketCollection(session)
 
     tickets = [
         collection.open_ticket(
             handler_id='1',
-            handler_code='ECH',
+            handler_code='EHO',
             title="Title",
             group="Group",
             email="citizen@example.org",
@@ -108,7 +50,7 @@ def test_delete_ticket_without_submission(org_app, handlers):
         ),
         collection.open_ticket(
             handler_id='2',
-            handler_code='ECH',
+            handler_code='EHO',
             title="Title",
             group="Group",
             email="citizen@example.org",

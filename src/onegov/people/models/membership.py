@@ -46,8 +46,8 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
         'polymorphic_identity': 'generic',
     }
 
-    es_public = True
-    es_properties = {
+    fts_public = True
+    fts_properties = {
         'title': {'type': 'localized', 'weight': 'A'},
     }
 

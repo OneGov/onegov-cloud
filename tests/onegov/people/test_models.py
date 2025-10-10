@@ -205,14 +205,12 @@ def test_person_polymorphism(session: Session) -> None:
         # FIXME: We should create a fixture which clones the SQLAlchemy
         #        metadata, so we can safely create subclasses like this
         #        without affecting the global metadata
-        es_type_name = 'my_person'
 
     class MyOtherPerson(Person):
         __mapper_args__ = {'polymorphic_identity': 'other'}
         # FIXME: We should create a fixture which clones the SQLAlchemy
         #        metadata, so we can safely create subclasses like this
         #        without affecting the global metadata
-        es_type_name = 'other_person'
 
     session.add(Person(first_name='default', last_name='person'))
     session.add(MyPerson(first_name='my', last_name='person'))
@@ -318,14 +316,12 @@ def test_agency_polymorphism(session: Session) -> None:
         # FIXME: We should create a fixture which clones the SQLAlchemy
         #        metadata, so we can safely create subclasses like this
         #        without affecting the global metadata
-        es_type_name = 'my_agency'
 
     class MyOtherAgency(Agency):
         __mapper_args__ = {'polymorphic_identity': 'other'}
         # FIXME: We should create a fixture which clones the SQLAlchemy
         #        metadata, so we can safely create subclasses like this
         #        without affecting the global metadata
-        es_type_name = 'my_other_agency'
 
     session.add(Agency(title='default', name='default'))
     session.add(MyAgency(title='my', name='my'))
@@ -448,14 +444,12 @@ def test_membership_polymorphism(session: Session) -> None:
         # FIXME: We should create a fixture which clones the SQLAlchemy
         #        metadata, so we can safely create subclasses like this
         #        without affecting the global metadata
-        es_type_name = 'my_agency_membership'
 
     class MyOtherMembership(AgencyMembership):
         __mapper_args__ = {'polymorphic_identity': 'other'}
         # FIXME: We should create a fixture which clones the SQLAlchemy
         #        metadata, so we can safely create subclasses like this
         #        without affecting the global metadata
-        es_type_name = 'other_agency_membership'
 
     session.add(
         AgencyMembership(

@@ -125,7 +125,7 @@ def test_town_create(
         },
         identity_secure=False,
         redis_url=redis_url,
-        enable_elasticsearch=False,
+        enable_search=False,
         depot_backend='depot.io.memory.MemoryFileStorage',
         websockets={
             'client_url': 'ws://localhost:8766',

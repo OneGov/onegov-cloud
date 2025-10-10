@@ -175,7 +175,7 @@ def random_namespace() -> str:
 def create_app(
     app_class: type[_AppT],
     request: pytest.FixtureRequest,
-    use_elasticsearch: bool = False,
+    enable_search: bool = False,
     reuse_filestorage: bool = True,
     use_maildir: bool = True,
     use_smsdir: bool = True,
@@ -194,13 +194,6 @@ def create_app(
     if not app_class.is_committed():
         scan_morepath_modules(app_class)
         app_class.commit()
-
-    if use_elasticsearch:
-        elasticsearch_hosts = [
-            request.getfixturevalue('es_url')
-        ]
-    else:
-        elasticsearch_hosts = []
 
     if depot_backend == 'depot.io.local.LocalFileStorage':
         if not depot_storage_path:
@@ -234,8 +227,7 @@ def create_app(
         identity_secure=False,
         identity_secret='test_identity_secret',
         csrf_secret='test_csrf_secret',
-        enable_elasticsearch=use_elasticsearch,
-        elasticsearch_hosts=elasticsearch_hosts,
+        enable_search=enable_search,
         redis_url=request.getfixturevalue('redis_url'),
         yubikey_client_id='foo',
         yubikey_secret_key='dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE=',

@@ -9,8 +9,4 @@ class LandsgemeindeFile(File, SearchableFile):
 
     __mapper_args__ = {'polymorphic_identity': 'landsgemeinde'}
 
-    es_type_name = 'landsgemeinde_file'
-
-    @property
-    def es_public(self) -> bool:
-        return True
+    fts_public = True

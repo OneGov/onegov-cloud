@@ -121,16 +121,18 @@ class PoliticalBusiness(
 
     __tablename__ = 'par_political_businesses'
 
-    es_type_name = 'ris_political_business'
-    es_public = True
-    es_properties = {
+    fts_public = True
+    fts_properties = {
         'title': {'type': 'text', 'weight': 'A'},
         'number': {'type': 'text', 'weight': 'A'}
     }
 
     @property
-    def es_suggestion(self) -> str:
-        return f'{self.title} {self.number}'
+    def fts_suggestion(self) -> list[str]:
+        return [
+            f'{self.title} {self.number}',
+            f'{self.number} {self.title}'
+        ]
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(

@@ -1592,6 +1592,18 @@ def widest_access(*accesses: str) -> str:
     return ORDERED_ACCESS[index]
 
 
+def narrowest_access(*accesses: str) -> str:
+    index = len(ORDERED_ACCESS) - 1
+    for access in accesses:
+        try:
+            # we only want to look at indexes starting with the one
+            # we're already at, otherwise we're lowering the access
+            index = ORDERED_ACCESS.index(access, 0, index)
+        except ValueError:
+            pass
+    return ORDERED_ACCESS[index]
+
+
 @overload
 def extract_categories_and_subcategories(
     categories: list[dict[str, list[str]] | str],

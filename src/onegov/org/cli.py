@@ -10,7 +10,6 @@ import re
 import shutil
 import sys
 import textwrap
-from functools import wraps
 
 from bs4 import BeautifulSoup
 from collections import defaultdict
@@ -80,7 +79,6 @@ from pathlib import Path
 from sqlalchemy import func, and_, or_
 from sqlalchemy.dialects.postgresql import array
 from uuid import uuid4
-from elasticsearch.exceptions import ConnectionError as ESConnectionError
 
 from typing import IO, Any, TYPE_CHECKING, TypedDict
 
@@ -2022,17 +2020,6 @@ def import_parliamentary_groups(
     return create_parliamentary_groups
 
 
-def handle_es_connection_error(func: Any) -> Callable[[OrgRequest, OrgApp],
-                                                      None]:
-    @wraps(func)
-    def wrapper(request: OrgRequest, app: OrgApp) -> None:
-        try:
-            return func(request, app)
-        except ESConnectionError:
-            click.echo('Ignoring Elasticsearch Connection error.')
-    return wrapper
-
-
 @cli.command(name='import-political-business')
 @click.argument('path', type=click.Path(exists=True, resolve_path=True))
 @click.option('--dry-run', is_flag=True, default=False)
@@ -2102,7 +2089,6 @@ def import_political_business(
         return (datetime.strptime(date_str, '%d. %B %Y').date()
                 if date_str else None)
 
-    @handle_es_connection_error
     def create_political_businesses(request: OrgRequest, app: OrgApp) -> None:
         session = request.session
         political_business_collection = PoliticalBusinessCollection(session)
@@ -2320,25 +2306,23 @@ def import_political_business(
                         click.secho(f'Warning: Unknown status '
                                     f'"{german_status}" in {article_name}. '
                                     f'Setting to None.', fg='yellow')
-                try:
-                    if '_' not in article_name:
-                        continue
-                    pol_business_id = article_name.split('_')[1].split('.')[0]
-                    political_business_collection.add(
-                        title=political_business['metadata']['title'],
-                        number=data_fields.get('Nummer'),
-                        political_business_type=english_business_type,
-                        status=english_status,
-                        entry_date=parse_german_date(data_fields.get('Datum')),
-                        content={},
-                        meta={
-                            'people_ids': people_ids,
-                            'parliamentary_group_ids': parliamentary_group_ids,
-                            'self_id': pol_business_id
-                        }
-                    )
-                except ESConnectionError:
-                    click.echo('Elasticsearch connection error')
+
+                if '_' not in article_name:
+                    continue
+                pol_business_id = article_name.split('_')[1].split('.')[0]
+                political_business_collection.add(
+                    title=political_business['metadata']['title'],
+                    number=data_fields.get('Nummer'),
+                    political_business_type=english_business_type,
+                    status=english_status,
+                    entry_date=parse_german_date(data_fields.get('Datum')),
+                    content={},
+                    meta={
+                        'people_ids': people_ids,
+                        'parliamentary_group_ids': parliamentary_group_ids,
+                        'self_id': pol_business_id
+                    }
+                )
 
         click.echo(f'{import_counter} political_businesses imported')
         click.echo(f'{overwrite_counter} political_businesses overwritten')

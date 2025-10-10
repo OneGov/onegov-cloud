@@ -5,8 +5,7 @@ from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID, UTCDateTime
 from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy import CheckConstraint, Index
-from sqlalchemy.dialects.postgresql import ARRAY, HSTORE, JSONB, TSVECTOR
-from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, TSVECTOR
 
 
 from typing import TYPE_CHECKING
@@ -43,7 +42,7 @@ class SearchIndex(Base, UTCPublicationMixin):
     #: String id of the original model if applicable
     owner_id_str = Column(String, nullable=True)
 
-    #: Indicates if entry is public (Searchable::es_public)
+    #: Indicates if entry is public (Searchable::fts_public)
     public = Column(Boolean, nullable=False, default=False)
 
     #: Access level of entry (AccessExtension::access)
@@ -53,14 +52,14 @@ class SearchIndex(Base, UTCPublicationMixin):
     last_change = Column(UTCDateTime, nullable=True, index=True)
 
     #: Tags associated with the entry (Searchable::es_tags)
-    _tags: Column[dict[str, str] | None] = Column(  # type:ignore
-        MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
+    _tags: Column[list[str] | None] = Column(
+        'tags',
+        ARRAY(String),
         nullable=True,
-        name='tags'
     )
 
-    #: Suggestions for search functionality (Searchable::es_suggestion)
-    suggestion = Column(ARRAY(String), nullable=True)
+    #: Suggestions for search functionality (Searchable::fts_suggestion)
+    suggestion: Column[list[str] | None] = Column(ARRAY(String), nullable=True)
 
     #: Full-text search index data (fts properties)
     fts_idx_data = Column(JSONB, default={})
@@ -169,8 +168,9 @@ class SearchIndex(Base, UTCPublicationMixin):
 
     @property
     def tags(self) -> set[str]:
-        return set(self._tags.keys()) if self._tags else set()
+        return set(self._tags) if self._tags else set()
 
     @tags.setter
     def tags(self, value: Iterable[str]) -> None:
-        self._tags = dict.fromkeys(value, '') if value else {}
+        # FIXME: Do we care about duplicates?
+        self._tags = list(value) if value else []

@@ -35,7 +35,7 @@ def test_export(request):
                 ('content', 'bar')
             ]]
 
-    app = create_org_app(request, use_elasticsearch=False, cls=App)
+    app = create_org_app(request, enable_search=False, cls=App)
 
     # the export should work for admins
     admin = Client(app)

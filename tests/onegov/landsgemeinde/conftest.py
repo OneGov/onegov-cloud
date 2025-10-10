@@ -36,7 +36,7 @@ def assembly():
 
 
 def create_landsgemeinde_app(
-    request, use_elasticsearch=False, websocket_config=None
+    request, enable_search=False, websocket_config=None
 ):
     if websocket_config:
         websockets = {
@@ -55,7 +55,7 @@ def create_landsgemeinde_app(
     app = create_app(
         LandsgemeindeApp,
         request,
-        use_elasticsearch,
+        enable_search,
         websockets=websockets
     )
     if not websocket_config:
@@ -97,7 +97,7 @@ def landsgemeinde_app(request):
 
 
 @fixture(scope='function')
-def landsgemeinde_app_with_es(request):
+def fts_landsgemeinde_app(request):
     yield create_landsgemeinde_app(request, True)
 
 
@@ -107,8 +107,8 @@ def client(landsgemeinde_app):
 
 
 @fixture(scope='function')
-def client_with_es(landsgemeinde_app_with_es):
-    return Client(landsgemeinde_app_with_es)
+def client_with_fts(fts_landsgemeinde_app):
+    return Client(fts_landsgemeinde_app)
 
 
 @fixture(scope='function')

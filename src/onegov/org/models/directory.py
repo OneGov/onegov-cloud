@@ -21,6 +21,8 @@ from onegov.org.models.extensions import (
     DeletableContentExtension)
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.message import DirectoryMessage
+from onegov.org.observer import observes
+from onegov.org.utils import narrowest_access
 from onegov.pay import Price
 from onegov.ticket import Ticket
 from sqlalchemy import and_
@@ -379,7 +381,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
                         GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
-    es_type_name = 'extended_directories'
+    fts_public = True
 
     content_fields_containing_links_to_files = {
         'text',
@@ -423,12 +425,6 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     @property
     def entry_cls_name(self) -> str:
         return 'ExtendedDirectoryEntry'
-
-    @property
-    def es_public(self) -> bool:
-        # FIXME: This es_public is redundant once we get rid of ES
-        #        we include access in the fts
-        return self.access == 'public'
 
     if TYPE_CHECKING:
         def extend_form_class(  # type:ignore[override]
@@ -500,19 +496,32 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
                              DeletableContentExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
-    es_type_name = 'extended_directory_entries'
-
     internal_notes: dict_property[str | None] = content_property()
 
     if TYPE_CHECKING:
         # technically not enforced, but it should be a given
         directory: relationship[ExtendedDirectory]
 
+    fts_public = True
+
     @property
-    def es_public(self) -> bool:
-        # FIXME: This es_public is redundant once we get rid of ES
-        #        we include access and publication dates in the fts
-        return self.access == 'public' and self.published
+    def fts_access(self) -> str:
+        self._fetch_if_necessary()
+        return narrowest_access(self.access, self.directory.access)
+
+    # force fts update when access of directory changes
+    @observes('directory.meta')
+    def _force_fts_update(self, *_ignored: object) -> None:
+        self.modified = self.modified
+
+    def _fetch_if_necessary(self) -> None:
+        session = object_session(self)
+        if session is None:
+            return
+
+        if self.directory_id is not None and self.directory is None:
+            self.directory = session.query(  # type: ignore[unreachable]
+                ExtendedDirectory).get(self.directory_id)
 
     @property
     def display_config(self) -> dict[str, Any]:

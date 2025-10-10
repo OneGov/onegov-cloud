@@ -203,16 +203,24 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     )
 
     # limit the search to the ticket number -> the rest can be found
-    es_public = False
-    es_properties = {
+    fts_public = False
+    fts_properties = {
         'number': {'type': 'text', 'weight': 'A'},
         'title': {'type': 'text', 'weight': 'B'},
         'subtitle': {'type': 'text', 'weight': 'C'},
         'group': {'type': 'text', 'weight': 'B'},
-        'ticket_email': {'type': 'keyword', 'weight': 'A'},
-        'ticket_data': {'type': 'localized_html', 'weight': 'B'},
+        'ticket_email': {'type': 'text', 'weight': 'A'},
+        'ticket_data': {'type': 'localized', 'weight': 'B'},
         'extra_localized_text': {'type': 'localized', 'weight': 'B'}
     }
+
+    @property
+    def fts_tags(self) -> list[str]:
+        return list(self._tags.keys()) if self._tags else []
+
+    @property
+    def fts_suggestion(self) -> list[str]:
+        return [self.number]
 
     # NOTE: For now we only allow setting a single tag, in order to
     #       avoid conflicts between tag-metadata, but in the future
@@ -233,10 +241,6 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
         """
         return None
-
-    @property
-    def es_suggestion(self) -> list[str]:
-        return [self.number]
 
     @property
     def ticket_data(self) -> Sequence[str] | None:

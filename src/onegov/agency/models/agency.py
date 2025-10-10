@@ -41,13 +41,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
-    es_type_name = 'extended_agency'
-
-    @property
-    def es_public(self) -> bool:  # type:ignore[override]
-        # FIXME: This es_public is redundant once we get rid of ES
-        #        we include access and publication dates in the fts
-        return self.access == 'public' and self.published
+    fts_public = True
 
     #: Defines which fields of a membership and person should be exported to
     #: the PDF. The fields are expected to contain two parts seperated by a

@@ -6,6 +6,8 @@ from __future__ import annotations
 
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.search.utils import searchable_sqlalchemy_models
+from sqlalchemy import String
+from sqlalchemy.dialects.postgresql import ARRAY
 
 
 @upgrade_task('Remove fts index column from all searchable models')
@@ -27,4 +29,15 @@ def make_last_change_nullable(context: UpgradeContext) -> None:
             'search_index',
             'last_change',
             nullable=True
+        )
+
+
+@upgrade_task('Change tags from HSTORE to ARRAY')
+def change_tags_from_hstore_to_array(context: UpgradeContext) -> None:
+    if context.has_table('search_index'):
+        context.operations.alter_column(
+            'search_index',
+            'tags',
+            type_=ARRAY(String),
+            postgresql_using='akeys(tags)'
         )

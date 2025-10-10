@@ -7,18 +7,18 @@ from transaction import begin
 from transaction import commit
 
 
-def test_views(client_with_es):
+def test_views(client_with_fts):
     last_modified = []
 
     def assert_last_modified():
-        response = client_with_es.head('/assembly/2023-05-07/ticker')
+        response = client_with_fts.head('/assembly/2023-05-07/ticker')
         last_modified.append(parser.parse(response.headers['Last-Modified']))
         assert sorted(last_modified) == last_modified
         assert len(set(last_modified)) == len(last_modified)
 
-    client_with_es.login('admin@example.org', 'hunter2')
+    client_with_fts.login('admin@example.org', 'hunter2')
 
-    page = client_with_es.get('/').click('Archiv')
+    page = client_with_fts.get('/').click('Archiv')
     assert 'Noch keine Landsgemeinden erfasst.' in page
     assert 'Zum Liveticker' not in page
 
@@ -36,11 +36,11 @@ def test_views(client_with_es):
     assert 'https://www.youtube.com/embed/1234' in page
     assert_last_modified()
 
-    page = client_with_es.get('/').follow()
+    page = client_with_fts.get('/').follow()
     assert 'Landsgemeinde vom 07. Mai 2023' in page
     assert 'Zum Liveticker' not in page
 
-    page = client_with_es.get('/assemblies')
+    page = client_with_fts.get('/assemblies')
     assert 'Landsgemeinde vom 07. Mai 2023' in page
     page = page.click('Landsgemeinde vom 07. Mai 2023')
 
@@ -132,19 +132,17 @@ def test_views(client_with_es):
     assert_last_modified()
 
     # open data
-    assert client_with_es.get('/assembly/2023-05-07/json').json
-    assert client_with_es.get('/catalog.rdf', status=501)
-    setting = client_with_es.get('/open-data-settings')
+    assert client_with_fts.get('/assembly/2023-05-07/json').json
+    assert client_with_fts.get('/catalog.rdf', status=501)
+    setting = client_with_fts.get('/open-data-settings')
     setting.form['ogd_publisher_mail'] = 'staatskanzlei@govikon.ch'
     setting.form['ogd_publisher_id'] = 'staatskanzlei-govikon'
     setting.form['ogd_publisher_name'] = 'Staatskanzlei Govikon'
     setting.form.submit()
-    assert len(etree.XML(client_with_es.get('/catalog.rdf').body)) == 1
+    assert len(etree.XML(client_with_fts.get('/catalog.rdf').body)) == 1
 
     # search
-    client_with_es.app.es_client.indices.refresh(index='_all')
-    client = client_with_es.spawn()
-    # elasticsearch
+    client = client_with_fts.spawn()
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=ipsum')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=adipiscing')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=dolore')
@@ -156,64 +154,41 @@ def test_views(client_with_es):
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=ullamco')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=aliquip')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=consequat')
-    # postgres
-    assert 'Landsgemeinde vom 07. Mai' in client.get(
-        '/search-postgres?q=ipsum')
-    assert 'Landsgemeinde vom 07. Mai' in client.get(
-        '/search-postgres?q=adipiscing')
-    assert 'Landsgemeinde vom 07. Mai' in client.get(
-        '/search-postgres?q=dolore')
-    assert 'Landsgemeinde vom 07. Mai' in client.get(
-        '/search-postgres?q=magnoli')
-    assert 'Landsgemeinde vom 07. Mai' in client.get(
-        '/search-postgres?q=veniam')
-    assert 'Landsgemeinde vom 07. Mai' in client.get(
-        '/search-postgres?q=nostrud')
-    assert 'Landsgemeinde vom 07. Mai' in client.get(
-        '/search-postgres?q=quimby')
-    assert 'Landsgemeinde vom 07. Mai' in client.get(
-        '/search-postgres?q=mayor')
-    assert 'Landsgemeinde vom 07. Mai' in client.get(
-        '/search-postgres?q=ullamco')
-    assert 'Landsgemeinde vom 07. Mai' in client.get(
-        '/search-postgres?q=aliquip')
-    assert 'Landsgemeinde vom 07. Mai' in client.get(
-        '/search-postgres?q=consequat')
 
     # states view
-    page = client_with_es.get('/assembly/2023-05-07/states')
+    page = client_with_fts.get('/assembly/2023-05-07/states')
     assert 'abgeschlossen' in page
     assert 'geplant' not in page
 
     state_url = page.pyquery('.votum a[ic-post-to]').attr['ic-post-to']
-    client_with_es.post(state_url)
-    page = client_with_es.get('/assembly/2023-05-07/states')
+    client_with_fts.post(state_url)
+    page = client_with_fts.get('/assembly/2023-05-07/states')
     assert 'Entwurf' in page
     assert 'laufend' not in page
     assert 'abgeschlossen' not in page
 
     ai_url = page.pyquery('.agenda-item a[ic-post-to]').attr['ic-post-to']
-    client_with_es.post(ai_url)
-    page = client_with_es.get('/assembly/2023-05-07/states')
+    client_with_fts.post(ai_url)
+    page = client_with_fts.get('/assembly/2023-05-07/states')
     assert 'geplant' in page
     assert 'Entwurf' in page  # Votum state shouldn't change
 
     ai_url = page.pyquery('.agenda-item a[ic-post-to]').attr['ic-post-to']
-    client_with_es.post(ai_url)
-    page = client_with_es.get('/assembly/2023-05-07/states')
+    client_with_fts.post(ai_url)
+    page = client_with_fts.get('/assembly/2023-05-07/states')
     assert 'laufend' in page
     assert 'Entwurf' in page  # Votum state still shouldn't change
 
     assembly_url = page.pyquery('.assembly a[ic-post-to]').attr['ic-post-to']
-    client_with_es.post(assembly_url)
-    page = client_with_es.get('/assembly/2023-05-07/states')
+    client_with_fts.post(assembly_url)
+    page = client_with_fts.get('/assembly/2023-05-07/states')
     assert 'abgeschlossen' in page
     assert 'geplant' not in page
     assert 'laufend' not in page
 
     # delete votum
     with freeze_time('2023-05-07 9:36'):
-        page = client_with_es.get('/traktandum/2023-05-07/6')
+        page = client_with_fts.get('/traktandum/2023-05-07/6')
         page.click('Löschen', href='votum')
         page = page.click('A. consectetur adipiscing', index=0)
     assert '<p>Dolore magnolia aliqua.</p>' in page

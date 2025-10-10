@@ -68,17 +68,17 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
         'polymorphic_identity': 'generic',
     }
 
-    es_public = True
-    es_properties = {
-        'title': {'type': 'text'},
-        'description': {'type': 'localized'},
-        'portrait': {'type': 'localized_html'},
+    fts_public = True
+    fts_properties = {
+        'title': {'type': 'text', 'weight': 'A'},
+        'description': {'type': 'localized', 'weight': 'B'},
+        'portrait': {'type': 'localized', 'weight': 'B'},
     }
 
     # NOTE: When an agency was last changed should not influence how
     #       relevant it is in the search results
     @property
-    def es_last_change(self) -> None:
+    def fts_last_change(self) -> None:
         return None
 
     #: a short description of the agency

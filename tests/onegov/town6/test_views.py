@@ -1,9 +1,8 @@
 import onegov.org
-from pytest import mark
-from tests.shared import utils
+import transaction
 
 from onegov.chat.collections import ChatCollection
-import transaction
+from tests.shared import utils
 
 
 def test_view_permissions():
@@ -146,14 +145,12 @@ def test_announcement(client):
     ) in page
 
 
-@mark.skip('Passes locally, but not in CI, skip for now')
-def test_search_in_header(client_with_es):
-    page = client_with_es.get("/")
-    client_with_es.app.es_client.indices.refresh(index='_all')
+def test_search_in_header(client_with_fts):
+    page = client_with_fts.get("/")
     assert "Suchbegriff" in page
     page.form['q'] = 'aktuell'
     page = page.form.submit()
-    assert "search-result-news" in page
+    assert "search-result-pages" in page
 
 
 def test_create_external_link(client):

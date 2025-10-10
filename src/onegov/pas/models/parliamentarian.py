@@ -22,16 +22,15 @@ class PASParliamentarian(Parliamentarian, ORMSearchable):
         'polymorphic_identity': 'pas_parliamentarian',
     }
 
-    es_type_name = 'pas_parliamentarian'
-    es_public = False
-    es_properties = {
+    fts_public = False
+    fts_properties = {
         # FIXME: A fullname property may yield better results
         'first_name': {'type': 'text', 'weight': 'A'},
         'last_name': {'type': 'text', 'weight': 'A'},
     }
 
     @property
-    def es_suggestion(self) -> tuple[str, ...]:
+    def fts_suggestion(self) -> tuple[str, ...]:
         return (
             f'{self.first_name} {self.last_name}',
             f'{self.last_name} {self.first_name}'

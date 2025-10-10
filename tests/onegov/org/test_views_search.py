@@ -1,5 +1,4 @@
 import textwrap
-import pytest
 import transaction
 
 from datetime import date
@@ -18,9 +17,8 @@ from sedate import utcnow
 from webtest import Upload
 
 
-@pytest.mark.flaky(reruns=3, only_rerun=None)
-def test_basic_search(client_with_es):
-    client = client_with_es
+def test_basic_search(client_with_fts):
+    client = client_with_fts
     client.login_admin()
     anom = client.spawn()
 
@@ -29,8 +27,6 @@ def test_basic_search(client_with_es):
     add_news.form['lead'] = "It is pretty awesome"
     add_news.form['text'] = "Much <em>wow</em>"
     news = add_news.form.submit().follow()
-
-    client.app.es_client.indices.refresh(index='_all')
 
     root_page = client.get('/')
     root_page.form['q'] = "fulltext"
@@ -47,36 +43,23 @@ def test_basic_search(client_with_es):
     assert "It is pretty awesome" in search_page
 
     # make sure anonymous doesn't see hidden things in the search results
-    # elasticsearch
     assert "fulltext" in anom.get('/search?q=fulltext')
-    # postgres
-    assert "fulltext" in anom.get('/search-postgres?q=fulltext')
 
     edit_news = news.click("Bearbeiten")
     edit_news.form['access'] = 'private'
     edit_news.form.submit()
 
-    client.app.es_client.indices.refresh(index='_all')
-
-    # elasticsearch
     assert "Now supporting" not in anom.get('/search?q=fulltext')
     assert anom.get('/search/suggest?q=fulltext').json == []
     assert "Now supporting" in client.get('/search?q=fulltext')
     assert client.get('/search/suggest?q=fulltext').json == []
 
-    # postgres
-    assert "Now supporting" not in anom.get('/search-postgres?q=fulltext')
-    assert anom.get('/search-postgres/suggest?q=fulltext').json == []
-    assert "Now supporting" in client.get('/search-postgres?q=fulltext')
-    assert client.get('/search-postgres/suggest?q=fulltext').json == []
 
-
-@pytest.mark.flaky(reruns=3, only_rerun=None)
-def test_view_search_is_limiting(client_with_es):
+def test_view_search_is_limiting(client_with_fts):
     # ensures that the search doesn't just return all results
     # a regression that occurred for anonymous uses only
 
-    client = client_with_es
+    client = client_with_fts
     client.login_admin()
 
     add_news = client.get('/news').click('Nachricht')
@@ -88,8 +71,6 @@ def test_view_search_is_limiting(client_with_es):
     add_news.form['title'] = "Deadbeef"
     add_news.form['lead'] = "Deadbeef"
     add_news.form.submit()
-
-    client.app.es_client.indices.refresh(index='_all')
 
     root_page = client.get('/')
     root_page.form['q'] = "Foobar"
@@ -106,9 +87,8 @@ def test_view_search_is_limiting(client_with_es):
     assert "1 Resultat" in search_page
 
 
-@pytest.mark.flaky(reruns=3, only_rerun=None)
-def test_search_recently_published_object(client_with_es):
-    client = client_with_es
+def test_search_recently_published_object(client_with_fts):
+    client = client_with_fts
     client.login_admin()
     anom = client.spawn()
     session = client.app.session()
@@ -123,26 +103,16 @@ def test_search_recently_published_object(client_with_es):
     add_news.form['publication_start'] = start.isoformat()
     add_news.form.submit()
 
-    client.app.es_client.indices.refresh(index='_all')
-
     page = session.query(Page).filter(
         Page.title == "Now supporting fulltext search"
     ).one()
     assert page.access == 'public'
     assert page.published == False
-    assert page.es_public == False
 
-    # elasticsearch
     assert 'fulltext' in client.get('/search?q=wow')
     assert 'fulltext' not in anom.get('/search?q=wow')
     assert 'It is pretty awesome' in client.get('/search?q=fulltext')
     assert 'It is pretty awesome' not in anom.get('/search?q=fulltext')
-
-    # postgres
-    assert 'fulltext' in client.get('/search-postgres?q=wow')
-    assert 'fulltext' not in anom.get('/search-postgres?q=wow')
-    assert 'pretty awesome' in client.get('/search-postgres?q=fulltext')
-    assert 'pretty awesome' not in anom.get('/search-postgres?q=fulltext')
 
     # Publish
     then = utcnow() - timedelta(minutes=30)
@@ -164,19 +134,11 @@ def test_search_recently_published_object(client_with_es):
     ).one()
     assert page.access == 'public'
     assert page.published == True
-    assert page.es_public == True
 
-    # elasticsearch
     assert 'fulltext' in client.get('/search?q=wow')
     assert 'fulltext' in anom.get('/search?q=wow')
     assert 'It is pretty awesome' in client.get('/search?q=fulltext')
     assert 'It is pretty awesome' in anom.get('/search?q=fulltext')
-
-    # postgres
-    assert 'fulltext' in client.get('/search-postgres?q=wow')
-    assert 'fulltext' in anom.get('/search-postgres?q=wow')
-    assert 'It is pretty awesome' in client.get('/search-postgres?q=fulltext')
-    assert 'It is pretty awesome' in anom.get('/search-postgres?q=fulltext')
 
     # Unpublish
     transaction.begin()
@@ -196,24 +158,15 @@ def test_search_recently_published_object(client_with_es):
     ).one()
     assert page.access == 'public'
     assert page.published == False
-    assert page.es_public == False
 
-    # elasticsearch
-    assert 'fulltext' in client.get('/search-postgres?q=wow')
-    assert 'fulltext' not in anom.get('/search-postgres?q=wow')
-    assert 'is pretty awesome' in client.get('/search-postgres?q=fulltext')
-    assert 'is pretty awesome' not in anom.get('/search-postgres?q=fulltext')
-
-    # postgres
-    assert 'fulltext' in client.get('/search-postgres?q=wow')
-    assert 'fulltext' not in anom.get('/search-postgres?q=wow')
-    assert 'is pretty awesome' in client.get('/search-postgres?q=fulltext')
-    assert 'is pretty awesome' not in anom.get('/search-postgres?q=fulltext')
+    assert 'fulltext' in client.get('/search?q=wow')
+    assert 'fulltext' not in anom.get('/search?q=wow')
+    assert 'is pretty awesome' in client.get('/search?q=fulltext')
+    assert 'is pretty awesome' not in anom.get('/search?q=fulltext')
 
 
-@pytest.mark.flaky(reruns=3, only_rerun=None)
-def test_search_for_page_with_member_access(client_with_es):
-    client = client_with_es
+def test_search_for_page_with_member_access(client_with_fts):
+    client = client_with_fts
     client.login_admin()
     anom = client.spawn()
     member = client.spawn()
@@ -225,22 +178,13 @@ def test_search_for_page_with_member_access(client_with_es):
     new_page.form['access'] = 'member'
     new_page.form.submit().follow()
 
-    client.app.es_client.indices.refresh(index='_all')
-
-    # elasticsearch
     assert 'Test' in client.get('/search?q=Memberius')
     assert 'Test' in member.get('/search?q=Memberius')
     assert 'Test' not in anom.get('/search?q=Memberius')
 
-    # postgres
-    assert 'Test' in client.get('/search-postgres?q=Memberius')
-    assert 'Test' in member.get('/search-postgres?q=Memberius')
-    assert 'Test' not in anom.get('/search-postgres?q=Memberius')
 
-
-@pytest.mark.flaky(reruns=3, only_rerun=None)
-def test_basic_autocomplete(client_with_es):
-    client = client_with_es
+def test_basic_autocomplete(client_with_fts):
+    client = client_with_fts
     client.login_editor()
 
     people = client.get('/people')
@@ -250,18 +194,12 @@ def test_basic_autocomplete(client_with_es):
     new_person.form['last_name'] = 'Gordon'
     new_person.form.submit()
 
-    # elasticsearch
-    client.app.es_client.indices.refresh(index='_all')
     assert client.get('/search/suggest?q=Go').json == ["Gordon Flash"]
     assert client.get('/search/suggest?q=Fl').json == ["Flash Gordon"]
 
-    # postgres
-    assert client.get('/search-postgres/suggest?q=Go').json == ["Gordon Flash"]
-    assert client.get('/search-postgres/suggest?q=Fl').json == ["Flash Gordon"]
 
-
-def test_search_publication_files(client_with_es):
-    client = client_with_es
+def test_search_publication_files(client_with_fts):
+    client = client_with_fts
     client.login_admin()
 
     path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
@@ -270,37 +208,23 @@ def test_search_publication_files(client_with_es):
         page.form['file'] = [Upload('Sample.pdf', f.read(), 'application/pdf')]
         page.form.submit()
 
-    client.app.es_indexer.process()
-    client.app.es_client.indices.refresh(index='_all')
-
-    # elasticsearch
     assert 'Sample' in client.get('/search?q=Adobe')
     assert 'Sample' not in client.spawn().get('/search?q=Adobe')
-
-    # postgres
-    assert 'Sample' in client.get('/search-postgres?q=Adobe')
-    assert 'Sample' not in client.spawn().get('/search-postgres?q=Adobe')
 
     transaction.begin()
     pdf = FileCollection(client.app.session()).query().one()
     pdf.publication = True
     transaction.commit()
 
-    client.app.es_indexer.process()
-    client.app.es_client.indices.refresh(index='_all')
+    client.app.fts_indexer.process()
 
-    # elasticsearch
     assert 'Sample' in client.get('/search?q=Adobe')
     assert 'Sample' in client.spawn().get('/search?q=Adobe')
 
-    # postgres
-    assert 'Sample' in client.get('/search-postgres?q=Adobe')
-    assert 'Sample' in client.spawn().get('/search-postgres?q=Adobe')
 
+def test_search_hashtags(client_with_fts):
 
-def test_search_hashtags(client_with_es):
-
-    client = client_with_es
+    client = client_with_fts
     client.login_admin()
 
     page = client.get('/news').click("Nachricht")
@@ -310,17 +234,12 @@ def test_search_hashtags(client_with_es):
 
     page = page.form.submit().follow()
 
-    client.app.es_indexer.process()
-    client.app.es_client.indices.refresh(index='_all')
-
-    assert 'We have a new homepage' in client.get(
-        '/search-postgres?q=%23newhomepage')
-    assert 'We have a new homepage' not in client.get(
-        '/search-postgres?q=%23newhomepa')
+    assert 'We have a new homepage' in client.get('/search?q=%23newhomepage')
+    assert 'We have a new homepage' not in client.get('/search?q=%23newhomepa')
 
 
-def test_ticket_chat_search(client_with_es):
-    client = client_with_es
+def test_ticket_chat_search(client_with_fts):
+    client = client_with_fts
 
     collection = FormCollection(client.app.session())
     collection.definitions.add('Profile', definition=textwrap.dedent("""
@@ -345,18 +264,17 @@ def test_ticket_chat_search(client_with_es):
     page = page.form.submit().follow()
 
     # at this point logged in users should find the ticket by 'deadbeef'
-    client.app.es_client.indices.refresh(index='_all')
 
-    page = client.get('/search-postgres?q=deadbeef')
+    page = client.get('/search?q=deadbeef')
     assert 'Foo' in page
 
     # but anonymous users should not
-    page = client.spawn().get('/search-postgres?q=deadbeef')
+    page = client.spawn().get('/search?q=deadbeef')
     assert 'Foo' not in page
 
 
-def test_search_future_events_are_sorted_by_occurrence_date(client_with_es):
-    client = client_with_es
+def test_search_future_events_are_sorted_by_occurrence_date(client_with_fts):
+    client = client_with_fts
     client.login_admin()
     anom = client.spawn()
     member = client.spawn()
@@ -416,21 +334,8 @@ def test_search_future_events_are_sorted_by_occurrence_date(client_with_es):
         events_redirect = form_page.form.submit().follow().follow()
         assert "erfolgreich erstellt" in events_redirect
 
-    client.app.es_client.indices.refresh(index='_all')
-
-    # elasticsearch even sorts past events by occurrence date
     for current_client in (client, member, anom):
         results = current_client.get('/search?q=Concert')
-        # Expect ordered by occurrence date, for all search results of 'Event'
-        assert [a.text.strip() for a in
-                results.pyquery('li.search-result-events a')] == [
-            'Not sorted Concert', 'First Concert', 'Second Concert',
-            'Third Concert', 'Forth Concert'
-        ]
-
-    # postgres
-    for current_client in (client, member, anom):
-        results = current_client.get('/search-postgres?q=Concert')
         # Expect future events ordered by occurrence date, far future first.
         # Past events are not sorted by occurrence date.
         assert [a.text.strip() for a in

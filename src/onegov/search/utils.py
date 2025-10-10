@@ -3,9 +3,10 @@ from __future__ import annotations
 import html
 import re
 
-from sqlalchemy import inspect
 from lingua import IsoCode639_1, LanguageDetectorBuilder
 from onegov.core.orm import find_models
+from sqlalchemy import inspect
+from unidecode import unidecode
 
 
 from typing import Any, Generic, TypeVar, TYPE_CHECKING
@@ -34,12 +35,27 @@ LANGUAGE_MAP = {
     'rm_CH': 'english',
     'rm': 'english',
 }
+UMLAUT_TRANS = str.maketrans({
+    'Ä': 'Ae',
+    'Ö': 'Oe',
+    'Ü': 'Ue',
+    'ä': 'ae',
+    'ö': 'oe',
+    'ü': 'ue',
+})
 
 
 def language_from_locale(locale: str | None) -> str:
     if locale is None:
         return 'simple'
     return LANGUAGE_MAP.get(locale, 'simple')
+
+
+def normalize_text(text: str) -> str:
+    """ This does the same thing  as unidecode, except it special-cases
+    umlaut translation for German text.
+    """
+    return unidecode(text.translate(UMLAUT_TRANS))
 
 
 def searchable_sqlalchemy_models(
@@ -98,42 +114,6 @@ def apply_searchable_polymorphic_filter(
     return query
 
 
-_invalid_index_characters = re.compile(r'[\\/?"<>|\s,A-Z:]+')
-
-
-def is_valid_index_name(name: str) -> bool:
-    """ Checks if the given name is a valid elasticsearch index name.
-    Elasticsearch does it's own checks, but we can do it earlier and we are
-    a bit stricter.
-
-    """
-
-    if name.startswith(('_', '.')):
-        return False
-
-    if _invalid_index_characters.search(name):
-        return False
-
-    if '*' in name:
-        return False
-
-    return True
-
-
-def is_valid_type_name(name: str) -> bool:
-    # the type name may be part of the index name, so we use the same check
-    return is_valid_index_name(name)
-
-
-def normalize_index_segment(segment: str, allow_wildcards: bool) -> str:
-    valid = _invalid_index_characters.sub('_', segment.lower())
-
-    if not allow_wildcards:
-        valid = valid.replace('*', '_')
-
-    return valid.replace('.', '_').replace('-', '_')
-
-
 def extract_hashtags(text: str) -> list[str]:
     return [t.lower() for t in HASHTAG.findall(html.unescape(text))]
 
@@ -147,45 +127,6 @@ class classproperty(Generic[T_co]):  # noqa: N801
 
     def __get__(self, obj: object | None, owner: type[object]) -> T_co:
         return self.f(owner)
-
-
-def iter_subclasses(baseclass: type[T]) -> Iterator[type[T]]:
-    for subclass in baseclass.__subclasses__():
-        yield subclass
-
-        # FIXME: Why are we only iterating two levels of inheritance?
-        yield from subclass.__subclasses__()
-
-
-def related_types(model: type[object]) -> set[str]:
-    """ Gathers all related es type names from the given model. A type is
-    counted as related a model is part of a polymorphic setup.
-
-    If no polymorphic identity is found, the result is simply a set with the
-    model's type itself.
-
-    """
-
-    if type_name := getattr(model, 'es_type_name', None):
-        result = {type_name}
-    else:
-        result = set()
-
-    if hasattr(model, '__mapper_args__'):
-        if 'polymorphic_on' in model.__mapper_args__:
-            for subclass in iter_subclasses(model):
-                if type_name := getattr(subclass, 'es_type_name', None):
-                    result.add(type_name)
-
-        elif 'polymorphic_identity' in model.__mapper_args__:
-            for parentclass in model.__mro__:
-                if not hasattr(parentclass, '__mapper_args__'):
-                    continue
-
-                if 'polymorphic_on' in parentclass.__mapper_args__:
-                    return related_types(parentclass)
-
-    return result
 
 
 class LanguageDetector:

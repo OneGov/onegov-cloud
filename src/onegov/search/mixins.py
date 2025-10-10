@@ -10,56 +10,39 @@ if TYPE_CHECKING:
     from datetime import datetime
 
 
-# TODO: generalize to 'fts' instead of 'es'
 class Searchable:
     """ Defines the interface required for an object to be searchable.
 
-    Note that ``es_id ``, ``es_properties`` and ``es_type_name`` must be class
+    Note that ``fts_id `` and ``fts_properties`` must be class
     properties, not instance properties. So do this::
 
         class X(Searchable):
 
-            es_properties = {}
-            es_type_name = 'x'
+            fts_properties = {}
 
     But do not do this::
 
         class X(Searchable):
 
             @property
-            def es_properties(self):
+            def fts_properties(self):
                 return {}
 
-            @property
-            def es_type_name(self):
-                return 'x'
-
     The rest of the properties may be normal properties.
-
-    **Polymorphic Identities**
-
-    If SQLAlchemy's Polymorphic Identities are used, each identity must
-    have it's own unqiue ``es_type_name``. Though such models may share
-    the ``es_properties`` from the base class, we don't assume anything and
-    store each polymorphic identity in its own index.
-
-    From the point of view of elasticsearch, each different polymorphic
-    identity is a completely different model.
 
     """
 
     if TYPE_CHECKING:
         # FIXME: Gross classproperty vs. ClassVar is a mess, we should
         #        consistently use one or the other
-        es_properties: ClassVar[dict[str, Any]]
-        es_type_name: ClassVar[str]
-        es_id: ClassVar[str]
+        fts_properties: ClassVar[dict[str, Any]]
+        fts_id: ClassVar[str]
         __tablename__: ClassVar[str]
 
     # TODO: rename to fts_properties
     @classproperty  # type:ignore[no-redef]
     @classmethod
-    def es_properties(cls) -> dict[str, Any]:
+    def fts_properties(cls) -> dict[str, Any]:
         """ Returns the type mapping of this model. Each property in the
         mapping will be read from the model instance.
 
@@ -83,15 +66,10 @@ class Searchable:
         """
         raise NotImplementedError
 
+    # FIXME: Replace this with `inspect(model).primary_key[0]`
     @classproperty  # type:ignore[no-redef]
     @classmethod
-    def es_type_name(cls) -> str:
-        """ Returns the unique type name of the model. """
-        raise NotImplementedError
-
-    @classproperty  # type:ignore[no-redef]
-    @classmethod
-    def es_id(cls) -> str:
+    def fts_id(cls) -> str:
         """ The name of the id attribute (not the actual value!).
 
         If you use this on an ORM model, be sure to use a primary key, all
@@ -101,7 +79,7 @@ class Searchable:
         raise NotImplementedError
 
     @property
-    def es_language(self) -> str:
+    def fts_language(self) -> str:
         """ Defines the language of the object. By default 'auto' is used,
         which triggers automatic language detection. Automatic language
         detection is reasonably accurate if provided with enough text. Short
@@ -115,9 +93,15 @@ class Searchable:
         """
         return 'auto'
 
-    # TODO: rename to fts_public
     @property
-    def es_public(self) -> bool:
+    def fts_access(self) -> str:
+        """ Returns access level of the model. Defaults to `public`.
+
+        """
+        return getattr(self, 'access', 'public')
+
+    @property
+    def fts_public(self) -> bool:
         """ Returns True if the model is available to be found by the public.
         If false, only editors/admins will see this object in the search
         results.
@@ -126,13 +110,13 @@ class Searchable:
         raise NotImplementedError
 
     @property
-    def es_skip(self) -> bool:
+    def fts_skip(self) -> bool:
         """ Returns True if the indexing of this specific model instance
         should be skipped. """
         return False
 
     @property
-    def es_suggestion(self) -> Sequence[str] | str:
+    def fts_suggestion(self) -> Sequence[str] | str:
         """ Returns suggest-as-you-type value of the document.
         The field used for this property should also be indexed, or the
         suggestion will lead to nowhere.
@@ -147,12 +131,22 @@ class Searchable:
         return self.title  # type:ignore[attr-defined]
 
     @property
-    def es_last_change(self) -> datetime | None:
+    def fts_publication_start(self) -> datetime | None:
+        """ Returns the date when the document should become public. """
+        return getattr(self, 'publication_start', None)
+
+    @property
+    def fts_publication_end(self) -> datetime | None:
+        """ Returns the date when the document should stop being public. """
+        return getattr(self, 'publication_end', None)
+
+    @property
+    def fts_last_change(self) -> datetime | None:
         """ Returns the date the document was created/last modified. """
         return None
 
     @property
-    def es_tags(self) -> list[str] | None:
+    def fts_tags(self) -> list[str] | None:
         """ Returns a list of tags associated with this content. """
         return None
 
@@ -166,21 +160,15 @@ class ORMSearchable(Searchable):
     if TYPE_CHECKING:
         # FIXME: Gross classproperty vs. ClassVar is a mess, we should
         #        consistently use one or the other
-        es_id: ClassVar[str]
-        es_type_name: ClassVar[str]
+        fts_id: ClassVar[str]
 
     @classproperty  # type:ignore[no-redef]
     @classmethod
-    def es_id(cls) -> str:
+    def fts_id(cls) -> str:
         return 'id'
 
-    @classproperty  # type:ignore[no-redef]
-    @classmethod
-    def es_type_name(cls) -> str:
-        return cls.__tablename__
-
     @property
-    def es_last_change(self) -> datetime | None:
+    def fts_last_change(self) -> datetime | None:
         return getattr(self, 'last_change', None)
 
 
@@ -190,26 +178,18 @@ class SearchableContent(ORMSearchable):
 
     """
 
-    es_properties = {
+    fts_properties = {
         'title': {'type': 'localized', 'weight': 'A'},
         'lead': {'type': 'localized', 'weight': 'B'},
-        'text': {'type': 'localized_html', 'weight': 'C'}
+        'text': {'type': 'localized', 'weight': 'C'}
     }
 
     @property
-    def es_public(self) -> bool:
-        # FIXME: This es_public is redundant once we get rid of ES
-        #        we include access and publication dates in the fts
-        return self.access == 'public'  # type:ignore[attr-defined]
+    def fts_public(self) -> bool:
+        return True
 
     @property
-    def es_suggestions(self) -> dict[str, list[str]]:
-        return {
-            'input': [self.title.lower()]  # type:ignore[attr-defined]
-        }
-
-    @property
-    def es_tags(self) -> list[str] | None:
+    def fts_tags(self) -> list[str] | None:
         tags: list[str] = []
 
         for field in ('lead', 'text', 'description'):

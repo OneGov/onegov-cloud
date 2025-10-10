@@ -232,7 +232,7 @@ def fix_directory_file_identity(context: UpgradeContext) -> None:
 def cache_news_hashtags_in_meta(context: UpgradeContext) -> None:
     try:
         for news in context.session.query(News):
-            news.hashtags = news.es_tags or []
+            news.hashtags = news.fts_tags or []
     except Exception:  # nosec B110
         pass
 

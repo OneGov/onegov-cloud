@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from onegov.ticket import Handler, Ticket
+
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -14,7 +16,7 @@ def get_cronjob_by_name(app: Framework, name: str) -> Job[Any] | None:
 
 
 def get_cronjob_url(cronjob: Job[Any]) -> str:
-    return '/cronjobs/{}'.format(cronjob.id)
+    return f'/cronjobs/{cronjob.id}'
 
 
 def edit_bar_links(page: Any, attrib: str | None = None) -> list[Any]:
@@ -24,3 +26,41 @@ def edit_bar_links(page: Any, attrib: str | None = None) -> list[Any]:
             return [li.text for li in links]
         return [li.attrib[attrib] for li in links]
     return links
+
+
+class EchoTicket(Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'EHO'}
+
+
+class EchoHandler(Handler):
+    handler_title = "Echo"
+
+    @property
+    def deleted(self):
+        return False
+
+    @property
+    def email(self):
+        return self.data.get('email')
+
+    @property
+    def title(self):
+        return self.data.get('title')
+
+    @property
+    def subtitle(self):
+        return self.data.get('subtitle')
+
+    @property
+    def group(self):
+        return self.data.get('group')
+
+    def get_summary(self, request):
+        return self.data.get('summary')
+
+    def get_links(self, request):
+        return self.data.get('links')
+
+
+def register_echo_handler(handlers):
+    handlers.register('EHO', EchoHandler)

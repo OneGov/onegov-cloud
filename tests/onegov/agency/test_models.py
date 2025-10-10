@@ -51,7 +51,7 @@ def test_extended_agency(agency_app: AgencyApp) -> None:
     assert agency.trait == 'agency'
     assert agency.proxy().id == agency.id
     assert agency.access == 'public'
-    assert agency.es_public is True
+    assert agency.fts_public is True
 
     # undo mypy narrowing
     agency_ = agency
@@ -68,7 +68,7 @@ def test_extended_agency(agency_app: AgencyApp) -> None:
     assert agency_.pdf.name == 'test-agency.pdf'
 
     agency.access = 'private'
-    assert agency_.es_public is False
+    assert agency.fts_access == 'private'
 
     assert agency.deletable(Bunch(is_admin=False)) is True  # type: ignore[arg-type]
     assert agency.deletable(Bunch(is_admin=True)) is True  # type: ignore[arg-type]
@@ -182,12 +182,10 @@ def test_extended_person(session: Session) -> None:
     assert person.notes == "This is\na note."
     assert person.notes_html == "<p>This is<br>a note.</p>"
     assert person.access == 'public'
-    assert person.es_public is True
+    assert person.fts_public is True
 
     person.access = 'private'
-    # undo mypy narrowing
-    person_ = person
-    assert person_.es_public is False
+    assert person.fts_access == 'private'
 
     assert person.deletable(Bunch(is_admin=False)) is True  # type: ignore[arg-type]
     assert person.deletable(Bunch(is_admin=True)) is True  # type: ignore[arg-type]
@@ -225,7 +223,7 @@ def test_extended_membership(session: Session) -> None:
     assert membership.addition == "Production"
     assert membership.prefix == "*"
     assert membership.access == 'public'
-    assert membership.es_public is True
+    assert membership.fts_access == 'public'
     assert membership.agency_id == agency.id
     assert membership.person_id == person.id
     assert membership.agency == agency
@@ -234,17 +232,15 @@ def test_extended_membership(session: Session) -> None:
     assert person.memberships.one() == membership
 
     membership.access = 'private'
-    # undo mypy narrowing
-    membership_ = membership
-    assert membership_.es_public is False
+    assert membership.fts_access == 'private'
 
     membership.access = 'public'
     membership.agency.meta['access'] = 'private'
-    assert membership_.es_public is False
+    assert membership.fts_access == 'private'
 
     membership.agency.meta['access'] = 'public'
     membership.person.meta['access'] = 'private'
-    assert membership_.es_public is False
+    assert membership.fts_access == 'private'
 
     assert agency.deletable(Bunch(is_admin=False)) is False  # type: ignore[arg-type]
     assert agency.deletable(Bunch(is_admin=True)) is True  # type: ignore[arg-type]
@@ -381,7 +377,7 @@ def test_membership_move_within_person(session: Session) -> None:
     assert len(siblings) == 3
 
 
-def test_agency_muation(session: Session) -> None:
+def test_agency_mutation(session: Session) -> None:
     agency = ExtendedAgency(
         title='Test Agency',
         name='test-agency',

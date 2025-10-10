@@ -9,17 +9,17 @@ import click
 from email_validator import (
     validate_email, EmailNotValidError, EmailUndeliverableError)
 from markupsafe import Markup
-
 from onegov.agency.collections import (
     ExtendedAgencyCollection, ExtendedPersonCollection)
 from onegov.core.csv import CSVFile
 from onegov.core.orm.abstract.adjacency_list import numeric_priority
 from onegov.core.utils import linkify
 
-from typing import TypeVar, Any
+
+from typing import Any
+from typing import TypeVar
 from typing import TypeVarTuple
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
     from collections.abc import Callable, Iterable
@@ -217,8 +217,7 @@ def import_bs_agencies(
         nonlocal added_count
         added_count += 1
         if added_count % 50 == 0:
-            app.es_indexer.process()
-            app.psql_indexer.bulk_process(session)
+            app.fts_indexer.process(session)
         line = lines_by_id[basisid]
         agency = parse_agency(line, parent=parent)
         for child_id in children.get(line.verzorgeinheitid, []):
@@ -293,8 +292,7 @@ def import_bs_persons(
 
     for ix, line in enumerate(csvfile.lines):
         if ix % 50 == 0:
-            app.es_indexer.process()
-            app.psql_indexer.bulk_process(session)
+            app.fts_indexer.process(session)
         parse_person(line)
 
     return persons
@@ -516,8 +514,7 @@ def import_lu_people(
 
     for ix, line in enumerate(csvfile.lines):
         if ix % 1000 == 0:
-            app.es_indexer.process()
-            app.psql_indexer.bulk_process(session)
+            app.fts_indexer.process(session)
 
         if not check_skip(line) and not check_skip_people(line):
             parse_person(line)
@@ -539,8 +536,7 @@ def import_lu_agencies(
     # Unterabteilung, Unterabteilung 2, Unterabteilung 3
     for ix, line in enumerate(csvfile.lines):
         if ix % 1000 == 0:
-            app.es_indexer.process()
-            app.psql_indexer.bulk_process(session)
+            app.fts_indexer.process(session)
 
         if check_skip(line):
             continue
@@ -798,8 +794,7 @@ def match_person_membership_title(
 
     for ix, line in enumerate(csvfile.lines):
         if ix % 50 == 0:
-            app.es_indexer.process()
-            app.psql_indexer.bulk_process(session)
+            app.fts_indexer.process(session)
         total_entries += 1
         match_membership_title(line, agencies)
 

@@ -247,12 +247,6 @@ class GeneralFile(File, SearchableFile):
 
         return widest_access(*self.linked_accesses.values())
 
-    @property
-    def es_public(self) -> bool:
-        # FIXME: This es_public is redundant once we get rid of ES
-        #        we include access and publication dates in the fts
-        return self.published and self.access == 'public'
-
 
 class ImageFile(File):
     __mapper_args__ = {'polymorphic_identity': 'image'}
@@ -261,22 +255,11 @@ class ImageFile(File):
 class ImageSet(FileSet, AccessExtension, ORMSearchable):
     __mapper_args__ = {'polymorphic_identity': 'image'}
 
-    es_properties = {
+    fts_public = True
+    fts_properties = {
         'title': {'type': 'localized', 'weight': 'A'},
         'lead': {'type': 'localized', 'weight': 'B'}
     }
-
-    @property
-    def es_public(self) -> bool:
-        # FIXME: This es_public is redundant once we get rid of ES
-        #        we include access in the fts
-        return self.access == 'public'
-
-    @property
-    def es_suggestions(self) -> dict[str, list[str]]:
-        return {
-            'input': [self.title.lower()]
-        }
 
     lead: dict_property[str | None] = meta_property()
     view: dict_property[str | None] = meta_property()

@@ -26,7 +26,7 @@ class FsiApp(TownApp):
     # ticket statistics.
     send_ticket_statistics = False
 
-    def es_may_use_private_search(
+    def fts_may_use_private_search(
         self,
         request: FsiRequest  # type:ignore[override]
     ) -> bool:

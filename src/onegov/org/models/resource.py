@@ -238,8 +238,6 @@ class DaypassResource(Resource, AccessExtension, SearchableContent,
                       ResourceValidationExtension, GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'daypass'}
 
-    es_type_name = 'daypasses'
-
     # the selected view
     view = 'dayGridMonth'
 
@@ -255,8 +253,6 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
                    CoordinatesExtension, SharedMethods,
                    ResourceValidationExtension, GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'room'}
-
-    es_type_name = 'rooms'
 
     # the selected view (depends on the resource's default)
     view = None
@@ -287,8 +283,6 @@ class ItemResource(Resource, AccessExtension, SearchableContent,
                    ResourceValidationExtension, GeneralFileLinkExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'daily-item'}
-
-    es_type_name = 'daily_items'
 
     view = None
 

@@ -43,7 +43,6 @@ jobs:
           git-core \
           postgresql \
           redis \
-          openjdk-8-jre-headless \
           gcc \
           libc-dev \
           fonts-liberation \
@@ -129,7 +128,6 @@ jobs:
           git-core \
           postgresql \
           redis \
-          openjdk-8-jre-headless \
           gcc \
           libc-dev \
           fonts-liberation \
@@ -223,5 +221,4 @@ jobs:
       env:
         LC_ALL: C.UTF-8
         LANG: C.UTF-8
-        JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
         SKIP_DRIVER_MANAGER: '1'

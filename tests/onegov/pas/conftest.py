@@ -51,12 +51,12 @@ def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
     return cfg_path
 
 
-def create_pas_app(request, use_elasticsearch=False):
+def create_pas_app(request, enable_search=False):
     app = create_app(
         PasApp,
         request,
         use_maildir=True,
-        use_elasticsearch=use_elasticsearch,
+        enable_search=enable_search,
         websockets={
             'client_url': 'ws://localhost:8766',
             'manage_url': 'ws://localhost:8766',
@@ -477,14 +477,14 @@ def memberships_json():
 
 @fixture(scope='function')
 def pas_app(request):
-    app = create_pas_app(request, use_elasticsearch=False)
+    app = create_pas_app(request, enable_search=False)
     yield app
     app.session_manager.dispose()
 
 
 @fixture(scope='function')
-def es_pas_app(request):
-    app = create_pas_app(request, use_elasticsearch=True)
+def fts_pas_app(request):
+    app = create_pas_app(request, enable_search=True)
     yield app
     app.session_manager.dispose()
 
@@ -498,8 +498,8 @@ def client(pas_app):
 
 
 @fixture(scope='function')
-def client_with_es(es_pas_app):
-    client = Client(es_pas_app)
+def client_with_fts(fts_pas_app):
+    client = Client(fts_pas_app)
     client.skip_n_forms = 1
     client.use_intercooler = True
     return client
@@ -507,7 +507,7 @@ def client_with_es(es_pas_app):
 
 @fixture(scope='function')
 def wsgi_server(request):
-    app = create_pas_app(request, False)
+    app = create_pas_app(request, enable_search=False)
     app.print_exceptions = True
     server = WSGIServer(application=app)
     server.start()

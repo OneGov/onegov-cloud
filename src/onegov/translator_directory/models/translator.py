@@ -52,7 +52,8 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     __tablename__ = 'translators'
 
-    es_properties = {
+    fts_public = False
+    fts_properties = {
         # TODO: We may get better results if we use the fullname
         #       although we may have to supply the fullname without
         #       capitalization of the last name.
@@ -60,8 +61,6 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
         'first_name': {'type': 'text', 'weight': 'A'},
         'email': {'type': 'text', 'weight': 'A'}
     }
-
-    es_public = False
 
     id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
