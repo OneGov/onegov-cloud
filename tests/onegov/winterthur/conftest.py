@@ -32,20 +32,20 @@ def addresses_csv(fixtures):
 
 @pytest.fixture(scope='function')
 def winterthur_app(request):
-    yield create_winterthur_app(request, use_elasticsearch=False)
+    yield create_winterthur_app(request, enable_search=False)
 
 
 @pytest.fixture(scope='function')
-def es_winterthur_app(request):
-    yield create_winterthur_app(request, use_elasticsearch=True)
+def fts_winterthur_app(request):
+    yield create_winterthur_app(request, enable_search=True)
 
 
-def create_winterthur_app(request, use_elasticsearch):
+def create_winterthur_app(request, enable_search):
 
     app = create_app(
         app_class=WinterthurApp,
         request=request,
-        use_elasticsearch=use_elasticsearch,
+        enable_search=enable_search,
         websockets={
             'client_url': 'ws://localhost:8766',
             'manage_url': 'ws://localhost:8766',
@@ -82,8 +82,8 @@ def create_winterthur_app(request, use_elasticsearch):
 
 
 @pytest.fixture(scope='function')
-def client_with_es(es_winterthur_app):
-    client = Client(es_winterthur_app)
+def client_with_fts(fts_winterthur_app):
+    client = Client(fts_winterthur_app)
     client.skip_n_forms = 1
     client.use_intercooler = True
     return client

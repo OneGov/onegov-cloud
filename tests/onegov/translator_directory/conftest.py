@@ -32,7 +32,7 @@ def translator_app(request):
 
 
 @pytest.fixture(scope='function')
-def es_translator_app(request):
+def fts_translator_app(request):
     yield create_translator_app(request, True)
 
 
@@ -42,16 +42,16 @@ def client(translator_app):
 
 
 @pytest.fixture(scope='function')
-def client_with_es(es_translator_app):
-    return Client(es_translator_app)
+def client_with_fts(fts_translator_app):
+    return Client(fts_translator_app)
 
 
-def create_translator_app(request, use_elasticsearch):
+def create_translator_app(request, enable_search):
 
     app = create_app(
         app_class=TranslatorDirectoryApp,
         request=request,
-        use_elasticsearch=use_elasticsearch,
+        enable_search=enable_search,
         websockets={
             'client_url': 'ws://localhost:8766',
             'manage_url': 'ws://localhost:8766',

@@ -44,18 +44,18 @@ class Meeting(
 
     __tablename__ = 'par_meetings'
 
-    es_public = True
-    es_properties = {
+    fts_public = True
+    fts_properties = {
         'title_text': {'type': 'text', 'weight': 'A'},
         'display_name': {'type': 'text', 'weight': 'A'}
     }
 
     @property
-    def es_suggestion(self) -> list[str]:
+    def fts_suggestion(self) -> list[str]:
         return [self.title_text, self.display_name]
 
     @property
-    def es_last_change(self) -> datetime | None:
+    def fts_last_change(self) -> datetime | None:
         # NOTE: More current meetings should be more relevant
         # FIXME: Should we de-prioritize meetings without a date
         #        or maybe even exclude them from search results?

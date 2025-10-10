@@ -24,15 +24,8 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
-    es_type_name = 'extended_person'
-
-    @property
-    def es_public(self) -> bool:  # type:ignore[override]
-        # FIXME: This es_public is redundant once we get rid of ES
-        #        we include access and publication dates in the fts
-        return self.access == 'public' and self.published
-
-    es_properties = {
+    fts_public = True
+    fts_properties = {
         'title': {'type': 'text', 'weight': 'A'},
         'function': {'type': 'localized', 'weight': 'B'},
         'email': {'type': 'text', 'weight': 'A'},
@@ -40,13 +33,8 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
         'phone_fts': {'type': 'text', 'weight': 'A'}
     }
 
-    external_user_id: dict_property[str | None] = meta_property()
-
-    # miscField50
-    staff_number: dict_property[str | None] = meta_property()
-
     @property
-    def es_suggestion(self) -> tuple[str, ...]:
+    def fts_suggestion(self) -> tuple[str, ...]:
         suffix = f' ({self.function})' if self.function else ''
         result = {
             f'{self.last_name} {self.first_name}{suffix}',
@@ -54,6 +42,11 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
             f'{self.phone_internal} {self.last_name} {self.first_name}{suffix}'
         }
         return tuple(result)
+
+    external_user_id: dict_property[str | None] = meta_property()
+
+    # miscField50
+    staff_number: dict_property[str | None] = meta_property()
 
     if TYPE_CHECKING:
         # we only allow ExtendedAgencyMembership memberships

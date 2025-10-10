@@ -30,12 +30,11 @@ class RISCommission(Commission, ORMSearchable):
         'polymorphic_identity': 'ris_commission',
     }
 
-    es_type_name = 'ris_commission'
-    es_public = True
-    es_properties = {'name': {'type': 'text', 'weight': 'A'}}
+    fts_public = True
+    fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
 
     @property
-    def es_suggestion(self) -> str:
+    def fts_suggestion(self) -> str:
         return self.name
 
 
@@ -100,24 +99,23 @@ class RISParliamentarian(Parliamentarian, ORMSearchable):
         'polymorphic_identity': 'ris_parliamentarian',
     }
 
-    es_type_name = 'ris_parliamentarian'
-    es_public = False
-    es_properties = {
+    fts_public = False
+    fts_properties = {
         # FIXME: A single fullname property may yield better results
         'first_name': {'type': 'text', 'weight': 'A'},
         'last_name': {'type': 'text', 'weight': 'A'},
     }
 
     @property
-    def title(self) -> str:
-        return f'{self.last_name} {self.first_name}'
-
-    @property
-    def es_suggestion(self) -> tuple[str, ...]:
+    def fts_suggestion(self) -> tuple[str, ...]:
         return (
             f'{self.first_name} {self.last_name}',
             f'{self.last_name} {self.first_name}'
         )
+
+    @property
+    def title(self) -> str:
+        return f'{self.last_name} {self.first_name}'
 
     #: political businesses participations [0..n]
     political_businesses: relationship[list[PoliticalBusinessParticipation]]
@@ -198,19 +196,18 @@ class RISParliamentaryGroup(ParliamentaryGroup, ORMSearchable):
         'polymorphic_identity': 'ris_parliamentary_group',
     }
 
-    es_type_name = 'ris_parliamentary_group'
-    es_public = True
-    es_properties = {'name': {'type': 'text', 'weight': 'A'}}
+    fts_public = True
+    fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
+
+    @property
+    def fts_suggestion(self) -> str:
+        return self.name
 
     political_businesses: relationship[list[PoliticalBusiness]]
     political_businesses = relationship(
         'PoliticalBusiness',
         back_populates='parliamentary_group'
     )
-
-    @property
-    def es_suggestion(self) -> str:
-        return self.name
 
 
 class RISParliamentaryGroupCollection(

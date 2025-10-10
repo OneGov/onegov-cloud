@@ -58,15 +58,12 @@ class InlineEventSearch:
         if not self.term:
             return query
 
-        search_properties = [
-            p for p in Event.es_properties.keys() if not p.startswith('es_')
-        ]
         for word in self.term.split():
             query = query.filter(or_(*(
                 func.lower(
-                    cast(getattr(Event, p), String)
+                    cast(getattr(Event, prop), String)
                 ).contains(word.lower())
-                for p in search_properties
+                for prop in Event.fts_properties.keys()
             )))
 
         return query

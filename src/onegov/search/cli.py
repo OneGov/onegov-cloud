@@ -43,14 +43,14 @@ def psql_index_status(app: SearchApp) -> None:
     ):
         tablename = model.__tablename__
         # FIXME: Replace this with a func.count query too by replacing
-        #        es_skip with a hybrid_property
+        #        fts_skip with a hybrid_property
         count = sum(
             1
             for obj in apply_searchable_polymorphic_filter(
                 session.query(model),
                 model
             )
-            if not getattr(obj, 'es_skip', False)
+            if not getattr(obj, 'fts_skip', False)
         )
         if not count:
             # nothing to index, so we indexed it all
@@ -111,7 +111,7 @@ def index_status(
     """ Prints the status of the psql index. """
 
     def run_index_status(request: CoreRequest, app: Framework) -> None:
-        if not hasattr(request.app, 'es_client'):
+        if not getattr(request.app, 'fts_search_enabled', False):
             return
 
         title = f'Index status of {app.application_id}'

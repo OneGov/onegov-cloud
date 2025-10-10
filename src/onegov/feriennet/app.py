@@ -49,7 +49,7 @@ class FeriennetApp(OrgApp):
 
     request_class = FeriennetRequest
 
-    def es_may_use_private_search(
+    def fts_may_use_private_search(
         self,
         request: FeriennetRequest  # type:ignore[override]
     ) -> bool:

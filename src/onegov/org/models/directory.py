@@ -379,7 +379,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
                         GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
-    es_type_name = 'extended_directories'
+    fts_public = True
 
     content_fields_containing_links_to_files = {
         'text',
@@ -423,12 +423,6 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     @property
     def entry_cls_name(self) -> str:
         return 'ExtendedDirectoryEntry'
-
-    @property
-    def es_public(self) -> bool:
-        # FIXME: This es_public is redundant once we get rid of ES
-        #        we include access in the fts
-        return self.access == 'public'
 
     if TYPE_CHECKING:
         def extend_form_class(  # type:ignore[override]
@@ -500,8 +494,6 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
                              DeletableContentExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
-    es_type_name = 'extended_directory_entries'
-
     internal_notes: dict_property[str | None] = content_property()
 
     if TYPE_CHECKING:
@@ -509,10 +501,8 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
         directory: relationship[ExtendedDirectory]
 
     @property
-    def es_public(self) -> bool:
-        # FIXME: This es_public is redundant once we get rid of ES
-        #        we include access and publication dates in the fts
-        return self.access == 'public' and self.published
+    def fts_public(self) -> bool:  # type: ignore[override]
+        return self.directory.access == 'public'
 
     @property
     def display_config(self) -> dict[str, Any]:

@@ -38,18 +38,18 @@ def client(feriennet_app):
 
 
 @pytest.fixture(scope='function')
-def client_with_es(es_feriennet_app):
-    return Client(es_feriennet_app)
+def client_with_fts(fts_feriennet_app):
+    return Client(fts_feriennet_app)
 
 
 @pytest.fixture(scope='function')
 def feriennet_app(request):
-    yield create_feriennet_app(request, use_elasticsearch=False)
+    yield create_feriennet_app(request, enable_search=False)
 
 
 @pytest.fixture(scope='function')
-def es_feriennet_app(request):
-    yield create_feriennet_app(request, use_elasticsearch=True)
+def fts_feriennet_app(request):
+    yield create_feriennet_app(request, enable_search=True)
 
 
 @pytest.fixture(scope='function')
@@ -67,11 +67,11 @@ def feriennet_app_url(request, feriennet_app):
     server.stop()
 
 
-def create_feriennet_app(request, use_elasticsearch):
+def create_feriennet_app(request, enable_search):
     app = create_app(
         app_class=FeriennetApp,
         request=request,
-        use_elasticsearch=use_elasticsearch,
+        enable_search=enable_search,
         websockets={
             'client_url': 'ws://localhost:8766',
             'manage_url': 'ws://localhost:8766',
@@ -124,7 +124,7 @@ def create_feriennet_app(request, use_elasticsearch):
 @pytest.fixture(scope='function')
 def scenario(request, session, test_password):
     for name in request.fixturenames:
-        if name in ('feriennet_app', 'es_feriennet_app'):
+        if name in ('feriennet_app', 'fts_feriennet_app'):
             session = request.getfixturevalue(name).session()
 
     yield Scenario(session, test_password, activity_model=VacationActivity)

@@ -64,14 +64,14 @@ def cfg_path(
 
 def create_agency_app(
     request: pytest.FixtureRequest,
-    use_elasticsearch: bool = False
+    enable_search: bool = False
 ) -> AgencyApp:
 
     app = create_app(
         AgencyApp,
         request,
         use_maildir=True,
-        use_elasticsearch=use_elasticsearch,
+        enable_search=enable_search,
         websockets={
             'client_url': 'ws://localhost:8766',
             'manage_url': 'ws://localhost:8766',
@@ -113,14 +113,14 @@ def create_agency_app(
 
 @pytest.fixture(scope='function')
 def agency_app(request: pytest.FixtureRequest) -> Iterator[AgencyApp]:
-    app = create_agency_app(request, use_elasticsearch=False)
+    app = create_agency_app(request, enable_search=False)
     yield app
     app.session_manager.dispose()
 
 
 @pytest.fixture(scope='function')
-def es_agency_app(request: pytest.FixtureRequest) -> Iterator[AgencyApp]:
-    app = create_agency_app(request, use_elasticsearch=True)
+def fts_agency_app(request: pytest.FixtureRequest) -> Iterator[AgencyApp]:
+    app = create_agency_app(request, enable_search=True)
     yield app
     app.session_manager.dispose()
 
@@ -134,8 +134,8 @@ def client(agency_app: AgencyApp) -> Client[AgencyApp]:
 
 
 @pytest.fixture(scope='function')
-def client_with_es(es_agency_app: AgencyApp) -> Client[AgencyApp]:
-    client = Client(es_agency_app)
+def client_with_fts(fts_agency_app: AgencyApp) -> Client[AgencyApp]:
+    client = Client(fts_agency_app)
     client.skip_n_forms = 1
     client.use_intercooler = True
     return client

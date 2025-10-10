@@ -26,7 +26,7 @@ class TranslatorDirectoryApp(TownApp):
     send_ticket_statistics = False
     request_class = TranslatorAppRequest
 
-    def es_may_use_private_search(
+    def fts_may_use_private_search(
         self,
         request: TranslatorAppRequest  # type:ignore[override]
     ) -> bool:

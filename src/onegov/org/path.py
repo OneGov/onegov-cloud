@@ -72,7 +72,7 @@ from onegov.org.models import PublicationCollection
 from onegov.org.models import ResourcePersonMove
 from onegov.org.models import ResourceRecipient
 from onegov.org.models import ResourceRecipientCollection
-from onegov.org.models import Search, SearchPostgres
+from onegov.org.models import Search
 from onegov.org.models import SiteCollection
 from onegov.org.models import TicketNote
 from onegov.org.models import Topic
@@ -785,18 +785,8 @@ def get_search(
     request: OrgRequest,
     q: str = '',
     page: int = 0
-) -> Search[Any]:
+) -> Search:
     return Search(request, q, page)
-
-
-@OrgApp.path(model=SearchPostgres, path='/search-postgres',
-             converters={'page': int})
-def get_search_postgres(
-    request: OrgRequest,
-    q: str = '',
-    page: int = 0
-) -> SearchPostgres[Any]:
-    return SearchPostgres(request, q, page)
 
 
 @OrgApp.path(model=AtoZPages, path='/a-z')

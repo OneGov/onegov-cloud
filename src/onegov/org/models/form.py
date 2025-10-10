@@ -25,8 +25,7 @@ class BuiltinFormDefinition(FormDefinition, AccessExtension,
                             HoneyPotExtension, GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'builtin'}
 
-    es_type_name = 'builtin_forms'
-    es_id = 'name'
+    fts_id = 'name'
 
     show_vat: dict_property[bool] = meta_property(default=False)
 
@@ -42,8 +41,7 @@ class CustomFormDefinition(FormDefinition, AccessExtension,
                            HoneyPotExtension, GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'custom'}
 
-    es_type_name = 'custom_forms'
-    es_id = 'name'
+    fts_id = 'name'
     default_extensions = ['honeypot']
 
     show_vat: dict_property[bool] = meta_property(default=False)

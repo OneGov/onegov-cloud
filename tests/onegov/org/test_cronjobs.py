@@ -41,7 +41,6 @@ from unittest.mock import patch, Mock
 
 class EchoTicket(Ticket):
     __mapper_args__ = {'polymorphic_identity': 'EHO'}
-    es_type_name = 'echo_tickets'
 
 
 class EchoHandler(Handler):
@@ -772,8 +771,8 @@ def test_send_scheduled_newsletters(client, org_app, secret_content_allowed):
             assert "Private News" not in mail['TextBody']
 
 
-def test_send_daily_newsletter(es_org_app):
-    org_app = es_org_app
+def test_send_daily_newsletter(fts_org_app):
+    org_app = fts_org_app
     tz = ensure_timezone('Europe/Zurich')
 
     session = org_app.session()
@@ -1468,11 +1467,11 @@ def test_delete_content_marked_deletable__events_occurrences(
     ('private', 'member', 'mtan', 'secret', 'secret_mtan', 'public')
 )
 def test_send_email_notification_for_recent_directory_entry_publications(
-    es_org_app,
+    fts_org_app,
     handlers,
     access
 ):
-    org_app = es_org_app
+    org_app = fts_org_app
     register_echo_handler(handlers)
     register_directory_handler(handlers)
 

@@ -230,6 +230,7 @@ def handle_publication_models(request: OrgRequest, now: datetime) -> None:
             obj.files_observer(obj.files, set(), None, None)
 
         if isinstance(obj, Searchable):
+            # FIXME: We probably no longer need this
             request.app.fts_orm_events.index(request.app.schema, obj)
 
         if (isinstance(obj, ExtendedDirectoryEntry) and

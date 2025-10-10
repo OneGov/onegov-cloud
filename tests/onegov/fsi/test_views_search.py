@@ -1,7 +1,7 @@
 
 
-def test_basic_search(client_with_es):
-    client = client_with_es
+def test_basic_search(client_with_fts):
+    client = client_with_fts
     client.login_admin()
     anom = client.spawn()
 

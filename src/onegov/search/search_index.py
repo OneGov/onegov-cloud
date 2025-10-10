@@ -43,7 +43,7 @@ class SearchIndex(Base, UTCPublicationMixin):
     #: String id of the original model if applicable
     owner_id_str = Column(String, nullable=True)
 
-    #: Indicates if entry is public (Searchable::es_public)
+    #: Indicates if entry is public (Searchable::fts_public)
     public = Column(Boolean, nullable=False, default=False)
 
     #: Access level of entry (AccessExtension::access)
@@ -59,7 +59,7 @@ class SearchIndex(Base, UTCPublicationMixin):
         name='tags'
     )
 
-    #: Suggestions for search functionality (Searchable::es_suggestion)
+    #: Suggestions for search functionality (Searchable::fts_suggestion)
     suggestion = Column(ARRAY(String), nullable=True)
 
     #: Full-text search index data (fts properties)

@@ -57,7 +57,7 @@ def forms():
 
 @pytest.fixture(scope='function')
 def town_app(request):
-    yield create_town_app(request, use_elasticsearch=False)
+    yield create_town_app(request, enable_search=False)
 
 
 @pytest.fixture(scope='function')
@@ -81,23 +81,23 @@ def town_app_url(request, town_app):
 
 
 @pytest.fixture(scope='function')
-def es_town_app(request):
-    yield create_town_app(request, use_elasticsearch=True)
+def fts_town_app(request):
+    yield create_town_app(request, enable_search=True)
 
 
 @pytest.fixture(scope='function')
-def client_with_es(es_town_app):
-    client = Client(es_town_app)
+def client_with_fts(fts_town_app):
+    client = Client(fts_town_app)
     client.skip_n_forms = 1
     client.use_intercooler = True
     return client
 
 
-def create_town_app(request, use_elasticsearch=False):
+def create_town_app(request, enable_search=False):
     app = create_app(
         TownApp,
         request,
-        use_elasticsearch,
+        enable_search,
         websockets={
             'client_url': 'ws://localhost:8766',
             'manage_url': 'ws://localhost:8766',

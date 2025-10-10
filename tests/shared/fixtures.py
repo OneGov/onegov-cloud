@@ -6,9 +6,7 @@ import platform
 import port_for
 import pytest
 import re
-import shlex
 import shutil
-import subprocess
 import tempfile
 import transaction
 import urllib3
@@ -16,11 +14,10 @@ import urllib3
 from _pytest.monkeypatch import MonkeyPatch
 from asyncio import run
 from contextlib import suppress
-from elasticsearch import Elasticsearch
 from fs.tempfs import TempFS
 from functools import lru_cache
 from libres.db.models import ORMBase
-from mirakuru import HTTPExecutor, TCPExecutor
+from mirakuru import TCPExecutor
 from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
 from onegov.websockets.server import main
@@ -284,141 +281,6 @@ def temporary_path(temporary_directory: str) -> Iterator[Path]:
     of a string. """
 
     yield Path(temporary_directory)
-
-
-@pytest.fixture(scope="session")
-def es_default_version() -> str:
-    return '7.5.1'
-
-
-@pytest.fixture(scope="session")
-def es_version(es_default_version: str) -> str:
-    return os.environ.get('ES_VERSION', es_default_version)
-
-
-@pytest.fixture(scope="session")
-def es_archive(es_version: str, request: pytest.FixtureRequest) -> str:
-    # FIXME: Maybe we should use es_directory here as well, the only
-    #        reason to do things differently here is to keep the archive
-    #        downloaded for repeated local test runs and we could try
-    #        to achieve this a different way.
-    try:
-        from xdist import get_xdist_worker_id  # type: ignore[import-untyped]
-        worker_id = get_xdist_worker_id(request)
-    except ImportError:
-        worker_id = ''
-    archive = f'elasticsearch-{es_version}-linux-x86_64.tar.gz'
-    archive_path = f'/tmp/{worker_id}{archive}'
-
-    if not os.path.exists(archive_path):
-        url = f'https://artifacts.elastic.co/downloads/elasticsearch/{archive}'
-        http = urllib3.PoolManager()
-
-        with http.request('GET', url, preload_content=False) as r:  # type: ignore[no-untyped-call]
-            with open(archive_path, 'wb') as f:
-                shutil.copyfileobj(r, f)
-
-    return archive_path
-
-
-@pytest.fixture(scope="session")
-def es_directory() -> Iterator[str]:
-    path = tempfile.mkdtemp()
-    yield path
-    shutil.rmtree(path)
-
-
-@pytest.fixture(scope="session")
-def es_binary(es_archive: str, es_directory: str) -> str:
-    process = subprocess.Popen(
-        shlex.split(
-            f"tar xzvf {es_archive} -C {es_directory} --strip-components=1"
-        ),
-        cwd=es_directory,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-    assert process.wait() == 0
-    return os.path.join(es_directory, 'bin/elasticsearch')
-
-
-@pytest.fixture(scope="session")
-def es_process(
-    es_binary: str,
-    es_version: str,
-    es_directory: str
-) -> Iterator[HTTPExecutor]:
-
-    port = port_for.select_random()
-    pid = es_binary + '.pid'
-
-    # if JAVA_HOME is not defined, try to find it
-    if 'JAVA_HOME' not in os.environ:
-        os.environ['JAVA_HOME'] = guess_java_home_or_fail()
-
-    # use a different garbage collector for better performance
-    os.environ['ES_JAVA_OPTS'] = (
-        '-Xms1g -Xmx1g -XX:-UseConcMarkSweepGC -XX:+UseG1GC'
-        ' -XX:+IgnoreUnrecognizedVMOptions'
-    )
-
-    command = (
-        f"{es_binary} -p {pid} -E http.port={port} "
-        f"-E xpack.monitoring.enabled=false "
-        f"-E xpack.monitoring.collection.enabled=false "
-        f"-E xpack.ml.enabled=false "
-        f'-E cluster.name=c{port} '
-        f"-E path.data={os.path.join(es_directory, 'data')} "
-        f"> /dev/null"
-    )
-
-    url = f'http://127.0.0.1:{port}/_cluster/health?wait_for_status=green'
-
-    executor = HTTPExecutor(command, url, method='GET', shell=True)
-    executor.start()
-
-    yield executor
-
-    executor.stop()
-    executor.kill()
-
-
-def guess_java_home_or_fail() -> str:
-    if os.path.exists('/usr/libexec/java_home'):
-        result = subprocess.run('/usr/libexec/java_home', capture_output=True)
-
-        if result.returncode != 0:
-            raise RuntimeError('/usr/libexec/java_home failed')
-
-        return result.stdout.decode('utf-8').strip()
-    elif os.path.exists('/usr/lib/jvm'):
-        # Ubuntu 24.04
-        return '/usr/lib/jvm/java-11-openjdk-amd64'
-
-    raise RuntimeError("Could not find JAVA_HOME, please set it manually")
-
-
-@pytest.fixture(scope="function")
-def es_url(es_process: HTTPExecutor) -> Iterator[str]:
-    """ Provides an url to an elasticsearch cluster that is guaranteed to be
-    empty at the beginning of each test.
-
-    """
-
-    url = es_process.url.geturl()
-    url = url.split('/_cluster')[0]
-
-    yield url
-
-    es = Elasticsearch(url)
-    es.indices.delete(index='*')
-    es.indices.refresh()
-
-
-@pytest.fixture(scope="function")
-def es_client(es_url: str) -> Iterator[Elasticsearch]:
-    """ Provides an elasticsearch client. """
-    yield Elasticsearch(es_url)
 
 
 @pytest.fixture(scope="function")

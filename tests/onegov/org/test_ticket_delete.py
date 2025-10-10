@@ -66,7 +66,6 @@ class EchoHandler(Handler, TicketDeletionMixin):
 # This is used implicitly to check for polymorphic identity
 class EchoTicket(Ticket):
     __mapper_args__ = {'polymorphic_identity': 'ECH'}
-    es_type_name = 'frr_tickets'
 
 
 def register_echo_handler(handlers):

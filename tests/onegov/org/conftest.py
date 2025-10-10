@@ -96,18 +96,18 @@ def handlers():
 
 @pytest.fixture(scope='function')
 def org_app(request):
-    yield create_org_app(request, use_elasticsearch=False)
+    yield create_org_app(request, enable_search=False)
 
 
 @pytest.fixture(scope='function')
 def wil_app(request):
     yield create_org_app(request, org_name='Stadt Wil',
-                         use_elasticsearch=False)
+                         enable_search=False)
 
 
 @pytest.fixture(scope='function')
-def es_org_app(request):
-    yield create_org_app(request, use_elasticsearch=True)
+def fts_org_app(request):
+    yield create_org_app(request, enable_search=True)
 
 
 @pytest.fixture(scope='function')
@@ -116,8 +116,8 @@ def client(org_app):
 
 
 @pytest.fixture(scope='function')
-def client_with_es(es_org_app):
-    return Client(es_org_app)
+def client_with_fts(fts_org_app):
+    return Client(fts_org_app)
 
 
 @pytest.fixture(scope='function')
@@ -138,13 +138,13 @@ def org_app_url(request, org_app):
 def create_org_app(
     request,
     org_name='Govikon',
-    use_elasticsearch=False,
+    enable_search=False,
     cls=OrgApp
 ):
     app = create_app(
         cls,
         request,
-        use_elasticsearch=use_elasticsearch,
+        enable_search=enable_search,
         websockets={
             'client_url': 'ws://localhost:8766',
             'manage_url': 'ws://localhost:8766',
@@ -216,7 +216,7 @@ def render_element(request):
     def render_element(self, request):
         return self(DefaultLayout(getattr(self, 'model', None), request))
 
-    app = create_org_app(request, use_elasticsearch=False, cls=App)
+    app = create_org_app(request, enable_search=False, cls=App)
     client = Client(app)
 
     def render(element):

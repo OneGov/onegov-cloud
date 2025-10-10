@@ -98,7 +98,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'fsi_course_events'
 
-    es_properties = {
+    fts_properties = {
         'name': {'type': 'localized', 'weight': 'A'},
         'description': {'type': 'localized', 'weight': 'B'},
         'location': {'type': 'localized', 'weight': 'C'},
@@ -125,7 +125,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     )
 
     @property
-    def es_public(self) -> bool:
+    def fts_public(self) -> bool:
         return not self.hidden_from_public
 
     @property

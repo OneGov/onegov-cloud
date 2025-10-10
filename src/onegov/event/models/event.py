@@ -186,24 +186,25 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         lazy='joined',
     )
 
-    es_properties = {
+    fts_properties = {
         'title': {'type': 'localized', 'weight': 'A'},
         'description': {'type': 'localized', 'weight': 'B'},
         'location': {'type': 'localized', 'weight': 'B'},
         'organizer': {'type': 'localized', 'weight': 'B'},
+        # FIXME: Should we move this to fts_tags?
         'filter_keywords': {'type': 'keyword', 'weight': 'A'}
     }
 
     @property
-    def es_public(self) -> bool:
+    def fts_public(self) -> bool:
         return self.state == 'published'
 
     @property
-    def es_skip(self) -> bool:
+    def fts_skip(self) -> bool:
         return self.state != 'published' or getattr(self, '_es_skip', False)
 
     @property
-    def es_last_change(self) -> datetime:
+    def fts_last_change(self) -> datetime:
         latest = self.latest_occurrence
         if latest is None:
             # NOTE: if there are no occurrences at all we want to deprioritize

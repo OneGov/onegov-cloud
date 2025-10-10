@@ -22,18 +22,18 @@ class MeetingItem(Base, ORMSearchable):
 
     __tablename__ = 'par_meeting_items'
 
-    es_public = True
-    es_properties = {
+    fts_public = True
+    fts_properties = {
         'title': {'type': 'text', 'weight': 'A'},
         'number': {'type': 'text', 'weight': 'A'}
     }
 
     @property
-    def es_suggestion(self) -> str:
+    def fts_suggestion(self) -> str:
         return self.title
 
     @property
-    def es_last_change(self) -> datetime | None:
+    def fts_last_change(self) -> datetime | None:
         # NOTE: More current meetings should be more relevant
         # FIXME: Should we de-prioritize meetings without a date
         #        or maybe even exclude them from search results?

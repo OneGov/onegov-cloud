@@ -14,10 +14,7 @@ from onegov.pdf.utils import extract_pdf_info
 from pytest import mark
 from sedate import utcnow
 from tests.onegov.core.test_utils import valid_test_phone_numbers
-from tests.onegov.org.common import get_cronjob_by_name
-from tests.onegov.org.common import get_cronjob_url
 from tests.shared.utils import encode_map_value
-from time import sleep
 from transaction import commit
 from unittest.mock import patch
 
@@ -742,8 +739,8 @@ def test_excel_export_not_logged_in(client: Client[AgencyApp]) -> None:
 
 
 @mark.flaky(reruns=3, only_rerun=None)
-def test_basic_search(client_with_es: Client[AgencyApp]) -> None:
-    client = client_with_es
+def test_basic_search(client_with_fts: Client[AgencyApp]) -> None:
+    client = client_with_fts
     client.login_admin()
     anom = client.spawn()
 
@@ -752,11 +749,6 @@ def test_basic_search(client_with_es: Client[AgencyApp]) -> None:
     assert client.get('/search/suggest?q=test').json == []
     assert 'Resultate' in anom.get('/search?q=test')
     assert anom.get('/search/suggest?q=test').json == []
-
-    assert 'Resultate' in client.get('/search-postgres?q=test')
-    assert client.get('/search-postgres/suggest?q=test').json == []
-    assert 'Resultate' in anom.get('/search-postgres?q=test')
-    assert anom.get('/search-postgres/suggest?q=test').json == []
 
     # Add data
     page = client.get('/settings').click("Organisationen", index=1)
@@ -780,10 +772,7 @@ def test_basic_search(client_with_es: Client[AgencyApp]) -> None:
     manage.form['person_id'].select(text='Rivera Nick')
     manage.form.submit()
 
-    assert client.app.es_client is not None
-    client.app.es_client.indices.refresh(index='_all')
-
-    # Test search results elasticsearch
+    # Test search results
     assert 'Rivera' in anom.get('/search?q=Nick')
     assert 'Nick' in anom.get('/search?q=Rivera')
     assert 'Nick' in anom.get('/search?q=Doctor')
@@ -799,30 +788,12 @@ def test_basic_search(client_with_es: Client[AgencyApp]) -> None:
     assert '7899 Rivera Nick (Doctor)' in anom.get(
         '/search/suggest?q=78').json
 
-    # postgres
-    assert 'Rivera' in anom.get('/search-postgres?q=Nick')
-    assert 'Nick' in anom.get('/search-postgres?q=Rivera')
-    assert 'Nick' in anom.get('/search-postgres?q=Doctor')
-    assert 'Nick' in anom.get('/search-postgres?q=%2B41234567890')
-    assert 'Nick' in anom.get('/search-postgres?q=4567890')
-    assert 'Nick' in anom.get('/search-postgres?q=7890')
-    assert 'Hospital Springfield' in anom.get('/search-postgres?q=Hospital')
-    assert 'Nick' in anom.get('/search-postgres?q=Anesthetist')
-
-    # Test suggestions (no partial matches yet)
-    assert 'Nick Rivera (Doctor)' in anom.get(
-        '/search-postgres/suggest?q=Nic').json
-    assert 'Rivera Nick (Doctor)' in anom.get(
-        '/search-postgres/suggest?q=Riv').json
-    assert '7899 Rivera Nick (Doctor)' in anom.get(
-        '/search-postgres/suggest?q=78').json
-
 
 @mark.flaky(reruns=3, only_rerun=None)
 def test_search_recently_published_object(
-    client_with_es: Client[AgencyApp]
+    client_with_fts: Client[AgencyApp]
 ) -> None:
-    client = client_with_es
+    client = client_with_fts
     client.login_admin()
     anom = client.spawn()
 
@@ -846,25 +817,12 @@ def test_search_recently_published_object(
     manage.form['publication_start'] = start.isoformat()
     manage.form.submit()
 
-    assert client.app.es_client is not None
-    client.app.es_client.indices.refresh(index='_all')
-
-    # elasticsearch
     assert 'Nick' in client.get('/search?q=Rivera')
     assert 'Nick' not in anom.get('/search?q=Rivera')
     assert 'Hospital Springfield' in client.get('/search?q=Hospital')
     assert 'Hospital Springfield' not in anom.get('/search?q=Hospital')
     assert 'Nick' in client.get('/search?q=Anesthetist')
     assert 'Nick' not in anom.get('/search?q=Anesthetist')
-
-    # postgres
-    assert 'Nick' in client.get('/search-postgres?q=Rivera')
-    assert 'Nick' not in anom.get('/search-postgres?q=Rivera')
-    assert 'Hospital Springfield' in client.get('/search-postgres?q=Hospital')
-    assert 'Hospital Springfield' not in anom.get(
-        '/search-postgres?q=Hospital')
-    assert 'Nick' in client.get('/search-postgres?q=Anesthetist')
-    assert 'Nick' not in anom.get('/search-postgres?q=Anesthetist')
 
     # Publish
     then = utcnow() - timedelta(minutes=30)
@@ -873,16 +831,8 @@ def test_search_recently_published_object(
     session.query(ExtendedAgencyMembership).one().publication_start = then
     session.query(ExtendedAgency).one().publication_start = then
     commit()
+    client.app.fts_indexer.process()
 
-    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
-    assert job is not None
-    job.app = client.app
-    url = get_cronjob_url(job)
-    client.get(url)
-
-    sleep(5)
-
-    # elasticsearch
     assert 'Nick' in client.get('/search?q=Rivera')
     assert 'Nick' in anom.get('/search?q=Rivera')
     assert 'Nick' in client.spawn().get('/search?q=Rivera')
@@ -893,18 +843,6 @@ def test_search_recently_published_object(
     assert 'Nick' in anom.get('/search?q=Anesthetist')
     assert 'Nick' in client.spawn().get('/search?q=Anesthetist')
 
-    # postgres
-    assert 'Nick' in client.get('/search-postgres?q=Rivera')
-    assert 'Nick' in anom.get('/search-postgres?q=Rivera')
-    assert 'Nick' in client.spawn().get('/search-postgres?q=Rivera')
-    assert 'Hospital Springfield' in client.get('/search-postgres?q=Hospital')
-    assert 'Hospital Springfield' in anom.get('/search-postgres?q=Hospital')
-    assert 'Hospital Springfield' in client.spawn().get(
-        '/search-postgres?q=Hospital')
-    assert 'Nick' in client.get('/search-postgres?q=Anesthetist')
-    assert 'Nick' in anom.get('/search-postgres?q=Anesthetist')
-    assert 'Nick' in client.spawn().get('/search-postgres?q=Anesthetist')
-
     # Unpublish
     session.query(ExtendedPerson).one().publication_start = None
     session.query(ExtendedPerson).one().publication_end = then
@@ -913,11 +851,8 @@ def test_search_recently_published_object(
     session.query(ExtendedAgency).one().publication_start = None
     session.query(ExtendedAgency).one().publication_end = then
     commit()
+    client.app.fts_indexer.process()
 
-    client.get(url)
-    sleep(5)
-
-    # elasticsearch
     assert 'Nick' in client.get('/search?q=Rivera')
     assert 'Nick' not in anom.get('/search?q=Rivera')
     assert 'Nick' not in client.spawn().get('/search?q=Rivera')
@@ -925,15 +860,6 @@ def test_search_recently_published_object(
     assert 'Hospital Springfield' not in anom.get('/search?q=Hospital')
     assert 'Nick' in client.get('/search?q=Anesthetist')
     assert 'Nick' not in anom.get('/search?q=Anesthetist')
-
-    # postgres
-    assert 'Nick' in client.get('/search-postgres?q=Rivera')
-    assert 'Nick' not in anom.get('/search-postgres?q=Rivera')
-    assert 'Hospital Springfield' in client.get('/search-postgres?q=Hospital')
-    assert 'Hospital Springfield' not in anom.get(
-        '/search-postgres?q=Hospital')
-    assert 'Nick' in client.get('/search-postgres?q=Anesthetist')
-    assert 'Nick' not in anom.get('/search-postgres?q=Anesthetist')
 
 
 def test_footer_settings_custom_links(client: Client[AgencyApp]) -> None:

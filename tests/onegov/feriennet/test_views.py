@@ -264,8 +264,8 @@ def test_activity_communication(broadcast, authenticate, connect, client,
     assert "Using a Raspberry Pi we will learn Python" in message
 
 
-def test_basic_search(client_with_es):
-    client = client_with_es
+def test_basic_search(client_with_fts):
+    client = client_with_fts
     anom = client.spawn()
 
     # basic test
@@ -274,14 +274,9 @@ def test_basic_search(client_with_es):
     assert 'Resultate' in anom.get('/search?q=test')
     assert anom.get('/search/suggest?q=test').json == []
 
-    assert 'Resultate' in client.get('/search-postgres?q=test')
-    assert client.get('/search-postgres/suggest?q=test').json == []
-    assert 'Resultate' in anom.get('/search-postgres?q=test')
-    assert anom.get('/search-postgres/suggest?q=test').json == []
 
-
-def test_activity_search(client_with_es, scenario):
-    client = client_with_es
+def test_activity_search(client_with_fts, scenario):
+    client = client_with_fts
 
     scenario.add_period()
     scenario.add_activity(
@@ -299,64 +294,33 @@ def test_activity_search(client_with_es, scenario):
     editor.login_editor()
 
     # in preview, activities can't be found
-    client.app.es_client.indices.refresh(index='_all')
-    # elasticsearch
     assert 'search-result-vacation' not in admin.get('/search?q=Learn')
     assert 'search-result-vacation' not in editor.get('/search?q=Learn')
     assert 'search-result-vacation' not in client.get('/search?q=Learn')
-    # postgres
-    assert ('search-result-vacation' not in
-            admin.get('/search-postgres?q=Learn'))
-    assert ('search-result-vacation' not in
-            editor.get('/search-postgres?q=Learn'))
-    assert ('search-result-vacation' not in
-            client.get('/search-postgres?q=Learn'))
 
     url = '/activity/learn-how-to-program'
     editor.get(url).click("Publikation beantragen")
 
     # once proposed, activities can be found by the admin only
-    client.app.es_client.indices.refresh(index='_all')
-    # elasticsearch
     assert 'search-result-vacation' in admin.get('/search?q=Learn')
     assert 'search-result-vacation' not in editor.get('/search?q=Learn')
     assert 'search-result-vacation' not in client.get('/search?q=Learn')
-    # postgres
-    assert 'search-result-vacation' in admin.get('/search-postgres?q=Learn')
-    assert ('search-result-vacation' not in
-            editor.get('/search-postgres?q=Learn'))
-    assert ('search-result-vacation' not in
-            client.get('/search-postgres?q=Learn'))
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     ticket.click("Veröffentlichen")
 
     # once accepted, activities can be found by anyone
-    client.app.es_client.indices.refresh(index='_all')
-    # elasticsearch
     assert 'search-result-vacation' in admin.get('/search?q=Learn')
     assert 'search-result-vacation' in editor.get('/search?q=Learn')
     assert 'search-result-vacation' in client.get('/search?q=Learn')
-    # postgres
-    assert 'search-result-vacation' in admin.get('/search-postgres?q=Learn')
-    assert 'search-result-vacation' in editor.get('/search-postgres?q=Learn')
-    assert 'search-result-vacation' in client.get('/search-postgres?q=Learn')
 
     ticket = admin.get(ticket.request.url)
     ticket.click("Archivieren")
 
     # archived the search will fail again, except for admins
-    client.app.es_client.indices.refresh(index='_all')
-    # elasticsearch
     assert 'search-result-vacation' in admin.get('/search?q=Learn')
     assert 'search-result-vacation' not in editor.get('/search?q=Learn')
     assert 'search-result-vacation' not in client.get('/search?q=Learn')
-    # postgres
-    assert 'search-result-vacation' in admin.get('/search-postgres?q=Learn')
-    assert ('search-result-vacation' not in
-            editor.get('/search-postgres?q=Learn'))
-    assert ('search-result-vacation' not in
-            client.get('/search-postgres?q=Learn'))
 
 
 def test_activity_filter_tags(client, scenario):

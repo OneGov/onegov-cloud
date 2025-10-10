@@ -32,7 +32,6 @@ jobs:
           git-core \
           postgresql \
           redis \
-          openjdk-8-jre-headless \
           gcc \
           libc-dev \
           fonts-liberation \

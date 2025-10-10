@@ -48,8 +48,8 @@ def add_rate_set(settings, delete) -> None:
 
 
 @pytest.mark.flaky(reruns=5, only_rerun=None)
-def test_views_manage(client_with_es):
-    client = client_with_es
+def test_views_manage(client_with_fts):
+    client = client_with_fts
     client.login_admin()
 
     settings = client.get('/').follow().click('PAS Einstellungen')
@@ -213,36 +213,21 @@ def test_views_manage(client_with_es):
     assert 'admin@example.org' in page
 
     # Test search results
-    client.app.es_client.indices.refresh(index='_all')
     client = client.spawn()
 
-    # elasticsearch
     assert '0 Resultate' in client.get('/search?q=aa')
     assert '0 Resultate' in client.get('/search?q=bb')
     assert '0 Resultate' in client.get('/search?q=cc')
     assert '0 Resultate' in client.get('/search?q=first')
     assert '0 Resultate' in client.get('/search?q=Q1')
-    # postgres
-    assert '0 Resultate' in client.get('/search-postgres?q=aa')
-    assert '0 Resultate' in client.get('/search-postgres?q=bb')
-    assert '0 Resultate' in client.get('/search-postgres?q=cc')
-    assert '0 Resultate' in client.get('/search-postgres?q=first')
-    assert '0 Resultate' in client.get('/search-postgres?q=Q1')
 
     client.login_admin()
 
-    # elasticsearch
     assert '1 Resultat' in client.get('/search?q=aa')
     assert '1 Resultat' in client.get('/search?q=bb')
     assert '1 Resultat' in client.get('/search?q=cc')
     assert '2 Resultate' in client.get('/search?q=first')
     assert '1 Resultat' in client.get('/search?q=Q1')
-    # postgres
-    assert '1 Resultat' in client.get('/search-postgres?q=aa')
-    assert '1 Resultat' in client.get('/search-postgres?q=bb')
-    assert '1 Resultat' in client.get('/search-postgres?q=cc')
-    assert '2 Resultate' in client.get('/search-postgres?q=first')
-    assert '1 Resultat' in client.get('/search-postgres?q=Q1')
 
     # Delete
     for page in delete:
