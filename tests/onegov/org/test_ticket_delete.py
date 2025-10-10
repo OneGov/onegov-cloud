@@ -14,11 +14,6 @@ from onegov.ticket import TicketCollection, Ticket
 from onegov.user import UserCollection
 from sedate import ensure_timezone
 from tests.onegov.org.common import register_echo_handler
-from tests.shared import Client as BaseClient
-
-
-class Client(BaseClient):
-    skip_n_forms = 1
 
 
 def archive_all_tickets(session, tickets, tz):
@@ -34,21 +29,20 @@ def archive_all_tickets(session, tickets, tz):
         t.modified = datetime(2016, 1, 2, 10, tzinfo=tz)
 
 
-def test_delete_ticket_without_submission(org_app, handlers):
+def test_delete_ticket_without_submission(client, handlers):
     register_echo_handler(handlers)
 
-    client = Client(org_app)
     tz = ensure_timezone('Europe/Zurich')
 
     transaction.begin()
 
-    session = org_app.session()
+    session = client.app.session()
     collection = TicketCollection(session)
 
     tickets = [
         collection.open_ticket(
             handler_id='1',
-            handler_code='ECH',
+            handler_code='EHO',
             title="Title",
             group="Group",
             email="citizen@example.org",
@@ -56,7 +50,7 @@ def test_delete_ticket_without_submission(org_app, handlers):
         ),
         collection.open_ticket(
             handler_id='2',
-            handler_code='ECH',
+            handler_code='EHO',
             title="Title",
             group="Group",
             email="citizen@example.org",
