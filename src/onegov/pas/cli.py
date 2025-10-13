@@ -109,6 +109,41 @@ def update_accounts_cli(dry_run: bool) -> Processor:
     return do_update_accounts
 
 
+@cli.command(name='update-account-single', context_settings={'singular': True})
+@click.option('--email', required=True, help='Email of the parliamentarian')
+@click.option('--dry-run/-no-dry-run', default=False)
+def update_account_single_cli(email: str, dry_run: bool) -> Processor:
+    """Updates user account for a single parliamentarian by email."""
+
+    def do_update_account(request: PasRequest, app: PasApp) -> None:
+        from onegov.pas.models import PASParliamentarian
+
+        parliamentarians = PASParliamentarianCollection(app)
+        parliamentarian = (
+            parliamentarians.query()
+            .filter(PASParliamentarian.email_primary == email)
+            .first()
+        )
+
+        if not parliamentarian:
+            click.secho(f'No parliamentarian found: {email}', fg='red')
+            transaction.abort()
+            return
+
+        parliamentarians.update_user(
+            parliamentarian, parliamentarian.email_primary
+        )
+        click.secho(
+            f'Updated account for parliamentarian: {email}', fg='green'
+        )
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Dry run - changes aborted', fg='yellow')
+
+    return do_update_account
+
+
 @cli.command('check-api')
 @click.option('--url', default='',
               help='API endpoint to check')
