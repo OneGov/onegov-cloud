@@ -75,15 +75,44 @@ def _fetch_custom_data_worker(
                 addresses=addresses,
                 sex=sex
             ))
+        except requests.exceptions.HTTPError as e:
+            if e.response is not None and e.response.status_code == 404:
+                log.warning(
+                    f'Person not found in API: {parliamentarian.title} '
+                    f'(ID: {person_id})'
+                )
+                result_queue.put(
+                    UpdateResult(
+                        parliamentarian_id=parliamentarian.id,
+                        title=parliamentarian.title,
+                        custom_values={},
+                        addresses=[],
+                        sex=None,
+                        error='404: Person not found in API',
+                    )
+                )
+            else:
+                result_queue.put(
+                    UpdateResult(
+                        parliamentarian_id=parliamentarian.id,
+                        title=parliamentarian.title,
+                        custom_values={},
+                        addresses=[],
+                        sex=None,
+                        error=str(e),
+                    )
+                )
         except Exception as e:
-            result_queue.put(UpdateResult(
-                parliamentarian_id=parliamentarian.id,
-                title=parliamentarian.title,
-                custom_values={},
-                addresses=[],
-                sex=None,
-                error=str(e)
-            ))
+            result_queue.put(
+                UpdateResult(
+                    parliamentarian_id=parliamentarian.id,
+                    title=parliamentarian.title,
+                    custom_values={},
+                    addresses=[],
+                    sex=None,
+                    error=str(e),
+                )
+            )
         finally:
             parliamentarian_queue.task_done()
 
@@ -410,10 +439,15 @@ class KubImporter:
                 if result.error:
                     error_count += 1
                     if self.output:
-                        self.output.error(
-                            f'✗ Failed to fetch {result.title}: '
-                            f'{result.error}'
-                        )
+                        if result.error.startswith('404:'):
+                            self.output.info(
+                                f'⊘ {result.title}: Person not found in API'
+                            )
+                        else:
+                            self.output.error(
+                                f'✗ Failed to fetch {result.title}: '
+                                f'{result.error}'
+                            )
                 else:
                     # Update parliamentarian in main thread's session
                     parliamentarian = request.session.query(
