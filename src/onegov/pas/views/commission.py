@@ -212,6 +212,8 @@ def commissions_parliamentarians_json(
     self: PASCommissionCollection, request: TownRequest
 ) -> JSON_ro:
     """Returns all commissions with their parliamentarians."""
+    if not request.is_admin:
+        return {}
     session = request.session
     memberships = session.query(PASCommissionMembership).all()
 

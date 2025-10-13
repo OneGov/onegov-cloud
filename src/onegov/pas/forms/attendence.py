@@ -99,6 +99,75 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
         depends_on=('type', '!plenary'),
     )
 
+    def _can_edit_parliamentarian(
+        self, parliamentarian_id: str
+    ) -> tuple[bool, str | None]:
+        """Check if current user can edit attendance for given parl ID.
+
+        Returns: (can_edit, error_message)
+        """
+        if not hasattr(self.request.identity, 'role'):
+            return (False, _('No role found for user.'))
+
+        role = self.request.identity.role
+        if role in ('admin', 'editor'):
+            return (True, None)
+
+        if role not in ('parliamentarian', 'commission_president'):
+            return (False, _('Insufficient permissions.'))
+
+        user = (
+            self.request.session.query(User)
+            .filter_by(username=self.request.identity.userid)
+            .first()
+        )
+        if not user or not user.parliamentarian:  # type: ignore[attr-defined]
+            return (False, _('User has no parliamentarian record.'))
+
+        user_parl_id = str(user.parliamentarian.id)  # type: ignore[attr-defined]
+
+        if parliamentarian_id == user_parl_id:
+            return (True, None)
+
+        if role == 'parliamentarian':
+            return (False, _('You can only edit your own attendance.'))
+
+        target_parl = PASParliamentarianCollection(self.request.app).by_id(
+            parliamentarian_id
+        )
+        if not target_parl:
+            return (False, _('Target parliamentarian not found.'))
+
+        for pres_membership in user.parliamentarian.commission_memberships:  # type: ignore[attr-defined]
+            if pres_membership.role == 'president' and (
+                pres_membership.end is None
+                or pres_membership.end >= date.today()
+            ):
+                for member_membership in target_parl.commission_memberships:
+                    if (
+                        member_membership.commission_id
+                        == pres_membership.commission_id
+                        and (
+                            member_membership.end is None
+                            or member_membership.end >= date.today()
+                        )
+                    ):
+                        return (True, None)
+
+        return (
+            False,
+            _(
+                'You can only edit your own or your commission '
+                "members' attendance."
+            ),
+        )
+
+    def validate_parliamentarian_id(self, field: ChosenSelectField) -> None:
+        """Prevent parliamentarians from editing other people's attendance."""
+        can_edit, error_msg = self._can_edit_parliamentarian(field.data)
+        if not can_edit and error_msg is not None:
+            raise ValidationError(error_msg)
+
     def ensure_commission(self) -> bool:
         if (
             self.type.data
@@ -148,11 +217,69 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
 
     def on_request(self) -> None:
         self.set_default_value_to_settlement_run_start()
-        self.parliamentarian_id.choices = [
-            (str(parliamentarian.id), parliamentarian.title)
-            for parliamentarian
-            in PASParliamentarianCollection(self.request.app).query()
-        ]
+
+        if (
+            hasattr(self.request.identity, 'role')
+            and self.request.identity.role == 'parliamentarian'
+        ):
+            user = (
+                self.request.session.query(User)
+                .filter_by(username=self.request.identity.userid)
+                .first()
+            )
+            if user and user.parliamentarian:  # type: ignore[attr-defined]
+                self.parliamentarian_id.choices = [
+                    (str(user.parliamentarian.id), user.parliamentarian.title)  # type: ignore[attr-defined]
+                ]
+            else:
+                self.parliamentarian_id.choices = []
+        elif (
+            hasattr(self.request.identity, 'role')
+            and self.request.identity.role == 'commission_president'
+        ):
+            user = (
+                self.request.session.query(User)
+                .filter_by(username=self.request.identity.userid)
+                .first()
+            )
+            if user and user.parliamentarian:  # type: ignore[attr-defined]
+                choices = [
+                    (
+                        str(user.parliamentarian.id),  # type: ignore[attr-defined]
+                        user.parliamentarian.title,  # type: ignore[attr-defined]
+                    )
+                ]
+
+                for membership in user.parliamentarian.commission_memberships:  # type: ignore[attr-defined]
+                    if membership.role == 'president' and (
+                        membership.end is None
+                        or membership.end >= date.today()
+                    ):
+                        for member_membership in (
+                            self.request.session.query(PASCommissionMembership)
+                            .filter_by(commission_id=membership.commission_id)
+                            .filter(
+                                PASCommissionMembership.end.is_(None)
+                                | (PASCommissionMembership.end >= date.today())
+                            )
+                        ):
+                            if (
+                                member_membership.parliamentarian_id
+                                != user.parliamentarian.id  # type: ignore[attr-defined]
+                            ):
+                                member = member_membership.parliamentarian
+                                choices.append((str(member.id), member.title))
+
+                self.parliamentarian_id.choices = list(dict.fromkeys(choices))
+            else:
+                self.parliamentarian_id.choices = []
+        else:
+            self.parliamentarian_id.choices = [
+                (str(parliamentarian.id), parliamentarian.title)
+                for parliamentarian in PASParliamentarianCollection(
+                    self.request.app
+                ).query()
+            ]
 
         # Filter commission choices based on user role
         if hasattr(
@@ -161,7 +288,6 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
             'parliamentarian',
             'commission_president',
         ):
-            # Non-admin users: only show commissions they're members of
             user = (
                 self.request.session.query(User)
                 .filter_by(username=self.request.identity.userid)
@@ -184,7 +310,6 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
             else:
                 self.commission_id.choices = []
         else:
-            # Admin/editor users: show all commissions
             self.commission_id.choices = [
                 (commission.id, commission.title)
                 for commission in PASCommissionCollection(
@@ -195,53 +320,6 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
 
 
 class AttendenceAddForm(AttendenceForm):
-
-    def validate_parliamentarian_id(self, field: ChosenSelectField) -> None:
-        """Ensure parliamentarians can only add attendance for themselves."""
-        if (hasattr(self.request.identity, 'role')
-            and self.request.identity.role == 'parliamentarian'):
-            user = self.request.session.query(User).filter_by(
-                username=self.request.identity.userid).first()
-            if user and user.parliamentarian:  # type: ignore[attr-defined]
-                if field.data != str(user.parliamentarian.id):  # type: ignore[attr-defined]
-                    raise ValidationError(
-                        _('You can only add attendance for yourself.')
-                    )
-        elif (hasattr(self.request.identity, 'role')
-              and self.request.identity.role == 'commission_president'):
-            # Commission presidents can add for themselves + commission members
-            user = self.request.session.query(User).filter_by(
-                username=self.request.identity.userid).first()
-            if user and user.parliamentarian:  # type: ignore[attr-defined]
-                # Check if they're trying to add for themselves (always OK)
-                if field.data == str(user.parliamentarian.id):  # type: ignore[attr-defined]
-                    return
-
-                # Check if target is a member of a commission they president
-                target_parl = PASParliamentarianCollection(
-                    self.request.app).by_id(field.data)
-                if target_parl:
-                    for pres_membership in (
-                        user.parliamentarian.commission_memberships  # type: ignore[attr-defined]
-                    ):
-                        if (pres_membership.role == 'president'
-                            and (pres_membership.end is None
-                                 or pres_membership.end >= date.today())):
-                            # Check if target is member of this commission
-                            for member_membership in (
-                                target_parl.commission_memberships
-                            ):
-                                if (member_membership.commission_id
-                                    == pres_membership.commission_id
-                                    and (member_membership.end is None
-                                         or member_membership.end
-                                         >= date.today())):
-                                    return  # Valid - same commission
-
-                raise ValidationError(
-                    _('You can only add attendance for yourself or your '
-                      'commission members.')
-                )
 
     def on_request(self) -> None:
         super().on_request()

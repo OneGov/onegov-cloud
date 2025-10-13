@@ -557,6 +557,7 @@ def test_fetch_commissions_parliamentarians_json(client):
     parl3_id = str(parl3.id)
     transaction.commit()
 
+    client.login_admin()
     response = client.get('/commissions/commissions-parliamentarians-json')
     assert response.status_code == 200
     assert response.content_type == 'application/json'

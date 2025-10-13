@@ -3,10 +3,10 @@ from onegov.pas.collections import (
     PASCommissionCollection,
     PASParliamentarianCollection
 )
-from onegov.pas.models import PASCommissionMembership
+from onegov.pas.models import PASCommissionMembership, SettlementRun
 from onegov.user import UserCollection
 import transaction
-from datetime import date
+from datetime import date, timedelta
 
 """
   1. Own attendance: Parliamentarians can edit their own attendance
@@ -17,6 +17,24 @@ from datetime import date
   5. Personal details: Cannot view other parliamentarians' personal info
 
 """
+
+
+def ensure_active_settlement_run(session):
+    """Ensure there's an active settlement run for testing."""
+    existing = session.query(SettlementRun).filter_by(closed=False).first()
+    if existing:
+        return existing
+
+    today = date.today()
+    settlement = SettlementRun(
+        name=f'Test Settlement {today.year}',
+        start=today - timedelta(days=30),
+        end=today + timedelta(days=30),
+        closed=False,
+    )
+    session.add(settlement)
+    session.flush()
+    return settlement
 
 
 def create_parliamentarian_with_user(client, first_name: str, last_name: str,
@@ -295,6 +313,8 @@ def test_parliamentarian_cannot_add_attendance_for_others(client):
     parliamentarians'''
     session = client.app.session()
 
+    ensure_active_settlement_run(session)
+
     parl_a, _ = create_parliamentarian_with_user(
         client, 'Alice', 'Parliamentarian', 'alice.parl@example.org'
     )
@@ -307,20 +327,22 @@ def test_parliamentarian_cannot_add_attendance_for_others(client):
 
     client.login('alice.parl@example.org', 'test')
 
-    # Get the form page first to extract CSRF token
     form_page = client.get('/attendences/new')
     assert form_page.status_code == 200
 
-    # Try to submit form with Bob's ID (form manipulation)
-    page = client.post('/attendences/new', {
-        'parliamentarian_id': str(parl_b_id),
-        'date': '2024-01-15',
-        'duration': '2.0',
-        'type': 'plenary',
-    })
+    csrf_token = form_page.form['csrf_token'].value
+    response = client.post(
+        '/attendences/new',
+        {
+            'csrf_token': csrf_token,
+            'parliamentarian_id': str(parl_b_id),
+            'date': date.today().isoformat(),
+            'duration': '2.0',
+            'type': 'plenary',
+        },
+    )
 
-    # Should get validation error
-    assert 'Sie können nur für sich selbst Anwesenheiten hinzufügen.' in page
+    assert 'Sie können nur Ihre eigene Anwesenheit bearbeiten.' in response
 
 
 def test_parliamentarian_can_only_see_self_in_dropdown(client):
@@ -351,6 +373,8 @@ def test_commission_president_can_add_for_commission_members(client):
     commission members'''
     session = client.app.session()
 
+    ensure_active_settlement_run(session)
+
     president, _ = create_parliamentarian_with_user(
         client, 'President', 'Leader', 'president.leader@example.org',
         role='commission_president'
@@ -367,24 +391,43 @@ def test_commission_president_can_add_for_commission_members(client):
 
     client.login('president.leader@example.org', 'test')
 
-    # Should be able to add attendance for commission member
-    page = client.post('/attendences/new', {
-        'parliamentarian_id': str(member_id),
-        'date': '2024-01-15',
-        'duration': '2.0',
-        'type': 'plenary',
-    })
+    form_page = client.get('/attendences/new')
+    assert form_page.status_code == 200
 
-    # Should not get our specific validation error
-    error_msg = ('You can only add attendance for yourself or your '
-                 'commission members')
-    assert error_msg not in str(page)
+    assert 'Member' in form_page
+    assert 'Follower' in form_page
+
+    form_page.form['parliamentarian_id'] = str(member_id)
+    form_page.form['date'] = date.today().isoformat()
+    form_page.form['duration'] = '2.0'
+    form_page.form['type'] = 'plenary'
+
+    response = form_page.form.submit()
+    assert 'Das Formular enthält Fehler' not in response
+
+    error_msg = (
+        'Sie können nur für sich selbst oder Ihre '
+        'Kommissionsmitglieder Anwesenheiten bearbeiten.'
+    )
+    assert error_msg not in response
+
+    transaction.commit()
+
+    attendences = AttendenceCollection(session)
+    query = attendences.query().filter_by(parliamentarian_id=member_id)
+    created_attendance = query.first()
+
+    assert created_attendance is not None
+    assert created_attendance.parliamentarian_id == member_id
+    assert created_attendance.type == 'plenary'
 
 
 def test_commission_president_cannot_add_for_other_commission_members(client):
     '''Commission presidents should NOT be able to add attendance for members
     of other commissions'''
     session = client.app.session()
+
+    ensure_active_settlement_run(session)
 
     finance_president, _ = create_parliamentarian_with_user(
         client, 'Finance', 'President', 'finance.president@example.org',
@@ -404,14 +447,22 @@ def test_commission_president_cannot_add_for_other_commission_members(client):
 
     client.login('finance.president@example.org', 'test')
 
-    # Try to submit form for member of different commission
-    page = client.post('/attendences/new', {
-        'parliamentarian_id': str(education_member_id),
-        'date': '2024-01-15',
-        'duration': '2.0',
-        'type': 'plenary',
-    })
+    form_page = client.get('/attendences/new')
+    assert form_page.status_code == 200
 
-    # Should get validation error
-    assert ('Sie können nur für sich selbst oder Ihre Kommissionsmitglieder '
-            'Anwesenheiten hinzufügen.') in page
+    csrf_token = form_page.form['csrf_token'].value
+    response = client.post(
+        '/attendences/new',
+        {
+            'csrf_token': csrf_token,
+            'parliamentarian_id': str(education_member_id),
+            'date': date.today().isoformat(),
+            'duration': '2.0',
+            'type': 'plenary',
+        },
+    )
+
+    assert (
+        'Sie können nur für sich selbst oder Ihre Kommissionsmitglieder '
+        'Anwesenheiten bearbeiten.'
+    ) in response

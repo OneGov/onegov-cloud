@@ -155,6 +155,53 @@ def test_view_attendence_as_parliamentarian(client):
     assert page.status_code == 200
 
 
+def test_parliamentarian_cannot_edit_others_attendence(client):
+    """Parliamentarians should not be able to change parliamentarian_id
+    when editing their own attendance"""
+    session = client.app.session()
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    alice = parliamentarians.add(
+        first_name='Alice',
+        last_name='One',
+        email_primary='alice.one@example.org',
+    )
+    bob = parliamentarians.add(
+        first_name='Bob', last_name='Two', email_primary='bob.two@example.org'
+    )
+
+    users = UserCollection(session)
+    alice_user = users.by_username('alice.one@example.org')
+    alice_user.password = 'test'
+    alice_user.role = 'parliamentarian'
+
+    attendences = AttendenceCollection(session)
+    alice_attendence = attendences.add(
+        parliamentarian_id=alice.id,
+        type='plenary',
+        date=date.today(),
+        duration=120,
+    )
+
+    alice_attendence_id = alice_attendence.id
+    bob_id = str(bob.id)
+    transaction.commit()
+
+    client.login('alice.one@example.org', 'test')
+
+    page = client.get(f'/attendence/{alice_attendence_id}/edit')
+    assert page.status_code == 200
+
+    page.form['date'] = '2024-01-15'
+    page.form['duration'] = '3.5'
+    page.form['type'] = 'plenary'
+
+    page.form['parliamentarian_id'].force_value(bob_id)
+
+    page = page.form.submit()
+
+    assert 'Sie können nur Ihre eigene Anwesenheit bearbeiten' in page
+
 
 def test_commission_president_has_private_access_to_commission(client):
     '''Commission presidents should have private access to their commissions'''
