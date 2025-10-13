@@ -40,6 +40,7 @@ from onegov.translator_directory.layout import (
     MailTemplatesLayout,
 )
 from onegov.translator_directory.models.time_report import TranslatorTimeReport
+from onegov.translator_directory.models.ticket import TimeReportTicket
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.utils import country_code_to_name
 
@@ -519,22 +520,80 @@ def confirm_current_data(
     template='form.pt',
     name='add-time-report',
     form=TranslatorTimeReportForm,
-    permission=Secret,
+    permission=Personal,
 )
 def add_time_report(
     self: Translator,
     request: TranslatorAppRequest,
     form: TranslatorTimeReportForm,
 ) -> RenderData | BaseResponse:
-    """Add a new time report for this translator (admin only)."""
+    """Add a new time report for this translator (member creates ticket)."""
 
     if form.submitted(request):
-        report = TranslatorTimeReport()
-        report.translator = self
-        form.update_model(report)
-        request.session.add(report)
-        request.success(_('Time report added successfully'))
-        return request.redirect(request.link(self))
+        assert request.current_username is not None
+
+        temp_report = TranslatorTimeReport()
+        temp_report.translator = self
+        form.update_model(temp_report)
+
+        session = request.session
+        with session.no_autoflush:
+            ticket = TicketCollection(session).open_ticket(
+                handler_code='TRP',
+                handler_id=uuid4().hex,
+                handler_data={
+                    'translator_id': str(self.id),
+                    'submitter_email': request.current_username,
+                    'time_report_data': {
+                        'assignment_type': temp_report.assignment_type,
+                        'duration': temp_report.duration,
+                        'case_number': temp_report.case_number,
+                        'assignment_date': (
+                            temp_report.assignment_date.isoformat()
+                        ),
+                        'hourly_rate': temp_report.hourly_rate,
+                        'surcharge_percentage': (
+                            temp_report.surcharge_percentage
+                        ),
+                        'travel_compensation': temp_report.travel_compensation,
+                        'total_compensation': temp_report.total_compensation,
+                        'notes': temp_report.notes,
+                    },
+                },
+            )
+            TicketMessage.create(ticket, request, 'opened', 'external')
+            ticket.create_snapshot(request)
+
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_opened.pt',
+            subject=_('Your ticket has been opened'),
+            receivers=(request.current_username,),
+            ticket=ticket,
+            send_self=True,
+        )
+        for email in emails_for_new_ticket(request, ticket):
+            send_ticket_mail(
+                request=request,
+                template='mail_ticket_opened_info.pt',
+                subject=_('New ticket'),
+                ticket=ticket,
+                receivers=(email,),
+                content={'model': ticket},
+            )
+
+        request.app.send_websocket(
+            channel=request.app.websockets_private_channel,
+            message={
+                'event': 'browser-notification',
+                'title': request.translate(_('New ticket')),
+                'created': ticket.created.isoformat(),
+            },
+            groupids=request.app.groupids_for_ticket(ticket),
+        )
+
+        request.success(_('Time report submitted for review'))
+        return redirect(request.link(ticket, 'status'))
 
     layout = TranslatorLayout(self, request)
     layout.edit_mode = True
@@ -545,6 +604,51 @@ def add_time_report(
         'form': form,
         'title': _('Add Time Report'),
     }
+
+
+@TranslatorDirectoryApp.view(
+    model=TimeReportTicket,
+    name='accept-time-report',
+    permission=Secret,
+    request_method='POST',
+)
+def accept_time_report(
+    self: TimeReportTicket, request: TranslatorAppRequest
+) -> BaseResponse:
+    """Accept time report and create the actual TranslatorTimeReport record."""
+
+    request.assert_valid_csrf_token()
+
+    handler = self.handler
+    assert hasattr(handler, 'translator')
+    assert hasattr(handler, 'time_report_data')
+
+    translator = handler.translator
+    if not translator:
+        request.alert(_('Translator not found'))
+        return request.redirect(request.link(self))
+
+    data = handler.time_report_data
+
+    report = TranslatorTimeReport()
+    report.translator = translator
+    report.assignment_type = data.get('assignment_type')
+    report.duration = data.get('duration', 0)
+    report.case_number = data.get('case_number')
+    report.assignment_date = data.get('assignment_date')
+    report.hourly_rate = data.get('hourly_rate', 0.0)
+    report.surcharge_percentage = data.get('surcharge_percentage', 0.0)
+    report.travel_compensation = data.get('travel_compensation', 0.0)
+    report.total_compensation = data.get('total_compensation', 0.0)
+    report.notes = data.get('notes')
+
+    request.session.add(report)
+    self.handler.data['state'] = 'accepted'
+
+    TicketMessage.create(self, request, 'accepted')
+    request.success(_('Time report accepted'))
+
+    return request.redirect(request.link(self))
 
 
 @TranslatorDirectoryApp.form(

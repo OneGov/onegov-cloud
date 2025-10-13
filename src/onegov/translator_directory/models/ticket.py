@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import cached_property
-from markupsafe import Markup
+from markupsafe import Markup, escape
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.core.templates import render_macro
@@ -162,6 +162,135 @@ class TranslatorMutationHandler(Handler):
                     attrs={'class': 'accept-link'},
                 )
             )
+
+        return links
+
+
+class TimeReportTicket(OrgTicketMixin, Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'TRP'}  # type:ignore
+    es_type_name = 'translator_time_reports'
+
+    def reference_group(self, request: OrgRequest) -> str:
+        return self.title
+
+
+@handlers.registered_handler('TRP')
+class TimeReportHandler(Handler):
+
+    handler_title = _('Time Report')
+    code_title = _('Time Reports')
+
+    @cached_property
+    def translator(self) -> Translator | None:
+        return (
+            self.session.query(Translator)
+            .filter_by(id=self.data['handler_data'].get('translator_id'))
+            .first()
+        )
+
+    @cached_property
+    def time_report_data(self) -> dict[str, Any]:
+        return self.data['handler_data'].get('time_report_data', {})
+
+    @property
+    def deleted(self) -> bool:
+        return self.translator is None
+
+    @property
+    def ticket_deletable(self) -> bool:
+        return self.deleted or self.data.get('state') == 'accepted'
+
+    @cached_property
+    def email(self) -> str:
+        return self.data['handler_data'].get('submitter_email', '')
+
+    @cached_property
+    def state(self) -> str | None:
+        return self.data.get('state')
+
+    @property
+    def title(self) -> str:
+        return self.translator.title if self.translator else '<Deleted>'
+
+    @property
+    def subtitle(self) -> str:
+        return _('Time Report')
+
+    @cached_property
+    def group(self) -> str:
+        return _('Time Report')
+
+    def get_summary(
+        self, request: TranslatorAppRequest  # type:ignore[override]
+    ) -> Markup:
+        if not self.translator:
+            return Markup('')
+
+        layout = TranslatorLayout(self.translator, request)
+        data = self.time_report_data
+
+        summary_parts = [
+            "<dl class='field-display'>",
+            f"<dt>{request.translate(_('Assignment Date'))}</dt>",
+            f"<dd>{escape(data.get('assignment_date', '-'))}</dd>",
+            f"<dt>{request.translate(_('Duration'))}</dt>",
+            f"<dd>{data.get('duration', 0)} min</dd>",
+            f"<dt>{request.translate(_('Type'))}</dt>",
+            f"<dd>{escape(data.get('assignment_type') or '-')}</dd>",
+        ]
+
+        if data.get('case_number'):
+            summary_parts.extend(
+                [
+                    f"<dt>{request.translate(_('Case Number'))}</dt>",
+                    f"<dd>{escape(data.get('case_number'))}</dd>",
+                ]
+            )
+
+        summary_parts.extend(
+            [
+                f"<dt>{request.translate(_('Hourly Rate'))}</dt>",
+                f"<dd>{layout.format_currency(data.get('hourly_rate'))}</dd>",
+                f"<dt>{request.translate(_('Surcharge'))}</dt>",
+                f"<dd>{data.get('surcharge_percentage', 0)}%</dd>",
+                f"<dt>{request.translate(_('Travel'))}</dt>",
+                f"<dd>{layout.format_currency(data.get('travel_compensation'))}"
+                f'</dd>',
+                f"<dt><strong>{request.translate(_('Total'))}</strong></dt>",
+                f"<dd><strong>{layout.format_currency(data.get('total_compensation'))}</strong></dd>",
+                '</dl>',
+            ]
+        )
+
+        return Markup(''.join(summary_parts))
+
+    def get_links(  # type:ignore[override]
+        self, request: TranslatorAppRequest  # type:ignore[override]
+    ) -> list[Link | LinkGroup]:
+
+        if self.deleted:
+            return []
+
+        links: list[Link | LinkGroup] = []
+
+        if self.state is None:
+            links.append(
+                Link(
+                    text=_('Accept Time Report'),
+                    url=request.return_here(
+                        request.link(self.ticket, 'accept-time-report')
+                    ),
+                    attrs={'class': 'accept-link'},
+                )
+            )
+
+        links.append(
+            Link(
+                text=_('View translator'),
+                url=request.return_here(request.link(self.translator)),
+                attrs={'class': 'internal-link'},
+            )
+        )
 
         return links
 

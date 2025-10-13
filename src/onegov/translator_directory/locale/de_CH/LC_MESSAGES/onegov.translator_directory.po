@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-10-08 14:43+0200\n"
+"POT-Creation-Date: 2025-10-08 16:44+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -509,11 +509,11 @@ msgstr "Akkreditierung"
 msgid "Type of translation/interpreting"
 msgstr "Art der Übersetzung/Dolmetschung"
 
-msgid "Duration (minutes)"
-msgstr "Zeitdauer (Minuten)"
+msgid "Duration (hours)"
+msgstr "Zeitdauer (Stunden)"
 
-msgid "Minimum 30 minutes"
-msgstr "Miniumum 30 Minuten"
+msgid "Minimum 0.5 hours"
+msgstr "Minimum halbe Stunde"
 
 msgid "Case number (Police)"
 msgstr "Geschäftsnummer (Polizei)"
@@ -645,7 +645,7 @@ msgid "Mail templates"
 msgstr "Briefvorlagen"
 
 msgid "Add Time Report"
-msgstr "Zeiterfassung hinzufügen"
+msgstr "Zeit erfassen"
 
 msgid "Report change"
 msgstr "Mutation melden"
@@ -685,6 +685,42 @@ msgstr "Zulassung verweigern"
 
 msgid "Mutation"
 msgstr "Mutation"
+
+msgid "Time Report"
+msgstr "Zeiterfassung"
+
+msgid "Time Reports"
+msgstr "Zeiterfassungen"
+
+msgid "Assignment Date"
+msgstr "Einsatzdatum"
+
+msgid "Duration"
+msgstr "Dauer"
+
+msgid "Type"
+msgstr "Art"
+
+msgid "Case Number"
+msgstr "Geschäftsnummer"
+
+msgid "Hourly Rate"
+msgstr "Stundenansatz"
+
+msgid "Surcharge"
+msgstr "Zuschlag"
+
+msgid "Travel"
+msgstr "Reise"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Accept Time Report"
+msgstr "Zeiterfassung akzeptieren"
+
+msgid "View translator"
+msgstr "Übersetzer/in anzeigen"
 
 msgid "Accreditations"
 msgstr "Akkreditierungen"
@@ -793,32 +829,11 @@ msgstr "Zertifikate"
 msgid "User"
 msgstr "Benutzer"
 
-msgid "Time Reports"
-msgstr "Zeiterfassungen"
-
 msgid "Date"
 msgstr "Datum"
 
-msgid "Type"
-msgstr "Art"
-
-msgid "Duration"
-msgstr "Dauer"
-
-msgid "Case Number"
-msgstr "Geschäftsnummer"
-
 msgid "Rate"
 msgstr "Tarif"
-
-msgid "Surcharge"
-msgstr "Zuschlag"
-
-msgid "Travel"
-msgstr "Reise"
-
-msgid "Total"
-msgstr "Total"
 
 msgid "Export Excel (from filter)"
 msgstr "Excel Export (mit Filter)"
@@ -895,8 +910,14 @@ msgstr "Übersetzer/in erfolgreich gelöscht"
 msgid "Your data has been confirmed"
 msgstr "Ihre Daten wurden bestätigt"
 
-msgid "Time report added successfully"
-msgstr "Zeiterfassung erfolgreich hinzugefügt"
+msgid "Time report submitted for review"
+msgstr "Zeiterfassung zur Überprüfung eingereicht"
+
+msgid "Translator not found"
+msgstr "Übersetzer/in nicht gefunden"
+
+msgid "Time report accepted"
+msgstr "Zeiterfassung akzeptiert"
 
 msgid "This file does not seem to exist."
 msgstr "Diese Datei wurde nicht gefunden."
@@ -918,3 +939,11 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 msgid "Download"
 msgstr "Herunterladen"
 
+#~ msgid "Duration (minutes)"
+#~ msgstr "Zeitdauer (Minuten)"
+
+#~ msgid "Minimum 30 minutes"
+#~ msgstr "Miniumum 30 Minuten"
+
+#~ msgid "Time report added successfully"
+#~ msgstr "Zeiterfassung erfolgreich hinzugefügt"

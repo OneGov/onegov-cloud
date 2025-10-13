@@ -70,6 +70,12 @@ class TranslatorTimeReportForm(Form):
         default=False,
     )
 
+    is_urgent = BooleanField(
+        label=_('Exceptionally urgent'),
+        description=_('25% surcharge'),
+        default=False,
+    )
+
     travel_distance = SelectField(
         label=_('Travel distance'), choices=[], validators=[Optional()]
     )
@@ -111,6 +117,8 @@ class TranslatorTimeReportForm(Form):
         if self.is_night_work.data:
             surcharge += 50.0
         if self.is_weekend_holiday.data:
+            surcharge += 25.0
+        if self.is_urgent.data:
             surcharge += 25.0
         return surcharge
 

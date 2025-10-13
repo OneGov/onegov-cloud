@@ -205,7 +205,12 @@ class TranslatorLayout(DefaultLayout):
                     _('Report change'),
                     self.request.link(self.model, name='report-change'),
                     attrs={'class': 'report-change'}
-                )
+                ),
+                Link(
+                    _('Add Time Report'),
+                    url=self.request.link(self.model, name='add-time-report'),
+                    attrs={'class': 'plus'},
+                ),
             ]
         elif self.request.is_member:
             return [
@@ -213,7 +218,12 @@ class TranslatorLayout(DefaultLayout):
                     _('Report change'),
                     self.request.link(self.model, name='report-change'),
                     attrs={'class': 'report-change'}
-                )
+                ),
+                Link(
+                    _('Add Time Report'),
+                    url=self.request.link(self.model, name='add-time-report'),
+                    attrs={'class': 'plus'},
+                ),
             ]
         elif self.translator_data_outdated():
             return [

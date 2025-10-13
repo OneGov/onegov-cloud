@@ -2080,3 +2080,78 @@ def test_basic_search(client_with_fts):
     assert client.get('/search/suggest?q=test').json == []
     assert 'Resultate' in anom.get('/search?q=test')
     assert anom.get('/search/suggest?q=test').json == []
+
+    assert 'Resultate' in client.get('/search-postgres?q=test')
+    assert client.get('/search-postgres/suggest?q=test').json == []
+    assert 'Resultate' in anom.get('/search-postgres?q=test')
+    assert anom.get('/search-postgres/suggest?q=test').json == []
+
+
+def test_view_time_report(broadcast, authenticate, connect, client):
+    """Test member submitting time report and admin accepting it."""
+    session = client.app.session()
+    languages = create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator_id = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+    ).id
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    assert 'Zeitmeldung hinzufügen' in page
+
+    page = page.click('Zeitmeldung hinzufügen')
+    page.form['assignment_type'] = 'consecutive'
+    page.form['duration'] = 90
+    page.form['case_number'] = 'CASE-123'
+    page.form['assignment_date'] = '2025-01-15'
+    page.form['is_night_work'] = False
+    page.form['is_weekend_holiday'] = True
+    page.form['is_urgent'] = False
+    page.form['travel_distance'] = '50'
+    page.form['notes'] = 'Test notes'
+    page = page.form.submit().follow()
+
+    assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
+
+    mail = client.get_email(0, flush_queue=True)
+    assert mail['To'] == 'member@example.org'
+    assert 'Ihr Ticket wurde eröffnet' in mail['Subject']
+
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+
+    client.logout()
+    client.login_admin()
+    page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    assert 'TRANSLATOR, Test' in page
+    assert '90 min' in page
+    assert 'CASE-123' in page
+    assert '2025-01-15' in page
+    assert 'CHF 90.00' in page
+    assert '25%' in page
+    assert 'CHF 50.00' in page
+
+    page = page.click('Zeitmeldung annehmen').follow()
+    assert 'Zeitmeldung angenommen' in page
+
+    page = client.get(f'/translator/{translator_id}')
+    assert '90 min' in page
+    assert 'CHF' in page
+
+    translator = session.query(Translator).filter_by(id=translator_id).one()
+    assert len(translator.time_reports) == 1
+    report = translator.time_reports[0]
+    assert report.duration == 90
+    assert report.hourly_rate == 90.0
+    assert report.surcharge_percentage == 25.0
+    assert report.travel_compensation == 50.0
+    assert report.case_number == 'CASE-123'
