@@ -40,6 +40,7 @@ from onegov.event.collections.events import EventImportItem
 from onegov.file import File
 from onegov.file.collection import FileCollection
 from onegov.form import FormCollection, FormDefinition
+from onegov.newsletter.collection import RecipientCollection
 from onegov.org import log
 from onegov.org.formats import DigirezDB
 from onegov.org.forms.event import TAGS
@@ -3110,3 +3111,36 @@ def wil_event_tags_to_german_as_we_use_custom_event_tags(
             request.session.flush()
 
     return event_tags_to_german
+
+
+@cli.command(name='subscribe-parliamentarians-to-newsletter')
+def subscribe_parliamentarians_to_newsletter(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    onegov-org --select /foo/bar subscribe-parliamentarians-to-newsletter
+    """
+
+    def subscribe_parliamentarians(
+        request: OrgRequest,
+        app: OrgApp
+    ) -> None:
+
+        recipients = RecipientCollection(request.session)
+        parliamentarians = RISParliamentarianCollection(
+            request.session).query().all()
+        subscribe_counter = 0
+
+        for p in parliamentarians:
+            if not p.email_primary:
+                continue
+
+            recipient = recipients.by_address(p.email_primary)
+            if not recipient:
+                recipients.add(
+                    address=p.email_primary,
+                    # group='Parlamentarier',
+                    confirmed=True
+                )
+                click.secho(f'Subscribed {p.email_primary}', fg='green')
+                subscribe_counter += 1
+    return subscribe_parliamentarians

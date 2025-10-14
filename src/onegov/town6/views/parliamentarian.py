@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
+from onegov.newsletter.collection import RecipientCollection
 from onegov.org.forms import ParliamentarianForm
 from onegov.org.forms import ParliamentarianRoleForm
 from onegov.org.forms.commission_role import ParliamentarianCommissionRoleForm
@@ -78,6 +79,16 @@ def add_parliamentarian(
         parliamentarian = self.add(**form.get_useful_data())
         request.success(_('Added a new parliamentarian'))
 
+        email = form.email_primary.data
+        recipients = RecipientCollection(request.session)
+        if email and not recipients.by_address(email):
+            recipients.add(
+                address=email,
+                confirmed=True
+            )
+            request.success(_('Parliamentarian has been automatically '
+                              'subscribed to the newsletter.'))
+
         return request.redirect(request.link(parliamentarian))
 
     layout.breadcrumbs.append(Link(_('New'), '#'))
@@ -112,6 +123,16 @@ def edit_parliamentarian(
 ) -> RenderData | Response:
 
     if form.submitted(request):
+        old_email = self.email_primary
+        new_email = form.email_primary.data
+        if old_email and new_email and old_email != new_email:
+            recipient = RecipientCollection(
+                request.session).by_address(old_email)
+            if recipient:
+                recipient.address = new_email
+                request.success(
+                    _('The newsletter subscription has been updated.'))
+
         form.populate_obj(self)
         request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
