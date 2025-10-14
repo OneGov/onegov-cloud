@@ -527,7 +527,6 @@ def add_time_report(
     request: TranslatorAppRequest,
     form: TranslatorTimeReportForm,
 ) -> RenderData | BaseResponse:
-    """Add a new time report for this translator (member creates ticket)."""
 
     if form.submitted(request):
         assert request.current_username is not None

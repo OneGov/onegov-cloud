@@ -537,7 +537,7 @@ msgid "25% surcharge"
 msgstr "25% Zuschlag"
 
 msgid "Travel distance"
-msgstr "Reisedistanz"
+msgstr "Weg"
 
 msgid "Notes"
 msgstr "Notizen"

@@ -13,6 +13,7 @@ from onegov.ticket import handlers
 from onegov.ticket import Ticket
 from onegov.translator_directory.collections.documents import (
     TranslatorDocumentCollection)
+from onegov.translator_directory.constants import INTERPRETING_TYPES
 from onegov.translator_directory.layout import AccreditationLayout
 from onegov.translator_directory.layout import TranslatorLayout
 from onegov.translator_directory.models.accreditation import Accreditation
@@ -229,6 +230,13 @@ class TimeReportHandler(Handler):
         layout = TranslatorLayout(self.translator, request)
         data = self.time_report_data
 
+        assignment_type_key = data.get('assignment_type')
+        assignment_type_translated = '-'
+        if assignment_type_key and assignment_type_key in INTERPRETING_TYPES:
+            assignment_type_translated = request.translate(
+                INTERPRETING_TYPES[assignment_type_key]
+            )
+
         summary_parts = [
             "<dl class='field-display'>",
             f"<dt>{request.translate(_('Assignment Date'))}</dt>",
@@ -236,7 +244,7 @@ class TimeReportHandler(Handler):
             f"<dt>{request.translate(_('Duration'))}</dt>",
             f"<dd>{data.get('duration', 0)} min</dd>",
             f"<dt>{request.translate(_('Type'))}</dt>",
-            f"<dd>{escape(data.get('assignment_type') or '-')}</dd>",
+            f'<dd>{escape(assignment_type_translated)}</dd>',
         ]
 
         if data.get('case_number'):
@@ -262,7 +270,7 @@ class TimeReportHandler(Handler):
             ]
         )
 
-        return Markup(''.join(summary_parts))
+        return Markup(''.join(summary_parts))  # nosec: B704
 
     def get_links(  # type:ignore[override]
         self, request: TranslatorAppRequest  # type:ignore[override]
