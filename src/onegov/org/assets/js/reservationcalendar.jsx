@@ -25,7 +25,7 @@ rc.defaultOptions = {
         The visible time range
     */
     minTime: '07:00:00',
-    maxTime: '22:00:00',
+    maxTime: '24:00:00',
 
     /*
         True if the calendar may be edited (by editors/admins)
@@ -111,7 +111,7 @@ rc.getFullcalendarOptions = function(rcExtendOptions) {
         // the fullcalendar default options
         fc: {
             allDaySlot: false,
-            height: 'auto',
+            height: '800px',
             events: rcOptions.feed,
             slotMinTime: rcOptions.minTime,
             slotMaxTime: rcOptions.maxTime,
