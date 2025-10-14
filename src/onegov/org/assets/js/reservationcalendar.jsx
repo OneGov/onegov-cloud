@@ -680,29 +680,34 @@ rc.setupResourceSwitch = function(options, resourcesUrl, active) {
 
             var lookup = {};
 
-            var switcher = $('<select>').append(
-                _.map(choices, function(resources, group) {
-                    return $('<optgroup>').attr('label', group || '').append(
-                        _.map(resources, function(resource) {
-                            lookup[resource.name] = resource.url;
+            if (Object.keys(choices).length >= 1) {
 
-                            return $('<option>')
-                                .attr('value', resource.name)
-                                .attr('selected', resource.name === active)
-                                .text(resource.title);
-                        })
-                    );
-                })
-            );
+                var switcher = $('<select>').append(
+                    _.map(choices, function(resources, group) {
+                        return $('<optgroup>').attr('label', group || '').append(
+                            _.map(resources, function(resource) {
+                                lookup[resource.name] = resource.url;
 
-            switcher.change(function() {
-                var url = new Url(lookup[$(this).val()]);
-                url.query = (new Url(window.location.href)).query;
+                                return $('<option>')
+                                    .attr('value', resource.name)
+                                    .attr('selected', resource.name === active)
+                                    .text(resource.title);
+                            })
+                        );
+                    })
+                );
 
-                window.location = url;
-            });
+                switcher.change(function() {
+                    var url = new Url(lookup[$(this).val()]);
+                    url.query = (new Url(window.location.href)).query;
 
-            container.append(switcher);
+                    window.location = url;
+                });
+
+                container.append(switcher);
+            } else {
+                container.hide();
+            }
         };
 
         $.getJSON(resourcesUrl, setup);
