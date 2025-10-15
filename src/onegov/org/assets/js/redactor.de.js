@@ -73,6 +73,7 @@ $.Redactor.opts.langs['de'] = {
 	deleted: 'Durchgestrichen',
 	anchor: 'Anker',
 	link_new_tab: 'Link in neuem Tab öffnen',
+	link_select_page: 'Seite auswählen...',
 	underline: 'Unterstrichen',
 	alignment: 'Ausrichtung',
 	filename: 'Name (optional)',
