@@ -312,9 +312,10 @@ class Search(Pagination[Any]):
             ).subquery()
             query = self.request.session.query(subquery.c.tag)
             if len(q) >= 0:
-                query = query.filter(
-                    subquery.c.tag.ilike(f'{escape_like(q)}%', '*')
-                )
+                query = query.filter(func.unaccent(subquery.c.tag).ilike(
+                    func.unaccent(f'{escape_like(q)}%'),
+                    '*'
+                ))
             return tuple(
                 f'#{tag}'
                 for tag, in query
