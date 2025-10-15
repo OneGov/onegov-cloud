@@ -307,8 +307,8 @@ class Search(Pagination[Any]):
                 self.request.session.query(
                     func.unnest(
                         SearchIndex._tags
-                    ).distinct().label('tag')
-                )
+                    ).label('tag')
+                ).distinct()
             ).subquery()
             query = self.request.session.query(subquery.c.tag)
             if len(q) >= 0:
@@ -326,8 +326,8 @@ class Search(Pagination[Any]):
                 self.request.session.query(
                     func.unnest(
                         SearchIndex.suggestion
-                    ).distinct().label('suggestion')
-                )
+                    ).label('suggestion')
+                ).distinct()
             ).subquery()
             # FIXME: This could be a lot faster if suggestions were
             #        their own table, we also don't handle normalization
@@ -336,8 +336,8 @@ class Search(Pagination[Any]):
                 suggestion
                 for suggestion, in self.request.session
                 .query(subquery.c.suggestion)
-                .filter(subquery.c.suggestion.ilike(
-                    f'{escape_like(self.query)}%',
+                .filter(func.unaccent(subquery.c.suggestion).ilike(
+                    func.unaccent(f'{escape_like(self.query)}%'),
                     '*'
                 ))
                 .order_by(subquery.c.suggestion.asc())
