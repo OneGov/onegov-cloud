@@ -36,6 +36,7 @@ if TYPE_CHECKING:
 
     from .certificate import LanguageCertificate
     from .language import Language
+    from .time_report import TranslatorTimeReport
 
     TranslatorState: TypeAlias = Literal['proposed', 'published']
     AdmissionState: TypeAlias = Literal[
@@ -191,6 +192,14 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
         'LanguageCertificate',
         secondary=certificate_association_table,
         back_populates='owners')
+
+    # Time reports for this translator
+    time_reports: relationship[list[TranslatorTimeReport]] = relationship(
+        'TranslatorTimeReport',
+        back_populates='translator',
+        order_by='TranslatorTimeReport.assignment_date.desc()',
+        cascade='all, delete-orphan',
+    )
 
     # Bemerkungen
     comments: Column[str | None] = Column(Text)
