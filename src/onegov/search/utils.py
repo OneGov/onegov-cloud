@@ -115,7 +115,7 @@ def apply_searchable_polymorphic_filter(
 
 
 def extract_hashtags(text: str) -> list[str]:
-    return [t.lower() for t in HASHTAG.findall(html.unescape(text))]
+    return [t for t in HASHTAG.findall(html.unescape(text))]
 
 
 class classproperty(Generic[T_co]):  # noqa: N801
