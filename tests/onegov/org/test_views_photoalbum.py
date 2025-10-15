@@ -1,11 +1,17 @@
+from __future__ import annotations
+
 import re
 
+from tests.shared.utils import create_image
 from webtest import Upload
 
-from tests.shared.utils import create_image
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
 
 
-def test_manage_album(client):
+def test_manage_album(client: Client) -> None:
     client.login_editor()
 
     albums = client.get('/photoalbums')
@@ -35,7 +41,7 @@ def test_manage_album(client):
 
     images = albums.click("Bilder verwalten")
 
-    url = re.search(r'data-note-update-url="([^"]+)"', images.text).group(1)
+    url = re.search(r'data-note-update-url="([^"]+)"', images.text).group(1)  # type: ignore[union-attr]
     client.post(url, {'note': "This is an alt text"})
 
     album = albums.click("Comicon 2016")

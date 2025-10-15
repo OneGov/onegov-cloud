@@ -31,3 +31,4 @@ morepath\.(app\.)?App\.link_prefix
 # can contain arbitary attributes
 morepath.settings.SettingRegistry.__getattr__
 morepath.settings.SettingSection.__getattr__
+morepath.settings.SettingSection.__setattr__

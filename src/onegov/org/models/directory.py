@@ -32,7 +32,11 @@ from sqlalchemy.orm import object_session
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
-    from onegov.directory.models.directory import DirectoryEntryForm
+    from onegov.directory.models.directory import (
+        DirectoryEntryForm,
+        InheritType,
+        INHERIT
+    )
     from onegov.directory.collections.directory_entry import (
         DirectorySearchWidget)
     from onegov.form.fields import TimezoneDateTimeField
@@ -427,11 +431,27 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
         return 'ExtendedDirectoryEntry'
 
     if TYPE_CHECKING:
+        # FIXME: We should consider making Directory generic, so we
+        #        don't need to overwrite these methods in order to
+        #        get precise types.
+        @property
+        def entry_cls(self) -> type[ExtendedDirectoryEntry]: ...
+        def add(
+            self,
+            values: dict[str, Any],
+            type: str | InheritType = INHERIT
+        ) -> ExtendedDirectoryEntry: ...
+        def add_by_form(
+            self,
+            form: DirectoryEntryForm,
+            type: str | InheritType = INHERIT
+        ) -> ExtendedDirectoryEntry: ...
         def extend_form_class(  # type:ignore[override]
             self,
             form_class: type[DirectoryEntryForm],  # type:ignore[override]
             extensions: Collection[str]
         ) -> type[ExtendedDirectoryEntryForm]: ...
+        entries: relationship[list[ExtendedDirectoryEntry]]  # type: ignore[assignment]
 
     def form_class_for_submissions(
         self,

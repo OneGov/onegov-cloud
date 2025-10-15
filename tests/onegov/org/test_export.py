@@ -1,23 +1,25 @@
-from datetime import date
+from __future__ import annotations
 
 import pytest
+import transaction
 
-from onegov.pay import PaymentCollection
-from tests.onegov.org.conftest import create_org_app
-
+from datetime import date
+from decimal import Decimal
 from onegov.core.security import Secret
 from onegov.org.app import OrgApp
 from onegov.org.forms import ExportForm
 from onegov.org.models import Export
-from tests.shared import Client as BaseClient
-import transaction
+from onegov.pay import PaymentCollection
+from tests.onegov.org.conftest import create_org_app, Client
 
 
-class Client(BaseClient):
-    skip_n_forms = 1
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.pay.types import PaymentState
+    from sqlalchemy.orm import Session
 
 
-def test_export(request):
+def test_export(request: pytest.FixtureRequest) -> None:
 
     class App(OrgApp):
         pass
@@ -29,7 +31,11 @@ def test_export(request):
         title="My Export",
         explanation="Foo bar.")
     class MyExport(Export):
-        def run(self, form, session):
+        def run(
+            self,
+            form: object,
+            session: Session
+        ) -> list[list[tuple[str, str]]]:
             return [[
                 ('id', 'foo'),
                 ('content', 'bar')
@@ -68,7 +74,7 @@ def test_export(request):
     assert "Ihnen fehlt die nötige Berechtigung" in page
 
 
-def test_exports_view(client):
+def test_exports_view(client: Client) -> None:
     client.get('/exports', status=403)
 
     client.login_editor()
@@ -77,7 +83,7 @@ def test_exports_view(client):
 
 
 @pytest.mark.skip_night_hours
-def test_payments_export(client):
+def test_payments_export(client: Client) -> None:
     client.login_editor()
     session = client.app.session()
     assert client.app.payment_providers_enabled
@@ -93,11 +99,11 @@ def test_payments_export(client):
     payments = PaymentCollection(session)
 
     # exceed the batch size of the query, ordered by desc created
-    states = ('open', 'paid', 'failed', 'cancelled')
+    states: tuple[PaymentState, ...] = ('open', 'paid', 'failed', 'cancelled')
     sources = ('manual',)
     for ix, state in enumerate(states, start=1):
         for source in sources:
-            payments.add(source=source, amount=ix, state=state)
+            payments.add(source=source, amount=Decimal(ix), state=state)
 
     transaction.commit()
     resp = exports.form.submit().json

@@ -1,14 +1,9 @@
+from __future__ import annotations
+
 import os.path
 
-import pytest
-
 from collections import defaultdict
-from depot.manager import DepotManager
 from markupsafe import Markup
-from tempfile import TemporaryDirectory
-from uuid import UUID
-from webtest import Upload
-
 from onegov.core.orm.abstract import MoveDirection
 from onegov.core.utils import Bunch
 from onegov.form import Form
@@ -20,10 +15,19 @@ from onegov.org.models.extensions import (
     InlinePhotoAlbumExtension, SidebarContactLinkExtension,
 )
 from onegov.people import Person
+from tempfile import TemporaryDirectory
 from tests.shared.utils import create_pdf
+from uuid import UUID
+from webtest import Upload
 
 
-def test_disable_extension():
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from .conftest import Client, TestOrgApp
+
+
+def test_disable_extension() -> None:
     class Topic(AccessExtension):
         meta = {}
 
@@ -31,7 +35,7 @@ def test_disable_extension():
         pass
 
     topic = Topic()
-    request = Bunch(app=Bunch(**{
+    request: Any = Bunch(app=Bunch(**{
         'settings.org.disabled_extensions': [],
         'can_deliver_sms': False
     }))
@@ -49,7 +53,7 @@ def test_disable_extension():
     assert 'access' not in form._fields
 
 
-def test_access_extension():
+def test_access_extension() -> None:
     class Topic(AccessExtension):
         meta = {}
 
@@ -59,19 +63,19 @@ def test_access_extension():
     topic = Topic()
     assert topic.access == 'public'
 
-    request = Bunch(app=Bunch(**{
+    request: Any = Bunch(app=Bunch(**{
         'settings.org.disabled_extensions': [],
         'can_deliver_sms': False
     }))
     form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class()
 
-    assert 'access' in form._fields
-    assert form.access.data == 'public'
+    assert 'access' in form
+    assert form['access'].data == 'public'
     assert {'mtan', 'secret_mtan'}.isdisjoint(
-        value for value, _ in form.access.choices)
+        value for value, _ in form['access'].choices)  # type: ignore[attr-defined]
 
-    form.access.data = 'private'
+    form['access'].data = 'private'
     form.populate_obj(topic)
 
     assert topic.access == 'private'
@@ -83,13 +87,13 @@ def test_access_extension():
     form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class()
     assert {'mtan', 'secret_mtan'}.issubset(
-        value for value, _ in form.access.choices)
+        value for value, _ in form['access'].choices)  # type: ignore[attr-defined]
 
     form.process(obj=topic)
 
-    assert form.access.data == 'private'
+    assert form['access'].data == 'private'
 
-    form.access.data = 'member'
+    form['access'].data = 'member'
     form.populate_obj(topic)
 
     assert topic.access == 'member'
@@ -98,15 +102,15 @@ def test_access_extension():
 # FIXME: There is a lot of mocking going on, we're probably better off
 #        actually using a real model with a database, instead of mocking
 #        that part.
-def setup_person_link_extension(people):
+def setup_person_link_extension(people: Any) -> tuple[Any, Any]:
     class Topic(PersonLinkExtension):
         content = {}
 
-        def get_selectable_people(self, request):
+        def get_selectable_people(self, request: object) -> Any:
             return people
 
         @property
-        def people(self):
+        def people(self) -> list[Any] | None:
             if not (people_items := self.content.get('people')):
                 return None
 
@@ -137,7 +141,7 @@ def setup_person_link_extension(people):
 
     return topic, request
 
-def test_person_link_extension():
+def test_person_link_extension() -> None:
     class TopicForm(Form):
         pass
 
@@ -190,7 +194,7 @@ def test_person_link_extension():
     assert field[1].form.display_function_in_person_directory.data is False
 
 
-def test_person_link_extension_order():
+def test_person_link_extension_order() -> None:
 
     class TopicForm(Form):
         pass
@@ -293,7 +297,7 @@ def test_person_link_extension_order():
     ]
 
 
-def test_person_link_move_function():
+def test_person_link_move_function() -> None:
 
     class TopicForm(Form):
         pass
@@ -339,17 +343,16 @@ def test_person_link_move_function():
     ]
 
 
-def test_contact_extension(org_app):
-    from onegov.org.models import Topic
+def test_contact_extension(org_app: TestOrgApp) -> None:
 
     class TopicForm(Form):
         pass
 
-    topic = Topic('test')
+    topic = Topic(name='test')
     assert topic.contact is None
     assert topic.contact_html is None
 
-    request = Bunch(app=org_app, session=org_app.session())
+    request: Any = Bunch(app=org_app, session=org_app.session())
     form_class = topic.with_content_extensions(
         TopicForm,
         request=request,
@@ -357,9 +360,9 @@ def test_contact_extension(org_app):
     )
     form = form_class()
 
-    assert 'contact' in form._fields
+    assert 'contact' in form
 
-    form.contact.data = (
+    form['contact'].data = (
         "Steve Jobs\n"
         "steve@apple.com\n"
         "https://www.apple.com"
@@ -391,25 +394,26 @@ def test_contact_extension(org_app):
 
     form.process(obj=topic)
 
-    assert form.contact.data == (
+    assert form['contact'].data == (
         "Steve Jobs\n"
         "steve@apple.com\n"
         "https://www.apple.com"
     )
 
 
-def test_contact_extension_with_top_level_domain_agency(org_app):
-    from onegov.org.models import Topic
+def test_contact_extension_with_top_level_domain_agency(
+    org_app: TestOrgApp
+) -> None:
 
     class TopicForm(Form):
         pass
 
-    topic = Topic('test')
+    topic = Topic(name='test')
 
     assert topic.contact is None
     assert topic.contact_html is None
 
-    request = Bunch(app=org_app, session=org_app.session())
+    request: Any = Bunch(app=org_app, session=org_app.session())
     form_class = topic.with_content_extensions(
         TopicForm,
         request=request,
@@ -418,9 +422,9 @@ def test_contact_extension_with_top_level_domain_agency(org_app):
     form = form_class()
     form.request = request
 
-    assert 'contact' in form._fields
+    assert 'contact' in form
 
-    form.contact.data = (
+    form['contact'].data = (
         "longdomain GmbH\n"
         "hello@website.agency\n"
         "https://custom.longdomain"
@@ -433,11 +437,17 @@ def test_contact_extension_with_top_level_domain_agency(org_app):
         "hello@website.agency\n"
         "https://custom.longdomain"
     )
-    d = topic.contact_html
-    assert '<a href="mailto:hello@website.ag"' not in d
+    # undo mypy narrowing
+    topic = topic
+    html = topic.contact_html
+    assert html is not None
+    assert '<a href="mailto:hello@website.ag"' not in html
 
 
-def test_people_shown_on_main_page_extension(client):
+def test_people_shown_on_main_page_extension(
+    client: Client[TestOrgApp]
+) -> None:
+
     client.login_admin()
 
     class Topic(PeopleShownOnMainPageExtension):
@@ -487,7 +497,7 @@ def test_people_shown_on_main_page_extension(client):
     assert 'Super-Clown' in page
 
 
-def test_honeypot_extension():
+def test_honeypot_extension() -> None:
     class Submission(Extendable, HoneyPotExtension):
         meta = {}
 
@@ -502,17 +512,19 @@ def test_honeypot_extension():
     submission = Submission()
     assert submission.honeypot is True
 
-    request = Bunch(**{'app.settings.org.disabled_extensions': []})
+    request: Any = Bunch(**{'app.settings.org.disabled_extensions': []})
     form_class = submission.with_content_extensions(
         EditSubmissionForm, request=request
     )
     form = form_class()
-    assert 'honeypot' in form._fields
-    assert form.honeypot.data is True
+    assert 'honeypot' in form
+    assert form['honeypot'].data is True
 
     # ... change
-    form.honeypot.data = False
+    form['honeypot'].data = False
     form.populate_obj(submission)
+    # undo mypy narrowing
+    submission = submission
     assert submission.honeypot is False
 
     # ... apply
@@ -521,40 +533,28 @@ def test_honeypot_extension():
     )
     form = form_class()
     form.process(obj=submission)
-    assert form.honeypot.data is False
+    assert form['honeypot'].data is False
 
     # Extend submission
     # ... add
     submission.honeypot = True
-    form_class = submission.extend_form_class(
+    form_class2 = submission.extend_form_class(
         SubmissionForm, extensions=['honeypot']
     )
-    form = form_class()
-    form.model = submission
-    form.on_request()
-    assert 'duplicate_of' in form._fields
+    form2 = form_class2()
+    form2.model = submission
+    form2.on_request()  # type: ignore[attr-defined]
+    assert 'duplicate_of' in form
 
     # ... don't add
     submission.honeypot = False
-    form = form_class()
-    form.model = submission
-    form.on_request()
-    assert 'duplicate_of' not in form._fields
+    form2 = form_class2()
+    form2.model = submission
+    form2.on_request()  # type: ignore[attr-defined]
+    assert 'duplicate_of' not in form2
 
 
-@pytest.fixture(scope='function')
-def depot(temporary_directory):
-    DepotManager.configure('default', {
-        'depot.backend': 'depot.io.local.LocalFileStorage',
-        'depot.storage_path': temporary_directory
-    })
-
-    yield DepotManager.get()
-
-    DepotManager._clear()
-
-
-def test_general_file_link_extension(client):
+def test_general_file_link_extension(client: Client[TestOrgApp]) -> None:
     client.login_admin()
 
     with TemporaryDirectory() as td:
@@ -571,7 +571,7 @@ def test_general_file_link_extension(client):
         )
         filename = os.path.join(td, 'simple.pdf')
         create_pdf(filename)
-        new_page.form.fields['files'][-1].value = [Upload(filename)]
+        new_page.form.set('files', [Upload(filename)], -1)
         new_page.form['show_file_links_in_sidebar'] = True
         page = new_page.form.submit().follow()
 
@@ -588,7 +588,9 @@ def test_general_file_link_extension(client):
         assert 'simple.pdf' not in page
 
 
-def test_general_file_link_extension_deduplication(client):
+def test_general_file_link_extension_deduplication(
+    client: Client[TestOrgApp]
+) -> None:
     client.login_admin()
 
     with TemporaryDirectory() as td:
@@ -605,10 +607,10 @@ def test_general_file_link_extension_deduplication(client):
         )
         filename = os.path.join(td, 'simple.pdf')
         create_pdf(filename)
-        new_page.form.fields['files'][-1].value = [
+        new_page.form.set('files', [
             Upload(filename),
             Upload(filename)
-        ]
+        ], -1)
         new_page.form['show_file_links_in_sidebar'] = True
         page = new_page.form.submit().follow()
 
@@ -633,7 +635,7 @@ def test_general_file_link_extension_deduplication(client):
         assert count == 1
 
 
-def test_sidebar_links_extension(session):
+def test_sidebar_links_extension(session: Session) -> None:
 
     class Topic(SidebarLinksExtension):
         sidepanel_links = []
@@ -644,17 +646,17 @@ def test_sidebar_links_extension(session):
     topic = Topic()
     assert topic.sidepanel_links == []
 
-    request = Bunch(**{
+    request: Any = Bunch(**{
         'app.settings.org.disabled_extensions': [],
         'session': session
     })
     form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class(meta={'request': request})
 
-    assert 'sidepanel_links' in form._fields
-    assert form.sidepanel_links.data == None
+    assert 'sidepanel_links' in form
+    assert form['sidepanel_links'].data is None
 
-    form.sidepanel_links.data = '''
+    form['sidepanel_links'].data = '''
             {"labels":
                 {"text": "Text",
                 "link": "URL",
@@ -676,7 +678,7 @@ def test_sidebar_links_extension(session):
         ('Castle Govikon', 'https://www.govikon-castle.ch')]
 
 
-def test_sidebar_contact_extension(session):
+def test_sidebar_contact_extension(session: Session) -> None:
     class Topic(SidebarContactLinkExtension):
         sidepanel_contact = []
 
@@ -686,7 +688,7 @@ def test_sidebar_contact_extension(session):
     topic = Topic()
     assert topic.sidepanel_contact == []
 
-    request = Bunch(**{
+    request: Any = Bunch(**{
         'app.settings.org.disabled_extensions': [],
         'session': session
     })
@@ -694,10 +696,10 @@ def test_sidebar_contact_extension(session):
     form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class(meta={'request': request})
 
-    assert 'sidepanel_contact' in form._fields
-    assert form.sidepanel_contact.data == None
+    assert 'sidepanel_contact' in form
+    assert form['sidepanel_contact'].data is None
 
-    form.sidepanel_contact.data = '''
+    form['sidepanel_contact'].data = '''
     {"labels":
         {"text": "Contact Text",
         "link": "Contact URL",
@@ -720,7 +722,7 @@ def test_sidebar_contact_extension(session):
     ]
 
 
-def test_inline_photo_album_extension(session):
+def test_inline_photo_album_extension(session: Session) -> None:
     class Topic(InlinePhotoAlbumExtension):
         meta = {}
         content = {}
@@ -731,11 +733,11 @@ def test_inline_photo_album_extension(session):
     topic = Topic()
     assert topic.photo_album_id is None
 
-    request = Bunch(
+    request: Any = Bunch(
         session=session,
         app=Bunch(**{'settings.org.disabled_extensions': []}),
         translate=lambda text: text
     )
 
     form_class = topic.with_content_extensions(TopicForm, request=request)
-    assert form_class == TopicForm  # No albums = no form extension
+    assert form_class is TopicForm  # No albums = no form extension

@@ -35,7 +35,6 @@ from webob.exc import HTTPBadRequest
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
-
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Iterator, Sequence
@@ -1606,19 +1605,19 @@ def narrowest_access(*accesses: str) -> str:
 
 @overload
 def extract_categories_and_subcategories(
-    categories: list[dict[str, list[str]] | str],
+    categories: Sequence[dict[str, list[str]] | str],
     flattened: Literal[False] = False
 ) -> tuple[list[str], list[list[str]]]: ...
 
 @overload
 def extract_categories_and_subcategories(
-    categories: list[dict[str, list[str]] | str],
+    categories: Sequence[dict[str, list[str]] | str],
     flattened: Literal[True]
 ) -> list[str]: ...
 
 
 def extract_categories_and_subcategories(
-    categories: list[dict[str, list[str]] | str],
+    categories: Sequence[dict[str, list[str]] | str],
     flattened: bool = False
 ) -> tuple[list[str], list[list[str]]] | list[str]:
     """
@@ -1654,8 +1653,13 @@ def extract_categories_and_subcategories(
             sub_cats.append([])
 
     if flattened:
-        return (cats +
-                [item for sublist in sub_cats if sublist for item in sublist])
+        cats.extend(
+            item
+            for sublist in sub_cats
+            if sublist
+            for item in sublist
+        )
+        return cats
 
     return cats, sub_cats
 

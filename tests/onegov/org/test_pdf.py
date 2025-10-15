@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 from datetime import datetime, date
 from onegov.core.utils import Bunch
 from onegov.form import FormCollection
+from onegov.org.models.ticket import ReservationTicket
 from onegov.org.models import TicketMessage, TicketChatMessage
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.pdf.utils import extract_pdf_info
@@ -10,7 +13,23 @@ from tests.onegov.pdf.test_pdf import LONGEST_TABLE_CELL_TEXT
 from webob.multidict import MultiDict
 
 
-def open_ticket(request, token, handler_code, create_message=True):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.form import Form, FormSubmission
+    from onegov.org.request import OrgRequest
+    from onegov.reservation import Resource
+    from onegov.ticket import Ticket
+    from sqlalchemy.orm import Session
+    from uuid import UUID
+    from .conftest import TestOrgApp
+
+
+def open_ticket(
+    request: OrgRequest,
+    token: str,
+    handler_code: str,
+    create_message: bool = True
+) -> Ticket:
     with request.session.no_autoflush:
         ticket = TicketCollection(request.session).open_ticket(
             handler_code=handler_code, handler_id=token
@@ -21,13 +40,17 @@ def open_ticket(request, token, handler_code, create_message=True):
     return ticket
 
 
-def add_submission(session, resource, token):
+def add_submission(
+    session: Session,
+    resource: Resource,
+    token: UUID
+) -> FormSubmission | None:
     # add the submission if it doesn't yet exist
     forms = FormCollection(session)
     submission = None
     if resource.definition:
         submission = forms.submissions.add_external(
-            form=resource.form_class(),
+            form=resource.form_class(),  # type: ignore[misc]
             state='pending',
             id=token,
             payment_method=resource.payment_method
@@ -35,42 +58,50 @@ def add_submission(session, resource, token):
     return submission
 
 
-def update_submission(session, submission, form):
+def update_submission(
+    session: Session,
+    submission: FormSubmission,
+    form: Form
+) -> None:
     # update the data on the submission
     forms = FormCollection(session)
     if submission:
         forms.submissions.update(submission, form)
 
 
-def add_ticket_message(request, ticket, text):
+def add_ticket_message(
+    request: OrgRequest,
+    ticket: Ticket,
+    text: str
+) -> TicketChatMessage:
     message = TicketChatMessage.create(
         ticket, request,
         text=text,
         owner='info@example.org',
         recipient=None,
-        notify=None,
+        notify=False,
         origin='internal')
     return message
 
 
-def test_ticket_pdf(org_app):
+def test_ticket_pdf(org_app: TestOrgApp) -> None:
 
     session = org_app.session()
     libres_context = org_app.libres_context
     owner = 'info@example.org'
 
-    def get_translate(**kwargs):
+    def get_translate(**kwargs: object) -> Any:
         return org_app.chameleon_translations.get('de_CH')
 
-    def get_form(form_cls, **kwargs):
+    def get_form(form_cls: type[Form], **kwargs: object) -> Form:
         form = form_cls(meta={'request': request})
         form.request = request
         return form
 
-    def class_link(cls, *args, **kwargs):
+    def class_link(cls: type[object], *args: object, **kwargs: object) -> str:
         return cls.__name__
 
-    def link(*args, **kwargs):
+    def link(*args: object, **kwargs: object) -> str:
         name = kwargs.pop('name')
         return f'https://seantis.ch/{name or ""}'
 
@@ -79,7 +110,7 @@ def test_ticket_pdf(org_app):
 
     host_url = '127.0.0.1:8080'
 
-    request = Bunch(
+    request: Any = Bunch(
         app=org_app,
         translate=lambda x: x,
         session=session,
@@ -115,18 +146,20 @@ def test_ticket_pdf(org_app):
 
     token = scheduler.reserve(owner, dates)
     submission = add_submission(session, room, token)
+    assert submission is not None
 
     form_data = MultiDict([('data_name', 'John')])
 
     # We skip the combining ReservationForm and the form from definition
-    form = room.form_class(form_data)
+    form = room.form_class(form_data)  # type: ignore[misc]
     assert form.validate()
     update_submission(session, submission, form)
 
     # scheduler.approve_reservations(token)
     reservation = scheduler.reservations_by_token(token).one()
     assert reservation
-    ticket = open_ticket(request, token, 'RSV', owner)
+    ticket = open_ticket(request, str(token), 'RSV', True)
+    assert isinstance(ticket, ReservationTicket)
 
     add_ticket_message(request, ticket, LONGEST_TABLE_CELL_TEXT)
 

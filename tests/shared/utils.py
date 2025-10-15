@@ -22,7 +22,6 @@ from xml.etree.ElementTree import tostring
 from typing import overload, Any, IO, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     import pytest
-    from bs4 import NavigableString, Tag
     from collections.abc import Callable, Iterator, Mapping
     from datetime import datetime
     from onegov.core.framework import Framework
@@ -57,7 +56,7 @@ def encode_map_value(dictionary: Mapping[str, Any]) -> str:
     return b64encode(json.dumps(dictionary).encode('utf-8')).decode('ascii')
 
 
-def decode_map_value(value: str | bytes) -> dict[str, Any]:
+def decode_map_value(value: str | bytes) -> Any:
     return json.loads(b64decode(value).decode('utf-8'))
 
 
@@ -353,7 +352,7 @@ def href_ends_with(end: str) -> Callable[[str | None], bool]:
 def find_link_by_href_end(
     response: TestResponse,
     href_end: str
-) -> Tag | NavigableString | None:
+) -> Any | None:
     """
     Returns the link that ends with the given href_end.
     :param response: a response object
