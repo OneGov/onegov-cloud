@@ -27,14 +27,14 @@ def test_payment_collection_pagination(session: Session) -> None:
 
     session.add_all(
         provider.payment(amount=Decimal(amount))
-        for amount in range(100, 2000, 100)
+        for amount in range(100, 2000, 20)
     )
 
     payments = PaymentCollection(session)
-    assert payments.query().count() == 19
+    assert payments.query().count() == 95
 
-    assert len(payments.batch) == 10
-    assert len(payments.page_by_index(1).batch) == 9
+    assert len(payments.batch) == 50
+    assert len(payments.page_by_index(1).batch) == 45
 
 
 def test_payment_pagination_negative_page_index(session: Session) -> None:
