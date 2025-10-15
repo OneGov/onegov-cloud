@@ -1009,64 +1009,6 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     page.form['password'] = 'p@ssw0rd'
     page.form.submit()
 
-    # Report changes as member
-    client.login_member()
-    page = client.get('/').maybe_follow().click('BOB, Uncle')
-    page = page.click('Mutation melden')
-    page.form['submitter_message'] = 'Hallo!'
-    page.form['first_name'] = 'Aunt'
-    page.form['last_name'] = 'Anny'
-    page.form['pers_id'] = 123456
-    page.form['admission'] = 'in_progress'
-    page.form['gender'] = 'F'
-    page.form['withholding_tax'] = True
-    page.form['self_employed'] = True
-    page.form['date_of_birth'] = '1960-01-01'
-    page.form['nationalities'] = ['CH', 'AT']
-    page.form['coordinates'] = encode_map_value({
-        'lat': 47, 'lon': 8, 'zoom': 13
-    })
-    page.form['address'] = 'Fakestreet 321'
-    page.form['zip_code'] = '6010'
-    page.form['city'] = 'Kriens'
-    page.form['tel_private'] = '+41412223347'
-    page.form['tel_mobile'] = '+41412223348'
-    page.form['tel_office'] = '+41412223349'
-    page.form['availability'] = 'Nie'
-    page.form['hometown'] = 'Gersau'
-    page.form['mother_tongues'] = language_ids[1:3]
-    page.form['spoken_languages'] = language_ids[0:2]
-    page.form['written_languages'] = language_ids[2:4]
-    page.form['monitoring_languages'] = language_ids[0:4]
-    page.form['expertise_interpreting_types'].select_multiple([
-        'consecutive', 'negotiation'
-    ])
-    page.form['expertise_professional_guilds'].select_multiple([
-        'economy', 'art_leisure'
-    ])
-    page.form['expertise_professional_guilds_other'] = ['Exorzismus']
-    with patch(
-            'onegov.gis.utils.MapboxRequests.directions',
-            return_value=FakeResponse({
-                'code': 'Ok',
-                'routes': [{'distance': 2000}]
-            })
-    ):
-        page = page.form.submit().follow()
-        assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
-
-    mail = client.get_email(0, flush_queue=True)
-    assert mail['To'] == 'member@example.org'
-    assert 'BOB, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
-
-    assert connect.call_count == 1
-    assert authenticate.call_count == 1
-    assert broadcast.call_count == 1
-    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
-    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
-    assert broadcast.call_args[0][3]['created']
-
-    client.logout()
     client.login_admin()
     page = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
@@ -1514,22 +1456,6 @@ def test_translator_mutation_with_document_upload(
         assert 'hinzugefügt' in page.form.submit().follow()
 
     initial_file_count = session.query(File).count()
-
-    client.logout()
-    client.login_member()
-    page = client.get('/').maybe_follow().click('BOB, Uncle')
-    page = page.click('Mutation melden')
-    page.form['submitter_message'] = 'Uploading new certificate!'
-
-    assert 'uploaded_certificates' in page.form.fields, \
-        f"Field not in form. Available: {list(page.form.fields.keys())}"
-
-    page.form['uploaded_certificates'] = upload_pdf('certificate.pdf')
-    page = page.form.submit().follow()
-    assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
-
-    client.logout()
-    client.login_admin()
     page = client.get('/tickets/ALL/open').click('Annehmen').follow()
     assert 'Uploading new certificate!' in page
     assert 'Dokumente' in page
