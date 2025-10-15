@@ -116,3 +116,20 @@ def remove_nationality_column(context: UpgradeContext) -> None:
         return
     if context.has_column('translators', 'nationality'):
         context.operations.drop_column('translators', 'nationality')
+
+
+@upgrade_task('Add status column to translator_time_reports')
+def add_status_column_to_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if not context.has_column('translator_time_reports', 'status'):
+        status_enum = Enum('pending', 'confirmed', name='time_report_status')
+        if not context.has_enum('time_report_status'):
+            status_enum.create(context.operations.get_bind())
+        context.add_column_with_defaults(
+            table='translator_time_reports',
+            column=Column(
+                'status', status_enum, nullable=False, default='pending'
+            ),
+            default=lambda x: 'pending',
+        )

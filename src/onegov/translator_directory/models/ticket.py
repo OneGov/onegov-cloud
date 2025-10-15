@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from onegov.translator_directory.models.time_report import TranslatorTimeReport
+
 from functools import cached_property
 from markupsafe import Markup, escape
 from onegov.core.elements import Link
@@ -190,8 +192,15 @@ class TimeReportHandler(Handler):
         )
 
     @cached_property
-    def time_report_data(self) -> dict[str, Any]:
-        return self.data['handler_data'].get('time_report_data', {})
+    def time_report(self) -> TranslatorTimeReport | None:
+        time_report_id = self.data['handler_data'].get('time_report_id')
+        if not time_report_id:
+            return None
+        return (
+            self.session.query(TranslatorTimeReport)
+            .filter_by(id=time_report_id)
+            .first()
+        )
 
     @property
     def deleted(self) -> bool:
@@ -199,7 +208,11 @@ class TimeReportHandler(Handler):
 
     @property
     def ticket_deletable(self) -> bool:
-        return self.deleted or self.data.get('state') == 'accepted'
+        if self.deleted:
+            return True
+        if self.time_report and self.time_report.status == 'confirmed':
+            return True
+        return False
 
     @cached_property
     def email(self) -> str:
@@ -224,48 +237,51 @@ class TimeReportHandler(Handler):
     def get_summary(
         self, request: TranslatorAppRequest  # type:ignore[override]
     ) -> Markup:
-        if not self.translator:
+        if not self.translator or not self.time_report:
             return Markup('')
 
         layout = TranslatorLayout(self.translator, request)
-        data = self.time_report_data
+        report = self.time_report
 
-        assignment_type_key = data.get('assignment_type')
+        assignment_type_key = report.assignment_type
         assignment_type_translated = '-'
         if assignment_type_key and assignment_type_key in INTERPRETING_TYPES:
             assignment_type_translated = request.translate(
                 INTERPRETING_TYPES[assignment_type_key]
             )
 
+        assignment_date_formatted = escape(
+            layout.format_date(report.assignment_date, 'date')
+        )
         summary_parts = [
             "<dl class='field-display'>",
             f"<dt>{request.translate(_('Assignment Date'))}</dt>",
-            f"<dd>{escape(data.get('assignment_date', '-'))}</dd>",
+            f'<dd>{assignment_date_formatted}</dd>',
             f"<dt>{request.translate(_('Duration'))}</dt>",
-            f"<dd>{data.get('duration', 0)} min</dd>",
+            f'<dd>{report.duration} min</dd>',
             f"<dt>{request.translate(_('Type'))}</dt>",
             f'<dd>{escape(assignment_type_translated)}</dd>',
         ]
 
-        if data.get('case_number'):
+        if report.case_number:
             summary_parts.extend(
                 [
                     f"<dt>{request.translate(_('Case Number'))}</dt>",
-                    f"<dd>{escape(data.get('case_number'))}</dd>",
+                    f'<dd>{escape(report.case_number)}</dd>',
                 ]
             )
 
         summary_parts.extend(
             [
                 f"<dt>{request.translate(_('Hourly Rate'))}</dt>",
-                f"<dd>{layout.format_currency(data.get('hourly_rate'))}</dd>",
+                f'<dd>{layout.format_currency(report.hourly_rate)}</dd>',
                 f"<dt>{request.translate(_('Surcharge'))}</dt>",
-                f"<dd>{data.get('surcharge_percentage', 0)}%</dd>",
+                f'<dd>{report.surcharge_percentage}%</dd>',
                 f"<dt>{request.translate(_('Travel'))}</dt>",
-                f"<dd>{layout.format_currency(data.get('travel_compensation'))}"
+                f'<dd>{layout.format_currency(report.travel_compensation)}'
                 f'</dd>',
                 f"<dt><strong>{request.translate(_('Total'))}</strong></dt>",
-                f"<dd><strong>{layout.format_currency(data.get('total_compensation'))}</strong></dd>",
+                f'<dd><strong>{layout.format_currency(report.total_compensation)}</strong></dd>',
                 '</dl>',
             ]
         )

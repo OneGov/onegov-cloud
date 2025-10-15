@@ -201,45 +201,6 @@
                         <dt i18n:translate>User</dt>
                         <dd ><a href="${request.link(model.user)}">${model.user.title}</a></dd>
                     </dl>
-
-                    <tal:b tal:condition="request.is_admin and model.time_reports">
-                        <h2 i18n:translate>Time Reports</h2>
-                        <table class="stacktable">
-                            <thead>
-                                <tr>
-                                    <th i18n:translate>Date</th>
-                                    <th i18n:translate>Type</th>
-                                    <th i18n:translate>Duration</th>
-                                    <th i18n:translate>Case Number</th>
-                                    <th i18n:translate>Rate</th>
-                                    <th i18n:translate>Surcharge</th>
-                                    <th i18n:translate>Travel</th>
-                                    <th i18n:translate>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr tal:repeat="report model.time_reports">
-                                    <td>${layout.format_date(report.assignment_date, 'date')}</td>
-                                    <td>${report.assignment_type or '-'}</td>
-                                    <td>${report.duration} min</td>
-                                    <td>${report.case_number or '-'}</td>
-                                    <td>${layout.format_currency(report.hourly_rate)}</td>
-                                    <td>${report.surcharge_percentage}%</td>
-                                    <td>${layout.format_currency(report.travel_compensation)}</td>
-                                    <td><strong>${layout.format_currency(report.total_compensation)}</strong></td>
-                                </tr>
-                            </tbody>
-                            <tfoot tal:define="total_mins python: sum(r.duration for r in model.time_reports);
-                                               total_comp python: sum(r.total_compensation for r in model.time_reports)">
-                                <tr>
-                                    <td colspan="2"><strong i18n:translate>Total</strong></td>
-                                    <td><strong>${total_mins} min</strong></td>
-                                    <td colspan="4"></td>
-                                    <td><strong>${layout.format_currency(total_comp)}</strong></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </tal:b>
                 </tal:b>
 
             </div>

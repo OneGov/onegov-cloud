@@ -531,11 +531,14 @@ def add_time_report(
     if form.submitted(request):
         assert request.current_username is not None
 
-        temp_report = TranslatorTimeReport()
-        temp_report.translator = self
-        form.update_model(temp_report)
+        report = TranslatorTimeReport()
+        report.translator = self
+        form.update_model(report)
 
         session = request.session
+        session.add(report)
+        session.flush()
+
         with session.no_autoflush:
             ticket = TicketCollection(session).open_ticket(
                 handler_code='TRP',
@@ -543,21 +546,7 @@ def add_time_report(
                 handler_data={
                     'translator_id': str(self.id),
                     'submitter_email': request.current_username,
-                    'time_report_data': {
-                        'assignment_type': temp_report.assignment_type,
-                        'duration': temp_report.duration,
-                        'case_number': temp_report.case_number,
-                        'assignment_date': (
-                            temp_report.assignment_date.isoformat()
-                        ),
-                        'hourly_rate': temp_report.hourly_rate,
-                        'surcharge_percentage': (
-                            temp_report.surcharge_percentage
-                        ),
-                        'travel_compensation': temp_report.travel_compensation,
-                        'total_compensation': temp_report.total_compensation,
-                        'notes': temp_report.notes,
-                    },
+                    'time_report_id': str(report.id),
                 },
             )
             TicketMessage.create(ticket, request, 'opened', 'external')
@@ -614,35 +603,19 @@ def add_time_report(
 def accept_time_report(
     self: TimeReportTicket, request: TranslatorAppRequest
 ) -> BaseResponse:
-    """Accept time report and create the actual TranslatorTimeReport record."""
+    """Accept time report."""
 
     request.assert_valid_csrf_token()
 
     handler = self.handler
-    assert hasattr(handler, 'translator')
-    assert hasattr(handler, 'time_report_data')
+    assert hasattr(handler, 'time_report')
 
-    translator = handler.translator
-    if not translator:
-        request.alert(_('Translator not found'))
+    if not handler.time_report:
+        request.alert(_('Time report not found'))
         return request.redirect(request.link(self))
 
-    data = handler.time_report_data
-
-    report = TranslatorTimeReport()
-    report.translator = translator
-    report.assignment_type = data.get('assignment_type')
-    report.duration = data.get('duration', 0)
-    report.case_number = data.get('case_number')
-    report.assignment_date = data.get('assignment_date')
-    report.hourly_rate = data.get('hourly_rate', 0.0)
-    report.surcharge_percentage = data.get('surcharge_percentage', 0.0)
-    report.travel_compensation = data.get('travel_compensation', 0.0)
-    report.total_compensation = data.get('total_compensation', 0.0)
-    report.notes = data.get('notes')
-
-    request.session.add(report)
-    self.handler.data['state'] = 'accepted'
+    handler.time_report.status = 'confirmed'
+    handler.data['state'] = 'accepted'
 
     TicketMessage.create(self, request, 'accepted')
     request.success(_('Time report accepted'))

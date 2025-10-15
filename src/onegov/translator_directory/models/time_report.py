@@ -5,20 +5,21 @@ from uuid import uuid4
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from sqlalchemy import Column, Date, Float, ForeignKey, Integer, Text
+from sqlalchemy import Column, Date, Enum, Float, ForeignKey, Integer, Text
 from sqlalchemy.orm import relationship
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     import uuid
     from datetime import date
     from .translator import Translator
 
+TimeReportStatus = Literal['pending', 'confirmed']
+
 
 class TranslatorTimeReport(Base, TimestampMixin):
-    """Records time reports for translator deployments/assignments."""
 
     __tablename__ = 'translator_time_reports'
 
@@ -70,6 +71,12 @@ class TranslatorTimeReport(Base, TimestampMixin):
     )
 
     notes: Column[str | None] = Column(Text)
+
+    status: Column[TimeReportStatus] = Column(
+        Enum('pending', 'confirmed', name='time_report_status'),
+        nullable=False,
+        default='pending',
+    )
 
     @property
     def duration_hours(self) -> float:
