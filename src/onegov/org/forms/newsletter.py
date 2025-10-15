@@ -115,11 +115,10 @@ class NewsletterForm(Form):
                     'class_': 'recommended'
                 }
             )
-            show_news_as_tiles = BooleanField(
-                label=_('Show news as tiles'),
+            show_only_previews = BooleanField(
+                label=_('Show only previews of news'),
                 description=_(
-                    'If checked, news are displayed as tiles. Otherwise, '
-                    'news are listed in full length.'),
+                    'If checked, only the preview of the news is shown.'),
                 default=True
             )
 
@@ -131,14 +130,14 @@ class NewsletterForm(Form):
 
                 super().update_model(model, request)
                 model.content['news'] = self.news.data
-                model.content['show_news_as_tiles'] = (
-                    self.show_news_as_tiles.data)
+                model.content['show_only_previews'] = (
+                    self.show_only_previews.data)
 
             def apply_model(self, model: Newsletter) -> None:
                 super().apply_model(model)
                 self.news.data = model.content.get('news')
-                self.show_news_as_tiles.data = model.content.get(
-                    'show_news_as_tiles', True)
+                self.show_only_previews.data = model.content.get(
+                    'show_only_previews', True)
 
         return NewsletterWithNewsForm
 

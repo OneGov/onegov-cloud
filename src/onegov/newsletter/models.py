@@ -115,7 +115,7 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
             )
         ))
 
-    show_news_as_tiles: dict_property[bool] = content_property(default=True)
+    show_only_previews: dict_property[bool] = content_property(default=True)
 
     #: categories the newsletter reports on
     newsletter_categories: dict_property[list[str] | None] = content_property()
