@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import os
 import pytest
@@ -22,13 +24,18 @@ from openpyxl import load_workbook
 from pathlib import Path
 from sqlalchemy import exc
 from sqlalchemy.orm.session import close_all_sessions
+from tests.shared.utils import add_reservation
 from unittest.mock import patch
 from webtest import Upload
 
-from tests.shared.utils import add_reservation
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from unittest.mock import MagicMock
+    from .conftest import Client
 
 
-def test_resource_slots(client):
+def test_resource_slots(client: Client) -> None:
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.add("Foo", 'Europe/Zurich')
 
@@ -81,7 +88,7 @@ def test_resource_slots(client):
     assert result[0]['title'] == "12:00 - 16:00 \nBesetzt"
 
 
-def test_resources(client):
+def test_resources(client: Client) -> None:
     client.login_admin()
 
     resources = client.get('/resources')
@@ -150,7 +157,7 @@ def test_resources(client):
     assert client.delete(delete_link, status=200)
 
 
-def test_resources_person_link_extension(client):
+def test_resources_person_link_extension(client: Client) -> None:
     client.login_admin()
 
     # add person
@@ -163,6 +170,7 @@ def test_resources_person_link_extension(client):
     new_person_page.form['function'] = 'Gemeindeschreiber'
 
     page = new_person_page.form.submit()
+    assert page.location is not None
     person_uuid = page.location.split('/')[-1]
     page = page.follow()
     assert 'Müller Franz' in page
@@ -183,7 +191,7 @@ def test_resources_person_link_extension(client):
     assert 'Franz Müller' in resource
 
 
-def test_resources_explicitly_link_referenced_files(client):
+def test_resources_explicitly_link_referenced_files(client: Client) -> None:
     admin = client.spawn()
     admin.login_admin()
 
@@ -209,8 +217,8 @@ def test_resources_explicitly_link_referenced_files(client):
     new_item = resources.click('Gegenstand')
     new_item.form['title'] = 'Dorf Bike'
     new_item.form['text'] = pdf_link
-    resource = new_item.form.submit().follow()
-    assert 'Dorf Bike' in resource
+    resource_page = new_item.form.submit().follow()
+    assert 'Dorf Bike' in resource_page
 
     session = client.app.session()
     pdf = FileCollection(session).query().one()
@@ -221,7 +229,7 @@ def test_resources_explicitly_link_referenced_files(client):
     assert resource.files == [pdf]
     assert pdf.access == 'public'
 
-    resource.access = 'mtan'
+    resource.access = 'mtan'  # type: ignore[attr-defined]
     session.flush()
     assert pdf.access == 'mtan'
 
@@ -232,7 +240,7 @@ def test_resources_explicitly_link_referenced_files(client):
 
 
 @freeze_time("2020-01-01", tick=True)
-def test_find_your_spot(client):
+def test_find_your_spot(client: Client) -> None:
     client.login_admin()
 
     resources = client.get('/resources')
@@ -321,7 +329,7 @@ def test_find_your_spot(client):
     transaction.begin()
 
     scheduler_1 = (
-        ResourceCollection(client.app.libres_context)
+        ResourceCollection(client.app.libres_context)  # type: ignore[union-attr]
         .by_name('meeting-1')
         .get_scheduler(client.app.libres_context)
     )
@@ -337,7 +345,7 @@ def test_find_your_spot(client):
     )
 
     scheduler_2 = (
-        ResourceCollection(client.app.libres_context)
+        ResourceCollection(client.app.libres_context)  # type: ignore[union-attr]
         .by_name('meeting-2')
         .get_scheduler(client.app.libres_context)
     )
@@ -459,7 +467,7 @@ def test_find_your_spot(client):
     assert reservation['time'] == '07:00 - 08:00'
 
 
-def test_resource_room_deletion(client):
+def test_resource_room_deletion(client: Client) -> None:
     # TicketMessage.create(ticket, request, 'opened')
     resources = ResourceCollection(client.app.libres_context)
     foyer = resources.add('Foyer', 'Europe/Zurich', type='room')
@@ -471,7 +479,7 @@ def test_resource_room_deletion(client):
         datetime(2017, 1, 6, 12),
         datetime(2017, 1, 6, 16),
     )
-    assert foyer.deletable
+    assert foyer.deletable  # type: ignore[attr-defined]
     transaction.commit()
 
     client.login_admin()
@@ -486,9 +494,13 @@ def test_resource_room_deletion(client):
     assert ticket.state == 'closed'
 
 
-def test_resource_room_deletion_with_future_allocation_and_payment(client):
+def test_resource_room_deletion_with_future_allocation_and_payment(
+    client: Client
+) -> None:
+
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.pricing_method = 'per_item'
     resource.price_per_item = 15.00
     resource.payment_method = 'manual'
@@ -512,8 +524,8 @@ def test_resource_room_deletion_with_future_allocation_and_payment(client):
     page = client.get('/resource/tageskarte/form')
     page.form['email'] = 'info@example.org'
 
-    ticket = page.form.submit().follow().form.submit().follow()
-    assert 'RSV-' in ticket.text
+    ticket_page = page.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket_page.text
 
     # mark it as paid
     client.login_supporter()
@@ -542,7 +554,7 @@ def test_resource_room_deletion_with_future_allocation_and_payment(client):
         assert ticket.snapshot is not None
 
 
-def test_reserved_resources_fields(client):
+def test_reserved_resources_fields(client: Client) -> None:
     client.login_admin()
 
     room = client.get('/resources').click('Raum')
@@ -560,7 +572,7 @@ def test_reserved_resources_fields(client):
     assert "Meeting Room" in room
 
 
-def test_allocations(client):
+def test_allocations(client: Client) -> None:
     client.login_admin()
     items = client.get('/resources').click('Gegenstand')
     items.form['title'] = 'Beamer'
@@ -677,7 +689,7 @@ def test_allocations(client):
     assert len(slots.json) == 0
 
 
-def test_allocation_times(client):
+def test_allocation_times(client: Client) -> None:
     client.login_admin()
 
     new = client.get('/resources').click('Raum')
@@ -741,7 +753,7 @@ def test_allocation_times(client):
     assert slots.json[1]['end'] == '2015-08-26T00:00:00+02:00'
 
 
-def test_allocation_visibility(client):
+def test_allocation_visibility(client: Client) -> None:
     client.login_admin()
 
     new = client.get('/resources').click('Raum')
@@ -817,7 +829,7 @@ def test_allocation_visibility(client):
     assert slots.json[0]['end'] == '2015-08-20T18:00:00+02:00'
 
 
-def test_allocation_holidays(client):
+def test_allocation_holidays(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/holiday-settings')
@@ -870,7 +882,7 @@ def test_allocation_holidays(client):
     assert slots.json[2]['start'].startswith('2019-08-02')
 
 
-def test_allocation_school_holidays(client):
+def test_allocation_school_holidays(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/holiday-settings')
@@ -923,10 +935,11 @@ def test_allocation_school_holidays(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_auto_accept_reservations(client):
+def test_auto_accept_reservations(client: Client) -> None:
     # prepare the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.definition = 'Note = ___'
     resource.pick_up = 'You can pick it up at the counter'
     scheduler = resource.get_scheduler(client.app.libres_context)
@@ -962,6 +975,7 @@ def test_auto_accept_reservations(client):
     assert 'Die Reservationen wurden angenommen' in page
     assert len(os.listdir(client.app.maildir)) == 1
     message = client.get_email(0)
+    assert message is not None
     assert 'Ihre Reservationen wurden bestätigt' in message['Subject']
     assert 'Foobar' in message['TextBody']
 
@@ -979,10 +993,16 @@ def test_auto_accept_reservations(client):
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
-def test_reserve_allocation(broadcast, authenticate, connect, client):
+def test_reserve_allocation(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.definition = 'Note = ___'
     scheduler = resource.get_scheduler(client.app.libres_context)
 
@@ -1104,10 +1124,16 @@ def test_reserve_allocation(broadcast, authenticate, connect, client):
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
-def test_reserve_with_tag(broadcast, authenticate, connect, client):
+def test_reserve_with_tag(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.definition = 'Note = ___'
     scheduler = resource.get_scheduler(client.app.libres_context)
 
@@ -1172,10 +1198,11 @@ def test_reserve_with_tag(broadcast, authenticate, connect, client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_allocation_partially(client):
+def test_reserve_allocation_partially(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1224,10 +1251,11 @@ def test_reserve_allocation_partially(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_allocation_change_email(client):
+def test_reserve_allocation_change_email(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1269,10 +1297,11 @@ def test_reserve_allocation_change_email(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_allocation_adjustment_pre_acceptance(client):
+def test_reserve_allocation_adjustment_pre_acceptance(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1335,10 +1364,11 @@ def test_reserve_allocation_adjustment_pre_acceptance(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_allocation_adjustment_post_acceptance(client):
+def test_reserve_allocation_adjustment_post_acceptance(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1380,10 +1410,11 @@ def test_reserve_allocation_adjustment_post_acceptance(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_allocation_adjustment_invoice_change(client):
+def test_reserve_allocation_adjustment_invoice_change(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.pricing_method = 'per_hour'
     resource.price_per_hour = 10.00
     resource.payment_method = 'manual'
@@ -1452,10 +1483,13 @@ def test_reserve_allocation_adjustment_invoice_change(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_allocation_add_reservation_invoice_change(client):
+def test_reserve_allocation_add_reservation_invoice_change(
+    client: Client
+) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('konferenzraum')
+    assert resource is not None
     resource.pricing_method = 'per_hour'
     resource.price_per_hour = 10.00
     resource.payment_method = 'manual'
@@ -1534,10 +1568,14 @@ def test_reserve_allocation_add_reservation_invoice_change(client):
 
 @freeze_time("2015-08-28", tick=True)
 @patch('onegov.pay.models.payment.Payment.sync')
-def test_reject_reservation_price_change(sync, client):
+def test_reject_reservation_price_change(
+    sync: MagicMock,
+    client: Client
+) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.pricing_method = 'per_item'
     resource.price_per_item = 10.00
     resource.payment_method = 'manual'
@@ -1623,10 +1661,11 @@ def test_reject_reservation_price_change(sync, client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_send_reservation_summary(client):
+def test_send_reservation_summary(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1699,10 +1738,11 @@ def test_send_reservation_summary(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_no_definition_pick_up_hint(client):
+def test_reserve_no_definition_pick_up_hint(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1730,10 +1770,11 @@ def test_reserve_no_definition_pick_up_hint(client):
 
 
 @freeze_time("2022-10-30", tick=True)
-def test_reserve_allocation_dst_to_st_transition(client):
+def test_reserve_allocation_dst_to_st_transition(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1760,10 +1801,11 @@ def test_reserve_allocation_dst_to_st_transition(client):
 
 
 @freeze_time("2022-03-27", tick=True)
-def test_reserve_allocation_st_to_dst_transition(client):
+def test_reserve_allocation_st_to_dst_transition(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1783,7 +1825,7 @@ def test_reserve_allocation_st_to_dst_transition(client):
     }
 
 
-def test_reserve_in_past(client):
+def test_reserve_in_past(client: Client) -> None:
     admin = client.spawn()
     admin.login_admin()
 
@@ -1794,6 +1836,7 @@ def test_reserve_in_past(client):
 
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1820,9 +1863,10 @@ def test_reserve_in_past(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_confirmation_no_definition(client):
+def test_reserve_confirmation_no_definition(client: Client) -> None:
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1861,9 +1905,10 @@ def test_reserve_confirmation_no_definition(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_confirmation_with_definition(client):
+def test_reserve_confirmation_with_definition(client: Client) -> None:
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.definition = "Vorname *= ___\nNachname *= ___"
 
     scheduler = resource.get_scheduler(client.app.libres_context)
@@ -1904,10 +1949,11 @@ def test_reserve_confirmation_with_definition(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_session_bound(client):
+def test_reserve_session_bound(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1937,10 +1983,11 @@ def test_reserve_session_bound(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_delete_reservation_anonymous(client):
+def test_delete_reservation_anonymous(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1972,10 +2019,11 @@ def test_delete_reservation_anonymous(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_in_parallel(client):
+def test_reserve_in_parallel(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -2004,15 +2052,16 @@ def test_reserve_in_parallel(client):
 
     # one will win, one will lose
     assert f1.form.submit().status_code == 302
-    assert "Der gewünschte Zeitraum ist nicht mehr verfügbar."\
-           in f2.form.submit().follow()
+    assert ("Der gewünschte Zeitraum ist nicht mehr verfügbar."
+        ) in f2.form.submit().follow()
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_occupancy_view(client):
+def test_occupancy_view(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -2041,7 +2090,7 @@ def test_occupancy_view(client):
     assert occupancy.status_code == 200
 
 
-def test_occupancy_view_member_access(client):
+def test_occupancy_view_member_access(client: Client) -> None:
     # setup a resource that's visible to members
     client.login_admin()
 
@@ -2072,10 +2121,11 @@ def test_occupancy_view_member_access(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reservation_export_view(client):
+def test_reservation_export_view(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.definition = "Vorname *= ___\nNachname *= ___"
 
     scheduler = resource.get_scheduler(client.app.libres_context)
@@ -2121,7 +2171,7 @@ def test_reservation_export_view(client):
 
 
 @freeze_time("2022-09-07", tick=True)
-def test_export_all_default_date_range(client):
+def test_export_all_default_date_range(client: Client) -> None:
     """ Date range in the export form is the current week. (from
     monday to friday)
     """
@@ -2139,7 +2189,9 @@ def test_export_all_default_date_range(client):
 
 
 @freeze_time("2022-09-05", tick=True)
-def test_export_all_default_date_range_from_start_of_week(client):
+def test_export_all_default_date_range_from_start_of_week(
+    client: Client
+) -> None:
     client.login_admin()
     export = client.get('/resources/export-all')
     start = export.form['start']
@@ -2152,7 +2204,9 @@ def test_export_all_default_date_range_from_start_of_week(client):
 
 
 @freeze_time("2022-09-09", tick=True)
-def test_export_all_default_date_range_from_end_of_week(client):
+def test_export_all_default_date_range_from_end_of_week(
+    client: Client
+) -> None:
     client.login_admin()
     export = client.get('/resources/export-all')
     start = export.form['start']
@@ -2165,13 +2219,14 @@ def test_export_all_default_date_range_from_end_of_week(client):
 
 
 @freeze_time("2023-08-28", tick=True)
-def test_reservation_export_all_view(client):
+def test_reservation_export_all_view(client: Client) -> None:
     """ Create reservations with two different resources.
         Then export everything to Excel.
         It should create one Worksheet per resource.
     """
     resources = ResourceCollection(client.app.libres_context)
     daypass_resource = resources.by_name('tageskarte')
+    assert daypass_resource is not None
     daypass_resource.definition = "Vorname *= ___\nNachname *= ___"
 
     scheduler = daypass_resource.get_scheduler(client.app.libres_context)
@@ -2190,6 +2245,7 @@ def test_reservation_export_all_view(client):
     )
 
     room_resource = resources.by_name('conference-room')
+    assert room_resource is not None
     room_resource.definition = "title *= ___"
 
     room_allocations = room_resource.scheduler.allocate(
@@ -2266,12 +2322,14 @@ def test_reservation_export_all_view(client):
         assert tab_1[1][0].value == "28.08.2023 00:00"
         assert tab_1[1][1].value == "29.08.2023 00:00"
         assert tab_1[1][2].value == int("1")
-        assert "RSV-" in tab_1[1][4].value
-        assert "Room" in tab_1[1][5].value
+        assert "RSV-" in tab_1[1][4].value  # type: ignore[operator]
+        assert "Room" in tab_1[1][5].value  # type: ignore[operator]
 
 
 @freeze_time("2023-08-28", tick=True)
-def test_reservation_export_all_view_normalizes_sheet_names(client):
+def test_reservation_export_all_view_normalizes_sheet_names(
+    client: Client
+) -> None:
     """ Names of Excel worksheets have to be valid.
         Limited to 31 characters, no special characters.
         Duplicate titles will be incremented numerically.
@@ -2282,6 +2340,7 @@ def test_reservation_export_all_view_normalizes_sheet_names(client):
 
     resources = ResourceCollection(client.app.libres_context)
     daypass_resource = resources.by_name('tageskarte')
+    assert daypass_resource is not None
     daypass_resource.definition = "Vorname *= ___\nNachname *= ___"
     daypass_resource.title = duplicate_title
 
@@ -2301,6 +2360,7 @@ def test_reservation_export_all_view_normalizes_sheet_names(client):
     )
 
     room_resource = resources.by_name('conference-room')
+    assert room_resource is not None
     room_resource.definition = "Name *= ___"
     room_resource.title = duplicate_title
 
@@ -2350,7 +2410,7 @@ def test_reservation_export_all_view_normalizes_sheet_names(client):
 
 
 @freeze_time("2022-09-07", tick=True)
-def test_reservation_export_all_with_no_resources(client):
+def test_reservation_export_all_with_no_resources(client: Client) -> None:
     client.login_admin()
 
     export = client.get('/resources/export-all')
@@ -2364,7 +2424,7 @@ def test_reservation_export_all_with_no_resources(client):
 
 
 @freeze_time("2016-04-28", tick=True)
-def test_reserve_session_separation(client):
+def test_reserve_session_separation(client: Client) -> None:
     c1 = client.spawn()
     c1.login_admin()
 
@@ -2380,6 +2440,7 @@ def test_reserve_session_separation(client):
         new.form.submit()
 
         resource = client.app.libres_resources.by_name(room)
+        assert resource is not None
         allocations = resource.scheduler.allocate(
             dates=(datetime(2016, 4, 28, 12, 0), datetime(2016, 4, 28, 13, 0)),
             whole_day=False
@@ -2426,6 +2487,7 @@ def test_reserve_session_separation(client):
     next_form = formular.form.submit().follow().form.submit().follow()
 
     resource = client.app.libres_resources.by_name('meeting-room')
+    assert resource is not None
     assert resource.scheduler.managed_reserved_slots().count() == 1
 
     result = c1.get('/resource/meeting-room/reservations').json
@@ -2464,7 +2526,7 @@ def test_reserve_session_separation(client):
     assert 'gym' in tickets
 
 
-def test_reserve_reservation_prediction(client):
+def test_reserve_reservation_prediction(client: Client) -> None:
     client.login_admin()
 
     new = client.get('/resources').click('Raum')
@@ -2474,6 +2536,7 @@ def test_reserve_reservation_prediction(client):
     transaction.begin()
 
     resource = client.app.libres_resources.by_name('gym')
+    assert resource is not None
 
     a1 = resource.scheduler.allocate(
         dates=(datetime(2017, 1, 1, 12, 0), datetime(2017, 1, 1, 13, 0)),
@@ -2498,6 +2561,7 @@ def test_reserve_reservation_prediction(client):
     transaction.begin()
 
     resource = client.app.libres_resources.by_name('gym')
+    assert resource is not None
     a3 = resource.scheduler.allocate(
         dates=(datetime(2017, 1, 3, 12, 0), datetime(2017, 1, 3, 13, 0)),
         whole_day=False
@@ -2522,12 +2586,13 @@ def test_reserve_reservation_prediction(client):
     assert prediction['wholeDay'] is False
 
 
-def test_reserve_multiple_allocations(client):
+def test_reserve_multiple_allocations(client: Client) -> None:
     client.login_admin()
 
     transaction.begin()
 
     resource = client.app.libres_resources.by_name('tageskarte')
+    assert resource is not None
     thursday = resource.scheduler.allocate(
         dates=(datetime(2016, 4, 28), datetime(2016, 4, 28)),
         whole_day=True
@@ -2573,6 +2638,7 @@ def test_reserve_multiple_allocations(client):
 
     # make sure the reservations are no longer pending
     resource = client.app.libres_resources.by_name('tageskarte')
+    assert resource is not None
 
     reservations = resource.scheduler.managed_reservations()
     assert reservations.filter(Reservation.status == 'approved').count() == 2
@@ -2594,12 +2660,13 @@ def test_reserve_multiple_allocations(client):
     assert resource.scheduler.managed_reserved_slots().count() == 0
 
 
-def test_reserve_and_deny_multiple_dates(client):
+def test_reserve_and_deny_multiple_dates(client: Client) -> None:
     client.login_admin()
 
     transaction.begin()
 
     resource = client.app.libres_resources.by_name('tageskarte')
+    assert resource is not None
     wednesday = resource.scheduler.allocate(
         dates=(datetime(2016, 4, 27), datetime(2016, 4, 27)),
         whole_day=True
@@ -2632,6 +2699,7 @@ def test_reserve_and_deny_multiple_dates(client):
 
     # the resource needs to be refetched after the commit
     resource = client.app.libres_resources.by_name('tageskarte')
+    assert resource is not None
     assert resource.scheduler.managed_reserved_slots().count() == 3
 
     # deny the last reservation
@@ -2676,7 +2744,7 @@ def test_reserve_and_deny_multiple_dates(client):
     assert "29. April 2016" not in message
 
 
-def test_reserve_failing_multiple(client):
+def test_reserve_failing_multiple(client: Client) -> None:
     c1 = client.spawn()
     c1.login_admin()
 
@@ -2686,6 +2754,7 @@ def test_reserve_failing_multiple(client):
     transaction.begin()
 
     resource = client.app.libres_resources.by_name('tageskarte')
+    assert resource is not None
     thursday = resource.scheduler.allocate(
         dates=(datetime(2016, 4, 28), datetime(2016, 4, 28)),
         whole_day=True
@@ -2725,17 +2794,18 @@ def test_reserve_failing_multiple(client):
     assert 'class="reservation failed"' in confirmation
 
 
-def test_cleanup_allocations(client):
+def test_cleanup_allocations(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
         dates=(
-            datetime(2015, 8, 28), datetime(2015, 8, 28),
-            datetime(2015, 8, 29), datetime(2015, 8, 29),
-            datetime(2015, 8, 30), datetime(2015, 8, 30),
+            (datetime(2015, 8, 28), datetime(2015, 8, 28)),
+            (datetime(2015, 8, 29), datetime(2015, 8, 29)),
+            (datetime(2015, 8, 30), datetime(2015, 8, 30)),
         ),
         whole_day=True
     )
@@ -2758,9 +2828,9 @@ def test_cleanup_allocations(client):
     cleanup.form['end'] = date(2015, 8, 31)
     # only remove fridays and sundays, which excludes the middle allocation
     cleanup.form['weekdays'] = [4, 6]
-    resource = cleanup.form.submit().follow()
+    resource_page = cleanup.form.submit().follow()
 
-    assert "1 Verfügbarkeiten wurden erfolgreich entfernt" in resource
+    assert "1 Verfügbarkeiten wurden erfolgreich entfernt" in resource_page
 
     allocations = scheduler.managed_allocations().order_by('id').all()
     assert len(allocations) == 2
@@ -2771,10 +2841,11 @@ def test_cleanup_allocations(client):
 
 
 @freeze_time("2017-07-09", tick=True)
-def test_manual_reservation_payment_with_one_off_extra(client):
+def test_manual_reservation_payment_with_one_off_extra(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.pricing_method = 'per_item'
     resource.price_per_item = 15.00
     resource.extras_pricing_method = 'one_off'
@@ -2878,10 +2949,13 @@ def test_manual_reservation_payment_with_one_off_extra(client):
 
 
 @freeze_time("2017-07-09", tick=True)
-def test_manual_reservation_payment_with_per_item_extra(client):
+def test_manual_reservation_payment_with_per_item_extra(
+    client: Client
+) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.pricing_method = 'per_item'
     resource.price_per_item = 15.00
     resource.extras_pricing_method = 'per_item'
@@ -3026,10 +3100,13 @@ def test_manual_reservation_payment_with_per_item_extra(client):
 
 
 @freeze_time("2017-07-09", tick=True)
-def test_manual_reservation_payment_with_per_hour_extra(client):
+def test_manual_reservation_payment_with_per_hour_extra(
+    client: Client
+) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.pricing_method = 'per_item'
     resource.price_per_item = 15.00
     resource.extras_pricing_method = 'per_hour'
@@ -3100,10 +3177,11 @@ def test_manual_reservation_payment_with_per_hour_extra(client):
 
 
 @freeze_time("2017-07-09", tick=True)
-def test_manual_reservation_payment_without_extra(client):
+def test_manual_reservation_payment_without_extra(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.pricing_method = 'per_hour'
     resource.price_per_hour = 10.00
     resource.payment_method = 'manual'
@@ -3161,10 +3239,11 @@ def test_manual_reservation_payment_without_extra(client):
 
 
 @freeze_time("2017-07-09", tick=True)
-def test_manual_reservation_payment_with_discount(client):
+def test_manual_reservation_payment_with_discount(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     resource.pricing_method = 'per_item'
     resource.price_per_item = 10.00
     resource.payment_method = 'manual'
@@ -3237,22 +3316,22 @@ def test_manual_reservation_payment_with_discount(client):
     assert "Unfakturiert" in invoices
 
 
-def test_allocation_rules_on_rooms(client):
+def test_allocation_rules_on_rooms(client: Client) -> None:
     client.login_admin()
 
-    resources = client.get('/resources')
+    resources_page = client.get('/resources')
 
-    page = resources.click('Raum')
+    page = resources_page.click('Raum')
     page.form['title'] = 'Room'
     page.form.submit()
 
-    def count_allocations():
+    def count_allocations() -> int:
         s = '2000-01-01'
         e = '2050-01-31'
 
         return len(client.get(f'/resource/room/slots?start={s}&end={e}').json)
 
-    def run_cronjob():
+    def run_cronjob() -> None:
         client.get('/resource/room/process-rules')
 
     page = client.get('/resource/room').click(
@@ -3314,6 +3393,7 @@ def test_allocation_rules_on_rooms(client):
     # deleting the rule will delete all associated slots (but not others)
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('room')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     scheduler.allocate(
@@ -3326,22 +3406,22 @@ def test_allocation_rules_on_rooms(client):
     assert count_allocations() == 7
 
 
-def test_allocation_rules_edit(client):
+def test_allocation_rules_edit(client: Client) -> None:
     client.login_admin()
 
-    resources = client.get('/resources')
+    resources_page = client.get('/resources')
 
-    page = resources.click('Raum')
+    page = resources_page.click('Raum')
     page.form['title'] = 'Room'
     page.form.submit()
 
-    def count_allocations():
+    def count_allocations() -> int:
         s = '2000-01-01'
         e = '2050-01-31'
 
         return len(client.get(f'/resource/room/slots?start={s}&end={e}').json)
 
-    def run_cronjob():
+    def run_cronjob() -> None:
         client.get('/resource/room/process-rules')
 
     page = client.get('/resource/room').click(
@@ -3372,25 +3452,25 @@ def test_allocation_rules_edit(client):
     assert 'Renamed room' in edit_page
 
 
-def test_allocation_rules_copy_paste(client):
+def test_allocation_rules_copy_paste(client: Client) -> None:
     client.login_admin()
 
-    resources = client.get('/resources')
+    resources_page = client.get('/resources')
 
-    page = resources.click('Raum')
+    page = resources_page.click('Raum')
     page.form['title'] = 'Room 1'
     page.form.submit()
 
-    page = resources.click('Raum')
+    page = resources_page.click('Raum')
     page.form['title'] = 'Room 2'
     page.form.submit()
 
-    def count_allocations(room):
+    def count_allocations(room: int) -> int:
         return len(client.get(
             f'/resource/room-{room}/slots?start=2000-01-01&end=2050-01-31'
         ).json)
 
-    def run_cronjob():
+    def run_cronjob() -> None:
         client.get('/resource/room/process-rules')
 
     page = client.get('/resource/room-1').click(
@@ -3427,28 +3507,28 @@ def test_allocation_rules_copy_paste(client):
     assert count_allocations(2) == 2
 
 
-def test_allocation_rules_on_daypasses(client):
+def test_allocation_rules_on_daypasses(client: Client) -> None:
     client.login_admin()
 
-    resources = client.get('/resources')
+    resources_page = client.get('/resources')
 
-    page = resources.click('Tageskarte', index=0)
+    page = resources_page.click('Tageskarte', index=0)
     page.form['title'] = 'Daypass'
     page.form.submit()
 
-    page = resources.click('Tageskarte', index=0)
+    page = resources_page.click('Tageskarte', index=0)
     page.form['title'] = 'Daypass'
     page = page.form.submit()
     assert "Eine Resource mit diesem Namen existiert bereits" in page
 
-    def count_allocations():
+    def count_allocations() -> int:
         s = '2000-01-01'
         e = '2050-01-31'
 
         return len(client.get(
             f'/resource/daypass/slots?start={s}&end={e}').json)
 
-    def run_cronjob():
+    def run_cronjob() -> None:
         client.get('/resource/daypass/process-rules')
 
     page = client.get('/resource/daypass').click(
@@ -3497,26 +3577,26 @@ def test_allocation_rules_on_daypasses(client):
     assert count_allocations() == 90
 
 
-def test_allocation_rules_with_holidays(client):
+def test_allocation_rules_with_holidays(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/holiday-settings')
     page.select_checkbox('cantonal_holidays', "Zug")
     page.form.submit()
 
-    resources = client.get('/resources')
-    page = resources.click('Tageskarte', index=0)
+    resources_page = client.get('/resources')
+    page = resources_page.click('Tageskarte', index=0)
     page.form['title'] = 'Daypass'
     page.form.submit()
 
-    def count_allocations():
+    def count_allocations() -> int:
         s = '2000-01-01'
         e = '2050-01-31'
 
         return len(client.get(
             f'/resource/daypass/slots?start={s}&end={e}').json)
 
-    def run_cronjob():
+    def run_cronjob() -> None:
         client.get('/resource/daypass/process-rules')
 
     page = client.get('/resource/daypass').click(
@@ -3546,7 +3626,7 @@ def test_allocation_rules_with_holidays(client):
     assert count_allocations() == 705
 
 
-def test_allocation_rules_with_school_holidays(client):
+def test_allocation_rules_with_school_holidays(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/holiday-settings')
@@ -3561,14 +3641,14 @@ def test_allocation_rules_with_school_holidays(client):
     page.form['title'] = 'Daypass'
     page.form.submit()
 
-    def count_allocations():
+    def count_allocations() -> int:
         s = '2000-01-01'
         e = '2050-01-31'
 
         return len(client.get(
             f'/resource/daypass/slots?start={s}&end={e}').json)
 
-    def run_cronjob():
+    def run_cronjob() -> None:
         client.get('/resource/daypass/process-rules')
 
     page = client.get('/resource/daypass').click(
@@ -3599,7 +3679,7 @@ def test_allocation_rules_with_school_holidays(client):
 
 
 @freeze_time("2019-08-01", tick=True)
-def test_zipcode_block(client):
+def test_zipcode_block(client: Client) -> None:
     client.login_admin()
 
     # enable zip-code blocking
@@ -3622,9 +3702,11 @@ def test_zipcode_block(client):
     # create a blocked and an unblocked allocation
     transaction.begin()
 
-    scheduler = ResourceCollection(client.app.libres_context)\
-        .by_name('tageskarte')\
+    scheduler = (
+        ResourceCollection(client.app.libres_context)  # type: ignore[union-attr]
+        .by_name('tageskarte')
         .get_scheduler(client.app.libres_context)
+    )
 
     allocations = [
         *scheduler.allocate(
@@ -3684,7 +3766,7 @@ def test_zipcode_block(client):
     page.form.submit().follow()
 
 
-def test_find_your_spot_link(client):
+def test_find_your_spot_link(client: Client) -> None:
     client.login_admin()
 
     resources = client.get('/resources')
@@ -3724,7 +3806,7 @@ def test_find_your_spot_link(client):
     assert page.pyquery('#Something .find-your-spot-link')
 
 
-def test_resource_recipient_overview(client):
+def test_resource_recipient_overview(client: Client) -> None:
     resources = ResourceCollection(client.app.libres_context)
     gymnasium = resources.add('Gymnasium', 'Europe/Zurich', type='room')
     dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')
@@ -3764,7 +3846,9 @@ def test_resource_recipient_overview(client):
 
 
 @freeze_time("2024-04-08", tick=True)
-def test_reserve_fractions_of_hours_total_correct_in_price(client):
+def test_reserve_fractions_of_hours_total_correct_in_price(
+    client: Client
+) -> None:
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
     assert resource
@@ -3811,10 +3895,11 @@ def test_reserve_fractions_of_hours_total_correct_in_price(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_my_reservations_view(client):
+def test_my_reservations_view(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
+    assert resource is not None
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
@@ -3853,7 +3938,7 @@ def test_my_reservations_view(client):
     confirm = login.form.submit().follow()
     assert len(os.listdir(client.app.maildir)) == 2
     message = client.get_email(1)['TextBody']
-    token = re.search(r'&token=([^)]+)', message).group(1)
+    token = re.search(r'&token=([^)]+)', message).group(1)  # type: ignore[union-attr]
     confirm.form['token'] = token
     reservations = confirm.form.submit().follow()
     assert reservations.request.path_qs == (
@@ -3865,7 +3950,7 @@ def test_my_reservations_view(client):
     assert reservations.status_code == 200
     subscribe = client.get('/resources/my-reservations-subscribe')
     assert 'webcal://' in subscribe
-    ical_url = re.search(
+    ical_url = re.search(  # type: ignore[union-attr]
         r'webcal://localhost(/[^"]+)', subscribe.text
     ).group(1)
 

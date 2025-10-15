@@ -15,9 +15,9 @@ from time import sleep
 
 from typing import cast, Any, ParamSpec, Self, TYPE_CHECKING
 if TYPE_CHECKING:
+    from _typeshed import StrPath
     from collections.abc import Callable
     from datetime import date
-    from os import PathLike
     from selenium.webdriver import Chrome
     from splinter import Browser
 else:
@@ -306,7 +306,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
         self.execute_script(
             'document.querySelector("{}").scrollIntoView()'.format(css))
 
-    def drop_file(self, selector: str, path: PathLike[str]) -> None:
+    def drop_file(self, selector: str, path: StrPath) -> None:
         # https://gist.github.com/z41/c11f8a4072e9f67e5755d4a1a72c8f02
         dropzone = self.find_by_css(selector)[0]._element  # type: ignore[attr-defined]
 

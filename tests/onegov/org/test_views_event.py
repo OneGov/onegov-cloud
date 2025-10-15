@@ -1,33 +1,43 @@
-import json
-from tempfile import TemporaryDirectory
+from __future__ import annotations
 
 import babel.dates
+import json
 import os
 import pytest
 import transaction
 import yaml
-
-from datetime import datetime, date, timedelta
 import xml.etree.ElementTree as ET
 
+from datetime import datetime, date, timedelta
 from onegov.event.models import Event
+from tempfile import TemporaryDirectory
 from tests.shared.utils import create_image, create_pdf
 from tests.shared.utils import get_meta
 from unittest.mock import patch
 from webtest.forms import Upload
 
 
-def etree_to_dict(root, node_name=''):
-    nodes = list()
-    for node in root.iter(node_name):
-        d = dict()
-        for item in node:
-            d[item.tag] = item.text
-        nodes.append(d)
-    return nodes
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.client import ExtendedResponse
+    from unittest.mock import MagicMock
+    from .conftest import Client
 
 
-def test_view_occurrences(client):
+def etree_to_dict(
+    root: ET.Element,
+    node_name: str = ''
+) -> list[dict[str, str | None]]:
+    return [
+        {
+            item.tag: item.text
+            for item in node
+        }
+        for node in root.iter(node_name)
+    ]
+
+
+def test_view_occurrences(client: Client) -> None:
     client.login_admin()
     settings = client.get('/event-settings')
     settings.form['event_locations'] = [
@@ -36,26 +46,25 @@ def test_view_occurrences(client):
     settings.form.submit()
     client.logout()
 
-    def events(query=''):
+    def events(query: str = '') -> list[str]:
         page = client.get(f'/events/?{query}')
         return [event.text for event in page.pyquery('h3 a')]
 
-    def dates(query=''):
+    def dates(query: str = '') -> list[date]:
         page = client.get(f'/events/?{query}')
         return [
             datetime.strptime(div.text, '%d.%m.%Y').date()
             for div in page.pyquery('.occurrence-date')
         ]
 
-    def tags(query=''):
+    def tags(query: str = '') -> set[str]:
         page = client.get(f'/events/?{query}')
-        tags = [s.text.strip() for s in page.pyquery('.occurrence-tags span')]
-        return list(set(tags))
+        return {s.text.strip() for s in page.pyquery('.occurrence-tags span')}
 
-    def as_json(query=''):
+    def as_json(query: str = '') -> Any:
         return client.get(f'/events/json?{query}').json
 
-    def as_xml():
+    def as_xml() -> list[dict[str, str | None]]:
         response = client.get('/events/xml')
         xml_string = response.body.decode('utf-8')
         root = ET.fromstring(xml_string)
@@ -72,32 +81,29 @@ def test_view_occurrences(client):
 
     # Test tags
     query = 'tags=Party'
-    assert tags(query) == ["Party"]
+    assert tags(query) == {"Party"}
     assert events(query) == ["150 Jahre Govikon"]
 
     query = 'tags=Politics'
-    assert tags(query) == ["Politik"]
+    assert tags(query) == {"Politik"}
     assert events(query) == ["Generalversammlung"]
 
     query = 'tags=Sports'
-    assert tags(query) == ["Sport"]
+    assert tags(query) == {"Sport"}
     assert len(events(query)) == 10
-    assert set(events(query)) == set(["Gemeinsames Turnen", "Fussballturnier"])
+    assert set(events(query)) == {"Gemeinsames Turnen", "Fussballturnier"}
 
     query = 'tags=Politics&tags=Party'
-    assert sorted(tags(query)) == ["Party", "Politik"]
+    assert tags(query) == {"Party", "Politik"}
     assert len(events(query)) == 2
-    assert set(events(query)) == set(["150 Jahre Govikon",
-                                      "Generalversammlung"])
+    assert set(events(query)) == {"150 Jahre Govikon", "Generalversammlung"}
 
     # Test locations
     query = 'locations=Sportanlage'
     assert sorted(events(query)) == ["150 Jahre Govikon", "Fussballturnier"]
 
     query = 'locations=Gemeindesaal&locations=Turnhalle'
-    assert sorted(set(events(query))) == [
-        "Gemeinsames Turnen", "Generalversammlung"
-    ]
+    assert set(events(query)) == {"Gemeinsames Turnen", "Generalversammlung"}
 
     query = 'locations=halle'
     assert events(query) == []
@@ -123,12 +129,12 @@ def test_view_occurrences(client):
         unique_dates[1].isoformat(),
         unique_dates[-2].isoformat()
     )
-    assert tags(query) == ["Sport"]
+    assert tags(query) == {"Sport"}
     assert min(dates(query)) == unique_dates[1]
     assert max(dates(query)) == unique_dates[-2]
 
     query = 'range=weekend'
-    assert tags(query) == ["Party"]
+    assert tags(query) == {"Party"}
     assert min(dates(query)) == unique_dates[0]
     assert max(dates(query)) == unique_dates[0]
     assert len(events(query)) == 1
@@ -158,28 +164,31 @@ def test_view_occurrences(client):
                                         'modified']
 
     # Test iCal
-    assert client.get('/events/').click('Diese Termine exportieren').\
-        text.startswith('BEGIN:VCALENDAR')
+    assert client.get('/events/').click(
+        'Diese Termine exportieren').text.startswith('BEGIN:VCALENDAR')
 
 
-def test_view_occurrences_event_filter(client):
+def test_view_occurrences_event_filter(client: Client) -> None:
     """
     This test switches the application settings event filter type between
     'tags', 'filters' and 'tags_and_filters'
     """
 
-    def events(query=''):
+    def events(query: str = '') -> list[str]:
         page = client.get(f'/events/?{query}')
         return [event.text for event in page.pyquery('h3 a')]
 
-    def dates(query=''):
+    def dates(query: str = '') -> list[date]:
         page = client.get(f'/events/?{query}')
         return [
             datetime.strptime(div.text, '%d.%m.%Y').date()
             for div in page.pyquery('.occurrence-date')
         ]
 
-    def set_setting_event_filter_type(client, event_filter_type):
+    def set_setting_event_filter_type(
+        client: Client,
+        event_filter_type: str
+    ) -> None:
         client.login_admin()
         settings = client.get('/event-settings')
         settings.form['event_filter_type'] = event_filter_type
@@ -187,7 +196,7 @@ def test_view_occurrences_event_filter(client):
         assert client.app.org.event_filter_type == event_filter_type
         client.logout()
 
-    def setup_event_filter(client):
+    def setup_event_filter(client: Client) -> None:
         assert client.login_admin()
         assert client.app.org.event_filter_type in ['filters',
                                                     'tags_and_filters']
@@ -202,7 +211,7 @@ def test_view_occurrences_event_filter(client):
         assert page.form.submit()
         client.logout()
 
-    def set_filter_on_event(client):
+    def set_filter_on_event(client: Client) -> None:
         # set single filter on one event
         client.login_admin()
         page = (client.get('/events').click('Fussballturnier').
@@ -244,7 +253,7 @@ def test_view_occurrences_event_filter(client):
     assert 'B Filter' in page
 
 
-def test_view_occurrences_event_documents(client):
+def test_view_occurrences_event_documents(client: Client) -> None:
     page = client.get('/events')
     assert "Dokumente" not in page
 
@@ -253,7 +262,7 @@ def test_view_occurrences_event_documents(client):
         settings = client.get('/event-settings')
         filename_1 = os.path.join(td, 'zoo-programm-saison-2024.pdf')
         create_pdf(filename_1)
-        settings.form.fields['event_files'][-1].value = [Upload(filename_1)]
+        settings.form.set('event_files', [Upload(filename_1)], -1)
         settings = settings.form.submit().follow()
         assert settings.status_code == 200
 
@@ -267,7 +276,7 @@ def test_view_occurrences_event_documents(client):
         assert "zoo-programm-saison-2024.pdf" in page
 
 
-def test_many_filters(client):
+def test_many_filters(client: Client) -> None:
     assert client.login_admin()
     page = client.get('/event-settings')
     page.form['event_filter_type'] = 'filters'
@@ -308,7 +317,7 @@ def test_many_filters(client):
     assert "Mehr anzeigen" in events
 
 
-def test_view_occurrence(client):
+def test_view_occurrence(client: Client) -> None:
     events = client.get('/events')
 
     event = events.click("Generalversammlung")
@@ -316,8 +325,9 @@ def test_view_occurrence(client):
     assert "Gemeindesaal" in event
     assert "Politik" in event
     assert "Alle Jahre wieder" in event
-    assert len(event.pyquery('.monthly-view').attr['data-dates'].split(';')) \
-        == 1
+    assert len(
+        event.pyquery('.monthly-view').attr['data-dates'].split(';')
+    ) == 1
     assert len(event.pyquery('.calendar-export-list li')) == 1
     assert event.click('Diesen Termin exportieren').text.startswith(
         'BEGIN:VCALENDAR'
@@ -337,13 +347,21 @@ def test_view_occurrence(client):
         == 9
     assert len(event.pyquery('.calendar-export-list li')) == 2
 
-    assert event.click('Diesen Termin exportieren').\
-        text.startswith('BEGIN:VCALENDAR')
-    assert event.click('Alle Termine exportieren').\
-        text.startswith('BEGIN:VCALENDAR')
+    assert event.click(
+        'Diesen Termin exportieren'
+    ).text.startswith('BEGIN:VCALENDAR')
+    assert event.click(
+        'Alle Termine exportieren'
+    ).text.startswith('BEGIN:VCALENDAR')
 
 
-def fill_event_form(form_page, start_date, end_date, add_image=False):
+def fill_event_form(
+    form_page: ExtendedResponse,
+    start_date: date,
+    end_date: date,
+    add_image: bool = False
+) -> ExtendedResponse:
+
     form_page.form['email'] = "test@example.org"
     form_page.form['title'] = "My Ewent"
     form_page.form['description'] = "My event is an event."
@@ -366,14 +384,20 @@ def fill_event_form(form_page, start_date, end_date, add_image=False):
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
 @pytest.mark.parametrize('skip', [True, False])
-def test_submit_event(broadcast, authenticate, connect, client, skip):
+def test_submit_event(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
+    skip: bool
+) -> None:
 
     if skip:
-        client.login_admin()
-        settings = client.get('/ticket-settings')
+        admin = client.spawn()
+        admin.login_admin()
+        settings = admin.get('/ticket-settings')
         settings.form['tickets_skip_opening_email'] = ['EVN']
         settings.form.submit()
-        client = client.spawn()
 
     form_page = client.get('/events').click("Veranstaltung erfassen")
 
@@ -422,7 +446,7 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     assert form_page.form['repeat'].value == 'weekly'
     for i in range(7):
         checkbox = form_page.form.fields['weekly'][i]
-        assert checkbox.checked
+        assert checkbox.checked  # type: ignore[attr-defined]
 
     preview_page = form_page.form.submit().follow()
 
@@ -443,6 +467,7 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
 
     assert len(os.listdir(client.app.maildir)) == 1
     message = client.get_email(0)
+    assert message is not None
     assert message['To'] == "test@example.org"
     assert ticket_nr in message['TextBody']
 
@@ -545,13 +570,13 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     assert len(os.listdir(client.app.maildir)) == 2
     message = client.get_email(1)
     assert message['To'] == "test@example.org"
-    message = message['TextBody']
-    assert "My special event" in message
-    assert "My event is exceptional." in message
-    assert "A special place" in message
-    assert "Ausstellung" in message
-    assert "Bibliothek" in message
-    assert "A carful organizer" in message
+    message_body = message['TextBody']
+    assert "My special event" in message_body
+    assert "My event is exceptional." in message_body
+    assert "A special place" in message_body
+    assert "Ausstellung" in message_body
+    assert "Bibliothek" in message_body
+    assert "A carful organizer" in message_body
     assert "info@myevents.ch" in preview_page
     assert "+41 76 111 22 33" in preview_page
     assert "{} 18:00 - 22:00".format(
@@ -561,7 +586,7 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     ) in ticket_page
     for d in next_dates + [start_date]:
         assert d.strftime('%d.%m.%Y') in ticket_page
-    assert "Ihre Veranstaltung wurde angenommen" in message
+    assert "Ihre Veranstaltung wurde angenommen" in message_body
 
     # Close ticket
     ticket_page.click("Ticket abschliessen").follow()
@@ -577,11 +602,13 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     confirmation_page = client.get(confirmation_page.request.url)
     assert "Ihr Anliegen wurde abgeschlossen" in confirmation_page
     assert "Bearbeiten Sie diese Veranstaltung." not in confirmation_page
-    assert client.get(form_page.request.url, expect_errors=True).status_code \
-        == 403
+    assert client.get(
+        form_page.request.url,
+        expect_errors=True
+    ).status_code == 403
 
 
-def test_edit_event(client):
+def test_edit_event(client: Client) -> None:
 
     # Submit and publish an event
     form_page = client.get('/events').click("Veranstaltung erfassen")
@@ -631,7 +658,7 @@ def test_edit_event(client):
     assert "Stadtfest" in client.get('/events')
 
 
-def test_delete_event(client):
+def test_delete_event(client: Client) -> None:
 
     # Submit and publish an event
     form_page = client.get('/events').click("Veranstaltung erfassen")
@@ -660,8 +687,8 @@ def test_delete_event(client):
     # Try to delete a submitted event directly
     event_page = editor.get('/events').click("My Event")
 
-    assert "Diese Veranstaltung kann nicht gelöscht werden." in \
-        event_page.pyquery('a.delete-link')[0].values()
+    assert ("Diese Veranstaltung kann nicht gelöscht werden."
+        ) in event_page.pyquery('a.delete-link')[0].values()
 
     # Test OpenGraph Tags
     assert get_meta(event_page, 'og:image:alt') == 'test.jpg'
@@ -673,18 +700,19 @@ def test_delete_event(client):
 
     assert len(os.listdir(client.app.maildir)) == 3
     message = client.get_email(2)
+    assert message is not None
     assert message['To'] == "test@example.org"
-    message = message['TextBody']
-    assert "My Event" in message
-    assert "Ihre Veranstaltung musste leider abgelehnt werden" in message
-    assert ticket_nr in message
+    message_body = message['TextBody']
+    assert "My Event" in message_body
+    assert "Ihre Veranstaltung musste leider abgelehnt werden" in message_body
+    assert ticket_nr in message_body
 
     assert "My Event" not in client.get('/events')
 
     # Delete a non-submitted event
     event_page = editor.get('/events').click("Generalversammlung")
-    assert "Möchten Sie die Veranstaltung wirklich löschen?" in \
-        event_page.pyquery('a.delete-link')[0].values()
+    assert ("Möchten Sie die Veranstaltung wirklich löschen?"
+        ) in event_page.pyquery('a.delete-link')[0].values()
 
     delete_link = event_page.pyquery('a.delete-link').attr('ic-delete-from')
     editor.delete(delete_link)
@@ -692,7 +720,7 @@ def test_delete_event(client):
     assert "Generalversammlung" not in editor.get('/events')
 
 
-def test_import_export_events(client):
+def test_import_export_events(client: Client) -> None:
     session = client.app.session()
     for event in session.query(Event):
         session.delete(event)
@@ -776,13 +804,14 @@ def test_import_export_events(client):
     }
 
 
-def test_import_export_events_with_custom_tags(client):
+def test_import_export_events_with_custom_tags(client: Client) -> None:
     session = client.app.session()
     for event in session.query(Event):
         session.delete(event)
     transaction.commit()
 
     fs = client.app.filestorage
+    assert fs is not None
     data = {
         'event_tags': ['Singing', 'Christmas']
     }
@@ -867,8 +896,9 @@ def test_import_export_events_with_custom_tags(client):
     }
 
 
-def test_event_form_with_custom_lead(client):
+def test_event_form_with_custom_lead(client: Client) -> None:
     fs = client.app.filestorage
+    assert fs is not None
     data = {
         'event_form_lead': 'A completely different lead text'
     }
