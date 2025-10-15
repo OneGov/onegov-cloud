@@ -69,6 +69,7 @@ $.Redactor.opts.langs['it'] = {
 	deleted: 'Eliminato',
 	anchor: 'Ancora',
 	link_new_tab: 'Apri il link in una nuova scheda',
+	link_select_page: 'Seleziona una pagina...',
 	underline: 'Sottolinea',
 	alignment: 'Allineamento',
 	filename: 'Nome (facoltativo)',
