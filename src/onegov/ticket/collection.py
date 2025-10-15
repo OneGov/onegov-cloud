@@ -299,6 +299,8 @@ class TicketInvoiceCollection(
     InvoiceCollection[TicketInvoice, TicketInvoiceItem]
 ):
 
+    batch_size = 50
+
     def __init__(
         self,
         session: Session,

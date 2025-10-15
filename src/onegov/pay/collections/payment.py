@@ -32,6 +32,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
     """
 
     page: int
+    batch_size = 50
 
     def __init__(
         self,
