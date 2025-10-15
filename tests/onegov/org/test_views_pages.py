@@ -277,7 +277,9 @@ def test_delete_pages(client: Client) -> None:
     )
     # we add a file attachment to ensure we can delete a page, even if
     # it contains file attachments
-    new_page.form.set('files', [Upload('test.txt')], -1)
+    new_page.form.set('files', [
+        Upload('test.txt', b'foo', 'text/plain')
+    ], -1)
     page = new_page.form.submit().follow()
     delete_link = page.pyquery('a[ic-delete-from]')[0].attrib['ic-delete-from']
 

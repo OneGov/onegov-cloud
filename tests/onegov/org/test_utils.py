@@ -357,8 +357,12 @@ def test_extract_categories_and_subcategories() -> None:
         ['a', 'b', 'c', 'd'],
         [['a1', 'a2'], ['b1'], [], []]
     )
-    assert utils.extract_categories_and_subcategories(
-        categories, flattened=True) == ['a', 'b', 'c', 'd', 'a1', 'a2', 'b1']
+    assert utils.extract_categories_and_subcategories([
+        {'a': ['a1', 'a2']},
+        {'b': ['b1']},
+        {'c': []},
+        'd'
+    ], flattened=True) == ['a', 'b', 'c', 'd', 'a1', 'a2', 'b1']
 
 
 def test_format_phone_number() -> None:

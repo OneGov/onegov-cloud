@@ -393,11 +393,11 @@ def test_submit_event(
 ) -> None:
 
     if skip:
-        client.login_admin()
-        settings = client.get('/ticket-settings')
+        admin = client.spawn()
+        admin.login_admin()
+        settings = admin.get('/ticket-settings')
         settings.form['tickets_skip_opening_email'] = ['EVN']
         settings.form.submit()
-        client = client.spawn()
 
     form_page = client.get('/events').click("Veranstaltung erfassen")
 
@@ -569,7 +569,6 @@ def test_submit_event(
 
     assert len(os.listdir(client.app.maildir)) == 2
     message = client.get_email(1)
-    assert message is not None
     assert message['To'] == "test@example.org"
     message_body = message['TextBody']
     assert "My special event" in message_body
@@ -587,14 +586,13 @@ def test_submit_event(
     ) in ticket_page
     for d in next_dates + [start_date]:
         assert d.strftime('%d.%m.%Y') in ticket_page
-    assert "Ihre Veranstaltung wurde angenommen" in message
+    assert "Ihre Veranstaltung wurde angenommen" in message_body
 
     # Close ticket
     ticket_page.click("Ticket abschliessen").follow()
 
     assert len(os.listdir(client.app.maildir)) == 3
     message = client.get_email(2)
-    assert message is not None
     assert message['To'] == "test@example.org"
     assert "Ihre Anfrage wurde abgeschlossen" in message['TextBody']
 

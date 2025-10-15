@@ -2528,15 +2528,15 @@ def test_wil_daily_event_import(
         2
     )
     collection = EventCollection(session)
-    assert occurrences.query().count() == 4
+    assert collection.query().count() == 4
 
     added, updated, purged = collection.from_minasa(xml_2.encode('utf-8'))
 
     assert len(added) == 0  # number of event schedules
     assert len(updated) == 0
     assert len(purged) == 2
-    assert occurrences.query().count() == 2
-    assert [o.title for o in occurrences.query()] == [
+    assert collection.query().count() == 2
+    assert [o.title for o in collection.query()] == [
         '100 Meter Race of the Year',
         '100 Meter Race of the Year'
     ]

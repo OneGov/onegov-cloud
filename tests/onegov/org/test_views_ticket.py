@@ -866,20 +866,19 @@ def test_assign_tickets(client: Client) -> None:
 
 
 def test_bcc_field_in_ticket_message(client: Client) -> None:
+    anon = client.spawn()
+    editor = client.spawn()
 
     client.login_admin()
-
     form_page = client.get('/forms/new')
     form_page.form['title'] = "Newsletter"
     form_page.form['definition'] = "E-Mail *= @@@"
     form_page.form.submit()
 
-    anon = client.spawn()
     form_page = anon.get('/form/newsletter')
     form_page.form['e_mail'] = 'anonymer-user@example.ch'
     form_page.form.submit().follow().form.submit().follow()
 
-    client.login_admin()
     tickets_page = client.get('/tickets/ALL/open')
     ticket_page = tickets_page.click('Annehmen').follow()
     ticket_url = ticket_page.request.url
@@ -890,8 +889,7 @@ def test_bcc_field_in_ticket_message(client: Client) -> None:
     page.form.get('notify').checked = True
     page.form.submit()
 
-    client.login_editor()
-    message = client.get_email(1)
+    message = client.get_email(1, flush_queue=True)
 
     assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
     assert message['Bcc'] == 'editor@example.org'
@@ -906,7 +904,8 @@ def test_bcc_field_in_ticket_message(client: Client) -> None:
     status_link = extract_link(body)
     assert status_link is not None
 
-    status_page = client.get(status_link)
+    editor.login_editor()
+    status_page = editor.get(status_link)
     assert 'fügen Sie der Anfrage eine Nachricht hinzu' in status_page.text
 
     # test the reply feature now
@@ -931,26 +930,22 @@ def test_bcc_field_in_ticket_message(client: Client) -> None:
     assert last_msg.owner == 'editor@example.org'
 
     # test invalid email
-    client.login_admin()
+    page = client.get(ticket_url).click("Nachricht senden")
     page.form['text'] = "'Bcc' — the photo-bomber of the email world."
     with pytest.raises(ValueError):
         page.form['email_bcc'] = ['not_an_email']
 
-    # test multiple CC
-    # this is not set correctly (Only one email is set), reason unclear
-    page.form['email_bcc'].select_multiple(texts=[
-        'editor@example.org', 'member@example.org'
-    ])
+    # test multiple BCC
+    page.form['email_bcc'] = [
+        'editor@example.org',
+        'member@example.org'
+    ]
     page.form.get('notify').checked = True
     page.form.submit()
 
-    client.login_editor()
-    message = client.get_email(1)
+    message = client.get_email(1, flush_queue=True)
     assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
     assert 'editor@example.org' in message['Bcc']
-    client.login_member()
-    message = client.get_email(1)
-    assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
     assert 'member@example.org' in message['Bcc']
 
 

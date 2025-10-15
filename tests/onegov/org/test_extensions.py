@@ -348,7 +348,7 @@ def test_contact_extension(org_app: TestOrgApp) -> None:
     class TopicForm(Form):
         pass
 
-    topic = Topic(name='test')
+    topic = Topic(title='test')
     assert topic.contact is None
     assert topic.contact_html is None
 
@@ -408,7 +408,7 @@ def test_contact_extension_with_top_level_domain_agency(
     class TopicForm(Form):
         pass
 
-    topic = Topic(name='test')
+    topic = Topic(title='test')
 
     assert topic.contact is None
     assert topic.contact_html is None
@@ -544,7 +544,7 @@ def test_honeypot_extension() -> None:
     form2 = form_class2()
     form2.model = submission
     form2.on_request()  # type: ignore[attr-defined]
-    assert 'duplicate_of' in form
+    assert 'duplicate_of' in form2
 
     # ... don't add
     submission.honeypot = False
