@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 
 from itertools import groupby
-from queue import Queue, Full
+from queue import Empty, Queue, Full
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import index_log, log, Searchable, utils
 from onegov.search.search_index import SearchIndex
@@ -390,10 +390,14 @@ class Indexer:
         """
 
         def task_generator() -> Iterator[Task]:
-            while not self.queue.empty():
-                task = self.queue.get(block=False, timeout=None)
-                self.queue.task_done()
-                yield task
+            while True:
+                try:
+                    task = self.queue.get(block=False, timeout=None)
+                except Empty:
+                    break
+                else:
+                    self.queue.task_done()
+                    yield task
 
         grouped_tasks = groupby(
             task_generator(),
