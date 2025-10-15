@@ -385,25 +385,31 @@ class TicketInvoiceCollection(
         if self.reservation_start or self.reservation_end:
             from onegov.reservation import Reservation
 
-            subquery = self.session.query(Reservation.id)
-            subquery = subquery.join(
+            reservations = self.session.query(
+                func.max(Reservation.end).label('reference_date'),
+                TicketInvoiceItem.invoice_id,
+            ).join(
                 TicketInvoiceItem,
                 Reservation.id == TicketInvoiceItem.reservation_id
-            )
+            ).group_by(
+                TicketInvoiceItem.invoice_id
+            ).subquery()
+
+            subquery = self.session.query(reservations.c.invoice_id)
             subquery = subquery.filter(
-                TicketInvoiceItem.invoice_id == TicketInvoice.id
+                reservations.c.invoice_id == TicketInvoice.id
             )
 
             if self.reservation_start is not None:
                 subquery = subquery.filter(
-                    Reservation.end >= self.align_date(
+                    reservations.c.reference_date >= self.align_date(
                         self.reservation_start,
                         'down'
                     )
                 )
             if self.reservation_end is not None:
                 subquery = subquery.filter(
-                    Reservation.start <= self.align_date(
+                    reservations.c.reference_date <= self.align_date(
                         self.reservation_end,
                         'up'
                     )
