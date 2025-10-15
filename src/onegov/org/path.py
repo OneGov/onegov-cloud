@@ -910,6 +910,7 @@ def get_payment(app: OrgApp, id: UUID) -> Payment | None:
         'end': datetime_converter,
         'status': str,
         'payment_type': str,
+        'ticket_group': [str],
         'ticket_start': extended_date_converter,
         'ticket_end': extended_date_converter,
         'reservation_start': extended_date_converter,
@@ -924,7 +925,7 @@ def get_payments(
     end: datetime | None = None,
     status: str | None = None,
     payment_type: str | None = None,
-    ticket_group: str | None = None,
+    ticket_group: list[str] | None = None,
     ticket_start: date | None = None,
     ticket_end: date | None = None,
     reservation_start: date | None = None,
@@ -951,6 +952,7 @@ def get_payments(
     path='/invoices',
     converters={
         'page': int,
+        'ticket_group': [str],
         'ticket_start': extended_date_converter,
         'ticket_end': extended_date_converter,
         'reservation_start': extended_date_converter,
@@ -961,7 +963,7 @@ def get_payments(
 def get_invoices(
     app: OrgApp,
     page: int = 0,
-    ticket_group: str | None = None,
+    ticket_group: list[str] | None = None,
     ticket_start: date | None = None,
     ticket_end: date | None = None,
     reservation_start: date | None = None,

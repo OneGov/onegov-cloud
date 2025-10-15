@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from onegov.core.utils import normalize_for_url
 from onegov.form.core import Form
-from onegov.form.fields import ChosenSelectField, TranslatedSelectField
+from onegov.form.fields import ChosenSelectMultipleField, TranslatedSelectField
 from onegov.form.validators import StrictOptional
 from onegov.org import _
 from onegov.ticket import handlers as ticket_handlers
@@ -76,11 +76,6 @@ def get_ticket_group_choices(request: CoreRequest) -> list[_Choice]:
             for group in handler_groups
         )
 
-    choices.insert(0, (
-        '',
-        request.translate(_('All Tickets')),
-        {'class': 'ALL-link'}
-    ))
     return choices
 
 
@@ -100,11 +95,10 @@ class TicketInvoiceSearchForm(Form):
         default=None,
     )
 
-    ticket_group = ChosenSelectField(
+    ticket_group = ChosenSelectMultipleField(
         label=_('Ticket category'),
         fieldset=_('Filter Invoices'),
         choices=[],
-        default='ALL',
     )
 
     ticket_start_date = DateField(
@@ -141,7 +135,7 @@ class TicketInvoiceSearchForm(Form):
     def apply_model(self, model: TicketInvoiceCollection) -> None:
         """Populate the form fields from the model's filter values."""
         self.invoiced.data = model.invoiced
-        self.ticket_group.data = model.ticket_group or ''
+        self.ticket_group.data = model.ticket_group or []
         self.ticket_start_date.data = model.ticket_start
         self.ticket_end_date.data = model.ticket_end
         self.reservation_start_date.data = model.reservation_start
@@ -150,7 +144,7 @@ class TicketInvoiceSearchForm(Form):
     def update_model(self, model: TicketInvoiceCollection) -> None:
         """Update the model's filter values from the form's data."""
         model.invoiced = self.invoiced.data
-        model.ticket_group = self.ticket_group.data or None
+        model.ticket_group = self.ticket_group.data or []
         model.ticket_start = self.ticket_start_date.data
         model.ticket_end = self.ticket_end_date.data
         model.reservation_start = self.reservation_start_date.data
@@ -186,11 +180,10 @@ class PaymentSearchForm(Form):
         default='',
     )
 
-    ticket_group = ChosenSelectField(
+    ticket_group = ChosenSelectMultipleField(
         label=_('Ticket category'),
         fieldset=_('Filter Payments'),
         choices=[],
-        default='ALL',
     )
 
     ticket_start_date = DateField(
@@ -226,7 +219,7 @@ class PaymentSearchForm(Form):
         self.reservation_start_date.data = model.reservation_start
         self.reservation_end_date.data = model.reservation_end
         self.status.data = model.status or ''
-        self.ticket_group.data = model.ticket_group
+        self.ticket_group.data = model.ticket_group or []
         self.ticket_start_date.data = model.ticket_start
         self.ticket_end_date.data = model.ticket_end
         self.payment_type.data = model.payment_type or ''
@@ -236,7 +229,7 @@ class PaymentSearchForm(Form):
         model.reservation_start = self.reservation_start_date.data
         model.reservation_end = self.reservation_end_date.data
         model.status = self.status.data or None
-        model.ticket_group = self.ticket_group.data or None
+        model.ticket_group = self.ticket_group.data or []
         model.ticket_start = self.ticket_start_date.data
         model.ticket_end = self.ticket_end_date.data
         model.payment_type = self.payment_type.data or None
