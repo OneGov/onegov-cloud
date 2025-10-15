@@ -11,7 +11,7 @@ from onegov.ticket import handlers as global_handlers
 from onegov.ticket.models.invoice import TicketInvoice
 from onegov.ticket.models.invoice_item import TicketInvoiceItem
 from onegov.ticket.models.ticket import Ticket
-from sqlalchemy import desc, func
+from sqlalchemy import and_, desc, func, or_
 from sqlalchemy.orm import contains_eager, joinedload, selectinload, undefer
 from uuid import UUID
 
@@ -305,7 +305,7 @@ class TicketInvoiceCollection(
         self,
         session: Session,
         page: int = 0,
-        ticket_group: str | None = None,
+        ticket_group: list[str] | None = None,
         ticket_start: date | None = None,
         ticket_end: date | None = None,
         reservation_start: date | None = None,
@@ -315,7 +315,7 @@ class TicketInvoiceCollection(
         Pagination.__init__(self, page)
         self.session = session
         self.invoiced = invoiced
-        self.ticket_group = ticket_group
+        self.ticket_group = ticket_group or []
         self.ticket_start = ticket_start
         self.ticket_end = ticket_end
         self.reservation_start = reservation_start
@@ -357,11 +357,16 @@ class TicketInvoiceCollection(
             query = query.filter(TicketInvoice.invoiced == self.invoiced)
 
         if self.ticket_group:
-            handler_code, *remainder = self.ticket_group.split('-', 1)
-            query = query.filter(Ticket.handler_code == handler_code)
-            if remainder:
-                group, = remainder
-                query = query.filter(Ticket.group == group)
+            conditions = []
+            for group in self.ticket_group:
+                handler_code, *remainder = group.split('-', 1)
+                condition = Ticket.handler_code == handler_code
+                if remainder:
+                    group, = remainder
+                    condition = and_(condition, Ticket.group == group)
+                conditions.append(condition)
+
+            query = query.filter(or_(*conditions))
 
         # Filter payments by each associated ticket creation date
         if self.ticket_start is not None:
