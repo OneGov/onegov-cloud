@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-09-29 16:14+0200\n"
+"POT-Creation-Date: 2025-10-15 15:02+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1067,6 +1067,16 @@ msgstr "Adresse e-mail de réponse (Reply-To)"
 
 msgid "Replies to automated e-mails go to this address."
 msgstr "Les réponses aux e-mails automatisés sont envoyées à cette adresse."
+
+msgid "Custom text above the footer"
+msgstr "Texte personnalisé au-dessus du pied de page"
+
+msgid ""
+"This text is shown above the footer in the ticket opening notification e-"
+"mail."
+msgstr ""
+"Ce texte est affiché au-dessus du pied de page dans l'e-mail de notification "
+"d'ouverture du ticket."
 
 msgid "Show VAT"
 msgstr "Afficher la TVA"
