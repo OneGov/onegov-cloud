@@ -151,10 +151,16 @@ def send_daily_newsletter(request: OrgRequest) -> None:
             else:
                 start = end - timedelta(
                     hours=current_hour_tz - times[index - 1])
-            news = request.session.query(News).filter(
+            news = request.session.query(News.id).filter(
                 News.published.is_(True),
                 News.published_or_created.between(start, end),
             )
+            if request.app.org.secret_content_allowed:
+                news = news.filter(
+                    News.access.in_(('public', 'secret'))  # type: ignore[union-attr]
+                )
+            else:
+                news = news.filter(News.access == 'public')
 
             recipients = RecipientCollection(
                 request.session).query().filter(
@@ -171,7 +177,7 @@ def send_daily_newsletter(request: OrgRequest) -> None:
                 )
                 newsletters = NewsletterCollection(request.session)
                 newsletter = newsletters.add(title=title, html=Markup(''))
-                newsletter.content['news'] = [n.id for n in news.all()]
+                newsletter.content['news'] = [news_id for news_id, in news]
 
                 send_newsletter(request=request, newsletter=newsletter,
                                 recipients=recipients.all(), daily=True)
