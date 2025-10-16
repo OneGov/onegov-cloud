@@ -90,6 +90,7 @@ def send_ticket_notifications(
 
 def handle_pdf_response(
     self: TicketInvoiceCollection,
+    form: TicketInvoiceSearchForm,
     request: OrgRequest
 ) -> WebobResponse:
     # Export a pdf of all invoiced, without pagination limit
@@ -104,7 +105,7 @@ def handle_pdf_response(
         return request.redirect(request.class_link(PaymentCollection))
 
     filename = 'Payments.pdf'
-    multi_pdf = TicketsPdf.from_tickets(request, tickets)
+    multi_pdf = TicketsPdf.from_tickets(request, tickets, form)
     return Response(
         multi_pdf.read(),
         content_type='application/pdf',
@@ -259,9 +260,6 @@ def view_invoices(
 
     layout = layout or TicketInvoiceCollectionLayout(self, request)
 
-    if request.params.get('format') == 'pdf':
-        return handle_pdf_response(self, request)
-
     if form.submitted(request):
         form.update_model(self)
         return request.redirect(request.link(self))
@@ -269,6 +267,9 @@ def view_invoices(
     request.include('invoicing')
     if not form.errors:
         form.apply_model(self)
+
+        if request.GET.get('format') == 'pdf':
+            return handle_pdf_response(self, form, request)
 
     # Process reservation dates into a display-ready format
     reservation_dates = self.reservation_dates_by_batch()
