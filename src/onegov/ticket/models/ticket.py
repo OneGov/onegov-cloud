@@ -64,6 +64,14 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     #: belonging to one specific handler (handler -> group -> title)
     group: Column[str] = Column(Text, nullable=False)
 
+    #: several tickets can belong to the same order, they will show up
+    #: as related tickets
+    order_id: Column[uuid.UUID | None] = Column(
+        UUID,  # type: ignore[arg-type]
+        nullable=True,
+        index=True
+    )
+
     #: Tags/Categories of the ticket
     _tags: Column[dict[str, str] | None] = Column(  # type: ignore[call-overload]
         MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
