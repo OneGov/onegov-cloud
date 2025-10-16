@@ -155,6 +155,12 @@ def send_daily_newsletter(request: OrgRequest) -> None:
                 News.published.is_(True),
                 News.published_or_created.between(start, end),
             )
+            if request.app.org.secret_content_allowed:
+                news = news.filter(
+                    News.access.in_(('public', 'secret'))  # type: ignore[union-attr]
+                )
+            else:
+                news = news.filter(News.access == 'public')
 
             recipients = RecipientCollection(
                 request.session).query().filter(
