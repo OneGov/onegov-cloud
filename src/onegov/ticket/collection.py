@@ -68,6 +68,11 @@ class TicketCollectionPagination(Pagination[Ticket]):
         return (
             isinstance(other, TicketCollection)
             and self.state == other.state
+            and self.handler == other.handler
+            and self.group == other.group
+            and self.owner == other.owner
+            and self.submitter == other.submitter
+            and self.extra_parameters == other.extra_parameters
             and self.page == other.page
         )
 
@@ -146,8 +151,8 @@ class TicketCollectionPagination(Pagination[Ticket]):
 
     def for_submitter(self, submitter: str) -> Self:
         return self.__class__(
-            self.session, 0, self.state, self.handler, self.group, self.owner,
-            submitter, self.extra_parameters
+            self.session, 0, self.state, self.handler, self.group,
+            self.owner, submitter, self.extra_parameters
         )
 
     def groups_by_handler_code(self) -> Query[tuple[str, list[str]]]:
@@ -224,6 +229,7 @@ class TicketCollection(TicketCollectionPagination):
         self,
         handler_code: str,
         handler_id: str,
+        order_id: UUID | None = None,
         **handler_data: Any
     ) -> Ticket:
         """ Opens a new ticket using the given handler. """
@@ -234,6 +240,7 @@ class TicketCollection(TicketCollectionPagination):
         # add it to the session before invoking the handler, who expects
         # each ticket to belong to a session already
         self.session.add(ticket)
+        ticket.order_id = order_id
         ticket.handler_id = handler_id
         ticket.handler_code = handler_code
         ticket.handler_data = handler_data
@@ -285,6 +292,9 @@ class TicketCollection(TicketCollectionPagination):
     def by_ticket_email(self, ticket_email: str) -> Query[Ticket]:
         return self.query().filter(
             func.lower(Ticket.ticket_email) == ticket_email.lower())
+
+    def by_order(self, order_id: UUID) -> Query[Ticket]:
+        return self.query().filter(Ticket.order_id == order_id)
 
 
 # FIXME: Why is this its own subclass? shouldn't this at least override
