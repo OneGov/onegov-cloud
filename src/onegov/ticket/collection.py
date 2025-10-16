@@ -310,10 +310,12 @@ class TicketInvoiceCollection(
         ticket_end: date | None = None,
         reservation_start: date | None = None,
         reservation_end: date | None = None,
+        has_payment: bool | None = None,
         invoiced: bool | None = None,
     ) -> None:
         Pagination.__init__(self, page)
         self.session = session
+        self.has_payment = has_payment
         self.invoiced = invoiced
         self.ticket_group = ticket_group or []
         self.ticket_start = ticket_start
@@ -352,6 +354,11 @@ class TicketInvoiceCollection(
             selectinload(TicketInvoice.items),
             contains_eager(TicketInvoice.ticket)
         )
+
+        if self.has_payment is True:
+            query = query.filter(Ticket.payment_id.isnot(None))
+        elif self.has_payment is False:
+            query = query.filter(Ticket.payment_id.is_(None))
 
         if self.invoiced is not None:
             query = query.filter(TicketInvoice.invoiced == self.invoiced)
@@ -432,6 +439,7 @@ class TicketInvoiceCollection(
             ticket_end=self.ticket_end,
             reservation_start=self.reservation_start,
             reservation_end=self.reservation_end,
+            has_payment=self.has_payment,
             invoiced=self.invoiced
         )
 
@@ -464,6 +472,7 @@ class TicketInvoiceCollection(
         return (
             isinstance(other, TicketInvoiceCollection)
             and self.page == other.page
+            and self.has_payment is other.has_payment
             and self.invoiced is other.invoiced
             and self.ticket_group == other.ticket_group
             and self.ticket_start == other.ticket_start
@@ -481,5 +490,6 @@ class TicketInvoiceCollection(
             ticket_end=self.ticket_end,
             reservation_start=self.reservation_start,
             reservation_end=self.reservation_end,
-            invoiced=invoiced
+            has_payment=self.has_payment,
+            invoiced=invoiced,
         )
