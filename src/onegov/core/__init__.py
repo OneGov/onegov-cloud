@@ -73,6 +73,7 @@ LEVELS = (
     ),
 )
 
+import email_validator
 import logging
 import warnings
 
@@ -89,6 +90,9 @@ ignored_warnings = (
 
 for message in ignored_warnings:
     warnings.filterwarnings('ignore', message=message)
+
+# we don't want to spend the extra I/O overhead on checking deliverability
+email_validator.CHECK_DELIVERABILITY = False
 
 from onegov.core.framework import Framework
 from onegov.core.filestorage import get_filestorage_file  # noqa: F401
