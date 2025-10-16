@@ -196,13 +196,7 @@ class TranslatorLayout(DefaultLayout):
                 )
             ]
         elif self.request.is_member:
-            return [
-                Link(
-                    _('Report change'),
-                    self.request.link(self.model, name='report-change'),
-                    attrs={'class': 'report-change'}
-                )
-            ]
+            return []
         elif self.translator_data_outdated():
             return [
                 Link(

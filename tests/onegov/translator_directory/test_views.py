@@ -1009,115 +1009,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     page.form['password'] = 'p@ssw0rd'
     page.form.submit()
 
-    # Report changes as member
-    client.login_member()
-    page = client.get('/').maybe_follow().click('BOB, Uncle')
-    page = page.click('Mutation melden')
-    page.form['submitter_message'] = 'Hallo!'
-    page.form['first_name'] = 'Aunt'
-    page.form['last_name'] = 'Anny'
-    page.form['pers_id'] = 123456
-    page.form['admission'] = 'in_progress'
-    page.form['gender'] = 'F'
-    page.form['withholding_tax'] = True
-    page.form['self_employed'] = True
-    page.form['date_of_birth'] = '1960-01-01'
-    page.form['nationalities'] = ['CH', 'AT']
-    page.form['coordinates'] = encode_map_value({
-        'lat': 47, 'lon': 8, 'zoom': 13
-    })
-    page.form['address'] = 'Fakestreet 321'
-    page.form['zip_code'] = '6010'
-    page.form['city'] = 'Kriens'
-    page.form['tel_private'] = '+41412223347'
-    page.form['tel_mobile'] = '+41412223348'
-    page.form['tel_office'] = '+41412223349'
-    page.form['availability'] = 'Nie'
-    page.form['hometown'] = 'Gersau'
-    page.form['mother_tongues'] = language_ids[1:3]
-    page.form['spoken_languages'] = language_ids[0:2]
-    page.form['written_languages'] = language_ids[2:4]
-    page.form['monitoring_languages'] = language_ids[0:4]
-    page.form['expertise_interpreting_types'].select_multiple([
-        'consecutive', 'negotiation'
-    ])
-    page.form['expertise_professional_guilds'].select_multiple([
-        'economy', 'art_leisure'
-    ])
-    page.form['expertise_professional_guilds_other'] = ['Exorzismus']
-    with patch(
-            'onegov.gis.utils.MapboxRequests.directions',
-            return_value=FakeResponse({
-                'code': 'Ok',
-                'routes': [{'distance': 2000}]
-            })
-    ):
-        page = page.form.submit().follow()
-        assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
-
-    mail = client.get_email(0, flush_queue=True)
-    assert mail['To'] == 'member@example.org'
-    assert 'BOB, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
-
-    assert connect.call_count == 1
-    assert authenticate.call_count == 1
-    assert broadcast.call_count == 1
-    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
-    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
-    assert broadcast.call_args[0][3]['created']
-
-    client.logout()
-    client.login_admin()
-    page = client.get('/tickets/ALL/open').click('Annehmen').follow()
-
-    assert 'Briefvorlagen' in page
-    mail_templates_link = page.pyquery('a.envelope')[0].attrib['href']
-    resp = client.request(mail_templates_link)
-    assert resp.status_code == 200
-
-    assert 'Hallo!' in page
-    assert 'Vorname: Aunt' in page
-    assert 'Nachname: Anny' in page
-    assert 'Personal Nr.: 123456' in page
-    assert 'Zulassung: im Zulassungsverfahren' in page
-    assert 'Geschlecht: Weiblich' in page
-    assert 'Quellensteuer: Ja' in page
-    assert 'Selbständig: Ja' in page
-    assert 'Geburtsdatum: 1960-01-01' in page
-    assert 'Nationalität(en): Schweiz, Österreich' in page
-    assert 'Standort: 47, 8' in page
-    assert 'Strasse und Hausnummer: Fakestreet 321' in page
-    assert 'PLZ: 6010' in page
-    assert 'Ort: Kriens' in page
-    assert 'Gersau' in page
-    assert 'Fahrdistanz (km): 2.0' in page
-    assert 'Telefon Privat: +41412223347' in page
-    assert 'Telefon Mobile: +41412223348' in page
-    assert 'Telefon Geschäft: +41412223349' in page
-    assert 'Erreich- und Verfügbarkeit: Nie' in page
-    assert 'Muttersprachen: French, Italian' in page
-    assert 'Arbeitssprache - Wort: French, German' in page
-    assert 'Arbeitssprache - Schrift: Arabic, Italian' in page
-    assert (
-        'Arbeitssprache - Kommunikationsüberwachung: '
-        'Arabic, French, German, Italian'
-    ) in page
-    assert (
-        'Fachkenntnisse nach Dolmetscherart: Konsektutivdolmetschen, '
-        'Verhandlungsdolmetschen'
-    ) in page
-    assert (
-        'Fachkenntnisse nach Berufssparte: Wirtschaft, Kunst und Freizeit'
-    ) in page
-    assert 'Fachkenntnisse nach Berufssparte: andere: Exorzismus' in page
-    page.click('Ticket abschliessen')
-
-    mail = client.get_email(0, flush_queue=True)
-    assert mail['To'] == 'member@example.org'
-    assert 'BOB, Uncle: Ihre Anfrage wurde abgeschlossen' in mail['Subject']
-
     # Report change as editor
-    client.logout()
     client.login_editor()
     page = client.get('/').maybe_follow().click('BOB, Uncle')
     page = page.click('Mutation melden')
@@ -1173,9 +1065,9 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert mail['To'] == 'editor@example.org'
     assert 'BOB, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
 
-    assert connect.call_count == 2
-    assert authenticate.call_count == 2
-    assert broadcast.call_count == 2
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
     assert broadcast.call_args[0][3]['event'] == 'browser-notification'
     assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
     assert broadcast.call_args[0][3]['created']
@@ -1297,9 +1189,9 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert mail['To'] == 'test@test.com'
     assert 'BOB, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
 
-    assert connect.call_count == 3
-    assert authenticate.call_count == 3
-    assert broadcast.call_count == 3
+    assert connect.call_count == 2
+    assert authenticate.call_count == 2
+    assert broadcast.call_count == 2
     assert broadcast.call_args[0][3]['event'] == 'browser-notification'
     assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
     assert broadcast.call_args[0][3]['created']
@@ -1514,9 +1406,8 @@ def test_translator_mutation_with_document_upload(
         assert 'hinzugefügt' in page.form.submit().follow()
 
     initial_file_count = session.query(File).count()
-
     client.logout()
-    client.login_member()
+    client.login_editor()
     page = client.get('/').maybe_follow().click('BOB, Uncle')
     page = page.click('Mutation melden')
     page.form['submitter_message'] = 'Uploading new certificate!'
