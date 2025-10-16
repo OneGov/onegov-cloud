@@ -658,6 +658,7 @@ class TicketsPdf(TicketPdf):
         request: OrgRequest
     ) -> None:
         if not any((
+            form.has_payment.data is not None,
             form.ticket_group.data,
             form.ticket_start_date.data,
             form.ticket_end_date.data,
@@ -670,6 +671,11 @@ class TicketsPdf(TicketPdf):
         self.h1(_('Filters'))
 
         data: list[list[str | Paragraph]] = []
+        if form.has_payment.data is not None:
+            data.append([
+                self.translate(form.has_payment.label.text),
+                '> 0.00' if form.has_payment.data else '≤ 0.00'
+            ])
         if form.ticket_group.data:
             label_dict = {
                 value: label

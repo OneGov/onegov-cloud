@@ -95,6 +95,18 @@ class TicketInvoiceSearchForm(Form):
         default=None,
     )
 
+    has_payment = TranslatedSelectField(
+        label=_('Net Amount'),
+        fieldset=_('Filter Invoices'),
+        choices=[
+            ('None', _('All')),
+            ('True', '> 0.00'),
+            ('False', '≤ 0.00'),
+        ],
+        coerce=coerce_optional_bool,
+        default=None,
+    )
+
     ticket_group = ChosenSelectMultipleField(
         label=_('Ticket category'),
         fieldset=_('Filter Invoices'),
@@ -134,6 +146,7 @@ class TicketInvoiceSearchForm(Form):
 
     def apply_model(self, model: TicketInvoiceCollection) -> None:
         """Populate the form fields from the model's filter values."""
+        self.has_payment.data = model.has_payment
         self.invoiced.data = model.invoiced
         self.ticket_group.data = model.ticket_group or []
         self.ticket_start_date.data = model.ticket_start
@@ -143,6 +156,7 @@ class TicketInvoiceSearchForm(Form):
 
     def update_model(self, model: TicketInvoiceCollection) -> None:
         """Update the model's filter values from the form's data."""
+        model.has_payment = self.has_payment.data
         model.invoiced = self.invoiced.data
         model.ticket_group = self.ticket_group.data or []
         model.ticket_start = self.ticket_start_date.data
