@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 
+from datetime import date
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.translator_directory import _
@@ -54,7 +55,9 @@ class TranslatorTimeReportForm(Form):
     )
 
     assignment_date = DateField(
-        label=_('Assignment date'), validators=[InputRequired()]
+        label=_('Assignment date'),
+        validators=[InputRequired()],
+        default=date.today,
     )
 
     is_night_work = BooleanField(
