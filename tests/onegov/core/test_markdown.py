@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from onegov.core.markdown import render_untrusted_markdown as render
-from mistletoe import HtmlRenderer  # type: ignore[import-untyped]
+from mistletoe import HtmlRenderer
 
 
 def test_render_untrusted_markdown() -> None:
