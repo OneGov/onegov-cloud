@@ -406,6 +406,13 @@ def add_new_invoice_columns(context: UpgradeContext) -> None:
     #       manual item can then be deleted afterwards.
     for ticket in (
         context.session.query(Ticket)
+        .options(
+            load_only(
+                Ticket.id,
+                Ticket.title,
+                Ticket.payment_id,
+            )
+        )
         .filter(Ticket.payment_id.isnot(None))
         .options(selectinload(Ticket.payment))
     ):
