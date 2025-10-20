@@ -18,7 +18,6 @@ from wtforms.validators import Optional
 
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from onegov.translator_directory.models.time_report import (
         TranslatorTimeReport,

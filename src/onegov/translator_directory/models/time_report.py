@@ -73,7 +73,7 @@ class TranslatorTimeReport(Base, TimestampMixin):
     notes: Column[str | None] = Column(Text)
 
     status: Column[TimeReportStatus] = Column(
-        Enum('pending', 'confirmed', name='time_report_status'),
+        Enum('pending', 'confirmed', name='time_report_status'),  # type: ignore[arg-type]
         nullable=False,
         default='pending',
     )
