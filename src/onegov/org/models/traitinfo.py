@@ -59,6 +59,7 @@ TRAIT_MESSAGES: dict[str, dict[str, str]] = {
         'new_page_title': _('Add iFrame'),
         'new_page_added': _('Added iFrame'),
         'edit_page_title': _('Edit iFrame'),
+        'move_page_title': _('Move iFrame'),
         'delete_message': _('The iFrame was deleted'),
         'delete_button': _('Delete iFrame'),
         'delete_question': _(
