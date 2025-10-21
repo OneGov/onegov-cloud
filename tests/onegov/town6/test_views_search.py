@@ -1,24 +1,25 @@
+from __future__ import annotations
+
 import textwrap
-import pytest
 import transaction
 
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
-
 from onegov.core.utils import module_path
 from onegov.file import FileCollection
 from onegov.form import FormCollection
-from onegov.org.models.page import Page
-
-from tests.onegov.org.common import get_cronjob_by_name
-from tests.onegov.org.common import get_cronjob_url
-from time import sleep
+from onegov.org.models.page import News, Page
 from sedate import utcnow
 from webtest import Upload
 
 
-def test_basic_search(client_with_fts):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_basic_search(client_with_fts: Client) -> None:
     client = client_with_fts
     client.login_admin()
     anom = client.spawn()
@@ -62,7 +63,7 @@ def test_basic_search(client_with_fts):
     assert "0 Resultate" in anom.get('/search?q=fulltext')
 
 
-def test_view_search_is_limiting(client_with_fts):
+def test_view_search_is_limiting(client_with_fts: Client) -> None:
     # ensures that the search doesn't just return all results
     # a regression that occurred for anonymous uses only
 
@@ -94,7 +95,7 @@ def test_view_search_is_limiting(client_with_fts):
     assert "1 Resultat" in search_page
 
 
-def test_search_recently_published_object(client_with_fts):
+def test_search_recently_published_object(client_with_fts: Client) -> None:
     client = client_with_fts
     client.login_admin()
     anom = client.spawn()
@@ -113,6 +114,7 @@ def test_search_recently_published_object(client_with_fts):
     page = session.query(Page).filter(
         Page.title == "Now supporting fulltext search"
     ).one()
+    assert isinstance(page, News)
     assert page.access == 'public'
     assert page.published == False
 
@@ -129,16 +131,10 @@ def test_search_recently_published_object(client_with_fts):
     ).one().publication_start = then
     transaction.commit()
 
-    # needed for ES
-    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
-    job.app = client.app
-    url = get_cronjob_url(job)
-    client.get(url)
-    sleep(5)
-
     page = session.query(Page).filter(
         Page.title == "Now supporting fulltext search"
     ).one()
+    assert isinstance(page, News)
     assert page.access == 'public'
     assert page.published == True
 
@@ -157,12 +153,10 @@ def test_search_recently_published_object(client_with_fts):
     ).one().publication_end = then
     transaction.commit()
 
-    client.get(url)
-    sleep(5)
-
     page = session.query(Page).filter(
         Page.title == "Now supporting fulltext search"
     ).one()
+    assert isinstance(page, News)
     assert page.access == 'public'
     assert page.published == False
 
@@ -172,7 +166,7 @@ def test_search_recently_published_object(client_with_fts):
     assert 'is pretty awesome' not in anom.get('/search?q=fulltext')
 
 
-def test_search_for_page_with_member_access(client_with_fts):
+def test_search_for_page_with_member_access(client_with_fts: Client) -> None:
     client = client_with_fts
     client.login_admin()
     anom = client.spawn()
@@ -190,8 +184,7 @@ def test_search_for_page_with_member_access(client_with_fts):
     assert 'Test' not in anom.get('/search?q=Memberius')
 
 
-@pytest.mark.flaky(reruns=3)
-def test_basic_autocomplete(client_with_fts):
+def test_basic_autocomplete(client_with_fts: Client) -> None:
     client = client_with_fts
     client.login_editor()
 
@@ -206,7 +199,7 @@ def test_basic_autocomplete(client_with_fts):
     assert client.get('/search/suggest?q=Fl').json == ["Flash Gordon"]
 
 
-def test_search_publication_files(client_with_fts):
+def test_search_publication_files(client_with_fts: Client) -> None:
     client = client_with_fts
     client.login_admin()
 
@@ -232,7 +225,7 @@ def test_search_publication_files(client_with_fts):
     assert 'Sample' in client.spawn().get('/search?q=Adobe')
 
 
-def test_search_hashtags(client_with_fts):
+def test_search_hashtags(client_with_fts: Client) -> None:
 
     client = client_with_fts
     client.login_admin()
@@ -250,7 +243,7 @@ def test_search_hashtags(client_with_fts):
         '/search?q=%23newhomepa')
 
 
-def test_ticket_chat_search(client_with_fts):
+def test_ticket_chat_search(client_with_fts: Client) -> None:
     client = client_with_fts
 
     collection = FormCollection(client.app.session())
@@ -284,14 +277,17 @@ def test_ticket_chat_search(client_with_fts):
     assert 'Foo' not in page
 
 
-def test_search_future_events_are_sorted_by_occurrence_date(client_with_fts):
+def test_search_future_events_are_sorted_by_occurrence_date(
+    client_with_fts: Client
+) -> None:
+
     client = client_with_fts
     client.login_admin()
     anom = client.spawn()
     member = client.spawn()
     member.login_member()
 
-    event_data = [
+    event_data: list[dict[str, Any]] = [
         {
             "email": "test@example.org",
             "title": "Not sorted Concert",
