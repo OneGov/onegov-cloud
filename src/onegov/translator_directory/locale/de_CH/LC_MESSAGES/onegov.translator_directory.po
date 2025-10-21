@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-10-08 16:44+0200\n"
+"POT-Creation-Date: 2025-10-21 13:17+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -536,8 +536,11 @@ msgstr "Wochenende oder Feiertag"
 msgid "25% surcharge"
 msgstr "25% Zuschlag"
 
+msgid "Exceptionally urgent"
+msgstr "Ausserordenlich dringlich"
+
 msgid "Travel distance"
-msgstr "Weg"
+msgstr "Wegpauschalen"
 
 msgid "Notes"
 msgstr "Notizen"
@@ -829,12 +832,6 @@ msgstr "Zertifikate"
 msgid "User"
 msgstr "Benutzer"
 
-msgid "Date"
-msgstr "Datum"
-
-msgid "Rate"
-msgstr "Tarif"
-
 msgid "Export Excel (from filter)"
 msgstr "Excel Export (mit Filter)"
 
@@ -913,8 +910,8 @@ msgstr "Ihre Daten wurden bestätigt"
 msgid "Time report submitted for review"
 msgstr "Zeiterfassung zur Überprüfung eingereicht"
 
-msgid "Translator not found"
-msgstr "Übersetzer/in nicht gefunden"
+msgid "Time report not found"
+msgstr "Zeiterfassung nicht gefunden"
 
 msgid "Time report accepted"
 msgstr "Zeiterfassung akzeptiert"
@@ -938,6 +935,15 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 
 msgid "Download"
 msgstr "Herunterladen"
+
+#~ msgid "Date"
+#~ msgstr "Datum"
+
+#~ msgid "Rate"
+#~ msgstr "Tarif"
+
+#~ msgid "Translator not found"
+#~ msgstr "Übersetzer/in nicht gefunden"
 
 #~ msgid "Duration (minutes)"
 #~ msgstr "Zeitdauer (Minuten)"
