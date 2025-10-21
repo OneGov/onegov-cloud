@@ -116,9 +116,10 @@ class NewsletterForm(Form):
                 }
             )
             show_only_previews = BooleanField(
-                label=_('Show only previews of news'),
+                label=_('Show only lead of news'),
                 description=_(
-                    'If checked, only the preview of the news is shown.'),
+                    'Only show the lead of the news and a "read more"'
+                    'link.'),
                 default=True
             )
 
