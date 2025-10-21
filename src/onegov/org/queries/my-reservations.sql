@@ -5,7 +5,8 @@ SELECT
     "end",                                     -- UTCDateTime
     ("data"->'accepted')::boolean as accepted, -- Boolean
     reservations.timezone as timezone,         -- Text
-    resources.title as resource,               -- UUID
+    reservations.resource as resource_id,      -- UUID
+    resources.title as resource,               -- Text
     tickets.id as ticket_id,                   -- UUID
     tickets.handler_code as handler_code,      -- Text
     tickets.number as ticket_number,           -- Text

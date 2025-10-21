@@ -40,7 +40,12 @@ oc.defaultOptions = {
         The event ids to highlight for a short while
     */
     highlights_min: null,
-    highlights_max: null
+    highlights_max: null,
+
+    /*
+        Base url for exporting the current date range as a PDF
+    */
+    pdf_url: null
 };
 
 oc.events = [
@@ -91,37 +96,43 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
 
     switch (ocOptions.type) {
         case 'daypass':
-            views = ['dayGridMonth', 'listMonth'];
+            views = ['multiMonthYear', 'dayGridMonth'];
             fcOptions.headerToolbar = {
                 left: 'title today prev,next',
                 center: '',
-                right: 'month listMonth'
+                right: 'multiMonthYear,dayGridMonth'
             };
             break;
         case 'room':
-            views = ['multiMonthYear', 'dayGridMonth', 'timeGridWeek', 'timeGridDay', 'listMonth'];
+            views = ['multiMonthYear', 'dayGridMonth', 'timeGridWeek', 'timeGridDay'];
             fcOptions.headerToolbar = {
                 left: 'title today prev,next',
                 center: '',
-                right: 'multiMonthYear,dayGridMonth,timeGridWeek,timeGridDay listMonth'
+                right: 'multiMonthYear,dayGridMonth,timeGridWeek,timeGridDay'
             };
             fcOptions.navLinks = true;
             fcOptions.weekNumbers = true;
             break;
         case 'daily-item':
-            views = ['month', 'listMonth'];
+            views = ['multiMonthYear', 'dayGridMonth'];
             fcOptions.headerToolbar = {
                 left: 'title today prev,next',
                 center: '',
-                right: 'month listMonth'
+                right: 'multiMonthYear,dayGridMonth'
             };
             break;
         default:
             throw new Error("Unknown reservation calendar type: " + options.type);
     }
 
+    var list_views = [];
+    for (var j = 0; j < views.length; j++) {
+        var granularity = oc.getGranularity(views[j]);
+        list_views[j] = 'list' + granularity[0].toUpperCase() + granularity.substring(1);
+    }
+
     // select a valid default view
-    if (!_.contains(views, ocOptions.view)) {
+    if (!_.contains(views, ocOptions.view) && !_.contains(list_views, ocOptions.view)) {
         fcOptions.initialView = views[0];
     }
 
@@ -199,6 +210,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
         for (var i = 0; i < renderers.length; i++) {
             renderers[i](info.view, $(info.el));
         }
+        oc.setupViewNavigation(info.view.calendar, $(info.view.calendar.el), views, ocOptions.pdf_url);
         return null;
     };
 
@@ -276,6 +288,128 @@ oc.setupDatePicker = function(calendar, element) {
     }).on('mouseleave', function() {
         title.css('cursor', '');
     });
+};
+
+oc.getGranularity = function(view_name) {
+    for (var i = view_name.length - 1; i >= 0; i--) {
+        if (view_name[i].toUpperCase() === view_name[i]) {
+            return view_name.substring(i).toLowerCase();
+        }
+    }
+    return view_name.toLowerCase();
+};
+
+oc.setupViewNavigation = function(calendar, element, views, pdf_url) {
+    var chunk = $(element).find('.fc-header-toolbar .fc-toolbar-chunk:last-child');
+    var i18n = calendar.currentData.availableRawLocales[calendar.getOption('locale')];
+    var granularity_group = $('<div class="fc-button-group"></div>');
+    for (var i = 0; i < views.length; i++) {
+        var button = $('<button type="button" class="fc-button fc-button-primary"></button>');
+        var granularity = oc.getGranularity(views[i]);
+        if (oc.getGranularity(calendar.view.type) === granularity) {
+            button.addClass('fc-button-active');
+            button.attr('aria-pressed', 'true');
+        } else {
+            button.attr('aria-pressed', 'false');
+        }
+        var label = i18n.buttonText[granularity];
+        button.text(label);
+        if (typeof i18n.viewHint === 'string' || i18n.viewHint instanceof String) {
+            button.attr('title', i18n.viewHint.replace(/\$\d/, label));
+        } else {
+            button.attr('title', i18n.viewHint(label));
+        }
+        button.data('view', views[i]);
+        button.click(function() {
+            if ($(this).hasClass('fc-button-active')) {
+                return false;
+            }
+            var view = $(this).data('view');
+            if (calendar.view.type.substring(0, 4) === 'list') {
+                var gran = oc.getGranularity(view);
+                calendar.changeView('list' + gran[0].toUpperCase() + gran.substring(1));
+            } else {
+                calendar.changeView(view);
+            }
+            return true;
+        });
+        button.appendTo(granularity_group);
+    }
+    var view_group = $('<div class="fc-button-group"></div>');
+    var calendar_btn = $('<button class="fc-button fc-button-primary"></button');
+    var list_btn = $('<button class="fc-button fc-button-primary"></button');
+    if (calendar.view.type.substring(0, 4) === 'list') {
+        calendar_btn.attr('aria-pressed', 'false');
+        list_btn.addClass('fc-button-active');
+        list_btn.attr('aria-pressed', 'true');
+    } else {
+        calendar_btn.addClass('fc-button-active');
+        calendar_btn.attr('aria-pressed', 'true');
+        list_btn.attr('aria-pressed', 'false');
+    }
+    calendar_btn.html('<span class="fa fa-calendar fa-calendar-alt"></span>');
+    calendar_btn.attr('title', locale('Calendar view'));
+    calendar_btn.click(function() {
+        if (calendar.view.type.substring(0, 4) !== 'list') {
+            return false;
+        }
+
+        var gran = oc.getGranularity(calendar.view.type);
+        for (var j = 0; j < views.length; j++) {
+            if (oc.getGranularity(views[j]) === gran) {
+                calendar.changeView(views[j]);
+                return true;
+            }
+        }
+        return false;
+    });
+    calendar_btn.appendTo(view_group);
+    list_btn.html('<span class="fa fa-list"></span>');
+    list_btn.attr('title', locale('List view'));
+    list_btn.click(function() {
+        if (calendar.view.type.substring(0, 4) === 'list') {
+            return false;
+        }
+
+        var gran = oc.getGranularity(calendar.view.type);
+        calendar.changeView('list' + gran[0].toUpperCase() + gran.substring(1));
+        return true;
+    });
+    list_btn.appendTo(view_group);
+
+    if (pdf_url) {
+        var pdf_btn = $('<button class="fc-button fc-button-primary"></button');
+        pdf_btn.attr('aria-pressed', 'false');
+        pdf_btn.html('<span class="fa fa-file-pdf-o fa-file-pdf"></span>');
+        pdf_btn.attr('title', locale("Export as PDF"));
+        pdf_btn.click(function() {
+            var wrapper = $('<div class="reservation-actions">');
+            var form = $('<div class="reservation-form">').appendTo(wrapper);
+
+            oc.PDFExportForm.render(
+                form.get(0),
+                calendar,
+                function(state) {
+                    var url = new Url(pdf_url || '/');
+                    url.query.start = state.start;
+                    url.query.end = state.end;
+                    window.location = url.toString();
+                    pdf_btn.popup('hide');
+                }
+            );
+
+            rc.showPopup(calendar, pdf_btn, wrapper);
+        });
+
+        pdf_btn.appendTo(view_group);
+    }
+
+    // clear chunk
+    chunk.html('');
+
+    // append our groups
+    granularity_group.appendTo(chunk);
+    view_group.appendTo(chunk);
 };
 
 // highlight events implementation
@@ -495,3 +629,96 @@ oc.bustIECache = function(originalUrl) {
     url.query['ie-cache'] = (new Date()).getTime();
     return url.toString();
 };
+
+/*
+    Allows to fine-adjust the date range for the PDF export.
+*/
+oc.PDFExportForm = React.createClass({
+    getInitialState: function() {
+        return {
+            start: this.props.start.format('YYYY-MM-DD'),
+            end: this.props.end.format('YYYY-MM-DD')
+        };
+    },
+    componentDidMount: function() {
+        var node = $(ReactDOM.findDOMNode(this));
+
+        // the timeout is set to 100ms because the popup will do its own focusing
+        // after 50ms (we could use it, but we want to focus AND select)
+        setTimeout(function() {
+            node.find('input:first').focus().select();
+        }, 100);
+    },
+    handleInputChange: function(e) {
+        var state = _.extend({}, this.state);
+        var name = e.target.getAttribute('name');
+
+        switch (name) {
+            case 'start':
+                state.start = e.target.value;
+                break;
+            case 'end':
+                state.end = e.target.value;
+                break;
+            default:
+                throw Error("Unknown input element: " + name);
+        }
+
+        this.setState(state);
+    },
+    handleButton: function(e) {
+        var node = ReactDOM.findDOMNode(this);
+        var self = this;
+
+        $(node).find('input').each(function(_ix, el) {
+            $(el).blur();
+        });
+
+        setTimeout(function() {
+            self.props.onSubmit.call(node, self.state);
+        }, 0);
+
+        e.preventDefault();
+    },    // eslint-disable-next-line complexity
+    render: function() {
+        var isValid = this.state.start && this.state.end && this.state.start <= this.state.end;
+
+        return (
+            <form>
+                <h3>{locale("Export as PDF")}</h3>
+                <div className="field split">
+                    <div>
+                        <label htmlFor="start">{locale("From")}</label>
+                        <input name="start" type="date" size="8"
+                            defaultValue={this.state.start}
+                            onChange={this.handleInputChange}
+                            className={isValid && 'valid' || 'invalid'}
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="end">{locale("Until")}</label>
+                        <input name="end" type="date" size="8"
+                            defaultValue={this.state.end}
+                            onChange={this.handleInputChange}
+                            className={isValid && 'valid' || 'invalid'}
+                        />
+                    </div>
+                </div>
+
+                <button className={isValid && "button" || "button secondary"} disabled={!isValid} onClick={this.handleButton}>{locale("Download")}</button>
+            </form>
+        );
+
+    }
+});
+
+oc.PDFExportForm.render = function(element, calendar, onSubmit) {
+    ReactDOM.render(
+        <oc.PDFExportForm
+            start={moment(calendar.view.currentStart)}
+            end={moment(calendar.view.currentEnd).subtract(1, 'day')}
+            onSubmit={onSubmit}
+        />,
+        element);
+};
+

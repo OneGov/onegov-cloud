@@ -903,6 +903,7 @@ class MyReservationEventInfo:
         'timezone',
         'accepted',
         'resource',
+        'resource_id',
         'ticket_id',
         'handler_code',
         'ticket_number',
@@ -920,6 +921,7 @@ class MyReservationEventInfo:
         accepted: bool,
         timezone: str,
         resource: str,
+        resource_id: UUID,
         ticket_id: UUID,
         handler_code: str,
         ticket_number: str,
@@ -937,6 +939,7 @@ class MyReservationEventInfo:
         self.timezone = timezone
         self.accepted = accepted
         self.resource = resource
+        self.resource_id = resource_id
         self.ticket_id = ticket_id
         self.handler_code = handler_code
         self.key_code = key_code
