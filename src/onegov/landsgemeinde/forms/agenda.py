@@ -286,7 +286,8 @@ class AgendaItemUploadForm(Form):
 
             if soup.body is None:
                 continue
-            textframes = soup.body.find_all('div', recursive=False)
+            textframes = soup.body.find_all('div', recursive=True,
+                                            class_='Einfacher-Textrahmen')
             for textframe in textframes[1:] if textframes else []:
                 for p_tag in textframe.find_all('p'):
                     p_class = ' '.join(p_tag.get('class', []))

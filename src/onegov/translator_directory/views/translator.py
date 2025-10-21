@@ -47,6 +47,7 @@ from onegov.translator_directory.utils import country_code_to_name
 from uuid import uuid4
 from xlsxwriter import Workbook
 from docx.image.exceptions import UnrecognizedImageError
+from webob.exc import HTTPForbidden
 
 
 from typing import TYPE_CHECKING
@@ -432,6 +433,9 @@ def report_translator_change(
     request: TranslatorAppRequest,
     form: TranslatorMutationForm
 ) -> RenderData | BaseResponse:
+
+    if request.is_member:
+        raise HTTPForbidden()
 
     if form.submitted(request):
         assert request.current_username is not None

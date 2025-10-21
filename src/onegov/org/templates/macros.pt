@@ -1695,9 +1695,6 @@
     <table class="payments-table" tal:condition="payments">
         <thead>
             <tr>
-                <th class="select-all-checkbox-cell">
-                    <input type="checkbox" aria-label="Select all payments" />
-                </th>
                 <th i18n:translate tal:condition="tickets|nothing">
                     Object
                 </th>
@@ -1727,9 +1724,6 @@
         </thead>
         <tbody>
             <tr tal:repeat="payment payments">
-                <td class="payment-checkbox-cell">
-                    <input type="checkbox" name="selected_payments" value="${payment.id}" aria-label="Select this payment" i18n:attributes="aria-label" />
-                </td>
                 <td tal:condition="tickets|nothing">
                     <tal:b define="ticket tickets[payment.id]|nothing">
                         <div tal:condition="ticket">

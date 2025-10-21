@@ -99,6 +99,16 @@ def view_ticket(
     if handler.payment:
         handler.payment.sync()
 
+    if self.order_id is not None:
+        tickets = TicketCollection(request.session)
+        related_tickets = request.exclude_invisible(
+            ticket
+            for ticket in tickets.by_order(self.order_id)
+            if ticket != self
+        )
+    else:
+        related_tickets = []
+
     messages = MessageCollection(
         request.session,
         channel_id=self.number
@@ -160,6 +170,7 @@ def view_ticket(
         'title': self.number,
         'layout': layout,
         'ticket': self,
+        'related_tickets': related_tickets,
         'summary': summary,
         'deleted': handler.deleted,
         'handler': handler,

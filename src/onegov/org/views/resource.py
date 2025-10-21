@@ -1477,7 +1477,7 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
         raise exc.HTTPForbidden()
 
     start = utcnow() - timedelta(days=30)
-    end = utcnow() + timedelta(days=30 * 12)
+    end = utcnow() + timedelta(days=730)
 
     cal = icalendar.Calendar()
     cal.add('prodid', '-//OneGov//onegov.org//')

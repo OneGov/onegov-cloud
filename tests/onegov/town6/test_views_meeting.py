@@ -1,14 +1,20 @@
+from __future__ import annotations
+
 import io
 import json
 import zipfile
 
 from freezegun import freeze_time
+from tests.shared.utils import create_image
 from webtest import Upload
 
-from tests.shared.utils import create_image
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
 
 
-def test_meetings(client):
+def test_meetings(client: Client) -> None:
     client.login_admin().follow()
 
     # ris views not enabled
@@ -65,8 +71,8 @@ def test_meetings(client):
 
         # add doc to meeting
         edit = meeting.click('Bearbeiten')
-        edit.form.fields['files'][-1].value = [
-            Upload('flyer.jpg', create_image().read())]
+        edit.form.set('files', [
+            Upload('flyer.jpg', create_image().read())], -1)
         meeting = edit.form.submit().follow()
 
         assert 'Test Meeting' in meeting

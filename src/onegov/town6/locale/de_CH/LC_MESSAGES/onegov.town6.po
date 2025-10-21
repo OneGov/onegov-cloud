@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-09-30 16:02+0200\n"
+"POT-Creation-Date: 2025-10-16 11:34+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1168,9 +1168,6 @@ msgstr "Erstellt"
 msgid "Disbursed"
 msgstr "Ausbezahlt"
 
-msgid "Select this payment"
-msgstr "Diese Zahlung auswählen"
-
 msgid "Select this invoice"
 msgstr "Diese Rechnung auswählen"
 
@@ -1363,8 +1360,8 @@ msgstr "Guten Tag"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Ihre E-Mail Adresse wurde soeben zur Erstellung eines Accounts auf "
-"${homepage} verwendet."
+"Ihre E-Mail Adresse wurde soeben zur Erstellung eines Accounts auf $"
+"{homepage} verwendet."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Um Ihren Account zu aktivieren, bestätigen Sie bitte die Anmeldung:"
@@ -1387,8 +1384,8 @@ msgstr "Wir wünschen Ihnen einen schönen Tag!"
 
 msgid "Your e-mail address was just used to send a login link to ${homepage}."
 msgstr ""
-"Ihre E-Mail Adresse wurde soeben zum Senden eines Anmeldelinks auf "
-"${homepage} verwendet."
+"Ihre E-Mail Adresse wurde soeben zum Senden eines Anmeldelinks auf $"
+"{homepage} verwendet."
 
 msgid "Use the token below or click on the link to complete your login."
 msgstr ""
@@ -1464,9 +1461,9 @@ msgid "visit the request page"
 msgstr "öffnen Sie die Anfrage"
 
 msgid ""
-"This is the notification for customer messages on reservations for ${request."
-"app.org.title}. If you no longer want to receive this e-mail please contact "
-"an administrator so they can remove you from the recipients list."
+"This is the notification for customer messages on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
 "Dies ist die tägliche Reservations-Übersicht für ${organisation}. Falls Sie "
 "dieses E-Mail nicht mehr bekommen möchten, melden Sie sich bitte bei einem "
@@ -1572,12 +1569,12 @@ msgid "New note in Ticket ${link}"
 msgstr "Neue Notiz in Ticket ${link}"
 
 msgid ""
-"This is the notification for notes on reservations for ${request.app.org."
-"title}. If you no longer want to receive this e-mail please contact an "
-"administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for $"
+"{request.app.org.title}. If you no longer want to receive this e-mail please "
+"contact an administrator so they can remove you from the recipients list."
 msgstr ""
-"Dies ist die Benachrichtigung für Notizen zu Reservierungen für ${request."
-"app.org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, "
+"Dies ist die Benachrichtigung für Notizen zu Reservierungen für $"
+"{request.app.org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, "
 "kontaktieren Sie bitte einen Administrator, damit er Sie aus der Liste "
 "entfernen kann."
 
@@ -1604,8 +1601,8 @@ msgid ""
 "no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Dies ist eine Benachrichtigung zu den neuen Reservationen von "
-"${organisation}. Falls Sie diese E-Mails nicht mehr bekommen möchten, melden "
+"Dies ist eine Benachrichtigung zu den neuen Reservationen von $"
+"{organisation}. Falls Sie diese E-Mails nicht mehr bekommen möchten, melden "
 "Sie sich bitte bei einem Administrator damit dieser Sie von der "
 "Empfängerliste streichen kann."
 
@@ -1630,8 +1627,8 @@ msgstr ""
 
 msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""
-"Um Ihr Konto zu verwenden benötigen Sie den YubiKey mit der Seriennummer "
-"${number}"
+"Um Ihr Konto zu verwenden benötigen Sie den YubiKey mit der Seriennummer $"
+"{number}"
 
 msgid "Latest news"
 msgstr "Aktuelles"
@@ -1707,8 +1704,8 @@ msgid ""
 "you no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Dies ist eine Benachrichtigung über die abgelehnten Reservierungen für "
-"${Organisation}. Wenn Sie diese Benachrichtigungen nicht mehr erhalten "
+"Dies ist eine Benachrichtigung über die abgelehnten Reservierungen für $"
+"{Organisation}. Wenn Sie diese Benachrichtigungen nicht mehr erhalten "
 "möchten, kontaktieren Sie bitte einen Administrator, damit er Sie aus der "
 "Empfängerliste entfernen kann."
 
@@ -2153,9 +2150,6 @@ msgstr "Aktiviert:"
 msgid "Fee:"
 msgstr "Gebühr:"
 
-msgid "Export Bill run as PDF"
-msgstr "Fakturierte Belege als PDF exportieren"
-
 msgid "No payments yet."
 msgstr "Noch keine Zahlungen."
 
@@ -2360,17 +2354,6 @@ msgstr ""
 msgid "Search"
 msgstr "Suche"
 
-msgid ""
-"Postgres Searching is currently unavailable due to technical difficulties. "
-"Please excuse the inconvenience and try again later."
-msgstr ""
-"Die Postgres Suche ist zur Zeit aufgrund technischer Schwierigkeiten nicht "
-"verfügbar. Bitte entschuldigen Sie die Unannehmlichkeiten und versuchen Sie "
-"es später wieder."
-
-msgid "Your postgres search returned no results."
-msgstr "Ihre Postgres Suche ergab keine Treffer."
-
 msgid "Select the images that should be shown inside this album."
 msgstr "Wählen Sie die Bilder aus welche im Album angezeigt werden sollen."
 
@@ -2537,6 +2520,9 @@ msgstr "Reaktionszeit"
 
 msgid "Process Time"
 msgstr "Bearbeitungszeit"
+
+msgid "Related Tickets"
+msgstr "Verknüpfte Tickets"
 
 msgid "Summary"
 msgstr "Zusammenfassung"
@@ -2737,8 +2723,15 @@ msgstr "Die Kommissionsmitgliedschaft wurde gelöscht."
 msgid "Added a new parliamentarian"
 msgstr "Parlamentsmitglied hinzugefügt"
 
+msgid "Parliamentarian has been automatically subscribed to the newsletter."
+msgstr ""
+"Das Parlamentsmitglied wurde automatisch für den Newsletter angemeldet."
+
 msgid "New parliamentarian"
 msgstr "Neues Parlamentsmitglied"
+
+msgid "The newsletter subscription has been updated."
+msgstr "Die Newsletter-Anmeldung wurde aktualisiert."
 
 msgid "The parliamentarian has been deleted."
 msgstr "Das Parlamentsmitglied wurde gelöscht."
@@ -2875,605 +2868,3 @@ msgstr "Ratsinformationssystem (RIS)"
 
 msgid "New Note"
 msgstr "Neue Notiz"
-
-#~ msgid ""
-#~ "This chatbot is experimental and may produce incorrect or misleading "
-#~ "information. It does not reflect the views of ${layout.org.name}. Please "
-#~ "verify any information provided by the chatbot with official sources."
-#~ msgstr ""
-#~ "Dieser Chatbot ist experimentell und kann falsche oder irreführende "
-#~ "Informationen liefern. Er spiegelt nicht die Ansichten von ${layout.org."
-#~ "name} wider. Bitte überprüfen Sie alle vom Chatbot bereitgestellten "
-#~ "Informationen mit offiziellen Quellen."
-
-#~ msgid "Meeting documents"
-#~ msgstr "Sitzungsdokumente"
-
-#~ msgid "Agenda item documents"
-#~ msgstr "Traktandendokumente"
-
-#~ msgid "No parliamentarians defined yet."
-#~ msgstr "Noch keine Parlamentarier erfasst."
-
-#~ msgid "Picture"
-#~ msgstr "Bild"
-
-#~ msgid "Roles"
-#~ msgstr "Mitgliedschaften"
-
-#~ msgid "Interest tie"
-#~ msgstr "Interessensbindung"
-
-#~ msgid "Category"
-#~ msgstr "Kategorie"
-
-#~ msgid "Role (as a group member)"
-#~ msgstr "Rolle (als Fraktionsmitglied)"
-
-#~ msgid "Membership of a parliamentary group"
-#~ msgstr "Fraktionsmitgliedschaft"
-
-#~ msgid "Member of a commission"
-#~ msgstr "Kommissionsmitgliedschaft"
-
-#~ msgid "New role"
-#~ msgstr "Neue Rolle"
-
-#~ msgid "Inquiry"
-#~ msgstr "Anfrage"
-
-#~ msgid "Proposal"
-#~ msgstr "Vorschlag"
-
-#~ msgid "Mandate"
-#~ msgstr "Mandat"
-
-#~ msgid "Report"
-#~ msgstr "Bericht"
-
-#~ msgid "Report and Proposal"
-#~ msgstr "Bericht und Vorschlag"
-
-#~ msgid "Decision"
-#~ msgstr "Entscheid"
-
-#~ msgid "Message"
-#~ msgstr "Botschaft"
-
-#~ msgid "Urgent Interpellation"
-#~ msgstr "Dringliche Interpellation"
-
-#~ msgid "Invitation"
-#~ msgstr "Einladung"
-
-#~ msgid "Interpellation"
-#~ msgstr "Interpellation"
-
-#~ msgid "Commission Report"
-#~ msgstr "Kommissionsbericht"
-
-#~ msgid "Communication"
-#~ msgstr "Mitteilung"
-
-#~ msgid "Motion"
-#~ msgstr "Motion"
-
-#~ msgid "Postulate"
-#~ msgstr "Postulat"
-
-#~ msgid "Resolution"
-#~ msgstr "Resolution"
-
-#~ msgid "Regulation"
-#~ msgstr "Verordnung"
-
-#~ msgid "Miscellaneous"
-#~ msgstr "Verschiedenes"
-
-#~ msgid "Elections"
-#~ msgstr "Wahlen"
-
-#~ msgid "First signatory"
-#~ msgstr "Erstunterzeichner/in"
-
-#~ msgid "Co-signatory"
-#~ msgstr "Mitunterzeichner/in"
-
-#~ msgid "Select additional person"
-#~ msgstr "Zusätzliche Person auswählen"
-
-#~ msgid "Participations"
-#~ msgstr "Verfasser / Beteiligte"
-
-#~ msgid "Parliamentarian is not in this commission."
-#~ msgstr "Parlamentarier:in ist nicht in dieser Kommission."
-
-#~ msgid "Basic properties"
-#~ msgstr "Grundeigenschaften"
-
-#~ msgid "Gender"
-#~ msgstr "Geschlecht"
-
-#~ msgid "Additional information"
-#~ msgstr "Zusatzinformationen"
-
-#~ msgid "Party role"
-#~ msgstr "Rolle in der Partei"
-
-#~ msgid "Parliamentary group role"
-#~ msgstr "Rolle in der Fraktion"
-
-#~ msgid "President"
-#~ msgstr "Präsident:in"
-
-#~ msgid "Commission meeting"
-#~ msgstr "Kommissionsitzung"
-
-#~ msgid "intercantonal commission"
-#~ msgstr "interkantonale Kommission"
-
-#~ msgid "Vice president"
-#~ msgstr "Vize-Präsident:in"
-
-#~ msgid "End must be after start"
-#~ msgstr "Ende muss nach dem Start liegen"
-
-#~ msgid "Do you really want to remove this parliamentarian?"
-#~ msgstr "Diese:n Parlamentarier:in wirklich entfernen?"
-
-#~ msgid "Remove parliamentarian"
-#~ msgstr "Parlamentarier:in entfernen"
-
-#~ msgid "Extended Member"
-#~ msgstr "erweitertes Mitglied"
-
-#~ msgid "male"
-#~ msgstr "männlich"
-
-#~ msgid "female"
-#~ msgstr "weiblich"
-
-#~ msgid "Vote counter"
-#~ msgstr "Stimmenzähler"
-
-#~ msgid "Media Manager"
-#~ msgstr "Leiter Medien und Kampagnen"
-
-#~ msgid "President of the parliamentary group"
-#~ msgstr "Fraktionsschef"
-
-#~ msgid "No meeting defined yet."
-#~ msgstr "Noch keine Sitzung erfasst."
-
-#~ msgid "Comission"
-#~ msgstr "Kommission"
-
-#~ msgid "Added commission meeting"
-#~ msgstr "Kommissionsitzung hinzugefügt"
-
-#~ msgid "New commission meeting"
-#~ msgstr "Neue Kommissionsitzung"
-
-#~ msgid "All Parties"
-#~ msgstr "Alle Parteien"
-
-#~ msgid "Addition"
-#~ msgstr "Adresszusatz"
-
-#~ msgid "Zip code"
-#~ msgstr "PLZ"
-
-#~ msgid "City"
-#~ msgstr "Ort"
-
-#~ msgid "Sign up"
-#~ msgstr "Anmelden"
-
-#~ msgid "Notify on newsletter unsubscription"
-#~ msgstr "Benachrichtigung bei Abmeldung vom Newsletter"
-
-#~ msgid ""
-#~ "Send an email notification when a user unsubscribes from the newsletter"
-#~ msgstr ""
-#~ "Sende eine E-Mail-Benachrichtigung, wenn sich ein Benutzer vom Newsletter "
-#~ "abmeldet"
-
-#~ msgid ""
-#~ "The user with the address <strong>${address}</strong> just unsubscribed "
-#~ "from the newsletter subscriber list."
-#~ msgstr ""
-#~ "Der Benutzer mit der Adresse <strong>${address}</strong> hat sich soeben "
-#~ "von der Newsletter-Abonnentenliste abgemeldet."
-
-#~ msgid "Change Request"
-#~ msgstr "Änderung vorschlagen"
-
-#~ msgid "Found an error? Propose a change to this entry."
-#~ msgstr "Haben Sie einen Fehler gefunden? Schlagen Sie eine Änderung vor."
-
-#~ msgid "Propose entry"
-#~ msgstr "Eintrag vorschlagen"
-
-#~ msgid "Something missing? Propose a new entry."
-#~ msgstr ""
-#~ "Fehlt ein Eintrag im Verzeichnis? Schlagen Sie einen neuen Eintrag vor."
-
-#~ msgid "Newsletter Subscription"
-#~ msgstr "Newsletter-Abonnement"
-
-#~ msgid "Update Newsletter Subscription"
-#~ msgstr "Newsletter-Abonnement aktualisieren"
-
-#~ msgid "Update your newsletter subscription categories:"
-#~ msgstr "Aktualisieren Sie Ihre Newsletter-Abonnementkategorien:"
-
-#~ msgid "Rejection withdrawn."
-#~ msgstr "Ablehnung zurückgezogen."
-
-#~ msgid ""
-#~ "Select newsletter categories your are interested in. You will receive the "
-#~ "newsletter if it reports on at least one of the subscribed categories."
-#~ msgstr ""
-#~ "Wählen Sie die Newsletter-Kategorien aus, an denen Sie interessiert sind. "
-#~ "Sie werden den Newsletter erhalten, wenn er über mindestens eine der "
-#~ "abonnierten Kategorien berichtet."
-
-#~ msgid ""
-#~ "Select categories the newsletter reports on. The users will receive the "
-#~ "newsletter only if it reports on at least one of the categories the user "
-#~ "subscribed to."
-#~ msgstr ""
-#~ "Wählen Sie die Kategorien aus, über die der Newsletter berichtet. Die "
-#~ "Benutzer erhalten den Newsletter nur, wenn er über mindestens eine der "
-#~ "Kategorien berichtet, die der Benutzer abonniert hat."
-
-#~ msgid "Newsletter categories"
-#~ msgstr "Newsletter-Kategorien"
-
-#~ msgid ""
-#~ "Example for newsletter topics with subtopics in yaml format. Note: Deeper "
-#~ "structures are not supported.\n"
-#~ "```\n"
-#~ "Organisation:\n"
-#~ "  - Topic 1:\n"
-#~ "    - Subtopic 1.1\n"
-#~ "    - Subtopic 1.2\n"
-#~ "  - Topic 2\n"
-#~ "  - Topic 3:\n"
-#~ "    - Subtopic 3.1\n"
-#~ "```"
-#~ msgstr ""
-#~ "Beispiel für Newsletter-Themen mit Unterthemen im yaml-Format. Hinweis: "
-#~ "Tiefere Strukturen werden nicht unterstützt.\n"
-#~ "```\n"
-#~ "Organisation:\n"
-#~ "  - Thema 1:\n"
-#~ "    - Unterthema 1.1\n"
-#~ "    - Unterthema 1.2\n"
-#~ "  - Thema 2\n"
-#~ "  - Thema 3:\n"
-#~ "    - Unterthema 3.1\n"
-#~ "```"
-
-#~ msgid "Sign up to our newsletter to always stay up to date:"
-#~ msgstr ""
-#~ "Abonnieren Sie unseren Newsletter um immer auf dem Laufenden zu bleiben:"
-
-#~ msgid "Error: No custom texts found"
-#~ msgstr "Fehler: Keine benutzerdefinierten Texte gefunden"
-
-#, python-format
-#~ msgid "Error: No custom text found for '${key}'"
-#~ msgstr "Fehler: Kein benutzerdefinierter Text gefunden für '${key}'"
-
-#~ msgid "Subscribe to Selection as RSS"
-#~ msgstr "Hashtags abonnieren"
-
-#~ msgid "Save"
-#~ msgstr "Speichern"
-
-#~ msgid "This event can't be edited."
-#~ msgstr "Diese Veranstaltung kann nicht bearbeitet werden."
-
-#~ msgid "Imported events can not be edited."
-#~ msgstr "Importierte Veranstaltungen können nicht bearbeitet werden."
-
-#~ msgid "Withdraw event"
-#~ msgstr "Veranstaltung zurückziehen"
-
-#~ msgid "Do you really want to withdraw this event?"
-#~ msgstr "Wollen sie diese Veranstaltung zurückziehen? "
-
-#~ msgid "You can re-publish an imported event later."
-#~ msgstr ""
-#~ "Sie können importierte Veranstaltungen später wieder veröffentlichen."
-
-#~ msgid "Re-publish event"
-#~ msgstr "Veranstaltung wieder veröffentlichen"
-
-#~ msgid "Do you really want to delete this event?"
-#~ msgstr "Möchten Sie die Veranstaltung wirklich löschen?"
-
-#~ msgid "This event can't be deleted."
-#~ msgstr "Diese Veranstaltung kann nicht gelöscht werden."
-
-#~ msgid "To remove this event, go to the ticket and reject it."
-#~ msgstr ""
-#~ "Sie können die Veranstaltung jedoch in der Ticketansicht absagen, um sie "
-#~ "zu entfernen."
-
-#~ msgid "Show news as tiles"
-#~ msgstr "Aktuelles als Kacheln anzeigen"
-
-#~ msgid ""
-#~ "If checked, news are displayed as tiles. Otherwise, news are listed in "
-#~ "full length."
-#~ msgstr ""
-#~ "Wenn diese Option aktiviert ist, werden die Nachrichten als Kacheln "
-#~ "angezeigt. Anderfalls werden die Nachrichten in voller Länge "
-#~ "untereinander aufgelistet."
-
-#~ msgid "Settings"
-#~ msgstr "Einstellungen"
-
-#~ msgid "Forms"
-#~ msgstr "Formulare"
-
-#~ msgid "This form can't be deleted."
-#~ msgstr "Das Formular kann nicht gelöscht werden."
-
-#~ msgid ""
-#~ "There are submissions associated with the form. Those need to be removed "
-#~ "first."
-#~ msgstr ""
-#~ "Es existieren Eingaben die mit diesem Formular verknüpft sind. Löschen "
-#~ "Sie diese Eingaben bevor Sie das Formular löschen."
-
-#~ msgid "Do you really want to delete this form?"
-#~ msgstr "Möchten Sie das Formular wirklich löschen?"
-
-#~ msgid "Delete form"
-#~ msgstr "Formular löschen"
-
-#~ msgid "Registration Windows"
-#~ msgstr "Anmeldezeitraum"
-
-#~ msgid "External form"
-#~ msgstr "Externes Formular"
-
-#~ msgid "New external form"
-#~ msgstr "Neues externes Formular"
-
-#~ msgid "Person"
-#~ msgstr "Person"
-
-#~ msgid "Do you really want to delete this person?"
-#~ msgstr "Möchten Sie die Person wirklich löschen?"
-
-#~ msgid "Delete person"
-#~ msgstr "Person löschen"
-
-#~ msgid "Delete archived tickets"
-#~ msgstr "Archivierte Tickets löschen"
-
-#~ msgid "Do you really want to delete all archived tickets?"
-#~ msgstr "Möchten Sie wirklich alle archivierten Tickets löschen?"
-
-#~ msgid "Accept ticket"
-#~ msgstr "Ticket annehmen"
-
-#~ msgid "This ticket can't be closed."
-#~ msgstr "Dieses Ticket kann nicht abgeschlossen werden."
-
-#~ msgid "This ticket requires a decision, but no decision has been made yet."
-#~ msgstr ""
-#~ "Dieses Ticket verlangt nach einer Entscheidung, aber bisher wurde keine "
-#~ "Entscheidung gefällt."
-
-#~ msgid "Assign ticket"
-#~ msgstr "Ticket zuweisen"
-
-#~ msgid "Close ticket"
-#~ msgstr "Ticket abschliessen"
-
-#~ msgid "Reopen ticket"
-#~ msgstr "Ticket wieder öffnen"
-
-#~ msgid "Archive ticket"
-#~ msgstr "Ticket archivieren"
-
-#~ msgid "Recover from archive"
-#~ msgstr "Aus dem Archiv holen"
-
-#~ msgid "Delete Ticket"
-#~ msgstr "Ticket löschen"
-
-#~ msgid "PDF"
-#~ msgstr "PDF"
-
-#~ msgid "Download files"
-#~ msgstr "Dateien herunterladen"
-
-#~ msgid "New Message"
-#~ msgstr "Neue Nachricht"
-
-#~ msgid "Ticket Status"
-#~ msgstr "Ticket Status"
-
-#~ msgid "Text modules"
-#~ msgstr "Textbausteine"
-
-#~ msgid "Text module"
-#~ msgstr "Textbaustein"
-
-#~ msgid "Do you really want to delete this text module?"
-#~ msgstr "Möchten Sie diesen Textbaustein wirklich löschen"
-
-#~ msgid "Delete text module"
-#~ msgstr "Textbaustein löschen"
-
-#~ msgid "Room"
-#~ msgstr "Raum"
-
-#~ msgid "Daypass"
-#~ msgstr "Tageskarte"
-
-#~ msgid "Resource Item"
-#~ msgstr "Gegenstand"
-
-#~ msgid "External resource link"
-#~ msgstr "Externer Reservationslink"
-
-#~ msgid "New external resource"
-#~ msgstr "Neue externe Reservation"
-
-#~ msgid "Export All"
-#~ msgstr "Alles exportieren"
-
-#~ msgid "Notifications"
-#~ msgstr "Mitteilungen"
-
-#~ msgid "E-Mail Recipient"
-#~ msgstr "E-Mail Empfänger"
-
-#~ msgid "Do you really want to delete this resource?"
-#~ msgstr "Möchten Sie diese Reservations-Ressource wirklich löschen?"
-
-#~ msgid "Delete resource"
-#~ msgstr "Reservations-Ressource löschen"
-
-#~ msgid "This resource can't be deleted."
-#~ msgstr "Diese Reservations-Ressource kann nicht gelöscht werden."
-
-#~ msgid "There are existing reservations associated with this resource"
-#~ msgstr "Es existieren Reservationen für diese Reservations-Ressource"
-
-#~ msgid "Clean up"
-#~ msgstr "Aufräumen"
-
-#~ msgid "Rules"
-#~ msgstr "Regeln"
-
-#~ msgid "Rule"
-#~ msgstr "Regel"
-
-#~ msgid "Edit allocation"
-#~ msgstr "Einteilung bearbeiten"
-
-#~ msgid "Do you really want to delete this allocation?"
-#~ msgstr "Möchten Sie diese Einteilung wirklich löschen?"
-
-#~ msgid "Delete allocation"
-#~ msgstr "Einteilung löschen"
-
-#, python-format
-#~ msgid "Every ${days} until ${end}"
-#~ msgstr "Jeden ${days} bis zum ${end}."
-
-#~ msgid "Subscribers"
-#~ msgstr "Abonnenten"
-
-#~ msgid "Test"
-#~ msgstr "Test"
-
-#~ msgid "Delete newsletter"
-#~ msgstr "Newsletter löschen"
-
-#~ msgid "Photo Albums"
-#~ msgstr "Fotoalben"
-
-#~ msgid "Manage images"
-#~ msgstr "Bilder verwalten"
-
-#~ msgid "Photo Album"
-#~ msgstr "Fotoalbum"
-
-#~ msgid "Choose images"
-#~ msgstr "Bilder auswählen"
-
-#~ msgid "Delete photo album"
-#~ msgstr "Fotoalbum löschen"
-
-#~ msgid "Usermanagement"
-#~ msgstr "Benutzerverwaltung"
-
-#~ msgid "Create Signup Link"
-#~ msgstr "Neuer Registrationslink"
-
-#~ msgid "User"
-#~ msgstr "Benutzer"
-
-#~ msgid "User groups"
-#~ msgstr "Benutzergruppen"
-
-#~ msgid "Do you really want to delete this user group?"
-#~ msgstr "Möchten Sie diese Benutzergruppe wirklich löschen"
-
-#~ msgid "Delete user group"
-#~ msgstr "Benutzergruppe löschen"
-
-#~ msgid "Payment Providers"
-#~ msgstr "Zahlungsanbieter"
-
-#~ msgid "Payments"
-#~ msgstr "Zahlungen"
-
-#~ msgid "Synchronise"
-#~ msgstr "Synchronisieren"
-
-#~ msgid "Upcoming"
-#~ msgstr "Demnächst"
-
-#~ msgid "Past"
-#~ msgstr "Vergangen"
-
-#~ msgid "Choose filter"
-#~ msgstr "Filter wählen"
-
-#~ msgid "Delete entry"
-#~ msgstr "Eintrag löschen"
-
-#~ msgid "Dashboard"
-#~ msgstr "Dashboard"
-
-#~ msgid "Do you really want to delete this external link?"
-#~ msgstr "Wollen sie die externe Verknüpfung wirklich löschen?"
-
-#~ msgid "Delete external link"
-#~ msgstr "Verknüpfung löschen"
-
-#~ msgid "Chat with"
-#~ msgstr "Chat mit"
-
-#~ msgid "Please add a day and times to each opening hour entry."
-#~ msgstr ""
-#~ "Bitte fügen Sie zu jeder Öffnungszeit einen Tag und eine Uhrzeit hinzu."
-
-#~ msgid "The chat is currently in a test-phase. Activate at your own risk."
-#~ msgstr ""
-#~ "Der Chat befindet sich aktuell in einer Test-Phase. Auf eigenes Risiko "
-#~ "aktivieren."
-
-#~ msgid "Chat title"
-#~ msgstr "Chat Titel"
-
-#~ msgid "Chat background color"
-#~ msgstr "Chat Hintegrundfarbe"
-
-#~ msgid "Customer-ID"
-#~ msgstr "Kunden-Identifier"
-
-#~ msgid "Admin"
-#~ msgstr "Admin"
-
-#~ msgid "Disable the chat"
-#~ msgstr "Chat deaktivieren"
-
-#~ msgid "Supported Chat Integrations"
-#~ msgstr "Unterstützte Chat Integration"
-
-#~ msgid "Straight to ..."
-#~ msgstr "Direkt zu ..."
-
-#~ msgid "Perform Search"
-#~ msgstr "Suchen"

@@ -35,13 +35,21 @@ LANGUAGE_MAP = {
     'rm_CH': 'english',
     'rm': 'english',
 }
-UMLAUT_TRANS = str.maketrans({
+SPECIAL_CHARACTER_TRANS = str.maketrans({
     'Ä': 'Ae',
     'Ö': 'Oe',
     'Ü': 'Ue',
     'ä': 'ae',
     'ö': 'oe',
     'ü': 'ue',
+    # NOTE: While << and >> are more natural translations and is what
+    #       unidecode will do, we will end up with something that is
+    #       interpreted as a HTML tag by Postgres
+    # FIXME: To make this more robust we probably should process
+    #        `Markup` differently from `str`, and for non-`Markup` we
+    #        remove any `<` and `>` from the input.
+    '«': '',
+    '»': '',
 })
 
 
@@ -55,7 +63,7 @@ def normalize_text(text: str) -> str:
     """ This does the same thing  as unidecode, except it special-cases
     umlaut translation for German text.
     """
-    return unidecode(text.translate(UMLAUT_TRANS))
+    return unidecode(text.translate(SPECIAL_CHARACTER_TRANS))
 
 
 def searchable_sqlalchemy_models(
@@ -115,7 +123,7 @@ def apply_searchable_polymorphic_filter(
 
 
 def extract_hashtags(text: str) -> list[str]:
-    return [t.lower() for t in HASHTAG.findall(html.unescape(text))]
+    return HASHTAG.findall(html.unescape(text))
 
 
 class classproperty(Generic[T_co]):  # noqa: N801
