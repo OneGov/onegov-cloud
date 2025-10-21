@@ -18,7 +18,6 @@ from onegov.pay import Payment
 from onegov.pay import PaymentCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.pay.errors import DatatransApiError, SaferpayApiError
-from onegov.pay.models.payment import ManualPayment
 from onegov.pay.models.payment_providers.datatrans import DatatransPayment
 from onegov.pay.models.payment_providers.stripe import StripePayment
 from onegov.pay.models.payment_providers.worldline_saferpay import (
@@ -90,6 +89,7 @@ def send_ticket_notifications(
 
 def handle_pdf_response(
     self: TicketInvoiceCollection,
+    form: TicketInvoiceSearchForm,
     request: OrgRequest
 ) -> WebobResponse:
     # Export a pdf of all invoiced, without pagination limit
@@ -104,7 +104,7 @@ def handle_pdf_response(
         return request.redirect(request.class_link(PaymentCollection))
 
     filename = 'Payments.pdf'
-    multi_pdf = TicketsPdf.from_tickets(request, tickets)
+    multi_pdf = TicketsPdf.from_tickets(request, tickets, form)
     return Response(
         multi_pdf.read(),
         content_type='application/pdf',
@@ -131,7 +131,6 @@ def view_payments(
         form.update_model(self)
         return request.redirect(request.link(self))
 
-    request.include('payments')
     if not form.errors:
         form.apply_model(self)
 
@@ -151,97 +150,14 @@ def view_payments(
     }
 
     return {
-        'title': _('Receivables'),
+        'title': _('Payments'),
         'form': form,
         'layout': layout,
         'payments': self.batch,
         'tickets': self.tickets_by_batch(),
         'reservation_dates_formatted': reservation_dates_formatted,
         'providers': providers,
-        'pdf_export_link': append_query_param(request.class_link(
-            TicketInvoiceCollection,
-            {
-                'ticket_group': self.ticket_group,
-                'ticket_start': self.ticket_start,
-                'ticket_end': self.ticket_end,
-                'reservation_start': self.reservation_start,
-                'reservation_end': self.reservation_end,
-            },
-        ), 'format', 'pdf')
     }
-
-
-@OrgApp.json(
-    model=PaymentCollection,
-    name='batch-set-payment-state',
-    request_method='POST',
-    permission=Private
-)
-def handle_batch_set_payment_state(
-    self: PaymentCollection,
-    request: OrgRequest
-) -> JSON_ro:
-
-    request.assert_valid_csrf_token()
-    payment_ids = request.json_body.get('payment_ids', [])
-    state = request.json_body.get('state')
-
-    if state not in ('invoiced', 'paid', 'open'):
-        raise exc.HTTPBadRequest()
-
-    invoiced: bool | None
-    match state:
-        case 'invoiced':
-            invoiced = True
-        case 'open':
-            invoiced = False
-        case 'paid':
-            invoiced = None
-    payments_query = self.session.query(Payment).distinct().filter(
-        Payment.id.in_(payment_ids)
-    ).options(
-        joinedload(Payment.linked_invoice_items)
-        .joinedload(TicketInvoiceItem.invoice)
-    )
-    # State sequence is assumed to be: 'open' -> 'invoiced' - 'paid'
-    updated_count = 0
-    for payment in payments_query:
-        if not isinstance(payment, ManualPayment):
-            continue
-        if payment.state != state:
-            if payment.state == 'open' and state == 'invoiced':
-                payment.state = state
-            if payment.state == 'invoiced' and state == 'paid':
-                payment.state = state
-            # backwards
-            if payment.state == 'invoiced' and state == 'open':
-                payment.state = state
-            if payment.state == 'paid' and state == 'invoiced':
-                payment.state = state
-
-        # update the paid/invoiced state of any linked invoices
-        for item in payment.linked_invoice_items:
-            paid = item.payments[-1].state == 'paid'
-            if item.paid is not paid:
-                item.paid = paid
-
-            if invoiced is not None and item.invoice.invoiced != invoiced:
-                item.invoice.invoiced = invoiced
-
-        updated_count += 1
-
-    if updated_count > 0:
-        messages = {
-            'invoiced': _('${count} payments marked as invoiced.',
-                          mapping={'count': updated_count}),
-            'paid': _('${count} payments marked as paid.',
-                      mapping={'count': updated_count}),
-            'open': _('${count} payments marked as unpaid.',
-                      mapping={'count': updated_count}),
-        }
-        request.success(messages[state])
-
-    return {'status': 'success', 'message': 'OK'}
 
 
 @OrgApp.form(
@@ -259,16 +175,17 @@ def view_invoices(
 
     layout = layout or TicketInvoiceCollectionLayout(self, request)
 
-    if request.params.get('format') == 'pdf':
-        return handle_pdf_response(self, request)
-
     if form.submitted(request):
         form.update_model(self)
         return request.redirect(request.link(self))
 
-    request.include('invoicing')
     if not form.errors:
         form.apply_model(self)
+
+        if request.GET.get('format') == 'pdf':
+            return handle_pdf_response(self, form, request)
+
+    request.include('invoicing')
 
     # Process reservation dates into a display-ready format
     reservation_dates = self.reservation_dates_by_batch()

@@ -386,6 +386,8 @@ def handle_complete_submission(
             submission = collection.submissions.by_id(
                 submission_id, current_only=True
             )
+            custom_above_footer = (
+                self.form.custom_above_footer if self.form else None)
             send_ticket_mail(
                 request=request,
                 template='mail_ticket_opened.pt',
@@ -396,6 +398,7 @@ def handle_complete_submission(
                     'model': ticket,
                     'form': form,
                     'show_submission': self.meta['show_submission'],
+                    'custom_above_footer': custom_above_footer
                 }
             )
             for email in emails_for_new_ticket(request, ticket):

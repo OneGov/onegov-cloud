@@ -719,8 +719,11 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
         forms.submissions.complete_submission(submission)
 
     with request.session.no_autoflush:
+        order_id = request.browser_session.get('ticket_order_id')
+        if order_id is None:
+            order_id = request.browser_session['ticket_order_id'] = uuid4()
         ticket = TicketCollection(request.session).open_ticket(
-            handler_code='RSV', handler_id=token.hex
+            handler_code='RSV', order_id=order_id, handler_id=token.hex
         )
         if getattr(self, 'kaba_components', []):
             # populate key code defaults
@@ -853,6 +856,10 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
         tickets[self.group].append(str(ticket.id))
         request.browser_session.reservation_tickets = tickets
         url = request.link(collection, 'tickets')
+
+    if not pending:
+        # rotate order_id in session
+        request.browser_session['ticket_order_id'] = uuid4()
 
     request.success(message)
 

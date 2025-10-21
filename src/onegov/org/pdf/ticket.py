@@ -13,7 +13,7 @@ from onegov.chat import MessageCollection
 from onegov.org import _
 from onegov.org.constants import (
     INVOICE_GROUPS, PAYMENT_STATES, PAYMENT_SOURCES, TICKET_STATES)
-from onegov.org.layout import TicketLayout
+from onegov.org.layout import DefaultLayout, TicketLayout
 from onegov.org.models.ticket import ticket_submitter
 from onegov.org.utils import group_invoice_items
 from onegov.org.views.message import view_messages_feed
@@ -34,6 +34,7 @@ if TYPE_CHECKING:
     from bleach.callbacks import _HTMLAttrs
     from bleach.sanitizer import _Filter
     from gettext import GNUTranslations
+    from onegov.org.forms import TicketInvoiceSearchForm
     from onegov.org.request import OrgRequest
     from onegov.pdf.templates import Template
     from onegov.ticket import Ticket
@@ -651,11 +652,76 @@ class TicketPdf(Pdf):
 
 class TicketsPdf(TicketPdf):
 
+    def filter_info(
+        self,
+        form: TicketInvoiceSearchForm,
+        request: OrgRequest
+    ) -> None:
+        if not any((
+            form.has_payment.data is not None,
+            form.ticket_group.data,
+            form.ticket_start_date.data,
+            form.ticket_end_date.data,
+            form.reservation_start_date.data,
+            form.reservation_end_date.data,
+        )):
+            return
+
+        layout = DefaultLayout(None, request)
+        self.h1(_('Filters'))
+
+        data: list[list[str | Paragraph]] = []
+        if form.has_payment.data is not None:
+            data.append([
+                self.translate(form.has_payment.label.text),
+                '> 0.00' if form.has_payment.data else '≤ 0.00'
+            ])
+        if form.ticket_group.data:
+            label_dict = {
+                value: label
+                for value, label, *__ in form.ticket_group.iter_choices()
+            }
+            data.append([
+                self.translate(form.ticket_group.label.text),
+                MarkupParagraph(Markup('<br/>').join(
+                    label_dict.get(choice, choice)
+                    for choice in form.ticket_group.data
+                ))
+            ])
+
+        if form.ticket_start_date.data or form.ticket_end_date.data:
+            data.extend([
+                [
+                    self.translate(form.ticket_start_date.label.text),
+                    layout.format_date(form.ticket_start_date.data, 'date')
+                ],
+                [
+                    self.translate(form.ticket_end_date.label.text),
+                    layout.format_date(form.ticket_end_date.data, 'date')
+                ],
+            ])
+
+        if form.reservation_start_date.data or form.reservation_end_date.data:
+            data.extend([
+                [
+                    self.translate(form.reservation_start_date.label.text),
+                    layout.format_date(
+                        form.reservation_start_date.data, 'date')
+                ],
+                [
+                    self.translate(form.reservation_end_date.label.text),
+                    layout.format_date(form.reservation_end_date.data, 'date')
+                ],
+            ])
+        self.table(data, 'even')
+        self.story.append(PageBreak())
+
     @classmethod
     def from_tickets(
         cls,
         request: OrgRequest,
-        tickets: Collection[Ticket]
+        tickets: Collection[Ticket],
+        form: TicketInvoiceSearchForm | None = None
     ) -> BytesIO:
         """
         Creates a PDF representation of the tickets. It is sensible to the
@@ -680,6 +746,9 @@ class TicketsPdf(TicketPdf):
         pdf.init_a4_portrait(
             page_fn=pdf.page_fn_later, page_fn_later=pdf.page_fn_later
         )
+
+        if form is not None:
+            pdf.filter_info(form, request)
 
         for i, ticket in enumerate(tickets):
             # Only add page break after the first ticket

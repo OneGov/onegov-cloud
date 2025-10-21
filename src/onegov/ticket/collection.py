@@ -11,7 +11,7 @@ from onegov.ticket import handlers as global_handlers
 from onegov.ticket.models.invoice import TicketInvoice
 from onegov.ticket.models.invoice_item import TicketInvoiceItem
 from onegov.ticket.models.ticket import Ticket
-from sqlalchemy import desc, func
+from sqlalchemy import and_, desc, func, or_
 from sqlalchemy.orm import contains_eager, joinedload, selectinload, undefer
 from uuid import UUID
 
@@ -68,6 +68,11 @@ class TicketCollectionPagination(Pagination[Ticket]):
         return (
             isinstance(other, TicketCollection)
             and self.state == other.state
+            and self.handler == other.handler
+            and self.group == other.group
+            and self.owner == other.owner
+            and self.submitter == other.submitter
+            and self.extra_parameters == other.extra_parameters
             and self.page == other.page
         )
 
@@ -146,8 +151,8 @@ class TicketCollectionPagination(Pagination[Ticket]):
 
     def for_submitter(self, submitter: str) -> Self:
         return self.__class__(
-            self.session, 0, self.state, self.handler, self.group, self.owner,
-            submitter, self.extra_parameters
+            self.session, 0, self.state, self.handler, self.group,
+            self.owner, submitter, self.extra_parameters
         )
 
     def groups_by_handler_code(self) -> Query[tuple[str, list[str]]]:
@@ -224,6 +229,7 @@ class TicketCollection(TicketCollectionPagination):
         self,
         handler_code: str,
         handler_id: str,
+        order_id: UUID | None = None,
         **handler_data: Any
     ) -> Ticket:
         """ Opens a new ticket using the given handler. """
@@ -234,6 +240,7 @@ class TicketCollection(TicketCollectionPagination):
         # add it to the session before invoking the handler, who expects
         # each ticket to belong to a session already
         self.session.add(ticket)
+        ticket.order_id = order_id
         ticket.handler_id = handler_id
         ticket.handler_code = handler_code
         ticket.handler_data = handler_data
@@ -286,6 +293,9 @@ class TicketCollection(TicketCollectionPagination):
         return self.query().filter(
             func.lower(Ticket.ticket_email) == ticket_email.lower())
 
+    def by_order(self, order_id: UUID) -> Query[Ticket]:
+        return self.query().filter(Ticket.order_id == order_id)
+
 
 # FIXME: Why is this its own subclass? shouldn't this at least override
 #        __init__ to pin state to 'archived'?!
@@ -305,17 +315,19 @@ class TicketInvoiceCollection(
         self,
         session: Session,
         page: int = 0,
-        ticket_group: str | None = None,
+        ticket_group: list[str] | None = None,
         ticket_start: date | None = None,
         ticket_end: date | None = None,
         reservation_start: date | None = None,
         reservation_end: date | None = None,
+        has_payment: bool | None = None,
         invoiced: bool | None = None,
     ) -> None:
         Pagination.__init__(self, page)
         self.session = session
+        self.has_payment = has_payment
         self.invoiced = invoiced
-        self.ticket_group = ticket_group
+        self.ticket_group = ticket_group or []
         self.ticket_start = ticket_start
         self.ticket_end = ticket_end
         self.reservation_start = reservation_start
@@ -353,15 +365,25 @@ class TicketInvoiceCollection(
             contains_eager(TicketInvoice.ticket)
         )
 
+        if self.has_payment is True:
+            query = query.filter(Ticket.payment_id.isnot(None))
+        elif self.has_payment is False:
+            query = query.filter(Ticket.payment_id.is_(None))
+
         if self.invoiced is not None:
             query = query.filter(TicketInvoice.invoiced == self.invoiced)
 
         if self.ticket_group:
-            handler_code, *remainder = self.ticket_group.split('-', 1)
-            query = query.filter(Ticket.handler_code == handler_code)
-            if remainder:
-                group, = remainder
-                query = query.filter(Ticket.group == group)
+            conditions = []
+            for group in self.ticket_group:
+                handler_code, *remainder = group.split('-', 1)
+                condition = Ticket.handler_code == handler_code
+                if remainder:
+                    group, = remainder
+                    condition = and_(condition, Ticket.group == group)
+                conditions.append(condition)
+
+            query = query.filter(or_(*conditions))
 
         # Filter payments by each associated ticket creation date
         if self.ticket_start is not None:
@@ -380,25 +402,31 @@ class TicketInvoiceCollection(
         if self.reservation_start or self.reservation_end:
             from onegov.reservation import Reservation
 
-            subquery = self.session.query(Reservation.id)
-            subquery = subquery.join(
+            reservations = self.session.query(
+                func.max(Reservation.end).label('reference_date'),
+                TicketInvoiceItem.invoice_id,
+            ).join(
                 TicketInvoiceItem,
                 Reservation.id == TicketInvoiceItem.reservation_id
-            )
+            ).group_by(
+                TicketInvoiceItem.invoice_id
+            ).subquery()
+
+            subquery = self.session.query(reservations.c.invoice_id)
             subquery = subquery.filter(
-                TicketInvoiceItem.invoice_id == TicketInvoice.id
+                reservations.c.invoice_id == TicketInvoice.id
             )
 
             if self.reservation_start is not None:
                 subquery = subquery.filter(
-                    Reservation.end >= self.align_date(
+                    reservations.c.reference_date >= self.align_date(
                         self.reservation_start,
                         'down'
                     )
                 )
             if self.reservation_end is not None:
                 subquery = subquery.filter(
-                    Reservation.start <= self.align_date(
+                    reservations.c.reference_date <= self.align_date(
                         self.reservation_end,
                         'up'
                     )
@@ -421,6 +449,7 @@ class TicketInvoiceCollection(
             ticket_end=self.ticket_end,
             reservation_start=self.reservation_start,
             reservation_end=self.reservation_end,
+            has_payment=self.has_payment,
             invoiced=self.invoiced
         )
 
@@ -453,6 +482,7 @@ class TicketInvoiceCollection(
         return (
             isinstance(other, TicketInvoiceCollection)
             and self.page == other.page
+            and self.has_payment is other.has_payment
             and self.invoiced is other.invoiced
             and self.ticket_group == other.ticket_group
             and self.ticket_start == other.ticket_start
@@ -470,5 +500,6 @@ class TicketInvoiceCollection(
             ticket_end=self.ticket_end,
             reservation_start=self.reservation_start,
             reservation_end=self.reservation_end,
-            invoiced=invoiced
+            has_payment=self.has_payment,
+            invoiced=invoiced,
         )

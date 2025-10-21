@@ -73,6 +73,7 @@ $.Redactor.opts.langs['fr'] = {
     deleted: 'Supprimer',
     anchor: 'Ancre',
     link_new_tab: 'Ouvrir le lien dans un nouvel onglet',
+    link_select_page: 'Sélectionner une page...',
     underline: 'Souligner',
     alignment: 'Alignement',
     filename: 'Nom de fichier (optionnel)',

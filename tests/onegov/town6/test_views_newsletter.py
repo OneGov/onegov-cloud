@@ -1,23 +1,28 @@
+from __future__ import annotations
+
 import os
 import re
-from io import BytesIO
 import transaction
 
 from datetime import datetime
 from freezegun import freeze_time
-from openpyxl import load_workbook
-
+from io import BytesIO
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.utils import Bunch
 from onegov.newsletter import RecipientCollection, NewsletterCollection
 from onegov.user import UserCollection
+from openpyxl import load_workbook
 from sedate import replace_timezone
+from tests.shared.utils import find_link_by_href_end
 from webtest.forms import Upload
 
-from tests.shared.utils import find_link_by_href_end
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
 
 
-def test_show_newsletter(client):
+def test_show_newsletter(client: Client) -> None:
     client.login_admin().follow()
 
     page = client.get('/newsletter-settings')
@@ -52,7 +57,7 @@ def test_show_newsletter(client):
     assert "Newsletter" in page.text
 
 
-def test_newsletter_disabled(client):
+def test_newsletter_disabled(client: Client) -> None:
 
     anon = client.spawn()
 
@@ -70,11 +75,15 @@ def test_newsletter_disabled(client):
     assert client.get('/newsletters').status_code == 200
 
 
-def test_unsubscribe_link(client):
-    request = Bunch(identity_secret=client.app.identity_secret, app=client.app)
+def test_unsubscribe_link(client: Client) -> None:
+    request: Any = Bunch(
+        identity_secret=client.app.identity_secret,
+        app=client.app
+    )
 
     session = client.app.session()
     user = UserCollection(session).by_username('editor@example.org')
+    assert user is not None
     assert not user.data
 
     # valid token
@@ -88,6 +97,7 @@ def test_unsubscribe_link(client):
     client.post(url)
 
     user = UserCollection(session).by_username('editor@example.org')
+    assert user is not None
     assert user.data['ticket_statistics'] == 'never'
 
     # unknown user
@@ -111,7 +121,7 @@ def test_unsubscribe_link(client):
     client.post(url)
 
 
-def test_newsletters_crud(client):
+def test_newsletters_crud(client: Client) -> None:
 
     client.login_admin()
     page = client.get('/newsletter-settings')
@@ -125,6 +135,7 @@ def test_newsletters_crud(client):
     assert 'Es wurden noch keine Newsletter versendet' in newsletter
 
     new_link = find_link_by_href_end(newsletter, '/newsletters/new')
+    assert new_link is not None
     new = newsletter.click(href=new_link['href'])
     new.form['title'] = "Our town is AWESOME"
     new.form['lead'] = "Like many of you, I just love our town..."
@@ -166,7 +177,7 @@ def test_newsletters_crud(client):
     assert "noch keine Newsletter" in newsletters
 
 
-def test_newsletter_secret_private_content(client):
+def test_newsletter_secret_private_content(client: Client) -> None:
     client.login_admin()
     page = client.get('/newsletter-settings')
     page.form['show_newsletter'] = True
@@ -198,6 +209,7 @@ def test_newsletter_secret_private_content(client):
 
     newsletter = client.get('/newsletters')
     new_link = find_link_by_href_end(newsletter, '/newsletters/new')
+    assert new_link is not None
     new = newsletter.click(href=new_link['href'])
     new.form['title'] = "Information"
     new.form['lead'] = ("We love information about our town!")
@@ -249,7 +261,7 @@ def test_newsletter_secret_private_content(client):
     assert "Private Information" not in newsletter
 
 
-def test_newsletter_signup(client):
+def test_newsletter_signup(client: Client) -> None:
 
     client.login_admin()
     page = client.get('/newsletter-settings')
@@ -276,8 +288,8 @@ def test_newsletter_signup(client):
     assert 'Mit freundlichen Grüssen' not in message
     assert 'Das OneGov Cloud Team' not in message
 
-    confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)
-    unsubscribe = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
+    confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)  # type: ignore[union-attr]
+    unsubscribe = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)  # type: ignore[union-attr]
     assert confirm.split('/confirm')[0] == unsubscribe.split('/unsubscribe')[0]
 
     # unsubscribing before the opt-in does nothing, no emails are sent
@@ -308,7 +320,7 @@ def test_newsletter_signup(client):
     assert len(os.listdir(client.app.maildir)) == 2
 
 
-def test_newsletter_signup_for_categories(client):
+def test_newsletter_signup_for_categories(client: Client) -> None:
     client.login_admin()
     page = client.get('/newsletter-settings')
     page.form['show_newsletter'] = True
@@ -342,12 +354,13 @@ def test_newsletter_signup_for_categories(client):
     assert ('Um Ihre Abonnementkategorien zu aktualisieren, klicken Sie hier'
             in message)
     assert 'Klicken Sie hier, um sich abzumelden' in message
-    update_link = re.search(r'aktualisieren\]\(([^\)]+)', message).group(1)
+    update_link = re.search(r'aktualisieren\]\(([^\)]+)', message).group(1)  # type: ignore[union-attr]
     assert update_link.endswith('newsletters/update')
 
     # test recipient
     recipients = RecipientCollection(client.app.session())
     recipient = recipients.by_address('info@example.org')
+    assert recipient is not None
     assert recipient.subscribed_categories == ['News', 'Anlässe']
     assert recipient.confirmed is False
 
@@ -360,11 +373,12 @@ def test_newsletter_signup_for_categories(client):
 
     recipients = RecipientCollection(client.app.session())
     recipient = recipients.by_address('info@example.org')
+    assert recipient is not None
     assert recipient.subscribed_categories == ['Sport']
     assert recipient.confirmed is False
 
 
-def test_newsletter_rfc8058(client):
+def test_newsletter_rfc8058(client: Client) -> None:
 
     client.login_admin()
     page = client.get('/newsletter-settings')
@@ -391,7 +405,7 @@ def test_newsletter_rfc8058(client):
     assert 'List-Unsubscribe-Post' in headers
     unsubscribe = headers['List-Unsubscribe'].strip('<>')
 
-    confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)
+    confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)  # type: ignore[union-attr]
     assert confirm.split('/confirm')[0] == unsubscribe.split('/unsubscribe')[0]
 
     # unsubscribing before the opt-in does nothing, no emails are sent
@@ -420,7 +434,7 @@ def test_newsletter_rfc8058(client):
     assert len(os.listdir(client.app.maildir)) == 2
 
 
-def test_newsletter_subscribers_and_edit_bar(client):
+def test_newsletter_subscribers_and_edit_bar(client: Client) -> None:
     client.login_admin()
     page = client.get('/newsletter-settings')
     page.form['show_newsletter'] = True
@@ -453,7 +467,7 @@ def test_newsletter_subscribers_and_edit_bar(client):
         assert not page.pyquery('a.new-newsletter')
 
 
-def test_newsletter_subscribers_management(client):
+def test_newsletter_subscribers_management(client: Client) -> None:
 
     client.login_admin()
     page = client.get('/newsletter-settings')
@@ -469,7 +483,7 @@ def test_newsletter_subscribers_management(client):
 
     message = client.get_email(0)['TextBody']
 
-    confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)
+    confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)  # type: ignore[union-attr]
     assert "info@example.org wurde erfolgreich" in client.get(confirm).follow()
 
     client.login_editor()
@@ -482,10 +496,10 @@ def test_newsletter_subscribers_management(client):
     assert "info@example.org erfolgreich vom Newsletter abgemeldet" in result
 
 
-def test_newsletter_subscribers_management_by_manager(client):
+def test_newsletter_subscribers_management_by_manager(client: Client) -> None:
     # a manager (editor or admin) adds a new subscriber
 
-    def subscribe_by_manager(client):
+    def subscribe_by_manager(client: Client) -> None:
         page = client.get('/newsletters')
         page.form['address'] = 'info@govikon.org'
         page.form['confirmed'] = True
@@ -499,6 +513,7 @@ def test_newsletter_subscribers_management_by_manager(client):
         assert "info@govikon.org" in subscribers
 
         recipient = RecipientCollection(client.app.session()).query().first()
+        assert recipient is not None
         assert recipient.confirmed is True
 
         unsubscribe = subscribers.pyquery('a[ic-get-from]').attr('ic-get-from')
@@ -514,7 +529,9 @@ def test_newsletter_subscribers_management_by_manager(client):
     client.logout()
 
 
-def test_newsletter_creation_limited_to_logged_in_users(client):
+def test_newsletter_creation_limited_to_logged_in_users(
+    client: Client
+) -> None:
     # verify adding a new newsletter view is set to private
 
     # enable the newsletter
@@ -544,7 +561,7 @@ def test_newsletter_creation_limited_to_logged_in_users(client):
             '/newsletters/new', expect_errors=True).status_code == 403
 
 
-def test_newsletter_send(client):
+def test_newsletter_send(client: Client) -> None:
 
     client.login_admin()
     page = client.get('/newsletter-settings')
@@ -565,6 +582,7 @@ def test_newsletter_send(client):
     # add a newsletter
     newsletters = client.get('/newsletters')
     new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+    assert new_link is not None
     new = newsletters.click(href=new_link['href'])
     new.form['title'] = "Our town is AWESOME"
     new.form['lead'] = "Like many of you, I just love our town..."
@@ -624,15 +642,15 @@ def test_newsletter_send(client):
     assert "Our town is AWESOME" in message
     assert "Like many of you" in message
 
-    web = re.search(r'Web-Version anzuzeigen.\]\(([^\)]+)', message).group(1)
+    web = re.search(r'Web-Version anzuzeigen.\]\(([^\)]+)', message).group(1)  # type: ignore[union-attr]
     assert web.endswith('/newsletter/our-town-is-awesome')
 
     # make sure the unconfirm link is different for each mail
-    unconfirm_1 = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
+    unconfirm_1 = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)  # type: ignore[union-attr]
 
     mail = client.get_email(0, 1)
     message = mail['TextBody']
-    unconfirm_2 = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
+    unconfirm_2 = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)  # type: ignore[union-attr]
 
     assert unconfirm_1 and unconfirm_2
     assert unconfirm_1 != unconfirm_2
@@ -654,7 +672,7 @@ def test_newsletter_send(client):
     assert 'Closing Remarks' in message
 
 
-def test_newsletter_send_with_categories(client):
+def test_newsletter_send_with_categories(client: Client) -> None:
 
     client.login_admin()
     page = client.get('/newsletter-settings')
@@ -681,6 +699,7 @@ def test_newsletter_send_with_categories(client):
     # add a newsletter
     newsletters = client.get('/newsletters')
     new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+    assert new_link is not None
     new = newsletters.click(href=new_link['href'])
     new.form['title'] = "Our town is AWESOME"
     new.form['lead'] = "Like many of you, I just love our town..."
@@ -740,6 +759,7 @@ def test_newsletter_send_with_categories(client):
     # add a second newsletter
     newsletters = client.get('/newsletters')
     new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+    assert new_link is not None
     new = newsletters.click(href=new_link['href'])
     new.form['title'] = "Sport Update"
     new.form['lead'] = "Bla bla blupp..."
@@ -777,12 +797,13 @@ def test_newsletter_send_with_categories(client):
     assert len(os.listdir(client.app.maildir)) == 2
 
 
-def test_newsletter_schedule(client):
+def test_newsletter_schedule(client: Client) -> None:
     client.login_editor()
 
     # add a newsletter
     newsletters = client.get('/newsletters')
     new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+    assert new_link is not None
     new = newsletters.click(href=new_link['href'])
     new.form['title'] = "Our town is AWESOME"
     new.form['lead'] = "Like many of you, I just love our town..."
@@ -821,12 +842,13 @@ def test_newsletter_schedule(client):
         send.form.submit().follow()
 
 
-def test_newsletter_test_delivery(client):
+def test_newsletter_test_delivery(client: Client) -> None:
     client.login_editor()
 
     # add a newsletter
     newsletters = client.get('/newsletters')
     new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+    assert new_link is not None
     new = newsletters.click(href=new_link['href'])
     new.form['title'] = "Our town is AWESOME"
     new.form['lead'] = "Like many of you, I just love our town..."
@@ -834,24 +856,24 @@ def test_newsletter_test_delivery(client):
     new.select_checkbox("news", "Willkommen bei OneGov")
     new.select_checkbox("occurrences", "150 Jahre Govikon")
 
-    newsletter = new.form.submit().follow()
+    newsletter_page = new.form.submit().follow()
 
     # add some recipients the quick wqy
     recipients = RecipientCollection(client.app.session())
     recipients.add('one@example.org', confirmed=True)
     recipients.add('two@example.org', confirmed=True)
 
-    recipient = recipients.query().first().id.hex
+    recipient = recipients.query().first().id.hex  # type: ignore[union-attr]
 
     transaction.commit()
 
-    send = newsletter.click('Test')
+    send = newsletter_page.click('Test')
     send.form['selected_recipient'] = recipient
     send.form.submit().follow()
 
     assert len(os.listdir(client.app.maildir)) == 1
 
-    send = newsletter.click('Test')
+    send = newsletter_page.click('Test')
     send.form['selected_recipient'] = recipient
     send.form.submit().follow()
 
@@ -862,7 +884,7 @@ def test_newsletter_test_delivery(client):
     assert not newsletter.recipients
 
 
-def test_import_export_subscribers(client):
+def test_import_export_subscribers(client: Client) -> None:
     with freeze_time("2018-05-31 12:00"):
         session = client.app.session()
         client.login_admin()
@@ -870,6 +892,7 @@ def test_import_export_subscribers(client):
         # add a newsletter
         newsletters = client.get('/newsletters')
         new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+        assert new_link is not None
         new = newsletters.click(href=new_link['href'])
         new.form['title'] = "Our town is AWESOME"
         new.form['lead'] = "Like many of you, I just love our town..."
@@ -941,11 +964,13 @@ def test_import_export_subscribers(client):
         assert recipients.query().filter_by(confirmed=True).count() == 4
 
 
-def test_admin_receives_email_notification_on_unsubscription(client):
+def test_admin_receives_email_notification_on_unsubscription(
+    client: Client
+) -> None:
 
-    def extract_unsubscription_link(client, index):
+    def extract_unsubscription_link(client: Client, index: int) -> str:
         message = client.get_email(index)['TextBody']
-        unsubscribe = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
+        unsubscribe = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)  # type: ignore[union-attr]
         return unsubscribe
 
     client.login_admin()
@@ -959,6 +984,7 @@ def test_admin_receives_email_notification_on_unsubscription(client):
     # add a newsletter
     newsletters = client.get('/newsletters')
     new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+    assert new_link is not None
     new = newsletters.click(href=new_link['href'])
     new.form['title'] = "Our town is AWESOME"
     new.form['lead'] = "Like many of you, I just love our town..."
@@ -999,6 +1025,7 @@ def test_admin_receives_email_notification_on_unsubscription(client):
     # add another newsletter
     newsletters = client.get('/newsletters')
     new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+    assert new_link is not None
     new = newsletters.click(href=new_link['href'])
     new.form['title'] = "Our town is AWESOME 2"
     new.form['lead'] = "Event reminder"
