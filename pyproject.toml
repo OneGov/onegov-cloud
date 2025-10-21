@@ -79,7 +79,6 @@ module = [
     "tests.onegov.landsgemeinde.*",
     "tests.onegov.pas.*",
     "tests.onegov.swissvotes.*",
-    "tests.onegov.town6.*",
     "tests.onegov.translator_directory.*",
     "tests.onegov.winterthur.*",
 ]

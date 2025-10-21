@@ -1,8 +1,16 @@
+from __future__ import annotations
+
 import os
 import re
 
 
-def test_directory_prev_next(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.client import ExtendedResponse
+    from .conftest import Client
+
+
+def test_directory_prev_next(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/directories').click('Verzeichnis')
@@ -52,7 +60,7 @@ def test_directory_prev_next(client):
     assert 'Susan Light' not in zak_page
 
 
-def test_newline_in_directory_header(client):
+def test_newline_in_directory_header(client: Client) -> None:
 
     client.login_admin()
     page = client.get('/directories')
@@ -74,7 +82,7 @@ def test_newline_in_directory_header(client):
     assert "this is a multiline<br>lead" in page
 
 
-def test_change_directory_url(client):
+def test_change_directory_url(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/directories').click('Verzeichnis')
@@ -109,7 +117,7 @@ def test_change_directory_url(client):
     assert 'Das Formular enthält Fehler' in page
 
 
-def test_directory_entry_subscription(client):
+def test_directory_entry_subscription(client: Client) -> None:
     client.login_admin()
 
     assert len(os.listdir(client.app.maildir)) == 0
@@ -137,12 +145,12 @@ def test_directory_entry_subscription(client):
 
     assert len(os.listdir(client.app.maildir)) == 3
     message = client.get_email(0)['TextBody']
-    confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)
+    confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)  # type: ignore[union-attr]
     message_2 = client.get_email(1)['TextBody']
-    confirm_2 = re.search(
+    confirm_2 = re.search(  # type: ignore[union-attr]
         r'Anmeldung bestätigen\]\(([^\)]+)', message_2).group(1)
     message_3 = client.get_email(2)['TextBody']
-    confirm_3 = re.search(
+    confirm_3 = re.search(  # type: ignore[union-attr]
         r'Anmeldung bestätigen\]\(([^\)]+)', message_3).group(1)
 
     illegal_confirm = confirm.split('/confirm')[0] + 'x/confirm'
@@ -172,14 +180,14 @@ def test_directory_entry_subscription(client):
     message = client.get_email(3)['TextBody']
     assert 'Emily Larlham' in message
 
-    unsubscribe = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
+    unsubscribe = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)  # type: ignore[union-attr]
     page = client.get(unsubscribe).follow().follow()
     assert "wurde erfolgreich abgemeldet" in page
 
 
-def test_create_directory_accordion_layout(client):
+def test_create_directory_accordion_layout(client: Client) -> None:
 
-    def create_directory(client, title):
+    def create_directory(client: Client, title: str) -> ExtendedResponse:
         page = (client.get('/directories').
                 click('Verzeichnis'))
         page.form['title'] = title

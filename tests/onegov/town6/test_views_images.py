@@ -1,9 +1,15 @@
-from webtest import Upload
+from __future__ import annotations
 
+from webtest import Upload
 from tests.shared.utils import create_image, get_meta
 
 
-def test_view_images(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_view_images(client: Client) -> None:
     assert client.get('/images', expect_errors=True).status_code == 403
 
     client.login_admin()

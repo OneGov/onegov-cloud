@@ -1,9 +1,16 @@
+from __future__ import annotations
+
 import transaction
 
 from freezegun import freeze_time
 
 
-def test_homepage(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_homepage(client: Client) -> None:
     client.app.org.meta['homepage_cover'] = "<b>0xdeadbeef</b>"
     client.app.org.meta['homepage_structure'] = """
     <row-wide>
@@ -72,7 +79,7 @@ def test_homepage(client):
     assert 'Alle News' in homepage
 
 
-def test_add_new_root_topic(client):
+def test_add_new_root_topic(client: Client) -> None:
     # ensure a root page can be added once admin is logged-in
     client.login_admin().follow()
 
@@ -92,7 +99,7 @@ def test_add_new_root_topic(client):
     assert 'Super Thema' in page
 
 
-def test_chat_opening_hours(client):
+def test_chat_opening_hours(client: Client) -> None:
     with freeze_time('2024-05-17 09:00'):
         anon = client.spawn()
         admin = client.spawn()
