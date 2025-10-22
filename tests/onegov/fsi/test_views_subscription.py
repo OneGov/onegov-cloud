@@ -1,14 +1,22 @@
+from __future__ import annotations
+
 from onegov.fsi.collections.course_event import CourseEventCollection
-from onegov.fsi.models import CourseSubscription, CourseAttendee, \
-    CourseEvent, Course
+from onegov.fsi.models import (
+    CourseSubscription, CourseAttendee, CourseEvent, Course)
 from onegov.user import User
 
 
-def test_locked_course_event_reservations(client_with_db):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_locked_course_event_reservations(client_with_db: Client) -> None:
     client = client_with_db
     client.login_admin()
     session = client.app.session()
     course = session.query(Course).first()
+    assert course is not None
 
     # Add a new course event
     page = client.get(f'/fsi/events/add?course_id={course.id}')
@@ -37,14 +45,16 @@ def test_locked_course_event_reservations(client_with_db):
     assert 'Diese Durchführung kann nicht (mehr) gebucht werden.' not in page
 
 
-def test_subscription_to_a_course_event(client_with_db):
+def test_subscription_to_a_course_event(client_with_db: Client) -> None:
     client = client_with_db
     client.login_admin()
     session = client.app.session()
     course = session.query(Course).first()
+    assert course is not None
 
     attendee = session.query(CourseAttendee).first()
-    assert attendee.user_id == session.query(User).filter_by(
+    assert attendee is not None
+    assert attendee.user_id == session.query(User).filter_by(  # type: ignore[union-attr]
         role='member').first().id
     assert attendee.organisation == 'ORG'
 
@@ -73,7 +83,7 @@ def test_subscription_to_a_course_event(client_with_db):
     assert 'Neue Anmeldung wurde hinzugefügt' in page
 
 
-def test_reservation_collection_view(client_with_db):
+def test_reservation_collection_view(client_with_db: Client) -> None:
     view = '/fsi/reservations'
     client = client_with_db
     client.get(view, status=403)
@@ -87,25 +97,29 @@ def test_reservation_collection_view(client_with_db):
     assert '01.01.1950' in page
 
 
-def test_reservation_details(client_with_db):
+def test_reservation_details(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
     attendee = session.query(CourseAttendee).first()
+    assert attendee is not None
     subscription = attendee.subscriptions.first()
+    assert subscription is not None
 
     view = f'/fsi/reservation/{subscription.id}'
     # This view has just the delete method
     client.get(view, status=405)
 
 
-def test_edit_reservation(client_with_db):
+def test_edit_reservation(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
     subscription = session.query(CourseSubscription).filter(
         CourseSubscription.attendee_id != None).first()
+    assert subscription is not None
 
     placeholder = session.query(CourseSubscription).filter(
         CourseSubscription.attendee_id == None).first()
+    assert placeholder is not None
 
     events = session.query(CourseEvent).all()
     assert events[1].id != subscription.course_event_id
@@ -155,7 +169,7 @@ def test_edit_reservation(client_with_db):
     assert page.form['attendee_id'].value == new_id
 
 
-def test_own_reservations(client_with_db):
+def test_own_reservations(client_with_db: Client) -> None:
     client = client_with_db
     client.login_editor()
     page = client.get('/topics/informationen')
@@ -167,16 +181,18 @@ def test_own_reservations(client_with_db):
     assert 'Keine Einträge gefunden' not in page
 
 
-def test_create_delete_reservation(client_with_db):
+def test_create_delete_reservation(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
 
     attendee = session.query(CourseAttendee).first()
+    assert attendee is not None
     att_res = attendee.subscriptions.all()
     assert len(att_res) == 2
 
     # Lazy loading not possible
     member = session.query(User).filter_by(role='member').first()
+    assert member is not None
     coll = CourseEventCollection(session, upcoming_only=True)
     events = coll.query().all()
     # one of the three is past
