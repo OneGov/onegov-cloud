@@ -4,8 +4,7 @@ from onegov.translator_directory.models.time_report import TranslatorTimeReport
 
 from functools import cached_property
 from markupsafe import Markup, escape
-from onegov.core.elements import Link
-from onegov.core.elements import LinkGroup
+from onegov.core.elements import Intercooler, Link, LinkGroup
 from onegov.core.templates import render_macro
 from onegov.core.utils import linkify
 from onegov.org import _
@@ -297,14 +296,12 @@ class TimeReportHandler(Handler):
 
         links: list[Link | LinkGroup] = []
 
-        if self.state is None:
+        if self.time_report:
             links.append(
                 Link(
-                    text=_('Accept Time Report'),
-                    url=request.return_here(
-                        request.link(self.ticket, 'accept-time-report')
-                    ),
-                    attrs={'class': 'accept-link'},
+                    text=_('View Time Report'),
+                    url=request.return_here(request.link(self.time_report)),
+                    attrs={'class': 'time'},
                 )
             )
 
@@ -315,6 +312,21 @@ class TimeReportHandler(Handler):
                 attrs={'class': 'internal-link'},
             )
         )
+
+        if self.state is None:
+            links.append(
+                Link(
+                    text=_('Accept Time Report'),
+                    url=request.link(self.ticket, 'accept-time-report'),
+                    attrs={'class': 'accept-link'},
+                    traits=(
+                        Intercooler(
+                            request_method='POST',
+                            redirect_after=request.link(self.ticket),
+                        ),
+                    ),
+                )
+            )
 
         return links
 

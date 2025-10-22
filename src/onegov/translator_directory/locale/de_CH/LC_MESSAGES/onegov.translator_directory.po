@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-10-21 13:17+0200\n"
+"POT-Creation-Date: 2025-10-22 14:11+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -102,6 +102,9 @@ msgstr "Verzeichniseinstellungen"
 
 msgid "Users"
 msgstr "Benutzer"
+
+msgid "Time Reports"
+msgstr "Zeiterfassungen"
 
 msgid "Tickets"
 msgstr "Tickets"
@@ -692,9 +695,6 @@ msgstr "Mutation"
 msgid "Time Report"
 msgstr "Zeiterfassung"
 
-msgid "Time Reports"
-msgstr "Zeiterfassungen"
-
 msgid "Assignment Date"
 msgstr "Einsatzdatum"
 
@@ -718,6 +718,9 @@ msgstr "Reise"
 
 msgid "Total"
 msgstr "Total"
+
+msgid "View Time Report"
+msgstr "Zeiterfassung anzeigen"
 
 msgid "Accept Time Report"
 msgstr "Zeiterfassung akzeptieren"
@@ -822,6 +825,24 @@ msgstr "Zulassung verweigert."
 
 msgid "Proposed changes applied"
 msgstr "Vorgeschlagene Änderungen übernommen"
+
+msgid "Travel Compensation"
+msgstr "Wegpauschale"
+
+msgid "Base Compensation"
+msgstr "Grundentschädigung"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Pending"
+msgstr "Ausstehend"
+
+msgid "Confirmed"
+msgstr "Bestätigt"
+
+msgid "No time reports found"
+msgstr "Keine Zeiterfassungen gefunden"
 
 msgid "This translator is in the admission process!"
 msgstr "Dieser Übersetzer ist im Zulassungsverfahren!"

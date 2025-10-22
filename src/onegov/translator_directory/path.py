@@ -12,6 +12,9 @@ from onegov.translator_directory.collections.translator import (
 from onegov.translator_directory.models.accreditation import Accreditation
 from onegov.translator_directory.models.language import Language
 from onegov.translator_directory.models.mutation import TranslatorMutation
+from onegov.translator_directory.models.time_report import (
+    TranslatorTimeReport,
+)
 from onegov.translator_directory.models.translator import Translator
 from uuid import UUID
 
@@ -151,3 +154,14 @@ def get_time_reports(
     app: TranslatorDirectoryApp, page: int = 0
 ) -> TimeReportCollection:
     return TimeReportCollection(app, page)
+
+
+@TranslatorDirectoryApp.path(
+    model=TranslatorTimeReport,
+    path='/time-report/{id}',
+    converters={'id': UUID},
+)
+def get_time_report(
+    request: TranslatorAppRequest, id: UUID
+) -> TranslatorTimeReport | None:
+    return request.session.query(TranslatorTimeReport).filter_by(id=id).first()

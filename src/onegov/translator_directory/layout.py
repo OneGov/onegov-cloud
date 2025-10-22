@@ -15,6 +15,9 @@ from onegov.org.models import Organisation
 from onegov.translator_directory.collections.documents import \
     TranslatorDocumentCollection
 from onegov.translator_directory.collections.language import LanguageCollection
+from onegov.translator_directory.collections.time_report import (
+    TimeReportCollection,
+)
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.constants import (
@@ -26,6 +29,9 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.translator_directory.models.language import Language
+    from onegov.translator_directory.models.time_report import (
+        TranslatorTimeReport,
+    )
     from markupsafe import Markup
     from onegov.translator_directory.models.translator import (
         AdmissionState, Gender, Translator)
@@ -633,4 +639,44 @@ class RefuseAccreditationLayout(DefaultLayout):
             )
         )
         links.append(Link(_('Refuse admission')))
+        return links
+
+
+class TimeReportCollectionLayout(DefaultLayout):
+
+    if TYPE_CHECKING:
+        model: TimeReportCollection
+
+    @cached_property
+    def title(self) -> str:
+        return _('Time Reports')
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        links = super().breadcrumbs
+        assert isinstance(links, list)
+        links.append(Link(_('Time Reports')))
+        return links
+
+
+class TimeReportLayout(DefaultLayout):
+
+    if TYPE_CHECKING:
+        model: TranslatorTimeReport
+
+        def __init__(
+            self, model: TranslatorTimeReport, request: TranslatorAppRequest
+        ) -> None: ...
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        links = super().breadcrumbs
+        assert isinstance(links, list)
+        links.append(
+            Link(
+                text=_('Time Reports'),
+                url=self.request.class_link(TimeReportCollection),
+            )
+        )
+        links.append(Link(self.model.title))
         return links

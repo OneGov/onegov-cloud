@@ -27,9 +27,14 @@
                                         ${report.translator.title}
                                     </a>
                                 </td>
-                                <td>${layout.format_date(
-                                    report.assignment_date, 'date')}</td>
-                                <td>${report.assignment_type or '-'}</td>
+                                <td>
+                                    <a href="${request.link(report)}">
+                                        ${layout.format_date(
+                                            report.assignment_date, 'date')}
+                                    </a>
+                                </td>
+                                <td>${layout.format_interpreting_type(
+                                    report.assignment_type) if report.assignment_type else '-'}</td>
                                 <td>${report.duration} min</td>
                                 <td>${report.case_number or '-'}</td>
                                 <td>${layout.format_currency(
