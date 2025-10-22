@@ -8,7 +8,8 @@ var setupOccupancyCalendar = function(calendar) {
         view: calendar.data('view'),
         date: calendar.data('date'),
         highlights_min: calendar.data('highlights-min'),
-        highlights_max: calendar.data('highlights-max')
+        highlights_max: calendar.data('highlights-max'),
+        pdf_url: calendar.data('pdf-url')
     });
 };
 
