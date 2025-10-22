@@ -29,6 +29,11 @@ if TYPE_CHECKING:
 
 log = logging.getLogger('onegov.pas.orchestrator')
 
+
+class APIAccessibilityError(Exception):
+    """Raised when the KUB API is not accessible."""
+
+
 # Disable SSL warnings for self-signed certificates
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -172,14 +177,14 @@ class KubImporter:
         try:
             response = self.session.get(test_url, timeout=10)
             if response.status_code != 200:
-                raise RuntimeError(
+                raise APIAccessibilityError(
                     f'API check failed: {response.status_code} - '
                     f'{response.text}'
                 )
             if self.output:
                 self.output.success('API is accessible')
         except requests.exceptions.RequestException as e:
-            raise RuntimeError(f'API check failed: {e}') from e
+            raise APIAccessibilityError(f'API check failed: {e}') from e
 
     def _update_address_fields(
         self,
@@ -576,7 +581,25 @@ class KubImporter:
         import_log_id = import_log.id
 
         try:
-            self._check_api_accessibility()
+            try:
+                self._check_api_accessibility()
+            except APIAccessibilityError as e:
+                log.warning(f'API accessibility check failed: {e}')
+                import_log.details.update(
+                    {'error': str(e), 'status': 'failed'}
+                )
+                flag_modified(import_log, 'details')
+                import_log.status = 'failed'
+                if self.output:
+                    self.output.error(f'API not accessible: {e}')
+                request.session.flush()
+                return (
+                    {},
+                    people_data,
+                    organization_data,
+                    membership_data,
+                    import_log_id,
+                )
 
             if self.output:
                 self.output.info('Fetching people data...')
