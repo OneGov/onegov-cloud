@@ -1,6 +1,11 @@
+from __future__ import annotations
 
 
-def test_basic_search(client_with_fts):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+def test_basic_search(client_with_fts: Client) -> None:
     client = client_with_fts
     client.login_admin()
     anom = client.spawn()

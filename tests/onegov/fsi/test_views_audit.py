@@ -1,11 +1,19 @@
+from __future__ import annotations
+
+import pytest
+
 from datetime import timedelta
 from sedate import utcnow
 from uuid import uuid4
-from pytest import mark
 
 
-@mark.flaky(reruns=3, only_rerun=None)
-def test_audit_for_course(client, scenario):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client, FsiScenario
+
+
+@pytest.mark.flaky(reruns=3, only_rerun=None)
+def test_audit_for_course(client: Client, scenario: FsiScenario) -> None:
     """
     Story:
     For a course with refresh interval,
@@ -63,8 +71,11 @@ def test_audit_for_course(client, scenario):
 
     scenario.commit()
     scenario.refresh()
-    editor = scenario.first_user('editor')
-    editor.permissions = ['UBV', 'ZHW']
+    # FIXME: This doesn't do anything, was the intention to check permissions
+    #        at some point? If so we need to create an attendee for the editor
+    #        set the permissions on the attendee and log in as the editor...
+    # editor = scenario.first_user('editor')
+    # editor.permissions = ['UBV', 'ZHW']  # type: ignore[attr-defined]
 
     scenario.commit()
     scenario.refresh()

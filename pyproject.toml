@@ -75,7 +75,6 @@ ignore_missing_imports = true
 module = [
     "tests.onegov.election_day.*",
     "tests.onegov.feriennet.*",
-    "tests.onegov.fsi.*",
     "tests.onegov.pas.*",
     "tests.onegov.swissvotes.*",
     "tests.onegov.translator_directory.*",
