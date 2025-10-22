@@ -1,22 +1,29 @@
+from __future__ import annotations
+
 from dateutil import parser
 from freezegun import freeze_time
 from lxml import etree
 from onegov.landsgemeinde.models import Assembly
-from tests.onegov.town6.conftest import Client
 from transaction import begin
 from transaction import commit
 
 
-def test_views(client_with_fts):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import TestApp
+    from tests.onegov.town6.conftest import Client
+
+
+def test_views(client_with_fts: Client[TestApp]) -> None:
     last_modified = []
 
-    def assert_last_modified():
+    def assert_last_modified() -> None:
         response = client_with_fts.head('/assembly/2023-05-07/ticker')
         last_modified.append(parser.parse(response.headers['Last-Modified']))
         assert sorted(last_modified) == last_modified
         assert len(set(last_modified)) == len(last_modified)
 
-    client_with_fts.login('admin@example.org', 'hunter2')
+    client_with_fts.login_admin()
 
     page = client_with_fts.get('/').click('Archiv')
     assert 'Noch keine Landsgemeinden erfasst.' in page
@@ -209,16 +216,14 @@ def test_views(client_with_fts):
         page = page.click('Archiv', index=0)
     assert 'Noch keine Landsgemeinden erfasst.' in page
 
-def test_view_pages_cache(landsgemeinde_app):
-    client = Client(landsgemeinde_app)
-
+def test_view_pages_cache(client: Client[TestApp]) -> None:
     # make sure codes != 200 are not cached
-    anonymous = Client(landsgemeinde_app)
+    anonymous = client.spawn()
     anonymous.get('/assembly/2023-05-07/ticker', status=404)
-    assert len(landsgemeinde_app.pages_cache.keys()) == 0
+    assert len(client.app.pages_cache.keys()) == 0
 
     # add assembly
-    client.login('admin@example.org', 'hunter2')
+    client.login_admin()
     page = client.get('/').click('Archiv')
     page = page.click('Landsgemeinde')
     page.form['date'] = '2023-05-07'
@@ -227,28 +232,28 @@ def test_view_pages_cache(landsgemeinde_app):
     page = page.form.submit()
 
     # make sure set-cookies are not cached
-    anonymous = Client(landsgemeinde_app)
+    anonymous = anonymous.spawn()
     response = anonymous.get('/assembly/2023-05-07/ticker')
     assert 'Set-Cookie' in response.headers  # session_id
-    assert len(landsgemeinde_app.pages_cache.keys()) == 0
+    assert len(client.app.pages_cache.keys()) == 0
 
     # make sure HEAD request are cached without qs
     anonymous.head('/assembly/2023-05-07/ticker')
-    assert len(landsgemeinde_app.pages_cache.keys()) == 1
+    assert len(client.app.pages_cache.keys()) == 1
 
     anonymous.head('/assembly/2023-05-07/ticker?now')
-    assert len(landsgemeinde_app.pages_cache.keys()) == 1
+    assert len(client.app.pages_cache.keys()) == 1
 
     # Create cache entries
     assert 'Lorem' in anonymous.get('/assembly/2023-05-07/ticker')
-    assert len(landsgemeinde_app.pages_cache.keys()) == 2
+    assert len(client.app.pages_cache.keys()) == 2
 
     anonymous.get('/assembly/2023-05-07/ticker?now')
-    assert len(landsgemeinde_app.pages_cache.keys()) == 3
+    assert len(client.app.pages_cache.keys()) == 3
 
     # Modify without invalidating the cache
     begin()
-    landsgemeinde_app.session().query(Assembly).one().overview = 'Ipsum'
+    client.app.session().query(Assembly).one().overview = 'Ipsum'
     commit()
 
     assert 'Ipsum' not in anonymous.get('/assembly/2023-05-07/ticker')
@@ -263,10 +268,9 @@ def test_view_pages_cache(landsgemeinde_app):
     assert 'Adipiscing' in client.get('/assembly/2023-05-07/ticker')
 
 
-def test_view_suggestions(landsgemeinde_app):
-    client = Client(landsgemeinde_app)
+def test_view_suggestions(client: Client[TestApp]) -> None:
 
-    client.login('admin@example.org', 'hunter2')
+    client.login_admin()
 
     page = client.get('/').click('Personen')
     page = page.click('Person', index=1)
