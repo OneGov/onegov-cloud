@@ -1668,14 +1668,14 @@
     <div class="identicon">
         <metal:b use-macro="layout.macros.identicon"
                  tal:define="
-                    initials owner.initials if not model.meta.get('origin') == 'external' or request.is_logged_in else layout.org.general_email[0];
-                    username owner.username if not model.meta.get('origin') == 'external' or request.is_logged_in else layout.org.general_email;
+                    initials owner.initials;
+                    username owner.username;
                     size 'large';
                 "
         />
     </div>
     <div class="timestamp">
-        <b>${owner.name if not model.meta.get('origin') == 'external' or request.is_logged_in else layout.org.general_email}</b>
+        <b>${owner.name}</b>
         <tal:b i18n:translate>
             at <tal:b i18n:name="time">${layout.format_date(model.created, 'time')}</tal:b>
         </tal:b>
