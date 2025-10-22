@@ -1242,7 +1242,7 @@ def view_my_reservations_json(
     ]
 
 
-@OrgApp.json(
+@OrgApp.html(
     model=ResourceCollection,
     name='my-reservations-pdf',
     permission=Public
