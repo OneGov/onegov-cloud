@@ -1,15 +1,23 @@
+from __future__ import annotations
+
 from onegov.gis import Coordinates
 from onegov.translator_directory.collections.language import LanguageCollection
-from onegov.translator_directory.collections.translator import \
-    TranslatorCollection
-from onegov.translator_directory.constants import INTERPRETING_TYPES, \
-    PROFESSIONAL_GUILDS
+from onegov.translator_directory.collections.translator import (
+    TranslatorCollection)
+from onegov.translator_directory.constants import (
+    INTERPRETING_TYPES, PROFESSIONAL_GUILDS)
 from onegov.user import UserCollection
-from tests.onegov.translator_directory.shared import create_languages, \
-    create_translator, translator_data
+from tests.onegov.translator_directory.shared import (
+    create_languages, create_translator, translator_data)
 
 
-def test_translator_collection_search(translator_app):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from .conftest import TestApp
+
+
+def test_translator_collection_search(translator_app: TestApp) -> None:
     interpreting_types = list(INTERPRETING_TYPES.keys())
     guild_types = list(PROFESSIONAL_GUILDS.keys())
     seba = create_translator(
@@ -77,7 +85,7 @@ def test_translator_collection_search(translator_app):
     assert translators.query().all() == [seba]
 
 
-def test_translator_collection(translator_app):
+def test_translator_collection(translator_app: TestApp) -> None:
     session = translator_app.session()
     langs = create_languages(session)
     collection = TranslatorCollection(translator_app)
@@ -95,18 +103,18 @@ def test_translator_collection(translator_app):
     )
 
     # Test filter spoken language
-    collection.spoken_langs = [langs[0].id]
+    collection.spoken_langs = [str(langs[0].id)]
     assert not collection.query().first()
     james.spoken_languages.append(langs[0])
     assert collection.query().count() == 1
 
     # Test filter with multiple spoken languages
-    collection.spoken_langs = [langs[0].id, langs[1].id]
+    collection.spoken_langs = [str(langs[0].id), str(langs[1].id)]
     assert not collection.query().first()
 
     # Add second language for james and test filter with two languages
     james.spoken_languages.append(langs[1])
-    collection.spoken_langs = [langs[0].id, langs[1].id]
+    collection.spoken_langs = [str(langs[0].id), str(langs[1].id)]
     assert collection.query().all() == [james]
 
     # Test filter with two languages
@@ -114,12 +122,12 @@ def test_translator_collection(translator_app):
     bob.written_languages.append(langs[2])
     bob.spoken_languages.append(langs[1])
     bob.spoken_languages.append(langs[2])
-    collection.spoken_langs = [langs[2].id]
+    collection.spoken_langs = [str(langs[2].id)]
     collection.written_langs = collection.spoken_langs
     assert collection.query().all() == [bob]
 
     # Test filter with two languages spoken and written
-    collection.written_langs = [langs[1].id, langs[2].id]
+    collection.written_langs = [str(langs[1].id), str(langs[2].id)]
     collection.spoken_langs = collection.written_langs
     assert collection.query().all() == [bob]
 
@@ -153,11 +161,11 @@ def test_translator_collection(translator_app):
 
     collection.genders = []
     lisa.monitoring_languages.append(langs[2])
-    collection.monitor_langs = [langs[2].id]
+    collection.monitor_langs = [str(langs[2].id)]
     assert collection.query().all() == [lisa]
 
 
-def test_translator_collection_coordinates(translator_app):
+def test_translator_collection_coordinates(translator_app: TestApp) -> None:
     translators = TranslatorCollection(translator_app)
     trs = translators.add(
         **translator_data,
@@ -168,16 +176,18 @@ def test_translator_collection_coordinates(translator_app):
     assert trs.coordinates == Coordinates()
 
 
-def test_translator_collection_wrong_user_input(translator_app):
+def test_translator_collection_wrong_user_input(
+    translator_app: TestApp
+) -> None:
     # Prevent wrong user input from going to the db query
     coll = TranslatorCollection(
-        translator_app, order_by='nothing', order_desc='hey'
+        translator_app, order_by='nothing', order_desc='hey'  # type: ignore[arg-type]
     )
     assert coll.order_desc is False
     assert coll.order_by == 'last_name'
 
 
-def test_translator_collection_update(translator_app):
+def test_translator_collection_update(translator_app: TestApp) -> None:
     session = translator_app.session()
     collection = TranslatorCollection(translator_app)
     users = UserCollection(session)
@@ -215,6 +225,7 @@ def test_translator_collection_update(translator_app):
     session.flush()
     session.expire_all()
     user_b = users.by_username('b@b.b')
+    assert user_b is not None
     assert translator_a.user.username == 'a@a.a'
     assert translator_a.user.role == 'translator'
     assert translator_a.user.active is True
@@ -231,8 +242,9 @@ def test_translator_collection_update(translator_app):
     session.flush()
     session.expire_all()
     user_a = users.by_username('a@a.a')
+    assert user_a is not None
     assert not user_a.active
-    assert not user_a.translator
+    assert not user_a.translator  # type: ignore[attr-defined]
     assert translator_b.user.username == 'b@b.b'
     assert translator_b.user.role == 'translator'
     assert translator_b.user.active
@@ -254,18 +266,18 @@ def test_translator_collection_update(translator_app):
     assert translator_b.user.username == 'a@a.a'
     assert translator_b.user.role == 'translator'
     assert translator_b.user.active
-    assert user_a.translator == translator_b
-    assert not user_b.translator
+    assert user_a.translator == translator_b  # type: ignore[attr-defined]
+    assert not user_b.translator  # type: ignore[attr-defined]
 
 
-def test_language_collection(session):
+def test_language_collection(session: Session) -> None:
     coll = LanguageCollection(session)
     zulu = coll.add(name='Zulu')
     arabic = coll.add(name='Arabic')
     assert coll.query().all() == [arabic, zulu]
 
 
-def test_translator_collection_visibility(translator_app):
+def test_translator_collection_visibility(translator_app: TestApp) -> None:
     # Create a single translator marked as for_admins_only
     hidden_translator = create_translator(
         translator_app, email='hidden@example.com', last_name='Hidden',
@@ -278,7 +290,6 @@ def test_translator_collection_visibility(translator_app):
     # regardless of the include_hidden flag.
     coll_non_admin = TranslatorCollection(translator_app, user_role='member')
     assert coll_non_admin.query().count() == 0
-    return
 
     coll_non_admin_include_true = TranslatorCollection(
         translator_app, user_role='member', include_hidden=True

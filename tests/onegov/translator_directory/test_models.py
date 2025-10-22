@@ -1,14 +1,16 @@
+from __future__ import annotations
+
 from datetime import date
 from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.gis import Coordinates
-from onegov.translator_directory.collections.certificate import \
-    LanguageCertificateCollection
-from onegov.translator_directory.collections.translator import \
-    TranslatorCollection
+from onegov.translator_directory.collections.certificate import (
+    LanguageCertificateCollection)
+from onegov.translator_directory.collections.translator import (
+    TranslatorCollection)
 from onegov.translator_directory.models.ticket import AccreditationTicket
-from onegov.translator_directory.models.ticket import \
-    TranslatorMutationTicket
+from onegov.translator_directory.models.ticket import (
+    TranslatorMutationTicket)
 from onegov.translator_directory.models.translator import Translator
 from onegov.user import User
 from onegov.user import UserCollection
@@ -18,7 +20,13 @@ from tests.onegov.translator_directory.shared import create_translator
 from tests.onegov.translator_directory.shared import translator_data
 
 
-def test_translator_model(translator_app):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from .conftest import TestApp
+
+
+def test_translator_model(translator_app: TestApp) -> None:
     session = translator_app.session()
     langs = create_languages(session)
     assert all((lang.deletable for lang in langs))
@@ -85,7 +93,7 @@ def test_translator_model(translator_app):
     assert translator.expertise_professional_guilds_all == ('Psychologie', )
 
 
-def test_translator_user(session):
+def test_translator_user(session: Session) -> None:
     users = UserCollection(session)
     user_a = users.add(username='a@example.org', password='a', role='member')
     user_b = users.add(username='b@example.org', password='b', role='member')
@@ -97,23 +105,26 @@ def test_translator_user(session):
     session.add(translator)
     session.flush()
 
-    assert translator.user is None
-    assert user_a.translator is None
-    assert user_b.translator is None
+    if not TYPE_CHECKING:
+        # we pretend this can't be true so we can't assert this at
+        # type checking time otherwise everything becomes unreachable
+        assert translator.user is None
+    assert user_a.translator is None  # type: ignore[attr-defined]
+    assert user_b.translator is None  # type: ignore[attr-defined]
 
     translator.email = 'a@example.org'
     session.flush()
     session.expire_all()
     assert translator.user == user_a
-    assert user_a.translator == translator
-    assert user_b.translator is None
+    assert user_a.translator == translator  # type: ignore[attr-defined]
+    assert user_b.translator is None  # type: ignore[attr-defined]
 
     translator.email = 'b@example.org'
     session.flush()
     session.expire_all()
     assert translator.user == user_b
-    assert user_a.translator is None
-    assert user_b.translator == translator
+    assert user_a.translator is None  # type: ignore[attr-defined]
+    assert user_b.translator == translator  # type: ignore[attr-defined]
 
     session.delete(user_b)
     session.flush()
@@ -126,18 +137,18 @@ def test_translator_user(session):
     session.flush()
     session.expire_all()
     assert translator.user == user
-    assert user.translator == translator
+    assert user.translator == translator  # type: ignore[attr-defined]
 
     session.delete(translator)
     session.flush()
     assert session.query(User).one().username == 'user@example.org'
 
 
-def test_translator_mutation(session):
+def test_translator_mutation(session: Session) -> None:
     languages = create_languages(session)
     certificates = create_certificates(session)
 
-    translator = Translator(
+    translator = Translator(  # type: ignore[misc]
         first_name='Hugo',
         last_name='Benito',
         confirm_name_reveal=True,
@@ -229,8 +240,9 @@ def test_translator_mutation(session):
     assert ticket.handler.subtitle == 'Mutation'
     assert ticket.handler.group == 'Translator'
 
-    request = Bunch(translate=lambda x: f'_{x}')
+    request: Any = Bunch(translate=lambda x: f'_{x}')
     mutation = ticket.handler.mutation
+    assert mutation is not None
     proposed_changes.pop('extra')
     assert mutation.changes == proposed_changes
     assert mutation.target == translator
@@ -377,7 +389,7 @@ def test_translator_mutation(session):
     assert translator.self_employed is False
     assert translator.gender == 'M'
     assert translator.date_of_birth == date(1970, 1, 1)
-    assert translator.nationalities == 'nationalities'
+    assert translator.nationalities == 'nationalities'  # type: ignore[comparison-overlap]
     assert translator.coordinates == Coordinates(1, 2)
     assert translator.address == 'Street and house number'
     assert translator.zip_code == '8000'
@@ -425,7 +437,7 @@ def test_translator_mutation(session):
     assert translator.last_name == 'Last Name'
 
 
-def test_accreditation(translator_app):
+def test_accreditation(translator_app: TestApp) -> None:
     session = translator_app.session()
     translator = create_translator(translator_app, state='proposed')
     ticket = AccreditationTicket(
@@ -443,6 +455,7 @@ def test_accreditation(translator_app):
     session.add(ticket)
     session.flush()
     accreditation = ticket.handler.accreditation
+    assert accreditation is not None
 
     assert translator.state == 'proposed'
     assert ticket.handler.translator == translator
@@ -457,6 +470,8 @@ def test_accreditation(translator_app):
 
     with freeze_time('2026-01-01') as today:
         accreditation.grant()
+        # undo mypy narrowing
+        translator = translator
         assert ticket.handler.state == 'granted'
         assert translator.state == 'published'
         assert translator.date_of_decision == today().date()
