@@ -120,7 +120,7 @@ class NewsletterForm(Form):
                 description=_(
                     'Only show the lead of the news and a "read more"'
                     'link.'),
-                default=True
+                default=False
             )
 
             def update_model(
