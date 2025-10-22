@@ -77,7 +77,6 @@ module = [
     "tests.onegov.feriennet.*",
     "tests.onegov.pas.*",
     "tests.onegov.swissvotes.*",
-    "tests.onegov.winterthur.*",
 ]
 check_untyped_defs = false
 ignore_errors = true
