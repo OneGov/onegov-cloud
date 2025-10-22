@@ -4,6 +4,9 @@ from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.documents import (
     TranslatorDocumentCollection)
 from onegov.translator_directory.collections.language import LanguageCollection
+from onegov.translator_directory.collections.time_report import (
+    TimeReportCollection,
+)
 from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
 from onegov.translator_directory.models.accreditation import Accreditation
@@ -139,3 +142,12 @@ def get_accreditation(
     ticket_id: UUID
 ) -> Accreditation:
     return Accreditation(app.session(), target_id, ticket_id)
+
+
+@TranslatorDirectoryApp.path(
+    model=TimeReportCollection, path='/time-reports', converters={'page': int}
+)
+def get_time_reports(
+    app: TranslatorDirectoryApp, page: int = 0
+) -> TimeReportCollection:
+    return TimeReportCollection(app, page)

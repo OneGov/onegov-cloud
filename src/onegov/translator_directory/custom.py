@@ -8,6 +8,9 @@ from onegov.org.models import GeneralFileCollection
 from onegov.ticket import TicketCollection
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.language import LanguageCollection
+from onegov.translator_directory.collections.time_report import (
+    TimeReportCollection,
+)
 from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
 from onegov.translator_directory import _
@@ -71,8 +74,13 @@ def get_global_tools(
                     Link(
                         _('Users'), request.class_link(UserCollection),
                         attrs={'class': 'user'}
-                    )
-                )
+                    ),
+                    Link(
+                        _('Time Reports'),
+                        request.class_link(TimeReportCollection),
+                        attrs={'class': 'time-reports'},
+                    ),
+                ),
             )
 
         # Tickets
