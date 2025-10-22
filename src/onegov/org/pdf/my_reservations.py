@@ -42,7 +42,6 @@ class MyReservationsPdf(OrgPdf):
         )
 
         if not infos:
-            self.spacer()
             self.p_markup(_('No data available'))
             return
 

@@ -1266,11 +1266,16 @@ def view_my_reservations_pdf(
     path = module_path('onegov.org', 'queries/my-reservations.sql')
     stmt = as_selectable_from_path(path)
 
-    records = request.session.execute(select(stmt.c).where(and_(
+    conditions = [
         func.lower(stmt.c.email) == request.authenticated_email.lower(),
         start <= stmt.c.start,
-        stmt.c.start <= end
-    )))
+        stmt.c.start <= end,
+    ]
+
+    if request.GET.get('accepted') == '1':
+        conditions.append(stmt.c.accepted.is_(True))
+
+    records = request.session.execute(select(stmt.c).where(and_(*conditions)))
 
     content = MyReservationsPdf.from_reservations(request, [
         utils.MyReservationEventInfo(

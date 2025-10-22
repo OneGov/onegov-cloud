@@ -393,6 +393,9 @@ oc.setupViewNavigation = function(calendar, element, views, pdf_url) {
                     var url = new Url(pdf_url || '/');
                     url.query.start = state.start;
                     url.query.end = state.end;
+                    if (state.accepted) {
+                        url.query.accepted = '1';
+                    }
                     window.location = url.toString();
                     pdf_btn.popup('hide');
                 }
@@ -637,7 +640,8 @@ oc.PDFExportForm = React.createClass({
     getInitialState: function() {
         return {
             start: this.props.start.format('YYYY-MM-DD'),
-            end: this.props.end.format('YYYY-MM-DD')
+            end: this.props.end.format('YYYY-MM-DD'),
+            accepted: true
         };
     },
     componentDidMount: function() {
@@ -659,6 +663,9 @@ oc.PDFExportForm = React.createClass({
                 break;
             case 'end':
                 state.end = e.target.value;
+                break;
+            case 'accepted':
+                state.accepted = e.target.checked;
                 break;
             default:
                 throw Error("Unknown input element: " + name);
@@ -702,6 +709,17 @@ oc.PDFExportForm = React.createClass({
                             onChange={this.handleInputChange}
                             className={isValid && 'valid' || 'invalid'}
                         />
+                    </div>
+                </div>
+                <div className="field checkbox">
+                    <div>
+                        <label className="label-text">
+                            <input name="accepted" type="checkbox"
+                                defaultChecked={this.state.accepted}
+                                onChange={this.handleInputChange}
+                            />
+                            {locale("Accepted reservations only")}
+                        </label>
                     </div>
                 </div>
 

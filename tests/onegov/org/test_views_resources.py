@@ -3959,9 +3959,18 @@ def test_my_reservations_view(client: Client) -> None:
         '/resources/my-reservations-pdf?start=2015-08-28&end=2015-08-29'
     )
     _, pdf_content = extract_pdf_info(BytesIO(pdf.body))
-    assert 'Ganztägig' in pdf_content
     assert '28. August 2015 - 29. August 2015' in pdf_content
+    assert 'Ganztägig' in pdf_content
     assert 'Noch nicht akzeptiert' in pdf_content
+
+    # if we only include accepted reservations the PDF is empty
+    pdf = client.get(
+        '/resources/my-reservations-pdf'
+        '?start=2015-08-28&end=2015-08-29&accepted=1'
+    )
+    _, pdf_content = extract_pdf_info(BytesIO(pdf.body))
+    assert '28. August 2015 - 29. August 2015' in pdf_content
+    assert 'Keine Daten verfügbar' in pdf_content
 
     subscribe = client.get('/resources/my-reservations-subscribe')
     assert 'webcal://' in subscribe
