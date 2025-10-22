@@ -1,8 +1,15 @@
+from __future__ import annotations
+
 from onegov.landsgemeinde.models import Assembly
 from transaction import commit
 
 
-def test_ticker(browser, assembly):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import WebsocketBrowser
+
+
+def test_ticker(browser: WebsocketBrowser, assembly: Assembly) -> None:
     app = browser.wsgi_server.app
     app.session().add(assembly)
     commit()
