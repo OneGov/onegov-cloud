@@ -131,14 +131,12 @@ class NewsletterForm(Form):
 
                 super().update_model(model, request)
                 model.content['news'] = self.news.data
-                model.content['show_only_previews'] = (
-                    self.show_only_previews.data)
+                model.show_only_previews = self.show_only_previews.data
 
             def apply_model(self, model: Newsletter) -> None:
                 super().apply_model(model)
                 self.news.data = model.content.get('news')
-                self.show_only_previews.data = model.content.get(
-                    'show_only_previews', True)
+                self.show_only_previews.data = model.show_only_previews
 
         return NewsletterWithNewsForm
 

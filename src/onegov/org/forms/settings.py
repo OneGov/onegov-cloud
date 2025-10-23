@@ -1401,6 +1401,16 @@ class NewsletterSettingsForm(Form):
         depends_on=('enable_automatic_newsletters', 'y'),
     )
 
+    show_only_previews = BooleanField(
+        label=_('Show only lead of news'),
+        fieldset=_('Automatic newsletters'),
+        description=_(
+            'Only show the lead of the news and a "read more"'
+            'link.'),
+        depends_on=('enable_automatic_newsletters', 'y'),
+        default=False
+    )
+
     newsletter_times = TagsField(
         label=_('Newsletter sending times (24h format)'),
         fieldset=_('Automatic newsletters'),

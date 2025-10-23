@@ -16,15 +16,14 @@
                     <p><strong>${layout.with_hashtags(item.lead)}</strong></p>
                 <p tal:condition="not newsletter.show_only_previews" tal:content="item.text">
                 <a tal:condition="newsletter.show_only_previews" href="${request.link(item)}" i18n:translate>read more</a>
-
-                </tal:b>
             </tal:b>
+        </tal:b>
 
-            <tal:b condition="publications">
+        <tal:b condition="publications">
             <hr>
-                <h2 i18n:translate>Publications</h2>
+            <h2 i18n:translate>Publications</h2>
 
-                <tal:b repeat="publication publications">
+            <tal:b repeat="publication publications">
                 <strong><a href="${request.link(publication)}">${name_without_extension(publication.name)}</a></strong>
                 <ul class="flat">
                     <li>${layout.format_date(publication.created, 'date')}</li>
