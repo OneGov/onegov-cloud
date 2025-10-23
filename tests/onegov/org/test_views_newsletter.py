@@ -542,7 +542,7 @@ def test_newsletter_send(client: Client) -> None:
     assert '150 Jahre Govikon' in message
     assert 'Gemeinsames Turnen' in message
     assert 'Testnews' in message
-    assert 'My Lead Text' not in message
+    assert 'My Lead Text' in message
     assert 'My Html editor text' in message
 
 
