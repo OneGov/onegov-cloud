@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import onegov
 import os
 import pyotp
@@ -9,14 +11,19 @@ from sqlalchemy.orm.session import close_all_sessions
 from tests.shared import Client, utils
 
 
-def test_view_permissions():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import TestApp
+
+
+def test_view_permissions() -> None:
     utils.assert_explicit_permissions(
         onegov.swissvotes,
         onegov.swissvotes.SwissvotesApp
     )
 
 
-def test_view_login_logout(swissvotes_app):
+def test_view_login_logout(swissvotes_app: TestApp) -> None:
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
 
@@ -41,7 +48,7 @@ def test_view_login_logout(swissvotes_app):
         assert 'Abmelden' not in page
 
 
-def test_view_reset_password(swissvotes_app):
+def test_view_reset_password(swissvotes_app: TestApp) -> None:
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
 
@@ -94,7 +101,7 @@ def test_view_reset_password(swissvotes_app):
     assert "Abmelden" in login_page.maybe_follow()
 
 
-def test_login_totp(swissvotes_app):
+def test_login_totp(swissvotes_app: TestApp) -> None:
     swissvotes_app.totp_enabled = True
     client = Client(swissvotes_app)
 
@@ -104,6 +111,7 @@ def test_login_totp(swissvotes_app):
     # configure TOTP for admin user
     users = UserCollection(client.app.session())
     admin = users.by_username('admin@example.org')
+    assert admin is not None
     admin.second_factor = {'type': 'totp', 'data': totp_secret}
     transaction.commit()
     close_all_sessions()
