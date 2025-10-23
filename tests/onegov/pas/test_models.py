@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from freezegun import freeze_time
 from datetime import date
 from onegov.core.utils import Bunch
@@ -20,8 +22,13 @@ from onegov.pas.views.pas_excel_export_nr_3_lohnart_fibu import (
 )
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
 @freeze_time('2022-06-06')
-def test_models(session):
+def test_models(session: Session) -> None:
     rate_set = RateSet(year=2022)
     legislative_period = LegislativePeriod(
         name='2022-2024',
@@ -81,7 +88,7 @@ def test_models(session):
     session.flush()
 
     change = Change.add(
-        request=Bunch(
+        request=Bunch(  # type: ignore[arg-type]
             current_username='user@example.org',
             current_user=Bunch(title='User'),
             session=session
@@ -125,9 +132,11 @@ def test_models(session):
     assert parliamentarian.active is True
     parliamentarian_role.end = date(2022, 5, 5)
     commission_membership.end = date(2022, 5, 5)
+    parliamentarian = parliamentarian  # undo mypy narrowing
     assert parliamentarian.active is False
     parliamentarian.roles = []
     parliamentarian.commission_memberships = []
+    parliamentarian = parliamentarian  # undo mypy narrowing
     assert parliamentarian.active is True
 
     # commission.end_observer
@@ -137,13 +146,13 @@ def test_models(session):
     assert commission_membership.end == date(2022, 5, 5)
 
 
-def test_fibu_konten_mapping_completeness():
+def test_fibu_konten_mapping_completeness() -> None:
     """Test that FIBU_KONTEN_MAPPING has all keys from TYPES.
 
     This ensures that if new attendance types are added to TYPES,
     they must also be mapped in FIBU_KONTEN_MAPPING.
     """
-    missing_keys = set(TYPES.keys()) - set(FIBU_KONTEN_MAPPING.keys())
+    missing_keys = TYPES.keys() - FIBU_KONTEN_MAPPING.keys()
     assert not missing_keys, (
         f"FIBU_KONTEN_MAPPING is missing keys: {missing_keys}"
     )

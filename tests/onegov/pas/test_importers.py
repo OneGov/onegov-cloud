@@ -2,18 +2,27 @@ from __future__ import annotations
 
 import pytest
 
+from onegov.pas.importer.json_import import (
+    PeopleImporter,
+    OrganizationImporter,
+)
 from onegov.pas.models import (
     PASCommission,
     PASParliamentarian,
     Party,
 )
-from onegov.pas.importer.json_import import (
-    PeopleImporter,
-    OrganizationImporter,
-)
 
 
-def test_people_importer_successful_import(session, people_json):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_people_importer_successful_import(
+    session: Session,
+    people_json: dict[str, Any]
+) -> None:
+
     importer = PeopleImporter(session)
     parliamentarian_map, details, processed_count = importer.bulk_import(
         people_json['results']
@@ -54,7 +63,10 @@ def test_people_importer_successful_import(session, people_json):
         assert person['id'] in parliamentarian_map
 
 
-def test_people_importer_existing_parliamentarian(session, people_json):
+def test_people_importer_existing_parliamentarian(
+    session: Session,
+    people_json: dict[str, Any]
+) -> None:
     """Test importing data for a parliamentarian that already exists."""
     importer = PeopleImporter(session)
 
@@ -87,18 +99,16 @@ def test_people_importer_existing_parliamentarian(session, people_json):
 
     assert updated_parliamentarian is not None
     # Check that the first name was updated
-    assert updated_parliamentarian.first_name == \
-    existing_person_data['firstName']
+    assert updated_parliamentarian.first_name == (
+        existing_person_data['firstName'])
     # Check that the email was updated
-    assert (
-        updated_parliamentarian.email_primary
-        == existing_person_data['primaryEmail']['email']
-    )
+    assert updated_parliamentarian.email_primary == (
+        existing_person_data['primaryEmail']['email'])
     # Check other attributes remain consistent
-    assert updated_parliamentarian.last_name == \
-    existing_person_data['officialName']
-    assert updated_parliamentarian.salutation == \
-    existing_person_data['salutation']
+    assert updated_parliamentarian.last_name == (
+        existing_person_data['officialName'])
+    assert updated_parliamentarian.salutation == (
+        existing_person_data['salutation'])
 
     # Ensure no duplicate parliamentarian was created
     count = session.query(PASParliamentarian).filter_by(
@@ -107,9 +117,10 @@ def test_people_importer_existing_parliamentarian(session, people_json):
     assert count == 1
 
 
-def test_organization_importer_existing(session,
-                                        organization_json_with_fraktion):
-
+def test_organization_importer_existing(
+    session: Session,
+    organization_json_with_fraktion: dict[str, Any]
+) -> None:
     """Test importing organization data when some organizations already exist.
     """
     organization_json = organization_json_with_fraktion
@@ -197,8 +208,9 @@ def test_organization_importer_existing(session,
     assert party_count == 1
 
 
+# FIXME: Use me or delete me
 @pytest.fixture
-def sample_memberships():
+def sample_memberships() -> list[dict[str, Any]]:
     """Provide test membership data covering all organization types and
     role patterns."""
     return [

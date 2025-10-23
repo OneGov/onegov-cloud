@@ -1,26 +1,34 @@
-from datetime import date
-from decimal import Decimal
+from __future__ import annotations
+
 import transaction
 
-from onegov.pas.models import RateSet
+from datetime import date
+from decimal import Decimal
 from onegov.pas.models import (
     Attendence,
     PASParliamentarian,
     PASParliamentarianRole,
     Party,
+    RateSet
 )
 from onegov.pas.models.commission import PASCommission
 from onegov.pas.models.settlement_run import SettlementRun
 
 
-def test_export_abschlussliste_xlsx(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared import Client
+    from .conftest import TestPasApp
+
+
+def test_export_abschlussliste_xlsx(client: Client[TestPasApp]) -> None:
 
     client.login_admin()
     session = client.app.session()
 
     transaction.begin()
     # Setup test data
-    rate_set = RateSet(
+    rate_set = RateSet(  # type: ignore[misc]
         year=2024,
         cost_of_living_adjustment=Decimal('2.0'),  # 2%
         plenary_none_member_halfday=Decimal('100'),
