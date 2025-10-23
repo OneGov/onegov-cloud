@@ -4,9 +4,9 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from __future__ import annotations
 
-from onegov.core.orm.types import JSON
+from onegov.core.orm.types import JSON, UUID
 from onegov.core.upgrade import upgrade_task, UpgradeContext
-from sqlalchemy import Column, Boolean, Enum, Text
+from sqlalchemy import Column, Boolean, Enum, ForeignKey, Text
 
 
 @upgrade_task('Change withholding tax column to boolean')
@@ -116,3 +116,36 @@ def remove_nationality_column(context: UpgradeContext) -> None:
         return
     if context.has_column('translators', 'nationality'):
         context.operations.drop_column('translators', 'nationality')
+
+
+@upgrade_task('Add status column to translator_time_reports')
+def add_status_column_to_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if not context.has_column('translator_time_reports', 'status'):
+        status_enum = Enum('pending', 'confirmed', name='time_report_status')
+        if not context.has_enum('time_report_status'):
+            status_enum.create(context.operations.get_bind())
+        context.add_column_with_defaults(
+            table='translator_time_reports',
+            column=Column(
+                'status', status_enum, nullable=False, default='pending'
+            ),
+            default=lambda x: 'pending',
+        )
+
+
+@upgrade_task('Add created_by_id to translator_time_reports')
+def add_created_by_to_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if not context.has_column('translator_time_reports', 'created_by_id'):
+        context.operations.add_column(
+            'translator_time_reports',
+            Column(
+                'created_by_id',
+                UUID,
+                ForeignKey('users.id', ondelete='SET NULL'),
+                nullable=True,
+            ),
+        )
