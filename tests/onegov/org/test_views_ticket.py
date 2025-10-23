@@ -1037,6 +1037,7 @@ def test_hide_personal_mail_in_tickets(client: Client) -> None:
                               messsage).group(1)
     anon_ticketinfo = anon.get(ticket_status)
     assert 'info@organisation.org' in anon_ticketinfo
+    assert 'anon@example.org' not in anon_ticketinfo
     assert 'admin@example.org' not in anon_ticketinfo
 
     assert 'info@organisation.org' in mails[2]['TextBody']

@@ -2414,7 +2414,7 @@
 </metal:tickets_table_row>
 
 <metal:open_graph_tags define-macro="open_graph_tags">
-<meta property="og:title" tal:attributes="content og_title" tal:define="og_title layout.og_title | title | None" tal:condition="og_title" />
+<meta property="og:title" tal:attributes="content og_title" tal:define="og_title og_title | layout.og_title | title | None" tal:condition="og_title" />
 <meta property="og:type" tal:attributes="content layout.og_type" />
 <meta property="og:url" tal:attributes="content layout.og_url" />
 <tal:b tal:define="og_image layout.og_image" tal:condition="og_image">
