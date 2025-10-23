@@ -22,7 +22,7 @@
                 </div>
                 <div class="agenda-item-overview page-text" tal:condition="agenda_item.overview" tal:content="agenda_item.overview"></div>
                 <div class="agenda-item-content page-text" tal:condition="agenda_item.text" tal:content="agenda_item.text"></div>
-                <div class="agenda-item-vota page-text">
+                <div class="agenda-item-vota">
                     <tal:block tal:repeat="votum agenda_item.vota" metal:use-macro="layout.macros['votum']" />
                 </div>
                 <div class="agenda-item-tags">
