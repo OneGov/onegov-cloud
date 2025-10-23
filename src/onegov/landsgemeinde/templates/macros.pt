@@ -306,5 +306,26 @@
     <a tal:condition="contact_url" tal:attributes="href contact_url"><strong><tal:b i18n:translate>more</tal:b>…</strong></a>
 </metal:footer_contact>
 
+<metal:file_icons define-macro="file_icons">
+    <i tal:condition="file.claimed_extension not in ['pdf', 'zip', 'png', 'jpg', 'gif']" class="fa fa-download" aria-hidden="true"></i>
+    <tal:b tal:switch="file.claimed_extension">
+        <tal:b tal:case="'pdf'">
+            <i class="fa fa-file-pdf" aria-hidden="true"></i>
+        </tal:b>
+        <tal:b tal:case="'png'">
+            <i class="fas fa-image" aria-hidden="true"></i>
+        </tal:b>
+        <tal:b tal:case="'jpg'">
+            <i class="fas fa-image" aria-hidden="true"></i>
+        </tal:b>
+        <tal:b tal:case="'gif'">
+            <i class="fas fa-image" aria-hidden="true"></i>
+        </tal:b>
+        <tal:b tal:case="'zip'">
+            <i class="fa fa-file-archive" aria-hidden="true"></i>
+        </tal:b>
+    </tal:b>
+</metal:file_icons>
+
 </body>
 <html>

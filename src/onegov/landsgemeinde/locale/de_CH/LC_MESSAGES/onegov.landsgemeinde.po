@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-10-06 11:10+0200\n"
+"POT-Creation-Date: 2025-10-23 14:05+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -371,6 +371,9 @@ msgstr "Downloads, Audio & Traktanden"
 
 msgid "Memorial (PDF)"
 msgstr "Memorial (PDF)"
+
+msgid "Protocol"
+msgstr "Protokoll"
 
 msgid "Audio"
 msgstr "Audio"

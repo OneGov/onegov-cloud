@@ -73,7 +73,7 @@
                         <tal:b tal:condition="agenda_item.more_files">
                             <tal:b tal:repeat="file agenda_item.more_files">
                                 <a href="${request.link(file)}" class="more-files-link">
-                                    <i class="fa fa-download" aria-hidden="true"></i>
+                                    <tal:block metal:use-macro="layout.macros['file-icons']" />
                                     <span tal:content="file.name" />
                                 </a>
                             </tal:b>
