@@ -1668,14 +1668,14 @@
     <div class="identicon">
         <metal:b use-macro="layout.macros.identicon"
                  tal:define="
-                    initials owner.initials if not layout.org.hide_personal_email or model.meta.get('origin') == 'external' or request.is_logged_in else layout.org.general_email[0];
-                    username owner.username if not layout.org.hide_personal_email or model.meta.get('origin') == 'external' or request.is_logged_in else layout.org.general_email;
+                    initials owner.initials;
+                    username owner.username;
                     size 'large';
                 "
         />
     </div>
     <div class="timestamp">
-        <b>${owner.name if not layout.org.hide_personal_email or model.meta.get('origin') == 'external' or request.is_logged_in else layout.org.general_email}</b>
+        <b>${owner.name}</b>
         <tal:b i18n:translate>
             at <tal:b i18n:name="time">${layout.format_date(model.created, 'time')}</tal:b>
         </tal:b>
@@ -2414,7 +2414,7 @@
 </metal:tickets_table_row>
 
 <metal:open_graph_tags define-macro="open_graph_tags">
-<meta property="og:title" tal:attributes="content og_title" tal:define="og_title layout.og_title | title | None" tal:condition="og_title" />
+<meta property="og:title" tal:attributes="content og_title" tal:define="og_title og_title | layout.og_title | title | None" tal:condition="og_title" />
 <meta property="og:type" tal:attributes="content layout.og_type" />
 <meta property="og:url" tal:attributes="content layout.og_url" />
 <tal:b tal:define="og_image layout.og_image" tal:condition="og_image">

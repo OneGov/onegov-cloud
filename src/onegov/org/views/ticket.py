@@ -1396,6 +1396,7 @@ def view_ticket_status(
 
     return {
         'title': title,
+        'og_title': title,
         'layout': layout,
         'ticket': self,
         'feed_data': messages and json.dumps(
