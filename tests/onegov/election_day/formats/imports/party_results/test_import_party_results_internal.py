@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import tarfile
 
 from datetime import date
@@ -11,7 +13,12 @@ from onegov.election_day.models import ProporzElection
 from tests.onegov.election_day.common import get_tar_file_path
 
 
-def test_import_party_results_internal_fixtures(session):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_import_party_results_internal_fixtures(session: Session) -> None:
     principal = Canton('gr')
 
     # Test data from R.Semlic
@@ -25,11 +32,12 @@ def test_import_party_results_internal_fixtures(session):
     )
     session.flush()
     election = session.query(Election).one()
+    assert isinstance(election, ProporzElection)
 
     tar_file = get_tar_file_path(
         'canton', 'gr', 'internal', 'election', 'proporz')
     with tarfile.open(tar_file, 'r:gz') as f:
-        csv = f.extractfile(
+        csv = f.extractfile(  # type: ignore[union-attr]
             'Nationalratswahlen_2019_sesam-test_Parteien.csv').read()
 
     errors = import_party_results_internal(
@@ -60,7 +68,7 @@ def test_import_party_results_internal_fixtures(session):
         assert pana_r.votes == 0
 
 
-def test_import_party_results_internal_ok(session):
+def test_import_party_results_internal_ok(session: Session) -> None:
     principal = Canton('gr')
 
     session.add(
@@ -73,6 +81,7 @@ def test_import_party_results_internal_ok(session):
     )
     session.flush()
     election = session.query(Election).one()
+    assert isinstance(election, ProporzElection)
 
     # minimal
     errors = import_party_results_internal(
@@ -317,7 +326,10 @@ def test_import_party_results_internal_ok(session):
     }
 
 
-def test_import_party_results_internal_missing_headers(session):
+def test_import_party_results_internal_missing_headers(
+    session: Session
+) -> None:
+
     principal = Canton('gr')
 
     session.add(
@@ -330,6 +342,7 @@ def test_import_party_results_internal_missing_headers(session):
     )
     session.flush()
     election = session.query(Election).one()
+    assert isinstance(election, ProporzElection)
 
     errors = import_party_results_internal(
         election,
@@ -348,13 +361,16 @@ def test_import_party_results_internal_missing_headers(session):
         ).encode('utf-8')), 'text/plain',
         ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
     )
-    assert [(e.filename, e.error.interpolate()) for e in errors] == [
+    assert [(e.filename, e.error.interpolate()) for e in errors] == [  # type: ignore[attr-defined]
         (None, "Missing columns: 'color'"),
         (None, 'No party results for year 2015')
     ]
 
 
-def test_import_party_results_internal_invalid_values(session):
+def test_import_party_results_internal_invalid_values(
+    session: Session
+) -> None:
+
     principal = Canton('gr')
 
     session.add(
@@ -367,8 +383,9 @@ def test_import_party_results_internal_invalid_values(session):
     )
     session.flush()
     election = session.query(Election).one()
+    assert isinstance(election, ProporzElection)
 
-    errors = import_party_results_internal(
+    raw_errors = import_party_results_internal(
         election,
         principal,
         BytesIO((
@@ -454,7 +471,7 @@ def test_import_party_results_internal_invalid_values(session):
         ).encode('utf-8')), 'text/plain',
         ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
     )
-    errors = sorted(set([(e.line, e.error.interpolate()) for e in errors]))
+    errors = sorted({(e.line, e.error.interpolate()) for e in raw_errors})  # type: ignore[attr-defined]
     assert errors == [
         (2, 'Invalid integer: year'),
         (2, 'Not an alphanumeric: id'),
@@ -466,7 +483,7 @@ def test_import_party_results_internal_invalid_values(session):
     ]
 
     # IDs don't match the IDs in the panache results
-    errors = import_party_results_internal(
+    raw_errors = import_party_results_internal(
         election,
         principal,
         BytesIO((
@@ -492,16 +509,16 @@ def test_import_party_results_internal_invalid_values(session):
         ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
     )
 
-    assert errors[0].error.interpolate() == (
+    assert raw_errors[0].error.interpolate() == (  # type: ignore[attr-defined]
         'Panachage results ids and id not consistent'
     )
 
 
-def test_import_party_results_internal_domains(session):
+def test_import_party_results_internal_domains(session: Session) -> None:
     principal = Canton('bl')
 
     session.add(
-        ProporzElection(
+        ProporzElection(  # type: ignore[misc]
             title='election',
             domain='region',
             domain_segment='Allschwil',
@@ -511,6 +528,7 @@ def test_import_party_results_internal_domains(session):
     )
     session.flush()
     election = session.query(Election).one()
+    assert isinstance(election, ProporzElection)
 
     session.add(
         ElectionCompound(
@@ -524,6 +542,7 @@ def test_import_party_results_internal_domains(session):
     compound.elections = [election]
 
     # Election
+    parties: dict[str, Any]
     for domain, segment, result, parties, panachage in (
         ('', '', set(), {'region': 'Allschwil'}, 4),
         ('region', '', set(), {'region': 'Allschwil'}, 4),
@@ -560,7 +579,7 @@ def test_import_party_results_internal_domains(session):
             ).encode('utf-8')), 'text/plain',
             ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
         )
-        assert result == {e.error.interpolate() for e in errors or []}
+        assert result == {e.error.interpolate() for e in errors or []}  # type: ignore[attr-defined]
         assert parties == {
             pr.domain: pr.domain_segment for pr in election.party_results
         }
@@ -604,7 +623,7 @@ def test_import_party_results_internal_domains(session):
             ).encode('utf-8')), 'text/plain',
             ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
         )
-        assert result == {e.error.interpolate() for e in errors or []}
+        assert result == {e.error.interpolate() for e in errors or []}  # type: ignore[attr-defined]
         assert parties == {
             pr.domain: pr.domain_segment for pr in compound.party_results
         }

@@ -6,7 +6,7 @@ from onegov.election_day.utils.election.connections import \
 
 
 def test_get_connection_results_interal(import_test_datasets, session):
-    election, errors = import_test_datasets(
+    import_results = import_test_datasets(
         'internal',
         'election',
         'gr',
@@ -17,6 +17,8 @@ def test_get_connection_results_interal(import_test_datasets, session):
         dataset_name='nationalratswahlen-2019-final',
         app_session=session
     )
+    assert len(import_results) == 1
+    election, errors = next(iter(import_results.values()))
     assert not errors
     # These results have been verified by T. Hardegger
     results = get_connection_results_api(election, session)
@@ -61,7 +63,7 @@ def test_get_connection_results_interal(import_test_datasets, session):
 
 
 def test_get_connection_results_subconn_ids(import_test_datasets, session):
-    election, errors = import_test_datasets(
+    import_results = import_test_datasets(
         'internal',
         'election',
         'sg',
@@ -72,6 +74,8 @@ def test_get_connection_results_subconn_ids(import_test_datasets, session):
         dataset_name='test_nonunique_subconn_ids',
         app_session=session
     )
+    assert len(import_results) == 1
+    election, errors = next(iter(import_results.values()))
     assert not errors
     results = get_connection_results_api(election, session)
     assert results['1']['total_votes'] == 3

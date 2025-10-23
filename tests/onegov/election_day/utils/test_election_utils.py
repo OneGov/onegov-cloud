@@ -15,7 +15,7 @@ from onegov.election_day.utils.parties import get_party_results_seat_allocation
 
 
 def test_election_utils_majorz(import_test_datasets, session):
-    election, errors = import_test_datasets(
+    results = import_test_datasets(
         'internal',
         'election',
         'zg',
@@ -26,6 +26,8 @@ def test_election_utils_majorz(import_test_datasets, session):
         dataset_name='staenderatswahl-2015-parties',
         has_expats=False
     )
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
 
     election.absolute_majoriy = 18191
@@ -339,7 +341,7 @@ def test_election_utils_majorz(import_test_datasets, session):
 
 
 def test_election_utils_proporz(import_test_datasets, session):
-    election, errors = import_test_datasets(
+    results = import_test_datasets(
         'internal',
         'election',
         'zg',
@@ -350,6 +352,8 @@ def test_election_utils_proporz(import_test_datasets, session):
         dataset_name='nationalratswahlen-2015',
         has_expats=False
     )
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
 
     election.colors = {
@@ -799,7 +803,7 @@ def test_election_utils_proporz(import_test_datasets, session):
 
 
 def test_election_utils_parties(import_test_datasets, session):
-    election, errors = import_test_datasets(
+    results = import_test_datasets(
         'internal',
         'election',
         'zg',
@@ -810,8 +814,10 @@ def test_election_utils_parties(import_test_datasets, session):
         dataset_name='nationalratswahlen-2015',
         has_expats=False
     )
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
-    errors = import_test_datasets(
+    results = import_test_datasets(
         'internal',
         'parties',
         'zg',
@@ -820,6 +826,8 @@ def test_election_utils_parties(import_test_datasets, session):
         election=election,
         dataset_name='nationalratswahlen-2015-parteien',
     )
+    assert len(results) == 1
+    errors = next(iter(results.values()))
     assert not errors
 
     years, parties = get_party_results(election)
@@ -1236,7 +1244,7 @@ def test_election_utils_parties(import_test_datasets, session):
 
 
 def test_get_connection_results_internal(import_test_datasets, session):
-    election, errors = import_test_datasets(
+    results = import_test_datasets(
         'internal',
         'election',
         'gr',
@@ -1247,6 +1255,8 @@ def test_get_connection_results_internal(import_test_datasets, session):
         dataset_name='nationalratswahlen-2019-final',
         app_session=session
     )
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
     # These results have been verified by T. Hardegger
     results = get_connection_results_api(election, session)
@@ -1291,7 +1301,7 @@ def test_get_connection_results_internal(import_test_datasets, session):
 
 
 def test_get_connection_results_subconn_ids(import_test_datasets, session):
-    election, errors = import_test_datasets(
+    results = import_test_datasets(
         'internal',
         'election',
         'sg',
@@ -1302,6 +1312,8 @@ def test_get_connection_results_subconn_ids(import_test_datasets, session):
         dataset_name='test_nonunique_subconn_ids',
         app_session=session
     )
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
     results = get_connection_results_api(election, session)
     assert results['1']['total_votes'] == 3

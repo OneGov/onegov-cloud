@@ -226,7 +226,7 @@ def test_long_filenames_are_truncated(election_day_app_zg):
 
 
 def test_election_generation(election_day_app_zg, import_test_datasets):
-    election, errors = import_test_datasets(
+    results = import_test_datasets(
         'internal',
         'election',
         'zg',
@@ -237,8 +237,10 @@ def test_election_generation(election_day_app_zg, import_test_datasets):
         dataset_name='nationalratswahlen-2015',
         app_session=election_day_app_zg.session()
     )
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
-    errors = import_test_datasets(
+    results = import_test_datasets(
         'internal',
         'parties',
         'zg',
@@ -247,6 +249,8 @@ def test_election_generation(election_day_app_zg, import_test_datasets):
         election=election,
         dataset_name='nationalratswahlen-2015-parteien',
     )
+    assert len(results) == 1
+    errors = next(iter(results.values()))
     assert not errors
 
     archive_generator = ArchiveGenerator(election_day_app_zg)
