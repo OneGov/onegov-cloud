@@ -305,7 +305,7 @@ def test_commission_president_private_access_permission_rule(
 
     # Test permission rule with president identity
     identity = Identity(
-        uid=user.id.hex,
+        uid='foo',
         userid='frank.president@example.org',
         role='commission_president',
         application_id=client.app.application_id,
@@ -360,7 +360,7 @@ def test_parliamentarian_no_private_access_to_commission(
 
     # Test permission rule with parliamentarian identity
     identity = Identity(
-        uid=user.id.hex,
+        uid='foo',
         userid='mary.member@example.org',
         groupids=frozenset(),
         role='parliamentarian',
@@ -411,7 +411,7 @@ def test_commission_president_no_access_to_different_commission(
 
     # Test permission rule with president identity
     identity = Identity(
-        uid=user.id.hex,
+        uid='foo',
         userid='george.president@example.org',
         groupids=frozenset(),
         role='commission_president',
