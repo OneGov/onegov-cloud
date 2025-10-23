@@ -111,7 +111,7 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
 
     # Add intermediate results
     with freeze_time('2022-01-01 12:00'):
-        model, errors = import_test_datasets(
+        results = import_test_datasets(
             'internal',
             'vote',
             'zg',
@@ -121,6 +121,8 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
             dataset_name='ndg-intermediate',
             app_session=session
         )
+        assert len(results) == 1
+        model, errors = next(iter(results.values()))
         assert not errors
         session.add(model)
         session.flush()
@@ -182,7 +184,7 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
 
     # Add final results
     with freeze_time('2022-01-02 12:00'):
-        model, errors = import_test_datasets(
+        results = import_test_datasets(
             'internal',
             'vote',
             'zg',
@@ -192,6 +194,8 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
             dataset_name='ndg',
             app_session=session
         )
+        assert len(results) == 1
+        model, errors = next(iter(results.values()))
         assert not errors
         session.add(model)
         session.flush()
@@ -378,7 +382,7 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
 
     # Add intermediate results
     with freeze_time('2022-01-01 12:00'):
-        model, errors = import_test_datasets(
+        import_results = import_test_datasets(
             'internal',
             'vote',
             'zg',
@@ -389,6 +393,8 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
             dataset_name='mundart-intermediate',
             app_session=session
         )
+        assert len(import_results) == 1
+        model, errors = next(iter(import_results.values()))
         assert not errors
         session.add(model)
         session.flush()
@@ -466,7 +472,7 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
 
     # Add final results
     with freeze_time('2022-01-02 12:00'):
-        model, errors = import_test_datasets(
+        import_results = import_test_datasets(
             'internal',
             'vote',
             'zg',
@@ -477,6 +483,8 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
             dataset_name='mundart',
             app_session=session
         )
+        assert len(import_results) == 1
+        model, errors = next(iter(import_results.values()))
         assert not errors
         session.add(model)
         session.flush()

@@ -36,7 +36,7 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
     assert get_candidate_statistics(election_compound) == {}
 
     # Add intermediate results
-    election_1, errors = import_test_datasets(
+    results = import_test_datasets(
         'internal',
         'election',
         'sg',
@@ -48,8 +48,10 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
         dataset_name='kantonsratswahl-2020-wahlkreis-rheintal-intermediate',
         app_session=session
     )
+    assert len(results) == 1
+    election_1, errors = next(iter(results.values()))
     assert not errors
-    election_2, errors = import_test_datasets(
+    results = import_test_datasets(
         'internal',
         'election',
         'sg',
@@ -61,6 +63,8 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
         dataset_name='kantonsratswahl-2020-wahlkreis-rorschach',
         app_session=session
     )
+    assert len(results) == 1
+    election_2, errors = next(iter(results.values()))
     assert not errors
     session.add(election_1)
     session.add(election_2)
@@ -122,7 +126,7 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
     assert get_candidate_statistics(election_compound) == {}
 
     # Add final results
-    election_1, errors = import_test_datasets(
+    results = import_test_datasets(
         'internal',
         'election',
         'sg',
@@ -134,6 +138,8 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
         dataset_name='kantonsratswahl-2020-wahlkreis-rheintal',
         app_session=session
     )
+    assert len(results) == 1
+    election_1, errors = next(iter(results.values()))
     assert not errors
     session.add(election_1)
     election_compound.elections = [election_1, election_2]
@@ -165,7 +171,7 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
 
 
 def test_election_compound_utils_parties(import_test_datasets, session):
-    election, errors = import_test_datasets(
+    results = import_test_datasets(
         'internal',
         'election',
         'sg',
@@ -177,6 +183,8 @@ def test_election_compound_utils_parties(import_test_datasets, session):
         dataset_name='kantonsratswahl-2020-wahlkreis-rheintal',
         app_session=session
     )
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
     session.add(election)
 
@@ -190,7 +198,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     election_compound.elections = [election]
     session.add(election_compound)
 
-    errors = import_test_datasets(
+    results = import_test_datasets(
         'internal',
         'parties',
         'zg',
@@ -199,6 +207,8 @@ def test_election_compound_utils_parties(import_test_datasets, session):
         election=election_compound,
         dataset_name='kantonsratswahl-2014-parteien',
     )
+    assert len(results) == 1
+    errors = next(iter(results.values()))
     assert not errors
 
     # Not pukelsheim
@@ -692,7 +702,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
 def test_election_utils_candidate_statistics(
     import_test_datasets, election_day_app_zg
 ):
-    election_compound, errors = import_test_datasets(
+    results = import_test_datasets(
         api_format='internal',
         model='election_compound',
         principal='zg',
@@ -727,6 +737,8 @@ def test_election_utils_candidate_statistics(
         date_=date(2022, 10, 2),
         dataset_name='kantonsratswahl-2022'
     )
+    assert len(results) == 1
+    election_compound, errors = next(iter(results.values()))
 
     assert not errors
     assert get_candidate_statistics(election_compound) == {
