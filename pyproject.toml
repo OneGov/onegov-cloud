@@ -75,7 +75,6 @@ ignore_missing_imports = true
 module = [
     "tests.onegov.election_day.*",
     "tests.onegov.feriennet.*",
-    "tests.onegov.pas.*",
 ]
 check_untyped_defs = false
 ignore_errors = true

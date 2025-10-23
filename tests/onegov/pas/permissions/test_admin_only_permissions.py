@@ -1,12 +1,21 @@
+from __future__ import annotations
+
+import pytest
+import transaction
+
+from datetime import date
 from onegov.pas.collections import (
     RateSetCollection,
     SettlementRunCollection,
     ImportLogCollection
 )
 from onegov.user import UserCollection
-import transaction
-import pytest
-from datetime import date
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.client import Client
+    from ..conftest import TestPasApp
 
 
 @pytest.mark.parametrize('role,user_email,should_access', [
@@ -21,8 +30,12 @@ from datetime import date
     '/usermanagement'
 ])
 def test_admin_only_collection_access(
-    client, role, user_email, should_access, path
-):
+    client: Client[TestPasApp],
+    role: str,
+    user_email: str,
+    should_access: bool,
+    path: str
+) -> None:
     session = client.app.session()
 
     # Create user with specified role
@@ -48,8 +61,12 @@ def test_admin_only_collection_access(
     ('parliamentarian', 'test.parliamentarian@example.org'),
     ('commission_president', 'test.president@example.org'),
 ])
-def test_admin_only_individual_items_denied(client, role, user_email):
-    '''Individual admin-only items should deny access to parliamentarians'''
+def test_admin_only_individual_items_denied(
+    client: Client[TestPasApp],
+    role: str,
+    user_email: str
+) -> None:
+    """Individual admin-only items should deny access to parliamentarians"""
     session = client.app.session()
 
     # Create test data as admin would
@@ -100,7 +117,7 @@ def test_admin_only_individual_items_denied(client, role, user_email):
         assert page.status_code in (403, 302)
 
 
-def test_admin_can_access_admin_only_items(client):
+def test_admin_can_access_admin_only_items(client: Client[TestPasApp]) -> None:
     session = client.app.session()
 
     # Create test data
