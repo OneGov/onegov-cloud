@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from io import BytesIO
 from onegov.file import File
 from morepath import redirect
@@ -534,12 +535,37 @@ def add_time_report(
 
     if form.submitted(request):
         assert request.current_username is not None
-
-        report = TranslatorTimeReport()
-        report.translator = self
-        form.update_model(report)
+        assert form.duration.data is not None
+        assert form.assignment_date.data is not None
 
         session = request.session
+        current_user = request.current_user
+
+        hours = float(form.duration.data)
+        rounded_hours = math.ceil(hours * 2) / 2
+        duration_minutes = int(rounded_hours * 60)
+
+        hourly_rate = form.get_hourly_rate(self)
+        surcharge_pct = form.calculate_surcharge()
+        travel_comp = float(form.travel_distance.data or 0)
+        duration_hours = duration_minutes / 60.0
+        base_comp = hourly_rate * duration_hours * (1 + surcharge_pct / 100)
+        total_comp = base_comp + travel_comp
+
+        report = TranslatorTimeReport(
+            translator=self,
+            created_by=current_user,
+            assignment_type=form.assignment_type.data or None,
+            duration=duration_minutes,
+            case_number=form.case_number.data or None,
+            assignment_date=form.assignment_date.data,
+            hourly_rate=hourly_rate,
+            surcharge_percentage=surcharge_pct,
+            travel_compensation=travel_comp,
+            total_compensation=total_comp,
+            notes=form.notes.data or None,
+        )
+
         session.add(report)
         session.flush()
 
@@ -608,22 +634,18 @@ def accept_time_report(
     self: TimeReportTicket, request: TranslatorAppRequest
 ) -> BaseResponse:
     """Accept time report."""
-
     request.assert_valid_csrf_token()
 
     handler = self.handler
     assert hasattr(handler, 'time_report')
-
     if not handler.time_report:
         request.alert(_('Time report not found'))
         return request.redirect(request.link(self))
 
     handler.time_report.status = 'confirmed'
     handler.data['state'] = 'accepted'
-
     TicketMessage.create(self, request, 'accepted')
     request.success(_('Time report accepted'))
-
     return request.redirect(request.link(self))
 
 

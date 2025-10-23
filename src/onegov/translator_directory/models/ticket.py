@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+
 from onegov.translator_directory.models.time_report import TranslatorTimeReport
 
 from functools import cached_property
 from markupsafe import Markup, escape
-from onegov.core.elements import Intercooler, Link, LinkGroup
+from onegov.core.elements import Link, LinkGroup
 from onegov.core.templates import render_macro
 from onegov.core.utils import linkify
 from onegov.org import _
@@ -12,6 +13,7 @@ from onegov.org.models.ticket import OrgTicketMixin
 from onegov.ticket import Handler
 from onegov.ticket import handlers
 from onegov.ticket import Ticket
+from onegov.core.elements import Intercooler
 from onegov.translator_directory.collections.documents import (
     TranslatorDocumentCollection)
 from onegov.translator_directory.constants import INTERPRETING_TYPES
@@ -20,6 +22,7 @@ from onegov.translator_directory.layout import TranslatorLayout
 from onegov.translator_directory.models.accreditation import Accreditation
 from onegov.translator_directory.models.mutation import TranslatorMutation
 from onegov.translator_directory.models.translator import Translator
+from onegov.translator_directory.constants import TRANSLATOR_FA_ICON
 from onegov.translator_directory.utils import get_custom_text
 
 from typing import Any, TYPE_CHECKING
@@ -295,9 +298,10 @@ class TimeReportHandler(Handler):
             return []
 
         links: list[Link | LinkGroup] = []
+        time_report_links = []
 
         if self.time_report:
-            links.append(
+            time_report_links.append(
                 Link(
                     text=_('View Time Report'),
                     url=request.return_here(request.link(self.time_report)),
@@ -305,26 +309,35 @@ class TimeReportHandler(Handler):
                 )
             )
 
-        links.append(
+        time_report_links.append(
             Link(
                 text=_('View translator'),
                 url=request.return_here(request.link(self.translator)),
-                attrs={'class': 'internal-link'},
+                attrs={'class': TRANSLATOR_FA_ICON},
             )
         )
 
         if self.state is None:
-            links.append(
+            time_report_links.append(
                 Link(
-                    text=_('Accept Time Report'),
+                    text=_('Accept time report'),
                     url=request.link(self.ticket, 'accept-time-report'),
                     attrs={'class': 'accept-link'},
                     traits=(
                         Intercooler(
                             request_method='POST',
                             redirect_after=request.link(self.ticket),
-                        ),
+                        )
                     ),
+                )
+            )
+
+        if time_report_links:
+            links.append(
+                LinkGroup(
+                    _('Time Report'),
+                    links=time_report_links,
+                    right_side=False
                 )
             )
 

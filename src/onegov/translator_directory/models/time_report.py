@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     import uuid
     from datetime import date
     from .translator import Translator
+    from onegov.user import User
 
 TimeReportStatus = Literal['pending', 'confirmed']
 
@@ -38,6 +39,14 @@ class TranslatorTimeReport(Base, TimestampMixin):
     translator: relationship[Translator] = relationship(
         'Translator', back_populates='time_reports'
     )
+
+    created_by_id: Column[uuid.UUID | None] = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey('users.id', ondelete='SET NULL'),
+        nullable=True,
+    )
+
+    created_by: relationship[User | None] = relationship('User')
 
     assignment_type: Column[str | None] = Column(Text)
 

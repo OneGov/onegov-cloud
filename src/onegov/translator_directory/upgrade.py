@@ -4,9 +4,9 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from __future__ import annotations
 
-from onegov.core.orm.types import JSON
+from onegov.core.orm.types import JSON, UUID
 from onegov.core.upgrade import upgrade_task, UpgradeContext
-from sqlalchemy import Column, Boolean, Enum, Text
+from sqlalchemy import Column, Boolean, Enum, ForeignKey, Text
 
 
 @upgrade_task('Change withholding tax column to boolean')
@@ -132,4 +132,20 @@ def add_status_column_to_time_reports(context: UpgradeContext) -> None:
                 'status', status_enum, nullable=False, default='pending'
             ),
             default=lambda x: 'pending',
+        )
+
+
+@upgrade_task('Add created_by_id to translator_time_reports')
+def add_created_by_to_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if not context.has_column('translator_time_reports', 'created_by_id'):
+        context.operations.add_column(
+            'translator_time_reports',
+            Column(
+                'created_by_id',
+                UUID,
+                ForeignKey('users.id', ondelete='SET NULL'),
+                nullable=True,
+            ),
         )

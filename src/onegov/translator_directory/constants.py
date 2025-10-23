@@ -143,3 +143,5 @@ INTERPRETING_TYPES = {
     'negotiation': _('Negotiation interpreting'),
     'whisper': _('Whisper interpreting'),
 }
+
+TRANSLATOR_FA_ICON = 'translator'

@@ -14,11 +14,15 @@ $dark-orange:  #be860e;
     max-width: 100% !important;
 }
 
+.time-reports::before { @include icon-bold('\f017'); }
+
 .edit-bar {
     .create-excel::before { @include icon('\f1c3'); }
     .documents::before { @include icon-bold('\f15b')}
     .report-change::before { @include icon-bold('\f044')}
     .plus::before { @include icon-bold('\f017')}
+    .time::before { @include icon-bold('\f017')}
+    .translator::before { @include icon('\f27a')}
 }
 
 .location-settings {

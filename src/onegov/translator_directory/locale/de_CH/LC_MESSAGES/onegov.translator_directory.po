@@ -722,7 +722,7 @@ msgstr "Total"
 msgid "View Time Report"
 msgstr "Zeiterfassung anzeigen"
 
-msgid "Accept Time Report"
+msgid "Accept time report"
 msgstr "Zeiterfassung akzeptieren"
 
 msgid "View translator"
