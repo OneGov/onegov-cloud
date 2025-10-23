@@ -7,18 +7,15 @@
         <p tal:condition="lead" tal:content="lead"></p>
 
         <tal:b condition="news">
-            <h2 i18n:translate>Latest news</h2>
+            <h2 i18n:translate tal:condition="not: daily">Latest news</h2>
 
             <tal:b repeat="item news">
-                <strong><a href="${request.link(item)}">${item.title}</a></strong>
-                <tal:b tal:switch="item.text_in_newsletter">
-                    <tal:b tal:case="False">
-                        <p>${layout.with_hashtags(item.lead)}</p>
-                    </tal:b>
-                    <tal:b tal:case="True" tal:content="item.text">
-                    </tal:b>
-                </tal:b>
-
+                <hr>
+                    <strong><a href="${request.link(item)}"><h3>${item.title}</h3></a></strong>
+                    <img tal:condition="item.page_image and item.show_preview_image" style="width: 100%; padding-bottom: 55%; background-image: url(${item.page_image}); background-size: cover;"></img>
+                    <p><strong>${layout.with_hashtags(item.lead)}</strong></p>
+                <p tal:condition="not newsletter.show_only_previews" tal:content="item.text">
+                <a tal:condition="newsletter.show_only_previews" href="${request.link(item)}" i18n:translate>read more</a>
             </tal:b>
         </tal:b>
 

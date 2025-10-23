@@ -175,8 +175,11 @@ def send_daily_newsletter(request: OrgRequest) -> None:
                             '%d.%m.%Y, %H:%M')
                     })
                 )
+                only_preview = request.app.org.show_only_previews
                 newsletters = NewsletterCollection(request.session)
-                newsletter = newsletters.add(title=title, html=Markup(''))
+                newsletter = newsletters.add(
+                    title=title, html=Markup(''),
+                    show_only_previews=only_preview)
                 newsletter.content['news'] = [news_id for news_id, in news]
 
                 send_newsletter(request=request, newsletter=newsletter,

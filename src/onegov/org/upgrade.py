@@ -30,7 +30,7 @@ from onegov.people import Person
 from onegov.reservation import Resource
 from onegov.ticket import TicketPermission
 from onegov.user import User, UserGroup
-from sqlalchemy import Column, ForeignKey, Text
+from sqlalchemy import Column, ForeignKey, Text, Boolean
 from sqlalchemy.orm import undefer, selectinload, load_only
 
 
@@ -721,3 +721,24 @@ def cache_new_news_hashtags_in_meta(context: UpgradeContext) -> None:
             news.hashtags = news.fts_tags or []
     except Exception:  # nosec B110
         pass
+
+
+@upgrade_task('Add show_only_previews column to newsletters')
+def add_show_only_previews_column_to_newsletters(
+    context: UpgradeContext) -> None:
+    if not context.has_table('newsletters'):
+        return
+
+    if context.has_column('newsletters', 'show_only_previews'):
+        return
+
+    context.add_column_with_defaults(
+        'newsletters',
+        Column(
+            'show_only_previews',
+            Boolean,
+            nullable=False,
+            default=False
+        ),
+        default=False
+    )
