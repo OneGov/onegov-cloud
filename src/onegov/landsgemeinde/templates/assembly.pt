@@ -19,30 +19,42 @@
                         <ul class="more-list"></ul>
                     </div>
                     <div class="side-panel downloads">
-                        <h3 i18n:translate="">Downloads</h3>
+                        <h3 i18n:translate="">Memorial</h3>
                         <p tal:condition="assembly.memorial_pdf">
                             <a href="${request.link(assembly.memorial_pdf)}" class="memorial-link">
-                                <i class="fa fa-download" aria-hidden="true"></i>
+                                <i class="fa fa-file-pdf" aria-hidden="true"></i>
                                 <span tal:condition="not: assembly.memorial_2_pdf" i18n:translate="">Memorial (PDF)</span>
                                 <span tal:condition="assembly.memorial_2_pdf" i18n:translate="">Memorial part 1 (PDF)</span>
                             </a>
                         </p>
                         <p tal:condition="assembly.memorial_2_pdf">
                             <a href="${request.link(assembly.memorial_2_pdf)}" class="memorial-link">
-                                <i class="fa fa-download" aria-hidden="true"></i>
+                                <i class="fa fa-file-pdf" aria-hidden="true"></i>
                                 <span i18n:translate="">Memorial part 2 (PDF)</span>
                             </a>
                         </p>
                         <p tal:condition="assembly.memorial_supplement_pdf">
                             <a href="${request.link(assembly.memorial_supplement_pdf)}" class="memorial-supplement-link">
-                                <i class="fa fa-download" aria-hidden="true"></i>
+                                <i class="fa fa-file-pdf" aria-hidden="true"></i>
                                 <span i18n:translate="">Supplement to the memorial (PDF)</span>
                             </a>
                         </p>
+                    </div>
+                    <div class="side-panel downloads">
+                        <h3 i18n:translate="">Protocol</h3>
                         <p tal:condition="assembly.protocol_pdf">
                             <a href="${request.link(assembly.protocol_pdf)}" class="protocol-link">
-                                <i class="fa fa-download" aria-hidden="true"></i>
+                                <i class="fa fa-file-pdf" aria-hidden="true"></i>
                                 <span i18n:translate="">Protocol (PDF)</span>
+                            </a>
+                        </p>
+                    </div>
+                    <div class="side-panel downloads">
+                        <h3 i18n:translate="">Downloads</h3>
+                        <p tal:condition="assembly.audio_zip">
+                            <a href="${request.link(assembly.audio_zip)}" class="audio-zip-link">
+                                <i class="fa fa-download" aria-hidden="true"></i>
+                                <span i18n:translate="">Memorial as audio for the visually impaired and blind</span>
                             </a>
                         </p>
                         <p tal:condition="assembly.audio_mp3">
@@ -51,12 +63,14 @@
                                 <span i18n:translate="">Audio (MP3)</span>
                             </a>
                         </p>
-                        <p tal:condition="assembly.audio_zip">
-                            <a href="${request.link(assembly.audio_zip)}" class="audio-zip-link">
-                                <i class="fa fa-download" aria-hidden="true"></i>
-                                <span i18n:translate="">Memorial as audio for the visually impaired and blind</span>
-                            </a>
-                        </p>
+                        <tal:b tal:condition="assembly.more_files">
+                            <tal:b tal:repeat="file assembly.more_files">
+                                <a href="${request.link(file)}" class="more-files-link">
+                                    <i class="fa fa-download" aria-hidden="true"></i>
+                                    <span tal:content="file.name" />
+                                </a>
+                            </tal:b>
+                        </tal:b>
                         <p>
                             <a href="${request.link(assembly, 'open-data')}" class="json-link">
                                 <i class="fa fa-download" aria-hidden="true"></i>
