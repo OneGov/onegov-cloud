@@ -172,32 +172,32 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         _result: Column[int]
         _result_people_accepted: Column[int]
         _result_cantons_accepted: Column[int]
-        _result_ag_accepted: Column[int]
-        _result_ai_accepted: Column[int]
-        _result_ar_accepted: Column[int]
-        _result_be_accepted: Column[int]
-        _result_bl_accepted: Column[int]
-        _result_bs_accepted: Column[int]
-        _result_fr_accepted: Column[int]
-        _result_ge_accepted: Column[int]
-        _result_gl_accepted: Column[int]
-        _result_gr_accepted: Column[int]
-        _result_ju_accepted: Column[int]
-        _result_lu_accepted: Column[int]
-        _result_ne_accepted: Column[int]
-        _result_nw_accepted: Column[int]
-        _result_ow_accepted: Column[int]
-        _result_sg_accepted: Column[int]
-        _result_sh_accepted: Column[int]
-        _result_so_accepted: Column[int]
-        _result_sz_accepted: Column[int]
-        _result_tg_accepted: Column[int]
-        _result_ti_accepted: Column[int]
-        _result_ur_accepted: Column[int]
-        _result_vd_accepted: Column[int]
-        _result_vs_accepted: Column[int]
-        _result_zg_accepted: Column[int]
-        _result_zh_accepted: Column[int]
+        _result_ag_accepted: Column[int | None]
+        _result_ai_accepted: Column[int | None]
+        _result_ar_accepted: Column[int | None]
+        _result_be_accepted: Column[int | None]
+        _result_bl_accepted: Column[int | None]
+        _result_bs_accepted: Column[int | None]
+        _result_fr_accepted: Column[int | None]
+        _result_ge_accepted: Column[int | None]
+        _result_gl_accepted: Column[int | None]
+        _result_gr_accepted: Column[int | None]
+        _result_ju_accepted: Column[int | None]
+        _result_lu_accepted: Column[int | None]
+        _result_ne_accepted: Column[int | None]
+        _result_nw_accepted: Column[int | None]
+        _result_ow_accepted: Column[int | None]
+        _result_sg_accepted: Column[int | None]
+        _result_sh_accepted: Column[int | None]
+        _result_so_accepted: Column[int | None]
+        _result_sz_accepted: Column[int | None]
+        _result_tg_accepted: Column[int | None]
+        _result_ti_accepted: Column[int | None]
+        _result_ur_accepted: Column[int | None]
+        _result_vd_accepted: Column[int | None]
+        _result_vs_accepted: Column[int | None]
+        _result_zg_accepted: Column[int | None]
+        _result_zh_accepted: Column[int | None]
         _position_council_of_states: Column[int]
         _position_federal_council: Column[int]
         _position_national_council: Column[int]
@@ -613,7 +613,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     signatures_valid: Column[int | None] = Column(Integer)
 
     # Voting recommendations
-    recommendations: Column[dict[str, int]] = Column(
+    recommendations: Column[dict[str, int | None]] = Column(
         JSON,
         nullable=False,
         default=dict
@@ -649,7 +649,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             self.recommendations.get(name)
         )
 
-    def get_recommendation_of_existing_parties(self) -> dict[str, int]:
+    def get_recommendation_of_existing_parties(self) -> dict[str, int | None]:
         """ Get only the existing parties as when this vote was conducted """
         if not self.recommendations:
             return {}

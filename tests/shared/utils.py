@@ -19,13 +19,13 @@ from uuid import uuid4
 from xml.etree.ElementTree import tostring
 
 
-from typing import overload, Any, IO, TypeVar, TYPE_CHECKING
+from typing import overload, Any, IO, Protocol, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     import pytest
     from collections.abc import Callable, Iterator, Mapping
     from datetime import datetime
     from onegov.core.framework import Framework
-    from onegov.core.orm import Base
+    from onegov.core.orm import SessionManager
     from onegov.reservation import Resource
     from reportlab.pdfgen.canvas import Canvas
     from sqlalchemy.orm import Session
@@ -36,6 +36,10 @@ if TYPE_CHECKING:
     _AppT = TypeVar('_AppT', bound=Framework)
     _ResourceT = TypeVar('_ResourceT', bound=Resource)
     _BinaryIOT = TypeVar('_BinaryIOT', bound=IO[bytes])
+
+    class HasSessionManager(Protocol):
+        @property
+        def session_manager(self) -> SessionManager | None: ...
 
 
 def get_meta(
@@ -327,7 +331,7 @@ def extract_intercooler_delete_link(client: Client, page: TestResponse) -> str:
 
 
 @contextmanager
-def use_locale(model: Base, locale: str) -> Iterator[None]:
+def use_locale(model: HasSessionManager, locale: str) -> Iterator[None]:
     assert model.session_manager is not None
     old_locale = model.session_manager.current_locale
     model.session_manager.current_locale = locale

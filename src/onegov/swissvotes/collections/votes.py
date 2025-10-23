@@ -590,7 +590,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
                     )
             csv.writerow(row)
 
-    def export_xlsx(self, file: IO[str]) -> None:
+    def export_xlsx(self, file: IO[Any]) -> None:
         """ Exports all votes according to the code book. """
         mapper = ColumnMapperDataset()
 

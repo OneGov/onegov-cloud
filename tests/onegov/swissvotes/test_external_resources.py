@@ -1,16 +1,24 @@
+from __future__ import annotations
+
+import pytest
+
 from datetime import date
 from decimal import Decimal
 from lxml.etree import XMLSyntaxError
-
 from onegov.core.utils import Bunch
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.external_resources import MfgPosters
 from onegov.swissvotes.external_resources import BsPosters
 from onegov.swissvotes.external_resources import SaPosters
 from onegov.swissvotes.external_resources.posters import Posters
-from pytest import raises
 from unittest.mock import MagicMock
 from unittest.mock import patch
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from .conftest import TestApp
 
 
 xml = '''
@@ -22,7 +30,7 @@ xml = '''
 '''
 
 
-def test_posters_fetch(swissvotes_app):
+def test_posters_fetch(swissvotes_app: TestApp) -> None:
 
     session = swissvotes_app.session()
 
@@ -242,7 +250,7 @@ def test_posters_fetch(swissvotes_app):
         assert vote_3.posters_sa_nay_imgs == {}
 
 
-def test_posters_meta_data_url():
+def test_posters_meta_data_url() -> None:
     assert MfgPosters('xxx').meta_data_url('object') == (
         'https://www.emuseum.ch/objects/object/xml'
     )
@@ -255,21 +263,21 @@ def test_posters_meta_data_url():
     )
 
 
-def test_posters_parse_xml(session):
+def test_posters_parse_xml(session: Session) -> None:
 
     class MyPosters(Posters):
 
-        def meta_data_url(self, url):
+        def meta_data_url(self, url: str) -> str:
             return url
 
     # parse xml
     posters = MyPosters()
-    with raises(TypeError):
-        posters.parse_xml(Bunch(content=None))
-    with raises(XMLSyntaxError):
-        posters.parse_xml(Bunch(content=''))
-    with raises(ValueError):
-        posters.parse_xml(Bunch(content='<object></object>'))
-    with raises(ValueError):
-        posters.parse_xml(Bunch(content=xml.format('')))
-    assert posters.parse_xml(Bunch(content=xml.format('url'))) == 'url'
+    with pytest.raises(TypeError):
+        posters.parse_xml(Bunch(content=None))  # type: ignore[arg-type]
+    with pytest.raises(XMLSyntaxError):
+        posters.parse_xml(Bunch(content=''))  # type: ignore[arg-type]
+    with pytest.raises(ValueError):
+        posters.parse_xml(Bunch(content='<object></object>'))  # type: ignore[arg-type]
+    with pytest.raises(ValueError):
+        posters.parse_xml(Bunch(content=xml.format('')))  # type: ignore[arg-type]
+    assert posters.parse_xml(Bunch(content=xml.format('url'))) == 'url'  # type: ignore[arg-type]
