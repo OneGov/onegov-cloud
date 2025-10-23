@@ -200,6 +200,7 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
     def collection(self) -> Any:
         result = ExtendedDirectoryEntryCollection(
             self.directory,
+            request=self.request,
             page=self.page or 0,
             published_only=True
         )
