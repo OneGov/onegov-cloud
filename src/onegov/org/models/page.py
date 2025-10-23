@@ -13,7 +13,7 @@ from onegov.org.models.atoz import AtoZ
 from onegov.org.models.extensions import (
     ContactExtension, ContactHiddenOnPageExtension,
     PeopleShownOnMainPageExtension, ImageExtension,
-    NewsletterExtension, PublicationExtension, DeletableContentExtension,
+    PublicationExtension, DeletableContentExtension,
     InlinePhotoAlbumExtension, SidebarContactLinkExtension,
     PushNotificationExtension
 )
@@ -140,8 +140,8 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
         raise NotImplementedError
 
 
-class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
-           AccessExtension, PublicationExtension, VisibleOnHomepageExtension,
+class News(Page, TraitInfo, SearchableContent, AccessExtension,
+           PublicationExtension, VisibleOnHomepageExtension,
            ContactExtension, ContactHiddenOnPageExtension,
            PeopleShownOnMainPageExtension, PersonLinkExtension,
            CoordinatesExtension, ImageExtension, GeneralFileLinkExtension,
