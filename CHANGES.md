@@ -1,8 +1,22 @@
 # Changes
 
+## 2025.59
+
+`2025-10-24` | [bcafc9a898...98bce20025](https://github.com/OneGov/onegov-cloud/compare/bcafc9a898^...98bce20025)
+
+### Search
+
+##### Avoids potentially leaking connections within the indexer
+
+`Bugfix` | [bcafc9a898](https://github.com/onegov/onegov-cloud/commit/bcafc9a89878970d7a6f4c173081ee0702a763b2)
+
+##### Also disposes the indexer engine at the end just to be sure.
+
+`Bugfix` | [98bce20025](https://github.com/onegov/onegov-cloud/commit/98bce200258276f06ad7068d33c1c16fedb7648c)
+
 ## 2025.58
 
-`2025-10-24` | [3a7d6284d7...3a7d6284d7](https://github.com/OneGov/onegov-cloud/compare/3a7d6284d7^...3a7d6284d7)
+`2025-10-24` | [3a7d6284d7...bca98ed899](https://github.com/OneGov/onegov-cloud/compare/3a7d6284d7^...bca98ed899)
 
 ## 2025.57
 
@@ -2425,8 +2439,4 @@ Fixes a number of issues OGC-2122, OGC-2120, OGC-2119, OGC-2109
 ##### Make db upgrade for ticket closed_on column more performant
 
 `Feature` | [NONE](#NONE) | [f59d7a9b0f](https://github.com/onegov/onegov-cloud/commit/f59d7a9b0fe658317e5dec8ba1381684d6364b09)
-
-## 2025.11
-
-`2025-03-03` | [0c2dd4a07e...c321b6c196](https://github.com/OneGov/onegov-cloud/compare/0c2dd4a07e^...c321b6c196)
 
