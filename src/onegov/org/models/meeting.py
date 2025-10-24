@@ -65,12 +65,16 @@ class Meeting(
 
     @property
     def title_text(self) -> str:
-        return f'{self.title} ({self.start_datetime})'
+        if self.start_datetime is not None:
+            return f'{self.title} ({self.start_datetime})'
+        return self.title
 
     @property
     def display_name(self) -> str:
         # return title and start_datetime as dmY
-        return f'{self.title} {self.start_datetime:%d.%m.%Y}'
+        if self.start_datetime is not None:
+            return f'{self.title} {self.start_datetime:%d.%m.%Y}'
+        return self.title
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(
