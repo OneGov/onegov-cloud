@@ -1,8 +1,12 @@
 # Changes
 
+## 2025.58
+
+`2025-10-24` | [3a7d6284d7...3a7d6284d7](https://github.com/OneGov/onegov-cloud/compare/3a7d6284d7^...3a7d6284d7)
+
 ## 2025.57
 
-`2025-10-24` | [a92f06950b...8b88a31823](https://github.com/OneGov/onegov-cloud/compare/a92f06950b^...8b88a31823)
+`2025-10-24` | [a92f06950b...d1e1b4df2c](https://github.com/OneGov/onegov-cloud/compare/a92f06950b^...d1e1b4df2c)
 
 ### Core
 
@@ -2425,49 +2429,4 @@ Fixes a number of issues OGC-2122, OGC-2120, OGC-2119, OGC-2109
 ## 2025.11
 
 `2025-03-03` | [0c2dd4a07e...c321b6c196](https://github.com/OneGov/onegov-cloud/compare/0c2dd4a07e^...c321b6c196)
-
-## 2025.10
-
-`2025-03-03` | [753d4737ed...a33c968d71](https://github.com/OneGov/onegov-cloud/compare/753d4737ed^...a33c968d71)
-
-### Agency
-
-##### Staka LU: Handle Sekretariat in column lastname as agency
-
-`Feature` | [OGC-2106](https://linear.app/onegovcloud/issue/OGC-2106) | [8ad24bda89](https://github.com/onegov/onegov-cloud/commit/8ad24bda897a91dadd9891857afdaf83a75fb2ea)
-
-##### Staka LU: Use membership title as export field (instead of person function)
-
-`Feature` | [OGC-2107](https://linear.app/onegovcloud/issue/OGC-2107) | [4c6118e20a](https://github.com/onegov/onegov-cloud/commit/4c6118e20a2856746669c5386f23bb851ec63cb2)
-
-### Org
-
-##### Prevent duplicates in push notifications and other improvements.
-
-- Auto-select default topic when only one exists and checkbox is ticked
-- Preventing duplicates in push notifications
-- Fix default choices not being in nested list
-- Prevent user from being able to submit an empty list if checkbox ticked
-- Fix inconsistent UI labels (Themen-ID ...) 
-
-The implementation now uses database constraints to ensure notification
- uniqueness even during simultaneous processing.
-
-`Feature` | [OGC-1951](https://linear.app/onegovcloud/issue/OGC-1951) | [5eac37b6e2](https://github.com/onegov/onegov-cloud/commit/5eac37b6e23c15470dc88e407c5332b0ba77fd19)
-
-### Swissvotes
-
-##### Allow English documents in vote search results
-
-`Bugfix` | [SWI-60](https://linear.app/swissvotes/issue/SWI-60) | [023147a26e](https://github.com/onegov/onegov-cloud/commit/023147a26ef0f1281909ce3638349a8e0ecb693b)
-
-##### Allow English documents in vote search results
-
-`Bugfix` | [SWI-60](https://linear.app/swissvotes/issue/SWI-60) | [cfa9246bb4](https://github.com/onegov/onegov-cloud/commit/cfa9246bb4ec9698d3d009b78b2fb713bf089fba)
-
-### Town6
-
-##### Add push notifications overview.
-
-`Feature` | [OGC-1951](https://linear.app/onegovcloud/issue/OGC-1951) | [23dbcc0a85](https://github.com/onegov/onegov-cloud/commit/23dbcc0a8583baf530842e4c6d3d80f8e5376c59)
 
