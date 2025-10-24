@@ -295,12 +295,12 @@ class Indexer:
     ) -> None:
 
         if session is None:
-            connection = self.engine.connect()
-            connection = connection.execution_options(
-                schema_translate_map={None: schema}
-            )
-            with connection.begin():
-                connection.execute(stmt, params or [{}])
+            with self.engine.connect() as connection:
+                connection = connection.execution_options(
+                    schema_translate_map={None: schema}
+                )
+                with connection.begin():
+                    connection.execute(stmt, params or [{}])
         else:
             # use a savepoint instead
             with session.begin_nested():
@@ -381,6 +381,7 @@ class Indexer:
 
         return True
 
+    # FIXME: We should consider making the session parameter mandatory
     def process(self, session: Session | None = None) -> int:
         """ Processes the queue in bulk.
 

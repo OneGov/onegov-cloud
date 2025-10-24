@@ -156,7 +156,7 @@ class SearchApp(morepath.App):
                 for obj in query:
                     self.fts_orm_events.index(schema, obj)
 
-                self.fts_indexer.process()
+                self.fts_indexer.process(session)
             except Exception:
                 index_log.info(
                     f"Error psql indexing model '{model.__name__}'",
@@ -171,9 +171,12 @@ class SearchApp(morepath.App):
             if fail:
                 index_log.info('Failed reindexing:', tuple(results))
 
+        session = self.session()
         try:
-            self.fts_indexer.process()
+            self.fts_indexer.process(session)
         finally:
+            session.invalidate()
+            session.bind.dispose()
             self.fts_orm_events.queue.maxsize = original_queue_size
 
 
@@ -189,7 +192,7 @@ def process_indexer_tween_factory(
             return handler(request)
 
         result = handler(request)
-        app.fts_indexer.process()
+        app.fts_indexer.process(app.session())
         return result
 
     return process_indexer_tween
