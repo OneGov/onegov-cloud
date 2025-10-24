@@ -286,6 +286,10 @@ class Indexer:
 
         return True
 
+    # FIXME: For some reason using the session can fail, maybe because the
+    #        session doesn't always match the schema? Maybe we should try
+    #        to give the SessionManager to the indexer, so it always has
+    #        access to a session bound to the corect schema.
     def execute_statement(
         self,
         session: Session | None,
@@ -381,7 +385,6 @@ class Indexer:
 
         return True
 
-    # FIXME: We should consider making the session parameter mandatory
     def process(self, session: Session | None = None) -> int:
         """ Processes the queue in bulk.
 
@@ -428,10 +431,7 @@ class Indexer:
         metadata = MetaData(schema=schema)
         search_index_table = Table(SearchIndex.__tablename__, metadata)
         stmt = search_index_table.delete()
-
-        connection = self.engine.connect()
-        with connection.begin():
-            connection.execute(stmt)
+        self.execute_statement(None, schema, stmt)
 
 
 class TypeMapping:

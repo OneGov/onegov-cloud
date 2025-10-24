@@ -134,11 +134,11 @@ class SearchApp(morepath.App):
         if not self.fts_search_enabled:
             return
 
-        # psql delete table search_index
-        self.fts_indexer.delete_search_index(self.schema)
-
         schema = self.schema
         index_log.info(f'Indexing schema {schema}..')
+
+        # psql delete table search_index
+        self.fts_indexer.delete_search_index(schema)
 
         # have no queue limit for reindexing (that we're able to change
         # this here is a bit of a CPython implementation detail) - we can't
@@ -156,7 +156,7 @@ class SearchApp(morepath.App):
                 for obj in query:
                     self.fts_orm_events.index(schema, obj)
 
-                self.fts_indexer.process(session)
+                self.fts_indexer.process()
             except Exception:
                 index_log.info(
                     f"Error psql indexing model '{model.__name__}'",
@@ -170,13 +170,9 @@ class SearchApp(morepath.App):
             results = executor.map(reindex_model, self.indexable_base_models())
             if fail:
                 index_log.info('Failed reindexing:', tuple(results))
-
-        session = self.session()
         try:
-            self.fts_indexer.process(session)
+            self.fts_indexer.process()
         finally:
-            session.invalidate()
-            session.bind.dispose()
             self.fts_orm_events.queue.maxsize = original_queue_size
 
 
@@ -192,7 +188,7 @@ def process_indexer_tween_factory(
             return handler(request)
 
         result = handler(request)
-        app.fts_indexer.process(app.session())
+        app.fts_indexer.process()
         return result
 
     return process_indexer_tween
