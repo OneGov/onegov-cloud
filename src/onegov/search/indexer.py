@@ -288,8 +288,8 @@ class Indexer:
 
     # FIXME: For some reason using the session can fail, maybe because the
     #        session doesn't always match the schema? Maybe we should try
-    #        to give the SessionManager to the indexer, so it always has
-    #        access to a session bound to the corect schema.
+    #        to give the SessionManager to the indexer instead of the Engine,
+    #        so it always can get a session bound to the correct schema.
     def execute_statement(
         self,
         session: Session | None,
