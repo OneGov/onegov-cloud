@@ -156,10 +156,18 @@ class SearchApp(morepath.App):
                 for obj in query:
                     self.fts_orm_events.index(schema, obj)
 
-                self.fts_indexer.process()
+                # FIXME: Ideally we process the queue concurrently as well,
+                #        but it seems we're leaking connections that way,
+                #        we will have to tighten things up, before we can
+                #        slightly speed things up a bit here. It might also
+                #        be worth bypassing the queue entirely and directly
+                #        generating and submitting the batches. Currently
+                #        we're only saving around 10% of runtime by processing
+                #        the queue concurrently.
+
             except Exception:
                 index_log.info(
-                    f"Error psql indexing model '{model.__name__}'",
+                    f"Error indexing model '{model.__name__}'",
                     exc_info=True
                 )
             finally:
