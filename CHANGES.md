@@ -1,8 +1,18 @@
 # Changes
 
+## 2025.60
+
+`2025-10-24` | [7136036d60...7136036d60](https://github.com/OneGov/onegov-cloud/compare/7136036d60^...7136036d60)
+
+### Search
+
+##### Only processes indexer queue on the main thread
+
+`Bugfix` | [7136036d60](https://github.com/onegov/onegov-cloud/commit/7136036d60d622f20ab80d98d309bc81481d45e3)
+
 ## 2025.59
 
-`2025-10-24` | [bcafc9a898...98bce20025](https://github.com/OneGov/onegov-cloud/compare/bcafc9a898^...98bce20025)
+`2025-10-24` | [bcafc9a898...ca05b98a32](https://github.com/OneGov/onegov-cloud/compare/bcafc9a898^...ca05b98a32)
 
 ### Search
 
@@ -2429,14 +2439,4 @@ Fixes a number of issues OGC-2122, OGC-2120, OGC-2119, OGC-2109
 ##### Allows users to be part of more than one group
 
 `Feature` | [OGC-2079](https://linear.app/onegovcloud/issue/OGC-2079) | [676ffb72a0](https://github.com/onegov/onegov-cloud/commit/676ffb72a0531b5010f071641037e7e0e40d9722)
-
-## 2025.12
-
-`2025-03-04` | [aeeac42f56...1ad5188fed](https://github.com/OneGov/onegov-cloud/compare/aeeac42f56^...1ad5188fed)
-
-### Ticket
-
-##### Make db upgrade for ticket closed_on column more performant
-
-`Feature` | [NONE](#NONE) | [f59d7a9b0f](https://github.com/onegov/onegov-cloud/commit/f59d7a9b0fe658317e5dec8ba1381684d6364b09)
 
