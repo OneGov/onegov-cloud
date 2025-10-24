@@ -174,6 +174,7 @@ class SearchApp(morepath.App):
             self.fts_indexer.process()
         finally:
             self.fts_orm_events.queue.maxsize = original_queue_size
+            self.fts_indexer.engine.dispose()
 
 
 @SearchApp.tween_factory(over=transaction_tween_factory)
