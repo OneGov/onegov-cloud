@@ -286,6 +286,10 @@ class Indexer:
 
         return True
 
+    # FIXME: For some reason using the session can fail, maybe because the
+    #        session doesn't always match the schema? Maybe we should try
+    #        to give the SessionManager to the indexer instead of the Engine,
+    #        so it always can get a session bound to the correct schema.
     def execute_statement(
         self,
         session: Session | None,
@@ -295,12 +299,12 @@ class Indexer:
     ) -> None:
 
         if session is None:
-            connection = self.engine.connect()
-            connection = connection.execution_options(
-                schema_translate_map={None: schema}
-            )
-            with connection.begin():
-                connection.execute(stmt, params or [{}])
+            with self.engine.connect() as connection:
+                connection = connection.execution_options(
+                    schema_translate_map={None: schema}
+                )
+                with connection.begin():
+                    connection.execute(stmt, params or [{}])
         else:
             # use a savepoint instead
             with session.begin_nested():
@@ -427,10 +431,7 @@ class Indexer:
         metadata = MetaData(schema=schema)
         search_index_table = Table(SearchIndex.__tablename__, metadata)
         stmt = search_index_table.delete()
-
-        connection = self.engine.connect()
-        with connection.begin():
-            connection.execute(stmt)
+        self.execute_statement(None, schema, stmt)
 
 
 class TypeMapping:

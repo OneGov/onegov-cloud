@@ -134,11 +134,11 @@ class SearchApp(morepath.App):
         if not self.fts_search_enabled:
             return
 
-        # psql delete table search_index
-        self.fts_indexer.delete_search_index(self.schema)
-
         schema = self.schema
         index_log.info(f'Indexing schema {schema}..')
+
+        # psql delete table search_index
+        self.fts_indexer.delete_search_index(schema)
 
         # have no queue limit for reindexing (that we're able to change
         # this here is a bit of a CPython implementation detail) - we can't
@@ -170,7 +170,6 @@ class SearchApp(morepath.App):
             results = executor.map(reindex_model, self.indexable_base_models())
             if fail:
                 index_log.info('Failed reindexing:', tuple(results))
-
         try:
             self.fts_indexer.process()
         finally:
