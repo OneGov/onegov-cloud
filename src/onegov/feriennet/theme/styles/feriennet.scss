@@ -309,6 +309,15 @@ p.tight {
     text-align: center;
 }
 
+.onegov-award,
+.pro-juventute-logo,
+.bosw-award,
+.social-media-links a {
+    &::before {
+        background: transparent !important;
+    }
+}
+
 .platform-awards {
     margin-top: .5rem;
 
@@ -518,53 +527,9 @@ ul.tags {
         font-size: 1rem !important;
     }
 
-    a::before {
-        width: 2ex;
-    }
-
     ul {
         list-style: none;
         margin: 0;
-    }
-
-    .organiser-name:first-child {
-        font-weight: bold;
-    }
-
-    .organiser-address {
-        margin-bottom: .5rem;
-    }
-
-    .organiser-name + .organiser-email,
-    .organiser-name + .organiser-phone,
-    .organiser-name + .organiser-website {
-        margin-top: .5rem;
-    }
-
-    .organiser-email a::before {
-        @include icon('\f0e0');
-    }
-
-    .organiser-phone a::before {
-        @include icon-bold('\f095');
-    }
-
-    .organiser-website a::before {
-        @include icon-bold('\f0c1');
-    }
-
-    .organiser-phone,
-    .organiser-email,
-    .organiser-website {
-        font-size: .875rem;
-    }
-
-    .organiser-phone a::before,
-    .organiser-email a::before,
-    .organiser-website a::before {
-        color: $body-font-color;
-        display: inline-block;
-        margin-right: 1ex;
     }
 }
 
@@ -1487,6 +1452,11 @@ $booking-left-margin: 1.6rem;
             font-size: .8rem;
             font-weight: normal;
         }
+    }
+
+    .fa,
+    .fas {
+        margin-left: .08rem !important;
     }
 }
 
@@ -3267,4 +3237,9 @@ $booking-left-margin: 1.6rem;
 .disabled {
     cursor: not-allowed !important;
     opacity: .5;
+}
+
+
+.vacation-activity-layout .content-panel {
+    display: none !important;
 }

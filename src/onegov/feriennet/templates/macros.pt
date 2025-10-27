@@ -559,18 +559,18 @@
                 </li>
             </tal:b>
             <tal:b condition="'email' in public">
-                <li class="organiser-email" tal:define="email organiser.data.email or organiser.username|organiser.username">
-                    <a href="mailto:${email}">${email}</a>
+                <li tal:define="email organiser.data.email or organiser.username|organiser.username">
+                    <a href="mailto:${email}"><i class="fa fa-envelope"></i> ${email}</a>
                 </li>
             </tal:b>
             <tal:b condition="'phone' in public">
-                <li class="organiser-phone" tal:condition="organiser.data.phone|nothing">
-                    <a href="tel:${layout.format_phone_number(organiser.data.phone)}">${layout.format_phone_number(organiser.data.phone)}</a>
+                <li tal:condition="organiser.data.phone|nothing">
+                    <a href="tel:${layout.format_phone_number(organiser.data.phone)}"><i class="fa fa-phone"></i> ${layout.format_phone_number(organiser.data.phone)}</a>
                 </li>
             </tal:b>
             <tal:b condition="'website' in public">
-                <li class="organiser-website" tal:condition="organiser.data.website|nothing">
-                    <a href="${organiser.data.website}">${organiser.data.website.replace('http://', '').replace('https://', '').rstrip('/')}</a>
+                <li tal:condition="organiser.data.website|nothing">
+                    <a href="${organiser.data.website}"><i class="fa fa-link"></i> ${organiser.data.website.replace('http://', '').replace('https://', '').rstrip('/')}</a>
                 </li>
             </tal:b>
         </ul>
