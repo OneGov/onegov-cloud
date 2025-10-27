@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.org.models.document_form import FormDocument
 from onegov.page import Page
 from onegov.form import FormDefinition
 from onegov.reservation import Resource
@@ -72,7 +73,7 @@ class PersonMove(Generic[_OwnerT]):
         if isinstance(obj, Page):
             return PagePersonMove
 
-        if isinstance(obj, FormDefinition):
+        if isinstance(obj, FormDefinition | FormDocument):
             return FormPersonMove
 
         if isinstance(obj, Resource):
@@ -102,7 +103,7 @@ class PagePersonMove(PersonMove['News | Topic']):
 
 
 class FormPersonMove(PersonMove[
-    'BuiltinFormDefinition | CustomFormDefinition'
+    'BuiltinFormDefinition | CustomFormDefinition | FormDocument'
 ]):
     """ Represents a single move of a linked person on a form definition. """
 

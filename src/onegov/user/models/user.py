@@ -6,6 +6,7 @@ from onegov.core.orm.mixins import data_property, dict_property, TimestampMixin
 from onegov.core.orm.types import JSON, UUID, LowercaseText
 from onegov.core.security import forget, remembered
 from onegov.core.utils import is_valid_yubikey_format
+from onegov.core.utils import remove_repeated_dots
 from onegov.core.utils import remove_repeated_spaces
 from onegov.core.utils import yubikey_otp_to_serial
 from onegov.search import ORMSearchable
@@ -50,15 +51,15 @@ class User(Base, TimestampMixin, ORMSearchable):
         'polymorphic_identity': 'generic',
     }
 
-    es_properties = {
-        'username': {'type': 'text'},
-        'realname': {'type': 'text'},
-        'userprofile': {'type': 'text'}
+    fts_properties = {
+        'username': {'type': 'text', 'weight': 'A'},
+        'realname': {'type': 'text', 'weight': 'A'},
+        'userprofile': {'type': 'text', 'weight': 'B'}
     }
-    es_public = False
+    fts_public = False
 
     @property
-    def es_suggestion(self) -> tuple[str, str]:
+    def fts_suggestion(self) -> tuple[str, str]:
         return (self.realname or self.username, self.username)
 
     @property
@@ -238,7 +239,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         # name in the e-mail address)
         if realname is None or not realname.strip():
             username = username.split('@')[0]
-            parts = username.split('.')[:2]
+            parts = remove_repeated_dots(username.strip('.')).split('.')[:2]
 
         # for real names split by space and assume that with more than one
         # part that the first and last part are the most important to get rid
@@ -249,7 +250,7 @@ class User(Base, TimestampMixin, ORMSearchable):
             if len(parts) > 2:
                 parts = (parts[0], parts[-1])
 
-        return ''.join(p[0] for p in parts).upper()
+        return ''.join(p[0] for p in parts if p).upper() or '?'
 
     @property
     def initials(self) -> str:

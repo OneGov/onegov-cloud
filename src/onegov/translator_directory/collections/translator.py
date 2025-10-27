@@ -48,7 +48,8 @@ class TranslatorCollection(
         interpret_types: list[str] | None = None,
         state: str | None = 'published',
         admissions: list[str] | None = None,
-        genders: list[str] | None = None
+        genders: list[str] | None = None,
+        include_hidden: bool = False
     ) -> None:
         super().__init__(app.session())
         self.app = app
@@ -60,6 +61,7 @@ class TranslatorCollection(
         self.state = state
         self.admissions = admissions or []
         self.genders = genders or []
+        self.include_hidden = include_hidden
 
         if spoken_langs:
             assert isinstance(spoken_langs, list)
@@ -94,6 +96,7 @@ class TranslatorCollection(
             and self.interpret_types == other.interpret_types
             and self.admissions == other.admissions
             and self.genders == other.genders
+            and self.include_hidden == other.include_hidden
         )
 
     def add(
@@ -294,7 +297,8 @@ class TranslatorCollection(
             interpret_types=self.interpret_types,
             state=self.state,
             admissions=self.admissions,
-            genders=self.genders
+            genders=self.genders,
+            include_hidden=self.include_hidden
         )
 
     @property
@@ -318,7 +322,11 @@ class TranslatorCollection(
         if self.monitor_langs:
             query = query.filter(and_(*self.by_monitor_lang_expression))
 
-        if self.user_role != 'admin':
+        if self.include_hidden and self.user_role == 'admin':
+            # Admins can request to see only items marked for admins
+            query = query.filter(Translator.for_admins_only == True)
+        else:
+            # Default behavior: hide items marked for admins only
             query = query.filter(Translator.for_admins_only == False)
 
         if self.search:

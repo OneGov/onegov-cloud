@@ -6,6 +6,7 @@ import morepath
 import transaction
 
 from collections import defaultdict
+from decimal import Decimal
 from onegov.core.html import html_to_text
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
@@ -96,7 +97,8 @@ def get_directory_entry_form_class(
             if model.directory.enable_map == 'no':
                 self.delete_field('coordinates')
 
-            if not model.directory.enable_publication and not request.is_admin:
+            if (not model.directory.enable_publication and
+                    not request.is_manager):
                 self.delete_field('publication_start')
                 self.delete_field('publication_end')
             elif model.directory.required_publication:
@@ -638,9 +640,8 @@ def handle_new_directory_entry(
 ) -> RenderData | Response:
 
     if form.submitted(request):
-        entry: ExtendedDirectoryEntry
         try:
-            entry = self.directory.add_by_form(  # type:ignore[assignment]
+            entry = self.directory.add_by_form(
                 form,
                 type='extended'
             )
@@ -735,7 +736,7 @@ def handle_submit_directory_entry(
 
         # the price per submission
         if self.directory.price == 'paid':
-            amount = self.directory.price_per_submission
+            amount = self.directory.price_per_submission or 0.0
         else:
             amount = 0.0
 
@@ -748,10 +749,13 @@ def handle_submit_directory_entry(
             meta={
                 'handler_code': 'DIR',
                 'directory': self.directory.id.hex,
-                'price': {
-                    'amount': amount,
-                    'currency': self.directory.currency
+                'invoice_item': {
+                    'text': request.translate(_('Lump sum')),
+                    'group': 'submission',
+                    'unit': Decimal(amount),
+                    'quantity': Decimal('1'),
                 },
+                'currency': self.directory.currency,
                 'extensions': tuple(
                     ext for ext in self.directory.extensions
                     if ext != 'submitter'

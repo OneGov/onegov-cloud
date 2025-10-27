@@ -272,7 +272,10 @@ def handle_manage_user(
         form.populate_obj(self)
         request.success(_('Your changes were saved'))
 
-        return request.redirect(request.class_link(UserCollection))
+        return request.redirect(request.class_link(
+            UserCollection,
+            variables={'active': '1'}
+        ))
 
     elif not request.POST:
         form.process(obj=self)

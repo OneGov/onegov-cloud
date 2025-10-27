@@ -16,7 +16,7 @@ from onegov.form.validators import Stdnum
 from onegov.org.forms.fields import HtmlField
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
-from stdnum import iban   # type:ignore[import-untyped]
+from stdnum import iban
 from wtforms.fields import BooleanField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
@@ -94,6 +94,14 @@ class FeriennetSettingsForm(Form):
         label=_('Require a SwissPass ID of attendees'),
         fieldset=_('SwissPass ID'),
         default=False
+    )
+
+    cancellation_conditions = HtmlField(
+        label=_('Cancellation condition text'),
+        fieldset=_('Cancellation conditions'),
+        description=_('The text will be shown below the '
+                'confirmation text for an activity in the mail'),
+        render_kw={'rows': 10}
     )
 
     show_related_contacts = BooleanField(
@@ -232,6 +240,7 @@ class FeriennetSettingsForm(Form):
         attributes = (
             ('show_political_municipality', False),
             ('require_swisspass', False),
+            ('cancellation_conditions', ''),
             ('require_full_age_for_registration', False),
             ('show_related_contacts', False),
             ('public_organiser_data', self.request.app.public_organiser_data),
@@ -267,6 +276,7 @@ class FeriennetSettingsForm(Form):
         attributes = (
             'show_political_municipality',
             'require_swisspass',
+            'cancellation_conditions',
             'require_full_age_for_registration',
             'show_related_contacts',
             'public_organiser_data',

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import contextmanager
 from functools import cached_property
 from json import JSONDecodeError
 from logging import getLogger
@@ -84,30 +85,38 @@ class ApiException(Exception):
     def __init__(
         self,
         message: str = 'Internal Server Error',
-        exception: Exception | None = None,
         status_code: int = 500,
         headers: dict[str, str] | None = None,
     ):
-        self.message = (
-            exception.message
-            if exception and hasattr(exception, 'message') else
-            exception.title
-            if exception and hasattr(exception, 'title') else
-            message
-        )
-        self.status_code = (
-            exception.status_code
-            if exception and hasattr(exception, 'status_code') else status_code
-        )
-
+        super().__init__()
+        self.message = message
+        self.status_code = status_code
         self.headers = headers or {}
 
-        # NOTE:log unexpected exceptions
-        if not (
-            exception is None
-            or isinstance(exception, (HTTPException, ApiException))
-        ):
-            log.exception(exception)
+    @classmethod
+    @contextmanager
+    def capture_exceptions(
+        cls,
+        default_message: str = 'Internal Server Error',
+        default_status_code: int = 500,
+        headers: dict[str, str] | None = None,
+        exception_type: type[Exception] = Exception,
+    ) -> Iterator[None]:
+        try:
+            yield
+        except exception_type as exc:
+            # NOTE: log unexpected exceptions
+            if (
+                exception_type is Exception
+                and not isinstance(exc, (HTTPException, ApiException))
+            ):
+                log.exception('Captured OneGov API Exception')
+
+            message = getattr(exc, 'message',
+                getattr(exc, 'title', default_message)
+            )
+            status_code = getattr(exc, 'status_code', default_status_code)
+            raise cls(message, status_code, headers) from exc
 
 
 class ApiInvalidParamException(ApiException):
@@ -134,8 +143,9 @@ class ApiEndpointItem(Generic[_M]):
 
     @cached_property
     def api_endpoint(self) -> ApiEndpoint[_M] | None:
-        cls = ApiEndpointCollection(self.app).endpoints.get(self.endpoint)
-        return cls(self.request) if cls else None
+        endpoint = ApiEndpointCollection(
+            self.request).endpoints.get(self.endpoint)
+        return endpoint if endpoint else None
 
     @cached_property
     def item(self) -> _M | None:
@@ -174,8 +184,7 @@ class ApiEndpoint(Generic[_M]):
 
     """
 
-    name: ClassVar[str] = ''  # FIXME: Do we ever use this?
-    endpoint: ClassVar[str] = ''
+    endpoint: str = ''
     filters: ClassVar[set[str]] = set()
     form_class: ClassVar[type[Form] | None] = None
 
@@ -379,10 +388,12 @@ class ApiEndpoint(Generic[_M]):
             }
 
             formdata = MultiDict()
-            try:
+            with ApiException.capture_exceptions(
+                exception_type=JSONDecodeError,
+                default_message='Malformed payload',
+                default_status_code=400,
+            ):
                 json_data = request.json
-            except JSONDecodeError as e:
-                raise ApiException('Malformed payload', status_code=400) from e
 
             if not isinstance(json_data, dict):
                 malformed_payload()
@@ -414,7 +425,9 @@ class ApiEndpoint(Generic[_M]):
                 elif isinstance(value, (str, int, float)):
                     formdata[name] = str(value)
                 else:
-                    raise ApiException(f'{name}: Unsupported value format')
+                    raise ApiException(
+                        f'{name}: Unsupported value format', status_code=400
+                    )
 
         else:
             formdata = None
@@ -448,15 +461,34 @@ class ApiEndpoint(Generic[_M]):
 class ApiEndpointCollection:
     """ A collection of all available API endpoints. """
 
-    def __init__(self, app: Framework):
-        self.app = app
+    def __init__(self, request: CoreRequest):
+        self.request = request
+        self.app = request.app
 
     @cached_property
-    def endpoints(self) -> dict[str, type[ApiEndpoint[Any]]]:
+    def endpoints(self) -> dict[str, ApiEndpoint[Any]]:
         return {
             endpoint.endpoint: endpoint
-            for endpoint in self.app.config.setting_registry.api.endpoints
+            for endpoint in self.app.config.setting_registry.api.endpoints(
+                request=self.request
+            )
         }
+
+    def get_endpoint(
+            self,
+            name: str,
+            page: int = 0,
+            extra_parameters: dict[str, Any] | None = None
+    ) -> ApiEndpoint[Any] | None:
+        endpoints = self.app.config.setting_registry.api.endpoints(
+            request=self.request,
+            extra_parameters=extra_parameters,
+            page=page
+        )
+        return next((
+            endpoint for endpoint in endpoints
+            if endpoint.endpoint == name
+        ), None)
 
 
 class AuthEndpoint:

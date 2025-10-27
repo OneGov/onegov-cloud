@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 import time
 import transaction
@@ -6,72 +8,81 @@ from datetime import timedelta
 from onegov.core import Framework
 from onegov.core.security.identity_policy import IdentityPolicy
 from onegov.core.utils import Bunch
-from onegov.user import Auth, UserCollection, UserApp
+from onegov.user import Auth, User, UserCollection, UserApp
 from onegov.user.errors import ExpiredSignupLinkError
 from sedate import utcnow
 from unittest.mock import patch
 from webtest import TestApp as Client
-from yubico_client import Yubico
+from yubico_client import Yubico  # type: ignore[import-untyped]
 
 
-class DummyPostData(dict):
-    def getlist(self, key):
-        v = self[key]
-        if not isinstance(v, (list, tuple)):
-            v = [v]
-        return v
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from sqlalchemy.orm import Session
+    from tests.shared.capturelog import CaptureLogFixture
+    from webob import Response
 
 
 class DummyApp:
 
+    sent_sms: list[tuple[str, str]]
     can_deliver_sms = True
 
-    def __init__(self, session, application_id='my-app'):
+    def __init__(
+        self,
+        session: Session,
+        application_id: str = 'my-app'
+    ) -> None:
+
         self._session = session
         self.application_id = application_id
         self.sent_sms = []
 
-    def session(self):
+    def session(self) -> Session:
         return self._session
 
-    def send_sms(self, number, content):
+    def send_sms(self, number: str, content: str) -> None:
         self.sent_sms.append((number, content))
 
 
-def test_auth_login(session):
+def test_auth_login(session: Session) -> None:
     UserCollection(session).add('AzureDiamond', 'hunter2', 'irc-user')
-    auth = Auth(DummyApp(session))
+    auth = Auth(DummyApp(session))  # type: ignore[arg-type]
 
+    request: Any = None
     assert not auth.authenticate(
-        request=None, username='AzureDiamond', password='hunter1')
+        request=request, username='AzureDiamond', password='hunter1')
     assert not auth.authenticate(
-        request=None, username='AzureDiamonb', password='hunter2')
+        request=request, username='AzureDiamonb', password='hunter2')
     user = auth.authenticate(
-        request=None, username='AzureDiamond', password='hunter2')
+        request=request, username='AzureDiamond', password='hunter2')
 
+    assert isinstance(user, User)
     identity = auth.as_identity(user)
     assert identity.userid == 'azurediamond'
     assert identity.role == 'irc-user'
     assert identity.application_id == 'my-app'
 
 
-def test_auth_login_inactive(session):
+def test_auth_login_inactive(session: Session) -> None:
     user = UserCollection(session).add(
         'AzureDiamond', 'hunter2', 'irc-user', active=False)
 
-    auth = Auth(DummyApp(session))
+    auth = Auth(DummyApp(session))  # type: ignore[arg-type]
 
+    request: Any = None
     assert not auth.authenticate(
-        request=None, username='AzureDiamond', password='hunter2')
+        request=request, username='AzureDiamond', password='hunter2')
 
     user.active = True
     transaction.commit()
 
     assert auth.authenticate(
-        request=None, username='AzureDiamond', password='hunter2')
+        request=request, username='AzureDiamond', password='hunter2')
 
 
-def test_auth_login_yubikey(session):
+def test_auth_login_yubikey(session: Session) -> None:
     UserCollection(session).add(
         username='admin@example.org',
         password='p@ssw0rd',
@@ -83,15 +94,16 @@ def test_auth_login_yubikey(session):
     )
 
     app = DummyApp(session)
-    app.yubikey_client_id = 'abc'
-    app.yubikey_secret_key = 'dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE='
+    app.yubikey_client_id = 'abc'  # type: ignore[attr-defined]
+    app.yubikey_secret_key = 'dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE='  # type: ignore[attr-defined]
 
-    auth = Auth(app)
+    auth = Auth(app)  # type: ignore[arg-type]
 
+    request: Any = None
     assert not auth.authenticate(
-        request=None, username='admin@example.org', password='p@ssw0rd')
+        request=request, username='admin@example.org', password='p@ssw0rd')
     assert not auth.authenticate(
-        request=None,
+        request=request,
         username='admin@example.org',
         password='p@ssw0rd',
         second_factor='xxxxxxbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
@@ -101,7 +113,7 @@ def test_auth_login_yubikey(session):
         verify.return_value = False
 
         assert not auth.authenticate(
-            request=None,
+            request=request,
             username='admin@example.org',
             password='p@ssw0rd',
             second_factor='ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
@@ -111,86 +123,88 @@ def test_auth_login_yubikey(session):
         verify.return_value = True
 
         user = auth.authenticate(
-            request=None,
+            request=request,
             username='admin@example.org',
             password='p@ssw0rd',
             second_factor='ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
         )
 
+    assert isinstance(user, User)
     identity = auth.as_identity(user)
     assert identity.userid == 'admin@example.org'
     assert identity.role == 'admin'
     assert identity.application_id == 'my-app'
 
 
-def test_auth_login_unnecessary_yubikey(session):
+def test_auth_login_unnecessary_yubikey(session: Session) -> None:
     UserCollection(session).add(
         username='admin@example.org',
         password='p@ssw0rd',
         role='admin'
     )
 
-    auth = Auth(DummyApp(session))
+    auth = Auth(DummyApp(session))  # type: ignore[arg-type]
 
     # simply ignore the second factor
     assert auth.authenticate(
-        request=None,
+        request=None,  # type: ignore[arg-type]
         username='admin@example.org',
         password='p@ssw0rd',
         second_factor='ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
     )
 
 
-def test_auth_logging(capturelog, session):
+def test_auth_logging(capturelog: CaptureLogFixture, session: Session) -> None:
     UserCollection(session).add('AzureDiamond', 'hunter2', 'irc-user')
-    auth = Auth(DummyApp(session))
+    auth = Auth(DummyApp(session))  # type: ignore[arg-type]
+    request: Any = None
 
     # XXX do not change the following messages, as they are used that way in
     # fail2ban already and should remain exactly the same
     capturelog.handler.records.clear()
     auth.authenticate(
-        request=None, username='AzureDiamond', password='hunter1')
-    assert capturelog.records()[0].message \
-        == "Failed login by unknown (AzureDiamond)"
+        request=request, username='AzureDiamond', password='hunter1')
+    assert capturelog.records()[0].message == (
+        "Failed login by unknown (AzureDiamond)")
 
     capturelog.handler.records.clear()
     auth.authenticate(
-        request=None, username='AzureDiamond', password='hunter1',
+        request=request, username='AzureDiamond', password='hunter1',
         client='127.0.0.1')
-    assert capturelog.records()[0].message \
-        == "Failed login by 127.0.0.1 (AzureDiamond)"
+    assert capturelog.records()[0].message == (
+        "Failed login by 127.0.0.1 (AzureDiamond)")
 
     capturelog.handler.records.clear()
     auth.authenticate(
-        request=None, username='AzureDiamond', password='hunter2',
+        request=request, username='AzureDiamond', password='hunter2',
         client='127.0.0.1')
-    assert capturelog.records()[0].message \
-        == "Successful login by 127.0.0.1 (AzureDiamond)"
+    assert capturelog.records()[0].message == (
+        "Successful login by 127.0.0.1 (AzureDiamond)")
 
 
-def test_auth_integration(session, redis_url):
+def test_auth_integration(session: Session, redis_url: str) -> None:
 
     class App(Framework, UserApp):
         pass
 
     @App.identity_policy()
-    def get_identity_policy():
+    def get_identity_policy() -> IdentityPolicy:
         return IdentityPolicy()
 
     @App.path(path='/auth', model=Auth)
-    def get_auth():
-        return Auth(DummyApp(session), to='https://abc.xyz/go')
+    def get_auth() -> Auth:
+        return Auth(DummyApp(session), to='https://abc.xyz/go')  # type: ignore[arg-type]
 
     @App.view(model=Auth)
-    def view_auth(self, request):
+    def view_auth(self: Auth, request: CoreRequest) -> Response | str:
         return self.login_to(
-            request.params.get('username'),
-            request.params.get('password'),
+            request.GET['username'],
+            request.GET['password'],
             request
         ) or 'Error'
 
     @App.view(model=Auth, name='logout')
-    def view_logout(self, request):
+    def view_logout(self: Auth, request: CoreRequest) -> Response:
         return self.logout_to(request)
 
     App.commit()
@@ -210,7 +224,9 @@ def test_auth_integration(session, redis_url):
 
     response = client.get('/auth?username=AzureDiamond&password=hunter1')
     assert response.text == 'Error'
-    assert not UserCollection(session).by_username('AzureDiamond').sessions
+    user = UserCollection(session).by_username('AzureDiamond')
+    assert user is not None
+    assert not user.sessions
 
     response = client.get('/auth?username=AzureDiamond&password=hunter2')
     assert response.status_code == 302
@@ -218,6 +234,8 @@ def test_auth_integration(session, redis_url):
     assert response.headers['Set-Cookie'].startswith('session_id')
     session_id = app.unsign(response.request.cookies['session_id'])
     user = UserCollection(session).by_username('AzureDiamond')
+    assert user is not None
+    assert user.sessions
     assert session_id in user.sessions
 
     response = client.get('/auth/logout')
@@ -225,6 +243,7 @@ def test_auth_integration(session, redis_url):
     assert response.location == 'http://localhost/go'
 
     user = UserCollection(session).by_username('AzureDiamond')
+    assert user is not None
     assert not user.sessions
 
     response = client.get('/auth?username=AzureDiamond&password=hunter2')
@@ -234,15 +253,18 @@ def test_auth_integration(session, redis_url):
     new_session_id = app.unsign(response.request.cookies['session_id'])
     assert new_session_id != session_id
     user = UserCollection(session).by_username('AzureDiamond')
+    assert user is not None
+    assert user.sessions
     assert new_session_id in user.sessions
 
 
-def test_signup_token_data(session):
-    auth = Auth(DummyApp(session, 'foo'), signup_token_secret='bar')
+def test_signup_token_data(session: Session) -> None:
+    auth = Auth(DummyApp(session, 'foo'), signup_token_secret='bar')  # type: ignore[arg-type]
     assert auth.new_signup_token('admin')
 
     token = auth.new_signup_token('admin', max_age=1)
     data = auth.decode_signup_token(token)
+    assert data is not None
     assert data['role'] == 'admin'
     assert data['max_uses'] == 1
 
@@ -252,16 +274,16 @@ def test_signup_token_data(session):
     assert before <= data['expires'] <= after
 
 
-def test_signup_max_uses(session):
-    auth = Auth(DummyApp(session, 'foo'), signup_token_secret='bar')
+def test_signup_max_uses(session: Session) -> None:
+    auth = Auth(DummyApp(session, 'foo'), signup_token_secret='bar')  # type: ignore[arg-type]
     auth.signup_token = auth.new_signup_token('admin', max_age=10, max_uses=1)
 
     foo = auth.register(
-        form=Bunch(
+        form=Bunch(  # type: ignore[arg-type]
             username=Bunch(data='foo@example.org'),
             password=Bunch(data='correct horse'),
         ),
-        request=Bunch(
+        request=Bunch(  # type: ignore[arg-type]
             client_addr='127.0.0.1'
         )
     )
@@ -270,26 +292,26 @@ def test_signup_max_uses(session):
 
     with pytest.raises(ExpiredSignupLinkError):
         auth.register(
-            form=Bunch(
+            form=Bunch(  # type: ignore[arg-type]
                 username=Bunch(data='bar@example.org'),
                 password=Bunch(data='battery staple'),
             ),
-            request=Bunch(
+            request=Bunch(  # type: ignore[arg-type]
                 client_addr='127.0.0.1'
             )
         )
 
 
-def test_signup_expired(session):
-    auth = Auth(DummyApp(session, 'foo'), signup_token_secret='bar')
+def test_signup_expired(session: Session) -> None:
+    auth = Auth(DummyApp(session, 'foo'), signup_token_secret='bar')  # type: ignore[arg-type]
     auth.signup_token = auth.new_signup_token('admin', max_age=1, max_uses=2)
 
     foo = auth.register(
-        form=Bunch(
+        form=Bunch(  # type: ignore[arg-type]
             username=Bunch(data='foo@example.org'),
             password=Bunch(data='correct horse'),
         ),
-        request=Bunch(
+        request=Bunch(  # type: ignore[arg-type]
             client_addr='127.0.0.1'
         )
     )
@@ -300,11 +322,11 @@ def test_signup_expired(session):
 
     with pytest.raises(ExpiredSignupLinkError):
         auth.register(
-            form=Bunch(
+            form=Bunch(  # type: ignore[arg-type]
                 username=Bunch(data='bar@example.org'),
                 password=Bunch(data='battery staple'),
             ),
-            request=Bunch(
+            request=Bunch(  # type: ignore[arg-type]
                 client_addr='127.0.0.1'
             )
         )

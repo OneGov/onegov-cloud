@@ -151,6 +151,12 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
     #: be submitted
     minimum_price_total: dict_property[float | None] = meta_property()
 
+    #: the reply_to address to supersede the global reply_to address for
+    #: tickets created through this form
+    reply_to: dict_property[str | None] = meta_property()
+
+    custom_above_footer: dict_property[str | None] = meta_property()
+
     __mapper_args__ = {
         'polymorphic_on': 'type',
         'polymorphic_identity': 'generic'

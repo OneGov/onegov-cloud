@@ -397,7 +397,8 @@ def view_get_file_collection_json(
             'link': request.class_link(File, {'id': id}),
             'title': name
         }
-        for id, name in self.query().with_entities(File.id, File.name).all()
+        for id, name in self.query().with_entities(
+            File.id, File.name).order_by(File.name).all()
     ]
 
 

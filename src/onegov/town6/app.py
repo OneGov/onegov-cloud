@@ -13,8 +13,10 @@ from onegov.core.utils import module_path
 from onegov.foundation6.integration import FoundationApp
 from onegov.org.app import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.org.models.directory import ExtendedDirectory
 from onegov.town6.api import (
-    EventApiEndpoint, NewsApiEndpoint, TopicApiEndpoint)
+    EventApiEndpoint, NewsApiEndpoint, TopicApiEndpoint,
+    DirectoryEntryApiEndpoint)
 from onegov.town6.custom import get_global_tools
 from onegov.town6.initial_content import create_new_organisation
 from onegov.town6.theme import TownTheme
@@ -224,12 +226,27 @@ def get_render_mtan_access_limit_exceeded(
 
 
 @TownApp.setting(section='api', name='endpoints')
-def get_api_endpoints() -> list[type[ApiEndpoint[Any]]]:
-    return [
-        EventApiEndpoint,
-        NewsApiEndpoint,
-        TopicApiEndpoint,
-    ]
+def get_api_endpoints_handler(
+) -> Callable[[TownRequest], Iterator[ApiEndpoint[Any]]]:
+
+    def get_api_endpoints(
+            request: TownRequest,
+            page: int = 0,
+            extra_parameters: dict[str, Any] | None = None
+    ) -> Iterator[ApiEndpoint[Any]]:
+        yield EventApiEndpoint(request, extra_parameters, page)
+        yield NewsApiEndpoint(request, extra_parameters, page)
+        yield TopicApiEndpoint(request, extra_parameters, page)
+        directories = request.exclude_invisible(
+            request.session.query(ExtendedDirectory).all())
+        for directory in directories:
+            yield DirectoryEntryApiEndpoint(
+                request=request,
+                page=page,
+                name=directory.name,
+                extra_parameters=extra_parameters)
+
+    return get_api_endpoints
 
 
 @TownApp.webasset_path()
@@ -316,11 +333,17 @@ def get_editor_asset() -> Iterator[str]:
 
 @TownApp.webasset('fullcalendar')
 def get_fullcalendar_asset() -> Iterator[str]:
-    yield 'fullcalendar.css'
     yield 'fullcalendar.js'
     yield 'fullcalendar.de.js'
+    yield 'fullcalendar.fr.js'
     yield 'reservationcalendar.jsx'
     yield 'reservationcalendar_custom.js'
+
+
+@TownApp.webasset('occupancycalendar')
+def get_occupancycalendar_asset() -> Iterator[str]:
+    yield 'occupancycalendar.jsx'
+    yield 'occupancycalendar_custom.js'
 
 
 @TownApp.webasset('staff-chat')

@@ -107,13 +107,13 @@ class Directory(Base, ContentMixin, TimestampMixin,
 
     __tablename__ = 'directories'
 
-    es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'}
+    fts_properties = {
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'}
     }
 
     @property
-    def es_public(self) -> bool:
+    def fts_public(self) -> bool:
         return False  # to be overridden downstream
 
     #: An interal id for references (not public)
@@ -479,7 +479,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
     def migration(
         self,
         new_structure: str,
-        new_configuration: DirectoryConfiguration
+        new_configuration: DirectoryConfiguration | None
     ) -> DirectoryMigration:
 
         return DirectoryMigration(
@@ -649,6 +649,12 @@ class EntryRecipient(Base, TimestampMixin, ContentMixin):
         address to be deactivated by Postmark.
         """
         self.meta['inactive'] = True
+
+    def reactivate(self) -> None:
+        """
+        Marks a previously `inactive` recipient as active again.
+        """
+        self.meta['inactive'] = False
 
 
 class EntrySubscription:

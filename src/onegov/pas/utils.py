@@ -1,20 +1,24 @@
 from __future__ import annotations
 
-from onegov.pas import log
 from onegov.pas.collections import AttendenceCollection
-from onegov.pas.models.party import Party
-from onegov.pas.models.parliamentarian import Parliamentarian
-from onegov.pas.models.parliamentarian_role import ParliamentarianRole
 from onegov.pas.models.attendence import Attendence
+from onegov.pas.models.commission import PASCommission
+from onegov.pas.models.commission_membership import PASCommissionMembership
+from onegov.pas.models.party import Party
+from onegov.pas.models.parliamentarian import PASParliamentarian
+from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
 from decimal import Decimal
 from babel.numbers import format_decimal
+from datetime import date
+from uuid import UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.pas.models import SettlementRun
+    from onegov.pas.models.attendence import Attendence
     from onegov.town6.request import TownRequest
-    from datetime import date
+    from onegov.user import User
     from sqlalchemy.orm import Session
 
 
@@ -28,41 +32,76 @@ def format_swiss_number(value: Decimal | int) -> str:
     return format_decimal(value, format='#,##0.00', locale='de_CH')
 
 
+def is_commission_president(
+    parliamentarian: PASParliamentarian,
+    attendance_or_commission_id: Attendence | UUID,
+    settlement_run: SettlementRun
+) -> bool:
+    """
+    Check if a parliamentarian is president of the commission for the given
+    attendance or commission_id during the settlement run period.
+    """
+    if isinstance(attendance_or_commission_id, UUID):
+        commission_id = attendance_or_commission_id
+        return any(
+            cm.role == 'president'
+            for cm in parliamentarian.commission_memberships
+            if (
+                cm.commission_id == commission_id and (
+                    cm.end is None or cm.end >= settlement_run.start
+                ) and (
+                    cm.start is None or cm.start <= settlement_run.end
+                )
+            )
+        )
+    else:
+        attendance = attendance_or_commission_id
+        return any(
+            cm.role == 'president'
+            for cm in parliamentarian.commission_memberships
+            if (
+                attendance.commission and
+                cm.commission_id == attendance.commission.id and (
+                    cm.end is None or cm.end >= settlement_run.start
+                ) and (
+                    cm.start is None or cm.start <= settlement_run.end
+                )
+            )
+        )
+
+
 def get_parliamentarians_with_settlements(
     session: Session,
     start_date: date,
     end_date: date
-) -> list[Parliamentarian]:
+) -> list[PASParliamentarian]:
     """
     Get all parliamentarians who were active and had settlements during the
     specified period.
     """
 
-    active_parliamentarians = session.query(Parliamentarian).filter(
-        Parliamentarian.id.in_(
-            session.query(ParliamentarianRole.parliamentarian_id).filter(
-                (ParliamentarianRole.start.is_(None) | (
-                            ParliamentarianRole.start <= end_date)),
-                (ParliamentarianRole.end.is_(None) | (
-                            ParliamentarianRole.end >= start_date))
+    active_parliamentarians = session.query(PASParliamentarian).filter(
+        PASParliamentarian.id.in_(
+            session.query(PASParliamentarianRole.parliamentarian_id).filter(
+                (PASParliamentarianRole.start.is_(None) | (
+                            PASParliamentarianRole.start <= end_date)),
+                (PASParliamentarianRole.end.is_(None) | (
+                            PASParliamentarianRole.end >= start_date))
             )
         )
-    ).order_by(Parliamentarian.last_name, Parliamentarian.first_name).all()
-
-    roles_pretty_print = [
-        f'{p.last_name} {p.first_name}: {p.roles}'
-        for p in active_parliamentarians
-    ]
-    log.info(f'Active parliamentarians: {roles_pretty_print}')
+    ).order_by(
+        PASParliamentarian.last_name,
+        PASParliamentarian.first_name
+    ).all()
 
     # Get all parliamentarians with attendances in one query
     parliamentarians_with_attendances = {
-        pid[0] for pid in session.query(Attendence.parliamentarian_id).filter(
+        pid[0] for pid in
+        session.query(Attendence.parliamentarian_id).filter(
             Attendence.date >= start_date,
             Attendence.date <= end_date
         ).distinct()
     }
-    log.info(f'Parli with attendances: {parliamentarians_with_attendances}')
 
     # Filter the active parliamentarians to only those with attendances
     return [
@@ -91,29 +130,97 @@ def get_parties_with_settlements(
         session.query(Party)
         .filter(
             Party.id.in_(
-                session.query(ParliamentarianRole.party_id)
-                .join(Parliamentarian)
+                session.query(PASParliamentarianRole.party_id)
+                .join(PASParliamentarian)
                 .join(
                     Attendence,
-                    Parliamentarian.id == Attendence.parliamentarian_id,
+                    PASParliamentarian.id == Attendence.parliamentarian_id,
                 )
                 .filter(
                     Attendence.date >= start_date,
                     Attendence.date <= end_date,
-                    ParliamentarianRole.party_id.isnot(None),
+                    PASParliamentarianRole.party_id.isnot(None),
                     (
-                        ParliamentarianRole.start.is_(None)
-                        | (ParliamentarianRole.start <= Attendence.date)
+                        PASParliamentarianRole.start.is_(None)
+                        | (PASParliamentarianRole.start <= Attendence.date)
                     ),
                     (
-                        ParliamentarianRole.end.is_(None)
-                        | (ParliamentarianRole.end >= Attendence.date)
+                        PASParliamentarianRole.end.is_(None)
+                        | (PASParliamentarianRole.end >= Attendence.date)
                     ),
                 )
                 .distinct()
             )
         )
         .order_by(Party.name)
+        .all()
+    )
+
+
+def is_parliamentarian(user: User | None) -> bool:
+    """Check if a user has parliamentarian role."""
+    parls = {'parliamentarian', 'commission_president'}
+    if not user:
+        return False
+    if user.role in parls:
+        return True
+    return False
+
+
+def is_parliamentarian_role(role: str | None) -> bool:
+    """Check if a role is a parliamentarian role."""
+    parls = {'parliamentarian', 'commission_president'}
+    return role in parls if role else False
+
+
+def get_active_commission_memberships(
+    user: User | None
+) -> list[PASCommissionMembership]:
+    """Get active commission memberships for a parliamentarian user."""
+    if (not user or not hasattr(user, 'parliamentarian')
+            or not user.parliamentarian):
+        return []
+
+    parliamentarian = user.parliamentarian
+    return [
+        m for m in parliamentarian.commission_memberships
+        if not m.end or m.end >= date.today()
+    ]
+
+
+def get_commissions_with_memberships(
+    session: Session,
+    start_date: date,
+    end_date: date
+) -> list[PASCommission]:
+    """
+    Get all commissions that had active memberships during the
+    specified period.
+
+    This function ensures accurate commission filtering by checking that
+    commissions had active members during the period, properly handling
+    cases where memberships have changing dates.
+    """
+
+    return (
+        session.query(PASCommission)
+        .filter(
+            PASCommission.id.in_(
+                session.query(PASCommissionMembership.commission_id)
+                .filter(
+                    (
+                        PASCommissionMembership.start.is_(None)
+                        | (PASCommissionMembership.start <= end_date)
+                    ),
+                    (
+                        PASCommissionMembership.end.is_(None)
+                        | (PASCommissionMembership.end >= start_date)
+                    ),
+                )
+                .distinct()
+            )
+        )
+        .order_by(PASCommission.name)
         .all()
     )
 
@@ -152,9 +259,9 @@ def debug_party_export(
         print(f'\nParliamentarian: {parl.first_name} {parl.last_name}')  # noqa: T201
         print(f'Attendance date: {attendance.date}')  # noqa: T201
 
-        roles = session.query(ParliamentarianRole).filter(
-            ParliamentarianRole.parliamentarian_id == parl.id,
-            ParliamentarianRole.party_id == party.id,
+        roles = session.query(PASParliamentarianRole).filter(
+            PASParliamentarianRole.parliamentarian_id == parl.id,
+            PASParliamentarianRole.party_id == party.id,
             ).all()
 
         print('Roles:')  # noqa: T201
@@ -191,8 +298,8 @@ def debug_party_export2(
     print(f'Party ID: {party.id}')  # noqa: T201
 
     # Check roles directly
-    all_roles = session.query(ParliamentarianRole).filter(
-        ParliamentarianRole.party_id == party.id
+    all_roles = session.query(PASParliamentarianRole).filter(
+        PASParliamentarianRole.party_id == party.id
     ).all()
     print(f'\nTotal roles for party: {len(all_roles)}')  # noqa: T201
     for role in all_roles:

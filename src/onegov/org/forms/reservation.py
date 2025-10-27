@@ -5,13 +5,22 @@ from functools import cached_property
 from uuid import UUID
 from wtforms.fields import DateField
 from wtforms.fields import EmailField
+from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
-from wtforms.validators import DataRequired, Email, InputRequired
+from wtforms.fields import StringField
+from wtforms.validators import DataRequired
+from wtforms.validators import Email
+from wtforms.validators import InputRequired
+from wtforms.validators import NumberRange
+from wtforms.validators import Regexp
 
 from onegov.core.csv import convert_list_of_list_of_dicts_to_xlsx
+from onegov.core.custom import json
 from onegov.form import Form
-from onegov.form.fields import DurationField, MultiCheckboxField, TimeField
+from onegov.form.fields import (
+    ChosenSelectField, DurationField, MultiCheckboxField, TimeField)
 from onegov.org import _
+from onegov.org.forms.util import KABA_CODE_RE
 from onegov.org.forms.util import WEEKDAYS
 
 
@@ -28,15 +37,193 @@ if TYPE_CHECKING:
 
 # include all fields used below so we can filter them out
 # when we merge this form with the custom form definition
-RESERVED_FIELDS: list[str] = ['email']
+RESERVED_FIELDS: list[str] = ['email', 'ticket_tag']
 
 
 class ReservationForm(Form):
+
+    if TYPE_CHECKING:
+        request: OrgRequest
+
     reserved_fields = RESERVED_FIELDS
+
+    ticket_tag = ChosenSelectField(
+        label=_('Tag'),
+        choices=(),
+        render_kw={},
+    )
 
     email = EmailField(
         label=_('E-Mail'),
         validators=[InputRequired(), Email()]
+    )
+
+    def on_request(self) -> None:
+        if not (self.request.is_manager or self.request.is_supporter):
+            self.delete_field('ticket_tag')
+            return
+
+        choices = self.ticket_tag.choices = [
+            (tag, tag)
+            for item in self.request.app.org.ticket_tags
+            for tag in (item.keys() if isinstance(item, dict) else (item,))
+        ]
+        if not choices:
+            self.delete_field('ticket_tag')
+
+        choices.insert(0, ('', ''))
+
+        self.css_class = 'resettable'
+
+        auto_fill_data = {
+            tag: filtered_meta
+            for item in self.request.app.org.ticket_tags
+            if isinstance(item, dict)
+            for tag, meta in item.items()
+            if (filtered_meta := {
+                field.id: value
+                for key, value in meta.items()
+                # only include pre-fill data for the fields we render
+                # since some of the data may not be public
+                for field in self
+                # FIXME: This is technically incorrect for IntegerRangeField
+                #        with a price, since the price is displayed in the
+                #        label, but since this is a very unlikely combination
+                #        of features, we punt on this for now. This should
+                #        handle everything else correctly.
+                if key == field.label.text
+                if field.id != 'ticket_tag'
+            })
+        }
+        if auto_fill_data:
+            self.ticket_tag.render_kw[
+                'data_auto_fill'] = json.dumps(auto_fill_data)
+
+
+class ReservationAdjustmentForm(Form):
+
+    # NOTE: Currently we don't allow adjusting a reservation
+    #       to a different allocation, so it's impossible to
+    #       change the date, but once we do support that we
+    #       may want to add a date field here
+
+    start_time = TimeField(
+        label=_('Starting at'),
+        description=_('HH:MM'),
+        validators=[InputRequired()],
+        fieldset=_('Time'),
+    )
+
+    end_time = TimeField(
+        label=_('Ending at'),
+        description=_('HH:MM'),
+        validators=[InputRequired()],
+        fieldset=_('Time'),
+    )
+
+
+class AddReservationForm(Form):
+
+    date = DateField(
+        label=_('Date'),
+        description=_('HH:MM'),
+        validators=[InputRequired()],
+        fieldset=_('Date'),
+    )
+
+    whole_day = RadioField(
+        label=_('Whole day'),
+        choices=[
+            ('yes', _('Yes')),
+            ('no', _('No'))
+        ],
+        default='no',
+        fieldset=_('Time'),
+    )
+
+    start_time = TimeField(
+        label=_('Starting at'),
+        description=_('HH:MM'),
+        fieldset=_('Time'),
+        validators=[InputRequired()],
+        depends_on=('whole_day', 'no')
+    )
+
+    end_time = TimeField(
+        label=_('Ending at'),
+        description=_('HH:MM'),
+        fieldset=_('Time'),
+        validators=[InputRequired()],
+        depends_on=('whole_day', 'no')
+    )
+
+    quota_room = IntegerField(
+        label=_('Quota'),
+        validators=[
+            InputRequired(),
+            NumberRange(1, 999)
+        ],
+        fieldset=_('Time'),
+        default=1,
+        depends_on=('whole_day', 'no')
+    )
+
+    quota_other = IntegerField(
+        label=_('Quota'),
+        validators=[
+            InputRequired(),
+            NumberRange(1, 999)
+        ],
+        fieldset=_('Time'),
+        default=1,
+    )
+
+    def apply_resource(self, resource: Resource) -> None:
+        if resource.type == 'room':
+            self.delete_field('quota_other')
+        else:
+            self.delete_field('start_time')
+            self.delete_field('end_time')
+            self.delete_field('whole_day')
+            self.delete_field('quota_room')
+
+    @property
+    def quota(self) -> IntegerField:
+        return self.quota_room if 'quota_room' in self else self.quota_other
+
+
+class KabaEditForm(Form):
+
+    key_code = StringField(
+        label=_('Key Code'),
+        validators=[
+            InputRequired(),
+            Regexp(
+                KABA_CODE_RE,
+                message=_(
+                    'Invalid Kaba Code. '
+                    'Needs to be a 4 to 6 digit number code.'
+                )
+            )
+        ],
+    )
+
+    key_code_lead_time = IntegerField(
+        label=_('Lead Time'),
+        validators=[InputRequired(), NumberRange(0, 1440)],
+        render_kw={
+            'step': 5,
+            'long_description': _('In minutes'),
+        },
+    )
+
+    key_code_lag_time = IntegerField(
+        label=_('Lag Time'),
+        validators=[InputRequired(), NumberRange(0, 1440)],
+        render_kw={
+            'step': 5,
+            'long_description': _('In minutes'),
+        },
     )
 
 

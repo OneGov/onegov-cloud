@@ -359,7 +359,7 @@ input.has-field-help {
     @include input-button;
     padding: 0 !important;
     margin: 0 .5rem !important;
-    
+
     &:hover {
         padding: 0 !important;
         margin: 0 .5rem !important;
@@ -527,13 +527,6 @@ dl.field-display > dt {
     input.button + a.button {
         margin-left: .5rem;
     }
-}
-
-a.category-anchor {
-    display: block;
-    position: relative;
-    top: -150px;
-    visibility: hidden;
 }
 
 .checkout-button {

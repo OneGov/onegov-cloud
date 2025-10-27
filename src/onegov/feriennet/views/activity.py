@@ -10,7 +10,7 @@ from onegov.activity import Activity
 from onegov.activity import Booking
 from onegov.activity import Occasion
 from onegov.activity import OccasionCollection
-from onegov.activity import Period
+from onegov.activity import BookingPeriod
 from onegov.activity.models import ACTIVITY_STATES, DAYS
 
 from onegov.core.elements import Link, Confirm, Intercooler
@@ -101,17 +101,17 @@ def occasions_by_period(
     query = query.options(contains_eager(Occasion.period))
 
     if not show_inactive:
-        query = query.filter(Period.active == True)
+        query = query.filter(BookingPeriod.active == True)
 
     if not show_archived:
-        query = query.filter(Period.archived == False)
+        query = query.filter(BookingPeriod.archived == False)
 
     if show_only_inactive:
-        query = query.filter(Period.active == False)
+        query = query.filter(BookingPeriod.active == False)
 
     query = query.order_by(
-        desc(Period.active),
-        Period.execution_start,
+        desc(BookingPeriod.active),
+        BookingPeriod.execution_start,
         Occasion.order)
 
     return tuple(
@@ -1114,7 +1114,8 @@ def propose_activity(
             'event': 'browser-notification',
             'title': request.translate(_('New ticket')),
             'created': ticket.created.isoformat()
-        }
+        },
+        groupids=request.app.groupids_for_ticket(ticket),
     )
 
     request.success(_('Thank you for your proposal!'))

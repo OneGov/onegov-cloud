@@ -89,6 +89,7 @@ def handle_new_resource_recipient(
             address=form.address.data,
             daily_reservations=form.daily_reservations.data,
             new_reservations=form.new_reservations.data,
+            customer_messages=form.customer_messages.data,
             internal_notes=form.internal_notes.data,
             send_on=form.send_on.data,
             resources=form.resources.data,
@@ -101,9 +102,12 @@ def handle_new_resource_recipient(
     if layout:
         layout.title = title
 
+    layout = layout or ResourceRecipientsFormLayout(self, request, title)
+    layout.edit_mode = True
+
     return {
         'title': title,
-        'layout': layout or ResourceRecipientsFormLayout(self, request, title),
+        'layout': layout,
         'form': form
     }
 

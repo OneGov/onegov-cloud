@@ -71,6 +71,7 @@ class SharedMethods:
 
     lead: dict_property[str | None] = meta_property()
     text = dict_markup_property('content')
+    confirmation_text = dict_markup_property('content')
     occupancy_is_visible_to_members: dict_property[bool | None]
     occupancy_is_visible_to_members = meta_property()
 
@@ -105,11 +106,19 @@ class SharedMethods:
         else:
             date = sedate.to_timezone(sedate.utcnow(), self.timezone)
 
-        if self.view == 'month':
+        if self.view in ('multiMonthYear', 'listYear'):
+            return sedate.replace_timezone(
+                datetime(date.year, 1, 1),
+                self.timezone
+            ), sedate.replace_timezone(
+                datetime(date.year, 12, 31, 23, 59, 59, 999999),
+                self.timezone
+            )
+        elif self.view in ('dayGridMonth', 'listMonth'):
             return sedate.align_range_to_month(date, date, self.timezone)
-        elif self.view == 'agendaWeek':
+        elif self.view in ('timeGridWeek', 'listWeek'):
             return sedate.align_range_to_week(date, date, self.timezone)
-        elif self.view == 'agendaDay':
+        elif self.view in ('timeGridDay', 'listDay'):
             return sedate.align_range_to_day(date, date, self.timezone)
         else:
             raise NotImplementedError()
@@ -128,19 +137,34 @@ class SharedMethods:
         if expired_sessions:
             query = session.query(Reservation).with_entities(Reservation.token)
             query = query.filter(Reservation.session_id.in_(expired_sessions))
-            tokens = {token for token, in query.all()}
+            tokens = {token for token, in query}
 
             query = session.query(FormSubmission)
             query = query.filter(FormSubmission.name == None)
             query = query.filter(FormSubmission.id.in_(tokens))
 
-            query.delete('fetch')
+            # NOTE: This used to be a batch delete, but since there may be
+            #       files attached to these submissions, we would need to
+            #       emit a batch delete for the file links and any orphaned
+            #       files. For now it's easier to do single deletes so
+            #       SQLAlchemy handles this for us, most of the time this
+            #       will only hit one or two submissions anyways. There
+            #       would need to be a burst of submissions where everyone
+            #       got as far as entering all of their data, but didn't
+            #       end up confirming the reservation and then a long
+            #       period after where no reservations happen at all.
+            for submission in query:
+                # remove file links (also removes orphaned files)
+                submission.files = []
+                session.delete(submission)
+
             queries.remove_expired_reservation_sessions(expiration_date)
 
     def bound_reservations(
         self,
         request: OrgRequest,
-        status: str = 'pending'
+        status: str = 'pending',
+        with_data: bool = False
     ) -> Query[Reservation]:
         """ The reservations associated with this resource and user. """
 
@@ -156,7 +180,10 @@ class SharedMethods:
         # used by ReservationInfo
         res = res.options(undefer(Reservation.created))
 
-        return res  # type:ignore[return-value]
+        if with_data:
+            res = res.options(undefer(Reservation.data))
+
+        return res
 
     def bound_session_id(self, request: OrgRequest) -> uuid.UUID:
         """ The session id associated with this resource and user. """
@@ -188,9 +215,9 @@ class SharedMethods:
         query = query.order_by(Ticket.subtitle)
         query = query.filter(Reservation.status == 'approved')
         if exclude_pending:
-            query = query.filter(Reservation.data != None)
+            query = query.filter(Reservation.data['accepted'] == True)
 
-        return query  # type:ignore[return-value]
+        return query
 
     def reservation_title(self, reservation: Reservation) -> str:
         title = self.title_template.format(
@@ -211,10 +238,8 @@ class DaypassResource(Resource, AccessExtension, SearchableContent,
                       ResourceValidationExtension, GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'daypass'}
 
-    es_type_name = 'daypasses'
-
     # the selected view
-    view = 'month'
+    view = 'dayGridMonth'
 
     # show or hide quota numbers in reports
     show_quota = True
@@ -229,8 +254,6 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
                    ResourceValidationExtension, GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'room'}
 
-    es_type_name = 'rooms'
-
     # the selected view (depends on the resource's default)
     view = None
 
@@ -239,6 +262,9 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
 
     # used to render the reservation title
     title_template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M}'
+
+    kaba_components: dict_property[list[tuple[str, str]]]
+    kaba_components = meta_property(default=list)
 
     @property
     def deletable(self) -> bool:
@@ -258,10 +284,11 @@ class ItemResource(Resource, AccessExtension, SearchableContent,
 
     __mapper_args__ = {'polymorphic_identity': 'daily-item'}
 
-    es_type_name = 'daily_items'
-
     view = None
 
     show_quota = True
 
     title_template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M} ({quota})'
+
+    kaba_components: dict_property[list[tuple[str, str]]]
+    kaba_components = meta_property(default=list)

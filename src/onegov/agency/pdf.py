@@ -271,7 +271,7 @@ class AgencyPdfZg(AgencyPdfDefault):
         canvas.drawRightString(
             doc.pagesize[0] - doc.rightMargin,
             doc.bottomMargin / 2,
-            f'{canvas.getPageNumber()}'  # type:ignore[no-untyped-call]
+            f'{canvas.getPageNumber()}'
         )
         canvas.restoreState()
 
@@ -316,7 +316,7 @@ class AgencyPdfAr(AgencyPdfDefault):
         canvas.drawRightString(
             doc.pagesize[0] - doc.rightMargin,
             doc.bottomMargin / 2,
-            f'{canvas.getPageNumber()}'  # type:ignore[no-untyped-call]
+            f'{canvas.getPageNumber()}'
         )
         canvas.restoreState()
 
@@ -439,7 +439,7 @@ class AgencyPdfBs(AgencyPdfDefault):
         canvas.drawRightString(
             doc.pagesize[0] - doc.rightMargin,
             doc.bottomMargin / 2,
-            f'{canvas.getPageNumber()}'  # type:ignore[no-untyped-call]
+            f'{canvas.getPageNumber()}'
         )
         canvas.restoreState()
 

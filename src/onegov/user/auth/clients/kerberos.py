@@ -52,10 +52,11 @@ class KerberosClient:
         previous = os.environ.pop('KRB5_KTNAME', None)
         os.environ['KRB5_KTNAME'] = self.keytab
 
-        yield
-
-        if previous is not None:
-            os.environ['KRB5_KTNAME'] = previous
+        try:
+            yield
+        finally:
+            if previous is not None:
+                os.environ['KRB5_KTNAME'] = previous
 
     def authenticated_username(
         self,

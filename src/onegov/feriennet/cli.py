@@ -3,7 +3,7 @@ from __future__ import annotations
 import click
 
 from onegov.core.cli import GroupContext, command_group, pass_group_context
-from onegov.activity.models import Period
+from onegov.activity.models import BookingPeriod
 from onegov.activity.models import Occasion
 from sqlalchemy import text
 
@@ -51,7 +51,8 @@ def delete_period(
         app: FeriennetApp
     ) -> None:
 
-        period = request.session.query(Period).filter_by(title=title).first()
+        period = request.session.query(
+            BookingPeriod).filter_by(title=title).first()
 
         if not period:
             raise click.ClickException(f'Could not find period «{title}»')

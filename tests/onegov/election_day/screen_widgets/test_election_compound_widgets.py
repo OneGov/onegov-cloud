@@ -158,7 +158,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
 
     # Add intermediate results
     with freeze_time('2022-01-01 12:00'):
-        election_1, errors = import_test_datasets(
+        results = import_test_datasets(
             'internal',
             'election',
             'sg',
@@ -172,8 +172,10 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             ),
             app_session=session
         )
+        assert len(results) == 1
+        election_1, errors = next(iter(results.values()))
         assert not errors
-        election_2, errors = import_test_datasets(
+        results = import_test_datasets(
             'internal',
             'election',
             'sg',
@@ -185,6 +187,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             dataset_name='kantonsratswahl-2020-wahlkreis-rorschach',
             app_session=session
         )
+        assert len(results) == 1
+        election_2, errors = next(iter(results.values()))
         assert not errors
         session.add(election_1)
         session.add(election_2)
@@ -298,7 +302,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
 
     # Add final results
     with freeze_time('2022-01-02 12:00'):
-        election_1, errors = import_test_datasets(
+        results = import_test_datasets(
             'internal',
             'election',
             'sg',
@@ -310,8 +314,10 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             dataset_name='kantonsratswahl-2020-wahlkreis-rheintal',
             app_session=session
         )
+        assert len(results) == 1
+        election_1, errors = next(iter(results.values()))
         assert not errors
-        errors = import_test_datasets(
+        results = import_test_datasets(
             'internal',
             'parties',
             'sg',
@@ -320,6 +326,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             election=model,
             dataset_name='kantonsratswahl-2020-parteien',
         )
+        assert len(results) == 1
+        errors = next(iter(results.values()))
         assert not errors
         session.add(election_1)
         model.elections = [election_1, election_2]

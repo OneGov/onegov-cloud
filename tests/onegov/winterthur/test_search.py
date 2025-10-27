@@ -1,13 +1,18 @@
+from __future__ import annotations
+
 from webtest import Upload
 from tests.shared.utils import create_image
 
-import pytest
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.client import Client
+    from .conftest import TestApp
 
 
-@pytest.mark.skip('Passes locally, but not in CI, skip for now')
-def test_search_excluding_image(client_with_es):
+def test_search_excluding_image(client_with_fts: Client[TestApp]) -> None:
 
-    client = client_with_es
+    client = client_with_fts
     client.login_admin()
 
     # Create directory
@@ -32,13 +37,10 @@ def test_search_excluding_image(client_with_es):
     page.form['pic'] = Upload('pretty-room.jpg', create_image().read())
     clubs = page.form.submit().follow()
 
-    client.app.es_client.indices.refresh(index='_all')
-
     search_page = client.get(
         '/directories/clubs?search=inline&search_query={"term"%3A"201-B"}')
     assert "Pilatus" in search_page
 
     search_page = client.get(
         '/directories/clubs?search=inline&search_query={"term"%3A"pretty"}')
-
     assert "Keine Eintr\xc3\xa4ge gefunden." not in search_page

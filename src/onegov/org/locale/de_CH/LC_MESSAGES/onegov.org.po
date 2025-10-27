@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-11 08:49+0200\n"
+"POT-Creation-Date: 2025-10-21 13:49+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -14,6 +14,30 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "gengo-order-id: 7629695\n"
 "X-Generator: Poedit 3.0.1\n"
+
+msgid "Important information regarding online payments"
+msgstr "Wichtige Information bezüglich Online-Zahlungen"
+
+msgid ""
+"The payment process is only complete once you are redirected back to our "
+"site and receive a request number. Any success messages the payment provider "
+"generates before then, do not indicate completion. Transactions in this semi-"
+"successful state will usually be refunded within one hour, although it might "
+"take longer depending on the chosen payment method."
+msgstr ""
+"Der Zahlungsprozess ist erst vollständig, nachdem Sie zurück auf unsere "
+"Seite weitergeleitet worden sind und Sie eine Referenznummer für Ihre "
+"Anfrage erhalten haben. Allfällige Erfolgsmitteilungen, die der "
+"Zahlungsanbieter vorher präsentiert, bedeuten noch nicht, dass der Vorgang "
+"abgeschlossen ist. Zahlungen, welche in diesem teils-erfolgreichen Zustand "
+"verlieben sind, werden in der Regel innert einer Stunde zurückerstattet, "
+"allerdings kann es abhängig vom gewählten Zahlmittel etwas länger dauern."
+
+msgid "Ok"
+msgstr "Ok"
+
+msgid "Cancel"
+msgstr "Abbrechen"
 
 #, python-format
 msgid ""
@@ -84,6 +108,24 @@ msgstr "Keine Daten verfügbar"
 msgid "Most Popular Pages"
 msgstr "Beliebteste Seiten"
 
+msgid "My Requests"
+msgstr "Meine Anfragen"
+
+msgid "Closed Tickets"
+msgstr "Abgeschlossene Tickets"
+
+msgid "My Reservations"
+msgstr "Meine Reservationen"
+
+msgid "Pending Future Reservations"
+msgstr "Ausstehende zukünftige Reservationen"
+
+msgid "Confirmed Future Reservations"
+msgstr "Bestätigte zukünftige Reservationen"
+
+msgid "Past Reservations"
+msgstr "Vergangene Reservationen"
+
 msgid "Open"
 msgstr "Offen"
 
@@ -99,6 +141,21 @@ msgstr "Archiviert"
 msgid "All"
 msgstr "Alle"
 
+msgid "Reservations"
+msgstr "Reservationen"
+
+msgid "Submission"
+msgstr "Eintrag"
+
+msgid "Selected Options"
+msgstr "Ausgewählte Optionen"
+
+msgid "Discounts / Surcharges"
+msgstr "Abzüge / Zuschläge"
+
+msgid "Lump sum"
+msgstr "Pauschalbetrag"
+
 msgid "Paid"
 msgstr "Bezahlt"
 
@@ -108,18 +165,24 @@ msgstr "Fehlgeschlagen"
 msgid "Refunded"
 msgstr "Rückerstattet"
 
+msgid "Invoiced"
+msgstr "Fakturiert"
+
 msgid "Manual"
 msgstr "Manuell"
+
+msgid "Datatrans"
+msgstr "Datatrans"
 
 msgid "Stripe Connect"
 msgstr "Stripe Connect"
 
+msgid "Worldline Saferpay"
+msgstr "Worldline Saferpay"
+
 #, python-format
 msgid "Daily Newsletter ${time}"
 msgstr "Täglicher Newsletter ${time}"
-
-msgid "New news since the last newsletter:"
-msgstr "Neue Einträge seit dem letzten Newsletter:"
 
 #, python-format
 msgid "${org} OneGov Cloud Status"
@@ -150,6 +213,12 @@ msgstr "Abmelden"
 msgid "Login"
 msgstr "Anmelden"
 
+msgid "Citizen Login"
+msgstr "Kunden-Login"
+
+msgid "No registration necessary"
+msgstr "Keine Registrierung erforderlich"
+
 msgid "Register"
 msgstr "Registrierung"
 
@@ -171,6 +240,9 @@ msgstr "Zahlungsanbieter"
 msgid "Payments"
 msgstr "Zahlungen"
 
+msgid "Invoices"
+msgstr "Rechnungen"
+
 msgid "Text modules"
 msgstr "Textbausteine"
 
@@ -182,6 +254,9 @@ msgstr "Benutzer"
 
 msgid "User groups"
 msgstr "Benutzergruppen"
+
+msgid "RIS Settings"
+msgstr "Ratsinformationssystem"
 
 msgid "Link Check"
 msgstr "Link-Prüfung"
@@ -201,9 +276,6 @@ msgstr "Verwaltung"
 msgid "My Tickets"
 msgstr "Meine Tickets"
 
-msgid "Closed Tickets"
-msgstr "Abgeschlossene Tickets"
-
 msgid "Ticket"
 msgstr "Ticket"
 
@@ -212,9 +284,6 @@ msgstr "Diese Seite ist privat"
 
 msgid "This site is secret"
 msgstr "Diese Seite ist geheim"
-
-msgid "Cancel"
-msgstr "Abbrechen"
 
 msgid "mTAN Access Limit Exceeded"
 msgstr "mTAN Zugriffslimit Überschritten"
@@ -228,6 +297,9 @@ msgstr ""
 
 msgid "ID Payment Provider"
 msgstr "ID beim Zahlungsanbieter"
+
+msgid "References Payment Provider"
+msgstr "Referenzen beim Zahlungsanbieter"
 
 msgid "Status"
 msgstr "Status"
@@ -384,6 +456,33 @@ msgstr "Kontingent per Reservation"
 
 msgid "Start time before end time"
 msgstr "Start-Zeit vor End-Zeit"
+
+msgid "E-Mail"
+msgstr "E-Mail"
+
+msgid "Token"
+msgstr "Login Code"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Type"
+msgstr "Typ"
+
+msgid "Description"
+msgstr "Beschreibung"
+
+msgid "Commission"
+msgstr "Kommission"
+
+msgid "Parliamentarian"
+msgstr "Parlamentsmitglied"
+
+msgid "Function"
+msgstr "Funktion"
+
+msgid "Role"
+msgstr "Rolle"
 
 msgid "Lead"
 msgstr "Einleitung"
@@ -575,6 +674,9 @@ msgstr ""
 msgid "Publication"
 msgstr "Publikation"
 
+msgid "Required publication dates"
+msgstr "Publikationsdaten erforderlich"
+
 msgid "Enable registering for update notifications"
 msgstr "Registrierung für Benachrichtigungen aktivieren"
 
@@ -585,14 +687,8 @@ msgstr ""
 msgid "Notifications"
 msgstr "Mitteilungen"
 
-msgid "Required publication dates"
-msgstr "Publikationsdaten erforderlich"
-
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Zusätzliche zur E-Mail benötigte Informationen des Antragstellers"
-
-msgid "Name"
-msgstr "Name"
 
 msgid "Phone"
 msgstr "Telefon"
@@ -659,9 +755,6 @@ msgstr "Ungültiger Name. Ein gültiger Vorschlag ist: ${name}"
 
 msgid "An entry with the same name exists"
 msgstr "Ein Eintrag mit diesem Namen existiert bereits"
-
-msgid "E-Mail"
-msgstr "E-Mail"
 
 msgid "Describes briefly what this form is about"
 msgstr "Beschreibt kurz um was es bei diesem Formular geht"
@@ -795,14 +888,14 @@ msgstr "So"
 msgid "Concerto in the castle garden"
 msgstr "Konzert im Schlossgarten"
 
-msgid "Description"
-msgstr "Beschreibung"
-
 msgid "Enjoy a concerto in the castle garden."
 msgstr "Freuen Sie sich auf ein klassisches Konzert im Schlossgarten."
 
 msgid "Image"
 msgstr "Bild"
+
+msgid "Ideal size: 700 x 420 px (5:3)"
+msgstr "Ideale Größe: 700 x 420 px (5:3)"
 
 msgid "Additional Information (PDF)"
 msgstr "Zusätzliche Informationen (PDF)"
@@ -970,6 +1063,30 @@ msgstr ""
 "Dieser Text wird auf Ticket-Status-Seite genutzt, um den Nutzer zu "
 "informieren"
 
+msgid "E-Mail Reply Address (Reply-To)"
+msgstr "E-Mail Antwort Adresse (Reply-To)"
+
+msgid "Replies to automated e-mails go to this address."
+msgstr "Antworten an automatisch generierte E-Mails gehen an diese Adresse."
+
+msgid "Custom text above the footer"
+msgstr "Eigener Text oberhalb der Fusszeile"
+
+msgid ""
+"This text is shown above the footer in the ticket opening notification e-"
+"mail."
+msgstr ""
+"Dieser Text wird oberhalb der Fusszeile in der Ticket-Eröffnungs-E-Mail "
+"angezeigt."
+
+msgid "Show VAT"
+msgstr "MwSt anzeigen"
+
+msgid "By default VAT is not shown, even when configured in the VAT settings."
+msgstr ""
+"Standardmässig wird die MwSt nicht angezeigt, selbst wenn sie konfiguriert "
+"worden ist in den Einstellungen."
+
 msgid "Short description of the survey"
 msgstr "Kurze Beschreibung der Umfrage"
 
@@ -1132,6 +1249,45 @@ msgstr "Nach Beschreibung"
 msgid "By last change"
 msgstr "Nach Zeitpunkt der letzten Änderung"
 
+msgid "Booking Text"
+msgstr "Buchungstext"
+
+msgid "Cost center / cost unit"
+msgstr "Kostenstelle / Kostenträger"
+
+msgid "Kind"
+msgstr "Art"
+
+msgid "Discount"
+msgstr "Abzug"
+
+msgid "Surcharge"
+msgstr "Zuschlag"
+
+msgid "Audio link to parliamentary debate"
+msgstr "Audio Link zur Parlamentsdebatte"
+
+msgid "Video link to parliamentary debate"
+msgstr "Video Link zur Parlamentsdebatte"
+
+msgid "New agenda item"
+msgstr "Neues Traktandum"
+
+msgid "Agenda items"
+msgstr "Traktanden"
+
+msgid "Number"
+msgstr "Nummer"
+
+msgid "Agenda item"
+msgstr "Traktandum"
+
+msgid "Meeting documents"
+msgstr "Sitzungsdokumente"
+
+msgid "Agenda item documents"
+msgstr "Traktandendokumente"
+
 msgid "Used in the overview and the e-mail subject"
 msgstr "Wird in der Übersicht und als E-Mail Subjekt verwendet"
 
@@ -1260,11 +1416,11 @@ msgstr "- Oberste Ebene -"
 msgid "Invalid destination selected"
 msgstr "Ungültiger Zielort gewählt"
 
-msgid "Salutation"
-msgstr "Anrede"
+msgid "Gender"
+msgstr "Geschlecht"
 
-msgid "Academic Title"
-msgstr "Akademischer Titel"
+msgid "Basic properties"
+msgstr "Basis-Eigenschaften"
 
 msgid "First name"
 msgstr "Vorname"
@@ -1272,8 +1428,117 @@ msgstr "Vorname"
 msgid "Last name"
 msgstr "Nachname"
 
-msgid "Function"
-msgstr "Funktion"
+msgid "Picture"
+msgstr "Bild"
+
+msgid "Private address"
+msgstr "Privatadresse"
+
+msgid "Addition"
+msgstr "Zusatz"
+
+msgid "Zip code"
+msgstr "PLZ"
+
+msgid "City"
+msgstr "Ort"
+
+msgid "Date of birth"
+msgstr "Geburtsdatum"
+
+msgid "Additional information"
+msgstr "Zusätzliche Informationen"
+
+msgid "Place of origin"
+msgstr "Bürgerort"
+
+msgid "Occupation"
+msgstr "Beruf"
+
+msgid "Academic title"
+msgstr "Akademischer Titel"
+
+msgid "Salutation"
+msgstr "Anrede"
+
+msgid "Private phone number"
+msgstr "Telefon Privat"
+
+msgid "Mobile phone number"
+msgstr "Telefon Mobile"
+
+msgid "Business phone number"
+msgstr "Telefon Geschäft"
+
+msgid "Primary email address"
+msgstr "E-Mail"
+
+msgid "Secondary email address"
+msgstr "Weitere E-Mail"
+
+msgid "Website"
+msgstr "Webseite"
+
+msgid "Remarks"
+msgstr "Bemerkungen"
+
+msgid "Interest ties"
+msgstr "Interessensbindungen"
+
+msgid "No categories defined."
+msgstr ""
+"Keine Kategorien definiert. Siehe Einstellungen -> Ratsinformationssystem"
+
+msgid "Interest tie"
+msgstr "Interessensbindung"
+
+msgid "Category"
+msgstr "Kategorie"
+
+msgid "Parliamentary group"
+msgstr "Fraktion"
+
+msgid "Parliamentary group role"
+msgstr "Rolle in der Fraktion"
+
+msgid "Filter Invoices"
+msgstr "Rechnungen filtern"
+
+msgid "Uninvoiced"
+msgstr "Unfakturiert"
+
+msgid "Ticket category"
+msgstr "Ticket-Kategorie"
+
+msgid "Ticket created from date"
+msgstr "Von Datum — Ticket erstellt"
+
+msgid "Filter by Ticket Date"
+msgstr "Nach Ticketdatum filtern"
+
+msgid "Filters payments by the creation date of their associated ticket."
+msgstr "Filtert Zahlungen nach dem Erstellungsdatum des zugehörigen Tickets."
+
+msgid "Ticket created to date"
+msgstr "Bis Datum — Ticket erstellt"
+
+msgid "From reservation date"
+msgstr "Von Datum — Reservation"
+
+msgid "Filter by Reservation Date"
+msgstr "Nach Reservationsdatum filtern"
+
+msgid "To reservation date"
+msgstr "Bis Datum — Reservation"
+
+msgid "Filter Payments"
+msgstr "Zahlungen filtern"
+
+msgid "Payment Type"
+msgstr "Zahlungsart"
+
+msgid "Academic Title"
+msgstr "Akademischer Titel"
 
 msgid "Organisation"
 msgstr "Organisation"
@@ -1291,13 +1556,10 @@ msgid "Profession"
 msgstr "Beruf"
 
 msgid "Political Party"
-msgstr "Politische Partei"
+msgstr "Partei"
 
 msgid "Parliamentary Group"
 msgstr "Fraktion"
-
-msgid "Website"
-msgstr "Webseite"
 
 msgid "Website 2"
 msgstr "Webseite 2"
@@ -1314,9 +1576,6 @@ msgstr "Postadresse"
 msgid "Postal Code and City"
 msgstr "Postleitzahl und Ort"
 
-msgid "Picture"
-msgstr "Bild"
-
 msgid "URL pointing to the picture"
 msgstr "Link zum Bild"
 
@@ -1325,6 +1584,54 @@ msgstr "Notizen"
 
 msgid "Public extra information about this person"
 msgstr "Öffentliche Extra Informationen zu dieser Person"
+
+msgid "Select additional participant"
+msgstr "Zusätzlichen Verfasser / Beteiligter auswählen"
+
+msgid "No results match"
+msgstr "Keine Ergebnisse gefunden:"
+
+msgid "First signatory"
+msgstr "Erstunterzeichner/in"
+
+msgid "Co-signatory"
+msgstr "Mitunterzeichner/in"
+
+msgid "Business Status"
+msgstr "Status"
+
+msgid "Submission/publication date"
+msgstr "Einreichungs-/Publikationsdatum"
+
+msgid "Participations"
+msgstr "Verfasser / Beteiligte"
+
+msgid "Tag"
+msgstr "Schlagwort"
+
+msgid "Starting at"
+msgstr "Von"
+
+msgid "Ending at"
+msgstr "Bis"
+
+msgid "Quota"
+msgstr "Anzahl"
+
+msgid "Key Code"
+msgstr "Schlüsselcode"
+
+msgid "Invalid Kaba Code. Needs to be a 4 to 6 digit number code."
+msgstr "Ungültiger Kaba Code. Muss ein 4- bis 6-stelliger Zifferncode sein."
+
+msgid "Lead Time"
+msgstr "Vorlaufszeit"
+
+msgid "In minutes"
+msgstr "In Minuten"
+
+msgid "Lag Time"
+msgstr "Nachlaufszeit"
 
 msgid "I am looking to make a reservation lasting"
 msgstr "Ich suche einen Termin für"
@@ -1372,8 +1679,40 @@ msgstr "Dient zur Gruppierung in der Übersicht"
 msgid "Subgroup"
 msgstr "Untergruppe"
 
+msgid "Additional information for confirmed reservations"
+msgstr "Zusätzliche Informationen für bestätigte Reservationen"
+
+msgid ""
+"This text will be included in the confirmation and reservation summary e-"
+"mails sent out to customers. As well as displayed on the ticket status page, "
+"once reservations have been accepted."
+msgstr ""
+"Dieser Text wird im Kunden-E-Mail für die Reservationsbestätigung und die "
+"Terminübersicht angezeigt. Zusätzlich wird es nach der Bestätigung auf der "
+"Status-Seite des Tickets angezeigt."
+
 msgid "Extra Fields Definition"
 msgstr "Extra-Felder Definition"
+
+msgid "Extra Field values to include in calendar subscription"
+msgstr "Extra-Feld Eingaben im Kalender-Abonnement"
+
+msgid ""
+"By default only the e-mail address and link to the ticket is included. You "
+"may wish to include additional administrative information like a phone "
+"number, name or address. Please be aware however that this data can be "
+"viewed by anyone that knows the subscription URL, so only include what you "
+"must."
+msgstr ""
+"Standardmässig sind nur die E-Mail Adresse und der Link zum Ticket "
+"enthalten. Diese Einstellung erlaubt es zusätzliche administrativen "
+"Informationen, wie z.B. eine Telefonnummer oder ein Name direkt im Kalender "
+"zu hinterlegen. Diese Einstellung ist jedoch mit Vorsicht zu geniessen, da "
+"diese Angaben für alle Personen sichtbar sind, die den Kalender abonniert "
+"haben oder den Link kennen."
+
+msgid "Calendar Subscription"
+msgstr "Kalender-Abonnement"
 
 msgid "Closing date for the public"
 msgstr "Annahmeschluss für die Öffentlichkeit"
@@ -1395,6 +1734,18 @@ msgstr "Stunden"
 
 msgid "Days"
 msgstr "Tage"
+
+msgid "Opening date for the public"
+msgstr "Annahmebeginn für die Öffentlichkeit"
+
+msgid "Opening date"
+msgstr "Annahmebeginn"
+
+msgid "No opening date"
+msgstr "Kein Annahmebeginn"
+
+msgid "Start accepting reservations days before the allocation"
+msgstr "Tage vor der Verfügbarkeit Reservationen annehmen"
 
 msgid "Limit reservations to certain zip-codes"
 msgstr "Reservationen nach Postleitzahl einschränken"
@@ -1420,6 +1771,25 @@ msgstr "Wochenansicht"
 msgid "Month view"
 msgstr "Monatsansicht"
 
+msgid "Doors"
+msgstr "Türen"
+
+msgid "Invoicing party"
+msgstr "Rechnungssteller"
+
+msgid "Invoicing"
+msgstr "Fakturierung"
+
+msgid "Will be displayed in invoices"
+msgstr "Wird in Rechnungen angezeigt"
+
+msgid ""
+"Will be displayed in invoices for any costs directly associated with "
+"reservations on this resource."
+msgstr ""
+"Wird bei allen Rechnugnspositionen angezeigt, die direkt mit der Reservation "
+"von diesem Objekt im Zusammenhang stehen."
+
 msgid "Per item"
 msgstr "Pro Eintrag"
 
@@ -1431,6 +1801,27 @@ msgstr "Preis pro Eintrag"
 
 msgid "Price per hour"
 msgstr "Preis pro Stunde"
+
+msgid "Prices in extra fields are"
+msgstr "Preise in Extra-Felder gelten"
+
+msgid ""
+"If no extra fields are defined or none of the extra fields contain pricing "
+"information, then this setting has no effect."
+msgstr ""
+"Falls keine Extra-Felder definiert sind oder keine der definierten Felder "
+"mit Preisen verknüpft sind, hat diese Auswahl keine Auswirkung."
+
+msgid "One-off"
+msgstr "Einmalig"
+
+msgid ""
+"Failed to retrieve the doors from the dormakaba API please make sure your "
+"credentials are still valid."
+msgstr ""
+"Die Türen konnten nicht von der dormakaba API abgerufen werden. Bitte "
+"stellen Sie sicher, dass die hinterlegten Zugangsdaten immer noch gültig "
+"sind."
 
 msgid "Please select the form field that holds the zip-code"
 msgstr "Bitte wählen Sie das Formfeld welches die Postleitzahl enthält"
@@ -1467,6 +1858,17 @@ msgstr ""
 "An jedem unten ausgewählten Tag wird eine Benachrichtigung mit den "
 "Reservierungen des Tages um 06:00 Uhr an den oben genannten Empfänger "
 "gesendet."
+
+msgid "Customer Messages"
+msgstr "Kunden Nachrichten"
+
+msgid ""
+"Each time a customer adds a message to the ticket for a reservation, a "
+"notification is sent to the recipient above."
+msgstr ""
+"Jedes Mal, wenn ein Kunde eine neue Nachricht zu einem Ticket für eine "
+"Reservierung hinzufügt, wird eine eine Benachrichtigung an den oben "
+"genannten Empfänger gesendet."
 
 msgid "Internal Notes"
 msgstr "Interne Notizen"
@@ -1506,12 +1908,6 @@ msgstr "Link zum Logo"
 
 msgid "Logo (Square)"
 msgstr "Logo (Quadratisch)"
-
-msgid "E-Mail Reply Address (Reply-To)"
-msgstr "E-Mail Antwort Adresse (Reply-To)"
-
-msgid "Replies to automated e-mails go to this address."
-msgstr "Antworten an automatisch generierte E-Mails gehen an diese Adresse."
 
 msgid "Primary Color"
 msgstr "Primärfarbe"
@@ -1628,6 +2024,12 @@ msgstr "TikTok"
 
 msgid "URL pointing to the TikTok site"
 msgstr "Link zu TikTok"
+
+msgid "Impressum"
+msgstr "Impressum"
+
+msgid "URL pointing to the Impressum site"
+msgstr "Link zum Impressum"
 
 msgid "Custom Link 1"
 msgstr "Benutzerdefinierter Link 1"
@@ -1961,11 +2363,20 @@ msgid "Email address that is displayed instead of the personal email address"
 msgstr ""
 "E-Mail-Adresse, die anstelle der persönlichen E-Mail-Adresse angezeigt wird"
 
+msgid "Hide submitter email address"
+msgstr "E-Mail-Adresse des Antragstellers verstecken"
+
+msgid ""
+"Hide the email address of the ticket submitter in the ticket status page"
+msgstr ""
+"Versteckt die E-Mail-Adresse des Ticket-Antragstellers auf der Ticket-Status "
+"Seite"
+
+msgid "Data Protection"
+msgstr "Datenschutz"
+
 msgid "Accept request and close ticket automatically based on:"
 msgstr "Akzeptiere und schliesse Tickets automatisch basierend auf:"
-
-msgid "Ticket category"
-msgstr "Ticket-Kategorie"
 
 msgid "User role"
 msgstr "Benutzer-Rolle"
@@ -2012,6 +2423,47 @@ msgstr "Email-Benachrichtigungen für alle Tickets deaktivieren"
 msgid "Always send email notification if a new ticket message is sent"
 msgstr "Email-Benachrichtigung immer senden bei neuen Ticket-Nachrichten"
 
+msgid ""
+"Each tag can be associated with arbitrary key value pairs which will be "
+"displayed in the ticket alongside the submitted form values. If a key "
+"exactly matches the name of a form field that field's value will be pre-"
+"populated according to the value.\n"
+"\n"
+"Example:\n"
+"```yaml\n"
+"- High Priority\n"
+"- Medium Priority\n"
+"- Low Priority\n"
+"- FC Govikon:\n"
+"    E-Mail: fc@govikon.ch\n"
+"    Postal Code / City: 1234 Govikon\n"
+"- HC Govikon:\n"
+"    E-Mail: hc@govikon.ch\n"
+"    Postal Code / City: 1234 Govikon\n"
+"```"
+msgstr ""
+"Jedes Schlagwort kann mit beliebigen Schlüsselwertepaaren verknüpft werden, "
+"die dann im Ticket zusammen mit den übermittelten Formularwerten angezeigt "
+"werden. Wenn ein Schlüssel genau mit dem Namen eines Formularfeldes "
+"übereinstimmt, wird der Wert dieses Feldes entsprechend vorausgefüllt.\n"
+"\n"
+"Beispiel:\n"
+"```yaml\n"
+"- Hohe Priorität\n"
+"- Mittler Priorität\n"
+"- Tiefe Priorität\n"
+"- FC Govikon:\n"
+"    E-Mail: fc@govikon.ch\n"
+"    PLZ / Ort: 1234 Govikon\n"
+"    Kaba Code: 123456\n"
+"    Color: '#ff0000'\n"
+"- HC Govikon:\n"
+"    E-Mail: hc@govikon.ch\n"
+"    PLZ / Ort: 1234 Govikon\n"
+"    Kaba Code: 654321\n"
+"    Color: '#00ff00'\n"
+"```"
+
 msgid "Categories restricted by user group settings"
 msgstr "Durch Benutzergruppeneinstellungen eingeschränkte Kategorien"
 
@@ -2019,6 +2471,27 @@ msgid "Mute tickets individually if the auto-accept feature is enabled."
 msgstr ""
 "Schalten Sie Tickets individuell auf stumm, wenn sie Tickets automatisch "
 "akzeptieren."
+
+msgid ""
+"Invalid format. Please define tags and their meta data according to the "
+"example."
+msgstr ""
+"Ungültiges Format. Bitte definieren Sie die Schlagworte und Metadaten "
+"entsprechend dem gegebenen Beispiel."
+
+#, python-format
+msgid "Invalid price \"${price}\", needs to be a non-negative number."
+msgstr "Ungültiger Preis \"${price}\", muss eine nicht-negative Zahl sein."
+
+#, python-format
+msgid ""
+"Invalid color \"${color}\", needs to be a 3 or 6 digit hex code, e.g. "
+"\"ff9000\" for orange. If you use a \"#\" prefix, make sure to enclose the "
+"value in quotation marks."
+msgstr ""
+"Ungültige Farbe \"${color}\", es muss eine 3- bis 6-stellige hexadezimal "
+"Zahl sein, z.B. \"ff9000\" für Orange. Wenn Sie \"#\" als Präfix verwenden, "
+"stellen Sie sicher, den Wert in Anführungszeichen einzuschliessen."
 
 msgid "Enable newsletter"
 msgstr "Newsletter aktivieren"
@@ -2079,6 +2552,12 @@ msgstr ""
 
 msgid "Automatic newsletters"
 msgstr "Automatische Newsletter"
+
+msgid "Title for daily newsletters"
+msgstr "Titel für tägliche Newsletter"
+
+msgid "Daily news from our town"
+msgstr "Tägliche Neuigkeiten aus unserer Gemeinde"
 
 msgid "Newsletter sending times (24h format)"
 msgstr "Newsletter Versandzeiten (24h Format)"
@@ -2158,6 +2637,33 @@ msgstr "Gever API-Endpunkt, wo die Dokumente hochgeladen werden."
 msgid "Website address including https://"
 msgstr "Webseiten-Adresse inklusive https://"
 
+msgid "Site ID"
+msgstr "ID der Anlage"
+
+msgid "Kaba Sites"
+msgstr "Anlagen"
+
+msgid "Default Lead Time"
+msgstr "Standard Vorlaufszeit"
+
+msgid "Default Lag Time"
+msgstr "Standard Nachlaufszeit"
+
+#, python-format
+msgid "Duplicate site ID ${site_id}"
+msgstr "ID der Anlage ${site_id} ist doppelt aufgeführt"
+
+#, python-format
+msgid "${field} for site ID ${site_id} is required"
+msgstr "${field} für ID ${site_id} muss ausgefüllt werden"
+
+#, python-format
+msgid "Invalid credentials for site ID ${site_id}"
+msgstr "Ungültige API Zugangsdaten für ID ${site_id}"
+
+msgid "Unexpected error encountered, please try again."
+msgstr "Unerwarteter Fehler aufgetreten, bitte versuchen Sie es erneut."
+
 msgid "API Key"
 msgstr "API Schlüssel"
 
@@ -2165,7 +2671,7 @@ msgid "Read only"
 msgstr "Nur Lesezugriff"
 
 msgid "Submit your event"
-msgstr "Veranstaltung vorschlagen"
+msgstr "Veranstaltung erfassen"
 
 msgid "Enables website visitors to submit their own events"
 msgstr ""
@@ -2193,11 +2699,23 @@ msgstr "Manuell konfigurierbare Filter"
 msgid "Both, predefined tags as well as configurable filters"
 msgstr "Sowohl vordefinierte Tags als auch konfigurierbare Filter"
 
+msgid "General information above the event list"
+msgstr "Allgemeine Informationen über der Veranstaltungs-Liste"
+
+msgid "General information below the event list"
+msgstr "Allgemeine Informationen unterhalb der Veranstaltungs-Liste"
+
 msgid "Documents"
 msgstr "Dokumente"
 
 msgid "General event documents"
 msgstr "Allgemeine Veranstaltungsdokumente"
+
+msgid "General information above the resource list"
+msgstr "Allgemeine Informationen über der Reservationen-Liste"
+
+msgid "General information below the resource list"
+msgstr "Allgemeine Informationen unterhalb der Reservationen-Liste"
 
 msgid "Duration from opening a ticket to its automatic archival"
 msgstr ""
@@ -2237,23 +2755,23 @@ msgid ""
 "Example for organisation hierarchy with subtopics in yaml format. Note: "
 "Deeper structures are not supported.\n"
 "```\n"
-"- Organisation:\n"
-"  - Sub-Organisation 1\n"
-"  - Sub-Organisation 2\n"
-"- Organisation 2:\n"
-"  - Sub-Organisation 1\n"
-"  - Sub-Organisation 2\n"
+"- Organisation 1:\n"
+"  - Sub-Organisation 1.1\n"
+"  - Sub-Organisation 1.2\n"
+"- Organisation 2\n"
+"- Organisation 3:\n"
+"  - Sub-Organisation 3.1\n"
 "```"
 msgstr ""
-"Beispiel für Organisationshierarchie mit Unterorganisationen im yaml-Format. "
+"Beispiel für Organisationshierarchie mit Unterthemen im yaml-Format. "
 "Hinweis: Tiefere Strukturen werden nicht unterstützt.\n"
 "```\n"
-"- Organisation:\n"
-"  - Unterorganisation 1\n"
-"  - Unterorganisation 2\n"
-"- Organisation 2:\n"
-"  - Unterorganisation 1\n"
-"  - Unterorganisation 2\n"
+"- Organisation 1:\n"
+"  - Unter-Organisation 1.1\n"
+"  - Unter-Organisation 1.2\n"
+"- Organisation 2\n"
+"- Organisation 3:\n"
+"  - Unter-Organisation 3.1\n"
 "```"
 
 msgid "Hide these fields for non-logged-in users"
@@ -2276,6 +2794,14 @@ msgstr ""
 "Ungültiges Format. Bitte definieren Sie Organisationen und "
 "Unterorganisationen wie im Beispiel."
 
+#, python-format
+msgid ""
+"Invalid format. Please define at least one sub-organisation for '${topic}' "
+"or remove the ':'"
+msgstr ""
+"Ungültiges Format. Bitte definieren Sie mindestens eine Unterorganisation "
+"für '${topic}' oder entfernen Sie den ':'"
+
 msgid ""
 "Invalid format. Only organisations and sub-organisations are allowed - no "
 "deeper structures supported."
@@ -2292,6 +2818,9 @@ msgid ""
 msgstr ""
 "Mehrwertsteuersatz in Prozent. Der Mehrwertsteuersatz wird auf alle Preise "
 "in den Formularen angewendet."
+
+msgid "Enable Citizen Login"
+msgstr "Kunden-Login aktivieren"
 
 msgid ""
 "Select newsletter categories your are interested in. You will receive the "
@@ -2390,9 +2919,6 @@ msgstr "Aktiv"
 msgid "Inactive"
 msgstr "Inaktiv"
 
-msgid "Role"
-msgstr "Rolle"
-
 msgid "Yubikey"
 msgstr "YubiKey"
 
@@ -2428,6 +2954,27 @@ msgstr ""
 
 msgid "Immediate e-mail notification to members upon ticket submission"
 msgstr "Unmittelbare E-Mail-Benachrichtigung an Mitglieder bei Ticketeingang"
+
+msgid ""
+"Also gives permission to these ticket categories, but does not restrict "
+"access to other groups."
+msgstr ""
+"Erteilt zudem die Berechtigung für die ausgewählten Ticketkategorien, aber "
+"schränkt den Zugriff nicht ein."
+
+msgid "Shared e-mail address for ticket submission notifications"
+msgstr ""
+"Geteilte E-Mail Adresse für E-Mail-Benachrichtigungen beim Ticketeingang"
+
+msgid ""
+"When specified, notifications for new tickets will be sent to this e-mail "
+"address, instead of to individual members. Requires that immediate e-mail "
+"notifications are turned on for at least one kind of ticket."
+msgstr ""
+"Falls gesetzt, werden E-Mail-Benachrichtigungen beim Ticketeingang nur an "
+"diese E-Mail Adresse versendet, anstatt an alle Mitglieder individuell. "
+"Setzt voraus, dass mindestens eine Ticket-Art ausgewählt ist für "
+"unmittelbare E-Mail-Benachrichtigungen."
 
 msgid "Send a periodic status e-mail."
 msgstr "Ein periodisches Status E-Mail senden."
@@ -2534,9 +3081,6 @@ msgstr "Sporverein"
 
 msgid "all day"
 msgstr "den ganzen Tag"
-
-msgid "VAT"
-msgstr "MwSt"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -2686,6 +3230,12 @@ msgstr "Neue Nachricht"
 msgid "Ticket Status"
 msgstr "Ticket Status"
 
+msgid "Invoice"
+msgstr "Rechnung"
+
+msgid "Discount / Surcharge"
+msgstr "Abzug / Zuschlag"
+
 msgid "Text module"
 msgstr "Textbaustein"
 
@@ -2694,9 +3244,6 @@ msgstr "Möchten Sie diesen Textbaustein wirklich löschen"
 
 msgid "Delete text module"
 msgstr "Textbaustein löschen"
-
-msgid "Reservations"
-msgstr "Reservationen"
 
 msgid "Recipients"
 msgstr "Empfänger"
@@ -2762,6 +3309,9 @@ msgstr "Verfügbarkeitszeiträume"
 
 msgid "Availability period"
 msgstr "Verfügbarkeitszeitraum"
+
+msgid "Paste"
+msgstr "Einfügen"
 
 msgid "Edit allocation"
 msgstr "Verfügbarkeit bearbeiten"
@@ -2868,14 +3418,11 @@ msgstr "Exporte"
 msgid "Payment Providers"
 msgstr "Zahlungsanbieter"
 
-msgid "Datatrans"
-msgstr "Datatrans"
-
-msgid "Worldline Saferpay"
-msgstr "Worldline Saferpay"
-
 msgid "Synchronise"
 msgstr "Synchronisieren"
+
+msgid "Export Bill run as PDF"
+msgstr "Fakturierte Belege als PDF exportieren"
 
 msgid "Directory"
 msgstr "Verzeichnis"
@@ -3020,9 +3567,6 @@ msgstr "Text statt Einleitung im Newsletter benutzen"
 msgid "Select additional person"
 msgstr "Zusätzliche Person auswählen"
 
-msgid "No results match"
-msgstr "Keine Ergebnisse gefunden:"
-
 msgid "List this function in the page of this person"
 msgstr "Diese Funktion anzeigen auf der Seite von dieser Person"
 
@@ -3116,6 +3660,9 @@ msgstr "Letztes Jahr"
 msgid "Older"
 msgstr "Älter"
 
+msgid "Meeting"
+msgstr "Sitzung"
+
 msgid "Do you really want to delete this note?"
 msgstr "Möchten Sie diese Notiz wirklich löschen?"
 
@@ -3124,6 +3671,42 @@ msgstr "Notiz löschen"
 
 msgid "Always visible on homepage"
 msgstr "Immer auf der Startseite anzeigen"
+
+msgid "Inquiry"
+msgstr "Anfrage"
+
+msgid "Report and Proposal"
+msgstr "Bericht und Antrag"
+
+msgid "Urgent Interpellation"
+msgstr "Dringliche Interpellation"
+
+msgid "Invitation"
+msgstr "Einladung"
+
+msgid "Interpellation"
+msgstr "Interpellation"
+
+msgid "Commission Report"
+msgstr "Kommissionsbericht"
+
+msgid "Motion"
+msgstr "Motion"
+
+msgid "Postulate"
+msgstr "Postulat"
+
+msgid "Resolution"
+msgstr "Resolution"
+
+msgid "Election"
+msgstr "Wahl"
+
+msgid "Parliamentary Statement"
+msgstr "Parlamentarische Erklärung"
+
+msgid "Miscellaneous"
+msgstr "Verschiedenes"
 
 msgid "Neujahrestag"
 msgstr "Neujahrestag"
@@ -3229,14 +3812,49 @@ msgstr "Anmeldung stornieren"
 msgid "Edit submission"
 msgstr "Eingabe bearbeiten"
 
+msgid "Reject"
+msgstr "Absagen"
+
+msgid "Do you really want to reject this reservation?"
+msgstr "Möchten Sie diese Reservation wirklich absagen?"
+
+#, python-format
+msgid "Rejecting ${title} can't be undone."
+msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
+
+msgid "Reject reservation"
+msgstr "Reservation absagen"
+
+msgid "Adjust"
+msgstr "Anpassen"
+
 msgid "Accept all reservations"
 msgstr "Alle Reservationen annehmen"
+
+msgid "Send reservation summary"
+msgstr "Terminübersicht senden"
+
+msgid "Do you really want to send a reservation summary?"
+msgstr "Möchten Sie wirklich eine Terminübersicht versenden?"
+
+msgid ""
+"This will always be sent via e-mail, even when ticket updates have been "
+"disabled. Make sure to only use this to inform customers, when significant "
+"changes have been made to the reservations, they need to be aware of."
+msgstr ""
+"Diese Übersicht wird immer via E-Mail versendet, selbst wenn Ticket Updates "
+"deaktiviert sind. Bitte benutzen Sie diese Funktion nur, wenn signifikante "
+"Änderungen vorgenommen worden sind an den Reservationen und der Kunde "
+"unbedingt informiert werden muss über den aktuellen Zustand."
 
 msgid "Details about the reservation"
 msgstr "Details zu Ihrer Reservation"
 
 msgid "Edit details"
 msgstr "Details bearbeiten"
+
+msgid "Edit key code"
+msgstr "Schlüsselcode bearbeiten"
 
 msgid "Accept all with message"
 msgstr "Alle annehmen mit Kommentar"
@@ -3256,19 +3874,8 @@ msgstr "Reservationen absagen"
 msgid "Reject all with message"
 msgstr "Alle absagen mit Kommentar"
 
-#, python-format
-msgid "Reject ${title}"
-msgstr "${title} absagen"
-
-msgid "Do you really want to reject this reservation?"
-msgstr "Möchten Sie diese Reservation wirklich absagen?"
-
-#, python-format
-msgid "Rejecting ${title} can't be undone."
-msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
-
-msgid "Reject reservation"
-msgstr "Reservation absagen"
+msgid "Add reservation"
+msgstr "Reservation hinzufügen"
 
 #. Used in sentence: "${event} published."
 #.
@@ -3431,13 +4038,17 @@ msgstr "Eine Nachricht kann nicht als Thema eingefügt werden"
 msgid "A Topic cannot be pasted as News"
 msgstr "Ein Thema kann nicht als News eingefügt werden"
 
-msgid "Paste"
-msgstr "Einfügen"
-
-msgid "Please note that this page has subpages which will also be deleted!"
+msgid ""
+"Please note that this page has the following subpages which will also be "
+"deleted:"
 msgstr ""
-"Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
-"werden!"
+"Bitte beachten Sie, dass dieses Thema die folgenden Unterthemen hat, welche "
+"ebenfalls gelöscht werden:"
+
+msgid "Please scroll to the bottom to enable the confirm button."
+msgstr ""
+"Bitte scrollen Sie bis zum Ende der Liste, um den Bestätigungsbutton zu "
+"aktivieren."
 
 msgid "This page can't be deleted."
 msgstr "Diese Seite kann nicht gelöscht werden."
@@ -3471,6 +4082,18 @@ msgstr "Bearbeitungszeit"
 
 msgid "Event Source"
 msgstr "Quelle Veranstaltung"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Unit"
+msgstr "Einheit"
+
+msgid "Quantity"
+msgstr "Anzahl"
+
+msgid "VAT"
+msgstr "MwSt"
 
 msgid "Payment"
 msgstr "Zahlung"
@@ -3637,7 +4260,20 @@ msgstr "iFrame einbetten"
 
 msgid "You can copy the following code to embed this page as an iFrame:"
 msgstr ""
-"Sie können den folgenden Code kopieren um diese Seite als iFrame einzubetten:"
+"Sie können den folgenden Code kopieren, um diese Seite als iFrame "
+"einzubetten:"
+
+msgid ""
+"To display the breadcrumbs you can add ${bc_level} as a parameter to the "
+"URL. The number defines where the breadcrumbs start. 1 in this case means "
+"that the first level is hidden. You can use any number as long as it is less "
+"than the number of levels in the breadcrumbs."
+msgstr ""
+"Um die Breadcrumbs anzuzeigen, können Sie ${bc_level} als Parameter zur URL "
+"hinzufügen. Die Zahl definiert, wo die Breadcrumbs beginnen. 1 in diesem "
+"Fall bedeutet, dass die erste Ebene verborgen ist. Sie können jede Zahl "
+"verwenden, solange sie kleiner ist als die Anzahl der Ebenen in den "
+"Breadcrumbs."
 
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
@@ -3752,6 +4388,27 @@ msgstr "Dieses Fotoalbum enthält noch keine Bilder."
 msgid "No photo albums defined yet."
 msgstr "Noch keine Fotoalben erstellt."
 
+msgid "No invoices yet."
+msgstr "Noch keine Rechnungen."
+
+msgid "Batch Action"
+msgstr "Massenbearbeitung"
+
+msgid "Mark as Invoiced"
+msgstr "Als fakturiert markieren"
+
+msgid "Mark as Uninvoiced"
+msgstr "Als unfakturiert markieren"
+
+msgid "Mark as Paid"
+msgstr "Als bezahlt markieren"
+
+msgid "Mark as Unpaid"
+msgstr "Als unbezahlt markieren"
+
+msgid "Apply to selected"
+msgstr "Auf Auswahl anwenden"
+
 msgid "Skip navigation"
 msgstr "Navigation überspringen"
 
@@ -3769,9 +4426,6 @@ msgstr "Das Formular enthält Fehler. Bitte die markierten Felder überprüfen."
 
 msgid "Copied to Clipboard!"
 msgstr "In die Zwischenablage kopiert!"
-
-msgid "Total"
-msgstr "Total"
 
 msgid "Healthy"
 msgstr "Intakt"
@@ -3834,7 +4488,7 @@ msgid "This site is secret and requires submitting an mTAN"
 msgstr "Diese Seite ist geheim und erfordert die Eingabe eines mTANs"
 
 msgid "This site is not published."
-msgstr "Diese Seite ist nicht publiziert."
+msgstr "Diese Seite ist nicht veröffentlicht."
 
 msgid "This site is not public."
 msgstr "Diese Seite ist nicht öffentlich."
@@ -3853,6 +4507,9 @@ msgstr ""
 msgid "Links"
 msgstr "Links"
 
+msgid "Invoice Items"
+msgstr "Rechnungspositionen"
+
 msgid "Item(s)"
 msgstr "Stück(e)"
 
@@ -3861,6 +4518,21 @@ msgstr "Änderungsvorschlag"
 
 msgid "New Entry"
 msgstr "Neuer Eintrag"
+
+msgid "Credit Card Fee"
+msgstr "Kreditkarten-Gebühr"
+
+msgid "${vat_rate}% included"
+msgstr "${vat_rate}% enthalten"
+
+msgid "Value Added Tax"
+msgstr "Mehrwertsteuer"
+
+msgid "Offline Payment"
+msgstr "Rechnung"
+
+msgid "Online Payment"
+msgstr "Online-Zahlung"
 
 msgid "Previous Page"
 msgstr "Vorherige Seite"
@@ -3872,11 +4544,8 @@ msgid ""
 "Persons living outside the following zipcodes may only reserve this "
 "allocation on the ${date}: ${zipcodes}"
 msgstr ""
-"Personen die ausserhalb der folgenden Postleitzahlen leben können diese "
+"Personen, die ausserhalb der folgenden Postleitzahlen leben, können diese "
 "Reservation erst am ${date} tätigen: ${zipcodes}"
-
-msgid "Quota"
-msgstr "Anzahl"
 
 msgid "Initiated"
 msgstr "Initiiert"
@@ -3986,11 +4655,8 @@ msgstr "Versand meiner Eingaben an meine E-Mail Adresse."
 msgid "Pay Online Now"
 msgstr "Jetzt online bezahlen"
 
-msgid "Credit Card Fee"
-msgstr "Kreditkarten-Gebühr"
-
 msgid "Pay Offline later"
-msgstr "Später bezahlen"
+msgstr "Per Rechnung bezahlen"
 
 msgid "Show more"
 msgstr "Mehr anzeigen"
@@ -4001,8 +4667,17 @@ msgstr "um ${time}"
 msgid "Object"
 msgstr "Objekt"
 
+msgid "Reservation"
+msgstr "Reservation"
+
 msgid "Disbursed"
 msgstr "Ausbezahlt"
+
+msgid "Select this invoice"
+msgstr "Diese Rechnung auswählen"
+
+msgid "Unpaid"
+msgstr "Unbezahlt"
 
 msgid "Digital seal"
 msgstr "Digitales Siegel"
@@ -4140,6 +4815,19 @@ msgstr ""
 "Falls Sie sich nicht bei dieser Seite angemeldet haben, können Sie diese "
 "Nachricht ignorieren. Sie erhalten dann keine weiteren E-Mails von uns."
 
+msgid "Your e-mail address was just used to send a login link to ${homepage}."
+msgstr ""
+"Ihre E-Mail Adresse wurde soeben zum Senden eines Anmeldelinks auf "
+"${homepage} verwendet."
+
+msgid "Use the token below or click on the link to complete your login."
+msgstr ""
+"Verwenden Sie den untenstehenden Login-Code oder klicken Sie auf den Link, "
+"um Ihre Anmeldung abzuschliessen."
+
+msgid "Complete Login"
+msgstr "Anmeldung abschliessen"
+
 msgid "Hello"
 msgstr "Grüezi"
 
@@ -4190,6 +4878,33 @@ msgstr ""
 "Falls Sie sich nicht für diese Benachrichtigungen angemeldet haben, können "
 "Sie diese Nachricht ignorieren."
 
+msgid "New customer message in Ticket ${link}"
+msgstr "Neue Kunden Nachricht in Ticket ${link}"
+
+msgid "${author} wrote"
+msgstr "${author} schrieb"
+
+#. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
+msgid "Please ${link} to reply."
+msgstr "Bitte ${link} um zu antworten"
+
+#. Used in sentence: "Please ${link} to reply."
+msgid "visit the request page"
+msgstr "öffnen Sie die Anfrage"
+
+msgid "Have a great day!"
+msgstr "Wir wünschen Ihnen einen schönen Tag!"
+
+msgid ""
+"This is the notification for customer messages on reservations for ${request."
+"app.org.title}. If you no longer want to receive this e-mail please contact "
+"an administrator so they can remove you from the recipients list."
+msgstr ""
+"Dies ist die tägliche Reservations-Übersicht für ${organisation}. Falls Sie "
+"dieses E-Mail nicht mehr bekommen möchten, melden Sie sich bitte bei einem "
+"Administrator damit dieser Sie von der Empfängerliste streichen kann."
+
 msgid "Good morning,"
 msgstr "Guten Morgen"
 
@@ -4199,17 +4914,15 @@ msgstr "Die folgenden Reservationen sind für heute geplant."
 msgid "No reservations today."
 msgstr "Heute keine Reservationen."
 
-msgid "Have a great day!"
-msgstr "Wir wünschen Ihnen einen schönen Tag!"
-
 msgid ""
 "This is the daily reservation overview for ${organisation}. If you no longer "
 "want to receive this e-mail please contact an administrator so they can "
 "remove you from the recipients list."
 msgstr ""
-"Dies ist die tägliche Reservations-Übersicht für ${organisation}. Falls Sie "
-"dieses E-Mail nicht mehr bekommen möchten, melden Sie sich bitte bei einem "
-"Administrator damit dieser Sie von der Empfängerliste streichen kann."
+"Dies ist die Benachrichtigung für Kunden Nachrichten zu Reservierungen für "
+"${request.app.org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, "
+"kontaktieren Sie bitte einen Administrator, damit er Sie aus der Liste "
+"entfernen kann."
 
 msgid "This is what happend on the ${org} website yesterday:"
 msgstr "Folgendes ist gestern auf der ${org} Webseite geschehen:"
@@ -4312,9 +5025,6 @@ msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
 msgid "New note in Ticket ${link}"
 msgstr "Neue Notiz in Ticket ${link}"
 
-msgid "${author} wrote"
-msgstr "${author} schrieb"
-
 msgid ""
 "This is the notification for notes on reservations for ${request.app.org."
 "title}. If you no longer want to receive this e-mail please contact an "
@@ -4324,6 +5034,9 @@ msgstr ""
 "app.org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, "
 "kontaktieren Sie bitte einen Administrator, damit er Sie aus der Liste "
 "entfernen kann."
+
+msgid "Pending approval"
+msgstr "Noch nicht akzeptiert"
 
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr ""
@@ -4347,7 +5060,10 @@ msgid "Do you no longer wish to receive these notifications?"
 msgstr "Möchten Sie diese Benachrichtigungen nicht mehr erhalten?"
 
 msgid "The following reservations have been accepted:"
-msgstr "Die folgenden Reservationen wurden angenommen:"
+msgstr "Die folgenden Reservationen wurden bestätigt:"
+
+msgid "See Ticket ${link} for additional information."
+msgstr "Siehe Ticket ${link} für zusätzliche Informationen."
 
 msgid ""
 "This is the notification for reservations for ${request.app.org.title}. If "
@@ -4444,7 +5160,7 @@ msgid "The ticket number is"
 msgstr "Ihre Ticket Referenz"
 
 msgid "The following reservations have been rejected:"
-msgstr "Folgende Reservationen wurden abgelehnt:"
+msgstr "Folgende Reservationen sind abgelehnt worden:"
 
 msgid ""
 "This is a notification for the rejected reservations for ${organisation}. If "
@@ -4456,8 +5172,20 @@ msgstr ""
 "möchten, kontaktieren Sie bitte einen Administrator, damit er Sie aus der "
 "Empfängerliste entfernen kann."
 
+msgid "See all your reservations"
+msgstr "Alle Ihre Reservationen einsehen"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
+
+msgid "Here's a summary of your reservations:"
+msgstr "Hier ist eine Zusammenfassung Ihrer Reservationen:"
+
+msgid "Changes to your submitted reservations:"
+msgstr "Änderungen an Ihren übermittelten Reservationen:"
+
+msgid "Rejected"
+msgstr "Abgelehnt"
 
 msgid "You have a new ticket"
 msgstr "Sie haben ein neues Ticket"
@@ -4465,18 +5193,9 @@ msgstr "Sie haben ein neues Ticket"
 msgid "A message has been sent regarding ${ref}:"
 msgstr "Sie haben zu ${ref} eine Nachricht erhalten:"
 
-#. Canonical text for ${link} is: "visit the request status page"
-#. Canonical text for ${link} is: "visit the request page"
-msgid "Please ${link} to reply."
-msgstr "Bitte ${link} um zu antworten"
-
 #. Used in sentence: "Please ${link} to reply."
 msgid "visit the request status page"
 msgstr "öffnen Sie den Anfragestatus"
-
-#. Used in sentence: "Please ${link} to reply."
-msgid "visit the request page"
-msgstr "öffnen Sie die Anfrage"
 
 msgid "Your request has been closed."
 msgstr "Ihre Anfrage wurde abgeschlossen"
@@ -4517,7 +5236,7 @@ msgstr ""
 "kümmern und uns bei Ihnen melden, sobald neue Informationen verfügbar sind."
 
 msgid "Below you can see your chat conversation:"
-msgstr "Unten sehen Sie Ihr Chat-Gespräch:"
+msgstr "Nachfolgend sehen Sie Ihre Chat-Konversation:"
 
 msgid "This is what happend on the ${org} website over the past week:"
 msgstr ""
@@ -4591,6 +5310,15 @@ msgstr "1 Reservation abgelehnt."
 msgid "${count} reservations rejected."
 msgstr "${count} Reservationen abgelehnt."
 
+msgid "1 reservation added."
+msgstr "1 Reservation hinzugefügt."
+
+msgid "${count} reservations added."
+msgstr "${count} Reservationen hinzugefügt."
+
+msgid "1 reservation adjusted:"
+msgstr "1 Reservation angepasst:"
+
 msgid "Registration confirmed."
 msgstr "Anmeldung bestätigt."
 
@@ -4623,6 +5351,9 @@ msgstr "Ticket E-Mails aktiviert."
 
 msgid "Payment amount changed."
 msgstr "Zahlungsbetrag geändert."
+
+msgid "Submitter e-mail changed."
+msgstr "E-Mail Adresse des Antragstellers geändert."
 
 msgid "Ticket archived."
 msgstr "Ticket archiviert."
@@ -4726,9 +5457,6 @@ msgstr "Dies ist eine importierte Veranstaltung"
 
 msgid "Search in Events"
 msgstr "Suche in Veranstaltungen"
-
-msgid "Tag"
-msgstr "Schlagwort"
 
 msgid "Export these events"
 msgstr "Diese Termine exportieren"
@@ -4847,17 +5575,42 @@ msgstr ""
 "geschieht). Deshalb ist die Information in der Kalender-Applikation mit "
 "Vorsicht zu geniessen."
 
-msgid "Reservations must be made at least one day in advance."
-msgstr "Reservationen müsen mindestens ein Tag im Voraus gemacht werden."
+msgid ""
+"If you want key codes to be included in the event's description then you may "
+"use the following link instead. Please note however that anyone you share "
+"this link with will have permanent access to this information."
+msgstr ""
+"Falls Sie die Schlüsselcodes in der Termin-Beschreibung sehen möchten, "
+"können Sie stattdessen den folgenden Link verwenden. Beachten Sie jedoch, "
+"dass jeder, der diesen Link kennt, einen permanenten Zugriff auf diese "
+"Information hat."
 
-msgid "Reservations must be made at least one hour in advance."
-msgstr "Reservationen müssen mindestens eine Stunde im Voraus gemacht werden."
+#, python-format
+msgid "Reservations must be made at least ${n} ${unit} in advance."
+msgstr "Reservationen müssen spätestens ${n} ${unit} im Voraus gemacht werden."
 
-msgid "Reservations must be made at least ${n} days in advance."
-msgstr "Reservationen müssen mindestens ${n} Tage im Voraus gemacht werden."
+msgid "day"
+msgstr "Tag"
 
-msgid "Reservations must be made at least ${n} hours in advance."
-msgstr "Reservationen müssen mindestens ${n} Stunden im Voraus gemacht werden."
+msgid "days"
+msgstr "Tage"
+
+msgid "hour"
+msgstr "Stunde"
+
+msgid "hours"
+msgstr "Stunden"
+
+#, python-format
+msgid "Reservations can only be made at most ${n} ${unit} in advance."
+msgstr "Reservationen können frühestens ${n} ${unit} im Voraus gemacht werden."
+
+msgid ""
+"Reservations must be made at least ${n1} ${unit1} and at most ${n2} ${unit2} "
+"in advance."
+msgstr ""
+"Reservationen müssen spätestens ${n1} ${unit1} und frühestens ${n2} ${unit2} "
+"im Voraus gemacht werden."
 
 msgid ""
 "Select a free time span in the calendar to create an availability period."
@@ -4877,15 +5630,6 @@ msgstr ""
 "erstellen, klicken Sie auf \"Bearbeiten\" in der Verfügbarkeitszeitraum und "
 "danach auf \"Speichern\" ohne etwas zu ändern."
 
-msgid "Reservation is pending approval"
-msgstr "Diese Reservation wurde noch nicht akzeptiert"
-
-msgid "(${num_pending} pending approval)"
-msgstr "(${num_pending} noch nicht akzeptiert)"
-
-msgid "Utilised"
-msgstr "Ausgelastet"
-
 msgid "No recipients defined yet."
 msgstr "Es wurden noch keine Empfänger definiert."
 
@@ -4893,6 +5637,9 @@ msgid ""
 "Receives notifications for reservations of the day on the following days:"
 msgstr ""
 "Erhält Benachrichtigungen für Reservationen des Tages an folgenden Tagen:"
+
+msgid "Receives notifications for customer messages on reservations."
+msgstr "Erhält Benachrichtigungen für Kunden Nachrichten zu Reservationen."
 
 msgid "Receives notifications for internal notes on reservations."
 msgstr "Erhält Benachrichtigungen für interne Notizen zu Reservationen."
@@ -4990,8 +5737,8 @@ msgid ""
 "Thank you for filling out this survey. If there's anything you'd like to "
 "change, click on the \"Edit\"-Button below."
 msgstr ""
-"Vielen Dank für das Ausfüllen dieser Umfrage. Falls Sie noch etwas ändern "
-"möchten, klicken Sie auf den \"Bearbeiten\"-Button unten."
+"Vielen Dank für Ihre Teilnahme an dieser Umfrage. Falls Sie noch etwas "
+"ändern möchten, klicken Sie auf den \"Bearbeiten\"-Button unten."
 
 msgid "No surveys defined yet."
 msgstr "Es wurden noch keine Umfragen definiert."
@@ -5042,6 +5789,15 @@ msgstr "${count} Notiz"
 msgid "${count} notes"
 msgstr "${count} Notizen"
 
+msgid "View Invoice"
+msgstr "Rechnung anzeigen"
+
+msgid "Change tag"
+msgstr "Schlagwort ändern"
+
+msgid "Related Tickets"
+msgstr "Verknüpfte Tickets"
+
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
 "will become the author of the whole note."
@@ -5066,7 +5822,7 @@ msgid "Forgot something or have a special request?"
 msgstr "Haben Sie ein besonderes Anliegen oder haben Sie etwas vergessen?"
 
 msgid "Add a message to the ticket."
-msgstr "Fügen Sie der Anfrage eine Nachricht hinzu."
+msgstr "Dann fügen Sie der Anfrage eine Nachricht hinzu."
 
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Nachrichten wurden deaktiviert, da das Ticket geschlossen wurde."
@@ -5106,6 +5862,15 @@ msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
 
 msgid "local"
 msgstr "lokal"
+
+msgid "Last login"
+msgstr "Zuletzt eingeloggt"
+
+msgid "Session information"
+msgstr "Session Information"
+
+msgid "Display information"
+msgstr "Information anzeigen"
 
 msgid "No links found."
 msgstr "Keine Verknüpfungen gefunden."
@@ -5275,11 +6040,12 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Availability period updated. ${deleted} allocations removed, ${created} new "
-"allocations created."
+"Availability period updated. ${deleted} allocations removed, ${updated} "
+"allocations adjusted and ${created} new allocations created."
 msgstr ""
 "Verfügbarkeitszeitraum aktualisiert. ${deleted} Verfügbarkeiten entfernt, "
-"${created} neue Verfügbarkeiten erstellt."
+"${updated} Verfügbarkeiten angepasst und ${created} neue Verfügbarkeiten "
+"erstellt."
 
 msgid "Availability period not found"
 msgstr "Verfügbarkeitszeitraum nicht gefunden"
@@ -5300,6 +6066,12 @@ msgstr ""
 
 msgid "The availability period was stopped"
 msgstr "Der Verfügbarkeitszeitraum wurde gestoppt"
+
+msgid "The availability period was added to the clipboard"
+msgstr "Der Verfügbarkeitszeitraum wurde in die Zwischenablage kopiert"
+
+msgid "Pasted availability period from to the clipboard"
+msgstr "Der Verfügbarkeitszeitraum aus der Zwischenablage wurde eingefügt"
 
 #, python-format
 msgid "The availability period was deleted, along with ${n} allocations"
@@ -5420,6 +6192,16 @@ msgstr ""
 
 msgid "Successfully authenticated via mTAN."
 msgstr "Erfolgreich per mTAN authentifiziert."
+
+#, python-format
+msgid "Login Token for ${organisation}"
+msgstr "Login-Code für ${organisation}"
+
+msgid "Invalid or expired login token provided."
+msgstr "Ungültiger oder abgelaufener Login-Code eingegeben."
+
+msgid "Confirm Citizen Login"
+msgstr "Kunden-Login bestätigen"
 
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
@@ -5650,7 +6432,7 @@ msgid "Your event was accepted"
 msgstr "Ihre Veranstaltung wurde angenommen"
 
 msgid "Submit an event"
-msgstr "Veranstaltung vorschlagen"
+msgstr "Veranstaltung erfassen"
 
 msgid ""
 "Only events taking place inside the town or events related to town societies "
@@ -5842,6 +6624,12 @@ msgstr ""
 
 msgid "Registrations are no longer possible"
 msgstr "Anmeldungen sind nicht mehr möglich"
+
+msgid ""
+"Your changes would alter the price total but the payment is no longer open."
+msgstr ""
+"Ihre Änderungen würde den Preis verändern, aber die Zahlung ist nicht mehr "
+"offen."
 
 msgid "Pay Online and Complete"
 msgstr "Online zahlen und abschliessen"
@@ -6038,6 +6826,25 @@ msgstr "Ihre Zahlung wurde rückgängig gemacht"
 msgid "Your payment has been refunded"
 msgstr "Ihre Zahlung wurde rückerstattet"
 
+msgid "No tickets found for PDF generation"
+msgstr "Keine Tickets gefunden für die PDF Erstellung"
+
+#, python-format
+msgid "${count} invoices marked as invoiced."
+msgstr "${count} Rechnungen als fakturiert markiert."
+
+#, python-format
+msgid "${count} invoices marked as uninvoiced."
+msgstr "${count} Rechnungen als unfakturiert markiert."
+
+#, python-format
+msgid "${count} invoices marked as unpaid."
+msgstr "${count} Rechnungen als bezahlt markiert."
+
+#, python-format
+msgid "${count} invoices marked as paid."
+msgstr "${count} Rechnungen als unbezahlt markiert."
+
 msgid "The ticket was marked as paid"
 msgstr "Das Ticket wurde als bezahlt markiert"
 
@@ -6206,22 +7013,6 @@ msgstr ""
 "Die ausgewählte Zeit existiert nicht an diesem Datum aufgrund der "
 "Sommerzeitumstellung."
 
-msgid "hour"
-msgstr "Stunde"
-
-msgid "hours"
-msgstr "Stunden"
-
-msgid "day"
-msgstr "Tag"
-
-msgid "days"
-msgstr "Tage"
-
-#, python-format
-msgid "Reservations must be made ${n} ${unit} in advance"
-msgstr "Reservationen müssen ${n} ${unit} im Voraus gemacht werden"
-
 msgid "This date lies in the past"
 msgstr "Dieses Datum liegt in der Vergangenheit"
 
@@ -6246,12 +7037,21 @@ msgstr ""
 "Ihre Reservation für ${room} wurde eingereicht. Bitte fahren Sie fort mit "
 "Ihrer Reservation für ${next_room}."
 
+#, python-format
+msgid ""
+"Failed to create visits using the dormakaba API for site ID ${site_id} "
+"please make sure your credentials are still valid."
+msgstr ""
+"Das Delegieren der Entriegelung der Türen via dormakaba API für Anlage "
+"${site_id} ist fehlgeschlagen. Bitte stellen Sie sicher, dass die "
+"hinterlegten Zugangsdaten immer noch gültig sind."
+
 msgid "Your reservations were accepted"
-msgstr "Ihre Reservationen wurden angenommen"
+msgstr "Ihre Reservationen wurden bestätigt"
 
 #, python-format
-msgid "${org} New Reservation(s)"
-msgstr "${org} Neue Reservation(en)"
+msgid "Reservation(s) confirmed ${org} ${resource}"
+msgstr "Bestätigung Reservation(en) ${org} ${resource}"
 
 msgid "The reservations were accepted"
 msgstr "Die Reservationen wurden angenommen"
@@ -6293,8 +7093,49 @@ msgstr "Die Reservationen wurden abgelehnt"
 msgid "The reservation was rejected"
 msgstr "Die Reservation wurde abgelehnt"
 
+msgid "Failed to revoke one or more door codes in dormakaba API"
+msgstr ""
+"Ein oder mehrere Türcodes konnten nicht via dormakaba API deaktiviert werden"
+
 msgid "Reject all reservations with message"
 msgstr "Alle Reservationen absagen mit Kommentar"
+
+msgid "Reservation summary"
+msgstr "Terminübersicht"
+
+msgid ""
+"Since the other reservations in this ticket have already been accepted, this "
+"reservation will also be immediately accepted. However we will not send a "
+"new reservation confirmation."
+msgstr ""
+"Da die anderen Reservationen in diesem Ticket bereits angenommen worden "
+"sind, wird diese neue Reservation sofort angenommen. Allerdings wird dadurch "
+"keine neue Reservationsbestätigung versendet."
+
+msgid ""
+"The targeted availability is not partially reservable and does not fully "
+"cover the selected time range."
+msgstr ""
+"Die betroffene Verfügbarkeit kann nicht teilweise reserviert werden, "
+"beinhaltet jedoch nicht den kompletten ausgewählten Zeitraum."
+
+msgid "Added a new reservation"
+msgstr "Eine neue Reservation wurde hinzugefügt"
+
+msgid "Reservation not adjustable"
+msgstr "Diese Reservation ist nicht anpassbar"
+
+msgid "Adjust reservation"
+msgstr "Reservation Anpassen"
+
+msgid "The reservation was adjusted"
+msgstr "Die Reservation wurde angepasst"
+
+msgid "The reservation was left unchanged"
+msgstr "Die Reservation ist unverändert geblieben"
+
+msgid "There are no future reservations"
+msgstr "Es gibt keine zukünftige Reservationen"
 
 msgid "Added a new daypass"
 msgstr "Eine neue Tageskarte wurde hinzugefügt"
@@ -6416,9 +7257,6 @@ msgid ""
 msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
-
-msgid "Value Added Tax"
-msgstr "Mehrwertsteuer"
 
 msgid "Chat"
 msgstr "Chat"
@@ -6553,6 +7391,10 @@ msgid "Your ticket has a new message"
 msgstr "Ihr Ticket hat eine neue Nachricht"
 
 #, python-format
+msgid "${org} New Customer Message in Reservation for ${resource_title}"
+msgstr "${org} Neue Kunden Nachricht in Reservation für ${resource_title}"
+
+#, python-format
 msgid "${org} New Note in Reservation for ${resource_title}"
 msgstr "${org} Neue Notiz in Reservation für ${resource_title}"
 
@@ -6616,6 +7458,9 @@ msgstr ""
 msgid "You recovered ticket ${number} from the archive"
 msgstr "Sie haben Ticket ${number} aus dem Archiv geholt"
 
+msgid "Tag changed"
+msgstr "Schlagwort geändert"
+
 msgid "The ticket has already been closed"
 msgstr "Das Ticket wurde bereits geschlossen"
 
@@ -6624,6 +7469,28 @@ msgstr "Ihre Nachricht wurde gesendet"
 
 msgid "Zip archive created successfully"
 msgstr "ZIP-Archiv erfolgreich generiert"
+
+msgid "The payment is no longer open, so the invoice cannot be modified."
+msgstr ""
+"Die Zahlung ist nicht mehr offen, daher kann die Rechnung nicht verändert "
+"werden."
+
+msgid "Remove Discount"
+msgstr "Abzug entfernen"
+
+msgid "Remove Surchage"
+msgstr "Zuschlag entfernen"
+
+#, python-format
+msgid "Do you really want to remove \"${booking_text}\"?"
+msgstr "Möchten Sie wirklich \"${booking_text}\" entfernen?"
+
+#, python-format
+msgid "${ticket} Invoice"
+msgstr "${ticket} Rechnung"
+
+msgid "Add Discount / Surcharge"
+msgstr "Abzug / Zuschlag hinzufügen"
 
 msgid "Your request has been submitted"
 msgstr "Anfrage eingereicht"
@@ -6672,6 +7539,9 @@ msgstr "Alle Tickets"
 msgid "All Users"
 msgstr "Alle Benutzer"
 
+msgid "All Submitters"
+msgstr "Alle Antragsteller"
+
 #, python-format
 msgid "${success_count} tickets deleted, ${error_count} are not deletable"
 msgstr ""
@@ -6711,6 +7581,29 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+msgid "Please enter your e-mail address in order to continue"
+msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid "New news since the last newsletter:"
+#~ msgstr "Neue Einträge seit dem letzten Newsletter:"
+
+#~ msgid "Parliamentarians"
+#~ msgstr "Parlamentsmitglieder"
+
+#~ msgid "Date of death"
+#~ msgstr "Sterbedatum"
+
+#~ msgid "Portrait"
+#~ msgstr "Portrait"
+
+#~ msgid "Please note that this page has subpages which will also be deleted!"
+#~ msgstr ""
+#~ "Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
+#~ "werden!"
+
+#~ msgid "One of your reservations was adjusted"
+#~ msgstr "Eine von Ihren Reservationen wurde angepasst"
 
 #~ msgid ""
 #~ "Select a free time span in the calendar below to create an availability "

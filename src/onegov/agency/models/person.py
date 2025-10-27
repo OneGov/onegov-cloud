@@ -24,24 +24,17 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
-    es_type_name = 'extended_person'
-
-    @property
-    def es_public(self) -> bool:  # type:ignore[override]
-        return self.access == 'public' and self.published
-
-    es_properties = {
-        'title': {'type': 'text'},
-        'function': {'type': 'localized'},
-        'email': {'type': 'text'},
-        'phone_internal': {'type': 'text'},
-        'phone_fts': {'type': 'text'}
+    fts_public = True
+    fts_properties = {
+        'title': {'type': 'text', 'weight': 'A'},
+        'function': {'type': 'localized', 'weight': 'B'},
+        'email': {'type': 'text', 'weight': 'A'},
+        'phone_internal': {'type': 'text', 'weight': 'A'},
+        'phone_fts': {'type': 'text', 'weight': 'A'}
     }
 
-    external_user_id: dict_property[str | None] = meta_property()
-
     @property
-    def es_suggestion(self) -> tuple[str, ...]:
+    def fts_suggestion(self) -> tuple[str, ...]:
         suffix = f' ({self.function})' if self.function else ''
         result = {
             f'{self.last_name} {self.first_name}{suffix}',
@@ -49,6 +42,11 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
             f'{self.phone_internal} {self.last_name} {self.first_name}{suffix}'
         }
         return tuple(result)
+
+    external_user_id: dict_property[str | None] = meta_property()
+
+    # miscField50
+    staff_number: dict_property[str | None] = meta_property()
 
     if TYPE_CHECKING:
         # we only allow ExtendedAgencyMembership memberships
@@ -65,8 +63,9 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
 
     @property
     def phone_fts(self) -> list[str]:
-        numbers = (self.phone_internal, self.phone, self.phone_direct)
-        return generate_fts_phonenumbers(numbers)
+        numbers = generate_fts_phonenumbers((self.phone, self.phone_direct))
+        numbers.insert(0, self.phone_internal)
+        return numbers
 
     @property
     def location_address_html(self) -> Markup:

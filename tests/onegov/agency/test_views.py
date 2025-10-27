@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 from datetime import datetime
 from datetime import timedelta
 from io import BytesIO
+
 from markupsafe import Markup
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
@@ -11,15 +14,19 @@ from onegov.pdf.utils import extract_pdf_info
 from pytest import mark
 from sedate import utcnow
 from tests.onegov.core.test_utils import valid_test_phone_numbers
-from tests.onegov.org.common import get_cronjob_by_name
-from tests.onegov.org.common import get_cronjob_url
 from tests.shared.utils import encode_map_value
-from time import sleep
 from transaction import commit
 from unittest.mock import patch
 
 
-def test_views_general(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.agency import AgencyApp
+    from tests.shared.client import Client
+    from unittest.mock import MagicMock
+
+
+def test_views_general(client: Client[AgencyApp]) -> None:
     client.login_admin()
     settings = client.get('/people-settings')
     settings.form['hidden_people_fields'] = ['academic_title', 'born']
@@ -160,24 +167,24 @@ def test_views_general(client):
 
     # ... move agencies
     # moving Nationalrat below Ständerat (note url was changed to 'sr')
-    move = client.get('/organization/bundesbehoerden/nationalrat')\
-                 .click('Verschieben')
+    move = (client.get('/organization/bundesbehoerden/nationalrat')
+        .click('Verschieben'))
     assert 'move' in move.form.action
     move.form['parent_id'].select(text='Ständerat')  # select new parent
     assert move.form.submit().follow().status_code == 200
     assert client.get('/organization/bundesbehoerden/sr').status_code == 200
-    assert client.get('/organization/bundesbehoerden/sr/nationalrat')\
-                 .status_code == 200
+    assert (client.get('/organization/bundesbehoerden/sr/nationalrat')
+                     .status_code == 200)
 
     # moving back
-    move_back = client.get('/organization/bundesbehoerden/sr/nationalrat')\
-        .click('Verschieben')
+    move_back = (client.get('/organization/bundesbehoerden/sr/nationalrat')
+            .click('Verschieben'))
     assert 'move' in move.form.action
     move_back.form['parent_id'].select(text='Bundesbehörden')
     assert move_back.form.submit().follow().status_code == 200
     assert client.get('/organization/bundesbehoerden/sr').status_code == 200
-    assert client.get('/organization/bundesbehoerden/nationalrat')\
-                 .status_code == 200
+    assert (client.get('/organization/bundesbehoerden/nationalrat')
+                     .status_code == 200)
 
     # ... add memberships
     new_membership = nr.click("Mitgliedschaft", href='new')
@@ -212,10 +219,10 @@ def test_views_general(client):
     edit_membership = agency.click("Standerat für Zug").click("Bearbeiten")
     edit_membership.form['title'] = "Ständerat für Zug"
     edit_membership.form['person_id'].select(text="Eder Joachim")
-    agency = edit_membership.form.submit().follow()
+    membership = edit_membership.form.submit().follow()
 
-    assert "Ständerat für Zug" in agency
-    assert "Eder Joachim" in agency
+    assert "Ständerat für Zug" in membership
+    assert "Eder Joachim" in membership
 
     # ... sort memberships
     new_membership = sr.click("Mitgliedschaft", href='new')
@@ -278,12 +285,10 @@ def test_views_general(client):
     bund = move.form.submit().maybe_follow()
     assert "Organisation verschoben" in bund
     client.get(sr_url).click("Eder Joachim")
-    client.get(sr_url).click("Bundesbehörden")\
-        .click("Nationalrat")
-    client.get(sr_url).click("Bundesbehörden")\
-        .click("Nationalrat")
-    client.get(sr_url).click("Bundesbehörden")\
-        .click("Nationalrat").click("Aeschi Thomas")
+    client.get(sr_url).click("Bundesbehörden").click("Nationalrat")
+    client.get(sr_url).click("Bundesbehörden").click("Nationalrat")
+    (client.get(sr_url).click("Bundesbehörden")
+        .click("Nationalrat").click("Aeschi Thomas"))
 
     # Delete agency
     client.login_admin()
@@ -292,7 +297,7 @@ def test_views_general(client):
     assert "noch keine Organisationen" in client.get('/organizations')
 
 
-def test_views_hidden_by_access(client):
+def test_views_hidden_by_access(client: Client[AgencyApp]) -> None:
     # Add data
     client.login_editor()
 
@@ -374,7 +379,7 @@ def test_views_hidden_by_access(client):
     assert "Bundesrat" not in client.get('/organizations')
 
 
-def test_views_hidden_by_publication(client):
+def test_views_hidden_by_publication(client: Client[AgencyApp]) -> None:
     next_week = datetime.now() + timedelta(days=7)
 
     # Add data
@@ -431,10 +436,10 @@ def test_views_hidden_by_publication(client):
     assert "Aeschi Thomas" in hidden
 
     # Test hints
-    assert 'nicht publiziert' in client.get(person.request.url)
-    assert 'nicht publiziert' in client.get(child.request.url)
-    assert 'nicht publiziert' in client.get(root_membership.request.url)
-    assert 'nicht publiziert' in client.get(child_membership.request.url)
+    assert 'nicht veröffentlicht' in client.get(person.request.url)
+    assert 'nicht veröffentlicht' in client.get(child.request.url)
+    assert 'nicht veröffentlicht' in client.get(root_membership.request.url)
+    assert 'nicht veröffentlicht' in client.get(child_membership.request.url)
 
     # Test forbidden views
     client.logout()
@@ -452,13 +457,13 @@ def test_views_hidden_by_publication(client):
     manage = client.get(bund.request.url).click('Bearbeiten')
     manage.form['publication_start'] = next_week.isoformat()
     manage.form.submit()
-    assert 'nicht publiziert' in client.get(bund.request.url)
+    assert 'nicht veröffentlicht' in client.get(bund.request.url)
     client.logout()
     client.get(bund.request.url, status=403)
     assert "Bundesrat" not in client.get('/organizations')
 
 
-def test_view_pdf_settings(client):
+def test_view_pdf_settings(client: Client[AgencyApp]) -> None:
 
     org = client.app.session().query(Organisation).one()
     assert org.pdf_layout is None
@@ -467,7 +472,7 @@ def test_view_pdf_settings(client):
     assert org.report_changes is None
     color = '#7a8367'
 
-    def get_pdf():
+    def get_pdf() -> str:
         agencies = client.get('/organizations')
         agencies = agencies.click("PDF erstellen").form.submit().follow()
 
@@ -524,7 +529,13 @@ def test_view_pdf_settings(client):
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
-def test_view_mutations(broadcast, authenticate, connect, client):
+def test_view_mutations(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client[AgencyApp]
+) -> None:
+
     # Add data
     client.login_admin()
 
@@ -631,10 +642,16 @@ def test_view_mutations(broadcast, authenticate, connect, client):
     change = change.form.submit().maybe_follow()
     assert "Vielen Dank für Ihre Eingabe!" not in change
 
-    # Details not shown if missing permissions
+    # Can't edit ticket if missing permissions
     client.login('member@example.org', 'hunter2')
-    client.get(agency_ticket_number, status=403)
-    client.get(person_ticket_number, status=403)
+    ticket = client.get(agency_ticket_number)
+    assert 'Ticket annehmen' not in ticket
+    assert 'Ticket zuweisen' not in ticket
+    assert 'Nachricht senden' not in ticket
+    client.get(person_ticket_number)
+    assert 'Ticket annehmen' not in ticket
+    assert 'Ticket zuweisen' not in ticket
+    assert 'Nachricht senden' not in ticket
     page = client.get('/tickets/ALL/closed')
     assert 'ticket-number-plain' in page
     assert 'ticket-state' not in page
@@ -660,7 +677,7 @@ def test_view_mutations(broadcast, authenticate, connect, client):
     assert "Funktion: Janitor" in manage
 
 
-def test_disable_report_changes(client):
+def test_disable_report_changes(client: Client[AgencyApp]) -> None:
     client.login_admin()
 
     page = client.get('/people').click("Person", href='new')
@@ -685,7 +702,7 @@ def test_disable_report_changes(client):
     assert "Mutation melden" in client.get(person_url)
 
 
-def test_excel_export_for_editor(client):
+def test_excel_export_for_editor(client: Client[AgencyApp]) -> None:
 
     #  Eventually is_manager is true for admin and editor
     client.login_editor()
@@ -706,7 +723,7 @@ def test_excel_export_for_editor(client):
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
 
-def test_excel_export_not_logged_in(client):
+def test_excel_export_not_logged_in(client: Client[AgencyApp]) -> None:
     page = client.get('/people')
     assert 'Excel erstellen' not in page
 
@@ -722,11 +739,18 @@ def test_excel_export_not_logged_in(client):
 
 
 @mark.flaky(reruns=3, only_rerun=None)
-def test_basic_search(client_with_es):
-    client = client_with_es
-
+def test_basic_search(client_with_fts: Client[AgencyApp]) -> None:
+    client = client_with_fts
     client.login_admin()
+    anom = client.spawn()
 
+    # basic test
+    assert 'Resultate' in client.get('/search?q=test')
+    assert client.get('/search/suggest?q=test').json == []
+    assert 'Resultate' in anom.get('/search?q=test')
+    assert anom.get('/search/suggest?q=test').json == []
+
+    # Add data
     page = client.get('/settings').click("Organisationen", index=1)
     page.form['agency_phone_internal_digits'] = 4
     page.form.submit()
@@ -748,31 +772,28 @@ def test_basic_search(client_with_es):
     manage.form['person_id'].select(text='Rivera Nick')
     manage.form.submit()
 
-    client.app.es_client.indices.refresh(index='_all')
-    client = client.spawn()
-
     # Test search results
-    assert 'Rivera' in client.get('/search?q=Nick')
-    assert 'Nick' in client.get('/search?q=Rivera')
-    assert 'Nick' in client.get('/search?q=Doctor')
-    assert 'Nick' in client.get('/search?q=+41234567890')
-    assert 'Nick' in client.get('/search?q=0234567890')
-    assert 'Nick' in client.get('/search?q=4567890')
-    assert 'Nick' in client.get('/search?q=7890')
-    assert 'Hospital Springfield' in client.get('/search?q=Hospital')
-    assert 'Nick' in client.get('/search?q=Anesthetist')
+    assert 'Rivera' in anom.get('/search?q=Nick')
+    assert 'Nick' in anom.get('/search?q=Rivera')
+    assert 'Nick' in anom.get('/search?q=Doctor')
+    assert 'Nick' in anom.get('/search?q=%2B41234567890')
+    assert 'Nick' in anom.get('/search?q=4567890')
+    assert 'Nick' in anom.get('/search?q=7890')
+    assert 'Hospital Springfield' in anom.get('/search?q=Hospital')
+    assert 'Nick' in anom.get('/search?q=Anesthetist')
 
     # Test suggestions
-    assert 'Nick Rivera (Doctor)' in client.get('/search/suggest?q=Nic').json
-    assert 'Rivera Nick (Doctor)' in client.get('/search/suggest?q=Riv').json
-    assert '7899 Rivera Nick (Doctor)' in client.get(
-        '/search/suggest?q=78'
-    ).json
+    assert 'Nick Rivera (Doctor)' in anom.get('/search/suggest?q=Nic').json
+    assert 'Rivera Nick (Doctor)' in anom.get('/search/suggest?q=Riv').json
+    assert '7899 Rivera Nick (Doctor)' in anom.get(
+        '/search/suggest?q=78').json
 
 
 @mark.flaky(reruns=3, only_rerun=None)
-def test_search_recently_published_object(client_with_es):
-    client = client_with_es
+def test_search_recently_published_object(
+    client_with_fts: Client[AgencyApp]
+) -> None:
+    client = client_with_fts
     client.login_admin()
     anom = client.spawn()
 
@@ -796,8 +817,6 @@ def test_search_recently_published_object(client_with_es):
     manage.form['publication_start'] = start.isoformat()
     manage.form.submit()
 
-    client.app.es_client.indices.refresh(index='_all')
-
     assert 'Nick' in client.get('/search?q=Rivera')
     assert 'Nick' not in anom.get('/search?q=Rivera')
     assert 'Hospital Springfield' in client.get('/search?q=Hospital')
@@ -812,20 +831,17 @@ def test_search_recently_published_object(client_with_es):
     session.query(ExtendedAgencyMembership).one().publication_start = then
     session.query(ExtendedAgency).one().publication_start = then
     commit()
-
-    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
-    job.app = client.app
-    url = get_cronjob_url(job)
-    client.get(url)
-
-    sleep(5)
+    client.app.fts_indexer.process()
 
     assert 'Nick' in client.get('/search?q=Rivera')
     assert 'Nick' in anom.get('/search?q=Rivera')
+    assert 'Nick' in client.spawn().get('/search?q=Rivera')
     assert 'Hospital Springfield' in client.get('/search?q=Hospital')
     assert 'Hospital Springfield' in anom.get('/search?q=Hospital')
+    assert 'Hospital Springfield' in client.spawn().get('/search?q=Hospital')
     assert 'Nick' in client.get('/search?q=Anesthetist')
     assert 'Nick' in anom.get('/search?q=Anesthetist')
+    assert 'Nick' in client.spawn().get('/search?q=Anesthetist')
 
     # Unpublish
     session.query(ExtendedPerson).one().publication_start = None
@@ -835,12 +851,10 @@ def test_search_recently_published_object(client_with_es):
     session.query(ExtendedAgency).one().publication_start = None
     session.query(ExtendedAgency).one().publication_end = then
     commit()
-
-    client.get(url)
-
-    sleep(5)
+    client.app.fts_indexer.process()
 
     assert 'Nick' in client.get('/search?q=Rivera')
+    assert 'Nick' not in anom.get('/search?q=Rivera')
     assert 'Nick' not in client.spawn().get('/search?q=Rivera')
     assert 'Hospital Springfield' in client.get('/search?q=Hospital')
     assert 'Hospital Springfield' not in anom.get('/search?q=Hospital')
@@ -848,7 +862,7 @@ def test_search_recently_published_object(client_with_es):
     assert 'Nick' not in anom.get('/search?q=Anesthetist')
 
 
-def test_footer_settings_custom_links(client):
+def test_footer_settings_custom_links(client: Client[AgencyApp]) -> None:
     client.login_admin()
 
     # footer settings custom links
@@ -866,7 +880,7 @@ def test_footer_settings_custom_links(client):
     assert 'Custom2' not in page
 
 
-def test_view_user_groups(client):
+def test_view_user_groups(client: Client[AgencyApp]) -> None:
     client.login_admin()
 
     manage = client.get('/organizations').click('Organisation', href='new')
@@ -918,7 +932,7 @@ def test_view_user_groups(client):
     assert 'Alle (0)' in client.get('/usergroups')
 
 
-def test_agency_map(client):
+def test_agency_map(client: Client[AgencyApp]) -> None:
     client.login_admin()
 
     manage = client.get('/organizations').click('Organisation', href='new')

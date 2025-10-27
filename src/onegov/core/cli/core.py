@@ -199,7 +199,7 @@ from onegov.server.core import Server
 from sqlalchemy.pool import NullPool
 from sqlalchemy import create_engine
 from uuid import uuid4
-from webtest import TestApp as Client  # type:ignore[import-untyped]
+from webtest import TestApp as Client
 
 
 from typing import Any, NoReturn, TYPE_CHECKING
@@ -224,12 +224,14 @@ if TYPE_CHECKING:
         matches_required: bool
         singular: bool
         creates_path: bool
+        skip_search_indexing: bool
 
     class ContextSpecificSettings(TypedDict, total=False):
         default_selector: str
         creates_path: bool
         singular: bool
         matches_required: bool
+        skip_search_indexing: bool
 
 else:
     _GroupContextAttrs = object
@@ -240,7 +242,8 @@ CONTEXT_SPECIFIC_SETTINGS = (
     'default_selector',
     'creates_path',
     'singular',
-    'matches_required'
+    'matches_required',
+    'skip_search_indexing'
 )
 
 
@@ -362,6 +365,11 @@ class GroupContext(GroupContextGuard):
     :param singular:
         True if the selector may not match multiple applications.
 
+    :param skip_search_indexing:
+        True if no search indexing is required. Should result in a free
+        speed-up in commands that don't modify data that's duplicated in
+        the search index.
+
     :param matches_required:
         True if the selector *must* match at least one application.
 
@@ -374,6 +382,7 @@ class GroupContext(GroupContextGuard):
         default_selector: str | None = None,
         creates_path: bool = False,
         singular: bool = False,
+        skip_search_indexing: bool = False,
         matches_required: bool = True
     ):
 
@@ -384,6 +393,7 @@ class GroupContext(GroupContextGuard):
 
         self.selector = selector or default_selector
         self.creates_path = creates_path
+        self.skip_search_indexing = skip_search_indexing
 
         if self.creates_path:
             self.singular = True
@@ -594,6 +604,11 @@ def run_processors(
                 # disable debug options in cli (like query output)
                 pass
 
+            if group_context.skip_search_indexing:
+                def configure_search(self, **cfg: Any) -> None:
+                    # disable search options in cli
+                    self.fts_search_enabled = False
+
         @CliApplication.path(path=view_path)
         class Model:
             pass
@@ -631,7 +646,12 @@ def run_processors(
         Config({
             'applications': applications,
         }),
-        configure_morepath=False,
+        # NOTE: For commands that create a new schema this is essential
+        #       otherwise the SQLAlchemy metadata may be incomplete
+        # FIXME: For some reason when this is enabled we get noisy logging
+        #        related to i18n, so we should replace the affected logger
+        #        with a NullHandler...
+        configure_morepath=group_context.creates_path,
         configure_logging=False
     )
 

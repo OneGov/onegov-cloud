@@ -1,5 +1,6 @@
 from builtins import type as _type  # type is being shadows in Field
 from collections.abc import Callable, Iterable, Sequence
+from decimal import Decimal
 from typing import Any, Generic, Protocol, TypeVar, overload
 from typing_extensions import Self, TypeAlias
 
@@ -76,6 +77,7 @@ class Field:
         fieldset: str | None = None,
         depends_on: Sequence[Any] | None = None,
         pricing: PricingRules | None = None,
+        discount: dict[str, float] | None = None,
     ) -> None: ...
     def __html__(self) -> str: ...
     def __call__(self, **kwargs: object) -> Markup: ...
@@ -106,6 +108,7 @@ class Field:
 
     # onegov specific overrides
     pricing: Pricing
+    discount: dict[str, Decimal] | None
 
 class UnboundField(Generic[_FieldT]):
     creation_counter: int
@@ -127,6 +130,7 @@ class UnboundField(Generic[_FieldT]):
     fieldset: str | None
     depends_on: FieldDependency
     pricing: PricingRules
+    discount: dict[str, float] | None
 
 class Flags:
     # the API for this is a bit loosey goosey, the intention probably

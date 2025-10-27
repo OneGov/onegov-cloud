@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 from datetime import date, datetime
-
-
+from markupsafe import Markup
 from onegov.core.utils import Bunch, generate_fts_phonenumbers
 from onegov.org import utils
 from pytz import timezone
@@ -9,42 +10,47 @@ from onegov.ticket import Ticket, TicketPermission
 from onegov.user import UserGroup, User
 
 
-def test_annotate_html():
-    html = "<p><img/></p><p></p>"
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_annotate_html() -> None:
+    html = Markup("<p><img/></p><p></p>")
     assert utils.annotate_html(html) == (
         '<p class="has-img"><img class="lazyload-alt"></p><p></p>'
     )
 
-    html = "<p class='x'><img/></p><p></p>"
+    html = Markup("<p class='x'><img/></p><p></p>")
     assert utils.annotate_html(html) == (
         '<p class="x has-img"><img class="lazyload-alt"></p><p></p>'
     )
 
-    html = "<strong></strong>"
+    html = Markup("<strong></strong>")
     assert utils.annotate_html(html) == html
 
-    html = '<a href="http://www.seantis.ch"></a>'
+    html = Markup('<a href="http://www.seantis.ch"></a>')
     assert utils.annotate_html(html) == html
 
-    html = 'no html'
+    html = Markup('no html')
     assert utils.annotate_html(html) == 'no html'
 
-    html = '<p><a href="http://www.seantis.ch"></a></p>'
+    html = Markup('<p><a href="http://www.seantis.ch"></a></p>')
     assert utils.annotate_html(html) == html
 
-    html = (
+    html = Markup(
         '<p><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></a></p>'
     )
     assert '<p class="has-video">' in utils.annotate_html(html)
     assert 'class="has-video"></a>' in utils.annotate_html(html)
 
-    html = (
+    html = Markup(
         '<p><a href="https://youtu.be/gEbx_0dBjbM"></a></p>'
     )
     assert '<p class="has-video">' in utils.annotate_html(html)
     assert 'class="has-video"></a>' in utils.annotate_html(html)
 
-    html = (
+    html = Markup(
         '<p>'
         '<a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></a>'
         '<img />'
@@ -53,35 +59,35 @@ def test_annotate_html():
     assert '<p class="has-img has-video">' in utils.annotate_html(html)
     assert 'class="has-video"></a>' in utils.annotate_html(html)
 
-    html = (
+    html = Markup(
         '<p># foo, #bar, #baz qux</p>'
     )
 
-    assert "has-hashtag" in utils.annotate_html('<p>#foo</p>')
-    assert "has-hashtag" in utils.annotate_html('<p>#bar</p>')
-    assert "has-hashtag" not in utils.annotate_html('<p>#xy</p>')
+    assert "has-hashtag" in utils.annotate_html(Markup('<p>#foo</p>'))
+    assert "has-hashtag" in utils.annotate_html(Markup('<p>#bar</p>'))
+    assert "has-hashtag" not in utils.annotate_html(Markup('<p>#xy</p>'))
 
 
-def test_remove_empty_paragraphs():
-    html = "<p><br></p>"
+def test_remove_empty_paragraphs() -> None:
+    html = Markup("<p><br></p>")
     assert utils.remove_empty_paragraphs(html) == ""
 
     # multiple br elements added by shift+enter are left alone (this is
     # a way to manually override the empty paragraphs removal)
-    html = "<p><br><br></p>"
+    html = Markup("<p><br><br></p>")
     assert utils.remove_empty_paragraphs(html) == "<p><br><br></p>"
 
-    html = "<p> <br></p>"
+    html = Markup("<p> <br></p>")
     assert utils.remove_empty_paragraphs(html) == ""
 
-    html = "<p>hey</p>"
+    html = Markup("<p>hey</p>")
     assert utils.remove_empty_paragraphs(html) == "<p>hey</p>"
 
-    html = "<p><img></p>"
+    html = Markup("<p><img></p>")
     assert utils.remove_empty_paragraphs(html) == "<p><img></p>"
 
 
-def test_predict_next_value():
+def test_predict_next_value() -> None:
     assert utils.predict_next_value((1, )) is None
     assert utils.predict_next_value((1, 1)) is None
     assert utils.predict_next_value((1, 1, 1)) == 1
@@ -97,14 +103,14 @@ def test_predict_next_value():
         (1, 2, 3, 5, 6), min_probability=.6) is None
 
 
-def test_predict_next_daterange():
-    assert utils.predict_next_daterange((
+def test_predict_next_daterange() -> None:
+    assert utils.predict_next_daterange((  # type: ignore[arg-type]
         (date(2017, 1, 1), date(2017, 1, 1)),
         (date(2017, 1, 2), date(2017, 1, 2)),
         (date(2017, 1, 3), date(2017, 1, 3)),
     )) == (date(2017, 1, 4), date(2017, 1, 4))
 
-    assert utils.predict_next_daterange((
+    assert utils.predict_next_daterange((  # type: ignore[arg-type]
         (date(2017, 1, 1), date(2017, 1, 1)),
         (date(2017, 1, 3), date(2017, 1, 3)),
         (date(2017, 1, 5), date(2017, 1, 5)),
@@ -117,12 +123,12 @@ def test_predict_next_daterange():
     )) == (datetime(2017, 1, 7, 10), datetime(2017, 1, 7, 12))
 
 
-def test_predict_next_daterange_dst_st_transitions():
+def test_predict_next_daterange_dst_st_transitions() -> None:
     tz_ch = timezone('Europe/Zurich')
 
-    def dt_ch(*args, is_dst=None):
+    def dt_ch(*args: int, is_dst: bool | None = None) -> datetime:
         # None -> not ambiguous, pick for me
-        dt = datetime(*args, tzinfo=None)
+        dt = datetime(*args, tzinfo=None)  # type: ignore[arg-type, misc]
         return tz_ch.localize(dt, is_dst=is_dst)
 
     # DST -> ST both times abiguous
@@ -180,7 +186,7 @@ def test_predict_next_daterange_dst_st_transitions():
     )) == (dt_ch(2022, 3, 27, 10), dt_ch(2022, 3, 27, 12))
 
 
-def test_emails_for_new_ticket(session):
+def test_emails_for_new_ticket(session: Session) -> None:
     session.query(User).delete()
 
     group1 = UserGroup(name='somename')
@@ -217,7 +223,7 @@ def test_emails_for_new_ticket(session):
         role='admin'
     )
 
-    group1.users = [user1, user_with_bogus_username]
+    group1.users = [user1, user_with_bogus_username]  # type: ignore[assignment]
 
     session.add(user1)
     session.add(user2)
@@ -226,7 +232,7 @@ def test_emails_for_new_ticket(session):
     session.add(group1)
     session.flush()
 
-    request = Bunch(**{
+    request: Any = Bunch(**{
         'session': session,
         'email_for_new_tickets': 'tickets@example.org',
         'app.ticket_permissions': {
@@ -261,7 +267,7 @@ def test_emails_for_new_ticket(session):
         immediate_notification=True,
     )
 
-    group2.users = [user3]
+    group2.users = [user3]  # type: ignore[assignment]
 
     session.add(user3)
     session.add(group2)
@@ -294,44 +300,72 @@ def test_emails_for_new_ticket(session):
     result = {a.addr_spec for a in emails_for_new_ticket(request, ticket3)}
     assert result == {'user1@example.org', 'user3@example.org'}
 
+    # set a shared email instead
+    group2.meta = {'shared_email': 'shared@example.org'}
+    session.flush()
+    request = Bunch(**{
+        'session': session,
+        'email_for_new_tickets': None,
+        'app.ticket_permissions': {
+            'DIR': {'Sports': [group1.id.hex]},
+        },
+    })
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket2)}
+    assert result == {'user1@example.org'}
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket3)}
+    assert result == {'user1@example.org', 'shared@example.org'}
 
-def test_extract_categories_and_subcategories():
-    result = utils.extract_categories_and_subcategories([])
-    assert result == ([], [])
-    result = utils.extract_categories_and_subcategories([],
-                                                        flattened=True)
-    assert result == ([], [])
+    request = Bunch(**{
+        'session': session,
+        'email_for_new_tickets': 'user3@example.org',
+        'app.ticket_permissions': {
+            'DIR': {'Sports': [group1.id.hex]},
+        },
+    })
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket2)}
+    assert result == {'user1@example.org', 'user3@example.org'}
+    result = {a.addr_spec for a in emails_for_new_ticket(request, ticket3)}
+    assert result == {
+        'user1@example.org', 'user3@example.org', 'shared@example.org'
+    }
+
+
+def test_extract_categories_and_subcategories() -> None:
+    assert utils.extract_categories_and_subcategories([]) == ([], [])
+    # FIXME: This is a weird singularity, this should probably return
+    #        just an empty list
+    assert utils.extract_categories_and_subcategories(  # type: ignore[comparison-overlap]
+        [], flattened=True) == ([], [])
 
     categories = [
         'Category 1',
         'Category 2',
     ]
-    result = utils.extract_categories_and_subcategories(categories)
-    assert result == (
+    assert utils.extract_categories_and_subcategories(categories) == (
         ['Category 1', 'Category 2'],
         [[], []]
     )
-    result = utils.extract_categories_and_subcategories(categories,
-                                                        flattened=True)
-    assert result == ['Category 1', 'Category 2']
+    assert utils.extract_categories_and_subcategories(
+        categories, flattened=True) == ['Category 1', 'Category 2']
 
-    categories = [
+    assert utils.extract_categories_and_subcategories([
         {'a': ['a1', 'a2']},
         {'b': ['b1']},
         {'c': []},
         'd'
-    ]
-    result = utils.extract_categories_and_subcategories(categories)
-    assert result == (
+    ]) == (
         ['a', 'b', 'c', 'd'],
         [['a1', 'a2'], ['b1'], [], []]
     )
-    result = utils.extract_categories_and_subcategories(categories,
-                                                        flattened=True)
-    assert result == ['a', 'b', 'c', 'd', 'a1', 'a2', 'b1']
+    assert utils.extract_categories_and_subcategories([
+        {'a': ['a1', 'a2']},
+        {'b': ['b1']},
+        {'c': []},
+        'd'
+    ], flattened=True) == ['a', 'b', 'c', 'd', 'a1', 'a2', 'b1']
 
 
-def test_format_phone_number():
+def test_format_phone_number() -> None:
     assert utils.format_phone_number('+41411112233') == '+41 41 111 22 33'
     assert utils.format_phone_number('0041411112233') == '+41 41 111 22 33'
     assert utils.format_phone_number('0411112233') == '+41 41 111 22 33'
@@ -351,7 +385,7 @@ def test_format_phone_number():
     assert utils.format_phone_number('411') == '+41 411'
     assert utils.format_phone_number('41') == '+41 41'
     assert utils.format_phone_number('') == ''
-    assert utils.format_phone_number(None) == ''
+    assert utils.format_phone_number(None) == ''  # type: ignore[arg-type]
 
     # force error (too long for phone number), will return the input
     long_text = ('You can reach me during office hours at 041 111 22 33 '
@@ -359,7 +393,7 @@ def test_format_phone_number():
     assert utils.format_phone_number(long_text) == long_text
 
 
-def test_generate_fts_phonenumbers():
+def test_generate_fts_phonenumbers() -> None:
     assert [] == generate_fts_phonenumbers([])
     assert [] == generate_fts_phonenumbers(())
     assert [] == generate_fts_phonenumbers({})

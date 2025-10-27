@@ -4,6 +4,7 @@ from functools import cached_property
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from purl import URL
+from urllib.parse import urlencode
 import pytz
 
 from onegov.translator_directory import _
@@ -11,11 +12,11 @@ from onegov.core.elements import Block, Link, LinkGroup, Confirm, Intercooler
 from onegov.core.utils import linkify
 from onegov.town6.layout import DefaultLayout as BaseLayout
 from onegov.org.models import Organisation
-from onegov.translator_directory.collections.documents import (
-    TranslatorDocumentCollection)
+from onegov.translator_directory.collections.documents import \
+    TranslatorDocumentCollection
 from onegov.translator_directory.collections.language import LanguageCollection
-from onegov.translator_directory.collections.translator import (
-    TranslatorCollection)
+from onegov.translator_directory.collections.translator import \
+    TranslatorCollection
 from onegov.translator_directory.constants import (
     member_can_see, editor_can_see, translator_can_see,
     GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS, INTERPRETING_TYPES)
@@ -195,13 +196,7 @@ class TranslatorLayout(DefaultLayout):
                 )
             ]
         elif self.request.is_member:
-            return [
-                Link(
-                    _('Report change'),
-                    self.request.link(self.model, name='report-change'),
-                    attrs={'class': 'report-change'}
-                )
-            ]
+            return []
         elif self.translator_data_outdated():
             return [
                 Link(
@@ -318,6 +313,8 @@ class MailTemplatesLayout(TranslatorLayout):
 
 class TranslatorCollectionLayout(DefaultLayout):
 
+    model: TranslatorCollection
+
     @cached_property
     def title(self) -> str:
         return _('Search for translators')
@@ -331,6 +328,39 @@ class TranslatorCollectionLayout(DefaultLayout):
                 url=self.request.class_link(TranslatorCollection)
             )
         ]
+
+    @cached_property
+    def export_link(self) -> str | None:
+        """ Returns the export link with current filters included, or None """
+        if not self.request.is_admin:
+            return None
+
+        params = self.request.GET.copy()
+
+        # Remove pagination parameter, not needed for export
+        params.pop('page', None)
+
+        # Ensure sorting parameters in the link match the actual state of the
+        # collection model, handling defaults correctly.
+        if self.model.order_by != 'last_name':
+            params['order_by'] = self.model.order_by
+        else:
+            # Remove order_by from params if it's the default
+            params.pop('order_by', None)
+
+        if self.model.order_desc:
+            params['order_desc'] = 'true'
+        else:
+            # Remove order_desc from params if it's the default (False)
+            params.pop('order_desc', None)
+
+        base_export_link = self.request.class_link(
+            TranslatorCollection, name='export'
+        )
+        return (
+            f'{base_export_link}?{urlencode(params, doseq=True)}'
+            if params else base_export_link
+        )
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
@@ -348,13 +378,7 @@ class TranslatorCollectionLayout(DefaultLayout):
                         ),
                     )
                 ),
-                Link(
-                    _('Export Excel'),
-                    url=self.request.class_link(
-                        TranslatorCollection, name='export'
-                    ),
-                    attrs={'class': 'export-link'},
-                ),
+                # Link removed from here
                 Link(
                     _('Mail to all translators'),
                     url=self.request.app.mailto_link,

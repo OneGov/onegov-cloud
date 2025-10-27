@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from click.testing import CliRunner
 from onegov.agency.cli import cli
 from onegov.org.cli import cli as org_cli
@@ -5,13 +7,18 @@ from onegov.org.models import Organisation
 from pathlib import Path
 
 
-def test_create_pdf(temporary_directory, cfg_path):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import SessionManager
+
+
+def test_create_pdf(temporary_directory: str, cfg_path: str) -> None:
     runner = CliRunner()
 
     class DummyResponse:
         content = b'image'
 
-        def raise_for_status(self):
+        def raise_for_status(self) -> None:
             pass
 
     result = runner.invoke(org_cli, [
@@ -34,7 +41,12 @@ def test_create_pdf(temporary_directory, cfg_path):
     ).exists()
 
 
-def test_enable_yubikey(temporary_directory, cfg_path, session_manager):
+def test_enable_yubikey(
+    temporary_directory: str,
+    cfg_path: str,
+    session_manager: SessionManager
+) -> None:
+
     runner = CliRunner()
 
     result = runner.invoke(org_cli, [

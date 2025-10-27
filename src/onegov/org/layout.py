@@ -34,6 +34,7 @@ from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
 from onegov.org.exports.base import OrgExport
+from onegov.org.models import CitizenDashboard
 from onegov.org.models import ExportCollection, Editor
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile
@@ -52,12 +53,12 @@ from onegov.org.models.external_link import ExternalLinkCollection
 from onegov.org.models.form import submission_deletable
 from onegov.org.open_graph import OpenGraphMixin
 from onegov.org.theme.org_theme import user_options
-from onegov.org.utils import IMG_URLS
+from onegov.org.utils import IMG_URLS, get_current_tickets_url
 from onegov.pay import PaymentCollection, PaymentProviderCollection
 from onegov.people import PersonCollection
 from onegov.qrcode import QrCode
 from onegov.reservation import ResourceCollection
-from onegov.ticket import TicketCollection
+from onegov.ticket import TicketCollection, TicketInvoiceCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from onegov.user.utils import password_reset_url
@@ -372,6 +373,10 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def newsletter_url(self) -> str:
         return self.request.class_link(NewsletterCollection)
 
+    @cached_property
+    def vat_rate(self) -> Decimal:
+        return Decimal(self.app.org.vat_rate or 0.0)
+
     def login_to_url(self, to: str | None, skip: bool = False) -> str:
         auth = Auth.from_request(self.request, to=to, skip=skip)
         return self.request.link(auth, 'login')
@@ -379,6 +384,17 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def login_from_path(self) -> str:
         auth = Auth.from_request_path(self.request)
         return self.request.link(auth, name='login')
+
+    def citizen_login(self) -> str:
+        dashboard = CitizenDashboard(self.request)
+        if dashboard.is_available:
+            auth = Auth.from_request(
+                self.request,
+                self.request.link(dashboard)
+            )
+        else:
+            auth = Auth.from_request_path(self.request)
+        return self.request.link(auth, name='citizen-login')
 
     def export_formatter(self, format: str) -> Callable[[object], Any]:
         """ Returns a formatter function which takes a value and returns
@@ -643,28 +659,21 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def format_seconds(self, seconds: float) -> str:
         return self.format_timedelta(timedelta(seconds=seconds))
 
-    def format_vat(self, amount: numbers.Number | Decimal | float | None,
-                   currency: str = 'CHF') -> str:
+    def get_vat_amount(
+        self,
+        amount: numbers.Number | Decimal | float | None
+    ) -> Decimal | None:
         """
-        Takes the given amount and currency returning the VAT string if the
-        VAT rate is set in the organization settings. The VAT string can be
-        placed right after a price value.
+        Takes the given amount and currency returning the amount
+        of the paid price that is attributed to the VAT.
         """
-        vat_rate = Decimal(self.app.org.vat_rate or 0.0)
-
-        if amount is not None and vat_rate:
+        if amount is not None and self.vat_rate:
             if isinstance(amount, (Decimal, int, float, str)):
                 amount = Decimal(amount)
             else:
                 amount = Decimal(str(amount))
-
-            vat = amount / (100 + vat_rate) * vat_rate
-            vat_name = self.request.translate(_('VAT'))
-            vat_str = (f'({vat_name} {self.format_number(vat_rate, 1)}%'
-                       f' enthalten: {self.format_number(vat)} {currency})')
-            return vat_str
-
-        return ''
+            return amount / (100 + self.vat_rate) * self.vat_rate
+        return None
 
     def format_phone_number(self, phone_number: str) -> str:
         return utils.format_phone_number(phone_number)
@@ -1734,15 +1743,14 @@ class TicketLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Tickets'), self.request.link(self.collection)),
+            Link(_('Tickets'), get_current_tickets_url(self.request)),
             Link(self.model.number, '#')
         ]
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
-        if self.request.is_manager_for_model(self.model):
-
-            links: list[Link | LinkGroup]
+        links: list[Link | LinkGroup] = []
+        if is_manager := self.request.is_manager_for_model(self.model):
 
             # only show the model related links when the ticket is pending
             if self.model.state == 'pending':
@@ -1823,6 +1831,7 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': ('ticket-button', 'ticket-assign')},
                 ))
 
+        if self.request.is_logged_in:
             # ticket notes are always enabled
             links.append(
                 Link(
@@ -1838,17 +1847,17 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': 'ticket-pdf'}
                 )
             )
-            if self.has_submission_files:
-                links.append(
-                    Link(
-                        text=_('Download files'),
-                        url=self.request.link(self.model, 'files'),
-                        attrs={'class': 'ticket-files'}
-                    )
-                )
 
-            return links
-        return None
+        if is_manager and self.has_submission_files:
+            links.append(
+                Link(
+                    text=_('Download files'),
+                    url=self.request.link(self.model, 'files'),
+                    attrs={'class': 'ticket-files'}
+                )
+            )
+
+        return links or None
 
     @cached_property
     def has_submission_files(self) -> bool:
@@ -1894,9 +1903,7 @@ class TicketNoteLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Tickets'), self.request.link(
-                TicketCollection(self.request.session)
-            )),
+            Link(_('Tickets'), get_current_tickets_url(self.request)),
             Link(self.ticket.number, self.request.link(self.ticket)),
             Link(self.title, '#')
         ]
@@ -1933,9 +1940,7 @@ class TicketChatMessageLayout(DefaultLayout):
     def internal_breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Tickets'), self.request.link(
-                TicketCollection(self.request.session)
-            )),
+            Link(_('Tickets'), get_current_tickets_url(self.request)),
             Link(self.model.number, self.request.link(self.model)),
             Link(_('New Message'), '#')
         ]
@@ -1947,6 +1952,50 @@ class TicketChatMessageLayout(DefaultLayout):
             Link(_('Ticket Status'), self.request.link(self.model, 'status')),
             Link(_('New Message'), '#')
         ]
+
+
+class TicketInvoiceLayout(DefaultLayout):
+
+    model: Ticket
+
+    def __init__(self, model: Ticket, request: OrgRequest) -> None:
+        super().__init__(model, request)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Tickets'), get_current_tickets_url(self.request)),
+            Link(self.model.number, self.request.link(self.model)),
+            Link(_('Invoice'), '#')
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager_for_model(self.model):
+            payment = self.model.payment
+            if payment is not None and (
+                payment.source != 'manual'
+                or payment.state != 'open'
+            ):
+                return None
+
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Discount / Surcharge'),
+                            url=self.request.link(
+                                self.model,
+                                name='add-invoice-item'
+                            ),
+                            attrs={'class': 'new-invoice-item'}
+                        )
+                    ]
+                ),
+            ]
+        return None
 
 
 class TextModulesLayout(DefaultLayout):
@@ -2206,7 +2255,11 @@ class ResourceLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(_('Reservations'), self.request.link(self.collection)),
-            Link(_(self.model.title), self.request.link(self.model))
+            Link(
+                _(self.model.title),
+                self.request.link(self.model),
+                {'class': 'calendar-dependent'}
+            )
         ]
 
     @cached_property
@@ -2326,21 +2379,42 @@ class AllocationRulesLayout(ResourceLayout):
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup]:
-        return [
-            LinkGroup(
-                title=_('Add'),
-                links=[
-                    Link(
-                        text=_('Availability period'),
-                        url=self.request.link(
-                            self.model,
-                            name='new-rule'
+        add_link = LinkGroup(
+            title=_('Add'),
+            links=[
+                Link(
+                    text=_('Availability period'),
+                    url=self.request.link(
+                        self.model,
+                        name='new-rule'
+                    ),
+                    attrs={'class': 'new-link'}
+                )
+            ]
+        )
+
+        if self.request.browser_session.get(  # type: ignore[call-overload]
+            'copied_allocation_rules', {}
+        ).get(self.model.type):
+            return [
+                add_link,
+                Link(
+                    text=_('Paste'),
+                    url=self.request.csrf_protected_url(
+                        self.request.link(self.model, 'paste-rule')
+                    ),
+                    attrs={'class': 'paste-link'},
+                    traits=(
+                        Intercooler(
+                            request_method='POST',
+                            redirect_after=self.request.link(
+                                self.model, 'rules'
+                            )
                         ),
-                        attrs={'class': 'new-link'}
                     )
-                ]
-            ),
-        ]
+                )
+            ]
+        return [add_link]
 
 
 class AllocationEditFormLayout(DefaultLayout):
@@ -2982,7 +3056,10 @@ class UserManagementLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Usermanagement'), self.request.class_link(UserCollection))
+            Link(_('Usermanagement'), self.request.class_link(
+                UserCollection,
+                variables={'active': '1'}
+        )),
         ]
 
     @cached_property
@@ -3032,7 +3109,10 @@ class UserLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Usermanagement'), self.request.class_link(UserCollection)),
+            Link(_('Usermanagement'), self.request.class_link(
+                UserCollection,
+                variables={'active': '1'}
+        )),
             Link(self.model.title, self.request.link(self.model))
         ]
 
@@ -3200,7 +3280,7 @@ class PaymentCollectionLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(_('Payments'), self.request.class_link(
-                PaymentProviderCollection
+                PaymentCollection
             ))
         ]
 
@@ -3227,12 +3307,42 @@ class PaymentCollectionLayout(DefaultLayout):
                     attrs={'class': 'sync'}
                 )
             )
-
             links.append(
                 Link(
                     text=_('Export'),
                     url=self.request.class_link(OrgExport, {'id': 'payments'}),
                     attrs={'class': 'export-link'}
+                )
+            )
+
+        return links
+
+
+class TicketInvoiceCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Invoices'), self.request.class_link(
+                TicketInvoiceCollection
+            ))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        links: list[Link | LinkGroup] = []
+
+        if self.request.is_manager_for_model(self.model):
+
+            links.append(
+                Link(
+                    text=_('Export Bill run as PDF'),
+                    url=self.request.link(
+                        self.model,
+                        query_params={'format': 'pdf'}
+                    ),
+                    attrs={'class': 'ticket-pdf'}
                 )
             )
 

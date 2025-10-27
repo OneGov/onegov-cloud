@@ -3,7 +3,7 @@ name: Measure and store test durations for pytest-split
 on:
   workflow_dispatch:  # allow to run manually
   schedule:
-    - cron: '0 6 * * 1'  # run once a week on monday morning
+    - cron: '0 4 * * 1'  # run once a week on monday morning
 
 jobs:
   build:
@@ -33,12 +33,12 @@ jobs:
           git-core \
           postgresql \
           redis \
-          openjdk-8-jre-headless \
           gcc \
           libc-dev \
           fonts-liberation \
           libappindicator3-1 \
           libasound2t64 \
+          libcairo2-dev \
           libdrm2 \
           libgbm1 \
           libnspr4 \
@@ -49,6 +49,7 @@ jobs:
           libxcb-dri3-0 \
           libxshmfence1 \
           libxss1 \
+          libxt-dev \
           unzip \
           xdg-utils
 
@@ -96,7 +97,6 @@ jobs:
       env:
         LC_ALL: C.UTF-8
         LANG: C.UTF-8
-        JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
         SKIP_DRIVER_MANAGER: '1'
 
     - uses: EndBug/add-and-commit@v9

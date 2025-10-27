@@ -10,7 +10,7 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.dialects.postgresql import array
 
 
-from typing import Any, Protocol, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, Protocol, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Mapping
@@ -50,13 +50,33 @@ class DirectoryEntryCollection(
 
     """
 
+    @overload
+    def __init__(
+        self: DirectoryEntryCollection[DirectoryEntry],
+        directory: Directory,
+        type: Literal['*', 'generic'] = '*',
+        keywords: Mapping[str, list[str]] | None = None,
+        page: int = 0,
+        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None,
+    ) -> None: ...
+
+    @overload
+    def __init__(
+        self,
+        directory: Directory,
+        type: str,
+        keywords: Mapping[str, list[str]] | None = None,
+        page: int = 0,
+        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None,
+    ) -> None: ...
+
     def __init__(
         self,
         directory: Directory,
         type: str = '*',
         keywords: Mapping[str, list[str]] | None = None,
         page: int = 0,
-        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None
+        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None,
     ) -> None:
 
         super().__init__(object_session(directory))
@@ -99,7 +119,7 @@ class DirectoryEntryCollection(
             self.directory,
             self.type,
             self.keywords,
-            page=index
+            page=index,
         )
 
     def by_name(self, name: str) -> DirectoryEntryT | None:
@@ -211,7 +231,7 @@ class DirectoryEntryCollection(
             directory=self.directory,
             type=self.type,
             search_widget=self.search_widget,
-            keywords=keywords
+            keywords=keywords,
         )
 
     def for_toggled_keyword_value(
@@ -242,7 +262,7 @@ class DirectoryEntryCollection(
             directory=self.directory,
             type=self.type,
             search_widget=self.search_widget,
-            keywords=parameters
+            keywords=parameters,
         )
 
     def without_keywords(self) -> Self:
@@ -250,5 +270,5 @@ class DirectoryEntryCollection(
             directory=self.directory,
             type=self.type,
             page=self.page,
-            search_widget=self.search_widget
+            search_widget=self.search_widget,
         )

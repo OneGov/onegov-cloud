@@ -26,7 +26,7 @@ class TranslatorDirectoryApp(TownApp):
     send_ticket_statistics = False
     request_class = TranslatorAppRequest
 
-    def es_may_use_private_search(
+    def fts_may_use_private_search(
         self,
         request: TranslatorAppRequest  # type:ignore[override]
     ) -> bool:
@@ -111,6 +111,12 @@ def get_theme() -> TranslatorDirectoryTheme:
 def get_create_new_organisation_factory(
 ) -> Callable[[TranslatorDirectoryApp, str], Organisation]:
     return create_new_organisation
+
+
+# NOTE: Feriennet doesn't need a citizen login
+@TranslatorDirectoryApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return False
 
 
 @TranslatorDirectoryApp.setting(section='i18n', name='localedirs')

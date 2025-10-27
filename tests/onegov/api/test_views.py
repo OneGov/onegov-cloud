@@ -1,10 +1,10 @@
-import json
+from __future__ import annotations
 
+import json
 import transaction
 
+from collection_json import Collection  # type: ignore[import-untyped]
 from freezegun import freeze_time
-from collection_json import Collection
-
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.api.models import ApiKey
 from onegov.people import Person
@@ -13,9 +13,15 @@ from unittest.mock import patch
 from uuid import uuid4
 
 
-def test_view_api(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.client import Client
+    from .conftest import App
 
-    user = UserCollection(client.app.session()).add(
+
+def test_view_api(client: Client, app: App) -> None:
+
+    user = UserCollection(app.session()).add(
         username='a@a.a', password='a', role='admin'
     )
     # create an access key with write access
@@ -23,7 +29,7 @@ def test_view_api(client):
     key = ApiKey(
         name='key', read_only=False, last_used=None, key=uuid, user=user
     )
-    client.app.session().add(key)
+    app.session().add(key)
     transaction.commit()
 
     # Collection
@@ -91,7 +97,7 @@ def test_view_api(client):
     assert response.json == {
         'collection': {
             'version': '1.0',
-            'href': 'http://localhost/api/endpoint',
+            'href': 'http://localhost/api/endpoint?page=0',
             'items': [
                 {
                     'href': 'http://localhost/api/endpoint/1',
@@ -147,7 +153,7 @@ def test_view_api(client):
         assert Collection.from_json(response.body).version == '1.0'
 
     # Rate Limit
-    client.app.rate_limit = (2, 900)
+    app.rate_limit = (2, 900)
     with freeze_time('2020-02-02 20:20'):
         response = client.get('/api/endpoint/1', status=429)
     headers = response.headers
@@ -164,7 +170,7 @@ def test_view_api(client):
     assert headers['X-RateLimit-Limit'] == '2'
     assert headers['X-RateLimit-Remaining'] == '1'
     assert headers['X-RateLimit-Reset'] == 'Sun, 02 Feb 2020 20:51:00 GMT'
-    client.app.rate_limit = (100, 900)
+    app.rate_limit = (100, 900)
 
     # Exceptions
     for url in ('/api/entpoind', '/api/entpoind/one', '/api/endpoint/one'):
@@ -181,7 +187,7 @@ def test_view_api(client):
         assert Collection.from_json(response.body).version == '1.0'
 
     with patch('onegov.api.models.ApiEndpointCollection'):
-        for url in ('/api', '/api/endpoint', '/api/endpoint/1'):
+        for url in ('/api', '/api/endpoint?page=0', '/api/endpoint/1'):
             response = client.get('/api/endpoint/1', status=500)
             headers = response.headers
             assert headers['Content-Type'] == 'application/vnd.collection+json'
@@ -196,20 +202,20 @@ def test_view_api(client):
 
 
     # Authorize
-    headers = {"Authorization": f"Bearer {uuid}"}
-    response = client.get('/api/authenticate', headers=headers)
+    get_headers = {"Authorization": f"Bearer {uuid}"}
+    response = client.get('/api/authenticate', headers=get_headers)
     assert response.status_code == 200
     resp = response.body.decode('utf-8')
     assert resp.startswith('{"token":')
 
     token = resp.split('"')[3]
-    headers = {"Authorization": f"Bearer {token}"}
+    put_headers = {"Authorization": f"Bearer {token}"}
 
     # Edit Item
     response = client.put(
         '/api/endpoint/1',
         params='title=Changed',
-        headers=headers
+        headers=put_headers
     )
     assert response.status_code == 200
 
@@ -217,7 +223,7 @@ def test_view_api(client):
     response = client.put(
         '/api/endpoint/3',
         params='title=Changed',
-        headers=headers,
+        headers=put_headers,
         status=404
     )
     headers = response.headers
@@ -232,7 +238,7 @@ def test_view_api(client):
     assert Collection.from_json(response.body).version == '1.0'
 
 
-def test_view_private_field_unauthorized(client):
+def test_view_private_field_unauthorized(client: Client) -> None:
     session = client.app.session()
 
     people = ExtendedPersonCollection(session)
@@ -253,7 +259,7 @@ def test_view_private_field_unauthorized(client):
         for d in person_data
     )
 
-def test_view_private_field(client):
+def test_view_private_field(client: Client) -> None:
     session = client.app.session()
 
     user = UserCollection(session).add(
@@ -278,7 +284,7 @@ def test_view_private_field(client):
     transaction.commit()
 
     session = client.app.session()  # Get fresh session
-    person = session.query(Person).get(person_id)  # Reload person with new
+    person = session.query(Person).get(person_id)  # type: ignore[assignment]  # Reload person with new
 
     # Authorize
     headers = {"Authorization": f"Bearer {uuid}"}

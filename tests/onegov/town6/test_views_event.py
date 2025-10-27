@@ -1,25 +1,35 @@
-from tempfile import TemporaryDirectory
+from __future__ import annotations
 
 import babel
 import os
 import transaction
 
 from datetime import date, timedelta
-
 from onegov.event import Event
+from tempfile import TemporaryDirectory
 from tests.onegov.town6.common import step_class
+from tests.shared.utils import create_pdf
 from unittest.mock import patch
 from webtest import Upload
 
-from tests.shared.utils import create_pdf
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from unittest.mock import MagicMock
+    from .conftest import Client
 
 
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
-def test_event_steps(broadcast, authenticate, connect, client):
+def test_event_steps(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
 
-    form_page = client.get('/events').click("Veranstaltung vorschlagen")
+    form_page = client.get('/events').click("Veranstaltung erfassen")
     start_date = date.today() + timedelta(days=1)
     end_date = start_date + timedelta(days=4)
 
@@ -219,7 +229,7 @@ def test_event_steps(broadcast, authenticate, connect, client):
         == 403
 
 
-def test_create_events_directly(client):
+def test_create_events_directly(client: Client) -> None:
     client.login_admin()
     form_page = client.get('/events').click("^Veranstaltung$")
     # As admin or editor, the progress indicator should not be displayed.
@@ -256,9 +266,9 @@ def test_create_events_directly(client):
     assert "Event 'My Event' erfolgreich erstellt" in events_redirect
 
 
-def test_hide_event_submission_option(client):
+def test_hide_event_submission_option(client: Client) -> None:
     events_page = client.get('/events')
-    assert "Veranstaltung vorschlagen" in events_page
+    assert "Veranstaltung erfassen" in events_page
 
     client.login_admin()
     settings = client.get('/event-settings')
@@ -266,16 +276,16 @@ def test_hide_event_submission_option(client):
     settings.form.submit()
 
     events_page = client.get('/events')
-    assert "Veranstaltung vorschlagen" not in events_page
+    assert "Veranstaltung erfassen" not in events_page
 
     settings.form['submit_events_visible'] = True
     settings.form.submit()
 
     events_page = client.get('/events')
-    assert "Veranstaltung vorschlagen" in events_page
+    assert "Veranstaltung erfassen" in events_page
 
 
-def test_view_occurrences_event_documents(client):
+def test_view_occurrences_event_documents(client: Client) -> None:
     page = client.get('/events')
     assert "Dokumente" not in page
 
@@ -284,7 +294,7 @@ def test_view_occurrences_event_documents(client):
         settings = client.get('/event-settings')
         filename_1 = os.path.join(td, 'zoo-programm-saison-2024.pdf')
         create_pdf(filename_1)
-        settings.form.fields['event_files'][-1].value = [Upload(filename_1)]
+        settings.form.set('event_files', [Upload(filename_1)], -1)
         settings = settings.form.submit().follow()
         assert settings.status_code == 200
 
@@ -296,3 +306,19 @@ def test_view_occurrences_event_documents(client):
         page = client.get('/events')
         assert "Dokumente" in page
         assert "zoo-programm-saison-2024.pdf" in page
+
+
+def test_view_occurrences_event_information(client: Client) -> None:
+    client.login_admin()
+    settings = client.get('/event-settings')
+    settings.form['event_header_html'] = (
+        '<em>My <strong>bold</strong> Header</em>')
+    settings.form['event_footer_html'] = (
+        '<em>My\n<strong>bold</strong>\nFooter</em>')
+    settings.form.submit()
+
+    client.logout()
+
+    page = client.get('/events')
+    assert 'My bold Header' in page.pyquery('.event-header').text()
+    assert 'My bold Footer' in page.pyquery('.event-footer').text()

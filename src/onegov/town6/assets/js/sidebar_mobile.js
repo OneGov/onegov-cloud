@@ -6,7 +6,6 @@ if (!$('.sidebar-wrapper').length) {
 
 newSidebarTitle = $('#right-sidebar').data("sidebarMobileTitle");
 // Take the text of the first two h3 elements in the sidebar and use them as the title
-console.log('newSidebarTitle', newSidebarTitle);
 if (!newSidebarTitle) {
     newSidebarTitle = $('.sidebar-wrapper h3').first().text();
     if ($('.sidebar-wrapper h3').length > 2) {

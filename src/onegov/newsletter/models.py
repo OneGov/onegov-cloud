@@ -50,15 +50,15 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
 
     __tablename__ = 'newsletters'
 
-    es_id = 'name'
-    es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
-        'html': {'type': 'localized_html'}
+    fts_id = 'name'
+    fts_properties = {
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'},
+        'html': {'type': 'localized', 'weight': 'C'}
     }
 
     @property
-    def es_public(self) -> bool:
+    def fts_public(self) -> bool:
         return self.sent is not None
 
     #: the name of the newsletter, derived from the title
@@ -210,6 +210,12 @@ class Recipient(Base, TimestampMixin, ContentMixin):
         address to be deactivated by Postmark.
         """
         self.meta['inactive'] = True
+
+    def reactivate(self) -> None:
+        """
+        Marks a previously `inactive` recipient as active again.
+        """
+        self.meta['inactive'] = False
 
 
 class Subscription:

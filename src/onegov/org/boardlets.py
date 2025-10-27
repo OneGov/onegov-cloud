@@ -3,17 +3,18 @@ from __future__ import annotations
 import re
 from datetime import timedelta
 from functools import cached_property
-
 from sedate import utcnow
-from typing import TYPE_CHECKING
+from sqlalchemy import func
 
 from onegov.org import _
 from onegov.org import OrgApp
 from onegov.org.layout import DefaultLayout
 from onegov.org.models import Boardlet, BoardletFact, News, Topic
 from onegov.plausible.plausible_api import PlausibleAPI
-from onegov.ticket import Ticket
+from onegov.reservation import Reservation, ResourceCollection
+from onegov.ticket import Ticket, TicketCollection
 
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from sqlalchemy.orm import Session
@@ -264,3 +265,137 @@ class PlausibleTopPages(OrgBoardlet):
                 text=text,
                 number=number
             )
+
+
+@OrgApp.boardlet(
+    name='ticket',
+    kind='citizen',
+    order=(1, 1),
+    icon='fa-ticket-alt'
+)
+class CitizenTicketBoardlet(OrgBoardlet):
+
+    @property
+    def title(self) -> str:
+        return _('My Requests')
+
+    @cached_property
+    def url(self) -> str:
+        return self.request.class_link(
+            TicketCollection,
+            {
+                'handler': 'ALL',
+                'state': 'all',
+            },
+            name='my-tickets'
+        )
+
+    @property
+    def facts(self) -> Iterator[BoardletFact]:
+        ticket_counts = dict(
+            self.session.query(
+                Ticket.state,
+                func.count(Ticket.id)
+            ).filter(
+                func.lower(Ticket.ticket_email) == email.lower()
+            ).group_by(Ticket.state)
+        ) if (email := self.request.authenticated_email) else {}
+
+        yield BoardletFact(
+            text='',
+            link=(self.url, _('Open Tickets')),
+            number=ticket_counts.get('open', 0),
+            icon='fas fa-hourglass'
+        )
+
+        yield BoardletFact(
+            text='',
+            link=(self.url, _('Pending Tickets')),
+            number=ticket_counts.get('pending', 0),
+            icon='fas fa-hourglass-half'
+        )
+
+        done_count = ticket_counts.get('closed', 0)
+        done_count += ticket_counts.get('archived', 0)
+        yield BoardletFact(
+            text='',
+            link=(self.url, _('Closed Tickets')),
+            number=done_count,
+            icon='fas fa-check-circle'
+        )
+
+
+@OrgApp.boardlet(
+    name='reservation',
+    kind='citizen',
+    order=(1, 2),
+    icon='fa-calendar fa-calendar-alt'
+)
+class CitizenReservationBoardlet(OrgBoardlet):
+
+    @property
+    def title(self) -> str:
+        return _('My Reservations')
+
+    @cached_property
+    def reservation_counts(self) -> dict[tuple[bool, bool], int]:
+        email = self.request.authenticated_email
+        if not email:
+            return {}
+
+        subquery = self.session.query(
+            Reservation.id.label('id'),
+            (Reservation.start > utcnow()).label('future'),
+            Reservation.data['accepted'].isnot(None).label('accepted')
+        ).filter(
+            func.lower(Reservation.email) == email.lower()
+        ).subquery()
+        return {
+            (future, accepted): count
+            for future, accepted, count in self.session.query(
+                subquery.c.future,
+                subquery.c.accepted,
+                func.count(subquery.c.id)
+            ).group_by(
+                subquery.c.future,
+                subquery.c.accepted
+            )
+        }
+
+    @property
+    def is_available(self) -> bool:
+        return any(self.reservation_counts.values())
+
+    @cached_property
+    def url(self) -> str:
+        return self.request.class_link(
+            ResourceCollection,
+            name='my-reservations'
+        )
+
+    @property
+    def facts(self) -> Iterator[BoardletFact]:
+        reservation_counts = self.reservation_counts
+
+        yield BoardletFact(
+            text='',
+            link=(self.url, _('Pending Future Reservations')),
+            number=reservation_counts.get((True, False), 0),
+            icon='far fa-calendar fa-calendar-o'
+        )
+
+        yield BoardletFact(
+            text='',
+            link=(self.url, _('Confirmed Future Reservations')),
+            number=reservation_counts.get((True, True), 0),
+            icon='far fa-calendar-check fa-calendar-check-o'
+        )
+
+        past_count = reservation_counts.get((False, False), 0)
+        past_count += reservation_counts.get((False, True), 0)
+        yield BoardletFact(
+            text='',
+            link=(self.url, _('Past Reservations')),
+            number=past_count,
+            icon='far fa-calendar-minus fa-calendar-minus-o '
+        )

@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+from markupsafe import Markup
 from onegov.core.utils import module_path
 from onegov.people.models import Agency
 from onegov.people.models import AgencyMembership
@@ -6,7 +9,14 @@ from os.path import splitext
 from pytest import mark
 
 
-def test_person(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+    from sqlalchemy.orm import Session
+    from .conftest import TestApp
+
+
+def test_person(session: Session) -> None:
     session.add(
         Person(
             salutation="Mr.",
@@ -55,7 +65,7 @@ def test_person(session):
     assert person.spoken_title == "Hans Maulwurf"
 
 
-def test_vcard(session):
+def test_vcard(session: Session) -> None:
     agency = Agency(name="agency", title="Agency")
     person = Person(
         salutation="Mr.",
@@ -164,7 +174,7 @@ def test_vcard(session):
     assert "ADR;CHARSET=utf-8:;;Fakestreet 2;InIrgendwo;;" in vcard
 
 
-def test_person_membership_by_agency(session):
+def test_person_membership_by_agency(session: Session) -> None:
     agency_a = Agency(title="A", name="a")
     agency_b = Agency(title="B", name="b")
     agency_c = Agency(title="C", name="c")
@@ -188,13 +198,19 @@ def test_person_membership_by_agency(session):
     ]
 
 
-def test_person_polymorphism(session):
+def test_person_polymorphism(session: Session) -> None:
 
     class MyPerson(Person):
         __mapper_args__ = {'polymorphic_identity': 'my'}
+        # FIXME: We should create a fixture which clones the SQLAlchemy
+        #        metadata, so we can safely create subclasses like this
+        #        without affecting the global metadata
 
     class MyOtherPerson(Person):
         __mapper_args__ = {'polymorphic_identity': 'other'}
+        # FIXME: We should create a fixture which clones the SQLAlchemy
+        #        metadata, so we can safely create subclasses like this
+        #        without affecting the global metadata
 
     session.add(Person(first_name='default', last_name='person'))
     session.add(MyPerson(first_name='my', last_name='person'))
@@ -206,14 +222,14 @@ def test_person_polymorphism(session):
     assert session.query(MyOtherPerson).one().first_name == 'other'
 
 
-def test_agency(test_app):
+def test_agency(test_app: TestApp) -> None:
     session = test_app.session()
     session.add(
         Agency(
             title="Foreigners' registration office",
             name="foreigners-registration-office",
             description="Agency regarding foreigners",
-            portrait=(
+            portrait=Markup(
                 "The Foreigners’ Registration Office is responsible for "
                 "matters related to laws concerning foreigners, as well as "
                 "the granting and extension of residence permits."
@@ -245,11 +261,15 @@ def test_agency(test_app):
         ('.png', )
     ),
 ])
-def test_agency_organigram(test_app, organigram):
+def test_agency_organigram(
+    test_app: TestApp,
+    organigram: tuple[str, Collection[str]]
+) -> None:
+
     with open(organigram[0], 'rb') as organigram_file:
         session = test_app.session()
         session.add(
-            Agency(
+            Agency(  # type: ignore[misc]
                 title="Agency",
                 name="agency",
                 organigram_file=organigram_file
@@ -258,12 +278,13 @@ def test_agency_organigram(test_app, organigram):
         session.flush()
     agency = session.query(Agency).one()
 
+    assert agency.organigram_file is not None
     assert splitext(agency.organigram_file.name)[1] in organigram[1]
     with open(organigram[0], 'rb') as organigram_file:
         assert agency.organigram_file.read() == organigram_file.read()
 
 
-def test_agency_add_person(session):
+def test_agency_add_person(session: Session) -> None:
     agency = Agency(title="Agency", name="agency",)
     patty = Person(first_name="Patty", last_name="Bouvier")
     selma = Person(first_name="Selma", last_name="Bouvier")
@@ -274,7 +295,7 @@ def test_agency_add_person(session):
 
     agency.add_person(patty.id, "Staff")
     agency.add_person(selma.id, "Staff", since="2012")
-    agency.add_person(str(selma.id), "Managing director", since="2018")
+    agency.add_person(str(selma.id), "Managing director", since="2018")  # type: ignore[arg-type]
 
     assert [m.order_within_agency for m in agency.memberships] == [0, 1, 2]
 
@@ -288,13 +309,19 @@ def test_agency_add_person(session):
     assert role == ["Managing director @ Agency", "Staff @ Agency"]
 
 
-def test_agency_polymorphism(session):
+def test_agency_polymorphism(session: Session) -> None:
 
     class MyAgency(Agency):
         __mapper_args__ = {'polymorphic_identity': 'my'}
+        # FIXME: We should create a fixture which clones the SQLAlchemy
+        #        metadata, so we can safely create subclasses like this
+        #        without affecting the global metadata
 
     class MyOtherAgency(Agency):
         __mapper_args__ = {'polymorphic_identity': 'other'}
+        # FIXME: We should create a fixture which clones the SQLAlchemy
+        #        metadata, so we can safely create subclasses like this
+        #        without affecting the global metadata
 
     session.add(Agency(title='default', name='default'))
     session.add(MyAgency(title='my', name='my'))
@@ -306,13 +333,13 @@ def test_agency_polymorphism(session):
     assert session.query(MyOtherAgency).one().title == 'other'
 
 
-def test_agency_sort_children(session):
+def test_agency_sort_children(session: Session) -> None:
     parent = Agency(id=1, name='parent', title='agency')
-    session.add(Agency(id=2, name='child_1', parent=parent, order=10,
+    session.add(Agency(id=2, name='child_1', parent=parent, order=10,  # type: ignore[misc]
                        title="Bjorm Guomundsdóttir's"))
-    session.add(Agency(id=3, name='child_2', parent=parent, order=11,
+    session.add(Agency(id=3, name='child_2', parent=parent, order=11,  # type: ignore[misc]
                        title="Björn Guðmundsdóttir's"))
-    session.add(Agency(id=4, name='child_3', parent=parent, order=11,
+    session.add(Agency(id=4, name='child_3', parent=parent, order=11,  # type: ignore[misc]
                        title="Björk Guomundsdottir's"))
     session.flush()
     assert [c.title for c in parent.children] == [
@@ -331,7 +358,7 @@ def test_agency_sort_children(session):
     ]
 
 
-def test_agency_sort_memberships(session):
+def test_agency_sort_memberships(session: Session) -> None:
     agency = Agency(title='agency', name='agency')
     bjork = Person(first_name="Björn", last_name="Guðmundsdóttir")
     bjorm = Person(first_name="Björk", last_name="Guomundsdottir")
@@ -368,7 +395,7 @@ def test_agency_sort_memberships(session):
     ]
 
 
-def test_membership_1(session):
+def test_membership_1(session: Session) -> None:
     agency = Agency(title='agency', name='agency')
     person = Person(first_name='a', last_name='person')
     session.add(agency)
@@ -405,7 +432,7 @@ def test_membership_1(session):
     assert session.query(AgencyMembership).count() == 0
 
 
-def test_membership_polymorphism(session):
+def test_membership_polymorphism(session: Session) -> None:
     agency = Agency(title='agency', name='agency')
     person = Person(first_name='a', last_name='person')
     session.add(agency)
@@ -414,9 +441,15 @@ def test_membership_polymorphism(session):
 
     class MyMembership(AgencyMembership):
         __mapper_args__ = {'polymorphic_identity': 'my'}
+        # FIXME: We should create a fixture which clones the SQLAlchemy
+        #        metadata, so we can safely create subclasses like this
+        #        without affecting the global metadata
 
     class MyOtherMembership(AgencyMembership):
         __mapper_args__ = {'polymorphic_identity': 'other'}
+        # FIXME: We should create a fixture which clones the SQLAlchemy
+        #        metadata, so we can safely create subclasses like this
+        #        without affecting the global metadata
 
     session.add(
         AgencyMembership(
@@ -452,7 +485,7 @@ def test_membership_polymorphism(session):
     assert session.query(MyOtherMembership).one().title == 'other'
 
 
-def test_membership_siblings(session):
+def test_membership_siblings(session: Session) -> None:
     agency_a = Agency(title='A', name='a')
     agency_b = Agency(title='B', name='b')
     person = Person(first_name='a', last_name='person')

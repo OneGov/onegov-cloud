@@ -42,7 +42,7 @@ class AssemblyCollectionLayout(DefaultLayout):
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_('Assembly'),
+                            text=self.assembly_type,
                             url=self.request.link(self.model, 'new'),
                             attrs={'class': 'new-form'}
                         ),
@@ -76,7 +76,7 @@ class AssemblyLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(
-                _('Archive'),
+                self.assembly_type_plural,
                 self.request.link(self.assembly_collection())
             ),
             Link(self.title, self.request.link(self.model))
@@ -110,9 +110,12 @@ class AssemblyLayout(DefaultLayout):
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _('Do you really want to delete this assembly?'),
+                            _('Do you really want to delete this '
+                              '${assembly_type}?',
+                              mapping={'assembly_type': self.assembly_type}),
                             _('This cannot be undone.'),
-                            _('Delete assembly'),
+                            _('Delete ${assembly_type}',
+                              mapping={'assembly_type': self.assembly_type}),
                             _('Cancel')
                         ),
                         Intercooler(
@@ -130,6 +133,11 @@ class AssemblyLayout(DefaultLayout):
                             text=_('Agenda item'),
                             url=self.request.link(items, 'new'),
                             attrs={'class': 'check-list-link'}
+                        ),
+                        Link(
+                            text=_('ZIP Upload'),
+                            url=self.request.link(items, 'new-import'),
+                            attrs={'class': 'ticket-archive'}
                         ),
                     ]
                 )

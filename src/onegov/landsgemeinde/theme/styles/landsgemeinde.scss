@@ -69,16 +69,12 @@ h1.main-title small {
 /*
     Manage views
 */
-.assembly-agenda-items {
-    margin-top: 2rem;
-}
-
 .agenda-item-vota {
     .votum,
     .ticker-votum {
+        @include smooth-edges;
         background: $white-smoke;
         border-left: 2px solid $smoke;
-        @include smooth-edges;
         box-shadow: -10px 0 10px -10px rgba(0, 0, 0, .07);
         margin-bottom: 1.5rem;
         padding: 1.5rem;
@@ -105,19 +101,19 @@ h1.main-title small {
             opacity: .5;
         }
 
-          .votum-time {
-              color: $base;
-              white-space: nowrap;
-              position: absolute;
-              right: 0;
-              text-align: right;
-              top: 0;
-              padding: .5rem .6rem .2rem;
-              border: 3px solid $white;
-              border-radius: 0 0 0 1.2rem;
-              border-right: 0;
-              border-top: 0;
-          }
+        .votum-time {
+            border: 3px solid $white;
+            border-radius: 0 0 0 1.2rem;
+            border-right: 0;
+            border-top: 0;
+            color: $base;
+            padding: .5rem .6rem .2rem;
+            position: absolute;
+            right: 0;
+            text-align: right;
+            top: 0;
+            white-space: nowrap;
+        }
 
         .votum-header {
             display: flex;
@@ -146,7 +142,7 @@ h1.main-title small {
         right: 0;
         top: 0;
 
-        & *:not(.scheduled) {
+        *:not(.scheduled) {
             display: none;
         }
     }
@@ -160,7 +156,7 @@ h1.main-title small {
             @include smooth-edges;
         }
 
-        &> li > a {
+        > li > a {
             border-left: 0;
         }
     }
@@ -168,6 +164,16 @@ h1.main-title small {
 
 .agenda-item-overview {
     margin-bottom: 4rem;
+
+    .memorial-link {
+        background: transparent;
+        border: 1px solid $gainsboro;
+        padding: 1.3rem 1.5rem;
+
+        &:hover {
+            background: $vapor;
+        }
+    }
 }
 
 .side-panel .agenda-item-list {
@@ -218,11 +224,15 @@ h1.main-title small {
             right: 0;
             text-align: right;
             top: 0;
+
+            span {
+                margin-left: .3rem;
+            }
         }
     }
 }
 
-.states-list {
+#states-list {
     list-style: none;
     margin-left: 0;
 
@@ -283,6 +293,10 @@ h1.main-title small {
             }
         }
     }
+
+    .label.draft {
+        background: $oil;
+    }
 }
 
 .videowrapper {
@@ -293,15 +307,15 @@ h1.main-title small {
     padding-top: 25px;
     position: relative;
     width: 100%;
-}
 
-.videowrapper iframe {
-    height: 100%;
-    left: 0;
-    padding-bottom: 2rem;
-    position: absolute;
-    top: 0;
-    width: 100%;
+    iframe {
+        height: 100%;
+        left: 0;
+        padding-bottom: 2rem;
+        position: absolute;
+        top: 0;
+        width: 100%;
+    }
 }
 
 /*
@@ -312,6 +326,7 @@ h1.main-title small {
     color: $charcoal;
 
     .person-card-function {
+        color: $aluminum;
         font-size: 1rem;
     }
 }
@@ -349,16 +364,18 @@ h1.main-title small {
 
 /* Side panel*/
 
-.sidebar-toggler .text{
+.sidebar-toggler .text {
     margin-bottom: -2px;
 }
 
 .agenda-item-list.with-current {
     height: 25rem;
     overflow-y: scroll;
-    scrollbar-color: $charcoal $white-smoke;  // sass-lint:disable-line no-misspelled-properties
+    // scss-lint:disable PropertySpelling
+    scrollbar-color: $charcoal $white-smoke;
+    // scss-lint:enable PropertySpelling
 
-    &::-webkit-scrollbar-tracK {
+    &::-webkit-scrollbar-track {
         background-color: $white-smoke;
     }
 
@@ -405,7 +422,8 @@ h1.main-title small {
             }
         }
 
-        .scheduled .list-title {
+        .scheduled .list-title,
+        .draft .list-title {
             opacity: .5;
             transition: opacity 200ms linear;
         }
@@ -418,6 +436,7 @@ h1.main-title small {
     .title {
         border-top: 1px solid $white-smoke;
         padding: .5rem 0;
+        width: 100%;
     }
 
     .timeline {
@@ -454,10 +473,6 @@ h1.main-title small {
         padding-top: .7rem;
         transition: opacity 200ms linear;
 
-
-        &::after {
-            display: none !important;
-        }
     }
 
     .agenda-item-title {
@@ -471,17 +486,92 @@ h1.main-title small {
         border-top: 0 !important;
         display: flex !important;
         padding-top: 0 !important;
+        align-items: inherit !important;
 
+
+        &::after {
+            display: none !important;
+        }
     }
+
+    .draft {
+        display: none !important;
+    }
+}
+
+/* Previous and next buttons */
+.item-arrows {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4rem;
+
+    @include breakpoint(medium down) {
+        font-weight: bold;
+
+        div {
+            align-items: center;
+            background: $aluminum;
+            justify-content: center;
+            position: fixed;
+            top: calc(100vh - 5rem);
+            z-index: 100;
+
+            a.button {
+                border: 0;
+                color: $white;
+                margin-bottom: 0;
+                padding-bottom: .5rem !important;
+                padding-top: .6rem !important;
+            }
+        }
+
+        .prev-item {
+            border-left: 0;
+            border-radius: 0 .7rem .7rem 0;
+            left: 0;
+
+            a {
+                padding-left: .7rem !important;
+                padding-right: .6rem !important;
+            }
+        }
+
+        .next-item {
+            border-radius: .7rem 0 0 .7rem;
+            border-right: 0;
+            right: 0;
+
+            a {
+                padding-left: .6rem !important;
+                padding-right: .7rem !important;
+            }
+        }
+    }
+
+    a {
+        display: block;
+    }
+
+    .prev-item a i {
+        margin-right: .3rem;
+    }
+
+    .next-item a i {
+        margin-left: .3rem;
+    }
+
+
 }
 
 /*Download Icons*/
 .downloads a,
-.memorial-link {
+.memorial-link,
+.more-files-link {
     @include smooth-edges;
     background: $white-smoke;
     display: flex;
     font-weight: bold;
+    margin-bottom: .5rem;
     padding: 1rem;
     transition: background 200ms linear;
 
@@ -494,17 +584,6 @@ h1.main-title small {
         margin-right: 1rem;
     }
 }
-
-.agenda-item-overview .memorial-link {
-    background: transparent;
-    border: 1px solid $gainsboro;
-    padding: 1.3rem 1.5rem;
-
-    &:hover {
-        background: $vapor;
-    }
-}
-
 
 #liveticker {
     color: $primary-color;
@@ -588,9 +667,9 @@ h1.main-title small {
         padding: 0 3rem !important;
 
         .typeahead {
-            top: 1.5rem;
-            position: relative;
             left: calc(4rem - 100%);
+            position: relative;
+            top: 1.5rem;
 
             ul {
                 width: 18rem;
@@ -639,4 +718,8 @@ h1.main-title small {
             }
         }
     }
+}
+
+.hide {
+    display: none !important;
 }

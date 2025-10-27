@@ -72,6 +72,12 @@ def get_theme() -> LandsgemeindeTheme:
     return LandsgemeindeTheme()
 
 
+# NOTE: Landsgemeinde doesn't need a citizen login
+@LandsgemeindeApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return False
+
+
 @LandsgemeindeApp.webasset('ticker')
 def get_backend_ticker() -> Iterator[str]:
     yield 'ticker.js'
@@ -80,11 +86,6 @@ def get_backend_ticker() -> Iterator[str]:
 @LandsgemeindeApp.webasset('person_votum')
 def get_person_votum() -> Iterator[str]:
     yield 'person_votum.js'
-
-
-@LandsgemeindeApp.webasset('start_time')
-def get_start_time() -> Iterator[str]:
-    yield 'start_time.js'
 
 
 @LandsgemeindeApp.webasset('agenda_items')
@@ -104,7 +105,7 @@ def pages_cache_tween_factory(
     """ Cache pages for 5 minutes. """
 
     cache_paths = (
-        '/landsgemeinde/.*/ticker',
+        '/assembly/.*/ticker',
     )
     cache_paths_re = compile(r'^({})$'.format('|'.join(cache_paths)))
 

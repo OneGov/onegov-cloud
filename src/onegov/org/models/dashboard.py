@@ -2,47 +2,57 @@ from __future__ import annotations
 
 from attr import attrs
 from itertools import groupby
+from operator import attrgetter
 
 
-from typing import Literal, TYPE_CHECKING
-
+from typing import ClassVar, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
+    from onegov.org.directives import BoardletConfig
     from onegov.org.request import OrgRequest
 
 
 class Dashboard:
 
+    kind: ClassVar[Literal['user', 'citizen']] = 'user'
+
     def __init__(self, request: OrgRequest) -> None:
         self.request = request
+
+    @property
+    def boardlet_configs(self) -> dict[str, BoardletConfig]:
+        """ Returns the appropriate set of `BoardletConfig` for our kind. """
+
+        return self.request.app.config.boardlets_registry[self.kind]
 
     @property
     def is_available(self) -> bool:
         """ Returns true if there are `Boardlet`s to display. """
 
-        return self.request.app.config.boardlets_registry and True or False
+        return self.boardlet_configs and True or False
 
     def boardlets(self) -> list[tuple[Boardlet, ...]]:
         """ Returns the boardlets, grouped/ordered by their order tuple. """
 
-        instances = []
-
-        for name, data in (
-                self.request.app.config.boardlets_registry.items()):
-            instances.append(data['cls'](
+        instances = sorted((
+            data['cls'](
                 name=name,
                 order=data['order'],
                 icon=data['icon'],
                 request=self.request
-            ))
+            )
+            for name, data in self.boardlet_configs.items()
+        ), key=attrgetter('order'))
 
-        instances.sort(key=lambda i: i.order)
-        boardlets = []
+        return [
+            tuple(items)
+            for _, items in groupby(instances, key=lambda i: i.order[0])
+        ]
 
-        for group, items in groupby(instances, key=lambda i: i.order[0]):
-            boardlets.append(tuple(items))
 
-        return boardlets
+class CitizenDashboard(Dashboard):
+
+    kind = 'citizen'
 
 
 class Boardlet:
@@ -77,6 +87,12 @@ class Boardlet:
 
         """
         raise NotImplementedError()
+
+    @property
+    def url(self) -> str | None:
+        """ Returns an url the title of the boardlet should link to.
+        """
+        return None
 
     @property
     def facts(self) -> Iterator[BoardletFact]:

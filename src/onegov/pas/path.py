@@ -3,23 +3,25 @@ from __future__ import annotations
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.app import PasApp
 from onegov.pas.collections import ChangeCollection
-from onegov.pas.collections import CommissionCollection
-from onegov.pas.collections import CommissionMembershipCollection
+from onegov.pas.collections import ImportLogCollection
 from onegov.pas.collections import LegislativePeriodCollection
-from onegov.pas.collections import ParliamentarianCollection
-from onegov.pas.collections import ParliamentarianRoleCollection
-from onegov.pas.collections import ParliamentaryGroupCollection
+from onegov.pas.collections import PASCommissionCollection
+from onegov.pas.collections import PASCommissionMembershipCollection
+from onegov.pas.collections import PASParliamentarianCollection
+from onegov.pas.collections import PASParliamentarianRoleCollection
+from onegov.pas.collections import PASParliamentaryGroupCollection
 from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.collections import SettlementRunCollection
 from onegov.pas.models import Attendence
 from onegov.pas.models import Change
-from onegov.pas.models import Commission
-from onegov.pas.models import CommissionMembership
+from onegov.pas.models import ImportLog
 from onegov.pas.models import LegislativePeriod
-from onegov.pas.models import Parliamentarian
-from onegov.pas.models import ParliamentarianRole
-from onegov.pas.models import ParliamentaryGroup
+from onegov.pas.models import PASCommission
+from onegov.pas.models import PASCommissionMembership
+from onegov.pas.models import PASParliamentarian
+from onegov.pas.models import PASParliamentarianRole
+from onegov.pas.models import PASParliamentaryGroup
 from onegov.pas.models import Party
 from onegov.pas.models import RateSet
 from onegov.pas.models import SettlementRun
@@ -100,49 +102,49 @@ def get_change(
 
 
 @PasApp.path(
-    model=CommissionCollection,
+    model=PASCommissionCollection,
     path='/commissions',
     converters={'active': bool}
 )
 def get_commissions(
     app: PasApp,
     active: bool = True
-) -> CommissionCollection:
-    return CommissionCollection(app.session(), active)
+) -> PASCommissionCollection:
+    return PASCommissionCollection(app.session(), active)
 
 
 @PasApp.path(
-    model=Commission,
+    model=PASCommission,
     path='/commission/{id}',
     converters={'id': UUID}
 )
 def get_commission(
     app: PasApp,
     id: UUID,
-) -> Commission | None:
-    return CommissionCollection(app.session()).by_id(id)
+) -> PASCommission | None:
+    return PASCommissionCollection(app.session()).by_id(id)
 
 
 @PasApp.path(
-    model=CommissionMembershipCollection,
+    model=PASCommissionMembershipCollection,
     path='/commission-memberships'
 )
 def get_commission_memberships(
     app: PasApp
-) -> CommissionMembershipCollection:
-    return CommissionMembershipCollection(app.session())
+) -> PASCommissionMembershipCollection:
+    return PASCommissionMembershipCollection(app.session())
 
 
 @PasApp.path(
-    model=CommissionMembership,
+    model=PASCommissionMembership,
     path='/commission-membership/{id}',
     converters={'id': UUID}
 )
 def get_commission_membership(
     app: PasApp,
     id: UUID
-) -> CommissionMembership | None:
-    return CommissionMembershipCollection(app.session()).by_id(id)
+) -> PASCommissionMembership | None:
+    return PASCommissionMembershipCollection(app.session()).by_id(id)
 
 
 @PasApp.path(
@@ -170,73 +172,79 @@ def get_legislative_period(
 
 
 @PasApp.path(
-    model=ParliamentarianCollection,
-    path='/parliamenarians',
-    converters={'active': bool}
+    model=PASParliamentarianCollection,
+    path='/parliamentarians',
+    converters={
+        'active': [bool],
+        'party': [str]
+    }
 )
 def get_parliamentarians(
     app: PasApp,
-    active: bool = True
-) -> ParliamentarianCollection:
-    return ParliamentarianCollection(app.session(), active)
+    active: list[bool] | None = None,
+) -> PASParliamentarianCollection:
+    return PASParliamentarianCollection(
+        app,
+        active=active or [True],
+    )
 
 
 @PasApp.path(
-    model=Parliamentarian,
-    path='/parliamenarian/{id}',
+    model=PASParliamentarian,
+    path='/parliamentarian/{id}',
     converters={'id': UUID}
 )
 def get_parliamentarian(
     app: PasApp,
     id: UUID
-) -> Parliamentarian | None:
-    return ParliamentarianCollection(app.session()).by_id(id)
+) -> PASParliamentarian | None:
+    return PASParliamentarianCollection(app).by_id(id)
 
 
 @PasApp.path(
-    model=ParliamentarianRoleCollection,
-    path='/parliamenarian-roles'
+    model=PASParliamentarianRoleCollection,
+    path='/parliamentarian-roles'
 )
 def get_parliamentarian_roles(
     app: PasApp
-) -> ParliamentarianRoleCollection:
-    return ParliamentarianRoleCollection(app.session())
+) -> PASParliamentarianRoleCollection:
+    return PASParliamentarianRoleCollection(app.session())
 
 
 @PasApp.path(
-    model=ParliamentarianRole,
-    path='/parliamenarian-role/{id}',
+    model=PASParliamentarianRole,
+    path='/parliamentarian-role/{id}',
     converters={'id': UUID}
 )
 def get_parliamentarian_role(
     app: PasApp,
     id: UUID
-) -> ParliamentarianRole | None:
-    return ParliamentarianRoleCollection(app.session()).by_id(id)
+) -> PASParliamentarianRole | None:
+    return PASParliamentarianRoleCollection(app.session()).by_id(id)
 
 
 @PasApp.path(
-    model=ParliamentaryGroupCollection,
-    path='/parliamenary-groups',
+    model=PASParliamentaryGroupCollection,
+    path='/parliamentary-groups',
     converters={'active': bool}
 )
 def get_parliamentary_groups(
     app: PasApp,
     active: bool = True,
-) -> ParliamentaryGroupCollection:
-    return ParliamentaryGroupCollection(app.session(), active)
+) -> PASParliamentaryGroupCollection:
+    return PASParliamentaryGroupCollection(app.session(), active)
 
 
 @PasApp.path(
-    model=ParliamentaryGroup,
-    path='/parliamenary-group/{id}',
+    model=PASParliamentaryGroup,
+    path='/parliamentary-group/{id}',
     converters={'id': UUID}
 )
 def get_parliamentary_group(
     app: PasApp,
     id: UUID
-) -> ParliamentaryGroup | None:
-    return ParliamentaryGroupCollection(app.session()).by_id(id)
+) -> PASParliamentaryGroup | None:
+    return PASParliamentaryGroupCollection(app.session()).by_id(id)
 
 
 @PasApp.path(
@@ -320,7 +328,7 @@ class SettlementRunExport:
     def __init__(
         self,
         settlement_run: SettlementRun,
-        entity: Party | Commission | Parliamentarian,
+        entity: Party | PASCommission | PASParliamentarian,
         category: str | None = None
     ):
         self.settlement_run = settlement_run
@@ -362,8 +370,8 @@ def get_settlement_run_export(
 
     model_map: dict[str, type] = {
         'Party': Party,
-        'Commission': Commission,
-        'Parliamentarian': Parliamentarian,
+        'PASCommission': PASCommission,
+        'PASParliamentarian': PASParliamentarian,
     }
     entity = (
         session.query(model_map.get(literal_type))
@@ -398,3 +406,27 @@ def get_settlement_run_export_all(
         settlement_run=settlement_run,
         category=category
     )
+
+
+@PasApp.path(
+    model=ImportLogCollection,
+    path='/import-logs'
+)
+def get_import_logs(
+    request: TownRequest
+) -> ImportLogCollection:
+    """ Returns the collection of import logs. """
+    return ImportLogCollection(request.session)
+
+
+@PasApp.path(
+    model=ImportLog,
+    path='/import-log/{id}',
+    converters={'id': UUID}
+)
+def get_import_log(
+    request: TownRequest,
+    id: UUID
+) -> ImportLog | None:
+    """ Returns a single import log by id. """
+    return ImportLogCollection(request.session).by_id(id)

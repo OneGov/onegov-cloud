@@ -22,7 +22,7 @@ from onegov.org.utils import emails_for_new_ticket
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
 from sedate import utcnow
-from uuid import uuid4
+from uuid import UUID, uuid4
 from webob import exc
 
 
@@ -323,6 +323,12 @@ def handle_new_event_without_workflow(
         event.state = 'submitted'
         form.populate_obj(event)
         return morepath.redirect(request.link(event, 'publish'))
+    else:
+        event_id = request.params.get('event_id')
+        if event_id and isinstance(event_id, str):
+            event_obj = EventCollection(self.session).by_id(UUID(event_id))
+            if event_obj:
+                form.process(obj=event_obj)
 
     # FIXME: same hack as in above view, add a proper layout
     layout = layout or EventLayout(self, request)  # type:ignore
@@ -406,7 +412,8 @@ def view_event(
                         'event': 'browser-notification',
                         'title': request.translate(_('New ticket')),
                         'created': ticket.created.isoformat()
-                    }
+                    },
+                    groupids=request.app.groupids_for_ticket(ticket),
                 )
 
                 if request.auto_accept(ticket):
@@ -643,6 +650,10 @@ def view_latest_event(self: Event, request: OrgRequest) -> BaseResponse:
     future events.
 
     """
+
+    if not self.occurrences:
+        # redirect to the event instead
+        return morepath.redirect(request.link(self))
 
     now = utcnow()
 

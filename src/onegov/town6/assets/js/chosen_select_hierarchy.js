@@ -1,11 +1,11 @@
 $(document).ready(function(){
     var categories = [];
     var hierarchy = [];
-    $(".chosen-select option").each(function() {
+    $(".chosen-select[multiple] option").each(function() {
         hierarchy.push($(this).val());
     });
 
-    $(".chosen-select").chosen().change(function (event) {
+    $(".chosen-select[multiple]").change(function (event) {
         var new_categories = $(event.target).val();
         if (!new_categories) {
             new_categories = [];

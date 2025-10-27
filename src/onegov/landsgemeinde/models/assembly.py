@@ -31,10 +31,12 @@ if TYPE_CHECKING:
     from translationstring import TranslationString
     from typing import TypeAlias
 
-    AssemblyState: TypeAlias = Literal['scheduled', 'ongoing', 'completed']
+    AssemblyState: TypeAlias = Literal[
+        'draft', 'scheduled', 'ongoing', 'completed']
 
 
 STATES: dict[AssemblyState, TranslationString] = {
+    'draft': _('draft'),
     'scheduled': _('scheduled'),
     'ongoing': _('ongoing'),
     'completed': _('completed')
@@ -48,13 +50,13 @@ class Assembly(
 
     __tablename__ = 'landsgemeinde_assemblies'
 
-    es_public = True
-    es_properties = {
-        'overview': {'type': 'localized_html'},
+    fts_public = True
+    fts_properties = {
+        'overview': {'type': 'localized', 'weight': 'A'},
     }
 
     @property
-    def es_suggestion(self) -> tuple[str, ...]:
+    def fts_suggestion(self) -> tuple[str, ...]:
         return (
             str(self.date.year),
             f'Landsgemeinde {self.date.year}',

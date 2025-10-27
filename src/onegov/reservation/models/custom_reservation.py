@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from datetime import timedelta
-from libres.db.models import Reservation
+from decimal import Decimal
+from libres.db.models import Allocation, Reservation
 from onegov.core.orm import ModelBase
-from onegov.pay import Payable, Price
+from onegov.pay import InvoiceItemMeta, Payable, Price
 from onegov.reservation.models.resource import Resource
+from sedate import utcnow
 from sqlalchemy.orm import object_session
 
 
@@ -20,15 +22,33 @@ class CustomReservation(Reservation, ModelBase, Payable):
     def payable_reference(self) -> str:
         return f'{self.resource.hex}/{self.email}x{self.quota}'
 
-    def price(self, resource: Resource | None = None) -> Price | None:
-        """ Returns the price of the reservation.
+    @property
+    def is_adjustable(self) -> bool:
+        """ Returns whether or not the reservation is adjustable.
 
-        Even though one token may point to multiple reservations the price
-        is bound to the reservation record.
-
-        The price per token is calculcated by combining all the prices.
+        A reservation is adjustable when it's not yet been accepted,
+        its start date is in the future and its target allocation is
+        partly available.
 
         """
+        if self.display_start() < utcnow():
+            return False
+
+        if self.data and self.data.get('accepted'):
+            return False
+
+        return object_session(self).query(
+            self
+            ._target_allocations()
+            .filter(Allocation.partly_available.is_(True))
+            .exists()
+        ).scalar()
+
+    def invoice_item(
+        self,
+        resource: Resource | None = None
+    ) -> InvoiceItemMeta | None:
+        """ Returns an invoice item for this reservation. """
 
         resource = resource or self.resource_obj
 
@@ -46,15 +66,46 @@ class CustomReservation(Reservation, ModelBase, Payable):
         if resource.pricing_method == 'per_hour':
             assert self.start is not None and self.end is not None
             duration = self.end + timedelta(microseconds=1) - self.start
-            hours = duration.total_seconds() / 3600
+            hours = Decimal(duration.total_seconds()) / Decimal('3600')
 
             assert resource.price_per_hour is not None
-            return Price(hours * resource.price_per_hour, resource.currency)
+            return InvoiceItemMeta(
+                text=resource.title,
+                group='reservation',
+                cost_object=resource.cost_object,
+                extra={'reservation_id': self.id},
+                unit=Decimal(resource.price_per_hour),
+                quantity=hours,
+            )
 
         if resource.pricing_method == 'per_item':
             count = self.quota
 
             assert resource.price_per_item is not None
-            return Price(count * resource.price_per_item, resource.currency)
+            return InvoiceItemMeta(
+                text=resource.title,
+                group='reservation',
+                cost_object=resource.cost_object,
+                extra={'reservation_id': self.id},
+                unit=Decimal(resource.price_per_item),
+                quantity=Decimal(count),
+            )
 
         raise NotImplementedError
+
+    def price(self, resource: Resource | None = None) -> Price | None:
+        """ Returns the price of the reservation.
+
+        Even though one token may point to multiple reservations the price
+        is bound to the reservation record.
+
+        The price per token is calculcated by combining all the prices.
+
+        """
+        resource = resource or self.resource_obj
+
+        item = self.invoice_item(resource)
+        if item is None:
+            return None
+
+        return Price(item.amount, resource.currency)

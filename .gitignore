@@ -59,6 +59,9 @@ venv/
 # Eggs folder
 eggs/
 
+# Temporary folder
+temp/
+
 # pytest-testmon data
 .testmondata
 .tmontmp
@@ -99,7 +102,9 @@ prof
 # chamelon cache
 .chameleon_cache
 
+# redis
+dump.rdb
+
 .codebuddy/
 
 .aider*
-

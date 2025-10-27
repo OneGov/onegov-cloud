@@ -68,6 +68,11 @@ class PageForm(PageBaseForm):
 class IframeForm(PageBaseForm):
     """ Defines the form for pages with the 'iframe' trait. """
 
+    lead = TextAreaField(
+        label=_('Lead'),
+        description=_('Describes what this page is about'),
+        render_kw={'rows': 4})
+
     allowed_domains: list[str] = []
 
     domain_hint = PanelField(

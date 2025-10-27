@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from freezegun import freeze_time
 from lxml import etree
@@ -9,7 +11,13 @@ from onegov.landsgemeinde.utils import timestamp_to_seconds
 from onegov.landsgemeinde.utils import update_ticker
 
 
-def test_update_ticker(landsgemeinde_app, assembly):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.landsgemeinde.models import Assembly
+    from .conftest import TestApp
+
+
+def test_update_ticker(landsgemeinde_app: TestApp, assembly: Assembly) -> None:
 
     class Request:
         app = landsgemeinde_app
@@ -22,16 +30,16 @@ def test_update_ticker(landsgemeinde_app, assembly):
             ._template_loaders['.pt']
         )
 
-        def include(self, asset):
+        def include(self, asset: object) -> None:
             pass
 
-        def translate(*args, **kwargs):
+        def translate(*args: object, **kwargs: object) -> str:
             return '__translated__'
 
-        def get_translate(self, for_chameleon=False):
+        def get_translate(self, for_chameleon: bool = False) -> Any:
             return self.translate
 
-    request = Request()
+    request: Any = Request()
     agenda_item_2 = assembly.agenda_items[0]
     agenda_item_1 = assembly.agenda_items[1]
     votum_1_1 = agenda_item_1.vota[0]
@@ -68,8 +76,8 @@ def test_update_ticker(landsgemeinde_app, assembly):
 
 
 @freeze_time("2024-05-05 10:00")
-def test_ensure_states():
-    def create():
+def test_ensure_states() -> None:
+    def create() -> Assembly:
         result = Assembly(state='ongoing', date=date(2023, 5, 7))
         result.agenda_items.append(AgendaItem(state='completed', number=1))
         result.agenda_items.append(AgendaItem(state='ongoing', number=2))
@@ -86,8 +94,8 @@ def test_ensure_states():
         result.agenda_items[1].start()
         return result
 
-    def get(assembly):
-        result = {'': assembly.state}
+    def get(assembly: Assembly) -> dict[str, str]:
+        result: dict[str, str] = {'': assembly.state}
         result.update({
             f'{a.number}': f'{a.state} {a.start_time or ""}'.strip()
             for a in assembly.agenda_items
@@ -170,6 +178,39 @@ def test_ensure_states():
         '4': 'completed',
         '4.1': 'completed',
         '4.2': 'completed'
+    }
+
+    # 1 draft
+    assembly = create()
+    assembly.agenda_items[0].state = 'draft'
+    assert ensure_states(assembly.agenda_items[0]) == {
+        assembly,  # was completed
+        assembly.agenda_items[0].vota[0],  # was completed
+        assembly.agenda_items[0].vota[1],  # was completed
+        assembly.agenda_items[0].vota[2],  # was completed
+        assembly.agenda_items[1],  # was ongoing
+        assembly.agenda_items[1].vota[0],  # was completed
+        assembly.agenda_items[1].vota[1],  # was ongoing
+        assembly.agenda_items[1].vota[2],  # was ongoing
+        assembly.agenda_items[2],  # was scheduled
+        assembly.agenda_items[3],  # was scheduled
+        assembly.agenda_items[3].vota[0],  # was scheduled
+        assembly.agenda_items[3].vota[1],  # was scheduled
+    }
+    assert get(assembly) == {
+        '': 'draft',
+        '1': 'draft',
+        '1.1': 'draft',
+        '1.2': 'draft',
+        '1.3': 'draft',
+        '2': 'draft',
+        '2.1': 'draft',
+        '2.2': 'draft',
+        '2.3': 'draft',
+        '3': 'draft',
+        '4': 'draft',
+        '4.1': 'draft',
+        '4.2': 'draft'
     }
 
     # 1 ongoing
@@ -696,7 +737,7 @@ def test_ensure_states():
     }
 
 
-def test_timestamps_to_seconds():
+def test_timestamps_to_seconds() -> None:
     assert timestamp_to_seconds(None) is None
     assert timestamp_to_seconds('') is None
 
@@ -725,7 +766,7 @@ def test_timestamps_to_seconds():
     assert timestamp_to_seconds('foo') is None
 
 
-def test_seconds_to_timestamp():
+def test_seconds_to_timestamp() -> None:
     assert seconds_to_timestamp(None) == '0s'
     assert seconds_to_timestamp(0) == '0s'
     assert seconds_to_timestamp(1) == '1s'

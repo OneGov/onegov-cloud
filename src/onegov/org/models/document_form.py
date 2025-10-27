@@ -42,10 +42,10 @@ class FormDocument(Base, ContentMixin, TimestampMixin, AccessExtension,
 
     __tablename__ = 'form_documents'
 
-    es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
-        'pdf_extract': {'type': 'localized'},
+    fts_properties = {
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'},
+        'pdf_extract': {'type': 'localized', 'weight': 'C'},
     }
 
     #: An internal id for references (not public)
@@ -87,9 +87,6 @@ class FormDocument(Base, ContentMixin, TimestampMixin, AccessExtension,
     @observes('title')
     def title_observer(self, title: str) -> None:
         self.order = normalize_for_url(title)
-
-    es_type_name = 'document_pages'
-    es_id = 'title'
 
 
 class FormDocumentCollection(GenericCollection[FormDocument]):

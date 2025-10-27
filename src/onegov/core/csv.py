@@ -22,7 +22,7 @@ from itertools import permutations
 from onegov.core import errors
 from ordered_set import OrderedSet
 from unidecode import unidecode
-from xlsxwriter.workbook import Workbook  # type:ignore[import-untyped]
+from xlsxwriter.workbook import Workbook
 from onegov.core.utils import normalize_for_url
 
 
@@ -43,7 +43,7 @@ if TYPE_CHECKING:
     )
 
     class _RowType(Protocol[_T_co]):
-        def __call__(self, rownumber: int, **kwargs: str) -> _T_co: ...
+        def __call__(self, *, rownumber: int, **kwargs: str) -> _T_co: ...
 
     class DefaultRow(Protocol):
         @property
@@ -52,9 +52,9 @@ if TYPE_CHECKING:
 
     KeyFunc: TypeAlias = Callable[[_T], SupportsRichComparison]
     DefaultCSVFile: TypeAlias = 'CSVFile[DefaultRow]'
-
-
-_RowT = TypeVar('_RowT')
+    _RowT = TypeVar('_RowT', default=DefaultRow)
+else:
+    _RowT = TypeVar('_RowT')
 
 
 VALID_CSV_DELIMITERS = ',;\t'

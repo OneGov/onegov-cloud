@@ -126,6 +126,8 @@
                        twitter layout.org.twitter_url|nothing;
                        instagram layout.org.instagram_url|nothing;
                        youtube layout.org.youtube_url|nothing;
+                       linkedin layout.org.linkedin_url|nothing;
+                       tiktok layout.org.tiktok_url|nothing;
                        custom_links layout.custom_links|nothing;">
         <div class="row footer-columns" tal:condition="any((
             contact,
@@ -136,6 +138,8 @@
             twitter,
             instagram,
             youtube,
+            linkedin,
+            tiktok,
             custom_links
         ))">
             <div class="small-12 columns medium-${request.app.org.footer_left_width}">
@@ -241,30 +245,42 @@
 </metal:footer_opening_hours>
 
 <metal:footer_social_media define-macro="footer_social_media">
-    <h2 i18n:translate tal:condition="facebook or twitter">Social Media</h2>
+    <tal:b condition="any((facebook, twitter, instagram, youtube, linkedin, tiktok))">
+        <h2 i18n:translate>Social Media</h2>
 
-    <ul class="social-media-links" tal:condition="facebook or twitter">
-        <li tal:condition="facebook">
-            <a tal:attributes="href facebook">
-                <i class="fa fa-facebook-official fa-fw"></i> Facebook
-            </a>
-        </li>
-        <li tal:condition="twitter">
-            <a tal:attributes="href twitter">
-                <i class="fa fa-twitter fa-fw"></i> Twitter
-            </a>
-        </li>
-        <li tal:condition="instagram">
-            <a tal:attributes="href instagram">
-                <i class="fa fa-instagram fa-fw"></i> Instagram
-            </a>
-        </li>
-        <li tal:condition="youtube">
-            <a tal:attributes="href youtube">
-                <i class="fa fa-youtube fa-fw"></i> YouTube
-            </a>
-        </li>
-    </ul>
+        <ul class="social-media-links">
+            <li tal:condition="facebook">
+                <a tal:attributes="href facebook">
+                    <i class="fa fa-facebook-official fa-fw"></i> Facebook
+                </a>
+            </li>
+            <li tal:condition="twitter">
+                <a tal:attributes="href twitter">
+                    <i class="fa fa-twitter fa-fw"></i> Twitter
+                </a>
+            </li>
+            <li tal:condition="instagram">
+                <a tal:attributes="href instagram">
+                    <i class="fa fa-instagram fa-fw"></i> Instagram
+                </a>
+            </li>
+            <li tal:condition="youtube">
+                <a tal:attributes="href youtube">
+                    <i class="fa fa-youtube fa-fw"></i> YouTube
+                </a>
+            </li>
+            <li tal:condition="linkedin">
+                <a tal:attributes="href linkedin">
+                    <i class="fa fa-linkedin fa-fw"></i> LinkedIn
+                </a>
+            </li>
+            <li tal:condition="tiktok">
+                <a tal:attributes="href tiktok">
+                    <img class="tiktok" src="static/font-awesome/tiktok-brands-solid.svg" height="14px"></img> TikTok
+                </a>
+            </li>
+        </ul>
+    </tal:b>
 </metal:footer_social_media>
 
 <metal:footer_locales define-macro="footer_locales">
@@ -626,7 +642,11 @@
             <metal:b use-macro="layout.macros['display_fields']" tal:define="fields fields.values()">
         </tal:b>
     </div>
-    <tal:b condition="price|nothing">
+    <tal:b tal:condition="invoice_items|nothing">
+        <h2 i18n:translate>Invoice Items</h2>
+        <tal:b metal:use-macro="layout.macros['invoice_items']" />
+    </tal:b>
+    <tal:b tal:condition="price|nothing">
         <dl class="field-display">
             <dt i18n:translate>Total Amount</dt>
             <dd><metal:b use-macro="layout.macros['price']" /></dd>
@@ -731,13 +751,56 @@
     <metal:b use-macro="layout.macros['display_form']" />
 </metal:directory_entry_submission>
 
-<metal:price define-macro="price">
-    ${layout.format_number(price.net_amount)} ${price.currency}
-    <tal:b condition="price.fee and show_fee|nothing">
-        (+ ${layout.format_number(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
+<metal:price define-macro="price" i18n:domain="onegov.org">
+    <tal:b tal:define="show_fee show_fee|False; show_vat show_vat|False">
+        ${layout.format_number(price.net_amount)} ${price.currency}
+        <tal:b tal:condition="show_fee and price.fee">
+            (+ ${layout.format_number(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
+        </tal:b>
+        <tal:b tal:define="vat_amount layout.get_vat_amount(price.amount); hide_vat_amount hide_vat_amount|False" tal:condition="show_vat and layout.vat_rate and vat_amount">
+            <br>
+            (<tal:b i18n:translate>VAT</tal:b> <tal:b i18n:translate><tal:b i18n:name="vat_rate">${layout.format_number(layout.vat_rate, 1)}</tal:b>% included</tal:b><tal:b tal:condition="not:hide_vat_amount">: ${layout.format_number(vat_amount, 2)} ${price.currency}</tal:b>)
+        </tal:b>
     </tal:b>
-    <br>${layout.format_vat(price.net_amount, price.currency)}
 </metal:price>
+
+<metal:payment define-macro="payment" i18n:domain="onegov.org">
+    <tal:b tal:define="show_fee show_fee|False" tal:condition="payment|nothing">
+        <h2 i18n:translate>Payment</h2>
+        <dl class="field-display">
+            <dt i18n:translate>Total Amount</dt>
+            <dd>${layout.format_number(payment.amount)} ${payment.currency}</dd>
+        </dl>
+        <dl class="field-display" tal:define="show_vat show_vat|False; vat_amount layout.get_vat_amount(payment.amount); hide_vat_amount hide_vat_amount|False" tal:condition="show_vat and layout.vat_rate and vat_amount">
+            <dt i18n:translate>Value Added Tax</dt>
+            <dd><tal:b i18n:translate><tal:b i18n:name="vat_rate">${layout.format_number(layout.vat_rate, 1)}</tal:b>% included</tal:b><tal:b tal:condition="not:hide_vat_amount">: ${layout.format_number(vat_amount, 2)} ${payment.currency}</tal:b></dd>
+        </dl>
+        <dl class="field-display">
+            <dt i18n:translate>State</dt>
+            <dd><tal:b metal:use-macro="layout.macros['payment_status']" /></dd>
+        </dl>
+        <dl class="field-display" tal:condition="not:show_fee">
+            <dt i18n:translate>Payment Method</dt>
+            <dd tal:switch="payment.source">
+                <tal:b tal:case="'manual'" i18n:translate>Offline Payment</tal:b>
+                <tal:b tal:case="default" i18n:translate>Online Payment</tal:b>
+            </dd>
+        </dl>
+        <dl class="field-display" tal:condition="show_fee">
+            <dt i18n:translate>Source</dt>
+            <dd tal:switch="payment.source">
+                <tal:b tal:case="'manual'" i18n:translate>Manual</tal:b>
+                <tal:b tal:case="'datatrans'" i18n:translate>Datatrans</tal:b>
+                <tal:b tal:case="'stripe_connect'" i18n:translate>Stripe Connect</tal:b>
+                <tal:b tal:case="'worldline_saferpay'" i18n:translate>Worldline Saferpay</tal:b>
+            </dd>
+        </dl>
+        <dl tal:condition="show_fee and payment.fee" class="field-display">
+            <dt i18n:translate>Fee</dt>
+            <dd>${layout.format_number(payment.fee)</dd>
+        </dl>
+    </tal:b>
+</metal:payment>
 
 <metal:person_card define-macro="person_list_card" i18n:domain="onegov.org">
     <div class="person-card person-list-card" tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)">
@@ -887,9 +950,12 @@
     <div i18n:translate tal:condition="payment.state == 'cancelled'" class="payment-state payment-state-cancelled">
         Refunded
     </div>
+    <div i18n:translate tal:condition="payment.state == 'invoiced'" class="payment-state payment-state-invoiced">
+        Invoiced
+    </div>
 </metal:payment_status>
 
-<metal:payment_status define-macro="payment_source" i18n:domain="onegov.org">
+<metal:payment_source define-macro="payment_source" i18n:domain="onegov.org">
     <div i18n:translate tal:condition="payment.source == 'manual'">
         Manual
     </div>
@@ -908,7 +974,7 @@
             Worldline Saferpay
         </a>
     </div>
-</metal:payment_status>
+</metal:payment_source>
 
 <metal:ticket_callout define-macro="ticket_callout" i18n:domain="onegov.org">
     <div class="borderless-side-panel" tal:condition="ticket">
@@ -980,22 +1046,29 @@
 </metal:reservations>
 
 <metal:reservations define-macro="reservations" i18n:domain="onegov.org">
-    <ul tal:condition="reservations" class="reservations">
-        <li tal:repeat="reservation reservations">
-            <tal:b define="start reservation.display_start(); end reservation.display_end()">
-                <strong>
-                    ${layout.format_date(start, 'weekday_long')},
-                    ${layout.format_date(start, 'date_long')}
-                </strong>
-                <!--! simple whole day check: -->
-                <span tal:condition="start.time() != end.time()">
-                    <br>
-                    ${layout.format_time_range(start, end)}
-                </span>
-                <br><span i18n:translate>Quota</span>
-                <span>
-                    ${reservation.quota}
-                </span>
+    <ul tal:condition="reservations" tal:define="get_links get_links|None; get_occupancy_url get_occupancy_url|None" class="reservations">
+        <li tal:repeat="reservation reservations" tal:attributes="class 'reservation' if get_links else None">
+            <tal:b define="start reservation.display_start(); end reservation.display_end(); links get_links(reservation, request) if get_links else []; url get_occupancy_url(reservation, request) if get_occupancy_url else None">
+                <div class="reservation-details" tal:omit-tag="not:links">
+                    <a href="${url}" title="Occupancy" tal:omit-tag="not:url" i18n:attributes="title">
+                        <strong>
+                            ${layout.format_date(start, 'weekday_long')},
+                            ${layout.format_date(start, 'date_long')}
+                        </strong>
+                    </a>
+                    <!--! simple whole day check: -->
+                    <span tal:condition="start.time() != end.time()">
+                        <br>
+                        ${layout.format_time_range(start, end)}
+                    </span>
+                    <br><span i18n:translate>Quota</span>
+                    <span>
+                        ${reservation.quota}
+                    </span>
+                </div>
+                <div class="reservation-actions text-links" tal:condition="links">
+                    <tal:b repeat="link links" content="link(layout)" />
+                </div>
             </tal:b>
         </li>
     </ul>
@@ -1595,14 +1668,14 @@
     <div class="identicon">
         <metal:b use-macro="layout.macros.identicon"
                  tal:define="
-                    initials owner.initials if not layout.org.hide_personal_email or model.meta.get('origin') == 'external' or request.is_logged_in else layout.org.general_email[0];
-                    username owner.username if not layout.org.hide_personal_email or model.meta.get('origin') == 'external' or request.is_logged_in else layout.org.general_email;
+                    initials owner.initials;
+                    username owner.username;
                     size 'large';
                 "
         />
     </div>
     <div class="timestamp">
-        <b>${owner.name if not layout.org.hide_personal_email or model.meta.get('origin') == 'external' or request.is_logged_in else layout.org.general_email}</b>
+        <b>${owner.name}</b>
         <tal:b i18n:translate>
             at <tal:b i18n:name="time">${layout.format_date(model.created, 'time')}</tal:b>
         </tal:b>
@@ -1618,16 +1691,15 @@
     </div>
 </metal:generic_message>
 
-<metal:payment_link_fallback define-macro="payment_link_fallback" i18n:domain="onegov.org">
-    <!--! pass -->
-</metal:payment_link_fallback>
-
 <metal:payments define-macro="payments" i18n:domain="onegov.org">
     <table class="payments-table" tal:condition="payments">
         <thead>
             <tr>
-                <th i18n:translate tal:condition="payment_links|nothing">
+                <th i18n:translate tal:condition="tickets|nothing">
                     Object
+                </th>
+                <th i18n:translate tal:condition="reservation_dates_formatted|nothing">
+                    Reservation
                 </th>
                 <th i18n:translate>
                     Net Amount
@@ -1652,38 +1724,26 @@
         </thead>
         <tbody>
             <tr tal:repeat="payment payments">
-                <td tal:condition="payment_links|nothing">
-                    <tal:b repeat="link payment_links[payment.id]">
-                        <tal:b switch="link.__tablename__">
-                            <tal:b case="'submissions'">
-                                <tal:b define="ticket get_ticket(link)">
-                                    <div>
-                                        <a href="${request.link(ticket)}">
-                                            <strong>${ticket.number}</strong> - ${ticket.group}
-                                        </a>
-                                        <div>
-                                            ${link.title}
-                                        </div>
-                                    </div>
-                                </tal:b>
+                <td tal:condition="tickets|nothing">
+                    <tal:b define="ticket tickets[payment.id]|nothing">
+                        <div tal:condition="ticket">
+                            <a tal:condition="ticket" href="${request.link(ticket)}">
+                                <strong>${ticket.number}</strong> - ${ticket.group}
+                            </a>
+                            <tal:b tal:switch="ticket.handler_code">
+                                <div tal:case="'RSV'">
+                                    ${ticket.ticket_email}
+                                </div>
+                                <div tal:case="default">
+                                    ${ticket.title}
+                                </div>
                             </tal:b>
-                            <tal:b case="'reservations'" condition="repeat.link.start">
-                                <tal:b define="ticket get_ticket(link)">
-                                    <div>
-                                        <a href="${request.link(ticket)}">
-                                            <strong>${ticket.number}</strong> - ${ticket.group}
-                                        </a>
-                                        <div>
-                                            ${link.title}
-                                        </div>
-                                    </div>
-                                </tal:b>
-                            </tal:b>
-                            <tal:b case="default">
-                                <metal:b use-macro="layout.macros['payment_link_fallback']" />
-                            </tal:b>
-                        </tal:b>
+                        </div>
                     </tal:b>
+                </td>
+                <!-- Cell for Reservation Dates -->
+                <td tal:condition="reservation_dates_formatted|nothing">
+                    <span tal:replace="reservation_dates_formatted.get(payment.id, '')" />
                 </td>
                 <td>${'{0:.2f}'.format(payment.net_amount)} ${payment.currency}</td>
                 <td>
@@ -1719,6 +1779,92 @@
         </tbody>
     </table>
 </metal:payments>
+
+<metal:invoices define-macro="invoices" i18n:domain="onegov.org">
+    <table class="invoices-table" tal:condition="invoices">
+        <thead>
+            <tr>
+                <th class="select-all-checkbox-cell">
+                    <input type="checkbox" aria-label="Select all invoices" />
+                </th>
+                <th i18n:translate>
+                    Object
+                </th>
+                <th i18n:translate tal:condition="reservation_dates_formatted|nothing">
+                    Reservation
+                </th>
+                <th i18n:translate>
+                    Net Amount
+                </th>
+                <th i18n:translate>
+                    Invoiced
+                </th>
+                <th i18n:translate>
+                    Paid
+                </th>
+                <th i18n:translate>
+                    Created
+                </th>
+                <th tal:condition="invoice_actions|nothing"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr tal:repeat="invoice invoices" class="${'' if invoice.invoiced else 'un'}invoiced ${'' if invoice.paid else 'un'}paid">
+                <td class="invoice-checkbox-cell">
+                    <input type="checkbox" name="selected_invoices" value="${invoice.id}" aria-label="Select this invoice" i18n:attributes="aria-label" />
+                </td>
+                <td>
+                    <div>
+                        <a href="${request.link(invoice.ticket)}">
+                            <strong>${invoice.ticket.number}</strong> - ${invoice.ticket.group}
+                        </a>
+                        <tal:b tal:switch="invoice.ticket.handler_code">
+                            <div tal:case="'RSV'">
+                                ${invoice.ticket.ticket_email}
+                            </div>
+                            <div tal:case="default">
+                                ${invoice.ticket.title}
+                            </div>
+                        </tal:b>
+                    </div>
+                </td>
+                <!-- Cell for Reservation Dates -->
+                <td tal:condition="reservation_dates_formatted|nothing">
+                    <span tal:replace="reservation_dates_formatted.get(invoice.id, '')" />
+                </td>
+                <td>${'{0:.2f}'.format(invoice.total_amount)}</td>
+                <td class="invoiced-state">
+                    <tal:b tal:condition="invoice.invoiced">
+                        <i class="fa fa-check-circle" aria-hidden="true" title="Invoiced" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Invoiced</span>
+                    </tal:b>
+                    <tal:b tal:condition="not:invoice.invoiced">
+                        <i class="fa fa-times-circle" aria-hidden="true" title="Uninvoiced" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Uninvoiced</span>
+                    </tal:b>
+                </td>
+                <td class="paid-state">
+                    <tal:b tal:condition="invoice.paid">
+                        <i class="fa fa-check-circle" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Paid</span>
+                    </tal:b>
+                    <tal:b tal:condition="not:invoice.paid">
+                        <i class="fa fa-times-circle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Unpaid</span>
+                    </tal:b>
+                </td>
+                <td>
+                    ${layout.format_date(invoice.ticket.created, 'datetime')}
+                </td>
+                <td tal:condition="invoice_actions|nothing" class="text-links">
+                    <tal:b repeat="link invoice_actions(invoice)">
+                        <tal:b replace="link(layout)" />
+                    </tal:b>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</metal:invoices>
 
 <metal:directory_error define-macro="directory_error" i18n:domain="onegov.org">
     <ul class="dense">
@@ -2268,7 +2414,7 @@
 </metal:tickets_table_row>
 
 <metal:open_graph_tags define-macro="open_graph_tags">
-<meta property="og:title" tal:attributes="content og_title" tal:define="og_title layout.og_title | title | None" tal:condition="og_title" />
+<meta property="og:title" tal:attributes="content og_title" tal:define="og_title og_title | layout.og_title | title | None" tal:condition="og_title" />
 <meta property="og:type" tal:attributes="content layout.og_type" />
 <meta property="og:url" tal:attributes="content layout.og_url" />
 <tal:b tal:define="og_image layout.og_image" tal:condition="og_image">
@@ -2303,6 +2449,103 @@
         tal:condition="not: layout.org.disable_page_refs"
     ></div>
 </metal:pageref>
+
+<metal:invoice_items define-macro="invoice_items" i18n:domain="onegov.org">
+    <table class="invoice-items" tal:define="total_amount total_amount|None; total_vat total_vat|None; total_paid total_paid|False; show_cost_object any(item.cost_object for items in invoice_items.values() for item in items); show_vat total_vat or any(item.vat for items in invoice_items.values() for item in items); show_quantity any(item.quantity != 1.0 for items in invoice_items.values() for item in items); item_actions item_actions|None; show_payment_state show_payment_state|False">
+        <thead>
+            <tr>
+                <th i18n:translate>Booking Text</th>
+                <th tal:condition="show_cost_object" i18n:translate>Cost center / cost unit</th>
+                <th tal:condition="show_quantity" class="centered" i18n:translate>Unit</th>
+                <th tal:condition="show_quantity" class="centered" i18n:translate>Quantity</th>
+                <th tal:condition="show_vat" class="centered" i18n:translate>VAT Rate</th>
+                <th tal:condition="show_vat" class="centered" i18n:translate>VAT</th>
+                <th class="centered" i18n:translate>Amount</th>
+                <th tal:condition="item_actions">
+                    <span i18n:translate class="show-for-sr">Actions</span>
+                </th>
+            </tr>
+        </thead>
+        <tal:b tal:repeat="(group, items) invoice_items.items()">
+            <thead>
+                <tr class="group">
+                    <th tal:switch="group" colspan="${2 + (1 if show_cost_object else 0) + (2 if show_quantity else 0) + (2 if show_vat else 0) + (1 if item_actions else 0)}">
+                        <tal:b tal:case="'reservation'" i18n:translate>
+                            Reservations
+                        </tal:b>
+                        <tal:b tal:case="'submission'" i18n:translate>
+                            Submission
+                        </tal:b>
+                        <tal:b tal:case="'form'" i18n:translate>
+                            Selected Options
+                        </tal:b>
+                        <tal:b tal:case="'manual'" i18n:translate>
+                            Discounts / Surcharges
+                        </tal:b>
+                        <tal:b tal:case="'migration'" i18n:translate>
+                            Lump sum
+                        </tal:b>
+                        <tal:b tal:case="default">
+                            ${item.group}
+                        </tal:b>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tal:b tal:repeat="item items">
+                    <tr tal:define="groupid hash(str(item.group) + str(repeat.item.index)); paid total_paid or item.paid|False" tal:attributes="class ('paid' if paid else 'unpaid') if show_payment_state else None">
+                        <td>${item.text}</td>
+                        <td tal:condition="show_cost_object" class="cost-object">${item.cost_object}</td>
+                        <td tal:condition="show_quantity" class="unit">${'{:.2f}'.format(item.unit)}</td>
+                        <td tal:condition="show_quantity" class="quantity">${'{:.2f}'.format(item.quantity)}</td>
+                        <td tal:condition="show_vat" class="vat-rate">${'{:.1f}%'.format(item.vat_rate or 0.0)}</td>
+                        <td tal:condition="show_vat" class="vat">${'{:.2f}'.format(item.vat)}</td>
+                        <td class="amount">
+                            ${'{:.2f}'.format(item.amount)}
+                            <tal:b tal:condition="show_payment_state and paid">
+                                <i class="fa ${item.source in ('datatrans', 'stripe_connect', 'worldline_saferpay') and 'fa-credit-card' or 'fa-check-circle'}" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
+                                <span i18n:translate class="show-for-sr">Paid</span>
+                            </tal:b>
+                            <tal:b tal:condition="show_payment_state and not paid">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
+                                <span i18n:translate class="show-for-sr">Unpaid</span>
+                            </tal:b>
+                        </td>
+                        <td class="actions" tal:condition="item_actions">
+                            <tal:b tal:repeat="action actions" tal:define="actions item_actions(item)">
+                                ${action(layout)}
+                            </tal:b>
+                        </td>
+                    </tr>
+                </tal:b>
+            </tbody>
+        </tal:b>
+        <tfoot tal:condition="total_amount is not None">
+            <tr class="total${(' paid' if total_paid else ' unpaid') if show_payment_state else ''}">
+                <td i18n:translate>Total</td>
+                <td tal:condition="show_cost_object"></td>
+                <td tal:condition="show_quantity" class="unit"></td>
+                <td tal:condition="show_quantity" class="quantity"></td>
+                <td tal:condition="show_vat" class="vat-rate"></td>
+                <td tal:condition="show_vat" class="vat">
+                    ${'{:.2f}'.format(total_vat)}
+                </td>
+                <td class="amount">
+                    ${'{:.2f}'.format(total_amount)}
+                    <tal:b tal:condition="show_payment_state and total_paid">
+                        <i class="fa fa-check-circle" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Paid</span>
+                    </tal:b>
+                    <tal:b tal:condition="show_payment_state and not total_paid">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Unpaid</span>
+                    </tal:b>
+                </td>
+                <td tal:condition="item_actions"></td>
+            </tr>
+        </tfoot>
+    </table>
+</metal:invoice_items>
 
 <metal:display_results define-macro="display_results" i18n:domain="onegov.org">
     <tal:b tal:condition="not submission_count" i18n:translate="">No submissions yet.</tal:b>

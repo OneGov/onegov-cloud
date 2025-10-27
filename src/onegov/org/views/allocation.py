@@ -26,9 +26,10 @@ from onegov.reservation import Resource
 from onegov.reservation import ResourceCollection
 from purl import URL
 from sedate import utcnow
-from sqlalchemy import not_, func
+from sqlalchemy import or_, func
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import defer, defaultload
+from uuid import uuid4
 from webob import exc
 
 
@@ -168,6 +169,17 @@ def view_allocation_rules(
         yield Link(
             text=_('Edit'),
             url=link_for_rule(rule, 'edit-rule'),
+        )
+
+        yield Link(
+            text=_('Copy'),
+            url=link_for_rule(rule, 'copy-rule'),
+            traits=(
+                Intercooler(
+                    request_method='POST',
+                    redirect_after=request.link(self, 'rules')
+                ),
+            )
         )
 
     def rules_with_actions() -> Iterator[RenderData]:
@@ -357,6 +369,30 @@ def handle_allocation_rule(
 
         return request.redirect(request.link(self, name='rules'))
 
+    elif not request.POST:
+        start, end = utils.parse_fullcalendar_request(request, self.timezone)
+        whole_day = request.params.get('whole_day') == 'yes'
+
+        if start and end:
+            if whole_day:
+                form['start'].data = start
+                form['end'].data = end
+
+                if hasattr(form, 'as_whole_day'):
+                    form.as_whole_day.data = 'yes'
+
+            else:
+                form['start'].data = start
+                form['end'].data = end
+
+                if hasattr(form, 'as_whole_day'):
+                    form.as_whole_day.data = 'no'
+
+                if hasattr(form, 'start_time'):
+                    assert hasattr(form, 'end_time')
+                    form.start_time.data = start
+                    form.end_time.data = end
+
     return {
         'layout': layout,
         'title': _('New availabilty period'),
@@ -397,15 +433,45 @@ def handle_edit_rule(
             ) == rule_id
         )
         # .. without the ones with slots
-        candidates = candidates.filter(
-            not_(Allocation.id.in_(slots.subquery())))
+        deletable_candidates = candidates.filter(
+            Allocation.id.notin_(slots.subquery()))
 
         # .. without the ones with reservations
-        candidates = candidates.filter(
-            not_(Allocation.group.in_(reservations.subquery())))
+        deletable_candidates = deletable_candidates.filter(
+            Allocation.group.notin_(reservations.subquery()))
 
         # delete the allocations
-        deleted_count = candidates.delete('fetch')
+        deleted_count = deletable_candidates.delete('fetch')
+
+        # we need to update any undeletedable allocations with
+        # the new rule_id and the new access
+        updatable_candidates = candidates.filter(or_(
+            Allocation.id.in_(slots.subquery()),
+            Allocation.group.in_(reservations.subquery())
+        ))
+
+        # .. but only future ones (so we don't keep an ever-growing
+        # rat's tail of ancient allocations we no longer care about)
+        updatable_candidates = updatable_candidates.filter(
+            Allocation._end >= utcnow())
+
+        # update the allocations
+        # NOTE: For now we only update the rule_id to keep the link
+        #       as well as the access, everything else is left alone
+        #       since it could otherwise result in inconsistent data
+        new_data = {'rule': form.rule_id}
+        if 'access' in form:
+            new_data['access'] = form['access'].data
+
+        # NOTE: This is a little bit dodgy, but since allocations aren't
+        #       searchable and we don't have any other use-cases currently
+        #       where we would want to know about changes to allocations
+        #       the speed increase outweighs any future potential for
+        #       bugs related to this bulk update
+        with request.app.session_manager.ignore_bulk_updates():
+            updated_count = updatable_candidates.update({
+                Allocation.data: Allocation.data.op('||')(new_data)
+            }, 'fetch')
 
         # Update the rule itself
         rules = self.content.get('rules', [])
@@ -424,9 +490,11 @@ def handle_edit_rule(
         request.success(
             _(
                 'Availability period updated. ${deleted} allocations removed, '
-                '${created} new allocations created.',
+                '${updated} allocations adjusted and ${created} new '
+                'allocations created.',
                 mapping={
                     'deleted': deleted_count,
+                    'updated': updated_count,
                     'created': new_allocations_count,
                 },
             )
@@ -555,6 +623,56 @@ def handle_stop_rule(self: Resource, request: OrgRequest) -> None:
 
 
 @OrgApp.view(model=Resource, request_method='POST', permission=Private,
+             name='copy-rule')
+def handle_copy_rule(self: Resource, request: OrgRequest) -> None:
+    request.assert_valid_csrf_token()
+
+    copied_rules: dict[str, dict[str, Any]]
+    copied_rules = request.browser_session.get('copied_allocation_rules', {})
+
+    rule_id = rule_id_from_request(request)
+    for rule in self.content.get('rules', ()):
+        if rule['id'] == rule_id:
+            rule = rule.copy()
+            rule['last_run'] = None
+            rule['iteration'] = 0
+            # NOTE: You can't copy between different resource types
+            #       so we keep a separate copy per type
+            copied_rules[self.type] = rule
+            request.browser_session.copied_allocation_rules = copied_rules
+            break
+    else:
+        raise exc.HTTPNotFound()
+
+    request.success(_('The availability period was added to the clipboard'))
+
+
+@OrgApp.view(model=Resource, request_method='POST', permission=Private,
+             name='paste-rule')
+def handle_paste_rule(self: Resource, request: OrgRequest) -> None:
+    request.assert_valid_csrf_token()
+
+    copied_rules: dict[str, dict[str, Any]]
+    copied_rules = request.browser_session.get('copied_allocation_rules', {})
+    rule = copied_rules.get(self.type)
+    if rule is None:
+        raise exc.HTTPNotFound()
+
+    form_class = get_allocation_rule_form_class(self, request)
+    form = request.get_form(form_class, csrf_support=False, model=self)
+    form.rule = rule
+    # set a new uuid for the copy
+    form.rule_id = uuid4().hex
+    form.apply(self)
+
+    rules = self.content.get('rules', [])
+    rules.append(form.rule)
+    self.content['rules'] = rules
+
+    request.success(_('Pasted availability period from to the clipboard'))
+
+
+@OrgApp.view(model=Resource, request_method='POST', permission=Private,
              name='delete-rule')
 def handle_delete_rule(self: Resource, request: OrgRequest) -> None:
     request.assert_valid_csrf_token()
@@ -579,11 +697,11 @@ def handle_delete_rule(self: Resource, request: OrgRequest) -> None:
 
     # .. without the ones with slots
     candidates = candidates.filter(
-        not_(Allocation.id.in_(slots.subquery())))
+        Allocation.id.notin_(slots.subquery()))
 
     # .. without the ones with reservations
     candidates = candidates.filter(
-        not_(Allocation.group.in_(reservations.subquery())))
+        Allocation.group.notin_(reservations.subquery()))
 
     # delete the allocations
     count = candidates.delete('fetch')

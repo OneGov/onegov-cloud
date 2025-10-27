@@ -62,15 +62,15 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'attendees'
 
-    es_properties = {
-        'username': {'type': 'text'},
-        'name': {'type': 'text'},
-        'notes': {'type': 'localized'}
+    fts_properties = {
+        'username': {'type': 'text', 'weight': 'A'},
+        'name': {'type': 'text', 'weight': 'A'},
+        'notes': {'type': 'localized', 'weight': 'C'}
     }
-    es_public = False
+    fts_public = False
 
     @property
-    def es_suggestion(self) -> str:
+    def fts_suggestion(self) -> str:
         return self.name
 
     def __hash__(self) -> int:

@@ -3,15 +3,18 @@ from __future__ import annotations
 from morepath import redirect
 from onegov.core.elements import BackLink, Link
 from onegov.core.security import Private
+from onegov.core.templates import render_macro
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde import LandsgemeindeApp
-from onegov.landsgemeinde.collections import VotumCollection
+from onegov.landsgemeinde.collections import (AgendaItemCollection,
+                                              VotumCollection)
 from onegov.landsgemeinde.forms import VotumForm
 from onegov.landsgemeinde.layouts import VotumCollectionLayout
 from onegov.landsgemeinde.layouts import VotumLayout
 from onegov.landsgemeinde.models import Votum
 from onegov.landsgemeinde.utils import ensure_states
 from onegov.landsgemeinde.utils import update_ticker
+from onegov.landsgemeinde.models.votum import STATES
 
 
 from typing import TYPE_CHECKING
@@ -115,3 +118,39 @@ def delete_votum(self: Votum, request: LandsgemeindeRequest) -> None:
     )
 
     update_ticker(request, {self.agenda_item})
+
+
+@LandsgemeindeApp.view(
+    model=Votum,
+    name='change-state',
+    request_method='POST',
+    permission=Private
+)
+def change_votum_state(
+    self: Votum,
+    request: LandsgemeindeRequest
+) -> str:
+    layout = VotumLayout(self, request)
+    request.assert_valid_csrf_token()
+
+    i = list(STATES).index(self.state)
+    self.state = list(STATES)[(i + 1) % len(STATES)]
+
+    updated = ensure_states(self)
+    updated.add(self)
+    update_ticker(request, updated)
+
+    assembly = self.agenda_item.assembly
+    agenda_items = (
+        AgendaItemCollection(request.session)
+        .preloaded_by_assembly(assembly).all()
+    )
+
+    return render_macro(
+        layout.macros['states-list'],
+        request,
+        {'assembly': assembly,
+         'agenda_items': agenda_items,
+         'layout': layout,
+         'state': self.state}
+    )

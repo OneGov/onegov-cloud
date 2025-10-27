@@ -5,7 +5,7 @@ from collections import OrderedDict
 from markupsafe import Markup
 
 
-from onegov.activity import PeriodCollection
+from onegov.activity import BookingPeriodCollection
 from onegov.core.elements import BackLink
 from onegov.core.html import html_to_text, sanitize_html
 from onegov.core.security import Secret
@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 
 
 def get_variables(request: FeriennetRequest) -> dict[str, str]:
-    period = PeriodCollection(request.session).active()
+    period = BookingPeriodCollection(request.session).active()
     variables = TemplateVariables(request, period).bound
 
     return OrderedDict(
@@ -180,7 +180,7 @@ def handle_send_notification(
     form: NotificationTemplateSendForm
 ) -> RenderData | Response:
 
-    period = PeriodCollection(request.session).active()
+    period = BookingPeriodCollection(request.session).active()
     variables = TemplateVariables(request, period)
     layout = NotificationTemplateLayout(self, request)
 

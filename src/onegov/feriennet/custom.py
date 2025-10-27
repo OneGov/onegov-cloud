@@ -1,6 +1,6 @@
 from __future__ import annotations
 from onegov.activity import BookingCollection
-from onegov.activity import PeriodCollection
+from onegov.activity import BookingPeriodCollection
 from onegov.activity import VolunteerCollection
 from onegov.core.utils import Bunch
 from onegov.feriennet import _, FeriennetApp
@@ -46,7 +46,7 @@ def get_template_variables(request: FeriennetRequest) -> RenderData:
 def get_global_tools(
     request: FeriennetRequest
 ) -> Iterator[Link | LinkGroup]:
-    yield from get_base_tools(request)
+    yield from get_base_tools(request, invoicing=False)
     yield from get_personal_tools(request)
     yield from get_admin_tools(request)
 
@@ -72,7 +72,7 @@ def get_admin_tools(
             links.append(
                 Link(
                     text=_('Periods'),
-                    url=request.class_link(PeriodCollection),
+                    url=request.class_link(BookingPeriodCollection),
                     attrs={'class': 'manage-periods'}
                 )
             )

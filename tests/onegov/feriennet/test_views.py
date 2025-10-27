@@ -7,7 +7,7 @@ import transaction
 
 from datetime import datetime, timedelta, date, time
 from freezegun import freeze_time
-from onegov.activity import Booking, Invoice, InvoiceItem
+from onegov.activity import Booking, BookingPeriodInvoice, ActivityInvoiceItem
 from onegov.activity.utils import generate_xml
 from onegov.core.custom import json
 from onegov.feriennet.utils import NAME_SEPARATOR
@@ -264,8 +264,19 @@ def test_activity_communication(broadcast, authenticate, connect, client,
     assert "Using a Raspberry Pi we will learn Python" in message
 
 
-def test_activity_search(client_with_es, scenario):
-    client = client_with_es
+def test_basic_search(client_with_fts):
+    client = client_with_fts
+    anom = client.spawn()
+
+    # basic test
+    assert 'Resultate' in client.get('/search?q=test')
+    assert client.get('/search/suggest?q=test').json == []
+    assert 'Resultate' in anom.get('/search?q=test')
+    assert anom.get('/search/suggest?q=test').json == []
+
+
+def test_activity_search(client_with_fts, scenario):
+    client = client_with_fts
 
     scenario.add_period()
     scenario.add_activity(
@@ -283,37 +294,33 @@ def test_activity_search(client_with_es, scenario):
     editor.login_editor()
 
     # in preview, activities can't be found
-    client.app.es_client.indices.refresh(index='_all')
-    assert 'search-result-vacation' not in admin.get('/search?q=Learn')
-    assert 'search-result-vacation' not in editor.get('/search?q=Learn')
-    assert 'search-result-vacation' not in client.get('/search?q=Learn')
+    assert 'search-result-activities' not in admin.get('/search?q=Learn')
+    assert 'search-result-activities' not in editor.get('/search?q=Learn')
+    assert 'search-result-activities' not in client.get('/search?q=Learn')
 
     url = '/activity/learn-how-to-program'
     editor.get(url).click("Publikation beantragen")
 
     # once proposed, activities can be found by the admin only
-    client.app.es_client.indices.refresh(index='_all')
-    assert 'search-result-vacation' in admin.get('/search?q=Learn')
-    assert 'search-result-vacation' not in editor.get('/search?q=Learn')
-    assert 'search-result-vacation' not in client.get('/search?q=Learn')
+    assert 'search-result-activities' in admin.get('/search?q=Learn')
+    assert 'search-result-activities' not in editor.get('/search?q=Learn')
+    assert 'search-result-activities' not in client.get('/search?q=Learn')
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     ticket.click("Veröffentlichen")
 
     # once accepted, activities can be found by anyone
-    client.app.es_client.indices.refresh(index='_all')
-    assert 'search-result-vacation' in admin.get('/search?q=Learn')
-    assert 'search-result-vacation' in editor.get('/search?q=Learn')
-    assert 'search-result-vacation' in client.get('/search?q=Learn')
+    assert 'search-result-activities' in admin.get('/search?q=Learn')
+    assert 'search-result-activities' in editor.get('/search?q=Learn')
+    assert 'search-result-activities' in client.get('/search?q=Learn')
 
     ticket = admin.get(ticket.request.url)
     ticket.click("Archivieren")
 
     # archived the search will fail again, except for admins
-    client.app.es_client.indices.refresh(index='_all')
-    assert 'search-result-vacation' in admin.get('/search?q=Learn')
-    assert 'search-result-vacation' not in editor.get('/search?q=Learn')
-    assert 'search-result-vacation' not in client.get('/search?q=Learn')
+    assert 'search-result-activities' in admin.get('/search?q=Learn')
+    assert 'search-result-activities' not in editor.get('/search?q=Learn')
+    assert 'search-result-activities' not in client.get('/search?q=Learn')
 
 
 @pytest.mark.skip('Activities work differently now, skipt for now')
@@ -1149,6 +1156,40 @@ def test_confirmed_booking_view(scenario, client):
     assert "nicht genügend Anmeldungen" in page
 
 
+def test_booking_mail(client, scenario):
+    scenario.add_period(
+        title="2019",
+        phase='booking',
+        confirmed=True,
+    )
+    scenario.add_activity(title="Foobar", state='accepted')
+    scenario.add_occasion(spots=(0, 1))
+    scenario.add_user(username='member@example.org', role='member')
+    scenario.add_attendee(
+        name="Dustin",
+        birth_date=date(2008, 1, 1),
+        username='admin@example.org'
+    )
+    scenario.commit()
+
+    client = client.spawn()
+    client.login_admin()
+    client.fill_out_profile("Scrooge", "McDuck")
+
+    # Add cancellation conditions to the ferienpass
+    page = client.get('/feriennet-settings')
+    page.form['cancellation_conditions'] = "Do not cancel"
+    page.form.submit()
+
+    page = client.get('/activity/foobar').click('Anmelden')
+    page = page.form.submit().follow()
+
+    # Check mail
+    assert len(os.listdir(client.app.maildir)) == 1
+    message_1 = client.get_email(0, 0)
+    assert "Do not cancel" in message_1['TextBody']
+
+
 def test_direct_booking_and_storno(client, scenario):
     scenario.add_period(confirmed=True)
     scenario.add_activity(title="Foobar", state='accepted')
@@ -1486,8 +1527,8 @@ def test_import_account_statement(client, scenario):
     settings.form.submit()
 
     # Prepare two payments
-    bookings = scenario.session.query(InvoiceItem)
-    bookings = bookings.order_by(InvoiceItem.group).all()
+    bookings = scenario.session.query(ActivityInvoiceItem)
+    bookings = bookings.order_by(ActivityInvoiceItem.group).all()
     assert not all([booking.payment_date for booking in bookings])
     assert not all([booking.tid for booking in bookings])
 
@@ -1519,13 +1560,13 @@ def test_import_account_statement(client, scenario):
     assert "2 Zahlungen wurden importiert" in page
 
     # Check dates and transaction IDs
-    booking1 = scenario.session.query(InvoiceItem).filter(
-        InvoiceItem.payment_date == date(2020, 3, 22)
+    booking1 = scenario.session.query(ActivityInvoiceItem).filter(
+        ActivityInvoiceItem.payment_date == date(2020, 3, 22)
     ).one()
     assert booking1.tid == 'TX1'
 
-    booking2 = scenario.session.query(InvoiceItem).filter(
-        InvoiceItem.payment_date == date(2020, 3, 5)
+    booking2 = scenario.session.query(ActivityInvoiceItem).filter(
+        ActivityInvoiceItem.payment_date == date(2020, 3, 5)
     ).all()
     assert [b.tid for b in booking2] == ['TX2', 'TX2']
 
@@ -1773,8 +1814,8 @@ def test_online_payment(client, scenario):
         assert ">Bezahlt<" in page
 
         page = client.get('/payments')
-        assert ">Offen<" not in page
-        assert ">Bezahlt<" in page
+        assert "Offen" not in page.pyquery('tbody tr').text()
+        assert "Bezahlt" in page.pyquery('tbody tr').text()
 
     page = client.get('/payments')
     assert "Ferienpass 2017" in page
@@ -1797,10 +1838,10 @@ def test_online_payment(client, scenario):
         # client.post(get_post_url(page, 'payment-refund'))
 
     page = client.get('/billing?expand=1&state=all')
-    assert ">Unbezahlt<" in page
+    assert "Unbezahlt" in page.pyquery('tbody tr').text()
 
     page = client.get('/payments')
-    assert ">Rückerstattet<" in page
+    assert "Rückerstattet" in page.pyquery('tbody tr').text()
 
     page = client.get('/my-bills')
     assert 'checkout-button' in page
@@ -1813,8 +1854,8 @@ def test_online_payment(client, scenario):
 
         # check if paid and payment date is set
         assert scenario.session.query(
-            InvoiceItem
-        ).all()[0].payment_date == date(2018, 1, 1)
+            ActivityInvoiceItem
+        ).first().payment_date == date(2018, 1, 1)
 
     client.get('/billing?state=all').click("Rechnung als unbezahlt markieren")
 
@@ -1832,8 +1873,9 @@ def test_online_payment(client, scenario):
         page.form.submit().follow()
 
     page = client.get('/payments')
-    assert ">Offen<" in page
-    assert ">Rückerstattet<" in page
+
+    assert "Offen" in page.pyquery('tbody tr').text()
+    assert "Rückerstattet" in page.pyquery('tbody tr').text()
 
 
 def test_icalendar_subscription(client, scenario):
@@ -2639,7 +2681,7 @@ def test_donations(client, scenario):
     assert "30" in page
 
     # mark it as paid to disable changes
-    for item in scenario.session.query(InvoiceItem):
+    for item in scenario.session.query(ActivityInvoiceItem):
         item.paid = True
 
     transaction.commit()
@@ -2649,7 +2691,7 @@ def test_donations(client, scenario):
     assert "Die Spende wurde bereits bezahlt" in client.get('/my-bills')
 
     # until we mark it as unpaid again
-    for item in scenario.session.query(InvoiceItem):
+    for item in scenario.session.query(ActivityInvoiceItem):
         item.paid = False
 
     transaction.commit()
@@ -2751,7 +2793,7 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
     ]
 
     # none of this should have produced more than one invoice
-    assert client.app.session().query(Invoice).count() == 1
+    assert client.app.session().query(BookingPeriodInvoice).count() == 1
 
 
 def test_booking_after_finalization_itemized(client, scenario):
@@ -2822,7 +2864,7 @@ def test_booking_after_finalization_itemized(client, scenario):
     ]
 
     # none of this should have produced more than one invoice
-    assert client.app.session().query(Invoice).count() == 1
+    assert client.app.session().query(BookingPeriodInvoice).count() == 1
 
 
 def test_booking_after_finalization_for_anonymous(client, scenario):

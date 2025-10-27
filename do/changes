@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 """ Renders the changelog from the last release up to the latest commit. """
 
+from __future__ import annotations
+
+import click
 import git
 import re
 import sys
@@ -33,7 +36,7 @@ class ChangelogCommit:
     title: str
     type: str
 
-    commit: 'Commit'
+    commit: Commit
     link: str | None = None
     hint: str | None = None
     note: str | None = None
@@ -43,7 +46,7 @@ class ChangelogCommit:
         return self.type.lower()
 
     @classmethod
-    def is_match(cls, commit: 'Commit') -> bool:
+    def is_match(cls, commit: Commit) -> bool:
 
         message = commit.message
         if isinstance(message, bytes):
@@ -56,7 +59,7 @@ class ChangelogCommit:
         return COMMIT_HEADER.match(message) is not None
 
     @classmethod
-    def parse(cls, commit: 'Commit') -> 'Self':
+    def parse(cls, commit: Commit) -> Self:
         message = commit.message
         if isinstance(message, bytes):
             message = message.decode('utf-8')
@@ -123,10 +126,10 @@ class ChangelogCommit:
         if self.type_id == 'feature':
             return 0
 
-        if self.type_id != 'performance':
+        if self.type_id == 'bugfix':
             return 1
 
-        if self.type_id != 'bugfix':
+        if self.type_id == 'performance':
             return 2
 
         return 100
@@ -182,10 +185,10 @@ class ChangelogCommit:
 
 
 def commits_between(
-    repository: 'Repo',
-    newer: 'Commit',
-    older: 'Commit'
-) -> 'Iterator[Commit]':
+    repository: Repo,
+    newer: Commit,
+    older: Commit
+) -> Iterator[Commit]:
 
     revisions = f'{older.hexsha}..{newer.hexsha}'
     commits = repository.iter_commits(revisions, reverse=True)
@@ -202,25 +205,25 @@ def commits_between(
             break
 
 
-def release_tags(repository: 'Repo') -> 'Iterator[TagObject]':
+def release_tags(repository: Repo) -> Iterator[TagObject]:
     for tag in repository.tags:
         if RELEASE_TAG.match(tag.name):
             yield tag
 
 
-def release_number(tag: 'TagObject') -> str:
+def release_number(tag: TagObject) -> str:
     return tag.name.rsplit('-', 1)[-1]
 
 
-def release_date(tag: 'TagObject') -> 'datetime':
+def release_date(tag: TagObject) -> datetime:
     return tag.commit.committed_datetime
 
 
-def format_datetime(dt: 'date | datetime') -> str:
+def format_datetime(dt: date | datetime) -> str:
     return dt.strftime('%Y-%m-%d')
 
 
-def changelog(folder: 'PathLike', new: str) -> None:
+def changelog(folder: PathLike, new: str) -> None:
     repository = git.Repo(folder, odbt=git.GitDB)
 
     tags = sorted(
@@ -230,22 +233,22 @@ def changelog(folder: 'PathLike', new: str) -> None:
     )
 
     # header
-    print('# Changes')
-    print('')
+    click.echo('# Changes')
+    click.echo()
 
     # not yet released
     if new == 'Unreleased':
-        print('## Unreleased')
+        click.echo('## Unreleased')
     else:
-        print(f"## {new.rsplit('-', 1)[-1]}")
-    print('')
+        click.echo(f"## {new.rsplit('-', 1)[-1]}")
+    click.echo()
     changelog_commits(new, repository, repository.head.commit, tags[0].commit,
                       date.today())
 
     # last 50 releases (the last version is not included by design)
     for newer, older in pairwise(tags[:50]):
-        print(f'## {release_number(newer)}')
-        print('')
+        click.echo(f'## {release_number(newer)}')
+        click.echo()
 
         changelog_commits(newer.name, repository, newer.commit, older.commit,
                           release_date(newer))
@@ -253,9 +256,9 @@ def changelog(folder: 'PathLike', new: str) -> None:
 
 def changelog_commits(
     release: str,
-    repository: 'Repo',
-    newer: 'Commit',
-    older: 'Commit',
+    repository: Repo,
+    newer: Commit,
+    older: Commit,
     release_date: date
 ) -> None:
 
@@ -263,16 +266,16 @@ def changelog_commits(
 
     # quit if there are no commits
     if not commit_objs:
-        print('No changes since last release')
-        print('')
+        click.echo('No changes since last release')
+        click.echo()
         return
 
     # print the release overview
     lo = commit_objs[0].hexsha[:10]
     hi = commit_objs[-1].hexsha[:10]
     url = f'https://github.com/OneGov/onegov-cloud/compare/{lo}^...{hi}'
-    print(f'`{format_datetime(release_date)}` | [{lo}...{hi}]({url})')
-    print('')
+    click.echo(f'`{format_datetime(release_date)}` | [{lo}...{hi}]({url})')
+    click.echo()
 
     # parse the commit messages
     commits = [
@@ -282,33 +285,33 @@ def changelog_commits(
 
     hints = [commit.hint for commit in commits if commit.hint]
     if hints:
-        print('**Upgrade hints**')
+        click.echo('**Upgrade hints**')
         for hint in hints:
-            print(f'- {hint}')
+            click.echo(f'- {hint}')
 
     # sort the result by name and type
     commits.sort(key=lambda k: (k.module, k.type_order))
 
     # print the resulting information
     for module, commit in groupby(commits, key=attrgetter('module')):
-        print(f'### {module}')
-        print('')
+        click.echo(f'### {module}')
+        click.echo()
 
         for c in commit:
-            print(f'##### {c.title}')
-            print('')
+            click.echo(f'##### {c.title}')
+            click.echo()
 
             if c.note:
-                print(c.note)
-                print('')
+                click.echo(c.note)
+                click.echo()
 
-            print(f'`{c.type}`', end='')
+            click.echo(f'`{c.type}`', nl=False)
 
             if c.link:
-                print(f' | [{c.link}]({c.link_url})', end='')
+                click.echo(f' | [{c.link}]({c.link_url})', nl=False)
 
-            print(f' | [{c.short}]({c.url})')
-            print('')
+            click.echo(f' | [{c.short}]({c.url})')
+            click.echo()
 
 
 if __name__ == '__main__':

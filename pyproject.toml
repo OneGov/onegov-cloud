@@ -52,7 +52,7 @@ implicit_reexport = true
 warn_unreachable = true
 warn_return_any = false
 # FIXME: remove sqlalchemy when upgrading to SQlAlchemy 2.0
-untyped_calls_exclude = "sqlalchemy,pycurl,onegov.core.types"
+untyped_calls_exclude = "sqlalchemy,pycurl,onegov.core.types,selenium.webdriver.chrome.webdriver"
 plugins = "sqlmypy"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
@@ -63,13 +63,28 @@ module = [
     #        in OCQMS, so we could just copy that code over... plus the
     #        standard lib technically supports some ISO-8601 formats as well
     "isodate.*",
-    # TODO: Consider switching to fasttext-langdetect
-    #       langdetect is really, really slow by comparison...
-    "langdetect.*",
     # FIXME: Remove after https://github.com/lipoja/URLExtract/issues/164
     "urlextract.*",
+    # FIXME: Remove after https://github.com/jmcnamara/XlsxWriter/issues/1123
+    "xlsxwriter.*"
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# very lax rules for tests that don't have type hints yet
+module = [
+    "tests.onegov.election_day.collections.*",
+    "tests.onegov.election_day.formats.exports.*",
+    "tests.onegov.election_day.forms.*",
+    "tests.onegov.election_day.layouts.*",
+    "tests.onegov.election_day.models.*",
+    "tests.onegov.election_day.screen_widgets.*",
+    "tests.onegov.election_day.utils.*",
+    "tests.onegov.election_day.views.*",
+    "tests.onegov.feriennet.*",
+]
+check_untyped_defs = false
+ignore_errors = true
 
 
 [tool.bandit]
@@ -129,6 +144,8 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = [
+    "A005",
+    "ASYNC",
     "B0",
     "B904",
     "B909",
@@ -141,8 +158,11 @@ select = [
     "F",
     "FLY002",
     "FURB",
+    "G010",
+    "G2",
     "I002",
     "ISC",
+    "LOG",
     "N",
     "PERF",
     "PGH004",
@@ -190,6 +210,7 @@ ignore = [
     "FURB157",
     "FURB180",
     "FURB189",
+    "LOG002",
     "N818",
     "PYI019",
     "PYI041",
@@ -219,7 +240,6 @@ ignore = [
     "UP009",
     "UP012",
     "UP032",
-    "UP038",
 ]
 unfixable = []
 external = ["TC"]
@@ -303,6 +323,9 @@ keep-runtime-typing = true
 
 [tool.ruff.lint.ruff]
 extend-markup-names = ["chameleon.utils.Markup"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["attr.attrib"]
 
 [tool.ruff.format]
 quote-style = "single"

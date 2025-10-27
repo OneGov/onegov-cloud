@@ -3,20 +3,26 @@ from __future__ import annotations
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form, merge_forms, FormDefinitionCollection
 from onegov.form.fields import URLPanelField
-from onegov.form.validators import (Optional, ValidFormDefinition,
-                                    ValidSurveyDefinition)
+from onegov.form.validators import (
+    Optional, ValidFormDefinition, ValidSurveyDefinition)
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import PaymentForm
+from wtforms.fields import BooleanField
+from wtforms.fields import EmailField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
 
 
 from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.request import OrgRequest
 
 
 class FormDefinitionBaseForm(Form):
+    request: OrgRequest
+
     title = StringField(_('Title'), [InputRequired()])
 
     lead = TextAreaField(
@@ -56,6 +62,35 @@ class FormDefinitionBaseForm(Form):
                       'This text is used on the ticket status page to '
                       'inform the user')
     )
+
+    reply_to = EmailField(
+        label=_('E-Mail Reply Address (Reply-To)'),
+        fieldset=_('Tickets'),
+        description=_('Replies to automated e-mails go to this address.')
+    )
+
+    custom_above_footer = TextAreaField(
+        label=_('Custom text above the footer'),
+        fieldset=_('Tickets'),
+        description=_(
+            'This text is shown above the footer in the ticket '
+            'opening notification e-mail.'
+        ),
+        render_kw={'rows': 4}
+    )
+
+    show_vat = BooleanField(
+        label=_('Show VAT'),
+        description=_(
+            'By default VAT is not shown, even when configured '
+            'in the VAT settings.'
+        ),
+        fieldset=_('Payments')
+    )
+
+    def on_request(self) -> None:
+        if not self.request.app.org.vat_rate:
+            self.delete_field('show_vat')
 
 
 if TYPE_CHECKING:

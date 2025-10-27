@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import date
-from onegov.activity import Period, PeriodCollection
+from onegov.activity import BookingPeriod, BookingPeriodCollection
 from onegov.core.security import Secret
 from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.forms import PeriodForm
@@ -9,7 +9,6 @@ from onegov.feriennet.layout import PeriodCollectionLayout
 from onegov.feriennet.layout import PeriodFormLayout
 from onegov.core.elements import BackLink, Link, Confirm, Intercooler, Block
 from onegov.feriennet.models import PeriodMessage
-from sqlalchemy import desc
 from sqlalchemy.exc import IntegrityError
 
 
@@ -23,17 +22,17 @@ if TYPE_CHECKING:
 
 
 @FeriennetApp.html(
-    model=PeriodCollection,
+    model=BookingPeriodCollection,
     template='periods.pt',
     permission=Secret)
 def view_periods(
-    self: PeriodCollection,
+    self: BookingPeriodCollection,
     request: FeriennetRequest
 ) -> RenderData:
 
     layout = PeriodCollectionLayout(self, request)
 
-    def links(period: Period) -> Iterator[Link]:
+    def links(period: BookingPeriod) -> Iterator[Link]:
         if period.active:
             yield Link(
                 text=_('Deactivate'),
@@ -164,7 +163,8 @@ def view_periods(
 
     return {
         'layout': layout,
-        'periods': self.query().order_by(desc(Period.execution_start)).all(),
+        'periods': self.query().order_by(
+            BookingPeriod.execution_start.desc()).all(),
         'title': _('Manage Periods'),
         'links': links
     }
@@ -177,13 +177,13 @@ def is_date_range(
 
 
 @FeriennetApp.form(
-    model=PeriodCollection,
+    model=BookingPeriodCollection,
     name='new',
     form=PeriodForm,
     template='period_form.pt',
     permission=Secret)
 def new_period(
-    self: PeriodCollection,
+    self: BookingPeriodCollection,
     request: FeriennetRequest,
     form: PeriodForm
 ) -> RenderData | Response:
@@ -222,13 +222,13 @@ def new_period(
 
 
 @FeriennetApp.form(
-    model=Period,
+    model=BookingPeriod,
     name='edit',
     form=PeriodForm,
     template='period_form.pt',
     permission=Secret)
 def edit_period(
-    self: Period,
+    self: BookingPeriod,
     request: FeriennetRequest,
     form: PeriodForm
 ) -> RenderData | Response:
@@ -238,7 +238,7 @@ def edit_period(
 
         request.success(_('Your changes were saved'))
 
-        return request.redirect(request.class_link(PeriodCollection))
+        return request.redirect(request.class_link(BookingPeriodCollection))
 
     elif not request.POST:
         form.process(obj=self)
@@ -257,14 +257,14 @@ def edit_period(
 
 
 @FeriennetApp.view(
-    model=Period,
+    model=BookingPeriod,
     request_method='DELETE',
     permission=Secret)
-def delete_period(self: Period, request: FeriennetRequest) -> None:
+def delete_period(self: BookingPeriod, request: FeriennetRequest) -> None:
     request.assert_valid_csrf_token()
 
     try:
-        PeriodCollection(request.session).delete(self)
+        BookingPeriodCollection(request.session).delete(self)
     except IntegrityError:
         request.alert(
             _('The period could not be deleted as it is still in use'))
@@ -276,15 +276,15 @@ def delete_period(self: Period, request: FeriennetRequest) -> None:
     @request.after
     def redirect_intercooler(response: Response) -> None:
         response.headers.add(
-            'X-IC-Redirect', request.class_link(PeriodCollection))
+            'X-IC-Redirect', request.class_link(BookingPeriodCollection))
 
 
 @FeriennetApp.view(
-    model=Period,
+    model=BookingPeriod,
     request_method='POST',
     name='activate',
     permission=Secret)
-def activate_period(self: Period, request: FeriennetRequest) -> None:
+def activate_period(self: BookingPeriod, request: FeriennetRequest) -> None:
     request.assert_valid_csrf_token()
 
     self.activate()
@@ -294,15 +294,15 @@ def activate_period(self: Period, request: FeriennetRequest) -> None:
     @request.after
     def redirect_intercooler(response: Response) -> None:
         response.headers.add(
-            'X-IC-Redirect', request.class_link(PeriodCollection))
+            'X-IC-Redirect', request.class_link(BookingPeriodCollection))
 
 
 @FeriennetApp.view(
-    model=Period,
+    model=BookingPeriod,
     request_method='POST',
     name='deactivate',
     permission=Secret)
-def deactivate_period(self: Period, request: FeriennetRequest) -> None:
+def deactivate_period(self: BookingPeriod, request: FeriennetRequest) -> None:
     request.assert_valid_csrf_token()
 
     self.deactivate()
@@ -312,15 +312,15 @@ def deactivate_period(self: Period, request: FeriennetRequest) -> None:
     @request.after
     def redirect_intercooler(response: Response) -> None:
         response.headers.add(
-            'X-IC-Redirect', request.class_link(PeriodCollection))
+            'X-IC-Redirect', request.class_link(BookingPeriodCollection))
 
 
 @FeriennetApp.view(
-    model=Period,
+    model=BookingPeriod,
     request_method='POST',
     name='archive',
     permission=Secret)
-def archive_period(self: Period, request: FeriennetRequest) -> None:
+def archive_period(self: BookingPeriod, request: FeriennetRequest) -> None:
     request.assert_valid_csrf_token()
 
     self.archive()
@@ -330,4 +330,4 @@ def archive_period(self: Period, request: FeriennetRequest) -> None:
     @request.after
     def redirect_intercooler(response: Response) -> None:
         response.headers.add(
-            'X-IC-Redirect', request.class_link(PeriodCollection))
+            'X-IC-Redirect', request.class_link(BookingPeriodCollection))

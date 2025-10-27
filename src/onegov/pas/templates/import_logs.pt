@@ -1,0 +1,56 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+
+    <tal:b metal:fill-slot="content">
+        <div class="row" tal:condition="layout.trigger_import_link">
+            <div class="small-12 columns">
+                <div class="import-controls callout">
+                    <div class="grid-x grid-padding-x align-middle">
+                        <div class="cell auto">
+                            <tal:b tal:condition="layout.last_import_time">
+                                <strong i18n:translate="">Last import:</strong>
+                                <span tal:content="layout.last_import_time"></span>
+                            </tal:b>
+                            <span tal:condition="not: layout.last_import_time" i18n:translate="">No imports yet</span>
+                        </div>
+                        <div class="cell shrink">
+                            <tal:b tal:condition="layout.trigger_import_link" tal:content="layout.trigger_import_link(layout)"></tal:b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <table class="inline-table clickable-rows">
+            <thead>
+                <tr>
+                    <th i18n:translate="">Timestamp</th>
+                    <th i18n:translate="">User</th>
+                    <th style="display: none;" i18n:translate="">Type</th>
+                    <th i18n:translate="">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr tal:repeat="log_entry logs"
+                    class="clickable-row"
+                    onclick="window.location.href='${request.link(log_entry.log)}'"
+                    style="cursor: pointer;">
+                    <td>${layout.format_date(log_entry.log.created, 'datetime_long')}</td>
+                    <td>${log_entry.log.user.username if log_entry.log.user else request.translate('System')}</td>
+                    <td style="display: none;">
+                        <span class="import-type ${log_entry.log.import_type}" tal:content="log_entry.translated_import_type"></span>
+                    </td>
+                    <td>
+                        <span class="import-status ${log_entry.log.status}" tal:content="log_entry.translated_status"></span>
+                    </td>
+                </tr>
+                <tr tal:condition="not logs">
+                    <td colspan="4" i18n:translate="">No import logs found.</td>
+                </tr>
+            </tbody>
+        </table>
+    </tal:b>
+</div>
+

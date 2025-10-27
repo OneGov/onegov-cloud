@@ -33,6 +33,11 @@ $(function() {
                 {
                     tag: 'h4',
                     title: translation.subsubtitle
+                },
+                {
+                    tag: 'p',
+                    class: 'edit-note',
+                    title: translation.editnote
                 }
             ],
             /* defined in input_with_button.js */

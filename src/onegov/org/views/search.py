@@ -13,7 +13,6 @@ from webob import exc
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.orm import Base
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
     from webob import Response
@@ -21,11 +20,10 @@ if TYPE_CHECKING:
 
 @OrgApp.html(model=Search, template='search.pt', permission=Public)
 def search(
-    self: Search[Base],
+    self: Search,
     request: OrgRequest,
     layout: DefaultLayout | None = None
 ) -> RenderData | Response:
-
     layout = layout or DefaultLayout(self, request)
     assert isinstance(layout.breadcrumbs, list)
     layout.breadcrumbs.append(Link(_('Search'), '#'))
@@ -35,7 +33,7 @@ def search(
             'count': self.available_documents
         })
         resultslabel = _('${count} Results', mapping={
-            'count': self.subset_count
+            'count': self.available_results
         })
     except SearchOfflineError:
         return {
@@ -62,7 +60,7 @@ def search(
 
 
 @OrgApp.json(model=Search, name='suggest', permission=Public)
-def suggestions(self: Search[Base], request: OrgRequest) -> JSON_ro:
+def suggestions(self: Search, request: OrgRequest) -> JSON_ro:
     try:
         return self.suggestions()
     except SearchOfflineError as exception:

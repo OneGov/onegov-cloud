@@ -29,6 +29,7 @@ import sys
 import traceback
 
 from base64 import b64encode
+from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.hashes import SHA256
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from datetime import datetime
@@ -1499,6 +1500,35 @@ class Framework(
             return signer.unsign(text).decode('utf-8')
         except BadSignature:
             return None
+
+    @property
+    def hashed_identity_key(self) -> bytes:
+        """ Take the sha-256 because we want a key that is 32 bytes long. """
+        hash_object = hashlib.sha256()
+        hash_object.update(self.identity_secret.encode('utf-8'))
+        return b64encode(hash_object.digest())
+
+    def encrypt(self, plaintext: str) -> bytes:
+        """ Encrypts the given text using Fernet (symmetric encryption).
+
+        plaintext (str): The data to encrypt.
+
+        Returns: the encrypted data in bytes.
+        """
+        return Fernet(
+            self.hashed_identity_key
+        ).encrypt(plaintext.encode('utf-8'))
+
+    def decrypt(self, cyphertext: bytes) -> str:
+        """ Decrypts the given text using Fernet (symmetric encryption).
+
+        cyphertext (str): The data to encrypt.
+
+        Returns: the decrypted text.
+        """
+        return Fernet(
+            self.hashed_identity_key
+        ).decrypt(cyphertext).decode('utf-8')
 
 
 @Framework.webasset_url()

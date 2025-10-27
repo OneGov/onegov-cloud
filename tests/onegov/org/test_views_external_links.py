@@ -1,4 +1,12 @@
-def test_external_links_in_forms(client):
+from __future__ import annotations
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_external_links_in_forms(client: Client) -> None:
     """
     Test adding a fake form that is a dummy to an external url. So this
     is the first collection mixing models together. """

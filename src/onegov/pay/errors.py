@@ -22,6 +22,26 @@ class SaferpayPaymentError(Exception):
 
 class SaferpayApiError(SaferpayPaymentError):
 
+    # the following errors should be fine to ignore on our end
+    # full list of names: https://saferpay.github.io/jsonapi/#errorhandling
+    EXPECTED_ERROR_NAMES = frozenset((
+        'BLOCKED_BY_RISK_MANAGEMENT',
+        'CARD_CHECK_FAILED',
+        'CARD_CVC_INVALID',
+        'CARD_CVC_REQUIRED',
+        'COMMUNICATION_FAILED',
+        'COMMUNICATION_TIMEOUT',
+        'GENERAL_DECLINED',
+        'PAYER_AUTHENTICATION_REQUIRED',
+        'PAYMENTMEANS_INVALID',
+        'PAYMENTMEANS_NOT_SUPPORTED',
+        '3DS_AUTHENTICATION_FAILED',
+        'TRANSACTION_ABORTED',
+        'TRANSACTION_DECLINED',
+        'UNEXPECTED_ERROR_BY_ACQUIRER',
+        'UPDATE_CARD_INFORMATION',
+    ))
+
     def __init__(
         self,
         name: str,
@@ -40,11 +60,25 @@ class SaferpayApiError(SaferpayPaymentError):
         self.behavior = behavior
         self.details = details
 
+    @property
+    def not_started_or_is_expected_failure(self) -> bool:
+        # this is not an expected failure after a redirect
+        # but it is an expected failure when we try to cancel
+        # stale transactions.
+        return (
+            self.name == 'TRANSACTION_NOT_STARTED'
+            or self.is_expected_failure
+        )
+
+    @property
+    def is_expected_failure(self) -> bool:
+        return self.name in self.EXPECTED_ERROR_NAMES
+
 
 # the following exceptions should be caught and logged - the user should be
 # informed that the payment failed, but not why
 CARD_ERRORS = (
-    stripe.error.CardError,
+    stripe.CardError,
     DatatransPaymentError,
     SaferpayPaymentError,
 )

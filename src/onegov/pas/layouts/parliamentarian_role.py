@@ -5,11 +5,11 @@ from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.pas import _
-from onegov.pas.collections import ParliamentarianCollection
+from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.layouts.default import DefaultLayout
 
 
-class ParliamentarianRoleLayout(DefaultLayout):
+class PASParliamentarianRoleLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
@@ -20,8 +20,8 @@ class ParliamentarianRoleLayout(DefaultLayout):
         return self.request.translate(self.title)
 
     @cached_property
-    def parliamentarian_collection(self) -> ParliamentarianCollection:
-        return ParliamentarianCollection(self.request.session)
+    def parliamentarian_collection(self) -> PASParliamentarianCollection:
+        return PASParliamentarianCollection(self.request.app)
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:

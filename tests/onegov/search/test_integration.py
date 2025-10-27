@@ -1,68 +1,79 @@
+from __future__ import annotations
+
+import math
 import morepath
 import sedate
 import transaction
 
 from datetime import timedelta
-from elasticsearch_dsl.function import SF
-from elasticsearch_dsl.query import MatchPhrase, FunctionScore
 from onegov.core import Framework
+from onegov.core.orm import Base as RealBase
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.utils import scan_morepath_modules
-from onegov.search import ElasticsearchApp, ORMSearchable
-from sqlalchemy import Boolean, Column, Integer, Text
+from onegov.search import ORMSearchable, SearchApp, SearchIndex
+from sqlalchemy import func, Boolean, Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
 from webtest import TestApp as Client
-from time import sleep
 
 
-def test_app_integration(es_url):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import Base  # noqa: F401
+    from onegov.core.request import CoreRequest
 
-    class App(Framework, ElasticsearchApp):
+
+def test_app_integration() -> None:
+
+    class App(Framework, SearchApp):
         pass
 
     app = App()
     app.namespace = 'test'
-    app.configure_application(elasticsearch_hosts=[es_url])
-
-    assert app.es_client.ping()
-
-    # make sure we got the testing host
-    assert len(app.es_client.transport.hosts) == 1
-    assert app.es_client.transport.hosts[0]['port'] \
-        == int(es_url.split(':')[-1])
+    app.configure_application(enable_search=True)
+    assert not app.fts_search_enabled
 
 
-def test_search_query(es_url, postgres_dsn):
+def test_search_query(postgres_dsn: str) -> None:
 
-    class App(Framework, ElasticsearchApp):
+    class App(Framework, SearchApp):
         pass
 
-    Base = declarative_base()
+    @App.setting(section='i18n', name='locales')
+    def locales() -> set[str]:
+        return {'en', 'de'}
+
+    @App.setting(section='i18n', name='default_locale')
+    def default_locale() -> str:
+        return 'en'
+
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Document(Base, ORMSearchable):
         __tablename__ = 'documents'
 
-        id = Column(Integer, primary_key=True)
-        title = Column(Text, nullable=False)
-        body = Column(Text, nullable=True)
-        public = Column(Boolean, nullable=False)
-        language = Column(Text, nullable=False)
+        id: Column[int] = Column(Integer, primary_key=True)
+        title: Column[str] = Column(Text, nullable=False)
+        body: Column[str | None] = Column(Text, nullable=True)
+        public: Column[bool] = Column(Boolean, nullable=False)
+        language: Column[str] = Column(Text, nullable=False)
 
-        es_properties = {
-            'title': {'type': 'localized'},
-            'body': {'type': 'localized'}
+        fts_properties = {
+            'title': {'type': 'localized', 'weight': 'A'},
+            'body': {'type': 'localized', 'weight': 'A'}
         }
 
         @property
-        def es_suggestion(self):
+        def fts_suggestion(self) -> str:
             return self.title
 
         @property
-        def es_public(self):
+        def fts_public(self) -> bool:
             return self.public
 
         @property
-        def es_language(self):
+        def fts_language(self) -> str:
             return self.language
 
     scan_morepath_modules(App)
@@ -73,12 +84,13 @@ def test_search_query(es_url, postgres_dsn):
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
-        elasticsearch_hosts=[es_url]
+        enable_search=True
     )
-    # remove ORMBase
-    app.session_manager.bases.pop()
+    # replace ORMBase with RealBase (we need RealBase for the search_index)
+    app.session_manager.bases[1] = RealBase
 
     app.set_application_id('documents/home')
+    assert app.fts_search_enabled
 
     session = app.session()
     session.add(Document(
@@ -106,84 +118,60 @@ def test_search_query(es_url, postgres_dsn):
         public=False
     ))
     transaction.commit()
-    app.es_indexer.process()
-    app.es_client.indices.refresh(index='_all')
+    app.fts_indexer.process()
 
-    assert app.es_search().execute().hits.total.value == 2
-    assert app.es_search(include_private=True)\
-        .execute().hits.total.value == 4
+    search = session.query(func.count(SearchIndex.id))
+    assert search.scalar() == 4
+    assert search.filter_by(public=True).scalar() == 2
 
-    result = app.es_search(languages=['en']).execute()
-    assert result.hits.total.value == 1
-
-    result = app.es_search(languages=['de'], include_private=True).execute()
-    assert result.hits.total.value == 2
-
-    search = app.es_search(languages=['de'])
-    assert search.query('match', body='Dokumente')\
-        .execute().hits.total.value == 1
-
-    search = app.es_search(languages=['de'], include_private=True)
-    assert search.query('match', body='Dokumente')\
-        .execute().hits.total.value == 2
-
-    # test result loading in one query
-    result = app.es_search(languages=['de'], include_private=True).execute()
-    records = result.load()
-    assert len(records) == 2
-    assert isinstance(records[0], Document)
-    assert True in (records[0].es_public, records[1].es_public)
-    assert False in (records[0].es_public, records[1].es_public)
-
-    # test result loading query
-    result = app.es_search(languages=['de'], include_private=True).execute()
-    query = result.query(type='documents')
-    assert query.count() == 2
-    assert query.filter(Document.public == True).count() == 1
-
-    # test single result loading
-    document = app.es_search(languages=['de']).execute()[0].load()
-    assert document.title == "Öffentlich"
-    assert document.public
-
-    # test single result query
-    document = app.es_search(languages=['de']).execute()[0].query().one()
-    assert document.title == "Öffentlich"
-    assert document.public
+    query = search.filter_by(owner_type='Document')
+    assert query.scalar() == 4
+    assert query.filter_by(public=True).scalar() == 2
 
 
-def test_orm_integration(es_url, postgres_dsn, redis_url):
+def test_orm_integration(
+    postgres_dsn: str,
+    redis_url: str
+) -> None:
 
-    class App(Framework, ElasticsearchApp):
+    class App(Framework, SearchApp):
         pass
 
-    Base = declarative_base()
+    @App.setting(section='i18n', name='locales')
+    def locales() -> set[str]:
+        return {'en'}
+
+    @App.setting(section='i18n', name='default_locale')
+    def default_locale() -> str:
+        return 'en'
+
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Document(Base, ORMSearchable):
         __tablename__ = 'documents'
 
-        id = Column(Integer, primary_key=True)
-        title = Column(Text, nullable=False)
-        body = Column(Text, nullable=True)
+        id: Column[int] = Column(Integer, primary_key=True)
+        title: Column[str] = Column(Text, nullable=False)
+        body: Column[str | None] = Column(Text, nullable=True)
 
         @property
-        def es_suggestion(self):
+        def fts_suggestion(self) -> str:
             return self.title
 
         @property
-        def es_tags(self):
-            if not isinstance(self.body, str):
-                body = ''.join(self.body)
-            else:
-                body = self.body
+        def fts_tags(self) -> list[str]:
+            if not self.body:
+                return []
 
-            return [word for word in body.split(' ') if len(word) > 3]
+            return [word for word in self.body.split(' ') if len(word) > 3]
 
-        es_public = True
-        es_language = 'en'
-        es_properties = {
-            'title': {'type': 'localized'},
-            'body': {'type': 'localized'}
+        fts_public = True
+        fts_language = 'en'
+        fts_properties = {
+            'title': {'type': 'localized', 'weight': 'A'},
+            'body': {'type': 'localized', 'weight': 'A'}
         }
 
     @App.path(path='/')
@@ -191,56 +179,45 @@ def test_orm_integration(es_url, postgres_dsn, redis_url):
         pass
 
     @App.json(model=Root)
-    def view_documents(self, request):
+    def view_documents(self: Root, request: CoreRequest) -> Any:
+        assert isinstance(request.app, App)
+        assert request.app.fts_search_enabled
 
-        # make sure the changes are propagated in testing
-        request.app.es_client.indices.refresh(index='_all')
+        search = request.session.query(func.count(SearchIndex.id))
 
-        query = request.params.get('q')
+        query = request.GET.get('q')
         if query:
             if query.startswith('#'):
-                return request.app.es_client.search(
-                    index='_all',
-                    query={
-                        'match': {
-                            'es_tags': query.lstrip('#'),
-                        }
-                    }
-                )
+                search = search.filter(SearchIndex.fts_idx.op('@@')(
+                    func.websearch_to_tsquery('simple', query)
+                ))
             else:
-                return request.app.es_client.search(
-                    index='_all',
-                    query={
-                        'multi_match': {
-                            'query': query,
-                            'fields': ['title', 'body']
-                        }
-                    }
+                search = search.filter(
+                    SearchIndex._tags.any_() == query.lstrip('#')
                 )
-        else:
-            return request.app.es_client.search(index='_all')
+        return search.scalar()
 
     @App.json(model=Root, name='new')
-    def view_add_document(self, request):
+    def view_add_document(self: Root, request: CoreRequest) -> None:
         session = request.session
         session.add(Document(
-            id=request.params.get('id'),
-            title=request.params.get('title'),
-            body=request.params.get('body')
+            id=int(request.GET['id']),
+            title=request.GET['title'],
+            body=request.GET.get('body')
         ))
 
     @App.json(model=Root, name='update')
-    def view_update_document(self, request):
+    def view_update_document(self: Root, request: CoreRequest) -> None:
         session = request.session
         query = session.query(Document)
-        query = query.filter(Document.id == request.params.get('id'))
+        query = query.filter(Document.id == request.GET['id'])
 
         document = query.one()
-        document.title = request.params.get('title')
-        document.body = request.params.get('body')
+        document.title = request.GET.get('title', document.title)
+        document.body = request.GET.get('body', document.body)
 
     @App.json(model=Root, name='delete')
-    def view_delete_document(self, request):
+    def view_delete_document(self: Root, request: CoreRequest) -> None:
         session = request.session
         query = session.query(Document)
         query = query.filter(Document.id == request.params.get('id'))
@@ -254,72 +231,74 @@ def test_orm_integration(es_url, postgres_dsn, redis_url):
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
-        elasticsearch_hosts=[es_url],
+        enable_search=True,
         redis_url=redis_url
     )
-    # remove ORMBase
-    app.session_manager.bases.pop()
+    # replace ORMBase with RealBase (we need RealBase for the search_index)
+    app.session_manager.bases[1] = RealBase
 
     app.set_application_id('documents/home')
 
+    # NOTE: Because our language is 'simple' the query will be a lot more
+    #       case-sensitive than it otherwise might be, so for now we use
+    #       all lower-case values, we might consider forcing our search
+    #       index to be case-insensitive regardless of config.
     client = Client(app)
-    client.get('/new?id=1&title=Shop&body=We sell things and stuff')
-    client.get('/new?id=2&title=About&body=We are a company')
-    client.get('/new?id=3&title=Terms&body=Stuff we pay lawyers for')
+    client.get('/new?id=1&title=shop&body=we sell things and stuff')
+    client.get('/new?id=2&title=about&body=we are a company')
+    client.get('/new?id=3&title=terms&body=stuff we pay lawyers for')
 
-    documents = client.get('/').json
-    assert documents['hits']['total']['value'] == 3
-
-    documents = client.get('/?q=stuff').json
-    assert documents['hits']['total']['value'] == 2
-
-    documents = client.get('/?q=company').json
-    assert documents['hits']['total']['value'] == 1
+    assert client.get('/').json == 3
+    assert client.get('/?q=stuff').json == 2
+    assert client.get('/?q=company').json == 1
 
     # %23 = #
-    documents = client.get('/?q=%23company').json
-    assert documents['hits']['total']['value'] == 1
-
-    documents = client.get('/?q=%23companx').json
-    assert documents['hits']['total']['value'] == 0
+    assert client.get('/?q=%23company').json == 1
+    assert client.get('/?q=%23companx').json == 0
 
     client.get('/delete?id=3')
 
-    documents = client.get('/?q=stuff').json
-    assert documents['hits']['total']['value'] == 1
+    assert client.get('/?q=stuff').json == 1
 
-    client.get('/update?id=2&title=About&body=We are a business')
+    client.get('/update?id=2&title=about&body=we are a business')
 
-    documents = client.get('/?q=company').json
-    assert documents['hits']['total']['value'] == 0
-
-    documents = client.get('/?q=business').json
-    assert documents['hits']['total']['value'] == 1
+    assert client.get('/?q=company').json == 0
+    assert client.get('/?q=business').json == 1
 
 
-def test_alternate_id_property(es_url, postgres_dsn):
+def test_alternate_id_property(postgres_dsn: str) -> None:
 
-    class App(Framework, ElasticsearchApp):
+    class App(Framework, SearchApp):
         pass
 
-    Base = declarative_base()
+    @App.setting(section='i18n', name='locales')
+    def locales() -> set[str]:
+        return {'en'}
 
-    class User(Base, ORMSearchable):
-        __tablename__ = 'users'
+    @App.setting(section='i18n', name='default_locale')
+    def default_locale() -> str:
+        return 'en'
 
-        name = Column(Text, primary_key=True)
-        fullname = Column(Text, nullable=False)
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
+
+    class MyUser(Base, ORMSearchable):
+        __tablename__ = 'my-users'
+
+        name: Column[str] = Column(Text, primary_key=True)
+        fullname: Column[str] = Column(Text, nullable=False)
 
         @property
-        def es_suggestion(self):
+        def fts_suggestion(self) -> str:
             return self.name
 
-        es_id = 'name'
-        es_properties = {
-            'fullname': {'type': 'text'},
+        fts_id = 'name'
+        fts_properties = {
+            'fullname': {'type': 'text', 'weight': 'A'},
         }
-        es_language = 'en'
-        es_public = True
+        fts_language = 'en'
+        fts_public = True
 
     scan_morepath_modules(App)
     morepath.commit(App)
@@ -329,77 +308,82 @@ def test_alternate_id_property(es_url, postgres_dsn):
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
-        elasticsearch_hosts=[es_url]
+        enable_search=True
     )
-    # remove ORMBase
-    app.session_manager.bases.pop()
+    # replace ORMBase with RealBase (we need RealBase for the search_index)
+    app.session_manager.bases[1] = RealBase
 
     app.set_application_id('users/corporate')
+    assert app.fts_search_enabled
 
     session = app.session()
-    session.add(User(
+    session.add(MyUser(
         name="root",
         fullname="Lil' Root"
     ))
-    session.add(User(
+    session.add(MyUser(
         name="user",
         fullname="Lil' User"
     ))
     transaction.commit()
-    app.es_indexer.process()
-    app.es_client.indices.refresh(index='_all')
-
-    assert app.es_search().count() == 2
-    assert app.es_search().query('match', fullname='Root').count() == 1
-
-    assert app.es_search().execute().query(type='users').count() == 2
-    assert len(app.es_search().execute().load()) == 2
-
-    root = app.es_search().query('match', fullname='Root').execute()[0]
-    assert root.query().count() == 1
-    assert root.load().name == 'root'
-    assert root.load().fullname == "Lil' Root"
+    app.fts_indexer.process()
 
 
-def test_orm_polymorphic(es_url, postgres_dsn):
+    search = session.query(func.count(SearchIndex.id))
 
-    class App(Framework, ElasticsearchApp):
+    assert search.scalar() == 2
+    assert search.filter(SearchIndex.fts_idx.op('@@')(
+        func.websearch_to_tsquery('english', 'Root')
+    )).scalar() == 1
+    assert search.filter_by(owner_type='MyUser').scalar() == 2
+
+
+def test_orm_polymorphic(postgres_dsn: str) -> None:
+
+    class App(Framework, SearchApp):
         pass
 
-    Base = declarative_base()
+    @App.setting(section='i18n', name='locales')
+    def locales() -> set[str]:
+        return {'en'}
 
-    class Page(Base, ORMSearchable):
-        __tablename__ = 'pages'
+    @App.setting(section='i18n', name='default_locale')
+    def default_locale() -> str:
+        return 'en'
 
-        es_properties = {
-            'content': {'type': 'localized'}
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
+
+    class MyPage(Base, ORMSearchable):
+        __tablename__ = 'my-pages'
+
+        fts_properties = {
+            'content': {'type': 'localized', 'weight': 'A'}
         }
-        es_language = 'en'
-        es_public = True
+        fts_language = 'en'
+        fts_public = True
 
         @property
-        def es_suggestion(self):
-            return self.content
+        def fts_suggestion(self) -> str:
+            return self.content or ''
 
-        id = Column(Integer, primary_key=True)
-        content = Column(Text, nullable=True)
-        type = Column(Text, nullable=False)
+        id: Column[int] = Column(Integer, primary_key=True)
+        content: Column[str | None] = Column(Text, nullable=True)
+        type: Column[str] = Column(Text, nullable=False)
 
         __mapper_args__ = {
             "polymorphic_on": 'type'
         }
 
-    class Topic(Page):
+    class MyTopic(MyPage):
         __mapper_args__ = {'polymorphic_identity': 'topic'}
-        es_type_name = 'topic'
 
-    class News(Page):
+    class MyNews(MyPage):
         __mapper_args__ = {'polymorphic_identity': 'news'}
-        es_type_name = 'news'
 
-    class Breaking(News):
+    class MyBreaking(MyNews):
         __mapper_args__ = {'polymorphic_identity': 'breaking'}
-        es_type_name = 'breaking'
 
     scan_morepath_modules(App)
     morepath.commit()
@@ -409,59 +393,72 @@ def test_orm_polymorphic(es_url, postgres_dsn):
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
-        elasticsearch_hosts=[es_url]
+        enable_search=True,
     )
-    # remove ORMBase
-    app.session_manager.bases.pop()
+    # replace ORMBase with RealBase (we need RealBase for the search_index)
+    app.session_manager.bases[1] = RealBase
 
     app.set_application_id('pages/site')
 
     session = app.session()
-    session.add(Topic(content="Topic", type='topic'))
-    session.add(News(content="News", type='news'))
-    session.add(Breaking(content="Breaking", type='breaking'))
+    session.add(MyTopic(content="Topic", type='topic'))
+    session.add(MyNews(content="News", type='news'))
+    session.add(MyBreaking(content="Breaking", type='breaking'))
 
-    def update():
+    def update() -> None:
         transaction.commit()
-        app.es_indexer.process()
-        app.es_client.indices.refresh(index='_all')
+        app.fts_indexer.process()
 
     update()
-    assert app.es_search().count() == 3
+    search = session.query(func.count(SearchIndex.id))
+    assert search.scalar() == 3
 
-    newsitem = session.query(Page).filter(Page.type == 'news').one()
-    assert isinstance(newsitem, News)
+    newsitem = session.query(MyPage).filter(MyPage.type == 'news').one()
+    assert isinstance(newsitem, MyNews)
 
     newsitem.content = 'Story'
     update()
-    assert app.es_search().query('match', content='story').count() == 1
+    assert search.filter(SearchIndex.fts_idx.op('@@')(
+        func.websearch_to_tsquery('simple', 'story')
+    )).scalar() == 1
 
-    session.query(Page).filter(Page.type == 'news').delete()
+    session.query(MyPage).filter(MyPage.type == 'news').delete()
     update()
-    assert app.es_search().count() == 2
+    assert search.scalar() == 2
 
-    session.delete(session.query(Page).filter(Page.type == 'breaking').one())
+    session.delete(session.query(MyPage).filter(
+        MyPage.type == 'breaking').one())
     update()
-    assert app.es_search().count() == 1
+    assert search.scalar() == 1
 
-    session.query(Page).delete()
+    session.query(MyPage).delete()
     update()
-    assert app.es_search().count() == 0
+    assert search.scalar() == 0
 
 
-def test_orm_polymorphic_sublcass_only(es_url, postgres_dsn):
+def test_orm_polymorphic_sublcass_only(postgres_dsn: str) -> None:
 
-    class App(Framework, ElasticsearchApp):
+    class App(Framework, SearchApp):
         pass
 
-    Base = declarative_base()
+    @App.setting(section='i18n', name='locales')
+    def locales() -> set[str]:
+        return {'en'}
+
+    @App.setting(section='i18n', name='default_locale')
+    def default_locale() -> str:
+        return 'en'
+
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Secret(Base):
         __tablename__ = 'secrets'
 
-        id = Column(Integer, primary_key=True)
-        content = Column(Text, nullable=True)
-        type = Column(Text, nullable=True)
+        id: Column[int] = Column(Integer, primary_key=True)
+        content: Column[str | None] = Column(Text, nullable=True)
+        type: Column[str | None] = Column(Text, nullable=True)
 
         __mapper_args__ = {
             "polymorphic_on": 'type'
@@ -470,14 +467,14 @@ def test_orm_polymorphic_sublcass_only(es_url, postgres_dsn):
     class Open(Secret, ORMSearchable):
         __mapper_args__ = {'polymorphic_identity': 'open'}
 
-        es_public = True
-        es_properties = {
-            'content': {'type': 'localized'}
+        fts_public = True
+        fts_properties = {
+            'content': {'type': 'localized', 'weight': 'A'}
         }
 
         @property
-        def es_suggestion(self):
-            return self.content
+        def fts_suggestion(self) -> str:
+            return self.content or ''
 
     scan_morepath_modules(App)
     morepath.commit()
@@ -487,69 +484,84 @@ def test_orm_polymorphic_sublcass_only(es_url, postgres_dsn):
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
-        elasticsearch_hosts=[es_url]
+        enable_search=True
     )
-    # remove ORMBase
-    app.session_manager.bases.pop()
+    # replace ORMBase with RealBase (we need RealBase for the search_index)
+    app.session_manager.bases[1] = RealBase
 
     app.set_application_id('pages/site')
+    assert app.fts_search_enabled
 
     session = app.session()
 
-    session.add(Secret(content="nobody knows"))
-    session.add(Open(content="everybody knows"))
+    session.add(Secret(content="Sally knows"))
+    session.add(Open(content="Peter knows"))
 
     transaction.commit()
-    app.es_indexer.process()
-    app.es_client.indices.refresh(index='_all')
+    app.fts_indexer.process()
 
-    assert app.es_search().query('match', content='nobody').count() == 0
-    assert app.es_search().query('match', content='everybody').count() == 1
+    search = session.query(func.count(SearchIndex.id))
+    assert search.filter(SearchIndex.fts_idx.op('@@')(
+        func.websearch_to_tsquery('english', 'sally')
+    )).scalar() == 0
+    assert search.filter(SearchIndex.fts_idx.op('@@')(
+        func.websearch_to_tsquery('english', 'peter')
+    )).scalar() == 1
 
 
-def test_suggestions(es_url, postgres_dsn):
+def test_suggestions(postgres_dsn: str) -> None:
 
-    class App(Framework, ElasticsearchApp):
+    class App(Framework, SearchApp):
         pass
 
-    Base = declarative_base()
+    @App.setting(section='i18n', name='locales')
+    def locales() -> set[str]:
+        return {'en', 'de'}
+
+    @App.setting(section='i18n', name='default_locale')
+    def default_locale() -> str:
+        return 'en'
+
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Document(Base, ORMSearchable):
         __tablename__ = 'documents'
 
-        id = Column(Integer, primary_key=True)
-        title = Column(Text, nullable=False)
-        public = Column(Boolean, nullable=False)
-        language = Column(Text, nullable=False)
+        id: Column[int] = Column(Integer, primary_key=True)
+        title: Column[str] = Column(Text, nullable=False)
+        public: Column[bool] = Column(Boolean, nullable=False)
+        language: Column[str] = Column(Text, nullable=False)
 
-        es_properties = {
-            'title': {'type': 'localized'}
+        fts_properties = {
+            'title': {'type': 'localized', 'weight': 'A'}
         }
 
         @property
-        def es_public(self):
+        def fts_public(self) -> bool:
             return self.public
 
         @property
-        def es_language(self):
+        def fts_language(self) -> str:
             return self.language
 
-    class Person(Base, ORMSearchable):
-        __tablename__ = 'people'
-        id = Column(Integer, primary_key=True)
-        first_name = Column(Text, nullable=False)
-        last_name = Column(Text, nullable=False)
+    class MyPerson(Base, ORMSearchable):
+        __tablename__ = 'my-people'
+        id: Column[int] = Column(Integer, primary_key=True)
+        first_name: Column[str] = Column(Text, nullable=False)
+        last_name: Column[str] = Column(Text, nullable=False)
 
         @property
-        def title(self):
+        def title(self) -> str:
             return ' '.join((self.first_name, self.last_name))
 
-        es_properties = {'title': {'type': 'localized'}}
-        es_public = True
-        es_language = 'en'
+        fts_properties = {'title': {'type': 'localized', 'weight': 'A'}}
+        fts_public = True
+        fts_language = 'en'
 
         @property
-        def es_suggestion(self):
+        def fts_suggestion(self) -> list[str]:
             return [
                 ' '.join((self.first_name, self.last_name)),
                 ' '.join((self.last_name, self.first_name))
@@ -563,12 +575,13 @@ def test_suggestions(es_url, postgres_dsn):
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
-        elasticsearch_hosts=[es_url]
+        enable_search=True,
     )
-    # remove ORMBase
-    app.session_manager.bases.pop()
+    # replace ORMBase with RealBase (we need RealBase for the search_index)
+    app.session_manager.bases[1] = RealBase
 
     app.set_application_id('documents/home')
+    assert app.fts_search_enabled is not None
 
     session = app.session()
     session.add(Document(
@@ -591,61 +604,83 @@ def test_suggestions(es_url, postgres_dsn):
         language='de',
         public=False
     ))
-    session.add(Person(
+    session.add(MyPerson(
         first_name='Jeff',
         last_name='Winger'
     ))
     transaction.commit()
-    app.es_indexer.process()
-    app.es_client.indices.refresh(index='_all')
+    app.fts_indexer.process()
 
-    assert set(app.es_suggestions(query='p')) == {"Public Document"}
-    assert set(app.es_suggestions(query='p', include_private=True)) == {
+    suggestions = session.query(
+        func.unnest(
+            SearchIndex.suggestion
+        ).distinct().label('suggestion'),
+        SearchIndex.public.label('public'),
+    ).subquery()
+    query = session.query(suggestions.c.suggestion)
+
+    assert {s for s, in query.filter(
+        suggestions.c.suggestion.ilike('p%')
+    )} == {
         "Public Document",
         "Private Document",
         "Privates Dokument"
     }
-    assert set(app.es_suggestions(query='ö', languages=['de'])) == {
+    assert {s for s, in query.filter(
+        suggestions.c.suggestion.ilike('p%')
+    ).filter(suggestions.c.public == True)} == {"Public Document"}
+
+    assert {s for s, in query.filter(
+        suggestions.c.suggestion.ilike('ö%')
+    )} == {
+        "Öffentliches Dokument",
+    }
+    assert {s for s, in query.filter(
+        suggestions.c.suggestion.ilike('ö%')
+    ).filter(suggestions.c.public == True)} == {
         "Öffentliches Dokument",
     }
 
-    assert set(app.es_suggestions(
-        query='ö', languages=['de'], include_private=True)) == {
-        "Öffentliches Dokument",
-    }
-
-    assert set(app.es_suggestions(
-        query='p', languages=['de'], include_private=True)) == {
-        "Privates Dokument",
-    }
-
-    assert set(app.es_suggestions(query='j', languages=['en'])) == {
+    assert {s for s, in query.filter(
+        suggestions.c.suggestion.ilike('j%')
+    )} == {
         'Jeff Winger'
     }
-
-    assert set(app.es_suggestions(query='w', languages=['en'])) == {
+    assert {s for s, in query.filter(
+        suggestions.c.suggestion.ilike('w%')
+    )} == {
         'Winger Jeff'
     }
 
 
-def test_language_detection(es_url, postgres_dsn):
+def test_language_detection(postgres_dsn: str) -> None:
 
-    class App(Framework, ElasticsearchApp):
+    class App(Framework, SearchApp):
         pass
 
-    Base = declarative_base()
+    @App.setting(section='i18n', name='locales')
+    def locales() -> set[str]:
+        return {'en', 'de', 'fr'}
+
+    @App.setting(section='i18n', name='default_locale')
+    def default_locale() -> str:
+        return 'en'
+
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Document(Base, ORMSearchable):
         __tablename__ = 'documents'
 
-        id = Column(Integer, primary_key=True)
-        title = Column(Text, nullable=False)
+        id: Column[int] = Column(Integer, primary_key=True)
+        title: Column[str] = Column(Text, nullable=False)
 
-        es_properties = {
-            'title': {'type': 'localized'}
+        fts_properties = {
+            'title': {'type': 'localized', 'weight': 'A'}
         }
 
-        es_public = True
+        fts_public = True
 
     scan_morepath_modules(App)
     morepath.commit()
@@ -655,53 +690,68 @@ def test_language_detection(es_url, postgres_dsn):
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
-        elasticsearch_hosts=[es_url]
+        enable_search=True
     )
-    # remove ORMBase
-    app.session_manager.bases.pop()
+    # replace ORMBase with RealBase (we need RealBase for the search_index)
+    app.session_manager.bases[1] = RealBase
 
     app.set_application_id('documents/home')
+    assert app.fts_search_enabled is not None
 
     session = app.session()
     session.add(Document(title="Mein Dokument"))
     session.add(Document(title="My document"))
     session.add(Document(title="Mon document"))
     transaction.commit()
-    app.es_indexer.process()
-    app.es_client.indices.refresh(index='_all')
+    app.fts_indexer.process()
 
-    german = app.es_search(languages=['de']).execute().load()
-    english = app.es_search(languages=['en']).execute().load()
-    french = app.es_search(languages=['fr']).execute().load()
+    # FIXME: Do we want to store the detected language into the index
+    #        so we can filter by language if we want to? Currently we
+    #        index for all detected and supported languages, but
+    #        de-prioritize results that don't match the language.
+    #        Currently we can't really verify detection using our
+    #        search index very reliably, so this test doesn't do anything
+    # german = app.es_search(languages=['de']).execute().load()
+    # english = app.es_search(languages=['en']).execute().load()
+    # french = app.es_search(languages=['fr']).execute().load()
 
-    # this illustrates that language detection is not exact (esp. if the
-    # text is rather short)
-    assert len(german) == 1
-    assert len(english) == 0
-    assert len(french) == 2
+    # even very short sentences have pretty reliable detection now
+    # assert len(german) == 1
+    # assert len(english) == 1
+    # assert len(french) == 1
 
-    assert german[0].title == "Mein Dokument"
-    assert french[0].title == "My document"
-    assert french[1].title == "Mon document"
+    # assert german[0].title == "Mein Dokument"
+    # assert english[0].title == "My document"
+    # assert french[0].title == "Mon document"
 
 
-def test_language_update(es_url, postgres_dsn):
-    class App(Framework, ElasticsearchApp):
+def test_language_update(postgres_dsn: str) -> None:
+    class App(Framework, SearchApp):
         pass
 
-    Base = declarative_base()
+    @App.setting(section='i18n', name='locales')
+    def locales() -> set[str]:
+        return {'de', 'fr'}
+
+    @App.setting(section='i18n', name='default_locale')
+    def default_locale() -> str:
+        return 'de'
+
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Document(Base, ORMSearchable):
         __tablename__ = 'documents'
 
-        id = Column(Integer, primary_key=True)
-        title = Column(Text, nullable=False)
+        id: Column[int] = Column(Integer, primary_key=True)
+        title: Column[str] = Column(Text, nullable=False)
 
-        es_properties = {
-            'title': {'type': 'localized'}
+        fts_properties = {
+            'title': {'type': 'localized', 'weight': 'A'}
         }
 
-        es_public = True
+        fts_public = True
 
     scan_morepath_modules(App)
     morepath.commit()
@@ -711,51 +761,61 @@ def test_language_update(es_url, postgres_dsn):
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
-        elasticsearch_hosts=[es_url]
+        enable_search=True
     )
-    # remove ORMBase
-    app.session_manager.bases.pop()
+    # replace ORMBase with RealBase (we need RealBase for the search_index)
+    app.session_manager.bases[1] = RealBase
 
     app.set_application_id('documents/home')
+    assert app.fts_search_enabled is not None
 
     session = app.session()
     session.add(Document(title="Mein Dokument"))
     transaction.commit()
-    app.es_indexer.process()
-    app.es_client.indices.refresh(index='_all')
+    app.fts_indexer.process()
 
-    german = app.es_search(languages=['de']).execute().load()
-    french = app.es_search(languages=['fr']).execute().load()
-    assert german
-    assert not french
+    # FIXME: Same problem as with above test
+    # german = app.es_search(languages=['de']).execute().load()
+    # french = app.es_search(languages=['fr']).execute().load()
+    # assert german
+    # assert not french
 
-    session.query(Document).one().title = "Mon document"
-    transaction.commit()
-    app.es_indexer.process()
-    app.es_client.indices.refresh(index='_all')
+    # session.query(Document).one().title = "Mon document"
+    # transaction.commit()
+    # app.fts_indexer.process()
 
-    german = app.es_search(languages=['de']).execute().load()
-    french = app.es_search(languages=['fr']).execute().load()
-    assert not german
-    assert french
+    # german = app.es_search(languages=['de']).execute().load()
+    # french = app.es_search(languages=['fr']).execute().load()
+    # assert not german
+    # assert french
 
 
-def test_date_decay(es_url, postgres_dsn):
+def test_date_decay(postgres_dsn: str) -> None:
 
-    class App(Framework, ElasticsearchApp):
+    class App(Framework, SearchApp):
         pass
 
-    Base = declarative_base()
+    @App.setting(section='i18n', name='locales')
+    def locales() -> set[str]:
+        return {'de'}
+
+    @App.setting(section='i18n', name='default_locale')
+    def default_locale() -> str:
+        return 'de'
+
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
 
     class Document(Base, ORMSearchable, TimestampMixin):
         __tablename__ = 'documents'
 
-        id = Column(Integer, primary_key=True)
-        title = Column(Text, nullable=False)
-        body = Column(Text, nullable=False)
+        id: Column[int] = Column(Integer, primary_key=True)
+        title: Column[str] = Column(Text, nullable=False)
+        body: Column[str] = Column(Text, nullable=False)
 
-        es_properties = {'title': {'type': 'localized'}}
-        es_public = True
+        fts_properties = {'title': {'type': 'localized', 'weight': 'A'}}
+        fts_public = True
 
     scan_morepath_modules(App)
     morepath.commit()
@@ -765,10 +825,10 @@ def test_date_decay(es_url, postgres_dsn):
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
-        elasticsearch_hosts=[es_url]
+        enable_search=True,
     )
-    # remove ORMBase
-    app.session_manager.bases.pop()
+    # replace ORMBase with RealBase (we need RealBase for the search_index)
+    app.session_manager.bases[1] = RealBase
 
     app.set_application_id('documents/home')
 
@@ -777,50 +837,54 @@ def test_date_decay(es_url, postgres_dsn):
     one = Document(id=1, title="Dokument", body="Eins")
     two = Document(id=2, title="Dokument", body="Zwei")
 
-    one.created = sedate.utcnow() - timedelta(days=365)
-    two.created = sedate.utcnow()
+    one.modified = sedate.utcnow() - timedelta(days=365)
+    two.modified = sedate.utcnow()
 
     session.add(one)
     session.add(two)
 
-    transaction.commit()
-
-    def search(title):
-        app.es_indexer.process()
-        app.es_client.indices.refresh(index='_all')
-        app.es_client.indices.flush(index='_all')
-
-        search = app.es_search(languages=['de'])
-        search = search.query(MatchPhrase(title={"query": title}))
-
-        search.query = FunctionScore(query=search.query, functions=[
-            SF('gauss', es_last_change={
-                'offset': '7d',
-                'scale': '30d',
-                'decay': '0.75'
-            })
-        ])
-
-        return search.execute()
-
-    assert search("Dokument")[0].meta.id == '2'
-    assert search("Dokument")[1].meta.id == '1'
-
-    # this part of the test is a bit flaky, for unknown reasons
-    for i in range(0, 10):
-
-        one = session.query(Document).filter_by(id=1).one()
-        two = session.query(Document).filter_by(id=2).one()
-
-        one.created = sedate.utcnow()
-        two.created = sedate.utcnow() - timedelta(days=365)
-
+    def search(title: str) -> list[int]:
         transaction.commit()
+        app.fts_indexer.process()
 
-        sleep(0.1)
+        search = session.query(SearchIndex.owner_id_int)
+        search = search.filter(SearchIndex.fts_idx.op('@@')(
+            func.websearch_to_tsquery('german', title)
+        ))
+        decay = 0.75
+        scale = (30 * 24 * 3600)  # 30 days to reach target decay
+        offset = (7 * 24 * 3600)  # 7 days without decay
+        two_times_variance_squared = -(scale**2 / math.log(decay))
+        search = search.order_by(
+            func.greatest(
+                func.exp(
+                    -func.greatest(
+                        func.abs(
+                            func.extract(
+                                'epoch',
+                                sedate.utcnow() - func.coalesce(
+                                    SearchIndex.last_change,
+                                    sedate.utcnow()
+                                )
+                            )
+                        ) - offset,
+                        0
+                    ).op('^')(2) / two_times_variance_squared
+                ),
+                1e-6
+            ).desc()
+        )
+        return [doc_id for doc_id, in search]  # type: ignore[misc]
 
-        if search("Dokument")[0].meta.id == '1':
-            break
+    assert search('Dokument') == [2, 1]
 
-    assert search("Dokument")[0].meta.id == '1'
-    assert search("Dokument")[1].meta.id == '2'
+    one = session.query(Document).filter_by(id=1).one()
+    two = session.query(Document).filter_by(id=2).one()
+
+    one.modified = sedate.utcnow()
+    two.modified = sedate.utcnow() - timedelta(days=365)
+
+    transaction.commit()
+    assert app.fts_indexer.queue.qsize() == 2
+
+    assert search('Dokument') == [1, 2]

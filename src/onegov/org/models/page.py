@@ -51,7 +51,11 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
-    es_type_name = 'topics'
+    fts_public = True
+
+    @property
+    def fts_skip(self) -> bool:
+        return self.meta.get('trait') == 'link'  # do not index links
 
     lead: dict_property[str | None] = content_property()
     text = dict_markup_property('content')
@@ -61,14 +65,6 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
     # Show the lead on topics page
     lead_when_child: dict_property[bool] = content_property(default=True)
-
-    @property
-    def es_skip(self) -> bool:
-        return self.meta.get('trait') == 'link'  # do not index links
-
-    @property
-    def es_public(self) -> bool:
-        return self.access == 'public' and self.published
 
     @property
     def deletable(self) -> bool:
@@ -154,7 +150,11 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
-    es_type_name = 'news'
+    fts_public = True
+
+    @property
+    def fts_last_change(self) -> datetime:
+        return self.published_or_created
 
     filter_years = None
     filter_tags = None
@@ -173,16 +173,12 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         default=False
     )
 
-    @property
-    def es_public(self) -> bool:
-        return self.access == 'public' and self.published
-
     @observes('content')
     def content_observer(self, content: dict[str, Any]) -> None:
-        self.hashtags = self.es_tags or []
+        self.hashtags = self.fts_tags or []
 
     @property
-    def absorb(self) -> str:  # type:ignore[override]
+    def absorb(self) -> str:
         return ''.join(self.path.split('/', 1)[1:])
 
     @property
@@ -212,10 +208,6 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
             return ('news', )
         else:
             return ()
-
-    @property
-    def es_last_change(self) -> datetime:
-        return self.published_or_created
 
     def is_supported_trait(self, trait: str) -> bool:
         return trait == 'news'

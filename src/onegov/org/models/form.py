@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.core.orm.mixins import dict_property, meta_property
 from onegov.form.models import FormDefinition
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import ContactExtension
@@ -24,8 +25,9 @@ class BuiltinFormDefinition(FormDefinition, AccessExtension,
                             HoneyPotExtension, GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'builtin'}
 
-    es_type_name = 'builtin_forms'
-    es_id = 'name'
+    fts_id = 'name'
+
+    show_vat: dict_property[bool] = meta_property(default=False)
 
     # FIXME: should this have a setter?
     @property
@@ -39,9 +41,10 @@ class CustomFormDefinition(FormDefinition, AccessExtension,
                            HoneyPotExtension, GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'custom'}
 
-    es_type_name = 'custom_forms'
-    es_id = 'name'
+    fts_id = 'name'
     default_extensions = ['honeypot']
+
+    show_vat: dict_property[bool] = meta_property(default=False)
 
     # FIXME: should this have a setter?
     @property

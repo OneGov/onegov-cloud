@@ -347,3 +347,12 @@ def unpackb(value: bytes) -> Any:
         ext_hook=default_serializers.decode,
         option=ormsgpack.OPT_NON_STR_KEYS,
     )
+
+
+def packable(obj: Any) -> bool:
+    try:
+        packb(obj)
+    except Exception:
+        return False
+    else:
+        return True

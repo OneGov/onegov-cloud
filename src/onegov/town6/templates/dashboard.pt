@@ -5,10 +5,12 @@
     <tal:b metal:fill-slot="content">
         <div class="boardlet-group grid-x grid-padding-x columns small-up-1 medium-up-2 large-up-3 align-center" tal:repeat="group model.boardlets()">
             <tal:b tal:repeat="boardlet group">
-                <div class=" cell" tal:condition="boardlet.is_available" >
+                <div class="cell" tal:condition="boardlet.is_available">
                     <div class="boardlet boardlet-${boardlet.state} ${boardlet.name}">
                         <h2 class="h4">
-                            <span>${boardlet.number|''}</span><br tal:condition="exists:boardlet.number"><span class="title">${boardlet.title}</span>
+                            <a href="${boardlet.url}" tal:omit-tag="not:boardlet.url">
+                                <span>${boardlet.number|''}</span><br tal:condition="exists:boardlet.number"><span class="title">${boardlet.title}</span>
+                            </a>
                         </h2>
                         <table class="facts">
                             <tr tal:repeat="fact boardlet.facts" class="${fact.css_class} small ${'none' if not (fact.number or fact.icon) else ''}">

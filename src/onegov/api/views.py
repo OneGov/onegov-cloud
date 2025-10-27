@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING, Any
 
 from onegov.api import ApiApp
 from onegov.api.models import ApiEndpoint, ApiException, AuthEndpoint
@@ -12,7 +13,6 @@ from webob.exc import HTTPMethodNotAllowed, HTTPNotFound, HTTPUnauthorized
 from wtforms import HiddenField
 
 
-from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Generator, Sequence
     from onegov.core.request import CoreRequest
@@ -59,7 +59,7 @@ def view_api_endpoints(
             'href': request.link(self),
             'queries': [
                 {
-                    'href': request.link(endpoint(request)),
+                    'href': request.link(endpoint),
                     'rel': endpoint.endpoint,
                     'data': [
                         {'name': name}
@@ -86,7 +86,7 @@ def view_api_endpoint(
     def add_headers(response: Response) -> None:
         response.headers['Content-Type'] = 'application/vnd.collection+json'
 
-    try:
+    with ApiException.capture_exceptions(headers=headers):
         payload: dict[str, JSONObject] = {
             'collection': {
                 'version': '1.0',
@@ -136,9 +136,6 @@ def view_api_endpoint(
             }
         return payload
 
-    except Exception as exception:
-        raise ApiException(exception=exception, headers=headers) from exception
-
 
 @ApiApp.json(
     model=ApiEndpointItem,
@@ -153,7 +150,7 @@ def view_api_endpoint_item(
     def add_headers(response: Response) -> None:
         response.headers['Content-Type'] = 'application/vnd.collection+json'
 
-    try:
+    with ApiException.capture_exceptions(headers=headers):
         endpoint = self.api_endpoint
         assert endpoint is not None
         links = self.links or {}
@@ -205,9 +202,6 @@ def view_api_endpoint_item(
             }
         return payload
 
-    except Exception as exception:
-        raise ApiException(exception=exception, headers=headers) from exception
-
 
 @ApiApp.json(
     model=ApiEndpointItem,
@@ -218,9 +212,9 @@ def edit_api_endpoint_item(
     self: ApiEndpointItem[Any], request: CoreRequest
 ) -> None:
 
-    endpoint = self.api_endpoint
-    assert endpoint is not None
-    try:
+    with ApiException.capture_exceptions():
+        endpoint = self.api_endpoint
+        assert endpoint is not None
         form = self.form(request)
         if form is None:
             raise HTTPMethodNotAllowed()
@@ -262,18 +256,13 @@ def edit_api_endpoint_item(
 
         endpoint.apply_changes(self.item, form)
 
-    except Exception as exception:
-        raise ApiException(exception=exception) from exception
-
 
 @ApiApp.json(model=AuthEndpoint, permission=Public)
 def get_time_restricted_token(
     self: AuthEndpoint, request: CoreRequest
 ) -> dict[str, str]:
-    try:
+    with ApiException.capture_exceptions():
         if request.authorization is None:
             raise HTTPUnauthorized()
 
         return get_token(request)
-    except Exception as exception:
-        raise ApiException(exception=exception) from exception

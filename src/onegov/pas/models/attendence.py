@@ -1,14 +1,12 @@
 from __future__ import annotations
 
 from decimal import ROUND_HALF_UP, Decimal
-
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.pas import _
-from onegov.pas.models.commission import Commission
-from onegov.pas.models.parliamentarian import Parliamentarian
-from sqlalchemy import Column
+from sqlalchemy import Boolean
+from sqlalchemy import Column, Text
 from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
@@ -16,10 +14,13 @@ from sqlalchemy import Integer
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     import datetime
+    from onegov.pas.models import PASCommission
+    from onegov.pas.models import PASParliamentarian
     from typing import Literal
     from typing import TypeAlias
 
@@ -40,7 +41,19 @@ TYPES: dict[AttendenceType, str] = {
 
 class Attendence(Base, TimestampMixin):
 
-    __tablename__ = 'pas_attendence'
+    __tablename__ = 'par_attendence'
+
+    #: The polymorphic type of attendence
+    poly_type: Column[str] = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
+
+    __mapper_args__ = {
+        'polymorphic_on': poly_type,
+        'polymorphic_identity': 'pas_attendence',
+    }
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(
@@ -65,10 +78,26 @@ class Attendence(Base, TimestampMixin):
     type: Column[AttendenceType] = Column(
         Enum(
             *TYPES.keys(),  # type:ignore[arg-type]
-            name='pas_attendence_type'
+            name='par_attendence_type'
         ),
         nullable=False,
         default='plenary'
+    )
+
+    #: Tracks grouped attendance records to enable future batch
+    #: modifications. Only relevant if added in bulk.
+    bulk_edit_id: Column[uuid.UUID | None] = Column(
+        UUID  # type:ignore[arg-type]
+    )
+
+    #: Whether this attendance submission is closed/completed
+    #: This is only relevant for commission attendance, not plenary sessions.
+    #: Parliamentarians use this to signal they have recorded all their
+    #: commission activities for a settlement run.
+    abschluss: Column[bool] = Column(
+        Boolean,
+        nullable=False,
+        default=False
     )
 
     #: The type as translated text
@@ -79,26 +108,26 @@ class Attendence(Base, TimestampMixin):
     #: The id of the parliamentarian
     parliamentarian_id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey('pas_parliamentarians.id'),
+        ForeignKey('par_parliamentarians.id'),
         nullable=False
     )
 
     #: The parliamentarian
-    parliamentarian: relationship[Parliamentarian] = relationship(
-        Parliamentarian,
+    parliamentarian: relationship[PASParliamentarian] = relationship(
+        'PASParliamentarian',
         back_populates='attendences'
     )
 
     #: the id of the commission
     commission_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey('pas_commissions.id'),
+        ForeignKey('par_commissions.id'),
         nullable=True
     )
 
     #: the related commission (which may have any number of memberships)
-    commission: relationship[Commission | None] = relationship(
-        Commission,
+    commission: relationship[PASCommission | None] = relationship(
+        'PASCommission',
         back_populates='attendences'
     )
 

@@ -161,7 +161,7 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         """ Returns a form instance containing the submission data. """
         return self.form_class(data=self.data)
 
-    def get_email_field_data(self, form: Form | None = None) -> str | None:
+    def get_email_field_name(self, form: Form | None = None) -> str | None:
         form = form or self.form_obj
 
         email_fields = form.match_fields(
@@ -169,15 +169,20 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
             required=True,
             limit=1
         )
-        email_fields += form.match_fields(
+        if email_fields:
+            return email_fields[0]
+
+        email_fields = form.match_fields(
             include_classes=(EmailField, ),
             required=False,
             limit=1
         )
+        return email_fields[0] if email_fields else None
 
-        if email_fields:
-            return form._fields[email_fields[0]].data
-        return None
+    def get_email_field_data(self, form: Form | None = None) -> str | None:
+        form = form or self.form_obj
+        name = self.get_email_field_name(form)
+        return form._fields[name].data if name else None
 
     @observes('definition')
     def definition_observer(self, definition: str) -> None:

@@ -5,11 +5,13 @@ import json
 import re
 import yaml
 
+from decimal import Decimal
 from functools import cached_property
 
 from cryptography.fernet import InvalidToken
 from lxml import etree
-
+from markupsafe import Markup
+from onegov.core.templates import render_macro
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
@@ -23,16 +25,16 @@ from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
 from onegov.form.fields import URLField
 from onegov.form.validators import StrictOptional
-from onegov.gever.encrypt import encrypt_symmetric, decrypt_symmetric
 from onegov.gis import CoordinatesField
-from onegov.org import _
-
+from onegov.org import _, log
 from onegov.org.forms.fields import (
     HtmlField,
     UploadOrSelectExistingMultipleFilesField,
 )
 from onegov.org.forms.user import AVAILABLE_ROLES
+from onegov.org.forms.util import KABA_CODE_RE
 from onegov.org.forms.util import TIMESPANS
+from onegov.org.kaba import KabaApiError, KabaClient
 from onegov.org.theme import user_options
 from onegov.ticket import handlers
 from onegov.ticket import TicketPermission
@@ -41,12 +43,15 @@ from operator import itemgetter
 from purl import URL
 from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
+from wtforms.fields import FieldList
 from wtforms.fields import FloatField
+from wtforms.fields import FormField
 from wtforms.fields import IntegerField
 from wtforms.fields import PasswordField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
+from wtforms.utils import unset_value
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
@@ -63,9 +68,12 @@ if TYPE_CHECKING:
     from webob import Response
     from wtforms import Field
     from wtforms.fields.choices import _Choice
+    from wtforms.fields.core import _Filter
+    from wtforms.meta import _MultiDictLikeWithGetlist
 
 
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
+COLOR_RE = re.compile(r'^#?(?:[0-9a-fA-F]{3}){1,2}$')
 
 
 class GeneralSettingsForm(Form):
@@ -281,6 +289,13 @@ class FooterSettingsForm(Form):
         label=_('TikTok'),
         description=_('URL pointing to the TikTok site'),
         fieldset=_('Social Media'),
+        validators=[Optional()]
+    )
+
+    impressum_url = URLField(
+        label=_('Impressum'),
+        description=_('URL pointing to the Impressum site'),
+        fieldset=_('Impressum'),
         validators=[Optional()]
     )
 
@@ -994,6 +1009,14 @@ class OrgTicketSettingsForm(Form):
         fieldset=_('General')
     )
 
+    hide_submitter_email = BooleanField(
+        label=_('Hide submitter email address'),
+        description=_('Hide the email address of the ticket submitter '
+                      'in the ticket status page'),
+        fieldset=_('Data Protection'),
+        default=True
+    )
+
     ticket_auto_accept_style = RadioField(
         label=_('Accept request and close ticket automatically based on:'),
         choices=(
@@ -1070,6 +1093,31 @@ class OrgTicketSettingsForm(Form):
         fieldset=_('Notifications'),
     )
 
+    ticket_tags = TextAreaField(
+        label=_('Tags'),
+        description=_(
+            'Each tag can be associated with arbitrary key value pairs '
+            'which will be displayed in the ticket alongside the submitted '
+            'form values. If a key exactly matches the name of a form field '
+            "that field's value will be pre-populated according to the value."
+            '\n\nExample:\n'
+            '```yaml\n'
+            '- High Priority\n'
+            '- Medium Priority\n'
+            '- Low Priority\n'
+            '- FC Govikon:\n'
+            '    E-Mail: fc@govikon.ch\n'
+            '    Postal Code / City: 1234 Govikon\n'
+            '- HC Govikon:\n'
+            '    E-Mail: hc@govikon.ch\n'
+            '    Postal Code / City: 1234 Govikon\n'
+            '```'
+        ),
+        render_kw={
+            'rows': 16,
+        },
+    )
+
     permissions = MultiCheckboxField(
         label=_('Categories restricted by user group settings'),
         choices=[],
@@ -1087,6 +1135,142 @@ class OrgTicketSettingsForm(Form):
                   'enabled.')
             )
             return False
+        return None
+
+    def ensure_valid_ticket_tags(self) -> bool | None:
+        assert isinstance(self.ticket_tags.errors, list)
+
+        if not self.ticket_tags.data:
+            return None
+
+        error_msg = _('Invalid format. Please define tags and '
+                      'their meta data according to the example.')
+
+        try:
+            items = yaml.safe_load(self.ticket_tags.data)
+        except yaml.YAMLError:
+            self.ticket_tags.errors.append(error_msg)
+            return False
+
+        if not items:
+            return None
+
+        if not isinstance(items, list):
+            self.ticket_tags.errors.append(error_msg)
+            return False
+
+        for item in items:
+
+            if isinstance(item, str) and item:
+                continue
+
+            if not isinstance(item, dict) or len(item) != 1:
+                self.ticket_tags.errors.append(error_msg)
+                return False
+
+            for tag, meta in item.items():
+                # we only allow string tags
+                if not isinstance(tag, str):
+                    self.ticket_tags.errors.append(error_msg)
+                    return False
+
+                # we allow tags without meta data
+                if not meta:
+                    continue
+
+                # the meta data needs to be a valid mapping
+                if not isinstance(meta, dict) or any(
+                    True
+                    for field, value in meta.items()
+                    # we only allow string keys
+                    if not isinstance(field, str)
+                    # we allow any value type except for containers
+                    or isinstance(value, (dict, list))
+                ):
+                    self.ticket_tags.errors.append(error_msg)
+                    return False
+
+                if 'Price' in meta or 'Preis' in meta:
+                    price = meta.get('Price', meta.get('Preis'))
+                    try:
+                        assert price and Decimal(price) >= Decimal('0')
+                    except Exception:
+                        self.ticket_tags.errors.append(_(
+                            'Invalid price "${price}", needs to be a '
+                            'non-negative number.',
+                            mapping={'price': price}
+                        ))
+                        return False
+
+                if 'Color' in meta:
+                    raw_color = meta['Color']
+                    if isinstance(raw_color, str):
+                        color = raw_color.strip()
+                    elif isinstance(raw_color, int):
+                        color = str(raw_color)
+                        # leading zeroes can be interpreted as octal
+                        # so we need to convert it back to its orginal
+                        # representation
+                        if color not in self.ticket_tags.data:
+                            color = f'{raw_color:o}'
+                        if len(color) < 6:
+                            # try to restore any leading zeroes YAML stripped
+                            for __ in range(6 - len(color)):
+                                prefixed = f'0{color}'
+                                if prefixed in self.ticket_tags.data:
+                                    color = prefixed
+                                else:
+                                    break
+                    else:
+                        color = str(raw_color).strip()
+
+                    if COLOR_RE.match(color):
+                        # Store normalized color
+                        meta['Color'] = '#' + color.removeprefix('#')
+                    else:
+                        self.ticket_tags.errors.append(_(
+                            'Invalid color "${color}", needs to be a 3 or 6 '
+                            'digit hex code, e.g. "ff9000" for orange. '
+                            'If you use a "#" prefix, make sure to enclose '
+                            'the value in quotation marks.',
+                            mapping={'color': color or ''}
+                        ))
+                        return False
+
+                if 'Kaba Code' in meta:
+                    raw_code = meta['Kaba Code']
+                    if isinstance(raw_code, str):
+                        code = raw_code
+                    elif isinstance(raw_code, int):
+                        code = str(raw_code)
+                        # leading zeroes can be interpreted as octal
+                        # so we need to convert it back to its orginal
+                        # representation
+                        if code not in self.ticket_tags.data:
+                            code = f'{raw_code:o}'
+                        if len(code) < 6:
+                            # try to restore any leading zeroes YAML stripped
+                            for __ in range(6 - len(code)):
+                                prefixed = f'0{code}'
+                                if prefixed in self.ticket_tags.data:
+                                    code = prefixed
+                                else:
+                                    break
+                    else:
+                        code = str(raw_code)
+
+                    if not KABA_CODE_RE.match(code):
+                        self.ticket_tags.errors.append(_(
+                            'Invalid Kaba Code. '
+                            'Needs to be a 4 to 6 digit number code.'
+                        ))
+                        return False
+
+                    # Store normalized Kaba code
+                    meta['Kaba Code'] = code
+
+        self.ticket_tags.parsed_data = items  # type: ignore[attr-defined]
+
         return None
 
     def code_title(self, code: str) -> str:
@@ -1141,6 +1325,32 @@ class OrgTicketSettingsForm(Form):
             (u.username, u.title) for u in user_q
         ]
 
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
+        super().populate_obj(model, exclude={'ticket_tags'})
+
+        if hasattr(self.ticket_tags, 'parsed_data'):
+            data = self.ticket_tags.parsed_data
+        else:
+            yaml_data = self.ticket_tags.data
+            data = yaml.safe_load(yaml_data) if yaml_data else []
+
+        model.ticket_tags = data
+
+    def process_obj(self, model: Organisation) -> None:  # type:ignore
+        super().process_obj(model)
+
+        tags = model.ticket_tags
+        if not tags:
+            self.ticket_tags.data = ''
+            return
+
+        yaml_data = yaml.safe_dump(
+            tags,
+            default_flow_style=False,
+            allow_unicode=True
+        )
+        self.ticket_tags.data = yaml_data
+
 
 class NewsletterSettingsForm(Form):
 
@@ -1190,6 +1400,13 @@ class NewsletterSettingsForm(Form):
         'of their selected categories if there are any.'),
         fieldset=_('Automatic newsletters'),
         default=False
+    )
+
+    daily_newsletter_title = StringField(
+        label=_('Title for daily newsletters'),
+        fieldset=_('Automatic newsletters'),
+        description=_('Daily news from our town'),
+        depends_on=('enable_automatic_newsletters', 'y'),
     )
 
     newsletter_times = TagsField(
@@ -1390,10 +1607,9 @@ class GeverSettingsForm(Form):
 
     def populate_obj(self, model: Organisation) -> None:  # type:ignore
         super().populate_obj(model)
-        key_base64 = self.request.app.hashed_identity_key
         try:
             assert self.gever_password.data is not None
-            encrypted = encrypt_symmetric(self.gever_password.data, key_base64)
+            encrypted = self.request.app.encrypt(self.gever_password.data)
             encrypted_str = encrypted.decode('utf-8')
             model.gever_username = self.gever_username.data or ''
             model.gever_password = encrypted_str or ''
@@ -1406,6 +1622,217 @@ class GeverSettingsForm(Form):
 
         self.gever_username.data = model.gever_username or ''
         self.gever_password.data = model.gever_password or ''
+
+
+class KabaConfigurationForm(Form):
+
+    site_id = StringField(
+        label=_('Site ID'),
+    )
+
+    api_key = StringField(
+        label='API_KEY',
+        depends_on=('site_id', '!'),
+    )
+
+    api_secret = PasswordField(
+        label='API_SECRET',
+        depends_on=('site_id', '!'),
+    )
+
+
+if TYPE_CHECKING:
+    FieldBase = FieldList[FormField[KabaConfigurationForm]]
+else:
+    FieldBase = FieldList
+
+
+class KabaConfigurationsField(FieldBase):
+    def process(
+        self,
+        formdata: _MultiDictLikeWithGetlist | None,
+        data: Any = unset_value,
+        extra_filters: Sequence[_Filter] | None = None
+    ) -> None:
+
+        # FIXME: I'm not quite sure why we need to do this
+        #        but it looks like the last_index gets updated
+        #        to 0 by something, so we start counting at 1
+        #        instead of 0, which breaks the field
+        self.last_index = -1
+        super().process(formdata, data, extra_filters)
+
+        # always have an empty extra entry
+        if formdata is None and self[-1].form.site_id.data is not None:
+            self.append_entry()
+
+    def populate_obj(self, obj: object, name: str) -> None:
+        assert name == 'kaba_configurations'
+        assert hasattr(obj, 'meta')
+
+        previous_secrets = {
+            config['site_id']: config['api_secret']
+            for config in obj.meta.get('kaba_configurations', [])
+        }
+        obj.meta['kaba_configurations'] = [
+            {
+                'site_id': site_id,
+                'api_key': item['api_key'],
+                # if we already submitted this then just use the existing
+                # key, unless we specified a new one
+                'api_secret':
+                    self.meta.request.app.encrypt(item['api_secret']).hex()
+                    if item['api_secret'] else previous_secrets[site_id]
+            }
+            for item in self.data
+            # skip de-selected entries
+            if (site_id := item['site_id'])
+        ]
+
+
+def kaba_configurations_widget(field: FieldBase, **kwargs: Any) -> Markup:
+    field.meta.request.include('kaba-configurations')
+    return Markup('').join(
+        Markup(
+            '<label><b>{}.</b></label>'
+            '<div id="{}" style="margin-left:1.55rem">{}</div>'
+        ).format(idx, f.id, f())
+        for idx, f in enumerate(field, start=1)
+    )
+
+
+class KabaSettingsForm(Form):
+
+    if TYPE_CHECKING:
+        request: OrgRequest
+
+    kaba_configurations = KabaConfigurationsField(
+        FormField(
+            KabaConfigurationForm,
+            widget=lambda field, **kw: Markup('').join(
+                Markup('<div><label>{}</label></div>').format(render_macro(
+                    field.meta.request.template_loader.macros['field'],
+                    field.meta.request,
+                    {
+                        'field': f,
+                        # FIXME: only used for rendering descriptions
+                        #        we should probably move this logic
+                        #        into a template macro or a method on
+                        #        CoreRequest, this doesn't really need
+                        #        to be part of Form, we could also move
+                        #        it to the form meta and access it
+                        #        through the field instead
+                        'form': field.meta.request.get_form(
+                            Form, csrf_support=False
+                        )
+                    }
+                )) for f in field
+            )
+        ),
+        label=_('Kaba Sites'),
+        min_entries=1,
+        widget=kaba_configurations_widget
+    )
+
+    default_key_code_lead_time = IntegerField(
+        label=_('Default Lead Time'),
+        validators=[InputRequired(), NumberRange(0, 1440)],
+        render_kw={
+            'step': 5,
+            'long_description': _('In minutes'),
+        },
+    )
+
+    default_key_code_lag_time = IntegerField(
+        label=_('Default Lag Time'),
+        validators=[InputRequired(), NumberRange(0, 1440)],
+        render_kw={
+            'step': 5,
+            'long_description': _('In minutes'),
+        },
+    )
+
+    def on_request(self) -> None:
+        # NOTE: Ensures translations work in FormField
+        for field in self.kaba_configurations:
+            field.form.meta = self.meta
+            for subfield in field.form:
+                subfield.meta = self.meta
+
+    def ensure_valid_configurations(self) -> bool | None:
+        seen: set[str] = set()
+        for field in self.kaba_configurations:
+            site_id = field.form.site_id.data
+            if not site_id:
+                continue
+
+            if site_id in seen:
+                assert isinstance(self.kaba_configurations.errors, list)
+                self.kaba_configurations.errors.append(_(
+                    'Duplicate site ID ${site_id}',
+                    mapping={'site_id': site_id}
+                ))
+                return False
+
+            seen.add(site_id)
+
+            if not field.form.api_key.data:
+                assert isinstance(self.kaba_configurations.errors, list)
+                self.kaba_configurations.errors.append(
+                    self.kaba_configurations.gettext(_(
+                        '${field} for site ID ${site_id} is required',
+                        mapping={
+                            'field': 'API_KEY',
+                            'site_id': field.form.site_id.data
+                        }
+                    ))
+                )
+                return False
+
+            if field.form.api_secret.data:
+                api_secret = field.form.api_secret.data
+            elif (cfg := self.model.get_kaba_configuration(site_id)) is None:
+                assert isinstance(self.kaba_configurations.errors, list)
+                self.kaba_configurations.errors.append(
+                    self.kaba_configurations.gettext(_(
+                        '${field} for site ID ${site_id} is required',
+                        mapping={
+                            'field': 'API_SECRET',
+                            'site_id': field.form.site_id.data
+                        }
+                    ))
+                )
+                return False
+            elif cfg.api_key == field.form.api_key.data:
+                # no need to re-validate
+                return None
+            else:
+                # decrypt existing API secret
+                api_secret = self.request.app.decrypt(
+                    bytes.fromhex(cfg.api_secret)
+                )
+
+            api_key = field.form.api_key.data
+            assert site_id is not None and api_key is not None
+
+            client = KabaClient(site_id, api_key, api_secret)
+            try:
+                client.site_name()
+            except KabaApiError:
+                assert isinstance(self.kaba_configurations.errors, list)
+                error = _(
+                    'Invalid credentials for site ID ${site_id}',
+                    mapping={'site_id': site_id}
+                )
+                self.kaba_configurations.errors.append(error)
+                return False
+            except Exception:
+                self.request.alert(
+                    _('Unexpected error encountered, please try again.')
+                )
+                log.exception('Unexpected error connecting to Kaba')
+                return False
+        return True
 
 
 class OneGovApiSettingsForm(Form):
@@ -1453,9 +1880,29 @@ class EventSettingsForm(Form):
         default='tags'
     )
 
+    event_header_html = HtmlField(
+        label=_('General information above the event list'),
+
+    )
+
+    event_footer_html = HtmlField(
+        label=_('General information below the event list'),
+    )
+
     event_files = UploadOrSelectExistingMultipleFilesField(
         label=_('Documents'),
         fieldset=_('General event documents')
+    )
+
+
+class ResourceSettingsForm(Form):
+
+    resource_header_html = HtmlField(
+        label=_('General information above the resource list'),
+    )
+
+    resource_footer_html = HtmlField(
+        label=_('General information below the resource list'),
     )
 
 
@@ -1514,12 +1961,10 @@ class FirebaseSettingsForm(Form):
 
     def populate_obj(self, model: Organisation) -> None:  # type:ignore
         super().populate_obj(model)
-        key_base64 = self.request.app.hashed_identity_key
-
         try:
             assert self.firebase_adminsdk_credential.data is not None
-            encrypted = encrypt_symmetric(
-                self.firebase_adminsdk_credential.data, key_base64
+            encrypted = self.request.app.encrypt(
+                self.firebase_adminsdk_credential.data
             )
             encrypted_str = encrypted.decode('utf-8')
             model.firebase_adminsdk_credential = encrypted_str or ''
@@ -1576,12 +2021,13 @@ class FirebaseSettingsForm(Form):
     def process_obj(self, model: Organisation) -> None:  # type:ignore
         super().process_obj(model)
 
-        key_base64 = self.request.app.hashed_identity_key
         if model.firebase_adminsdk_credential:
             try:
-                self.firebase_adminsdk_credential.data = decrypt_symmetric(
-                model.firebase_adminsdk_credential.encode('utf-8'), key_base64
-            )
+                self.firebase_adminsdk_credential.data = (
+                    self.request.app.decrypt(
+                        model.firebase_adminsdk_credential.encode('utf-8')
+                    )
+                )
             except InvalidToken:
                 self.firebase_adminsdk_credential.data = ''
 
@@ -1687,12 +2133,12 @@ class PeopleSettingsForm(Form):
             'format. Note: Deeper structures are not supported.'
             '\n'
             '```\n'
-            '- Organisation:\n'
-            '  - Sub-Organisation 1\n'
-            '  - Sub-Organisation 2\n'
-            '- Organisation 2:\n'
-            '  - Sub-Organisation 1\n'
-            '  - Sub-Organisation 2\n'
+            '- Organisation 1:\n'
+            '  - Sub-Organisation 1.1\n'
+            '  - Sub-Organisation 1.2\n'
+            '- Organisation 2\n'
+            '- Organisation 3:\n'
+            '  - Sub-Organisation 3.1\n'
             '```'
         ),
         render_kw={
@@ -1758,9 +2204,11 @@ class PeopleSettingsForm(Form):
                     for topic, sub_topic in item.items():
                         if not isinstance(sub_topic, list):
                             self.organisation_hierarchy.errors.append(
-                                _(f'Invalid format. Please define '
-                                  f"sub-organisations(s) for '{topic}' "
-                                  f"or remove the ':'.")
+                                _('Invalid format. Please define at least '
+                                  "one sub-organisation for '${topic}' "
+                                  "or remove the ':'",
+                                    mapping={'topic': topic}
+                                )
                             )
                             return False
 
@@ -1789,7 +2237,13 @@ class PeopleSettingsForm(Form):
             self.organisation_hierarchy.data = ''
             return
 
-        yaml_data = yaml.safe_dump(categories, default_flow_style=False)
+        yaml_data = yaml.safe_dump(
+            categories,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True,
+            indent=2
+        )
         self.organisation_hierarchy.data = yaml_data
 
 
@@ -1800,4 +2254,12 @@ class VATSettingsForm(Form):
         description=_('This is the VAT rate in percent. The VAT rate will '
                       'apply to all prices in the forms.'),
         validators=[InputRequired(), NumberRange(0, 100)],
+    )
+
+
+class CitizenLoginSettingsForm(Form):
+
+    citizen_login_enabled = BooleanField(
+        label=_('Enable Citizen Login'),
+        default=False,
     )

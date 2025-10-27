@@ -19,13 +19,13 @@
 
 - name: CONCORDIA
   logo_url:
-    de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=logo-fnlogo-2023-0-projuventute-de'
-    fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=logo-fnlogo-2023-0-projuventute-fr'
-    it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=logo-fnlogo-2023-0-projuventute-it'
+      de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-pjoswb-2025-0-fnet-de'
+      fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-pjoswb-2025-0-fnet-fr'
+      it: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-pjoswb-2025-0-fnet-it'
   mail_url:
-    de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-fnbannmails-2023-0-projuventute-de'
-    fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-fnbannmails-2023-0-projuventute-fr'
-    it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner-fnbannmails-2023-0-projuventute-it'
+      de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-pjoswb-2025-0-fnet-de'
+      fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-pjoswb-2025-0-fnet-fr'
+      it: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-pjoswb-2025-0-fnet-it'
   logo: sponsors/CON_Logo_RGB_pos.jpg
   background: '#fff'
   banners:
@@ -38,9 +38,9 @@
       fr: sponsors/concordia-banner-narrow-fr.jpg
       it: sponsors/concordia-banner-narrow-it.jpg
     url:
-      de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-fnangebotue-2023-0-projuventute-de'
-      fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-fnangebotue-2023-0-projuventute-fr'
-      it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner-fnangebotue-2023-0-projuventute-it'
+      de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-pjoswb-2025-0-fnet-de'
+      fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-pjoswb-2025-0-fnet-fr'
+      it: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-pjoswb-2025-0-fnet-it'
     info:
       de: 'Partner von Pro Juventute'
       fr: 'Partenaire Pro Juventute'

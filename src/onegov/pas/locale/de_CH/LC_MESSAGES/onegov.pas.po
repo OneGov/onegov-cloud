@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-11-14 01:27+0100\n"
+"POT-Creation-Date: 2025-10-13 11:02+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -17,8 +17,8 @@ msgstr "Benutzer"
 msgid "Logout"
 msgstr "Abmelden"
 
-msgid "Management"
-msgstr "Verwaltung"
+msgid "Current Settlement Run"
+msgstr "Aktueller Abrechnungslauf"
 
 msgid "Attendences"
 msgstr "Anwesenheiten"
@@ -26,11 +26,26 @@ msgstr "Anwesenheiten"
 msgid "Changes"
 msgstr "Aktivitäten"
 
+msgid "Import History"
+msgstr "Übersicht Importe"
+
 msgid "PAS settings"
 msgstr "PAS Einstellungen"
 
+msgid "Files"
+msgstr "Dateien"
+
 msgid "More settings"
 msgstr "Weitere Einstellungen"
+
+msgid "User Management"
+msgstr "Benutzerverwaltung"
+
+msgid "Management"
+msgstr "Verwaltung"
+
+msgid "Profile"
+msgstr "Profil"
 
 msgid "No within an active settlement run."
 msgstr "Nicht in einem aktiven Abrechungslauf"
@@ -50,8 +65,86 @@ msgstr "Parlamentarier:in"
 msgid "Commission"
 msgstr "Kommission"
 
+msgid "Abschluss"
+msgstr "Abschluss"
+
+msgid "Mark as completed/closed"
+msgstr "Als abgeschlossen markieren"
+
+msgid "No role found for user."
+msgstr "Keine Rolle für Benutzer gefunden."
+
+msgid "Insufficient permissions."
+msgstr "Unzureichende Berechtigungen."
+
+msgid "User has no parliamentarian record."
+msgstr "Benutzer hat keinen Parlamentarier:in-Datensatz."
+
+msgid "You can only edit your own attendance."
+msgstr "Sie können nur Ihre eigene Anwesenheit bearbeiten."
+
+msgid "Target parliamentarian not found."
+msgstr "Ziel-Parlamentarier:in nicht gefunden."
+
+msgid "You can only edit your own or your commission members' attendance."
+msgstr ""
+"Sie können nur für sich selbst oder Ihre Kommissionsmitglieder "
+"Anwesenheiten bearbeiten."
+
 msgid "Parliamentarian is not in this commission."
 msgstr "Parlamentarier:in ist nicht in dieser Kommission."
+
+msgid "Bulk edit group"
+msgstr "Massenbuchungsgruppe"
+
+msgid "People Data (JSON)"
+msgstr "Personendaten (JSON)"
+
+msgid "JSON file containing parliamentarian data."
+msgstr "JSON-Datei mit Parlamentarierdaten."
+
+msgid "Organizations Data (JSON)"
+msgstr "Organisationsdaten (JSON)"
+
+msgid "JSON file containing organization data (commissions, parties, etc.)."
+msgstr "JSON-Datei mit Organisationsdaten (Kommissionen, Parteien, usw.)."
+
+msgid "Memberships Data (JSON)"
+msgstr "Mitgliedschaftsdaten (JSON)"
+
+msgid ""
+"JSON file containing membership data (who is member of what organization)."
+msgstr ""
+"JSON-Datei mit Mitgliedschaftsdaten (wer ist Mitglied welcher Organisation)."
+
+msgid "Validate JSON Schema"
+msgstr "JSON-Schema validieren"
+
+msgid "Check if the uploaded JSON files match the expected structure."
+msgstr ""
+"Überprüft ob die hochgeladenen JSON-Dateien der erwarteten Struktur "
+"entsprechen.Überprüft ob die hochgeladenen JSON-Dateien der erwarteten "
+"Struktur entsprechen."
+
+#, python-format
+msgid "File ${name} is missing the \"results\" list."
+msgstr "Datei ${name} fehlt die \"results\"-Liste."
+
+#, python-format
+msgid "Item ${idx} in file ${name} is not an object."
+msgstr "Element ${idx} in Datei ${name} ist kein Objekt."
+
+#, python-format
+msgid "Item ${idx} in ${name} is missing keys ${keys}"
+msgstr "Element ${idx} in ${name} fehlen die Schlüssel ${keys}"
+
+#, python-format
+msgid "Error reading file ${name}: ${error}"
+msgstr "Fehler beim Lesen der Datei ${name}: ${error}"
+
+#, python-format
+msgid "Unexpected error processing file ${name}: ${error}"
+msgstr "Unerwarteter Fehler bei der Verarbeitung der Datei ${name}: ${error}"
 
 msgid "Name"
 msgstr "Name"
@@ -61,12 +154,6 @@ msgstr "Start"
 
 msgid "End"
 msgstr "Ende"
-
-msgid "Description"
-msgstr "Beschreibung"
-
-msgid "Function"
-msgstr "Funktion"
 
 msgid "Personnel number"
 msgstr "Personalnummer"
@@ -161,23 +248,17 @@ msgstr "Webseite"
 msgid "Remarks"
 msgstr "Bemerkungen"
 
-msgid "Role"
-msgstr "Rolle"
-
-msgid "Party"
+msgid "Political Party"
 msgstr "Partei"
 
 msgid "Party role"
 msgstr "Rolle in der Partei"
 
-msgid "Parliamentary group"
-msgstr "Fraktion"
-
-msgid "Parliamentary group role"
-msgstr "Rolle in der Fraktion"
-
 msgid "Portrait"
 msgstr "Portrait"
+
+msgid "Description"
+msgstr "Beschreibung"
 
 msgid "Year"
 msgstr "Jahr"
@@ -243,8 +324,8 @@ msgstr "Kürzestsitzung"
 msgid "Rate set for ${year} alredy exists"
 msgstr "Sätze für ${year} bereits erfasst"
 
-msgid "Active"
-msgstr "Aktiv"
+msgid "Closed"
+msgstr "Geschlossen"
 
 msgid "End must be after start"
 msgstr "Ende muss nach dem Start liegen"
@@ -253,6 +334,12 @@ msgstr "Ende muss nach dem Start liegen"
 msgid "Dates overlap with existing settlement run: ${start} - ${end}"
 msgstr ""
 "Daten überschneiden sich mit bestehendem Abrechnungslauf: ${start} - ${end}"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Commission President"
+msgstr "Kommissionspräsident:in"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -265,6 +352,9 @@ msgstr "Sitzung"
 
 msgid "Plenary session (bulk)"
 msgstr "Massenbuchung Plenarsitzung"
+
+msgid "Commission meeting (bulk)"
+msgstr "Massenbuchung Kommissionssitzung"
 
 msgid "Edit"
 msgstr "Bearbeiten"
@@ -314,6 +404,27 @@ msgstr "${hours} Stunden"
 msgid "${minutes} minutes"
 msgstr "${minutes} Minuten"
 
+msgid "JSON Import"
+msgstr "JSON-Import"
+
+msgid "Trigger Manual Import"
+msgstr "Manuellen Import auslösen"
+
+msgid "Import Started..."
+msgstr "Import gestartet..."
+
+msgid "Are you sure you want to trigger a manual import?"
+msgstr "Sind Sie sicher, dass Sie einen manuellen Import auslösen möchten?"
+
+msgid "This will start a new KUB data import process."
+msgstr "Dies startet einen neuen KUB-Datenimportprozess."
+
+msgid "Trigger Import"
+msgstr "Import andstossen (dauert ca. 20 Sekunden)"
+
+msgid "Import Log Details"
+msgstr "Details zum Importlog"
+
 msgid "Legislative periods"
 msgstr "Legislaturen"
 
@@ -329,12 +440,6 @@ msgstr "Legislatur löschen"
 msgid "Parliamentarians"
 msgstr "Parlamentarier:innen"
 
-msgid "Export"
-msgstr "Export"
-
-msgid "Export All (xlsx)"
-msgstr "Alle exportieren (xlsx)"
-
 msgid "Role (as a party or group member)"
 msgstr "Rolle (als Partei- oder Fraktionsmitglied)"
 
@@ -343,9 +448,6 @@ msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
 
 msgid "Delete parliamentarian"
 msgstr "Parlamentarier:in löschen"
-
-msgid "CSV billing export"
-msgstr "Abrechnungsexport (CSV)"
 
 msgid "Do you really want to remove this role?"
 msgstr "Rolle wirklich entfernen?"
@@ -356,6 +458,9 @@ msgstr "Rolle entfernen"
 msgid "Parliamentary groups"
 msgstr "Fraktionen"
 
+msgid "Parliamentary group"
+msgstr "Fraktion"
+
 msgid "Do you really want to delete this parliamentary group?"
 msgstr "Möchten Sie diese Fraktion wirklich löschen?"
 
@@ -364,6 +469,9 @@ msgstr "Fraktion löschen"
 
 msgid "Parties"
 msgstr "Parteien"
+
+msgid "Party"
+msgstr "Partei"
 
 msgid "Do you really want to delete this party?"
 msgstr "Möchten Sie diese Partei wirklich löschen?"
@@ -407,50 +515,26 @@ msgstr "Anwesenheit bearbeitet"
 msgid "Attendence removed"
 msgstr "Anwesenheit gelöscht"
 
-msgid "normal"
-msgstr "normal"
+msgid "completed"
+msgstr "Abgeschlossen"
 
-msgid "intercantonal"
-msgstr "interkantonal"
+msgid "failed"
+msgstr "Fehlgeschlagen"
 
-msgid "Guest"
-msgstr "Gast"
+msgid "pending"
+msgstr "Ausstehend"
 
-msgid "Extended Member"
-msgstr "erweitertes Mitglied"
+msgid "timeout"
+msgstr "Zeitüberschreitung"
 
-msgid "male"
-msgstr "männlich"
+msgid "cli"
+msgstr "Manuell auf dem Server"
 
-msgid "female"
-msgstr "weiblich"
+msgid "automatic"
+msgstr "Automatisch"
 
-msgid "A mail"
-msgstr "A-Post"
-
-msgid "A mail plus"
-msgstr "A-Post Plus"
-
-msgid "registered"
-msgstr "eingeschrieben"
-
-msgid "confidential"
-msgstr "vertraulich"
-
-msgid "personal / confidential"
-msgstr "persönlich / vertraulich"
-
-msgid "none"
-msgstr "keine"
-
-msgid "Vote counter"
-msgstr "Stimmenzähler"
-
-msgid "Media Manager"
-msgstr "Leiter Medien und Kampagnen"
-
-msgid "President of the parliamentary group"
-msgstr "Fraktionsschef"
+msgid "upload"
+msgstr "Auf App hochgeladen"
 
 msgid "Duration"
 msgstr "Dauer"
@@ -458,8 +542,11 @@ msgstr "Dauer"
 msgid "No meeting defined yet."
 msgstr "Noch keine Sitzung erfasst."
 
-msgid "Comission"
-msgstr "Kommission"
+msgid "Bulk edits"
+msgstr "Massenbuchungen"
+
+msgid "edited"
+msgstr "bearbeitet"
 
 msgid "Timestamp"
 msgstr "Zeitpunkt"
@@ -467,17 +554,101 @@ msgstr "Zeitpunkt"
 msgid "Attendence"
 msgstr "Anwesenheit"
 
+msgid "Comission"
+msgstr "Kommission"
+
 msgid "No changes yet."
 msgstr "Noch keine Aktivitäten."
 
 msgid "Action"
 msgstr "Aktion"
 
+msgid "Members"
+msgstr "Mitglieder"
+
+msgid "Function"
+msgstr "Funktion"
+
 msgid "No active commissions."
 msgstr "Keine aktiven Kommissionen."
 
 msgid "Filters"
 msgstr "Filter"
+
+msgid "Please correct the errors below:"
+msgstr "Bitte korrigieren Sie die nachstehenden Fehler:"
+
+msgid "Import Error"
+msgstr "Import Fehler"
+
+msgid "Timestamp:"
+msgstr "Zeitstempel:"
+
+msgid "User:"
+msgstr "Benutzer:"
+
+msgid "Status:"
+msgstr "Status:"
+
+msgid "Source Data Files:"
+msgstr "Quelldateien:"
+
+msgid "People"
+msgstr "Personen"
+
+msgid "Organizations"
+msgstr "Organisationen"
+
+msgid "Memberships"
+msgstr "Mitgliedschaften"
+
+msgid "Logs"
+msgstr "Protokolle"
+
+msgid "Raw JSON"
+msgstr "JSON Rohdaten"
+
+msgid "Overall Status"
+msgstr "Gesamtstatus"
+
+msgid "Import Results"
+msgstr "Import-Ergebnisse"
+
+msgid "Total Summary"
+msgstr "Gesamtzusammenfassung"
+
+msgid "Custom Data Update"
+msgstr "Benutzerdefinierte Datenaktualisierung"
+
+msgid "Import Logs"
+msgstr "Import-Protokolle"
+
+msgid "All"
+msgstr "Alle"
+
+msgid "Errors"
+msgstr "Fehler"
+
+msgid "Warnings"
+msgstr "Warnungen"
+
+msgid "Info"
+msgstr "Info"
+
+msgid "No log data available"
+msgstr "Keine Log-Daten verfügbar"
+
+msgid "Last import:"
+msgstr "Letzter Import:"
+
+msgid "No imports yet"
+msgstr "Noch keine Importe"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "No import logs found."
+msgstr "Keine Import Logs gefunden"
 
 msgid "Skip navigation"
 msgstr "Navigation überspringen"
@@ -501,11 +672,20 @@ msgstr "In die Zwischenablage kopiert!"
 msgid "No legislative periods defined yet."
 msgstr "Noch keine Legislaturen erfasst."
 
+msgid "Administrator"
+msgstr "Administrator"
+
+msgid "Administrators"
+msgstr "Administratoren"
+
 msgid "Roles"
 msgstr "Rollen"
 
 msgid "Parliament"
 msgstr "Parlament"
+
+msgid "Role"
+msgstr "Rolle"
 
 msgid "No parliamentarians defined yet."
 msgstr "Noch keine Parlamentarier:innen erfasst."
@@ -522,17 +702,67 @@ msgstr "Betrag"
 msgid "No rate sets defined yet."
 msgstr "Noch keine Sätze erfasst."
 
+msgid "Copy this rate set"
+msgstr "Diesen Satz kopieren"
+
+msgid "Active"
+msgstr "Aktiv"
+
 msgid "Yes"
 msgstr "Ja"
 
 msgid "No"
 msgstr "Nein"
 
-msgid "Exports Settlement runs"
-msgstr "Exporte Abrechnungsläufe"
+msgid "Commission Closure Status"
+msgstr "Kommissions-Abschlussstatus"
+
+msgid ""
+"This table shows the attendance closure status for each commission. It "
+"displays how many commission members have marked their attendance as "
+"\"closed\" (abschluss) for this settlement run. Members who have not yet "
+"closed their attendance are listed below each commission."
+msgstr ""
+"Diese Tabelle zeigt den Abschlussstatus der Anwesenheit für jede Kommission. "
+"Sie zeigt, wie viele Kommissionsmitglieder ihre Anwesenheit als "
+"\"abgeschlossen\" für diesen Abrechnungslauf markiert haben. Mitglieder, die "
+"ihre Anwesenheit noch nicht abgeschlossen haben, sind unter jeder Kommission "
+"aufgelistet."
+
+msgid "⚠ Incomplete"
+msgstr "⚠ Unvollständig"
+
+msgid "Members who have closed their attendance:"
+msgstr "Mitglieder, die ihre Anwesenheit abgeschlossen haben:"
+
+msgid "✓ (closed)"
+msgstr "✓ (abgeschlossen)"
+
+msgid "Members who have not closed their attendance:"
+msgstr "Mitglieder, die ihre Anwesenheit nicht abgeschlossen haben:"
+
+msgid "(has attendance)"
+msgstr "(hat Anwesenheit)"
+
+msgid "(no attendance)"
+msgstr "(keine Anwesenheit)"
+
+msgid ""
+"No commissions with active memberships found for this settlement period."
+msgstr ""
+"Keine Kommissionen mit aktiven Mitgliedschaften für diesen "
+"Abrechnungszeitraum gefunden."
 
 msgid "No settlement runs defined yet."
 msgstr "Noch keine Abrechnungsläufe erfasst"
+
+msgid "Cannot create attendance in closed settlement run."
+msgstr ""
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht erstellt werden."
+
+msgid "New attendence"
+msgstr "Neue Anwesenheit"
 
 msgid "Added a new attendence"
 msgstr "Neue Anwesenheit hinzugefügt"
@@ -540,26 +770,54 @@ msgstr "Neue Anwesenheit hinzugefügt"
 msgid "New"
 msgstr "Neu"
 
-msgid "New attendence"
-msgstr "Neue Anwesenheit"
+msgid "New commission session"
+msgstr "Neue Kommissionssitzung"
 
-msgid "Added plenary session"
-msgstr "Plenarsitzung hinzugefügt"
+msgid "No parliamentarians selected"
+msgstr "Keine Parlamentarier:innen ausgewählt"
+
+msgid "Added commission session"
+msgstr "Kommissionssitzung hinzugefügt"
+
+msgid "Cannot edit attendance in closed settlement run."
+msgstr ""
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht bearbeitet werden."
+
+msgid "Edit plenary session"
+msgstr "Plenarsitzung bearbeiten"
+
+msgid "Edited attendences"
+msgstr "Anwesenheiten bearbeitet"
+
+msgid "Edit session"
+msgstr "Sitzung bearbeiten"
+
+msgid "Do you really want to delete this bulk edit?"
+msgstr "Möchten Sie diese Massenbuchung wirklich löschen?"
+
+msgid "Delete Attendencess"
+msgstr "Anwesenheiten löschen"
+
+msgid "Edit commission session"
+msgstr "Kommissionssitzung bearbeiten"
 
 msgid "New plenary session"
 msgstr "Neue Plenarsitzung"
 
+msgid "Added plenary session"
+msgstr "Plenarsitzung hinzugefügt"
+
 msgid "Your changes were saved"
 msgstr "Änderungen gespeichert"
 
-msgid "Inactive"
-msgstr "Inaktiv"
+msgid "Cannot delete attendance in closed settlement run."
+msgstr ""
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht gelöscht werden."
+"Anwesenheit in geschlossenem Abrechnungslauf kann nicht gelöscht werden."
 
-msgid "Added a new commission"
-msgstr "Kommission hinzugefügt"
-
-msgid "New commission"
-msgstr "Neue Kommission"
+#, python-format
+msgid "Deleted ${count} attendeces"
+msgstr "${count} Anwesenheiten gelöscht"
 
 msgid "Added a new parliamentarian"
 msgstr "Parlamentarier:in hinzugefügt"
@@ -567,14 +825,40 @@ msgstr "Parlamentarier:in hinzugefügt"
 msgid "New parliamentarian"
 msgstr "Neue:r Parlamentarier:in"
 
-msgid "Added commission meeting"
-msgstr "Kommissionsitzung hinzugefügt"
-
 msgid "New commission meeting"
 msgstr "Neue Kommissionsitzung"
 
+msgid "Added commission meeting"
+msgstr "Kommissionsitzung hinzugefügt"
+
+msgid "Data Import (JSON)"
+msgstr "Import (JSON)"
+
 msgid "Dashboard"
 msgstr "Startseite"
+
+msgid "Import completed successfully"
+msgstr "Import erfolgreich abgeschlossen"
+
+#, python-format
+msgid "Data import failed: ${error}"
+msgstr "Datenimport fehlgeschlagen: ${error}"
+
+msgid "Import"
+msgstr "Import"
+
+msgid ""
+"Import triggered successfully. The process may take up to 30 seconds to "
+"complete."
+msgstr ""
+"Import erfolgreich ausgelöst. Der Vorgang kann bis zu 30 Sekunden dauern."
+
+#, python-format
+msgid "Import failed: ${error}"
+msgstr "Import fehlgeschlagen: ${error}"
+
+msgid "Inactive"
+msgstr "Inaktiv"
 
 msgid "Added a new legislative period"
 msgstr "Legislatur hinzugefügt"
@@ -582,17 +866,8 @@ msgstr "Legislatur hinzugefügt"
 msgid "New legislative period"
 msgstr "Neue Legislatur"
 
-msgid "Added a new role"
-msgstr "Neue Rolle hinzugefügt"
-
-msgid "New role"
-msgstr "Neue Rolle"
-
-msgid "Added a new parliamentary group"
-msgstr "Fraktion hinzugefügt"
-
-msgid "New parliamentary group"
-msgstr "Neue Fraktion"
+msgid "The parliamentarian has been deleted."
+msgstr "Der/Die Parlamentarier:in wurde gelöscht."
 
 msgid "Added a new party"
 msgstr "Partei hinzugefügt"
@@ -606,8 +881,17 @@ msgstr "Neue Sätze hinzugefügt"
 msgid "New rate set"
 msgstr "Neue Sätze"
 
-msgid "Usermanagement"
-msgstr "Benutzerverwaltung"
+msgid "The rate set was copied."
+msgstr "Der Satz wurde kopiert"
+
+msgid "Copy"
+msgstr "Kopieren"
+
+msgid "Copy Rate Set"
+msgstr "Satz kopieren"
+
+msgid "Create Attendence"
+msgstr "Sitzung erfassen"
 
 msgid "Added a new settlement run"
 msgstr "Neuer Abrechnungslauf hinzugefügt"
@@ -630,29 +914,42 @@ msgstr "Abrechnungen nach Kommission"
 msgid "Settlements by Parliamentarian"
 msgstr "Abrechnungen nach Parlamentarier:in"
 
+msgid "Abschlussliste"
+msgstr "Abschlussliste"
+
+msgid "Abschlussliste (XLSX)"
+msgstr "Abschlussliste (XLSX)"
+
+msgid "Buchungen Abrechnungslauf"
+msgstr "Buchungen Abrechnungslauf"
+
+msgid "Buchungen Abrechnungslauf (Kontrollliste)"
+msgstr "Buchungen Abrechnungslauf (Kontrollliste)"
+
+msgid "KR-Entschädigungen (CSV)"
+msgstr "KR-Entschädigungen (CSV)"
+
+msgid "PDF Exports"
+msgstr "PDF Exporte"
+
+msgid "Excel Exports"
+msgstr "Excel Exporte"
+
 msgid "Total all parties"
 msgstr "Total Alle Parteien"
 
-#~ msgid "Date from"
-#~ msgstr "Datum von"
+msgid "closed"
+msgstr "geschlossen"
 
-#~ msgid "Date to"
-#~ msgstr "Datum bis"
+msgid "reopened"
+msgstr "geöffnet"
 
-#~ msgid "All Settlement runs"
-#~ msgstr "Alle Abrechnungsläufe"
+#, python-format
+msgid "Settlement run ${name} has been ${action}"
+msgstr "Abrechnungslauf ${name} wurde ${action}"
 
-#~ msgid "All Parliamentarians"
-#~ msgstr "Alle Parlamentarier:innen"
+msgid "Cannot delete closed settlement run. Please reopen it first."
+msgstr ""
+"Geschlossener Abrechnungslauf kann nicht gelöscht werden. Bitte zuerst "
+"öffnen."
 
-#~ msgid "All Commissions"
-#~ msgstr "Alle Kommissionen"
-
-#~ msgid "All Types"
-#~ msgstr "Alle Arten"
-
-#~ msgid "Filter"
-#~ msgstr "Filter"
-
-#~ msgid "Apply Filter"
-#~ msgstr "Filter anwenden"

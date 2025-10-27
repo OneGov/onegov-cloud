@@ -64,6 +64,9 @@
         <tal:b condition="page.trait == 'iframe'">
             <div class="row">
                 <div class="small-12 columns">
+                    <div class="limit-line-width">
+                        <span class="page-lead h5" tal:condition="page.content.get('lead')" tal:content="layout.linkify(page.content.get('lead'))" />
+                    </div>
                     <div class="${'iframe-panel' if page.as_card else ''}">
                         <iframe src="${page.content.url}" width="100%" height="${page.height if page.height else '800'}" frameborder="0"></iframe>
                     </div>

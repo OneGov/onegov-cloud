@@ -2238,6 +2238,9 @@ msgstr "Vous trouverez ici un aperçu de toutes les réservations:"
 msgid "Best regards"
 msgstr "Meilleures salutations"
 
+msgid "Cancellation conditions:"
+msgstr "Conditions d'annulation:"
+
 msgid "We have received your deregistration for ${name}."
 msgstr "Nous avons reçu votre annulation pour ${name}."
 
@@ -3149,6 +3152,19 @@ msgstr "Exiger un ID SwissPass des participant·e·s"
 
 msgid "SwissPass ID"
 msgstr "ID SwissPass"
+
+msgid "Cancellation condition text"
+msgstr "Texte des conditions d'annulation"
+
+msgid "Cancellation conditions"
+msgstr "Conditions d'annulation"
+
+msgid ""
+"The text will be shown below the confirmation text for an activity in the "
+"mail"
+msgstr ""
+"Le texte sera affiché sous le texte de confirmation d'une activité dans le "
+"mail"
 
 msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""

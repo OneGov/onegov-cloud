@@ -4,7 +4,9 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from __future__ import annotations
 
+
 from onegov.core.upgrade import upgrade_task
+from sqlalchemy import false
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Text
@@ -50,4 +52,74 @@ def add_enabled_to_payment_providers(context: UpgradeContext) -> None:
             table='payment_providers',
             column=Column('enabled', Boolean, nullable=False),
             default=True
+        )
+
+
+@upgrade_task('Add invoiced state to payments')
+def add_invoiced_state_to_payments(context: UpgradeContext) -> None:
+    if context.has_table('payments'):
+        # On one of the instances this upgrade step failed (ogc-2335)
+        # Solution: We end the current transaction first
+        # before altering the type
+
+        # End current transaction
+        context.operations.execute('COMMIT')
+
+        context.operations.execute(
+            "ALTER TYPE payment_state ADD VALUE IF NOT EXISTS 'invoiced'"
+        )
+
+        # Start new transaction
+        context.operations.execute('BEGIN')
+
+
+@upgrade_task('Add invoiced column to invoices')
+def add_invoiced_state_to_invoices(context: UpgradeContext) -> None:
+    if not context.has_table('invoices'):
+        return
+
+    if not context.has_column('invoices', 'invoiced'):
+        context.operations.add_column(
+            'invoices',
+            Column(
+                'invoiced',
+                Boolean,
+                nullable=False,
+                server_default=false(),
+                index=True,
+            )
+        )
+
+        context.operations.execute("""
+            UPDATE invoices
+               SET invoiced = TRUE
+             WHERE id IN (
+                SELECT invoice_items.invoice_id
+                  FROM invoice_items
+                  JOIN payments_for_invoice_items_payments AS link
+                    ON link.invoice_items_id = invoice_items.id
+                  JOIN payments
+                    ON payments.id = link.payment_id
+                 WHERE payments.state = 'invoiced'
+            )
+        """)
+
+
+@upgrade_task('Add invoicing party and cost object column to invoices')
+def add_invoicing_party_and_cost_center_to_invoices(
+    context: UpgradeContext
+) -> None:
+    if not context.has_table('invoices'):
+        return
+
+    if not context.has_column('invoices', 'invoicing_party'):
+        context.operations.add_column(
+            'invoices',
+            Column('invoicing_party', Text, nullable=True)
+        )
+
+    if not context.has_column('invoice_items', 'cost_object'):
+        context.operations.add_column(
+            'invoice_items',
+            Column('cost_object', Text, nullable=True)
         )

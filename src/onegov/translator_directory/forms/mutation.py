@@ -1,15 +1,22 @@
 from __future__ import annotations
 
+from depot.io.utils import FileIntent
 from functools import cached_property
-
+from io import BytesIO
+from onegov.core.crypto import random_token
+from onegov.core.utils import dictionary_to_binary
+from onegov.file import File
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TagsField
+from onegov.form.fields import UploadField
+from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import Stdnum
 from onegov.form.validators import ValidPhoneNumber
 from onegov.form.validators import ValidSwissSocialSecurityNumber
+from onegov.form.validators import WhitelistedMimeType
 from onegov.gis import Coordinates
 from onegov.gis import CoordinatesField
 from onegov.translator_directory import _
@@ -49,14 +56,13 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     request: TranslatorAppRequest
 
     hints = [
-        ('text', _('You can use this form to report mutations.')),
         ('bullet', _('You can either leave us a message or directly suggest '
                      'changes in the corresponding fields.')),
         ('bullet', _('You only need to specify the fields that are to be '
                      'changed. The current value is greyed out.')),
         ('bullet', _('Please note that the address must be entered via the '
                      'location.')),
-        ('bullet', _('Make sure that if you make multiple selections '
+       ('bullet', _('Make sure that if you make multiple selections '
                      '(e.g. languages) you select all options, not just those '
                      'you want changed.')),
         ('bullet', _('Expertise by professional guild (other) can be listed '
@@ -177,21 +183,208 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         return data
 
     def ensure_has_content(self) -> bool:
-        if not self.submitter_message.data and not self.proposed_changes:
+        has_message = bool(self.submitter_message.data)
+        has_changes = bool(self.proposed_changes)
+        has_docs = any(
+            [
+                self.declaration_of_authorization.data,
+                self.letter_of_motivation.data,
+                self.resume.data,
+                self.uploaded_certificates.data,
+                self.social_security_card.data,
+                self.passport.data,
+                self.passport_photo.data,
+                self.debt_collection_register_extract.data,
+                self.criminal_register_extract.data,
+                self.certificate_of_capability.data,
+                self.confirmation_compensation_office.data,
+            ]
+        )
+        if not has_message and not has_changes and not has_docs:
             assert isinstance(self.submitter_message.errors, list)
             self.submitter_message.errors.append(
                 _(
-                    'Please enter a message or suggest some changes '
-                    'using the fields below.'
+                    'Please enter a message, suggest changes, '
+                    'or upload documents.'
                 )
             )
             return False
         return True
 
+    def get_files(self) -> list[File]:
+        """Convert uploaded files to File objects."""
+
+        def as_file(field: UploadField, category: str) -> File | None:
+            name = self.request.translate(field.label.text)
+            name = name.replace(' (PDF)', '')
+            if field.data:
+                return File(  # type:ignore[misc]
+                    id=random_token(),
+                    name=f'{name}.pdf',
+                    note=category,
+                    reference=FileIntent(
+                        BytesIO(dictionary_to_binary(
+                            field.data  # type:ignore[arg-type]
+                        )),
+                        field.data['filename'],
+                        field.data['mimetype'],
+                    ),
+                )
+            return None
+
+        result = [
+            as_file(self.declaration_of_authorization, 'Mutationsmeldung'),
+            as_file(self.letter_of_motivation, 'Mutationsmeldung'),
+            as_file(self.resume, 'Mutationsmeldung'),
+            as_file(self.uploaded_certificates, 'Mutationsmeldung'),
+            as_file(self.social_security_card, 'Mutationsmeldung'),
+            as_file(self.passport, 'Mutationsmeldung'),
+            as_file(self.passport_photo, 'Mutationsmeldung'),
+            as_file(self.debt_collection_register_extract, 'Mutationsmeldung'),
+            as_file(self.criminal_register_extract, 'Mutationsmeldung'),
+            as_file(self.certificate_of_capability, 'Mutationsmeldung'),
+            as_file(self.confirmation_compensation_office, 'Mutationsmeldung'),
+        ]
+        return [r for r in result if r is not None]
+
     submitter_message = TextAreaField(
         fieldset=_('Your message'),
         label=_('Message'),
         render_kw={'rows': 8}
+    )
+
+    declaration_of_authorization = UploadField(
+        label=_('Signed declaration of authorization (PDF)'),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    letter_of_motivation = UploadField(
+        label=_('Short letter of motivation (PDF)'),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    resume = UploadField(
+        label=_('Resume (PDF)'),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    uploaded_certificates = UploadField(
+        label=_('Certificates (PDF)'),
+        description=_(
+            'For the last five years. Language proficiency certificates '
+            'level C2 are mandatory for non-native speakers.'
+        ),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    social_security_card = UploadField(
+        label=_('Social security card (PDF)'),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    passport = UploadField(
+        label=_('Identity card, passport or foreigner identity card (PDF)'),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    passport_photo = UploadField(
+        label=_('Current passport photo (PDF)'),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    debt_collection_register_extract = UploadField(
+        label=_('Current extract from the debt collection register (PDF)'),
+        description=_('Maximum 6 months since issue.'),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    criminal_register_extract = UploadField(
+        label=_('Current extract from the Central Criminal Register (PDF)'),
+        description=_(
+            'Maximum 6 months since issue. Online order at '
+            'www.strafregister.admin.ch'
+        ),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    certificate_of_capability = UploadField(
+        label=_('Certificate of Capability (PDF)'),
+        description=_('Available from the municipal or city administration.'),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
+    )
+
+    confirmation_compensation_office = UploadField(
+        label=_(
+            'Confirmation from the compensation office regarding '
+            'self-employment'
+        ),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            Optional(),
+        ],
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents'),
     )
 
     first_name = StringField(

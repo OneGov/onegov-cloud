@@ -1,3 +1,4 @@
+# TODO: Get rid of this config file, once nobody is using it anymore
 rules:
   no-css-comments: 0
   indentation:

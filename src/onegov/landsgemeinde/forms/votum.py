@@ -1,4 +1,7 @@
 from __future__ import annotations
+from datetime import datetime
+
+import pytz
 
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import TimeField
@@ -115,15 +118,6 @@ class VotumForm(NamedFileForm):
     calculated_timestamp = StringField(
         label=_('Calculated video timestamp'),
         fieldset=_('Progress'),
-        render_kw={
-            'long_description': _(
-                'Calculated automatically based on the start time of the '
-                'votum and the start time of of the livestream of the assembly'
-                '.'
-            ),
-            'readonly': True,
-            'step': 1
-        },
         validators=[
             Optional()
         ],
@@ -182,12 +176,21 @@ class VotumForm(NamedFileForm):
         self.person_choices.choices = people_choices
 
     def on_request(self) -> None:
-        DefaultLayout(self.model, self.request)
+        layout = DefaultLayout(self.model, self.request)
         self.request.include('redactor')
         self.request.include('editor')
         self.request.include('person_votum')
-        self.request.include('start_time')
         self.populate_person_choices()
+        self.calculated_timestamp.render_kw = {
+            'long_description': _(
+                'Calculated automatically based on the start time of the '
+                'votum and the start time of of the livestream of the '
+                '${assembly_type}.',
+                mapping={'assembly_type': layout.assembly_type}
+            ),
+            'readonly': True,
+            'step': 1
+        }
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         data = super().get_useful_data(exclude={
@@ -215,3 +218,7 @@ class VotumForm(NamedFileForm):
 
     def populate_obj(self, obj: Votum) -> None:  # type:ignore[override]
         super().populate_obj(obj, exclude={'calculated_timestamp'})
+        if not obj.start_time and self.state.data == 'ongoing':
+            tz = pytz.timezone('Europe/Zurich')
+            now = datetime.now(tz=tz).time()
+            obj.start_time = now

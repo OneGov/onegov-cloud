@@ -1,8 +1,15 @@
+from __future__ import annotations
+
 from onegov.gis import Coordinates
 from tests.shared.utils import decode_map_value, encode_map_value
 
 
-def test_map_default_view(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_map_default_view(client: Client) -> None:
     client.login_admin()
 
     settings = client.get('/map-settings')
@@ -26,7 +33,7 @@ def test_map_default_view(client):
     assert 'data-default-zoom="12"' in edit
 
 
-def test_map_set_marker(client):
+def test_map_set_marker(client: Client) -> None:
     client.login_admin()
 
     edit = client.get('/editor/edit/page/1')

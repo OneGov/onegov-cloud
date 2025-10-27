@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import morepath
 import onegov.onboarding
 import os
@@ -7,17 +9,22 @@ from tests.shared import Client, utils
 from onegov.town6 import TownApp
 
 
-def test_view_permissions():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.onboarding.app import OnboardingApp
+
+
+def test_view_permissions() -> None:
     utils.assert_explicit_permissions(
         onegov.onboarding, onegov.onboarding.OnboardingApp)
 
 
-def test_default_assistant(onboarding_app):
+def test_default_assistant(onboarding_app: OnboardingApp) -> None:
     c = Client(onboarding_app)
     assert c.get('/').follow().request.url.endswith('for-towns/1')
 
 
-def test_town_go_back(onboarding_app):
+def test_town_go_back(onboarding_app: OnboardingApp) -> None:
     c = Client(onboarding_app)
     a = c.get('/for-towns/1')
 
@@ -51,7 +58,7 @@ def test_town_go_back(onboarding_app):
     assert 'new-jersey.example.org' in a
 
 
-def test_town_valid_values(onboarding_app):
+def test_town_valid_values(onboarding_app: OnboardingApp) -> None:
     c = Client(onboarding_app)
     a = c.get('/for-towns/1')
 
@@ -69,7 +76,13 @@ def test_town_valid_values(onboarding_app):
     assert "Ungültige Telefonnummer" in a
 
 
-def test_town_create(onboarding_app, temporary_directory, maildir, redis_url):
+def test_town_create(
+    onboarding_app: OnboardingApp,
+    temporary_directory: str,
+    maildir: str,
+    redis_url: str
+) -> None:
+
     c = Client(onboarding_app)
     a = c.get('/for-towns/1')
 
@@ -112,7 +125,7 @@ def test_town_create(onboarding_app, temporary_directory, maildir, redis_url):
         },
         identity_secure=False,
         redis_url=redis_url,
-        enable_elasticsearch=False,
+        enable_search=False,
         depot_backend='depot.io.memory.MemoryFileStorage',
         websockets={
             'client_url': 'ws://localhost:8766',
@@ -121,14 +134,14 @@ def test_town_create(onboarding_app, temporary_directory, maildir, redis_url):
         }
     )
     town.set_application_id(town.namespace + '/' + 'new_york')
-    town.settings.cronjobs = Bunch(enabled=False)
+    town.settings.cronjobs = Bunch(enabled=False)  # type: ignore[attr-defined]
 
-    c = Client(town)
-    p = c.get('/')
+    c2 = Client(town)
+    p = c2.get('/')
 
     assert "New York" in p
 
-    p = c.get('/auth/login')
+    p = c2.get('/auth/login')
     p.forms[1]['username'] = username
     p.forms[1]['password'] = password
     p = p.forms[1].submit().follow()

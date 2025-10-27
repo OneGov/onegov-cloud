@@ -1,35 +1,34 @@
+from __future__ import annotations
+
 import textwrap
-import pytest
 import transaction
 
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
-
 from onegov.core.utils import module_path
 from onegov.file import FileCollection
 from onegov.form import FormCollection
-from onegov.page.model import Page
-
-from tests.onegov.org.common import get_cronjob_by_name
-from tests.onegov.org.common import get_cronjob_url
-from time import sleep
+from onegov.org.models.page import Page
 from sedate import utcnow
 from webtest import Upload
 
 
-@pytest.mark.flaky(reruns=3, only_rerun=None)
-def test_basic_search(client_with_es):
-    client = client_with_es
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_basic_search(client_with_fts: Client) -> None:
+    client = client_with_fts
     client.login_admin()
+    anom = client.spawn()
 
     add_news = client.get('/news').click('Nachricht')
     add_news.form['title'] = "Now supporting fulltext search"
     add_news.form['lead'] = "It is pretty awesome"
     add_news.form['text'] = "Much <em>wow</em>"
     news = add_news.form.submit().follow()
-
-    client.app.es_client.indices.refresh(index='_all')
 
     root_page = client.get('/')
     root_page.form['q'] = "fulltext"
@@ -46,23 +45,23 @@ def test_basic_search(client_with_es):
     assert "It is pretty awesome" in search_page
 
     # make sure anonymous doesn't see hidden things in the search results
-    assert "fulltext" in client.spawn().get('/search?q=fulltext')
+    assert "fulltext" in anom.get('/search?q=fulltext')
+
     edit_news = news.click("Bearbeiten")
     edit_news.form['access'] = 'private'
     edit_news.form.submit()
 
-    client.app.es_client.indices.refresh(index='_all')
-
-    assert "Now supporting" not in client.spawn().get('/search?q=fulltext')
+    assert "Now supporting" not in anom.get('/search?q=fulltext')
+    assert anom.get('/search/suggest?q=fulltext').json == []
     assert "Now supporting" in client.get('/search?q=fulltext')
+    assert client.get('/search/suggest?q=fulltext').json == []
 
 
-@pytest.mark.flaky(reruns=3, only_rerun=None)
-def test_view_search_is_limiting(client_with_es):
+def test_view_search_is_limiting(client_with_fts: Client) -> None:
     # ensures that the search doesn't just return all results
-    # a regression that occured for anonymous uses only
+    # a regression that occurred for anonymous uses only
 
-    client = client_with_es
+    client = client_with_fts
     client.login_admin()
 
     add_news = client.get('/news').click('Nachricht')
@@ -74,8 +73,6 @@ def test_view_search_is_limiting(client_with_es):
     add_news.form['title'] = "Deadbeef"
     add_news.form['lead'] = "Deadbeef"
     add_news.form.submit()
-
-    client.app.es_client.indices.refresh(index='_all')
 
     root_page = client.get('/')
     root_page.form['q'] = "Foobar"
@@ -92,11 +89,11 @@ def test_view_search_is_limiting(client_with_es):
     assert "1 Resultat" in search_page
 
 
-@pytest.mark.flaky(reruns=3, only_rerun=None)
-def test_search_recently_published_object(client_with_es):
-    client = client_with_es
+def test_search_recently_published_object(client_with_fts: Client) -> None:
+    client = client_with_fts
     client.login_admin()
     anom = client.spawn()
+    session = client.app.session()
 
     # Create objects, not yet published
     start = datetime.now() + timedelta(days=1)
@@ -108,7 +105,11 @@ def test_search_recently_published_object(client_with_es):
     add_news.form['publication_start'] = start.isoformat()
     add_news.form.submit()
 
-    client.app.es_client.indices.refresh(index='_all')
+    page = session.query(Page).filter(
+        Page.title == "Now supporting fulltext search"
+    ).one()
+    assert page.access == 'public'  # type: ignore[attr-defined]
+    assert page.published == False
 
     assert 'fulltext' in client.get('/search?q=wow')
     assert 'fulltext' not in anom.get('/search?q=wow')
@@ -117,19 +118,17 @@ def test_search_recently_published_object(client_with_es):
 
     # Publish
     then = utcnow() - timedelta(minutes=30)
-    session = client.app.session()
     transaction.begin()
     session.query(Page).filter(
         Page.title == "Now supporting fulltext search"
     ).one().publication_start = then
     transaction.commit()
 
-    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
-    job.app = client.app
-    url = get_cronjob_url(job)
-    client.get(url)
-
-    sleep(5)
+    page = session.query(Page).filter(
+        Page.title == "Now supporting fulltext search"
+    ).one()
+    assert page.access == 'public'  # type: ignore[attr-defined]
+    assert page.published == True
 
     assert 'fulltext' in client.get('/search?q=wow')
     assert 'fulltext' in anom.get('/search?q=wow')
@@ -146,19 +145,20 @@ def test_search_recently_published_object(client_with_es):
     ).one().publication_end = then
     transaction.commit()
 
-    client.get(url)
-
-    sleep(5)
+    page = session.query(Page).filter(
+        Page.title == "Now supporting fulltext search"
+    ).one()
+    assert page.access == 'public'  # type: ignore[attr-defined]
+    assert page.published == False
 
     assert 'fulltext' in client.get('/search?q=wow')
     assert 'fulltext' not in anom.get('/search?q=wow')
-    assert 'It is pretty awesome' in client.get('/search?q=fulltext')
-    assert 'It is pretty awesome' not in anom.get('/search?q=fulltext')
+    assert 'is pretty awesome' in client.get('/search?q=fulltext')
+    assert 'is pretty awesome' not in anom.get('/search?q=fulltext')
 
 
-@pytest.mark.flaky(reruns=3, only_rerun=None)
-def test_search_for_page_with_member_access(client_with_es):
-    client = client_with_es
+def test_search_for_page_with_member_access(client_with_fts: Client) -> None:
+    client = client_with_fts
     client.login_admin()
     anom = client.spawn()
     member = client.spawn()
@@ -170,16 +170,13 @@ def test_search_for_page_with_member_access(client_with_es):
     new_page.form['access'] = 'member'
     new_page.form.submit().follow()
 
-    client.app.es_client.indices.refresh(index='_all')
-
     assert 'Test' in client.get('/search?q=Memberius')
     assert 'Test' in member.get('/search?q=Memberius')
     assert 'Test' not in anom.get('/search?q=Memberius')
 
 
-@pytest.mark.flaky(reruns=3, only_rerun=None)
-def test_basic_autocomplete(client_with_es):
-    client = client_with_es
+def test_basic_autocomplete(client_with_fts: Client) -> None:
+    client = client_with_fts
     client.login_editor()
 
     people = client.get('/people')
@@ -189,23 +186,19 @@ def test_basic_autocomplete(client_with_es):
     new_person.form['last_name'] = 'Gordon'
     new_person.form.submit()
 
-    client.app.es_client.indices.refresh(index='_all')
     assert client.get('/search/suggest?q=Go').json == ["Gordon Flash"]
     assert client.get('/search/suggest?q=Fl').json == ["Flash Gordon"]
 
 
-def test_search_publication_files(client_with_es):
-    client = client_with_es
+def test_search_publication_files(client_with_fts: Client) -> None:
+    client = client_with_fts
     client.login_admin()
 
     path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
-    with open(path, 'rb') as f:
+    with (open(path, 'rb') as f):
         page = client.get('/files')
         page.form['file'] = [Upload('Sample.pdf', f.read(), 'application/pdf')]
         page.form.submit()
-
-    client.app.es_indexer.process()
-    client.app.es_client.indices.refresh(index='_all')
 
     assert 'Sample' in client.get('/search?q=Adobe')
     assert 'Sample' not in client.spawn().get('/search?q=Adobe')
@@ -215,16 +208,15 @@ def test_search_publication_files(client_with_es):
     pdf.publication = True
     transaction.commit()
 
-    client.app.es_indexer.process()
-    client.app.es_client.indices.refresh(index='_all')
+    client.app.fts_indexer.process()
 
     assert 'Sample' in client.get('/search?q=Adobe')
     assert 'Sample' in client.spawn().get('/search?q=Adobe')
 
 
-def test_search_hashtags(client_with_es):
+def test_search_hashtags(client_with_fts: Client) -> None:
 
-    client = client_with_es
+    client = client_with_fts
     client.login_admin()
 
     page = client.get('/news').click("Nachricht")
@@ -234,15 +226,12 @@ def test_search_hashtags(client_with_es):
 
     page = page.form.submit().follow()
 
-    client.app.es_indexer.process()
-    client.app.es_client.indices.refresh(index='_all')
-
     assert 'We have a new homepage' in client.get('/search?q=%23newhomepage')
     assert 'We have a new homepage' not in client.get('/search?q=%23newhomepa')
 
 
-def test_ticket_chat_search(client_with_es):
-    client = client_with_es
+def test_ticket_chat_search(client_with_fts: Client) -> None:
+    client = client_with_fts
 
     collection = FormCollection(client.app.session())
     collection.definitions.add('Profile', definition=textwrap.dedent("""
@@ -267,7 +256,6 @@ def test_ticket_chat_search(client_with_es):
     page = page.form.submit().follow()
 
     # at this point logged in users should find the ticket by 'deadbeef'
-    client.app.es_client.indices.refresh(index='_all')
 
     page = client.get('/search?q=deadbeef')
     assert 'Foo' in page
@@ -277,27 +265,36 @@ def test_ticket_chat_search(client_with_es):
     assert 'Foo' not in page
 
 
-def test_search_events_are_sorted_by_occurrence_date(client_with_es):
-    client = client_with_es
+def test_search_future_events_are_sorted_by_occurrence_date(
+    client_with_fts: Client
+) -> None:
+    client = client_with_fts
     client.login_admin()
     anom = client.spawn()
     member = client.spawn()
     member.login_member()
 
-    event_data = [
+    event_data: list[dict[str, Any]] = [
         {
             "email": "test@example.org",
-            "title": "First Concert",
-            "location": "Location",
-            "organizer": "Organizer",
-            "start_date": date.today() - timedelta(days=40),
+            "title": "Not sorted Concert",
+            "location": "Location0",
+            "organizer": "Organizer0",
+            "start_date": date.today() - timedelta(days=10),
         },
         {
             "email": "test2@example.org",
             "title": "Second Concert",
             "location": "Location2",
             "organizer": "Organizer2",
-            "start_date": date.today() - timedelta(days=30),
+            "start_date": date.today() + timedelta(days=20),
+        },
+        {
+            "email": "test1@example.org",
+            "title": "First Concert",
+            "location": "Location1",
+            "organizer": "Organizer1",
+            "start_date": date.today() + timedelta(days=1),
         },
         {
             "email": "test4@example.org",
@@ -311,7 +308,7 @@ def test_search_events_are_sorted_by_occurrence_date(client_with_es):
             "title": "Third Concert",
             "location": "Location3",
             "organizer": "Organizer3",
-            "start_date": date.today() + timedelta(days=1),
+            "start_date": date.today() + timedelta(days=35),
         },
 
     ]
@@ -331,12 +328,12 @@ def test_search_events_are_sorted_by_occurrence_date(client_with_es):
         events_redirect = form_page.form.submit().follow().follow()
         assert "erfolgreich erstellt" in events_redirect
 
-    client.app.es_client.indices.refresh(index='_all')
-
     for current_client in (client, member, anom):
         results = current_client.get('/search?q=Concert')
-        # Expect ordered by occurrence date, for all search results of 'Event'
-        assert [a.text.rstrip(' \n') for a in results.pyquery(
-               'li.search-result-events a')] == [
-            'First Concert', 'Second Concert', 'Third Concert', 'Forth Concert'
+        # Expect future events ordered by occurrence date, far future first.
+        # Past events are not sorted by occurrence date.
+        assert [a.text.strip() for a in
+                results.pyquery('li.search-result-events a')] == [
+            'Forth Concert', 'Third Concert', 'Second Concert',
+            'First Concert', 'Not sorted Concert'
         ]

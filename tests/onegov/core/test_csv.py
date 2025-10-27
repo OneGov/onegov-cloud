@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 import tempfile
 from io import BytesIO
@@ -25,7 +27,7 @@ from onegov.core.errors import (
 from openpyxl import load_workbook
 
 
-def test_parse_header():
+def test_parse_header() -> None:
     assert parse_header("   Firtst name;  LastNAME; Designation")\
            == ['firtst name', 'lastname', 'designation']
     assert parse_header("a") == ['a']
@@ -37,13 +39,13 @@ def test_parse_header():
     ) == ['a', 'b', 'c', 'c_1', 'c_2', 'c_3', 'c_4', 'b_1', 'b_2', 'a_1']
 
 
-def test_normalize_header():
+def test_normalize_header() -> None:
     assert normalize_header("") == ""
     assert normalize_header("Wääh") == "waah"
     assert normalize_header(" a   b\tc ") == "a b c"
 
 
-def test_detect_encoding():
+def test_detect_encoding() -> None:
     assert detect_encoding(BytesIO('jöö'.encode('ISO-8859-2'))) == 'cp1252'
     assert detect_encoding(BytesIO('jöö'.encode('utf-8'))) == 'utf-8'
 
@@ -52,7 +54,7 @@ def test_detect_encoding():
     ) == 'utf-8'
 
 
-def test_simple_csv_file():
+def test_simple_csv_file() -> None:
     data = (
         b'Datum, Reale Temperatur, Gef\xfchlte Temperatur\n'
         b'01.01.2015, 5, k\xfchl\n'
@@ -82,7 +84,7 @@ def test_simple_csv_file():
     ]
 
 
-def test_wacky_csv_file():
+def test_wacky_csv_file() -> None:
     data = (
         b'Datum,   Temperatur%, Datum\n'
         b'01.01.2015, 5, 01.01.2014\n'
@@ -99,7 +101,7 @@ def test_wacky_csv_file():
     assert list(csv.lines)[1].temperatur == '0'
 
 
-def test_convert_xlsx_to_csv_wrong_format():
+def test_convert_xlsx_to_csv_wrong_format() -> None:
     with pytest.raises(IOError):
         convert_xlsx_to_csv(BytesIO())
 
@@ -112,7 +114,7 @@ def test_convert_xlsx_to_csv_wrong_format():
             convert_xlsx_to_csv(file)
 
 
-def test_convert_xls_to_csv_wrong_format():
+def test_convert_xls_to_csv_wrong_format() -> None:
     with pytest.raises(IOError):
         convert_xls_to_csv(BytesIO())
 
@@ -129,7 +131,7 @@ def test_convert_xls_to_csv_wrong_format():
     utils.module_path('tests.onegov.core', 'fixtures/excel.xls'),
     utils.module_path('tests.onegov.core', 'fixtures/excel.xlsx'),
 ])
-def test_convert_to_csv(excel_file):
+def test_convert_to_csv(excel_file: str) -> None:
     with open(excel_file, 'rb') as f:
         headers = ['ID', 'Namä', 'Date', 'Bool', 'Leer', 'Formel']
         csv = CSVFile(convert_excel_to_csv(f), headers)
@@ -174,7 +176,7 @@ def test_convert_to_csv(excel_file):
         convert_excel_to_csv(f, '')
 
 
-def test_empty_line_csv_file():
+def test_empty_line_csv_file() -> None:
     data = (
         b'Datum, Reale Temperatur, Gef\xfchlte Temperatur\n'
         b'\n'
@@ -209,12 +211,12 @@ def test_empty_line_csv_file():
     assert list(csv.lines)
 
 
-def test_match_headers_duplicate():
+def test_match_headers_duplicate() -> None:
     with pytest.raises(DuplicateColumnNamesError):
-        match_headers(['first_name', 'first_name'], expected=None)
+        match_headers(['first_name', 'first_name'], expected=[])
 
 
-def test_match_headers_order():
+def test_match_headers_order() -> None:
     matches = match_headers(
         headers=['firtst name', 'lastname'],
         expected=('first_name', 'last_name')
@@ -228,12 +230,12 @@ def test_match_headers_order():
     assert matches == ['first_name', 'last_name']
 
 
-def test_match_headers_case():
+def test_match_headers_case() -> None:
     assert match_headers(['a', 'b'], expected=('A', 'B')) == ['A', 'B']
     assert match_headers(['a', 'b'], expected=('b', 'a')) == ['a', 'b']
 
 
-def test_match_headers_missing():
+def test_match_headers_missing() -> None:
     with pytest.raises(MissingColumnsError) as e:
         match_headers(['a', 'b'], expected=('a', 'c'))
     assert e.value.columns == ['c']
@@ -255,7 +257,7 @@ def test_match_headers_missing():
            == ['a', 'b', 'c']
 
 
-def test_match_headers_ambiguous():
+def test_match_headers_ambiguous() -> None:
     with pytest.raises(AmbiguousColumnsError) as e:
         match_headers(['abcd', 'bcde'], expected=('bcd',))
 
@@ -263,7 +265,7 @@ def test_match_headers_ambiguous():
     assert set(e.value.columns['bcd']) == {'abcd', 'bcde'}
 
 
-def test_convert_list_of_dicts_to_csv():
+def test_convert_list_of_dicts_to_csv() -> None:
     data = [
         {
             'first_name': 'Dick',
@@ -319,7 +321,7 @@ def test_convert_list_of_dicts_to_csv():
     assert donald == 'Donald,Rumsfeld'
 
 
-def test_convert_list_of_dicts_to_csv_escaping():
+def test_convert_list_of_dicts_to_csv_escaping() -> None:
     data = [
         {
             'value': ',;"'
@@ -334,7 +336,7 @@ def test_convert_list_of_dicts_to_csv_escaping():
     assert row == '",;"""'
 
 
-def test_convert_list_of_dicts_to_xlsx():
+def test_convert_list_of_dicts_to_xlsx() -> None:
     data = [
         {
             'first_name': 'Dick',
@@ -351,7 +353,9 @@ def test_convert_list_of_dicts_to_xlsx():
     with tempfile.NamedTemporaryFile() as f:
         f.write(xlsx)
 
-        rows = tuple(load_workbook(f).active.rows)
+        workbook = load_workbook(f)
+        assert workbook.active is not None
+        rows = tuple(workbook.active.rows)
 
         assert rows[0][0].value == 'first_name'
         assert rows[0][1].value == 'last_name'
@@ -361,7 +365,7 @@ def test_convert_list_of_dicts_to_xlsx():
         assert rows[2][1].value == 'Rumsfeld'
 
 
-def test_convert_irregular_list_of_dicts_to_csv():
+def test_convert_irregular_list_of_dicts_to_csv() -> None:
     data = [
         {
             'name': 'Batman',
@@ -398,7 +402,7 @@ def test_convert_irregular_list_of_dicts_to_csv():
     assert joker == 'Joker,Supervillain,,Injustice League'
 
 
-def test_convert_multiple_list_of_dicts_to_xlsx():
+def test_convert_multiple_list_of_dicts_to_xlsx() -> None:
     data = [
         {
             'first_name': 'Dick',
@@ -443,7 +447,7 @@ def test_convert_multiple_list_of_dicts_to_xlsx():
             assert rows[2][2].value == '3434'
 
 
-def test_xlsx_title_validation():
+def test_xlsx_title_validation() -> None:
     # this is 36 chars, excel cannot load more than 31 chars
     title1 = "Schulhaus Schönwetter Gruppenraum 01"
     title2 = "Schulhaus Schönwetter Gruppenraum 02"
@@ -473,7 +477,7 @@ def test_xlsx_title_validation():
     titles = [title1, title2, title3]
 
 
-def test_remove_first_word():
+def test_remove_first_word() -> None:
     titles = ["raum-zweiter-stock-mit-langem-namen-01",
               "raum-zweiter-stock-mit-langem-namen-02"]
 
@@ -483,7 +487,7 @@ def test_remove_first_word():
     assert trimmed_titles[1] == "zweiter-stock-mit-langem-namen-02"
 
 
-def test_check_duplicates():
+def test_check_duplicates() -> None:
     titles = ["raum-zweiter-stock-mit-langem-namen-01",
               "raum-zweiter-stock-mit-langem-namen-011",
               "raum-zweiter-stock-mit-langem-namen-01",
@@ -495,7 +499,7 @@ def test_check_duplicates():
     assert duplicate_index == [2, 4]
 
 
-def test_avoid_duplicates():
+def test_avoid_duplicates() -> None:
     titles = ["Schulhaus-Schönwetter-Gruppenraum",
               "raum-zweiter-stock-mit-langem-namen-01",
               "raum-zweiter-stock-mit-langem-namen-01"]

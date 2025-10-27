@@ -3,7 +3,7 @@
 OneGov Cloud is a Swiss initiative to provide municipalities with open-source
 web-applications.
 
-[![Screenshot](docs/_static/govikon.png?raw=true)]()
+[![Screenshot](docs/_static/wil-sg.png?raw=true)]()
 
 ---
 
@@ -128,12 +128,10 @@ To run OneGov Cloud locally, you must meet the following requirements:
 * Redis 5+
 * NodeJS 9+
 * Docker Compose
-* OpenJDK JRE 8 (for elasiticsearch setup)
-* ElasticSearch
 
 To install the requirements for Ubuntu do:
 
-    sudo apt install postgresql postgresql-contrib redis-server nodejs python3 docker-compose openjdk-8-jre-headless elasticsearch
+    sudo apt install postgresql postgresql-contrib redis-server nodejs python3 docker-compose
 
 ### Libraries
 
@@ -256,7 +254,7 @@ To auto-reload chameleon templates, set `ONEGOV_DEVELOPMENT` environment variabl
     export ONEGOV_DEVELOPMENT='1'
 
 **Optional**
-Run the elastic search cluster, D3renderer and the SMTP server: (for me sudo was required)
+Run the D3renderer and the SMTP server: (for me sudo was required)
 
     docker compose up -d
 

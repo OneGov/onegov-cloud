@@ -1,11 +1,17 @@
-import re
+from __future__ import annotations
 
+import re
 import transaction
 
 from onegov.user import UserCollection
 
 
-def test_disable_users(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_disable_users(client: Client) -> None:
     client.login_admin()
 
     users = client.get('/usermanagement')
@@ -28,7 +34,7 @@ def test_disable_users(client):
     assert login.status_code == 302
 
 
-def test_change_role(client):
+def test_change_role(client: Client) -> None:
     client.login_admin()
 
     user = client.spawn()
@@ -67,7 +73,7 @@ def test_change_role(client):
     assert user.get('/userprofile', expect_errors=True).status_code == 403
 
 
-def test_user_source(client):
+def test_user_source(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/usermanagement')
@@ -76,6 +82,7 @@ def test_user_source(client):
 
     users = UserCollection(client.app.session())
     user = users.by_username('editor@example.org')
+    assert user is not None
     user.source = 'msal'
     user.source_id = '1234'
     transaction.commit()
@@ -88,7 +95,7 @@ def test_user_source(client):
     assert '1234' in page
 
 
-def test_unique_yubikey(client):
+def test_unique_yubikey(client: Client) -> None:
     client.login_admin()
 
     client.app.enable_yubikey = True
@@ -108,7 +115,7 @@ def test_unique_yubikey(client):
     assert admin.form.submit().status_code == 302
 
 
-def test_add_new_user_without_activation_email(client):
+def test_add_new_user_without_activation_email(client: Client) -> None:
     client.login_admin()
 
     client.app.enable_yubikey = True
@@ -136,7 +143,7 @@ def test_add_new_user_without_activation_email(client):
     assert login.form.submit().status_code == 302
 
 
-def test_add_new_user_with_activation_email(client):
+def test_add_new_user_with_activation_email(client: Client) -> None:
     client.login_admin()
 
     client.app.enable_yubikey = False
@@ -151,7 +158,7 @@ def test_add_new_user_with_activation_email(client):
     assert "Anmeldungs-Anleitung wurde an den Benutzer gesendet" in added
 
     email = client.get_email(0)['TextBody']
-    reset = re.search(
+    reset = re.search(  # type: ignore[union-attr]
         r'(http://localhost/auth/reset-password[^)]+)', email).group()
 
     page = client.spawn().get(reset)
@@ -165,7 +172,7 @@ def test_add_new_user_with_activation_email(client):
     assert login.form.submit().status_code == 302
 
 
-def test_edit_user_settings(client):
+def test_edit_user_settings(client: Client) -> None:
     client.login_admin()
 
     client.app.enable_yubikey = False
@@ -176,7 +183,7 @@ def test_edit_user_settings(client):
     new.form.submit()
 
     users = UserCollection(client.app.session())
-    assert users.by_username('new@example.org').data
+    assert users.by_username('new@example.org').data  # type: ignore[union-attr]
 
     edit = client.get('/usermanagement').click('Ansicht', index=-1)
     edit = edit.click('Bearbeiten')
@@ -185,16 +192,16 @@ def test_edit_user_settings(client):
     edit.form['ticket_statistics'] = 'never'
     edit.form.submit()
 
-    assert users.by_username('new@example.org')\
-        .data['ticket_statistics'] == 'never'
+    assert (users.by_username('new@example.org')  # type: ignore[union-attr]
+        .data['ticket_statistics'] == 'never')
 
 
-def test_filters(client):
+def test_filters(client: Client) -> None:
     client.login_admin()
 
     client.app.enable_yubikey = False
 
-    def add_user(username, role, state):
+    def add_user(username: str, role: str, state: str) -> None:
         new = client.get('/usermanagement').click('Benutzer', href='new')
         new.form['username'] = username
         new.form['role'] = role
@@ -208,8 +215,29 @@ def test_filters(client):
     add_user('emilia@example.org', 'admin', 'active')
     add_user('frank@example.org', 'admin', 'inactive')
 
+    # test active filter by default
+    users = client.get('/usermanagement')
+    assert not users.pyquery('.filter-active .active a')
+
+    users = client.get('/usermanagement?active=1')
+    assert users.pyquery('.filter-active .active a').text() == 'Aktiv'
+    users = client.get('/usermanagement?active=0')
+    assert users.pyquery('.filter-active .active a').text() == 'Inaktiv'
+    # assert not users.pyquery('.filter-active .active a')
+
+    # test active filter clicking breadcrumb (collection and user layout)
+    users = users.click('Benutzerverwaltung')
+    assert users.pyquery('.filter-active .active a').text() == 'Aktiv'
+    user = users.click('Ansicht', index=0).click('Benutzerverwaltung')
+    assert user.pyquery('.filter-active .active a').text() == 'Aktiv'
+
+    # test active filter after submitting a user change
+    user = users.click('Ansicht', index=0).click('Bearbeiten')
+    users = user.form.submit().follow()
+    assert users.pyquery('.filter-active .active a').text() == 'Aktiv'
+
+    # test active filter via Menu user
     users = client.get('/').click('Benutzer', index=1)
-    # ensure 'active' filter is selected by default
     assert users.pyquery('.filter-active .active a').text() == 'Aktiv'
     assert 'arno' in users
     assert 'beno' not in users

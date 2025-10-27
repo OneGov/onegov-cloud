@@ -161,7 +161,7 @@ def test_election_compound_part_widgets(
     # Add final results (actually final, but not manually completed)
     with freeze_time('2022-01-01 12:00'):
         session.delete(compound)
-        compound, errors = import_test_datasets(
+        results = import_test_datasets(
             app_session=session,
             api_format='internal',
             model='election_compound',
@@ -212,6 +212,8 @@ def test_election_compound_part_widgets(
             date_=date(2019, 3, 31),
             dataset_name='landratswahlen-2019'
         )
+        assert len(results) == 1
+        compound, errors = next(iter(results.values()))
         assert not errors
         compound.completes_manually = True
         compound.manually_completed = False
@@ -343,7 +345,7 @@ def test_election_compound_part_widgets(
 
     # Add final results (actually, set final and add party results)
     with freeze_time('2022-01-02 12:00'):
-        errors = import_test_datasets(
+        results = import_test_datasets(
             'internal',
             'parties',
             'bl',
@@ -352,6 +354,8 @@ def test_election_compound_part_widgets(
             election=model.election_compound,
             dataset_name='landratswahlen-2019-parteien',
         )
+        assert len(results) == 1
+        errors = next(iter(results.values()))
         assert not errors
         model.election_compound.manually_completed = True
         session.flush()

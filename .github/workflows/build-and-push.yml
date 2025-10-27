@@ -58,7 +58,7 @@ jobs:
     needs: build-and-push-image
     strategy:
       matrix:
-        group: [1, 2, 3, 4, 5, 6]
+        group: [1, 2, 3, 4, 5, 6, 7, 8]
 
     runs-on: ubuntu-latest
 
@@ -87,12 +87,12 @@ jobs:
           git-core \
           postgresql \
           redis \
-          openjdk-8-jre-headless \
           gcc \
           libc-dev \
           fonts-liberation \
           libappindicator3-1 \
           libasound2t64 \
+          libcairo2-dev \
           libdrm2 \
           libgbm1 \
           libnspr4 \
@@ -103,6 +103,7 @@ jobs:
           libxcb-dri3-0 \
           libxshmfence1 \
           libxss1 \
+          libxt-dev \
           unzip \
           xdg-utils
 
@@ -153,14 +154,14 @@ jobs:
           -o cache_dir=/tmp/pytest \
           -r fER \
           --dist loadgroup \
-          --splits "6" \
+          --splits "8" \
           --group "${{matrix.group}}" \
           --reruns 3 \
           --reruns-delay 1 \
           --only-rerun "AttributeError: 'SessionManager'" \
           --only-rerun "AttributeError: 'DefaultLayout'" \
-          --only-rerun "ReferenceError: $ is not defined" \
-          --only-rerun "FileNotFoundError: [Errno 2] No such file" \
+          --only-rerun ".*ReferenceError: [$] is not defined" \
+          --only-rerun "FileNotFoundError:" \
           --only-rerun "Bad response: 404 Not Found" \
           --junit-xml=/tmp/junit.xml \
           -o junit_family=legacy \
@@ -175,7 +176,6 @@ jobs:
       env:
         LC_ALL: C.UTF-8
         LANG: C.UTF-8
-        JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
         SKIP_DRIVER_MANAGER: '1'
 
   cleanup-images:

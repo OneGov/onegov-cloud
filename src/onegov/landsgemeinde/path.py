@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 @LandsgemeindeApp.path(
     model=AssemblyCollection,
-    path='/landsgemeinden'
+    path='/assemblies'
 )
 def get_assemblies(app: LandsgemeindeApp) -> AssemblyCollection:
     return AssemblyCollection(app.session())
@@ -29,7 +29,7 @@ def get_assemblies(app: LandsgemeindeApp) -> AssemblyCollection:
 
 @LandsgemeindeApp.path(
     model=Assembly,
-    path='/landsgemeinde/{date}',
+    path='/assembly/{date}',
     converters={'date': extended_date_converter}
 )
 def get_assembly(app: LandsgemeindeApp, date: date) -> Assembly | None:

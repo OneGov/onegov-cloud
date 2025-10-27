@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-04-14 11:50+0200\n"
+"POT-Creation-Date: 2025-10-06 11:10+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -59,15 +59,14 @@ msgstr "Auszug aus dem Memorial (PDF)"
 msgid "Memorial"
 msgstr "Memorial"
 
-msgid ""
-"Links to the whole memorial (if there is one linked to the assembly), but "
-"opens it on the chosen page number"
-msgstr ""
-"Verlinkt das gesamte Memorial (sofern eines auf der Landsgemeinde "
-"hochgeladen ist), öffnet es aber auf der angegebenen Seitennummer"
-
 msgid "Alternatively: Page from the Memorial"
 msgstr "Alternativ: Seite aus dem Memorial"
+
+msgid "Additional documents"
+msgstr "Zusätzliche Dokumente"
+
+msgid "Documents"
+msgstr "Dokumente"
 
 msgid "Start"
 msgstr "Start"
@@ -81,13 +80,6 @@ msgstr ""
 
 msgid "Calculated video timestamp"
 msgstr "Berechneter Video-Zeitstempel"
-
-msgid ""
-"Calculated automatically based on the start time of the agenda item and the "
-"start time of of the livestream of the assembly ."
-msgstr ""
-"Automatisch berechnet anhand der Startzeit des Traktandums und der Startzeit "
-"des Livestreams der Landsgemeinde."
 
 msgid "Manual video timestamp"
 msgstr "Manueller Video-Zeitstempel"
@@ -113,11 +105,39 @@ msgstr "Stillschweigend angenommen"
 msgid "Tags"
 msgstr "Schlagworte"
 
+#, python-format
+msgid ""
+"Links to the whole memorial (if there is one linked to the "
+"${assembly_type}), but opens it on the chosen page number"
+msgstr ""
+"Verlinkt das gesamte Memorial (sofern eines auf der ${assembly_type} "
+"hochgeladen ist), öffnet es aber auf der angegebenen Seitennummer"
+
+#, python-format
+msgid ""
+"Calculated automatically based on the start time of the agenda item and the "
+"start time of of the livestream of the ${assembly_type}."
+msgstr ""
+"Automatisch berechnet anhand der Startzeit des Traktandums und der Startzeit "
+"des Livestreams der ${assembly_type}."
+
 msgid "Number already used."
 msgstr "Nummer wird bereits verwendet."
 
 msgid "Invalid timestamp."
 msgstr "Ungültiger Zeitstempel."
+
+msgid "Agenda Item ZIP"
+msgstr "Traktandum ZIP"
+
+msgid "Import"
+msgstr "Importieren"
+
+msgid "No file uploaded."
+msgstr "Keine Datei hochgeladen."
+
+msgid "No html directory found in the zip file."
+msgstr "Keine HTML-Dateien im ZIP-Archiv gefunden."
 
 msgid "Date"
 msgstr "Datum"
@@ -138,9 +158,6 @@ msgstr "Video"
 
 msgid "Video URL"
 msgstr "Video URL"
-
-msgid "The URL to the video of the assembly."
-msgstr "Die URL zum Video der Landsgemeinde."
 
 msgid "Start time of the livestream"
 msgstr "Startzeit des Livestreams"
@@ -166,6 +183,10 @@ msgstr "Audio (MP3)"
 msgid "Memorial as audio for the visually impaired and blind"
 msgstr "Memorial als Hörfassung für Sehbehinderte und Blinde"
 
+#, python-format
+msgid "The URL to the video of the ${assembly_type}."
+msgstr "Die URL zum Video der ${assembly_type}."
+
 msgid "Date already used."
 msgstr "Datum wird bereits verwendet."
 
@@ -177,6 +198,21 @@ msgstr "ID"
 
 msgid "Name"
 msgstr "Name"
+
+msgid "The title of the assemblies."
+msgstr "Der Titel der Versammlungen."
+
+msgid "Assembly settings"
+msgstr "Einstellungen für Versammlungen"
+
+msgid "Assembly"
+msgstr "Landsgemeinde"
+
+msgid "General Assembly"
+msgstr "Versammlung"
+
+msgid "Town Hall Meeting"
+msgstr "Gemeindeversammlung"
 
 msgid "Person"
 msgstr "Person"
@@ -204,13 +240,6 @@ msgid "Automatically updated when votum changed to ongoing."
 msgstr ""
 "Automatisch aktualisiert, wenn die Wortmeldung auf 'laufend' gesetzt wird."
 
-msgid ""
-"Calculated automatically based on the start time of the votum and the start "
-"time of of the livestream of the assembly."
-msgstr ""
-"Automatisch berechnet anhand der Startzeit der Wortmeldung und der Startzeit "
-"des Livestreams der Landsgemeinde."
-
 msgid "Motion"
 msgstr "Antrag"
 
@@ -218,14 +247,19 @@ msgid "Statement of reasons"
 msgstr "Begründung"
 
 #, python-format
-msgid "Agenda items of assembly from ${date}"
-msgstr "Traktanden der Landsgemeinde vom ${date}"
+msgid ""
+"Calculated automatically based on the start time of the votum and the start "
+"time of of the livestream of the ${assembly_type}."
+msgstr ""
+"Automatisch berechnet anhand der Startzeit der Wortmeldung und der Startzeit "
+"des Livestreams der ${assembly_type}."
+
+#, python-format
+msgid "Agenda items of ${assembly_type} from ${date}"
+msgstr "Traktanden der ${assembly_type} vom ${date}"
 
 msgid "Homepage"
 msgstr "Startseite"
-
-msgid "Assemblies"
-msgstr "Landsgemeinden"
 
 msgid "Agenda items"
 msgstr "Traktanden"
@@ -263,38 +297,53 @@ msgstr "Möchten Sie diese Wortmeldung wirklich löschen?"
 msgid "Delete votum"
 msgstr "Wortmeldung löschen"
 
-msgid "Assembly"
-msgstr "Landsgemeinde"
-
 msgid "States"
 msgstr "Status"
 
 msgid "Ticker"
 msgstr "Ticker"
 
-msgid "Do you really want to delete this assembly?"
-msgstr "Möchten Sie diese Landsgemeinde wirklich löschen?"
-
-msgid "Delete assembly"
-msgstr "Landsgemeinde löschen"
+#, python-format
+msgid "Do you really want to delete this ${assembly_type}?"
+msgstr "Möchten Sie diese ${assembly_type} wirklich löschen?"
 
 #, python-format
-msgid "Extraodinary assembly from ${date}"
-msgstr "Ausserordentliche Landsgemeinde vom ${date}"
+msgid "Delete ${assembly_type}"
+msgstr "${assembly_type} löschen"
+
+msgid "ZIP Upload"
+msgstr "ZIP-Upload"
 
 #, python-format
-msgid "Assembly from ${date}"
-msgstr "Landsgemeinde vom ${date}"
+msgid "Extraordinary ${assembly_type} from ${date}"
+msgstr "Ausserordentliche ${assembly_type} vom ${date}"
+
+#, python-format
+msgid "${assembly_type} from ${date}"
+msgstr "${assembly_type} vom ${date}"
 
 msgid "Irrelevant motion"
 msgstr "Unerheblicher Antrag"
 
+msgid "General Assemblies"
+msgstr "Versammlungen"
+
+msgid "Town Hall Meetings"
+msgstr "Gemeindeversammlungen"
+
+msgid "Assemblies"
+msgstr "Landsgemeinden"
+
 #, python-format
-msgid "Vota of agenda items ${number} of assembly from ${date}"
-msgstr "Wortmeldungen des Traktandum ${number} der Landsgemeinde vom ${date}"
+msgid "Vota of agenda items ${number} of ${assembly_type} from ${date}"
+msgstr ""
+"Wortmeldungen des Traktandum ${number} der ${assembly_type} vom ${date}"
 
 msgid "Vota"
 msgstr "Wortmeldungen"
+
+msgid "draft"
+msgstr "Entwurf"
 
 msgid "scheduled"
 msgstr "geplant"
@@ -305,14 +354,23 @@ msgstr "laufend"
 msgid "completed"
 msgstr "abgeschlossen"
 
+msgid "Previous agenda item"
+msgstr "Vorheriges Traktandum"
+
+msgid "Next agenda item"
+msgstr "Nächstes Traktandum"
+
+msgid "Excerpt from the Memorial.pdf"
+msgstr "Auszug aus dem Memorial.pdf"
+
+msgid "No ${assembly} defined yet."
+msgstr "Noch keine ${assembly} erfasst."
+
+msgid "Downloads, Audio & Assembly items"
+msgstr "Downloads, Audio & Traktanden"
+
 msgid "Memorial (PDF)"
 msgstr "Memorial (PDF)"
-
-msgid "No assemblies defined yet."
-msgstr "Noch keine Landsgemeinden erfasst."
-
-msgid "Assembly items & downloads"
-msgstr "Traktanden & Downloads"
 
 msgid "Audio"
 msgstr "Audio"
@@ -364,15 +422,15 @@ msgid "You must provide the source (author, title and link to the dataset)."
 msgstr "Eine Quellenangabe ist Pflicht (Autor, Titel und Link zum Datensatz)."
 
 msgid ""
-"Shows the status of each element of an assembly. The statuses of each "
+"Shows the status of each element of an ${assembly}. The statuses of each "
 "element are automatically adjusted when editing an element, if possible."
 msgstr ""
-"Zeigt den Status jedes Elements einer Landsgemeinde. Die Stati aller "
-"Elemente einer Landsgemeinde werden beim Bearbeiten eines einzelnen "
-"Elementes automatisch angepasst (sofern möglich)."
+"Zeigt den Status jedes Elements einer ${assembly}. Die Stati aller Elemente "
+"einer ${assembly} werden beim Bearbeiten eines einzelnen Elementes "
+"automatisch angepasst (sofern möglich)."
 
-msgid "The assembly has ended."
-msgstr "Die Landsgemeinde ist beendet."
+msgid "The ${assembly} has ended."
+msgstr "Die ${assembly} ist beendet."
 
 msgid "Added a new agenda item"
 msgstr "Neues Traktandum hinzugefügt"
@@ -383,17 +441,22 @@ msgstr "Neu"
 msgid "New agenda item"
 msgstr "Neues Traktandum"
 
+msgid "Imported a new agenda item"
+msgstr "Neues Traktandum importiert"
+
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
-msgid "Added a new assembly"
-msgstr "Neue Landsgemeinde hinzugefügt"
+#, python-format
+msgid "Added a new ${assembly}"
+msgstr "Neue ${assembly} hinzugefügt"
 
-msgid "New assembly"
-msgstr "Neue Landsgemeinde"
+#, python-format
+msgid "New ${assembly}"
+msgstr "Neue ${assembly}"
 
-msgid "Open data"
-msgstr "Open data"
+msgid "Open Data"
+msgstr "Open Data"
 
 #, python-format
 msgid "Results from the ${title}, structured as json"
@@ -402,14 +465,88 @@ msgstr "Resultate der ${title}, strukturiert als JSON"
 msgid "Location"
 msgstr "Ort"
 
-msgid "Open Data"
-msgstr "Open Data"
-
 msgid "Added a new votum"
 msgstr "Neue Wortmeldung hinzugefügt"
 
 msgid "New votum"
 msgstr "Neue Wortmeldung"
+
+#~ msgid "The assembly has ended."
+#~ msgstr "Die Landsgemeinde ist beendet."
+
+#~ msgid ""
+#~ "Shows the status of each element of an ${layout.assembly_type}. The "
+#~ "statuses of each element are automatically adjusted when editing an "
+#~ "element, if possible."
+#~ msgstr ""
+#~ "Zeigt den Status jedes Elements einer ${layout.assembly_type}. Die Stati "
+#~ "aller Elemente einer ${layout.assembly_type} werden beim Bearbeiten eines "
+#~ "einzelnen Elementes automatisch angepasst (sofern möglich)."
+
+#~ msgid ""
+#~ "Shows the status of each element of an assembly. The statuses of each "
+#~ "element are automatically adjusted when editing an element, if possible."
+#~ msgstr ""
+#~ "Zeigt den Status jedes Elements einer Landsgemeinde. Die Stati aller "
+#~ "Elemente einer Landsgemeinde werden beim Bearbeiten eines einzelnen "
+#~ "Elementes automatisch angepasst (sofern möglich)."
+
+#, python-format
+#~ msgid "Vota of agenda items ${number} of assembly from ${date}"
+#~ msgstr ""
+#~ "Wortmeldungen des Traktandum ${number} der Landsgemeinde vom ${date}"
+
+#~ msgid "Do you really want to delete this assembly?"
+#~ msgstr "Möchten Sie diese Landsgemeinde wirklich löschen?"
+
+#~ msgid "Delete assembly"
+#~ msgstr "Landsgemeinde löschen"
+
+#, python-format
+#~ msgid "Agenda items of assembly from ${date}"
+#~ msgstr "Traktanden der Landsgemeinde vom ${date}"
+
+#~ msgid ""
+#~ "Calculated automatically based on the start time of the votum and the "
+#~ "start time of of the livestream of the assembly."
+#~ msgstr ""
+#~ "Automatisch berechnet anhand der Startzeit der Wortmeldung und der "
+#~ "Startzeit des Livestreams der Landsgemeinde."
+
+#~ msgid ""
+#~ "Calculated automatically based on the start time of the agenda item and "
+#~ "the start time of of the livestream of the assembly ."
+#~ msgstr ""
+#~ "Automatisch berechnet anhand der Startzeit des Traktandums und der "
+#~ "Startzeit des Livestreams der Landsgemeinde."
+
+#~ msgid "The URL to the video of the assembly."
+#~ msgstr "Die URL zum Video der Landsgemeinde."
+
+#~ msgid ""
+#~ "Links to the whole memorial (if there is one linked to the assembly), but "
+#~ "opens it on the chosen page number"
+#~ msgstr ""
+#~ "Verlinkt das gesamte Memorial (sofern eines auf der Landsgemeinde "
+#~ "hochgeladen ist), öffnet es aber auf der angegebenen Seitennummer"
+
+#, python-format
+#~ msgid "Extraodinary ${assembly_type} from ${date}"
+#~ msgstr "Ausserordentliche ${assembly_type} vom ${date}"
+
+#~ msgid "No assemblies defined yet."
+#~ msgstr "Noch keine Landsgemeinden erfasst."
+
+#, python-format
+#~ msgid "Extraodinary assembly from ${date}"
+#~ msgstr "Ausserordentliche Landsgemeinde vom ${date}"
+
+#, python-format
+#~ msgid "Assembly from ${date}"
+#~ msgstr "Landsgemeinde vom ${date}"
+
+#~ msgid "Assembly items & downloads"
+#~ msgstr "Traktanden & Downloads"
 
 #~ msgid "Audio (ZIP)"
 #~ msgstr "Audio (ZIP)"

@@ -7,7 +7,7 @@
 #
 from __future__ import annotations
 
-__version__ = '2025.18'
+__version__ = '2025.60'
 
 # The module levels used for dependency tests and to have a well defined
 # onegov core upgrade order.
@@ -36,8 +36,8 @@ LEVELS = (
         'onegov.gis',
         'onegov.gever',
         'onegov.newsletter',
-        'onegov.notice',
         'onegov.page',
+        'onegov.parliament',
         'onegov.pay',
         'onegov.pdf',
         'onegov.people',
@@ -61,7 +61,6 @@ LEVELS = (
         'onegov.feriennet',
         'onegov.foundation6',
         'onegov.fsi',
-        'onegov.gazette',
         'onegov.intranet',
         'onegov.landsgemeinde',
         'onegov.onboarding',
@@ -74,6 +73,7 @@ LEVELS = (
     ),
 )
 
+import email_validator
 import logging
 import warnings
 
@@ -90,6 +90,9 @@ ignored_warnings = (
 
 for message in ignored_warnings:
     warnings.filterwarnings('ignore', message=message)
+
+# we don't want to spend the extra I/O overhead on checking deliverability
+email_validator.CHECK_DELIVERABILITY = False
 
 from onegov.core.framework import Framework
 from onegov.core.filestorage import get_filestorage_file  # noqa: F401

@@ -1,12 +1,19 @@
+from __future__ import annotations
+
 from onegov.api.models import ApiKey
 from onegov.org.theme.org_theme import HELVETICA
 from xml.etree.ElementTree import tostring
 
 
-def test_settings(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
 
-    assert client.get('/general-settings', expect_errors=True)\
-        .status_code == 403
+
+def test_settings(client: Client) -> None:
+    assert client.get(
+        '/general-settings', expect_errors=True
+    ).status_code == 403
 
     client.login_admin()
 
@@ -97,7 +104,7 @@ def test_settings(client):
     assert settings.form['event_filter_type'].value == 'tags'
 
 
-def test_api_keys_create_and_delete(client):
+def test_api_keys_create_and_delete(client: Client) -> None:
 
     client.login_admin()
 
@@ -107,6 +114,7 @@ def test_api_keys_create_and_delete(client):
     assert 'My API key' in page
 
     key = client.app.session().query(ApiKey).first()
+    assert key is not None
     assert key.name == "My API key"
     assert key.read_only == True
 
@@ -121,7 +129,7 @@ def test_api_keys_create_and_delete(client):
     assert client.app.session().query(ApiKey).first() is None
 
 
-def test_switch_languages(client):
+def test_switch_languages(client: Client) -> None:
 
     client.login_admin()
 

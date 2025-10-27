@@ -49,17 +49,23 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         'polymorphic_identity': 'generic',
     }
 
-    es_public = True
-    es_properties = {
-        'title': {'type': 'text'},
-        'function': {'type': 'localized'},
-        'email': {'type': 'text'},
-        'phone_fts': {'type': 'text'},
+    fts_public = True
+    fts_properties = {
+        'title': {'type': 'text', 'weight': 'A'},
+        'function': {'type': 'localized', 'weight': 'B'},
+        'email': {'type': 'text', 'weight': 'A'},
+        'phone_fts': {'type': 'text', 'weight': 'A'},
     }
 
     @property
-    def es_suggestion(self) -> tuple[str, ...]:
+    def fts_suggestion(self) -> tuple[str, ...]:
         return (self.title, f'{self.first_name} {self.last_name}')
+
+    # NOTE: When a person was last changed should not influence how
+    #       relevant they are in the search results
+    @property
+    def fts_last_change(self) -> None:
+        return None
 
     @property
     def phone_fts(self) -> list[str]:
@@ -69,8 +75,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     @property
     def title(self) -> str:
         """ Returns the Eastern-ordered name. """
-
-        return self.last_name + ' ' + self.first_name
+        return f'{self.last_name} {self.first_name}'
 
     @property
     def spoken_title(self) -> str:

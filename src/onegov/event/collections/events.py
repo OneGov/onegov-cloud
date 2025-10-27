@@ -5,12 +5,22 @@ import hashlib
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+
+import click
+import logging
+import requests
+
+from dateutil.parser import parse
+from html import unescape
+
 from icalendar import Calendar as vCalendar
 from icalendar.prop import vCategory
+from io import BytesIO
 from lxml import etree
 from lxml.etree import SubElement, CDATA
 from markupsafe import escape
 from onegov.core.collection import Pagination
+from onegov.core.html import html_to_text
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
 from onegov.event.models import Event
@@ -25,11 +35,11 @@ from sqlalchemy import and_
 from sqlalchemy import or_
 from uuid import uuid4
 
-
 from typing import Any
 from typing import IO
 from typing import NamedTuple
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from collections.abc import Mapping
@@ -37,8 +47,10 @@ if TYPE_CHECKING:
     from onegov.event.models.event import EventState
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing import Self
+    from typing import Self, IO
     from uuid import UUID
+
+log = logging.getLogger('onegov.org.events')
 
 
 class EventImportItem(NamedTuple):
@@ -50,7 +62,6 @@ class EventImportItem(NamedTuple):
 
 
 class EventCollection(Pagination[Event]):
-
     """ Manage a list of events. """
 
     def __init__(
@@ -188,7 +199,7 @@ class EventCollection(Pagination[Event]):
     def from_import(
         self,
         items: Iterable[EventImportItem | str],
-        purge: str | None = None,
+        to_purge: list[str] | None = None,
         publish_immediately: bool = True,
         valid_state_transfers: Mapping[str, str] | None = None,
         published_only: bool = False,
@@ -206,7 +217,7 @@ class EventCollection(Pagination[Event]):
             A list of ``EventImportItem``'s or event sources to keep
             from purging.
 
-        :param purge:
+        :param to_purge:
             Optionally removes all events with the given meta-source-prefix not
             present in the given events.
 
@@ -236,12 +247,12 @@ class EventCollection(Pagination[Event]):
             If set only events in the future will be imported
         """
 
-        if purge:
+        purged = set()
+        for purge_id in to_purge or []:
             query = self.session.query(Event.meta['source'].label('source'))
-            query = query.filter(Event.meta['source'].astext.startswith(purge))
-            purged = {r.source for r in query}
-        else:
-            purged = set()
+            query = query.filter(
+                Event.meta['source'].astext.startswith(purge_id))
+            purged.update([r.source for r in query])
 
         added = []
         updated = []
@@ -261,7 +272,7 @@ class EventCollection(Pagination[Event]):
                 Event.meta['source'] == event.meta['source']
             ).first()
 
-            if purge:
+            if to_purge:
                 purged -= {event.source}
 
             if existing:
@@ -482,6 +493,232 @@ class EventCollection(Pagination[Event]):
         return self.from_import(items, publish_immediately=True,
                                 future_events_only=future_events_only)
 
+    def from_minasa(
+        self,
+        xml_stream: bytes,
+    ) -> tuple[list[Event], list[Event], list[UUID]]:
+        locations = {}
+        organizers = {}
+        items = []
+        items_to_purge = []
+        source_ids = []
+        h2t_config = {'ignore_emphasis': True}
+
+        root = etree.fromstring(xml_stream)
+        ns = {'ns': 'https://minasa.ch/schema/v1'}
+
+        def rdate_from_single_dates(dates: list[datetime]) -> str | None:
+            """
+            Transforms a list of start dates into a RDATE string.
+            Returns a string with the RDATE's for the given dates.
+
+            Example for two recurrence dates:
+                'RDATE:20250501T120000Z
+                 RDATE:20250508T120000Z'
+            """
+            if not dates:
+                return None
+
+            return '\n'.join(
+                f'RDATE:{to_timezone(start, "UTC"):%Y%m%dT%H%M%SZ}'
+                for start in dates
+            )
+
+        def find_element_text(parent: etree._Element, key: str) -> str:
+            element = parent.find(f'ns:{key}', namespaces=ns)
+            if element is not None:
+                return unescape(element.text or '')
+
+            return ''
+
+        def get_event_image(
+                event: etree._Element
+        ) -> tuple[IO[bytes] | None, str | None]:
+            url = find_element_text(event, 'imageUrl')
+
+            if not url:
+                return None, None
+
+            try:
+                response = requests.get(url, timeout=10)
+                response.raise_for_status()
+                image_steam = BytesIO(response.content)
+                return image_steam, url.split('/')[-1]
+            except requests.RequestException:
+                log.exception(
+                    f'Failed to retrieve event image from {url}')
+                return None, None
+
+        for location in root.xpath('//ns:location', namespaces=ns):
+            uuid7 = find_element_text(location, 'uuid7')
+            address = location.find('ns:address', namespaces=ns)
+            title = find_element_text(address, 'title')
+            street = find_element_text(address, 'street')
+            zip = find_element_text(address, 'zip')
+            city = find_element_text(address, 'city')
+            url = find_element_text(address, 'url')
+            lat = find_element_text(address, 'latitude')
+            lon = find_element_text(address, 'longitude')
+            locations[uuid7] = {
+                'title': title,
+                'street': street,
+                'zip': zip,
+                'city': city,
+                'url': url,
+                'lat': lat,
+                'lon': lon,
+            }
+
+        for organizer in root.xpath('//ns:organizer', namespaces=ns):
+            uuid7 = find_element_text(organizer, 'uuid7')
+            address = organizer.find('ns:address', namespaces=ns)
+            title = find_element_text(address, 'title')
+            phone = find_element_text(address, 'phone')
+            email = find_element_text(address, 'email')
+            organizers[uuid7] = {
+                'title': title,
+                'phone': phone,
+                'email': email,
+            }
+
+        for event in root.xpath('//ns:event', namespaces=ns):
+            title = find_element_text(event, 'title')
+            abstract = find_element_text(event, 'abstract')
+            description = find_element_text(event, 'description')
+            description = (
+                html_to_text(description, **h2t_config)) if description else ''
+            if abstract:
+                description = f'{abstract}\n\n{description}'
+
+            organizer_id = find_element_text(event, 'organizerUuid7')
+
+            location_id = find_element_text(event, 'locationUuid7')
+            location_data = locations.get(location_id, {})
+            location = ', '.join(
+                location_data[i] for i in ['title', 'street', 'zip', 'city']
+                if location_data[i]
+            )
+            coordinates = None
+            if (location_data.get('lat', None) and
+                    location_data.get('lon', None)):
+                coordinates = Coordinates(
+                    lat=float(location_data['lat']),
+                    lon=float(location_data['lon'])
+                )
+            event_image, event_image_name = get_event_image(event)
+
+            ticket_price = find_element_text(event, 'ticketPrice')
+            event_url = find_element_text(event, 'originalEventUrl') or ''
+
+            provider_url = ''
+            provider_ref = event.find('ns:providerReference', namespaces=ns)
+            if provider_ref is not None:
+                provider_url = find_element_text(provider_ref, 'url')
+
+            tags = []
+            category = event.find('ns:category', namespaces=ns)
+            if category is not None:
+                tag = find_element_text(category, 'mainCategory')
+                tags.append(tag) if tag else None
+
+            timezone = 'Europe/Zurich'
+            for schedule in event.find('ns:schedules', namespaces=ns):
+                schedule_id = find_element_text(schedule, 'uuid7')
+                start = parse(find_element_text(schedule, 'start'))
+                end_text = find_element_text(schedule, 'end')
+                end = (parse(end_text) if end_text else
+                       start + timedelta(hours=2))
+
+                recurrence_start_dates: list[datetime] = []
+                recurrence = schedule.find('ns:recurrence', namespaces=ns)
+                frequency = find_element_text(recurrence, 'frequency')
+
+                event_status = find_element_text(schedule, 'eventStatus')
+                if event_status == 'deleted':
+                    items_to_purge.append(schedule_id)
+                    continue  # skip from importing otherwise no purge
+
+                if frequency == 'single':
+                    pass
+
+                elif frequency in ['daily', 'weekly']:
+                    interval = int(find_element_text(recurrence, 'interval'))
+                    until = parse(find_element_text(recurrence, 'until'))
+
+                    if until.tzinfo is None:
+                        until = until.replace(tzinfo=start.tzinfo)
+
+                    delta = (
+                        timedelta(days=interval)
+                        if frequency == 'daily'
+                        else timedelta(weeks=interval)
+                    )
+                    current_start = start + delta
+                    while current_start <= until:
+                        recurrence_start_dates.append(current_start)
+                        current_start += delta
+
+                else:
+                    log.error(
+                        'Error unhandled recurrence type:', frequency)
+
+                recurrence = (
+                    rdate_from_single_dates(recurrence_start_dates))
+
+                # Importing each single schedule, recurrence within a schedule
+                # will link the different occurrences using the schedule id.
+                # Multiple 'single' frequency schedule lead to single events.
+                items.append(
+                    EventImportItem(
+                        event=Event(  # type:ignore[misc]
+                            state='published',
+                            title=title,
+                            start=start,
+                            end=end,
+                            timezone=timezone,
+                            recurrence=recurrence,
+                            description=description,
+                            organizer=organizers.get(
+                                organizer_id, {}).get('title', ''),
+                            organizer_email=organizers.get(
+                                organizer_id, {}).get('email', ''),
+                            organizer_phone=organizers.get(
+                                organizer_id, {}).get('phone', ''),
+                            location=location,
+                            coordinates=coordinates,
+                            price=ticket_price,
+                            external_event_url=event_url or provider_url,
+                            tags=tags,
+                            filter_keywords=None,
+                            source=schedule_id,
+                        ),
+                        image=event_image,
+                        image_filename=event_image_name,
+                        pdf=None,
+                        pdf_filename=None,
+                    )
+                )
+
+                source_ids.append(schedule_id)
+
+        # ogc-2447 imported events with source ids not in this `xml_stream`
+        # can be removed to prevent duplicates as the xml stream represents
+        # a complete set of events
+        for event in (
+                self.session.query(Event)
+                .filter(Event.source.notin_(source_ids))):  # type:ignore[union-attr]
+            if event.source:
+                items_to_purge.append(event.source)
+                click.echo(f' - removing event as not in xml stream '
+                           f'{event.title} {event.start}')
+
+        return self.from_import(
+            items,
+            to_purge=items_to_purge,
+            publish_immediately=True,
+            future_events_only=False
+        )
+
     def as_anthrazit_xml(
         self,
         request: CoreRequest,
@@ -563,7 +800,7 @@ class EventCollection(Pagination[Event]):
                 desc = e.description
                 if len(e.description) > 10000:
                     desc = e.description[:9995] + '..'
-                text_mobile.text = CDATA(  # type: ignore[assignment]
+                text_mobile.text = CDATA(
                     desc.replace('\r\n', '<br>'))
 
             for occ in e.occurrences:
@@ -576,7 +813,7 @@ class EventCollection(Pagination[Event]):
 
             if e.price:
                 price = SubElement(event, 'sf01')
-                price.text = CDATA(  # type: ignore[assignment]
+                price.text = CDATA(
                     e.price.replace('\r\n', '<br>'))
 
             if e.external_event_url:

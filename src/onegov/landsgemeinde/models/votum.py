@@ -28,10 +28,12 @@ if TYPE_CHECKING:
     from typing import Literal
     from typing import TypeAlias
 
-    VotumState: TypeAlias = Literal['scheduled', 'ongoing', 'completed']
+    VotumState: TypeAlias = Literal[
+        'draft', 'scheduled', 'ongoing', 'completed']
 
 
 STATES: dict[VotumState, TranslationString] = {
+    'draft': _('draft'),
     'scheduled': _('scheduled'),
     'ongoing': _('ongoing'),
     'completed': _('completed')
@@ -45,19 +47,19 @@ class Votum(
 
     __tablename__ = 'landsgemeinde_vota'
 
-    es_public = True
-    es_properties = {
-        'text': {'type': 'localized_html'},
-        'motion': {'type': 'localized_html'},
-        'statement_of_reasons': {'type': 'localized_html'},
-        'person_name': {'type': 'text'},
-        'person_function': {'type': 'text'},
-        'person_place': {'type': 'text'},
-        'person_political_affiliation': {'type': 'text'},
+    fts_public = True
+    fts_properties = {
+        'text': {'type': 'localized', 'weight': 'A'},
+        'motion': {'type': 'localized', 'weight': 'A'},
+        'statement_of_reasons': {'type': 'localized', 'weight': 'C'},
+        'person_name': {'type': 'text', 'weight': 'A'},
+        'person_function': {'type': 'text', 'weight': 'B'},
+        'person_place': {'type': 'text', 'weight': 'D'},
+        'person_political_affiliation': {'type': 'text', 'weight': 'C'},
     }
 
     @property
-    def es_suggestion(self) -> tuple[str, ...]:
+    def fts_suggestion(self) -> tuple[str, ...]:
         return ()
 
     #: the internal id of the votum

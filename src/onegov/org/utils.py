@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 import colorsys
-import re
-
+import hashlib
 import phonenumbers
+import re
 import sedate
 import pytz
 
 from contextlib import suppress
 from collections import defaultdict, Counter, OrderedDict
 from datetime import datetime, time, timedelta
+from decimal import Decimal
 from email.headerregistry import Address
 from functools import lru_cache
 from isodate import parse_date, parse_datetime
@@ -24,34 +25,38 @@ from onegov.file import File, FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
+from onegov.pay import InvoiceItemMeta, Price
 from onegov.reservation import Resource
-from onegov.ticket import TicketCollection, TicketPermission
+from onegov.ticket import Ticket, TicketCollection, TicketPermission
 from onegov.user import User, UserGroup
 from operator import add, attrgetter
-from sqlalchemy import nullsfirst  # type:ignore[attr-defined]
+from sqlalchemy import case, nullsfirst  # type:ignore[attr-defined]
+from webob.exc import HTTPBadRequest
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
-
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from lxml.etree import _Element
     from onegov.core.request import CoreRequest
+    from onegov.form import Form, FormSubmission
     from onegov.org.models import ImageFile
     from onegov.org.request import OrgRequest
+    from onegov.pay import InvoiceItem
     from onegov.pay.types import PriceDict
     from onegov.reservation import Allocation, Reservation
-    from onegov.ticket import Ticket
     from pytz.tzinfo import DstTzInfo, StaticTzInfo
     from sqlalchemy.orm import Query
     from sqlalchemy import Column
     from typing import Self, TypeAlias, TypeVar
+    from uuid import UUID
 
     _T = TypeVar('_T')
     _DeltaT = TypeVar('_DeltaT')
     _SortT = TypeVar('_SortT', bound='SupportsRichComparison')
     _TransformedT = TypeVar('_TransformedT')
+    _ItemT = TypeVar('_ItemT', bound=InvoiceItem | InvoiceItemMeta)
     TzInfo: TypeAlias = DstTzInfo | StaticTzInfo
     DateRange: TypeAlias = tuple[datetime, datetime]
 
@@ -66,6 +71,12 @@ EMPTY_PARAGRAPHS = re.compile(r'<p>\s*<br>\s*</p>')
 # additionally it is used in onegov.org's common.js in javascript variant
 HASHTAG = re.compile(r'(?<![\w/])#\w{3,}')
 IMG_URLS = re.compile(r'<img[^>]*?src="(.*?)"')
+
+# some sensible colors to be used for labels in calendars
+COLORS = [
+    '#d3e3fb', '#c69943', '#2c9f42', '#ffb100', '#ef969d', '#ffc800',
+    '#92baf6', '#d1d4d6', '#96cfa1', '#de2c3b', '#f8d5d8', '#ffe480',
+]
 
 
 def djb2_hash(text: str, size: int) -> int:
@@ -283,14 +294,19 @@ def parse_fullcalendar_request(
 
     if start_str and end_str:
         if 'T' in start_str:
-            start = parse_datetime(start_str)
-            end = parse_datetime(end_str)
+            try:
+                start = parse_datetime(start_str)
+                end = parse_datetime(end_str)
+            except Exception:
+                raise HTTPBadRequest() from None
         else:
-            start = datetime.combine(parse_date(start_str), time(0, 0))
-            end = datetime.combine(
-                parse_date(end_str),
-                time(23, 59, 59, 999999)
-            )
+            try:
+                start_date = parse_date(start_str)
+                end_date = parse_date(end_str)
+            except Exception:
+                raise HTTPBadRequest() from None
+            start = datetime.combine(start_date, time(0, 0))
+            end = datetime.combine(end_date, time(23, 59, 59, 999999))
 
         start = sedate.replace_timezone(start, timezone)
         end = sedate.replace_timezone(end, timezone)
@@ -310,6 +326,12 @@ def render_time_range(start: datetime | time, end: datetime | time) -> str:
         end_str = f'{end:%H:%M}'
 
     return f'{start:%H:%M} - {end_str}'
+
+
+def complete_url(url: str | None) -> str | None:
+    if url is None or url.startswith(('http://', 'https://', '/')):
+        return url
+    return f'https://{url}'
 
 
 class ReservationInfo:
@@ -524,6 +546,22 @@ class AllocationEventInfo:
         if self.allocation.end < sedate.utcnow():
             yield 'event-in-past'
 
+        elif not self.request.is_manager and (
+            self.resource.is_past_deadline(
+                # for partly available allocations we use the end of the
+                # allocation, since some small sliver of the allocation
+                # may still be before the deadline, we could get a slightly
+                # more accurate result by subtracting the raster, but it
+                # doesn't seem worth the extra CPU cycles.
+                self.allocation.end
+                if self.allocation.partly_available
+                else self.allocation.start
+            ) or self.resource.is_before_lead_time(
+                self.allocation.start
+            )
+        ):
+            yield 'event-outside-booking-window'
+
         if self.quota > 1:
             if self.quota_left == self.quota:
                 yield 'event-available'
@@ -546,7 +584,7 @@ class AllocationEventInfo:
             {
                 'name': self.resource.name,
                 'date': self.allocation.display_start(),
-                'view': 'agendaDay'
+                'view': 'timeGridDay'
             },
             name='occupancy'
         )
@@ -614,11 +652,13 @@ class AllocationEventInfo:
             'start': self.event_start,
             'end': self.event_end,
             'title': self.event_title,
+            'classNames': list(self.event_classes),
+            'display': 'block',
+            # extended properties
             'wholeDay': self.allocation.whole_day,
             'partlyAvailable': self.allocation.partly_available,
             'quota': self.allocation.quota,
             'quotaLeft': self.quota_left,
-            'className': ' '.join(self.event_classes),
             'partitions': self.allocation.availability_partitions(),
             'actions': [
                 link(self.request)
@@ -626,6 +666,351 @@ class AllocationEventInfo:
             ],
             'editurl': self.request.link(self.allocation, name='edit'),
             'reserveurl': self.request.link(self.allocation, name='reserve')
+        }
+
+
+class AvailabilityEventInfo:
+
+    __slots__ = ('resource', 'allocation', 'request', 'translate')
+
+    def __init__(
+        self,
+        resource: Resource,
+        allocation: Allocation,
+        request: OrgRequest
+    ) -> None:
+
+        self.resource = resource
+        self.allocation = allocation
+        self.request = request
+        self.translate = request.translate
+
+    @classmethod
+    def from_allocations(
+        cls,
+        request: OrgRequest,
+        resource: Resource,
+        allocations: Iterable[Allocation]
+    ) -> list[Self]:
+
+        return [
+            cls(resource, allocation, request)
+            for allocation in allocations
+            if allocation.is_master
+        ]
+
+    @property
+    def event_start(self) -> str:
+        return self.allocation.display_start().isoformat()
+
+    @property
+    def event_end(self) -> str:
+        return self.allocation.display_end().isoformat()
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            'id': self.allocation.id,
+            'start': self.event_start,
+            'end': self.event_end,
+            'editable': False,
+            'display': 'background',
+        }
+
+
+@lru_cache(maxsize=64)
+def event_color(event_name: str) -> str:
+    # NOTE: We use sha256 for stability, we could also
+    #       use a different stable hash, but we can't use
+    #       the builtin Python hash, since it changes with
+    #       every run
+    h = hashlib.new('md5', event_name.encode('utf-8'), usedforsecurity=False)
+    # NOTE: Currently we only need to use the last two digits
+    #       but if we add more than 16 colors, then this would
+    #       change.
+    index = int(h.hexdigest()[-2:], base=16) % len(COLORS)
+    return COLORS[index]
+
+
+class ReservationEventInfo:
+
+    __slots__ = ('resource', 'reservation', 'ticket', 'request', 'translate')
+
+    def __init__(
+        self,
+        resource: Resource,
+        reservation: Reservation,
+        ticket: Ticket,
+        request: OrgRequest,
+    ) -> None:
+
+        self.resource = resource
+        self.reservation = reservation
+        self.ticket = ticket
+        self.request = request
+        self.translate = request.translate
+
+    @classmethod
+    def from_reservations(
+        cls,
+        request: OrgRequest,
+        resource: Resource,
+        reservations: Iterable[tuple[Reservation, Ticket]]
+    ) -> list[Self]:
+
+        return [
+            cls(
+                resource,
+                reservation,
+                ticket,
+                request
+            )
+            for reservation, ticket in reservations
+        ]
+
+    @classmethod
+    def from_resources(
+        cls,
+        request: OrgRequest,
+        reservations: Iterable[tuple[Resource, Reservation, Ticket]]
+    ) -> list[Self]:
+
+        return [
+            cls(
+                resource,
+                reservation,
+                ticket,
+                request
+            )
+            for resource, reservation, ticket in reservations
+        ]
+
+    @property
+    def event_start(self) -> str:
+        return self.reservation.display_start().isoformat()
+
+    @property
+    def event_end(self) -> str:
+        return self.reservation.display_end().isoformat()
+
+    @property
+    def whole_day(self) -> bool:
+        start = self.reservation.display_start()
+        end = self.reservation.display_end()
+        tz = self.reservation.timezone
+        assert tz is not None
+        return sedate.is_whole_day(start, end, tz)
+
+    @property
+    def event_time(self) -> str:
+        if self.whole_day:
+            return self.translate(_('Whole day'))
+        else:
+            return render_time_range(
+                self.reservation.display_start(),
+                self.reservation.display_end()
+            )
+
+    @property
+    def quota(self) -> int:
+        return self.reservation.quota
+
+    @property
+    def accepted(self) -> bool:
+        if self.reservation.data and self.reservation.data.get('accepted'):
+            return True
+        return False
+
+    @property
+    def event_title(self) -> str:
+        return '\n'.join(part for part in (
+            self.ticket.number,
+            self.event_time,
+            f'{self.translate(_("Quota"))}: {self.quota}'
+            if getattr(self.resource, 'show_quota', False) else '',
+            self.ticket.tag,
+            self.reservation.email,
+            self.translate(_('Pending approval')) if not self.accepted else '',
+        ) if part)
+
+    @property
+    def event_classes(self) -> Iterator[str]:
+        if self.accepted:
+            yield 'event-accepted'
+        else:
+            yield 'event-pending'
+
+        # HACK: Find event element by id, it would be better if fullcalendar
+        #       generated an element id we could use, but we'll work with
+        #       what we have.
+        yield f'event-{self.reservation.id}'
+
+    @property
+    def color(self) -> str | None:
+        tag = self.ticket.tag
+        if not tag:
+            return None
+
+        for tag_config in self.request.app.org.ticket_tags or ():
+            if not isinstance(tag_config, dict):
+                continue
+
+            meta = tag_config.get(tag)
+            if not meta:
+                continue
+
+            color = meta.get('Color')
+            if color is None:
+                break
+            return color
+        return event_color(tag)
+
+    @property
+    def editable(self) -> bool:
+        if self.reservation.display_start() < sedate.utcnow():
+            return False
+        return not self.accepted
+
+    def as_dict(self) -> dict[str, Any]:
+        is_manager = self.request.is_manager
+        return {
+            'id': self.reservation.id,
+            'start': self.event_start,
+            'end': self.event_end,
+            'backgroundColor': self.color,
+            'title': self.event_title,
+            'classNames': list(self.event_classes),
+            'url': self.request.link(self.ticket)
+            if is_manager else self.request.link(self.ticket, name='status'),
+            'display': 'block',
+            # extended properties
+            'wholeDay': self.whole_day,
+            'editable': is_manager and self.editable,
+            'editurl': self.request.csrf_protected_url(self.request.link(
+                self.ticket,
+                name='adjust-reservation',
+                query_params={'reservation-id': str(self.reservation.id)}
+            )) if is_manager else None,
+        }
+
+
+class MyReservationEventInfo:
+
+    __slots__ = (
+        'id',
+        'token',
+        'start',
+        'end',
+        'timezone',
+        'accepted',
+        'resource',
+        'resource_id',
+        'ticket_id',
+        'handler_code',
+        'ticket_number',
+        'key_code',
+        'request',
+        'translate',
+    )
+
+    def __init__(
+        self,
+        id: int,
+        token: str,
+        start: datetime,
+        end: datetime,
+        accepted: bool,
+        timezone: str,
+        resource: str,
+        resource_id: UUID,
+        ticket_id: UUID,
+        handler_code: str,
+        ticket_number: str,
+        key_code: str | None,
+        request: OrgRequest,
+    ) -> None:
+
+        self.id = id
+        self.token = token
+        self.start = sedate.to_timezone(start, timezone)
+        self.end = sedate.to_timezone(
+            end + timedelta(microseconds=1),
+            timezone
+        )
+        self.timezone = timezone
+        self.accepted = accepted
+        self.resource = resource
+        self.resource_id = resource_id
+        self.ticket_id = ticket_id
+        self.handler_code = handler_code
+        self.key_code = key_code
+        self.request = request
+        self.translate = request.translate
+
+    @property
+    def event_start(self) -> str:
+        return self.start.isoformat()
+
+    @property
+    def event_end(self) -> str:
+        return self.end.isoformat()
+
+    @property
+    def whole_day(self) -> bool:
+        start = self.start
+        end = self.end
+        tz = self.timezone
+        return sedate.is_whole_day(start, end, tz)
+
+    @property
+    def event_time(self) -> str:
+        if self.whole_day:
+            return self.translate(_('Whole day'))
+        else:
+            return render_time_range(self.start, self.end)
+
+    @property
+    def event_title(self) -> str:
+        return '\n'.join(part for part in (
+            self.resource,
+            self.event_time,
+            f'{self.translate(_("Key Code"))}: {self.key_code}'
+            if self.key_code else '',
+            self.translate(_('Pending approval')) if not self.accepted else '',
+        ) if part)
+
+    @property
+    def event_classes(self) -> Iterator[str]:
+        if self.accepted:
+            yield 'event-accepted'
+        else:
+            yield 'event-pending'
+
+        # HACK: Find event element by id, it would be better if fullcalendar
+        #       generated an element id we could use, but we'll work with
+        #       what we have.
+        yield f'event-{self.id}'
+
+    def as_dict(self) -> dict[str, Any]:
+        is_manager = self.request.is_manager
+        return {
+            'id': self.id,
+            'start': self.event_start,
+            'end': self.event_end,
+            'title': self.event_title,
+            'classNames': list(self.event_classes),
+            'url': self.request.class_link(
+                Ticket,
+                {
+                    'handler_code': self.handler_code,
+                    'id': self.ticket_id
+                },
+                name='' if is_manager else 'status'
+            ),
+            'display': 'block',
+            # extended properties
+            'wholeDay': self.whole_day,
+            'editable': False,
+            'editurl': None,
         }
 
 
@@ -1161,19 +1546,25 @@ def emails_for_new_ticket(
         general_condition | (TicketPermission.group == ticket.group)
     )
 
-    for username, realname in query.join(UserGroup.users).with_entities(
-        User.username,
-        User.realname,
+    for email, name in query.join(UserGroup.users).with_entities(
+        case([(
+            UserGroup.meta['shared_email'].isnot(None),
+            UserGroup.meta['shared_email'].astext,
+        )], else_=User.username),
+        case([(
+            UserGroup.meta['shared_email'].isnot(None),
+            UserGroup.name,
+        )], else_=User.realname),
     ).distinct():
 
-        if username in seen:
+        if email in seen:
             continue
 
-        seen.add(username)
+        seen.add(email)
         try:
             yield Address(
-                display_name=realname or '',
-                addr_spec=username
+                display_name=name or '',
+                addr_spec=email
             )
         except ValueError:
             # if it's not a valid address then skip it
@@ -1203,21 +1594,33 @@ def widest_access(*accesses: str) -> str:
     return ORDERED_ACCESS[index]
 
 
+def narrowest_access(*accesses: str) -> str:
+    index = len(ORDERED_ACCESS) - 1
+    for access in accesses:
+        try:
+            # we only want to look at indexes starting with the one
+            # we're already at, otherwise we're lowering the access
+            index = ORDERED_ACCESS.index(access, 0, index)
+        except ValueError:
+            pass
+    return ORDERED_ACCESS[index]
+
+
 @overload
 def extract_categories_and_subcategories(
-    categories: list[dict[str, list[str]] | str],
+    categories: Sequence[dict[str, list[str]] | str],
     flattened: Literal[False] = False
 ) -> tuple[list[str], list[list[str]]]: ...
 
 @overload
 def extract_categories_and_subcategories(
-    categories: list[dict[str, list[str]] | str],
+    categories: Sequence[dict[str, list[str]] | str],
     flattened: Literal[True]
 ) -> list[str]: ...
 
 
 def extract_categories_and_subcategories(
-    categories: list[dict[str, list[str]] | str],
+    categories: Sequence[dict[str, list[str]] | str],
     flattened: bool = False
 ) -> tuple[list[str], list[list[str]]] | list[str]:
     """
@@ -1253,8 +1656,13 @@ def extract_categories_and_subcategories(
             sub_cats.append([])
 
     if flattened:
-        return (cats +
-                [item for sublist in sub_cats if sublist for item in sublist])
+        cats.extend(
+            item
+            for sublist in sub_cats
+            if sublist
+            for item in sublist
+        )
+        return cats
 
     return cats, sub_cats
 
@@ -1274,3 +1682,100 @@ def format_phone_number(phone_number: str) -> str:
         )
     except phonenumbers.phonenumberutil.NumberParseException:
         return phone_number
+
+
+def get_current_tickets_url(request: OrgRequest) -> str:
+    """ Get the tickets url with the parameters we last visited. """
+    state = request.browser_session.get('tickets_state')
+    return request.class_link(
+        TicketCollection,
+        state or {'handler': 'ALL', 'state': 'open', 'page': 0}
+    )
+
+
+def invoice_items_for_submission(
+    request: CoreRequest,
+    form: Form,
+    submission: FormSubmission
+) -> list[InvoiceItemMeta]:
+
+    # NOTE: Eventually we may need something more sophisticated
+    vat_rate = Decimal(org.vat_rate) if (
+        getattr(submission.form, 'show_vat', False)
+        and (org := getattr(request.app, 'org', None))
+        and org.vat_rate
+    ) else None
+    extra = {'submission_id': submission.id}
+    items = form.invoice_items(extra=extra, vat_rate=vat_rate)
+    discounts = form.discount_items(extra=extra, vat_rate=vat_rate)
+
+    # for backwards compatibility we still support a raw price
+    # instead of a more complete invoice item
+    if 'invoice_item' in submission.meta:
+        items.insert(0, InvoiceItemMeta(**submission.meta['invoice_item']))
+    elif 'price' in submission.meta:
+        price = Price(**submission.meta['price'])
+        items.insert(0, InvoiceItemMeta(
+            text=request.translate(_('Lump sum')),
+            group='submission',
+            unit=price.amount,
+            vat_rate=vat_rate,
+        ))
+
+    total = InvoiceItemMeta.total(items)
+    if discounts:
+        remainder = total
+        for discount in discounts:
+            item = discount.apply_discount(total, remainder)
+            remainder += item.amount
+            assert remainder >= 0.0
+            items.append(item)
+        total = remainder
+
+    return items
+
+
+def currency_for_submission(form: Form, submission: FormSubmission) -> str:
+    if 'currency' in submission.meta:
+        return submission.meta['currency']
+
+    if 'price' in submission.meta:
+        return submission.meta['price'].get('currency', 'CHF')
+
+    # We just pick the first currency from any pricing rule we can find
+    # if we can't find any, then we fall back to 'CHF'. Although that
+    # should be an invalid form definition.
+    for field in form._fields.values():
+        if not hasattr(field, 'pricing'):
+            continue
+
+        rules = field.pricing.rules
+        if not rules:
+            continue
+
+        return next(iter(rules.values())).currency or 'CHF'
+    return 'CHF'
+
+
+def group_invoice_items(
+    invoice_items: Iterable[_ItemT]
+) -> dict[str, list[_ItemT]]:
+
+    def sort_key(item: _ItemT) -> tuple[int, str]:
+        match item.group:
+            case 'submission' | 'reservation' | 'migration':
+                return 0, item.group
+            case 'form':
+                return 1, item.group
+            case 'manual' | 'reduced_amount':
+                return 99, 'manual'
+            case _:
+                return 2, item.group
+
+    return {
+        group: list(items)
+        for (__, group), items in groupby(
+            sorted(invoice_items, key=sort_key),
+            key=sort_key
+        )
+    }

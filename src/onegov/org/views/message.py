@@ -87,24 +87,30 @@ def view_messages_feed(
     messages = tuple(cast(m) for m in self.query())
     usernames = {m.owner for m in messages if m.owner}
 
+    hide_personal_email = (request.app.org.hide_personal_email
+                  and not request.is_manager)
+    hide_submitter_email = (request.app.org.hide_submitter_email
+                              and not request.is_manager)
+    general = request.app.org.general_email or ''
+    submitter_name = request.translate(_('Submitter'))
+
     if usernames:
         q = request.session.query(User)
         q = q.with_entities(User.username, User.realname)
         q = q.filter(User.username.in_(usernames))
 
-        owners = {u.username: Owner(u.username, u.realname) for u in q}
+        owners = {u.username: Owner(
+            general if hide_personal_email else u.username, u.realname
+        ) for u in q}
         owners.update({
-            username: Owner(username, None)
+            username: Owner(
+                submitter_name if hide_submitter_email else username, None)
             for username in usernames
             if username not in owners
         })
 
     else:
         owners = {}
-
-    hide_email = (request.app.org.hide_personal_email
-                  and not request.is_manager)
-    general = request.app.org.general_email
 
     return {
         'messages': [
@@ -116,7 +122,7 @@ def view_messages_feed(
                     layout.format_date(m.created, 'weekday_long'),
                     layout.format_date(m.created, 'date_long')
                 )),
-                'owner': general if hide_email else owners[m.owner].username,
+                'owner': owners[m.owner].username,
                 'html': render_message(
                     message=m,
                     request=request,

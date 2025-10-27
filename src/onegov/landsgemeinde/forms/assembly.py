@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
+
+import pytz
 from onegov.form.fields import PanelField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
@@ -64,7 +66,6 @@ class AssemblyForm(NamedFileForm):
     video_url = URLField(
         label=_('Video URL'),
         fieldset=_('Video'),
-        description=_('The URL to the video of the assembly.'),
         validators=[URL(), Optional()]
     )
 
@@ -141,7 +142,10 @@ class AssemblyForm(NamedFileForm):
         DefaultLayout(self.model, self.request)
         self.request.include('redactor')
         self.request.include('editor')
-        self.request.include('start_time')
+        self.video_url.description = _(
+            'The URL to the video of the ${assembly_type}.',
+            mapping={'assembly_type': DefaultLayout(self.model, self.request
+                                                    ).assembly_type})
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         data = super().get_useful_data(exclude=['info_video'])
@@ -156,3 +160,10 @@ class AssemblyForm(NamedFileForm):
                 query = query.filter(Assembly.id != self.model.id)
             if session.query(query.exists()).scalar():
                 raise ValidationError(_('Date already used.'))
+
+    def populate_obj(self, obj: Assembly) -> None:  # type:ignore[override]
+        super().populate_obj(obj)
+        if not obj.start_time and self.state.data == 'ongoing':
+            tz = pytz.timezone('Europe/Zurich')
+            now = datetime.now(tz=tz).time()
+            obj.start_time = now

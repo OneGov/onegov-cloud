@@ -3,7 +3,6 @@ from __future__ import annotations
 import humanize
 import importlib
 import phonenumbers
-import re
 
 from babel.dates import format_date
 from cgi import FieldStorage
@@ -19,7 +18,7 @@ from onegov.form.errors import FieldCompileError
 from onegov.form.errors import InvalidFormSyntax
 from onegov.form.errors import MixedTypeError
 from onegov.form.types import BaseFormT, FieldT
-from stdnum.exceptions import (  # type:ignore[import-untyped]
+from stdnum.exceptions import (
     ValidationError as StdnumValidationError)
 from wtforms import DateField, DateTimeLocalField, RadioField, TimeField
 from wtforms.fields import SelectField
@@ -501,9 +500,6 @@ class ValidPhoneNumber:
             raise ValidationError(self.message)
 
 
-swiss_ssn_rgxp = re.compile(r'756\.\d{4}\.\d{4}\.\d{2}$')
-
-
 class ValidSwissSocialSecurityNumber:
     """ Makes sure the given input is a valid swiss social security number.
 
@@ -513,12 +509,17 @@ class ValidSwissSocialSecurityNumber:
 
     message = _('Not a valid swiss social security number.')
 
+    def __init__(self) -> None:
+        self.stdnum_validator = Stdnum(format='ch.ssn')
+
     def __call__(self, form: Form, field: Field) -> None:
         if not field.data:
             return
 
-        if not re.match(swiss_ssn_rgxp, field.data):
-            raise ValidationError(self.message)
+        try:
+            self.stdnum_validator(form, field)
+        except ValidationError:
+            raise ValidationError(self.message) from None
 
 
 class UniqueColumnValue:

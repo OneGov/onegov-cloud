@@ -1,11 +1,10 @@
-import functools
-from datetime import timedelta
+from __future__ import annotations
 
+import functools
 import pytest
 import transaction
-from sedate import utcnow, to_timezone, ensure_timezone
-from sqlalchemy import exists
 
+from datetime import timedelta
 from onegov.org.models import PushNotification
 from onegov.org.models.page import News
 import json
@@ -13,15 +12,27 @@ from onegov.org.notification_service import (
     TestNotificationService,
     set_test_notification_service,
 )
+from sedate import utcnow, to_timezone, ensure_timezone
+from sqlalchemy import exists
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 from tests.onegov.org.test_cronjobs import register_echo_handler
 from tests.shared import ExtendedBrowser
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import datetime
+    from onegov.ticket.handler import HandlerRegistry
+    from tests.shared.browser import ExtendedBrowser
+    from .conftest import TestTownApp
+
+
 @pytest.mark.xdist_group(name="browser")
 def test_firebase_settings_form_and_push_notification_flow(
-    browser, town_app, handlers
-):
+    browser: ExtendedBrowser,
+    town_app: TestTownApp,
+    handlers: HandlerRegistry
+) -> None:
     # Adding patches until either the test passes or we run out of monkeys
     monkey_patch_fill_for_element_not_interactable(browser)
     monkey_patch_visit_to_ignore_console_errors(browser)
@@ -42,7 +53,7 @@ def test_firebase_settings_form_and_push_notification_flow(
         # Missing other required fields
     }
     assert browser.is_element_present_by_name('firebase_adminsdk_credential')
-    browser.fill('firebase_adminsdk_credential', invalid_credentials)
+    browser.fill('firebase_adminsdk_credential', invalid_credentials)  # type: ignore[arg-type]
 
     browser.find_by_value('Speichern').click()
     assert browser.is_text_present(
@@ -51,7 +62,7 @@ def test_firebase_settings_form_and_push_notification_flow(
 
     # 4. Test with valid json
     assert browser.is_element_present_by_name('firebase_adminsdk_credential')
-    browser.fill('firebase_adminsdk_credential', {
+    browser.fill('firebase_adminsdk_credential', {  # type: ignore[arg-type]
         "type": "service_account",
         "project_id": "test-project",
         "private_key_id": "test-key-id",
@@ -92,6 +103,7 @@ def test_firebase_settings_form_and_push_notification_flow(
 
     register_echo_handler(handlers)
     job = get_cronjob_by_name(town_app, 'send_push_notifications_for_news')
+    assert job is not None
     job.app = town_app
     transaction.begin()
     browser.visit(get_cronjob_url(job))
@@ -112,8 +124,10 @@ def test_firebase_settings_form_and_push_notification_flow(
 
 
 def create_news_with_push_notification(
-    browser, dt, title='My push notification News'
-):
+    browser: ExtendedBrowser,
+    dt: datetime,
+    title: str = 'My push notification News'
+) -> None:
     # in a real browser scenario, form submission is is timezone naive, but the
     # user of course still selects in local time. Regardless Europe/Zurich
     # is assumed throughout the codebase.
@@ -145,8 +159,11 @@ def create_news_with_push_notification(
 
 @pytest.mark.xdist_group(name="browser")
 def test_firebase_push_notifications_date_in_future_should_not_send(
-    browser, town_app, handlers
-):
+    browser: ExtendedBrowser,
+    town_app: TestTownApp,
+    handlers: HandlerRegistry
+) -> None:
+
     session = town_app.session()
     monkey_patch_fill_for_element_not_interactable(browser)
     monkey_patch_visit_to_ignore_console_errors(browser)
@@ -156,7 +173,7 @@ def test_firebase_push_notifications_date_in_future_should_not_send(
     browser.visit('/firebase')
 
     assert browser.is_element_present_by_name('firebase_adminsdk_credential')
-    browser.fill('firebase_adminsdk_credential', {
+    browser.fill('firebase_adminsdk_credential', {  # type: ignore[arg-type]
         "type": "service_account",
         "project_id": "test-project",
         "private_key_id": "test-key-id",
@@ -187,6 +204,7 @@ def test_firebase_push_notifications_date_in_future_should_not_send(
 
     register_echo_handler(handlers)
     job = get_cronjob_by_name(town_app, 'send_push_notifications_for_news')
+    assert job is not None
     job.app = town_app
     transaction.begin()
     browser.visit(get_cronjob_url(job))
@@ -199,11 +217,11 @@ def test_firebase_push_notifications_date_in_future_should_not_send(
 
 @pytest.mark.xdist_group(name="browser")
 def test_send_push_notification_checkbox_not_present_by_default(
-    browser, town_app
-):
+    browser: ExtendedBrowser,
+    town_app: TestTownApp
+) -> None:
 
     monkey_patch_visit_to_ignore_console_errors(browser)
-    browser: ExtendedBrowser
     browser.login_admin()
     browser.visit('/news')
     new_news_link = browser.find_by_css(
@@ -216,7 +234,9 @@ def test_send_push_notification_checkbox_not_present_by_default(
     assert not browser.find_by_id('send_push_notifications_to_app')
 
 
-def monkey_patch_fill_for_element_not_interactable(browser):
+def monkey_patch_fill_for_element_not_interactable(
+    browser: ExtendedBrowser
+) -> None:
     """ Prevent `ElementNotInteractableException` error for text in textarea.
 
     The caller is not aware of this, but if we can't fill in text we do the
@@ -225,7 +245,11 @@ def monkey_patch_fill_for_element_not_interactable(browser):
 
      """
     original_fill = browser.__class__.fill
-    def custom_fill(self, name, value):
+    def custom_fill(
+        self: ExtendedBrowser,
+        name: str,
+        value: str | dict[str, Any]
+    ) -> Any:
         if name == 'firebase_adminsdk_credential':
             if isinstance(value, dict):
                 value = json.dumps(value, indent=2)
@@ -238,15 +262,17 @@ def monkey_patch_fill_for_element_not_interactable(browser):
                 if ace_editor_present:
                     return self.interact_with_ace_editor(content=value)
 
-        return original_fill(self, name, value)
+        return original_fill(self, name, value)  # type: ignore[arg-type]
 
-    browser.__class__.fill = custom_fill
+    browser.__class__.fill = custom_fill  # type: ignore[assignment, method-assign]
 
 
-def monkey_patch_visit_to_ignore_console_errors(browser):
+def monkey_patch_visit_to_ignore_console_errors(
+    browser: ExtendedBrowser
+) -> None:
     """ A lot of times, completely unrelated console errors make the test
     fail. So we avoid this by patching it for this session."""
     original_visit = browser.visit
-    browser.visit = functools.partial(
+    browser.visit = functools.partial(  # type: ignore[method-assign]
         original_visit, ignore_all_console_errors=True
     )

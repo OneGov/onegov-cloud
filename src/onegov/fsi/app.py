@@ -26,7 +26,7 @@ class FsiApp(TownApp):
     # ticket statistics.
     send_ticket_statistics = False
 
-    def es_may_use_private_search(
+    def fts_may_use_private_search(
         self,
         request: FsiRequest  # type:ignore[override]
     ) -> bool:
@@ -72,6 +72,12 @@ def get_theme() -> FsiTheme:
 def get_create_new_organisation_factory(
 ) -> Callable[[FsiApp, str], Organisation]:
     return create_new_organisation
+
+
+# NOTE: Fsi doesn't need a citizen login
+@FsiApp.setting(section='org', name='citizen_login_enabled')
+def get_citizen_login_enabled() -> bool:
+    return False
 
 
 @FsiApp.setting(section='i18n', name='localedirs')

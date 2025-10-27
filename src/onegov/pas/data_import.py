@@ -1,40 +1,39 @@
 from __future__ import annotations
 
 import csv
+import openpyxl
 from dataclasses import dataclass
 from datetime import datetime, date
-from pathlib import Path
-from tempfile import NamedTemporaryFile
-from typing import (
-    TypeVar,
-    BinaryIO,
-    Protocol,
-    ParamSpec, Self, Any,
-)
-
-import openpyxl
-
 from onegov.core.csv import CSVFile, convert_excel_to_csv, detect_encoding
 from onegov.pas.models import (
-    CommissionMembership,
-    ParliamentarianRole,
-    Parliamentarian,
-    ParliamentaryGroup,
+    PASCommission,
+    PASCommissionMembership,
+    PASParliamentarian,
+    PASParliamentarianRole,
+    PASParliamentaryGroup,
     Party,
-    Commission,
 )
+from pathlib import Path
+from tempfile import NamedTemporaryFile
 
-T = TypeVar('T')
-P = ParamSpec('P')
 
-
-from typing import Any as Incomplete
+from typing import (
+    Any,
+    Any as Incomplete,
+    TypeVar,
+    BinaryIO,
+    cast,
+    Protocol,
+    ParamSpec,
+    Self,
+)
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from _typeshed import StrOrBytesPath
     from collections.abc import Callable
+    from onegov.parliament.models.commission_membership import MembershipRole
     from sqlalchemy.orm import Session
     from types import TracebackType
-    from _typeshed import StrOrBytesPath
 
     class Row(Protocol):
         adress_anrede: str
@@ -77,6 +76,9 @@ if TYPE_CHECKING:
         wahlkreis: str
         webseite: str
         zusatzinformationen: str
+
+T = TypeVar('T')
+P = ParamSpec('P')
 
 # For commission import, Callable keys on the Row object of CSV files.
 EXPECTED_HEADERS = [
@@ -342,7 +344,7 @@ def with_open_excel_or_csv(
 
 
 @with_open_excel_or_csv
-def import_commissions(
+def import_commissions_excel(
     import_file: ImportFile,
     session: Session,
     commission_file_abs_path: str,
@@ -373,12 +375,12 @@ def import_commissions(
     commission_name = commission_name.replace('_', ' ')
 
     # Get or create commission
-    commission = session.query(Commission).filter_by(
+    commission = session.query(PASCommission).filter_by(
         name=commission_name
     ).first()
 
     if not commission:
-        commission = Commission(
+        commission = PASCommission(
             name=commission_name,
             type='normal'
         )
@@ -393,11 +395,11 @@ def import_commissions(
             session.add(party)
 
         # Create parliamentary group if needed
-        group = session.query(ParliamentaryGroup).filter_by(
+        group = session.query(PASParliamentaryGroup).filter_by(
             name=row.fraktion
         ).first()
         if not group:
-            group = ParliamentaryGroup(name=row.fraktion)
+            group = PASParliamentaryGroup(name=row.fraktion)
             session.add(group)
 
     session.flush()
@@ -406,17 +408,17 @@ def import_commissions(
     for row in import_file.rows:
         # Get party and group
         party = session.query(Party).filter_by(name=row.partei).one()
-        group = session.query(ParliamentaryGroup).filter_by(
+        group = session.query(PASParliamentaryGroup).filter_by(
             name=row.fraktion
         ).one()
 
         # Create parliamentarian if needed
-        parliamentarian = session.query(Parliamentarian).filter_by(
+        parliamentarian = session.query(PASParliamentarian).filter_by(
             personnel_number=row.personalnummer
         ).first()
 
         if not parliamentarian:
-            parliamentarian = Parliamentarian(
+            parliamentarian = PASParliamentarian(
                 personnel_number=row.personalnummer,
                 contract_number=row.vertragsnummer,
                 first_name=row.vorname,
@@ -450,7 +452,7 @@ def import_commissions(
             session.add(parliamentarian)
 
             # Create roles linking to party and group
-            parliamentarian.roles.append(ParliamentarianRole(
+            parliamentarian.roles.append(PASParliamentarianRole(
                 party=party,
                 party_role='member',
                 parliamentary_group=group,
@@ -466,10 +468,10 @@ def import_commissions(
                 'member',
             )
             # Create commission membership
-            membership = CommissionMembership(
+            membership = PASCommissionMembership(
                 commission=commission,
                 parliamentarian=parliamentarian,
-                role=role,  # type:ignore[misc]
+                role=cast('MembershipRole', role),
                 start=parse_date(row.eintritt_kommission),
                 end=parse_date(row.austritt_kommission)
             )

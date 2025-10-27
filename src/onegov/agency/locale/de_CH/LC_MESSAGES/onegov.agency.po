@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-02-13 15:44+0100\n"
+"POT-Creation-Date: 2025-07-29 00:11+0200\n"
 "PO-Revision-Date: 2021-01-27 13:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -222,6 +222,12 @@ msgstr "Bemerkungen"
 msgid "External ID"
 msgstr "Externe ID"
 
+msgid "Personnel Number"
+msgstr "Personalnummer"
+
+msgid "Number"
+msgstr "Nummer"
+
 msgid "Immediate e-mail notification to members upon ticket submission"
 msgstr "Unmittelbare E-Mail-Benachrichtigung an Mitglieder bei Ticketeingang"
 
@@ -267,11 +273,21 @@ msgstr "Hinzufügen"
 msgid "Agency"
 msgstr "Organisation"
 
+msgid "This cannot be undone. Following agencies will be deleted as well:"
+msgstr ""
+"Dies kann nicht rückgängig gemacht werden. Folgende Organisationen werden "
+"ebenfalls gelöscht:"
+
 msgid "Do you really want to delete this agency?"
 msgstr "Möchten Sie die Organisation wirklich löschen?"
 
 msgid "Delete agency"
 msgstr "Organisation löschen"
+
+msgid "Please scroll to the bottom to enable the confirm button."
+msgstr ""
+"Bitte scrollen Sie bis zum Ende der Liste, um den Bestätigungsbutton zu "
+"aktivieren."
 
 msgid "Agency with memberships or suborganizations can't be deleted"
 msgstr "Organisationen mit Mitgliedschaften können nicht gelöscht werden"

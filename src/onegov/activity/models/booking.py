@@ -18,12 +18,12 @@ from sqlalchemy_utils import aggregated
 from uuid import uuid4
 
 
-from typing import Literal, TYPE_CHECKING
+from typing import Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Collection
     from decimal import Decimal
-    from onegov.activity.models import Attendee, OccasionDate, Period
+    from onegov.activity.models import Attendee, OccasionDate, BookingPeriod
     from onegov.user import User
     from sqlalchemy.sql import ColumnElement
     from typing import TypeAlias
@@ -160,8 +160,8 @@ class Booking(Base, TimestampMixin):
     )
 
     #: access the period linked to this booking
-    period: relationship[Period] = relationship(
-        'Period',
+    period: relationship[BookingPeriod] = relationship(
+        'BookingPeriod',
         back_populates='bookings'
     )
 
@@ -179,7 +179,10 @@ class Booking(Base, TimestampMixin):
 
         return query.scalar()
 
-    def period_bound_booking_state(self, period: Period) -> BookingState:
+    def period_bound_booking_state(
+        self,
+        period: BookingPeriod
+    ) -> BookingState:
         """ During pre-booking we don't show the actual state of the booking,
         unless the occasion was cancelled, otherwise the user might see
         accepted bookings at a point where those states are not confirmed yet.
@@ -284,7 +287,7 @@ class Booking(Base, TimestampMixin):
 
     def overlaps(
         self,
-        other: Booking,
+        other: Self,
         with_anti_affinity_check: bool = False
     ) -> bool:
         # XXX circular import

@@ -274,6 +274,8 @@ class Confirm(Trait):
         extra: str | None = None,
         yes: str | None = 'Yes',
         no: str = 'Cancel',
+        items: Sequence[str] | None = None,
+        scroll_hint: str | None = None,
         **ignored: Any
     ):
         def apply(attrs: dict[str, Any]) -> dict[str, Any]:
@@ -282,6 +284,9 @@ class Confirm(Trait):
             attrs['data-confirm-extra'] = extra
             attrs['data-confirm-yes'] = yes
             attrs['data-confirm-no'] = no
+            if items:
+                attrs['data-confirm-items'] = items
+                attrs['data-scroll-hint'] = scroll_hint
             return attrs
 
         self.apply = apply

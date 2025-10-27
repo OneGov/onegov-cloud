@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from io import BytesIO
 from onegov.core.csv import convert_list_of_dicts_to_csv
@@ -8,8 +10,18 @@ from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import create_principal
 
 
-def test_import_internal_vote_success(session, import_test_datasets):
-    vote, errors = import_test_datasets(
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from tests.onegov.election_day.conftest import ImportTestDatasets
+
+
+def test_import_internal_vote_success(
+    session: Session,
+    import_test_datasets: ImportTestDatasets
+) -> None:
+
+    results = import_test_datasets(
         'internal',
         'vote',
         'sg',
@@ -19,7 +31,8 @@ def test_import_internal_vote_success(session, import_test_datasets):
         dataset_name='energiegesetz-eng',
         has_expats=True
     )
-    assert not errors
+    assert len(results) == 1
+    vote, errors = next(iter(results.values()))
     assert not errors
     assert vote.last_result_change
     assert vote.completed
@@ -66,6 +79,8 @@ def test_import_internal_vote_success(session, import_test_datasets):
         BytesIO(csv),
         'text/plain'
     )
+    # undo mypy narrowing
+    vote = vote
     assert not errors
     assert not vote.completed
     assert vote.progress == (73, 78)
@@ -87,12 +102,14 @@ def test_import_internal_vote_success(session, import_test_datasets):
         'text/plain'
     )
     assert not errors
+    # undo mypy narrowing
+    vote = vote
     assert vote.completed
     assert vote.progress == (70, 70)
     assert len(vote.proposal.results) == 70
 
 
-def test_import_internal_vote_missing_headers(session):
+def test_import_internal_vote_missing_headers(session: Session) -> None:
     session.add(
         Vote(title='vote', domain='federation', date=date(2017, 2, 12))
     )
@@ -118,12 +135,12 @@ def test_import_internal_vote_missing_headers(session):
         ).encode('utf-8')),
         'text/plain'
     )
-    assert [(e.filename, e.error.interpolate()) for e in errors] == [
+    assert [(e.filename, e.error.interpolate()) for e in errors] == [  # type: ignore[attr-defined]
         (None, "Missing columns: 'yeas'")
     ]
 
 
-def test_import_internal_vote_invalid_values(session):
+def test_import_internal_vote_invalid_values(session: Session) -> None:
     session.add(
         Vote(title='vote', domain='federation', date=date(2017, 2, 12))
     )
@@ -131,7 +148,7 @@ def test_import_internal_vote_invalid_values(session):
     vote = session.query(Vote).one()
     principal = Canton(canton='zg')
 
-    errors = import_vote_internal(
+    raw_errors = import_vote_internal(
         vote, principal,
         BytesIO((
             '\n'.join((
@@ -200,7 +217,7 @@ def test_import_internal_vote_invalid_values(session):
         'text/plain'
     )
 
-    errors = sorted(set([(e.line, e.error.interpolate()) for e in errors]))
+    errors = sorted({(e.line, e.error.interpolate()) for e in raw_errors})  # type: ignore[attr-defined]
     assert errors == [
         (2, 'Invalid ballot type'),
         (2, 'Invalid integer: eligible_voters'),
@@ -218,7 +235,7 @@ def test_import_internal_vote_invalid_values(session):
     ]
 
 
-def test_import_internal_vote_expats(session):
+def test_import_internal_vote_expats(session: Session) -> None:
     session.add(
         Vote(title='vote', domain='federation', date=date(2017, 2, 12))
     )
@@ -228,7 +245,7 @@ def test_import_internal_vote_expats(session):
 
     for has_expats in (False, True):
         vote.has_expats = has_expats
-        errors = import_vote_internal(
+        raw_errors = import_vote_internal(
             vote, principal,
             BytesIO((
                 '\n'.join((
@@ -269,13 +286,13 @@ def test_import_internal_vote_expats(session):
             ).encode('utf-8')),
             'text/plain'
         )
-        errors = [(e.line, e.error.interpolate()) for e in errors]
+        errors = [(e.line, e.error.interpolate()) for e in raw_errors]  # type: ignore[attr-defined]
         if has_expats:
             assert errors == [(3, '0 was found twice')]
         else:
             assert errors == [(None, 'No data found')]
 
-        errors = import_vote_internal(
+        raw_errors = import_vote_internal(
             vote, principal,
             BytesIO((
                 '\n'.join((
@@ -305,19 +322,20 @@ def test_import_internal_vote_expats(session):
             ).encode('utf-8')),
             'text/plain'
         )
-        errors = [(e.line, e.error.interpolate()) for e in errors]
+        errors = [(e.line, e.error.interpolate()) for e in raw_errors]  # type: ignore[attr-defined]
         result = next(
             (r for r in vote.proposal.results if r.entity_id == 0), None
         )
         if has_expats:
             assert errors == []
+            assert result is not None
             assert result.yeas == 20
         else:
             assert errors == [(None, 'No data found')]
             assert result is None
 
 
-def test_import_internal_vote_temporary_results(session):
+def test_import_internal_vote_temporary_results(session: Session) -> None:
     session.add(
         Vote(title='vote', domain='federation', date=date(2017, 2, 12))
     )
@@ -392,7 +410,7 @@ def test_import_internal_vote_temporary_results(session):
     assert vote.invalid == 2
 
 
-def test_import_internal_vote_optional_columns(session):
+def test_import_internal_vote_optional_columns(session: Session) -> None:
     session.add(
         Vote(title='vote', domain='federation', date=date(2017, 2, 12))
     )
@@ -437,35 +455,39 @@ def test_import_internal_vote_optional_columns(session):
     assert result.expats == 30
 
 
-def test_import_internal_vote_regional(session):
+def test_import_internal_vote_regional(session: Session) -> None:
 
-    def create_csv(results):
-        lines = []
-        lines.append((
-            'status',
-            'type',
-            'entity_id',
-            'counted',
-            'yeas',
-            'nays',
-            'invalid',
-            'empty',
-            'eligible_voters',
-            'expats',
-        ))
-        for entity_id, counted in results:
-            lines.append((
-                'unknown',  # status
-                'proposal',  # type
-                str(entity_id),  # entity_id
-                str(counted),  # counted
-                '20',  # yeas
-                '10',  # nays
-                '0',  # invalid
-                '0',  # empty
-                '100',  # eligible_voters
-                '30',  # expats
-            ))
+    def create_csv(
+        results: tuple[tuple[int, bool], ...]
+    ) -> tuple[BytesIO, str]:
+        lines = [
+            (
+                'status',
+                'type',
+                'entity_id',
+                'counted',
+                'yeas',
+                'nays',
+                'invalid',
+                'empty',
+                'eligible_voters',
+                'expats',
+            ),
+            *(
+                (
+                    'unknown',  # status
+                    'proposal',  # type
+                    str(entity_id),  # entity_id
+                    str(counted),  # counted
+                    '20',  # yeas
+                    '10',  # nays
+                    '0',  # invalid
+                    '0',  # empty
+                    '100',  # eligible_voters
+                    '30',  # expats
+                ) for entity_id, counted in results
+            )
+        ]
 
         return BytesIO(
             '\n'.join(
@@ -487,7 +509,7 @@ def test_import_internal_vote_regional(session):
         vote, principal,
         *create_csv(((1701, False), (1702, False)))
     )
-    assert [(e.error.interpolate()) for e in errors] == [
+    assert [(e.error.interpolate()) for e in errors] == [  # type: ignore[attr-defined]
         '1702 is not part of this business'
     ]
 
