@@ -326,7 +326,10 @@ class TimeReportHandler(Handler):
                     traits=(
                         Intercooler(
                             request_method='POST',
-                            redirect_after=request.link(self.ticket),
+                            redirect_after=request.link(
+                                self.translator if request.is_member
+                                else self.ticket
+                            )
                         )
                     ),
                 )
