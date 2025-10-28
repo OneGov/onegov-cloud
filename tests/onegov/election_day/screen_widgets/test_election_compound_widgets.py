@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from decimal import Decimal
 from freezegun import freeze_time
@@ -31,7 +33,17 @@ from onegov.election_day.screen_widgets import (
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.widgets import Widget
+    from ..conftest import ImportTestDatasets, TestApp
+
+
+def test_election_compound_widgets(
+    election_day_app_sg: TestApp,
+    import_test_datasets: ImportTestDatasets
+) -> None:
+
     structure = """
         <model-title class="class-for-title"/>
         <model-progress class="class-for-progress"/>
@@ -72,7 +84,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             class="class-for-party-strengths-table-2"
             year="2019"/>
     """
-    widgets = [
+    widgets: list[Widget] = [
         CountedEntitiesWidget(),
         ElectionCompoundCandidatesTableWidget(),
         ElectionCompoundDistrictsMapWidget(),
@@ -97,14 +109,14 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     # Empty
     session = election_day_app_sg.session()
     session.add(
-        ElectionCompound(
+        ElectionCompound(  # type: ignore[misc]
             title='Compound', domain='canton', date=date(2020, 3, 8),
             pukelsheim=True, completes_manually=True, voters_counts=True,
             exact_voters_counts=True
         )
     )
     model = session.query(ElectionCompound).one()
-    request = DummyRequest(app=election_day_app_sg, session=session)
+    request: Any = DummyRequest(app=election_day_app_sg, session=session)
     layout = ElectionCompoundLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
@@ -317,18 +329,17 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         assert len(results) == 1
         election_1, errors = next(iter(results.values()))
         assert not errors
-        results = import_test_datasets(
+        results_ = import_test_datasets(
             'internal',
             'parties',
             'sg',
             'district',
-            'proporz',
             election=model,
             dataset_name='kantonsratswahl-2020-parteien',
         )
         assert len(results) == 1
-        errors = next(iter(results.values()))
-        assert not errors
+        errors_ = next(iter(results_.values()))
+        assert not errors_
         session.add(election_1)
         model.elections = [election_1, election_2]
         model.manually_completed = True
