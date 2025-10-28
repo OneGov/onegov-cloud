@@ -329,6 +329,8 @@ def render_time_range(start: datetime | time, end: datetime | time) -> str:
 
 
 def complete_url(url: str | None) -> str | None:
+    if 'keine' in url.lower():
+        return None
     if url is None or url.startswith(('http://', 'https://', '/')):
         return url
     return f'https://{url}'
