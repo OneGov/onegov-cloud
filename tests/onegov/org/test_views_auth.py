@@ -85,6 +85,8 @@ def test_login_setup_mtan(client: Client, smsdir: str) -> None:
     client.app.mtan_automatic_setup = True
     # descend to app-specific sms directory
     smsdir = os.path.join(smsdir, client.app.schema)
+
+    client2 = client.spawn()
     links = client.get('/').pyquery('.globals a.login')
     assert links.text() == 'Anmelden'
 
@@ -126,6 +128,7 @@ def test_login_setup_mtan(client: Client, smsdir: str) -> None:
     index_page = client.get(links.attr('href')).follow()
     links = index_page.pyquery('.globals a.login')
     assert links.text() == 'Anmelden'
+
     # now test a regular login without mTAN setup step
     login_page = client.get(links.attr('href'))
     login_page.form['username'] = 'admin@example.org'
@@ -141,11 +144,43 @@ def test_login_setup_mtan(client: Client, smsdir: str) -> None:
     with open(sms_path) as fd:
         content = json.loads(fd.read())
     mtan = content['content'].split(' ', 1)[0]
-    mtan_page.form['tan'] = mtan
 
+    # we do it one more time because we're impatient
+    login_page.form['username'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+    login_page.form.submit().follow()
+
+    sms_files2 = os.listdir(smsdir)
+    assert len(sms_files2) == 2
+    sms_path2 = os.path.join(smsdir, next(
+        file
+        for file in sms_files2
+        if file != sms_files[0]
+    ))
+    with open(sms_path2) as fd:
+        content2 = json.loads(fd.read())
+    mtan2 = content2['content'].split(' ', 1)[0]
+
+    mtan_page.form['tan'] = mtan
     index_page = mtan_page.form.submit().follow()
     assert "Sie wurden angemeldet" in index_page.text
 
+    # someone else can't reuse the same mTAN
+    links = client2.get('/').pyquery('.globals a.login')
+    assert links.text() == 'Anmelden'
+
+    login_page = client2.get(links.attr('href'))
+    login_page.form['username'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+    mtan_page = login_page.form.submit().follow()
+    mtan_page.form['tan'] = mtan
+    mtan_page = mtan_page.form.submit()
+    assert 'Ungültige oder abgelaufene mTAN' in mtan_page
+
+    # and they also can't use the redundant mTAN we didn't end up using
+    mtan_page.form['tan'] = mtan
+    mtan_page = mtan_page.form.submit()
+    assert 'Ungültige oder abgelaufene mTAN' in mtan_page
 
 def test_login_totp(client: Client, test_password: str) -> None:
     client.app.totp_enabled = True
@@ -422,6 +457,19 @@ def test_mtan_access(client: Client, smsdir: str) -> None:
     # tan should be the last url parameter in the SMS
     _, _, tan = sms_content['content'].rpartition('=')
 
+    # because we're impatient we request another mTAN
+    mtan_page.form['phone_number'] = '+41791112233'
+    mtan_page.form.submit().follow()
+    files2 = os.listdir(smsdir)
+    assert len(files2) == 2
+    new_file = next(file for file in files2 if file != files[0])
+
+    with open(os.path.join(smsdir, new_file), mode='r') as fp:
+        sms_content2 = json.loads(fp.read())
+
+    assert sms_content2['receivers'] == ['+41791112233']
+    _, _, tan2 = sms_content2['content'].rpartition('=')
+
     verify_page.form['tan'] = tan
     page = verify_page.form.submit().follow()
     assert 'Test' in page
@@ -455,6 +503,12 @@ def test_mtan_access(client: Client, smsdir: str) -> None:
     # the second user should not be able to re-use the mTAN
     # from the first one
     verify_page.form['tan'] = tan
+    verify_page = verify_page.form.submit()
+    assert 'Ungültige oder abgelaufene mTAN' in verify_page
+
+    # the second user should also not be able to use the redundant
+    # mTAN we didn't end up using
+    verify_page.form['tan'] = tan2
     verify_page = verify_page.form.submit()
     assert 'Ungültige oder abgelaufene mTAN' in verify_page
 
@@ -753,6 +807,14 @@ def test_citizen_login(client: Client) -> None:
     assert 'confirm-citizen-login' in message
     token = re.search(r'&token=([^)]+)', message).group(1)  # type: ignore[union-attr]
 
+    # because we're impatient we request another TAN
+    login_page.form['email'] = 'citizen@example.org'
+    login_page.form.submit().follow()
+    assert len(os.listdir(client.app.maildir)) == 2
+    message2 = client.get_email(0)['TextBody']
+    assert 'confirm-citizen-login' in message2
+    token2 = re.search(r'&token=([^)]+)', message2).group(1)  # type: ignore[union-attr]
+
     # finish login with the token
     confirm_page.form['token'] = token
     index_page = confirm_page.form.submit().follow()
@@ -773,6 +835,14 @@ def test_citizen_login(client: Client) -> None:
     # a second user can't use the same token to login as well
     confirm_page = client.get('/auth/confirm-citizen-login')
     confirm_page.form['token'] = token
+    login_page = confirm_page.form.submit().follow()
+    assert login_page.request.path == '/auth/citizen-login'
+    assert 'Ungültiger oder abgelaufener Login-Code' in login_page
+
+    # they also can't use the redundant token, since it has been
+    # invalidate as well
+    confirm_page = client.get('/auth/confirm-citizen-login')
+    confirm_page.form['token'] = token2
     login_page = confirm_page.form.submit().follow()
     assert login_page.request.path == '/auth/citizen-login'
     assert 'Ungültiger oder abgelaufener Login-Code' in login_page
