@@ -26,12 +26,22 @@ if TYPE_CHECKING:
     from webob import Response
 
 
+def get_agenda_item_form_class(
+    model: object,
+    request: LandsgemeindeRequest
+) -> type[AgendaItemForm]:
+
+    if isinstance(model, AgendaItem):
+        return model.with_content_extensions(AgendaItemForm, request)
+    return AgendaItem().with_content_extensions(AgendaItemForm, request)
+
+
 @LandsgemeindeApp.form(
     model=AgendaItemCollection,
     name='new',
     template='form.pt',
     permission=Private,
-    form=AgendaItemForm
+    form=get_agenda_item_form_class
 )
 def add_agenda_item(
     self: AgendaItemCollection,
@@ -142,7 +152,7 @@ def view_agenda_item(
     name='edit',
     template='form.pt',
     permission=Private,
-    form=AgendaItemForm
+    form=get_agenda_item_form_class
 )
 def edit_agenda_item(
     self: AgendaItem,
