@@ -9,6 +9,7 @@ from markupsafe import Markup
 from onegov.org import _
 from onegov.org.layout import DefaultLayout
 from onegov.org.pdf.core import OrgPdf
+from onegov.org.utils import MyReservationEventInfo
 from onegov.reservation import Resource
 from pdfdocument.document import MarkupParagraph
 from reportlab.lib.enums import TA_RIGHT
@@ -18,8 +19,8 @@ from reportlab.platypus import PageBreak
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
+    from onegov.org.models.ticket import ReservationTicket
     from onegov.org.request import OrgRequest
-    from onegov.org.utils import MyReservationEventInfo
 
 
 class MyReservationsPdf(OrgPdf):
@@ -27,19 +28,16 @@ class MyReservationsPdf(OrgPdf):
     def add_reservations(
         self,
         infos: list[MyReservationEventInfo],
-        start: datetime,
-        end: datetime,
+        title: str,
+        subtitle: str,
         request: OrgRequest
     ) -> None:
         """ Adds reservations to the story. """
 
         layout = DefaultLayout(None, request)
 
-        self.h1(_('My Reservations'))
-        self.h2(
-            f"{layout.format_date(start, 'date_long')} - "
-            f"{layout.format_date(end, 'date_long')}"
-        )
+        self.h1(title)
+        self.h2(subtitle)
 
         if not infos:
             self.p_markup(_('No data available'))
@@ -134,7 +132,13 @@ class MyReservationsPdf(OrgPdf):
             page_fn=pdf.page_fn,
             page_fn_later=pdf.page_fn_later
         )
-        pdf.add_reservations(infos, start, end, request)
+        pdf.add_reservations(
+            infos,
+            _('My Reservations'),
+            f"{layout.format_date(start, 'date_long')} - "
+            f"{layout.format_date(end, 'date_long')}",
+            request
+        )
 
         resource_ids = {info.resource_id for info in infos}
         resources = (
@@ -144,6 +148,62 @@ class MyReservationsPdf(OrgPdf):
             .all()
         )
         pdf.resource_infos(resources)
+
+        pdf.generate()
+        result.seek(0)
+        return result
+
+    @classmethod
+    def from_ticket(
+        cls,
+        request: OrgRequest,
+        ticket: ReservationTicket,
+    ) -> BytesIO:
+        """
+        Creates a PDF representation of the reservations in that ticket.
+        """
+        result = BytesIO()
+        subtitle = ticket.reference_group(request)
+        pdf = cls(
+            result,
+            title=f'{ticket.number} - {subtitle}',
+            created=f'{date.today():%d.%m.%Y}',
+            link_color='#00538c',
+            underline_links=True,
+            author=request.host_url,
+            translations=request.app.translations,
+            locale=request.locale,
+        )
+        pdf.init_a4_portrait(
+            page_fn=pdf.page_fn,
+            page_fn_later=pdf.page_fn_later
+        )
+        resource = ticket.handler.resource
+        assert resource is not None
+        pdf.add_reservations(
+            [
+                MyReservationEventInfo(
+                    id=reservation.id,
+                    token=reservation.token,
+                    start=reservation.start,  # type: ignore[arg-type]
+                    end=reservation.end,  # type: ignore[arg-type]
+                    accepted=(reservation.data or {}).get('accepted', False),
+                    timezone=resource.timezone,
+                    resource=resource.title,
+                    resource_id=resource.id,
+                    ticket_id=ticket.id,
+                    handler_code=ticket.handler_code,
+                    ticket_number=ticket.number,
+                    key_code=ticket.handler.data.get('key_code', None),
+                    request=request,
+                ) for reservation in ticket.handler.reservations
+            ],
+            ticket.number,
+            subtitle,
+            request
+        )
+
+        pdf.resource_infos([resource])
 
         pdf.generate()
         result.seek(0)

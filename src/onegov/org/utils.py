@@ -918,7 +918,7 @@ class MyReservationEventInfo:
     def __init__(
         self,
         id: int,
-        token: str,
+        token: UUID,
         start: datetime,
         end: datetime,
         accepted: bool,
