@@ -12,6 +12,7 @@ from contextlib import contextmanager
 from depot.io.utils import FileIntent
 from depot.manager import DepotManager
 from depot.middleware import FileServeApp
+from depot.utils import make_content_disposition
 from more.transaction.main import transaction_tween_factory
 from morepath import App
 from onegov.core.custom import json
@@ -23,7 +24,8 @@ from onegov.file.errors import InvalidTokenError
 from onegov.file.errors import TokenConfigurationError
 from onegov.file.models import File
 from onegov.file.sign import SigningService
-from onegov.file.utils import digest, current_dir
+from onegov.file.utils import (
+    digest, current_dir, get_supported_image_mime_types)
 from pathlib import Path
 from sedate import utcnow
 from sqlalchemy.orm import object_session
@@ -451,6 +453,23 @@ def render_depot_file(
         FileServeApp(file, cache_max_age=3600 * 24 * 7))
 
 
+def respond_with_content_disposition(file: File, request: CoreRequest) -> None:
+    # NOTE: Technically `FileServeApp` already sets the `Content-Disposition`
+    #       header, but it will always be `inline`. We only really want that
+    #       for images, videos and PDFs, the rest should be `attachment`.
+    @request.after
+    def include_content_disposition(response: Response) -> None:
+        response.headers['Content-Disposition'] = make_content_disposition(
+            'inline' if file.reference.content_type in {
+                'application/pdf',
+                'video/mp4',
+                'video/webm',
+                *get_supported_image_mime_types()
+            } else 'attachment',
+            file.reference.filename
+        )
+
+
 def respond_with_alt_text(reference: File, request: CoreRequest) -> None:
     @request.after
     def include_alt_text(response: Response) -> None:
@@ -461,24 +480,18 @@ def respond_with_alt_text(reference: File, request: CoreRequest) -> None:
         ))
 
 
-def respond_with_caching_header(
-    reference: File,
-    request: CoreRequest
-) -> None:
-    if not reference.published:
+def respond_with_caching_header(file: File, request: CoreRequest) -> None:
+    if not file.published:
         @request.after
         def include_private_header(response: Response) -> None:
             response.headers['Cache-Control'] = 'private'
 
 
-def respond_with_x_robots_tag_header(
-    reference: File,
-    request: CoreRequest
-) -> None:
-    if getattr(reference, 'access', None) in ('secret', 'secret_mtan'):
+def respond_with_x_robots_tag_header(file: File, request: CoreRequest) -> None:
+    if getattr(file, 'access', None) in ('secret', 'secret_mtan'):
         @request.after
         def include_x_robots_tag_header(response: Response) -> None:
-            response.headers.add('X-Robots-Tag', 'noindex')
+            response.headers['X-Robots-Tag'] = 'noindex'
 
 
 @DepotApp.path(model=File, path='/storage/{id}')
@@ -488,6 +501,7 @@ def get_file(app: DepotApp, id: str) -> File | None:
 
 @DepotApp.view(model=File, render=render_depot_file, permission=Public)
 def view_file(self: File, request: CoreRequest) -> StoredFile:
+    respond_with_content_disposition(self, request)
     respond_with_alt_text(self, request)
     respond_with_caching_header(self, request)
     respond_with_x_robots_tag_header(self, request)
@@ -518,6 +532,7 @@ def view_thumbnail(
     if not thumbnail_id:
         return morepath.redirect(request.link(self))
 
+    respond_with_content_disposition(self, request)
     return request.app.bound_depot.get(thumbnail_id)  # type:ignore
 
 
