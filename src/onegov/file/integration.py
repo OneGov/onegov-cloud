@@ -12,6 +12,7 @@ from contextlib import contextmanager
 from depot.io.utils import FileIntent
 from depot.manager import DepotManager
 from depot.middleware import FileServeApp
+from depot.utils import make_content_disposition
 from more.transaction.main import transaction_tween_factory
 from morepath import App
 from onegov.core.custom import json
@@ -458,15 +459,15 @@ def respond_with_content_disposition(file: File, request: CoreRequest) -> None:
     #       for images, videos and PDFs, the rest should be `attachment`.
     @request.after
     def include_content_disposition(response: Response) -> None:
-        inline = file.reference.content_type in {
-            'application/pdf',
-            'video/mp4',
-            'video/webm',
-            *get_supported_image_mime_types()
-        }
-        kind = 'inline' if inline else 'attachment'
-        response.headers['Content-Disposition'] = (
-            f'{kind}; filename={file.name}')
+        response.headers['Content-Disposition'] = make_content_disposition(
+            'inline' if file.reference.content_type in {
+                'application/pdf',
+                'video/mp4',
+                'video/webm',
+                *get_supported_image_mime_types()
+            } else 'attachment',
+            file.reference.filename
+        )
 
 
 def respond_with_alt_text(reference: File, request: CoreRequest) -> None:
