@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import BallotResult
@@ -8,7 +10,12 @@ from onegov.election_day.models import Vote
 from onegov.election_day.utils import add_local_results
 
 
-def test_add_local_results_simple(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_add_local_results_simple(session: Session) -> None:
     target = ArchivedResult()
 
     be = Canton(name='BE', canton='be')
@@ -29,7 +36,7 @@ def test_add_local_results_simple(session):
     assert not target.local
 
     # no vote
-    source = ArchivedResult(type='vote', external_id='id')
+    source = ArchivedResult(type='vote', external_id='id')  # type: ignore[misc]
     add_local_results(source, target, bern, session)
     assert not target.local
 
@@ -38,14 +45,14 @@ def test_add_local_results_simple(session):
     session.flush()
     vote = session.query(Vote).one()
 
-    source = ArchivedResult(type='vote', external_id=vote.id)
+    source = ArchivedResult(type='vote', external_id=vote.id)  # type: ignore[misc]
     add_local_results(source, target, bern, session)
     assert not target.local
 
     # no results
     assert vote.proposal  # create
 
-    source = ArchivedResult(type='vote', external_id=vote.id)
+    source = ArchivedResult(type='vote', external_id=vote.id)  # type: ignore[misc]
     add_local_results(source, target, bern, session)
     assert not target.local
 
@@ -59,14 +66,14 @@ def test_add_local_results_simple(session):
     session.flush()
     proposal = session.query(BallotResult).one()
 
-    source = ArchivedResult(type='vote', external_id=vote.id)
+    source = ArchivedResult(type='vote', external_id=vote.id)  # type: ignore[misc]
     add_local_results(source, target, bern, session)
     assert not target.local
 
     # simple vote
     proposal.counted = True
 
-    source = ArchivedResult(type='vote', external_id=vote.id)
+    source = ArchivedResult(type='vote', external_id=vote.id)  # type: ignore[misc]
     add_local_results(source, target, bern, session)
     assert target.local
     assert target.local_answer == 'rejected'
@@ -82,7 +89,7 @@ def test_add_local_results_simple(session):
     assert target.local_nays_percentage == 30.0
 
 
-def test_add_local_results_complex(session):
+def test_add_local_results_complex(session: Session) -> None:
     target = ArchivedResult()
 
     be = Canton(name='BE', canton='be')
@@ -103,7 +110,7 @@ def test_add_local_results_complex(session):
     assert not target.local
 
     # no vote
-    source = ArchivedResult(type='vote', external_id='id')
+    source = ArchivedResult(type='vote', external_id='id')  # type: ignore[misc]
     add_local_results(source, target, bern, session)
     assert not target.local
 
@@ -120,7 +127,7 @@ def test_add_local_results_complex(session):
     assert vote.tie_breaker  # create
     session.flush()
 
-    source = ArchivedResult(type='vote', external_id=vote.id)
+    source = ArchivedResult(type='vote', external_id=vote.id)  # type: ignore[misc]
     add_local_results(source, target, bern, session)
     assert not target.local
 
@@ -148,7 +155,7 @@ def test_add_local_results_complex(session):
     counter = vote.counter_proposal.results[0]
     tie = vote.tie_breaker.results[0]
 
-    source = ArchivedResult(type='vote', external_id=vote.id)
+    source = ArchivedResult(type='vote', external_id=vote.id)  # type: ignore[misc]
     add_local_results(source, target, bern, session)
     assert not target.local
 
