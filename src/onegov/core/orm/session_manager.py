@@ -20,7 +20,7 @@ from typing import Any, Self, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from sqlalchemy.engine import Connection, Engine
-    from sqlalchemy.orm.session import Session
+    from sqlalchemy.orm.session import Session, SessionTransaction
 
     _T = TypeVar('_T')
     _S = TypeVar('_S', bound=Session)
@@ -164,6 +164,13 @@ class SessionManager:
 
         The session manager supports the following signals:
 
+        ``self.on_transaction_join``
+
+        Called with the schema and session each time a new transaction
+        could be joined on the given session. This helps with creating
+        a `transaction.interfaces.IDataManager` that tracks SQLAlchemy
+        activity per transaction.
+
         ``self.on_insert``
 
         Called with the schema and each object when an insert happens.
@@ -174,9 +181,12 @@ class SessionManager:
 
         ``self.on_delete``
 
-        Called with the scheam and each object when a change happens. Note that
-        because those objects basically do not exist anymore, only the
-        primary keys of those objects contain actual values!
+        Called with the schema, the session and each object when a delete
+        happens. Note that because those objects basically do not exist
+        anymore, only the primary keys of those objects contain actual
+        values! You also can't use `object_session` on these objects.
+        That's why this signal also sends the session the delete happened
+        in for additional context.
 
         Signals abstracts SQLAlchemy ORM events. Since those handle events
         of the Session, only things happening on sessions provided by this
@@ -214,7 +224,7 @@ class SessionManager:
             # handler is strongly referenced and may be used in a closure
             from blinker import ANY
             @mgr.on_delete.connect_via(ANY, weak=False)
-            def on_delete(schema, obj):
+            def on_delete(schema, session, obj):
                 print("Deleted {} @ {}".format(obj, schema))
 
         """
@@ -233,6 +243,7 @@ class SessionManager:
 
         self._ignore_bulk_updates = False
 
+        self.on_transaction_join = Signal()
         self.on_insert = Signal()
         self.on_update = Signal()
         self.on_delete = Signal()
@@ -355,12 +366,6 @@ class SessionManager:
 
         """
 
-        signals = (
-            (self.on_insert, lambda session: session.new),
-            (self.on_update, lambda session: session.dirty),
-            (self.on_delete, lambda session: session.deleted)
-        )
-
         # SQLAlchemy-Utils' aggregates decorator doesn't work correctly
         # with our sessions - we need to setup the appropriate event handler
         # manually. There's a test that makes sure that this is not done
@@ -392,10 +397,16 @@ class SessionManager:
             session: Session,
             flush_context: Any
         ) -> None:
-            for signal, get_objects in signals:
-                if signal.receivers:
-                    for obj in get_objects(session):  # type:ignore[no-untyped-call]
-                        signal.send(self.current_schema, obj=obj)
+            if self.on_insert.receivers:
+                for obj in session.new:
+                    self.on_insert.send(self.current_schema, obj=obj)
+            if self.on_update.receivers:
+                for obj in session.dirty:
+                    self.on_update.send(self.current_schema, obj=obj)
+            if self.on_delete.receivers:
+                for obj in session.deleted:
+                    self.on_delete.send(
+                        self.current_schema, session=session, obj=obj)
 
         @event.listens_for(session, 'after_bulk_update')  # type:ignore[misc]
         def on_after_bulk_update(update_context: Any) -> None:
@@ -428,7 +439,27 @@ class SessionManager:
                         c.name: v for c, v
                         in zip(delete_context.mapper.primary_key, row)
                     })
-                    self.on_delete.send(self.current_schema, obj=obj)
+                    self.on_delete.send(
+                        self.current_schema,
+                        session=delete_context.session,
+                        obj=obj
+                    )
+
+        @event.listens_for(session, 'after_begin')  # type: ignore[misc]
+        def on_after_begin(
+            session: Session,
+            transaction: SessionTransaction,
+            connection: Connection
+        ) -> None:
+            if self.on_transaction_join.receivers:
+                self.on_transaction_join.send(
+                    self.current_schema, session=session)
+
+        @event.listens_for(session, 'after_attach')  # type: ignore[misc]
+        def on_after_attach(session: Session, instance: object) -> None:
+            if self.on_transaction_join.receivers:
+                self.on_transaction_join.send(
+                    self.current_schema, session=session)
 
         zope.sqlalchemy.register(session)
 

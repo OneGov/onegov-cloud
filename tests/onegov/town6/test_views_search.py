@@ -210,7 +210,6 @@ def test_search_publication_files(client_with_fts: Client) -> None:
             'Sample.pdf', f.read(), 'application/pdf')]
         page.form.submit()
 
-    client.app.fts_indexer.process()
     assert 'Sample' in client.get('/search?q=Adobe')
     assert 'Sample' not in client.spawn().get('/search?q=Adobe')
 
@@ -218,8 +217,6 @@ def test_search_publication_files(client_with_fts: Client) -> None:
     pdf = FileCollection(client.app.session()).query().one()
     pdf.publication = True
     transaction.commit()
-
-    client.app.fts_indexer.process()
 
     assert 'Sample' in client.get('/search?q=Adobe')
     assert 'Sample' in client.spawn().get('/search?q=Adobe')
@@ -341,7 +338,6 @@ def test_search_future_events_are_sorted_by_occurrence_date(
         events_redirect = form_page.form.submit().follow().follow()
         assert "erfolgreich erstellt" in events_redirect
 
-    client.app.fts_indexer.process()
     for current_client in (client, member, anom):
         results = current_client.get('/search?q=Concert')
         # Expect future events ordered by occurrence date, far future first.

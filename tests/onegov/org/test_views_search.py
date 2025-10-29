@@ -208,8 +208,6 @@ def test_search_publication_files(client_with_fts: Client) -> None:
     pdf.publication = True
     transaction.commit()
 
-    client.app.fts_indexer.process()
-
     assert 'Sample' in client.get('/search?q=Adobe')
     assert 'Sample' in client.spawn().get('/search?q=Adobe')
 
