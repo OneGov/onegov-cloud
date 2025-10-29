@@ -494,6 +494,15 @@ def respond_with_x_robots_tag_header(file: File, request: CoreRequest) -> None:
             response.headers['X-Robots-Tag'] = 'noindex'
 
 
+def respond_with_x_content_type_options_header(
+    file: File,
+    request: CoreRequest
+) -> None:
+    @request.after
+    def include_x_content_type_options(response: Response) -> None:
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+
+
 @DepotApp.path(model=File, path='/storage/{id}')
 def get_file(app: DepotApp, id: str) -> File | None:
     return FileCollection(app.session()).by_id(id)
@@ -505,6 +514,7 @@ def view_file(self: File, request: CoreRequest) -> StoredFile:
     respond_with_alt_text(self, request)
     respond_with_caching_header(self, request)
     respond_with_x_robots_tag_header(self, request)
+    respond_with_x_content_type_options_header(self, request)
     return self.reference.file
 
 
@@ -533,6 +543,7 @@ def view_thumbnail(
         return morepath.redirect(request.link(self))
 
     respond_with_content_disposition(self, request)
+    respond_with_x_content_type_options_header(self, request)
     return request.app.bound_depot.get(thumbnail_id)  # type:ignore
 
 
