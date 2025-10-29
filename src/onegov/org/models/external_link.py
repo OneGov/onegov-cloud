@@ -32,7 +32,6 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
 
     __tablename__ = 'external_links'
 
-    fts_id = 'title'
     fts_properties = {
         'title': {'type': 'localized', 'weight': 'A'},
         'lead': {'type': 'localized', 'weight': 'B'},
