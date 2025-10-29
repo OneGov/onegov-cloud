@@ -77,9 +77,10 @@ class PASParliamentarianCollection(
     def update_user(
         self,
         item: PASParliamentarian,
-        new_email: str | None
+        new_email: str | None,
+        users_cache: dict[str, Any] | None = None,
     ) -> None:
-        """ Keep the parliamentarian and its user account in sync.
+        """Keep the parliamentarian and its user account in sync.
 
         * Creates a new user account if an email address is set (if not already
           existing).
@@ -89,12 +90,27 @@ class PASParliamentarianCollection(
         * Make sure used user accounts are activated.
         * Make sure the password is changed if activated or disabled.
 
+         Optional users_cache parameter allows to pre-fetch the users to avoid
+         N+1 queries.
+
         """
 
         old_email = item.email_primary
         users = UserCollection(self.session)
-        old_user = users.by_username(old_email) if old_email else None
-        new_user = users.by_username(new_email) if new_email else None
+
+        if users_cache is not None:
+            old_user = (
+                users_cache.get(old_email.lower()) if old_email
+                else None
+            )
+            new_user = (
+                users_cache.get(new_email.lower()) if new_email
+                else None
+            )
+        else:
+            old_user = users.by_username(old_email) if old_email else None
+            new_user = users.by_username(new_email) if new_email else None
+
         create = False
         enable = None
         disable = []
@@ -127,10 +143,12 @@ class PASParliamentarianCollection(
                  else 'parliamentarian'
             )
             log.info(f'Creating user {new_email} with role {role}')
-            users.add(
+            new_user_obj = users.add(
                 new_email, random_password(16), role=role,
                 realname=item.title
             )
+            if users_cache is not None:
+                users_cache[new_email.lower()] = new_user_obj
 
         if enable:
             role = (
@@ -150,7 +168,8 @@ class PASParliamentarianCollection(
                 if getattr(enable, attribute) != value
             }
             if corrections:
-                log.info(f'Correcting user {enable.username} to {corrections}')
+                log.info('Correcting user'
+                    f' {enable.username} to {corrections}')
                 for attribute, value in corrections.items():
                     setattr(enable, attribute, value)
                 enable.logout_all_sessions(self.app)
