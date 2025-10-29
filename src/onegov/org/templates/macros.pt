@@ -2173,7 +2173,7 @@
 <metal:file_links define-macro="file-links" i18n:domain="onegov.org">
     <ul class="search-results">
         <tal:b repeat="result file.links">
-            <li class="search-result-${result.es_type_name}" tal:condition="result">
+            <li class="search-result-${result.__tablename__}" tal:condition="result">
                 <tal:b
                     define="macro 'search_result_{}'.format(result.__tablename__); tenant_macro 'search_result_{}_{}'.format(result.__tablename__, request.app.application_id.split('/')[-1])"
                     metal:use-macro="layout.macros[tenant_macro]|layout.macros[macro]|layout.macros['search_result_default']"
