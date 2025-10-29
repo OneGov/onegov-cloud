@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import logging
+from email_validator import EmailNotValidError, validate_email
 from onegov.pas.app import PasApp
+from onegov.pas.collections.parliamentarian import PASParliamentarianCollection
 from onegov.pas.importer.orchestrator import KubImporter
 from onegov.pas.log import CompositeOutputHandler, LogOutputHandler
 from onegov.pas.importer.output_handlers import DatabaseOutputHandler
@@ -55,3 +57,32 @@ def trigger_kub_data_import(
         'custom_results': combined_results.get('custom_data'),
         'import_log_id': import_log_id
     }
+
+
+@PasApp.cronjob(hour='*', minute=10, timezone='UTC')
+def hourly_user_account_sync(request: PasRequest) -> None:
+
+    try:
+        collection = PASParliamentarianCollection(request.app)
+        parliamentarians = collection.query().all()
+
+        for parliamentarian in parliamentarians:
+            if email := parliamentarian.email_primary:
+                try:
+                    # Note: We probably want to check deliverability,
+                    # but not hourly. This would need to be seperate.
+                    validate_email(email, check_deliverability=False)
+                except EmailNotValidError as e:
+                    log.warning(
+                        f'Skipping parliamentarian '
+                        f'{parliamentarian.title} with invalid email '
+                        f'{email}: {e}'
+                    )
+                    continue
+            collection.update_user(parliamentarian, email)
+
+        request.session.flush()
+
+    except Exception:
+        log.exception('User account sync failed')
+        raise
