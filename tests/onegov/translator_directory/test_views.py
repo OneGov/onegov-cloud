@@ -178,8 +178,8 @@ def test_view_translator(client: Client) -> None:
         assert values['IBAN'] == 'DE07 1234 1234 1234 1234 12'
         assert values['E-Mail'] == 'test@test.com'
         assert values['Telefon Mobile'] == '079 700 80 97'
-        assert values['Fachkenntnisse nach Dolmetscherart'] == \
-            'Simultandolmetschen'
+        assert values['Fachkenntnisse nach Dolmetscherart'] == (
+            'Simultandolmetschen')
         assert 'Ernährung' in values['Fachkenntnisse nach Berufssparte']
         assert 'Psychologie' in values['Fachkenntnisse nach Berufssparte']
         assert values['Muttersprachen'] == language_names[3]
@@ -212,17 +212,17 @@ def test_view_translator(client: Client) -> None:
         ).group()
         page = client.get(reset_password_url)
         page.form['email'] = 'test@test.com'
-        page.form['password'] = 'p@ssw0rd'
+        page.form['password'] = 'p@ssw0rd12'
         page.form.submit()
 
     with freeze_time('2021-12-31'):
-        page = client.login('test@test.com', 'p@ssw0rd', None).maybe_follow()
+        page = client.login('test@test.com', 'p@ssw0rd12', None).maybe_follow()
         assert 'Sind ihre Daten noch aktuell? Bitte überprüfen Sie' not in page
         assert '978654' in page
         assert 'Uncle' in page
         assert 'BOB' in page
 
-    page = client.login('test@test.com', 'p@ssw0rd', None).maybe_follow()
+    page = client.login('test@test.com', 'p@ssw0rd12', None).maybe_follow()
     assert 'Sind ihre Daten noch aktuell? Bitte überprüfen Sie' in page
     assert '978654' in page
     assert 'Uncle' in page
@@ -349,8 +349,8 @@ def test_view_translator(client: Client) -> None:
     assert values['Erreich- und Verfügbarkeit'] == 'always 24h'
     assert 'Wirtschaft' in values['Fachkenntnisse nach Berufssparte']
     assert 'Religion' in values['Fachkenntnisse nach Berufssparte']
-    assert values['Fachkenntnisse nach Dolmetscherart'] == \
-        'Konsektutivdolmetschen'
+    assert values['Fachkenntnisse nach Dolmetscherart'] == (
+        'Konsektutivdolmetschen')
     assert values['Geburtsdatum'] == '01.01.2019'
     assert values['Geschlecht'] == 'Weiblich'
     assert values['IBAN'] == 'CH5604835012345678009'
@@ -909,7 +909,7 @@ def test_view_redirects(client: Client) -> None:
     ).group()
     page = client.get(reset_password_url)
     page.form['email'] = 'translator@example.org'
-    page.form['password'] = 'p@ssword'
+    page.form['password'] = 'p@ssword12'
     page.form.submit()
 
     # Test redirects
@@ -918,7 +918,7 @@ def test_view_redirects(client: Client) -> None:
             'homepage': translator_url,
             'login': translator_url,
             'logout': 'http://localhost/auth/login',
-            'password': 'p@ssword',
+            'password': 'p@ssword12',
             'to': 'http://localhost/topics/informationen'
         },
         'member@example.org': {
@@ -1033,7 +1033,7 @@ def test_view_translator_mutation(
     ).group()
     page = client.get(reset_password_url)
     page.form['email'] = 'test@test.com'
-    page.form['password'] = 'p@ssw0rd'
+    page.form['password'] = 'p@ssw0rd12'
     page.form.submit()
 
     # Report change as editor
@@ -1150,7 +1150,7 @@ def test_view_translator_mutation(
 
     # Report change as translator
     client.logout()
-    client.login('test@test.com', 'p@ssw0rd', None)
+    client.login('test@test.com', 'p@ssw0rd12', None)
     page = client.get('/').maybe_follow()
     page = page.click('Mutation melden')
     page.form['submitter_message'] = 'Hallo!'
@@ -1698,10 +1698,10 @@ def test_view_accreditation(
     # Login as translator
     page = client.get(reset_password_url)
     page.form['email'] = 'hugo.benito@translators.com'
-    page.form['password'] = 'p@ssw0rd'
+    page.form['password'] = 'p@ssw0rd12'
     page.form.submit()
 
-    page = client.login('hugo.benito@translators.com', 'p@ssw0rd', None)
+    page = client.login('hugo.benito@translators.com', 'p@ssw0rd12', None)
     page = page.maybe_follow()
     assert 'BENITO, Hugo' in page
     assert '756.1234.4568.94' in page
@@ -2097,7 +2097,7 @@ def test_member_cannot_submit_mutation(
     ).group()
     page = client.get(reset_password_url)
     page.form['email'] = 'member@test.com'
-    page.form['password'] = 'p@ssw0rd'
+    page.form['password'] = 'p@ssw0rd12'
     page.form.submit()
 
     client.login_member()
