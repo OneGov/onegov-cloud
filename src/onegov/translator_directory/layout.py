@@ -15,6 +15,9 @@ from onegov.org.models import Organisation
 from onegov.translator_directory.collections.documents import \
     TranslatorDocumentCollection
 from onegov.translator_directory.collections.language import LanguageCollection
+from onegov.translator_directory.collections.time_report import (
+    TimeReportCollection,
+)
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.constants import (
@@ -26,6 +29,9 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.translator_directory.models.language import Language
+    from onegov.translator_directory.models.time_report import (
+        TranslatorTimeReport,
+    )
     from markupsafe import Markup
     from onegov.translator_directory.models.translator import (
         AdmissionState, Gender, Translator)
@@ -90,6 +96,13 @@ class DefaultLayout(BaseLayout):
         if key in INTERPRETING_TYPES:
             return self.request.translate(INTERPRETING_TYPES[key])
         return key
+
+    @staticmethod
+    def format_currency(amount: float | None) -> str:
+        """Format amount as Swiss Francs."""
+        if amount is None:
+            return 'CHF 0.00'
+        return f'CHF {amount:.2f}'
 
 
 class TranslatorLayout(DefaultLayout):
@@ -179,6 +192,11 @@ class TranslatorLayout(DefaultLayout):
                     ),
                     attrs={'class': 'envelope'}
                 ),
+                Link(
+                    _('Add Time Report'),
+                    url=self.request.link(self.model, name='add-time-report'),
+                    attrs={'class': 'plus'},
+                ),
             ]
         elif self.request.is_editor:
             return [
@@ -193,10 +211,21 @@ class TranslatorLayout(DefaultLayout):
                     _('Report change'),
                     self.request.link(self.model, name='report-change'),
                     attrs={'class': 'report-change'}
-                )
+                ),
+                Link(
+                    _('Add Time Report'),
+                    url=self.request.link(self.model, name='add-time-report'),
+                    attrs={'class': 'plus'},
+                ),
             ]
         elif self.request.is_member:
-            return []
+            return [
+                Link(
+                    _('Add Time Report'),
+                    url=self.request.link(self.model, name='add-time-report'),
+                    attrs={'class': 'plus'},
+                ),
+            ]
         elif self.translator_data_outdated():
             return [
                 Link(
@@ -610,4 +639,44 @@ class RefuseAccreditationLayout(DefaultLayout):
             )
         )
         links.append(Link(_('Refuse admission')))
+        return links
+
+
+class TimeReportCollectionLayout(DefaultLayout):
+
+    if TYPE_CHECKING:
+        model: TimeReportCollection
+
+    @cached_property
+    def title(self) -> str:
+        return _('Time Reports')
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        links = super().breadcrumbs
+        assert isinstance(links, list)
+        links.append(Link(_('Time Reports')))
+        return links
+
+
+class TimeReportLayout(DefaultLayout):
+
+    if TYPE_CHECKING:
+        model: TranslatorTimeReport
+
+        def __init__(
+            self, model: TranslatorTimeReport, request: TranslatorAppRequest
+        ) -> None: ...
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        links = super().breadcrumbs
+        assert isinstance(links, list)
+        links.append(
+            Link(
+                text=_('Time Reports'),
+                url=self.request.class_link(TimeReportCollection),
+            )
+        )
+        links.append(Link(self.model.title))
         return links

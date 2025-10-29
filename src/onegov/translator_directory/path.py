@@ -4,11 +4,17 @@ from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.documents import (
     TranslatorDocumentCollection)
 from onegov.translator_directory.collections.language import LanguageCollection
+from onegov.translator_directory.collections.time_report import (
+    TimeReportCollection,
+)
 from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
 from onegov.translator_directory.models.accreditation import Accreditation
 from onegov.translator_directory.models.language import Language
 from onegov.translator_directory.models.mutation import TranslatorMutation
+from onegov.translator_directory.models.time_report import (
+    TranslatorTimeReport,
+)
 from onegov.translator_directory.models.translator import Translator
 from uuid import UUID
 
@@ -139,3 +145,23 @@ def get_accreditation(
     ticket_id: UUID
 ) -> Accreditation:
     return Accreditation(app.session(), target_id, ticket_id)
+
+
+@TranslatorDirectoryApp.path(
+    model=TimeReportCollection, path='/time-reports', converters={'page': int}
+)
+def get_time_reports(
+    app: TranslatorDirectoryApp, page: int = 0
+) -> TimeReportCollection:
+    return TimeReportCollection(app, page)
+
+
+@TranslatorDirectoryApp.path(
+    model=TranslatorTimeReport,
+    path='/time-report/{id}',
+    converters={'id': UUID},
+)
+def get_time_report(
+    request: TranslatorAppRequest, id: UUID
+) -> TranslatorTimeReport | None:
+    return request.session.query(TranslatorTimeReport).filter_by(id=id).first()

@@ -2018,6 +2018,59 @@ def test_basic_search(client_with_fts: Client) -> None:
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
+def test_view_time_report(broadcast, authenticate, connect, client):
+    """Test editor submitting time report."""
+    session = client.app.session()
+    languages = create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator_id = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+    ).id
+    transaction.commit()
+
+    client.login_editor()
+    page = client.get(f'/translator/{translator_id}')
+    assert 'Zeit erfassen' in page
+
+    page = page.click('Zeit erfassen')
+    page.form['assignment_type'] = 'consecutive'
+    page.form['duration'] = 1.5
+    page.form['case_number'] = 'CASE-123'
+    page.form['assignment_date'] = '2025-01-15'
+    page.form['is_night_work'] = False
+    page.form['is_weekend_holiday'] = True
+    page.form['is_urgent'] = False
+    page.form['travel_distance'] = '50'
+    page.form['notes'] = 'Test notes'
+    response = page.form.submit()
+    assert response.status_code == 302
+
+    mail = client.get_email(0, flush_queue=True)
+    assert mail['To'] == 'editor@example.org'
+    assert 'Ihr Ticket wurde eröffnet' in mail['Subject']
+
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+
+    translator = session.query(Translator).filter_by(id=translator_id).one()
+    assert len(translator.time_reports) == 1
+    report = translator.time_reports[0]
+    assert report.duration == 90
+    assert report.hourly_rate == 90.0
+    assert report.surcharge_percentage == 25.0
+    assert report.travel_compensation == 50.0
+    assert report.case_number == 'CASE-123'
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
 def test_member_cannot_submit_mutation(
     broadcast: MagicMock,
     authenticate: MagicMock,
