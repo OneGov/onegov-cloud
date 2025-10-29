@@ -74,7 +74,7 @@ def hourly_user_account_sync(request: PasRequest) -> None:
         parliamentarians = collection.query().all()
 
         users = UserCollection(request.session)
-        # We also need to use username.lower() to avoid potential 
+        # We also need to use username.lower() to avoid potential
         # onegov.user.errors.ExistingUserError
         users_cache = {
             user.username.lower(): user for user in users.query()
