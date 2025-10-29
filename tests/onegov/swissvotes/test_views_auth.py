@@ -69,7 +69,7 @@ def test_view_reset_password(swissvotes_app: TestApp) -> None:
     assert token in reset_page.text
 
     reset_page.form['email'] = 'someone_else@example.org'
-    reset_page.form['password'] = 'password1'
+    reset_page.form['password'] = 'password12'
     reset_page = reset_page.form.submit()
     assert "Ungültige E-Mail oder abgelaufener Link" in reset_page
     assert token in reset_page.text
@@ -77,15 +77,15 @@ def test_view_reset_password(swissvotes_app: TestApp) -> None:
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = '1234'
     reset_page = reset_page.form.submit()
-    assert "Feld muss mindestens 8 Zeichen beinhalten" in reset_page
+    assert "Feld muss mindestens 10 Zeichen beinhalten" in reset_page
     assert token in reset_page.text
 
     reset_page.form['email'] = 'admin@example.org'
-    reset_page.form['password'] = 'password2'
+    reset_page.form['password'] = 'password12'
     assert "Passwort geändert" in reset_page.form.submit().maybe_follow()
 
     reset_page.form['email'] = 'admin@example.org'
-    reset_page.form['password'] = 'password3'
+    reset_page.form['password'] = 'password13'
     reset_page = reset_page.form.submit()
     assert "Ungültige E-Mail oder abgelaufener Link" in reset_page
 
@@ -96,7 +96,7 @@ def test_view_reset_password(swissvotes_app: TestApp) -> None:
     assert "Unbekannter Benutzername oder falsches Passwort" in login_page
 
     login_page.form['username'] = 'admin@example.org'
-    login_page.form['password'] = 'password2'
+    login_page.form['password'] = 'password12'
     login_page = login_page.form.submit().maybe_follow()
     assert "Abmelden" in login_page.maybe_follow()
 

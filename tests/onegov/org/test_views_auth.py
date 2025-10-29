@@ -252,7 +252,7 @@ def test_reset_password(client: Client) -> None:
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = '1234'
     reset_page = reset_page.form.submit()
-    assert "Feld muss mindestens 8 Zeichen beinhalten" in reset_page.text
+    assert "Feld muss mindestens 10 Zeichen beinhalten" in reset_page.text
     assert token in reset_page.text
 
     reset_page.form['email'] = 'admin@example.org'
@@ -322,8 +322,8 @@ def test_registration_honeypot(client: Client) -> None:
 
     register = client.get('/auth/register')
     register.form['username'] = 'spam@example.org'
-    register.form['password'] = 'p@ssw0rd'
-    register.form['confirm'] = 'p@ssw0rd'
+    register.form['password'] = 'p@ssw0rd12'
+    register.form['confirm'] = 'p@ssw0rd12'
     register.form['roboter_falle'] = 'buy pills now'
 
     assert "Das Feld ist nicht leer" in register.form.submit()
@@ -334,8 +334,8 @@ def test_registration(client: Client) -> None:
 
     register = client.get('/auth/register')
     register.form['username'] = 'user@example.org'
-    register.form['password'] = 'p@ssw0rd'
-    register.form['confirm'] = 'p@ssw0rd'
+    register.form['password'] = 'p@ssw0rd12'
+    register.form['confirm'] = 'p@ssw0rd12'
 
     assert "Vielen Dank" in register.form.submit().follow()
 
@@ -350,7 +350,7 @@ def test_registration(client: Client) -> None:
     assert "Konto wurde aktiviert" in client.get(url).follow()
     assert "Konto wurde bereits aktiviert" in client.get(url).follow()
 
-    logged_in = client.login('user@example.org', 'p@ssw0rd').follow()
+    logged_in = client.login('user@example.org', 'p@ssw0rd12').follow()
     assert "angemeldet" in logged_in
 
 
