@@ -27,6 +27,7 @@ from onegov.pay import Price
 from onegov.ticket import Ticket
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import object_session
+from sqlalchemy.orm.attributes import set_committed_value
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -540,8 +541,11 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
             return
 
         if self.directory_id is not None and self.directory is None:
-            self.directory = session.query(  # type: ignore[unreachable]
-                ExtendedDirectory).get(self.directory_id)
+            set_committed_value(  # type: ignore[unreachable]
+                self,
+                'directory',
+                session.query(ExtendedDirectory).get(self.directory_id)
+            )
 
     @property
     def display_config(self) -> dict[str, Any]:

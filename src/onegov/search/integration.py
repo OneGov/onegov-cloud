@@ -4,7 +4,6 @@ import morepath
 
 from concurrent.futures import ThreadPoolExecutor
 from functools import cached_property
-from more.transaction.main import transaction_tween_factory
 from onegov.search import index_log, Searchable
 from onegov.search.indexer import Indexer
 from onegov.search.indexer import ORMEventTranslator
@@ -15,6 +14,7 @@ from onegov.search.utils import (
     language_from_locale,
     searchable_sqlalchemy_models,
 )
+from sqlalchemy import text
 from sqlalchemy.orm import undefer
 
 
@@ -24,7 +24,6 @@ if TYPE_CHECKING:
     from onegov.core.orm import Base, SessionManager
     from onegov.core.request import CoreRequest
     from sqlalchemy.orm import Session
-    from webob import Response
 
 
 class SearchApp(morepath.App):
@@ -71,24 +70,21 @@ class SearchApp(morepath.App):
         if not self.fts_search_enabled:
             return
 
-        max_queue_size = int(cfg.get(
-            'elasticsarch_max_queue_size', '20000'))
+        max_queue_size = cfg.get('search_max_queue_size', 20000)
 
         self.fts_mappings = TypeMappingRegistry()
 
         for base in self.session_manager.bases:
             self.fts_mappings.register_orm_base(base)
 
-        self.fts_orm_events = ORMEventTranslator(
-            self.fts_mappings,
-            max_queue_size=max_queue_size
-        )
-
         self.fts_indexer = Indexer(
             self.fts_mappings,
-            self.fts_orm_events.queue,
-            self.session_manager.engine,
             self.fts_languages
+        )
+
+        self.fts_orm_events = ORMEventTranslator(
+            self.fts_indexer,
+            max_queue_size=max_queue_size
         )
 
         self.session_manager.on_insert.connect(
@@ -99,6 +95,10 @@ class SearchApp(morepath.App):
 
         self.session_manager.on_delete.connect(
             self.fts_orm_events.on_delete)
+
+        self.session_manager.on_transaction_join.connect(
+            self.fts_orm_events.on_transaction_join
+        )
 
     def fts_may_use_private_search(self, request: CoreRequest) -> bool:
         """ Returns True if the given request is allowed to access private
@@ -123,7 +123,7 @@ class SearchApp(morepath.App):
             for model in searchable_sqlalchemy_models(base)
         }
 
-    def perform_reindex(self, fail: bool = False) -> None:
+    def perform_reindex(self) -> None:
         """ Re-indexes all content.
 
         This is a heavy operation and should be run with consideration.
@@ -135,39 +135,34 @@ class SearchApp(morepath.App):
             return
 
         schema = self.schema
-        index_log.info(f'Indexing schema {schema}..')
-
-        # psql delete table search_index
-        self.fts_indexer.delete_search_index(schema)
-
-        # have no queue limit for reindexing (that we're able to change
-        # this here is a bit of a CPython implementation detail) - we can't
-        # necessarily always rely on being able to change this property
-        original_queue_size = self.fts_orm_events.queue.maxsize
-        self.fts_orm_events.queue.maxsize = 0
+        session = self.session()
+        self.fts_indexer.delete_search_index(session)
 
         def reindex_model(model: type[Base]) -> None:
             """ Load all database objects and index them. """
             session = self.session()
             try:
                 query = session.query(model).options(undefer('*'))
-                query = apply_searchable_polymorphic_filter(query, model)
+                query = apply_searchable_polymorphic_filter(
+                    query,
+                    model,
+                    order_by_polymorphic_identity=True
+                )
 
-                for obj in query:
-                    self.fts_orm_events.index(schema, obj)
-
-                # FIXME: Ideally we process the queue concurrently as well,
-                #        but it seems we're leaking connections that way,
-                #        we will have to tighten things up, before we can
-                #        slightly speed things up a bit here. It might also
-                #        be worth bypassing the queue entirely and directly
-                #        generating and submitting the batches. Currently
-                #        we're only saving around 10% of runtime by processing
-                #        the queue concurrently.
+                # NOTE: we bypass the normal transaction machinery for speed
+                self.fts_indexer.process((
+                    task
+                    for obj in query
+                    if (
+                        task := self.fts_orm_events.index_task(schema, obj)
+                    ) is not None
+                ), session)
+                session.execute(text('COMMIT'))
 
             except Exception:
                 index_log.info(
-                    f"Error indexing model '{model.__name__}'",
+                    f"Error indexing model '{model.__name__}' "
+                    f"in schema {schema}",
                     exc_info=True
                 )
             finally:
@@ -175,29 +170,7 @@ class SearchApp(morepath.App):
                 session.bind.dispose()
 
         with ThreadPoolExecutor() as executor:
-            results = executor.map(reindex_model, self.indexable_base_models())
-            if fail:
-                index_log.info('Failed reindexing:', tuple(results))
-        try:
-            self.fts_indexer.process()
-        finally:
-            self.fts_orm_events.queue.maxsize = original_queue_size
-            self.fts_indexer.engine.dispose()
+            executor.map(reindex_model, self.indexable_base_models())
 
-
-@SearchApp.tween_factory(over=transaction_tween_factory)
-def process_indexer_tween_factory(
-    app: SearchApp,
-    handler: Callable[[CoreRequest], Response]
-) -> Callable[[CoreRequest], Response]:
-    def process_indexer_tween(request: CoreRequest) -> Response:
-        app: SearchApp = request.app  # type:ignore[assignment]
-
-        if not app.fts_search_enabled:
-            return handler(request)
-
-        result = handler(request)
-        app.fts_indexer.process()
-        return result
-
-    return process_indexer_tween
+        session.invalidate()
+        session.bind.dispose()

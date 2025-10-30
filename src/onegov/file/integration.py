@@ -175,7 +175,12 @@ class DepotApp(App):
 
             @self.session_manager.on_update.connect_via(ANY, weak=False)
             @self.session_manager.on_delete.connect_via(ANY, weak=False)
-            def on_file_change(schema: str, obj: object) -> None:
+            def on_file_change(
+                schema: str,
+                obj: object,
+                # NOTE: This parameter is required by `on_delete`
+                session: Session | None = None
+            ) -> None:
                 if isinstance(obj, File):
                     self.bust_frontend_cache(obj.id)
 
