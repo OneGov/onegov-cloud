@@ -359,7 +359,7 @@ class Indexer:
     def process(
         self,
         tasks: Iterable[Task],
-        session: Session | None = None
+        session: Session
     ) -> int:
         """ Processes the queue in bulk.
 
@@ -382,9 +382,15 @@ class Indexer:
             task_list = list(tasks)
 
             if action == 'index':
-                success += self.index(task_list, session)  # type: ignore[arg-type]
+                success += self.index(
+                    task_list,  # type: ignore[arg-type]
+                    session
+                )
             elif action == 'delete':
-                success += self.delete(task_list, session)  # type: ignore[arg-type]
+                success += self.delete(
+                    task_list,  # type: ignore[arg-type]
+                    session
+                )
             else:
                 raise NotImplementedError(
                     f"Action '{action}' not implemented for {self.__class__}")
