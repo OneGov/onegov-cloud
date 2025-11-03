@@ -136,8 +136,8 @@ def test_daily_ticket_statistics(
 
     # those will be ignored as they are inactive or not editors/admins
     request: Any = Bunch(client_addr='127.0.0.1')
-    UserCollection(session).register('a', 'p@ssw0rd', request, role='editor')
-    UserCollection(session).register('b', 'p@ssw0rd', request, role='member')
+    UserCollection(session).register('a', 'p@ssw0rd12', request, role='editor')
+    UserCollection(session).register('b', 'p@ssw0rd12', request, role='member')
 
     users = UserCollection(session).query().all()
     user = users[0]
@@ -269,8 +269,8 @@ def test_weekly_ticket_statistics(
 
     # those will be ignored as they are inactive or not editors/admins
     request: Any = Bunch(client_addr='127.0.0.1')
-    UserCollection(session).register('a', 'p@ssw0rd', request, role='editor')
-    UserCollection(session).register('b', 'p@ssw0rd', request, role='member')
+    UserCollection(session).register('a', 'p@ssw0rd12', request, role='editor')
+    UserCollection(session).register('b', 'p@ssw0rd12', request, role='member')
 
     users = UserCollection(session).query().all()
     user = users[0]
@@ -414,8 +414,8 @@ def test_monthly_ticket_statistics(
 
     # those will be ignored as they are inactive or not editors/admins
     request: Any = Bunch(client_addr='127.0.0.1')
-    UserCollection(session).register('a', 'p@ssw0rd', request, role='editor')
-    UserCollection(session).register('b', 'p@ssw0rd', request, role='member')
+    UserCollection(session).register('a', 'p@ssw0rd12', request, role='editor')
+    UserCollection(session).register('b', 'p@ssw0rd12', request, role='member')
 
     users = UserCollection(session).query().all()
     user = users[0]
@@ -876,7 +876,7 @@ def test_auto_archive_tickets_and_delete(
 
         request: Any = Bunch(client_addr='127.0.0.1')
         UserCollection(session).register(
-            'b', 'p@ssw0rd', request, role='admin'
+            'b', 'p@ssw0rd12', request, role='admin'
         )
         users = UserCollection(session).query().all()
         user = users[0]

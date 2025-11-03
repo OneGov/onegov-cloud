@@ -252,9 +252,7 @@ def test_ldap(
         if not success:
             click.echo(f'Search not successfull in base {ba}')
             continue
-        for ix, entry in enumerate(
-            sorted(client.connection.entries, key=sort_func)
-        ):
+        for entry in sorted(client.connection.entries, key=sort_func):
             click.echo(json.dumps(entry.entry_attributes_as_dict, indent=4))
             count += 1
     click.echo(f'Found {count} entries')
@@ -371,7 +369,7 @@ def fetch_users(
                 )
             )
         )
-        for ix, user_ in enumerate(inactive):
+        for user_ in inactive:
             if user_.active:
                 log.info(f'Deactivating inactive user {user_.username}')
             user_.active = False
@@ -379,16 +377,11 @@ def fetch_users(
             if att:
                 att.active = False
 
-            if not dry_run:
-                if ix % 200 == 0:
-                    app.fts_indexer.process(session)
-
     client = LDAPClient(ldap_server, ldap_username, ldap_password)
     client.try_configuration()
     count = 0
     synced_users = []
-    for ix, data in enumerate(users(client.connection)):
-
+    for data in users(client.connection):
         if data['type'] == 'ldap':
             source = 'ldap'
             source_id = data['source_id']
@@ -427,9 +420,6 @@ def fetch_users(
             user.attendee.active = user.active
 
         count += 1
-        if not dry_run:
-            if ix % 200 == 0:
-                app.fts_indexer.process(session)
 
     log.info(f'Synchronized {count} users')
 

@@ -570,7 +570,6 @@ $editbar-fg-color-active: $white;
     .sync::before { @include icon-bold($sync-icon); }
     .upload::before { @include icon-bold($upload-icon); }
     .view-link::before { @include icon($view-link); }
-    .ticket-pdf::before { @include icon($pdf-icon); }
     .ticket-files::before { @include icon-bold($ticket-files-icon); }
     .new-daily-item::before { @include icon-bold($new-daily-item-icon); }
     .new-resource-link::before { @include icon-bold($new-resource-link-icon); }

@@ -179,7 +179,6 @@ def import_bs_agencies(
     added_agencies = {}
     children = defaultdict(list)
     roots = []
-    added_count = 0
 
     click.echo(f'Treated as root agencies: {", ".join(treat_as_root)}')
     for line in csvfile.lines:
@@ -214,10 +213,6 @@ def import_bs_agencies(
         parent: ExtendedAgency | None = None
     ) -> None:
 
-        nonlocal added_count
-        added_count += 1
-        if added_count % 50 == 0:
-            app.fts_indexer.process(session)
         line = lines_by_id[basisid]
         agency = parse_agency(line, parent=parent)
         for child_id in children.get(line.verzorgeinheitid, []):
@@ -291,8 +286,6 @@ def import_bs_persons(
                     f'agency id {agency_id} not found in agencies', err=True)
 
     for ix, line in enumerate(csvfile.lines):
-        if ix % 50 == 0:
-            app.fts_indexer.process(session)
         parse_person(line)
 
     return persons
@@ -513,9 +506,6 @@ def import_lu_people(
                 click.echo(f'Error agency id {agency_id} not found', err=True)
 
     for ix, line in enumerate(csvfile.lines):
-        if ix % 1000 == 0:
-            app.fts_indexer.process(session)
-
         if not check_skip(line) and not check_skip_people(line):
             parse_person(line)
 
@@ -535,9 +525,6 @@ def import_lu_agencies(
     # Hierarchy: Hierarchie: Department, Dienststelle, Abteilung,
     # Unterabteilung, Unterabteilung 2, Unterabteilung 3
     for ix, line in enumerate(csvfile.lines):
-        if ix % 1000 == 0:
-            app.fts_indexer.process(session)
-
         if check_skip(line):
             continue
 
@@ -792,9 +779,7 @@ def match_person_membership_title(
                 if agency in agencies_by_name:
                     set_membership_title(membership, function)
 
-    for ix, line in enumerate(csvfile.lines):
-        if ix % 50 == 0:
-            app.fts_indexer.process(session)
+    for line in csvfile.lines:
         total_entries += 1
         match_membership_title(line, agencies)
 

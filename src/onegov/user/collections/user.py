@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 _T = TypeVar('_T')
 
 
-MIN_PASSWORD_LENGTH = 8
+MIN_PASSWORD_LENGTH = 10
 
 
 @overload

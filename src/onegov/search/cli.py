@@ -80,7 +80,7 @@ def psql_index_status(app: SearchApp) -> None:
 
 
 @cli.command(context_settings={'default_selector': '*'})
-@click.option('--fail', is_flag=True, default=False, help='Fail on errors')
+@click.option('--fail', is_flag=True, default=False, help='No longer used')
 @pass_group_context
 def reindex(
     group_context: GroupContext,
@@ -96,7 +96,7 @@ def reindex(
         click.secho(title, underline=True)
 
         start = utcnow()
-        request.app.perform_reindex(fail)  # type:ignore[attr-defined]
+        request.app.perform_reindex()  # type:ignore[attr-defined]
 
         click.secho(f'took {utcnow() - start}')
 

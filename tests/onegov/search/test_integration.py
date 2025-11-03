@@ -11,6 +11,7 @@ from onegov.core.orm import Base as RealBase
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.utils import scan_morepath_modules
 from onegov.search import ORMSearchable, SearchApp, SearchIndex
+from onegov.search.datamanager import IndexerDataManager
 from sqlalchemy import func, Boolean, Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
 from webtest import TestApp as Client
@@ -118,7 +119,6 @@ def test_search_query(postgres_dsn: str) -> None:
         public=False
     ))
     transaction.commit()
-    app.fts_indexer.process()
 
     search = session.query(func.count(SearchIndex.id))
     assert search.scalar() == 4
@@ -127,6 +127,195 @@ def test_search_query(postgres_dsn: str) -> None:
     query = search.filter_by(owner_type='Document')
     assert query.scalar() == 4
     assert query.filter_by(public=True).scalar() == 2
+
+
+def test_transaction_abort(postgres_dsn: str) -> None:
+
+    class App(Framework, SearchApp):
+        pass
+
+    @App.setting(section='i18n', name='locales')
+    def locales() -> set[str]:
+        return {'en', 'de'}
+
+    @App.setting(section='i18n', name='default_locale')
+    def default_locale() -> str:
+        return 'en'
+
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
+
+    class Document(Base, ORMSearchable):
+        __tablename__ = 'documents'
+
+        id: Column[int] = Column(Integer, primary_key=True)
+        title: Column[str] = Column(Text, nullable=False)
+
+        fts_public = True
+        fts_properties = {
+            'title': {'type': 'localized', 'weight': 'A'}
+        }
+
+        @property
+        def fts_suggestion(self) -> str:
+            return self.title
+
+    scan_morepath_modules(App)
+    morepath.commit(App)
+
+    app = App()
+    app.namespace = 'documents'
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        enable_search=True
+    )
+    # replace ORMBase with RealBase (we need RealBase for the search_index)
+    app.session_manager.bases[1] = RealBase
+
+    app.set_application_id('documents/home')
+    assert app.fts_search_enabled
+
+    session = app.session()
+    session.add(Document(id=1, title='1'))
+    session.add(Document(id=2, title='2'))
+    transaction.abort()
+
+    search = session.query(func.count(SearchIndex.id))
+    assert search.scalar() == 0
+
+
+def test_savepoint(postgres_dsn: str) -> None:
+
+    class App(Framework, SearchApp):
+        pass
+
+    @App.setting(section='i18n', name='locales')
+    def locales() -> set[str]:
+        return {'en', 'de'}
+
+    @App.setting(section='i18n', name='default_locale')
+    def default_locale() -> str:
+        return 'en'
+
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
+
+    class Document(Base, ORMSearchable):
+        __tablename__ = 'documents'
+
+        id: Column[int] = Column(Integer, primary_key=True)
+        title: Column[str] = Column(Text, nullable=False)
+
+        fts_public = True
+        fts_properties = {
+            'title': {'type': 'localized', 'weight': 'A'}
+        }
+
+        @property
+        def fts_suggestion(self) -> str:
+            return self.title
+
+    scan_morepath_modules(App)
+    morepath.commit(App)
+
+    app = App()
+    app.namespace = 'documents'
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        enable_search=True
+    )
+    # replace ORMBase with RealBase (we need RealBase for the search_index)
+    app.session_manager.bases[1] = RealBase
+
+    app.set_application_id('documents/home')
+    assert app.fts_search_enabled
+
+    session = app.session()
+    session.add(Document(id=1, title='1'))
+    session.add(Document(id=2, title='2'))
+    savepoint1 = transaction.savepoint()
+    session.add(Document(id=3, title='2.1'))
+    session.add(Document(id=4, title='2.2'))
+    savepoint2 = transaction.savepoint()
+    session.add(Document(id=5, title='2.2.1'))
+    session.add(Document(id=6, title='2.2.2'))
+    savepoint2.rollback()
+    session.add(Document(id=7, title='2.3'))
+    transaction.commit()
+
+    search = session.query(func.count(SearchIndex.id))
+    assert search.scalar() == 5
+    assert {
+        doc_id
+        for doc_id, in session.query(SearchIndex.owner_id_int)
+    } == {1, 2, 3, 4, 7}
+
+
+def test_reindex(postgres_dsn: str) -> None:
+
+    class App(Framework, SearchApp):
+        pass
+
+    @App.setting(section='i18n', name='locales')
+    def locales() -> set[str]:
+        return {'en', 'de'}
+
+    @App.setting(section='i18n', name='default_locale')
+    def default_locale() -> str:
+        return 'en'
+
+    # avoids confusing mypy
+    if not TYPE_CHECKING:
+        Base = declarative_base()
+
+    class Document(Base, ORMSearchable):
+        __tablename__ = 'documents'
+
+        id: Column[int] = Column(Integer, primary_key=True)
+        title: Column[str] = Column(Text, nullable=False)
+
+        fts_public = True
+        fts_properties = {
+            'title': {'type': 'localized', 'weight': 'A'}
+        }
+
+        @property
+        def fts_suggestion(self) -> str:
+            return self.title
+
+    scan_morepath_modules(App)
+    morepath.commit(App)
+
+    app = App()
+    app.namespace = 'documents'
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        enable_search=True
+    )
+    # replace ORMBase with RealBase (we need RealBase for the search_index)
+    app.session_manager.bases[1] = RealBase
+
+    app.set_application_id('documents/home')
+    assert app.fts_search_enabled
+
+    session = app.session()
+    session.add(Document(id=1, title='1'))
+    session.add(Document(id=2, title='2'))
+    transaction.commit()
+
+    search = session.query(func.count(SearchIndex.id))
+    assert search.scalar() == 2
+
+    # after a reindex we still should have two documents
+    app.perform_reindex()
+    session = app.session()
+    search = session.query(func.count(SearchIndex.id))
+    assert search.scalar() == 2
 
 
 def test_orm_integration(
@@ -326,7 +515,6 @@ def test_alternate_id_property(postgres_dsn: str) -> None:
         fullname="Lil' User"
     ))
     transaction.commit()
-    app.fts_indexer.process()
 
 
     search = session.query(func.count(SearchIndex.id))
@@ -405,11 +593,7 @@ def test_orm_polymorphic(postgres_dsn: str) -> None:
     session.add(MyNews(content="News", type='news'))
     session.add(MyBreaking(content="Breaking", type='breaking'))
 
-    def update() -> None:
-        transaction.commit()
-        app.fts_indexer.process()
-
-    update()
+    transaction.commit()
     search = session.query(func.count(SearchIndex.id))
     assert search.scalar() == 3
 
@@ -417,22 +601,22 @@ def test_orm_polymorphic(postgres_dsn: str) -> None:
     assert isinstance(newsitem, MyNews)
 
     newsitem.content = 'Story'
-    update()
+    transaction.commit()
     assert search.filter(SearchIndex.fts_idx.op('@@')(
         func.websearch_to_tsquery('simple', 'story')
     )).scalar() == 1
 
     session.query(MyPage).filter(MyPage.type == 'news').delete()
-    update()
+    transaction.commit()
     assert search.scalar() == 2
 
     session.delete(session.query(MyPage).filter(
         MyPage.type == 'breaking').one())
-    update()
+    transaction.commit()
     assert search.scalar() == 1
 
     session.query(MyPage).delete()
-    update()
+    transaction.commit()
     assert search.scalar() == 0
 
 
@@ -498,7 +682,6 @@ def test_orm_polymorphic_sublcass_only(postgres_dsn: str) -> None:
     session.add(Open(content="Peter knows"))
 
     transaction.commit()
-    app.fts_indexer.process()
 
     search = session.query(func.count(SearchIndex.id))
     assert search.filter(SearchIndex.fts_idx.op('@@')(
@@ -609,7 +792,6 @@ def test_suggestions(postgres_dsn: str) -> None:
         last_name='Winger'
     ))
     transaction.commit()
-    app.fts_indexer.process()
 
     suggestions = session.query(
         func.unnest(
@@ -703,7 +885,6 @@ def test_language_detection(postgres_dsn: str) -> None:
     session.add(Document(title="My document"))
     session.add(Document(title="Mon document"))
     transaction.commit()
-    app.fts_indexer.process()
 
     # FIXME: Do we want to store the detected language into the index
     #        so we can filter by language if we want to? Currently we
@@ -772,7 +953,6 @@ def test_language_update(postgres_dsn: str) -> None:
     session = app.session()
     session.add(Document(title="Mein Dokument"))
     transaction.commit()
-    app.fts_indexer.process()
 
     # FIXME: Same problem as with above test
     # german = app.es_search(languages=['de']).execute().load()
@@ -782,7 +962,6 @@ def test_language_update(postgres_dsn: str) -> None:
 
     # session.query(Document).one().title = "Mon document"
     # transaction.commit()
-    # app.fts_indexer.process()
 
     # german = app.es_search(languages=['de']).execute().load()
     # french = app.es_search(languages=['fr']).execute().load()
@@ -845,7 +1024,6 @@ def test_date_decay(postgres_dsn: str) -> None:
 
     def search(title: str) -> list[int]:
         transaction.commit()
-        app.fts_indexer.process()
 
         search = session.query(SearchIndex.owner_id_int)
         search = search.filter(SearchIndex.fts_idx.op('@@')(
@@ -884,7 +1062,8 @@ def test_date_decay(postgres_dsn: str) -> None:
     one.modified = sedate.utcnow()
     two.modified = sedate.utcnow() - timedelta(days=365)
 
-    transaction.commit()
-    assert app.fts_indexer.queue.qsize() == 2
-
+    session.flush()
+    queue = IndexerDataManager.get_queue(session, app.fts_indexer)
+    assert queue is not None
+    assert len(queue) == 2
     assert search('Dokument') == [1, 2]

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import transaction
+
 from onegov.pas.log import log
 
 
@@ -93,118 +95,121 @@ def import_zug_kub_data(
     if logger is None:
         logger = log
 
+    # Use a transaction savepoint, to ensure the search index is correct
+    # even if there is an error, we roll back the savepoint if there is
+    # any exception
+    savepoint = transaction.savepoint()
     try:
-        # Use a savepoint; rollback occurs automatically on exception
-        with session.begin_nested():
-            people_importer = PeopleImporter(session, logger)
-            (parliamentarian_map, people_details, people_processed) = (
-                people_importer.bulk_import(people_data)
-            )
-            import_details['parliamentarians'] = {
-                'created': _serialize_model_objects(people_details['created']),
-                'updated': _serialize_model_objects(people_details['updated']),
-                'processed': people_processed,
-            }
+        people_importer = PeopleImporter(session, logger)
+        (parliamentarian_map, people_details, people_processed) = (
+            people_importer.bulk_import(people_data)
+        )
+        import_details['parliamentarians'] = {
+            'created': _serialize_model_objects(people_details['created']),
+            'updated': _serialize_model_objects(people_details['updated']),
+            'processed': people_processed,
+        }
 
-            organization_importer = OrganizationImporter(session, logger)
-            (
-                commission_map,
-                parliamentary_group_map,
-                party_map,
-                other_organization_map,
-                org_details,
-                org_processed_counts,
-            ) = organization_importer.bulk_import(organization_data)
+        organization_importer = OrganizationImporter(session, logger)
+        (
+            commission_map,
+            parliamentary_group_map,
+            party_map,
+            other_organization_map,
+            org_details,
+            org_processed_counts,
+        ) = organization_importer.bulk_import(organization_data)
 
-            for category, details_list_dict in org_details.items():
-                processed_count = org_processed_counts.get(category, 0)
-                # Only add categories that have actual ORM objects
-                # (Commissions, Parties)
-                if category in ('commissions', 'parties'):
-                    created_objs = details_list_dict.get('created', [])
-                    updated_objs = details_list_dict.get('updated', [])
-                    import_details[category] = {
-                        'created': _serialize_model_objects(created_objs),
-                        'updated': _serialize_model_objects(updated_objs),
-                        'processed': processed_count,
-                    }
+        for category, details_list_dict in org_details.items():
+            processed_count = org_processed_counts.get(category, 0)
+            # Only add categories that have actual ORM objects
+            # (Commissions, Parties)
+            if category in ('commissions', 'parties'):
+                created_objs = details_list_dict.get('created', [])
+                updated_objs = details_list_dict.get('updated', [])
+                import_details[category] = {
+                    'created': _serialize_model_objects(created_objs),
+                    'updated': _serialize_model_objects(updated_objs),
+                    'processed': processed_count,
+                }
 
-            # Add 'other' processed count to log_details separately
-            log_details['other_organizations_processed'] = (
-                org_processed_counts.get('other', 0)
-            )
-            log_details['parliamentary_groups_processed'] = (
-                org_processed_counts.get('parliamentary_groups', 0)
-            )
+        # Add 'other' processed count to log_details separately
+        log_details['other_organizations_processed'] = (
+            org_processed_counts.get('other', 0)
+        )
+        log_details['parliamentary_groups_processed'] = (
+            org_processed_counts.get('parliamentary_groups', 0)
+        )
 
-            membership_importer = MembershipImporter(session, logger)
-            membership_importer.init(
-                session,
-                parliamentarian_map,
-                commission_map,
-                parliamentary_group_map,
-                party_map,
-                other_organization_map,
-            )
-            (membership_details, membership_processed_counts) = (
-                membership_importer.bulk_import(membership_data)
-            )
+        membership_importer = MembershipImporter(session, logger)
+        membership_importer.init(
+            session,
+            parliamentarian_map,
+            commission_map,
+            parliamentary_group_map,
+            party_map,
+            other_organization_map,
+        )
+        (membership_details, membership_processed_counts) = (
+            membership_importer.bulk_import(membership_data)
+        )
 
-            for category, details_dict in membership_details.items():
-                if category == 'parliamentarians_from_memberships':
-                    if isinstance(
-                        details_dict, dict
-                    ):
-                        created_parl = details_dict.get('created', [])
-                        updated_parl = details_dict.get('updated', [])
-                        import_details['parliamentarians']['created'].extend(
-                            _serialize_model_objects(created_parl)
-                        )
-                        import_details['parliamentarians']['updated'].extend(
-                            _serialize_model_objects(updated_parl)
-                        )
-
-                elif category in (
-                    'commission_memberships',
-                    'parliamentarian_roles',
+        for category, details_dict in membership_details.items():
+            if category == 'parliamentarians_from_memberships':
+                if isinstance(
+                    details_dict, dict
                 ):
-                    created_items = details_dict.get('created', [])
-                    updated_items = details_dict.get('updated', [])
-                    import_details[category] = cast(
-                        'ImportCategoryResult', {
-                            'created': _serialize_model_objects(created_items),
-                            'updated': _serialize_model_objects(updated_items),
-                            'processed': details_dict.get('processed', 0)
-                        }
+                    created_parl = details_dict.get('created', [])
+                    updated_parl = details_dict.get('updated', [])
+                    import_details['parliamentarians']['created'].extend(
+                        _serialize_model_objects(created_parl)
+                    )
+                    import_details['parliamentarians']['updated'].extend(
+                        _serialize_model_objects(updated_parl)
                     )
 
-            log_details['skipped_memberships'] = (
-                membership_processed_counts.get('skipped', 0)
-            )
+            elif category in (
+                'commission_memberships',
+                'parliamentarian_roles',
+            ):
+                created_items = details_dict.get('created', [])
+                updated_items = details_dict.get('updated', [])
+                import_details[category] = cast(
+                    'ImportCategoryResult', {
+                        'created': _serialize_model_objects(created_items),
+                        'updated': _serialize_model_objects(updated_items),
+                        'processed': details_dict.get('processed', 0)
+                    }
+                )
 
-            log_details['summary'] = {}
-            for k, v in import_details.items():
-                # v is now guaranteed to be ImportCategoryResult
-                log_details['summary'][k] = {
-                    'created_count': len(v['created']),
-                    'updated_count': len(v['updated']),
-                    'processed_count': v['processed'],
-                }
-            log_details['summary']['other_organizations_processed'] = (
-                log_details['other_organizations_processed']
-            )
-            log_details['summary']['parliamentary_groups_processed'] = (
-                log_details['parliamentary_groups_processed']
-            )
-            log_details['summary']['skipped_memberships'] = log_details[
-                'skipped_memberships'
-            ]
+        log_details['skipped_memberships'] = (
+            membership_processed_counts.get('skipped', 0)
+        )
 
-            log_status = 'completed'
-            logger.info(
-                'KUB data import processing successful within transaction.'
-            )
+        log_details['summary'] = {}
+        for k, v in import_details.items():
+            # v is now guaranteed to be ImportCategoryResult
+            log_details['summary'][k] = {
+                'created_count': len(v['created']),
+                'updated_count': len(v['updated']),
+                'processed_count': v['processed'],
+            }
+        log_details['summary']['other_organizations_processed'] = (
+            log_details['other_organizations_processed']
+        )
+        log_details['summary']['parliamentary_groups_processed'] = (
+            log_details['parliamentary_groups_processed']
+        )
+        log_details['summary']['skipped_memberships'] = log_details[
+            'skipped_memberships'
+        ]
+
+        log_status = 'completed'
+        logger.info(
+            'KUB data import processing successful within transaction.'
+        )
     except Exception as e:
+        savepoint.rollback()
         final_error = e
         log_status = 'failed'
         log_details['error'] = str(e)
