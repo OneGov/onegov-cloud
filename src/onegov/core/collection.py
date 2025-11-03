@@ -341,7 +341,7 @@ class RangedPagination(Generic[_M]):
     """
 
     # how many items are shown per page
-    batch_size = 20
+    batch_size = 22
 
     # how many items may be shown together, ranges exceeding this limit are
     # may be clipped by using `limit_range`.

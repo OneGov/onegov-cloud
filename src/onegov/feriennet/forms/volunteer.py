@@ -11,6 +11,8 @@ from wtforms.validators import InputRequired, Email
 
 class VolunteerForm(Form):
 
+    css_class = 'two-columns'
+
     first_name = StringField(
         label=_('First Name'),
         validators=[InputRequired()])

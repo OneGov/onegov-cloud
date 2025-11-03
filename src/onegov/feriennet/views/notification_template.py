@@ -56,11 +56,6 @@ def view_notification_templates(
             return
 
         yield Link(
-            text=_('Mailing'),
-            url=request.link(notification, 'send')
-        )
-
-        yield Link(
             text=_('Edit'),
             url=request.link(notification, 'edit')
         )
@@ -73,6 +68,11 @@ def view_notification_templates(
             }),
             target=f'#{notification.id.hex}',
             yes_button_text=_('Delete Notification Template')
+        )
+
+        yield Link(
+            text=_('Use Template'),
+            url=request.link(notification, 'send')
         )
 
     return {

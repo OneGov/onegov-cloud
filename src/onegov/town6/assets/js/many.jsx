@@ -220,7 +220,7 @@ var ManyDateTimeRanges = React.createClass({
                     return (
                         <div key={index}>
                             <div className={"grid-x " + (value.error && 'error' || '')}>
-                                <div className="small-5 cell">
+                                <div className="small-12 medium-5 cell">
                                     <DateTimePickerField required
                                         type="datetime"
                                         label={data.labels.start}
@@ -230,7 +230,7 @@ var ManyDateTimeRanges = React.createClass({
                                         size="small"
                                     />
                                 </div>
-                                <div className="small-5 cell">
+                                <div className="small-13 medium-5 cell">
                                     <DateTimePickerField required
                                         type="datetime"
                                         label={data.labels.end}
@@ -240,7 +240,7 @@ var ManyDateTimeRanges = React.createClass({
                                         size="small"
                                     />
                                 </div>
-                                <div className="small-2 cell">
+                                <div className="small-12 medium-2 cell many-plus-minus">
                                     {
                                         index === (values.length - 1) &&
                                             <a href="#" className="button round field-button" onClick={onAdd}>

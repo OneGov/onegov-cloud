@@ -457,6 +457,7 @@ $editbar-fg-color-active: $white;
 
 .edit-bar-container {
     background-color: $editbar-bg-color;
+    padding: 0 !important;
 }
 
 .edit-bar {
@@ -598,8 +599,8 @@ $editbar-fg-color-active: $white;
     }
 }
 
-#offCanvas {
-    background: $primary-color;
+#offCanvas,
+#offCanvasFilters {
     z-index: 1000;
 
     .button-area {
@@ -628,16 +629,16 @@ $editbar-fg-color-active: $white;
         background-color: $white;
     }
 
+    .drilldown a {
+        background-color: transparent;
+    }
+
     .side-navigation {
         padding: 0 2rem;
         width: 30rem;
 
         @include breakpoint(small only) {
             width: auto;
-
-            .menu {
-                background: $primary-color;
-            }
         }
 
         li {
@@ -690,9 +691,6 @@ $editbar-fg-color-active: $white;
         }
     }
 
-    .drilldown a {
-        background-color: $primary-color !important;
-    }
 
     // Overwrite foundation arrows
     .accordion-menu .is-accordion-submenu-parent:not(.has-submenu-toggle) > a::after,
@@ -727,7 +725,6 @@ $editbar-fg-color-active: $white;
         padding-left: 3rem;
 
         &::before {
-            background-color: $primary-color;
             content: "\f053";
             display: block;
             left: 1rem;
@@ -736,9 +733,61 @@ $editbar-fg-color-active: $white;
             top: .8rem;
         }
     }
+}
+
+#offCanvasFilters {
+    background: $white;
+
+    .navigation-area {
+        padding: 2rem 0;
+
+        .menu-wrapper {
+            height: calc(100vh - 240px);
+            overflow: scroll;
+        }
+
+        .accordion {
+            background: transparent;
+
+            .accordion-content {
+                margin: 0;
+                border: 0;
+                background: transparent;
+            }
+
+            .accordion-title {
+                color: $oil;
+                font-size: 1rem;
+                border: 0;
+                border-top: 1px solid $gainsboro;
+                border-radius: 0;
+            }
+
+            @media #{$small-only} {min-width: 90vw;}
+            @media #{$medium-up} {min-width: 60vw;}
+            @media #{$large-up} {min-width: 30vw;}
+        }
+    }
+}
+
+#offCanvas {
+    background: $primary-color;
 
     * {
         color: $white;
+    }
+
+    .side-navigation .menu {
+        background: $primary-color;
+    }
+
+    .drilldown a {
+        background-color: $primary-color !important;
+    }
+
+    .js-drilldown-back::before {
+            background-color: $primary-color;
+            content: "\f053";
     }
 }
 

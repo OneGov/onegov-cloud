@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from functools import cached_property
-from markupsafe import Markup
 from onegov.activity import BookingPeriod
 from onegov.activity import BookingPeriodMeta
 from onegov.activity import BookingPeriodCollection
@@ -14,10 +13,10 @@ from onegov.feriennet.initial_content import create_new_organisation
 from onegov.feriennet.request import FeriennetRequest
 from onegov.feriennet.sponsors import load_sponsors
 from onegov.feriennet.theme import FeriennetTheme
-from onegov.org import OrgApp
-from onegov.org.app import get_common_asset as default_common_asset
-from onegov.org.app import get_i18n_localedirs as default_i18n_localedirs
-from onegov.org.app import (
+from onegov.town6 import TownApp
+from onegov.town6.app import get_common_asset as default_common_asset
+from onegov.town6.app import get_i18n_localedirs as get_town6_i18n_localedirs
+from onegov.town6.app import (
     get_public_ticket_messages as default_public_ticket_messages)
 from onegov.pay.models.invoice_reference import Schema
 from onegov.user import User, UserCollection
@@ -33,19 +32,7 @@ if TYPE_CHECKING:
     from more.content_security import ContentSecurityPolicy
 
 
-BANNER_TEMPLATE = Markup("""
-<div class="sponsor-banner">
-    <div class="sponsor-banner-{id}">
-        <a href="{url}">
-            <img src="{src}">
-            <p class="banner-info">{info}</p>
-        </a>
-    </div>
-</div>
-""")
-
-
-class FeriennetApp(OrgApp):
+class FeriennetApp(TownApp):
 
     request_class = FeriennetRequest
 
@@ -125,8 +112,8 @@ class FeriennetApp(OrgApp):
         ]
 
         if sponsors:
-            sponsors[0].banners['src'] = sponsors[0].url_for(
-                request, sponsors[0].banners['src'])
+            sponsors[0].banners['narrow'] = sponsors[0].url_for(
+                request, sponsors[0].banners['narrow'])
 
         return sponsors
 
@@ -328,7 +315,7 @@ def get_citizen_login_enabled() -> bool:
 def get_i18n_localedirs() -> list[str]:
     return [
         utils.module_path('onegov.feriennet', 'locale'),
-        *default_i18n_localedirs()
+        *get_town6_i18n_localedirs()
     ]
 
 
@@ -355,7 +342,6 @@ def get_volunteer_cart() -> Iterator[str]:
 @FeriennetApp.webasset('common')
 def get_common_asset() -> Iterator[str]:
     yield from default_common_asset()
-    yield 'reloadfrom.js'
     yield 'printthis.js'
     yield 'print.js'
     yield 'click-to-load.js'

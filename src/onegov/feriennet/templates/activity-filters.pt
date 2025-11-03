@@ -1,0 +1,1 @@
+<tal:b metal:use-macro="layout.macros['filters']" />

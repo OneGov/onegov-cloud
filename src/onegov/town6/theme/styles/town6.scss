@@ -1,3 +1,12 @@
+/* Mixins */
+
+@mixin rotate {
+    -ms-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
+
 /*
     The maximum width of a line relative to the main font size. This limits textblocks
     to a readable length.
@@ -71,7 +80,6 @@ body {
 html {
     scroll-behavior: smooth;
 }
-
 
 .off-canvas-content {
     display: flex;
@@ -198,10 +206,11 @@ footer {
 */
 
 .page-text,
-.footer-container,
 .breadcrumbs,
-.contact-panel {
-    a {
+.contact-panel,
+.organiser-panel,
+.occasions {
+    a:not(.button) {
         position: relative;
         transition: all 250ms;
         z-index: 2;
@@ -487,6 +496,11 @@ input[type="url"] {
     padding: 1rem 1.5rem !important;
     transition: all 200ms linear !important;
 
+    i.fa:first-child,
+    i.fas:first-child  {
+        margin-right: .5rem;
+    }
+
     &.hollow.find-your-spot-link {
         height: fit-content;
         margin-bottom: .5rem;
@@ -497,6 +511,7 @@ input[type="url"] {
             margin-right: .5rem;
         }
     }
+
 
     &:hover {
         margin-left: -.5rem;
@@ -701,7 +716,7 @@ $pageref-color-hover: $iron;
 */
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .flash-message {
@@ -1430,6 +1445,106 @@ ul.recipients {
             border: 0 !important;
             box-shadow: none !important;
             float: none;
+        }
+    }
+}
+
+/* Filters */
+#filters-top {
+    display:flex;
+    align-items: start;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    .button.dropdown-button {
+        padding: .7rem 1rem !important;
+        margin-bottom: 0;
+        border-radius: .7rem !important;
+
+        &.active {
+            background: $primary-color !important;
+            color: $white !important;
+        }
+
+        &.hover {
+            border: 1px solid darken($primary-color, 10%) !important;
+            .fa-chevron-down {
+                @include rotate;
+            }
+        }
+
+        &:hover {
+            padding: .7rem 1rem !important;
+            margin-left: 0;
+            margin-right: 0;
+        }
+    }
+    .dropdown-pane {
+        background: transparent;
+        padding: .5rem 0 0;
+        border: none;
+
+        &.ic-transitioning .filter-panel * {
+            opacity: .7;
+        }
+
+    }
+    .filter-panel {
+        background: $white;
+        border: 1px solid $primary-color;
+        padding: 1rem;
+        border-radius: .7rem;
+        width: clamp(300px, calc(100% - 2rem), 450px);
+
+        .apply-filters{
+            margin-bottom: 0;
+        }
+
+        li span:focus,
+        li span:focus-visible,
+        li span:focus-within {
+            background: $primary-color !important;
+            a {
+                color: $white !important;
+            }
+        }
+    }
+}
+
+.filter-panel .blank-label {
+    border-radius: .7rem;
+    background: $smoke;
+    border: 1px solid $smoke;
+
+    &.active {
+        background: $primary-color;
+    }
+}
+
+#mobile-filters-button {
+    margin-left: auto;
+    display: flex;
+}
+
+
+/* Dropdown Menu */
+.dropdown-pane.dropdown-options {
+    list-style: none;
+    padding: 0;
+    width: auto;
+
+    li a {
+        display: block;
+        padding:.5rem .7rem;
+        cursor: pointer;
+        border-radius: .7rem;
+        white-space: nowrap;
+        color: $body-font-color;
+        font-weight: normal;
+
+        &:hover {
+            background: $smoke;
         }
     }
 }

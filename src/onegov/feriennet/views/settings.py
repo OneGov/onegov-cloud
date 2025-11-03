@@ -28,6 +28,8 @@ from wtforms.validators import Optional
 
 
 from typing import TYPE_CHECKING
+
+from onegov.town6.layout import SettingsLayout
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.feriennet.request import FeriennetRequest
@@ -311,4 +313,5 @@ def custom_handle_settings(
     request: FeriennetRequest,
     form: FeriennetSettingsForm
 ) -> RenderData | Response:
-    return handle_generic_settings(self, request, form, _('Feriennet'))
+    return handle_generic_settings(self, request, form, _('Feriennet'),
+                                   SettingsLayout(self, request))

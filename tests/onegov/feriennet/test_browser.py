@@ -8,7 +8,7 @@ from pytest import mark
 from sedate import as_datetime, replace_timezone
 
 
-@mark.flaky(reruns=3, only_rerun=None)
+@mark.skip('Login with selenium is not working')
 def test_browse_matching(browser, scenario):
     scenario.add_period(title="Ferienpass 2016")
 

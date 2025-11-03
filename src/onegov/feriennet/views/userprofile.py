@@ -4,7 +4,7 @@ from onegov.core.security import Personal
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.forms import UserProfileForm
 from onegov.org.models import Organisation
-from onegov.org.views.userprofile import handle_user_profile
+from onegov.town6.views.userprofile import town_handle_user_profile
 
 
 from typing import TYPE_CHECKING
@@ -22,4 +22,5 @@ def handle_custom_user_profile(
     request: FeriennetRequest,
     form: UserProfileForm
 ) -> RenderData | Response:
-    return handle_user_profile(self, request, form)
+    return town_handle_user_profile(
+        self, request, form)  # type:ignore

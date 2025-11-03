@@ -129,7 +129,10 @@ class AttendeeForm(AttendeeBase):
 
     swisspass = StringField(
         label=_('Swisspass ID'),
-        description='XXX-XXX-XXX-X'
+        description='XXX-XXX-XXX-X',
+        render_kw={
+            'data-max-length': 13,
+        }
     )
 
     differing_address = BooleanField(
@@ -183,7 +186,8 @@ class AttendeeForm(AttendeeBase):
             if len(self.swisspass.data) != 13:
                 assert isinstance(self.swisspass.errors, list)
                 self.swisspass.errors.append(_(
-                    'The Swisspass ID must be 13 characters long.'
+                    'The Swisspass ID must be 13 characters long '
+                    '(including dashes).'
                 ))
                 return False
 
@@ -237,7 +241,10 @@ class AttendeeSignupForm(AttendeeBase):
     swisspass = StringField(
         label=_('Swisspass ID'),
         description='XXX-XXX-XXX-X',
-        depends_on=('attendee', 'other')
+        depends_on=('attendee', 'other'),
+        render_kw={
+            'data-max-length': 13,
+        }
     )
 
     differing_address = BooleanField(
@@ -595,7 +602,8 @@ class AttendeeSignupForm(AttendeeBase):
             if len(self.swisspass.data) != 13:
                 assert isinstance(self.swisspass.errors, list)
                 self.swisspass.errors.append(_(
-                    'The Swisspass ID must be 13 characters long.'
+                    'The Swisspass ID must be 13 characters long '
+                    '(including dashes).'
                 ))
                 return False
 
