@@ -131,8 +131,6 @@ class AttendeeForm(AttendeeBase):
     swisspass = StringField(
         label=_('Swisspass ID'),
         description='XXX-XXX-XXX-X',
-        validators=[InputRequired(),
-                    Regexp(r'^[0-9\-]+$')],
         render_kw={
             'data-max-length': 13,
         }
@@ -244,8 +242,6 @@ class AttendeeSignupForm(AttendeeBase):
     swisspass = StringField(
         label=_('Swisspass ID'),
         description='XXX-XXX-XXX-X',
-        validators=[InputRequired(),
-                    Regexp(r'^[0-9\-]+$')],
         depends_on=('attendee', 'other'),
         render_kw={
             'data-max-length': 13,
