@@ -220,7 +220,9 @@ def test_create_directory_accordion_layout(client: Client) -> None:
     assert answer not in q2
 
 
-def test_new_edit_submit_directory_entry_with_publication(client):
+def test_new_edit_submit_directory_entry_with_publication(
+    client: Client
+) -> None:
     # submissions and creation of directory entries shall be handled
     # the same regarding publication
 
