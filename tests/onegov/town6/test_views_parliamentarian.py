@@ -20,26 +20,44 @@ def test_parliamentarians(client: Client) -> None:
     settings.form['ris_enabled'] = True
     settings.form.submit()
 
-    # add parliamentary group
+    # add parliamentary groups
+    groups = client.get('/parliamentary-groups')
+    assert 'Noch keine Fraktionen erfasst' in groups
+
     page = client.get('/parliamentary-groups/new')
     page.form['name'] = 'Die Moderne Fraktion'
-    page.form.submit()
+    page = page.form.submit().follow()
+    assert 'Die Moderne Fraktion' in page
 
     page = client.get('/parliamentary-groups/new')
     page.form['name'] = 'Old Party Fraktion'
-    page.form.submit()
+    page = page.form.submit().follow()
+    assert 'Old Party Fraktion' in page
 
-    # add commission
+    edit = page.click('Bearbeiten')
+    edit.form['description'] = 'We the old once!'
+    page = edit.form.submit().follow()
+    assert 'We the old once!' in page
+
+    # add commissions
+    commissions = client.get('/commissions')
+    assert 'Keine aktiven Kommissionen' in commissions
+
     page = client.get('/commissions/new')
     page.form['name'] = 'Verkehrskommission'
-    page.form.submit()
+    page = page.form.submit().follow()
+    assert 'Verkehrskommission' in page
+
+    edit = page.click('Bearbeiten')
+    edit.form['description'] = 'Commission for ...'
+    page = edit.form.submit().follow()
+    assert 'Commission for ...' in page
 
     # configure interest ties
     # TODO
 
+    parliamentarian_pages = []
     with freeze_time("2025-11-03 8:00"):
-        parliamentarian_pages = []
-
         page = client.get('/parliamentarians')
         assert ('Keine Filterergebnisse gefunden oder noch keine '
                 'Parlamentarier erfasst') in page
@@ -55,7 +73,6 @@ def test_parliamentarians(client: Client) -> None:
         new.form['email_primary'] = 'funny.comedian@fun.org'
         new.form['party'] = 'Die Moderne'
         # TODO: set interest tie
-
         parliamentarian = new.form.submit().follow()
         parliamentarian_pages.append(parliamentarian)
         assert 'Funny' in parliamentarian
@@ -100,7 +117,6 @@ def test_parliamentarians(client: Client) -> None:
         new.form['last_name'] = 'Man'
         new.form['email_primary'] = 'old.man@cov.org'
         new.form['party'] = 'Old Party'
-
         parliamentarian = new.form.submit().follow()
         parliamentarian_pages.append(parliamentarian)
         assert 'Old' in parliamentarian
@@ -151,3 +167,16 @@ def test_parliamentarians(client: Client) -> None:
         page = client.get('/parliamentarians')
         assert ('Keine Filterergebnisse gefunden oder noch keine '
                 'Parlamentarier erfasst') in page
+
+    # delete commissions
+    client.get('/commissions').click('Verkehrskommission').click('Löschen')
+    commissions = client.get('/commissions')
+    assert 'Keine aktiven Kommissionen' in commissions
+
+    # delete parliamentary groups
+    (client.get('/parliamentary-groups')
+     .click('Die Moderne Fraktion').click('Löschen'))
+    (client.get('/parliamentary-groups')
+     .click('Old Party').click('Löschen'))
+    groups = client.get('/parliamentary-groups')
+    assert 'Noch keine Fraktionen erfasst' in groups
