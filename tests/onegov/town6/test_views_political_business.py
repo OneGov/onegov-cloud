@@ -45,13 +45,7 @@ def test_political_businesses(client: Client) -> None:
         (opt[0] for opt in options if opt[2] == 'Für ein schöneres Luzern'))
     role.form['parliamentary_group_id'] = id
     role.form['parliamentary_group_role'] = 'member'
-    page = role.form.submit().follow()
-
-    # new = client.get('/parliamentarians/new')
-    # new.form['first_name'] = 'Huf'
-    # new.form['last_name'] = 'Schmied'
-    # new.form['email_primary'] = 'huf.schmied@example.org'
-    # new.form.submit().follow()
+    role.form.submit().follow()
 
     with freeze_time('2025-11-04 8:00'):
         page = client.get('/political-businesses')
@@ -101,3 +95,15 @@ def test_political_businesses(client: Client) -> None:
             'Status', 'Pendent Legislative (1)', 'Jahr', '2025 (1)']
         for keyword in keywords:
             assert keyword in page
+
+    # delete businesses
+    (client.get('/political-businesses')
+     .click('ow many congressmen does it take to change a light bulb?')
+     .click('Löschen'))
+
+    # delete parliamentarian
+    client.get('/parliamentarians').click('Mann Bau').click('Löschen')
+
+    # delete parliamentary group
+    (client.get('/parliamentary-groups')
+     .click('Für ein schöneres Luzern').click('Löschen'))
