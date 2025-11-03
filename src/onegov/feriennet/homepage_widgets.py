@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from onegov.activity import ActivityFilter
-from onegov.feriennet import FeriennetApp
+from onegov.feriennet import FeriennetApp, _
 
 
 from typing import TYPE_CHECKING

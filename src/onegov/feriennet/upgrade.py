@@ -225,6 +225,7 @@ def migrate_homepage_structure_for_feriennet(context: UpgradeContext) -> None:
 
     if 'Nouvelle' not in org.meta['homepage_structure']:
         org.meta['homepage_structure'] = textwrap.dedent("""\
+    <slider height-d="100vh" height-m="55vw" />
     <row>
         <column span="12">
             <row>
@@ -283,9 +284,11 @@ def migrate_homepage_structure_for_feriennet(context: UpgradeContext) -> None:
             </row>
         </column>
     </row-wide>
+
         """)
     else:
         org.meta['homepage_structure'] = textwrap.dedent("""\
+    <slider height-d="100vh" height-m="55vw" />
     <row>
         <column span="12">
             <row>
