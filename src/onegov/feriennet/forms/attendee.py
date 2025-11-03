@@ -19,7 +19,6 @@ from wtforms.fields import DateField
 from wtforms.fields import HiddenField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
-from wtforms.validators import Regexp
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired, NumberRange
