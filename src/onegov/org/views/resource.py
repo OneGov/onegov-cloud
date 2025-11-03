@@ -31,6 +31,7 @@ from onegov.org.models.resource import (
     DaypassResource, FindYourSpotCollection, RoomResource, ItemResource)
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
+from onegov.org.pdf.my_reservations import MyReservationsPdf
 from onegov.org.utils import group_by_column, keywords_first
 from onegov.org.views.utils import assert_citizen_logged_in
 from onegov.reservation import ResourceCollection, Resource, Reservation
@@ -316,6 +317,8 @@ def view_resources(
         'link_func': link_func,
         'edit_link': edit_link,
         'lead_func': lead_func,
+        'header_html': request.app.org.resource_header_html,
+        'footer_html': request.app.org.resource_footer_html,
     }
 
 
@@ -898,6 +901,7 @@ def handle_new_resource(
     layout.include_editor()
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(RESOURCE_TYPES[type]['title'], '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -1228,6 +1232,7 @@ def view_my_reservations_json(
             accepted=r.accepted,
             timezone=r.timezone,
             resource=r.resource,
+            resource_id=r.resource_id,
             ticket_id=r.ticket_id,
             handler_code=r.handler_code,
             ticket_number=r.ticket_number,
@@ -1235,6 +1240,71 @@ def view_my_reservations_json(
             request=request
         ).as_dict() for r in records
     ]
+
+
+@OrgApp.html(
+    model=ResourceCollection,
+    name='my-reservations-pdf',
+    permission=Public
+)
+def view_my_reservations_pdf(
+    self: ResourceCollection,
+    request: OrgRequest
+) -> Response:
+    """ Returns the reservations as PDF. """
+    if not request.app.org.citizen_login_enabled:
+        raise exc.HTTPNotFound()
+
+    if not request.authenticated_email:
+        raise exc.HTTPForbidden()
+
+    start, end = utils.parse_fullcalendar_request(request, 'Europe/Zurich')
+
+    if not (start and end):
+        raise exc.HTTPBadRequest()
+
+    path = module_path('onegov.org', 'queries/my-reservations.sql')
+    stmt = as_selectable_from_path(path)
+
+    conditions = [
+        func.lower(stmt.c.email) == request.authenticated_email.lower(),
+        start <= stmt.c.start,
+        stmt.c.start <= end,
+    ]
+
+    if request.GET.get('accepted') == '1':
+        conditions.append(stmt.c.accepted.is_(True))
+
+    records = request.session.execute(select(stmt.c).where(and_(*conditions)))
+
+    content = MyReservationsPdf.from_reservations(request, [
+        utils.MyReservationEventInfo(
+            id=r.id,
+            token=r.token,
+            start=r.start,
+            end=r.end,
+            accepted=r.accepted,
+            timezone=r.timezone,
+            resource=r.resource,
+            resource_id=r.resource_id,
+            ticket_id=r.ticket_id,
+            handler_code=r.handler_code,
+            ticket_number=r.ticket_number,
+            key_code=r.key_code,
+            request=request
+        ) for r in records
+    ], start, end)
+
+    return Response(
+        content.read(),
+        content_type='application/pdf',
+        content_disposition='attachment; filename='
+        'my-reservations-{}-{}-{}.pdf'.format(
+            request.authenticated_email,
+            start.strftime('%Y%m%d'),
+            end.strftime('%Y%m%d')
+        )
+    )
 
 
 @OrgApp.html(
@@ -1290,6 +1360,7 @@ def view_my_reservations(
         ),
         'layout': layout,
         'feed': request.link(self, name='my-reservations-json'),
+        'pdf_url': request.link(self, name='my-reservations-pdf'),
     }
 
 
@@ -1474,7 +1545,7 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
         raise exc.HTTPForbidden()
 
     start = utcnow() - timedelta(days=30)
-    end = utcnow() + timedelta(days=30 * 12)
+    end = utcnow() + timedelta(days=730)
 
     cal = icalendar.Calendar()
     cal.add('prodid', '-//OneGov//onegov.org//')
@@ -1498,7 +1569,6 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
         .with_entities(
             Reservation.id.label('id'),
             Reservation.token.label('token'),
-            Reservation.resource.label('resource'),
             Ticket.subtitle.label('title'),
             Ticket.number.label('description'),
             Reservation.start.label('start'),
@@ -1511,6 +1581,7 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
             )
         )
         .filter(Reservation.status == 'approved')
+        .filter(Reservation.resource == self.id)
         .filter(sa_cast(Reservation.data['accepted'], Boolean).is_(True))
         .filter(Reservation.start >= start)
         .filter(Reservation.start <= end)
@@ -1623,6 +1694,7 @@ def view_export_all(
     self.title = _('Export All')  # type:ignore
     layout = layout or ResourceLayout(self, request)  # type:ignore
     layout.editbar_links = None
+    layout.edit_mode = True
 
     if form.submitted(request):
 

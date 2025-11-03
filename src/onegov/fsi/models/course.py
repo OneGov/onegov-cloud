@@ -23,11 +23,11 @@ if TYPE_CHECKING:
 class Course(Base, ORMSearchable):
     __tablename__ = 'fsi_courses'
 
-    es_properties = {
-        'name': {'type': 'localized'},
-        'description': {'type': 'localized'},
+    fts_public = True
+    fts_properties = {
+        'name': {'type': 'localized', 'weight': 'A'},
+        'description': {'type': 'localized', 'weight': 'B'},
     }
-    es_public = True
 
     id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]

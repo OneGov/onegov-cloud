@@ -20,9 +20,12 @@ class LegislativePeriod(Base, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'par_legislative_periods'
 
-    es_type_name = 'pas_legislative_period'
-    es_public = False
-    es_properties = {'name': {'type': 'text'}}
+    fts_public = False
+    fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
+
+    @property
+    def fts_suggestion(self) -> str:
+        return self.name
 
     #: The polymorphic type of legislative period
     type: Column[str] = Column(
@@ -35,10 +38,6 @@ class LegislativePeriod(Base, TimestampMixin, ORMSearchable):
         'polymorphic_on': type,
         'polymorphic_identity': 'pas_legislative_period',
     }
-
-    @property
-    def es_suggestion(self) -> str:
-        return self.name
 
     @property
     def title(self) -> str:

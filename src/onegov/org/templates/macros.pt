@@ -1668,14 +1668,14 @@
     <div class="identicon">
         <metal:b use-macro="layout.macros.identicon"
                  tal:define="
-                    initials owner.initials if not layout.org.hide_personal_email or model.meta.get('origin') == 'external' or request.is_logged_in else layout.org.general_email[0];
-                    username owner.username if not layout.org.hide_personal_email or model.meta.get('origin') == 'external' or request.is_logged_in else layout.org.general_email;
+                    initials owner.initials;
+                    username owner.username;
                     size 'large';
                 "
         />
     </div>
     <div class="timestamp">
-        <b>${owner.name if not layout.org.hide_personal_email or model.meta.get('origin') == 'external' or request.is_logged_in else layout.org.general_email}</b>
+        <b>${owner.name}</b>
         <tal:b i18n:translate>
             at <tal:b i18n:name="time">${layout.format_date(model.created, 'time')}</tal:b>
         </tal:b>
@@ -1695,9 +1695,6 @@
     <table class="payments-table" tal:condition="payments">
         <thead>
             <tr>
-                <th class="select-all-checkbox-cell">
-                    <input type="checkbox" aria-label="Select all payments" />
-                </th>
                 <th i18n:translate tal:condition="tickets|nothing">
                     Object
                 </th>
@@ -1727,9 +1724,6 @@
         </thead>
         <tbody>
             <tr tal:repeat="payment payments">
-                <td class="payment-checkbox-cell">
-                    <input type="checkbox" name="selected_payments" value="${payment.id}" aria-label="Select this payment" i18n:attributes="aria-label" />
-                </td>
                 <td tal:condition="tickets|nothing">
                     <tal:b define="ticket tickets[payment.id]|nothing">
                         <div tal:condition="ticket">
@@ -2179,7 +2173,7 @@
 <metal:file_links define-macro="file-links" i18n:domain="onegov.org">
     <ul class="search-results">
         <tal:b repeat="result file.links">
-            <li class="search-result-${result.es_type_name}" tal:condition="result">
+            <li class="search-result-${result.__tablename__}" tal:condition="result">
                 <tal:b
                     define="macro 'search_result_{}'.format(result.__tablename__); tenant_macro 'search_result_{}_{}'.format(result.__tablename__, request.app.application_id.split('/')[-1])"
                     metal:use-macro="layout.macros[tenant_macro]|layout.macros[macro]|layout.macros['search_result_default']"
@@ -2420,7 +2414,7 @@
 </metal:tickets_table_row>
 
 <metal:open_graph_tags define-macro="open_graph_tags">
-<meta property="og:title" tal:attributes="content og_title" tal:define="og_title layout.og_title | title | None" tal:condition="og_title" />
+<meta property="og:title" tal:attributes="content og_title" tal:define="og_title og_title | layout.og_title | title | None" tal:condition="og_title" />
 <meta property="og:type" tal:attributes="content layout.og_type" />
 <meta property="og:url" tal:attributes="content layout.og_url" />
 <tal:b tal:define="og_image layout.og_image" tal:condition="og_image">
@@ -2457,15 +2451,16 @@
 </metal:pageref>
 
 <metal:invoice_items define-macro="invoice_items" i18n:domain="onegov.org">
-    <table class="invoice-items" tal:define="total_amount total_amount|None; total_vat total_vat|None; total_paid total_paid|False; show_vat total_vat or any(item.vat for items in invoice_items.values() for item in items); show_quantity any(item.quantity != 1.0 for items in invoice_items.values() for item in items); item_actions item_actions|None; show_payment_state show_payment_state|False">
+    <table class="invoice-items" tal:define="total_amount total_amount|None; total_vat total_vat|None; total_paid total_paid|False; show_cost_object any(item.cost_object for items in invoice_items.values() for item in items); show_vat total_vat or any(item.vat for items in invoice_items.values() for item in items); show_quantity any(item.quantity != 1.0 for items in invoice_items.values() for item in items); item_actions item_actions|None; show_payment_state show_payment_state|False">
         <thead>
             <tr>
                 <th i18n:translate>Booking Text</th>
-                <th tal:condition="show_quantity" i18n:translate>Unit</th>
-                <th tal:condition="show_quantity" i18n:translate>Quantity</th>
-                <th tal:condition="show_vat" i18n:translate>VAT Rate</th>
-                <th tal:condition="show_vat" i18n:translate>VAT</th>
-                <th i18n:translate>Amount</th>
+                <th tal:condition="show_cost_object" i18n:translate>Cost center / cost unit</th>
+                <th tal:condition="show_quantity" class="centered" i18n:translate>Unit</th>
+                <th tal:condition="show_quantity" class="centered" i18n:translate>Quantity</th>
+                <th tal:condition="show_vat" class="centered" i18n:translate>VAT Rate</th>
+                <th tal:condition="show_vat" class="centered" i18n:translate>VAT</th>
+                <th class="centered" i18n:translate>Amount</th>
                 <th tal:condition="item_actions">
                     <span i18n:translate class="show-for-sr">Actions</span>
                 </th>
@@ -2474,7 +2469,7 @@
         <tal:b tal:repeat="(group, items) invoice_items.items()">
             <thead>
                 <tr class="group">
-                    <th tal:switch="group" colspan="${2 + (2 if show_quantity else 0) + (2 if show_vat else 0) + (1 if item_actions else 0)}">
+                    <th tal:switch="group" colspan="${2 + (1 if show_cost_object else 0) + (2 if show_quantity else 0) + (2 if show_vat else 0) + (1 if item_actions else 0)}">
                         <tal:b tal:case="'reservation'" i18n:translate>
                             Reservations
                         </tal:b>
@@ -2499,9 +2494,8 @@
             <tbody>
                 <tal:b tal:repeat="item items">
                     <tr tal:define="groupid hash(str(item.group) + str(repeat.item.index)); paid total_paid or item.paid|False" tal:attributes="class ('paid' if paid else 'unpaid') if show_payment_state else None">
-                        <td>
-                            ${item.text}
-                        </td>
+                        <td>${item.text}</td>
+                        <td tal:condition="show_cost_object" class="cost-object">${item.cost_object}</td>
                         <td tal:condition="show_quantity" class="unit">${'{:.2f}'.format(item.unit)}</td>
                         <td tal:condition="show_quantity" class="quantity">${'{:.2f}'.format(item.quantity)}</td>
                         <td tal:condition="show_vat" class="vat-rate">${'{:.1f}%'.format(item.vat_rate or 0.0)}</td>
@@ -2529,6 +2523,7 @@
         <tfoot tal:condition="total_amount is not None">
             <tr class="total${(' paid' if total_paid else ' unpaid') if show_payment_state else ''}">
                 <td i18n:translate>Total</td>
+                <td tal:condition="show_cost_object"></td>
                 <td tal:condition="show_quantity" class="unit"></td>
                 <td tal:condition="show_quantity" class="quantity"></td>
                 <td tal:condition="show_vat" class="vat-rate"></td>

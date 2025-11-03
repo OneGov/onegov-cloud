@@ -1,24 +1,31 @@
+from __future__ import annotations
+
 from dateutil import parser
 from freezegun import freeze_time
 from lxml import etree
 from onegov.landsgemeinde.models import Assembly
-from tests.onegov.town6.conftest import Client
 from transaction import begin
 from transaction import commit
 
 
-def test_views(client_with_es):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import TestApp
+    from tests.onegov.town6.conftest import Client
+
+
+def test_views(client_with_fts: Client[TestApp]) -> None:
     last_modified = []
 
-    def assert_last_modified():
-        response = client_with_es.head('/landsgemeinde/2023-05-07/ticker')
+    def assert_last_modified() -> None:
+        response = client_with_fts.head('/assembly/2023-05-07/ticker')
         last_modified.append(parser.parse(response.headers['Last-Modified']))
         assert sorted(last_modified) == last_modified
         assert len(set(last_modified)) == len(last_modified)
 
-    client_with_es.login('admin@example.org', 'hunter2')
+    client_with_fts.login_admin()
 
-    page = client_with_es.get('/').click('Archiv')
+    page = client_with_fts.get('/').click('Archiv')
     assert 'Noch keine Landsgemeinden erfasst.' in page
     assert 'Zum Liveticker' not in page
 
@@ -36,11 +43,11 @@ def test_views(client_with_es):
     assert 'https://www.youtube.com/embed/1234' in page
     assert_last_modified()
 
-    page = client_with_es.get('/').follow()
+    page = client_with_fts.get('/').follow()
     assert 'Landsgemeinde vom 07. Mai 2023' in page
     assert 'Zum Liveticker' not in page
 
-    page = client_with_es.get('/landsgemeinden')
+    page = client_with_fts.get('/assemblies')
     assert 'Landsgemeinde vom 07. Mai 2023' in page
     page = page.click('Landsgemeinde vom 07. Mai 2023')
 
@@ -58,7 +65,7 @@ def test_views(client_with_es):
         page.form['number'] = 5
         page.form['state'] = 'completed'
         page.form['title'] = 'A. consectetur adipiscing\nB. tempor incididunt'
-        page.form['overview'] = '<p>Dolore magna aliqua.</p>'
+        page.form['overview'] = '<p>Dolore magnolia aliqua.</p>'
         page.form['text'] = '<p>Ad minim veniam.</p>'
         page.form['resolution'] = '<p>Nostrud exercitation.</p>'
         page = page.form.submit().follow()
@@ -68,7 +75,7 @@ def test_views(client_with_es):
         'B. tempor incididunt</span>'
     ) in page
     assert 'A. consectetur adipiscing\nB. tempor incididunt' in page
-    assert '<p>Dolore magna aliqua.</p>' in page
+    assert '<p>Dolore magnolia aliqua.</p>' in page
     assert '<p>Ad minim veniam.</p>' in page
     assert '<p>Nostrud exercitation.</p>' in page
     assert_last_modified()
@@ -132,67 +139,66 @@ def test_views(client_with_es):
     assert_last_modified()
 
     # open data
-    assert client_with_es.get('/landsgemeinde/2023-05-07/json').json
-    assert client_with_es.get('/catalog.rdf', status=501)
-    setting = client_with_es.get('/open-data-settings')
+    assert client_with_fts.get('/assembly/2023-05-07/json').json
+    assert client_with_fts.get('/catalog.rdf', status=501)
+    setting = client_with_fts.get('/open-data-settings')
     setting.form['ogd_publisher_mail'] = 'staatskanzlei@govikon.ch'
     setting.form['ogd_publisher_id'] = 'staatskanzlei-govikon'
     setting.form['ogd_publisher_name'] = 'Staatskanzlei Govikon'
     setting.form.submit()
-    assert len(etree.XML(client_with_es.get('/catalog.rdf').body)) == 1
+    assert len(etree.XML(client_with_fts.get('/catalog.rdf').body)) == 1
 
     # search
-    client_with_es.app.es_client.indices.refresh(index='_all')
-    client = client_with_es.spawn()
+    client = client_with_fts.spawn()
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=ipsum')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=adipiscing')
-    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=aliqua')
-    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=magna')
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=dolore')
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=magnoli')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=veniam')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=nostrud')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=quimby')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=mayor')
-    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=laboris')
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=ullamco')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=aliquip')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=consequat')
 
     # states view
-    page = client_with_es.get('/landsgemeinde/2023-05-07/states')
+    page = client_with_fts.get('/assembly/2023-05-07/states')
     assert 'abgeschlossen' in page
     assert 'geplant' not in page
 
     state_url = page.pyquery('.votum a[ic-post-to]').attr['ic-post-to']
-    client_with_es.post(state_url)
-    page = client_with_es.get('/landsgemeinde/2023-05-07/states')
+    client_with_fts.post(state_url)
+    page = client_with_fts.get('/assembly/2023-05-07/states')
     assert 'Entwurf' in page
     assert 'laufend' not in page
     assert 'abgeschlossen' not in page
 
     ai_url = page.pyquery('.agenda-item a[ic-post-to]').attr['ic-post-to']
-    client_with_es.post(ai_url)
-    page = client_with_es.get('/landsgemeinde/2023-05-07/states')
+    client_with_fts.post(ai_url)
+    page = client_with_fts.get('/assembly/2023-05-07/states')
     assert 'geplant' in page
     assert 'Entwurf' in page  # Votum state shouldn't change
 
     ai_url = page.pyquery('.agenda-item a[ic-post-to]').attr['ic-post-to']
-    client_with_es.post(ai_url)
-    page = client_with_es.get('/landsgemeinde/2023-05-07/states')
+    client_with_fts.post(ai_url)
+    page = client_with_fts.get('/assembly/2023-05-07/states')
     assert 'laufend' in page
     assert 'Entwurf' in page  # Votum state still shouldn't change
 
     assembly_url = page.pyquery('.assembly a[ic-post-to]').attr['ic-post-to']
-    client_with_es.post(assembly_url)
-    page = client_with_es.get('/landsgemeinde/2023-05-07/states')
+    client_with_fts.post(assembly_url)
+    page = client_with_fts.get('/assembly/2023-05-07/states')
     assert 'abgeschlossen' in page
     assert 'geplant' not in page
     assert 'laufend' not in page
 
     # delete votum
     with freeze_time('2023-05-07 9:36'):
-        page = client_with_es.get('/traktandum/2023-05-07/6')
+        page = client_with_fts.get('/traktandum/2023-05-07/6')
         page.click('Löschen', href='votum')
         page = page.click('A. consectetur adipiscing', index=0)
-    assert '<p>Dolore magna aliqua.</p>' in page
+    assert '<p>Dolore magnolia aliqua.</p>' in page
     assert 'Joe Quimby' not in page
     assert_last_modified()
 
@@ -210,16 +216,14 @@ def test_views(client_with_es):
         page = page.click('Archiv', index=0)
     assert 'Noch keine Landsgemeinden erfasst.' in page
 
-def test_view_pages_cache(landsgemeinde_app):
-    client = Client(landsgemeinde_app)
-
+def test_view_pages_cache(client: Client[TestApp]) -> None:
     # make sure codes != 200 are not cached
-    anonymous = Client(landsgemeinde_app)
-    anonymous.get('/landsgemeinde/2023-05-07/ticker', status=404)
-    assert len(landsgemeinde_app.pages_cache.keys()) == 0
+    anonymous = client.spawn()
+    anonymous.get('/assembly/2023-05-07/ticker', status=404)
+    assert len(client.app.pages_cache.keys()) == 0
 
     # add assembly
-    client.login('admin@example.org', 'hunter2')
+    client.login_admin()
     page = client.get('/').click('Archiv')
     page = page.click('Landsgemeinde')
     page.form['date'] = '2023-05-07'
@@ -228,46 +232,45 @@ def test_view_pages_cache(landsgemeinde_app):
     page = page.form.submit()
 
     # make sure set-cookies are not cached
-    anonymous = Client(landsgemeinde_app)
-    response = anonymous.get('/landsgemeinde/2023-05-07/ticker')
+    anonymous = anonymous.spawn()
+    response = anonymous.get('/assembly/2023-05-07/ticker')
     assert 'Set-Cookie' in response.headers  # session_id
-    assert len(landsgemeinde_app.pages_cache.keys()) == 0
+    assert len(client.app.pages_cache.keys()) == 0
 
     # make sure HEAD request are cached without qs
-    anonymous.head('/landsgemeinde/2023-05-07/ticker')
-    assert len(landsgemeinde_app.pages_cache.keys()) == 1
+    anonymous.head('/assembly/2023-05-07/ticker')
+    assert len(client.app.pages_cache.keys()) == 1
 
-    anonymous.head('/landsgemeinde/2023-05-07/ticker?now')
-    assert len(landsgemeinde_app.pages_cache.keys()) == 1
+    anonymous.head('/assembly/2023-05-07/ticker?now')
+    assert len(client.app.pages_cache.keys()) == 1
 
     # Create cache entries
-    assert 'Lorem' in anonymous.get('/landsgemeinde/2023-05-07/ticker')
-    assert len(landsgemeinde_app.pages_cache.keys()) == 2
+    assert 'Lorem' in anonymous.get('/assembly/2023-05-07/ticker')
+    assert len(client.app.pages_cache.keys()) == 2
 
-    anonymous.get('/landsgemeinde/2023-05-07/ticker?now')
-    assert len(landsgemeinde_app.pages_cache.keys()) == 3
+    anonymous.get('/assembly/2023-05-07/ticker?now')
+    assert len(client.app.pages_cache.keys()) == 3
 
     # Modify without invalidating the cache
     begin()
-    landsgemeinde_app.session().query(Assembly).one().overview = 'Ipsum'
+    client.app.session().query(Assembly).one().overview = 'Ipsum'
     commit()
 
-    assert 'Ipsum' not in anonymous.get('/landsgemeinde/2023-05-07/ticker')
-    assert 'Ipsum' in client.get('/landsgemeinde/2023-05-07/ticker')
+    assert 'Ipsum' not in anonymous.get('/assembly/2023-05-07/ticker')
+    assert 'Ipsum' in client.get('/assembly/2023-05-07/ticker')
 
     # Modify with invalidating the cache
-    edit = client.get('/landsgemeinde/2023-05-07/edit')
+    edit = client.get('/assembly/2023-05-07/edit')
     edit.form['overview'] = 'Adipiscing'
     edit.form.submit()
 
-    assert 'Adipiscing' in anonymous.get('/landsgemeinde/2023-05-07/ticker')
-    assert 'Adipiscing' in client.get('/landsgemeinde/2023-05-07/ticker')
+    assert 'Adipiscing' in anonymous.get('/assembly/2023-05-07/ticker')
+    assert 'Adipiscing' in client.get('/assembly/2023-05-07/ticker')
 
 
-def test_view_suggestions(landsgemeinde_app):
-    client = Client(landsgemeinde_app)
+def test_view_suggestions(client: Client[TestApp]) -> None:
 
-    client.login('admin@example.org', 'hunter2')
+    client.login_admin()
 
     page = client.get('/').click('Personen')
     page = page.click('Person', index=1)

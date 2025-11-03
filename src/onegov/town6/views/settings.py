@@ -15,7 +15,7 @@ from onegov.org.forms.settings import (
     LinkHealthCheckForm, PeopleSettingsForm, SocialMediaSettingsForm,
     EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm,
     DataRetentionPolicyForm, FirebaseSettingsForm, VATSettingsForm,
-    KabaSettingsForm, CitizenLoginSettingsForm)
+    KabaSettingsForm, CitizenLoginSettingsForm, ResourceSettingsForm)
 from onegov.org.models import Organisation
 from onegov.town6.forms.settings import RISSettingsForm
 from onegov.org.views.settings import (
@@ -27,7 +27,8 @@ from onegov.org.views.settings import (
     handle_newsletter_settings, handle_generic_settings, handle_migrate_links,
     handle_link_health_check, handle_social_media_settings,
     handle_event_settings, handle_api_keys, handle_chat_settings,
-    handle_kaba_settings, handle_citizen_login_settings)
+    handle_kaba_settings, handle_citizen_login_settings,
+    handle_resource_settings)
 
 from onegov.town6.app import TownApp
 from onegov.town6.forms.settings import (
@@ -433,6 +434,20 @@ def town_handle_event(
     return handle_event_settings(
         self, request, form, SettingsLayout(self, request)
     )
+
+
+@TownApp.form(
+    model=Organisation, name='resource-settings', template='form.pt',
+    permission=Secret, form=ResourceSettingsForm, setting=_('Resources'),
+    icon='fa-building')
+def town_handle_resource(
+    self: Organisation,
+    request: TownRequest,
+    form: ResourceSettingsForm,
+    layout: SettingsLayout | None = None
+) -> RenderData | Response:
+    return handle_resource_settings(
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(

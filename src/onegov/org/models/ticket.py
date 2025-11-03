@@ -254,19 +254,18 @@ class OrgTicketMixin:
         return ' '.join(n.text for n in q if n.text)
 
     @property
-    def es_tags(self) -> list[str] | None:
+    def fts_tags(self) -> list[str]:
+        tags: list[str] = super().fts_tags  # type: ignore[misc]
         if self.extra_localized_text:
-            return [
-                tag.lstrip('#') for tag in extract_hashtags(
-                    self.extra_localized_text
-                )
-            ]
-        return None
+            tags.extend(
+                tag.lstrip('#')
+                for tag in extract_hashtags(self.extra_localized_text)
+            )
+        return tags
 
 
 class FormSubmissionTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'FRM'}  # type:ignore
-    es_type_name = 'submission_tickets'
 
     if TYPE_CHECKING:
         handler: FormSubmissionHandler
@@ -274,7 +273,6 @@ class FormSubmissionTicket(OrgTicketMixin, Ticket):
 
 class ReservationTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'RSV'}  # type:ignore
-    es_type_name = 'reservation_tickets'
 
     if TYPE_CHECKING:
         handler: ReservationHandler
@@ -282,7 +280,6 @@ class ReservationTicket(OrgTicketMixin, Ticket):
 
 class EventSubmissionTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'EVN'}  # type:ignore
-    es_type_name = 'event_tickets'
 
     if TYPE_CHECKING:
         handler: EventSubmissionHandler
@@ -310,7 +307,6 @@ class EventSubmissionTicket(OrgTicketMixin, Ticket):
 
 class DirectoryEntryTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'DIR'}  # type:ignore
-    es_type_name = 'directory_tickets'
 
     if TYPE_CHECKING:
         handler: DirectoryEntryHandler
@@ -624,9 +620,16 @@ class ReservationHandler(Handler):
                 self.submission.form_class,
                 data=self.submission.data
             )
+            cost_object = self.resource.cost_object if self.resource else None
             item_extra = {'submission_id': self.submission.id}
-            extras = form.invoice_items(extra=item_extra)
-            discounts = form.discount_items(extra=item_extra)
+            extras = form.invoice_items(
+                cost_object=cost_object,
+                extra=item_extra
+            )
+            discounts = form.discount_items(
+                cost_object=cost_object,
+                extra=item_extra
+            )
         else:
             extras = []
             discounts = []
@@ -663,6 +666,10 @@ class ReservationHandler(Handler):
             invoice = TicketInvoice(id=uuid4())
             request.session.add(invoice)
             self.ticket.invoice = invoice
+
+        # update the invoicing party
+        if self.resource:
+            invoice.invoicing_party = self.resource.invoicing_party
 
         old_items = sorted(invoice.items, key=attrgetter('group'))
         new_items: list[InvoiceItem] = []
@@ -1697,7 +1704,6 @@ class DirectoryEntryHandler(Handler):
 
 class ChatTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'CHT'}  # type:ignore
-    es_type_name = 'chat_tickets'
 
     def reference_group(self, request: OrgRequest) -> str:
         return self.handler.title

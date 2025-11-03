@@ -1,9 +1,12 @@
+from __future__ import annotations
+
+import pytest
+
 from onegov.agency.app import AgencyApp
 from onegov.agency.initial_content import create_new_organisation
 from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.user import User
 from os import path
-from pytest import fixture
 from sqlalchemy.orm.session import close_all_sessions
 from tests.shared import Client
 from tests.shared.utils import create_app
@@ -11,8 +14,20 @@ from transaction import commit
 from yaml import dump
 
 
-@fixture(scope='function')
-def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.orm import SessionManager
+
+
+@pytest.fixture(scope='function')
+def cfg_path(
+    postgres_dsn: str,
+    session_manager: SessionManager,
+    temporary_directory: str,
+    redis_url: str
+) -> str:
+
     cfg = {
         'applications': [
             {
@@ -47,12 +62,16 @@ def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
     return cfg_path
 
 
-def create_agency_app(request, use_elasticsearch=False):
+def create_agency_app(
+    request: pytest.FixtureRequest,
+    enable_search: bool = False
+) -> AgencyApp:
+
     app = create_app(
         AgencyApp,
         request,
         use_maildir=True,
-        use_elasticsearch=use_elasticsearch,
+        enable_search=enable_search,
         websockets={
             'client_url': 'ws://localhost:8766',
             'manage_url': 'ws://localhost:8766',
@@ -92,37 +111,37 @@ def create_agency_app(request, use_elasticsearch=False):
     return app
 
 
-@fixture(scope='function')
-def agency_app(request):
-    app = create_agency_app(request, use_elasticsearch=False)
+@pytest.fixture(scope='function')
+def agency_app(request: pytest.FixtureRequest) -> Iterator[AgencyApp]:
+    app = create_agency_app(request, enable_search=False)
     yield app
     app.session_manager.dispose()
 
 
-@fixture(scope='function')
-def es_agency_app(request):
-    app = create_agency_app(request, use_elasticsearch=True)
+@pytest.fixture(scope='function')
+def fts_agency_app(request: pytest.FixtureRequest) -> Iterator[AgencyApp]:
+    app = create_agency_app(request, enable_search=True)
     yield app
     app.session_manager.dispose()
 
 
-@fixture(scope='function')
-def client(agency_app):
+@pytest.fixture(scope='function')
+def client(agency_app: AgencyApp) -> Client[AgencyApp]:
     client = Client(agency_app)
     client.skip_n_forms = 1
     client.use_intercooler = True
     return client
 
 
-@fixture(scope='function')
-def client_with_es(es_agency_app):
-    client = Client(es_agency_app)
+@pytest.fixture(scope='function')
+def client_with_fts(fts_agency_app: AgencyApp) -> Client[AgencyApp]:
+    client = Client(fts_agency_app)
     client.skip_n_forms = 1
     client.use_intercooler = True
     return client
 
 
-@fixture(scope="session", autouse=True)
-def enter_observer_scope():
+@pytest.fixture(scope="session", autouse=True)
+def enter_observer_scope() -> None:
     """Ensures app specific observers are active"""
     ScopedPropertyObserver.enter_class_scope(AgencyApp)

@@ -145,6 +145,10 @@ class Organisation(Base, TimestampMixin):
     event_footer_html: dict_markup_property[Markup | None]
     event_footer_html = dict_markup_property('meta')
     event_files = associated(File, 'event_files', 'many-to-many')
+    resource_header_html: dict_markup_property[Markup | None]
+    resource_header_html = dict_markup_property('meta')
+    resource_footer_html: dict_markup_property[Markup | None]
+    resource_footer_html = dict_markup_property('meta')
 
     # social media
     facebook_url: dict_property[str | None] = meta_property()
@@ -156,6 +160,7 @@ class Organisation(Base, TimestampMixin):
     og_logo_default: dict_property[str | None] = meta_property()
 
     # custom links
+    impressum_url: dict_property[str | None] = meta_property()
     custom_link_1_name: dict_property[str | None] = meta_property()
     custom_link_1_url: dict_property[str | None] = meta_property()
     custom_link_2_name: dict_property[str | None] = meta_property()
@@ -186,6 +191,7 @@ class Organisation(Base, TimestampMixin):
     ticket_tags = meta_property(default=list)
     hide_personal_email: dict_property[bool] = meta_property(default=False)
     general_email: dict_property[str | None] = meta_property()
+    hide_submitter_email: dict_property[bool] = meta_property(default=True)
     email_for_new_tickets: dict_property[str | None] = meta_property()
     ticket_auto_accept_style: dict_property[str | None] = meta_property()
     ticket_auto_accepts: dict_property[list[str] | None] = meta_property()
@@ -252,10 +258,12 @@ class Organisation(Base, TimestampMixin):
     enable_automatic_newsletters: dict_property[bool] = meta_property(
         default=False)
     newsletter_times: dict_property[list[str] | None] = meta_property()
+    daily_newsletter_title: dict_property[str | None] = meta_property()
 
     # Chat Settings
     chat_staff: dict_property[list[str] | None] = meta_property()
-    enable_chat: dict_property[bool] = meta_property(default=False)
+    enable_chat: dict_property[str] = meta_property(default='disabled')
+    chat_link: dict_property[str | None] = meta_property()
     specific_opening_hours: dict_property[bool] = meta_property(default=False)
     opening_hours_chat: dict_property[list[list[str]] | None] = meta_property()
     chat_topics: dict_property[list[str] | None] = meta_property()
@@ -269,6 +277,8 @@ class Organisation(Base, TimestampMixin):
     gever_username: dict_property[str | None] = meta_property()
     gever_password: dict_property[str | None] = meta_property()
     gever_endpoint: dict_property[str | None] = meta_property()
+
+    assembly_title: dict_property[str | None] = meta_property()
 
     # Kaba settings
     @property

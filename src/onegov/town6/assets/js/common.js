@@ -345,7 +345,6 @@ if (
         id = id.replace(/ö/g, 'oe');
         id = id.replace(/ü/g, 'ue');
         id = id.replace(/[^a-z0-9]+/g, '-');
-        console.log('Generated ID:', id);
 
         if (id) {
             var link = $('<a class="anchor-link" href="#' + id + '"><i class="fa fa-link"></i></a>');

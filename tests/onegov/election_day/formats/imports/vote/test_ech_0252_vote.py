@@ -1,23 +1,38 @@
+from __future__ import annotations
+
 from datetime import date
+from onegov.election_day.models import ComplexVote
 from onegov.election_day.models import Vote
 
 
-def test_import_ech_vote_gr(session, import_test_datasets):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from tests.onegov.election_day.conftest import ImportTestDatasets
+
+
+def test_import_ech_vote_gr(
+    session: Session,
+    import_test_datasets: ImportTestDatasets
+) -> None:
     # The datasets contain empty and intermediate results from the 3.3.2024
     # two federal and 4 communal votes, one of these 4 is a complex vote.
 
     # initial import
-    errors, updated, deleted = import_test_datasets(
+    results = import_test_datasets(
         api_format='ech',
         principal='gr',
         dataset_name='votes-empty'
     )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
     assert not errors
     assert len(updated) == 6
     assert not deleted
 
     # ... test complex communal
-    vote = next(u for u in updated if u.type == 'complex')
+    vote = next(u for u in updated if getattr(u, 'type', '') == 'complex')
+    assert isinstance(vote, ComplexVote)
     assert vote.domain == 'municipality'
     assert vote.id == 'ipq52'
     assert vote.external_id == 'IPQ52'
@@ -29,10 +44,12 @@ def test_import_ech_vote_gr(session, import_test_datasets):
         'Angestellten der Gemeinde können nicht Mitglied des Gemeinderates '
         'sein'
     )
+    assert vote.counter_proposal.title_translations is not None
     assert vote.counter_proposal.title_translations['de_CH'] == (
         'Variante b) zur Totalrevision der Gemeindeverfassung: nur leitende '
         'Angestellte können nicht Mitglied des Gemeinderates sein'
     )
+    assert vote.tie_breaker.title_translations is not None
     assert vote.tie_breaker.title_translations['de_CH'] == (
         'Falls Variante a) und Variante b) angenommen werden, welche Regelung '
         'soll in Kraft treten.'
@@ -40,6 +57,7 @@ def test_import_ech_vote_gr(session, import_test_datasets):
 
     # ... test simple federal
     vote = next(u for u in updated if u.id == 'ipq50')
+    assert isinstance(vote, Vote)
     assert vote.domain == 'federation'
     assert vote.id == 'ipq50'
     assert vote.external_id == 'IPQ50'
@@ -72,27 +90,32 @@ def test_import_ech_vote_gr(session, import_test_datasets):
     }
 
     # re-import
-    errors, updated, deleted = import_test_datasets(
+    results = import_test_datasets(
         api_format='ech',
         principal='gr',
         dataset_name='votes-empty'
     )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
     assert not errors
     assert len(updated) == 6
     assert not deleted
 
     # import of results
-    errors, updated, deleted = import_test_datasets(
+    results = import_test_datasets(
         api_format='ech',
         principal='gr',
         dataset_name='votes-intermediate'
     )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
     assert not errors
     assert len(updated) == 6
     assert not deleted
 
     # ... test complex communal
-    vote = next(u for u in updated if u.type == 'complex')
+    vote = next(u for u in updated if getattr(u, 'type', '') == 'complex')
+    assert isinstance(vote, ComplexVote)
     assert vote.progress == (1, 1)
     assert vote.counted is True
     assert vote.answer == 'counter-proposal'
@@ -102,6 +125,7 @@ def test_import_ech_vote_gr(session, import_test_datasets):
 
     # ... test simple federal
     vote = next(u for u in updated if u.id == 'ipq50')
+    assert isinstance(vote, Vote)
     assert vote.progress == (7, 101)
     assert vote.counted is False
     assert vote.answer is None
@@ -110,11 +134,13 @@ def test_import_ech_vote_gr(session, import_test_datasets):
     assert vote.yeas == 8457
 
     # re-import of results
-    errors, updated, deleted = import_test_datasets(
+    results = import_test_datasets(
         api_format='ech',
         principal='gr',
         dataset_name='votes-intermediate'
     )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
     assert not errors
     assert len(updated) == 6
     assert not deleted
@@ -139,18 +165,21 @@ def test_import_ech_vote_gr(session, import_test_datasets):
     session.flush()
 
     # ... vote on the same day marked for deletion
-    errors, updated, deleted = import_test_datasets(
+    results = import_test_datasets(
         api_format='ech',
         principal='gr',
         dataset_name='votes-empty'
     )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
     assert not errors
     assert len(updated) == 6
     assert len(deleted) == 1
     assert list(deleted)[0].id == 'remove'
 
     # ... test complex communal
-    vote = next(u for u in updated if u.type == 'complex')
+    vote = next(u for u in updated if getattr(u, 'type', '') == 'complex')
+    assert isinstance(vote, ComplexVote)
     assert vote.progress == (0, 1)
     assert vote.counted is False
     assert vote.answer is None
@@ -160,6 +189,7 @@ def test_import_ech_vote_gr(session, import_test_datasets):
 
     # ... test simple federal
     vote = next(u for u in updated if u.id == 'ipq50')
+    assert isinstance(vote, Vote)
     assert vote.progress == (0, 101)
     assert vote.counted is False
     assert vote.answer is None

@@ -202,9 +202,15 @@ def test_person_polymorphism(session: Session) -> None:
 
     class MyPerson(Person):
         __mapper_args__ = {'polymorphic_identity': 'my'}
+        # FIXME: We should create a fixture which clones the SQLAlchemy
+        #        metadata, so we can safely create subclasses like this
+        #        without affecting the global metadata
 
     class MyOtherPerson(Person):
         __mapper_args__ = {'polymorphic_identity': 'other'}
+        # FIXME: We should create a fixture which clones the SQLAlchemy
+        #        metadata, so we can safely create subclasses like this
+        #        without affecting the global metadata
 
     session.add(Person(first_name='default', last_name='person'))
     session.add(MyPerson(first_name='my', last_name='person'))
@@ -307,9 +313,15 @@ def test_agency_polymorphism(session: Session) -> None:
 
     class MyAgency(Agency):
         __mapper_args__ = {'polymorphic_identity': 'my'}
+        # FIXME: We should create a fixture which clones the SQLAlchemy
+        #        metadata, so we can safely create subclasses like this
+        #        without affecting the global metadata
 
     class MyOtherAgency(Agency):
         __mapper_args__ = {'polymorphic_identity': 'other'}
+        # FIXME: We should create a fixture which clones the SQLAlchemy
+        #        metadata, so we can safely create subclasses like this
+        #        without affecting the global metadata
 
     session.add(Agency(title='default', name='default'))
     session.add(MyAgency(title='my', name='my'))
@@ -429,9 +441,15 @@ def test_membership_polymorphism(session: Session) -> None:
 
     class MyMembership(AgencyMembership):
         __mapper_args__ = {'polymorphic_identity': 'my'}
+        # FIXME: We should create a fixture which clones the SQLAlchemy
+        #        metadata, so we can safely create subclasses like this
+        #        without affecting the global metadata
 
     class MyOtherMembership(AgencyMembership):
         __mapper_args__ = {'polymorphic_identity': 'other'}
+        # FIXME: We should create a fixture which clones the SQLAlchemy
+        #        metadata, so we can safely create subclasses like this
+        #        without affecting the global metadata
 
     session.add(
         AgencyMembership(

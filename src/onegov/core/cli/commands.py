@@ -159,6 +159,7 @@ def sendmail(group_context: GroupContext, queue: str, limit: int) -> None:
 
 @cli.group(context_settings={
     'matches_required': False,
+    'skip_search_indexing': True,
     'default_selector': '*'
 })
 @pass_group_context

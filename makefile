@@ -1,6 +1,9 @@
 install: ensure_uv
-	# install requirements
-	uv pip install -e '.[test,lint,dev,docs,mypy]' --config-settings editable_mode=compat
+	# install all dependencies
+	uv pip compile setup.cfg --all-extras | uv pip install -r /dev/stdin
+
+	# install source in editable mode
+	uv pip install -e . --config-settings editable_mode=compat
 
 	# enable pre-commit
 	pre-commit install
@@ -13,7 +16,7 @@ install: ensure_uv
 	scrambler --target eggs
 
 lint: ensure_uv
-    # Run linters in parallel with proper cleanup on exit/interrupt
+	# Run linters in parallel with proper cleanup on exit/interrupt
 	@set -e; \
 	cleanup() { \
 		pkill -P $$ 2>/dev/null || true; \

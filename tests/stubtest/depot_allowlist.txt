@@ -3,5 +3,3 @@
 # The interface on StoredFile.close is a bit wacky, it doesn't really
 # make sense for it to accept arbirary parameters
 depot.io.interfaces.StoredFile.close
-# this seems like a false positive due to the use of ABCMeta
-depot.fields.sqlalchemy.UploadedFileField.__init__

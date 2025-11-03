@@ -31,6 +31,7 @@ from onegov.user.forms import RegistrationForm
 from onegov.user.forms import RequestMTANForm
 from onegov.user.forms import RequestPasswordResetForm
 from onegov.user.forms import TOTPForm
+from onegov.user.models import TAN
 from purl import URL
 from webob import exc
 
@@ -817,9 +818,16 @@ def handle_confirm_citizen_login(
             request.alert(_('Invalid or expired login token provided.'))
             return morepath.redirect(request.link(self, 'citizen-login'))
         else:
-            request.browser_session['authenticated_email'] = (
+            request.browser_session['authenticated_email'] = email = (
                 tan_obj.meta['email'])
+
+            # expire the TAN we just used
             tan_obj.expire()
+            # expire any other TANs issued to the same email
+            for tan_obj in collection.query().filter(
+                TAN.meta['email'] == email
+            ):
+                tan_obj.expire()
             return self.redirect(
                 request,
                 tan_obj.meta.get('redirect_to', self.to)

@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+import pytest
+
 from datetime import date
 from decimal import Decimal
 from io import BytesIO
@@ -7,7 +11,6 @@ from onegov.swissvotes.external_resources.posters import MfgPosters
 from onegov.swissvotes.external_resources.posters import SaPosters
 from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import SwissVote
-from pytest import mark
 from tests.shared import Client
 from transaction import commit
 from unittest.mock import patch
@@ -15,7 +18,13 @@ from webtest.forms import Upload
 from xlsxwriter.workbook import Workbook
 
 
-def test_view_votes_pagination(swissvotes_app):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from unittest.mock import MagicMock
+    from .conftest import TestApp
+
+
+def test_view_votes_pagination(swissvotes_app: TestApp) -> None:
     for day, number in ((1, '100'), (2, '101.1'), (2, '101.2'), (3, '102')):
         swissvotes_app.session().add(
             SwissVote(
@@ -73,10 +82,10 @@ def test_view_votes_pagination(swissvotes_app):
     assert "<td>102</td>" in page
 
 
-@mark.parametrize('file', [
+@pytest.mark.parametrize('file', [
     module_path('tests.onegov.swissvotes', 'fixtures/dataset.xlsx'),
 ])
-def test_view_update_votes(swissvotes_app, file):
+def test_view_update_votes(swissvotes_app: TestApp, file: str) -> None:
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
 
@@ -155,7 +164,10 @@ def test_view_update_votes(swissvotes_app, file):
     assert swissvotes_app.session().query(SwissVote).count() == 0
 
 
-def test_view_update_votes_unknown_descriptors(swissvotes_app):
+def test_view_update_votes_unknown_descriptors(
+    swissvotes_app: TestApp
+) -> None:
+
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
 
@@ -208,10 +220,15 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
     assert "unbekannte Deskriptoren: 12.55, 12.6, 13" in manage
 
 
-@mark.parametrize('file', [
+@pytest.mark.parametrize('file', [
     module_path('tests.onegov.swissvotes', 'fixtures/metadata.xlsx'),
 ])
-def test_view_update_metadata(swissvotes_app, file, sample_vote):
+def test_view_update_metadata(
+    swissvotes_app: TestApp,
+    sample_vote: SwissVote,
+    file: str
+) -> None:
+
     session = swissvotes_app.session()
     sample_vote.bfs_number = Decimal('236')
     session.add(sample_vote)
@@ -262,7 +279,13 @@ def test_view_update_metadata(swissvotes_app, file, sample_vote):
               return_value=(5, 6, 7, {(Decimal('8'), 'id-8')}))
 @patch.object(BsPosters, 'fetch',
               return_value=(9, 9, 9, {(Decimal('9'), 'id-9')}))
-def test_view_update_external_resources(mfg, sa, bs, swissvotes_app):
+def test_view_update_external_resources(
+    mfg: MagicMock,
+    sa: MagicMock,
+    bs: MagicMock,
+    swissvotes_app: TestApp
+) -> None:
+
     swissvotes_app.mfg_api_token = 'xxx'
     swissvotes_app.bs_api_token = 'yyy'
 

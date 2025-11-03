@@ -107,13 +107,13 @@ class Directory(Base, ContentMixin, TimestampMixin,
 
     __tablename__ = 'directories'
 
-    es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'}
+    fts_properties = {
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'}
     }
 
     @property
-    def es_public(self) -> bool:
+    def fts_public(self) -> bool:
         return False  # to be overridden downstream
 
     #: An interal id for references (not public)

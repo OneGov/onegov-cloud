@@ -98,13 +98,13 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'fsi_course_events'
 
-    es_properties = {
-        'name': {'type': 'localized'},
-        'description': {'type': 'localized'},
-        'location': {'type': 'localized'},
-        'presenter_name': {'type': 'text'},
-        'presenter_company': {'type': 'text'},
-        'presenter_email': {'type': 'text'},
+    fts_properties = {
+        'name': {'type': 'localized', 'weight': 'A'},
+        'description': {'type': 'localized', 'weight': 'B'},
+        'location': {'type': 'localized', 'weight': 'C'},
+        'presenter_name': {'type': 'text', 'weight': 'A'},
+        'presenter_company': {'type': 'text', 'weight': 'B'},
+        'presenter_email': {'type': 'text', 'weight': 'A'},
     }
 
     id: Column[uuid.UUID] = Column(
@@ -125,7 +125,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     )
 
     @property
-    def es_public(self) -> bool:
+    def fts_public(self) -> bool:
         return not self.hidden_from_public
 
     @property

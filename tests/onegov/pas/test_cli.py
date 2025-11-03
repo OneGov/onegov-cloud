@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import traceback
-from pathlib import Path
 import pytest
-from click.testing import CliRunner
+import traceback
 
+from click.testing import CliRunner
 from onegov.org.cli import cli as org_cli
 from onegov.pas.cli import cli
 from onegov.pas.models import (
@@ -14,9 +13,19 @@ from onegov.pas.models import (
     PASParliamentarian,
     PASCommissionMembership
 )
+from pathlib import Path
 
 
-def do_run_cli_import(cfg_path, file_type, commission_test_files):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import SessionManager
+
+
+def do_run_cli_import(
+    cfg_path: str,
+    file_type: str,
+    commission_test_files: dict[str, str]
+) -> None:
     """ Helper function to reduce duplication"""
     runner = CliRunner()
     # First create the application
@@ -35,8 +44,7 @@ def do_run_cli_import(cfg_path, file_type, commission_test_files):
     assert result.exit_code == 0
 
     # Get the appropriate test file based on the file type
-    test_file = commission_test_files[file_type]
-    test_file = Path(test_file)
+    test_file = Path(commission_test_files[file_type])
     assert test_file.exists(), f"Test file {test_file} does not exist"
 
     result = runner.invoke(
@@ -58,8 +66,11 @@ def do_run_cli_import(cfg_path, file_type, commission_test_files):
 
 @pytest.mark.parametrize('file_type', ['xlsx', 'csv'])
 def test_import_commission_data(
-    cfg_path, session_manager, commission_test_files, file_type
-):
+    cfg_path: str,
+    session_manager: SessionManager,
+    commission_test_files: dict[str, str],
+    file_type: str
+) -> None:
     try:
         do_run_cli_import(cfg_path, file_type, commission_test_files)
 
@@ -67,6 +78,7 @@ def test_import_commission_data(
         session = session_manager.session()
         # Check commission
         commission = session.query(PASCommission).first()
+        assert commission is not None
         # Name should be inferred from the filename
         assert commission.name == 'commission test'
         assert commission.type == 'normal'

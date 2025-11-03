@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import transaction
 import yaml
@@ -10,10 +12,24 @@ from onegov.core.cli.commands import cli as core_cli
 from onegov.election_day.cli import cli
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import BallotResult
+from onegov.election_day.models import ComplexVote
 from onegov.election_day.models import Vote
 
 
-def write_config(path, postgres_dsn, temporary_directory, redis_url):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from click.testing import Result
+    from onegov.core.orm import SessionManager
+    from onegov.election_day.types import DomainOfInfluence
+    from sqlalchemy.orm import Session
+
+
+def write_config(
+    path: str,
+    postgres_dsn: str,
+    temporary_directory: str,
+    redis_url: str
+) -> None:
     cfg = {
         'applications': [
             {
@@ -49,7 +65,13 @@ def write_config(path, postgres_dsn, temporary_directory, redis_url):
         f.write(yaml.dump(cfg))
 
 
-def write_principal(temporary_directory, principal, entity='be', params=None):
+def write_principal(
+    temporary_directory: str,
+    principal: str,
+    entity: str = 'be',
+    params: dict[str, Any] | None = None
+) -> None:
+
     params = params or {}
     params.update({
         'name': principal,
@@ -73,15 +95,20 @@ def write_principal(temporary_directory, principal, entity='be', params=None):
         )
 
 
-def run_command(cfg_path, principal, commands):
+def run_command(cfg_path: str, principal: str, commands: list[str]) -> Result:
     runner = CliRunner()
     return runner.invoke(cli, [
         '--config', cfg_path,
-        '--select', '/onegov_election_day/{}'.format(principal),
-    ] + commands)
+        '--select', f'/onegov_election_day/{principal}',
+        *commands
+    ])
 
 
-def test_manage_instances(postgres_dsn, temporary_directory, redis_url):
+def test_manage_instances(
+    postgres_dsn: str,
+    temporary_directory: str,
+    redis_url: str
+) -> None:
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
@@ -107,8 +134,11 @@ def test_manage_instances(postgres_dsn, temporary_directory, redis_url):
     assert "Instance was deleted successfully" in result.output
 
 
-def test_add_instance_missing_config(postgres_dsn, temporary_directory,
-                                     redis_url):
+def test_add_instance_missing_config(
+    postgres_dsn: str,
+    temporary_directory: str,
+    redis_url: str
+) -> None:
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
@@ -119,7 +149,12 @@ def test_add_instance_missing_config(postgres_dsn, temporary_directory,
     assert "Instance was created successfully" in result.output
 
 
-def test_fetch(postgres_dsn, temporary_directory, session_manager, redis_url):
+def test_fetch(
+    postgres_dsn: str,
+    temporary_directory: str,
+    session_manager: SessionManager,
+    redis_url: str
+) -> None:
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
@@ -150,7 +185,16 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager, redis_url):
 
     last_result_change = datetime(2010, 1, 1, 0, 0, tzinfo=timezone.utc)
 
-    results = (
+    def get_schema(entity: str) -> str:
+        return f'onegov_election_day-{entity}'
+
+    def get_session(entity: str) -> Session:
+        session_manager.set_current_schema(get_schema(entity))
+        session_manager.set_locale('de_CH', 'de_CH')
+        return session_manager.session()
+
+    domain: DomainOfInfluence
+    for entity, domain, title in (
         ('be', 'canton', 'vote-1'),
         ('be', 'canton', 'vote-2'),
         ('be', 'federation', 'vote'),
@@ -163,17 +207,7 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager, redis_url):
         ('thun', 'canton', 'vote-2'),
         ('thun', 'municipality', 'vote-1'),
         ('thun', 'municipality', 'vote-2'),
-    )
-
-    def get_schema(entity):
-        return 'onegov_election_day-{}'.format(entity)
-
-    def get_session(entity):
-        session_manager.set_current_schema(get_schema(entity))
-        session_manager.set_locale('de_CH', 'de_CH')
-        return session_manager.session()
-
-    for entity, domain, title in results:
+    ):
         get_session(entity).add(
             ArchivedResult(
                 date=date(2010, 1, 1),
@@ -189,7 +223,7 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager, redis_url):
         get_session(entity).flush()
         transaction.commit()
 
-    results = (
+    for entity, domain, title, vote_type, with_id, with_result in (
         ('be', 'canton', 'vote-3', None, False, False),
         ('be', 'canton', 'vote-4', None, False, False),
         ('be', 'canton', 'vote-5', None, True, False),
@@ -199,8 +233,7 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager, redis_url):
         ('be', 'canton', 'vote-9', 'complex', False, False),
         ('be', 'canton', 'vote-10', 'complex', True, False),
         ('be', 'canton', 'vote-11', 'complex', True, True),
-    )
-    for entity, domain, title, vote_type, with_id, with_result in results:
+    ):
         id = '{}-{}-{}'.format(entity, domain, title)
         then = date(2010, 1, 1)
 
@@ -222,6 +255,7 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager, redis_url):
                 )
 
             if vote_type == 'complex':
+                assert isinstance(vote, ComplexVote)
                 assert vote.counter_proposal  # create
                 assert vote.tie_breaker  # create
 
@@ -251,7 +285,7 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager, redis_url):
                 domain=domain,
                 name=entity,
                 type='vote',
-                meta={'id': id} if with_id else None
+                meta={'id': id} if with_id else {}
             )
         )
         get_session(entity).flush()
@@ -278,8 +312,8 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager, redis_url):
         for r in get_session('bern').query(ArchivedResult)
         if r.meta and 'id' in r.meta
     }
-    assert sorted(meta.keys()) == [
-        'be-canton-vote-{}'.format(i) for i in (10, 11, 5, 7, 8)
+    assert sorted(meta.keys()) == [  # type: ignore[type-var]
+        f'be-canton-vote-{i}' for i in (10, 11, 5, 7, 8)
     ]
     assert meta['be-canton-vote-8']['local'] == {
         'answer': 'accepted',
@@ -299,10 +333,10 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager, redis_url):
     assert get_session('thun').query(ArchivedResult).count() == 4
 
 
-def add_vote(number, session_manager):
+def add_vote(number: int, session_manager: SessionManager) -> None:
     vote = Vote(
-        id='vote-{}'.format(number),
-        title='vote-{}'.format(number),
+        id=f'vote-{number}',
+        title=f'vote-{number}',
         domain='canton',
         date=date(2015, 6, number)
     )
@@ -319,8 +353,13 @@ def add_vote(number, session_manager):
     transaction.commit()
 
 
-def test_generate_media(postgres_dsn, temporary_directory, session_manager,
-                        redis_url):
+def test_generate_media(
+    postgres_dsn: str,
+    temporary_directory: str,
+    redis_url: str,
+    session_manager: SessionManager
+) -> None:
+
     session_manager.set_locale('de_CH', 'de_CH')
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
@@ -352,8 +391,13 @@ def test_generate_media(postgres_dsn, temporary_directory, session_manager,
     assert os.listdir(svg_path) == []
 
 
-def test_generate_archive_total_package(postgres_dsn, temporary_directory,
-                                        session_manager, redis_url):
+def test_generate_archive_total_package(
+    postgres_dsn: str,
+    temporary_directory: str,
+    redis_url: str,
+    session_manager: SessionManager
+) -> None:
+
     session_manager.set_locale('de_CH', 'de_CH')
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
@@ -380,8 +424,12 @@ def test_generate_archive_total_package(postgres_dsn, temporary_directory,
 
 
 def test_update_archived_results(
-    postgres_dsn, temporary_directory, redis_url, session_manager
-):
+    postgres_dsn: str,
+    temporary_directory: str,
+    redis_url: str,
+    session_manager: SessionManager
+) -> None:
+
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
     write_principal(temporary_directory, 'Govikon', entity='1200')

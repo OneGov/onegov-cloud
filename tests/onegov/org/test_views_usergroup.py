@@ -1,4 +1,12 @@
-def test_view_user_groups(client):
+from __future__ import annotations
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_view_user_groups(client: Client) -> None:
     client.login_admin()
 
     # create

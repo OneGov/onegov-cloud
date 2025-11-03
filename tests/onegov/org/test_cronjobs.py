@@ -1,15 +1,16 @@
+from __future__ import annotations
+
 import json
 import logging
 import os
-from pathlib import Path
-from unittest.mock import patch, Mock
-
 import pytest
 import requests
 import transaction
-from datetime import datetime, timedelta, timezone
-from freezegun import freeze_time
 
+from datetime import datetime, timedelta, timezone
+from decimal import Decimal
+from freezegun import freeze_time
+from markupsafe import Markup
 from onegov.core.utils import Bunch, normalize_for_url
 from onegov.directory import (DirectoryEntryCollection,
                               DirectoryConfiguration,
@@ -26,74 +27,50 @@ from onegov.org.models.ticket import ReservationHandler, DirectoryEntryHandler
 from onegov.org.notification_service import (
     TestNotificationService, set_test_notification_service)
 from onegov.page import PageCollection
-from onegov.ticket import Handler, Ticket, TicketCollection
+from onegov.ticket import Ticket, TicketCollection
 from onegov.user import UserCollection
 from onegov.newsletter import (Newsletter, NewsletterCollection,
                                RecipientCollection)
 from onegov.reservation import ResourceCollection
 from onegov.user.collections import TANCollection
-from sedate import ensure_timezone, utcnow
+from pathlib import Path
+from sedate import ensure_timezone, to_timezone, utcnow
 from sqlalchemy.orm import close_all_sessions
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
-from decimal import Decimal
-from tests.shared import Client
+from tests.onegov.org.common import register_echo_handler
+from tests.onegov.org.conftest import Client
 from tests.shared.utils import add_reservation
+from unittest.mock import patch, Mock
 
 
-class EchoTicket(Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'EHO'}
-    es_type_name = 'echo_tickets'
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from onegov.org.models import ExtendedDirectory
+    from onegov.ticket.handler import HandlerRegistry
+    from sqlalchemy.orm import Session
+    from tests.shared.capturelog import CaptureLogFixture
+    from .conftest import TestOrgApp
 
 
-class EchoHandler(Handler):
-    handler_title = "Echo"
-
-    @property
-    def deleted(self):
-        return False
-
-    @property
-    def email(self):
-        return self.data.get('email')
-
-    @property
-    def title(self):
-        return self.data.get('title')
-
-    @property
-    def subtitle(self):
-        return self.data.get('subtitle')
-
-    @property
-    def group(self):
-        return self.data.get('group')
-
-    def get_summary(self, request):
-        return self.data.get('summary')
-
-    def get_links(self, request):
-        return self.data.get('links')
-
-
-def register_echo_handler(handlers):
-    handlers.register('EHO', EchoHandler)
-
-
-def register_reservation_handler(handlers):
+def register_reservation_handler(handlers: HandlerRegistry) -> None:
     handlers.register('RSV', ReservationHandler)
 
 
-def register_directory_handler(handlers):
+def register_directory_handler(handlers: HandlerRegistry) -> None:
     handlers.register('DIR', DirectoryEntryHandler)
 
 
-def test_daily_ticket_statistics(org_app, handlers):
+def test_daily_ticket_statistics(
+    client: Client[TestOrgApp],
+    handlers: HandlerRegistry
+) -> None:
+
     register_echo_handler(handlers)
 
-    client = Client(org_app)
-
-    job = get_cronjob_by_name(org_app, 'daily_ticket_statistics')
-    job.app = org_app
+    job = get_cronjob_by_name(client.app, 'daily_ticket_statistics')
+    assert job is not None
+    job.app = client.app
 
     url = get_cronjob_url(job)
 
@@ -103,7 +80,7 @@ def test_daily_ticket_statistics(org_app, handlers):
 
     transaction.begin()
 
-    session = org_app.session()
+    session = client.app.session()
     collection = TicketCollection(session)
 
     tickets = [
@@ -158,9 +135,9 @@ def test_daily_ticket_statistics(org_app, handlers):
     ]
 
     # those will be ignored as they are inactive or not editors/admins
-    request = Bunch(client_addr='127.0.0.1')
-    UserCollection(session).register('a', 'p@ssw0rd', request, role='editor')
-    UserCollection(session).register('b', 'p@ssw0rd', request, role='member')
+    request: Any = Bunch(client_addr='127.0.0.1')
+    UserCollection(session).register('a', 'p@ssw0rd12', request, role='editor')
+    UserCollection(session).register('b', 'p@ssw0rd12', request, role='member')
 
     users = UserCollection(session).query().all()
     user = users[0]
@@ -185,6 +162,7 @@ def test_daily_ticket_statistics(org_app, handlers):
 
     assert len(os.listdir(client.app.maildir)) == 1
     message = client.get_email(0)
+    assert message is not None
 
     headers = {h['Name']: h['Value'] for h in message['Headers']}
     assert 'List-Unsubscribe' in headers
@@ -216,13 +194,16 @@ def test_daily_ticket_statistics(org_app, handlers):
     assert len(os.listdir(client.app.maildir)) == 1
 
 
-def test_weekly_ticket_statistics(org_app, handlers):
+def test_weekly_ticket_statistics(
+    client: Client[TestOrgApp],
+    handlers: HandlerRegistry
+) -> None:
+
     register_echo_handler(handlers)
 
-    client = Client(org_app)
-
-    job = get_cronjob_by_name(org_app, 'weekly_ticket_statistics')
-    job.app = org_app
+    job = get_cronjob_by_name(client.app, 'weekly_ticket_statistics')
+    assert job is not None
+    job.app = client.app
 
     url = get_cronjob_url(job)
 
@@ -232,7 +213,7 @@ def test_weekly_ticket_statistics(org_app, handlers):
 
     transaction.begin()
 
-    session = org_app.session()
+    session = client.app.session()
     collection = TicketCollection(session)
 
     tickets = [
@@ -287,9 +268,9 @@ def test_weekly_ticket_statistics(org_app, handlers):
     ]
 
     # those will be ignored as they are inactive or not editors/admins
-    request = Bunch(client_addr='127.0.0.1')
-    UserCollection(session).register('a', 'p@ssw0rd', request, role='editor')
-    UserCollection(session).register('b', 'p@ssw0rd', request, role='member')
+    request: Any = Bunch(client_addr='127.0.0.1')
+    UserCollection(session).register('a', 'p@ssw0rd12', request, role='editor')
+    UserCollection(session).register('b', 'p@ssw0rd12', request, role='member')
 
     users = UserCollection(session).query().all()
     user = users[0]
@@ -314,6 +295,7 @@ def test_weekly_ticket_statistics(org_app, handlers):
 
     assert len(os.listdir(client.app.maildir)) == 1
     message = client.get_email(0)
+    assert message is not None
 
     headers = {h['Name']: h['Value'] for h in message['Headers']}
     assert 'List-Unsubscribe' in headers
@@ -357,13 +339,16 @@ def test_weekly_ticket_statistics(org_app, handlers):
     assert len(os.listdir(client.app.maildir)) == 1
 
 
-def test_monthly_ticket_statistics(org_app, handlers):
+def test_monthly_ticket_statistics(
+    client: Client[TestOrgApp],
+    handlers: HandlerRegistry
+) -> None:
+
     register_echo_handler(handlers)
 
-    client = Client(org_app)
-
-    job = get_cronjob_by_name(org_app, 'monthly_ticket_statistics')
-    job.app = org_app
+    job = get_cronjob_by_name(client.app, 'monthly_ticket_statistics')
+    assert job is not None
+    job.app = client.app
 
     url = get_cronjob_url(job)
 
@@ -373,7 +358,7 @@ def test_monthly_ticket_statistics(org_app, handlers):
 
     transaction.begin()
 
-    session = org_app.session()
+    session = client.app.session()
     collection = TicketCollection(session)
 
     tickets = [
@@ -428,9 +413,9 @@ def test_monthly_ticket_statistics(org_app, handlers):
     ]
 
     # those will be ignored as they are inactive or not editors/admins
-    request = Bunch(client_addr='127.0.0.1')
-    UserCollection(session).register('a', 'p@ssw0rd', request, role='editor')
-    UserCollection(session).register('b', 'p@ssw0rd', request, role='member')
+    request: Any = Bunch(client_addr='127.0.0.1')
+    UserCollection(session).register('a', 'p@ssw0rd12', request, role='editor')
+    UserCollection(session).register('b', 'p@ssw0rd12', request, role='member')
 
     users = UserCollection(session).query().all()
     user = users[0]
@@ -455,6 +440,7 @@ def test_monthly_ticket_statistics(org_app, handlers):
 
     assert len(os.listdir(client.app.maildir)) == 1
     message = client.get_email(0)
+    assert message is not None
 
     headers = {h['Name']: h['Value'] for h in message['Headers']}
     assert 'List-Unsubscribe' in headers
@@ -510,8 +496,8 @@ def test_monthly_ticket_statistics(org_app, handlers):
     assert len(os.listdir(client.app.maildir)) == 1
 
 
-def test_daily_reservation_overview(org_app):
-    resources = ResourceCollection(org_app.libres_context)
+def test_daily_reservation_overview(client: Client[TestOrgApp]) -> None:
+    resources = ResourceCollection(client.app.libres_context)
     gymnasium = resources.add('Gymnasium', 'Europe/Zurich', type='room')
     dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')
     assert isinstance(gymnasium, RoomResource)
@@ -544,14 +530,14 @@ def test_daily_reservation_overview(org_app):
     gymnasium.scheduler.approve_reservations(gym_reservation_token)
     dailypass.scheduler.approve_reservations(day_reservation_token)
 
-    submissions = FormSubmissionCollection(org_app.session())
+    submissions = FormSubmissionCollection(client.app.session())
     submissions.add_external(
-        form=gymnasium.form_class(data={'name': '0xdeadbeef'}),
+        form=gymnasium.form_class(data={'name': '0xdeadbeef'}),  # type: ignore[misc]
         state='complete',
         id=gym_reservation_token
     )
 
-    recipients = ResourceRecipientCollection(org_app.session())
+    recipients = ResourceRecipientCollection(client.app.session())
     recipients.add(
         name='Gym',
         medium='email',
@@ -586,10 +572,9 @@ def test_daily_reservation_overview(org_app):
 
     transaction.commit()
 
-    client = Client(org_app)
-
-    job = get_cronjob_by_name(org_app, 'daily_resource_usage')
-    job.app = org_app
+    job = get_cronjob_by_name(client.app, 'daily_resource_usage')
+    assert job is not None
+    job.app = client.app
 
     url = get_cronjob_url(job)
     tz = ensure_timezone('Europe/Zurich')
@@ -621,19 +606,23 @@ def test_daily_reservation_overview(org_app):
 
     mails = [client.get_email(i) for i in range(2)]
     for mail in mails:
+        assert mail is not None
         assert "Heute keine Reservationen" in mail['TextBody']
         assert "-reservation" not in mail['TextBody']
 
     # NOTE: These seem to not always get sent in the same order...
     #       technically we don't really care so let's determine order
+    assert mails[0] is not None
     if mails[0]['To'] == 'gym@example.org':
         gym_mail, day_mail = mails
     else:
         day_mail, gym_mail = mails
+    assert gym_mail is not None
     assert gym_mail['To'] == 'gym@example.org'
     assert "Allgemein - Gymnasium" in gym_mail['TextBody']
     assert "Allgemein - Dailypass" not in gym_mail['TextBody']
 
+    assert day_mail is not None
     assert day_mail['To'] == 'day@example.org'
     assert "Allgemein - Dailypass" in day_mail['TextBody']
     assert "Allgemein - Gymnasium" not in day_mail['TextBody']
@@ -641,7 +630,7 @@ def test_daily_reservation_overview(org_app):
     # once we confirm the reservation it shows up in the e-mail
     client.flush_email_queue()
 
-    gymnasium = resources.by_name('gymnasium')
+    gymnasium = resources.by_name('gymnasium')  # type: ignore[assignment]
     r = gymnasium.scheduler.reservations_by_token(gym_reservation_token)[0]
     r.data = {'accepted': True}
 
@@ -661,6 +650,7 @@ def test_daily_reservation_overview(org_app):
         assert '0xdeadbeef' in client.get_email(1)['TextBody']
 
     mail = client.get_email(2)
+    assert mail is not None
     assert mail['To'] == 'both@example.org'
     assert 'Gymnasium' in mail['TextBody']
     assert 'Dailypass' in mail['TextBody']
@@ -669,7 +659,7 @@ def test_daily_reservation_overview(org_app):
     # this also works for the other reservation which has no data
     client.flush_email_queue()
 
-    dailypass = resources.by_name('dailypass')
+    dailypass = resources.by_name('dailypass')  # type: ignore[assignment]
     r = dailypass.scheduler.reservations_by_token(day_reservation_token)[0]
     r.data = {'accepted': True}
 
@@ -694,8 +684,12 @@ def test_daily_reservation_overview(org_app):
 
 
 @pytest.mark.parametrize('secret_content_allowed', [False, True])
-def test_send_scheduled_newsletters(client, org_app, secret_content_allowed):
-    def create_scheduled_newsletter():
+def test_send_scheduled_newsletters(
+    client: Client[TestOrgApp],
+    secret_content_allowed: bool
+) -> None:
+
+    def create_scheduled_newsletter() -> None:
         with freeze_time('2018-05-31 12:00'):
             news_public = news.add(
                 news_parent, 'Public News', 'public-news',
@@ -715,7 +709,7 @@ def test_send_scheduled_newsletters(client, org_app, secret_content_allowed):
                 type='news', access='private')
             newsletters.add(
                 "Latest News",
-                "<h1>Latest News</h1>",
+                Markup("<h1>Latest News</h1>"),
                 content={"news": [
                     str(news_public.id),
                     str(news_public_2.id),
@@ -727,7 +721,7 @@ def test_send_scheduled_newsletters(client, org_app, secret_content_allowed):
 
             transaction.commit()
 
-    session = org_app.session()
+    session = client.app.session()
     news = PageCollection(session)
     news_parent = news.query().filter_by(name='news').one()
     newsletters = NewsletterCollection(session)
@@ -736,16 +730,16 @@ def test_send_scheduled_newsletters(client, org_app, secret_content_allowed):
     recipient = recipients.add('info@example.org')
     recipient.confirmed = True
 
-    org_app.org.secret_content_allowed = secret_content_allowed
-    org_app.org.enable_automatic_newsletters = True
+    client.app.org.secret_content_allowed = secret_content_allowed
+    client.app.org.enable_automatic_newsletters = True
 
     create_scheduled_newsletter()
 
-    job = get_cronjob_by_name(org_app, 'hourly_maintenance_tasks')
-    job.app = org_app
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
 
     with freeze_time('2018-05-31 11:00'):
-        client = Client(org_app)
         client.get(get_cronjob_url(job))
         newsletter = newsletters.query().one()
 
@@ -753,7 +747,6 @@ def test_send_scheduled_newsletters(client, org_app, secret_content_allowed):
         assert len(os.listdir(client.app.maildir)) == 0
 
     with freeze_time('2018-05-31 12:00'):
-        client = Client(org_app)
         client.get(get_cronjob_url(job))
         newsletter = newsletters.query().one()
 
@@ -773,13 +766,13 @@ def test_send_scheduled_newsletters(client, org_app, secret_content_allowed):
             assert "Private News" not in mail['TextBody']
 
 
-def test_send_daily_newsletter(es_org_app):
-    org_app = es_org_app
+def test_send_daily_newsletter(client: Client[TestOrgApp]) -> None:
     tz = ensure_timezone('Europe/Zurich')
 
-    session = org_app.session()
-    org_app.org.enable_automatic_newsletters = True
-    org_app.org.newsletter_times = '10', '11', '16'
+    session = client.app.session()
+    client.app.org.enable_automatic_newsletters = True
+    client.app.org.daily_newsletter_title = 'News aus Govikon'
+    client.app.org.newsletter_times = ['10', '11', '16']
 
     news = PageCollection(session)
     news_parent = news.query().filter_by(name='news').one()
@@ -813,9 +806,9 @@ def test_send_daily_newsletter(es_org_app):
 
     transaction.commit()
 
-    job = get_cronjob_by_name(org_app, 'hourly_maintenance_tasks')
-    job.app = org_app
-    client = Client(org_app)
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
 
     with freeze_time(datetime(2018, 3, 5, 10, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
@@ -823,6 +816,8 @@ def test_send_daily_newsletter(es_org_app):
         assert newsletter.title == 'Täglicher Newsletter 05.03.2018, 10:00'
         assert len(os.listdir(client.app.maildir)) == 1
         mail = client.get_email(0)
+        assert mail is not None
+        assert "News aus Govikon" in mail['Subject']
         assert "News1" in mail['TextBody']
         assert "News2" in mail['TextBody']
         assert "News3" not in mail['TextBody']
@@ -836,6 +831,8 @@ def test_send_daily_newsletter(es_org_app):
         assert 'Täglicher Newsletter 05.03.2018, 11:00' in newsletter.title
         assert len(os.listdir(client.app.maildir)) == 2
         mail = client.get_email(1)
+        assert mail is not None
+        assert "News aus Govikon" in mail['Subject']
         assert "News1" not in mail['TextBody']
         assert "News2" not in mail['TextBody']
         assert "News3" in mail['TextBody']
@@ -847,10 +844,14 @@ def test_send_daily_newsletter(es_org_app):
         assert len(os.listdir(client.app.maildir)) == 2
 
 
-def test_auto_archive_tickets_and_delete(org_app, handlers):
+def test_auto_archive_tickets_and_delete(
+    client: Client[TestOrgApp],
+    handlers: HandlerRegistry
+) -> None:
+
     register_echo_handler(handlers)
 
-    session = org_app.session()
+    session = client.app.session()
     transaction.begin()
 
     with freeze_time('2022-08-17 04:30'):
@@ -873,9 +874,9 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
             ),
         ]
 
-        request = Bunch(client_addr='127.0.0.1')
+        request: Any = Bunch(client_addr='127.0.0.1')
         UserCollection(session).register(
-            'b', 'p@ssw0rd', request, role='admin'
+            'b', 'p@ssw0rd12', request, role='admin'
         )
         users = UserCollection(session).query().all()
         user = users[0]
@@ -883,9 +884,8 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
             t.accept_ticket(user)
             t.close_ticket()
 
-        org_app.org.auto_archive_timespan = 30  # days
-        org_app.org.auto_delete_timespan = 30  # days
-
+        client.app.org.auto_archive_timespan = 30  # days
+        client.app.org.auto_delete_timespan = 30  # dclient.
         transaction.commit()
 
         close_all_sessions()
@@ -897,9 +897,9 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
         query = query.filter_by(state='closed')
         assert query.count() == 2
 
-        job = get_cronjob_by_name(org_app, 'archive_old_tickets')
-        job.app = org_app
-        client = Client(org_app)
+        job = get_cronjob_by_name(client.app, 'archive_old_tickets')
+        assert job is not None
+        job.app = client.app
         client.get(get_cronjob_url(job))
 
         query = session.query(Ticket)
@@ -908,9 +908,9 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
 
         # this delete cronjob should have no effect (yet), since archiving
         # resets the `last_change`
-        job = get_cronjob_by_name(org_app, 'delete_old_tickets')
-        job.app = org_app
-        client = Client(org_app)
+        job = get_cronjob_by_name(client.app, 'delete_old_tickets')
+        assert job is not None
+        job.app = client.app
         client.get(get_cronjob_url(job))
 
         query = session.query(Ticket)
@@ -920,31 +920,35 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
     # and another month for deletion
     with freeze_time('2022-10-17 05:30'):
         session.flush()
-        assert org_app.org.auto_delete_timespan is not None
+        assert client.app.org.auto_delete_timespan is not None
 
-        job = get_cronjob_by_name(org_app, 'delete_old_tickets')
-        job.app = org_app
-        client = Client(org_app)
+        job = get_cronjob_by_name(client.app, 'delete_old_tickets')
+        assert job is not None
+        job.app = client.app
         client.get(get_cronjob_url(job))
 
         # should be deleted
         assert session.query(Ticket).count() == 0
 
 
-def test_respect_recent_reservation_for_archive(org_app, handlers):
+def test_respect_recent_reservation_for_archive(
+    client: Client[TestOrgApp],
+    handlers: HandlerRegistry
+) -> None:
+
     register_echo_handler(handlers)
     register_reservation_handler(handlers)
 
     transaction.begin()
 
-    resources = ResourceCollection(org_app.libres_context)
+    resources = ResourceCollection(client.app.libres_context)
     dailypass = resources.add(
         'Dailypass',
         'Europe/Zurich',
         type='daypass'
     )
 
-    recipients = ResourceRecipientCollection(org_app.session())
+    recipients = ResourceRecipientCollection(client.app.session())
     recipients.add(
         name='John',
         medium='email',
@@ -958,7 +962,7 @@ def test_respect_recent_reservation_for_archive(org_app, handlers):
     with freeze_time('2022-06-06 01:00'):
         # First we add some random ticket. Acts Kind of like a 'control
         # group', this is not reservation)
-        collection = TicketCollection(org_app.session())
+        collection = TicketCollection(client.app.session())
         collection.open_ticket(
             handler_id='1',
             handler_code='EHO',
@@ -971,21 +975,22 @@ def test_respect_recent_reservation_for_archive(org_app, handlers):
         # uncommon in practice)
         add_reservation(
             dailypass,
-            org_app.session(),
+            client.app.session(),
             start=datetime(2023, 6, 6, 4, 30),
             end=datetime(2023, 6, 6, 5, 0),
         )
 
         # close all the tickets
-        tickets_query = TicketCollection(org_app.session()).query()
+        tickets_query = TicketCollection(client.app.session()).query()
         assert tickets_query.count() == 2
-        user = UserCollection(org_app.session()).query().first()
+        user = UserCollection(client.app.session()).query().first()
+        assert user is not None
         for ticket in tickets_query:
             ticket.accept_ticket(user)
             ticket.close_ticket()
 
-        org_app.org.auto_archive_timespan = 365  # days
-        org_app.org.auto_delete_timespan = 365  # days
+        client.app.org.auto_archive_timespan = 365  # days
+        client.app.org.auto_delete_timespan = 365  # days
 
         transaction.commit()
 
@@ -994,13 +999,13 @@ def test_respect_recent_reservation_for_archive(org_app, handlers):
     # now go forward a year
     with freeze_time('2023-06-06 02:00'):
 
-        q = TicketCollection(org_app.session()).query()
+        q = TicketCollection(client.app.session()).query()
         assert q.filter_by(state='open').count() == 0
         assert q.filter_by(state='closed').count() == 2
 
-        job = get_cronjob_by_name(org_app, 'archive_old_tickets')
-        job.app = org_app
-        client = Client(org_app)
+        job = get_cronjob_by_name(client.app, 'archive_old_tickets')
+        assert job is not None
+        job.app = client.app
         client.get(get_cronjob_url(job))
 
         after_cronjob_tickets = TicketCollection(client.app.session()).query()
@@ -1014,13 +1019,10 @@ def test_respect_recent_reservation_for_archive(org_app, handlers):
                 assert ticket.state == 'closed'
 
 
-def test_monthly_mtan_statistics(org_app, handlers):
-    register_echo_handler(handlers)
-
-    client = Client(org_app)
-
-    job = get_cronjob_by_name(org_app, 'monthly_mtan_statistics')
-    job.app = org_app
+def test_monthly_mtan_statistics(client: Client[TestOrgApp]) -> None:
+    job = get_cronjob_by_name(client.app, 'monthly_mtan_statistics')
+    assert job is not None
+    job.app = client.app
 
     url = get_cronjob_url(job)
 
@@ -1036,7 +1038,7 @@ def test_monthly_mtan_statistics(org_app, handlers):
 
     transaction.begin()
 
-    session = org_app.session()
+    session = client.app.session()
     collection = TANCollection(session, scope='test')
 
     collection.add(  # outside
@@ -1085,7 +1087,7 @@ def test_monthly_mtan_statistics(org_app, handlers):
 
     assert len(os.listdir(client.app.maildir)) == 1
     message = client.get_email(0)
-
+    assert message is not None
     assert message['Subject'] == (
         'Govikon: mTAN Statistik Januar 2016')
     assert "5 mTAN SMS versendet" in message['TextBody']
@@ -1125,18 +1127,22 @@ def test_monthly_mtan_statistics(org_app, handlers):
     assert len(os.listdir(client.app.maildir)) == 1
 
 
-def test_delete_content_marked_deletable__directory_entries(org_app, handlers):
-    register_echo_handler(handlers)
+def test_delete_content_marked_deletable__directory_entries(
+    client: Client[TestOrgApp],
+    handlers: HandlerRegistry
+) -> None:
+
     register_directory_handler(handlers)
 
-    client = Client(org_app)
-    job = get_cronjob_by_name(org_app, 'delete_content_marked_deletable')
-    job.app = org_app
+    job = get_cronjob_by_name(client.app, 'delete_content_marked_deletable')
+    assert job is not None
+    job.app = client.app
     tz = ensure_timezone('Europe/Zurich')
 
     transaction.begin()
 
-    directories = DirectoryCollection(org_app.session(), type='extended')
+    directories: DirectoryCollection[ExtendedDirectory]
+    directories = DirectoryCollection(client.app.session(), type='extended')
     directory_entries = directories.add(
         title='Öffentliche Planauflage',
         structure="""
@@ -1145,7 +1151,7 @@ def test_delete_content_marked_deletable__directory_entries(org_app, handlers):
         """,
         configuration=DirectoryConfiguration(
             title="[Gesuchsteller/in]",
-            order=('Gesuchsteller/in'),
+            order=['Gesuchsteller/in'],
         )
     )
 
@@ -1192,8 +1198,11 @@ def test_delete_content_marked_deletable__directory_entries(org_app, handlers):
     transaction.commit()
     close_all_sessions()
 
-    def count_publications(directories):
+    def count_publications(
+        directories: DirectoryCollection[ExtendedDirectory]
+    ) -> int:
         applications = directories.by_name('offentliche-planauflage')
+        assert applications is not None
         return (DirectoryEntryCollection(applications, type='extended').
                 query().count())
 
@@ -1228,17 +1237,20 @@ def test_delete_content_marked_deletable__directory_entries(org_app, handlers):
     assert count_publications(directories) == 2
 
 
-def test_delete_content_marked_deletable__news(org_app, handlers):
-    register_echo_handler(handlers)
+def test_delete_content_marked_deletable__news(
+    client: Client[TestOrgApp],
+    handlers: HandlerRegistry
+) -> None:
+
     register_directory_handler(handlers)
 
-    client = Client(org_app)
-    job = get_cronjob_by_name(org_app, 'delete_content_marked_deletable')
-    job.app = org_app
+    job = get_cronjob_by_name(client.app, 'delete_content_marked_deletable')
+    assert job is not None
+    job.app = client.app
     tz = ensure_timezone('Europe/Zurich')
 
     transaction.begin()
-    collection = PageCollection(org_app.session())
+    collection = PageCollection(client.app.session())
     news = collection.add_root('News', type='news')
     first = collection.add(
         news,
@@ -1246,6 +1258,7 @@ def test_delete_content_marked_deletable__news(org_app, handlers):
         type='news',
         lead='First News Lead',
     )
+    assert isinstance(first, News)
     first.publication_start = datetime(2024, 4, 1, tzinfo=tz)
     first.publication_end = datetime(2024, 4, 2, 23, 59, tzinfo=tz)
     first.delete_when_expired = True
@@ -1256,6 +1269,7 @@ def test_delete_content_marked_deletable__news(org_app, handlers):
         type='news',
         lead='Second News Lead'
     )
+    assert isinstance(two, News)
     two.publication_start = datetime(2024, 4, 5, tzinfo=tz)
     two.publication_end = datetime(2024, 4, 6, tzinfo=tz)
     two.delete_when_expired = True
@@ -1263,8 +1277,8 @@ def test_delete_content_marked_deletable__news(org_app, handlers):
     transaction.commit()
     close_all_sessions()
 
-    def count_news():
-        c = PageCollection(org_app.session()).query()
+    def count_news() -> int:
+        c = PageCollection(client.app.session()).query()
         c = c.filter(News.publication_start.isnot(None))
         c = c.filter(News.publication_end.isnot(None))
         return c.count()
@@ -1287,21 +1301,21 @@ def test_delete_content_marked_deletable__news(org_app, handlers):
 
 
 def test_delete_content_marked_deletable__events_occurrences(
-    org_app,
-    handlers
-):
-    register_echo_handler(handlers)
+    client: Client[TestOrgApp],
+    handlers: HandlerRegistry
+) -> None:
+
     register_directory_handler(handlers)
 
-    client = Client(org_app)
-    job = get_cronjob_by_name(org_app, 'delete_content_marked_deletable')
-    job.app = org_app
+    job = get_cronjob_by_name(client.app, 'delete_content_marked_deletable')
+    assert job is not None
+    job.app = client.app
     tz = ensure_timezone('Europe/Zurich')
 
     transaction.begin()
 
     title_1 = 'Antelope Canyon Tour'
-    events = EventCollection(org_app.session())
+    events = EventCollection(client.app.session())
     event_1 = events.add(
         title=title_1,
         start=datetime(2024, 4, 18, 11, 0),
@@ -1337,17 +1351,17 @@ def test_delete_content_marked_deletable__events_occurrences(
     transaction.commit()
     close_all_sessions()
 
-    def count_events(title):
-        return (EventCollection(org_app.session()).query()
+    def count_events(title: str) -> int:
+        return (EventCollection(client.app.session()).query()
                 .filter_by(title=title).count())
 
-    def count_occurrences(title):
-        return (OccurrenceCollection(org_app.session(), outdated=True)
+    def count_occurrences(title: str) -> int:
+        return (OccurrenceCollection(client.app.session(), outdated=True)
                 .query().filter_by(title=title).count())
 
     with (freeze_time(datetime(2024, 4, 18, 6, 0, tzinfo=tz))):
         # default setting, no deletion of past event and past occurrences
-        assert org_app.org.delete_past_events is False
+        assert client.app.org.delete_past_events is False
 
         assert count_events(title_1) == 1
         assert count_occurrences(title_1) == 4
@@ -1364,7 +1378,7 @@ def test_delete_content_marked_deletable__events_occurrences(
         # switch setting and see nothing gets deleted event without occurrences
         # and prior end date
         transaction.begin()
-        org_app.org.delete_past_events = True
+        client.app.org.delete_past_events = True
         transaction.commit()
         close_all_sessions()
 
@@ -1377,7 +1391,7 @@ def test_delete_content_marked_deletable__events_occurrences(
     with (freeze_time(datetime(2024, 4, 19, 6, 0, tzinfo=tz))):
         # nothing gets deleted due to two cutoff days
         transaction.begin()
-        org_app.org.delete_past_events = True
+        client.app.org.delete_past_events = True
         transaction.commit()
         close_all_sessions()
 
@@ -1390,7 +1404,7 @@ def test_delete_content_marked_deletable__events_occurrences(
     with (freeze_time(datetime(2024, 4, 20, 6, 0, tzinfo=tz))):
         # nothing gets deleted due to two cutoff days
         transaction.begin()
-        org_app.org.delete_past_events = True
+        client.app.org.delete_past_events = True
         transaction.commit()
         close_all_sessions()
 
@@ -1403,7 +1417,7 @@ def test_delete_content_marked_deletable__events_occurrences(
     with (freeze_time(datetime(2024, 4, 21, 6, 0, tzinfo=tz))):
         # an old occurrence could be deleted, but the setting is not enabled
         transaction.begin()
-        org_app.org.delete_past_events = False
+        client.app.org.delete_past_events = False
         transaction.commit()
         close_all_sessions()
 
@@ -1415,7 +1429,7 @@ def test_delete_content_marked_deletable__events_occurrences(
 
         # switch setting and see if past events/occurrences get deleted
         transaction.begin()
-        org_app.org.delete_past_events = True
+        client.app.org.delete_past_events = True
         transaction.commit()
         close_all_sessions()
 
@@ -1466,38 +1480,34 @@ def test_delete_content_marked_deletable__events_occurrences(
     ('private', 'member', 'mtan', 'secret', 'secret_mtan', 'public')
 )
 def test_send_email_notification_for_recent_directory_entry_publications(
-    es_org_app,
-    handlers,
-    access
-):
-    org_app = es_org_app
-    register_echo_handler(handlers)
-    register_directory_handler(handlers)
+    client: Client[TestOrgApp],
+    access: str
+) -> None:
 
-    client = Client(org_app)
-    job = get_cronjob_by_name(org_app, 'hourly_maintenance_tasks')
-    job.app = org_app
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
     tz = ensure_timezone('Europe/Zurich')
 
-    def planauflagen():
-        return (DirectoryCollection(org_app.session(), type='extended')
+    def planauflagen() -> ExtendedDirectory:
+        return (DirectoryCollection(client.app.session(), type='extended')  # type: ignore[return-value]
                 .by_name('offentliche-planauflage'))
 
-    def sport_clubs():
-        return (DirectoryCollection(org_app.session(), type='extended')
+    def sport_clubs() -> ExtendedDirectory:
+        return (DirectoryCollection(client.app.session(), type='extended')  # type: ignore[return-value]
                 .by_name('sport-clubs'))
 
-    def count_recipients():
-        return (EntryRecipientCollection(org_app.session()).query()
+    def count_recipients() -> int:
+        return (EntryRecipientCollection(client.app.session()).query()
                 .filter_by(directory_id=planauflagen().id)
                 .filter_by(confirmed=True).count())
 
     assert len(os.listdir(client.app.maildir)) == 0
 
-    print(f'*** Access {access} ***')
     transaction.begin()
 
-    directories = DirectoryCollection(org_app.session(), type='extended')
+    directories: DirectoryCollection[ExtendedDirectory]
+    directories = DirectoryCollection(client.app.session(), type='extended')
     planauflage = directories.add(
         title='Öffentliche Planauflage',
         structure="""
@@ -1506,7 +1516,7 @@ def test_send_email_notification_for_recent_directory_entry_publications(
         """,
         configuration=DirectoryConfiguration(
             title="[Gesuchsteller/in]",
-            order=('Gesuchsteller/in'),
+            order=['Gesuchsteller/in'],
             searchable=['title'],
         ),
         enable_update_notifications=True,
@@ -1537,7 +1547,7 @@ def test_send_email_notification_for_recent_directory_entry_publications(
         """,
         configuration=DirectoryConfiguration(
             title="[Name]",
-            order=('Name'),
+            order=['Name'],
             searchable=['title']
         ),
         enable_update_notifications=False,
@@ -1560,12 +1570,12 @@ def test_send_email_notification_for_recent_directory_entry_publications(
     entry.access = access
     assert entry.access == access
 
-    EntryRecipientCollection(org_app.session()).add(
+    EntryRecipientCollection(client.app.session()).add(
         directory_id=planauflage.id,
         address='john@doe.ch',
         confirmed=True
     )
-    EntryRecipientCollection(org_app.session()).add(
+    EntryRecipientCollection(client.app.session()).add(
         directory_id=sport_club.id,
         address='john@doe.ch',
         confirmed=True
@@ -1575,15 +1585,16 @@ def test_send_email_notification_for_recent_directory_entry_publications(
     close_all_sessions()
 
     assert count_recipients() == 1
-    john = EntryRecipientCollection(org_app.session()).query().first()
+    john = EntryRecipientCollection(client.app.session()).query().first()
+    assert john is not None
 
-    assert org_app.org.meta.get('hourly_maintenance_tasks_last_run') is None
+    assert client.app.org.meta.get('hourly_maintenance_tasks_last_run') is None
 
     with freeze_time(datetime(2025, 1, 1, 4, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
 
         assert len(os.listdir(client.app.maildir)) == 0
-        assert org_app.org.meta.get('hourly_maintenance_tasks_last_run')
+        assert client.app.org.meta.get('hourly_maintenance_tasks_last_run')
 
     with freeze_time(datetime(2025, 1, 6, 4, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
@@ -1593,6 +1604,7 @@ def test_send_email_notification_for_recent_directory_entry_publications(
         if entry_1.access in ('mtan', 'public'):
             assert len(os.listdir(client.app.maildir)) == 1
             message = client.get_email(0)
+            assert message is not None
             assert message['To'] == john.address
             assert planauflagen().title in message['Subject']
             assert entry_1.name in message['TextBody']
@@ -1607,6 +1619,7 @@ def test_send_email_notification_for_recent_directory_entry_publications(
         if entry_1.access in ('mtan', 'public'):
             assert len(os.listdir(client.app.maildir)) == 2
             message = client.get_email(1)
+            assert message is not None
             assert message['To'] == john.address
             assert planauflagen().title in message['Subject']
             assert entry_2.name in message['TextBody']
@@ -1645,6 +1658,7 @@ def test_send_email_notification_for_recent_directory_entry_publications(
             # only for still published sports club entry 'Wanderfreunde'
             assert len(os.listdir(client.app.maildir)) == 3
             message = client.get_email(2)
+            assert message is not None
             assert message['To'] == john.address
             assert sport_clubs().title in message['Subject']
             assert entry_2.name in message['TextBody']
@@ -1652,29 +1666,31 @@ def test_send_email_notification_for_recent_directory_entry_publications(
             assert len(os.listdir(client.app.maildir)) == 0
 
 
-def test_update_newsletter_email_bounce_statistics(org_app, handlers):
-    register_echo_handler(handlers)
-    register_directory_handler(handlers)
+def test_update_newsletter_email_bounce_statistics(
+    client: Client[TestOrgApp]
+) -> None:
 
     # fake postmark mailer
-    org_app.mail['marketing']['mailer'] = 'postmark'
+    assert client.app.mail is not None
+    client.app.mail['marketing']['mailer'] = 'postmark'
 
-    client = Client(org_app)
-    job = get_cronjob_by_name(org_app,
+    job = get_cronjob_by_name(client.app,
                               'update_newsletter_email_bounce_statistics')
-    job.app = org_app
+    assert job is not None
+    job.app = client.app
     tz = ensure_timezone('Europe/Zurich')
 
     transaction.begin()
 
     # create recipients Franz and Heinz
-    recipients = RecipientCollection(org_app.session())
+    recipients = RecipientCollection(client.app.session())
     recipients.add('franz@user.ch', confirmed=True)
     recipients.add('heinz@user.ch', confirmed=True)
     recipients.add('trudi@user.ch', confirmed=True)
 
     # create directory entry recipients
-    directories = DirectoryCollection(org_app.session(), type='extended')
+    directories: DirectoryCollection[ExtendedDirectory]
+    directories = DirectoryCollection(client.app.session(), type='extended')
     directory_entries = directories.add(
         title='Baugesuche (Planauflage)',
         structure="""
@@ -1689,7 +1705,7 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
         publication_start=datetime(2024, 4, 1, tzinfo=tz),
         publication_end=datetime(2024, 4, 10, tzinfo=tz),
     ))
-    entry_recipients = EntryRecipientCollection(org_app.session())
+    entry_recipients = EntryRecipientCollection(client.app.session())
     entry_recipients.add(
         'marietta@user.ch', directory_entries.id, confirmed=True)
     entry_recipients.add(
@@ -1763,17 +1779,17 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
 
         # check if the statistics are updated
         assert mock_get.called
-        assert RecipientCollection(org_app.session()).by_address(
+        assert RecipientCollection(client.app.session()).by_address(  # type: ignore[union-attr]
             'franz@user.ch').is_inactive is False
-        assert RecipientCollection(org_app.session()).by_address(
+        assert RecipientCollection(client.app.session()).by_address(  # type: ignore[union-attr]
             'heinz@user.ch').is_inactive is True
-        assert RecipientCollection(org_app.session()).by_address(
+        assert RecipientCollection(client.app.session()).by_address(  # type: ignore[union-attr]
             'trudi@user.ch').is_inactive is True
-        assert EntryRecipientCollection(org_app.session()).by_address(
+        assert EntryRecipientCollection(client.app.session()).by_address(  # type: ignore[union-attr]
             'marietta@user.ch').is_inactive is False
-        assert EntryRecipientCollection(org_app.session()).by_address(
+        assert EntryRecipientCollection(client.app.session()).by_address(  # type: ignore[union-attr]
             'martha@user.ch').is_inactive is True
-        assert EntryRecipientCollection(org_app.session()).by_address(
+        assert EntryRecipientCollection(client.app.session()).by_address(  # type: ignore[union-attr]
             'michu@user.ch').is_inactive is True
 
     # reactivate recipients
@@ -1822,17 +1838,17 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
 
         # check if the statistics are updated
         assert mock_get.called
-        assert RecipientCollection(org_app.session()).by_address(
+        assert RecipientCollection(client.app.session()).by_address(  # type: ignore[union-attr]
             'franz@user.ch').is_inactive is False
-        assert RecipientCollection(org_app.session()).by_address(
+        assert RecipientCollection(client.app.session()).by_address(  # type: ignore[union-attr]
             'heinz@user.ch').is_inactive is False
-        assert RecipientCollection(org_app.session()).by_address(
+        assert RecipientCollection(client.app.session()).by_address(  # type: ignore[union-attr]
             'trudi@user.ch').is_inactive is True
-        assert EntryRecipientCollection(org_app.session()).by_address(
+        assert EntryRecipientCollection(client.app.session()).by_address(  # type: ignore[union-attr]
             'marietta@user.ch').is_inactive is False
-        assert EntryRecipientCollection(org_app.session()).by_address(
+        assert EntryRecipientCollection(client.app.session()).by_address(  # type: ignore[union-attr]
             'martha@user.ch').is_inactive is False
-        assert EntryRecipientCollection(org_app.session()).by_address(
+        assert EntryRecipientCollection(client.app.session()).by_address(  # type: ignore[union-attr]
             'michu@user.ch').is_inactive is True
 
     # test raising runtime warning exception for status code 401
@@ -1862,30 +1878,30 @@ def test_update_newsletter_email_bounce_statistics(org_app, handlers):
             with pytest.raises(requests.exceptions.HTTPError):
                 client.get(get_cronjob_url(job))
 
-    recipients = RecipientCollection(org_app.session())
+    recipients = RecipientCollection(client.app.session())
     assert recipients.query().count() == 3
-    assert recipients.by_address('franz@user.ch').is_inactive is False
-    assert recipients.by_address('heinz@user.ch').is_inactive is False
-    assert recipients.by_address('trudi@user.ch').is_inactive is True
+    assert recipients.by_address('franz@user.ch').is_inactive is False  # type: ignore[union-attr]
+    assert recipients.by_address('heinz@user.ch').is_inactive is False  # type: ignore[union-attr]
+    assert recipients.by_address('trudi@user.ch').is_inactive is True  # type: ignore[union-attr]
 
-    entry_recipients = EntryRecipientCollection(org_app.session())
+    entry_recipients = EntryRecipientCollection(client.app.session())
     assert entry_recipients.query().count() == 3
-    assert entry_recipients.by_address('marietta@user.ch').is_inactive is False
-    assert entry_recipients.by_address('martha@user.ch').is_inactive is False
-    assert entry_recipients.by_address('michu@user.ch').is_inactive is True
+    assert entry_recipients.by_address('marietta@user.ch').is_inactive is False  # type: ignore[union-attr]
+    assert entry_recipients.by_address('martha@user.ch').is_inactive is False  # type: ignore[union-attr]
+    assert entry_recipients.by_address('michu@user.ch').is_inactive is True  # type: ignore[union-attr]
 
 
-def test_delete_unconfirmed_subscribers(org_app, handlers):
-    register_echo_handler(handlers)
+def test_delete_unconfirmed_subscribers(client: Client[TestOrgApp]) -> None:
 
-    job = get_cronjob_by_name(org_app,
+    job = get_cronjob_by_name(client.app,
                               'delete_unconfirmed_newsletter_subscriptions')
-    job.app = org_app
+    assert job is not None
+    job.app = client.app
 
     with freeze_time(datetime(2025, 1, 1, 4, 0)):
         transaction.begin()
 
-        session = org_app.session()
+        session = client.app.session()
 
         recipients = RecipientCollection(session)
         recipients.add('one@example.org', confirmed=False)
@@ -1897,42 +1913,40 @@ def test_delete_unconfirmed_subscribers(org_app, handlers):
     recipients.add('four@example.org', confirmed=False)
     transaction.commit()
 
-    recipients = RecipientCollection(org_app.session())
+    recipients = RecipientCollection(client.app.session())
     assert recipients.query().count() == 4
-
-    client = Client(org_app)
 
     client.get(get_cronjob_url(job))
 
-    recipients = RecipientCollection(org_app.session())
+    recipients = RecipientCollection(client.app.session())
     assert recipients.query().count() == 2
 
 
 def test_send_push_notifications_for_news(
-    org_app, handlers, firebase_json, client
-):
-    register_echo_handler(handlers)
+    client: Client[TestOrgApp],
+    firebase_json: str
+) -> None:
 
-    client = Client(org_app)
-    job = get_cronjob_by_name(org_app, 'send_push_notifications_for_news')
-    job.app = org_app
+    job = get_cronjob_by_name(client.app, 'send_push_notifications_for_news')
+    assert job is not None
+    job.app = client.app
     tz = ensure_timezone('Europe/Zurich')
 
     # Set up test data
     transaction.begin()
 
     # Configure Firebase credentials for the organization
-    encrypted_creds = org_app.encrypt(firebase_json).decode('utf-8')
-    org_app.org.firebase_adminsdk_credential = encrypted_creds
+    encrypted_creds = client.app.encrypt(firebase_json).decode('utf-8')
+    client.app.org.firebase_adminsdk_credential = encrypted_creds
 
     # Define topic mapping for the organization
-    org_app.org.selectable_push_notification_options = [
-        [f'{org_app.schema}_news', 'News'],
-        [f'{org_app.schema}_important', 'Important']
+    client.app.org.selectable_push_notification_options = [
+        [f'{client.app.schema}_news', 'News'],
+        [f'{client.app.schema}_important', 'Important']
     ]
 
     # Create a news item that should trigger notifications
-    news = PageCollection(org_app.session())
+    news = PageCollection(client.app.session())
     news_parent = news.add_root('News', type='news')
     recent_news = news.add(
         parent=news_parent,
@@ -1949,7 +1963,7 @@ def test_send_push_notifications_for_news(
     # Set metadata
     recent_news.meta = {
         'send_push_notifications_to_app': True,
-        'push_notifications': [f'{org_app.schema}_news'],
+        'push_notifications': [f'{client.app.schema}_news'],
         'hashtags': ['News']
     }
 
@@ -1971,7 +1985,7 @@ def test_send_push_notifications_for_news(
 
         # Verify the notification content
         message = test_service.sent_messages[0]
-        assert message['topic'] == f'{org_app.schema}_news'
+        assert message['topic'] == f'{client.app.schema}_news'
         assert message['title'] == 'Recent news with notifications'
         assert message['body'] == 'This should trigger a notification'
         assert message['data'] is not None
@@ -1982,21 +1996,21 @@ def test_send_push_notifications_for_news(
 
 
 def test_push_notification_duplicate_detection(
-    org_app, handlers, firebase_json
-):
+    client: Client[TestOrgApp],
+    firebase_json: str
+) -> None:
     """Test that validates the duplicate detection logic properly."""
-    register_echo_handler(handlers)
-    client = Client(org_app)
-    session = org_app.session()
-    job = get_cronjob_by_name(org_app, 'send_push_notifications_for_news')
-    job.app = org_app
+    session = client.app.session()
+    job = get_cronjob_by_name(client.app, 'send_push_notifications_for_news')
+    assert job is not None
+    job.app = client.app
 
     # Set up test data
     transaction.begin()
-    encrypted_creds = org_app.encrypt(firebase_json).decode('utf-8')
-    org_app.org.firebase_adminsdk_credential = encrypted_creds
-    org_app.org.selectable_push_notification_options = [
-        [f'{org_app.schema}_news', 'News']
+    encrypted_creds = client.app.encrypt(firebase_json).decode('utf-8')
+    client.app.org.firebase_adminsdk_credential = encrypted_creds
+    client.app.org.selectable_push_notification_options = [
+        [f'{client.app.schema}_news', 'News']
     ]
 
     # Create a news item
@@ -2016,14 +2030,14 @@ def test_push_notification_duplicate_detection(
     test_news.publication_start = utcnow() - timedelta(minutes=2)
     test_news.meta = {
         'send_push_notifications_to_app': 'true',
-        'push_notifications': [[f'{org_app.schema}_news', 'News']],
+        'push_notifications': [[f'{client.app.schema}_news', 'News']],
     }
 
     # Create a PushNotification record directly in the database
     # to simulate a notification that was already sent
     push_notification = PushNotification(
         news_id=news_id,
-        topic_id=f'{org_app.schema}_news',
+        topic_id=f'{client.app.schema}_news',
         sent_at=utcnow(),
         response_data={'status': 'sent', 'message_id': 'test-message-id'},
     )
@@ -2049,7 +2063,7 @@ def test_push_notification_duplicate_detection(
             session.query(PushNotification)
             .filter(
                 PushNotification.news_id == news_id,  # Use stored ID
-                PushNotification.topic_id == f'{org_app.schema}_news',
+                PushNotification.topic_id == f'{client.app.schema}_news',
                 )
             .count()
         )
@@ -2062,16 +2076,24 @@ def test_push_notification_duplicate_detection(
         set_test_notification_service(None)
 
 
-def _create_news_hierarchy(session, parent, items_data):
+def _create_news_hierarchy(
+    session: Session,
+    parent: News | None,
+    items_data: Iterable[tuple[str, Decimal | None]]
+) -> list[News]:
     created_items = []
     for title, order in items_data:
         name = normalize_for_url(title)
-        item = News(
+        # NOTE: Even though order is not nullable it has a default value
+        #       so SQLAlchemy will use that if you set it to `None`, we
+        #       shouldn't really rely on this behavior too much, but we
+        #       still want to test it works correctly.
+        item = News(  # type: ignore[misc]
             title=title,
             name=name,
             type='news',
             parent=parent,
-            order=order  # Handles Decimal and None
+            order=order
         )
         session.add(item)
         created_items.append(item)
@@ -2079,11 +2101,11 @@ def _create_news_hierarchy(session, parent, items_data):
     return created_items
 
 
-def test_normalize_adjacency_list_order(org_app):
-    client = Client(org_app)
-    session = org_app.session()
-    job = get_cronjob_by_name(org_app, 'normalize_adjacency_list_order')
-    job.app = org_app
+def test_normalize_adjacency_list_order(client: Client[TestOrgApp]) -> None:
+    session = client.app.session()
+    job = get_cronjob_by_name(client.app, 'normalize_adjacency_list_order')
+    assert job is not None
+    job.app = client.app
 
     orders = [Decimal('1.0'), Decimal('5.0'), Decimal('10.0')]
     titles = [f'News {i+1}' for i in range(len(orders))]
@@ -2115,7 +2137,7 @@ def test_normalize_adjacency_list_order(org_app):
     session.expire_all()  # Force reload from DB
 
     # Verify normalized order
-    request = Bunch(session=session)
+    request: Any = Bunch(session=session)
     news_items_after = NewsCollection(request).query().filter(
         News.parent_id == news_root_id).order_by(News.order).all()
 
@@ -2129,14 +2151,18 @@ def test_normalize_adjacency_list_order(org_app):
                                                    'News 2', 'News 3']
     # Verify the root page order was not affected
     root = pages.by_id(news_root_id)
+    assert root is not None
     assert root.order == default_root_order
 
 
-def test_normalize_adjacency_list_order_with_null_becomes_default(org_app):
-    client = Client(org_app)
-    session = org_app.session()
-    job = get_cronjob_by_name(org_app, 'normalize_adjacency_list_order')
-    job.app = org_app
+def test_normalize_adjacency_list_order_with_null_becomes_default(
+    client: Client[TestOrgApp]
+) -> None:
+
+    session = client.app.session()
+    job = get_cronjob_by_name(client.app, 'normalize_adjacency_list_order')
+    assert job is not None
+    job.app = client.app
 
     # Define items with one potentially becoming default order
     # Corresponds to default value set in AdjacencyList.order
@@ -2177,7 +2203,7 @@ def test_normalize_adjacency_list_order_with_null_becomes_default(org_app):
     # Initial sort order for ROW_NUMBER() would be:
     # Item C (1.0), Item A (5.0), Item B (65536.0)
     # Normalization should result in: Item C (1.0), Item A (2.0), Item B (3.0)
-    request = Bunch(session=session)
+    request: Any = Bunch(session=session)
     news_items_after = NewsCollection(request).query().filter(
         News.parent_id == news_root_id).order_by(News.order).all()
 
@@ -2189,23 +2215,30 @@ def test_normalize_adjacency_list_order_with_null_becomes_default(org_app):
 
     # Verify the root page order was not affected
     root = pages.by_id(news_root_id)
+    assert root is not None
     assert root.order == default_root_order
 
 
-def test_wil_daily_event_import_wrong_app(org_app):
-    client = Client(org_app)
-    session = org_app.session()
-    org_job = get_cronjob_by_name(org_app, 'wil_daily_event_import')
-    org_job.app = org_app
+def test_wil_daily_event_import_wrong_app(client: Client[TestOrgApp]) -> None:
+    session = client.app.session()
+    org_job = get_cronjob_by_name(client.app, 'wil_daily_event_import')
+    assert org_job is not None
+    org_job.app = client.app
 
     # test not being the right organisation
     client.get(get_cronjob_url(org_job))
 
 
-def test_wil_daily_event_import(wil_app, capturelog):
+@freeze_time('2025-09-01', tick=True)
+def test_wil_daily_event_import(
+    wil_app: TestOrgApp,
+    capturelog: CaptureLogFixture
+) -> None:
+
     client = Client(wil_app)
     session = wil_app.session()
     wil_job = get_cronjob_by_name(wil_app, 'wil_daily_event_import')
+    assert wil_job is not None
     wil_job.app = wil_app
     capturelog.setLevel(logging.ERROR, logger='onegov.org.cronjobs')
 
@@ -2260,7 +2293,6 @@ def test_wil_daily_event_import(wil_app, capturelog):
           <uuid7>E132456</uuid7>
           <locationUuid7>L132456</locationUuid7>
           <organizerUuid7>O789565</organizerUuid7>
-          <category>Sport</category>
           <title>Pole Vault Lesson</title>
           <description>Pole Vault description</description>
           <originalEventUrl>polevaultassociation.sport/first-lession</originalEventUrl>
@@ -2280,13 +2312,12 @@ def test_wil_daily_event_import(wil_app, capturelog):
           <uuid7>E132499</uuid7>
           <locationUuid7>L132488</locationUuid7>
           <organizerUuid7>O789588</organizerUuid7>
-          <category>Literatur</category>
           <title>Reading with Johanna Beehrens</title>
           <abstract>Best book reader in town</abstract>
           <description>Reading a Book</description>
-          <tags>
-            <tag>Library</tag>
-          </tags>
+          <category>
+            <mainCategory>Literature</mainCategory>
+          </category>
           <originalEventUrl></originalEventUrl>
           <providerReference>
             <url>https://www.lemington.ch/events/reading-johanna-beehrens</url>
@@ -2311,13 +2342,11 @@ def test_wil_daily_event_import(wil_app, capturelog):
           <uuid7>E132500</uuid7>
           <locationUuid7>L132456</locationUuid7>
           <organizerUuid7>O789565</organizerUuid7>
-          <category>Sport</category>
           <title>100 Meter Race of the Year</title>
           <description>Event of the year!</description>
-          <tags>
-            <tag>Sport</tag>
-            <tag>Race</tag>
-          </tags>
+          <category>
+            <mainCategory>Sports</mainCategory>
+          </category>
           <originalEventUrl>www.100race.org</originalEventUrl>
           <schedules>
             <schedule>
@@ -2404,13 +2433,13 @@ def test_wil_daily_event_import(wil_app, capturelog):
     """
 
     # remove all existing/initial events from collection
-    occurrences = EventCollection(session)
-    for e in occurrences.query():
-        occurrences.delete(e)
+    collection = EventCollection(session)
+    for e in collection.query():
+        collection.delete(e)
 
-    added, updated, purged = occurrences.from_minasa(xml.encode('utf-8'))
+    added, updated, purged = collection.from_minasa(xml.encode('utf-8'))
 
-    events = occurrences.query().order_by(Event.start).all()
+    events = collection.query().order_by(Event.start).all()
     assert len(events) == 4  # number of event schedules
     assert len(added) == 4  # number of event schedules
     assert len(updated) == 0
@@ -2436,15 +2465,15 @@ def test_wil_daily_event_import(wil_app, capturelog):
     assert events[1].title == 'Reading with Johanna Beehrens'
     assert (events[1].description ==
             'Best book reader in town\n\nReading a Book')
-    assert events[1].tags == ['Library']
+    assert events[1].tags == ['Literature']
     assert events[1].start == start_dates[1]
     assert events[1].end == start_dates[1] + timedelta(hours=2)
-    assert events[1].recurrence == '\n'.join([
-        f'RDATE:'
-        f'{(start_dates[1] + timedelta(weeks=2)).strftime("%Y%m%dT%H%M%SZ")}',
-        f'RDATE:'
-        f'{(start_dates[1] + timedelta(weeks=4)).strftime("%Y%m%dT%H%M%SZ")}'
-    ])
+    recurrence1 = to_timezone(start_dates[1] + timedelta(weeks=2), 'UTC')
+    recurrence2 = to_timezone(start_dates[1] + timedelta(weeks=4), 'UTC')
+    assert events[1].recurrence == (
+        f'RDATE:{recurrence1:%Y%m%dT%H%M%SZ}\n'
+        f'RDATE:{recurrence2:%Y%m%dT%H%M%SZ}'
+    )
     assert events[1].occurrence_dates() == [
         start_dates[1],
         start_dates[1] + timedelta(weeks=2),
@@ -2463,6 +2492,7 @@ def test_wil_daily_event_import(wil_app, capturelog):
     ):
         assert events[i] == added[i]
         assert events[i].title == '100 Meter Race of the Year'
+        assert events[i].tags == ['Sports']
         assert events[i].start == start
         assert events[i].end == start + timedelta(minutes=100)
         assert events[i].recurrence == None
@@ -2497,16 +2527,16 @@ def test_wil_daily_event_import(wil_app, capturelog):
         '<eventStatus>deleted</eventStatus>',
         2
     )
-    occurrences = EventCollection(session)
-    assert occurrences.query().count() == 4
+    collection = EventCollection(session)
+    assert collection.query().count() == 4
 
-    added, updated, purged = occurrences.from_minasa(xml_2.encode('utf-8'))
+    added, updated, purged = collection.from_minasa(xml_2.encode('utf-8'))
 
     assert len(added) == 0  # number of event schedules
     assert len(updated) == 0
     assert len(purged) == 2
-    assert occurrences.query().count() == 2
-    assert [o.title for o in occurrences.query()] == [
+    assert collection.query().count() == 2
+    assert [o.title for o in collection.query()] == [
         '100 Meter Race of the Year',
         '100 Meter Race of the Year'
     ]

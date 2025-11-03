@@ -129,6 +129,7 @@ class InvoiceItemMeta:
     quantity: Decimal = Decimal('1')
     vat_rate: Decimal | None = None
     family: str | None = None
+    cost_object: str | None = None
     extra: dict[str, Any] | None = None
 
     @cached_property
@@ -165,6 +166,7 @@ class InvoiceItemMeta:
             text=self.text,
             group=self.group,
             family=self.family,
+            cost_object=self.cost_object,
             unit=self.unit,
             quantity=self.quantity,
             vat_rate=self.vat_rate,
@@ -174,6 +176,8 @@ class InvoiceItemMeta:
     def refresh_item(self, item: InvoiceItem) -> None:
         assert item.group == self.group
         assert item.family == self.family
+        if item.cost_object != self.cost_object:
+            item.cost_object = self.cost_object
         if item.text != self.text:
             item.text = self.text
         if item.unit != self.unit:
@@ -193,6 +197,7 @@ class _InvoiceDiscountMetaBase(NamedTuple):
     discount: Decimal
     vat_rate: Decimal | None = None
     family: str | None = None
+    cost_object: str | None = None
     extra: dict[str, Any] | None = None
 
 
@@ -212,6 +217,7 @@ class InvoiceDiscountMeta(_InvoiceDiscountMetaBase):
             unit=-amount,
             group=self.group,
             family=self.family,
+            cost_object=self.cost_object,
             vat_rate=self.vat_rate,
             extra=self.extra,
         )

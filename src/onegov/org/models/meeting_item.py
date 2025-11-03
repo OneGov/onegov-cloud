@@ -12,6 +12,7 @@ from sqlalchemy.orm import relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
+    from datetime import datetime
     from onegov.org.models import PoliticalBusiness
     from onegov.org.models import Meeting
     from sqlalchemy.orm import Query
@@ -21,15 +22,30 @@ class MeetingItem(Base, ORMSearchable):
 
     __tablename__ = 'par_meeting_items'
 
-    es_public = True
-    es_properties = {
-        'title': {'type': 'text'},
-        'number': {'type': 'text'}
+    fts_public = True
+    fts_properties = {
+        'title': {'type': 'text', 'weight': 'A'},
+        'number': {'type': 'text', 'weight': 'A'}
     }
 
     @property
-    def es_suggestion(self) -> str:
+    def fts_suggestion(self) -> str:
         return self.title
+
+    @property
+    def fts_last_change(self) -> datetime | None:
+        # NOTE: More current meetings should be more relevant
+        # FIXME: Should we de-prioritize meetings without a date
+        #        or maybe even exclude them from search results?
+        #        Currently they would be as relevant as current
+        #        meetings.
+        # FIXME: This could slow down indexing quite a bit, does it
+        #        result in significantly better results? Maybe we
+        #        shouldn't index individual meeting items and instead
+        #        add their numbers and texts to the index for the
+        #        meeting itself, so you can find meetings by their
+        #        meeting items, which might be what you want anyways.
+        return self.meeting.start_datetime
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(
@@ -52,7 +68,6 @@ class MeetingItem(Base, ORMSearchable):
     political_business: relationship[PoliticalBusiness | None] = relationship(
         'PoliticalBusiness',
         foreign_keys=[political_business_id],
-        lazy='joined'
     )
 
     #: link ID only used for mapping after import

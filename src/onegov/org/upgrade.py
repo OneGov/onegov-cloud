@@ -232,7 +232,7 @@ def fix_directory_file_identity(context: UpgradeContext) -> None:
 def cache_news_hashtags_in_meta(context: UpgradeContext) -> None:
     try:
         for news in context.session.query(News):
-            news.hashtags = news.es_tags or []
+            news.hashtags = news.fts_tags or []
     except Exception:  # nosec B110
         pass
 
@@ -712,3 +712,12 @@ def update_political_business_type_enum_values(
             TYPE par_political_business_type
             USING political_business_type::text::par_political_business_type;
         """)
+
+
+@upgrade_task('Cache new news hashtags in meta')
+def cache_new_news_hashtags_in_meta(context: UpgradeContext) -> None:
+    try:
+        for news in context.session.query(News):
+            news.hashtags = news.fts_tags or []
+    except Exception:  # nosec B110
+        pass

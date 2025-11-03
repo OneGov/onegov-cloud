@@ -24,9 +24,8 @@ class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'par_parties'
 
-    es_type_name = 'pas_party'
-    es_public = False
-    es_properties = {'name': {'type': 'text'}}
+    fts_public = False
+    fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
 
     #: The polymorphic type of party
     type: Column[str] = Column(
@@ -39,10 +38,6 @@ class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
         'polymorphic_on': type,
         'polymorphic_identity': 'pas_party',
     }
-
-    @property
-    def es_suggestion(self) -> str:
-        return self.name
 
     @property
     def title(self) -> str:

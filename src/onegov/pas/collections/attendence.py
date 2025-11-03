@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from sqlalchemy import desc, or_
+from sqlalchemy.orm import joinedload
 
 from onegov.core.collection import GenericCollection
 from onegov.pas.models import (
@@ -15,6 +16,7 @@ from typing import TYPE_CHECKING, Self
 if TYPE_CHECKING:
     from datetime import date
     from sqlalchemy.orm import Query, Session
+    from onegov.pas.request import PasRequest
 
 
 class AttendenceCollection(GenericCollection[Attendence]):
@@ -44,6 +46,12 @@ class AttendenceCollection(GenericCollection[Attendence]):
 
     def query(self) -> Query[Attendence]:
         query = super().query()
+
+        # Eagerly load related data to prevent N+1 queries
+        query = query.options(
+            joinedload(Attendence.parliamentarian).joinedload(PASParliamentarian.roles),
+            joinedload(Attendence.commission)
+        )
 
         if self.settlement_run_id:
             settlement_run = self.session.query(SettlementRun).get(
@@ -131,3 +139,69 @@ class AttendenceCollection(GenericCollection[Attendence]):
             commission_id=self.commission_id,
             party_id=party_id,
         )
+
+    def for_parliamentarian(self, parliamentarian_id: str) -> Self:
+        """Returns attendances for a specific parliamentarian only."""
+        return self.for_filter(parliamentarian_id=parliamentarian_id)
+
+    def for_commission_president(
+        self,
+        parliamentarian_id: str,
+        active_commission_ids: list[str]
+    ) -> Query[Attendence]:
+        """
+        Returns attendances for a commission president:
+        - Their own attendances
+        - Attendances of members in commissions they preside over
+        """
+        query = self.query()
+        return query.filter(
+            (Attendence.parliamentarian_id == parliamentarian_id) |
+            (Attendence.commission_id.in_(active_commission_ids))
+        )
+
+    def view_for_parliamentarian(
+        self, request: PasRequest
+    ) -> list[Attendence]:
+        """
+        Returns filtered attendances based on user role and permissions.
+        This encapsulates the filtering logic previously in the view.
+        """
+        user = request.current_user
+
+        if not request.is_parliamentarian:
+            # Admins see all attendances
+            return self.query().all()
+
+        if not (user and hasattr(user, 'parliamentarian') and
+                user.parliamentarian):
+            return []
+
+        parliamentarian = user.parliamentarian
+
+        if user.role == 'commission_president':
+            from datetime import date
+            # Commission presidents see own + commission members' attendances
+            # We have to check all but usually president of just one
+            active_presidencies = [
+                cm.commission_id
+                for cm in parliamentarian.commission_memberships
+                if (cm.role == 'president' and
+                    (cm.end is None or cm.end >= date.today()))
+            ]
+
+            if active_presidencies:
+                return self.for_commission_president(
+                    str(parliamentarian.id),
+                    active_presidencies
+                ).all()
+            else:
+                # Fallback to own attendances only
+                return self.for_parliamentarian(
+                    str(parliamentarian.id)
+                ).query().all()
+        else:
+            # Regular parliamentarians see only their own attendances
+            return self.for_parliamentarian(
+                str(parliamentarian.id)
+            ).query().all()

@@ -6,10 +6,8 @@ from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.org.models import Search
 from onegov.org.views.search import search
 
-
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.orm import Base
     from onegov.core.types import RenderData
     from onegov.landsgemeinde.request import LandsgemeindeRequest
     from webob import Response
@@ -17,7 +15,7 @@ if TYPE_CHECKING:
 
 @LandsgemeindeApp.html(model=Search, template='search.pt', permission=Public)
 def landsgemeinde_search(
-    self: Search[Base],
+    self: Search,
     request: LandsgemeindeRequest
 ) -> RenderData | Response:
     return search(self, request, DefaultLayout(self, request))

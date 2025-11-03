@@ -344,7 +344,7 @@ def with_open_excel_or_csv(
 
 
 @with_open_excel_or_csv
-def import_commissions(
+def import_commissions_excel(
     import_file: ImportFile,
     session: Session,
     commission_file_abs_path: str,

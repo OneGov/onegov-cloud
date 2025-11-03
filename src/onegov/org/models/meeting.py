@@ -44,21 +44,37 @@ class Meeting(
 
     __tablename__ = 'par_meetings'
 
-    es_public = True
-    es_properties = {'title_text': {'type': 'text'}}
+    fts_public = True
+    fts_properties = {
+        'title_text': {'type': 'text', 'weight': 'A'},
+        'display_name': {'type': 'text', 'weight': 'A'}
+    }
 
     @property
-    def es_suggestion(self) -> str:
-        return self.title
+    def fts_suggestion(self) -> list[str]:
+        return [self.title_text, self.display_name]
+
+    @property
+    def fts_last_change(self) -> datetime | None:
+        # NOTE: More current meetings should be more relevant
+        # FIXME: Should we de-prioritize meetings without a date
+        #        or maybe even exclude them from search results?
+        #        Currently they would be as relevant as current
+        #        meetings.
+        return self.start_datetime
 
     @property
     def title_text(self) -> str:
-        return f'{self.title} ({self.start_datetime})'
+        if self.start_datetime is not None:
+            return f'{self.title} ({self.start_datetime})'
+        return self.title
 
     @property
     def display_name(self) -> str:
         # return title and start_datetime as dmY
-        return f'{self.title} {self.start_datetime:%d.%m.%Y}'
+        if self.start_datetime is not None:
+            return f'{self.title} {self.start_datetime:%d.%m.%Y}'
+        return self.title
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(

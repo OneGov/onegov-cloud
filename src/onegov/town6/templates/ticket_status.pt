@@ -51,7 +51,7 @@
                         data-feed='static'>
                 </div>
 
-                <tal:b condition="ticket.handler_code == 'EVN'  and ticket.unguessable_edit_link(request)">
+                <tal:b condition="ticket.handler_code == 'EVN' and ticket.unguessable_edit_link(request)">
                     <div class="panel">
                         <span i18n:translate>Would you like to make corrections to the event?</span>
                         <a href="${ticket.unguessable_edit_link(request)}" i18n:translate>Edit this event.</a>

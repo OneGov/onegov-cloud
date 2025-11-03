@@ -1,18 +1,31 @@
+from __future__ import annotations
+
 from onegov.landsgemeinde.forms import AgendaItemForm
 from onegov.landsgemeinde.forms import AssemblyForm
 from onegov.landsgemeinde.forms import VotumForm
 from unittest.mock import Mock
 
 
-class DummyPostData(dict):
-    def getlist(self, key):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.landsgemeinde.models import Assembly
+    from sqlalchemy.orm import Session
+    from webob.multidict import MultiDict
+
+    DummyPostDataBase = MultiDict[str, Any]
+else:
+    DummyPostDataBase = dict
+
+
+class DummyPostData(DummyPostDataBase):
+    def getlist(self, key: str) -> list[Any]:
         v = self[key]
         if not isinstance(v, (list, tuple)):
             v = [v]
         return v
 
 
-def test_assembly_form(session, assembly):
+def test_assembly_form(session: Session, assembly: Assembly) -> None:
     session.add(assembly)
     session.flush()
     session.expire_all()
@@ -57,7 +70,7 @@ def test_assembly_form(session, assembly):
     assert form.validate()
 
 
-def test_agenda_item_form(session, assembly):
+def test_agenda_item_form(session: Session, assembly: Assembly) -> None:
     session.add(assembly)
     session.flush()
     session.expire_all()
@@ -123,7 +136,7 @@ def test_agenda_item_form(session, assembly):
     assert form.validate()
 
 
-def test_votum_form(session, assembly):
+def test_votum_form(session: Session, assembly: Assembly) -> None:
     session.add(assembly)
     session.flush()
     session.expire_all()
@@ -136,8 +149,8 @@ def test_votum_form(session, assembly):
     assert form.next_number == 3
 
     # useful data
-    assert form.get_useful_data()['agenda_item_id'] == \
-        assembly.agenda_items[0].id
+    assert form.get_useful_data()['agenda_item_id'] == (
+        assembly.agenda_items[0].id)
 
     # validate: no data
     form = VotumForm()

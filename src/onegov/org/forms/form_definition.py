@@ -69,6 +69,16 @@ class FormDefinitionBaseForm(Form):
         description=_('Replies to automated e-mails go to this address.')
     )
 
+    custom_above_footer = TextAreaField(
+        label=_('Custom text above the footer'),
+        fieldset=_('Tickets'),
+        description=_(
+            'This text is shown above the footer in the ticket '
+            'opening notification e-mail.'
+        ),
+        render_kw={'rows': 4}
+    )
+
     show_vat = BooleanField(
         label=_('Show VAT'),
         description=_(

@@ -9,48 +9,35 @@ jobs:
   stubtest:
     runs-on: ubuntu-24.04
 
+    # we always use the latest container from the master branch
+    # this is fine because we still run all our installs just in case
+    container:
+      image: ghcr.io/onegov/onegov-cloud:master
+      credentials:
+         username: ${{ github.actor }}
+         password: ${{ secrets.GITHUB_TOKEN }}
+
+    defaults:
+      run:
+        shell: bash
+
     steps:
     - name: Install packages
       run: |
-        sudo apt-get update
-        sudo apt-get install \
-          build-essential \
-          git \
-          gcc \
-          g++ \
-          libcurl4-openssl-dev \
-          libffi-dev \
-          libjpeg-dev \
-          libpq-dev \
-          libxml2-dev \
-          libxslt1-dev \
-          zlib1g-dev \
-          libev-dev \
-          libgnutls28-dev \
-          libkrb5-dev \
-          libpoppler-cpp-dev \
-          pv \
-          libzbar0 \
-          openssl \
-          libssl-dev \
-          xmlsec1 \
-          libxmlsec1-openssl \
-          ghostscript \
-          zip \
-          libev4 \
-          libmagic1 \
+        apt-get update
+        apt-get install -y \
           wget \
           apparmor \
           curl \
           git-core \
           postgresql \
           redis \
-          openjdk-8-jre-headless \
           gcc \
           libc-dev \
           fonts-liberation \
           libappindicator3-1 \
-          libasound2t64  \
+          libasound2t64 \
+          libcairo2-dev \
           libdrm2 \
           libgbm1 \
           libnspr4 \
@@ -61,25 +48,20 @@ jobs:
           libxcb-dri3-0 \
           libxshmfence1 \
           libxss1 \
-          xdg-utils \
-          --fix-missing
+          libxt-dev \
+          xdg-utils
 
     - name: Checkout repo
       uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.11
-
     - name: Install dependencies
       run: |
+        source /app/bin/activate
         python -m pip install --upgrade uv
-        uv pip install .[mypy]
-      env:
-        UV_SYSTEM_PYTHON: true
+        uv pip compile setup.cfg -U \
+        | uv pip install .[mypy] -r /dev/stdin
 
     - name: Stubtest
-      run: bash stubtest.sh
-      env:
-        SKIP_VENV: 1
+      run:  |
+        source /app/bin/activate
+        bash stubtest.sh

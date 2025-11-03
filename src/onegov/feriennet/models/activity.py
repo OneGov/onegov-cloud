@@ -25,21 +25,22 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
 
     __mapper_args__ = {'polymorphic_identity': 'vacation'}
 
-    es_type_name = 'vacation'
-
-    es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
-        'text': {'type': 'localized_html'},
-        'organiser': {'type': 'text'}
+    fts_properties = {
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'},
+        'text': {'type': 'localized', 'weight': 'C'},
+        # FIXME: We may want to split this into more properties
+        #        the organiser's name definitely seems more important
+        #        than their bank account or emergency contact for searching
+        'organiser_text': {'type': 'text', 'weight': 'B'}
     }
 
     @property
-    def es_public(self) -> bool:
+    def fts_public(self) -> bool:
         return self.state == 'accepted'
 
     @property
-    def es_skip(self) -> bool:
+    def fts_skip(self) -> bool:
         return self.state == 'preview'
 
     @property
@@ -73,6 +74,10 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
 
         return organiser
 
+    @property
+    def organiser_text(self) -> str:
+        return ' '.join(self.organiser)
+
     def ordered_tags(
         self,
         request: FeriennetRequest,
@@ -103,7 +108,6 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
 
 class ActivityTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'FER'}  # type:ignore
-    es_type_name = 'activity_tickets'
 
     def reference_group(
         self,

@@ -10,7 +10,6 @@ import re
 import shutil
 import sys
 import textwrap
-from functools import wraps
 
 from bs4 import BeautifulSoup
 from collections import defaultdict
@@ -22,6 +21,7 @@ import locale
 import requests
 import transaction
 import yaml
+
 from onegov.core.orm.utils import QueryChain
 from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
                                    TimerangeTooLong)
@@ -32,11 +32,15 @@ from onegov.core.crypto import random_token
 from onegov.core.utils import Bunch
 from onegov.directory import DirectoryEntry
 from onegov.directory.models.directory import DirectoryFile
-from onegov.event import Event, Occurrence, EventCollection
+from onegov.event import Event
+from onegov.event import Occurrence
+from onegov.event import EventCollection
+from onegov.event import OccurrenceCollection
 from onegov.event.collections.events import EventImportItem
 from onegov.file import File
 from onegov.file.collection import FileCollection
 from onegov.form import FormCollection, FormDefinition
+from onegov.newsletter.collection import RecipientCollection
 from onegov.org import log
 from onegov.org.formats import DigirezDB
 from onegov.org.forms.event import TAGS
@@ -76,10 +80,9 @@ from pathlib import Path
 from sqlalchemy import func, and_, or_
 from sqlalchemy.dialects.postgresql import array
 from uuid import uuid4
-from elasticsearch.exceptions import ConnectionError as ESConnectionError
-
 
 from typing import IO, Any, TYPE_CHECKING, TypedDict
+
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from depot.fields.upload import UploadedFile
@@ -2018,17 +2021,6 @@ def import_parliamentary_groups(
     return create_parliamentary_groups
 
 
-def handle_es_connection_error(func: Any) -> Callable[[OrgRequest, OrgApp],
-                                                      None]:
-    @wraps(func)
-    def wrapper(request: OrgRequest, app: OrgApp) -> None:
-        try:
-            return func(request, app)
-        except ESConnectionError:
-            click.echo('Ignoring Elasticsearch Connection error.')
-    return wrapper
-
-
 @cli.command(name='import-political-business')
 @click.argument('path', type=click.Path(exists=True, resolve_path=True))
 @click.option('--dry-run', is_flag=True, default=False)
@@ -2098,7 +2090,6 @@ def import_political_business(
         return (datetime.strptime(date_str, '%d. %B %Y').date()
                 if date_str else None)
 
-    @handle_es_connection_error
     def create_political_businesses(request: OrgRequest, app: OrgApp) -> None:
         session = request.session
         political_business_collection = PoliticalBusinessCollection(session)
@@ -2263,14 +2254,14 @@ def import_political_business(
                                             'Creating new parliamentarian: '
                                             f'{first_name} {last_name} for '
                                             f'{article_name} (unlinked)')
+                                        savepoint = transaction.savepoint()
                                         parliamentarian = RISParliamentarian(
                                             first_name=first_name,
                                             last_name=last_name)
                                         session.add(parliamentarian)
                                         try:
-                                            with session.begin_nested():
-                                                # Ensure ID is available
-                                                session.flush()
+                                            # Ensure ID is available
+                                            session.flush()
                                         except Exception as e:
                                             click.secho(
                                                 'Error creating '
@@ -2278,6 +2269,7 @@ def import_political_business(
                                                 f' {last_name}: {e}', fg='red')
                                             parliamentarian = None
                                             # Failed to create
+                                            savepoint.rollback()
 
                                         if (
                                             parliamentarian
@@ -2316,25 +2308,23 @@ def import_political_business(
                         click.secho(f'Warning: Unknown status '
                                     f'"{german_status}" in {article_name}. '
                                     f'Setting to None.', fg='yellow')
-                try:
-                    if '_' not in article_name:
-                        continue
-                    pol_business_id = article_name.split('_')[1].split('.')[0]
-                    political_business_collection.add(
-                        title=political_business['metadata']['title'],
-                        number=data_fields.get('Nummer'),
-                        political_business_type=english_business_type,
-                        status=english_status,
-                        entry_date=parse_german_date(data_fields.get('Datum')),
-                        content={},
-                        meta={
-                            'people_ids': people_ids,
-                            'parliamentary_group_ids': parliamentary_group_ids,
-                            'self_id': pol_business_id
-                        }
-                    )
-                except ESConnectionError:
-                    click.echo('Elasticsearch connection error')
+
+                if '_' not in article_name:
+                    continue
+                pol_business_id = article_name.split('_')[1].split('.')[0]
+                political_business_collection.add(
+                    title=political_business['metadata']['title'],
+                    number=data_fields.get('Nummer'),
+                    political_business_type=english_business_type,
+                    status=english_status,
+                    entry_date=parse_german_date(data_fields.get('Datum')),
+                    content={},
+                    meta={
+                        'people_ids': people_ids,
+                        'parliamentary_group_ids': parliamentary_group_ids,
+                        'self_id': pol_business_id
+                    }
+                )
 
         click.echo(f'{import_counter} political_businesses imported')
         click.echo(f'{overwrite_counter} political_businesses overwritten')
@@ -3056,3 +3046,102 @@ def ris_wil_meetings_shorten_audio_links(
         transaction.commit()
 
     return ris_wil_meetings_fix_audio_links
+
+
+@cli.command(name='wil-event-tags-to-german-as-we-use-custom-event-tags')
+def wil_event_tags_to_german_as_we_use_custom_event_tags(
+) -> Callable[[OrgRequest, OrgApp], None]:
+
+    map = {
+        'Art': 'Kunst',
+        'Cinema': 'Kino',
+        'Concert': 'Konzert',
+        'Congress': 'Kongress',
+        'Culture': 'Kultur',
+        'Dancing': 'Tanzen',
+        'Education': 'Bildung',
+        'Exhibition': 'Ausstellung',
+        'Gastronomy': 'Gastronomie',
+        'Health': 'Gesundheit',
+        'Library': 'Bibliothek',
+        'Literature': 'Literatur',
+        'Market': 'Markt',
+        'Meetup': 'Treffen',
+        'Misc': 'Verschiedenes',
+        'Music School': 'Musikschule',
+        'Nature': 'Natur',
+        'Music': 'Musik',
+        'Party': 'Party',
+        'Politics': 'Politik',
+        'Reading': 'Lesung',
+        'Religion': 'Religion',
+        'Sports': 'Sport',
+        'Talk': 'Vortrag',
+        'Theater': 'Theater',
+        'Tourism': 'Tourismus',
+        'Toy Library': 'Spielzeugbibliothek',
+        'Tradition': 'Tradition',
+        'Youth': 'Jugend',
+        'Elderly': 'Senioren',
+
+        'Diverses': 'Verschiedenes',
+    }
+
+    def event_tags_to_german(
+        request: OrgRequest,
+        app: OrgApp
+    ) -> None:
+
+        click.secho(f'org name: {request.app.org.name}')
+        if request.app.org.name != 'Stadt Wil':
+            return
+
+        events = EventCollection(request.session).query()
+        occurrences = OccurrenceCollection(request.session).query()
+
+        for collection in [events, occurrences]:
+            for item in collection:  # type: ignore[attr-defined]
+                new_tags = []
+                tags = item.tags
+                for tag in tags:
+                    translated = map.get(tag, tag)
+                    new_tags.append(translated)
+                click.secho(f'new tags: {new_tags}', fg='green')
+                item.tags = new_tags
+
+            request.session.flush()
+
+    return event_tags_to_german
+
+
+@cli.command(name='subscribe-parliamentarians-to-newsletter')
+def subscribe_parliamentarians_to_newsletter(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    onegov-org --select /foo/bar subscribe-parliamentarians-to-newsletter
+    """
+
+    def subscribe_parliamentarians(
+        request: OrgRequest,
+        app: OrgApp
+    ) -> None:
+
+        recipients = RecipientCollection(request.session)
+        parliamentarians = RISParliamentarianCollection(
+            request.session).query().all()
+        subscribe_counter = 0
+
+        for p in parliamentarians:
+            if not p.email_primary:
+                continue
+
+            recipient = recipients.by_address(p.email_primary)
+            if not recipient:
+                recipients.add(
+                    address=p.email_primary,
+                    # group='Parlamentarier',
+                    confirmed=True
+                )
+                click.secho(f'Subscribed {p.email_primary}', fg='green')
+                subscribe_counter += 1
+    return subscribe_parliamentarians

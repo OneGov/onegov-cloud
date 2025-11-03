@@ -1,15 +1,18 @@
+from __future__ import annotations
+
 import copy
 import re
 import docx
-from freezegun import freeze_time
 import transaction
-from io import BytesIO
 
+from freezegun import freeze_time
+from io import BytesIO
 from onegov.core.utils import module_path
 from onegov.translator_directory.models.ticket import AccreditationTicket
 from onegov.translator_directory.models.translator import Translator
 from os.path import basename
 from onegov.file import FileCollection
+from onegov.file import File
 from tests.onegov.translator_directory.shared import iter_block_items
 from onegov.gis import Coordinates
 from onegov.pdf import Pdf
@@ -17,7 +20,7 @@ from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
 from onegov.user import UserCollection
 from openpyxl import load_workbook
-from pdftotext import PDF
+from pdftotext import PDF  # type: ignore[import-not-found]
 from tests.onegov.translator_directory.shared import (
     translator_data, create_languages, create_certificates)
 from tests.shared.utils import decode_map_value, encode_map_value
@@ -25,16 +28,27 @@ from unittest.mock import patch
 from webtest import Upload
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.client import ExtendedResponse
+    from unittest.mock import MagicMock
+    from .conftest import Client
+
+
 class FakeResponse:
-    def __init__(self, json_data=None, status_code=200):
+    def __init__(
+        self,
+        json_data: Any | None = None,
+        status_code: int = 200
+    ) -> None:
         self.status_code = status_code
         self.json_data = json_data or {}
 
-    def json(self):
+    def json(self) -> Any:
         return self.json_data
 
 
-def upload_pdf(filename):
+def upload_pdf(filename: str) -> Upload:
     file = BytesIO()
     pdf = Pdf(file)
     pdf.init_report()
@@ -45,7 +59,7 @@ def upload_pdf(filename):
     return Upload(filename, file.read(), 'application/pdf')
 
 
-def check_pdf(page, filename, link):
+def check_pdf(page: ExtendedResponse, filename: str, link: str) -> None:
     response = page.click(link, index=0)
     headers = dict(response.headers)
     assert filename in headers['Content-Disposition']
@@ -53,7 +67,11 @@ def check_pdf(page, filename, link):
     assert filename in ''.join(PDF(BytesIO(response.body)))
 
 
-def upload_file(filename, client, content_type=None):
+def upload_file(
+    filename: str,
+    client: Client,
+    content_type: str | None = None
+) -> None:
     with open(filename, 'rb') as f:
         page = client.get('/files')
         page.form['file'] = [
@@ -62,7 +80,7 @@ def upload_file(filename, client, content_type=None):
         page.form.submit()
 
 
-def test_view_translator(client):
+def test_view_translator(client: Client) -> None:
     session = client.app.session()
     languages = create_languages(session)
     certs = create_certificates(session)
@@ -160,8 +178,8 @@ def test_view_translator(client):
         assert values['IBAN'] == 'DE07 1234 1234 1234 1234 12'
         assert values['E-Mail'] == 'test@test.com'
         assert values['Telefon Mobile'] == '079 700 80 97'
-        assert values['Fachkenntnisse nach Dolmetscherart'] == \
-            'Simultandolmetschen'
+        assert values['Fachkenntnisse nach Dolmetscherart'] == (
+            'Simultandolmetschen')
         assert 'Ernährung' in values['Fachkenntnisse nach Berufssparte']
         assert 'Psychologie' in values['Fachkenntnisse nach Berufssparte']
         assert values['Muttersprachen'] == language_names[3]
@@ -177,7 +195,8 @@ def test_view_translator(client):
 
         # test user account created and activation mail sent
         user = UserCollection(session).by_username('test@test.com')
-        assert user.translator.title == 'BOB, Uncle'
+        assert user is not None
+        assert user.translator.title == 'BOB, Uncle'  # type: ignore[attr-defined]
         assert user.active is True
         assert user.role == 'translator'
 
@@ -187,23 +206,23 @@ def test_view_translator(client):
 
         # test translator can login and view his own data
         client.logout()
-        reset_password_url = re.search(
+        reset_password_url = re.search(  # type: ignore[union-attr]
             r'(http://localhost/auth/reset-password[^)]+)',
             mail['TextBody']
         ).group()
         page = client.get(reset_password_url)
         page.form['email'] = 'test@test.com'
-        page.form['password'] = 'p@ssw0rd'
+        page.form['password'] = 'p@ssw0rd12'
         page.form.submit()
 
     with freeze_time('2021-12-31'):
-        page = client.login('test@test.com', 'p@ssw0rd', None).maybe_follow()
+        page = client.login('test@test.com', 'p@ssw0rd12', None).maybe_follow()
         assert 'Sind ihre Daten noch aktuell? Bitte überprüfen Sie' not in page
         assert '978654' in page
         assert 'Uncle' in page
         assert 'BOB' in page
 
-    page = client.login('test@test.com', 'p@ssw0rd', None).maybe_follow()
+    page = client.login('test@test.com', 'p@ssw0rd12', None).maybe_follow()
     assert 'Sind ihre Daten noch aktuell? Bitte überprüfen Sie' in page
     assert '978654' in page
     assert 'Uncle' in page
@@ -262,7 +281,7 @@ def test_view_translator(client):
     page.form['zip_code'] = '4052'
     page.form['city'] = 'Somecity'
     page.form['drive_distance'] = drive_distance
-    page.form['social_sec_number'] = '756.1111.1111.11'
+    page.form['social_sec_number'] = '756.1111.1111.13'
     page.form['bank_name'] = 'Abank'
     page.form['bank_address'] = 'AB Address'
     page.form['account_owner'] = 'AccountOwner'
@@ -316,7 +335,7 @@ def test_view_translator(client):
     assert len(values) == 42
     assert values['Nachname'] == 'MAGGIE'
     assert values['Vorname'] == 'Aunt'
-    assert values['AHV-Nr.'] == '756.1111.1111.11'
+    assert values['AHV-Nr.'] == '756.1111.1111.13'
     assert values['Anschrift'] == 'Somestreet'
     assert values['Ausbildung Dolmetscher'] == 'Ja'
     assert values['Bank Adresse'] == 'AB Address'
@@ -330,8 +349,8 @@ def test_view_translator(client):
     assert values['Erreich- und Verfügbarkeit'] == 'always 24h'
     assert 'Wirtschaft' in values['Fachkenntnisse nach Berufssparte']
     assert 'Religion' in values['Fachkenntnisse nach Berufssparte']
-    assert values['Fachkenntnisse nach Dolmetscherart'] == \
-        'Konsektutivdolmetschen'
+    assert values['Fachkenntnisse nach Dolmetscherart'] == (
+        'Konsektutivdolmetschen')
     assert values['Geburtsdatum'] == '01.01.2019'
     assert values['Geschlecht'] == 'Weiblich'
     assert values['IBAN'] == 'CH5604835012345678009'
@@ -360,7 +379,8 @@ def test_view_translator(client):
     users = UserCollection(session)
     assert not users.by_username('test@test.com')
     user = users.by_username('aunt.maggie@translators.com')
-    assert user.translator.title == 'MAGGIE, Aunt'
+    assert user is not None
+    assert user.translator.title == 'MAGGIE, Aunt'  # type: ignore[attr-defined]
     assert user.active is True
     assert user.role == 'translator'
 
@@ -381,7 +401,7 @@ def test_view_translator(client):
     client.logout()
 
 
-def test_view_languages(client):
+def test_view_languages(client: Client) -> None:
     create_languages(client.app.session())
     transaction.commit()
 
@@ -397,7 +417,7 @@ def test_view_languages(client):
     assert 'Arabic' in page
 
 
-def test_manage_language(client):
+def test_manage_language(client: Client) -> None:
     client.login_editor()
     client.get('/languages/new', status=403)
     client.login_admin()
@@ -428,7 +448,7 @@ def test_manage_language(client):
     assert 'English (British)' not in page
 
 
-def test_view_search_translator(client):
+def test_view_search_translator(client: Client) -> None:
     """
     - test excluding hidden ones for non-admins
     """
@@ -491,7 +511,7 @@ def test_view_search_translator(client):
     assert 'Hugentobler'.upper() not in page
 
 
-def test_view_export_translators(client):
+def test_view_export_translators(client: Client) -> None:
     session = client.app.session()
     languages = create_languages(session)
     translators = TranslatorCollection(client.app)
@@ -526,7 +546,7 @@ def test_view_export_translators(client):
     assert sheet.cell(2, 12).value == '4000'
     assert sheet.cell(2, 13).value == 'Luzern'
     assert sheet.cell(2, 14).value is None
-    assert sheet.cell(2, 15).value == '756.1234.4568.90'
+    assert sheet.cell(2, 15).value == '756.1234.4568.94'
     assert sheet.cell(2, 16).value == 'R-BS'
     assert sheet.cell(2, 17).value == 'Bullstreet 5'
     assert sheet.cell(2, 18).value == 'Hugo Benito'
@@ -555,7 +575,7 @@ def test_view_export_translators(client):
     assert sheet.cell(2, 41).value is None
 
 
-def test_view_export_translators_with_filters(client):
+def test_view_export_translators_with_filters(client: Client) -> None:
     session = client.app.session()
     languages = create_languages(session)
     lang_ids = [str(lang.id) for lang in languages]
@@ -611,7 +631,7 @@ def test_view_export_translators_with_filters(client):
     response = page.click('Export')
     sheet = load_workbook(BytesIO(response.body)).worksheets[0]
     assert sheet.max_row == 2
-    header = {cell.value: cell.column for cell in sheet[1]}
+    header: dict[str, int] = {cell.value: cell.column for cell in sheet[1]}  # type: ignore[misc]
     # Check data of the exported translator (should be translator 1) using
     # column names from the header
     data_row = 2
@@ -629,7 +649,9 @@ def test_view_export_translators_with_filters(client):
     ).value == 'Italian'
 
 
-def test_view_export_translators_with_filters_two_langs(client):
+def test_view_export_translators_with_filters_two_langs(
+    client: Client
+) -> None:
     session = client.app.session()
     languages = create_languages(session)
     lang_ids = [str(lang.id) for lang in languages]
@@ -668,7 +690,7 @@ def test_view_export_translators_with_filters_two_langs(client):
     response = page.click('Export')
     sheet = load_workbook(BytesIO(response.body)).worksheets[0]
     assert sheet.max_row == 3
-    header = {cell.value: cell.column for cell in sheet[1]}
+    header: dict[str, int] = {cell.value: cell.column for cell in sheet[1]}  # type: ignore[misc]
 
     data_row = 2
     # first one will be the 5555  (ordered by lastname
@@ -711,7 +733,7 @@ def test_view_export_translators_with_filters_two_langs(client):
     response = page.click('Export')
     sheet = load_workbook(BytesIO(response.body)).worksheets[0]
     assert sheet.max_row == 3
-    header = {cell.value: cell.column for cell in sheet[1]}
+    header = {cell.value: cell.column for cell in sheet[1]}  # type: ignore[misc]
 
     # Check order is reversed in export (4444 first, then 5555)
     data_row = 2
@@ -728,12 +750,12 @@ def test_view_export_translators_with_filters_two_langs(client):
 
 
 
-def test_file_security(client):
+def test_file_security(client: Client) -> None:
     translators = TranslatorCollection(client.app)
     trs_id = translators.add(**translator_data).id
     transaction.commit()
 
-    def content_disposition(file, filename):
+    def content_disposition(file: str, filename: str) -> bool:
         return filename in client.get(file).headers['Content-Disposition']
 
     # Add a published general, an unpublished general and a translator file
@@ -808,11 +830,35 @@ def test_file_security(client):
     client.get(translator_file, status=403)
 
 
-def test_translator_directory_settings(client):
+def test_translator_file_access_forbidden(client: Client) -> None:
+    client.login_admin()
+    page = client.get('/files')
+    page.form['file'] = [upload_pdf('test.pdf')]
+    page = page.form.submit()
+    url = page.pyquery('div[ic-get-from]')[0].attrib['ic-get-from']
+    file_url = url.replace('/details', '')
+    client.logout()
+
+    client.login_translator()
+    client.get(file_url, status=403)
+    client.get(f'{file_url}/thumbnail', status=403)
+    client.get(f'{file_url}/small', status=403)
+    client.get(f'{file_url}/medium', status=403)
+    client.get(file_url, status=403, extra_environ={'REQUEST_METHOD': 'HEAD'})
+    thumbnail_url = f'{file_url}/thumbnail'
+    client.get(
+        thumbnail_url,
+        status=403,
+        extra_environ={'REQUEST_METHOD': 'HEAD'}
+    )
+    client.logout()
+
+
+def test_translator_directory_settings(client: Client) -> None:
     client.login_admin()
     settings = client.get('/').follow().click('Verzeichniseinstellungen')
 
-    def map_value(page):
+    def map_value(page: ExtendedResponse) -> Any:
         return decode_map_value(page.form['coordinates'].value)
 
     assert not map_value(settings)
@@ -835,7 +881,7 @@ def test_translator_directory_settings(client):
     assert 'https://t.ch/file.pdf' in client.get('/request-accreditation')
 
 
-def test_view_redirects(client):
+def test_view_redirects(client: Client) -> None:
     # Create a translator
     languages = create_languages(client.app.session())
     language_id = str(languages[0].id)
@@ -858,12 +904,12 @@ def test_view_redirects(client):
     client.logout()
 
     mail = client.get_email(0, flush_queue=True)['TextBody']
-    reset_password_url = re.search(
+    reset_password_url = re.search(  # type: ignore[union-attr]
         r'(http://localhost/auth/reset-password[^)]+)', mail
     ).group()
     page = client.get(reset_password_url)
     page.form['email'] = 'translator@example.org'
-    page.form['password'] = 'p@ssword'
+    page.form['password'] = 'p@ssword12'
     page.form.submit()
 
     # Test redirects
@@ -872,7 +918,7 @@ def test_view_redirects(client):
             'homepage': translator_url,
             'login': translator_url,
             'logout': 'http://localhost/auth/login',
-            'password': 'p@ssword',
+            'password': 'p@ssword12',
             'to': 'http://localhost/topics/informationen'
         },
         'member@example.org': {
@@ -903,7 +949,13 @@ def test_view_redirects(client):
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
-def test_view_translator_mutation(broadcast, authenticate, connect, client):
+def test_view_translator_mutation(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
+
     session = client.app.session()
     languages = create_languages(session)
     certs = create_certificates(session)
@@ -975,124 +1027,16 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
         assert 'hinzugefügt' in page.form.submit().follow()
 
     client.logout()
-    reset_password_url = re.search(
+    reset_password_url = re.search(  # type: ignore[union-attr]
         r'(http://localhost/auth/reset-password[^)]+)',
         client.get_email(0, flush_queue=True)['TextBody']
     ).group()
     page = client.get(reset_password_url)
     page.form['email'] = 'test@test.com'
-    page.form['password'] = 'p@ssw0rd'
+    page.form['password'] = 'p@ssw0rd12'
     page.form.submit()
 
-    # Report changes as member
-    client.login_member()
-    page = client.get('/').maybe_follow().click('BOB, Uncle')
-    page = page.click('Mutation melden')
-    page.form['submitter_message'] = 'Hallo!'
-    page.form['first_name'] = 'Aunt'
-    page.form['last_name'] = 'Anny'
-    page.form['pers_id'] = 123456
-    page.form['admission'] = 'in_progress'
-    page.form['gender'] = 'F'
-    page.form['withholding_tax'] = True
-    page.form['self_employed'] = True
-    page.form['date_of_birth'] = '1960-01-01'
-    page.form['nationalities'] = ['CH', 'AT']
-    page.form['coordinates'] = encode_map_value({
-        'lat': 47, 'lon': 8, 'zoom': 13
-    })
-    page.form['address'] = 'Fakestreet 321'
-    page.form['zip_code'] = '6010'
-    page.form['city'] = 'Kriens'
-    page.form['tel_private'] = '+41412223347'
-    page.form['tel_mobile'] = '+41412223348'
-    page.form['tel_office'] = '+41412223349'
-    page.form['availability'] = 'Nie'
-    page.form['hometown'] = 'Gersau'
-    page.form['mother_tongues'] = language_ids[1:3]
-    page.form['spoken_languages'] = language_ids[0:2]
-    page.form['written_languages'] = language_ids[2:4]
-    page.form['monitoring_languages'] = language_ids[0:4]
-    page.form['expertise_interpreting_types'].select_multiple([
-        'consecutive', 'negotiation'
-    ])
-    page.form['expertise_professional_guilds'].select_multiple([
-        'economy', 'art_leisure'
-    ])
-    page.form['expertise_professional_guilds_other'] = ['Exorzismus']
-    with patch(
-            'onegov.gis.utils.MapboxRequests.directions',
-            return_value=FakeResponse({
-                'code': 'Ok',
-                'routes': [{'distance': 2000}]
-            })
-    ):
-        page = page.form.submit().follow()
-        assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
-
-    mail = client.get_email(0, flush_queue=True)
-    assert mail['To'] == 'member@example.org'
-    assert 'BOB, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
-
-    assert connect.call_count == 1
-    assert authenticate.call_count == 1
-    assert broadcast.call_count == 1
-    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
-    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
-    assert broadcast.call_args[0][3]['created']
-
-    client.logout()
-    client.login_admin()
-    page = client.get('/tickets/ALL/open').click('Annehmen').follow()
-
-    assert 'Briefvorlagen' in page
-    mail_templates_link = page.pyquery('a.envelope')[0].attrib['href']
-    resp = client.request(mail_templates_link)
-    assert resp.status_code == 200
-
-    assert 'Hallo!' in page
-    assert 'Vorname: Aunt' in page
-    assert 'Nachname: Anny' in page
-    assert 'Personal Nr.: 123456' in page
-    assert 'Zulassung: im Zulassungsverfahren' in page
-    assert 'Geschlecht: Weiblich' in page
-    assert 'Quellensteuer: Ja' in page
-    assert 'Selbständig: Ja' in page
-    assert 'Geburtsdatum: 1960-01-01' in page
-    assert 'Nationalität(en): Schweiz, Österreich' in page
-    assert 'Standort: 47, 8' in page
-    assert 'Strasse und Hausnummer: Fakestreet 321' in page
-    assert 'PLZ: 6010' in page
-    assert 'Ort: Kriens' in page
-    assert 'Gersau' in page
-    assert 'Fahrdistanz (km): 2.0' in page
-    assert 'Telefon Privat: +41412223347' in page
-    assert 'Telefon Mobile: +41412223348' in page
-    assert 'Telefon Geschäft: +41412223349' in page
-    assert 'Erreich- und Verfügbarkeit: Nie' in page
-    assert 'Muttersprachen: French, Italian' in page
-    assert 'Arbeitssprache - Wort: French, German' in page
-    assert 'Arbeitssprache - Schrift: Arabic, Italian' in page
-    assert (
-        'Arbeitssprache - Kommunikationsüberwachung: '
-        'Arabic, French, German, Italian'
-    ) in page
-    assert (
-        'Fachkenntnisse nach Dolmetscherart: Konsektutivdolmetschen, '
-        'Verhandlungsdolmetschen'
-    ) in page
-    assert (
-        'Fachkenntnisse nach Berufssparte: Wirtschaft, Kunst und Freizeit'
-    ) in page
-    assert 'Fachkenntnisse nach Berufssparte: andere: Exorzismus' in page
-    page.click('Ticket abschliessen')
-
-    mail = client.get_email(0, flush_queue=True)
-    assert mail['To'] == 'member@example.org'
-    assert 'BOB, Uncle: Ihre Anfrage wurde abgeschlossen' in mail['Subject']
-
     # Report change as editor
-    client.logout()
     client.login_editor()
     page = client.get('/').maybe_follow().click('BOB, Uncle')
     page = page.click('Mutation melden')
@@ -1148,9 +1092,9 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert mail['To'] == 'editor@example.org'
     assert 'BOB, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
 
-    assert connect.call_count == 2
-    assert authenticate.call_count == 2
-    assert broadcast.call_count == 2
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
     assert broadcast.call_args[0][3]['event'] == 'browser-notification'
     assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
     assert broadcast.call_args[0][3]['created']
@@ -1206,7 +1150,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
 
     # Report change as translator
     client.logout()
-    client.login('test@test.com', 'p@ssw0rd', None)
+    client.login('test@test.com', 'p@ssw0rd12', None)
     page = client.get('/').maybe_follow()
     page = page.click('Mutation melden')
     page.form['submitter_message'] = 'Hallo!'
@@ -1272,9 +1216,9 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert mail['To'] == 'test@test.com'
     assert 'BOB, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
 
-    assert connect.call_count == 3
-    assert authenticate.call_count == 3
-    assert broadcast.call_count == 3
+    assert connect.call_count == 2
+    assert authenticate.call_count == 2
+    assert broadcast.call_count == 2
     assert broadcast.call_args[0][3]['event'] == 'browser-notification'
     assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
     assert broadcast.call_args[0][3]['created']
@@ -1418,7 +1362,128 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
-def test_view_accreditation(broadcast, authenticate, connect, client):
+def test_translator_mutation_with_document_upload(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
+
+    session = client.app.session()
+    languages = create_languages(session)
+    certs = create_certificates(session)
+    cert_ids = [str(cert.id) for cert in certs]
+    language_ids = [str(lang.id) for lang in languages]
+    transaction.commit()
+
+    client.login_admin()
+
+    settings = client.get('/directory-settings')
+    settings.form['coordinates'] = encode_map_value({
+        'lat': 46, 'lon': 7, 'zoom': 12
+    })
+    settings.form.submit()
+
+    # Create a new translator
+    page = client.get('/translators/new')
+    page.form['first_name'] = 'Uncle'
+    page.form['last_name'] = 'Bob'
+    page.form['pers_id'] = 978654
+    page.form['admission'] = 'uncertified'
+    page.form['gender'] = 'M'
+    page.form['withholding_tax'] = False
+    page.form['self_employed'] = False
+    page.form['date_of_birth'] = '1970-01-01'
+    page.form['nationalities'] = ['CH']
+    page.form['coordinates'] = encode_map_value({
+        'lat': 46, 'lon': 7, 'zoom': 12
+    })
+    page.form['address'] = 'Fakestreet 123'
+    page.form['zip_code'] = '6000'
+    page.form['city'] = 'Luzern'
+    page.form['email'] = 'translator@test.com'
+    page.form['tel_private'] = '+41412223344'
+    page.form['tel_mobile'] = '+41412223345'
+    page.form['tel_office'] = '+41412223346'
+    page.form['availability'] = 'Always'
+    page.form['mother_tongues_ids'] = language_ids[0:1]
+    page.form['spoken_languages_ids'] = language_ids[1:2]
+    page.form['written_languages_ids'] = language_ids[2:3]
+    page.form['monitoring_languages_ids'] = language_ids[3:4]
+    page.form.get('expertise_professional_guilds', index=0).checked = True
+    page.form['expertise_professional_guilds_other'] = ['Psychologie']
+    page.form.get('expertise_interpreting_types', index=0).checked = True
+    page.form['social_sec_number'] = '756.1234.5678.97'
+    page.form['bank_name'] = 'Luzerner Bank'
+    page.form['bank_address'] = 'Bankplatz Luzern'
+    page.form['account_owner'] = 'Uncle Bob'
+    page.form['iban'] = 'DE07 1234 1234 1234 1234 12'
+    page.form['operation_comments'] = 'No operation comments'
+    page.form['confirm_name_reveal'] = False
+    page.form['date_of_application'] = '2020-01-01'
+    page.form['profession'] = 'Handwerker'
+    page.form['occupation'] = 'Bäcker'
+    page.form['agency_references'] = 'All okay'
+    page.form['education_as_interpreter'] = False
+    page.form['certificates_ids'] = cert_ids[0:1]
+    page.form['comments'] = 'No comments'
+    with patch(
+        'onegov.gis.utils.MapboxRequests.directions',
+        return_value=FakeResponse({
+            'code': 'Ok',
+            'routes': [{'distance': 1000}]
+        })
+    ):
+        assert 'hinzugefügt' in page.form.submit().follow()
+
+    initial_file_count = session.query(File).count()
+    client.logout()
+    client.login_editor()
+    page = client.get('/').maybe_follow().click('BOB, Uncle')
+    page = page.click('Mutation melden')
+    page.form['submitter_message'] = 'Uploading new certificate!'
+
+    assert 'uploaded_certificates' in page.form.fields
+    page.form['uploaded_certificates'] = upload_pdf('certificate.pdf')
+    page = page.form.submit().follow()
+    assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
+
+    client.logout()
+    client.login_admin()
+    page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert 'Uploading new certificate!' in page
+    assert 'Dokumente' in page
+    assert '.pdf' in page
+
+    session = client.app.session()
+    from onegov.ticket import TicketCollection
+
+    new_file_count = session.query(File).count()
+    assert new_file_count > initial_file_count
+
+    tickets = TicketCollection(session).by_handler_code('TRN')
+    ticket = tickets[-1] if tickets else None
+    assert ticket is not None, "No ticket found"
+
+    handler_data = ticket.handler_data.get('handler_data', {})
+    file_ids = handler_data.get('file_ids', [])
+    assert len(file_ids) > 0, "No file_ids found in ticket"
+
+    uploaded_file = session.query(File).filter_by(id=file_ids[0]).first()
+    assert uploaded_file is not None
+    assert uploaded_file.name.endswith('.pdf')
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_view_accreditation(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
+
     session = client.app.session()
     language_ids = [str(lang.id) for lang in create_languages(session)]
     transaction.commit()
@@ -1433,7 +1498,7 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
 
     websocket_messages = 0
 
-    def request_accreditation():
+    def request_accreditation() -> ExtendedResponse:
         client.logout()
 
         page = client.get('/request-accreditation')
@@ -1453,7 +1518,7 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
         page.form['drive_distance'] = '1.1'
         page.form['withholding_tax'] = False
         page.form['self_employed'] = True
-        page.form['social_sec_number'] = '756.1234.4568.90'
+        page.form['social_sec_number'] = '756.1234.4568.94'
         page.form['bank_name'] = 'R-BS'
         page.form['bank_address'] = 'Bullstreet 5'
         page.form['account_owner'] = 'Hugo Benito'
@@ -1534,7 +1599,7 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
         assert '1.1' in page
         assert '"withholding-tax">Nein' in page
         assert '"self-employed">Ja' in page
-        assert '756.1234.4568.90' in page
+        assert '756.1234.4568.94' in page
         assert 'R-BS' in page
         assert 'Bullstreet 5' in page
         assert 'Hugo Benito' in page
@@ -1610,7 +1675,7 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
     assert mail['To'] == 'hugo.benito@translators.com'
     assert mail['Subject'] == 'Ein Konto wurde für Sie erstellt'
 
-    reset_password_url = re.search(
+    reset_password_url = re.search(  # type: ignore[union-attr]
         r'(http://localhost/auth/reset-password[^)]+)',
         mail['TextBody']
     ).group()
@@ -1626,27 +1691,31 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
 
     page = page.click('BENITO, Hugo')
     assert 'BENITO, Hugo' in page
-    assert '756.1234.4568.90' in page
+    assert '756.1234.4568.94' in page
 
     client.logout()
 
     # Login as translator
     page = client.get(reset_password_url)
     page.form['email'] = 'hugo.benito@translators.com'
-    page.form['password'] = 'p@ssw0rd'
+    page.form['password'] = 'p@ssw0rd12'
     page.form.submit()
 
-    page = client.login('hugo.benito@translators.com', 'p@ssw0rd', None)
+    page = client.login('hugo.benito@translators.com', 'p@ssw0rd12', None)
     page = page.maybe_follow()
     assert 'BENITO, Hugo' in page
-    assert '756.1234.4568.90' in page
+    assert '756.1234.4568.94' in page
 
 
 @patch(
     'onegov.gis.utils.MapboxRequests.directions',
     return_value=FakeResponse({'code': 'Ok', 'routes': [{'distance': 2000}]})
 )
-def test_view_accreditation_errors(directions, client):
+def test_view_accreditation_errors(
+    directions: MagicMock,
+    client: Client
+) -> None:
+
     session = client.app.session()
     language_ids = [str(lang.id) for lang in create_languages(session)]
     transaction.commit()
@@ -1707,7 +1776,7 @@ def test_view_accreditation_errors(directions, client):
     page.form['drive_distance'] = '1.1'
     page.form['withholding_tax'] = False
     page.form['self_employed'] = False
-    page.form['social_sec_number'] = '756.1234.4568.90'
+    page.form['social_sec_number'] = '756.1234.4568.94'
     page.form['bank_name'] = 'R-BS'
     page.form['bank_address'] = 'Bullstreet 5'
     page.form['account_owner'] = 'Hugo Benito'
@@ -1766,7 +1835,7 @@ def test_view_accreditation_errors(directions, client):
     assert '1.1' in page
     assert '"withholding-tax">Nein' in page
     assert '"self-employed">Nein' in page
-    assert '756.1234.4568.90' in page
+    assert '756.1234.4568.94' in page
     assert 'R-BS' in page
     assert 'Bullstreet 5' in page
     assert 'Hugo Benito' in page
@@ -1808,7 +1877,7 @@ def test_view_accreditation_errors(directions, client):
     check_pdf(page, 'A.pdf', 'Handlungsfähigkeitszeugnis.pdf')
 
 
-def test_view_mail_template(client):
+def test_view_mail_template(client: Client) -> None:
     session = client.app.session()
     translator = Translator(**translator_data)
     translators = TranslatorCollection(client.app)
@@ -1833,6 +1902,8 @@ def test_view_mail_template(client):
 
     # User.realname has to exist since this is required for signature
     user = UserCollection(session).by_username('admin@example.org')
+    assert user is not None
+    assert user.realname is not None
     first_name, last_name = user.realname.split(" ")
     assert first_name == 'John'
     assert last_name == 'Doe'
@@ -1859,14 +1930,14 @@ def test_view_mail_template(client):
         for block in iter_block_items(doc):
             line = block.text
             # make sure all variables have been rendered
-            assert '{{' not in line and '}}' not in line, line
-            if target in line:
+            assert '{{' not in line and '}}' not in line
+            if target and target in line:
                 found_variables_in_docx.add(target)
 
     assert expected_variables_in_docx == found_variables_in_docx
 
 
-def test_mail_templates_with_hometown_and_ticket_nr(client):
+def test_mail_templates_with_hometown_and_ticket_nr(client: Client) -> None:
     session = client.app.session()
     translator_data_copy = copy.deepcopy(translator_data)
     translator_data_copy['city'] = 'SomeOtherTown'
@@ -1903,6 +1974,8 @@ def test_mail_templates_with_hometown_and_ticket_nr(client):
     upload_file(docx_path, client, content_type='application/vnd.ms-office')
     upload_file(signature_path, client)
     user = UserCollection(session).by_username('admin@example.org')
+    assert user is not None
+    assert user.realname is not None
     first_name, last_name = user.realname.split(" ")
 
     # Now we have everything set up, go to the mail templates and generate one
@@ -1929,3 +2002,112 @@ def test_mail_templates_with_hometown_and_ticket_nr(client):
                 found_variables_in_docx.add(target)
 
     assert expected_variables_in_docx == found_variables_in_docx
+
+
+def test_basic_search(client_with_fts: Client) -> None:
+    client = client_with_fts
+    client.login_admin()
+    anom = client.spawn()
+
+    assert 'Resultate' in client.get('/search?q=test')
+    assert client.get('/search/suggest?q=test').json == []
+    assert 'Resultate' in anom.get('/search?q=test')
+    assert anom.get('/search/suggest?q=test').json == []
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_member_cannot_submit_mutation(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
+
+    session = client.app.session()
+    languages = create_languages(session)
+    certs = create_certificates(session)
+    cert_ids = [str(cert.id) for cert in certs]
+    language_ids = [str(lang.id) for lang in languages]
+    transaction.commit()
+
+    client.login_admin()
+
+    settings = client.get('/directory-settings')
+    settings.form['coordinates'] = encode_map_value(
+        {'lat': 46, 'lon': 7, 'zoom': 12}
+    )
+    settings.form.submit()
+
+    page = client.get('/translators/new')
+    page.form['first_name'] = 'Uncle'
+    page.form['last_name'] = 'Bob'
+    page.form['pers_id'] = 978654
+    page.form['admission'] = 'uncertified'
+    page.form['gender'] = 'M'
+    page.form['withholding_tax'] = False
+    page.form['self_employed'] = False
+    page.form['date_of_birth'] = '1970-01-01'
+    page.form['nationalities'] = ['CH']
+    page.form['coordinates'] = encode_map_value(
+        {'lat': 46, 'lon': 7, 'zoom': 12}
+    )
+    page.form['address'] = 'Fakestreet 123'
+    page.form['zip_code'] = '6000'
+    page.form['city'] = 'Luzern'
+    page.form['email'] = 'member@test.com'
+    page.form['tel_private'] = '+41412223344'
+    page.form['tel_mobile'] = '+41412223345'
+    page.form['tel_office'] = '+41412223346'
+    page.form['availability'] = 'Always'
+    page.form['mother_tongues_ids'] = language_ids[0:1]
+    page.form['spoken_languages_ids'] = language_ids[1:2]
+    page.form['written_languages_ids'] = language_ids[2:3]
+    page.form['monitoring_languages_ids'] = language_ids[3:4]
+    page.form.get('expertise_professional_guilds', index=0).checked = True
+    page.form['expertise_professional_guilds_other'] = ['Psychologie']
+    page.form.get('expertise_interpreting_types', index=0).checked = True
+    page.form['social_sec_number'] = '756.1234.5678.97'
+    page.form['bank_name'] = 'Luzerner Bank'
+    page.form['bank_address'] = 'Bankplatz Luzern'
+    page.form['account_owner'] = 'Uncle Bob'
+    page.form['iban'] = 'DE07 1234 1234 1234 1234 12'
+    page.form['operation_comments'] = 'No operation comments'
+    page.form['confirm_name_reveal'] = False
+    page.form['date_of_application'] = '2020-01-01'
+    page.form['profession'] = 'Handwerker'
+    page.form['occupation'] = 'Bäcker'
+    page.form['agency_references'] = 'All okay'
+    page.form['education_as_interpreter'] = False
+    page.form['certificates_ids'] = cert_ids[0:1]
+    page.form['comments'] = 'No comments'
+    with patch(
+        'onegov.gis.utils.MapboxRequests.directions',
+        return_value=FakeResponse(
+            {'code': 'Ok', 'routes': [{'distance': 1000}]}
+        ),
+    ):
+        assert 'hinzugefügt' in page.form.submit().follow()
+
+    client.logout()
+    reset_password_url = re.search(  # type: ignore[union-attr]
+        r'(http://localhost/auth/reset-password[^)]+)',
+        client.get_email(0, flush_queue=True)['TextBody'],
+    ).group()
+    page = client.get(reset_password_url)
+    page.form['email'] = 'member@test.com'
+    page.form['password'] = 'p@ssw0rd12'
+    page.form.submit()
+
+    client.login_member()
+    page = client.get('/').maybe_follow().click('BOB, Uncle')
+
+    assert 'Report change' not in page
+    assert 'Mutation melden' not in page
+
+    session = client.app.session()
+    translator = session.query(Translator).filter_by(last_name='Bob').first()
+    assert translator is not None
+
+    client.get(f'/translator/{translator.id.hex}/report-change', status=403)

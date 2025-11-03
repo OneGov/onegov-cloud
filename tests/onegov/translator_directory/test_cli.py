@@ -1,22 +1,33 @@
-from click.testing import CliRunner
-from transaction import commit
+from __future__ import annotations
 
+from click.testing import CliRunner
 from onegov.translator_directory.cli import cli, LANGUAGES
 from onegov.translator_directory.models.language import Language
+from transaction import commit
 
 
-def test_create_languages(cfg_path, session_manager):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import SessionManager
+    from sqlalchemy.orm import Query, Session
+
+
+def test_create_languages(
+    cfg_path: str,
+    session_manager: SessionManager
+) -> None:
+
     runner = CliRunner()
     session_manager.ensure_schema_exists('translator_directory')
     session_manager.set_current_schema('translator_directory-deadbeef')
 
-    def languages():
+    def languages() -> Query[Language]:
         return get_session().query(Language)
 
-    def by_name(name):
+    def by_name(name: str) -> Language:
         return languages().filter(Language.name == name).one()
 
-    def get_session():
+    def get_session() -> Session:
         return session_manager.session()
 
     # recreate from scratch
@@ -46,7 +57,7 @@ def test_create_languages(cfg_path, session_manager):
     assert languages().count() == len(LANGUAGES) + 1
 
     # manually rename language
-    languages().first().name += ' RENAMED'
+    languages().first().name += ' RENAMED'  # type: ignore[union-attr]
     commit()
     result = runner.invoke(cli, [
         '--config', cfg_path,
@@ -89,18 +100,22 @@ def test_create_languages(cfg_path, session_manager):
     assert languages().count() == len(LANGUAGES)
 
 
-def test_delete_languages(cfg_path, session_manager):
+def test_delete_languages(
+    cfg_path: str,
+    session_manager: SessionManager
+) -> None:
+
     runner = CliRunner()
     session_manager.ensure_schema_exists('translator_directory')
     session_manager.set_current_schema('translator_directory-deadbeef')
 
-    def languages():
+    def languages() -> Query[Language]:
         return get_session().query(Language)
 
-    def by_name(name):
+    def by_name(name: str) -> Language:
         return languages().filter(Language.name == name).one()
 
-    def get_session():
+    def get_session() -> Session:
         return session_manager.session()
 
     # add some languages

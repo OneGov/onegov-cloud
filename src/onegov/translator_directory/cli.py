@@ -83,21 +83,16 @@ def fetch_users(
                 )
             )
         )
-        for ix, user_ in enumerate(inactive):
+        for user_ in inactive:
             if user_.active:
                 log.info(f'Deactivating inactive user {user_.username}')
             user_.active = False
-
-            if not dry_run:
-                if ix % 200 == 0:
-                    app.es_indexer.process()
-                    app.psql_indexer.bulk_process(session)
 
     client = LDAPClient(ldap_server, ldap_username, ldap_password)
     client.try_configuration()
     count = 0
     synced_users = []
-    for ix, data in enumerate(users(client.connection)):
+    for data in users(client.connection):
 
         if data['mail'] in translators:
             log.info(f'Skipping {data["mail"]}, translator exists')
@@ -128,11 +123,6 @@ def fetch_users(
         synced_users.append(user.id)
 
         count += 1
-        if not dry_run:
-            if ix % 200 == 0:
-                session.flush()
-                app.es_indexer.process()
-                app.psql_indexer.bulk_process(session)
 
     log.info(f'Synchronized {count} users')
 

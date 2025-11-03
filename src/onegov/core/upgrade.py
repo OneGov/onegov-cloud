@@ -594,10 +594,10 @@ class UpgradeContext:
     def stop_search_updates(self) -> Iterator[None]:
         # XXX this would be better handled with a more general approach
         # that doesn't require knowledge of onegov.search
-        if hasattr(self.app, 'es_orm_events'):
-            self.app.es_orm_events.stopped = True
+        if hasattr(self.app, 'fts_orm_events'):
+            self.app.fts_orm_events.stopped = True
             yield
-            self.app.es_orm_events.stopped = False
+            self.app.fts_orm_events.stopped = False
         else:
             yield
 

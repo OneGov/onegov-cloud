@@ -1,8 +1,15 @@
+from __future__ import annotations
+
 from onegov.landsgemeinde.layouts import DefaultLayout
 from unittest.mock import Mock
 
 
-def test_layouts(assembly):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.landsgemeinde.models import Assembly
+
+
+def test_layouts(assembly: Assembly) -> None:
 
     class Request:
         include = Mock()
@@ -10,20 +17,20 @@ def test_layouts(assembly):
         is_manager = True
         locale = 'de_CH'
 
-        def translate(self, text):
+        def translate(self, text: str) -> str:
             return text
 
-    layout = DefaultLayout(None, Request())
+    layout = DefaultLayout(None, Request())  # type: ignore[arg-type]
 
-    def a(x):
-        return layout.assembly_title(x).interpolate()
+    def a(x: Any) -> str:
+        return layout.assembly_title(x).interpolate()  # type: ignore[attr-defined]
 
-    def ai(*args, **kwargs):
+    def ai(*args: Any, **kwargs: Any) -> str:
         return layout.agenda_item_title(*args, **kwargs)
 
     assert a(assembly) == 'Assembly from 07. Mai 2023'
     assembly.extraordinary = True
-    assert a(assembly) == 'Extraodinary assembly from 07. Mai 2023'
+    assert a(assembly) == 'Extraordinary Assembly from 07. Mai 2023'
 
     agenda_item = assembly.agenda_items[0]
     assert ai(agenda_item) == 'Agenda item 2'

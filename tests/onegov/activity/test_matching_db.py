@@ -1,10 +1,10 @@
+from __future__ import annotations
+
 import random
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from functools import partial
-
-from sedate import replace_timezone
-
+from sedate import as_datetime, replace_timezone
 from onegov.activity.matching import deferred_acceptance_from_database
 from onegov.activity.matching import PreferAdminChildren
 from onegov.activity.matching import PreferGroups
@@ -17,6 +17,14 @@ from psycopg2.extras import NumericRange
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.activity import Attendee, BookingPeriod, Occasion
+    from onegov.user import User
+    from sqlalchemy.orm import Session
+    from tests.onegov.activity.conftest import Collections
+
+
 match = partial(
     deferred_acceptance_from_database,
     stability_check=True,
@@ -25,9 +33,20 @@ match = partial(
 )
 
 
-def new_occasion(collections, period, offset, length,
-                 activity_name=None, username="owner@example.org",
-                 spots=(0, 10), age=(0, 10)):
+def as_utc(date: date) -> datetime:
+    return replace_timezone(as_datetime(date), 'UTC')
+
+
+def new_occasion(
+    collections: Collections,
+    period: BookingPeriod,
+    offset: float,
+    length: float,
+    activity_name: str | None = None,
+    username: str = "owner@example.org",
+    spots: tuple[int, int] = (0, 10),
+    age: tuple[int, int] = (0, 10)
+) -> Occasion:
 
     activity_name = activity_name or uuid4().hex
     activity = collections.activities.by_name(activity_name)
@@ -35,14 +54,8 @@ def new_occasion(collections, period, offset, length,
     if not activity:
         activity = collections.activities.add(activity_name, username=username)
     return collections.occasions.add(
-        start=(
-            replace_timezone(period.prebooking_start, 'UTC')
-            + timedelta(days=offset)
-        ),
-        end=(
-            replace_timezone(period.prebooking_start, 'UTC')
-            + timedelta(days=offset + length)
-        ),
+        start=as_utc(period.prebooking_start) + timedelta(days=offset),
+        end=as_utc(period.prebooking_start) + timedelta(days=offset + length),
         timezone="Europe/Zurich",
         activity=activity,
         period=period,
@@ -51,16 +64,26 @@ def new_occasion(collections, period, offset, length,
     )
 
 
-def new_attendee(collections, name=None, birth_date=None, user=None):
+def new_attendee(
+    collections: Collections,
+    name: str | None = None,
+    birth_date: date | None = None,
+    user: User | None = None
+) -> Attendee:
 
     return collections.attendees.add(
         name=name or uuid4().hex,
         birth_date=birth_date or date(2000, 1, 1),
-        user=user or Bunch(username="owner@example.org"),
+        user=user or Bunch(username="owner@example.org"),  # type: ignore[arg-type]
         gender=random.choice(('male', 'female')))
 
 
-def test_simple_match(session, owner, collections, prebooking_period):
+def test_simple_match(
+    session: Session,
+    owner: User,
+    collections: Collections,
+    prebooking_period: BookingPeriod
+) -> None:
     """ Tests the matching of two occasions on the same activity with no
     conflicting signups.
 
@@ -90,7 +113,12 @@ def test_simple_match(session, owner, collections, prebooking_period):
         assert a2.happiness(prebooking_period.id) == 1.0
 
 
-def test_changing_priorities(session, owner, collections, prebooking_period):
+def test_changing_priorities(
+    session: Session,
+    owner: User,
+    collections: Collections,
+    prebooking_period: BookingPeriod
+) -> None:
     """ Makes sure that changing priorities lead to a changing match. """
 
     # only one available spot
@@ -117,15 +145,23 @@ def test_changing_priorities(session, owner, collections, prebooking_period):
 
     match(session, prebooking_period.id)
 
-    assert b1.state == 'open'
-    assert b2.state == 'accepted'
+    # undo mypy narrowing
+    b1_, b2_ = b1, b2
+    assert b1_.state == 'open'
+    assert b2_.state == 'accepted'
 
 
-def test_prefer_in_age_bracket(session, owner, collections, prebooking_period):
+def test_prefer_in_age_bracket(
+    session: Session,
+    owner: User,
+    collections: Collections,
+    prebooking_period: BookingPeriod
+) -> None:
+
     o = new_occasion(
         collections, prebooking_period, 0, 1, spots=(0, 1), age=(10, 20))
 
-    base = prebooking_period.prebooking_start.date()
+    base = prebooking_period.prebooking_start
 
     # two attendees, one is inside the age bracket, the other is outside
     a1 = new_attendee(collections, birth_date=base - timedelta(days=360 * 30))
@@ -141,19 +177,26 @@ def test_prefer_in_age_bracket(session, owner, collections, prebooking_period):
     assert b1.state == 'open'
     assert b2.state == 'accepted'
 
-    o.age = NumericRange(20, 50)
+    o.age = NumericRange(20, 50)  # type: ignore[assignment]
 
     match(session, prebooking_period.id, score_function=Scoring(
         criteria=[PreferInAgeBracket.from_session(session)]
     ))
 
-    assert b1.state == 'accepted'
-    assert b2.state == 'open'
+    # undo mypy narrowing
+    b1_, b2_ = b1, b2
+    assert b1_.state == 'accepted'
+    assert b2_.state == 'open'
 
 
-def test_prefer_organisers_of_period(session, owner, secondary_owner,
-                                     collections, prebooking_period,
-                                     inactive_period):
+def test_prefer_organisers_of_period(
+    session: Session,
+    owner: User,
+    secondary_owner: User,
+    collections: Collections,
+    prebooking_period: BookingPeriod,
+    inactive_period: BookingPeriod
+) -> None:
 
     # if someone was an organiser in another period, it doesn't count
     new_occasion(collections, inactive_period, 0, 1, spots=(0, 1),
@@ -178,8 +221,13 @@ def test_prefer_organisers_of_period(session, owner, secondary_owner,
     assert b2.state == 'open'
 
 
-def test_prefer_organisers_over_members(session, owner, member,
-                                        collections, prebooking_period):
+def test_prefer_organisers_over_members(
+    session: Session,
+    owner: User,
+    member: User,
+    collections: Collections,
+    prebooking_period: BookingPeriod
+) -> None:
 
     # organisers > members
     o = new_occasion(collections, prebooking_period, 0, 1, spots=(0, 1),
@@ -200,8 +248,13 @@ def test_prefer_organisers_over_members(session, owner, member,
     assert b2.state == 'accepted'
 
 
-def test_prefer_admin_children(session, owner, member, collections,
-                               prebooking_period):
+def test_prefer_admin_children(
+    session: Session,
+    owner: User,
+    member: User,
+    collections: Collections,
+    prebooking_period: BookingPeriod
+) -> None:
 
     owner.role = 'admin'
 
@@ -222,7 +275,12 @@ def test_prefer_admin_children(session, owner, member, collections,
     assert b2.state == 'open'
 
 
-def test_interleaved_dates(session, owner, collections, prebooking_period):
+def test_interleaved_dates(
+    session: Session,
+    owner: User,
+    collections: Collections,
+    prebooking_period: BookingPeriod
+) -> None:
 
     o1 = new_occasion(collections, prebooking_period, 0, 1)
     collections.occasions.add_date(
@@ -251,7 +309,12 @@ def test_interleaved_dates(session, owner, collections, prebooking_period):
     assert b2.state == 'accepted'
 
 
-def test_overlapping_dates(session, owner, collections, prebooking_period):
+def test_overlapping_dates(
+    session: Session,
+    owner: User,
+    collections: Collections,
+    prebooking_period: BookingPeriod
+) -> None:
 
     # only the second dates overlap
     o1 = new_occasion(collections, prebooking_period, 0, 1)
@@ -281,7 +344,12 @@ def test_overlapping_dates(session, owner, collections, prebooking_period):
     assert b2.state == 'blocked'
 
 
-def test_alignment(session, owner, collections, prebooking_period):
+def test_alignment(
+    session: Session,
+    owner: User,
+    collections: Collections,
+    prebooking_period: BookingPeriod
+) -> None:
 
     o1 = new_occasion(collections, prebooking_period, 0, 0.5)
     o2 = new_occasion(collections, prebooking_period, 0.5, 0.5)
@@ -299,11 +367,18 @@ def test_alignment(session, owner, collections, prebooking_period):
     prebooking_period.alignment = 'day'
 
     match(session, prebooking_period.id)
-    assert b1.state == 'accepted'
-    assert b2.state == 'blocked'
+    # undo mypy narrowing
+    b1_, b2_ = b1, b2
+    assert b1_.state == 'accepted'
+    assert b2_.state == 'blocked'
 
 
-def test_activity_one_occasion(session, owner, collections, prebooking_period):
+def test_activity_one_occasion(
+    session: Session,
+    owner: User,
+    collections: Collections,
+    prebooking_period: BookingPeriod
+) -> None:
 
     o1 = new_occasion(collections, prebooking_period, 0, 1, activity_name='x')
     o2 = new_occasion(collections, prebooking_period, 0, 1, activity_name='x')
@@ -319,7 +394,13 @@ def test_activity_one_occasion(session, owner, collections, prebooking_period):
     assert b2.state == 'blocked'
 
 
-def test_prefer_groups(session, owner, collections, prebooking_period):
+def test_prefer_groups(
+    session: Session,
+    owner: User,
+    collections: Collections,
+    prebooking_period: BookingPeriod
+) -> None:
+
     o = new_occasion(collections, prebooking_period, 0, 1, spots=(0, 2))
 
     a1 = new_attendee(collections, user=owner)
@@ -341,7 +422,13 @@ def test_prefer_groups(session, owner, collections, prebooking_period):
     assert b3.state == 'open'
 
 
-def test_prefer_small_groups(session, owner, collections, prebooking_period):
+def test_prefer_small_groups(
+    session: Session,
+    owner: User,
+    collections: Collections,
+    prebooking_period: BookingPeriod
+) -> None:
+
     o = new_occasion(collections, prebooking_period, 0, 1, spots=(0, 2))
 
     a1 = new_attendee(collections, user=owner)
@@ -370,7 +457,13 @@ def test_prefer_small_groups(session, owner, collections, prebooking_period):
     assert b5.state == 'open'
 
 
-def test_keep_groups_together(session, owner, collections, prebooking_period):
+def test_keep_groups_together(
+    session: Session,
+    owner: User,
+    collections: Collections,
+    prebooking_period: BookingPeriod
+) -> None:
+
     # all things being equal, groups are kept together
     o = new_occasion(collections, prebooking_period, 0, 1, spots=(0, 2))
 
@@ -403,13 +496,21 @@ def test_keep_groups_together(session, owner, collections, prebooking_period):
         criteria=[PreferGroups.from_session(session)]
     ))
 
-    assert b1.state == 'open'
-    assert b2.state == 'open'
-    assert b3.state == 'accepted'
-    assert b4.state == 'accepted'
+    # undo mypy narrowing
+    b1_, b2_, b3_, b4_ = b1, b2, b3, b4
+    assert b1_.state == 'open'
+    assert b2_.state == 'open'
+    assert b3_.state == 'accepted'
+    assert b4_.state == 'accepted'
 
 
-def test_prefer_groups_equal(session, owner, collections, prebooking_period):
+def test_prefer_groups_equal(
+    session: Session,
+    owner: User,
+    collections: Collections,
+    prebooking_period: BookingPeriod
+) -> None:
+
     # make sure that given an equal choice between two occasions we prefer
     # the group joining an occasion over joining another as a non-group
     o1 = new_occasion(collections, prebooking_period, 0, 1)
@@ -435,7 +536,13 @@ def test_prefer_groups_equal(session, owner, collections, prebooking_period):
     assert b4.state == 'blocked'
 
 
-def test_favorite_occasion(session, owner, collections, prebooking_period):
+def test_favorite_occasion(
+    session: Session,
+    owner: User,
+    collections: Collections,
+    prebooking_period: BookingPeriod
+) -> None:
+
     # make sure favorite occasions are preferred
     o1 = new_occasion(collections, prebooking_period, 0, 1)
     o2 = new_occasion(collections, prebooking_period, 0, 1)
@@ -449,9 +556,6 @@ def test_favorite_occasion(session, owner, collections, prebooking_period):
     b4 = collections.bookings.add(owner, a2, o2, priority=0)
 
     b1.group_code = b2.group_code = 'foo'
-
-    b1.favorite_occasion_id = o2.id
-    b2.favorite_occasion_id = o2.id
 
     match(session, prebooking_period.id, score_function=Scoring(
         criteria=[PreferGroups.from_session(session), PreferMotivated()]

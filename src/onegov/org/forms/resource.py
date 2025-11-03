@@ -259,6 +259,22 @@ class ResourceBaseForm(Form):
         description=_('Replies to automated e-mails go to this address.')
     )
 
+    invoicing_party = TextAreaField(
+        label=_('Invoicing party'),
+        fieldset=_('Invoicing'),
+        description=_('Will be displayed in invoices'),
+        render_kw={'rows': 3}
+    )
+
+    cost_object = StringField(
+        label=_('Cost center / cost unit'),
+        fieldset=_('Invoicing'),
+        description=_(
+            'Will be displayed in invoices for any costs directly '
+            'associated with reservations on this resource.'
+        )
+    )
+
     pricing_method = RadioField(
         label=_('Price'),
         fieldset=_('Payments'),

@@ -13,23 +13,21 @@
         <div class="row" tal:condition="connection">
             <div class="columns small-12 medium-8">
                 <form class="searchbox" action="${request.link(model).split('?')[0]}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
-                    <div class="row collapse">
-                        <label>${searchlabel}</label>
-                        <div class="columns small-11">
-                            <label for="search" class="show-for-sr" i18n:translate>Search</label>
-                            <input id="search" data-typeahead-subject type="text" name="q" value="${model.query}" autocomplete="off" autocorrect="off" required autofocus onfocus="this.select()"/>
-                            <button type="reset" class="reset-button" tabindex="-1"></button>
-                        </div>
-                        <div class="columns small-1">
-                            <button type="submit" class="button postfix" aria-label="Search" i18n:attributes="aria-label">
-                                <i class="fa fa-search"></i>
-                            </button>
-                        </div>
+                <div class="row collapse">
+                    <label>${searchlabel}</label>
+                    <div class="columns small-11">
+                        <label for="search" class="show-for-sr" i18n:translate>Search</label>
+                        <input id="search" data-typeahead-subject type="text" name="q" value="${model.query}" autocomplete="off" autocorrect="off" required autofocus onfocus="this.select()"/> <button type="reset" class="reset-button" tabindex="-1"></button>
                     </div>
-                    <div class="row typeahead">
-                      <div class="columns small-12" data-typeahead-container>
-                      </div>
+                    <div class="columns small-1">
+                        <button type="submit" class="button postfix" aria-label="Search" i18n:attributes="aria-label">
+                            <i class="fa fa-search"></i>
+                        </button>
                     </div>
+                </div>
+                <div class="row typeahead">
+                    <div class="columns small-12" data-typeahead-container></div>
+                </div>
                 </form>
             </div>
         </div>
@@ -38,33 +36,21 @@
             <h2 i18n:translate>${resultslabel}</h2>
             <div class="row">
                 <div class="columns medium-8 small-12">
-                    <p tal:condition="not: model.batch.hits.total" i18n:translate="">Your search returned no results.</p>
+                    <p tal:condition="not: model.batch" i18n:translate="">Your search returned no results.</p>
 
                     <ul class="search-results">
                         <tal:b repeat="result model.load_batch_results">
-                            <li class="search-result-${result.es_type_name}" tal:condition="result">
+                            <li class="search-result-${result.__tablename__}" tal:condition="result">
                                 <tal:b
                                     define="macro 'search_result_{}'.format(result.__tablename__); tenant_macro 'search_result_{}_{}'.format(result.__tablename__, request.app.application_id.split('/')[-1])"
                                     metal:use-macro="layout.macros[tenant_macro]|layout.macros[macro]|layout.macros['search_result_default']"
                                 />
-
-                                <tal:b condition="request.is_manager and result.explanation|nothing">
-                                    <ul class="result-explanation">
-                                        <li>Score: ${result.explanation['score']}</li>
-                                        <tal:b repeat="(title, key) [('TF', 'term-frequency'), ('IDF', 'inverse-document-frequency'), ('Field Norm', 'field-norm')]">
-                                            <li title="${result.explanation[key]['description']}" tal:condition="result.explanation[key]">
-                                                ${title}: ${result.explanation[key]['value']}
-                                            </li>
-                                        </tal:b>
-                                    </ul>
-                                </tal:b>
                             </li>
                         </tal:b>
                     </ul>
 
                     <div class="pagination-centered">
-                        <div metal:use-macro="layout.macros['pagination']" tal:define="
-                        collection model; current_page model;" />
+                        <div metal:use-macro="layout.macros['pagination']" tal:define="collection model; current_page model;" />
                     </div>
                 </div>
             </div>

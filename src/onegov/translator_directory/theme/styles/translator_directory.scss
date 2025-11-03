@@ -17,7 +17,7 @@ $dark-orange:  #be860e;
 .edit-bar {
     .create-excel::before { @include icon('\f1c3'); }
     .documents::before { @include icon-bold('\f15b')}
-    .report-change::before { @include icon('\f2bc')}
+    .report-change::before { @include icon-bold('\f044')}
 }
 
 .location-settings {

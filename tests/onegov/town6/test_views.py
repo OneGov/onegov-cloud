@@ -1,23 +1,28 @@
-import onegov.core
-import onegov.org
-from pytest import mark
-from tests.shared import utils
+from __future__ import annotations
 
-from onegov.chat.collections import ChatCollection
+import onegov.org
 import transaction
 
+from onegov.chat.collections import ChatCollection
+from tests.shared import utils
 
-def test_view_permissions():
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_view_permissions() -> None:
     utils.assert_explicit_permissions(onegov.org, onegov.org.OrgApp)
 
 
-def test_notfound(client):
+def test_notfound(client: Client) -> None:
     notfound_page = client.get('/foobar', expect_errors=True)
     assert "Seite nicht gefunden" in notfound_page
     assert notfound_page.status_code == 404
 
 
-def test_links(client):
+def test_links(client: Client) -> None:
     root_url = client.get('/').pyquery('.side-navigation a').attr('href')
     client.login_admin()
     root_page = client.get(root_url)
@@ -45,7 +50,7 @@ def test_links(client):
     assert google.location == 'https://www.google.ch'
 
 
-def test_clipboard(client):
+def test_clipboard(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/topics/organisation')
@@ -62,7 +67,7 @@ def test_clipboard(client):
     assert '/organisation/organisation' in page.request.url
 
 
-def test_clipboard_separation(client):
+def test_clipboard_separation(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/topics/organisation')
@@ -77,7 +82,7 @@ def test_clipboard_separation(client):
     assert 'paste-link' not in client.get('/topics/organisation')
 
 
-def test_gobal_tools(client):
+def test_gobal_tools(client: Client) -> None:
     links = client.get('/').pyquery('.globals a')
     assert links == []
 
@@ -86,7 +91,7 @@ def test_gobal_tools(client):
     assert links != []
 
 
-def test_top_navigation(client):
+def test_top_navigation(client: Client) -> None:
     links = client.get('/').pyquery('.side-navigation a span')
     assert links.text() == 'Organisation Themen Kontakt Aktuelles'
 
@@ -115,7 +120,7 @@ def test_top_navigation(client):
     assert 'fas fa-bars' not in page
 
 
-def test_announcement(client):
+def test_announcement(client: Client) -> None:
     client.login_admin()
 
     color = '#006fbb'
@@ -147,17 +152,15 @@ def test_announcement(client):
     ) in page
 
 
-@mark.skip('Passes locally, but not in CI, skip for now')
-def test_search_in_header(client_with_es):
-    page = client_with_es.get("/")
-    client_with_es.app.es_client.indices.refresh(index='_all')
+def test_search_in_header(client_with_fts: Client) -> None:
+    page = client_with_fts.get("/")
     assert "Suchbegriff" in page
     page.form['q'] = 'aktuell'
     page = page.form.submit()
-    assert "search-result-news" in page
+    assert "search-result-pages" in page
 
 
-def test_create_external_link(client):
+def test_create_external_link(client: Client) -> None:
     client.login_admin()
     resources = client.get('/resources')
     forms = client.get('/forms')
@@ -184,7 +187,7 @@ def test_create_external_link(client):
     assert 'Birth certificate request' not in resources
 
 
-def test_header_links(client):
+def test_header_links(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/')
@@ -225,11 +228,11 @@ def test_header_links(client):
     assert '<a href="https://www.govikon-school.ch">Govikon School</a>' in page
 
 
-def test_chat_archive(client):
+def test_chat_archive(client: Client) -> None:
     client.login_admin()
 
     settings = client.get('/chat-settings')
-    settings.form['enable_chat'] = True
+    settings.form['enable_chat'] = 'people_chat'
     settings.form.submit()
 
     page = client.get('/chats/+initiate')
@@ -257,11 +260,11 @@ def test_chat_archive(client):
     assert 'Andrew' in page
 
 
-def test_chat_topics(client):
+def test_chat_topics(client: Client) -> None:
     client.login_admin()
 
     settings = client.get('/chat-settings')
-    settings.form['enable_chat'] = True
+    settings.form['enable_chat'] = 'people_chat'
     settings.form['chat_topics'] = 'Steuern, Bau'
     settings.form.submit()
 
@@ -284,9 +287,30 @@ def test_chat_topics(client):
     assert 'Thema' not in page
 
 
-def test_view_iframe_button_on_page(client):
+def test_view_iframe_button_on_page(client: Client) -> None:
     client.login_admin().follow()
 
     page = client.get('/news')
     assert ('&lt;iframe src="http://localhost/news" width="100%" height="800" '
             'frameborder="0"&gt;&lt;/iframe&gt;') in page
+
+
+def test_footer_settings_custom_links(client: Client) -> None:
+    client.login_admin()
+
+    # footer settings custom links
+    settings = client.get('/footer-settings')
+    impressum_url = 'https://my.impressum.io'
+    custom_url = 'https://custom.com/1'
+    custom_name = 'Custom1'
+
+    settings.form['impressum_url'] = impressum_url
+    settings.form['custom_link_1_name'] = custom_name
+    settings.form['custom_link_1_url'] = custom_url
+    settings.form['custom_link_2_name'] = 'Custom2'
+    settings.form['custom_link_2_url'] = None
+
+    page = settings.form.submit().follow()
+    assert f'<a href="{impressum_url}">Impressum</a>' in page
+    assert f'<a href="{custom_url}">{custom_name}</a>' in page
+    assert 'Custom2' not in page

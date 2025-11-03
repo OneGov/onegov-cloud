@@ -25,7 +25,7 @@ rc.defaultOptions = {
         The visible time range
     */
     minTime: '07:00:00',
-    maxTime: '22:00:00',
+    maxTime: '24:00:00',
 
     /*
         True if the calendar may be edited (by editors/admins)
@@ -111,7 +111,7 @@ rc.getFullcalendarOptions = function(rcExtendOptions) {
         // the fullcalendar default options
         fc: {
             allDaySlot: false,
-            height: 'auto',
+            height: '800px',
             events: rcOptions.feed,
             slotMinTime: rcOptions.minTime,
             slotMaxTime: rcOptions.maxTime,
@@ -410,7 +410,7 @@ rc.shouldRenderReservationForm = function(event, previousReservationState) {
             previousReservationState.end !== moment(event.end).format('HH:mm')
         );
     const showPreviousTime = (showTimeRange || showWholeDay) && hasPreviousTimeToOffer;
-    const showQuota = !event.extendedProps.partlyAvailable && (event.extendedProps.quotaLeft > 1);
+    const showQuota = !event.extendedProps.partlyAvailable && (event.extendedProps.quotaLeft > 0) && (event.extendedProps.quota > 1);
 
     // Determine if any fields need to be rendered
     return (
@@ -440,7 +440,7 @@ rc.showActionsPopup = function(calendar, element, event) {
             event.extendedProps.reserveurl,
             moment(event.start).format('HH:mm'),
             moment(event.end).format('HH:mm'),
-            event.extendedProps.quota,
+            event.extendedProps.quotaLeft,
             event.extendedProps.wholeDay
         );
         return;
@@ -680,29 +680,34 @@ rc.setupResourceSwitch = function(options, resourcesUrl, active) {
 
             var lookup = {};
 
-            var switcher = $('<select>').append(
-                _.map(choices, function(resources, group) {
-                    return $('<optgroup>').attr('label', group || '').append(
-                        _.map(resources, function(resource) {
-                            lookup[resource.name] = resource.url;
+            if (Object.keys(choices).length >= 1) {
 
-                            return $('<option>')
-                                .attr('value', resource.name)
-                                .attr('selected', resource.name === active)
-                                .text(resource.title);
-                        })
-                    );
-                })
-            );
+                var switcher = $('<select>').append(
+                    _.map(choices, function(resources, group) {
+                        return $('<optgroup>').attr('label', group || '').append(
+                            _.map(resources, function(resource) {
+                                lookup[resource.name] = resource.url;
 
-            switcher.change(function() {
-                var url = new Url(lookup[$(this).val()]);
-                url.query = (new Url(window.location.href)).query;
+                                return $('<option>')
+                                    .attr('value', resource.name)
+                                    .attr('selected', resource.name === active)
+                                    .text(resource.title);
+                            })
+                        );
+                    })
+                );
 
-                window.location = url;
-            });
+                switcher.change(function() {
+                    var url = new Url(lookup[$(this).val()]);
+                    url.query = (new Url(window.location.href)).query;
 
-            container.append(switcher);
+                    window.location = url;
+                });
+
+                container.append(switcher);
+            } else {
+                container.hide();
+            }
         };
 
         $.getJSON(resourcesUrl, setup);
@@ -802,6 +807,12 @@ rc.renderPartitions = function(event, element, view) {
 // for that fact. This function takes the event, and the range of
 // the calendar and adjusts the partitions if necessary.
 rc.adjustPartitions = function(event, min_hour, max_hour) {
+
+    // if the max time is 24:00:00, then hour will be 0, which will
+    // give us incorrect partitions
+    if (max_hour === 0) {
+        max_hour = 24;
+    }
 
     if (_.isUndefined(event.extendedProps.partitions)) {
         return event.extendedProps.partitions;

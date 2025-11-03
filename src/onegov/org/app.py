@@ -20,7 +20,7 @@ from onegov.core.widgets import transform_structure
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.gis import MapboxApp
-from onegov.org import directives
+from onegov.org import _, directives
 from onegov.org.auth import MTANAuth
 from onegov.org.exceptions import MTANAccessLimitExceeded
 from onegov.org.initial_content import create_new_organisation
@@ -29,7 +29,7 @@ from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
 from onegov.pay import PayApp, log as pay_log
 from onegov.reservation import LibresIntegration
-from onegov.search import ElasticsearchApp
+from onegov.search import SearchApp
 from onegov.ticket import TicketCollection
 from onegov.ticket import TicketPermission
 from onegov.user import UserApp
@@ -55,7 +55,7 @@ if TYPE_CHECKING:
     from reg.dispatch import _KeyLookup
 
 
-class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
+class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
              DepotApp, PayApp, FormApp, UserApp, WebsocketsApp):
 
     serve_static_files = True
@@ -417,6 +417,23 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
         if self.org.square_logo_url:
             extra['image'] = self.org.square_logo_url
+
+        if provider.type == 'worldline_saferpay':
+            # add confirm dialog
+            extra['confirm'] = request.translate(
+                _('Important information regarding online payments')
+            )
+            extra['confirm_extra'] = request.translate(_(
+                'The payment process is only complete once you are '
+                'redirected back to our site and receive a request number. '
+                'Any success messages the payment provider generates '
+                'before then, do not indicate completion. Transactions '
+                'in this semi-successful state will usually be refunded '
+                'within one hour, although it might take longer depending '
+                'on the chosen payment method.'
+            ))
+            extra['confirm_yes'] = request.translate(_('Ok'))
+            extra['confirm_no'] = request.translate(_('Cancel'))
 
         try:
             return provider.checkout_button(
@@ -915,11 +932,6 @@ def kaba_configurations_asset() -> Iterator[str]:
 def mapbox_address_autofill() -> Iterator[str]:
     yield 'mapbox-search-web.js'  # implicit dependency
     yield 'mapbox_address_autofill.js'
-
-
-@OrgApp.webasset('payments')
-def get_payments() -> Iterator[str]:
-    yield 'payments.js'
 
 
 @OrgApp.webasset('invoicing')

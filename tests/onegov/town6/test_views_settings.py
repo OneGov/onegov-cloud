@@ -1,9 +1,15 @@
-from xml.etree.ElementTree import tostring
+from __future__ import annotations
 
 from onegov.api.models import ApiKey
+from xml.etree.ElementTree import tostring
 
 
-def test_gever_settings_only_https_allowed(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_gever_settings_only_https_allowed(client: Client) -> None:
 
     client.login_admin()
     settings = client.get('/settings').click('Gever API')
@@ -23,7 +29,7 @@ def test_gever_settings_only_https_allowed(client):
     assert res.status_code == 200
 
 
-def test_api_keys_create_and_delete(client):
+def test_api_keys_create_and_delete(client: Client) -> None:
 
     client.login_admin()
 
@@ -33,6 +39,7 @@ def test_api_keys_create_and_delete(client):
     assert 'My API key' in page
 
     key = client.app.session().query(ApiKey).first()
+    assert key is not None
     assert key.name == "My API key"
     assert key.read_only == True
 
@@ -47,7 +54,7 @@ def test_api_keys_create_and_delete(client):
     assert client.app.session().query(ApiKey).first() is None
 
 
-def test_all_settings_are_reachable(client):
+def test_all_settings_are_reachable(client: Client) -> None:
     # The purpose is to identify any broken or unreachable settings links that
     # might happen if a view is missing
 
@@ -60,7 +67,7 @@ def test_all_settings_are_reachable(client):
     assert all(client.get(link).status_code == 200 for link in links)
 
 
-def test_general_settings(client):
+def test_general_settings(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/topics/themen')
@@ -78,7 +85,7 @@ def test_general_settings(client):
     assert 'class="header-image"' in page
 
 
-def test_analytics_settings(client):
+def test_analytics_settings(client: Client) -> None:
     # plausible
     client.login_admin()
 
@@ -118,7 +125,7 @@ def test_analytics_settings(client):
 
 
 
-def test_firebase_settings(client):
+def test_firebase_settings(client: Client) -> None:
 
     client.login_admin()
 
@@ -146,3 +153,18 @@ def test_firebase_settings(client):
 
     settings = settings.form.submit().maybe_follow()
     assert 'Ihre Änderungen wurden gespeichert' in settings
+
+
+def test_resource_settings(client: Client) -> None:
+    client.login_admin()
+
+    settings = client.get('/settings').click('Reservationen')
+    settings.form['resource_header_html'] = '<h1>foo</h1>'
+    settings.form['resource_footer_html'] = '<p>bar</p>'
+    assert ('Ihre Änderungen wurden gespeichert' in
+            settings.form.submit().maybe_follow())
+
+    page = client.get('/resources')
+    assert 'Allgemeine Informationen zu Reservationen' in page
+    assert '<h1>foo</h1>' in page
+    assert '<p>bar</p>' in page

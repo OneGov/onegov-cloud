@@ -519,8 +519,10 @@ class EventCollection(Pagination[Event]):
             if not dates:
                 return None
 
-            rdates = [start.strftime('%Y%m%dT%H%M%SZ') for start in dates]
-            return '\n'.join(f'RDATE:{start}' for start in rdates)
+            return '\n'.join(
+                f'RDATE:{to_timezone(start, "UTC"):%Y%m%dT%H%M%SZ}'
+                for start in dates
+            )
 
         def find_element_text(parent: etree._Element, key: str) -> str:
             element = parent.find(f'ns:{key}', namespaces=ns)
@@ -614,9 +616,10 @@ class EventCollection(Pagination[Event]):
                 provider_url = find_element_text(provider_ref, 'url')
 
             tags = []
-            if event.find('ns:tags', namespaces=ns) is not None:
-                tags = [
-                    tag.text for tag in event.find('ns:tags', namespaces=ns)]
+            category = event.find('ns:category', namespaces=ns)
+            if category is not None:
+                tag = find_element_text(category, 'mainCategory')
+                tags.append(tag) if tag else None
 
             timezone = 'Europe/Zurich'
             for schedule in event.find('ns:schedules', namespaces=ns):

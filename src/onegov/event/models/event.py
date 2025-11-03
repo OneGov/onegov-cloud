@@ -2,14 +2,12 @@ from __future__ import annotations
 
 import warnings
 
-from datetime import datetime
-
+from datetime import datetime, timedelta
 from dateutil import rrule
 from dateutil.rrule import rrulestr
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from icalendar import vRecur
-
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import content_property
@@ -188,21 +186,41 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         lazy='joined',
     )
 
-    es_properties = {
-        'title': {'type': 'localized'},
-        'description': {'type': 'localized'},
-        'location': {'type': 'localized'},
-        'organizer': {'type': 'localized'},
-        'filter_keywords': {'type': 'keyword'}
+    fts_properties = {
+        'title': {'type': 'localized', 'weight': 'A'},
+        'description': {'type': 'localized', 'weight': 'B'},
+        'location': {'type': 'localized', 'weight': 'B'},
+        'organizer': {'type': 'localized', 'weight': 'B'},
+        # FIXME: Should we move this to fts_tags?
+        'filter_keywords': {'type': 'keyword', 'weight': 'A'}
     }
 
     @property
-    def es_public(self) -> bool:
+    def fts_public(self) -> bool:
         return self.state == 'published'
 
     @property
-    def es_skip(self) -> bool:
+    def fts_skip(self) -> bool:
         return self.state != 'published' or getattr(self, '_es_skip', False)
+
+    @property
+    def fts_last_change(self) -> datetime:
+        latest = self.latest_occurrence
+        if latest is None:
+            # NOTE: if there are no occurrences at all we want to deprioritize
+            #       this by a lot, so we pretend the latest occurrence was four
+            #       years ago, which results in a factor of around 8%
+            return utcnow() - timedelta(days=1461)
+        elif latest.start < utcnow():
+            # NOTE: if the occurrence is in the past, we want to deprioritize
+            #       it over upcoming events, we use a gaussian time decay so
+            #       being in the future by x days would be deprioritized the
+            #       same as being in the past by x days, so we subtract one
+            #       year to make past events less relevant. For an event that
+            #       just happened this results in a factor of around 85%, so
+            #       still relevant, but not as relevant as the upcoming events.
+            return latest.start - timedelta(days=365)
+        return latest.start
 
     def source_url(self, request: CoreRequest) -> str | None:
         """ Returns an url pointing to the external event if imported. """

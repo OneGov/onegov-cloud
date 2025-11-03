@@ -9,9 +9,13 @@ $rate-set-icon: '\f362';
 $role-icon: '\f02b';
 $pas-settings-icon: '\f7d9';
 $settlement-run-icon: '\f4c0';
+$import-icon: '\f56f';
+$import-logs-icon: '\f1da';
+$user-management-icon: '\f0c0';
 
 .globals {
     .attendences::before { @include icon-bold($attendence-icon); }
+    .attendances::before { @include icon-bold($attendence-icon); }
     .changes::before { @include icon-bold($change-icon); }
     .commissions::before { @include icon-bold($commission-icon); }
     .legislative-periods::before { @include icon($legislative-period-icon); }
@@ -21,6 +25,11 @@ $settlement-run-icon: '\f4c0';
     .rate-sets::before { @include icon-bold($rate-set-icon); }
     .pas-settings::before { @include icon-bold($pas-settings-icon); }
     .settlement-runs::before { @include icon-bold($settlement-run-icon); }
+    .settlement-run::before { @include icon-bold($settlement-run-icon); }
+    .import::before { @include icon-bold($import-icon); }
+    .import-logs::before { @include icon-bold($import-logs-icon); }
+    .user-management::before { @include icon-bold($user-management-icon); }
+    .usermanagement::before { @include icon-bold($user-management-icon); }
 }
 
 .edit-bar {
@@ -41,9 +50,61 @@ $settlement-run-icon: '\f4c0';
         position: relative;
     }
 
+    .input-group-field {
+        border-radius: $global-radius !important;
+    }
+
     .typeahead {
         z-index: 5000;
         top: 1.2rem;
+    }
+}
+
+// Closure Status Table Styles
+.closure-status-section {
+    margin: 2rem 0;
+
+    .closure-status-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+
+            &:first-child {
+                text-align: left;
+                font-weight: bold;
+            }
+        }
+
+        th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+
+        .closure-indicator {
+            font-size: 1.2em;
+            font-weight: bold;
+
+            &.closed {
+                color: #28a745; // Green checkmark
+            }
+
+            &.not-closed {
+                color: #dc3545; // Red X
+            }
+        }
+
+        .closed {
+            background-color: #d4edda; // Light green background
+        }
+
+        .not-closed {
+            background-color: #f8d7da; // Light red background
+        }
     }
 }
 
@@ -97,33 +158,59 @@ table.changes span {
 // Import Log Styling
 .import-status {
     display: inline-block;
-    padding: 0.2rem 0.5rem;
+    padding: 0.3rem 0.6rem;
     border-radius: $global-radius;
-    font-size: 0.8rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    color: $white;
+    font-size: 0.85rem;
+    font-weight: normal;
+    text-transform: capitalize;
 
-    &.success {
-        background-color: $success-color;
+    &.success, &.completed {
+        background-color: #28a745;
+        color: $white;
     }
 
     &.failed {
         background-color: $alert-color;
+        color: $white;
     }
 
     &.pending {
         background-color: $warning-color;
-        color: $black; // Warning color might be light
+        color: $black;
     }
 
-    // Add more statuses as needed
+    // Ensure status is readable on blue rows
+    .clickable-row:nth-child(even) & {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
 }
 
 // Improve table padding
 .inline-table {
     td, th {
         padding: 0.8rem 0.5rem; // Add more vertical padding
+    }
+
+    // Clickable rows styling
+    &.clickable-rows {
+        .clickable-row {
+            transition: background-color 0.2s ease;
+
+            &:nth-child(even) {
+                background-color: rgba(0, 111, 186, 0.1);
+                color: $black;
+            }
+
+            &:hover {
+                background-color: $light-gray;
+                color: $black;
+            }
+
+            &:active {
+                background-color: $medium-gray;
+                color: $black;
+            }
+        }
     }
 }
 
@@ -159,10 +246,10 @@ pre {
 }
 
 #parliamentarian_id li.animate-in {
-    animation: bubbleIn 0.4s ease forwards;
+    animation: bubble-in 0.4s ease forwards;
 }
 
-@keyframes bubbleIn {
+@keyframes bubble-in {
     from {
         opacity: 0;
         transform: scale(0.5);
@@ -171,4 +258,233 @@ pre {
         opacity: 1;
         transform: scale(1);
     }
+}
+
+// Import Log Detail Styles
+.import-log-header {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+
+    p {
+        margin: 0;
+    }
+
+    .source-files {
+        margin-top: 10px;
+
+        a {
+            margin-left: 10px;
+        }
+    }
+}
+
+// Import log tabs use Foundation's built-in tabs
+#import-log-tabs {
+    margin-bottom: 20px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.summary-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+
+    h4 {
+        margin-top: 0;
+        color: #495057;
+    }
+
+    .status-text {
+        font-weight: bold;
+        text-transform: capitalize;
+    }
+}
+
+.stats-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        border-bottom: 1px solid #e9ecef;
+
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+}
+
+.events-log {
+    max-height: 500px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.event-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.event-level {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 60px;
+    text-align: center;
+
+    &.info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    &.success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    &.error {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    &.warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+}
+
+.event-message {
+    flex: 1;
+    line-height: 1.4;
+}
+
+.output-messages {
+    max-height: 400px;
+    overflow-y: auto;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.json-viewer {
+    max-height: 600px;
+    overflow-y: auto;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+}
+
+// Import logs styling
+.import-logs-entry {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    padding: 15px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 13px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.log-entry {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    padding: 4px 0;
+}
+
+.log-filters {
+    margin-bottom: 15px;
+
+    .log-filter {
+        margin-right: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            filter: brightness(1.1);
+        }
+
+        &.active {
+            border: 2px solid #333;
+            box-shadow: 0 0 0 1px rgba(51, 51, 51, 0.3);
+            font-weight: bold;
+        }
+    }
+}
+
+.log-level {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: bold;
+    min-width: 50px;
+    text-align: center;
+    margin-right: 12px;
+    flex-shrink: 0;
+
+    &.log-info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+    }
+
+    &.log-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    &.log-warning, &.log-warn {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+
+    &.log-debug {
+        background-color: #e2e3e5;
+        color: #383d41;
+        border: 1px solid #d6d8db;
+    }
+
+    &.log-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+}
+
+.log-message {
+    flex: 1;
+    line-height: 1.4;
+    overflow-wrap: break-word;
 }

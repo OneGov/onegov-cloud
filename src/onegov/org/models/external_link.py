@@ -32,9 +32,9 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
 
     __tablename__ = 'external_links'
 
-    es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
+    fts_properties = {
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'},
     }
 
     id: Column[uuid.UUID] = Column(
@@ -55,9 +55,6 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
 
     #: The normalized title for sorting
     order: Column[str] = Column(Text, nullable=False, index=True)
-
-    es_type_name = 'external_links'
-    es_id = 'title'
 
     lead: dict_property[str | None] = meta_property()
 

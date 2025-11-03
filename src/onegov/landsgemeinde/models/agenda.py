@@ -28,6 +28,7 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
+    from collections.abc import Iterator
     from datetime import date as date_t
     from onegov.file.models.file import File
     from onegov.landsgemeinde.models import Assembly
@@ -54,13 +55,28 @@ class AgendaItem(
 
     __tablename__ = 'landsgemeinde_agenda_items'
 
-    es_public = True
-    es_properties = {
-        'title': {'type': 'text'},
-        'overview': {'type': 'localized_html'},
-        'text': {'type': 'localized_html'},
-        'resolution': {'type': 'localized_html'},
+    fts_public = True
+    fts_properties = {
+        'title': {'type': 'text', 'weight': 'A'},
+        'overview': {'type': 'localized', 'weight': 'B'},
+        'text': {'type': 'localized', 'weight': 'C'},
+        'resolution': {'type': 'localized', 'weight': 'C'},
     }
+
+    @property
+    def fts_suggestion(self) -> list[str]:
+        def suggestions() -> Iterator[str]:
+            for line in self.title.splitlines():
+                line = line.strip()
+                if len(line) < 3:
+                    continue
+
+                yield line
+                # another suggestion without the leading A./B./C. etc.
+                if line[1] == '.':
+                    yield line[2:].lstrip()
+
+        return list(suggestions())
 
     #: the internal id of the agenda item
     id: Column[uuid.UUID] = Column(

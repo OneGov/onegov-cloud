@@ -639,9 +639,8 @@ def handle_new_directory_entry(
 ) -> RenderData | Response:
 
     if form.submitted(request):
-        entry: ExtendedDirectoryEntry
         try:
-            entry = self.directory.add_by_form(  # type:ignore[assignment]
+            entry = self.directory.add_by_form(
                 form,
                 type='extended'
             )

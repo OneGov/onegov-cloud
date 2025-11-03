@@ -6,7 +6,7 @@
         <div class="grid-x grid-padding-x">
             <div class="medium-7 cell main-content">
                 <div class="panel" i18n:translate="">
-                    Shows the status of each element of an assembly. The statuses of each element are automatically adjusted when editing an element, if possible.
+                    Shows the status of each element of an <tal:b i18n:name="assembly">${layout.assembly_type}</tal:b>. The statuses of each element are automatically adjusted when editing an element, if possible.
                 </div>
 
                 <tal:b metal:use-macro="layout.macros['states-list']"/>

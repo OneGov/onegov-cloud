@@ -1,12 +1,23 @@
+from __future__ import annotations
+
 from datetime import date
-
 from onegov.election_day.utils.common import LastUpdatedOrderedDict
-from onegov.election_day.utils.election.connections import \
-    get_connection_results_api
+from onegov.election_day.utils.election.connections import (
+    get_connection_results_api)
 
 
-def test_get_connection_results_interal(import_test_datasets, session):
-    election, errors = import_test_datasets(
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from ..conftest import ImportTestDatasets
+
+
+def test_get_connection_results_interal(
+    import_test_datasets: ImportTestDatasets,
+    session: Session
+) -> None:
+
+    import_results = import_test_datasets(
         'internal',
         'election',
         'gr',
@@ -17,10 +28,12 @@ def test_get_connection_results_interal(import_test_datasets, session):
         dataset_name='nationalratswahlen-2019-final',
         app_session=session
     )
+    assert len(import_results) == 1
+    election, errors = next(iter(import_results.values()))
     assert not errors
     # These results have been verified by T. Hardegger
     results = get_connection_results_api(election, session)
-
+    assert isinstance(results, dict)
     assert results['1']['total_votes'] == 23141
     assert results['1']['subconns']['1'] == LastUpdatedOrderedDict({
         'total_votes': 7520,
@@ -60,8 +73,12 @@ def test_get_connection_results_interal(import_test_datasets, session):
     })
 
 
-def test_get_connection_results_subconn_ids(import_test_datasets, session):
-    election, errors = import_test_datasets(
+def test_get_connection_results_subconn_ids(
+    import_test_datasets: ImportTestDatasets,
+    session: Session
+) -> None:
+
+    import_results = import_test_datasets(
         'internal',
         'election',
         'sg',
@@ -72,8 +89,11 @@ def test_get_connection_results_subconn_ids(import_test_datasets, session):
         dataset_name='test_nonunique_subconn_ids',
         app_session=session
     )
+    assert len(import_results) == 1
+    election, errors = next(iter(import_results.values()))
     assert not errors
     results = get_connection_results_api(election, session)
+    assert isinstance(results, dict)
     assert results['1']['total_votes'] == 3
     assert results['2']['total_votes'] == 2
     assert results['1']['subconns']['1']['total_votes'] == 2

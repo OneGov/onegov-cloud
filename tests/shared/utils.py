@@ -19,14 +19,13 @@ from uuid import uuid4
 from xml.etree.ElementTree import tostring
 
 
-from typing import overload, Any, IO, TypeVar, TYPE_CHECKING
+from typing import overload, Any, IO, Protocol, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     import pytest
-    from bs4 import NavigableString, Tag
     from collections.abc import Callable, Iterator, Mapping
     from datetime import datetime
     from onegov.core.framework import Framework
-    from onegov.core.orm import Base
+    from onegov.core.orm import SessionManager
     from onegov.reservation import Resource
     from reportlab.pdfgen.canvas import Canvas
     from sqlalchemy.orm import Session
@@ -37,6 +36,10 @@ if TYPE_CHECKING:
     _AppT = TypeVar('_AppT', bound=Framework)
     _ResourceT = TypeVar('_ResourceT', bound=Resource)
     _BinaryIOT = TypeVar('_BinaryIOT', bound=IO[bytes])
+
+    class HasSessionManager(Protocol):
+        @property
+        def session_manager(self) -> SessionManager | None: ...
 
 
 def get_meta(
@@ -57,7 +60,7 @@ def encode_map_value(dictionary: Mapping[str, Any]) -> str:
     return b64encode(json.dumps(dictionary).encode('utf-8')).decode('ascii')
 
 
-def decode_map_value(value: str | bytes) -> dict[str, Any]:
+def decode_map_value(value: str | bytes) -> Any:
     return json.loads(b64decode(value).decode('utf-8'))
 
 
@@ -175,7 +178,7 @@ def random_namespace() -> str:
 def create_app(
     app_class: type[_AppT],
     request: pytest.FixtureRequest,
-    use_elasticsearch: bool = False,
+    enable_search: bool = False,
     reuse_filestorage: bool = True,
     use_maildir: bool = True,
     use_smsdir: bool = True,
@@ -194,13 +197,6 @@ def create_app(
     if not app_class.is_committed():
         scan_morepath_modules(app_class)
         app_class.commit()
-
-    if use_elasticsearch:
-        elasticsearch_hosts = [
-            request.getfixturevalue('es_url')
-        ]
-    else:
-        elasticsearch_hosts = []
 
     if depot_backend == 'depot.io.local.LocalFileStorage':
         if not depot_storage_path:
@@ -234,8 +230,7 @@ def create_app(
         identity_secure=False,
         identity_secret='test_identity_secret',
         csrf_secret='test_csrf_secret',
-        enable_elasticsearch=use_elasticsearch,
-        elasticsearch_hosts=elasticsearch_hosts,
+        enable_search=enable_search,
         redis_url=request.getfixturevalue('redis_url'),
         yubikey_client_id='foo',
         yubikey_secret_key='dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE=',
@@ -336,7 +331,7 @@ def extract_intercooler_delete_link(client: Client, page: TestResponse) -> str:
 
 
 @contextmanager
-def use_locale(model: Base, locale: str) -> Iterator[None]:
+def use_locale(model: HasSessionManager, locale: str) -> Iterator[None]:
     assert model.session_manager is not None
     old_locale = model.session_manager.current_locale
     model.session_manager.current_locale = locale
@@ -361,7 +356,7 @@ def href_ends_with(end: str) -> Callable[[str | None], bool]:
 def find_link_by_href_end(
     response: TestResponse,
     href_end: str
-) -> Tag | NavigableString | None:
+) -> Any | None:
     """
     Returns the link that ends with the given href_end.
     :param response: a response object

@@ -17,8 +17,10 @@ if TYPE_CHECKING:
     model=ApiEndpointCollection,
     path='/api'
 )
-def get_api_endpoints(app: Framework) -> ApiEndpointCollection:
-    return ApiEndpointCollection(app)
+def get_api_endpoints(
+    request: CoreRequest,
+    app: Framework) -> ApiEndpointCollection:
+    return ApiEndpointCollection(request)
 
 
 @ApiApp.path(
@@ -37,10 +39,14 @@ def get_api_endpoint(
     if endpoint == 'authenticate':
         return AuthEndpoint(app)
 
-    cls = ApiEndpointCollection(app).endpoints.get(endpoint)
-    if not cls:
+    item = ApiEndpointCollection(request).get_endpoint(
+        endpoint,
+        page=page,
+        extra_parameters=extra_parameters
+    )
+    if not item:
         raise ApiException('Not found', status_code=404)
-    return cls(request, extra_parameters=extra_parameters, page=page)
+    return item
 
 
 @ApiApp.path(

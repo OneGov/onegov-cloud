@@ -100,10 +100,11 @@ class SearchableFile(ORMSearchable):
 
     """
 
-    es_properties = {
-        'name': {'type': 'text'},
-        'note': {'type': 'localized'},
-        'extract': {'type': 'localized'}
+    fts_public = True
+    fts_properties = {
+        'name': {'type': 'text', 'weight': 'A'},
+        'note': {'type': 'localized', 'weight': 'B'},
+        'extract': {'type': 'localized', 'weight': 'C'}
     }
 
     if TYPE_CHECKING:
@@ -112,12 +113,8 @@ class SearchableFile(ORMSearchable):
         published: Column[bool]
 
     @property
-    def es_suggestion(self) -> str:
+    def fts_suggestion(self) -> str:
         return self.name
-
-    @property
-    def es_public(self) -> bool:
-        return self.published
 
 
 class File(Base, Associable, TimestampMixin):

@@ -1,19 +1,24 @@
-import onegov.core
+from __future__ import annotations
+
 import onegov.org
 from tests.shared import utils
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
 
-def test_view_permissions():
+
+def test_view_permissions() -> None:
     utils.assert_explicit_permissions(onegov.org, onegov.org.OrgApp)
 
 
-def test_notfound(client):
+def test_notfound(client: Client) -> None:
     notfound_page = client.get('/foobar', expect_errors=True)
     assert "Seite nicht gefunden" in notfound_page
     assert notfound_page.status_code == 404
 
 
-def test_header_links(client):
+def test_header_links(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/')
@@ -54,7 +59,7 @@ def test_header_links(client):
     assert '<a href="https://www.govikon-school.ch">Govikon School</a>' in page
 
 
-def test_publications_year(client):
+def test_publications_year(client: Client) -> None:
 
     page = client.get('/publications?year=20263', status=400)
     assert 'Cannot decode URL parameter' in page
