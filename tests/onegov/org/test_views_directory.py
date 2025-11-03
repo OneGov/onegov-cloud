@@ -25,6 +25,7 @@ from tests.shared.utils import (
 from webtest import Upload
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onegov.org.models import ExtendedDirectory
     from sedate.types import TzInfoOrName
@@ -110,6 +111,7 @@ def accept_latest_submission(client: Client) -> ExtendedResponse:
 
 
 def test_publication_added_by_admin(client: Client) -> None:
+    # publication dates are now independent of role
     utc_now = utcnow()
     now = to_timezone(utc_now, 'Europe/Zurich')
 
@@ -121,7 +123,16 @@ def test_publication_added_by_admin(client: Client) -> None:
     # These url should be available for people who know it
     client.get('/directories/meetings/+submit')
 
-    # create one entry as admin, publications is still available for admin
+    # create one entry as admin, publications not available for admin either
+    page = meetings.click('Eintrag', index=0)
+    assert 'publication_start' not in page.form.fields
+    assert 'publication_end' not in page.form.fields
+
+    # now enable publications
+    page = meetings.click('Konfigurieren')
+    page.form['enable_publication'] = True
+    page.form.submit()
+
     page = meetings.click('Eintrag', index=0)
     page.form['name'] = 'Annual'
     page.form['pic'] = Upload('annual.jpg', create_image().read())
@@ -153,6 +164,18 @@ def test_publication_added_by_admin(client: Client) -> None:
     # timezone unaware and not converted to utc before
     # contains publications relevant info
     assert entry_db.publication_end.tzinfo == UTC
+
+    # check change request publication start activated
+    page = entry.click('Änderung vorschlagen')
+    assert 'publication_start' in page.form.fields
+    # check new submission
+    page = meetings.click('Eintrag', index=1)
+    assert 'publication_start' in page.form.fields
+
+    # now disable publications
+    page = meetings.click('Konfigurieren')
+    page.form['enable_publication'] = False
+    page.form.submit()
 
     # check change request publication start deactivated
     page = entry.click('Änderung vorschlagen')
