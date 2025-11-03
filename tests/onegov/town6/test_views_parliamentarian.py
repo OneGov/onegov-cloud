@@ -30,6 +30,9 @@ def test_parliamentarians(client: Client) -> None:
     page.form.submit()
 
     # add commission
+    page = client.get('/commissions/new')
+    page.form['name'] = 'Verkehrskommission'
+    page.form.submit()
 
     # configure interest ties
     # TODO
@@ -66,7 +69,7 @@ def test_parliamentarians(client: Client) -> None:
         parliamentarian = edit.form.submit().follow()
         assert 'Laugh' in parliamentarian
 
-        # TODO: add new role
+        # add role
         role = parliamentarian.click('Neue Fraktionsfunktion')
         options = role.form['parliamentary_group_id'].options
         id = next(
@@ -79,7 +82,17 @@ def test_parliamentarians(client: Client) -> None:
         assert 'Mitglied Fraktion' in parliamentarian
         assert 'Die Moderne Fraktion' in parliamentarian
 
-        # TODO: add new commission
+        # add commission
+        commission = parliamentarian.click('Neue Kommissionsfunktion')
+        options = commission.form['commission_id'].options
+        id = next(
+            (opt[0] for opt in options if opt[2] == 'Verkehrskommission'))
+        commission.form['commission_id'] = id
+        commission.form['role'] = 'member'
+        parliamentarian = commission.form.submit().follow()
+        assert 'Neue Rolle hinzugefügt' in parliamentarian
+        assert 'Mitglied' in parliamentarian
+        assert 'Verkehrskommission' in parliamentarian
 
         # add another parliamentarian
         new = client.get('/parliamentarians/new')
@@ -95,16 +108,44 @@ def test_parliamentarians(client: Client) -> None:
         assert 'old.man@cov.org' in parliamentarian
         assert 'Old Party' in parliamentarian
 
+        # add role
+        role = parliamentarian.click('Neue Fraktionsfunktion')
+        options = role.form['parliamentary_group_id'].options
+        id = next(
+            (opt[0] for opt in options if opt[2] == 'Old Party Fraktion'))
+        role.form['parliamentary_group_id'] = id
+        role.form['parliamentary_group_role'] = 'member'
+        parliamentarian = role.form.submit().follow()
+        assert 'Neue Rolle hinzugefügt' in parliamentarian
+        assert 'Mitglied Parlament' in parliamentarian
+        assert 'Mitglied Fraktion' in parliamentarian
+        assert 'Old Party' in parliamentarian
+
         # Test filters on overview
-        page = client.get('/parliamentarians')
-        page = page.click('Inaktiv')  # inactive by default for now
+        page = client.get('/parliamentarians')  # default filter = active
         assert 'Comedian Laugh' in page
         assert 'Die Moderne' in page
         assert 'Man Old' in page
         assert 'Old Party' in page
-        # TODO: test more
+        page = client.get('/parliamentarians?active=0')
+        assert 'Comedian Laugh' not in page
+        assert 'Man Old' not in page
+        page = client.get('/parliamentarians?party=Die+Moderne')
+        assert 'Comedian Laugh' in page
+        assert 'Die Moderne' in page
+        assert 'Man Old' not in page
+        page = client.get('/parliamentarians?party=Old+Party')
+        assert 'Comedian Laugh' not in page
+        assert 'Man Old' in page
+        assert 'Old Party' in page
+        page = client.get(
+            '/parliamentarians?party=Old+Party&party=Die+Moderne')
+        assert 'Comedian Laugh' in page
+        assert 'Die Moderne' in page
+        assert 'Man Old' in page
+        assert 'Old Party' in page
 
-        # delete parliamentarian
+        # delete parliamentarians
         for parliamentarian in parliamentarian_pages:
             parliamentarian.click('Löschen')
         page = client.get('/parliamentarians')
