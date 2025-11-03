@@ -1094,7 +1094,7 @@
                         <tal:b replace="volunteer_link(layout)" />
                     </li>
                     <li tal:condition="not request.is_logged_in">
-                        <a href="./auth/register" i18n:translate>
+                        <a href="${request.link(request.app.org, name='auth/register')}" i18n:translate>
                             Register
                         </a>
                     </li>

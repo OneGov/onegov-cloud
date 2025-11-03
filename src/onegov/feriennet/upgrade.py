@@ -319,7 +319,7 @@ def migrate_homepage_structure_for_feriennet(context: UpgradeContext) -> None:
                 <icon_link
                     icon="fa-images"
                     link="/photoalbums"
-                    title="Albums photos"
+                    title="Photos"
                     text="Impressions des activités"
                 />
             </column>
