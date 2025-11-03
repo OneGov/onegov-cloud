@@ -232,7 +232,7 @@
 <div class="small-12 medium-6 cell footer-links">
     <tal:b condition="not request.app.org.hide_onegov_footer|True">
         <span>
-            <a class="footer-link" href="https://www.admin.digital">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
+            <a class="footer-link" href="https://www.admin.digital">OneGov Cloud</a> | <a class="footer-link" href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
         </span>
         <br/>
         <span>
@@ -241,7 +241,7 @@
             </a>
         </span>
         <span tal:condition="request.app.org.impressum_url|None">
-            <a href="${request.app.org.impressum_url}" i18n:translate>
+            <a class="footer-link" href="${request.app.org.impressum_url}" i18n:translate>
                 Impressum
             </a>
         </span>
