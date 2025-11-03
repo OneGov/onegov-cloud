@@ -5,8 +5,8 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
             <div class="medium-7 cell main-content">
-                <p tal:condition="not:attendences" i18n:translate="">No meeting defined yet.</p>
-                <table tal:condition="attendences" class="attendences hover">
+                <p tal:condition="python:len(attendences) == 0" i18n:translate="">No meeting defined yet.</p>
+                <table tal:condition="python:len(attendences) > 0" class="attendences hover">
                     <thead>
                         <tr>
                             <th i18n:translate>Date</th>
@@ -29,7 +29,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="medium-5 cell">
+            <div class="medium-5 cell" tal:condition="python:any(group and group[0].bulk_edit_id for group in bulk_edit_groups)">
                 <h3 i18n:translate>Bulk edits</h3>
                 <ul class="more-list">
                     <tal:b tal:repeat="group bulk_edit_groups">

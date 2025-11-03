@@ -886,7 +886,9 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
     # NOTE: We override this so we pass an instance of ourselves
     #       to resolve_model, rather than a base Request instance
-    #       like in the original implementation
+    #       like in the original implementation, the original
+    #       implementation also doesn't handle query params
+    #       correctly, which can lead to converter errors
     def resolve_path(
         self,
         path: str,
@@ -909,10 +911,17 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         if app is SAME_APP:
             app = self.app
 
+        path_info, __, query_string = path.partition('?')
+
+        environ = self.environ.copy()
+        environ.pop('webob._parsed_post_vars', None)
         request = self.__class__(
-            self.environ.copy(),
+            environ,
             cast('App', app),
-            path_info=path
+            method='GET',
+            path_info=path_info,
+            query_string=query_string,
+            body=b''
         )
         # try to resolve imports..
         from morepath.publish import resolve_model

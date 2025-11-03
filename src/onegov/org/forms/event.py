@@ -25,6 +25,7 @@ from onegov.form.validators import (
 from onegov.form.validators import WhitelistedMimeType
 from onegov.gis import CoordinatesField
 from onegov.org import _
+from onegov.org.utils import complete_url
 from onegov.ticket import TicketCollection
 from sedate import replace_timezone, to_timezone
 from wtforms.fields import BooleanField
@@ -388,6 +389,9 @@ class EventForm(Form):
         model.timezone = self.timezone
         model.start = self.start
         model.end = self.end
+        model.external_event_url = complete_url(self.external_event_url.data)
+        model.event_registration_url = complete_url(
+            self.event_registration_url.data)
 
         if self.repeat.data == 'without':
             self.recurrence = None

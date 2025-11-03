@@ -21,7 +21,7 @@ class PASParliamentarianRoleLayout(DefaultLayout):
 
     @cached_property
     def parliamentarian_collection(self) -> PASParliamentarianCollection:
-        return PASParliamentarianCollection(self.request.session)
+        return PASParliamentarianCollection(self.request.app)
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:

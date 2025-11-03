@@ -99,7 +99,7 @@ def render_element(
     def render_element(self: Element, request: CoreRequest) -> str:
         return self(ChameleonLayout(getattr(self, 'model', None), request))
 
-    app = create_app(App, request, use_elasticsearch=False)
+    app = create_app(App, request, enable_search=False)
     transaction.commit()
 
     client = Client(app)

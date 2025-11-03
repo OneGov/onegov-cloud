@@ -16,32 +16,54 @@
             },
             load: function()
             {
-                var $select = $('<select id="redactor-defined-links" />');
+                var placeholder = this.lang.get('link_select_page');
+                var $select = $(
+                    '<select id="redactor-defined-links" '
+                    + 'data-placeholder="' + placeholder + '" />'
+                );
                 $('#redactor-modal-link-insert').prepend($select);
 
                 this.definedlinks.storage = {};
 
                 $.getJSON(this.opts.definedLinks, $.proxy(function(data)
                 {
-                    var grouped = _.groupBy(data, function(d) { return d.group; });
+                    var grouped = _.groupBy(
+                        data, function(d) { return d.group; }
+                    );
                     var key = 0;
 
-                    $.each(_.groupBy(data, 'group'), $.proxy(function(group, links) {
+                    $select.append($('<option>').val('').html(''));
 
-                        var $optgroup = $('<optgroup />').attr('label', group);
-                        $select.append($optgroup);
+                    $.each(_.groupBy(data, 'group'), $.proxy(
+                        function(group, links) {
 
-                        $.each(links, $.proxy(function(ix, val) {
-                            this.definedlinks.storage[key] = val;
-                            $optgroup.append($('<option>').val(key).html(val.name));
-                            key += 1;
-                        }, this));
-                    }, this));
+                            var $optgroup = $(
+                                '<optgroup />'
+                            ).attr('label', group);
+                            $select.append($optgroup);
 
-                    // makes sure there's nothing preselected
-                    $select.prop('selectedIndex', -1);
+                            $.each(links, $.proxy(function(ix, val) {
+                                this.definedlinks.storage[key] = val;
+                                $optgroup.append(
+                                    $('<option>').val(key).html(val.name)
+                                );
+                                key += 1;
+                            }, this));
+                        }, this
+                    ));
 
-                    $select.on('change', $.proxy(this.definedlinks.select, this));
+                    $select.prop('selectedIndex', 0);
+
+                    $select.chosen({
+                        allow_single_deselect: true,
+                        search_contains: true,
+                        width: '100%'
+                    });
+
+                    $select.on(
+                        'change',
+                        $.proxy(this.definedlinks.select, this)
+                    );
 
                 }, this));
 
@@ -50,7 +72,7 @@
             {
                 var key = $(e.target).val();
                 var name = '', url = '';
-                if (key !== 0)
+                if (key !== '' && key !== null && key !== undefined)
                 {
                     name = this.definedlinks.storage[key].name;
                     url = this.definedlinks.storage[key].url;

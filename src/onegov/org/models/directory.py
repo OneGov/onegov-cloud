@@ -21,16 +21,23 @@ from onegov.org.models.extensions import (
     DeletableContentExtension)
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.message import DirectoryMessage
+from onegov.org.observer import observes
+from onegov.org.utils import narrowest_access
 from onegov.pay import Price
 from onegov.ticket import Ticket
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import object_session
+from sqlalchemy.orm.attributes import set_committed_value
 
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
-    from onegov.directory.models.directory import DirectoryEntryForm
+    from onegov.directory.models.directory import (
+        DirectoryEntryForm,
+        InheritType,
+        INHERIT
+    )
     from onegov.directory.collections.directory_entry import (
         DirectorySearchWidget)
     from onegov.form.fields import TimezoneDateTimeField
@@ -379,7 +386,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
                         GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
-    es_type_name = 'extended_directories'
+    fts_public = True
 
     content_fields_containing_links_to_files = {
         'text',
@@ -424,16 +431,28 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     def entry_cls_name(self) -> str:
         return 'ExtendedDirectoryEntry'
 
-    @property
-    def es_public(self) -> bool:
-        return self.access == 'public'
-
     if TYPE_CHECKING:
+        # FIXME: We should consider making Directory generic, so we
+        #        don't need to overwrite these methods in order to
+        #        get precise types.
+        @property
+        def entry_cls(self) -> type[ExtendedDirectoryEntry]: ...
+        def add(
+            self,
+            values: dict[str, Any],
+            type: str | InheritType = INHERIT
+        ) -> ExtendedDirectoryEntry: ...
+        def add_by_form(
+            self,
+            form: DirectoryEntryForm,
+            type: str | InheritType = INHERIT
+        ) -> ExtendedDirectoryEntry: ...
         def extend_form_class(  # type:ignore[override]
             self,
             form_class: type[DirectoryEntryForm],  # type:ignore[override]
             extensions: Collection[str]
         ) -> type[ExtendedDirectoryEntryForm]: ...
+        entries: relationship[list[ExtendedDirectoryEntry]]  # type: ignore[assignment]
 
     def form_class_for_submissions(
         self,
@@ -498,17 +517,35 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
                              DeletableContentExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
-    es_type_name = 'extended_directory_entries'
-
     internal_notes: dict_property[str | None] = content_property()
 
     if TYPE_CHECKING:
         # technically not enforced, but it should be a given
         directory: relationship[ExtendedDirectory]
 
+    fts_public = True
+
     @property
-    def es_public(self) -> bool:
-        return self.access == 'public' and self.published
+    def fts_access(self) -> str:
+        self._fetch_if_necessary()
+        return narrowest_access(self.access, self.directory.access)
+
+    # force fts update when access of directory changes
+    @observes('directory.meta')
+    def _force_fts_update(self, *_ignored: object) -> None:
+        self.modified = self.modified
+
+    def _fetch_if_necessary(self) -> None:
+        session = object_session(self)
+        if session is None:
+            return
+
+        if self.directory_id is not None and self.directory is None:
+            set_committed_value(  # type: ignore[unreachable]
+                self,
+                'directory',
+                session.query(ExtendedDirectory).get(self.directory_id)
+            )
 
     @property
     def display_config(self) -> dict[str, Any]:
@@ -576,9 +613,14 @@ class ExtendedDirectoryEntryCollection(
         search_widget: ExtendedDirectorySearchWidget | None = None,
         published_only: bool = False,
         past_only: bool = False,
-        upcoming_only: bool = False
+        upcoming_only: bool = False,
+        # FIXME: Consider making this required, since it's more reliable
+        #        than filtering access after the fact, for now we'll only
+        #        use it in the API.
+        request: OrgRequest | None = None,
     ) -> None:
 
+        self.request = request
         super().__init__(directory, type, keywords, page, search_widget)
         self.published_only = published_only
         self.past_only = past_only
@@ -589,7 +631,26 @@ class ExtendedDirectoryEntryCollection(
 
     def query(self) -> Query[ExtendedDirectoryEntry]:
         query = super().query()
-        if self.published_only:
+        available_accesses: tuple[str, ...]
+        if self.request is None:
+            # assume highest access level or we filter later
+            available_accesses = ()
+        else:
+            role = getattr(self.request.identity, 'role', 'anonymous')
+            available_accesses = {
+                'admin': (),  # can see everything
+                'editor': (),  # can see everything
+                'member': ('member', 'mtan', 'public')
+            }.get(role, ('mtan', 'public'))
+        if available_accesses:
+            query = query.filter(or_(
+                *(
+                    self.model_class.meta['access'].astext == access
+                    for access in available_accesses
+                ),
+                self.model_class.meta['access'].is_(None)
+            ))
+        if self.published_only or available_accesses:
             query = query.filter(
                 self.model_class.publication_started == True,
                 self.model_class.publication_ended == False

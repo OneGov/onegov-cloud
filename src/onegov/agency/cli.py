@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import click
 import transaction
-from sqlalchemy import text
 
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.data_import import (import_bs_data,
@@ -13,12 +12,10 @@ from onegov.agency.models import ExtendedAgencyMembership, ExtendedPerson
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.people import Agency, Person, AgencyMembership
+from sqlalchemy import text
 
 
 from typing import TYPE_CHECKING
-
-from onegov.search import SearchOfflineError
-
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.agency.app import AgencyApp
@@ -44,7 +41,6 @@ def consolidate_cli(
     Consolidates double entries of person objects based on the property
     `based_on`. Property must be convertible to string.
     """
-    buffer = 100
 
     def find_double_entries(session: Session) -> tuple[
         dict[str, ExtendedPerson],
@@ -107,6 +103,7 @@ def consolidate_cli(
             session.delete(p)
 
     def do_consolidate(request: AgencyRequest, app: AgencyApp) -> None:
+        app.fts_orm_events.max_queue_size = 0
         session = request.session
         first_seen, to_consolidate = find_double_entries(session)
         click.echo(f'Double entries found based on '
@@ -117,9 +114,6 @@ def consolidate_cli(
             person = consolidate_persons(person, persons, id_)
             session.flush()
             consolidate_memberships(session, person, persons)
-            if ix % buffer == 0:
-                app.es_indexer.process()
-                app.psql_indexer.bulk_process(session)
         count_after = session.query(ExtendedAgencyMembership).count()
         assert count == count_after, f'before: {count}, after {count_after}'
         if dry_run:
@@ -177,29 +171,18 @@ def import_bs_data_files(
         $agency_file $people_file
     """
 
-    buffer = 100
-
     def execute(request: AgencyRequest, app: AgencyApp) -> None:
 
         if clean:
             session = request.session
             for ix, membership in enumerate(session.query(AgencyMembership)):
                 session.delete(membership)
-                if ix % buffer == 0:
-                    app.es_indexer.process()
-                    app.psql_indexer.bulk_process(session)
 
             for ix, person in enumerate(session.query(Person)):
                 session.delete(person)
-                if ix % buffer == 0:
-                    app.es_indexer.process()
-                    app.psql_indexer.bulk_process(session)
 
             for ix, agency in enumerate(session.query(Agency)):
                 session.delete(agency)
-                if ix % buffer == 0:
-                    app.es_indexer.process()
-                    app.psql_indexer.bulk_process(session)
 
             session.flush()
             click.secho(
@@ -236,8 +219,6 @@ def import_lu_data_files(
         onegov-agency --select /onegov_agency/lu import-lu-data $people_file
     """
 
-    es_type_names = frozenset(('extended_person', 'extended_agency'))
-
     def execute(request: AgencyRequest, app: AgencyApp) -> None:
         if clean:
             schema = app.session_manager.current_schema
@@ -246,11 +227,6 @@ def import_lu_data_files(
             click.secho(f'Cleaning data in schema: {schema}', fg='yellow')
 
             session = request.session
-
-            request.session.execute(
-                text('SET search_path TO :schema;').bindparams(schema=schema)
-            )
-
             agency_count = session.execute(
                 text('SELECT COUNT(*) FROM agencies')
             ).scalar()
@@ -271,28 +247,14 @@ def import_lu_data_files(
                 """)
             )
             session.flush()
-            if app.es_client is not None:
-                es_client = app.es_client
-                hostname = app.es_indexer.hostname
-
-                for type_name in es_type_names:
-                    index_pattern = f'{hostname}-{schema}-*-{type_name}'
-                    try:
-                        es_client.indices.delete(
-                            index=index_pattern, ignore_unavailable=True
-                        )
-                        click.secho(
-                            f'Elasticsearch index {index_pattern}'
-                            f' removed', fg='green',
-                        )
-                    except SearchOfflineError:
-                        click.secho(
-                            f'Warning: Elasticsearch is offline, '
-                            f'could not delete index {index_pattern}',
-                            fg='yellow',
-                        )
-                    except Exception:
-                        click.secho('Unknown Error', fg='red')
+            if app.fts_search_enabled:
+                # remove the relevant entries from the search index
+                session.execute(text("""
+                    DELETE
+                      FROM search_index
+                     WHERE owner_tablename IN ('agencies', 'people');
+                    COMMIT;
+                """))
 
             click.secho('Exiting...', fg='green')
             return

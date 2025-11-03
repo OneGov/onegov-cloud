@@ -406,6 +406,13 @@ def add_new_invoice_columns(context: UpgradeContext) -> None:
     #       manual item can then be deleted afterwards.
     for ticket in (
         context.session.query(Ticket)
+        .options(
+            load_only(
+                Ticket.id,
+                Ticket.title,
+                Ticket.payment_id,
+            )
+        )
         .filter(Ticket.payment_id.isnot(None))
         .options(selectinload(Ticket.payment))
     ):
@@ -432,3 +439,17 @@ def add_new_invoice_columns(context: UpgradeContext) -> None:
         item.paid = payment.state == 'paid'
 
     context.session.flush()
+
+
+@upgrade_task('Add order_id to ticket')
+def add_order_id_to_ticket(context: UpgradeContext) -> None:
+    if context.has_column('tickets', 'order_id'):
+        return
+
+    context.operations.add_column(
+        'tickets', Column('order_id', UUID, nullable=True)
+    )
+
+    context.operations.create_index(
+        'ix_tickets_order_id', 'tickets', ['order_id']
+    )

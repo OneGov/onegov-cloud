@@ -472,6 +472,7 @@ class Form(BaseForm):
     def invoice_items(
         self,
         group: str = 'form',
+        cost_object: str | None = None,
         vat_rate: Decimal | None = None,
         extra: dict[str, Any] | None = None,
     ) -> list[InvoiceItemMeta]:
@@ -486,6 +487,7 @@ class Form(BaseForm):
                            else self.request.translate(label),
                 group=group,
                 family=f'price-{field_id}',
+                cost_object=cost_object,
                 unit=price.amount,
                 extra=extra,
                 vat_rate=vat_rate,
@@ -540,6 +542,7 @@ class Form(BaseForm):
     def discount_items(
         self,
         group: str = 'form',
+        cost_object: str | None = None,
         vat_rate: Decimal | None = None,
         extra: dict[str, Any] | None = None,
     ) -> list[InvoiceDiscountMeta]:
@@ -554,6 +557,7 @@ class Form(BaseForm):
                            else self.request.translate(label),
                 group=group,
                 family=f'discount-{field_id}',
+                cost_object=cost_object,
                 discount=discount,
                 vat_rate=vat_rate,
                 extra=extra

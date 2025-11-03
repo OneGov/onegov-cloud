@@ -31,10 +31,10 @@ from onegov.ticket import Ticket, TicketCollection, TicketPermission
 from onegov.user import User, UserGroup
 from operator import add, attrgetter
 from sqlalchemy import case, nullsfirst  # type:ignore[attr-defined]
+from webob.exc import HTTPBadRequest
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
-
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Iterator, Sequence
@@ -294,14 +294,19 @@ def parse_fullcalendar_request(
 
     if start_str and end_str:
         if 'T' in start_str:
-            start = parse_datetime(start_str)
-            end = parse_datetime(end_str)
+            try:
+                start = parse_datetime(start_str)
+                end = parse_datetime(end_str)
+            except Exception:
+                raise HTTPBadRequest() from None
         else:
-            start = datetime.combine(parse_date(start_str), time(0, 0))
-            end = datetime.combine(
-                parse_date(end_str),
-                time(23, 59, 59, 999999)
-            )
+            try:
+                start_date = parse_date(start_str)
+                end_date = parse_date(end_str)
+            except Exception:
+                raise HTTPBadRequest() from None
+            start = datetime.combine(start_date, time(0, 0))
+            end = datetime.combine(end_date, time(23, 59, 59, 999999))
 
         start = sedate.replace_timezone(start, timezone)
         end = sedate.replace_timezone(end, timezone)
@@ -321,6 +326,15 @@ def render_time_range(start: datetime | time, end: datetime | time) -> str:
         end_str = f'{end:%H:%M}'
 
     return f'{start:%H:%M} - {end_str}'
+
+
+def complete_url(url: str | None) -> str | None:
+    # fixes erroneous data retrospectively
+    if url == 'https://' or url == 'https://keine':
+        return None
+    if url is None or url.startswith(('http://', 'https://', '/')):
+        return url
+    return f'https://{url}'
 
 
 class ReservationInfo:
@@ -892,6 +906,7 @@ class MyReservationEventInfo:
         'timezone',
         'accepted',
         'resource',
+        'resource_id',
         'ticket_id',
         'handler_code',
         'ticket_number',
@@ -903,12 +918,13 @@ class MyReservationEventInfo:
     def __init__(
         self,
         id: int,
-        token: str,
+        token: UUID,
         start: datetime,
         end: datetime,
         accepted: bool,
         timezone: str,
         resource: str,
+        resource_id: UUID,
         ticket_id: UUID,
         handler_code: str,
         ticket_number: str,
@@ -926,6 +942,7 @@ class MyReservationEventInfo:
         self.timezone = timezone
         self.accepted = accepted
         self.resource = resource
+        self.resource_id = resource_id
         self.ticket_id = ticket_id
         self.handler_code = handler_code
         self.key_code = key_code
@@ -1580,21 +1597,33 @@ def widest_access(*accesses: str) -> str:
     return ORDERED_ACCESS[index]
 
 
+def narrowest_access(*accesses: str) -> str:
+    index = len(ORDERED_ACCESS) - 1
+    for access in accesses:
+        try:
+            # we only want to look at indexes starting with the one
+            # we're already at, otherwise we're lowering the access
+            index = ORDERED_ACCESS.index(access, 0, index)
+        except ValueError:
+            pass
+    return ORDERED_ACCESS[index]
+
+
 @overload
 def extract_categories_and_subcategories(
-    categories: list[dict[str, list[str]] | str],
+    categories: Sequence[dict[str, list[str]] | str],
     flattened: Literal[False] = False
 ) -> tuple[list[str], list[list[str]]]: ...
 
 @overload
 def extract_categories_and_subcategories(
-    categories: list[dict[str, list[str]] | str],
+    categories: Sequence[dict[str, list[str]] | str],
     flattened: Literal[True]
 ) -> list[str]: ...
 
 
 def extract_categories_and_subcategories(
-    categories: list[dict[str, list[str]] | str],
+    categories: Sequence[dict[str, list[str]] | str],
     flattened: bool = False
 ) -> tuple[list[str], list[list[str]]] | list[str]:
     """
@@ -1630,8 +1659,13 @@ def extract_categories_and_subcategories(
             sub_cats.append([])
 
     if flattened:
-        return (cats +
-                [item for sublist in sub_cats if sublist for item in sublist])
+        cats.extend(
+            item
+            for sublist in sub_cats
+            if sublist
+            for item in sublist
+        )
+        return cats
 
     return cats, sub_cats
 

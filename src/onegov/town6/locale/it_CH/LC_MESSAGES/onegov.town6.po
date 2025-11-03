@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-09-11 12:40+0200\n"
+"POT-Creation-Date: 2025-10-16 11:34+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -77,6 +77,21 @@ msgstr "Usato per tutti i titoli"
 
 msgid "Enable the chat"
 msgstr "Attivare la chat"
+
+msgid "Disable chat"
+msgstr "Disattiva chat"
+
+msgid "Enable chat for chosen people"
+msgstr "Attiva chat per le seguenti persone"
+
+msgid "Enable AI chatbot"
+msgstr "Attiva chatbot AI"
+
+msgid "Link to chat service"
+msgstr "Collegamento al servizio di chat"
+
+msgid "https://govikonchatbot.seantis.ch"
+msgstr "https://govikonchatbot.seantis.ch"
 
 msgid "Show chat for chosen people"
 msgstr "Mostra la chat per le seguenti persone"
@@ -168,11 +183,11 @@ msgstr "Categorie predefinite per i legami di interesse"
 
 msgid ""
 "Enter a list of categories for interest ties. Each category should be "
-"separated by a semicolon. Example: \"Cat 1 text; Cat 2 text; Cat 3 text\""
+"separated by a semicolon. Example: Cat 1 text; Cat 2 text; Cat 3 text"
 msgstr ""
 "Inserisci un elenco di categorie per i legami di interesse. Ogni categoria "
-"deve essere separata da un punto e virgola. Esempio: Cat 1 text; Cat 2 "
-"text; Cat 3 text"
+"deve essere separata da un punto e virgola. Esempio: Testo Cat 1; Testo Cat "
+"2; Testo Cat 3"
 
 #, fuzzy
 msgid "Events"
@@ -763,6 +778,9 @@ msgstr "Ti trovi qui"
 msgid "Privacy Protection"
 msgstr "Tutela della privacy"
 
+msgid "Impressum"
+msgstr "Colophon"
+
 msgid "Login"
 msgstr "Accedi"
 
@@ -1152,9 +1170,6 @@ msgstr "Creato"
 msgid "Disbursed"
 msgstr "Erogato"
 
-msgid "Select this payment"
-msgstr "Seleziona questo pagamento"
-
 msgid "Select this invoice"
 msgstr "Seleziona questa fattura"
 
@@ -1285,11 +1300,29 @@ msgstr "Messa a fuoco"
 msgid "Available options for the focus widget:"
 msgstr "Opzioni disponibili per il widget di messa a fuoco:"
 
+msgid "Experimental AI Chatbot"
+msgstr "Chatbot AI sperimentale"
+
+msgid ""
+"This chatbot is experimental and may produce incorrect or misleading "
+"information. Please verify any information provided by the chatbot with "
+"official sources."
+msgstr ""
+"Questo chatbot è sperimentale e può produrre informazioni errate o "
+"fuorvianti. Si prega di verificare qualsiasi informazione fornita dal "
+"chatbot con fonti ufficiali."
+
+msgid "Try it out"
+msgstr "Provalo"
+
 msgid "Copy to clipboard"
 msgstr "Copia negli appunti"
 
 msgid "Booking Text"
 msgstr "Testo prenotazione"
+
+msgid "Cost center / cost unit"
+msgstr "Unità di costo"
 
 msgid "Unit"
 msgstr "Unità"
@@ -2111,9 +2144,6 @@ msgstr "Abilitato:"
 msgid "Fee:"
 msgstr "Imposta:"
 
-msgid "Export Bill run as PDF"
-msgstr "Esporta l'esecuzione della fattura come PDF"
-
 msgid "No payments yet."
 msgstr "Nessun pagamento ancora."
 
@@ -2303,6 +2333,9 @@ msgstr "Riceve le notifiche per le nuove prenotazioni."
 msgid "Notifications for following Resources"
 msgstr "Notifiche per le seguenti risorse"
 
+msgid "General information about resources"
+msgstr "Informazioni generali sulle prenotazioni"
+
 msgid "No reservation resources defined yet."
 msgstr "Nessuna risorsa di prenotazione ancora definita."
 
@@ -2484,6 +2517,9 @@ msgstr "Tempo di reazione"
 
 msgid "Process Time"
 msgstr "Tempo di elaborazione"
+
+msgid "Related Tickets"
+msgstr "Biglietti correlati"
 
 msgid "Summary"
 msgstr "Riepilogo"
@@ -2688,8 +2724,14 @@ msgstr "L'appartenenza alla commissione è stata eliminata."
 msgid "Added a new parliamentarian"
 msgstr "Aggiunto un nuovo parlamentare"
 
+msgid "Parliamentarian has been automatically subscribed to the newsletter."
+msgstr "Il parlamentare è stato automaticamente iscritto alla newsletter."
+
 msgid "New parliamentarian"
 msgstr "Nuovo parlamentare"
+
+msgid "The newsletter subscription has been updated."
+msgstr "L'iscrizione alla newsletter è stata aggiornata."
 
 msgid "The parliamentarian has been deleted."
 msgstr "Il parlamentare è stato eliminato."
@@ -2800,6 +2842,9 @@ msgstr "Abbonamento alla newsletter"
 msgid "Link Migration"
 msgstr "Migrazione dei link"
 
+msgid "Resources"
+msgstr "Prenotazioni"
+
 msgid "OneGov API"
 msgstr "API OneGov"
 
@@ -2824,24 +2869,3 @@ msgstr "Sistema di informazione sui ratti (RIS)"
 
 msgid "New Note"
 msgstr "Nuova nota"
-
-#~ msgid "No parliamentarians defined yet."
-#~ msgstr "Nessun parlamentare ancora definito."
-
-#~ msgid "Picture"
-#~ msgstr "Immagine"
-
-#~ msgid "Roles"
-#~ msgstr "Ruoli"
-
-#~ msgid "Interest tie"
-#~ msgstr "Legame di interesse"
-
-#~ msgid "Category"
-#~ msgstr "Categoria"
-
-#~ msgid "Role (as a group member)"
-#~ msgstr "Ruolo (come membro di un gruppo)"
-
-#~ msgid "New role"
-#~ msgstr "Nuovo ruolo"

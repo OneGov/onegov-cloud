@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import os
-from tempfile import TemporaryDirectory
 import textwrap
 import transaction
 import zipfile
@@ -7,7 +8,6 @@ import zipfile
 from datetime import date, timedelta
 from freezegun import freeze_time
 from io import BytesIO
-
 from onegov.core.utils import module_path
 from onegov.file import FileCollection
 from onegov.form import (
@@ -17,26 +17,38 @@ from onegov.org.models.document_form import FormDocument
 from onegov.people import Person
 from onegov.ticket import TicketCollection, Ticket
 from onegov.user import UserCollection
+from tempfile import TemporaryDirectory
 from tests.shared.utils import create_image, create_pdf
 from unittest.mock import patch
 from webtest import Upload
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.client import ExtendedResponse
+    from unittest.mock import MagicMock
+    from .conftest import Client
 
-def test_view_form_alert(client):
+
+def test_view_form_alert(client: Client) -> None:
     login = client.get('/auth/login').form.submit()
     assert 'Das Formular enthält Fehler' in login
 
 
-def test_render_form(client):
+def test_render_form(client: Client) -> None:
 
     class Field:
-        def __init__(self, name, definition, comment=None):
+        def __init__(
+            self,
+            name: str,
+            definition: str,
+            comment: str | None = None
+        ) -> None:
             self.name = name
             self.id = as_internal_id(name)
             self.definition = definition
             self.comment = comment
 
-        def __str__(self):
+        def __str__(self) -> str:
             base = f'{self.name} {self.definition}'
             if self.comment:
                 base += f'\n<< {self.comment} >>'
@@ -96,14 +108,19 @@ def test_render_form(client):
         row = page.pyquery(f'.field-{field.id} .long-field-help')
         print(field.name)
         assert row.text() == field.comment
-        assert 'None' not in row.text(), \
-            f'Description not captured by field {field.type}'
+        assert 'None' not in row.text()
 
 
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
-def test_submit_form(broadcast, authenticate, connect, client):
+def test_submit_form(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
+
     collection = FormCollection(client.app.session())
     collection.definitions.add('Profile', definition=textwrap.dedent("""
         # Your Details
@@ -183,7 +200,7 @@ def test_submit_form(broadcast, authenticate, connect, client):
     assert broadcast.call_args[0][3]['created']
 
 
-def test_pending_submission_error_file_upload(client):
+def test_pending_submission_error_file_upload(client: Client) -> None:
     collection = FormCollection(client.app.session())
     collection.definitions.add('Statistics', definition=textwrap.dedent("""
         Name * = ___
@@ -199,7 +216,7 @@ def test_pending_submission_error_file_upload(client):
     assert len(form_page.pyquery('small.error')) == 2
 
 
-def test_pending_submission_successful_file_upload(client):
+def test_pending_submission_successful_file_upload(client: Client) -> None:
     collection = FormCollection(client.app.session())
     collection.definitions.add('Statistics', definition=textwrap.dedent("""
         Name * = ___
@@ -216,12 +233,13 @@ def test_pending_submission_successful_file_upload(client):
     assert "Datei löschen" in form_page.text
     assert "Datei behalten" in form_page.text
 
+    # FIXME: we should be able to test this now
     # unfortunately we can't test more here, as webtest doesn't support
     # multiple differing fields of the same name...
     # wait until webtest 3.0.1, which will support multiple file upload
 
 
-def test_add_custom_form(client):
+def test_add_custom_form(client: Client) -> None:
     client.login_editor()
 
     # this error is not strictly line based, so there's a general error
@@ -261,7 +279,7 @@ def test_add_custom_form(client):
     form_page.form.submit().follow()
 
 
-def test_add_custom_form_minimum_price_validation(client):
+def test_add_custom_form_minimum_price_validation(client: Client) -> None:
     client.login_editor()
 
     form_page = client.get('/forms/new')
@@ -295,7 +313,9 @@ def test_add_custom_form_minimum_price_validation(client):
     assert "Minimalbetrag" not in form_page
 
 
-def test_add_custom_form_payment_metod_validation_error(client):
+def test_add_custom_form_payment_metod_validation_error(
+    client: Client
+) -> None:
     client.login_editor()
 
     form_page = client.get('/forms/new')
@@ -318,7 +338,7 @@ def test_add_custom_form_payment_metod_validation_error(client):
     assert "benötigen Sie einen Standard-Zahlungsanbieter" in form_page
 
 
-def test_add_custom_form_payment_validation_error(client):
+def test_add_custom_form_payment_validation_error(client: Client) -> None:
     client.login_editor()
 
     form_page = client.get('/forms/new')
@@ -341,7 +361,7 @@ def test_add_custom_form_payment_validation_error(client):
     form_page = form_page.form.submit().follow()
 
 
-def test_add_duplicate_form(client):
+def test_add_duplicate_form(client: Client) -> None:
     client.login_editor()
 
     form_page = client.get('/forms/new')
@@ -363,7 +383,7 @@ def test_add_duplicate_form(client):
     assert "Ein Formular mit diesem Namen existiert bereits" in form_page
 
 
-def test_forms_explicitly_link_referenced_files(client):
+def test_forms_explicitly_link_referenced_files(client: Client) -> None:
     admin = client.spawn()
     admin.login_admin()
 
@@ -394,10 +414,11 @@ def test_forms_explicitly_link_referenced_files(client):
     session = client.app.session()
     pdf = FileCollection(session).query().one()
     form = FormDefinitionCollection(session).by_name('my-form')
+    assert form is not None
     assert form.files == [pdf]
     assert pdf.access == 'public'
 
-    form.access = 'mtan'
+    form.access = 'mtan'  # type: ignore[attr-defined]
     session.flush()
     assert pdf.access == 'mtan'
 
@@ -407,7 +428,7 @@ def test_forms_explicitly_link_referenced_files(client):
     assert pdf.access == 'secret'
 
 
-def test_delete_builtin_form(client):
+def test_delete_builtin_form(client: Client) -> None:
     builtin_form = '/form/anmeldung'
 
     response = client.delete(builtin_form, expect_errors=True)
@@ -419,7 +440,7 @@ def test_delete_builtin_form(client):
     assert response.status_code == 403
 
 
-def test_delete_custom_form(client):
+def test_delete_custom_form(client: Client) -> None:
     client.login_editor()
 
     form_page = client.get('/forms/new')
@@ -431,7 +452,7 @@ def test_delete_custom_form(client):
         form_page.pyquery('a.delete-link')[0].attrib['ic-delete-from'])
 
 
-def test_show_uploaded_file(client):
+def test_show_uploaded_file(client: Client) -> None:
     collection = FormCollection(client.app.session())
     collection.definitions.add(
         'Text', definition="File * = *.txt\nE-Mail * = @@@", type='custom')
@@ -461,7 +482,7 @@ def test_show_uploaded_file(client):
     assert client.spawn().get(file_response.request.url, status=404)
 
 
-def test_hide_form(client):
+def test_hide_form(client: Client) -> None:
     client.login_editor()
 
     form_page = client.get('/form/anmeldung/edit')
@@ -481,7 +502,7 @@ def test_hide_form(client):
     assert response.status_code == 200
 
 
-def test_change_email(client):
+def test_change_email(client: Client) -> None:
     collection = FormCollection(client.app.session())
     collection.definitions.add('Newsletter', definition=textwrap.dedent("""
         E-Mail *= @@@
@@ -510,7 +531,7 @@ def test_change_email(client):
         'new@example.org')
 
 
-def test_manual_form_payment(client):
+def test_manual_form_payment(client: Client) -> None:
     collection = FormCollection(client.app.session())
     collection.definitions.add('Govikon Poster', definition=textwrap.dedent("""
         E-Mail *= @@@
@@ -645,7 +666,7 @@ def test_manual_form_payment(client):
     assert "Offen" in payments
 
 
-def test_form_payment_required(client):
+def test_form_payment_required(client: Client) -> None:
     collection = FormCollection(client.app.session())
     collection.definitions.add('Govikon Poster', definition=textwrap.dedent("""
         E-Mail *= @@@
@@ -681,7 +702,7 @@ def test_form_payment_required(client):
     assert "Später bezahlen" not in page
 
 
-def test_dependent_number_form(client):
+def test_dependent_number_form(client: Client) -> None:
     collection = FormCollection(client.app.session())
     collection.definitions.add('Profile', definition=textwrap.dedent("""
         E-Mail *= @@@
@@ -700,7 +721,7 @@ def test_dependent_number_form(client):
     assert "Bitte überprüfen Sie Ihre Angaben" in page
 
 
-def test_registration_form_hints(client):
+def test_registration_form_hints(client: Client) -> None:
     collection = FormCollection(client.app.session())
     collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
     transaction.commit()
@@ -792,7 +813,7 @@ def test_registration_form_hints(client):
         assert "Keine Plätze mehr verfügbar" in page
 
 
-def test_registration_complete_after_deadline(client):
+def test_registration_complete_after_deadline(client: Client) -> None:
     collection = FormCollection(client.app.session())
 
     form = collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
@@ -816,7 +837,7 @@ def test_registration_complete_after_deadline(client):
         assert TicketCollection(client.app.session()).query().count() == 0
 
 
-def test_registration_race_condition(client):
+def test_registration_race_condition(client: Client) -> None:
     collection = FormCollection(client.app.session())
 
     form = collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
@@ -832,24 +853,24 @@ def test_registration_race_condition(client):
     foo = client.spawn()
     bar = client.spawn()
 
-    def fill_out_form(client):
+    def fill_out_form(client: Client) -> ExtendedResponse:
         page = client.get('/form/meetup')
         page.form['e_mail'] = 'info@example.org'
 
         return page.form.submit().follow()
 
-    def complete_form(page):
+    def complete_form(page: ExtendedResponse) -> ExtendedResponse:
         return page.form.submit().follow()
 
     with freeze_time('2018-01-01'):
-        foo = fill_out_form(foo)
-        bar = fill_out_form(bar)
+        foo_page = fill_out_form(foo)
+        bar_page = fill_out_form(bar)
 
-        assert "Vielen Dank für Ihre Eingabe" in complete_form(foo)
-        assert "Anmeldungen sind nicht mehr möglich" in complete_form(bar)
+        assert "Vielen Dank für Ihre Eingabe" in complete_form(foo_page)
+        assert "Anmeldungen sind nicht mehr möglich" in complete_form(bar_page)
 
 
-def test_registration_change_limit_after_submissions(client):
+def test_registration_change_limit_after_submissions(client: Client) -> None:
     collection = FormCollection(client.app.session())
 
     form = collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
@@ -906,7 +927,7 @@ def test_registration_change_limit_after_submissions(client):
     assert "Ihre Änderungen wurden gespeichert" in page
 
 
-def test_registration_window_adjust_end_date(client):
+def test_registration_window_adjust_end_date(client: Client) -> None:
     collection = FormCollection(client.app.session())
 
     form = collection.definitions.add(
@@ -955,7 +976,7 @@ def test_registration_window_adjust_end_date(client):
         assert 'Ihre Änderungen wurden gespeichert' in result
 
 
-def test_registration_ticket_workflow(client):
+def test_registration_ticket_workflow(client: Client) -> None:
     session = client.app.session()
     collection = FormCollection(session)
     users = UserCollection(session)
@@ -981,8 +1002,12 @@ def test_registration_ticket_workflow(client):
 
     count = 0
 
-    def register(client, data_in_email, accept_ticket=True,
-                 url='/form/meetup'):
+    def register(
+        client: Client,
+        data_in_email: bool,
+        accept_ticket: bool = True,
+        url: str = '/form/meetup'
+    ) -> ExtendedResponse:
         nonlocal count
         count += 1
         with freeze_time(f'2018-01-01 00:00:{count:02d}'):
@@ -1054,6 +1079,7 @@ def test_registration_ticket_workflow(client):
     client = client.spawn()
     page = register(client, False, accept_ticket=False)
     mail = client.get_email(-1)
+    assert mail is not None
     assert 'Meetup: Ihre Anmeldung wurde bestätigt' in mail['Subject']
     assert 'Ihr Anliegen wurde abgeschlossen' in page
 
@@ -1081,12 +1107,12 @@ def test_registration_ticket_workflow(client):
     page = client.get('/tickets/ALL/closed')
     last_ticket = page.pyquery('td.ticket-number-plain a').attr('href')
     ticket = client.get(last_ticket).click('Ticket wieder öffnen').follow()
-    window = ticket.click('Anmeldezeitraum')
-    assert 'Offen (1)' in window
-    assert 'Bestätigt (1)' in window
-    assert 'Storniert (2)' in window
+    window_page = ticket.click('Anmeldezeitraum')
+    assert 'Offen (1)' in window_page
+    assert 'Bestätigt (1)' in window_page
+    assert 'Storniert (2)' in window_page
 
-    message = window.click('E-Mail an Teilnehmende')
+    message = window_page.click('E-Mail an Teilnehmende')
     message.form['message'] = 'Message for all the attendees'
     message.form['registration_state'] = ['open', 'cancelled', 'confirmed']
     page = message.form.submit().follow()
@@ -1097,15 +1123,17 @@ def test_registration_ticket_workflow(client):
         .order_by(TicketNote.created.desc())
         .first()
     )
+    assert latest_ticket_note is not None
     assert "Neue E-Mail" in latest_ticket_note.text
 
     mail = client.get_email(-1)
+    assert mail is not None
     assert 'Message for all the attendees' in mail['HtmlBody']
     assert 'Allgemeine Nachricht' in mail['Subject']
 
     # navigate to the registration window an cancel all
-    window.click('Anmeldezeitraum absagen')
-    page = client.get(window.request.url)
+    window_page.click('Anmeldezeitraum absagen')
+    page = client.get(window_page.request.url)
     assert 'Storniert (4)' in page
 
     ticket_url = page.pyquery('.field-display a:first-of-type').attr('href')
@@ -1117,7 +1145,7 @@ def test_registration_ticket_workflow(client):
     transaction.commit()
 
     # the window is no longer accesible through the ticket
-    page = client.get(window.request.url, status=404)
+    page = client.get(window_page.request.url, status=404)
 
     # the link to the deleted ticket is gone from the window view
     page = client.get(f'/form-registration-window/{window_id.hex}')
@@ -1127,8 +1155,8 @@ def test_registration_ticket_workflow(client):
 
     # Try deleting the form with active registrations window
     form_page = client.get('/form/meetings')
-    assert 'Dies kann nicht rückgängig gemacht werden.' in \
-           form_page.pyquery('.delete-link.confirm').attr('data-confirm-extra')
+    assert 'Dies kann nicht rückgängig gemacht werden.' in form_page.pyquery(
+        '.delete-link.confirm').attr('data-confirm-extra')
 
     form_delete_link = form_page.pyquery(
         '.delete-link.confirm').attr('ic-delete-from')
@@ -1136,7 +1164,7 @@ def test_registration_ticket_workflow(client):
     client.delete(form_delete_link, status=200)
 
 
-def test_registration_not_in_front_of_queue(client):
+def test_registration_not_in_front_of_queue(client: Client) -> None:
     collection = FormCollection(client.app.session())
 
     form = collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
@@ -1166,7 +1194,7 @@ def test_registration_not_in_front_of_queue(client):
     assert "Dies ist nicht die älteste offene Eingabe" not in page
 
 
-def test_markdown_in_forms(client):
+def test_markdown_in_forms(client: Client) -> None:
     collection = FormCollection(client.app.session())
     collection.definitions.add('Content', definition=textwrap.dedent("""
         E-Mail *= @@@
@@ -1184,7 +1212,7 @@ def test_markdown_in_forms(client):
     assert '<li>bar</li>' in page
 
 
-def test_exploit_markdown_in_forms(client):
+def test_exploit_markdown_in_forms(client: Client) -> None:
     collection = FormCollection(client.app.session())
     collection.definitions.add('Content', definition=textwrap.dedent("""
         E-Mail *= @@@
@@ -1202,7 +1230,7 @@ def test_exploit_markdown_in_forms(client):
     assert '&lt;script&gt;alert' in page
 
 
-def test_honeypotted_forms(client):
+def test_honeypotted_forms(client: Client) -> None:
     client.login_editor()
 
     # this error is not strictly line based, so there's a general error
@@ -1260,7 +1288,7 @@ def test_honeypotted_forms(client):
     assert 'Das Formular enthält Fehler' not in preview_page
 
 
-def test_edit_page_people_function_is_displayed(client):
+def test_edit_page_people_function_is_displayed(client: Client) -> None:
 
     client.login_admin()
 
@@ -1310,7 +1338,7 @@ def test_edit_page_people_function_is_displayed(client):
     assert option.attr('data-show') == 'true'
 
 
-def test_event_configuration_validation(client):
+def test_event_configuration_validation(client: Client) -> None:
     """
     Tests ValidFilterFormDefinition only allows Radio and Checkbox
     fields.
@@ -1350,7 +1378,11 @@ def test_event_configuration_validation(client):
     assert 'Invalid field type for field \'Webpage\'.' in page
 
 
-def test_file_export_for_ticket(client, temporary_directory):
+def test_file_export_for_ticket(
+    client: Client,
+    temporary_directory: str
+) -> None:
+
     collection = FormCollection(client.app.session())
     collection.definitions.add('Statistics', definition=textwrap.dedent("""
         E-Mail * = @@@
@@ -1389,8 +1421,8 @@ def test_file_export_for_ticket(client, temporary_directory):
         assert {'README1.txt', 'README2.txt'}.issubset(file_names)
 
         for file_name, content in zip(file_names, [b'first', b'second']):
-            with zip_file.open(file_name) as file:
-                extracted_file_content = file.read()
+            with zip_file.open(file_name) as fp:
+                extracted_file_content = fp.read()
                 assert extracted_file_content == content
 
     # test one where the file got deleted
@@ -1426,15 +1458,15 @@ def test_file_export_for_ticket(client, temporary_directory):
         assert 'README3.txt' not in file_names
 
         for file_name, content in zip(file_names, [b'fourth']):
-            with zip_file.open(file_name) as file:
-                extracted_file_content = file.read()
+            with zip_file.open(file_name) as fp:
+                extracted_file_content = fp.read()
                 assert extracted_file_content == content
 
     # testing something like "Datei * = *.txt (multiple)" would require
     # webtest to support multiple file upload which will come on 3.0.1
 
 
-def test_create_and_fill_survey(client):
+def test_create_and_fill_survey(client: Client) -> None:
     client.login_editor()
     anonymous = client.spawn()
 
@@ -1517,7 +1549,7 @@ def test_create_and_fill_survey(client):
     assert 'Nicolas Thomas' not in page
 
 
-def test_document_form(client):
+def test_document_form(client: Client) -> None:
 
     session = client.app.session()
     client.login_editor()
@@ -1545,6 +1577,7 @@ def test_document_form(client):
         ''' in page
         assert 'first_pdf.pdf' in page
         form_document = session.query(FormDocument).one()
+        assert form_document.pdf_extract is not None
         assert 'This is the wrong form' in form_document.pdf_extract
 
         page = page.click('Bearbeiten')
@@ -1556,4 +1589,5 @@ def test_document_form(client):
         assert 'Deadline Extension Request' in page
         assert 'other_pdf.pdf' in page
         form_document = session.query(FormDocument).one()
+        assert form_document.pdf_extract is not None
         assert 'This is a deadline extension form' in form_document.pdf_extract

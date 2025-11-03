@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import morepath
-import onegov.core
 import onegov.onboarding
 import os.path
 import pytest
@@ -20,7 +19,6 @@ def onboarding_app(
     postgres_dsn: str,
     temporary_directory: str,
     maildir: str,
-    es_url: str,
     redis_url: str
 ) -> Iterator[onegov.onboarding.OnboardingApp]:
 
@@ -48,7 +46,7 @@ def onboarding_app(
                 }
             }
         },
-        elasticsearch_hosts=[es_url]
+        enable_search=False
     )
     app.set_application_id(app.namespace + '/' + 'test')
 

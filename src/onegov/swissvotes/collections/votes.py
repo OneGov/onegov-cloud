@@ -11,7 +11,7 @@ from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import SwissVote
 from sqlalchemy import func
 from sqlalchemy import or_
-from xlsxwriter.workbook import Workbook  # type:ignore[import-untyped]
+from xlsxwriter.workbook import Workbook
 
 
 from typing import Any
@@ -590,7 +590,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
                     )
             csv.writerow(row)
 
-    def export_xlsx(self, file: IO[str]) -> None:
+    def export_xlsx(self, file: IO[Any]) -> None:
         """ Exports all votes according to the code book. """
         mapper = ColumnMapperDataset()
 

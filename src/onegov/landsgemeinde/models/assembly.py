@@ -50,13 +50,13 @@ class Assembly(
 
     __tablename__ = 'landsgemeinde_assemblies'
 
-    es_public = True
-    es_properties = {
-        'overview': {'type': 'localized_html'},
+    fts_public = True
+    fts_properties = {
+        'overview': {'type': 'localized', 'weight': 'A'},
     }
 
     @property
-    def es_suggestion(self) -> tuple[str, ...]:
+    def fts_suggestion(self) -> tuple[str, ...]:
         return (
             str(self.date.year),
             f'Landsgemeinde {self.date.year}',

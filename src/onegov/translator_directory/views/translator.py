@@ -35,8 +35,9 @@ from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.utils import country_code_to_name
 
 from uuid import uuid4
-from xlsxwriter import Workbook  # type:ignore[import-untyped]
+from xlsxwriter import Workbook
 from docx.image.exceptions import UnrecognizedImageError
+from webob.exc import HTTPForbidden
 
 
 from typing import TYPE_CHECKING
@@ -191,8 +192,9 @@ def export_translator_directory(
             return ''
         return ', '.join(mapping[n] for n in nationalities)
 
-    worksheet = workbook.add_worksheet()
-    worksheet.name = request.translate(_('Translator directory'))
+    worksheet = workbook.add_worksheet(
+        request.translate(_('Translator directory'))
+    )
     worksheet.write_row(0, 0, (
         request.translate(_('Personal ID')),
         request.translate(_('Admission')),
@@ -422,9 +424,21 @@ def report_translator_change(
     form: TranslatorMutationForm
 ) -> RenderData | BaseResponse:
 
+    if request.is_member:
+        raise HTTPForbidden()
+
     if form.submitted(request):
         assert request.current_username is not None
         session = request.session
+
+        # Get uploaded files from the form
+        uploaded_files = form.get_files()
+        file_ids: list[str] = []
+        if uploaded_files:
+            self.files.extend(uploaded_files)
+            session.flush()
+            file_ids = [f.id for f in uploaded_files]
+
         with session.no_autoflush:
             ticket = TicketCollection(session).open_ticket(
                 handler_code='TRN',
@@ -433,8 +447,9 @@ def report_translator_change(
                     'id': str(self.id),
                     'submitter_email': request.current_username,
                     'submitter_message': form.submitter_message.data,
-                    'proposed_changes': form.proposed_changes
-                }
+                    'proposed_changes': form.proposed_changes,
+                    'file_ids': file_ids,
+                },
             )
             TicketMessage.create(ticket, request, 'opened', 'external')
             ticket.create_snapshot(request)

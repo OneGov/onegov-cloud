@@ -64,7 +64,7 @@ def test_process_credit_card_payment_error(
             currency: object,
             token: object
         ) -> None:
-            raise CARD_ERRORS[0](None, None, None)
+            raise CARD_ERRORS[0](None, None, None)  # type: ignore[no-untyped-call]
 
     capturelog.setLevel(logging.ERROR, logger='onegov.pay')
 

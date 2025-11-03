@@ -66,7 +66,6 @@ class AssemblyForm(NamedFileForm):
     video_url = URLField(
         label=_('Video URL'),
         fieldset=_('Video'),
-        description=_('The URL to the video of the assembly.'),
         validators=[URL(), Optional()]
     )
 
@@ -143,6 +142,10 @@ class AssemblyForm(NamedFileForm):
         DefaultLayout(self.model, self.request)
         self.request.include('redactor')
         self.request.include('editor')
+        self.video_url.description = _(
+            'The URL to the video of the ${assembly_type}.',
+            mapping={'assembly_type': DefaultLayout(self.model, self.request
+                                                    ).assembly_type})
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         data = super().get_useful_data(exclude=['info_video'])

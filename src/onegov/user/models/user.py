@@ -51,15 +51,15 @@ class User(Base, TimestampMixin, ORMSearchable):
         'polymorphic_identity': 'generic',
     }
 
-    es_properties = {
-        'username': {'type': 'text'},
-        'realname': {'type': 'text'},
-        'userprofile': {'type': 'text'}
+    fts_properties = {
+        'username': {'type': 'text', 'weight': 'A'},
+        'realname': {'type': 'text', 'weight': 'A'},
+        'userprofile': {'type': 'text', 'weight': 'B'}
     }
-    es_public = False
+    fts_public = False
 
     @property
-    def es_suggestion(self) -> tuple[str, str]:
+    def fts_suggestion(self) -> tuple[str, str]:
         return (self.realname or self.username, self.username)
 
     @property

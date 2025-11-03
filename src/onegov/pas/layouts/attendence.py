@@ -29,7 +29,9 @@ class AttendenceCollectionLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[LinkGroup] | None:
-        if self.request.is_manager:
+        if (self.request.is_manager
+            or (hasattr(self.request.identity, 'role')
+                and self.request.identity.role == 'commission_president')):
             return [
                 LinkGroup(
                     title=_('Add'),
@@ -50,6 +52,19 @@ class AttendenceCollectionLayout(DefaultLayout):
                                 self.model, 'new-commission-bulk'
                             ),
                             attrs={'class': 'new-attendence'},
+                        ),
+                    ]
+                ),
+            ]
+        elif self.request.is_parliamentarian:
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('New Attendence'),
+                            url=self.request.link(self.model, 'new'),
+                            attrs={'class': 'new-attendence'}
                         ),
                     ]
                 ),
@@ -84,7 +99,7 @@ class AttendenceLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[Link] | None:
-        if self.request.is_manager:
+        if self.request.is_admin:
             return [
                 Link(
                     text=_('Edit'),
@@ -111,6 +126,17 @@ class AttendenceLayout(DefaultLayout):
                             )
                         )
                     )
+                )
+            ]
+        elif (self.request.is_parliamentarian
+              and self.request.current_parliamentarian
+              and str(self.request.current_parliamentarian.id)
+              == str(self.model.parliamentarian_id)):
+            return [
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
                 )
             ]
         return None

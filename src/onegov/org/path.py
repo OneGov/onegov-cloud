@@ -785,7 +785,7 @@ def get_search(
     request: OrgRequest,
     q: str = '',
     page: int = 0
-) -> Search[Any]:
+) -> Search:
     return Search(request, q, page)
 
 
@@ -910,6 +910,7 @@ def get_payment(app: OrgApp, id: UUID) -> Payment | None:
         'end': datetime_converter,
         'status': str,
         'payment_type': str,
+        'ticket_group': [str],
         'ticket_start': extended_date_converter,
         'ticket_end': extended_date_converter,
         'reservation_start': extended_date_converter,
@@ -924,7 +925,7 @@ def get_payments(
     end: datetime | None = None,
     status: str | None = None,
     payment_type: str | None = None,
-    ticket_group: str | None = None,
+    ticket_group: list[str] | None = None,
     ticket_start: date | None = None,
     ticket_end: date | None = None,
     reservation_start: date | None = None,
@@ -951,21 +952,24 @@ def get_payments(
     path='/invoices',
     converters={
         'page': int,
+        'ticket_group': [str],
         'ticket_start': extended_date_converter,
         'ticket_end': extended_date_converter,
         'reservation_start': extended_date_converter,
         'reservation_end': extended_date_converter,
+        'has_payment': bool,
         'invoiced': bool,
     }
 )
 def get_invoices(
     app: OrgApp,
     page: int = 0,
-    ticket_group: str | None = None,
+    ticket_group: list[str] | None = None,
     ticket_start: date | None = None,
     ticket_end: date | None = None,
     reservation_start: date | None = None,
     reservation_end: date | None = None,
+    has_payment: bool | None = None,
     invoiced: bool | None = None,
 ) -> TicketInvoiceCollection:
     return TicketInvoiceCollection(
@@ -976,6 +980,7 @@ def get_invoices(
         ticket_end=ticket_end,
         reservation_start=reservation_start,
         reservation_end=reservation_end,
+        has_payment=has_payment,
         invoiced=invoiced,
     )
 

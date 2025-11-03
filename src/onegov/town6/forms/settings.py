@@ -124,14 +124,27 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
 
 class ChatSettingsForm(Form):
 
-    enable_chat = BooleanField(
+    enable_chat = RadioField(
         label=_('Enable the chat'),
-        default=False
+        choices=[
+            ('disabled', _('Disable chat')),
+            ('people_chat', _('Enable chat for chosen people')),
+            ('chatbot', _('Enable AI chatbot')),
+        ],
+        default='disabled'
+    )
+
+    chat_link = StringField(
+        label=_('Link to chat service'),
+        description=_('https://govikonchatbot.seantis.ch'),
+        depends_on=('enable_chat', 'chatbot'),
+        validators=[InputRequired()]
     )
 
     chat_staff = ChosenSelectMultipleField(
         label=_('Show chat for chosen people'),
-        choices=[]
+        choices=[],
+        depends_on=('enable_chat', 'people_chat')
     )
 
     chat_topics = TagsField(
@@ -140,17 +153,17 @@ class ChatSettingsForm(Form):
             "The topics can be chosen on the form at the start of the chat. "
             "Example topics are 'Social', 'Clubs' or 'Planning & Construction'"
             ". If left empty, all Chats get the topic 'General'."),
+        depends_on=('enable_chat', 'people_chat')
     )
 
     specific_opening_hours = BooleanField(
         label=_('Specific Opening Hours'),
         description=_('If unchecked, the chat is open 24/7.'),
-        fieldset=_('Opening Hours'),
+        depends_on=('enable_chat', 'people_chat')
     )
 
     opening_hours_chat = StringField(
         label=_('Opening Hours'),
-        fieldset=_('Opening Hours'),
         depends_on=('specific_opening_hours', 'y'),
         render_kw={'class_': 'many many-opening-hours'}
     )
@@ -166,7 +179,7 @@ class ChatSettingsForm(Form):
 
         super().process_obj(obj)
         self.chat_staff.data = obj.chat_staff or []
-        self.enable_chat.data = obj.enable_chat or False
+        self.enable_chat.data = obj.enable_chat or 'disabled'
         self.chat_topics.data = obj.chat_topics or []
         self.specific_opening_hours.data = obj.specific_opening_hours
         if not obj.opening_hours_chat:

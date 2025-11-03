@@ -1,10 +1,19 @@
-from decimal import Decimal
+from __future__ import annotations
+
+
 import transaction
-from onegov.pay import Payment, PaymentProvider
+
 from datetime import datetime, timezone
+from decimal import Decimal
+from onegov.pay import Payment, PaymentProvider
 
 
-def test_view_payments_as_admin(client) -> None:
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_view_payments_as_admin(client: Client) -> None:
     client.login_admin()
 
     session = client.app.session()
@@ -34,29 +43,26 @@ def test_view_payments_as_admin(client) -> None:
     payments_url = '/payments'
 
     page = client.get(payments_url)
-    return
 
-    # Scenario 1: Filter for Jan 10, 2023. Expect P1.
+    # Scenario 1: Filter for open payments expect P1
     form = page.form
-    form['start_date'] = '2023-01-10'
-    form['end_date'] = '2023-01-10'
+    form['status'] = 'open'
     filtered_page = form.submit().follow()
     assert '10.00' in filtered_page.text
     assert '20.00' not in filtered_page.text
     assert "No payments found." not in filtered_page.text
 
-    # Scenario 2: Filter for Jan 10, 2023 to Jan 12, 2023. Expect P1 and P2.
+    # Scenario 2: Filter for any status, expect P1 and P2
     page = client.get(payments_url)
     form = page.form
-    form['start_date'] = '2023-01-10'
-    form['end_date'] = '2023-01-12'
+    form['status'] = ''
     filtered_page = form.submit().follow()
     assert '10.00' in filtered_page.text
     assert '20.00' in filtered_page.text
     assert "No payments found." not in filtered_page.text
 
 
-def test_view_payments_filter_by_status(client) -> None:
+def test_view_payments_filter_by_status(client: Client) -> None:
     client.login_admin()
 
     session = client.app.session()
@@ -90,7 +96,7 @@ def test_view_payments_filter_by_status(client) -> None:
     assert "No payments found." not in filtered_page.text
 
 
-def test_view_payments_filter_by_payment_type(client) -> None:
+def test_view_payments_filter_by_payment_type(client: Client) -> None:
     client.login_admin()
 
     session = client.app.session()

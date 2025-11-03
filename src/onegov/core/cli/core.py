@@ -224,12 +224,14 @@ if TYPE_CHECKING:
         matches_required: bool
         singular: bool
         creates_path: bool
+        skip_search_indexing: bool
 
     class ContextSpecificSettings(TypedDict, total=False):
         default_selector: str
         creates_path: bool
         singular: bool
         matches_required: bool
+        skip_search_indexing: bool
 
 else:
     _GroupContextAttrs = object
@@ -240,7 +242,8 @@ CONTEXT_SPECIFIC_SETTINGS = (
     'default_selector',
     'creates_path',
     'singular',
-    'matches_required'
+    'matches_required',
+    'skip_search_indexing'
 )
 
 
@@ -362,6 +365,11 @@ class GroupContext(GroupContextGuard):
     :param singular:
         True if the selector may not match multiple applications.
 
+    :param skip_search_indexing:
+        True if no search indexing is required. Should result in a free
+        speed-up in commands that don't modify data that's duplicated in
+        the search index.
+
     :param matches_required:
         True if the selector *must* match at least one application.
 
@@ -374,6 +382,7 @@ class GroupContext(GroupContextGuard):
         default_selector: str | None = None,
         creates_path: bool = False,
         singular: bool = False,
+        skip_search_indexing: bool = False,
         matches_required: bool = True
     ):
 
@@ -384,6 +393,7 @@ class GroupContext(GroupContextGuard):
 
         self.selector = selector or default_selector
         self.creates_path = creates_path
+        self.skip_search_indexing = skip_search_indexing
 
         if self.creates_path:
             self.singular = True
@@ -590,13 +600,19 @@ def run_processors(
 
                 return super().is_allowed_application_id(application_id)
 
+            def configure_application(self, **cfg: Any) -> None:
+                if group_context.skip_search_indexing:
+                    cfg['enable_search'] = False
+                else:
+                    # in CLI commands we don't want to have to worry
+                    # about the maximum size of the queue
+                    cfg['search_max_queue_size'] = 0
+
+                super().configure_application(**cfg)
+
             def configure_debug(self, **cfg: Any) -> None:
                 # disable debug options in cli (like query output)
                 pass
-
-            def configure_search(self, **cfg: Any) -> None:
-                # disable search options in cli
-                self.es_client = None
 
         @CliApplication.path(path=view_path)
         class Model:

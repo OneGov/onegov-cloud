@@ -45,15 +45,16 @@ class CourseAttendee(Base, ORMSearchable):
 
     __tablename__ = 'fsi_attendees'
 
-    es_properties = {
-        'first_name': {'type': 'text'},
-        'last_name': {'type': 'text'},
-        'organisation': {'type': 'text'},
-        'email': {'type': 'text'},
-        'title': {'type': 'text'},
+    fts_public = False
+    fts_properties = {
+        # NOTE: We use both individual properties and title, it's
+        #       probably better to only use the title
+        'first_name': {'type': 'text', 'weight': 'A'},
+        'last_name': {'type': 'text', 'weight': 'A'},
+        'email': {'type': 'text', 'weight': 'A'},
+        'title': {'type': 'text', 'weight': 'A'},
+        'organisation': {'type': 'text', 'weight': 'B'},
     }
-
-    es_public = False
 
     id: Column[uuid.UUID] = Column(
         UUID,  # type:ignore[arg-type]

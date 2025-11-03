@@ -16,12 +16,11 @@ class PASCommission(Commission, ORMSearchable):
         'polymorphic_identity': 'pas_commission',
     }
 
-    es_type_name = 'pas_commission'
-    es_public = False
-    es_properties = {'name': {'type': 'text'}}
+    fts_public = False
+    fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
 
     @property
-    def es_suggestion(self) -> str:
+    def fts_suggestion(self) -> str:
         return self.name
 
     #: A commission may hold meetings

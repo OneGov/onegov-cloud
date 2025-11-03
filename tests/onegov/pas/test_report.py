@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+from datetime import date
 from onegov.pas.models import (
     Attendence,
     PASCommission,
@@ -5,10 +8,14 @@ from onegov.pas.models import (
     RateSet,
     SettlementRun
 )
-from datetime import date
 
 
-def test_generate_parliamentarian_export(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_generate_parliamentarian_export(session: Session) -> None:
     # Create parliamentarian
     parliamentarian = PASParliamentarian(
         first_name='John', last_name='Doe', gender='male'
@@ -25,7 +32,7 @@ def test_generate_parliamentarian_export(session):
     session.add(settlement_run)
 
     # Create rate set for 2023
-    rate_set = RateSet(
+    rate_set = RateSet(  # type: ignore[misc]
         year=2023,
         cost_of_living_adjustment=2.0,  # 2% adjustment
         plenary_none_member_halfday=400,  # 100/hour after /4
@@ -70,3 +77,4 @@ def test_generate_parliamentarian_export(session):
     session.flush()
 
     # Generate export: single parliamentarian
+    # FIXME: implement me

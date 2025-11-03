@@ -56,7 +56,8 @@ SANE_HTML_ATTRS = {
     'a': ['href', 'title'],
     'abbr': ['title', ],
     'acronym': ['title', ],
-    'img': ['src', 'alt', 'title']
+    'img': ['src', 'alt', 'title'],
+    'p': ['class']
 }
 
 # lines without these plaintext characters are excluded in html_to_text

@@ -10,6 +10,7 @@ from pyquery import PyQuery as pq  # type: ignore[import-untyped]
 
 from typing import Any, Generic, Self, TYPE_CHECKING
 if TYPE_CHECKING:
+    from _typeshed import MaybeNone
     from onegov.core.framework import Framework
     from onegov.core.types import EmailJsonDict
     from typing import type_check_only, TypeVar
@@ -17,7 +18,12 @@ if TYPE_CHECKING:
     from webtest.response import _Pattern, TestResponse
     from webtest.forms import Form
 
-    _AppT = TypeVar('_AppT', bound=Framework, default=Framework)
+    _AppT = TypeVar(
+        '_AppT',
+        bound=Framework,
+        default=Framework,
+        covariant=True
+    )
     BaseExtension = TestResponse
     class TestApp(BaseTestApp['ExtendedResponse', _AppT]):
         ...
@@ -37,7 +43,7 @@ EXTRACT_HREF = re.compile(
 
 
 class Client(TestApp[_AppT]):
-    skip_n_forms = False
+    skip_n_forms = 0
     use_intercooler = False
 
     def spawn(self) -> Self:
@@ -79,12 +85,15 @@ class Client(TestApp[_AppT]):
     def logout(self) -> ExtendedResponse:
         return self.get('/auth/logout')
 
+    # NOTE: The vast majority of time we expect there to be a mail
+    #       so having to add `is not None` everywhere adds a lot of
+    #       boiler plate, which we don't want for tests.
     def get_email(
         self,
         batch_index: int,
         index: int = 0,
         flush_queue: bool = False
-    ) -> EmailJsonDict | None:
+    ) -> EmailJsonDict | MaybeNone:
         """ Get the nth email from the batch at the given batch index.
         This will be dictionary formatted to suit the Postmark API
 
@@ -116,7 +125,10 @@ class Client(TestApp[_AppT]):
         for path in os.listdir(self.app.maildir):
             os.remove(os.path.join(self.app.maildir, path))
 
-    def extract_href(self, link: str) -> str | None:
+    # NOTE: Pretty much every time we use this, we expect to get something
+    #       so having to add `is not None` in every test that uses it is
+    #       is a lot of boiler plate. MaybeNone avoids this.
+    def extract_href(self, link: str) -> str | MaybeNone:
         """ Takes a link (<a href...>) and returns the href address. """
 
         result = EXTRACT_HREF.search(link)

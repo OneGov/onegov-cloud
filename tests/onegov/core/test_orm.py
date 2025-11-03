@@ -1193,7 +1193,11 @@ def test_orm_signals(postgres_dsn: str) -> None:
         updated.append((obj, schema))
 
     @mgr.on_delete.connect
-    def on_delete(schema: str, obj: Document | Comment) -> None:
+    def on_delete(
+        schema: str,
+        session: Session,
+        obj: Document | Comment
+    ) -> None:
         deleted.append((obj, schema))
 
     mgr.set_current_schema('foo')

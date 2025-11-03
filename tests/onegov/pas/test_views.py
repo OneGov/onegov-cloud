@@ -1,25 +1,27 @@
-import pytest
+from __future__ import annotations
+
 import json
 import transaction
-from webtest import Upload
 
-from typing import Any
 from onegov.pas.collections.commission import PASCommissionCollection
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections.commission_membership import (
     PASCommissionMembershipCollection
 )
+from webtest import Upload
 
 
-@pytest.mark.flaky(reruns=5, only_rerun=None)
-def test_views_manage(client_with_es):
-    client = client_with_es
-    client.login_admin()
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.client import Client, ExtendedResponse
+    from .conftest import TestPasApp
 
-    settings = client.get('/').click('PAS Einstellungen')
-    delete = []
 
-    # Rate Sets
+def add_rate_set(
+    settings: ExtendedResponse,
+    delete: list[ExtendedResponse]
+) -> None:
+    """Adds a rate set via the UI."""
     page = settings.click('Sätze')
     page = page.click(href='new')
     page.form['year'] = 2024
@@ -53,13 +55,23 @@ def test_views_manage(client_with_es):
     assert '2%' in page
     delete.append(page)
 
+
+def test_views_manage(client_with_fts: Client[TestPasApp]) -> None:
+    client = client_with_fts
+    client.login_admin()
+
+    settings = client.get('/').follow().click('PAS Einstellungen')
+    delete: list[ExtendedResponse] = []
+
+    add_rate_set(settings, delete)
+
     # Settlement Runs
     page = settings.click('Abrechnungsläufe')
     page = page.click(href='new')
     page.form['name'] = 'Q1'
     page.form['start'] = '2024-01-01'
     page.form['end'] = '2024-12-31'
-    page.form['active'] = True
+    page.form['closed'] = False
     page = page.form.submit().follow()
     assert '31.12.2024' in page
 
@@ -111,6 +123,7 @@ def test_views_manage(client_with_es):
     page.form['email_primary'] = 'first.last@example.org'
     page = page.form.submit().follow()
     assert 'First Last' in page
+    assert ' Das Parlamentsmitglied wurde automatisch für den' in page
 
     page = page.click('Bearbeiten')
     page.form['gender'] = 'female'
@@ -167,7 +180,9 @@ def test_views_manage(client_with_es):
     assert 'Kommissionsitzung hinzugefügt' in page
 
     # ... attendence
-    page = client.get('/').click('Anwesenheiten').click(href='new', index=0)
+    page = client.get('/').follow().click('Anwesenheiten').click(
+        href='new', index=0
+    )
     page.form['date'] = '2024-02-03'
     page.form['duration'] = '2'
     page.form['type'] = 'study'
@@ -183,19 +198,21 @@ def test_views_manage(client_with_es):
     delete.insert(0, page)
 
     # ... plenary
-    page = client.get('/').click('Anwesenheiten').click(href='new', index=1)
+    page = client.get('/').follow().click('Anwesenheiten').click(
+        href='new', index=1
+    )
     page.form['date'] = '2024-02-04'
     page.form['duration'] = '3'
     page = page.form.submit().follow()
     assert 'Plenarsitzung hinzugefügt' in page
 
-    page = client.get('/').click('Anwesenheiten')
+    page = client.get('/').follow().click('Anwesenheiten')
     assert '02.02.2024' in page
     assert '03.02.2024' in page
     assert '04.02.2024' in page
 
     # Changes
-    page = client.get('/').click('Aktivitäten')
+    page = client.get('/').follow().click('Aktivitäten')
     assert '02.02.2024' in page
     assert '03.02.2024' in page
     assert '04.02.2024' in page
@@ -205,7 +222,6 @@ def test_views_manage(client_with_es):
     assert 'admin@example.org' in page
 
     # Test search results
-    client.app.es_client.indices.refresh(index='_all')
     client = client.spawn()
 
     assert '0 Resultate' in client.get('/search?q=aa')
@@ -219,27 +235,27 @@ def test_views_manage(client_with_es):
     assert '1 Resultat' in client.get('/search?q=aa')
     assert '1 Resultat' in client.get('/search?q=bb')
     assert '1 Resultat' in client.get('/search?q=cc')
-    assert '1 Resultat' in client.get('/search?q=first')
+    assert '2 Resultate' in client.get('/search?q=first')
     assert '1 Resultat' in client.get('/search?q=Q1')
 
     # Delete
     for page in delete:
         page.click('Löschen')
     assert 'Noch keine Sätze erfasst' in settings.click('Sätze')
-    assert 'Noch keine Abrechnungsläufe erfasst' in\
-           settings.click('Abrechnungsläufe')
+    assert 'Noch keine Abrechnungsläufe erfasst' in (
+           settings.click('Abrechnungsläufe'))
     assert 'Noch keine Parteien erfasst' in settings.click('Parteien')
     assert 'Noch keine Fraktionen erfasst' in settings.click('Fraktionen')
-    assert 'Noch keine Parlamentarier:innen erfasst' in\
-           settings.click('Parlamentarier:innen')
+    assert 'Noch keine Parlamentarier:innen erfasst' in (
+           settings.click('Parlamentarier:innen'))
 
 
 def test_view_upload_json(
-    client,
-    people_json,
-    organization_json,
-    memberships_json
-):
+    client: Client[TestPasApp],
+    people_json: dict[str, Any],
+    organization_json: dict[str, Any],
+    memberships_json: dict[str, Any]
+) -> None:
     """ Test successful import of all data using fixtures.
 
     *1. Understanding the Data and Models**
@@ -334,10 +350,10 @@ def test_view_upload_json(
         )
 
     def do_upload_procedure(
-        org_data,
-        member_data,
-        ppl_data
-    ):
+        org_data: dict[str, Any],
+        member_data: dict[str, Any],
+        ppl_data: dict[str, Any]
+    ) -> ExtendedResponse:
         """Uploads data using Upload objects created from fixtures."""
         page = client.get('/pas-import')
 
@@ -375,15 +391,6 @@ def test_view_upload_json(
     # Check the import logs after first import
     logs_page = client.get('/import-logs')
     assert logs_page.status_code == 200
-    assert 'completed' in logs_page  # Check if the status is shown
-    log_detail_page = logs_page.click(
-        'Details anzeigen', index=0
-    ).maybe_follow()
-
-    assert log_detail_page.status_code == 200
-    assert 'Import Details' in log_detail_page
-    status = log_detail_page.pyquery('.import-status').text()
-    assert 'completed' in status, f"Import status not 'completed': {status}"
     # Todo: This should validate all columns on all table
     # For example address is not checked here.
 
@@ -398,45 +405,19 @@ def test_view_upload_json(
     assert logs_page.status_code == 200, "Could not load import logs page"
     # Should now have two logs
     assert len(logs_page.pyquery('tbody tr')) == 2
-    assert 'completed' in logs_page.pyquery(
+    assert 'Abgeschlossen' in logs_page.pyquery(
         'tbody tr:first-child .import-status'
     ).text()
-    assert 'completed' in logs_page.pyquery(
+    assert 'Abgeschlossen' in logs_page.pyquery(
         'tbody tr:last-child .import-status'
     ).text()
 
 
-def test_copy_rate_set(client):
+def test_copy_rate_set(client: Client[TestPasApp]) -> None:
     client.login_admin()
 
-    settings = client.get('/').click('PAS Einstellungen')
-
-    # Add a rate set to copy
-    page = settings.click('Sätze')
-    page = page.click(href='new')
-    page.form['year'] = 2024
-    page.form['cost_of_living_adjustment'] = 2
-    page.form['plenary_none_president_halfday'] = 1
-    page.form['plenary_none_member_halfday'] = 1
-    page.form['commission_normal_president_initial'] = 1
-    page.form['commission_normal_president_additional'] = 1
-    page.form['study_normal_president_halfhour'] = 1
-    page.form['commission_normal_member_initial'] = 1
-    page.form['commission_normal_member_additional'] = 1
-    page.form['study_normal_member_halfhour'] = 1
-    page.form['commission_intercantonal_president_halfday'] = 1
-    page.form['study_intercantonal_president_hour'] = 1
-    page.form['commission_intercantonal_member_halfday'] = 1
-    page.form['study_intercantonal_member_hour'] = 1
-    page.form['commission_official_president_halfday'] = 1
-    page.form['commission_official_president_fullday'] = 1
-    page.form['study_official_president_halfhour'] = 1
-    page.form['commission_official_vice_president_halfday'] = 1
-    page.form['commission_official_vice_president_fullday'] = 1
-    page.form['study_official_member_halfhour'] = 1
-    page.form['shortest_all_president_halfhour'] = 1
-    page.form['shortest_all_member_halfhour'] = 1
-    page = page.form.submit()
+    settings = client.get('/').follow().click('PAS Einstellungen')
+    add_rate_set(settings, [])
 
     page = client.get('/rate-sets')
     page = page.click('Inaktiv')
@@ -451,7 +432,99 @@ def test_copy_rate_set(client):
     assert '2025' in new_page
 
 
-def test_fetch_commissions_parliamentarians_json(client):
+def test_simple_attendence_add(client: Client[TestPasApp]) -> None:
+    client.login_admin()
+    settings = client.get('/').follow().click('PAS Einstellungen')
+
+    add_rate_set(settings, [])
+
+    # Settlement Runs
+    page = settings.click('Abrechnungsläufe')
+    page = page.click(href='new')
+    page.form['name'] = 'Q1'
+    page.form['start'] = '2024-01-01'
+    page.form['end'] = '2024-03-31'
+    page.form['closed'] = False
+    page = page.form.submit().follow()
+
+    # parties
+    page = settings.click('Parteien')
+    page = page.click(href='new')
+    page.form['name'] = 'BB'
+    page = page.form.submit().follow()
+    assert 'BB' in page
+
+    # Parliamentarian
+    page = settings.click('Parlamentarier:innen')
+    page = page.click(href='new')
+    page.form['personnel_number'] = '666999'
+    page.form['gender'] = 'male'
+    page.form['first_name'] = 'First'
+    page.form['last_name'] = 'Last'
+    page.form['shipping_method'] = 'a'
+    page.form['shipping_address'] = 'Address'
+    page.form['shipping_address_zip_code'] = 'ZIP'
+    page.form['shipping_address_city'] = 'City'
+    page.form['email_primary'] = 'first.last@example.org'
+    page = page.form.submit().follow()
+    assert 'First Last' in page
+
+    page = page.click('Bearbeiten')
+    page.form['gender'] = 'female'
+    page = page.form.submit().follow()
+    assert 'weiblich' in page
+
+    # Role
+    page = page.click(href='new')
+    page.form['role'] = 'member'
+    page.form['start'] = '2020-01-01'
+    page = page.form.submit().follow()
+    assert 'Mitglied Parlament' in page
+
+    # Commission
+    page = settings.click('Kommissionen')
+    page = page.click(href='new')
+    page.form['name'] = 'DD'
+    page = page.form.submit().follow()
+    assert 'DD' in page
+
+    # Commission Membership
+    page = page.click(href='new-membership')
+    page.form['role'] = 'member'
+    page.form['start'] = '2020-01-01'
+    page = page.form.submit().follow()
+    assert 'Mitglied' in page
+
+    # make president
+    # page = page.click('Mitglied').click('Bearbeiten')
+    # page.form['role'] = 'president'
+    # page = page.form.submit().follow()
+    # assert 'Präsident:in' in page
+
+    # Attendences
+    # ... commission
+    page = page.click(href='add-attendence')
+    page.form['date'] = '2024-02-02'
+    page.form['duration'] = '1'
+    page.form['type'] = 'commission'
+    page = page.form.submit().follow()
+    assert 'Kommissionsitzung hinzugefügt' in page
+
+    # ... attendence
+    page = client.get('/').follow().click('Anwesenheiten').click(
+        href='new', index=0
+    )
+    page.form['date'] = '2024-02-03'
+    page.form['duration'] = '2'
+    page.form['type'] = 'study'
+    page.form['commission_id'].select(text='DD')
+    page = page.form.submit().follow()
+    assert 'Neue Anwesenheit hinzugefügt' in page
+
+
+def test_fetch_commissions_parliamentarians_json(
+    client: Client[TestPasApp]
+) -> None:
     """Test the commissions-parliamentarians-json endpoint that the JS
     dropdown uses."""
 
@@ -460,7 +533,7 @@ def test_fetch_commissions_parliamentarians_json(client):
     commission1 = commissions.add(name='Commission A')
     commission2 = commissions.add(name='Commission B')
 
-    parliamentarians = PASParliamentarianCollection(session)
+    parliamentarians = PASParliamentarianCollection(client.app)
     parl1 = parliamentarians.add(
         first_name='John',
         last_name='Doe',
@@ -492,6 +565,7 @@ def test_fetch_commissions_parliamentarians_json(client):
     parl3_id = str(parl3.id)
     transaction.commit()
 
+    client.login_admin()
     response = client.get('/commissions/commissions-parliamentarians-json')
     assert response.status_code == 200
     assert response.content_type == 'application/json'
@@ -532,3 +606,34 @@ def test_fetch_commissions_parliamentarians_json(client):
     response2 = client.get('/commissions/commissions-parliamentarians-json')
     data2 = response2.json
     assert commission3_id not in data2
+
+
+def test_add_new_user_without_activation_email(
+    client: Client[TestPasApp]
+) -> None:
+
+    client.login_admin()
+
+    client.app.enable_yubikey = True
+
+    new = client.get('/usermanagement').click('Benutzer', href='new')
+    new.form['username'] = 'admin@example.org'
+
+    assert "existiert bereits" in new.form.submit()
+
+    new.form['username'] = 'secondadmin@example.org'
+    new.form['role'] = 'admin'
+
+    assert "müssen zwingend einen YubiKey" in new.form.submit()
+
+    new.form['role'] = 'parliamentarian'
+    new.form['send_activation_email'] = False
+    added = new.form.submit()
+
+    assert "Passwort" in added
+    password = added.pyquery('.panel strong').text()
+
+    login = client.spawn().get('/auth/login')
+    login.form['username'] = 'secondadmin@example.org'
+    login.form['password'] = password
+    assert login.form.submit().status_code == 302

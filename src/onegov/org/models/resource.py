@@ -137,13 +137,27 @@ class SharedMethods:
         if expired_sessions:
             query = session.query(Reservation).with_entities(Reservation.token)
             query = query.filter(Reservation.session_id.in_(expired_sessions))
-            tokens = {token for token, in query.all()}
+            tokens = {token for token, in query}
 
             query = session.query(FormSubmission)
             query = query.filter(FormSubmission.name == None)
             query = query.filter(FormSubmission.id.in_(tokens))
 
-            query.delete('fetch')
+            # NOTE: This used to be a batch delete, but since there may be
+            #       files attached to these submissions, we would need to
+            #       emit a batch delete for the file links and any orphaned
+            #       files. For now it's easier to do single deletes so
+            #       SQLAlchemy handles this for us, most of the time this
+            #       will only hit one or two submissions anyways. There
+            #       would need to be a burst of submissions where everyone
+            #       got as far as entering all of their data, but didn't
+            #       end up confirming the reservation and then a long
+            #       period after where no reservations happen at all.
+            for submission in query:
+                # remove file links (also removes orphaned files)
+                submission.files = []
+                session.delete(submission)
+
             queries.remove_expired_reservation_sessions(expiration_date)
 
     def bound_reservations(
@@ -224,8 +238,6 @@ class DaypassResource(Resource, AccessExtension, SearchableContent,
                       ResourceValidationExtension, GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'daypass'}
 
-    es_type_name = 'daypasses'
-
     # the selected view
     view = 'dayGridMonth'
 
@@ -241,8 +253,6 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
                    CoordinatesExtension, SharedMethods,
                    ResourceValidationExtension, GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'room'}
-
-    es_type_name = 'rooms'
 
     # the selected view (depends on the resource's default)
     view = None
@@ -273,8 +283,6 @@ class ItemResource(Resource, AccessExtension, SearchableContent,
                    ResourceValidationExtension, GeneralFileLinkExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'daily-item'}
-
-    es_type_name = 'daily_items'
 
     view = None
 

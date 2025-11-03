@@ -1,9 +1,14 @@
+from __future__ import annotations
+
 from onegov.pas.layouts import DefaultLayout
 from onegov.core.utils import Bunch
 
 
-def test_layouts():
-    request = Bunch(
+from typing import Any
+
+
+def test_layouts() -> None:
+    request: Any = Bunch(
         app=Bunch(
             org=Bunch(
                 geo_provider=None,
@@ -23,6 +28,6 @@ def test_layouts():
     assert layout.format_minutes(None) == ''
     assert layout.format_minutes(0) == ''
     assert layout.format_minutes(-20) == ''
-    assert layout.format_minutes(10).interpolate() == '10 minutes'
-    assert layout.format_minutes(60).interpolate() == '1 hours'
-    assert layout.format_minutes(123).interpolate() == '2 hours 3 minutes'
+    assert layout.format_minutes(10).interpolate() == '10 minutes'  # type: ignore[attr-defined]
+    assert layout.format_minutes(60).interpolate() == '1 hours'  # type: ignore[attr-defined]
+    assert layout.format_minutes(123).interpolate() == '2 hours 3 minutes'  # type: ignore[attr-defined]

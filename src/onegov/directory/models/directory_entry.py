@@ -31,21 +31,20 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
 
     __tablename__ = 'directory_entries'
 
-    es_properties = {
-        'keywords': {'type': 'keyword'},
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
-        'directory_id': {'type': 'keyword'},
+    fts_public = False
+    fts_properties = {
+        # FIXME: We may want to include the directory title, so you can
+        #        find entries by the kind of directory they are in
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'},
+        # FIXME: Should we move this to fts_tags?
+        'keywords': {'type': 'keyword', 'weight': 'A'},
 
         # since the searchable text might include html, we remove it
         # even if there's no html -> possibly decreasing the search
         # quality a bit
-        'text': {'type': 'localized_html'}
+        'text': {'type': 'localized', 'weight': 'C'}
     }
-
-    @property
-    def es_public(self) -> bool:
-        return False  # to be overridden downstream
 
     #: An interal id for references (not public)
     id: Column[uuid.UUID] = Column(

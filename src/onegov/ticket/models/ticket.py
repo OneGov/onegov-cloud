@@ -64,6 +64,14 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     #: belonging to one specific handler (handler -> group -> title)
     group: Column[str] = Column(Text, nullable=False)
 
+    #: several tickets can belong to the same order, they will show up
+    #: as related tickets
+    order_id: Column[uuid.UUID | None] = Column(
+        UUID,  # type: ignore[arg-type]
+        nullable=True,
+        index=True
+    )
+
     #: Tags/Categories of the ticket
     _tags: Column[dict[str, str] | None] = Column(  # type: ignore[call-overload]
         MutableDict.as_mutable(HSTORE),  # type:ignore[no-untyped-call]
@@ -203,16 +211,24 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     )
 
     # limit the search to the ticket number -> the rest can be found
-    es_public = False
-    es_properties = {
-        'number': {'type': 'text'},
-        'title': {'type': 'text'},
-        'subtitle': {'type': 'text'},
-        'group': {'type': 'text'},
-        'ticket_email': {'type': 'keyword'},
-        'ticket_data': {'type': 'localized_html'},
-        'extra_localized_text': {'type': 'localized'}
+    fts_public = False
+    fts_properties = {
+        'number': {'type': 'text', 'weight': 'A'},
+        'title': {'type': 'text', 'weight': 'B'},
+        'subtitle': {'type': 'text', 'weight': 'C'},
+        'group': {'type': 'text', 'weight': 'B'},
+        'ticket_email': {'type': 'text', 'weight': 'A'},
+        'ticket_data': {'type': 'localized', 'weight': 'B'},
+        'extra_localized_text': {'type': 'localized', 'weight': 'B'}
     }
+
+    @property
+    def fts_tags(self) -> list[str]:
+        return list(self._tags.keys()) if self._tags else []
+
+    @property
+    def fts_suggestion(self) -> list[str]:
+        return [self.number]
 
     # NOTE: For now we only allow setting a single tag, in order to
     #       avoid conflicts between tag-metadata, but in the future
@@ -233,13 +249,6 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
         """
         return None
-
-    @property
-    def es_suggestion(self) -> list[str]:
-        return [
-            self.number,
-            self.number.replace('-', '')
-        ]
 
     @property
     def ticket_data(self) -> Sequence[str] | None:

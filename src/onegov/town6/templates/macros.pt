@@ -240,6 +240,11 @@
                 Privacy Protection
             </a>
         </span>
+        <span tal:condition="request.app.org.impressum_url|None">
+            <a href="${request.app.org.impressum_url}" i18n:translate>
+                Impressum
+            </a>
+        </span>
     </tal:b>
     <span tal:condition="not request.is_logged_in">
         <a href="${layout.login_from_path()}" i18n:translate>
@@ -2164,9 +2169,6 @@
     <table class="payments-table" tal:condition="payments">
         <thead>
             <tr>
-                <th class="select-all-checkbox-cell">
-                    <input type="checkbox" aria-label="Select all payments" />
-                </th>
                 <th i18n:translate tal:condition="tickets|nothing">
                     Object
                 </th>
@@ -2196,9 +2198,6 @@
         </thead>
         <tbody>
             <tr tal:repeat="payment payments">
-                <td class="payment-checkbox-cell">
-                    <input type="checkbox" name="selected_payments" value="${payment.id}" aria-label="Select this payment" i18n:attributes="aria-label" />
-                </td>
                 <td tal:condition="tickets|nothing">
                     <tal:b define="ticket tickets[payment.id] | nothing">
                         <div tal:condition="ticket">
@@ -2687,7 +2686,7 @@
 <metal:file_links define-macro="file-links" i18n:domain="onegov.town6">
     <ul class="more-list">
         <tal:b repeat="result file.links">
-            <li class="search-result-${result.es_type_name}" tal:condition="result">
+            <li class="search-result-${result.__tablename__}" tal:condition="result">
                 <tal:b
                     define="macro 'search_result_{}'.format(result.__tablename__); tenant_macro 'search_result_{}_{}'.format(result.__tablename__, request.app.application_id.split('/')[-1])"
                     metal:use-macro="layout.macros[tenant_macro]|layout.macros[macro]|layout.macros['search_result_default']"
@@ -2966,14 +2965,27 @@
         </div>
 </metal:focus>
 
-<metal:chat define-macro="chat">
-    <div tal:condition="layout.org.meta.get('enable_chat', False) and (layout.app.chat_open(request) or request.is_logged_in)" class="sticky floaty-chat" data-sticky  data-sticky-on="small" data-stick-to="bottom">
-        <div class="grid-container">
-            <a class="chat-button" href="${chat_link}">
-                <p><i class="fas fa-comments"></i> Chat</p>
-            </a>
+<metal:chat define-macro="chat" i18n:domain="onegov.town6">
+    <tal:b define="enable_chat layout.org.meta.get('enable_chat', 'disabled')">
+        <div tal:condition="enable_chat == 'chatbot' or enable_chat == 'people_chat' and (layout.app.chat_open(request) or request.is_logged_in)" class="sticky floaty-chat" data-sticky  data-sticky-on="small" data-stick-to="bottom">
+            <div class="grid-container">
+                <a tal:condition="enable_chat == 'people_chat'" class="chat-button no-icon" href="${chat_link}">
+                    <p><i class="fas fa-comments"></i> Chat</p>
+                </a>
+                <!-- Left Bottom -->
+                <a tal:condition="enable_chat == 'chatbot'" class="chat-button no-icon"  type="button" data-toggle="example-dropdown-left-bottom"><p><i class="fas fa-comments"></i> Chat</p></a>
+                <div class="dropdown-pane" data-position="top" data-alignment="right" id="example-dropdown-left-bottom" data-dropdown data-auto-focus="true">
+                    <!-- Close-->
+                    <button class="close-button" data-close aria-label="Close" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 i18n:translate="">Experimental AI Chatbot</h4>
+                    <p i18n:translate="">This chatbot is experimental and may produce incorrect or misleading information. Please verify any information provided by the chatbot with official sources.</p>
+                    <a href="${chat_link}" class="button" i18n:translate>Try it out</a>
+                </div>
+            </div>
         </div>
-    </div>
+    </tal:b>
 </metal:chat>
 
 <metal:progress_indicator define-macro="progress_indicator">
@@ -3282,15 +3294,16 @@
 </metal:b>
 
 <metal:invoice_items define-macro="invoice_items" i18n:domain="onegov.town6">
-    <table class="invoice-items" tal:define="total_amount total_amount|None; total_vat total_vat|None; total_paid total_paid|False; show_vat total_vat or any(item.vat for items in invoice_items.values() for item in items); show_quantity any(item.quantity != 1.0 for items in invoice_items.values() for item in items); item_actions item_actions|None; show_payment_state show_payment_state|False">
+    <table class="invoice-items" tal:define="total_amount total_amount|None; total_vat total_vat|None; total_paid total_paid|False; show_cost_object any(item.cost_object for items in invoice_items.values() for item in items); show_vat total_vat or any(item.vat for items in invoice_items.values() for item in items); show_quantity any(item.quantity != 1.0 for items in invoice_items.values() for item in items); item_actions item_actions|None; show_payment_state show_payment_state|False">
         <thead>
             <tr>
                 <th i18n:translate>Booking Text</th>
-                <th tal:condition="show_quantity" i18n:translate>Unit</th>
-                <th tal:condition="show_quantity" i18n:translate>Quantity</th>
-                <th tal:condition="show_vat" i18n:translate>VAT Rate</th>
-                <th tal:condition="show_vat" i18n:translate>VAT</th>
-                <th i18n:translate>Amount</th>
+                <th tal:condition="show_cost_object" i18n:translate>Cost center / cost unit</th>
+                <th tal:condition="show_quantity" class="centered" i18n:translate>Unit</th>
+                <th tal:condition="show_quantity" class="centered" i18n:translate>Quantity</th>
+                <th tal:condition="show_vat" class="centered" i18n:translate>VAT Rate</th>
+                <th tal:condition="show_vat" class="centered" i18n:translate>VAT</th>
+                <th class="centered" i18n:translate>Amount</th>
                 <th tal:condition="item_actions">
                     <span i18n:translate class="show-for-sr">Actions</span>
                 </th>
@@ -3299,7 +3312,7 @@
         <tal:b tal:repeat="(group, items) invoice_items.items()">
             <thead>
                 <tr class="group">
-                    <th tal:switch="group" colspan="${2 + (2 if show_quantity else 0) + (2 if show_vat else 0) + (1 if item_actions else 0)}">
+                    <th tal:switch="group" colspan="${2 + (1 if show_cost_object else 0) + (2 if show_quantity else 0) + (2 if show_vat else 0) + (1 if item_actions else 0)}">
                         <tal:b tal:case="'reservation'" i18n:translate>
                             Reservations
                         </tal:b>
@@ -3324,9 +3337,8 @@
             <tbody>
                 <tal:b tal:repeat="item items">
                     <tr tal:define="groupid hash(str(item.group) + str(repeat.item.index)); paid total_paid or item.paid|False" tal:attributes="class ('paid' if paid else 'unpaid') if show_payment_state else None">
-                        <td>
-                            ${item.text}
-                        </td>
+                        <td>${item.text}</td>
+                        <td tal:condition="show_cost_object" class="cost-object">${item.cost_object}</td>
                         <td tal:condition="show_quantity" class="unit">${'{:.2f}'.format(item.unit)}</td>
                         <td tal:condition="show_quantity" class="quantity">${'{:.2f}'.format(item.quantity)}</td>
                         <td tal:condition="show_vat" class="vat-rate">${'{:.1f}%'.format(item.vat_rate or 0.0)}</td>
@@ -3354,6 +3366,7 @@
         <tfoot tal:condition="total_amount is not None">
             <tr class="total${(' paid' if total_paid else ' unpaid') if show_payment_state else ''}">
                 <td i18n:translate>Total</td>
+                <td tal:condition="show_cost_object"></td>
                 <td tal:condition="show_quantity" class="unit"></td>
                 <td tal:condition="show_quantity" class="quantity"></td>
                 <td tal:condition="show_vat" class="vat-rate"></td>

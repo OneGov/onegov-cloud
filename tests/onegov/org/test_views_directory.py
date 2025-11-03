@@ -1,15 +1,12 @@
-from datetime import timedelta, datetime
-from io import BytesIO
+from __future__ import annotations
 
 import os
 import re
 import pytest
 import transaction
-from purl import URL
-from pytz import UTC
-from sedate import standardize_date, utcnow, to_timezone, replace_timezone
-from webtest import Upload
 
+from datetime import timedelta, datetime
+from io import BytesIO
 from onegov.core.utils import module_path
 from onegov.file import FileCollection
 from onegov.directory import (
@@ -20,25 +17,38 @@ from onegov.directory.models.directory import DirectoryFile
 from onegov.form import FormFile, FormSubmission
 from onegov.form.display import TimezoneDateTimeFieldRenderer
 from onegov.org.models import ExtendedDirectoryEntry
+from purl import URL
+from pytz import UTC
+from sedate import standardize_date, utcnow, to_timezone, replace_timezone
 from tests.shared.utils import (
     create_image, get_meta, extract_filename_from_response)
+from webtest import Upload
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.models import ExtendedDirectory
+    from sedate.types import TzInfoOrName
+    from sqlalchemy.orm import Query
+    from tests.shared.client import ExtendedResponse
+    from tests.shared.postgresql import Postgresql
+    from .conftest import Client
 
 
-def dt_for_form(dt):
+def dt_for_form(dt: datetime) -> str:
     """2020-11-25 12:29, using the correct format for local datetime
      fields """
     return dt.strftime('%Y-%m-%dT%H:%M')
 
 
-def dt_repr(dt):
+def dt_repr(dt: datetime) -> str:
     return dt.strftime(TimezoneDateTimeFieldRenderer.date_format)
 
 
-def dir_query(client):
+def dir_query(client: Client) -> Query[ExtendedDirectoryEntry]:
     return client.app.session().query(ExtendedDirectoryEntry)
 
 
-def strip_s(dt, timezone=None):
+def strip_s(dt: datetime, timezone: TzInfoOrName | None = None) -> datetime:
     """Strips the time from seconds ms and seconds according to inputs of
     type datetime-local """
     dt = datetime(
@@ -49,10 +59,17 @@ def strip_s(dt, timezone=None):
 
 
 def create_directory(
-    client, publication=True, required_publication=False,
-    change_reqs=True, submission=True, extended_submitter=False,
-    title='Meetings', lead=None, text=None
-):
+    client: Client,
+    publication: bool = True,
+    required_publication: bool = False,
+    change_reqs: bool = True,
+    submission: bool = True,
+    extended_submitter: bool = False,
+    title: str = 'Meetings',
+    lead: str | None = None,
+    text: str | None = None
+) -> ExtendedResponse:
+
     client.login_admin()
     page = client.get('/directories').click('Verzeichnis')
     page.form['title'] = title
@@ -84,7 +101,7 @@ def create_directory(
     return meetings
 
 
-def accept_latest_submission(client):
+def accept_latest_submission(client: Client) -> ExtendedResponse:
     page = client.get('/tickets/ALL/open').click(
         "Annehmen", index=0).follow()
     accept_url = page.pyquery('.accept-link').attr('ic-post-to')
@@ -92,7 +109,7 @@ def accept_latest_submission(client):
     return page
 
 
-def test_publication_added_by_admin(client):
+def test_publication_added_by_admin(client: Client) -> None:
     utc_now = utcnow()
     now = to_timezone(utc_now, 'Europe/Zurich')
 
@@ -132,6 +149,7 @@ def test_publication_added_by_admin(client):
     assert 'Pic' not in entry
 
     entry_db = dir_query(client).one()
+    assert entry_db.publication_end is not None
     # timezone unaware and not converted to utc before
     # contains publications relevant info
     assert entry_db.publication_end.tzinfo == UTC
@@ -144,7 +162,7 @@ def test_publication_added_by_admin(client):
     assert 'publication_start' not in page.form.fields
 
 
-def test_required_publication(client):
+def test_required_publication(client: Client) -> None:
     utc_now = utcnow()
     now = to_timezone(utc_now, 'Europe/Zurich')
 
@@ -167,30 +185,30 @@ def test_required_publication(client):
     page.form.submit().follow()
 
 
-def test_publication_with_submission(client):
+def test_publication_with_submission(client: Client) -> None:
     utc_now = utcnow()
     now = to_timezone(utc_now, 'Europe/Zurich')
     meetings = create_directory(
         client, publication=True, extended_submitter=True)
 
     # create a submission
-    submission = meetings.click('Eintrag', index=1)
-    submission.form['name'] = 'Monthly'
-    submission.form['pic'] = Upload('monthly.jpg', create_image().read())
-    submission.form['submitter'] = 'user@example.org'
-    submission.form['submitter_name'] = 'User Example'
-    submission.form['submitter_address'] = 'Testaddress'
-    assert 'submitter_phone' not in submission.form.fields
+    subm_page = meetings.click('Eintrag', index=1)
+    subm_page.form['name'] = 'Monthly'
+    subm_page.form['pic'] = Upload('monthly.jpg', create_image().read())
+    subm_page.form['submitter'] = 'user@example.org'
+    subm_page.form['submitter_name'] = 'User Example'
+    subm_page.form['submitter_address'] = 'Testaddress'
+    assert 'submitter_phone' not in subm_page.form.fields
 
-    submission.form['publication_end'] = dt_for_form(now)
-    submission = submission.form.submit()
-    assert 'Das Publikationsende muss in der Zukunft liegen' in submission
-    submission.form['pic'] = Upload('monthly.jpg', create_image().read())
-    assert submission.form['publication_end'].value
+    subm_page.form['publication_end'] = dt_for_form(now)
+    subm_page = subm_page.form.submit()
+    assert 'Das Publikationsende muss in der Zukunft liegen' in subm_page
+    subm_page.form['pic'] = Upload('monthly.jpg', create_image().read())
+    assert subm_page.form['publication_end'].value
 
     monthly_end = now + timedelta(minutes=2)
-    submission.form['publication_end'] = dt_for_form(monthly_end)
-    preview = submission.form.submit().follow()
+    subm_page.form['publication_end'] = dt_for_form(monthly_end)
+    preview = subm_page.form.submit().follow()
     submission = client.app.session().query(FormSubmission).one()
     assert 'publication_end' in submission.data
     assert submission.submitter_name
@@ -232,7 +250,7 @@ def test_publication_with_submission(client):
     assert 'Monthly' in meetings
 
 
-def test_directory_publication_change_request(client):
+def test_directory_publication_change_request(client: Client) -> None:
     utc_now = utcnow()
     now = to_timezone(utc_now, 'Europe/Zurich')
     meetings = create_directory(
@@ -262,10 +280,10 @@ def test_directory_publication_change_request(client):
     new_end = now + timedelta(days=9, minutes=5)
     form_preview.form['publication_end'] = dt_for_form(new_end)
     changes = form_preview.form.submit()
-    assert changes.pyquery('.diff ins')[0].text == \
-           dt_repr(replace_timezone(new_end, 'CET'))
-    assert changes.pyquery('.diff del')[0].text == \
-           dt_repr(standardize_date(end, 'UTC'))
+    assert changes.pyquery('.diff ins')[0].text == (
+           dt_repr(replace_timezone(new_end, 'CET')))
+    assert changes.pyquery('.diff del')[0].text == (
+           dt_repr(standardize_date(end, 'UTC')))
 
     page = changes.form.submit().follow()
 
@@ -275,14 +293,15 @@ def test_directory_publication_change_request(client):
     assert 'User Example' in ticket_page
     assert 'User Address' in ticket_page
     annual_entry = dir_query(client).first()
+    assert annual_entry is not None
     assert annual_entry.name == 'annual'
-    assert annual_entry.publication_end == \
-           strip_s(new_end, timezone='Europe/Zurich')
-    assert annual_entry.publication_start == \
-           strip_s(now, timezone='Europe/Zurich')
+    assert annual_entry.publication_end == (
+           strip_s(new_end, timezone='Europe/Zurich'))
+    assert annual_entry.publication_start == (
+           strip_s(now, timezone='Europe/Zurich'))
 
 
-def test_directory_change_requests(client):
+def test_directory_change_requests(client: Client) -> None:
     client.login_admin()
 
     # create a directory that accepts change requests
@@ -327,8 +346,8 @@ def test_directory_change_requests(client):
     assert 'This is better' in page
 
     # make sure it hasn't been applied yet
-    assert 'Central Park' in \
-           client.get('/directories/playgrounds/central-park')
+    assert 'Central Park' in client.get(
+        '/directories/playgrounds/central-park')
 
     # apply the changes
     page.click("Übernehmen")
@@ -346,7 +365,10 @@ def test_directory_change_requests(client):
     assert page.pyquery('.field-display img').attr('href') == img_url
 
 
-def test_directory_submissions(client, postgres):
+def test_directory_submissions(
+    client: Client,
+    postgres: Postgresql
+) -> None:
     client.login_admin()
 
     # create a directory does not accept submissions
@@ -522,7 +544,7 @@ def test_directory_submissions(client, postgres):
     transaction.abort()
 
 
-def test_directory_visibility(client):
+def test_directory_visibility(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/directories')
@@ -606,7 +628,7 @@ def test_directory_visibility(client):
     assert len(page.pyquery('.publication-nav a')) == 3
 
 
-def test_markdown_in_directories(client):
+def test_markdown_in_directories(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/directories').click('Verzeichnis')
@@ -628,7 +650,7 @@ def test_markdown_in_directories(client):
     assert "<li>Soccer rules" in client.get('/directories/clubs/soccer-club')
 
 
-def test_bug_semicolons_in_choices_with_filters(client):
+def test_bug_semicolons_in_choices_with_filters(client: Client) -> None:
     session = client.app.session()
     test_label = "Z: with semicolon"
 
@@ -695,8 +717,9 @@ def test_bug_semicolons_in_choices_with_filters(client):
     assert [t.text for t in tags] == [f'{test_label} (1)', 'B (1)', 'C (1)']
 
 
-def test_directory_export(client):
+def test_directory_export(client: Client) -> None:
     session = client.app.session()
+    directories: DirectoryCollection[ExtendedDirectory]
     directories = DirectoryCollection(session, type='extended')
     dir_structure = """
                 Name *= ___
@@ -745,7 +768,8 @@ def test_directory_export(client):
     ))
     transaction.commit()
 
-    events = directories.by_name('events')
+    events = directories.by_name('events')  # type: ignore[assignment]
+    assert events is not None
     export_page = client.get('/directories/events/+export')
 
     # Does not find A (1) link by its text otherwise
@@ -761,13 +785,14 @@ def test_directory_export(client):
 
     resp = export_view.follow()
     filename = extract_filename_from_response(resp)
+    assert filename is not None
     assert '.zip' in filename
 
     archive = DirectoryZipArchive.from_buffer(BytesIO(resp.body))
 
     count = 0
 
-    def count_entry(entry):
+    def count_entry(entry: object) -> None:
         nonlocal count
         count += 1
 
@@ -778,7 +803,7 @@ def test_directory_export(client):
     assert directory.meta == events.meta
 
 
-def test_add_directory_entries_with_duplicate_names(client):
+def test_add_directory_entries_with_duplicate_names(client: Client) -> None:
     client.login_admin()
     duplicate_name = "duplicate"
 
@@ -805,7 +830,7 @@ def test_add_directory_entries_with_duplicate_names(client):
             "entries in /directories")
 
 
-def test_directory_numbering(client):
+def test_directory_numbering(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/directories').click('Verzeichnis')
@@ -850,7 +875,7 @@ def test_directory_numbering(client):
     assert [t.text for t in numbers] == ['4. ', '5. ']
 
 
-def test_directory_explicitly_link_referenced_files(client):
+def test_directory_explicitly_link_referenced_files(client: Client) -> None:
     client.login_admin()
 
     path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
@@ -878,7 +903,7 @@ def test_directory_explicitly_link_referenced_files(client):
     assert directory.files == [pdf]
     assert pdf.access == 'public'
 
-    directory.access = 'mtan'
+    directory.access = 'mtan'  # type: ignore[attr-defined]
     session.flush()
     assert pdf.access == 'mtan'
 
@@ -888,7 +913,7 @@ def test_directory_explicitly_link_referenced_files(client):
     assert pdf.access == 'secret'
 
 
-def test_newline_in_directory_header(client):
+def test_newline_in_directory_header(client: Client) -> None:
 
     client.login_admin()
     page = client.get('/directories')
@@ -910,7 +935,7 @@ def test_newline_in_directory_header(client):
     assert "this is a multiline<br>lead" in page
 
 
-def test_change_directory_url(client):
+def test_change_directory_url(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/directories').click('Verzeichnis')
@@ -946,7 +971,7 @@ def test_change_directory_url(client):
     assert 'Das Formular enthält Fehler' in page
 
 
-def test_directory_entry_subscription(client):
+def test_directory_entry_subscription(client: Client) -> None:
     client.login_admin()
 
     assert len(os.listdir(client.app.maildir)) == 0
@@ -970,9 +995,9 @@ def test_directory_entry_subscription(client):
 
     assert len(os.listdir(client.app.maildir)) == 2
     message = client.get_email(0)['TextBody']
-    confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)
+    confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)  # type: ignore[union-attr]
     message_2 = client.get_email(1)['TextBody']
-    confirm_2 = re.search(
+    confirm_2 = re.search(  # type: ignore[union-attr]
         r'Anmeldung bestätigen\]\(([^\)]+)', message_2).group(1)
 
     illegal_confirm = confirm.split('/confirm')[0] + 'x/confirm'
@@ -998,14 +1023,14 @@ def test_directory_entry_subscription(client):
     message = client.get_email(2)['TextBody']
     assert 'Emily Larlham' in message
 
-    unsubscribe = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
+    unsubscribe = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)  # type: ignore[union-attr]
     page = client.get(unsubscribe).follow().follow()
     assert "wurde erfolgreich abgemeldet" in page
 
 
-def test_create_directory_accordion_layout(client):
+def test_create_directory_accordion_layout(client: Client) -> None:
 
-    def create_directory(client, title):
+    def create_directory(client: Client, title: str) -> ExtendedResponse:
         page = (client.get('/directories').
                 click('Verzeichnis'))
         page.form['title'] = title

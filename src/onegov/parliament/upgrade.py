@@ -201,6 +201,65 @@ def remove_unused_type_column(
             context.operations.drop_column(table, type_column)
 
 
+@upgrade_task('Add unique constraint to parliamentarian fields'
+    'where it makes sense')
+def add_unique_constraint_to_parliamentarian_fields(
+    context: UpgradeContext
+) -> None:
+    if not context.has_table('par_parliamentarians'):
+        return
+    # TODO:: Add for `email_primary` aswell but there are duplicates
+    # which need to be cleaned out first
+
+    if context.has_column('par_parliamentarians', 'personnel_number'):
+        if not context.has_constraint(
+            'par_parliamentarians',
+            'unique_parliamentarian_personnel_number',
+            'UNIQUE'):
+            context.operations.execute(
+                "UPDATE par_parliamentarians SET personnel_number=NULL "
+                "WHERE personnel_number='';"
+            )
+            context.operations.create_unique_constraint(
+                'unique_parliamentarian_personnel_number',
+                'par_parliamentarians',
+                ['personnel_number']
+            )
+
+    if context.has_column('par_parliamentarians', 'external_kub_id'):
+        if not context.has_constraint(
+            'par_parliamentarians',
+            'unique_parliamentarian_external_kub_id',
+            'UNIQUE'):
+            context.operations.execute(
+                "UPDATE par_parliamentarians SET external_kub_id=NULL "
+                "WHERE external_kub_id::text='';"
+            )
+            context.operations.create_unique_constraint(
+                'unique_parliamentarian_external_kub_id',
+                'par_parliamentarians',
+                ['external_kub_id']
+            )
+
+
+@upgrade_task('Drop personnel_number unique constraint')
+def drop_personnel_number_unique_constraint(
+    context: UpgradeContext
+) -> None:
+    if not context.has_table('par_parliamentarians'):
+        return
+
+    if context.has_constraint(
+        'par_parliamentarians',
+        'unique_parliamentarian_personnel_number',
+        'UNIQUE'):
+        context.operations.drop_constraint(
+            'unique_parliamentarian_personnel_number',
+            'par_parliamentarians',
+            type_='unique'
+        )
+
+
 @upgrade_task('Remove unused political businesses relationship from meeting')
 def remove_unused_political_businesses_relationship(
         context: UpgradeContext

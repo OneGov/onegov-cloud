@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+import pytest
+
 from datetime import date
 from decimal import Decimal
 from io import BytesIO
@@ -12,16 +16,30 @@ from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
 from onegov.swissvotes.models import TranslatablePageFile
 from onegov.user import User
-from pytest import fixture
 from tests.shared.utils import create_app
 from tests.shared.utils import create_image
 from transaction import commit
 from xlsxwriter.workbook import Workbook
 
 
-def create_swissvotes_app(request, temporary_path):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from sqlalchemy.orm import Session
+
+
+class TestApp(SwissvotesApp):
+    __test__ = False
+    maildir: str
+
+
+def create_swissvotes_app(
+    request: pytest.FixtureRequest,
+    temporary_path: str
+) -> TestApp:
+
     app = create_app(
-        SwissvotesApp,
+        TestApp,
         request,
         use_maildir=True,
         depot_backend='depot.io.local.LocalFileStorage',
@@ -52,7 +70,7 @@ def create_swissvotes_app(request, temporary_path):
     return app
 
 
-def create_pdf(content):
+def create_pdf(content: str) -> BytesIO:
     result = BytesIO()
     pdf = Pdf(result)
     pdf.init_report()
@@ -62,25 +80,28 @@ def create_pdf(content):
     return result
 
 
-@fixture(scope='session')
-def swissvotes_password():
+@pytest.fixture(scope='session')
+def swissvotes_password() -> str:
     return hash_password('hunter2')
 
 
-@fixture(scope="function")
-def principal():
-    yield Principal()
+@pytest.fixture(scope="function")
+def principal() -> Principal:
+    return Principal()
 
 
-@fixture(scope="function")
-def swissvotes_app(request, temporary_path):
+@pytest.fixture(scope="function")
+def swissvotes_app(
+    request: pytest.FixtureRequest,
+    temporary_path: str
+) -> Iterator[TestApp]:
     app = create_swissvotes_app(request, temporary_path)
     yield app
     app.session_manager.dispose()
 
 
-@fixture(scope="function")
-def attachments(swissvotes_app):
+@pytest.fixture(scope="function")
+def attachments(swissvotes_app: TestApp) -> dict[str, SwissVoteFile]:
     result = {}
     for name, content in (
         ('ad_analysis', "Inserateanalyse"),
@@ -153,11 +174,11 @@ def attachments(swissvotes_app):
         attachment.reference = as_fileintent(file, name)
         result[name] = attachment
 
-    yield result
+    return result
 
 
-@fixture(scope="function")
-def campaign_material(swissvotes_app):
+@pytest.fixture(scope="function")
+def campaign_material(swissvotes_app: TestApp) -> dict[str, SwissVoteFile]:
     result = {}
 
     for name in ('yea-1.png', 'yea-2.png', 'nay-1.png', 'nay-2.png'):
@@ -180,11 +201,11 @@ def campaign_material(swissvotes_app):
         attachment.reference = as_fileintent(file, name)
         result[name] = attachment
 
-    yield result
+    return result
 
 
-@fixture(scope="function")
-def slider_images(swissvotes_app):
+@pytest.fixture(scope="function")
+def slider_images(swissvotes_app: TestApp) -> dict[str, TranslatablePageFile]:
     result = {}
 
     for name in ('1', '1-1', '2.1-x', '2.2-x', '2.3-x', 'n'):
@@ -193,12 +214,12 @@ def slider_images(swissvotes_app):
         attachment.reference = as_fileintent(create_image(), f'{name}.png')
         result[name] = attachment
 
-    yield result
+    return result
 
 
-@fixture(scope="function")
-def attachment_urls():
-    yield {
+@pytest.fixture(scope="function")
+def attachment_urls() -> dict[str, dict[str, str]]:
+    return {
         'de_CH': {
             'ad_analysis': 'inserateanalyse.pdf',
             'brief_description': 'kurzbeschreibung-de.pdf',
@@ -248,9 +269,9 @@ def attachment_urls():
     }
 
 
-@fixture(scope='function')
-def page_attachments_filenames():
-    yield {
+@pytest.fixture(scope='function')
+def page_attachments_filenames() -> dict[str, dict[str, str]]:
+    return {
         'de_CH': {
             'CODEBOOK': 'CODEBOOK.pdf',
             'DATASET CSV': 'DATASET CSV dd-mm-yyyy.csv',
@@ -272,9 +293,13 @@ def page_attachments_filenames():
     }
 
 
-@fixture(scope="function")
-def page_attachments(swissvotes_app, page_attachments_filenames):
-    result = {}
+@pytest.fixture(scope="function")
+def page_attachments(
+    swissvotes_app: TestApp,
+    page_attachments_filenames: dict[str, dict[str, str]]
+) -> dict[str, dict[str, TranslatablePageFile]]:
+
+    result: dict[str, dict[str, TranslatablePageFile]] = {}
 
     for locale in ('de_CH', 'fr_CH', 'en_US'):
         result[locale] = {}
@@ -320,12 +345,12 @@ def page_attachments(swissvotes_app, page_attachments_filenames):
             attachment.reference = as_fileintent(file, filename)
             result[locale][name] = attachment
 
-    yield result
+    return result
 
 
-@fixture(scope="function")
-def page_attachment_urls():
-    yield {
+@pytest.fixture(scope="function")
+def page_attachment_urls() -> dict[str, dict[str, str]]:
+    return {
         'de_CH': {
             'CODEBOOK': 'codebook-de.pdf',
             'DATASET CSV': 'swissvotes_dataset.csv',
@@ -343,14 +368,14 @@ def page_attachment_urls():
     }
 
 
-@fixture(scope="function")
-def postgres_version(session):
+@pytest.fixture(scope="function")
+def postgres_version(session: Session) -> str:
     connection = session.connection()
-    yield connection.execute('show server_version;').fetchone()[0]
+    return connection.execute('show server_version;').fetchone()[0]
 
 
-@fixture(scope="function")
-def sample_vote():
+@pytest.fixture(scope="function")
+def sample_vote() -> SwissVote:
     vote = SwissVote()
     vote.bfs_number = Decimal('100.1')
     vote.date = date(1990, 6, 2)
@@ -595,7 +620,6 @@ def sample_vote():
     vote.national_council_share_empty = Decimal('26.20')
     vote.national_council_share_free_vote = Decimal('27.20')
     vote.national_council_share_unknown = Decimal('28.20')
-    vote.national_council_share_vague = Decimal('28.20')
     vote.campaign_material_metadata = {
         'article': {
             'title': 'Article',
@@ -622,7 +646,7 @@ def sample_vote():
     return vote
 
 
-@fixture(scope="session", autouse=True)
-def enter_observer_scope():
+@pytest.fixture(scope="session", autouse=True)
+def enter_observer_scope() -> None:
     """Ensures app specific observers are active"""
     ScopedPropertyObserver.enter_class_scope(SwissvotesApp)

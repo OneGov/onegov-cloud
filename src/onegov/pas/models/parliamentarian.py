@@ -4,7 +4,7 @@ from onegov.parliament.models import Parliamentarian
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
 from onegov.search import ORMSearchable
 from sqlalchemy import or_
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
 
 from typing import TYPE_CHECKING
@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from datetime import date
     from onegov.pas.models import Attendence
     from onegov.pas.models import Party
+    from onegov.user import User
     from sqlalchemy.orm import Session
 
 
@@ -21,15 +22,15 @@ class PASParliamentarian(Parliamentarian, ORMSearchable):
         'polymorphic_identity': 'pas_parliamentarian',
     }
 
-    es_type_name = 'pas_parliamentarian'
-    es_public = False
-    es_properties = {
-        'first_name': {'type': 'text'},
-        'last_name': {'type': 'text'},
+    fts_public = False
+    fts_properties = {
+        # FIXME: A fullname property may yield better results
+        'first_name': {'type': 'text', 'weight': 'A'},
+        'last_name': {'type': 'text', 'weight': 'A'},
     }
 
     @property
-    def es_suggestion(self) -> tuple[str, ...]:
+    def fts_suggestion(self) -> tuple[str, ...]:
         return (
             f'{self.first_name} {self.last_name}',
             f'{self.last_name} {self.first_name}'
@@ -42,6 +43,16 @@ class PASParliamentarian(Parliamentarian, ORMSearchable):
         back_populates='parliamentarian'
     )
 
+    # the user account related to this parliamentarian
+    user: relationship[User] = relationship(
+        'User',
+        primaryjoin='foreign(PASParliamentarian.email_primary) == '
+                    'User.username',
+        uselist=False,
+        backref=backref('parliamentarian', uselist=False,
+                        passive_deletes='all')
+    )
+
     if TYPE_CHECKING:
         roles: relationship[list[PASParliamentarianRole]]  # type: ignore[assignment]
 
@@ -49,7 +60,11 @@ class PASParliamentarian(Parliamentarian, ORMSearchable):
         self, start_date: date, end_date: date, session: Session
     ) -> Party | None:
         """Get the party this parliamentarian belonged to during a specific
-        period."""
+        period.
+
+        Note: If you find yourself calling this in a loop, it's not
+            recommended. Pre-fetch `PASParliamentarianRole` first.
+        """
 
         role = (
             session.query(PASParliamentarianRole)

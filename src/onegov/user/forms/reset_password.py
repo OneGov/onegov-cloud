@@ -3,6 +3,7 @@ from __future__ import annotations
 from onegov.form import Form
 from onegov.user import _
 from onegov.user import UserCollection
+from onegov.user.collections import MIN_PASSWORD_LENGTH
 from wtforms.fields import HiddenField
 from wtforms.fields import PasswordField
 from wtforms.fields import StringField
@@ -36,7 +37,7 @@ class PasswordResetForm(Form):
     )
     password = PasswordField(
         label=_('New Password'),
-        validators=[InputRequired(), Length(min=8)],
+        validators=[InputRequired(), Length(min=MIN_PASSWORD_LENGTH)],
         render_kw={'autocomplete': 'new-password'}
     )
     token = HiddenField()

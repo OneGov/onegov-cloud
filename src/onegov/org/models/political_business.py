@@ -120,16 +120,20 @@ class PoliticalBusiness(
 
     __tablename__ = 'par_political_businesses'
 
-    es_type_name = 'ris_political_business'
-    es_public = True
-    es_properties = {
-        'title': {'type': 'text'},
-        'number': {'type': 'text'}
+    fts_public = True
+    fts_properties = {
+        'title': {'type': 'text', 'weight': 'A'},
+        'number': {'type': 'text', 'weight': 'A'}
     }
 
     @property
-    def es_suggestion(self) -> str:
-        return f'{self.title} {self.number}'
+    def fts_suggestion(self) -> list[str]:
+        if self.number is None:
+            return [self.title]
+        return [
+            f'{self.title} {self.number}',
+            f'{self.number} {self.title}'
+        ]
 
     #: Internal ID
     id: Column[uuid.UUID] = Column(
@@ -170,7 +174,6 @@ class PoliticalBusiness(
     participants = relationship(
         'PoliticalBusinessParticipation',
         back_populates='political_business',
-        lazy='joined',
         order_by='desc(PoliticalBusinessParticipation.participant_type)',
     )
 
@@ -190,7 +193,6 @@ class PoliticalBusiness(
     meeting_items: relationship[list[MeetingItem]] = relationship(
         'MeetingItem',
         back_populates='political_business',
-        lazy='joined',
     )
 
     @hybrid_property
@@ -250,14 +252,12 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
     political_business = relationship(
         'PoliticalBusiness',
         back_populates='participants',
-        lazy='joined',
     )
 
     #: the related parliamentarian
     parliamentarian: relationship[RISParliamentarian] = relationship(
         'RISParliamentarian',
         back_populates='political_businesses',
-        lazy='joined',
     )
 
     def __repr__(self) -> str:
@@ -322,14 +322,8 @@ class PoliticalBusinessCollection(
                 ])
             )
 
-        return query.order_by(self.model_class.entry_date.desc())
-
-    def query_all(self) -> Query[PoliticalBusiness]:
-        """
-        Returns a query for all political businesses, ignoring the page,
-        status, types, and years filters.
-        """
-        return super().query().order_by(self.model_class.entry_date.desc())
+        return query.order_by(self.model_class.entry_date.desc(),
+                              self.model_class.title)
 
     def subset(self) -> Query[PoliticalBusiness]:
         return self.query()
@@ -368,7 +362,7 @@ class PoliticalBusinessCollection(
     def years_for_entries(self) -> list[int]:
         """ Returns a list of years for which there are entries in the db """
 
-        years = self.query_all().with_entities(
+        years = self.session.query(
             func.extract('year', PoliticalBusiness.entry_date).label('year')
         ).filter(
             PoliticalBusiness.entry_date.isnot(None)

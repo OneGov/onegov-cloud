@@ -1,54 +1,82 @@
+from __future__ import annotations
+
 import pytest
 import transaction
-from os import path
-from yaml import dump
 
 from onegov.core.orm.observer import ScopedPropertyObserver
-from onegov.fsi.initial_content import create_new_organisation
 from onegov.translator_directory import TranslatorDirectoryApp
+from onegov.translator_directory.initial_content import create_new_organisation
 from onegov.user import User
+from os import path
 from sqlalchemy.orm.session import close_all_sessions
 from tests.shared import Client as BaseClient
 from tests.shared.utils import create_app
-from pytest import fixture
 from onegov.core.crypto import hash_password
+from yaml import dump
 
 
-class Client(BaseClient):
+from typing import TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.orm import SessionManager
+    from tests.shared.client import ExtendedResponse
+
+    _AppT = TypeVar(
+        '_AppT',
+        bound=TranslatorDirectoryApp,
+        default='TestApp',
+        covariant=True
+    )
+else:
+    _AppT = TypeVar('_AppT', bound=TranslatorDirectoryApp)
+
+
+class TestApp(TranslatorDirectoryApp):
+    __test__ = False
+    maildir: str
+
+
+class Client(BaseClient[_AppT]):
 
     use_intercooler = True
     skip_n_forms = 1
 
-    def login_member(self, to=None):
+    def login_member(self, to: str | None = None) -> ExtendedResponse:
         return self.login('member@example.org', 'hunter2', to)
+
+    def login_translator(self, to: str | None = None) -> ExtendedResponse:
+        return self.login('translator@example.org', 'hunter2', to)
 
 
 @pytest.fixture(scope='function')
-def translator_app(request):
+def translator_app(request: pytest.FixtureRequest) -> Iterator[TestApp]:
     yield create_translator_app(request, False)
 
 
 @pytest.fixture(scope='function')
-def es_translator_app(request):
+def fts_translator_app(request: pytest.FixtureRequest) -> Iterator[TestApp]:
     yield create_translator_app(request, True)
 
 
 @pytest.fixture(scope='function')
-def client(translator_app):
+def client(translator_app: TestApp) -> Client[TestApp]:
     return Client(translator_app)
 
 
 @pytest.fixture(scope='function')
-def client_with_es(es_translator_app):
-    return Client(es_translator_app)
+def client_with_fts(fts_translator_app: TestApp) -> Client[TestApp]:
+    return Client(fts_translator_app)
 
 
-def create_translator_app(request, use_elasticsearch):
+def create_translator_app(
+    request: pytest.FixtureRequest,
+    enable_search: bool
+) -> TestApp:
 
     app = create_app(
-        app_class=TranslatorDirectoryApp,
+        app_class=TestApp,
         request=request,
-        use_elasticsearch=use_elasticsearch,
+        enable_search=enable_search,
         websockets={
             'client_url': 'ws://localhost:8766',
             'manage_url': 'ws://localhost:8766',
@@ -84,16 +112,25 @@ def create_translator_app(request, use_elasticsearch):
         role='member'
     ))
 
+    session.add(User(
+        username='translator@example.org',
+        password_hash=hash_password('hunter2'),
+        role='translator'
+    ))
+
     transaction.commit()
     close_all_sessions()
 
     return app
 
 
-@fixture(scope='function')
+@pytest.fixture(scope='function')
 def cfg_path(
-    postgres_dsn, session_manager, temporary_directory, redis_url
-):
+    postgres_dsn: str,
+    session_manager: SessionManager,
+    temporary_directory: str,
+    redis_url: str
+) -> str:
     cfg = {
         'applications': [
             {
@@ -134,7 +171,7 @@ def cfg_path(
     return cfg_path
 
 
-@fixture(scope="session", autouse=True)
-def enter_observer_scope():
+@pytest.fixture(scope="session", autouse=True)
+def enter_observer_scope() -> None:
     """Ensures app specific observers are active"""
     ScopedPropertyObserver.enter_class_scope(TranslatorDirectoryApp)

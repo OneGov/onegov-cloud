@@ -176,6 +176,9 @@ def test_swiss_ssn_validator() -> None:
         def __init__(self, data: str | None) -> None:
             self.data = data
 
+        def gettext(self, text: str) -> str:
+            return text
+
     request: Any = None
     validator = ValidSwissSocialSecurityNumber()
 

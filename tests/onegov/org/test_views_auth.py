@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import os
 import pyotp
@@ -10,8 +12,12 @@ from onegov.org.models import TANAccessCollection
 from onegov.user import UserCollection
 from sqlalchemy.orm.session import close_all_sessions
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
 
-def test_view_login(client):
+
+def test_view_login(client: Client) -> None:
     assert client.get('/auth/logout', expect_errors=True).status_code == 403
 
     response = client.get('/auth/login')
@@ -42,7 +48,7 @@ def test_view_login(client):
     assert client.get('/auth/logout', expect_errors=True).status_code == 403
 
 
-def test_login(client):
+def test_login(client: Client) -> None:
     links = client.get('/').pyquery('.globals a.login')
     assert links.text() == 'Anmelden'
 
@@ -74,11 +80,13 @@ def test_login(client):
     assert links.text() == 'Anmelden'
 
 
-def test_login_setup_mtan(client, smsdir):
+def test_login_setup_mtan(client: Client, smsdir: str) -> None:
     client.app.mtan_second_factor_enabled = True
     client.app.mtan_automatic_setup = True
     # descend to app-specific sms directory
     smsdir = os.path.join(smsdir, client.app.schema)
+
+    client2 = client.spawn()
     links = client.get('/').pyquery('.globals a.login')
     assert links.text() == 'Anmelden'
 
@@ -120,6 +128,7 @@ def test_login_setup_mtan(client, smsdir):
     index_page = client.get(links.attr('href')).follow()
     links = index_page.pyquery('.globals a.login')
     assert links.text() == 'Anmelden'
+
     # now test a regular login without mTAN setup step
     login_page = client.get(links.attr('href'))
     login_page.form['username'] = 'admin@example.org'
@@ -135,13 +144,45 @@ def test_login_setup_mtan(client, smsdir):
     with open(sms_path) as fd:
         content = json.loads(fd.read())
     mtan = content['content'].split(' ', 1)[0]
-    mtan_page.form['tan'] = mtan
 
+    # we do it one more time because we're impatient
+    login_page.form['username'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+    login_page.form.submit().follow()
+
+    sms_files2 = os.listdir(smsdir)
+    assert len(sms_files2) == 2
+    sms_path2 = os.path.join(smsdir, next(
+        file
+        for file in sms_files2
+        if file != sms_files[0]
+    ))
+    with open(sms_path2) as fd:
+        content2 = json.loads(fd.read())
+    mtan2 = content2['content'].split(' ', 1)[0]
+
+    mtan_page.form['tan'] = mtan
     index_page = mtan_page.form.submit().follow()
     assert "Sie wurden angemeldet" in index_page.text
 
+    # someone else can't reuse the same mTAN
+    links = client2.get('/').pyquery('.globals a.login')
+    assert links.text() == 'Anmelden'
 
-def test_login_totp(client, test_password):
+    login_page = client2.get(links.attr('href'))
+    login_page.form['username'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+    mtan_page = login_page.form.submit().follow()
+    mtan_page.form['tan'] = mtan
+    mtan_page = mtan_page.form.submit()
+    assert 'Ungültige oder abgelaufene mTAN' in mtan_page
+
+    # and they also can't use the redundant mTAN we didn't end up using
+    mtan_page.form['tan'] = mtan
+    mtan_page = mtan_page.form.submit()
+    assert 'Ungültige oder abgelaufene mTAN' in mtan_page
+
+def test_login_totp(client: Client, test_password: str) -> None:
     client.app.totp_enabled = True
     totp_secret = pyotp.random_base32()
     totp = pyotp.TOTP(totp_secret)
@@ -149,6 +190,7 @@ def test_login_totp(client, test_password):
     # configure TOTP for admin user
     users = UserCollection(client.app.session())
     admin = users.by_username('admin@example.org')
+    assert admin is not None
     admin.second_factor = {'type': 'totp', 'data': totp_secret}
     transaction.commit()
     close_all_sessions()
@@ -178,7 +220,7 @@ def test_login_totp(client, test_password):
     assert links.text() == 'Anmelden'
 
 
-def test_reset_password(client):
+def test_reset_password(client: Client) -> None:
     links = client.get('/').pyquery('.globals a.login')
     assert links.text() == 'Anmelden'
     login_page = client.get(links.attr('href'))
@@ -210,7 +252,7 @@ def test_reset_password(client):
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = '1234'
     reset_page = reset_page.form.submit()
-    assert "Feld muss mindestens 8 Zeichen beinhalten" in reset_page.text
+    assert "Feld muss mindestens 10 Zeichen beinhalten" in reset_page.text
     assert token in reset_page.text
 
     reset_page.form['email'] = 'admin@example.org'
@@ -250,7 +292,7 @@ def test_reset_password(client):
     assert len(os.listdir(client.app.maildir)) == 1
 
 
-def test_unauthorized(client):
+def test_unauthorized(client: Client) -> None:
 
     unauth_page = client.get('/settings', expect_errors=True)
     assert "Zugriff verweigert" in unauth_page.text
@@ -275,25 +317,25 @@ def test_unauthorized(client):
     assert "Zugriff verweigert" not in settings_page
 
 
-def test_registration_honeypot(client):
+def test_registration_honeypot(client: Client) -> None:
     client.app.enable_user_registration = True
 
     register = client.get('/auth/register')
     register.form['username'] = 'spam@example.org'
-    register.form['password'] = 'p@ssw0rd'
-    register.form['confirm'] = 'p@ssw0rd'
+    register.form['password'] = 'p@ssw0rd12'
+    register.form['confirm'] = 'p@ssw0rd12'
     register.form['roboter_falle'] = 'buy pills now'
 
     assert "Das Feld ist nicht leer" in register.form.submit()
 
 
-def test_registration(client):
+def test_registration(client: Client) -> None:
     client.app.enable_user_registration = True
 
     register = client.get('/auth/register')
     register.form['username'] = 'user@example.org'
-    register.form['password'] = 'p@ssw0rd'
-    register.form['confirm'] = 'p@ssw0rd'
+    register.form['password'] = 'p@ssw0rd12'
+    register.form['confirm'] = 'p@ssw0rd12'
 
     assert "Vielen Dank" in register.form.submit().follow()
 
@@ -301,24 +343,25 @@ def test_registration(client):
     assert "Anmeldung bestätigen" in message
 
     expr = r'href="[^"]+">Anmeldung bestätigen</a>'
-    url = re.search(expr, message).group()
+    url = re.search(expr, message).group()  # type: ignore[union-attr]
     url = client.extract_href(url)
+    assert url is not None
 
     assert "Konto wurde aktiviert" in client.get(url).follow()
     assert "Konto wurde bereits aktiviert" in client.get(url).follow()
 
-    logged_in = client.login('user@example.org', 'p@ssw0rd').follow()
+    logged_in = client.login('user@example.org', 'p@ssw0rd12').follow()
     assert "angemeldet" in logged_in
 
 
-def test_registration_disabled(client):
+def test_registration_disabled(client: Client) -> None:
 
     client.app.enable_user_registration = False
 
     assert client.get('/auth/register', status=404)
 
 
-def test_disabled_yubikey(client):
+def test_disabled_yubikey(client: Client) -> None:
     client.login_admin()
 
     client.app.enable_yubikey = False
@@ -330,7 +373,7 @@ def test_disabled_yubikey(client):
     assert 'YubiKey' in client.get('/usermanagement')
 
 
-def test_disabled_mtan(client):
+def test_disabled_mtan(client: Client) -> None:
     client.login_admin()
 
     client.app.mtan_second_factor_enabled = False
@@ -340,7 +383,7 @@ def test_disabled_mtan(client):
     assert 'mTAN' in client.get('/usermanagement')
 
 
-def test_login_with_required_userprofile(client):
+def test_login_with_required_userprofile(client: Client) -> None:
     # userprofile is not complete
     client.app.settings.org.require_complete_userprofile = True
     client.app.settings.org.is_complete_userprofile = lambda r, u: False
@@ -384,7 +427,7 @@ def test_login_with_required_userprofile(client):
     assert 'settings' in page.request.url
 
 
-def test_mtan_access(org_app, client, smsdir):
+def test_mtan_access(client: Client, smsdir: str) -> None:
     client.login_editor()
 
     new_page = client.get('/topics/organisation').click('Thema')
@@ -403,7 +446,7 @@ def test_mtan_access(org_app, client, smsdir):
     mtan_page.form['phone_number'] = '+41791112233'
     verify_page = mtan_page.form.submit().follow()
 
-    smsdir = os.path.join(smsdir, org_app.schema)
+    smsdir = os.path.join(smsdir, client.app.schema)
     files = os.listdir(smsdir)
     assert len(files) == 1
 
@@ -414,13 +457,26 @@ def test_mtan_access(org_app, client, smsdir):
     # tan should be the last url parameter in the SMS
     _, _, tan = sms_content['content'].rpartition('=')
 
+    # because we're impatient we request another mTAN
+    mtan_page.form['phone_number'] = '+41791112233'
+    mtan_page.form.submit().follow()
+    files2 = os.listdir(smsdir)
+    assert len(files2) == 2
+    new_file = next(file for file in files2 if file != files[0])
+
+    with open(os.path.join(smsdir, new_file), mode='r') as fp:
+        sms_content2 = json.loads(fp.read())
+
+    assert sms_content2['receivers'] == ['+41791112233']
+    _, _, tan2 = sms_content2['content'].rpartition('=')
+
     verify_page.form['tan'] = tan
     page = verify_page.form.submit().follow()
     assert 'Test' in page
 
     # the access to the protected page should have been logged
     accesses = TANAccessCollection(
-        org_app.session(),
+        client.app.session(),
         session_id='+41791112233'
     ).query().all()
     assert len(accesses) == 1
@@ -432,7 +488,7 @@ def test_mtan_access(org_app, client, smsdir):
 
     # the second access should not create a new entry
     accesses = TANAccessCollection(
-        org_app.session(),
+        client.app.session(),
         session_id='+41791112233'
     ).query().all()
     assert len(accesses) == 1
@@ -450,8 +506,14 @@ def test_mtan_access(org_app, client, smsdir):
     verify_page = verify_page.form.submit()
     assert 'Ungültige oder abgelaufene mTAN' in verify_page
 
+    # the second user should also not be able to use the redundant
+    # mTAN we didn't end up using
+    verify_page.form['tan'] = tan2
+    verify_page = verify_page.form.submit()
+    assert 'Ungültige oder abgelaufene mTAN' in verify_page
 
-def test_mtan_access_from_sms_url(org_app, client, smsdir):
+
+def test_mtan_access_from_sms_url(client: Client, smsdir: str) -> None:
     client.login_editor()
 
     new_page = client.get('/topics/organisation').click('Thema')
@@ -470,7 +532,7 @@ def test_mtan_access_from_sms_url(org_app, client, smsdir):
     mtan_page.form['phone_number'] = '+41791112233'
     verify_page = mtan_page.form.submit().follow()
 
-    smsdir = os.path.join(smsdir, org_app.schema)
+    smsdir = os.path.join(smsdir, client.app.schema)
     files = os.listdir(smsdir)
     assert len(files) == 1
 
@@ -491,7 +553,7 @@ def test_mtan_access_from_sms_url(org_app, client, smsdir):
 
     # the access to the protected page should have been logged
     accesses = TANAccessCollection(
-        org_app.session(),
+        client.app.session(),
         session_id='+41791112233'
     ).query().all()
     assert len(accesses) == 1
@@ -503,7 +565,7 @@ def test_mtan_access_from_sms_url(org_app, client, smsdir):
 
     # the second access should not create a new entry
     accesses = TANAccessCollection(
-        org_app.session(),
+        client.app.session(),
         session_id='+41791112233'
     ).query().all()
     assert len(accesses) == 1
@@ -522,7 +584,7 @@ def test_mtan_access_from_sms_url(org_app, client, smsdir):
     assert 'Ungültige oder abgelaufene mTAN' in verify_page
 
 
-def test_secret_mtan_access(org_app, client, smsdir):
+def test_secret_mtan_access(client: Client, smsdir: str) -> None:
     client.login_editor()
 
     new_page = client.get('/topics/organisation').click('Thema')
@@ -541,7 +603,7 @@ def test_secret_mtan_access(org_app, client, smsdir):
     mtan_page.form['phone_number'] = '+41791112233'
     verify_page = mtan_page.form.submit().follow()
 
-    smsdir = os.path.join(smsdir, org_app.schema)
+    smsdir = os.path.join(smsdir, client.app.schema)
     files = os.listdir(smsdir)
     assert len(files) == 1
 
@@ -558,7 +620,7 @@ def test_secret_mtan_access(org_app, client, smsdir):
 
     # the access to the protected page should have been logged
     accesses = TANAccessCollection(
-        org_app.session(),
+        client.app.session(),
         session_id='+41791112233'
     ).query().all()
     assert len(accesses) == 1
@@ -570,7 +632,7 @@ def test_secret_mtan_access(org_app, client, smsdir):
 
     # the second access should not create a new entry
     accesses = TANAccessCollection(
-        org_app.session(),
+        client.app.session(),
         session_id='+41791112233'
     ).query().all()
     assert len(accesses) == 1
@@ -589,7 +651,7 @@ def test_secret_mtan_access(org_app, client, smsdir):
     assert 'Ungültige oder abgelaufene mTAN' in verify_page
 
 
-def test_mtan_access_limit(org_app, client, smsdir):
+def test_mtan_access_limit(client: Client, smsdir: str) -> None:
     with freeze_time("2020-10-10 08:00", tick=True):
         client.login_admin()
 
@@ -624,7 +686,7 @@ def test_mtan_access_limit(org_app, client, smsdir):
         mtan_page.form['phone_number'] = '+41791112233'
         verify_page = mtan_page.form.submit().follow()
 
-        smsdir = os.path.join(smsdir, org_app.schema)
+        smsdir = os.path.join(smsdir, client.app.schema)
         files = os.listdir(smsdir)
         assert len(files) == 1
 
@@ -641,7 +703,7 @@ def test_mtan_access_limit(org_app, client, smsdir):
 
         # the access to the protected page should have been logged
         accesses = TANAccessCollection(
-            org_app.session(),
+            client.app.session(),
             session_id='+41791112233'
         ).query().all()
         assert len(accesses) == 1
@@ -653,7 +715,7 @@ def test_mtan_access_limit(org_app, client, smsdir):
 
         # the second access should not create a new entry
         accesses = TANAccessCollection(
-            org_app.session(),
+            client.app.session(),
             session_id='+41791112233'
         ).query().all()
         assert len(accesses) == 1
@@ -664,7 +726,7 @@ def test_mtan_access_limit(org_app, client, smsdir):
 
         # since it didn't succeed it should not create a new entry
         accesses = TANAccessCollection(
-            org_app.session(),
+            client.app.session(),
             session_id='+41791112233'
         ).query().all()
         assert len(accesses) == 1
@@ -678,7 +740,7 @@ def test_mtan_access_limit(org_app, client, smsdir):
 
         # which creates a new access
         accesses = TANAccessCollection(
-            org_app.session(),
+            client.app.session(),
             session_id='+41791112233'
         ).query().all()
         assert len(accesses) == 2
@@ -690,7 +752,11 @@ def test_mtan_access_limit(org_app, client, smsdir):
 
 
 @freeze_time("2020-10-10", tick=True)
-def test_mtan_access_unauthorized_resource(org_app, client, smsdir):
+def test_mtan_access_unauthorized_resource(
+    client: Client,
+    smsdir: str
+) -> None:
+
     client.login_editor()
 
     new_page = client.get('/topics/organisation').click('Thema')
@@ -712,7 +778,7 @@ def test_mtan_access_unauthorized_resource(org_app, client, smsdir):
     assert "folgen Sie diesem Link um sich anzumelden" in unauth_page.text
 
 
-def test_citizen_login(client):
+def test_citizen_login(client: Client) -> None:
     admin = client.spawn()
     client2 = client.spawn()
 
@@ -739,7 +805,15 @@ def test_citizen_login(client):
     assert len(os.listdir(client.app.maildir)) == 1
     message = client.get_email(0)['TextBody']
     assert 'confirm-citizen-login' in message
-    token = re.search(r'&token=([^)]+)', message).group(1)
+    token = re.search(r'&token=([^)]+)', message).group(1)  # type: ignore[union-attr]
+
+    # because we're impatient we request another TAN
+    login_page.form['email'] = 'citizen@example.org'
+    login_page.form.submit().follow()
+    assert len(os.listdir(client.app.maildir)) == 2
+    message2 = client.get_email(0)['TextBody']
+    assert 'confirm-citizen-login' in message2
+    token2 = re.search(r'&token=([^)]+)', message2).group(1)  # type: ignore[union-attr]
 
     # finish login with the token
     confirm_page.form['token'] = token
@@ -765,8 +839,16 @@ def test_citizen_login(client):
     assert login_page.request.path == '/auth/citizen-login'
     assert 'Ungültiger oder abgelaufener Login-Code' in login_page
 
+    # they also can't use the redundant token, since it has been
+    # invalidate as well
+    confirm_page = client.get('/auth/confirm-citizen-login')
+    confirm_page.form['token'] = token2
+    login_page = confirm_page.form.submit().follow()
+    assert login_page.request.path == '/auth/citizen-login'
+    assert 'Ungültiger oder abgelaufener Login-Code' in login_page
 
-def test_citizen_login_via_confirm_url(client):
+
+def test_citizen_login_via_confirm_url(client: Client) -> None:
     admin = client.spawn()
     client2 = client.spawn()
 
@@ -791,7 +873,7 @@ def test_citizen_login_via_confirm_url(client):
     assert len(os.listdir(client.app.maildir)) == 1
     message = client.get_email(0)['TextBody']
     assert 'confirm-citizen-login' in message
-    url = re.search(r'localhost(/auth/[^)]+)', message).group(1)
+    url = re.search(r'localhost(/auth/[^)]+)', message).group(1)  # type: ignore[union-attr]
 
     # finish login with the confirm url
     confirm_page = client.get(url)

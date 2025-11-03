@@ -102,9 +102,12 @@ def handle_new_resource_recipient(
     if layout:
         layout.title = title
 
+    layout = layout or ResourceRecipientsFormLayout(self, request, title)
+    layout.edit_mode = True
+
     return {
         'title': title,
-        'layout': layout or ResourceRecipientsFormLayout(self, request, title),
+        'layout': layout,
         'form': form
     }
 

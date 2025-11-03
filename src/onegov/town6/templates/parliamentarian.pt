@@ -37,7 +37,7 @@
                     </ul>
                 </div>
                 <div tal:condition="parliamentarian.commission_memberships">
-                    <h2 i18n:translate class="h3">Commissions</h2>  
+                    <h2 i18n:translate class="h3">Commissions</h2>
                     <ul class="more-list">
                         <li tal:repeat="membership parliamentarian.commission_memberships">
                             <div class="list-link">
@@ -98,7 +98,7 @@
                             <h2 class="h3" i18n:translate>Personal details</h2>
                             <div tal:condition="parliamentarian.picture">
                                 <div class="person-card" style="margin-bottom: 1rem;">
-                                    <div class="person-card-portrait" style="border-radius: 0;">
+                                    <div class="person-card-portrait">
                                         <div class="cover-image"
                                              style='background-image: url("${request.link(parliamentarian.picture)}");'></div>
                                     </div>
