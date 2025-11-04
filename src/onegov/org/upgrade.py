@@ -20,6 +20,7 @@ from onegov.directory import DirectoryEntry
 from onegov.directory.models.directory import DirectoryFile
 from onegov.file import File
 from onegov.form import FormDefinition
+from onegov.newsletter import Newsletter
 from onegov.org.models import (
     Organisation, Topic, News, ExtendedDirectory, PushNotification)
 from onegov.org.models.political_business import (
@@ -742,3 +743,11 @@ def add_show_only_previews_column_to_newsletters(
         ),
         default=False
     )
+
+    newsletters = context.session.query(Newsletter).all()
+    for newsletter in newsletters:
+        newsletter.show_only_previews = newsletter.content.get(
+            'show_news_as_tiles', False)
+        newsletter.content.pop('show_news_as_tiles', None)
+
+    context.session.flush()
