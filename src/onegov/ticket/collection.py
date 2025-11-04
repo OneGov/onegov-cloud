@@ -6,12 +6,13 @@ import sedate
 from functools import cached_property
 from onegov.core.collection import Pagination
 from onegov.core.custom import msgpack
+from onegov.core.orm.types import UUID as UUIDType
 from onegov.pay.collections import InvoiceCollection
 from onegov.ticket import handlers as global_handlers
 from onegov.ticket.models.invoice import TicketInvoice
 from onegov.ticket.models.invoice_item import TicketInvoiceItem
 from onegov.ticket.models.ticket import Ticket
-from sqlalchemy import and_, desc, func, or_
+from sqlalchemy import and_, cast, desc, func, or_
 from sqlalchemy.orm import contains_eager, joinedload, selectinload, undefer
 from uuid import UUID
 
@@ -404,17 +405,14 @@ class TicketInvoiceCollection(
 
             reservations = self.session.query(
                 func.max(Reservation.end).label('reference_date'),
-                TicketInvoiceItem.invoice_id,
-            ).join(
-                TicketInvoiceItem,
-                Reservation.id == TicketInvoiceItem.reservation_id
+                Reservation.token,
             ).group_by(
-                TicketInvoiceItem.invoice_id
+                Reservation.token
             ).subquery()
 
-            subquery = self.session.query(reservations.c.invoice_id)
+            subquery = self.session.query(reservations.c.token)
             subquery = subquery.filter(
-                reservations.c.invoice_id == TicketInvoice.id
+                reservations.c.token == cast(Ticket.handler_id, UUIDType)
             )
 
             if self.reservation_start is not None:
@@ -464,15 +462,13 @@ class TicketInvoiceCollection(
             )
             for invoice_id, start, end in self.session.query(Reservation)
             .join(
-                TicketInvoiceItem,
-                TicketInvoiceItem.reservation_id == Reservation.id
+                Ticket,
+                cast(Ticket.handler_id, UUIDType) == Reservation.token
             )
-            .filter(TicketInvoiceItem.invoice_id.in_([
-                el.id for el in self.batch
-            ]))
-            .group_by(TicketInvoiceItem.invoice_id)
+            .filter(Ticket.invoice_id.in_([el.id for el in self.batch]))
+            .group_by(Ticket.invoice_id)
             .with_entities(
-                TicketInvoiceItem.invoice_id,
+                Ticket.invoice_id,
                 func.min(Reservation.start),
                 func.max(Reservation.end)
             )
