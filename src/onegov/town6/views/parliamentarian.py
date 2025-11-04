@@ -76,7 +76,11 @@ def add_parliamentarian(
 ) -> RenderData | Response:
 
     if form.submitted(request):
-        parliamentarian = self.add(**form.get_useful_data())
+        parliamentarian = self.add(
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+        )
+        form.populate_obj(parliamentarian)
         request.success(_('Added a new parliamentarian'))
 
         email = form.email_primary.data
