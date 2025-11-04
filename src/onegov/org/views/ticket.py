@@ -43,7 +43,7 @@ from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import (
     ticket_submitter, ReservationHandler, ReservationTicket)
 from onegov.org.pdf.my_reservations import MyReservationsPdf
-from onegov.org.pdf.ticket import TicketPdf
+from onegov.org.pdf.ticket import TicketPdf, TicketsPdf
 from onegov.org.utils import get_current_tickets_url, group_invoice_items
 from onegov.org.views.message import view_messages_feed
 from onegov.org.views.utils import assert_citizen_logged_in
@@ -1087,6 +1087,29 @@ def view_ticket_pdf(self: Ticket, request: OrgRequest) -> Response:
         content.read(),
         content_type='application/pdf',
         content_disposition='inline; filename={}_{}.pdf'.format(
+            normalize_for_url(self.number),
+            date.today().strftime('%Y%m%d')
+        )
+    )
+
+
+@OrgApp.view(model=Ticket, name='related-tickets-pdf', permission=Personal)
+def view_related_tickets_pdf(self: Ticket, request: OrgRequest) -> Response:
+    if self.order_id is not None:
+        tickets = TicketCollection(request.session)
+        related_tickets = request.exclude_invisible(
+            ticket
+            for ticket in tickets.by_order(self.order_id)
+        )
+    else:
+        related_tickets = [self]
+
+    content = TicketsPdf.from_tickets(request, related_tickets)
+
+    return Response(
+        content.read(),
+        content_type='application/pdf',
+        content_disposition='inline; filename={}_related_{}.pdf'.format(
             normalize_for_url(self.number),
             date.today().strftime('%Y%m%d')
         )

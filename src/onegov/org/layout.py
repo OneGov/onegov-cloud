@@ -1840,13 +1840,32 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': 'new-note'}
                 )
             )
-            links.append(
-                Link(
-                    text=_('PDF'),
-                    url=self.request.link(self.model, 'pdf'),
-                    attrs={'class': 'ticket-pdf'}
+            if getattr(self.model, 'order_id', None) is not None:
+                links.append(LinkGroup(
+                    title=_('PDF'),
+                    links=[
+                        Link(
+                            text=_('Only this ticket'),
+                            url=self.request.link(self.model, 'pdf'),
+                            attrs={'class': 'ticket-pdf'}
+                        ),
+                        Link(
+                            text=_('With related tickets'),
+                            url=self.request.link(
+                                self.model, 'related-tickets-pdf'),
+                            attrs={'class': 'ticket-pdf'}
+                        ),
+                    ],
+                    classes=['ticket-pdf']
+                ))
+            else:
+                links.append(
+                    Link(
+                        text=_('PDF'),
+                        url=self.request.link(self.model, 'pdf'),
+                        attrs={'class': 'ticket-pdf'}
+                    )
                 )
-            )
 
         if is_manager and self.has_submission_files:
             links.append(

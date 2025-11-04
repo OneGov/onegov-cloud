@@ -2527,6 +2527,14 @@ def test_reserve_session_separation(client: Client) -> None:
     assert 'meeting-room' in tickets
     assert 'gym' in tickets
 
+    # the two tickets should be linked
+    client.login_admin()
+    open_tickets = client.get('/tickets/ALL/open')
+    ticket = open_tickets.click('Annehmen', index=0).follow()
+    assert 'Verknüpfte Tickets' in ticket
+    # we can create a multi-ticket pdf
+    pdf = ticket.click('Mit verknüpften Tickets')
+
 
 def test_reserve_reservation_prediction(client: Client) -> None:
     client.login_admin()
