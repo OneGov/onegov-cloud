@@ -40,7 +40,9 @@ from onegov.org.models import (
     CitizenDashboard, TicketChatMessage, TicketMessage, TicketNote,
     ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
-from onegov.org.models.ticket import ticket_submitter, ReservationHandler
+from onegov.org.models.ticket import (
+    ticket_submitter, ReservationHandler, ReservationTicket)
+from onegov.org.pdf.my_reservations import MyReservationsPdf
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.utils import get_current_tickets_url, group_invoice_items
 from onegov.org.views.message import view_messages_feed
@@ -1852,8 +1854,47 @@ def view_my_tickets(
         Link(_('Submitted Requests'), '#')
     ]
 
+    def ticket_actions(ticket: Ticket) -> list[Link]:
+        actions = []
+        if getattr(ticket.handler, 'reservations', ()):
+            actions.append(Link(
+                text='',
+                url=request.link(ticket, 'reservations-pdf'),
+                attrs={'class': 'ticket-pdf', 'title': _('PDF')}
+            ))
+        return actions
+
     return {
         'title': _('Submitted Requests'),
         'layout': layout,
         'tickets': tickets,
+        'ticket_actions': ticket_actions
     }
+
+
+@OrgApp.html(
+    model=ReservationTicket,
+    name='reservations-pdf',
+    permission=Public,
+)
+def view_reservations_pdf(
+    self: ReservationTicket,
+    request: OrgRequest,
+) -> Response:
+
+    if not request.app.org.citizen_login_enabled:
+        raise exc.HTTPNotFound()
+
+    if not request.authenticated_email:
+        raise exc.HTTPForbidden()
+
+    if self.handler.deleted or not self.handler.reservations:
+        raise exc.HTTPNotFound()
+
+    content = MyReservationsPdf.from_ticket(request, self)
+    return Response(
+        content.read(),
+        content_type='application/pdf',
+        content_disposition='attachment; filename='
+        f'{self.number}-reservations-summary.pdf'
+    )

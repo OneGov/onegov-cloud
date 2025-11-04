@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     class OccasionByStateRow(NamedTuple):
         state: OccasionState | None
         occasion_id: UUID
+        activity_id: UUID
         title: str
         start: datetime
         end: datetime

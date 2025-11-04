@@ -808,6 +808,12 @@ rc.renderPartitions = function(event, element, view) {
 // the calendar and adjusts the partitions if necessary.
 rc.adjustPartitions = function(event, min_hour, max_hour) {
 
+    // if the max time is 24:00:00, then hour will be 0, which will
+    // give us incorrect partitions
+    if (max_hour === 0) {
+        max_hour = 24;
+    }
+
     if (_.isUndefined(event.extendedProps.partitions)) {
         return event.extendedProps.partitions;
     }

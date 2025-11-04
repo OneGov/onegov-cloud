@@ -36,6 +36,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from morepath.request import Request
     from onegov.core.framework import Framework
+    from sqlalchemy.orm import Session
     from typing import Protocol
     from typing import Self
 
@@ -145,7 +146,13 @@ class OrmCacheApp:
 
         """
 
-        def handle_orm_change(schema: str, obj: Base) -> None:
+        def handle_orm_change(
+            schema: str,
+            obj: Base,
+            # NOTE: We don't ever use this parameter, but `on_delete` needs
+            #       to support this parameter in order to attach correctly
+            session: Session | None = None
+        ) -> None:
 
             if callable(descriptor.cache_policy):
                 dirty = descriptor.cache_policy(obj)

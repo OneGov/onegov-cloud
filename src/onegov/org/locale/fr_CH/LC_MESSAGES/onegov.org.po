@@ -3095,7 +3095,7 @@ msgid "Homepage"
 msgstr "Page d'accueil"
 
 msgid "Save"
-msgstr "Sauver"
+msgstr "Enregistrer"
 
 msgid "Edit"
 msgstr "Modifier"

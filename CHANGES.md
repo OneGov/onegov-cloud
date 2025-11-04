@@ -1,8 +1,76 @@
 # Changes
 
+## 2025.61
+
+`2025-11-03` | [93a5f5203e...f973ae4c6c](https://github.com/OneGov/onegov-cloud/compare/93a5f5203e^...f973ae4c6c)
+
+### Feriennet
+
+##### Update banners.
+
+`Feature` | [PRO-1437](https://linear.app/projuventute/issue/PRO-1437) | [ec5e2ff043](https://github.com/onegov/onegov-cloud/commit/ec5e2ff043644e0577e03e764e3c3c5dec59c03e)
+
+### File
+
+##### Adds `X-Content-Type-Options: nosniff` header to uploaded files
+
+`Feature` | [OGC-2750](https://linear.app/onegovcloud/issue/OGC-2750) | [44b9456cba](https://github.com/onegov/onegov-cloud/commit/44b9456cbac23dc726941fcaf1c13485f238acf7)
+
+##### Switches to `Content-Disposition: attachment` for most uploads
+
+There's only really a small list of content types we want to serve
+inline, such as images, videos and PDF files, we continue to serve
+them inline and serve everything else as attachments.
+
+`Bugfix` | [OGC-2733](https://linear.app/onegovcloud/issue/OGC-2733) | [8eb56af3c1](https://github.com/onegov/onegov-cloud/commit/8eb56af3c1b2642a30a499dd04ecf27bae752960)
+
+### Org
+
+##### Adds a my reservations PDF to the ticket list for RSV tickets
+
+`Feature` | [OGC-2756](https://linear.app/onegovcloud/issue/OGC-2756) | [5ac8e0bd32](https://github.com/onegov/onegov-cloud/commit/5ac8e0bd323f51be7e3a970472562d9ce2fb8a7e)
+
+##### Invalidates related TANs after authentication
+
+This also decreases the validity period of mTANs used as a second factor
+
+`Bugfix` | [OGC-2749](https://linear.app/onegovcloud/issue/OGC-2749) | [bb3782adb9](https://github.com/onegov/onegov-cloud/commit/bb3782adb99a2af293213e2cc1ebc7e5a32e710c)
+
+##### Fixes crash in `file-links` template macro
+
+`Bugfix` | [54e794bac3](https://github.com/onegov/onegov-cloud/commit/54e794bac36555d9adc1ba36e971a814984f2b06)
+
+##### Uses a more sensible column as the `fts_id` for `ExternalLink`
+
+`Bugfix` | [e7210a3096](https://github.com/onegov/onegov-cloud/commit/e7210a309647df9fade4e4ea8269b27b7befb2af)
+
+##### Fixes invisible partitions in reservation calendar
+
+`Bugfix` | [OGC-2764](https://linear.app/onegovcloud/issue/OGC-2764) | [c07ac95a1d](https://github.com/onegov/onegov-cloud/commit/c07ac95a1ddfb6a2eaa1be97a79bcbdde362635f)
+
+### Search
+
+##### Integrates indexer into transaction workflow with a data manager
+
+This also refactors some code that relied on the old indexer behavior
+
+`Feature` | [OGC-2759](https://linear.app/onegovcloud/issue/OGC-2759) | [24b68fba31](https://github.com/onegov/onegov-cloud/commit/24b68fba316962aa50edfb6870599eaa48efa6e4)
+
+### Town6
+
+##### Fixes empty links still rendered due to `populate_obj`.
+
+`Bugfix` | [OGC-2761](https://linear.app/onegovcloud/issue/OGC-2761) | [835976629e](https://github.com/onegov/onegov-cloud/commit/835976629e8bebedf5fb67493e164e1b6b306a1c)
+
+### User
+
+##### Raises minimum password length from 8 to 10
+
+`Feature` | [OGC-2736](https://linear.app/onegovcloud/issue/OGC-2736) | [2948b7da2e](https://github.com/onegov/onegov-cloud/commit/2948b7da2eb63a367f541cd38dd075f83e6d535d)
+
 ## 2025.60
 
-`2025-10-24` | [7136036d60...7136036d60](https://github.com/OneGov/onegov-cloud/compare/7136036d60^...7136036d60)
+`2025-10-24` | [7136036d60...4b63568190](https://github.com/OneGov/onegov-cloud/compare/7136036d60^...4b63568190)
 
 ### Search
 
@@ -2346,97 +2414,4 @@ The international format prefixes the country code e.g. +41 for Switzerland
 ##### Adds a button to show a modal with file links in the file details
 
 `Feature` | [OGC-2077](https://linear.app/onegovcloud/issue/OGC-2077) | [65267dc3b5](https://github.com/onegov/onegov-cloud/commit/65267dc3b5c03a5ee84e79e25e8e8eed68496ca5)
-
-## 2025.13
-
-`2025-03-11` | [2f9d78d9fb...e6692a77d8](https://github.com/OneGov/onegov-cloud/compare/2f9d78d9fb^...e6692a77d8)
-
-### Form
-
-##### Add new format to formcode
-
-New possible format for animal identification number (15 digits)
-
-`Feature` | [OGC-2052](https://linear.app/onegovcloud/issue/OGC-2052) | [809bbfd4cf](https://github.com/onegov/onegov-cloud/commit/809bbfd4cfe0b8ba3e434490d53512e42f15ac60)
-
-### Org
-
-##### Rearrange fields in upload-div
-
-`Feature` | [OGC-2078](https://linear.app/onegovcloud/issue/OGC-2078) | [f8e1511849](https://github.com/onegov/onegov-cloud/commit/f8e151184979f312786e7196661e82beeec938da)
-
-##### Don't allow to paste topic into news and vice versa
-
-`Feature` | [OGC-2105](https://linear.app/onegovcloud/issue/OGC-2105) | [08eb4146de](https://github.com/onegov/onegov-cloud/commit/08eb4146de81cf86a91745f326526db280bb71ef)
-
-##### Small adjustment in body of push notification message.
-
-`Feature` | [OGC-2123](https://linear.app/onegovcloud/issue/OGC-2123) | [90b33b586d](https://github.com/onegov/onegov-cloud/commit/90b33b586da9f8952ebf3e71f27e19c4591d8ca7)
-
-##### Checkbox for automatic newsletter subscription
-
-Add a checkbox for confirming the recipient subscribed by the admin agreed to this.
-
-`Feature` | [OGC-2065](https://linear.app/onegovcloud/issue/OGC-2065) | [6f23ad1242](https://github.com/onegov/onegov-cloud/commit/6f23ad124205991fa509bda2711dfcbee37a9ea5)
-
-##### Adds a supporter role which can only receive and process tickets
-
-Additionally this makes sure that actions on the ticket go through the
-ticket or a different proxy model which supporters have private access
-to, so supporters can apply changes relevant to the ticket.
-
-`Feature` | [OGC-1865](https://linear.app/onegovcloud/issue/OGC-1865) | [7a52db6883](https://github.com/onegov/onegov-cloud/commit/7a52db6883dc7ea8ad444dc1c546d633da9ee506)
-
-##### Show only topics in 'Edited Topics` boardlet on dashboard
-
-`Bugfix` | [OGC-2121](https://linear.app/onegovcloud/issue/OGC-2121) | [cd84b19459](https://github.com/onegov/onegov-cloud/commit/cd84b194596e57b0d6cd7f68caf3afa5437fc97e)
-
-##### Fix dashboard translations get lost
-
-Executing `do/translate onegov.town6` made dashboard translations disappear
-
-`Bugfix` | [NONE](#NONE) | [7febe10d80](https://github.com/onegov/onegov-cloud/commit/7febe10d80fa9e60e8475fc1bf419793630c11df)
-
-##### Fixes tests afer new message format.
-
-`Bugfix` | [6c99360456](https://github.com/onegov/onegov-cloud/commit/6c99360456640d1a1c8976571c62f619376a55b1)
-
-### Town6
-
-##### Sidebar name
-
-Create title of sidebar from h3 elements
-
-`Feature` | [OGC-2043](https://linear.app/onegovcloud/issue/OGC-2043) | [6d862946df](https://github.com/onegov/onegov-cloud/commit/6d862946dfa2ccd4b621dafff166c5873a688ce5)
-
-##### Display sidebar contact links like sidebar links
-
-`Feature` | [OGC-2112](https://linear.app/onegovcloud/issue/OGC-2112) | [8fe36d71b2](https://github.com/onegov/onegov-cloud/commit/8fe36d71b2cf5ffd51f206d4afc4d5e5b0e3ff31)
-
-##### Directory preview
-
-Fix display of preview text
-
-`Bugfix` | [OGC-2114](https://linear.app/onegovcloud/issue/OGC-2114) | [e35b22bb72](https://github.com/onegov/onegov-cloud/commit/e35b22bb72f8da252115bfb7708eb0fa5a309f61)
-
-##### Fix margin for plus and minus button
-
-`Bugfix` | [NONE](#NONE) | [5ad5e4e0b6](https://github.com/onegov/onegov-cloud/commit/5ad5e4e0b6581525998801bc3c39893f7074a2e7)
-
-##### Firebase bugfixes.
-
-Fixes a number of issues OGC-2122, OGC-2120, OGC-2119, OGC-2109
-
-- Fix an issue where news published only 1 min in the future was not sent
-- Link to the `/push-notifications`
-- Show hint in UI if message already sent and it won't send again
-- Make deleting News with push notifications possible
-
-`Bugfix` | [771272f75e](https://github.com/onegov/onegov-cloud/commit/771272f75e100045de2b07cae6ff55a2615e8c6d)
-
-### User
-
-##### Allows users to be part of more than one group
-
-`Feature` | [OGC-2079](https://linear.app/onegovcloud/issue/OGC-2079) | [676ffb72a0](https://github.com/onegov/onegov-cloud/commit/676ffb72a0531b5010f071641037e7e0e40d9722)
 

@@ -1813,7 +1813,6 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .sync::before { @include icon($sync-icon); }
     .upload::before { @include icon($upload-icon); }
     .view-link::before { @include icon($view-link); }
-    .ticket-pdf::before { @include icon($pdf-icon); }
     .ticket-files::before { @include icon($ticket-files-icon); }
     .new-daily-item::before { @include icon($new-daily-item-icon); }
     .new-resource-link::before { @include icon($new-resource-link-icon); }
@@ -1825,6 +1824,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .settings-link::before { @include icon($settings-icon); }
 }
 
+.ticket-pdf::before { @include icon($pdf-icon); }
 .mark-as-paid::before { @include icon($mark-as-paid); }
 .mark-as-unpaid::before { @include icon($mark-as-unpaid); }
 .payment-capture::before { @include icon($payment-capture-icon); }

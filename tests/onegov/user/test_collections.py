@@ -141,7 +141,7 @@ def test_register_user(session: Session) -> None:
     with pytest.raises(InsecurePasswordError):
         users.register('user', 'short', request)
 
-    user = users.register('user', 'p@ssw0rd', request)
+    user = users.register('user', 'p@ssw0rd12', request)
     token = user.data['activation_token']
 
     assert len(token) == RANDOM_TOKEN_LENGTH
@@ -161,7 +161,7 @@ def test_register_user(session: Session) -> None:
     assert 'activation_token' not in user.data
 
     with pytest.raises(ExistingUserError):
-        user = users.register('user', 'p@ssw0rd', request)
+        user = users.register('user', 'p@ssw0rd12', request)
 
     with pytest.raises(AlreadyActivatedError):
         users.activate_with_token('user', token)

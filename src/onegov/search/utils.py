@@ -99,7 +99,8 @@ def get_polymorphic_base(
 
 def apply_searchable_polymorphic_filter(
     query: Query[T],
-    model: Any
+    model: Any,
+    order_by_polymorphic_identity: bool = False
 ) -> Query[T]:
     """
     Given a query and the corresponding model add a filter
@@ -114,11 +115,13 @@ def apply_searchable_polymorphic_filter(
     if mapper.polymorphic_on is not None:
         # only include the polymorphic identities that
         # are actually searchable
-        return query.filter(mapper.polymorphic_on.in_({
+        query = query.filter(mapper.polymorphic_on.in_({
             m.polymorphic_identity
             for m in mapper.self_and_descendants
             if issubclass(m.class_, Searchable)
         }))
+        if order_by_polymorphic_identity:
+            query = query.order_by(mapper.polymorphic_on)
     return query
 
 

@@ -91,6 +91,8 @@ $ticket-notification-disabled-icon: '\f1f6';
     margin-top: 1.25rem;
 }
 
+.ticket-pdf::before { @include icon($pdf-icon); }
+
 /*
     Tickets list
 */

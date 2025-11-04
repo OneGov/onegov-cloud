@@ -163,12 +163,12 @@ def test_add_new_user_with_activation_email(client: Client) -> None:
 
     page = client.spawn().get(reset)
     page.form['email'] = 'newmember@example.org'
-    page.form['password'] = 'p@ssw0rd'
+    page.form['password'] = 'p@ssw0rd12'
     page.form.submit()
 
     login = client.spawn().get('/auth/login')
     login.form['username'] = 'newmember@example.org'
-    login.form['password'] = 'p@ssw0rd'
+    login.form['password'] = 'p@ssw0rd12'
     assert login.form.submit().status_code == 302
 
 

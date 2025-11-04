@@ -4,9 +4,11 @@ import morepath
 import pyotp
 
 from abc import ABCMeta, abstractmethod
+from datetime import timedelta
 from onegov.core.utils import is_valid_yubikey
 from onegov.user.collections import TANCollection
 from onegov.user.i18n import _
+from onegov.user.models import TAN
 
 
 from typing import Any, ClassVar, Literal, Self, TYPE_CHECKING
@@ -196,10 +198,15 @@ class YubikeyFactor(SingleStepSecondFactor, type='yubikey'):
 class MTANFactor(TwoStepSecondFactor, type='mtan'):
     """ Implements a mTAN factor for the :class:`Auth` class. """
 
-    __slots__ = ('self_activation',)
+    __slots__ = ('self_activation', 'expires_after')
 
     def __init__(self, mtan_automatic_setup: bool) -> None:
         self.self_activation = mtan_automatic_setup
+        # TODO: Do we want to make this configurable? For now we want
+        #       this to be slightly shorter than the default validity
+        #       period of one hour, since the second factor is a little
+        #       bit more sensitive.
+        self.mtan_expires_after = timedelta(minutes=15)
 
     @classmethod
     def configure(cls, **cfg: Any) -> Self | None:
@@ -220,6 +227,13 @@ class MTANFactor(TwoStepSecondFactor, type='mtan'):
             'mtan_second_factor_enabled': enabled,
             'mtan_automatic_setup': getattr(app, 'mtan_automatic_setup', False)
         }
+
+    def tans(self, request: CoreRequest) -> TANCollection:
+        return TANCollection(
+            request.session,
+            scope='mtan_second_factor',
+            expires_after=self.mtan_expires_after
+        )
 
     def start_activation(
         self,
@@ -245,7 +259,7 @@ class MTANFactor(TwoStepSecondFactor, type='mtan'):
             mobile_number = user.second_factor['data']
             assert mobile_number is not None
 
-        tans = TANCollection(request.session, scope='mtan_second_factor')
+        tans = self.tans(request)
         obj = tans.add(
             client=request.client_addr or 'unknown',
             username=user.username,
@@ -278,15 +292,18 @@ class MTANFactor(TwoStepSecondFactor, type='mtan'):
         factor: str
     ) -> bool:
 
-        tans = TANCollection(request.session, scope='mtan_second_factor')
+        tans = self.tans(request)
         tan = tans.by_tan(factor)
         if (
             tan is not None
             and tan.meta.get('mobile_number') == mobile_number
             and tan.meta.get('username') == username
         ):
-            # expire the tan we just used
+            # expire the TAN we just used
             tan.expire()
+            # expire any other TANs issued to the same user
+            for tan in tans.query().filter(TAN.meta['username'] == username):
+                tan.expire()
             return True
         return False
 

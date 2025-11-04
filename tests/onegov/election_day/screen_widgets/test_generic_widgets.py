@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from lxml import etree
 from onegov.core.templates import PageTemplate
 from onegov.core.utils import Bunch
@@ -14,7 +16,12 @@ from onegov.election_day.screen_widgets import PWidget
 from onegov.election_day.screen_widgets import QrCodeWidget
 
 
-def test_generic_widgets():
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.widgets import Widget
+
+
+def test_generic_widgets() -> None:
     structure = """
         <grid-row class="my-row">
             <grid-column span="1" class="my-first-column">
@@ -39,7 +46,7 @@ def test_generic_widgets():
             </grid-column>
         </grid-row>
     """
-    widgets = [
+    widgets: list[Widget] = [
         GridColumnWidget(),
         H1Widget(),
         H2Widget(),
@@ -51,12 +58,13 @@ def test_generic_widgets():
         PWidget()
     ]
 
-    layout = Bunch(
+    layout: Any = Bunch(
         app=Bunch(logo='logo.svg'),
         request=Bunch(link=lambda x: x)
     )
 
     data = inject_variables(widgets, layout, structure)
+    assert data is not None
     assert len(data) == 2
     assert data['logo'] == 'logo.svg'
     assert data['qr_code']
@@ -68,68 +76,68 @@ def test_generic_widgets():
 
     row = next(xml.iterchildren())
     assert row.tag == 'div'
-    assert row.attrib == {
+    assert row.attrib == {  # type: ignore[comparison-overlap]
         'class': 'row my-row',
         'style': 'max-width: none'
     }
 
     columns = list(row.iterchildren())
     assert columns[0].tag == 'div'
-    assert columns[0].attrib == {
+    assert columns[0].attrib == {  # type: ignore[comparison-overlap]
         'class': 'small-12 medium-1 columns my-first-column'
     }
     assert columns[1].tag == 'div'
-    assert columns[1].attrib == {
+    assert columns[1].attrib == {  # type: ignore[comparison-overlap]
         'class': 'small-12 medium-1 columns my-second-column'
     }
     assert columns[2].tag == 'div'
-    assert columns[2].attrib == {
+    assert columns[2].attrib == {  # type: ignore[comparison-overlap]
         'class': 'small-12 medium-1 columns my-third-column'
     }
     assert columns[3].tag == 'div'
-    assert columns[3].attrib == {
+    assert columns[3].attrib == {  # type: ignore[comparison-overlap]
         'class': 'small-12 medium-1 columns my-fourth-column'
     }
     assert columns[4].tag == 'div'
-    assert columns[4].attrib == {
+    assert columns[4].attrib == {  # type: ignore[comparison-overlap]
         'class': 'small-12 medium-1 columns my-fifth-column'
     }
 
     h1 = next(columns[0].iterchildren())
     assert h1.tag == 'h1'
-    assert h1.attrib == {
+    assert h1.attrib == {  # type: ignore[comparison-overlap]
         'class': 'my-first-header'
     }
 
     h2 = next(h1.iterchildren())
     assert h2.tag == 'h2'
-    assert h2.attrib == {
+    assert h2.attrib == {  # type: ignore[comparison-overlap]
         'class': 'my-second-header'
     }
 
     h3 = next(h2.iterchildren())
     assert h3.tag == 'h3'
-    assert h3.attrib == {
+    assert h3.attrib == {  # type: ignore[comparison-overlap]
         'class': 'my-third-header'
     }
     assert h3.text == 'Title'
 
     hr = next(columns[1].iterchildren())
     assert hr.tag == 'hr'
-    assert hr.attrib == {
+    assert hr.attrib == {  # type: ignore[comparison-overlap]
         'class': 'my-hr'
     }
 
     logo = next(columns[2].iterchildren())
     assert logo.tag == 'img'
-    assert logo.attrib == {
+    assert logo.attrib == {  # type: ignore[comparison-overlap]
         'class': 'my-logo',
         'src': 'logo.svg'
     }
 
     text = next(columns[3].iterchildren())
     assert text.tag == 'p'
-    assert text.attrib == {
+    assert text.attrib == {  # type: ignore[comparison-overlap]
         'class': 'my-text'
     }
     assert text.text == 'Lorem'

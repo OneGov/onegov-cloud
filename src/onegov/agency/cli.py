@@ -41,7 +41,6 @@ def consolidate_cli(
     Consolidates double entries of person objects based on the property
     `based_on`. Property must be convertible to string.
     """
-    buffer = 100
 
     def find_double_entries(session: Session) -> tuple[
         dict[str, ExtendedPerson],
@@ -104,6 +103,7 @@ def consolidate_cli(
             session.delete(p)
 
     def do_consolidate(request: AgencyRequest, app: AgencyApp) -> None:
+        app.fts_orm_events.max_queue_size = 0
         session = request.session
         first_seen, to_consolidate = find_double_entries(session)
         click.echo(f'Double entries found based on '
@@ -114,8 +114,6 @@ def consolidate_cli(
             person = consolidate_persons(person, persons, id_)
             session.flush()
             consolidate_memberships(session, person, persons)
-            if ix % buffer == 0:
-                app.fts_indexer.process(session)
         count_after = session.query(ExtendedAgencyMembership).count()
         assert count == count_after, f'before: {count}, after {count_after}'
         if dry_run:
@@ -173,26 +171,18 @@ def import_bs_data_files(
         $agency_file $people_file
     """
 
-    buffer = 100
-
     def execute(request: AgencyRequest, app: AgencyApp) -> None:
 
         if clean:
             session = request.session
             for ix, membership in enumerate(session.query(AgencyMembership)):
                 session.delete(membership)
-                if ix % buffer == 0:
-                    app.fts_indexer.process(session)
 
             for ix, person in enumerate(session.query(Person)):
                 session.delete(person)
-                if ix % buffer == 0:
-                    app.fts_indexer.process(session)
 
             for ix, agency in enumerate(session.query(Agency)):
                 session.delete(agency)
-                if ix % buffer == 0:
-                    app.fts_indexer.process(session)
 
             session.flush()
             click.secho(
