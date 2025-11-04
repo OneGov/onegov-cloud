@@ -65,7 +65,7 @@
                 <div class="edit-bar clearfix">
                     <tal:b repeat="group editbar_links">
                         <tal:b condition="group.links|nothing" define="dropdown_id 'editbar-dropdown-{}'.format(repeat.group.number)">
-                            <button href="#" data-dropdown="${dropdown_id}" class="${group.right_side and 'right-side'} tiny button dropdown">
+                            <button href="#" data-dropdown="${dropdown_id}" class="${group.right_side and 'right-side'} tiny button dropdown ${' '.join(group.classes or ())}">
                                 ${group.title}
                             </button>
                             <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">

@@ -130,7 +130,7 @@
         <ul class="dropdown menu edit-bar" data-dropdown-menu tal:condition="editbar_links">
             <li tal:repeat="group editbar_links|layout.editbar_links">
                 <tal:b condition="group.links|nothing">
-                    <a href="#">${group.title}</a>
+                    <a href="#" class="${' '.join(group.classes or ())}">${group.title}</a>
                     <ul class="menu">
                         <li tal:repeat="link group.links">
                             <tal:b replace="link(layout)" />
