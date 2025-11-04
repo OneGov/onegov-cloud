@@ -6,7 +6,10 @@ import transaction
 from io import BytesIO
 
 from onegov.core.utils import module_path
-from onegov.translator_directory.models.ticket import AccreditationTicket
+from onegov.translator_directory.models.ticket import (
+    AccreditationTicket,
+    TimeReportTicket,
+)
 from onegov.translator_directory.models.translator import Translator
 from os.path import basename
 from onegov.file import FileCollection
@@ -1989,7 +1992,7 @@ def test_view_time_report(broadcast, authenticate, connect, client):
     ).id
     transaction.commit()
 
-    client.login_editor()
+    client.login_member()
     page = client.get(f'/translator/{translator_id}')
     assert 'Zeit erfassen' in page
 
@@ -2003,13 +2006,10 @@ def test_view_time_report(broadcast, authenticate, connect, client):
     page.form['is_urgent'] = False
     page.form['travel_distance'] = '50'
     page.form['notes'] = 'Test notes'
-    response = page.form.submit()
-    assert response.status_code == 302
-
+    anfrage_eingereicht_page = page.form.submit()
     mail = client.get_email(0, flush_queue=True)
-    assert mail['To'] == 'editor@example.org'
-    assert 'Ihr Ticket wurde eröffnet' in mail['Subject']
 
+    assert 'Ihr Ticket wurde eröffnet' in mail['Subject']
     assert connect.call_count == 1
     assert authenticate.call_count == 1
     assert broadcast.call_count == 1
@@ -2024,6 +2024,20 @@ def test_view_time_report(broadcast, authenticate, connect, client):
     assert report.surcharge_percentage == 25.0
     assert report.travel_compensation == 50.0
     assert report.case_number == 'CASE-123'
+    assert report.status == 'pending'
+
+    client.login_admin()
+    client.use_intercooler = True
+
+    ticket_page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    accept_url = ticket_page.pyquery('a.accept-link')[0].attrib['ic-post-to']
+    page = client.post(accept_url).follow()
+    assert 'Zeiterfassung akzeptiert' in page
+
+    session.expire_all() # *do* we need this?
+    report = session.query(Translator).filter_by(
+        id=translator_id).one().time_reports[0]
+    assert report.status == 'confirmed'
 
 
 @patch('onegov.websockets.integration.connect')

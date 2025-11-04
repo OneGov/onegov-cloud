@@ -321,7 +321,9 @@ class TimeReportHandler(Handler):
             time_report_links.append(
                 Link(
                     text=_('Accept time report'),
-                    url=request.link(self.ticket, 'accept-time-report'),
+                    url=request.csrf_protected_url(
+                            request.link(self.ticket, 'accept-time-report')
+                    ),
                     attrs={'class': 'accept-link'},
                     traits=(
                         Intercooler(

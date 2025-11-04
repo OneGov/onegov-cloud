@@ -627,7 +627,7 @@ def add_time_report(
 @TranslatorDirectoryApp.view(
     model=TimeReportTicket,
     name='accept-time-report',
-    permission=Secret,
+    permission=Private,
     request_method='POST',
 )
 def accept_time_report(
