@@ -132,6 +132,18 @@ class GeneralSettingsForm(Form):
         render_kw={'class_': 'image-url'}
     )
 
+    level_table_of_contents = RadioField(
+        label=_('Table of Contents'),
+        choices=(
+            ('none', _('No Table of Contents')),
+            ('h2', _('1 Level')),
+            ('h3', _('2 Levels')),
+            ('h4', _('3 Levels')),
+            ('h5', _('4 Levels')),
+        ),
+        default='h5',
+    )
+
     @property
     def theme_options(self) -> dict[str, Any]:
         options = self.model.theme_options

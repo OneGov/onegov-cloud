@@ -1603,9 +1603,21 @@ a.category-anchor {
     visibility: hidden;
 }
 
-.content-panel .level-3 {
-    font-weight: normal !important;
-    padding-left: .5rem;
+.content-panel {
+    .level-3,
+    .level-4,
+    .level-5 {
+        font-weight: normal !important;
+    }
+
+    .level-4 {
+        padding-left: .75rem;
+    }
+
+    .level-5 {
+        padding-left: 1.5rem;
+    }
+
 }
 
 .political-businesses .card {
