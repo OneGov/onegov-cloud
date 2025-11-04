@@ -1555,8 +1555,10 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
     cal.add('x-wr-calname', self.title)
     cal.add('x-wr-relcalid', self.id.hex)
 
-    # refresh every 120 minutes by default (Outlook and maybe others)
-    cal.add('x-published-ttl', 'PT120M')
+    # refresh every 30 minutes by default (Outlook and maybe others)
+    # this is a higher frequency than my-reservations, since it can
+    # have quite a bit of activity on busy days
+    cal.add('x-published-ttl', 'PT30M')
 
     # add allocations/reservations
     date = utcnow()
