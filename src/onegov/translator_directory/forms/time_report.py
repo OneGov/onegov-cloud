@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 
 from datetime import date
+from decimal import Decimal
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.translator_directory import _
@@ -107,21 +108,21 @@ class TranslatorTimeReportForm(Form):
             ('150', self.request.translate(_('Over 100 km (CHF 150)'))),
         ]
 
-    def get_hourly_rate(self, translator: Translator) -> float:
+    def get_hourly_rate(self, translator: Translator) -> Decimal:
         """Determine hourly rate based on translator certification."""
         if translator.admission == 'certified':
-            return 90.0
-        return 75.0
+            return Decimal('90.00')
+        return Decimal('75.00')
 
-    def calculate_surcharge(self) -> float:
+    def calculate_surcharge(self) -> Decimal:
         """Calculate total surcharge percentage."""
-        surcharge = 0.0
+        surcharge = Decimal('0')
         if self.is_night_work.data:
-            surcharge += 50.0
+            surcharge += Decimal('50')
         if self.is_weekend_holiday.data:
-            surcharge += 25.0
+            surcharge += Decimal('25')
         if self.is_urgent.data:
-            surcharge += 25.0
+            surcharge += Decimal('25')
         return surcharge
 
     def populate_obj(  # type: ignore[override]
@@ -164,10 +165,10 @@ class TranslatorTimeReportForm(Form):
         surcharge_pct = self.calculate_surcharge()
         model.surcharge_percentage = surcharge_pct
 
-        travel_comp = float(self.travel_distance.data or 0)
+        travel_comp = Decimal(self.travel_distance.data or 0)
         model.travel_compensation = travel_comp
 
-        duration_hours = model.duration / 60.0
+        duration_hours = Decimal(model.duration) / Decimal(60)
         base = hourly_rate * duration_hours
-        surcharge_amount = base * (surcharge_pct / 100)
+        surcharge_amount = base * (surcharge_pct / Decimal(100))
         model.total_compensation = base + surcharge_amount + travel_comp

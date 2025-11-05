@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from uuid import uuid4
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from sqlalchemy import Column, Date, Enum, Float, ForeignKey, Integer, Text
+from sqlalchemy import Column, Date, Enum, ForeignKey, Integer, Numeric, Text
 from sqlalchemy.orm import relationship
 
 
@@ -57,25 +58,25 @@ class TranslatorTimeReport(Base, TimestampMixin):
 
     assignment_date: Column[date] = Column(Date, nullable=False)
 
-    hourly_rate: Column[float] = Column(
-        Float,  # type:ignore[arg-type]
+    hourly_rate: Column[Decimal] = Column(
+        Numeric(precision=10, scale=2),  # type:ignore[arg-type]
         nullable=False,
     )
 
-    surcharge_percentage: Column[float] = Column(
-        Float,  # type:ignore[arg-type]
+    surcharge_percentage: Column[Decimal] = Column(
+        Numeric(precision=5, scale=2),  # type:ignore[arg-type]
         nullable=False,
-        default=0.0,
+        default=0,
     )
 
-    travel_compensation: Column[float] = Column(
-        Float,  # type:ignore[arg-type]
+    travel_compensation: Column[Decimal] = Column(
+        Numeric(precision=10, scale=2),  # type:ignore[arg-type]
         nullable=False,
-        default=0.0,
+        default=0,
     )
 
-    total_compensation: Column[float] = Column(
-        Float,  # type:ignore[arg-type]
+    total_compensation: Column[Decimal] = Column(
+        Numeric(precision=10, scale=2),  # type:ignore[arg-type]
         nullable=False,
     )
 
@@ -88,17 +89,17 @@ class TranslatorTimeReport(Base, TimestampMixin):
     )
 
     @property
-    def duration_hours(self) -> float:
+    def duration_hours(self) -> Decimal:
         """Return duration in hours for display."""
-        return self.duration / 60.0
+        return Decimal(self.duration) / Decimal(60)
 
     @property
-    def base_compensation(self) -> float:
+    def base_compensation(self) -> Decimal:
         """Calculate compensation without travel."""
         return (
             self.hourly_rate
             * self.duration_hours
-            * (1 + self.surcharge_percentage / 100)
+            * (1 + self.surcharge_percentage / Decimal(100))
         )
 
     @property

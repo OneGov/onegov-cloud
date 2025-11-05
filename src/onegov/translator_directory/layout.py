@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from functools import cached_property
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -98,7 +99,7 @@ class DefaultLayout(BaseLayout):
         return key
 
     @staticmethod
-    def format_currency(amount: float | None) -> str:
+    def format_currency(amount: Decimal | float | None) -> str:
         """Format amount as Swiss Francs."""
         if amount is None:
             return 'CHF 0.00'

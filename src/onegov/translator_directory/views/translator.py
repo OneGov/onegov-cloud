@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from decimal import Decimal
 from io import BytesIO
 from onegov.file import File
 from morepath import redirect
@@ -547,9 +548,13 @@ def add_time_report(
 
         hourly_rate = form.get_hourly_rate(self)
         surcharge_pct = form.calculate_surcharge()
-        travel_comp = float(form.travel_distance.data or 0)
-        duration_hours = duration_minutes / 60.0
-        base_comp = hourly_rate * duration_hours * (1 + surcharge_pct / 100)
+        travel_comp = Decimal(form.travel_distance.data or 0)
+        duration_hours = Decimal(duration_minutes) / Decimal(60)
+        base_comp = (
+            hourly_rate
+            * duration_hours
+            * (1 + surcharge_pct / Decimal(100))
+        )
         total_comp = base_comp + travel_comp
 
         report = TranslatorTimeReport(

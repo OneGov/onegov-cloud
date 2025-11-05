@@ -149,3 +149,29 @@ def add_created_by_to_time_reports(context: UpgradeContext) -> None:
                 nullable=True,
             ),
         )
+
+
+@upgrade_task('Convert Float to Numeric for monetary columns')
+def convert_float_to_numeric_in_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+
+    monetary_columns = [
+        'hourly_rate',
+        'surcharge_percentage',
+        'travel_compensation',
+        'total_compensation',
+    ]
+
+    for col in monetary_columns:
+        if context.has_column('translator_time_reports', col):
+            if col == 'surcharge_percentage':
+                precision, scale = 5, 2
+            else:
+                precision, scale = 10, 2
+
+            context.operations.execute(
+                f'ALTER TABLE translator_time_reports '
+                f'ALTER COLUMN {col} TYPE NUMERIC({precision},{scale}) '
+                f'USING {col}::NUMERIC({precision},{scale})'
+            )
