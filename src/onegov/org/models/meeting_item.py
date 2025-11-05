@@ -46,7 +46,7 @@ class MeetingItem(Base, ORMSearchable):
         #        meeting itself, so you can find meetings by their
         #        meeting items, which might be what you want anyways.
         if self.meeting is None:
-            return None
+            return None  # type:ignore[unreachable]
 
         return self.meeting.start_datetime
 
