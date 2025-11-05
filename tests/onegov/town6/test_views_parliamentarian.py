@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import TYPE_CHECKING
 
 from freezegun import freeze_time
@@ -15,9 +16,10 @@ def test_parliamentarians(client: Client) -> None:
     assert client.get('/parliamentarian', status=404)
     assert client.get('/parliamentarian/new', status=404)
 
-    # enable ris
+    # enable ris and configure interest tie categories
     settings = client.get('/ris-enable')
     settings.form['ris_enabled'] = True
+    settings.form['ris_interest_tie_categories'] = 'Work; Leisure and Fun;'
     settings.form.submit()
 
     # add parliamentary groups
@@ -53,9 +55,6 @@ def test_parliamentarians(client: Client) -> None:
     page = edit.form.submit().follow()
     assert 'Commission for ...' in page
 
-    # configure interest ties
-    # TODO
-
     parliamentarian_pages = []
     with freeze_time("2025-11-03 8:00"):
         page = client.get('/parliamentarians')
@@ -72,19 +71,39 @@ def test_parliamentarians(client: Client) -> None:
         new.form['last_name'] = 'Comedian'
         new.form['email_primary'] = 'funny.comedian@fun.org'
         new.form['party'] = 'Die Moderne'
-        # TODO: set interest tie
+        new.form['interest_ties'] = json.dumps({  # many field
+            'values': [{
+                'interest_tie': 'Manager',
+                'category': 'Work'
+            }]
+        })
         parliamentarian = new.form.submit().follow()
         parliamentarian_pages.append(parliamentarian)
         assert 'Funny' in parliamentarian
         assert 'Comedian' in parliamentarian
         assert 'funny.comedian@fun.org' in parliamentarian
         assert 'Die Moderne' in parliamentarian
+        assert 'Manager' in parliamentarian
+        assert 'Work' in parliamentarian
 
         # edit parliamentarian
         edit = parliamentarian.click('Bearbeiten')
         edit.form['first_name'] = 'Laugh'
+        edit.form['interest_ties'] = json.dumps({  # many field
+            'values': [{
+                'interest_tie': 'Manager',
+                'category': 'Work'
+            }, {
+                'interest_tie': 'Talented Sailor',
+                'category': 'Leisure and Fun'
+            }]
+        })
         parliamentarian = edit.form.submit().follow()
         assert 'Laugh' in parliamentarian
+        assert 'Manager' in parliamentarian
+        assert 'Work' in parliamentarian
+        assert 'Talented Sailor' in parliamentarian
+        assert 'Leisure and Fun' in parliamentarian
 
         # add role
         role = parliamentarian.click('Neue Fraktionsfunktion')
