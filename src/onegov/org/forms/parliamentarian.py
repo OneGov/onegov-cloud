@@ -20,12 +20,12 @@ from wtforms.validators import Optional
 from wtforms.validators import URL
 
 from typing import Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onegov.parliament.models.parliamentarian import Parliamentarian
 
 
 class ParliamentarianForm(NamedFileForm):
-
     gender = TranslatedSelectField(
         label=_('Gender'),
         fieldset=_('Basic properties'),
@@ -164,7 +164,8 @@ class ParliamentarianForm(NamedFileForm):
         self.interest_tie_errors: dict[int, str] = {}
 
     def on_request(self) -> None:
-        pass
+        if not self.interest_ties.data:
+            self.interest_ties.data = self.interest_ties_to_json(None)
 
     def process_obj(self, obj: Parliamentarian) -> None:  # type:ignore[override]
         super().process_obj(obj)
@@ -173,9 +174,9 @@ class ParliamentarianForm(NamedFileForm):
         interest_ties = parliamentarian.interests or {'rows': []}
         self.interest_ties.data = self.interest_ties_to_json(interest_ties)
 
-    def populate_obj(
+    def populate_obj(  # type:ignore[override]
         self,
-        obj: object,
+        obj: Parliamentarian,  # type:ignore[override]
         *args: Any, **kwargs: Any
     ) -> None:
         super().populate_obj(
@@ -183,24 +184,19 @@ class ParliamentarianForm(NamedFileForm):
             exclude={'interest_ties'}
         )
 
-        if hasattr(obj, 'interests'):
-            interests = obj.interests
-            interests['rows'] = self.json_to_interest_ties(
-                self.interest_ties.data)
-            if not interests.get('headers'):
-                interests['headers'] = ['Interessenbindung', 'Kategorie']
-            obj.interests = interests
-
-    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
-        data = super().get_useful_data()
-        data.pop('interest_ties')
-        return data
+        interests: dict[str, Any] = {}
+        interests['rows'] = self.json_to_interest_ties(
+            self.interest_ties.data)
+        if not interests.get('headers'):
+            interests['headers'] = ['Interessenbindung', 'Kategorie']
+        obj.interests = interests
 
     def interest_ties_to_json(
         self,
-        interest_ties: dict[str, Any]
+        interest_ties: dict[str, Any] | None = None
     ) -> str:
         cats = [self.request.translate(_('No categories defined.'))]
+        interest_ties = interest_ties or {'rows': []}
 
         interest_tie_cats = self.request.app.org.ris_interest_tie_categories  # type:ignore[attr-defined]
         if interest_tie_cats:
