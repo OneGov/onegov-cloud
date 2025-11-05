@@ -1930,6 +1930,24 @@ msgstr ""
 msgid "Standard Image"
 msgstr "Image standard"
 
+msgid "Table of Contents"
+msgstr "Table des matières"
+
+msgid "No Table of Contents"
+msgstr "Pas de table des matières"
+
+msgid "1 Level"
+msgstr "1 Niveau"
+
+msgid "2 Levels"
+msgstr "2 Niveaux"
+
+msgid "3 Levels"
+msgstr "3 Niveaux"
+
+msgid "4 Levels"
+msgstr "4 Niveaux"
+
 msgid "Column width left side"
 msgstr "Largeur de la colonne côté gauche"
 

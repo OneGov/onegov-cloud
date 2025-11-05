@@ -325,40 +325,63 @@ $('a[data-back-link]').on('click', function(e) {
 
 
 // if there are headings in the content and if there is a .sidebar-wrapper, add a div with the class "side-panel" to the sidebar and add the headings to it
-if (
-    $('.main-content').find('h1, h2, h3, h4, h5, h6').length > 2
-    || $('.page-content-main').find('h1, h2, h3, h4, h5, h6').length > 2
-    && $('.sidebar-wrapper').length
-) {
-    var sidePanel = $('.side-panel.content-panel');
-    var list = $('<ul class="more-list"></ul>');
-    var mainContent = $('.main-content').length ? $('.main-content') : $('.page-content-main');
-    mainContent.find('h1, h2, h3, h4, h5, h6').each(function() {
-        var heading = this;
-        if (heading.textContent === '') {
-            return; // skip empty headings
-        }
-        var id = this.textContent
-        id = id.trim().toLowerCase()
-        // replace ä, ö, ü with ae, oe, ue
-        id = id.replace(/ä/g, 'ae');
-        id = id.replace(/ö/g, 'oe');
-        id = id.replace(/ü/g, 'ue');
-        id = id.replace(/[^a-z0-9]+/g, '-');
+var level = $('.side-panel.content-panel').data('toc-level');
+console.log('level', level);
 
-        if (id) {
-            var link = $('<a class="anchor-link" href="#' + id + '"><i class="fa fa-link"></i></a>');
-            $(heading).append(link);
-            var anchor = $('<a class="category-anchor"></a>');
-            anchor.attr('id', id);
-            $(heading).prepend(anchor);
-            var level = parseInt(heading.tagName.charAt(1), 10);
-            var link = $('<li><a class="list-link level-' + level + '" href="#' + id + '">' + heading.textContent + '</a></li>');
-            list.append(link);
-        }
-    });
-    sidePanel.append(list);
-    sidePanel.show();
+if (level !== 'none' && $('.sidebar-wrapper').length) {
+    // Create heading selector based on level
+    var headingSelector;
+    switch(level) {
+        case 'h5':
+            headingSelector = 'h1, h2, h3, h4, h5';
+            break;
+        case 'h4':
+            headingSelector = 'h1, h2, h3, h4';
+            break;
+        case 'h3':
+            headingSelector = 'h1, h2, h3';
+            break;
+        case 'h2':
+            headingSelector = 'h1, h2';
+            break;
+        default:
+            headingSelector = 'h1, h2, h3, h4, h5'; // fallback
+    }
+
+    var mainContent = $('.main-content').length ? $('.main-content') : $('.page-content-main');
+    var headings = mainContent.find(headingSelector);
+
+    if (headings.length > 2) {
+        var sidePanel = $('.side-panel.content-panel');
+        var list = $('<ul class="more-list"></ul>');
+
+        headings.each(function() {
+            var heading = this;
+            if (heading.textContent === '') {
+                return; // skip empty headings
+            }
+            var id = this.textContent;
+            id = id.trim().toLowerCase();
+            // replace ä, ö, ü with ae, oe, ue
+            id = id.replace(/ä/g, 'ae');
+            id = id.replace(/ö/g, 'oe');
+            id = id.replace(/ü/g, 'ue');
+            id = id.replace(/[^a-z0-9]+/g, '-');
+
+            if (id) {
+                var link = $('<a class="anchor-link" href="#' + id + '"><i class="fa fa-link"></i></a>');
+                $(heading).append(link);
+                var anchor = $('<a class="category-anchor"></a>');
+                anchor.attr('id', id);
+                $(heading).prepend(anchor);
+                var headingLevel = parseInt(heading.tagName.charAt(1), 10);
+                var listItem = $('<li><a class="list-link level-' + headingLevel + '" href="#' + id + '">' + heading.textContent + '</a></li>');
+                list.append(listItem);
+            }
+        });
+        sidePanel.append(list);
+        sidePanel.show();
+    }
 }
 
 $('.is-accordion-submenu-parent a span').on('click', function(e) {

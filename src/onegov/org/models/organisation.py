@@ -127,6 +127,8 @@ class Organisation(Base, TimestampMixin):
     hidden_people_fields: dict_property[list[str]] = meta_property(
         default=lambda: ['external_user_id']
     )
+
+    level_table_of_contents: dict_property[str | None] = meta_property()
     event_locations: dict_property[list[str]] = meta_property(default=list)
     geo_provider: dict_property[str] = meta_property(default='geo-mapbox')
     holiday_settings: dict_property[dict[str, Any]] = meta_property(
