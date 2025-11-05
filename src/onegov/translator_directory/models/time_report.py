@@ -59,24 +59,24 @@ class TranslatorTimeReport(Base, TimestampMixin):
     assignment_date: Column[date] = Column(Date, nullable=False)
 
     hourly_rate: Column[Decimal] = Column(
-        Numeric(precision=10, scale=2),  # type:ignore[arg-type]
+        Numeric(precision=10, scale=2),
         nullable=False,
     )
 
     surcharge_percentage: Column[Decimal] = Column(
-        Numeric(precision=5, scale=2),  # type:ignore[arg-type]
+        Numeric(precision=5, scale=2),
         nullable=False,
         default=0,
     )
 
     travel_compensation: Column[Decimal] = Column(
-        Numeric(precision=10, scale=2),  # type:ignore[arg-type]
+        Numeric(precision=10, scale=2),
         nullable=False,
         default=0,
     )
 
     total_compensation: Column[Decimal] = Column(
-        Numeric(precision=10, scale=2),  # type:ignore[arg-type]
+        Numeric(precision=10, scale=2),
         nullable=False,
     )
 

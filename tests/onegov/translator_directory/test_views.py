@@ -8,7 +8,6 @@ from io import BytesIO
 from onegov.core.utils import module_path
 from onegov.translator_directory.models.ticket import (
     AccreditationTicket,
-    TimeReportTicket,
 )
 from onegov.translator_directory.models.translator import Translator
 from os.path import basename
@@ -2034,7 +2033,7 @@ def test_view_time_report(broadcast, authenticate, connect, client):
     page = client.post(accept_url).follow()
     assert 'Zeiterfassung akzeptiert' in page
 
-    session.expire_all() # *do* we need this?
+    session.expire_all()  # *do* we need this?
     report = session.query(Translator).filter_by(
         id=translator_id).one().time_reports[0]
     assert report.status == 'confirmed'

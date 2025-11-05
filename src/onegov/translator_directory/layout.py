@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from decimal import Decimal
 from functools import cached_property
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -29,6 +28,7 @@ from onegov.translator_directory.constants import (
 from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Iterable
+    from decimal import Decimal
     from onegov.translator_directory.models.language import Language
     from onegov.translator_directory.models.time_report import (
         TranslatorTimeReport,
