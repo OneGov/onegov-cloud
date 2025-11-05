@@ -2915,7 +2915,6 @@ def ris_rebuild_political_business_links_to_meetings(
                 meeting = meetings.query().get(meeting_item.meeting_id)
                 collected_meetings.append(meeting)
 
-            business.meetings = collected_meetings  # type: ignore[assignment]
             if len(collected_meetings) > 1:
                 multiple_meetings_found_counter += 1
                 click.secho(f'Multiple meetings found for political business '

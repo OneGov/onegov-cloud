@@ -17,8 +17,8 @@ from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.search import ORMSearchable
-from sqlalchemy import Column, Text, ForeignKey
-from sqlalchemy.orm import RelationshipProperty, relationship
+from sqlalchemy import Column, Text
+from sqlalchemy.orm import relationship
 
 from typing import TYPE_CHECKING, Self
 if TYPE_CHECKING:
@@ -29,7 +29,6 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
 
-    from onegov.org.models import PoliticalBusiness
     from onegov.org.models import MeetingItem
 
 
@@ -98,23 +97,6 @@ class Meeting(
     address: Column[Markup] = Column(MarkupText, nullable=False)
 
     description: Column[Markup | None] = Column(MarkupText, nullable=True)
-
-    #: political business id
-    political_business_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('par_political_businesses.id'),
-    )
-
-    #: list of political businesses, "Traktanden"
-    political_businesses: RelationshipProperty[PoliticalBusiness] = (
-        relationship(
-            'PoliticalBusiness',
-            back_populates='meetings',
-            order_by='PoliticalBusiness.number',
-            primaryjoin='Meeting.political_business_id == '
-            'PoliticalBusiness.id',
-        )
-    )
 
     #: The meeting items
     meeting_items: relationship[list[MeetingItem]]

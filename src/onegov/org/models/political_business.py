@@ -27,7 +27,6 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import ColumnElement
 
-    from onegov.org.models import Meeting
     from onegov.org.models import MeetingItem
     from onegov.org.models import RISParliamentarian
     from onegov.org.models import RISParliamentaryGroup
@@ -189,14 +188,6 @@ class PoliticalBusiness(
     parliamentary_group = relationship(
         'RISParliamentaryGroup',
         back_populates='political_businesses'
-    )
-
-    # FIXME: needless as we have meeting items
-    #: The meetings this agenda item was discussed in
-    meetings: relationship[Meeting] = relationship(
-        'Meeting',
-        back_populates='political_businesses',
-        order_by='Meeting.start_datetime',
     )
 
     meeting_items: relationship[list[MeetingItem]] = relationship(
