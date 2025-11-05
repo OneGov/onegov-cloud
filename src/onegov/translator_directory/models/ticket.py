@@ -30,6 +30,9 @@ if TYPE_CHECKING:
 class TranslatorMutationTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'TRN'}  # type:ignore
 
+    if TYPE_CHECKING:
+        handler: TranslatorMutationHandler
+
     def reference_group(self, request: OrgRequest) -> str:
         return self.title
 
@@ -168,6 +171,9 @@ class TranslatorMutationHandler(Handler):
 
 class AccreditationTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'AKK'}  # type:ignore
+
+    if TYPE_CHECKING:
+        handler: AccreditationHandler
 
     def reference_group(self, request: OrgRequest) -> str:
         return self.title

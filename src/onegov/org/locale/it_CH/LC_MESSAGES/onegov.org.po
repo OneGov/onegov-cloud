@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-10-21 14:15+0200\n"
+"POT-Creation-Date: 2025-11-04 12:21+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2364,6 +2364,18 @@ msgstr ""
 "Indirizzo e-mail che viene visualizzato invece dell'indirizzo e-mail "
 "personale"
 
+msgid "Hide submitter email address"
+msgstr "Nascondi l'indirizzo e-mail del mittente"
+
+msgid ""
+"Hide the email address of the ticket submitter in the ticket status page"
+msgstr ""
+"Nascondi l'indirizzo e-mail del mittente del ticket nella pagina di stato "
+"del ticket"
+
+msgid "Data Protection"
+msgstr "Protezione dei dati"
+
 msgid "Accept request and close ticket automatically based on:"
 msgstr "Accetta la richiesta e chiudi il ticket automaticamente in base a:"
 
@@ -3212,6 +3224,12 @@ msgstr "Nuova nota"
 msgid "PDF"
 msgstr "PDF"
 
+msgid "Only this ticket"
+msgstr "Solo questo biglietto"
+
+msgid "With related tickets"
+msgstr "Con biglietti correlati"
+
 msgid "Download files"
 msgstr "Scarica i file"
 
@@ -4006,6 +4024,9 @@ msgstr "Aggiunto iFrame"
 
 msgid "Edit iFrame"
 msgstr "Modifica iFrame"
+
+msgid "Move iFrame"
+msgstr "Spostare iFrame"
 
 msgid "The iFrame was deleted"
 msgstr "L'iFrame è stato eliminato"

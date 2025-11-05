@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from datetime import datetime
 from freezegun import freeze_time
@@ -11,8 +13,18 @@ from onegov.election_day.models import ProporzElection
 from pytz import utc
 
 
-def test_import_internal_compound_regional_gr(session, import_test_datasets):
-    election_compound, errors = import_test_datasets(
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from tests.onegov.election_day.conftest import ImportTestDatasets
+
+
+def test_import_internal_compound_regional_gr(
+    session: Session,
+    import_test_datasets: ImportTestDatasets
+) -> None:
+
+    results = import_test_datasets(
         api_format='internal',
         model='election_compound',
         principal='gr',
@@ -104,6 +116,8 @@ def test_import_internal_compound_regional_gr(session, import_test_datasets):
         dataset_name='grossratswahlen-2022'
     )
 
+    assert len(results) == 1
+    election_compound, errors = next(iter(results.values()))
     assert not errors
     assert election_compound.last_result_change
     assert election_compound.completed
@@ -113,6 +127,7 @@ def test_import_internal_compound_regional_gr(session, import_test_datasets):
     assert len(election_compound.elected_candidates) == 120
 
     election = election_compound.elections[0]
+    assert isinstance(election, ProporzElection)
     list_ = next((l for l in election.lists if l.name == 'FDP'))
     candidate = next((
         c for c in election.candidates if c.family_name == 'Crameri'
@@ -142,6 +157,7 @@ def test_import_internal_compound_regional_gr(session, import_test_datasets):
     assert len(election_compound.elected_candidates) == 120
 
     election = election_compound.elections[0]
+    assert isinstance(election, ProporzElection)
     list_ = next((l for l in election.lists if l.name == 'FDP'))
     candidate = next((
         c for c in election.candidates if c.family_name == 'Crameri'
@@ -152,22 +168,22 @@ def test_import_internal_compound_regional_gr(session, import_test_datasets):
     assert candidate.votes == 659
 
 
-def test_import_internal_compound_missing_headers(session):
-    election_1 = ProporzElection(
+def test_import_internal_compound_missing_headers(session: Session) -> None:
+    election_1 = ProporzElection(  # type: ignore[misc]
         title='election-1',
         domain='district',
         domain_segment='St. Gallen',
         date=date(2022, 10, 18),
         number_of_mandates=6,
     )
-    election_2 = ProporzElection(
+    election_2 = ProporzElection(  # type: ignore[misc]
         title='election-2',
         domain='district',
         domain_segment='Rorschach',
         date=date(2022, 10, 18),
         number_of_mandates=6,
     )
-    compound = ElectionCompound(
+    compound = ElectionCompound(  # type: ignore[misc]
         title='election',
         domain='canton',
         domain_elections='district',
@@ -210,27 +226,27 @@ def test_import_internal_compound_missing_headers(session):
             ))
         ).encode('utf-8')), 'text/plain',
     )
-    assert [(e.error.interpolate()) for e in errors] == [
+    assert [(e.error.interpolate()) for e in errors] == [  # type: ignore[attr-defined]
         ("Missing columns: 'candidate_elected'")
     ]
 
 
-def test_import_internal_compound_invalid_values(session):
-    election_1 = ProporzElection(
+def test_import_internal_compound_invalid_values(session: Session) -> None:
+    election_1 = ProporzElection(  # type: ignore[misc]
         title='election-1',
         domain='district',
         domain_segment='St. Gallen',
         date=date(2022, 10, 18),
         number_of_mandates=6,
     )
-    election_2 = ProporzElection(
+    election_2 = ProporzElection(  # type: ignore[misc]
         title='election-2',
         domain='district',
         domain_segment='Rorschach',
         date=date(2022, 10, 18),
         number_of_mandates=6,
     )
-    compound = ElectionCompound(
+    compound = ElectionCompound(  # type: ignore[misc]
         title='election',
         domain='canton',
         domain_elections='district',
@@ -379,8 +395,7 @@ def test_import_internal_compound_invalid_values(session):
                 ))
                 ).encode('utf-8')), 'text/plain',
     )
-    errors = sorted([(e.line, e.error.interpolate()) for e in errors])
-    assert errors == [
+    assert sorted((e.line, e.error.interpolate()) for e in errors) == [  # type: ignore[attr-defined]
         (2, 'Invalid integer: candidate_votes'),
         (2, 'Invalid integer: entity_id'),
         (2, 'Invalid integer: list_votes'),
@@ -392,22 +407,22 @@ def test_import_internal_compound_invalid_values(session):
     ]
 
 
-def test_import_internal_compound_expats(session):
-    election_1 = ProporzElection(
+def test_import_internal_compound_expats(session: Session) -> None:
+    election_1 = ProporzElection(  # type: ignore[misc]
         title='election-1',
         domain='district',
         domain_segment='St. Gallen',
         date=date(2022, 10, 18),
         number_of_mandates=6,
     )
-    election_2 = ProporzElection(
+    election_2 = ProporzElection(  # type: ignore[misc]
         title='election-2',
         domain='district',
         domain_segment='Rorschach',
         date=date(2022, 10, 18),
         number_of_mandates=6,
     )
-    compound = ElectionCompound(
+    compound = ElectionCompound(  # type: ignore[misc]
         title='election',
         domain='canton',
         domain_elections='district',
@@ -425,7 +440,7 @@ def test_import_internal_compound_expats(session):
         election_1.has_expats = has_expats
         election_2.has_expats = has_expats
         for entity_id in (9170, 0):
-            errors = import_election_compound_internal(
+            raw_errors = import_election_compound_internal(
                 compound, principal,
                 BytesIO((
                     '\n'.join((
@@ -478,7 +493,7 @@ def test_import_internal_compound_expats(session):
                     ))
                 ).encode('utf-8')), 'text/plain',
             )
-            errors = [e.error.interpolate() for e in errors]
+            errors = [e.error.interpolate() for e in raw_errors]  # type: ignore[attr-defined]
 
             if has_expats:
                 assert errors == [
@@ -488,22 +503,22 @@ def test_import_internal_compound_expats(session):
                 assert not errors
 
 
-def test_import_internal_compound_temporary_results(session):
-    election_1 = ProporzElection(
+def test_import_internal_compound_temporary_results(session: Session) -> None:
+    election_1 = ProporzElection(  # type: ignore[misc]
         title='election-1',
         domain='district',
         domain_segment='St. Gallen',
         date=date(2022, 10, 18),
         number_of_mandates=6,
     )
-    election_2 = ProporzElection(
+    election_2 = ProporzElection(  # type: ignore[misc]
         title='election-2',
         domain='district',
         domain_segment='Rorschach',
         date=date(2022, 10, 18),
         number_of_mandates=6,
     )
-    compound = ElectionCompound(
+    compound = ElectionCompound(  # type: ignore[misc]
         title='election',
         domain='canton',
         domain_elections='district',

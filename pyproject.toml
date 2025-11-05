@@ -73,14 +73,13 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 # very lax rules for tests that don't have type hints yet
 module = [
-    "tests.onegov.election_day.*",
+    "tests.onegov.election_day.collections.*",
+    "tests.onegov.election_day.formats.exports.*",
+    "tests.onegov.election_day.forms.*",
+    "tests.onegov.election_day.layouts.*",
+    "tests.onegov.election_day.models.*",
+    "tests.onegov.election_day.views.*",
     "tests.onegov.feriennet.*",
-    "tests.onegov.fsi.*",
-    "tests.onegov.landsgemeinde.*",
-    "tests.onegov.pas.*",
-    "tests.onegov.swissvotes.*",
-    "tests.onegov.translator_directory.*",
-    "tests.onegov.winterthur.*",
 ]
 check_untyped_defs = false
 ignore_errors = true

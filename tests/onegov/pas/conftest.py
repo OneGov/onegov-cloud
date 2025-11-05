@@ -1,22 +1,37 @@
-from pytest_localserver.http import WSGIServer
-from onegov.core.orm.observer import ScopedPropertyObserver
-from os import path
-from yaml import dump
+from __future__ import annotations
 
+import pytest
+
+from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.core.utils import Bunch
 from onegov.core.utils import module_path
 from onegov.pas.app import PasApp
 from onegov.pas.content.initial import create_new_organisation
 from onegov.user import User
-from pytest import fixture
+from os import path
+from pytest_localserver.http import WSGIServer  # type: ignore[import-untyped]
 from sqlalchemy.orm.session import close_all_sessions
 from tests.shared import Client
 from tests.shared.utils import create_app
 from transaction import commit
+from yaml import dump
 
 
-@fixture(scope='function')
-def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.orm import SessionManager
+    from sqlalchemy.orm import Session
+    from tests.shared.browser import ExtendedBrowser
+
+
+@pytest.fixture(scope='function')
+def cfg_path(
+    postgres_dsn: str,
+    session_manager: SessionManager,
+    temporary_directory: str,
+    redis_url: str
+) -> str:
     cfg = {
         'applications': [
             {
@@ -51,9 +66,18 @@ def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
     return cfg_path
 
 
-def create_pas_app(request, enable_search=False):
+class TestPasApp(PasApp):
+    __test__ = False
+    maildir: str
+
+
+def create_pas_app(
+    request: pytest.FixtureRequest,
+    enable_search: bool = False
+) -> TestPasApp:
+
     app = create_app(
-        PasApp,
+        TestPasApp,
         request,
         use_maildir=True,
         enable_search=enable_search,
@@ -96,8 +120,8 @@ def create_pas_app(request, enable_search=False):
     return app
 
 
-@fixture
-def people_json():
+@pytest.fixture
+def people_json() -> dict[str, Any]:
     """Fixture providing sample people data as JSON string."""
     return {
         'count': 2,
@@ -156,8 +180,8 @@ def people_json():
     }
 
 
-@fixture
-def organization_json():
+@pytest.fixture
+def organization_json() -> dict[str, Any]:
     """Fixture providing sample organizations data as JSON string.
 
     """
@@ -196,8 +220,8 @@ def organization_json():
     }
 
 
-@fixture
-def organization_json_with_fraktion():
+@pytest.fixture
+def organization_json_with_fraktion() -> dict[str, Any]:
     return {
         'count': 2,
         'next': None,
@@ -235,8 +259,8 @@ def organization_json_with_fraktion():
 
 
 
-@fixture
-def memberships_json():
+@pytest.fixture
+def memberships_json() -> dict[str, Any]:
     """Fixture providing sample memberships data as JSON string."""
     return {
         'count': 2,
@@ -475,38 +499,38 @@ def memberships_json():
     }
 
 
-@fixture(scope='function')
-def pas_app(request):
+@pytest.fixture(scope='function')
+def pas_app(request: pytest.FixtureRequest) -> Iterator[TestPasApp]:
     app = create_pas_app(request, enable_search=False)
     yield app
     app.session_manager.dispose()
 
 
-@fixture(scope='function')
-def fts_pas_app(request):
+@pytest.fixture(scope='function')
+def fts_pas_app(request: pytest.FixtureRequest) -> Iterator[TestPasApp]:
     app = create_pas_app(request, enable_search=True)
     yield app
     app.session_manager.dispose()
 
 
-@fixture(scope='function')
-def client(pas_app):
+@pytest.fixture(scope='function')
+def client(pas_app: TestPasApp) -> Client[TestPasApp]:
     client = Client(pas_app)
     client.skip_n_forms = 1
     client.use_intercooler = True
     return client
 
 
-@fixture(scope='function')
-def client_with_fts(fts_pas_app):
+@pytest.fixture(scope='function')
+def client_with_fts(fts_pas_app: TestPasApp) -> Client[TestPasApp]:
     client = Client(fts_pas_app)
     client.skip_n_forms = 1
     client.use_intercooler = True
     return client
 
 
-@fixture(scope='function')
-def wsgi_server(request):
+@pytest.fixture(scope='function')
+def wsgi_server(request: pytest.FixtureRequest) -> Iterator[WSGIServer]:
     app = create_pas_app(request, enable_search=False)
     app.print_exceptions = True
     server = WSGIServer(application=app)
@@ -515,21 +539,25 @@ def wsgi_server(request):
     server.stop()
 
 
-@fixture(scope='function')
-def browser(request, browser, wsgi_server):
+@pytest.fixture(scope='function')
+def browser(
+    request: pytest.FixtureRequest,
+    browser: ExtendedBrowser,
+    wsgi_server: WSGIServer
+) -> ExtendedBrowser:
     browser.baseurl = wsgi_server.url
-    browser.wsgi_server = wsgi_server
-    yield browser
+    browser.wsgi_server = wsgi_server  # type: ignore[attr-defined]
+    return browser
 
 
-@fixture(scope='session', autouse=True)
-def enter_observer_scope():
+@pytest.fixture(scope='session', autouse=True)
+def enter_observer_scope() -> None:
     """Ensures app specific observers are active"""
     ScopedPropertyObserver.enter_class_scope(PasApp)
 
 
-@fixture
-def commission_test_files():
+@pytest.fixture
+def commission_test_files() -> dict[str, str]:
     csv = module_path('tests.onegov.pas', '/fixtures/commission_test.csv')
     xlsx = module_path('tests.onegov.pas', '/fixtures/commission_test.xlsx')
     return {'csv': csv, 'xlsx': xlsx}
@@ -537,13 +565,17 @@ def commission_test_files():
 
 class DummyApp:
 
-    def __init__(self, session, application_id='my-app'):
+    def __init__(
+        self,
+        session: Session,
+        application_id: str = 'my-app'
+    ) -> None:
         self._session = session
         self.application_id = application_id
-        self.org = Bunch(
+        self.org: Any = Bunch(
             geo_provider='none',
             open_files_target_blank=True
         )
 
-    def session(self):
+    def session(self) -> Session:
         return self._session

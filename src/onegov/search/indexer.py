@@ -3,13 +3,14 @@ from __future__ import annotations
 import re
 
 from itertools import groupby
-from queue import Empty, Queue, Full
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import index_log, log, Searchable, utils
+from onegov.search.datamanager import IndexerDataManager
 from onegov.search.search_index import SearchIndex
 from onegov.search.utils import language_from_locale, normalize_text
 from operator import itemgetter
-from sqlalchemy import and_, bindparam, func, String, Table, MetaData
+from sqlalchemy import and_, bindparam, func, text, String
+from sqlalchemy.orm import object_session
 from sqlalchemy.orm.exc import ObjectDeletedError
 from sqlalchemy.dialects.postgresql import insert, ARRAY
 from uuid import UUID
@@ -17,12 +18,10 @@ from uuid import UUID
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator, Sequence
+    from collections.abc import Iterable, Iterator, Sequence
     from datetime import datetime
-    from sqlalchemy.engine import Engine
     from sqlalchemy.orm import Session
     from sqlalchemy.sql import ColumnElement
-    from sqlalchemy.sql.expression import Executable
     from typing import TypeAlias
     from typing import TypedDict
 
@@ -59,24 +58,19 @@ if TYPE_CHECKING:
 
 
 class Indexer:
-    queue: Queue[Task]
 
     def __init__(
         self,
         mappings: TypeMappingRegistry,
-        queue: Queue[Task],
-        engine: Engine,
         languages: set[str] | None = None
     ) -> None:
         self.mappings = mappings
-        self.queue = queue
-        self.engine = engine
         self.languages = languages or {'simple'}
 
     def index(
         self,
         tasks: list[IndexTask] | IndexTask,
-        session: Session | None = None,
+        session: Session,
     ) -> bool:
         """ Update the 'search_index' table (full text search index) of
         the given object(s)/task(s).
@@ -275,8 +269,8 @@ class Indexer:
                 )
             )
             params = list(params_dict.values())
-
-            self.execute_statement(session, schema, stmt, params)
+            with session.begin_nested():
+                session.execute(stmt, params)
         except Exception:
             index_log.exception(
                 f'Error creating index schema {schema} of '
@@ -286,30 +280,10 @@ class Indexer:
 
         return True
 
-    def execute_statement(
-        self,
-        session: Session | None,
-        schema: str,
-        stmt: Executable,
-        params: list[dict[str, Any]] | None = None
-    ) -> None:
-
-        if session is None:
-            connection = self.engine.connect()
-            connection = connection.execution_options(
-                schema_translate_map={None: schema}
-            )
-            with connection.begin():
-                connection.execute(stmt, params or [{}])
-        else:
-            # use a savepoint instead
-            with session.begin_nested():
-                session.execute(stmt, params or [{}])
-
     def delete(
         self,
         tasks: list[IndexTask] | IndexTask,
-        session: Session | None = None
+        session: Session
     ) -> bool:
 
         if not isinstance(tasks, list):
@@ -372,7 +346,8 @@ class Indexer:
                     owner_id_column.in_(owner_ids)
                 ))
             )
-            self.execute_statement(session, schema, stmt)
+            with session.begin_nested():
+                session.execute(stmt)
         except Exception:
             index_log.exception(
                 f'Error deleting index schema {schema} tasks {tasks}:'
@@ -381,7 +356,11 @@ class Indexer:
 
         return True
 
-    def process(self, session: Session | None = None) -> int:
+    def process(
+        self,
+        tasks: Iterable[Task],
+        session: Session
+    ) -> int:
         """ Processes the queue in bulk.
 
         Gathers all tasks and groups them by action and owner type.
@@ -389,18 +368,8 @@ class Indexer:
         Returns the number of successfully processed batches.
         """
 
-        def task_generator() -> Iterator[Task]:
-            while True:
-                try:
-                    task = self.queue.get(block=False, timeout=None)
-                except Empty:
-                    break
-                else:
-                    self.queue.task_done()
-                    yield task
-
         grouped_tasks = groupby(
-            task_generator(),
+            tasks,
             # NOTE: We could group by tablename for delete actions
             #       which could yield slightly larger batches in
             #       some cases, but for indexing we currently
@@ -413,24 +382,26 @@ class Indexer:
             task_list = list(tasks)
 
             if action == 'index':
-                success += self.index(task_list, session)  # type: ignore[arg-type]
+                success += self.index(
+                    task_list,  # type: ignore[arg-type]
+                    session
+                )
             elif action == 'delete':
-                success += self.delete(task_list, session)  # type: ignore[arg-type]
+                success += self.delete(
+                    task_list,  # type: ignore[arg-type]
+                    session
+                )
             else:
                 raise NotImplementedError(
                     f"Action '{action}' not implemented for {self.__class__}")
         return success
 
-    def delete_search_index(self, schema: str) -> None:
-        """ Delete all records in search index table of the given `schema`. """
-
-        metadata = MetaData(schema=schema)
-        search_index_table = Table(SearchIndex.__tablename__, metadata)
-        stmt = search_index_table.delete()
-
-        connection = self.engine.connect()
-        with connection.begin():
-            connection.execute(stmt)
+    def delete_search_index(self, session: Session) -> None:
+        """ Immediately delete all records in search index table. """
+        session.execute(text("""
+            TRUNCATE search_index;
+            COMMIT;
+        """))
 
 
 class TypeMapping:
@@ -555,17 +526,16 @@ class ORMEventTranslator:
 
     """
 
-    queue: Queue[Task]
-
     def __init__(
         self,
-        mappings: TypeMappingRegistry,
+        indexer: Indexer,
         max_queue_size: int = 0,
         languages: Sequence[str] = ('de', 'fr', 'en')
     ) -> None:
-        self.mappings = mappings
-        self.queue = Queue(maxsize=max_queue_size)
+        self.indexer = indexer
+        self.mappings = indexer.mappings
         self.detector = ORMLanguageDetector(languages)
+        self.max_queue_size = max_queue_size
         self.stopped = False
 
     def on_insert(self, schema: str, obj: object) -> None:
@@ -583,29 +553,44 @@ class ORMEventTranslator:
                 else:
                     self.index(schema, obj)
 
-    def on_delete(self, schema: str, obj: object) -> None:
+    def on_delete(self, schema: str, session: Session, obj: object) -> None:
         if not self.stopped:
             if isinstance(obj, Searchable):
-                self.delete(schema, obj)
+                self.delete(schema, obj, session)
 
-    def put(self, translation: Task) -> None:
-        try:
-            self.queue.put_nowait(translation)
-        except Full:
-            log.error('The orm event translator queue is full!')
+    def on_transaction_join(self, schema: str, session: Session) -> None:
+        if not self.stopped:
+            # NOTE: This ensures IndexerDataManager gets created before
+            #       the transaction is in its `Comitting` state, where
+            #       it no longer can be joined.
+            IndexerDataManager.get_queue(
+                session,
+                self.indexer,
+                self.max_queue_size
+            )
 
-    def index(
+    def put(self, session: Session, translation: Task) -> None:
+        queue = IndexerDataManager.get_queue(
+            session,
+            self.indexer,
+            self.max_queue_size
+        )
+        if queue is None:
+            log.error(
+                'Tried to put events into the ORM translation queue '
+                'while the transaction was in an invalid state.'
+            )
+            return
+        queue.append(translation)
+
+    def index_task(
         self,
         schema: str,
         obj: Searchable,
-    ) -> None:
-        """
-        Creates or updates index for the given object
-
-        """
+    ) -> IndexTask | None:
         try:
             if obj.fts_skip:
-                return
+                return None
 
             if obj.fts_language == 'auto':
                 language = self.detector.detect_object_language(obj)
@@ -671,20 +656,17 @@ class ORMEventTranslator:
 
                 translation['suggestion'] = suggestion
 
-            self.put(translation)
+            return translation
         except ObjectDeletedError:
             obj_id = getattr(obj, 'id', obj)
             log.info(
                 f'Object {obj_id} was deleted before indexing:',
                 exc_info=True
             )
+            return None
 
-    def delete(self, schema: str, obj: Searchable) -> None:
-        """
-        Deletes index of the given object
-
-        """
-        translation: DeleteTask = {
+    def delete_task(self, schema: str, obj: Searchable) -> DeleteTask:
+        return {
             'action': 'delete',
             'schema': schema,
             'tablename': obj.__tablename__,
@@ -692,4 +674,32 @@ class ORMEventTranslator:
             'id': getattr(obj, obj.fts_id)
         }
 
-        self.put(translation)
+    def index(
+        self,
+        schema: str,
+        obj: Searchable,
+        session: Session | None = None,
+    ) -> None:
+        """
+        Creates or updates index for the given object
+
+        """
+        if session is None:
+            session = object_session(obj)
+        task = self.index_task(schema, obj)
+        if task is not None:
+            self.put(object_session(obj), task)
+
+    def delete(
+        self,
+        schema: str,
+        obj: Searchable,
+        session: Session | None = None,
+    ) -> None:
+        """
+        Deletes index of the given object
+
+        """
+        if session is None:
+            session = object_session(obj)
+        self.put(session, self.delete_task(schema, obj))

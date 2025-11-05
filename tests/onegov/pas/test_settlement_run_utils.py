@@ -1,6 +1,8 @@
-import transaction
-from datetime import date
+from __future__ import annotations
 
+import transaction
+
+from datetime import date
 from onegov.pas.collections.commission import PASCommissionCollection
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections.commission_membership import (
@@ -11,7 +13,12 @@ from onegov.pas.views.settlement_run import get_commission_closure_status
 from onegov.pas.models import Attendence
 
 
-def test_get_commission_closure_status(pas_app):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import TestPasApp
+
+
+def test_get_commission_closure_status(pas_app: TestPasApp) -> None:
     """Test the get_commission_closure_status function comprehensively."""
     session = pas_app.session()
 

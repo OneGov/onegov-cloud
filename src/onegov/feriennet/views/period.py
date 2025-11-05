@@ -131,26 +131,35 @@ def view_periods(
                         )
                     )
                 )
-
-        yield Link(
-            text=_('Delete'),
-            url=layout.csrf_protected_url(request.link(period)),
-            traits=(
-                Confirm(
-                    _(
-                        'Do you really want to delete "${title}"?',
-                        mapping={'title': period.title}
-                    ),
-                    _('This cannot be undone.'),
-                    _('Delete Period'),
-                    _('Cancel')
-                ),
-                Intercooler(
-                    request_method='DELETE',
-                    redirect_after=request.link(self)
-                ),
+        if len(period.bookings):
+            yield Link(
+                text=_('Delete'),
+                attrs={
+                    'title': _('The period can not be deleted as it is '
+                            'already in use'),
+                    'class': 'disabled' if len(period.bookings) else ''
+                },
             )
-        )
+        else:
+            yield Link(
+                text=_('Delete'),
+                url=layout.csrf_protected_url(request.link(period)),
+                traits=(
+                    Confirm(
+                        _(
+                            'Do you really want to delete "${title}"?',
+                            mapping={'title': period.title}
+                        ),
+                        _('This cannot be undone.'),
+                        _('Delete Period'),
+                        _('Cancel')
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=request.link(self)
+                    ),
+                )
+            )
 
     return {
         'layout': layout,

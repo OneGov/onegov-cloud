@@ -135,15 +135,35 @@ class PeriodForm(Form):
         validators=[InputRequired()]
     )
 
+    deadline = RadioField(
+        label=_('Stop accepting bookings'),
+        fieldset=_('Deadline'),
+        choices=[
+            ('fix', _('At the end of the booking phase')),
+            ('rel', _('X days before each occasion')),
+        ],
+        default='fix',
+    )
+
+    deadline_days = IntegerField(
+        label=_('X Days Before'),
+        fieldset=_('Deadline'),
+        validators=[
+            InputRequired(),
+            NumberRange(0, 360),
+        ],
+        depends_on=('deadline', 'rel')
+    )
+
     execution_start = DateField(
         label=_('Execution Start'),
-        fieldset=_('Dates'),
+        fieldset=_('Execution phase'),
         validators=[InputRequired()]
     )
 
     execution_end = DateField(
         label=_('Execution End'),
-        fieldset=_('Dates'),
+        fieldset=_('Execution phase'),
         validators=[InputRequired()]
     )
 
@@ -243,26 +263,6 @@ class PeriodForm(Form):
             ('no', _('No'))
         ],
         default='no'
-    )
-
-    deadline = RadioField(
-        label=_('Stop accepting bookings'),
-        fieldset=_('Deadline'),
-        choices=[
-            ('fix', _('At the end of the booking phase')),
-            ('rel', _('X days before each occasion')),
-        ],
-        default='fix',
-    )
-
-    deadline_days = IntegerField(
-        label=_('X Days Before'),
-        fieldset=_('Deadline'),
-        validators=[
-            InputRequired(),
-            NumberRange(0, 360),
-        ],
-        depends_on=('deadline', 'rel')
     )
 
     book_finalized = BooleanField(

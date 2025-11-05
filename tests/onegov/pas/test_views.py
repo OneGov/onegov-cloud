@@ -1,17 +1,26 @@
-import pytest
+from __future__ import annotations
+
 import json
 import transaction
-from webtest import Upload
 
-from typing import Any
 from onegov.pas.collections.commission import PASCommissionCollection
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections.commission_membership import (
     PASCommissionMembershipCollection
 )
+from webtest import Upload
 
 
-def add_rate_set(settings, delete) -> None:
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.client import Client, ExtendedResponse
+    from .conftest import TestPasApp
+
+
+def add_rate_set(
+    settings: ExtendedResponse,
+    delete: list[ExtendedResponse]
+) -> None:
     """Adds a rate set via the UI."""
     page = settings.click('Sätze')
     page = page.click(href='new')
@@ -47,13 +56,12 @@ def add_rate_set(settings, delete) -> None:
     delete.append(page)
 
 
-@pytest.mark.flaky(reruns=5, only_rerun=None)
-def test_views_manage(client_with_fts):
+def test_views_manage(client_with_fts: Client[TestPasApp]) -> None:
     client = client_with_fts
     client.login_admin()
 
     settings = client.get('/').follow().click('PAS Einstellungen')
-    delete = []
+    delete: list[ExtendedResponse] = []
 
     add_rate_set(settings, delete)
 
@@ -243,11 +251,11 @@ def test_views_manage(client_with_fts):
 
 
 def test_view_upload_json(
-    client,
-    people_json,
-    organization_json,
-    memberships_json
-):
+    client: Client[TestPasApp],
+    people_json: dict[str, Any],
+    organization_json: dict[str, Any],
+    memberships_json: dict[str, Any]
+) -> None:
     """ Test successful import of all data using fixtures.
 
     *1. Understanding the Data and Models**
@@ -342,10 +350,10 @@ def test_view_upload_json(
         )
 
     def do_upload_procedure(
-        org_data,
-        member_data,
-        ppl_data
-    ):
+        org_data: dict[str, Any],
+        member_data: dict[str, Any],
+        ppl_data: dict[str, Any]
+    ) -> ExtendedResponse:
         """Uploads data using Upload objects created from fixtures."""
         page = client.get('/pas-import')
 
@@ -405,12 +413,11 @@ def test_view_upload_json(
     ).text()
 
 
-def test_copy_rate_set(client):
+def test_copy_rate_set(client: Client[TestPasApp]) -> None:
     client.login_admin()
 
     settings = client.get('/').follow().click('PAS Einstellungen')
-    delete = []
-    add_rate_set(settings, delete)
+    add_rate_set(settings, [])
 
     page = client.get('/rate-sets')
     page = page.click('Inaktiv')
@@ -425,12 +432,11 @@ def test_copy_rate_set(client):
     assert '2025' in new_page
 
 
-def test_simple_attendence_add(client):
+def test_simple_attendence_add(client: Client[TestPasApp]) -> None:
     client.login_admin()
     settings = client.get('/').follow().click('PAS Einstellungen')
-    delete = []
 
-    add_rate_set(settings, delete)
+    add_rate_set(settings, [])
 
     # Settlement Runs
     page = settings.click('Abrechnungsläufe')
@@ -503,7 +509,6 @@ def test_simple_attendence_add(client):
     page.form['type'] = 'commission'
     page = page.form.submit().follow()
     assert 'Kommissionsitzung hinzugefügt' in page
-    return
 
     # ... attendence
     page = client.get('/').follow().click('Anwesenheiten').click(
@@ -512,12 +517,14 @@ def test_simple_attendence_add(client):
     page.form['date'] = '2024-02-03'
     page.form['duration'] = '2'
     page.form['type'] = 'study'
-    page.form['commission_id'].select(text='CC')
+    page.form['commission_id'].select(text='DD')
     page = page.form.submit().follow()
     assert 'Neue Anwesenheit hinzugefügt' in page
 
 
-def test_fetch_commissions_parliamentarians_json(client):
+def test_fetch_commissions_parliamentarians_json(
+    client: Client[TestPasApp]
+) -> None:
     """Test the commissions-parliamentarians-json endpoint that the JS
     dropdown uses."""
 
@@ -601,7 +608,10 @@ def test_fetch_commissions_parliamentarians_json(client):
     assert commission3_id not in data2
 
 
-def test_add_new_user_without_activation_email(client):
+def test_add_new_user_without_activation_email(
+    client: Client[TestPasApp]
+) -> None:
+
     client.login_admin()
 
     client.app.enable_yubikey = True

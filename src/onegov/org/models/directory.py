@@ -25,8 +25,9 @@ from onegov.org.observer import observes
 from onegov.org.utils import narrowest_access
 from onegov.pay import Price
 from onegov.ticket import Ticket
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import object_session
+from sqlalchemy.orm.attributes import set_committed_value
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -540,8 +541,11 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
             return
 
         if self.directory_id is not None and self.directory is None:
-            self.directory = session.query(  # type: ignore[unreachable]
-                ExtendedDirectory).get(self.directory_id)
+            set_committed_value(  # type: ignore[unreachable]
+                self,
+                'directory',
+                session.query(ExtendedDirectory).get(self.directory_id)
+            )
 
     @property
     def display_config(self) -> dict[str, Any]:
@@ -609,9 +613,14 @@ class ExtendedDirectoryEntryCollection(
         search_widget: ExtendedDirectorySearchWidget | None = None,
         published_only: bool = False,
         past_only: bool = False,
-        upcoming_only: bool = False
+        upcoming_only: bool = False,
+        # FIXME: Consider making this required, since it's more reliable
+        #        than filtering access after the fact, for now we'll only
+        #        use it in the API.
+        request: OrgRequest | None = None,
     ) -> None:
 
+        self.request = request
         super().__init__(directory, type, keywords, page, search_widget)
         self.published_only = published_only
         self.past_only = past_only
@@ -622,7 +631,26 @@ class ExtendedDirectoryEntryCollection(
 
     def query(self) -> Query[ExtendedDirectoryEntry]:
         query = super().query()
-        if self.published_only:
+        available_accesses: tuple[str, ...]
+        if self.request is None:
+            # assume highest access level or we filter later
+            available_accesses = ()
+        else:
+            role = getattr(self.request.identity, 'role', 'anonymous')
+            available_accesses = {
+                'admin': (),  # can see everything
+                'editor': (),  # can see everything
+                'member': ('member', 'mtan', 'public')
+            }.get(role, ('mtan', 'public'))
+        if available_accesses:
+            query = query.filter(or_(
+                *(
+                    self.model_class.meta['access'].astext == access
+                    for access in available_accesses
+                ),
+                self.model_class.meta['access'].is_(None)
+            ))
+        if self.published_only or available_accesses:
             query = query.filter(
                 self.model_class.publication_started == True,
                 self.model_class.publication_ended == False

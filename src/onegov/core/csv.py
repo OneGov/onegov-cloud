@@ -52,9 +52,9 @@ if TYPE_CHECKING:
 
     KeyFunc: TypeAlias = Callable[[_T], SupportsRichComparison]
     DefaultCSVFile: TypeAlias = 'CSVFile[DefaultRow]'
-
-
-_RowT = TypeVar('_RowT')
+    _RowT = TypeVar('_RowT', default=DefaultRow)
+else:
+    _RowT = TypeVar('_RowT')
 
 
 VALID_CSV_DELIMITERS = ',;\t'

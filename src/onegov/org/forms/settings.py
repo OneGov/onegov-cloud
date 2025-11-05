@@ -1009,6 +1009,14 @@ class OrgTicketSettingsForm(Form):
         fieldset=_('General')
     )
 
+    hide_submitter_email = BooleanField(
+        label=_('Hide submitter email address'),
+        description=_('Hide the email address of the ticket submitter '
+                      'in the ticket status page'),
+        fieldset=_('Data Protection'),
+        default=True
+    )
+
     ticket_auto_accept_style = RadioField(
         label=_('Accept request and close ticket automatically based on:'),
         choices=(

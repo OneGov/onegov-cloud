@@ -15,9 +15,9 @@ from onegov.org.constants import (
     INVOICE_GROUPS, PAYMENT_STATES, PAYMENT_SOURCES, TICKET_STATES)
 from onegov.org.layout import DefaultLayout, TicketLayout
 from onegov.org.models.ticket import ticket_submitter
+from onegov.org.pdf.core import OrgPdf
 from onegov.org.utils import group_invoice_items
 from onegov.org.views.message import view_messages_feed
-from onegov.pdf import Pdf, page_fn_header
 from onegov.qrcode import QrCode
 from html5lib.filters.whitespace import Filter as WhitespaceFilter
 from pdfdocument.document import MarkupParagraph
@@ -27,90 +27,30 @@ from reportlab.lib.utils import ImageReader
 from reportlab.platypus import PageBreak, Paragraph
 
 
-from typing import overload, Any, Literal, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Mapping, Sequence
+    from collections.abc import Callable, Mapping
     from collections.abc import Collection
     from bleach.callbacks import _HTMLAttrs
     from bleach.sanitizer import _Filter
-    from gettext import GNUTranslations
     from onegov.org.forms import TicketInvoiceSearchForm
     from onegov.org.request import OrgRequest
     from onegov.pdf.templates import Template
     from onegov.ticket import Ticket
-    from reportlab.lib.styles import PropertySet
     from reportlab.pdfgen.canvas import Canvas
-    from reportlab.platypus.tables import _TableCommand, TableStyle
+    from reportlab.platypus.tables import _TableCommand
 
 
 class TicketQrCode(QrCode):
     _border = 0
 
 
-class TicketPdf(Pdf):
+class TicketPdf(OrgPdf):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        locale = kwargs.pop('locale', None)
-        self.locale: str = locale or 'en'
-        translations = kwargs.pop('translations', None)
         qr_payload = kwargs.pop('qr_payload', None)
         super().__init__(*args, **kwargs)
-        self.translations: dict[str, GNUTranslations] = translations
-
-        # Modification for the footer left on all pages
-        self.doc.author = self.translate(_('Source')) + f': {self.doc.author}'
         self.doc.qr_payload = qr_payload  # type:ignore[attr-defined]
-
-    def translate(self, text: str) -> str:
-        """ Translates the given string. """
-
-        if not hasattr(text, 'interpolate'):
-            return text
-
-        translator = (
-            self.translations.get(self.locale)
-            if self.locale else None
-        )
-        translated = translator.gettext(text) if translator else text
-        return text.interpolate(translated)
-
-    def h1(self, title: str) -> None:  # type:ignore[override]
-        """ Translated H1. """
-
-        super().h1(self.translate(title))
-
-    def h2(self, title: str) -> None:  # type:ignore[override]
-        """ Translated H2. """
-
-        super().h2(self.translate(title))
-
-    def h3(self, title: str) -> None:  # type:ignore[override]
-        """ Translated H3. """
-
-        super().h3(self.translate(title))
-
-    @staticmethod
-    def page_fn_header_and_footer(
-        canvas: Canvas,
-        doc: Template
-    ) -> None:
-
-        page_fn_header(canvas, doc)
-
-        canvas.saveState()
-        canvas.setFont('Helvetica', 9)
-        if doc.author:
-            canvas.drawString(
-                doc.leftMargin,
-                doc.bottomMargin / 2,
-                f'{doc.author}'
-            )
-        canvas.drawRightString(
-            doc.pagesize[0] - doc.rightMargin,
-            doc.bottomMargin / 2,
-            f'{canvas.getPageNumber()}'
-        )
-        canvas.restoreState()
 
     @staticmethod
     def page_fn_header_and_footer_qr(
@@ -119,7 +59,7 @@ class TicketPdf(Pdf):
     ) -> None:
 
         assert hasattr(doc, 'qr_payload')
-        TicketPdf.page_fn_header_and_footer(canvas, doc)
+        OrgPdf.page_fn_header_and_footer(canvas, doc)
         height = 2 * cm
         width = height
         canvas.saveState()
@@ -138,78 +78,6 @@ class TicketPdf(Pdf):
     def page_fn(self) -> Callable[[Canvas, Template], None]:
         """ First page the same as later except Qr-Code. """
         return self.page_fn_header_and_footer_qr
-
-    @property
-    def page_fn_later(self) -> Callable[[Canvas, Template], None]:
-        return self.page_fn_header_and_footer
-
-    @overload  # type:ignore[override]
-    def table(
-        self,
-        data: Sequence[Sequence[str | Paragraph]],
-        columns: Literal['even'] | Sequence[float | None] | None,
-        style: TableStyle | Iterable[_TableCommand] | None = None,
-        ratios: Literal[False] = False,
-        border: bool = True,
-        first_bold: bool = True
-    ) -> None: ...
-
-    @overload
-    def table(
-        self,
-        data: Sequence[Sequence[str | Paragraph]],
-        columns: Literal['even'] | list[float] | None,
-        style: TableStyle | Iterable[_TableCommand] | None = None,
-        *,
-        ratios: Literal[True],
-        border: bool = True,
-        first_bold: bool = True
-    ) -> None: ...
-
-    @overload
-    def table(
-        self,
-        data: Sequence[Sequence[str | Paragraph]],
-        columns: Literal['even'] | list[float] | None,
-        style: TableStyle | Iterable[_TableCommand] | None,
-        ratios: Literal[True],
-        border: bool = True,
-        first_bold: bool = True
-    ) -> None: ...
-
-    @overload
-    def table(
-        self,
-        data: Sequence[Sequence[str | Paragraph]],
-        columns: Literal['even'] | Sequence[float | None] | None,
-        style: TableStyle | Iterable[_TableCommand] | None = None,
-        ratios: bool = False,
-        border: bool = True,
-        first_bold: bool = True
-    ) -> None: ...
-
-    def table(
-        self,
-        data: Sequence[Sequence[str | Paragraph]],
-        columns: Literal['even'] | Sequence[float | None] | None,
-        style: TableStyle | Iterable[_TableCommand] | None = None,
-        ratios: bool = False,
-        border: bool = True,
-        first_bold: bool = True
-    ) -> None:
-
-        if border:
-            # FIXME: What if we want to pass a style in?
-            style = list(self.style.table)
-            style.append(('LINEBELOW', (0, 0), (-1, -1), 0.25, colors.black))
-        if not first_bold:
-            return super().table(data, columns, style, ratios)
-        for row in data:
-            if isinstance(row[0], Paragraph):
-                continue
-            row[0] = MarkupParagraph(  # type:ignore[index]
-                self.translate(row[0]), style=deepcopy(self.style.bold))
-        return super().table(data, columns, style, ratios)
 
     def ticket_summary(self, html: str | None, linkify: bool = True) -> None:
         """A copy of the mini_html adapted for ticket summary.
@@ -504,14 +372,6 @@ class TicketPdf(Pdf):
             [_('Source'), self.translate(PAYMENT_SOURCES[price.source])],
             [_('Fee'), f'{layout.format_number(price.fee)}'],
         ], 'even')
-
-    def p_markup(
-        self,
-        text: str,
-        style: PropertySet | None = None
-    ) -> None:
-
-        super().p_markup(self.translate(text), style)
 
     def ticket_timeline(self, msg_feed: Mapping[str, Any] | None) -> None:
         """Will parse the timeline from view_messages_feed """

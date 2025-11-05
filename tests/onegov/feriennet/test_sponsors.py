@@ -211,7 +211,7 @@ def test_banner_in_mail(client):
             {
                 'name': 'CompanyOne',
                 'banners': {
-                    'src': {
+                    'narrow': {
                         'de': 'sponsors/CompanyOne-de.jpg',
                     }
                 },
@@ -222,7 +222,7 @@ def test_banner_in_mail(client):
             {
                 'name': 'CompanyTwo',
                 'banners': {
-                    'src': {
+                    'narrow': {
                         'de': 'sponsors/CompanyTwo-de.jpg',
                     }
                 },

@@ -1,11 +1,11 @@
+from __future__ import annotations
+
+import transaction
+
 from datetime import date
 from decimal import Decimal
-import transaction
 from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import AttendenceCollection
-from onegov.pas.views.settlement_run import _get_commission_settlement_data
-from onegov.town6.request import TownRequest
-from unittest.mock import Mock
 from onegov.pas.models import (
     Party,
     PASParliamentarian,
@@ -16,15 +16,23 @@ from onegov.pas.models import (
     Attendence,
     PASCommissionMembership,
 )
+from onegov.pas.views.settlement_run import _get_commission_settlement_data
+from onegov.town6.request import TownRequest
+from unittest.mock import Mock
 
 
-def test_parliamentarian_settlement_calculations(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_parliamentarian_settlement_calculations(session: Session) -> None:
     """Test the business logic for calculating parliamentarian settlements."""
 
     with transaction.manager:
         # Setup test data
         rate_set = RateSet(year=2024)
-        rate_set.cost_of_living_adjustment = Decimal('5.0')  # 5% adjustment
+        rate_set.cost_of_living_adjustment = 5.0  # 5% adjustment
 
         # Set rates
         rate_set.plenary_none_president_halfday = 1000
@@ -181,14 +189,14 @@ def test_parliamentarian_settlement_calculations(session):
     final_total = total_base + cola_amount
     assert final_total == Decimal('2415')
 
-def test_commission_export_one_member_one_president(session):
+def test_commission_export_one_member_one_president(session: Session) -> None:
     """Test commission export with one member and one president."""
 
 
     with transaction.manager:
         # Create rate set with actual current values
         rate_set = RateSet(year=2025)
-        rate_set.cost_of_living_adjustment = Decimal('21.935')
+        rate_set.cost_of_living_adjustment = 21.935
 
         rate_set.plenary_none_member_halfday = 184
         rate_set.shortest_all_member_halfhour = 26

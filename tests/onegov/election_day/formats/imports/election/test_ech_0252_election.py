@@ -1,23 +1,38 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.election_day.models import Election
+from onegov.election_day.models import ProporzElection
 
 
-def test_import_ech_election_gr(session, import_test_datasets):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from tests.onegov.election_day.conftest import ImportTestDatasets
+
+
+def test_import_ech_election_gr(
+    session: Session,
+    import_test_datasets: ImportTestDatasets
+) -> None:
     # The datasets contain an election information and an election result
     # delivery for the SRW and NRW 2023
 
     # initial import
-    errors, updated, deleted = import_test_datasets(
+    results = import_test_datasets(
         api_format='ech',
         principal='gr',
         dataset_name='elections-information'
     )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
     assert not errors
     assert len(updated) == 2
     assert not deleted
 
     # ... test majorz
-    election = next(u for u in updated if u.type == 'majorz')
+    election = next(u for u in updated if getattr(u, 'type', None) == 'majorz')
+    assert isinstance(election, Election)
     assert election.domain == 'canton'
     assert election.id == 'i75'
     assert election.external_id == 'I75'
@@ -37,7 +52,9 @@ def test_import_ech_election_gr(session, import_test_datasets):
     assert len(election.candidates) == 3
 
     # ... test proporz
-    election = next(u for u in updated if u.type == 'proporz')
+    election = next(u for u in updated
+        if getattr(u, 'type', None) == 'proporz')
+    assert isinstance(election, ProporzElection)
     assert election.domain == 'federation'
     assert election.id == 'i74'
     assert election.external_id == 'I74'
@@ -59,27 +76,32 @@ def test_import_ech_election_gr(session, import_test_datasets):
     assert len(election.list_connections) == 9
 
     # re-import
-    errors, updated, deleted = import_test_datasets(
+    results = import_test_datasets(
         api_format='ech',
         principal='gr',
         dataset_name='elections-information'
     )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
     assert not errors
     assert len(updated) == 2
     assert not deleted
 
     # import of results
-    errors, updated, deleted = import_test_datasets(
+    results = import_test_datasets(
         api_format='ech',
         principal='gr',
         dataset_name='elections-results'
     )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
     assert not errors
     assert len(updated) == 2
     assert not deleted
 
     # ... test majorz
-    election = next(u for u in updated if u.type == 'majorz')
+    election = next(u for u in updated if getattr(u, 'type', None) == 'majorz')
+    assert isinstance(election, Election)
     assert election.has_results is True
     assert election.counted is True
     assert election.absolute_majority == 22000
@@ -92,7 +114,9 @@ def test_import_ech_election_gr(session, import_test_datasets):
     assert candidate.votes == 38316
 
     # ... test proporz
-    election = next(u for u in updated if u.type == 'proporz')
+    election = next(u for u in updated
+        if getattr(u, 'type', None) == 'proporz')
+    assert isinstance(election, ProporzElection)
     assert election.has_results is True
     assert election.counted is True
     assert election.accounted_ballots == 59521
@@ -109,11 +133,13 @@ def test_import_ech_election_gr(session, import_test_datasets):
     assert result.votes == 7509
 
     # re-import of results
-    errors, updated, deleted = import_test_datasets(
+    results = import_test_datasets(
         api_format='ech',
         principal='gr',
         dataset_name='elections-results'
     )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
     assert not errors
     assert len(updated) == 2
     assert not deleted
@@ -138,11 +164,13 @@ def test_import_ech_election_gr(session, import_test_datasets):
     session.flush()
 
     # ... election on the same day marked for deletion
-    errors, updated, deleted = import_test_datasets(
+    results = import_test_datasets(
         api_format='ech',
         principal='gr',
         dataset_name='elections-information'
     )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
     assert not errors
     assert len(updated) == 2
     assert len(deleted) == 1
@@ -152,9 +180,11 @@ def test_import_ech_election_gr(session, import_test_datasets):
     for election in updated:
         election.clear_results(True)
 
-    errors, updated, deleted = import_test_datasets(
+    results = import_test_datasets(
         api_format='ech',
         principal='gr',
         dataset_name='elections-results'
     )
+    assert len(results) == 1
+    errors, updated, deleted = next(iter(results.values()))
     assert errors

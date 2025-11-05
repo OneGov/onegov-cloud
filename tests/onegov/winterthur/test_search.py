@@ -1,8 +1,16 @@
+from __future__ import annotations
+
 from webtest import Upload
 from tests.shared.utils import create_image
 
 
-def test_search_excluding_image(client_with_fts):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.client import Client
+    from .conftest import TestApp
+
+
+def test_search_excluding_image(client_with_fts: Client[TestApp]) -> None:
 
     client = client_with_fts
     client.login_admin()

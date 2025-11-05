@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import copy
 import re
 import docx
-from freezegun import freeze_time
 import transaction
-from io import BytesIO
 
+from freezegun import freeze_time
+from io import BytesIO
 from onegov.core.utils import module_path
 from onegov.translator_directory.models.ticket import AccreditationTicket
 from onegov.translator_directory.models.translator import Translator
@@ -18,7 +20,7 @@ from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
 from onegov.user import UserCollection
 from openpyxl import load_workbook
-from pdftotext import PDF
+from pdftotext import PDF  # type: ignore[import-not-found]
 from tests.onegov.translator_directory.shared import (
     translator_data, create_languages, create_certificates)
 from tests.shared.utils import decode_map_value, encode_map_value
@@ -26,16 +28,27 @@ from unittest.mock import patch
 from webtest import Upload
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.client import ExtendedResponse
+    from unittest.mock import MagicMock
+    from .conftest import Client
+
+
 class FakeResponse:
-    def __init__(self, json_data=None, status_code=200):
+    def __init__(
+        self,
+        json_data: Any | None = None,
+        status_code: int = 200
+    ) -> None:
         self.status_code = status_code
         self.json_data = json_data or {}
 
-    def json(self):
+    def json(self) -> Any:
         return self.json_data
 
 
-def upload_pdf(filename):
+def upload_pdf(filename: str) -> Upload:
     file = BytesIO()
     pdf = Pdf(file)
     pdf.init_report()
@@ -46,7 +59,7 @@ def upload_pdf(filename):
     return Upload(filename, file.read(), 'application/pdf')
 
 
-def check_pdf(page, filename, link):
+def check_pdf(page: ExtendedResponse, filename: str, link: str) -> None:
     response = page.click(link, index=0)
     headers = dict(response.headers)
     assert filename in headers['Content-Disposition']
@@ -54,7 +67,11 @@ def check_pdf(page, filename, link):
     assert filename in ''.join(PDF(BytesIO(response.body)))
 
 
-def upload_file(filename, client, content_type=None):
+def upload_file(
+    filename: str,
+    client: Client,
+    content_type: str | None = None
+) -> None:
     with open(filename, 'rb') as f:
         page = client.get('/files')
         page.form['file'] = [
@@ -63,7 +80,7 @@ def upload_file(filename, client, content_type=None):
         page.form.submit()
 
 
-def test_view_translator(client):
+def test_view_translator(client: Client) -> None:
     session = client.app.session()
     languages = create_languages(session)
     certs = create_certificates(session)
@@ -161,8 +178,8 @@ def test_view_translator(client):
         assert values['IBAN'] == 'DE07 1234 1234 1234 1234 12'
         assert values['E-Mail'] == 'test@test.com'
         assert values['Telefon Mobile'] == '079 700 80 97'
-        assert values['Fachkenntnisse nach Dolmetscherart'] == \
-            'Simultandolmetschen'
+        assert values['Fachkenntnisse nach Dolmetscherart'] == (
+            'Simultandolmetschen')
         assert 'Ernährung' in values['Fachkenntnisse nach Berufssparte']
         assert 'Psychologie' in values['Fachkenntnisse nach Berufssparte']
         assert values['Muttersprachen'] == language_names[3]
@@ -178,7 +195,8 @@ def test_view_translator(client):
 
         # test user account created and activation mail sent
         user = UserCollection(session).by_username('test@test.com')
-        assert user.translator.title == 'BOB, Uncle'
+        assert user is not None
+        assert user.translator.title == 'BOB, Uncle'  # type: ignore[attr-defined]
         assert user.active is True
         assert user.role == 'translator'
 
@@ -188,23 +206,23 @@ def test_view_translator(client):
 
         # test translator can login and view his own data
         client.logout()
-        reset_password_url = re.search(
+        reset_password_url = re.search(  # type: ignore[union-attr]
             r'(http://localhost/auth/reset-password[^)]+)',
             mail['TextBody']
         ).group()
         page = client.get(reset_password_url)
         page.form['email'] = 'test@test.com'
-        page.form['password'] = 'p@ssw0rd'
+        page.form['password'] = 'p@ssw0rd12'
         page.form.submit()
 
     with freeze_time('2021-12-31'):
-        page = client.login('test@test.com', 'p@ssw0rd', None).maybe_follow()
+        page = client.login('test@test.com', 'p@ssw0rd12', None).maybe_follow()
         assert 'Sind ihre Daten noch aktuell? Bitte überprüfen Sie' not in page
         assert '978654' in page
         assert 'Uncle' in page
         assert 'BOB' in page
 
-    page = client.login('test@test.com', 'p@ssw0rd', None).maybe_follow()
+    page = client.login('test@test.com', 'p@ssw0rd12', None).maybe_follow()
     assert 'Sind ihre Daten noch aktuell? Bitte überprüfen Sie' in page
     assert '978654' in page
     assert 'Uncle' in page
@@ -331,8 +349,8 @@ def test_view_translator(client):
     assert values['Erreich- und Verfügbarkeit'] == 'always 24h'
     assert 'Wirtschaft' in values['Fachkenntnisse nach Berufssparte']
     assert 'Religion' in values['Fachkenntnisse nach Berufssparte']
-    assert values['Fachkenntnisse nach Dolmetscherart'] == \
-        'Konsektutivdolmetschen'
+    assert values['Fachkenntnisse nach Dolmetscherart'] == (
+        'Konsektutivdolmetschen')
     assert values['Geburtsdatum'] == '01.01.2019'
     assert values['Geschlecht'] == 'Weiblich'
     assert values['IBAN'] == 'CH5604835012345678009'
@@ -361,7 +379,8 @@ def test_view_translator(client):
     users = UserCollection(session)
     assert not users.by_username('test@test.com')
     user = users.by_username('aunt.maggie@translators.com')
-    assert user.translator.title == 'MAGGIE, Aunt'
+    assert user is not None
+    assert user.translator.title == 'MAGGIE, Aunt'  # type: ignore[attr-defined]
     assert user.active is True
     assert user.role == 'translator'
 
@@ -382,7 +401,7 @@ def test_view_translator(client):
     client.logout()
 
 
-def test_view_languages(client):
+def test_view_languages(client: Client) -> None:
     create_languages(client.app.session())
     transaction.commit()
 
@@ -398,7 +417,7 @@ def test_view_languages(client):
     assert 'Arabic' in page
 
 
-def test_manage_language(client):
+def test_manage_language(client: Client) -> None:
     client.login_editor()
     client.get('/languages/new', status=403)
     client.login_admin()
@@ -429,7 +448,7 @@ def test_manage_language(client):
     assert 'English (British)' not in page
 
 
-def test_view_search_translator(client):
+def test_view_search_translator(client: Client) -> None:
     """
     - test excluding hidden ones for non-admins
     """
@@ -492,7 +511,7 @@ def test_view_search_translator(client):
     assert 'Hugentobler'.upper() not in page
 
 
-def test_view_export_translators(client):
+def test_view_export_translators(client: Client) -> None:
     session = client.app.session()
     languages = create_languages(session)
     translators = TranslatorCollection(client.app)
@@ -556,7 +575,7 @@ def test_view_export_translators(client):
     assert sheet.cell(2, 41).value is None
 
 
-def test_view_export_translators_with_filters(client):
+def test_view_export_translators_with_filters(client: Client) -> None:
     session = client.app.session()
     languages = create_languages(session)
     lang_ids = [str(lang.id) for lang in languages]
@@ -612,7 +631,7 @@ def test_view_export_translators_with_filters(client):
     response = page.click('Export')
     sheet = load_workbook(BytesIO(response.body)).worksheets[0]
     assert sheet.max_row == 2
-    header = {cell.value: cell.column for cell in sheet[1]}
+    header: dict[str, int] = {cell.value: cell.column for cell in sheet[1]}  # type: ignore[misc]
     # Check data of the exported translator (should be translator 1) using
     # column names from the header
     data_row = 2
@@ -630,7 +649,9 @@ def test_view_export_translators_with_filters(client):
     ).value == 'Italian'
 
 
-def test_view_export_translators_with_filters_two_langs(client):
+def test_view_export_translators_with_filters_two_langs(
+    client: Client
+) -> None:
     session = client.app.session()
     languages = create_languages(session)
     lang_ids = [str(lang.id) for lang in languages]
@@ -669,7 +690,7 @@ def test_view_export_translators_with_filters_two_langs(client):
     response = page.click('Export')
     sheet = load_workbook(BytesIO(response.body)).worksheets[0]
     assert sheet.max_row == 3
-    header = {cell.value: cell.column for cell in sheet[1]}
+    header: dict[str, int] = {cell.value: cell.column for cell in sheet[1]}  # type: ignore[misc]
 
     data_row = 2
     # first one will be the 5555  (ordered by lastname
@@ -712,7 +733,7 @@ def test_view_export_translators_with_filters_two_langs(client):
     response = page.click('Export')
     sheet = load_workbook(BytesIO(response.body)).worksheets[0]
     assert sheet.max_row == 3
-    header = {cell.value: cell.column for cell in sheet[1]}
+    header = {cell.value: cell.column for cell in sheet[1]}  # type: ignore[misc]
 
     # Check order is reversed in export (4444 first, then 5555)
     data_row = 2
@@ -729,12 +750,12 @@ def test_view_export_translators_with_filters_two_langs(client):
 
 
 
-def test_file_security(client):
+def test_file_security(client: Client) -> None:
     translators = TranslatorCollection(client.app)
     trs_id = translators.add(**translator_data).id
     transaction.commit()
 
-    def content_disposition(file, filename):
+    def content_disposition(file: str, filename: str) -> bool:
         return filename in client.get(file).headers['Content-Disposition']
 
     # Add a published general, an unpublished general and a translator file
@@ -809,7 +830,7 @@ def test_file_security(client):
     client.get(translator_file, status=403)
 
 
-def test_translator_file_access_forbidden(client):
+def test_translator_file_access_forbidden(client: Client) -> None:
     client.login_admin()
     page = client.get('/files')
     page.form['file'] = [upload_pdf('test.pdf')]
@@ -833,11 +854,11 @@ def test_translator_file_access_forbidden(client):
     client.logout()
 
 
-def test_translator_directory_settings(client):
+def test_translator_directory_settings(client: Client) -> None:
     client.login_admin()
     settings = client.get('/').follow().click('Verzeichniseinstellungen')
 
-    def map_value(page):
+    def map_value(page: ExtendedResponse) -> Any:
         return decode_map_value(page.form['coordinates'].value)
 
     assert not map_value(settings)
@@ -860,7 +881,7 @@ def test_translator_directory_settings(client):
     assert 'https://t.ch/file.pdf' in client.get('/request-accreditation')
 
 
-def test_view_redirects(client):
+def test_view_redirects(client: Client) -> None:
     # Create a translator
     languages = create_languages(client.app.session())
     language_id = str(languages[0].id)
@@ -883,12 +904,12 @@ def test_view_redirects(client):
     client.logout()
 
     mail = client.get_email(0, flush_queue=True)['TextBody']
-    reset_password_url = re.search(
+    reset_password_url = re.search(  # type: ignore[union-attr]
         r'(http://localhost/auth/reset-password[^)]+)', mail
     ).group()
     page = client.get(reset_password_url)
     page.form['email'] = 'translator@example.org'
-    page.form['password'] = 'p@ssword'
+    page.form['password'] = 'p@ssword12'
     page.form.submit()
 
     # Test redirects
@@ -897,7 +918,7 @@ def test_view_redirects(client):
             'homepage': translator_url,
             'login': translator_url,
             'logout': 'http://localhost/auth/login',
-            'password': 'p@ssword',
+            'password': 'p@ssword12',
             'to': 'http://localhost/topics/informationen'
         },
         'member@example.org': {
@@ -928,7 +949,13 @@ def test_view_redirects(client):
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
-def test_view_translator_mutation(broadcast, authenticate, connect, client):
+def test_view_translator_mutation(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
+
     session = client.app.session()
     languages = create_languages(session)
     certs = create_certificates(session)
@@ -1000,13 +1027,13 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
         assert 'hinzugefügt' in page.form.submit().follow()
 
     client.logout()
-    reset_password_url = re.search(
+    reset_password_url = re.search(  # type: ignore[union-attr]
         r'(http://localhost/auth/reset-password[^)]+)',
         client.get_email(0, flush_queue=True)['TextBody']
     ).group()
     page = client.get(reset_password_url)
     page.form['email'] = 'test@test.com'
-    page.form['password'] = 'p@ssw0rd'
+    page.form['password'] = 'p@ssw0rd12'
     page.form.submit()
 
     # Report change as editor
@@ -1123,7 +1150,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
 
     # Report change as translator
     client.logout()
-    client.login('test@test.com', 'p@ssw0rd', None)
+    client.login('test@test.com', 'p@ssw0rd12', None)
     page = client.get('/').maybe_follow()
     page = page.click('Mutation melden')
     page.form['submitter_message'] = 'Hallo!'
@@ -1336,8 +1363,12 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
 def test_translator_mutation_with_document_upload(
-    broadcast, authenticate, connect, client
-):
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
+
     session = client.app.session()
     languages = create_languages(session)
     certs = create_certificates(session)
@@ -1412,9 +1443,7 @@ def test_translator_mutation_with_document_upload(
     page = page.click('Mutation melden')
     page.form['submitter_message'] = 'Uploading new certificate!'
 
-    assert 'uploaded_certificates' in page.form.fields, \
-        f"Field not in form. Available: {list(page.form.fields.keys())}"
-
+    assert 'uploaded_certificates' in page.form.fields
     page.form['uploaded_certificates'] = upload_pdf('certificate.pdf')
     page = page.form.submit().follow()
     assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
@@ -1430,8 +1459,7 @@ def test_translator_mutation_with_document_upload(
     from onegov.ticket import TicketCollection
 
     new_file_count = session.query(File).count()
-    assert new_file_count > initial_file_count, \
-        f"File count should increase: {initial_file_count} -> {new_file_count}"
+    assert new_file_count > initial_file_count
 
     tickets = TicketCollection(session).by_handler_code('TRN')
     ticket = tickets[-1] if tickets else None
@@ -1449,7 +1477,13 @@ def test_translator_mutation_with_document_upload(
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
-def test_view_accreditation(broadcast, authenticate, connect, client):
+def test_view_accreditation(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
+
     session = client.app.session()
     language_ids = [str(lang.id) for lang in create_languages(session)]
     transaction.commit()
@@ -1464,7 +1498,7 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
 
     websocket_messages = 0
 
-    def request_accreditation():
+    def request_accreditation() -> ExtendedResponse:
         client.logout()
 
         page = client.get('/request-accreditation')
@@ -1641,7 +1675,7 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
     assert mail['To'] == 'hugo.benito@translators.com'
     assert mail['Subject'] == 'Ein Konto wurde für Sie erstellt'
 
-    reset_password_url = re.search(
+    reset_password_url = re.search(  # type: ignore[union-attr]
         r'(http://localhost/auth/reset-password[^)]+)',
         mail['TextBody']
     ).group()
@@ -1664,10 +1698,10 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
     # Login as translator
     page = client.get(reset_password_url)
     page.form['email'] = 'hugo.benito@translators.com'
-    page.form['password'] = 'p@ssw0rd'
+    page.form['password'] = 'p@ssw0rd12'
     page.form.submit()
 
-    page = client.login('hugo.benito@translators.com', 'p@ssw0rd', None)
+    page = client.login('hugo.benito@translators.com', 'p@ssw0rd12', None)
     page = page.maybe_follow()
     assert 'BENITO, Hugo' in page
     assert '756.1234.4568.94' in page
@@ -1677,7 +1711,11 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
     'onegov.gis.utils.MapboxRequests.directions',
     return_value=FakeResponse({'code': 'Ok', 'routes': [{'distance': 2000}]})
 )
-def test_view_accreditation_errors(directions, client):
+def test_view_accreditation_errors(
+    directions: MagicMock,
+    client: Client
+) -> None:
+
     session = client.app.session()
     language_ids = [str(lang.id) for lang in create_languages(session)]
     transaction.commit()
@@ -1839,7 +1877,7 @@ def test_view_accreditation_errors(directions, client):
     check_pdf(page, 'A.pdf', 'Handlungsfähigkeitszeugnis.pdf')
 
 
-def test_view_mail_template(client):
+def test_view_mail_template(client: Client) -> None:
     session = client.app.session()
     translator = Translator(**translator_data)
     translators = TranslatorCollection(client.app)
@@ -1864,6 +1902,8 @@ def test_view_mail_template(client):
 
     # User.realname has to exist since this is required for signature
     user = UserCollection(session).by_username('admin@example.org')
+    assert user is not None
+    assert user.realname is not None
     first_name, last_name = user.realname.split(" ")
     assert first_name == 'John'
     assert last_name == 'Doe'
@@ -1890,14 +1930,14 @@ def test_view_mail_template(client):
         for block in iter_block_items(doc):
             line = block.text
             # make sure all variables have been rendered
-            assert '{{' not in line and '}}' not in line, line
-            if target in line:
+            assert '{{' not in line and '}}' not in line
+            if target and target in line:
                 found_variables_in_docx.add(target)
 
     assert expected_variables_in_docx == found_variables_in_docx
 
 
-def test_mail_templates_with_hometown_and_ticket_nr(client):
+def test_mail_templates_with_hometown_and_ticket_nr(client: Client) -> None:
     session = client.app.session()
     translator_data_copy = copy.deepcopy(translator_data)
     translator_data_copy['city'] = 'SomeOtherTown'
@@ -1934,6 +1974,8 @@ def test_mail_templates_with_hometown_and_ticket_nr(client):
     upload_file(docx_path, client, content_type='application/vnd.ms-office')
     upload_file(signature_path, client)
     user = UserCollection(session).by_username('admin@example.org')
+    assert user is not None
+    assert user.realname is not None
     first_name, last_name = user.realname.split(" ")
 
     # Now we have everything set up, go to the mail templates and generate one
@@ -1962,7 +2004,7 @@ def test_mail_templates_with_hometown_and_ticket_nr(client):
     assert expected_variables_in_docx == found_variables_in_docx
 
 
-def test_basic_search(client_with_fts):
+def test_basic_search(client_with_fts: Client) -> None:
     client = client_with_fts
     client.login_admin()
     anom = client.spawn()
@@ -1977,8 +2019,12 @@ def test_basic_search(client_with_fts):
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
 def test_member_cannot_submit_mutation(
-    broadcast, authenticate, connect, client
-):
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
+
     session = client.app.session()
     languages = create_languages(session)
     certs = create_certificates(session)
@@ -2045,13 +2091,13 @@ def test_member_cannot_submit_mutation(
         assert 'hinzugefügt' in page.form.submit().follow()
 
     client.logout()
-    reset_password_url = re.search(
+    reset_password_url = re.search(  # type: ignore[union-attr]
         r'(http://localhost/auth/reset-password[^)]+)',
         client.get_email(0, flush_queue=True)['TextBody'],
     ).group()
     page = client.get(reset_password_url)
     page.form['email'] = 'member@test.com'
-    page.form['password'] = 'p@ssw0rd'
+    page.form['password'] = 'p@ssw0rd12'
     page.form.submit()
 
     client.login_member()

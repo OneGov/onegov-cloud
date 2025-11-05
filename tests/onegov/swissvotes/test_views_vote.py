@@ -1,9 +1,11 @@
+from __future__ import annotations
+
+import pytest
+
 from datetime import date
 from decimal import Decimal
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.views.vote import view_vote_percentages
-from pytest import mark
-from pytest import raises
 from re import findall
 from tests.shared.utils import use_locale
 from transaction import commit
@@ -12,7 +14,14 @@ from webtest import TestApp as Client
 from webtest.forms import Upload
 
 
-def test_view_vote(swissvotes_app, sample_vote):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.swissvotes.models import SwissVoteFile
+    from sqlalchemy.orm import Session
+    from .conftest import TestApp
+
+
+def test_view_vote(swissvotes_app: TestApp, sample_vote: SwissVote) -> None:
     swissvotes_app.session().add(sample_vote)
     commit()
 
@@ -202,7 +211,11 @@ def test_view_vote(swissvotes_app, sample_vote):
     assert swissvotes_app.session().query(SwissVote).count() == 0
 
 
-def test_view_vote_tie_breaker(swissvotes_app, sample_vote):
+def test_view_vote_tie_breaker(
+    swissvotes_app: TestApp,
+    sample_vote: SwissVote
+) -> None:
+
     sample_vote._legal_form = 5
 
     swissvotes_app.session().add(sample_vote)
@@ -223,7 +236,11 @@ def test_view_vote_tie_breaker(swissvotes_app, sample_vote):
     assert "(30 für die Volksinitiative, 40 für den Gegenentwurf)" in page
 
 
-def test_vote_upload(swissvotes_app, attachments):
+def test_vote_upload(
+    swissvotes_app: TestApp,
+    attachments: dict[str, SwissVoteFile]
+) -> None:
+
     names = attachments.keys()
 
     swissvotes_app.session().add(
@@ -275,6 +292,7 @@ def test_vote_upload(swissvotes_app, attachments):
         )
         assert page.content_length
         assert page.body
+        assert page.content_disposition
         assert page.content_disposition.startswith('inline; filename=100.1')
 
     # Fallback
@@ -296,12 +314,13 @@ def test_vote_upload(swissvotes_app, attachments):
         )
         assert page.content_length
         assert page.body
+        assert page.content_disposition
         assert page.content_disposition.startswith('inline; filename=100.1')
 
 
-def test_view_vote_chart(session):
+def test_view_vote_chart(session: Session) -> None:
     class Request:
-        def translate(self, text):
+        def translate(self, text: str) -> str:
             if isinstance(text, TranslationString):
                 return text.interpolate()
             return text
@@ -314,7 +333,7 @@ def test_view_vote_chart(session):
     }
 
     model = SwissVote()
-    request = Request()
+    request: Any = Request()
     assert view_vote_percentages(model, request) == {
         'results': [empty],
         'title': None
@@ -330,6 +349,7 @@ def test_view_vote_chart(session):
     model._position_national_council = 1
     model._position_council_of_states = 2
     data = view_vote_percentages(model, request)
+    assert isinstance(data, dict)
     results = data['results']
     assert results[0] == {
         'empty': False,
@@ -366,14 +386,15 @@ def test_view_vote_chart(session):
     model.result_people_yeas_p = Decimal('10.2')
     model.result_cantons_yeas = Decimal('23.5')
     model.result_cantons_nays = Decimal('2.5')
-    model.position_national_council_yeas = Decimal('149')
-    model.position_national_council_nays = Decimal('51')
-    model.position_council_of_states_yeas = Decimal('43')
-    model.position_council_of_states_nays = Decimal('3')
+    model.position_national_council_yeas = 149
+    model.position_national_council_nays = 51
+    model.position_council_of_states_yeas = 43
+    model.position_council_of_states_nays = 3
     model.national_council_share_yeas = Decimal('1.0')
     model.national_council_share_nays = Decimal('3.4')
 
     data = view_vote_percentages(model, request)
+    assert isinstance(data, dict)
     results = data['results']
     assert results[0] == {
         'empty': False,
@@ -425,7 +446,9 @@ def test_view_vote_chart(session):
 
     # Test tie-breaker
     model._legal_form = 5
-    results = view_vote_percentages(model, request)['results']
+    data = view_vote_percentages(model, request)
+    assert isinstance(data, dict)
+    results = data['results']
 
     assert results[0] == {
         'empty': False,
@@ -479,10 +502,14 @@ def test_view_vote_chart(session):
     }
 
 
-@mark.parametrize('locale', ('de_CH', 'fr_CH'))
-def test_view_vote_static_attachment_links(swissvotes_app, sample_vote,
-                                           attachments, attachment_urls,
-                                           locale):
+@pytest.mark.parametrize('locale', ('de_CH', 'fr_CH'))
+def test_view_vote_static_attachment_links(
+    swissvotes_app: TestApp,
+    sample_vote: SwissVote,
+    attachments: dict[str, SwissVoteFile],
+    attachment_urls: dict[str, dict[str, str]],
+    locale: str
+) -> None:
 
     session = swissvotes_app.session()
     session.add(sample_vote)
@@ -500,6 +527,7 @@ def test_view_vote_static_attachment_links(swissvotes_app, sample_vote,
         assert view.status_code == 404
 
     vote = session.query(SwissVote).first()
+    assert vote is not None
     with use_locale(vote, locale):
         for name, attachment in attachments.items():
             setattr(vote, name, attachment)
@@ -510,9 +538,11 @@ def test_view_vote_static_attachment_links(swissvotes_app, sample_vote,
         assert view.status_code in (200, 301, 302)
 
 
-@mark.skip("Flaky when uploading the pdf. Why did this pass before?")
-def test_view_vote_campaign_material(swissvotes_app, sample_vote,
-                                     campaign_material):
+def test_view_vote_campaign_material(
+    swissvotes_app: TestApp,
+    sample_vote: SwissVote,
+    campaign_material: dict[str, SwissVoteFile]
+) -> None:
 
     session = swissvotes_app.session()
     session.add(sample_vote)
@@ -535,11 +565,11 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote,
 
     # ... upload
     file = campaign_material['campaign_material_other-article.pdf']
-    manage.form['file'] = Upload(
+    manage.form['file'] = [Upload(
         'article.pdf',
         file.reference.file.read(),
         'application/pdf'
-    )
+    )]
     manage = manage.form.submit().maybe_follow()
     assert manage.status_code == 200
 
@@ -557,8 +587,8 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote,
     details = details.click('Abstimmungen').click('Details')
     details = details.click('Liste der Dokumente anzeigen')
     assert 'Urheberrechtsschutz' in details
-    with raises(Exception): # noqa
-        assert details.click('Article').content_type == 'application/pdf'
+    with pytest.raises(IndexError):
+        details.click('Article')
 
     # ... delete
     manage = manage.click('Löschen').form.submit().maybe_follow()
@@ -569,11 +599,11 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote,
     assert 'Keine Anhänge.' in manage
 
     # ... upload
-    manage.form['file'] = Upload(
+    manage.form['file'] = [Upload(
         '1.png',
         campaign_material['campaign_material_yea-1.png'].reference.file.read(),
         'image/png'
-    )
+    )]
     manage = manage.form.submit().maybe_follow()
     assert manage.status_code == 200
 
@@ -590,11 +620,11 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote,
     assert 'Keine Anhänge.' in manage
 
     # ... upload
-    manage.form['file'] = Upload(
+    manage.form['file'] = [Upload(
         '1.png',
         campaign_material['campaign_material_nay-1.png'].reference.file.read(),
         'image/png'
-    )
+    )]
     manage = manage.form.submit().maybe_follow()
     assert manage.status_code == 200
 
@@ -607,7 +637,12 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote,
     assert 'Keine Anhänge.' in manage
 
 
-def test_view_vote_search(swissvotes_app, sample_vote, campaign_material):
+def test_view_vote_search(
+    swissvotes_app: TestApp,
+    sample_vote: SwissVote,
+    campaign_material: dict[str, SwissVoteFile]
+) -> None:
+
     session = swissvotes_app.session()
     session.add(sample_vote)
     commit()

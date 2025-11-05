@@ -11,6 +11,7 @@ import warnings
 
 from datetime import datetime, date, timedelta
 from freezegun import freeze_time
+from io import BytesIO
 from libres.db.models import Reservation
 from libres.modules.errors import AffectedReservationError
 from onegov.core.utils import module_path, normalize_for_url
@@ -18,6 +19,7 @@ from onegov.file import FileCollection
 from onegov.form import FormSubmission
 from onegov.org.models import ResourceRecipientCollection
 from onegov.pay import Payment
+from onegov.pdf.utils import extract_pdf_info
 from onegov.reservation import Resource, ResourceCollection
 from onegov.ticket import TicketCollection
 from openpyxl import load_workbook
@@ -2525,6 +2527,14 @@ def test_reserve_session_separation(client: Client) -> None:
     assert 'meeting-room' in tickets
     assert 'gym' in tickets
 
+    # the two tickets should be linked
+    client.login_admin()
+    open_tickets = client.get('/tickets/ALL/open')
+    ticket = open_tickets.click('Annehmen', index=0).follow()
+    assert 'Verknüpfte Tickets' in ticket
+    # we can create a multi-ticket pdf
+    pdf = ticket.click('Mit verknüpften Tickets')
+
 
 def test_reserve_reservation_prediction(client: Client) -> None:
     client.login_admin()
@@ -3921,6 +3931,7 @@ def test_my_reservations_view(client: Client) -> None:
     # by default this view is disabled
     client.get('/resources/my-reservations', status=404)
     client.get('/resources/my-reservations-json', status=404)
+    client.get('/resources/my-reservations-pdf', status=404)
     client.get('/resources/my-reservations-subscribe', status=404)
     client.get('/resources/my-reservations-ical', status=403)
 
@@ -3933,6 +3944,7 @@ def test_my_reservations_view(client: Client) -> None:
 
     # now we don't have access yet
     client.get('/resources/my-reservations-json', status=403)
+    client.get('/resources/my-reservations-pdf', status=403)
     login = client.get('/resources/my-reservations?date=20150828').follow()
     login.form['email'] = 'info@example.org'
     confirm = login.form.submit().follow()
@@ -3948,6 +3960,32 @@ def test_my_reservations_view(client: Client) -> None:
         '/resources/my-reservations-json?start=2015-08-28&end=2015-08-29'
     )
     assert reservations.status_code == 200
+
+    # accessing the PDF without a date filter is not allowed
+    client.get('/resources/my-reservations-pdf', status=400)
+    pdf = client.get(
+        '/resources/my-reservations-pdf?start=2015-08-28&end=2015-08-29'
+    )
+    _, pdf_content = extract_pdf_info(BytesIO(pdf.body))
+    assert '28. August 2015 - 29. August 2015' in pdf_content
+    assert 'Ganztägig' in pdf_content
+    assert 'Noch nicht akzeptiert' in pdf_content
+
+    # if we only include accepted reservations the PDF is empty
+    pdf = client.get(
+        '/resources/my-reservations-pdf'
+        '?start=2015-08-28&end=2015-08-29&accepted=1'
+    )
+    _, pdf_content = extract_pdf_info(BytesIO(pdf.body))
+    assert '28. August 2015 - 29. August 2015' in pdf_content
+    assert 'Keine Daten verfügbar' in pdf_content
+
+    # let's also check out the ticket specific pdf
+    tickets = client.get('/tickets/ALL/all/my-tickets')
+    pdf = tickets.click(href='reservations-pdf')
+    _, pdf_content = extract_pdf_info(BytesIO(pdf.body))
+    assert 'Ganztägig' in pdf_content
+
     subscribe = client.get('/resources/my-reservations-subscribe')
     assert 'webcal://' in subscribe
     ical_url = re.search(  # type: ignore[union-attr]
@@ -3962,3 +4000,6 @@ def test_my_reservations_view(client: Client) -> None:
 
     # someone else can open the same ical link without authentication
     assert client2.get(ical_url).status_code == 200
+    # but not the other views
+    client2.get('/resources/my-reservations-json', status=403)
+    client2.get('/resources/my-reservations-pdf', status=403)

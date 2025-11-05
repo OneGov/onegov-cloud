@@ -350,8 +350,20 @@ input.has-field-help {
     }
 }
 
-.button.datetimepicker {
+.many-plus-minus {
+    align-items: center;
+    display:flex;
+}
+
+.many-fields a.button.datetimepicker {
     @include input-button;
+    padding: 0 !important;
+    margin: 0 .5rem !important;
+
+    &:hover {
+        padding: 0 !important;
+        margin: 0 .5rem !important;
+    }
 }
 
 .fieldset-display {
@@ -496,11 +508,11 @@ dl.field-display > dt {
 }
 
 .many-fields a.button {
-    margin: 0 .5rem !important;
+    margin: 1rem .2rem !important;
     padding: .5rem !important;
 
     &:hover {
-        margin: 0 .5rem !important;
+        margin: 1rem .2rem !important;
         padding: .5rem !important;
     }
 }

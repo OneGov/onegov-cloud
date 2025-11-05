@@ -329,6 +329,9 @@ def render_time_range(start: datetime | time, end: datetime | time) -> str:
 
 
 def complete_url(url: str | None) -> str | None:
+    # fixes erroneous data retrospectively
+    if url == 'https://' or url == 'https://keine':
+        return None
     if url is None or url.startswith(('http://', 'https://', '/')):
         return url
     return f'https://{url}'
@@ -903,6 +906,7 @@ class MyReservationEventInfo:
         'timezone',
         'accepted',
         'resource',
+        'resource_id',
         'ticket_id',
         'handler_code',
         'ticket_number',
@@ -914,12 +918,13 @@ class MyReservationEventInfo:
     def __init__(
         self,
         id: int,
-        token: str,
+        token: UUID,
         start: datetime,
         end: datetime,
         accepted: bool,
         timezone: str,
         resource: str,
+        resource_id: UUID,
         ticket_id: UUID,
         handler_code: str,
         ticket_number: str,
@@ -937,6 +942,7 @@ class MyReservationEventInfo:
         self.timezone = timezone
         self.accepted = accepted
         self.resource = resource
+        self.resource_id = resource_id
         self.ticket_id = ticket_id
         self.handler_code = handler_code
         self.key_code = key_code

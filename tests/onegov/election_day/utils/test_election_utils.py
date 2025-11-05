@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from decimal import Decimal
 from onegov.election_day.utils.common import LastUpdatedOrderedDict
@@ -14,8 +16,18 @@ from onegov.election_day.utils.parties import get_party_results_deltas
 from onegov.election_day.utils.parties import get_party_results_seat_allocation
 
 
-def test_election_utils_majorz(import_test_datasets, session):
-    election, errors = import_test_datasets(
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from ..conftest import ImportTestDatasets
+
+
+def test_election_utils_majorz(
+    import_test_datasets: ImportTestDatasets,
+    session: Session
+) -> None:
+
+    results = import_test_datasets(
         'internal',
         'election',
         'zg',
@@ -26,9 +38,11 @@ def test_election_utils_majorz(import_test_datasets, session):
         dataset_name='staenderatswahl-2015-parties',
         has_expats=False
     )
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
 
-    election.absolute_majoriy = 18191
+    election.absolute_majority = 18191
     election.majority_type = 'absolute'
     election.colors = {
         'ALG': '#a74c97',
@@ -39,7 +53,7 @@ def test_election_utils_majorz(import_test_datasets, session):
     }
 
     # get_candidates_results
-    assert tuple(get_candidates_results(election, session)) == (
+    assert tuple(get_candidates_results(election, session)) == (  # type: ignore[comparison-overlap]
         (24132, 'Hegglin', 'Peter', True, 'CVP', Decimal('62.3'), None, None),
         (23620, 'Eder', 'Joachim', True, 'FDP', Decimal('61.0'), None, None),
         (10997, 'Brandenberg', 'Manuel', False, 'SVP', Decimal('28.4'), None,
@@ -51,7 +65,7 @@ def test_election_utils_majorz(import_test_datasets, session):
     )
 
     entities = ['Baar', 'Cham']
-    assert tuple(
+    assert tuple(  # type: ignore[comparison-overlap]
         get_candidates_results(election, session, entities=entities)
     ) == (
         (2905 + 4207, 'Hegglin', 'Peter', True, 'CVP', Decimal('60.2'),
@@ -120,13 +134,13 @@ def test_election_utils_majorz(import_test_datasets, session):
             'title': 'majorz_internal_staenderatswahl-2015-parties',
             'results': expected,
         }
-    for lists in ([], None):
+    for lists in ([], None):  # type: ignore[var-annotated]
         assert get_candidates_data(election, lists=lists) == {
             'majority': 18191,
             'title': 'majorz_internal_staenderatswahl-2015-parties',
             'results': expected,
         }
-    for entities in ([], None):
+    for entities in ([], None):  # type: ignore[assignment]
         assert get_candidates_data(election, entities=entities) == {
             'majority': 18191,
             'title': 'majorz_internal_staenderatswahl-2015-parties',
@@ -215,9 +229,8 @@ def test_election_utils_majorz(import_test_datasets, session):
     }
 
     # get_candidates_results_by_entity
-    candidates, entities = get_candidates_results_by_entity(election)
-    candidates = [candidate[1:] for candidate in candidates]
-    assert candidates == [
+    candidates, candidate_entities = get_candidates_results_by_entity(election)
+    assert [candidate[1:] for candidate in candidates] == [
         ('Brandenberg', 'Manuel', 10997),
         ('Eder', 'Joachim', 23620),
         ('Gysel', 'Barbara', 6612),
@@ -225,7 +238,7 @@ def test_election_utils_majorz(import_test_datasets, session):
         ('Lustenberger', 'Andreas', 5691),
         ('Thöni', 'Stefan', 1709)
     ]
-    assert entities == [
+    assert candidate_entities == [
         ('Baar', [
             ('Baar', 'Brandenberg', 'Manuel', 2100),
             ('Baar', 'Eder', 'Joachim', 4237),
@@ -316,11 +329,10 @@ def test_election_utils_majorz(import_test_datasets, session):
         ])
     ]
 
-    candidates, entities = get_candidates_results_by_entity(
+    candidates, candidate_entities = get_candidates_results_by_entity(
         election, sort_by_votes=True
     )
-    candidates = [candidate[1:] for candidate in candidates]
-    assert candidates == [
+    assert [candidate[1:] for candidate in candidates] == [
         ('Hegglin', 'Peter', 24132),
         ('Eder', 'Joachim', 23620),
         ('Brandenberg', 'Manuel', 10997),
@@ -328,7 +340,7 @@ def test_election_utils_majorz(import_test_datasets, session):
         ('Lustenberger', 'Andreas', 5691),
         ('Thöni', 'Stefan', 1709)
     ]
-    assert entities[0][1] == [
+    assert candidate_entities[0][1] == [
         ('Baar', 'Hegglin', 'Peter', 4207),
         ('Baar', 'Eder', 'Joachim', 4237),
         ('Baar', 'Brandenberg', 'Manuel', 2100),
@@ -338,8 +350,12 @@ def test_election_utils_majorz(import_test_datasets, session):
     ]
 
 
-def test_election_utils_proporz(import_test_datasets, session):
-    election, errors = import_test_datasets(
+def test_election_utils_proporz(
+    import_test_datasets: ImportTestDatasets,
+    session: Session
+) -> None:
+
+    results = import_test_datasets(
         'internal',
         'election',
         'zg',
@@ -350,6 +366,8 @@ def test_election_utils_proporz(import_test_datasets, session):
         dataset_name='nationalratswahlen-2015',
         has_expats=False
     )
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
 
     election.colors = {
@@ -452,13 +470,13 @@ def test_election_utils_proporz(import_test_datasets, session):
             'title': 'proporz_internal_nationalratswahlen-2015',
             'results': expected,
         }
-    for lists in ([], None):
+    for lists in ([], None):  # type: ignore[var-annotated]
         assert get_candidates_data(election, lists=lists) == {
             'majority': 0,
             'title': 'proporz_internal_nationalratswahlen-2015',
             'results': expected,
         }
-    for entities in ([], None):
+    for entities in ([], None):  # type: ignore[var-annotated]
         assert get_candidates_data(election, entities=entities) == {
             'majority': 0,
             'title': 'proporz_internal_nationalratswahlen-2015',
@@ -482,7 +500,7 @@ def test_election_utils_proporz(import_test_datasets, session):
         'title': 'proporz_internal_nationalratswahlen-2015',
         'results': list(reversed(expected[1:])),
     }
-    assert len(get_candidates_data(election, elected=False)['results']) == 50
+    assert len(get_candidates_data(election, elected=False)['results']) == 50  # type: ignore[arg-type]
     assert get_candidates_data(election, limit=1,
                                lists=['FDP Ost', 'CVP', 'GLP']) == {
         'majority': 0,
@@ -560,7 +578,7 @@ def test_election_utils_proporz(import_test_datasets, session):
     }
 
     # get_list_results
-    expected = (
+    expected_list: tuple[tuple[int, str, int], ...] = (
         (30532, 'SVP', 1),
         (24335, 'CVP', 1),
         (16285, 'FDP Ost', 1),
@@ -579,24 +597,25 @@ def test_election_utils_proporz(import_test_datasets, session):
         (575, 'SVP Int.', 0),
         (347, 'SP Migrant.', 0)
     )
-    assert tuple(get_list_results(election)) == expected
+    assert tuple(get_list_results(election)) == expected_list
 
     # ... invalid filters
     for limit in (0, None, -3):
-        assert tuple(get_list_results(election, limit=limit)) == expected
-    for names in ([], None):
-        assert tuple(get_list_results(election, names=names)) == expected
+        assert tuple(get_list_results(election, limit=limit)) == expected_list
+    for names in ([], None):  # type: ignore[var-annotated]
+        assert tuple(get_list_results(election, names=names)) == expected_list
     for entities in ([], None):
-        assert tuple(get_list_results(election, entities=entities)) == expected
+        assert tuple(
+            get_list_results(election, entities=entities)) == expected_list
 
     # ... valid filters
-    assert tuple(get_list_results(election, limit=3)) == expected[:3]
+    assert tuple(get_list_results(election, limit=3)) == expected_list[:3]
     names = ['SP Juso', 'SP Alle', 'SP Männer', 'SP Frauen']
     assert tuple(get_list_results(election, names=names)) == tuple(
-        (e for e in expected if e[1] in names)
+        (e for e in expected_list if e[1] in names)
     )
     assert tuple(get_list_results(election, limit=2, names=names)) == tuple(
-        (e for e in expected if e[1] in names)
+        (e for e in expected_list if e[1] in names)
     )[:2]
     entities = ['Baar', 'Zug']
     assert tuple(
@@ -760,18 +779,18 @@ def test_election_utils_proporz(import_test_datasets, session):
     assert get_lists_data(election, names=names) == {
         'majority': None,
         'title': 'proporz_internal_nationalratswahlen-2015',
-        'results': [e for e in expected if e['text'] in names],
+        'results': [e for e in expected if e['text'] in names],  # type: ignore[index]
     }
     assert get_lists_data(election, limit=2, names=names) == {
         'majority': None,
         'title': 'proporz_internal_nationalratswahlen-2015',
-        'results': [e for e in expected if e['text'] in names][:2],
+        'results': [e for e in expected if e['text'] in names][:2],  # type: ignore[index]
     }
     names = ['SP Juso', 'SP Frauen', 'SP Männer']
     assert get_lists_data(election, names=names, sort_by_names=True) == {
         'majority': None,
         'title': 'proporz_internal_nationalratswahlen-2015',
-        'results': list(reversed([e for e in expected if e['text'] in names])),
+        'results': list(reversed([e for e in expected if e['text'] in names])),  # type: ignore[index]
     }
     entities = ['Baar', 'Zug']
     assert get_lists_data(
@@ -798,8 +817,12 @@ def test_election_utils_proporz(import_test_datasets, session):
     }
 
 
-def test_election_utils_parties(import_test_datasets, session):
-    election, errors = import_test_datasets(
+def test_election_utils_parties(
+    import_test_datasets: ImportTestDatasets,
+    session: Session
+) -> None:
+
+    results = import_test_datasets(
         'internal',
         'election',
         'zg',
@@ -810,17 +833,20 @@ def test_election_utils_parties(import_test_datasets, session):
         dataset_name='nationalratswahlen-2015',
         has_expats=False
     )
+    assert len(results) == 1
+    election, errors = next(iter(results.values()))
     assert not errors
-    errors = import_test_datasets(
+    results_ = import_test_datasets(
         'internal',
         'parties',
         'zg',
         'canton',
-        'proporz',
         election=election,
         dataset_name='nationalratswahlen-2015-parteien',
     )
-    assert not errors
+    assert len(results_) == 1
+    errors_ = next(iter(results_.values()))
+    assert not errors_
 
     years, parties = get_party_results(election)
     assert years == ['2011', '2015']
@@ -923,9 +949,9 @@ def test_election_utils_parties(import_test_datasets, session):
         }
     }
 
-    deltas, results = get_party_results_deltas(election, years, parties)
+    deltas, party_results = get_party_results_deltas(election, years, parties)
     assert deltas
-    assert results == {
+    assert party_results == {
         '2011': [
             ['AL', 0, 17972, '15.4%', ''],
             ['CVP', 1, 28413, '24.3%', ''],
@@ -1150,8 +1176,14 @@ def test_election_utils_parties(import_test_datasets, session):
     data = get_parties_panachage_data(election)
     assert data['title'] == 'proporz_internal_nationalratswahlen-2015'
 
-    def assert_link(active, color, source, target, value):
-        assert {
+    def assert_link(
+        active: bool,
+        color: str | None,
+        source: int,
+        target: int,
+        value: int
+    ) -> None:
+        assert {  # type: ignore[operator]
             'active': active, 'color': color,
             'source': source, 'target': target, 'value': value
         } in data['links']
@@ -1193,8 +1225,13 @@ def test_election_utils_parties(import_test_datasets, session):
     assert_link(False, '#db3c27', 5, 13, 54)
     assert_link(False, None, 0, 13, 75)
 
-    def assert_node(active, color, id_, name):
-        assert {
+    def assert_node(
+        active: bool,
+        color: str | None,
+        id_: int,
+        name: str
+    ) -> None:
+        assert {  # type: ignore[operator]
             'active': active, 'color': color, 'id': id_, 'name': name
         } in data['nodes']
 
@@ -1216,7 +1253,7 @@ def test_election_utils_parties(import_test_datasets, session):
     # incomplete data (only check for exceptions)
     party_result = next((
         r for r in election.party_results if r.year == 2011 and r.name == 'AL'
-    ), None)
+    ))
     party_result.party_id = 'AL11'
     party_result.party_id = '6'
     election.party_results = [
@@ -1235,8 +1272,12 @@ def test_election_utils_parties(import_test_datasets, session):
     get_party_results_data(election, False)
 
 
-def test_get_connection_results_internal(import_test_datasets, session):
-    election, errors = import_test_datasets(
+def test_get_connection_results_internal(
+    import_test_datasets: ImportTestDatasets,
+    session: Session
+) -> None:
+
+    import_results = import_test_datasets(
         'internal',
         'election',
         'gr',
@@ -1247,10 +1288,13 @@ def test_get_connection_results_internal(import_test_datasets, session):
         dataset_name='nationalratswahlen-2019-final',
         app_session=session
     )
+    assert len(import_results) == 1
+    election, errors = next(iter(import_results.values()))
     assert not errors
     # These results have been verified by T. Hardegger
     results = get_connection_results_api(election, session)
 
+    assert isinstance(results, dict)
     assert results['1']['total_votes'] == 23141
     assert results['1']['subconns']['1'] == LastUpdatedOrderedDict({
         'total_votes': 7520,
@@ -1290,8 +1334,12 @@ def test_get_connection_results_internal(import_test_datasets, session):
     })
 
 
-def test_get_connection_results_subconn_ids(import_test_datasets, session):
-    election, errors = import_test_datasets(
+def test_get_connection_results_subconn_ids(
+    import_test_datasets: ImportTestDatasets,
+    session: Session
+) -> None:
+
+    import_results = import_test_datasets(
         'internal',
         'election',
         'sg',
@@ -1302,12 +1350,15 @@ def test_get_connection_results_subconn_ids(import_test_datasets, session):
         dataset_name='test_nonunique_subconn_ids',
         app_session=session
     )
+    assert len(import_results) == 1
+    election, errors = next(iter(import_results.values()))
     assert not errors
     results = get_connection_results_api(election, session)
+    assert isinstance(results, dict)
     assert results['1']['total_votes'] == 3
     assert results['2']['total_votes'] == 2
     assert results['1']['subconns']['1']['total_votes'] == 2
     assert results['2']['subconns']['1']['total_votes'] == 2
 
 
-# todo: test on incompleted election
+# TODO: test on uncompleted election

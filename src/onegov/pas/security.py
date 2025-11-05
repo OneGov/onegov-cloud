@@ -50,7 +50,7 @@ def has_permission_logged_in(
     app: PasApp,
     identity: Identity,
     model: Any,
-    permission: Intent
+    permission: type[Intent]
 ) -> bool:
     return permission in getattr(app.settings.roles, identity.role)
 
@@ -60,7 +60,7 @@ def restrict_attendence_collection_access(
     app: PasApp,
     identity: Identity,
     model: AttendenceCollection,
-    permission: Intent
+    permission: type[Intent]
 ) -> bool:
     if identity.role in ('parliamentarian', 'commission_president'):
         # Allow Private permission for attendance collection access
@@ -75,7 +75,7 @@ def restrict_attendence_access(
     app: PasApp,
     identity: Identity,
     model: Attendence,
-    permission: Intent
+    permission: type[Intent]
 ) -> bool:
     # Check basic role permissions first
     if identity.role not in ('parliamentarian', 'commission_president'):
@@ -146,7 +146,7 @@ def restrict_parliamentarian_access(
     app: PasApp,
     identity: Identity,
     model: PASParliamentarian,
-    permission: Intent
+    permission: type[Intent]
 ) -> bool:
     # Check basic role permissions first
     if identity.role not in ('parliamentarian', 'commission_president'):
@@ -200,7 +200,7 @@ def restrict_organisation_access(
     app: PasApp,
     identity: Identity,
     model: Organisation,
-    permission: Intent
+    permission: type[Intent]
 ) -> bool:
     # Allow parliamentarians to access pas-settings via Organisation model
     return permission in getattr(app.settings.roles, identity.role)
@@ -211,7 +211,7 @@ def restrict_files_collection_access(
     app: PasApp,
     identity: Identity,
     model: GeneralFileCollection,
-    permission: Intent
+    permission: type[Intent]
 ) -> bool:
     """ Grant parliamentarians and commission presidents access to files """
     # Special case: auto-grant Private access to these roles
@@ -227,7 +227,7 @@ def has_private_access_to_commission(
     app: PasApp,
     identity: Identity,
     model: Commission,
-    permission: Intent
+    permission: type[Intent]
 ) -> bool:
     """
     -Looks up the User from database by username

@@ -15,10 +15,10 @@
                         <table class="facts">
                             <tr tal:repeat="fact boardlet.facts" class="${fact.css_class} small ${'none' if not (fact.number or fact.icon) else ''}">
                                 <td tal:condition="fact.icon" class="fact-icon">
-                                    <i class="${fact.icon}"></i>
+                                    <span><i class="${fact.icon}"></i></span>
                                 </td>
                                 <td tal:condition="fact.number is not None" class="fact-number">
-                                    ${layout.format_number(fact.number) or '-'}
+                                    <span>${layout.format_number(fact.number) or '-'}</span>
                                 </td>
                                 <td tal:condition="not:(fact.number is not None or fact.icon)" class="fact-number">
                                     -

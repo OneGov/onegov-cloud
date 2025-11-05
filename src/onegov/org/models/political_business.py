@@ -129,6 +129,8 @@ class PoliticalBusiness(
 
     @property
     def fts_suggestion(self) -> list[str]:
+        if self.number is None:
+            return [self.title]
         return [
             f'{self.title} {self.number}',
             f'{self.number} {self.title}'

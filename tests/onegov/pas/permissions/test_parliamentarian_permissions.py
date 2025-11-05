@@ -1,22 +1,30 @@
+from __future__ import annotations
+
+import pytest
+import transaction
+
+from datetime import date
+from morepath import Identity
+from onegov.core.security import Private
 from onegov.pas.collections import (
     AttendenceCollection,
-    PASCommissionCollection
+    PASCommissionCollection,
+    PASParliamentarianCollection
 )
-
-from onegov.core.security import Private
-from onegov.pas.security import has_private_access_to_commission
-from morepath import Identity
 from onegov.pas.models import PASCommission
 from onegov.pas.models import PASCommissionMembership
-from onegov.pas.collections import PASParliamentarianCollection
+from onegov.pas.security import has_private_access_to_commission
 from onegov.user import UserCollection
-import transaction
-from datetime import date
-import pytest
 
 
-def test_view_dashboard_as_parliamentarian(client):
-    '''Parliamentarians should be able to access the dashboard'''
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.client import Client
+    from ..conftest import TestPasApp
+
+
+def test_view_dashboard_as_parliamentarian(client: Client[TestPasApp]) -> None:
+    """Parliamentarians should be able to access the dashboard"""
     session = client.app.session()
 
     # Create commission for testing commission shortcuts
@@ -43,6 +51,7 @@ def test_view_dashboard_as_parliamentarian(client):
     # Set correct password and role for the created user
     users = UserCollection(session)
     user = users.by_username('pia.parliamentarian@example.org')
+    assert user is not None
     user.password = 'test'
     user.role = 'parliamentarian'
 
@@ -56,8 +65,10 @@ def test_view_dashboard_as_parliamentarian(client):
     assert page.status_code == 200
 
 
-def test_view_dashboard_as_commission_president(client):
-    '''Commission presidents should be able to access the dashboard'''
+def test_view_dashboard_as_commission_president(
+    client: Client[TestPasApp]
+) -> None:
+    """Commission presidents should be able to access the dashboard"""
     session = client.app.session()
 
     # Create commission
@@ -83,6 +94,7 @@ def test_view_dashboard_as_commission_president(client):
     # Update user role to commission_president
     users = UserCollection(session)
     user = users.by_username('peter.president@example.org')
+    assert user is not None
     user.role = 'commission_president'
     user.password = 'test'
 
@@ -96,9 +108,12 @@ def test_view_dashboard_as_commission_president(client):
     page = client.get('/pas-settings')
     assert page.status_code == 200
 
-def test_view_attendence_as_parliamentarian(client):
-    '''Parliamentarians should be able to view individual attendences and
-    create new ones'''
+
+def test_view_attendence_as_parliamentarian(
+    client: Client[TestPasApp]
+) -> None:
+    """Parliamentarians should be able to view individual attendences and
+    create new ones"""
     session = client.app.session()
 
     # Create parliamentarian
@@ -111,6 +126,7 @@ def test_view_attendence_as_parliamentarian(client):
     # Set correct password for the created user
     users = UserCollection(session)
     user = users.by_username('bob.viewer@example.org')
+    assert user is not None
     user.password = 'test'
 
     # Create attendence
@@ -155,7 +171,9 @@ def test_view_attendence_as_parliamentarian(client):
     assert page.status_code == 200
 
 
-def test_parliamentarian_cannot_edit_others_attendence(client):
+def test_parliamentarian_cannot_edit_others_attendence(
+    client: Client[TestPasApp]
+) -> None:
     """Parliamentarians should not be able to change parliamentarian_id
     when editing their own attendance"""
     session = client.app.session()
@@ -172,6 +190,7 @@ def test_parliamentarian_cannot_edit_others_attendence(client):
 
     users = UserCollection(session)
     alice_user = users.by_username('alice.one@example.org')
+    assert alice_user is not None
     alice_user.password = 'test'
     alice_user.role = 'parliamentarian'
 
@@ -203,8 +222,10 @@ def test_parliamentarian_cannot_edit_others_attendence(client):
     assert 'Sie können nur Ihre eigene Anwesenheit bearbeiten' in page
 
 
-def test_commission_president_has_private_access_to_commission(client):
-    '''Commission presidents should have private access to their commissions'''
+def test_commission_president_has_private_access_to_commission(
+    client: Client[TestPasApp]
+) -> None:
+    """Commission presidents should have private access to their commissions"""
     session = client.app.session()
 
     # Create commission
@@ -230,6 +251,7 @@ def test_commission_president_has_private_access_to_commission(client):
     # Update user role to commission_president
     users = UserCollection(session)
     user = users.by_username('emma.president@example.org')
+    assert user is not None
     user.role = 'commission_president'
     user.password = 'test'
 
@@ -246,11 +268,10 @@ def test_commission_president_has_private_access_to_commission(client):
     assert page.status_code == 200
 
 
-def test_commission_president_private_access_permission_rule(client):
-    '''Test the has_private_access_to_commission permission rule directly'''
-    from onegov.core.security import Private
-    from onegov.pas.security import has_private_access_to_commission
-    from morepath import Identity
+def test_commission_president_private_access_permission_rule(
+    client: Client[TestPasApp]
+) -> None:
+    """Test the has_private_access_to_commission permission rule directly"""
 
     session = client.app.session()
 
@@ -277,17 +298,24 @@ def test_commission_president_private_access_permission_rule(client):
     # Update user role to commission_president
     users = UserCollection(session)
     user = users.by_username('frank.president@example.org')
+    assert user is not None
     user.role = 'commission_president'
 
     transaction.commit()
 
     # Test permission rule with president identity
-    identity = Identity(userid='frank.president@example.org',
-                       role='commission_president')
+    identity = Identity(
+        uid='foo',
+        userid='frank.president@example.org',
+        role='commission_president',
+        application_id=client.app.application_id,
+        groupids=frozenset()
+    )
 
     # Re-fetch commission from session to avoid detached instance issues
     fresh_commission = session.query(PASCommission).filter_by(
         name='Finance Commission').first()
+    assert fresh_commission is not None
 
     # Should have private access to their commission
     assert has_private_access_to_commission(
@@ -295,13 +323,11 @@ def test_commission_president_private_access_permission_rule(client):
     ) is True
 
 
-def test_parliamentarian_no_private_access_to_commission(client):
-    '''Regular parliamentarians should not have private access to
-    commissions'''
-    from onegov.core.security import Private
-    from onegov.pas.security import has_private_access_to_commission
-    from morepath import Identity
-
+def test_parliamentarian_no_private_access_to_commission(
+    client: Client[TestPasApp]
+) -> None:
+    """Regular parliamentarians should not have private access to
+    commissions"""
     session = client.app.session()
 
     # Create commission
@@ -327,14 +353,18 @@ def test_parliamentarian_no_private_access_to_commission(client):
     # Update user role to parliamentarian
     users = UserCollection(session)
     user = users.by_username('mary.member@example.org')
+    assert user is not None
     user.role = 'parliamentarian'
 
     transaction.commit()
 
     # Test permission rule with parliamentarian identity
     identity = Identity(
+        uid='foo',
         userid='mary.member@example.org',
-        role='parliamentarian'
+        groupids=frozenset(),
+        role='parliamentarian',
+        application_id=client.app.application_id
     )
 
     # Should not have private access to commission
@@ -343,13 +373,11 @@ def test_parliamentarian_no_private_access_to_commission(client):
     ) is False
 
 
-def test_commission_president_no_access_to_different_commission(client):
-    '''Commission presidents should not have private access to other
-    commissions'''
-    from onegov.core.security import Private
-    from onegov.pas.security import has_private_access_to_commission
-    from morepath import Identity
-
+def test_commission_president_no_access_to_different_commission(
+    client: Client[TestPasApp]
+) -> None:
+    """Commission presidents should not have private access to other
+    commissions"""
     session = client.app.session()
 
     # Create two commissions
@@ -376,19 +404,27 @@ def test_commission_president_no_access_to_different_commission(client):
     # Update user role to commission_president
     users = UserCollection(session)
     user = users.by_username('george.president@example.org')
+    assert user is not None
     user.role = 'commission_president'
 
     transaction.commit()
 
     # Test permission rule with president identity
-    identity = Identity(userid='george.president@example.org',
-                       role='commission_president')
+    identity = Identity(
+        uid='foo',
+        userid='george.president@example.org',
+        groupids=frozenset(),
+        role='commission_president',
+        application_id=client.app.application_id
+    )
 
     # Re-fetch commissions from session to avoid detached instance issues
     fresh_finance = session.query(PASCommission).filter_by(
         name='Finance Commission').first()
+    assert fresh_finance is not None
     fresh_education = session.query(PASCommission).filter_by(
         name='Education Commission').first()
+    assert fresh_education is not None
 
     # Should have private access to their commission
     assert has_private_access_to_commission(
@@ -401,9 +437,11 @@ def test_commission_president_no_access_to_different_commission(client):
     ) is False
 
 
-def test_commission_president_with_no_parliamentarian_record(client):
-    '''Commission presidents without parliamentarian record should not
-    have access'''
+def test_commission_president_with_no_parliamentarian_record(
+    client: Client[TestPasApp]
+) -> None:
+    """Commission presidents without parliamentarian record should not
+    have access"""
 
     session = client.app.session()
 
@@ -423,8 +461,13 @@ def test_commission_president_with_no_parliamentarian_record(client):
 
     # Test permission rule with president identity but no parliamentarian
     # record
-    identity = Identity(userid='orphan.president@example.org',
-                       role='commission_president')
+    identity = Identity(
+        uid='foo',
+        userid='orphan.president@example.org',
+        groupids=frozenset(),
+        role='commission_president',
+        application_id=client.app.application_id
+    )
 
     # Should not have private access without parliamentarian record
     assert has_private_access_to_commission(
@@ -436,9 +479,13 @@ def test_commission_president_with_no_parliamentarian_record(client):
     ('parliamentarian', 'files.parliamentarian@example.org'),
     ('commission_president', 'files.president@example.org'),
 ])
-def test_view_files_collection(client, role, user_email):
-    '''Parliamentarians and commission presidents should be able to access
-    the files collection'''
+def test_view_files_collection(
+    client: Client[TestPasApp],
+    role: str,
+    user_email: str
+) -> None:
+    """Parliamentarians and commission presidents should be able to access
+    the files collection"""
     session = client.app.session()
 
     # Create parliamentarian
@@ -464,6 +511,7 @@ def test_view_files_collection(client, role, user_email):
     # Set user role and password
     users = UserCollection(session)
     user = users.by_username(user_email)
+    assert user is not None
     user.role = role
     user.password = 'test'
     transaction.commit()

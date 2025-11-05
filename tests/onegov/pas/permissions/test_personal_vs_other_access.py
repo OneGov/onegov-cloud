@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+import transaction
+
+from datetime import date, timedelta
 from onegov.pas.collections import (
     AttendenceCollection,
     PASCommissionCollection,
@@ -5,8 +10,16 @@ from onegov.pas.collections import (
 )
 from onegov.pas.models import PASCommissionMembership, SettlementRun
 from onegov.user import UserCollection
-import transaction
-from datetime import date, timedelta
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.pas.models import Attendence, PASCommission, PASParliamentarian
+    from onegov.user import User
+    from sqlalchemy.orm import Session
+    from tests.shared.client import Client
+    from uuid import UUID
+    from ..conftest import TestPasApp
 
 """
   1. Own attendance: Parliamentarians can edit their own attendance
@@ -19,7 +32,7 @@ from datetime import date, timedelta
 """
 
 
-def ensure_active_settlement_run(session):
+def ensure_active_settlement_run(session: Session) -> SettlementRun:
     """Ensure there's an active settlement run for testing."""
     existing = session.query(SettlementRun).filter_by(closed=False).first()
     if existing:
@@ -37,9 +50,14 @@ def ensure_active_settlement_run(session):
     return settlement
 
 
-def create_parliamentarian_with_user(client, first_name: str, last_name: str,
-                                    email: str, role: str = 'parliamentarian',
-                                    password: str = 'test'):
+def create_parliamentarian_with_user(
+    client: Client[TestPasApp],
+    first_name: str,
+    last_name: str,
+    email: str,
+    role: str = 'parliamentarian',
+    password: str = 'test'
+) -> tuple[PASParliamentarian, User]:
     """Helper to create a parliamentarian and set up their user account."""
     session = client.app.session()
     parliamentarians = PASParliamentarianCollection(client.app)
@@ -52,15 +70,19 @@ def create_parliamentarian_with_user(client, first_name: str, last_name: str,
 
     users = UserCollection(session)
     user = users.by_username(email)
+    assert user is not None
     user.role = role
     user.password = password
 
     return parl, user
 
 
-def create_attendance_for_parliamentarian(session, parliamentarian_id: str,
-                                        attendance_type: str = 'commission',
-                                        duration: int = 120):
+def create_attendance_for_parliamentarian(
+    session: Session,
+    parliamentarian_id: UUID,
+    attendance_type: str = 'commission',
+    duration: int = 120
+) -> Attendence:
     """Helper to create attendance record for a parliamentarian."""
     attendences = AttendenceCollection(session)
     return attendences.add(
@@ -71,8 +93,12 @@ def create_attendance_for_parliamentarian(session, parliamentarian_id: str,
     )
 
 
-def setup_commission_with_members(session, commission_name: str,
-                                president_parl, member_parl):
+def setup_commission_with_members(
+    session: Session,
+    commission_name: str,
+    president_parl: PASParliamentarian,
+    member_parl: PASParliamentarian
+) -> PASCommission:
     """Helper to create commission and set up memberships."""
     commissions = PASCommissionCollection(session)
     commission = commissions.add(name=commission_name)
@@ -94,8 +120,13 @@ def setup_commission_with_members(session, commission_name: str,
     return commission
 
 
-def setup_two_separate_commissions(session, president_parl, president_comm,
-                                 member_parl, member_comm):
+def setup_two_separate_commissions(
+    session: Session,
+    president_parl: PASParliamentarian,
+    president_comm: str,
+    member_parl: PASParliamentarian,
+    member_comm: str
+) -> tuple[PASCommission, PASCommission]:
     """Helper to create two separate commissions with different members."""
     commissions = PASCommissionCollection(session)
     commission1 = commissions.add(name=president_comm)
@@ -118,8 +149,10 @@ def setup_two_separate_commissions(session, president_parl, president_comm,
     return commission1, commission2
 
 
-def test_parliamentarian_can_edit_own_attendance(client):
-    '''Parliamentarians should be able to edit their own attendance'''
+def test_parliamentarian_can_edit_own_attendance(
+    client: Client[TestPasApp]
+) -> None:
+    """Parliamentarians should be able to edit their own attendance"""
     session = client.app.session()
 
     parl_a, _ = create_parliamentarian_with_user(
@@ -137,9 +170,11 @@ def test_parliamentarian_can_edit_own_attendance(client):
     assert 'form' in page
 
 
-def test_parliamentarian_cannot_edit_other_attendance(client):
-    '''Parliamentarian A should NOT be able to edit parliamentarian B\'s
-    attendance'''
+def test_parliamentarian_cannot_edit_other_attendance(
+    client: Client[TestPasApp]
+) -> None:
+    """Parliamentarian A should NOT be able to edit parliamentarian B's
+    attendance"""
     session = client.app.session()
 
     parl_a, _ = create_parliamentarian_with_user(
@@ -166,9 +201,11 @@ def test_parliamentarian_cannot_edit_other_attendance(client):
     assert page.status_code in (403, 302)
 
 
-def test_commission_president_can_edit_member_attendance(client):
-    '''Commission presidents should be able to edit attendance of their
-    commission members'''
+def test_commission_president_can_edit_member_attendance(
+    client: Client[TestPasApp]
+) -> None:
+    """Commission presidents should be able to edit attendance of their
+    commission members"""
     session = client.app.session()
 
     president, _ = create_parliamentarian_with_user(
@@ -195,9 +232,11 @@ def test_commission_president_can_edit_member_attendance(client):
     assert 'form' in page
 
 
-def test_commission_president_cannot_edit_other_commission_attendance(client):
-    '''Commission presidents should NOT be able to edit attendance of
-    members from other commissions'''
+def test_commission_president_cannot_edit_other_commission_attendance(
+    client: Client[TestPasApp]
+) -> None:
+    """Commission presidents should NOT be able to edit attendance of
+    members from other commissions"""
     session = client.app.session()
 
     finance_president, _ = create_parliamentarian_with_user(
@@ -225,9 +264,11 @@ def test_commission_president_cannot_edit_other_commission_attendance(client):
     assert page.status_code in (403, 302)
 
 
-def test_parliamentarian_cannot_view_other_parliamentarian_details(client):
-    '''Parliamentarians should not be able to view other
-    parliamentarians\' personal details'''
+def test_parliamentarian_cannot_view_other_parliamentarian_details(
+    client: Client[TestPasApp]
+) -> None:
+    """Parliamentarians should not be able to view other
+    parliamentarians' personal details"""
     parl_a, _ = create_parliamentarian_with_user(
         client, 'Alice', 'Parliamentarian', 'alice.parl@example.org'
     )
@@ -250,9 +291,11 @@ def test_parliamentarian_cannot_view_other_parliamentarian_details(client):
     assert page.status_code in (403, 302)
 
 
-def test_attendance_collection_shows_only_own_records(client):
-    session = client.app.session()
+def test_attendance_collection_shows_only_own_records(
+    client: Client[TestPasApp]
+) -> None:
 
+    session = client.app.session()
     parl_a, _ = create_parliamentarian_with_user(
         client, 'Alice', 'Parliamentarian', 'alice.parl@example.org'
     )
@@ -277,8 +320,10 @@ def test_attendance_collection_shows_only_own_records(client):
             else 'Bob' not in str(page))
 
 
-def test_admin_sees_all_attendance_records(client):
-    '''Admins should see all attendance records in /attendences'''
+def test_admin_sees_all_attendance_records(
+    client: Client[TestPasApp]
+) -> None:
+    """Admins should see all attendance records in /attendences"""
     session = client.app.session()
 
     parl_a, _ = create_parliamentarian_with_user(
@@ -290,6 +335,7 @@ def test_admin_sees_all_attendance_records(client):
 
     users = UserCollection(session)
     admin_user = users.by_username('admin@example.org')
+    assert admin_user is not None
     admin_user.password = 'test'
 
     create_attendance_for_parliamentarian(session, parl_a.id)
@@ -308,9 +354,11 @@ def test_admin_sees_all_attendance_records(client):
     assert 'Bob' in page
 
 
-def test_parliamentarian_cannot_add_attendance_for_others(client):
-    '''Parliamentarians should not be able to add attendance for other
-    parliamentarians'''
+def test_parliamentarian_cannot_add_attendance_for_others(
+    client: Client[TestPasApp]
+) -> None:
+    """Parliamentarians should not be able to add attendance for other
+    parliamentarians"""
     session = client.app.session()
 
     ensure_active_settlement_run(session)
@@ -345,8 +393,10 @@ def test_parliamentarian_cannot_add_attendance_for_others(client):
     assert 'Sie können nur Ihre eigene Anwesenheit bearbeiten.' in response
 
 
-def test_parliamentarian_can_only_see_self_in_dropdown(client):
-    '''Parliamentarians should only see themselves in the dropdown'''
+def test_parliamentarian_can_only_see_self_in_dropdown(
+    client: Client[TestPasApp]
+) -> None:
+    """Parliamentarians should only see themselves in the dropdown"""
     session = client.app.session()
 
     parl_a, _ = create_parliamentarian_with_user(
@@ -368,9 +418,11 @@ def test_parliamentarian_can_only_see_self_in_dropdown(client):
     assert 'Bob' not in page
 
 
-def test_commission_president_can_add_for_commission_members(client):
-    '''Commission presidents should be able to add attendance for their
-    commission members'''
+def test_commission_president_can_add_for_commission_members(
+    client: Client[TestPasApp]
+) -> None:
+    """Commission presidents should be able to add attendance for their
+    commission members"""
     session = client.app.session()
 
     ensure_active_settlement_run(session)
@@ -422,9 +474,11 @@ def test_commission_president_can_add_for_commission_members(client):
     assert created_attendance.type == 'plenary'
 
 
-def test_commission_president_cannot_add_for_other_commission_members(client):
-    '''Commission presidents should NOT be able to add attendance for members
-    of other commissions'''
+def test_commission_president_cannot_add_for_other_commission_members(
+    client: Client[TestPasApp]
+) -> None:
+    """Commission presidents should NOT be able to add attendance for members
+    of other commissions"""
     session = client.app.session()
 
     ensure_active_settlement_run(session)

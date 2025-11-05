@@ -8,6 +8,7 @@ from onegov.org.models.extensions import PublicationExtension
 from onegov.org.utils import narrowest_access
 from onegov.people import AgencyMembership
 from sqlalchemy.orm import object_session
+from sqlalchemy.orm.attributes import set_committed_value
 
 
 from typing import TYPE_CHECKING
@@ -61,11 +62,19 @@ class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
         if self.person_id is not None and self.person is None:
             # retrieve the person
             from onegov.agency.models import ExtendedPerson  # type: ignore[unreachable]
-            self.person = session.query(ExtendedPerson).get(self.person_id)
+            set_committed_value(
+                self,
+                'person',
+                session.query(ExtendedPerson).get(self.person_id)
+            )
         if self.agency_id is not None and self.agency is None:
             # retrieve the agency
             from onegov.agency.models import ExtendedAgency  # type: ignore[unreachable]
-            self.agency = session.query(ExtendedAgency).get(self.agency_id)
+            set_committed_value(
+                self,
+                'agency',
+                session.query(ExtendedAgency).get(self.agency_id)
+            )
 
     # Todo: It is very unclear how this should be used. In the PDF rendering,
     # it is placed a middle column with 0.5 cm after the title.

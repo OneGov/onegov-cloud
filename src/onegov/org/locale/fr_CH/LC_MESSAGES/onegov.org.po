@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-10-21 14:15+0200\n"
+"POT-Creation-Date: 2025-11-04 12:21+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2358,6 +2358,18 @@ msgid "Email address that is displayed instead of the personal email address"
 msgstr ""
 "Adresse e-mail qui est affichée à la place de l'adresse e-mail personnelle"
 
+msgid "Hide submitter email address"
+msgstr "Masquer l'adresse e-mail de l'expéditeur"
+
+msgid ""
+"Hide the email address of the ticket submitter in the ticket status page"
+msgstr ""
+"Masquer l'adresse e-mail de l'expéditeur du ticket dans la page d'état du "
+"ticket"
+
+msgid "Data Protection"
+msgstr "Protection des données"
+
 msgid "Accept request and close ticket automatically based on:"
 msgstr ""
 "Accepter la demande et fermer le ticket automatiquement en fonction de :"
@@ -3079,7 +3091,7 @@ msgid "Homepage"
 msgstr "Page d'accueil"
 
 msgid "Save"
-msgstr "Sauver"
+msgstr "Enregistrer"
 
 msgid "Edit"
 msgstr "Modifier"
@@ -3209,6 +3221,12 @@ msgstr "Nouveau commentaire"
 
 msgid "PDF"
 msgstr "PDF"
+
+msgid "Only this ticket"
+msgstr "Seulement ce billet"
+
+msgid "With related tickets"
+msgstr "Avec les tickets associés"
 
 msgid "Download files"
 msgstr "Télécharger les fichiers"
@@ -4005,6 +4023,9 @@ msgstr "Ajout d'une iFrame"
 
 msgid "Edit iFrame"
 msgstr "Modifier l'iFrame"
+
+msgid "Move iFrame"
+msgstr "Déplacer l'iFrame"
 
 msgid "The iFrame was deleted"
 msgstr "L'iFrame a été supprimée"
