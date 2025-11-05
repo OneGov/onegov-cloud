@@ -73,6 +73,3 @@ msgstr "Leiter Medien und Kampagnen"
 
 msgid "President of the parliamentary group"
 msgstr "Fraktionschef/in"
-
-msgid "on"
-msgstr "vom"
