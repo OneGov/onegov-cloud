@@ -5,6 +5,7 @@ import importlib
 import phonenumbers
 
 from babel.dates import format_date
+from bad_passwords import is_bad_password
 from cgi import FieldStorage
 from datetime import date
 from datetime import datetime
@@ -24,6 +25,7 @@ from wtforms import DateField, DateTimeLocalField, RadioField, TimeField
 from wtforms.fields import SelectField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
+from wtforms.validators import Length
 from wtforms.validators import Optional
 from wtforms.validators import StopValidation
 from wtforms.validators import ValidationError
@@ -35,7 +37,7 @@ if TYPE_CHECKING:
     from onegov.core.orm import Base
     from onegov.form import Form
     from onegov.form.types import BaseValidator, FieldCondition
-    from wtforms import Field
+    from wtforms import Field, StringField
     from wtforms.form import BaseForm
 
 
@@ -178,6 +180,30 @@ class ExpectedExtensions(WhitelistedMimeType):
                 if (mimetype := types_map.get('.' + ext.lstrip('.'), None))
             }
         super().__init__(whitelist=mimetypes)
+
+
+class ValidPassword(Length):
+    """
+    Makes sure the given password is not part of a list of commonly used
+    passwords.
+    """
+    def __init__(
+        self,
+        min_length: int = 10,
+        length_message: str | None = None
+    ) -> None:
+        assert min_length >= 10
+        super().__init__(min=min_length, message=length_message)
+
+    def __call__(self, form: BaseForm, field: StringField) -> None:
+        super().__call__(form, field)
+        assert field.data is not None
+        if is_bad_password(field.data):
+            raise ValidationError(_(
+                'The password you wanted to use was found on '
+                'list of commonly used passwords, please use '
+                'a more secure password.'
+            ))
 
 
 class ValidFormDefinition:

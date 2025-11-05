@@ -96,6 +96,14 @@ def test_registration_form(session: Session) -> None:
     }))
     assert not form.validate()
 
+    # known bad password
+    form.process(DummyPostData({
+        'username': 'info@example.com',
+        'password': 'qwertqwert123',
+        'confirm': 'qwertqwert123'
+    }))
+    assert not form.validate()
+
     form.process(DummyPostData({
         'username': 'info@example.com',
         'password': 'much_secret',
@@ -141,6 +149,13 @@ def test_password_reset_form(session: Session) -> None:
     form.process(DummyPostData({
         'email': 'info@example.com',
         'password': 'secret',
+    }))
+    assert not form.validate()
+
+    # known bad password
+    form.process(DummyPostData({
+        'email': 'info@example.com',
+        'password': 'qwertqwert123',
     }))
     assert not form.validate()
 

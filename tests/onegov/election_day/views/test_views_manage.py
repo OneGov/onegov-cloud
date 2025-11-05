@@ -442,7 +442,7 @@ def test_reset_password(election_day_app_zg):
     assert token in reset_page.text
 
     reset_page.form['email'] = 'someone_else@example.org'
-    reset_page.form['password'] = 'new_password'
+    reset_page.form['password'] = 'known_very_secure_password'
     reset_page = reset_page.form.submit()
     assert "Ungültige Adresse oder abgelaufener Link" in reset_page
     assert token in reset_page.text
@@ -450,15 +450,22 @@ def test_reset_password(election_day_app_zg):
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = '1234'
     reset_page = reset_page.form.submit()
-    assert "Feld muss mindestens 10 Zeichen beinhalten" in reset_page
+    assert "Das Passwort muss mindestens zehn Zeichen lang sein" in reset_page
     assert token in reset_page.text
 
     reset_page.form['email'] = 'admin@example.org'
-    reset_page.form['password'] = 'new_password'
+    reset_page.form['password'] = 'qwertqwert123'
+    reset_page = reset_page.form.submit()
+    assert ("Das gewünschte Passwort befindet sich auf einer Liste"
+    ) in reset_page.text
+    assert token in reset_page.text
+
+    reset_page.form['email'] = 'admin@example.org'
+    reset_page.form['password'] = 'known_very_secure_password'
     assert "Passwort geändert" in reset_page.form.submit()
 
     reset_page.form['email'] = 'admin@example.org'
-    reset_page.form['password'] = 'new_password'
+    reset_page.form['password'] = 'known_very_secure_password'
     reset_page = reset_page.form.submit()
     assert "Ungültige Adresse oder abgelaufener Link" in reset_page
 
@@ -469,7 +476,7 @@ def test_reset_password(election_day_app_zg):
     assert "Unbekannter Benutzername oder falsches Passwort" in login_page
 
     login_page.form['username'] = 'admin@example.org'
-    login_page.form['password'] = 'new_password'
+    login_page.form['password'] = 'known_very_secure_password'
     login_page = login_page.form.submit().follow()
     assert "Sie sind angemeldet" in login_page
 
