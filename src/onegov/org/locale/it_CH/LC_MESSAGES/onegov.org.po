@@ -1938,6 +1938,24 @@ msgstr ""
 msgid "Standard Image"
 msgstr "Immagine standard"
 
+msgid "Table of Contents"
+msgstr "Sommario"
+
+msgid "No Table of Contents"
+msgstr "Nessun sommario"
+
+msgid "1 Level"
+msgstr "1 Livello"
+
+msgid "2 Levels"
+msgstr "2 Livelli"
+
+msgid "3 Levels"
+msgstr "3 Livelli"
+
+msgid "4 Levels"
+msgstr "4 Livelli"
+
 msgid "Column width left side"
 msgstr "Larghezza colonna lato sinistro"
 

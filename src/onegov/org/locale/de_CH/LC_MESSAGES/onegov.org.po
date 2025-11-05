@@ -1934,6 +1934,24 @@ msgid "Will be used if an image is needed, but none has been set"
 msgstr ""
 "Wird verwendet, wenn ein Bild benötigt wird, aber keines festgelegt wurde"
 
+msgid "Table of Contents"
+msgstr "Inhaltsverzeichnis"
+
+msgid "No Table of Contents"
+msgstr "Kein Inhaltsverzeichnis"
+
+msgid "1 Level"
+msgstr "1 Ebene"
+
+msgid "2 Levels"
+msgstr "2 Ebenen"
+
+msgid "3 Levels"
+msgstr "3 Ebenen"
+
+msgid "4 Levels"
+msgstr "4 Ebenen"
+
 msgid "Standard Image"
 msgstr "Standardbild"
 
