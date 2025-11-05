@@ -102,7 +102,8 @@ def associated(
     *,
     uselist: Literal['auto'] = ...,
     backref_suffix: str = ...,
-    onupdate: str | None = ...
+    onupdate: str | None = ...,
+    order_by: str | None = ...
 ) -> rel[list[_M]]: ...
 
 
@@ -114,7 +115,8 @@ def associated(
     *,
     uselist: Literal['auto'] = ...,
     backref_suffix: str = ...,
-    onupdate: str | None = ...
+    onupdate: str | None = ...,
+    order_by: str | None = ...
 ) -> rel[_M | None]: ...
 
 
@@ -126,7 +128,8 @@ def associated(
     *,
     uselist: Literal[True],
     backref_suffix: str = ...,
-    onupdate: str | None = ...
+    onupdate: str | None = ...,
+    order_by: str | None = ...
 ) -> rel[list[_M]]: ...
 
 
@@ -138,7 +141,8 @@ def associated(
     *,
     uselist: Literal[False],
     backref_suffix: str = ...,
-    onupdate: str | None = ...
+    onupdate: str | None = ...,
+    order_by: str | None = ...
 ) -> rel[_M | None]: ...
 
 
@@ -148,7 +152,8 @@ def associated(
     cardinality: Cardinality = 'one-to-many',
     uselist: Literal['auto'] | bool = 'auto',
     backref_suffix: str = '__tablename__',
-    onupdate: str | None = None
+    onupdate: str | None = None,
+    order_by: str | None = None
 ) -> rel[list[_M]] | rel[_M | None]:
     """ Creates an associated attribute. This attribute is supposed to be
     defined on the mixin class that will establish the generic association
@@ -299,7 +304,8 @@ def associated(
             single_parent=single_parent,
             cascade=cascade,
             uselist=uselist,
-            passive_deletes=passive_deletes
+            passive_deletes=passive_deletes,
+            order_by=order_by
         )
 
     return declared_attr(descriptor)  # type:ignore[return-value]

@@ -11,9 +11,10 @@ from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.layouts import DefaultLayout
-from onegov.landsgemeinde.models import Assembly
+from onegov.landsgemeinde.models import Assembly, LandsgemeindeFile
 from onegov.landsgemeinde.models.assembly import STATES
 from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.fields import UploadMultipleFilesWithORMSupport
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import RadioField
@@ -131,6 +132,12 @@ class AssemblyForm(NamedFileForm):
             WhitelistedMimeType({'application/zip'}),
             FileSizeLimit(600 * 1024 * 1024)
         ]
+    )
+
+    more_files = UploadMultipleFilesWithORMSupport(
+        label=_('Additional documents'),
+        fieldset=_('Documents'),
+        file_class=LandsgemeindeFile,
     )
 
     overview = HtmlField(

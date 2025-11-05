@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     import uuid
     from datetime import date as date_t
     from datetime import datetime
+    from onegov.file.models.file import File
     from translationstring import TranslationString
     from typing import TypeAlias
 
@@ -121,3 +122,26 @@ class Assembly(
 
     def stamp(self) -> None:
         self.last_modified = self.timestamp()
+
+    filenames = ['memorial_pdf', 'memorial_2_pdf', 'memorial_supplement_pdf',
+                 'protocol_pdf', 'audio_mp3', 'audio_zip']
+
+    @property
+    def more_files(self) -> list[File]:
+        files = self.files
+        return [file for file in files if file.name not in self.filenames]
+
+    @more_files.setter
+    def more_files(self, value: list[File]) -> None:
+        existing_files = {
+            file.name: file for file in self.files
+            if file.name not in self.filenames
+        }
+
+        for file in existing_files.values():
+            if file not in value:
+                self.files.remove(file)
+
+        for file in value:
+            if file.name not in existing_files:
+                self.files.append(file)

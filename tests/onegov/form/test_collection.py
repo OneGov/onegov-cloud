@@ -393,7 +393,7 @@ def test_multiple_file_submissions_update(session: Session) -> None:
     data = FileMultiDict()
     data.add('file-0', 'replace')
     data.add_file('file-0', BytesIO(b'barfoo'), filename='foobar.txt')
-    data.add_file('file', BytesIO(b'baz'), filename='baz.txt')
+    data.add_file('file', BytesIO(b'baz'), filename='zab.txt')
 
     collection.submissions.update(submission, definition.form_class(data))
     session.flush()
