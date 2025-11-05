@@ -429,24 +429,6 @@ class PeopleShownOnMainPageExtension(ContentExtension):
         return form_class
 
 
-class NewsletterExtension(ContentExtension):
-    text_in_newsletter: dict_property[bool] = content_property(default=False)
-
-    def extend_form(
-        self,
-        form_class: type[FormT],
-        request: OrgRequest
-    ) -> type[FormT]:
-
-        class NewsletterSettingsForm(form_class):  # type:ignore
-            text_in_newsletter = BooleanField(
-                label=_('Use text instead of lead in the newsletter'),
-                fieldset=_('Newsletter'),
-                default=False
-            )
-        return NewsletterSettingsForm
-
-
 if TYPE_CHECKING:
     @type_check_only
     class PersonWithFunction(Person):

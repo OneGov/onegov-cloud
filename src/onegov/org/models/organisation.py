@@ -259,6 +259,7 @@ class Organisation(Base, TimestampMixin):
         default=False)
     newsletter_times: dict_property[list[str] | None] = meta_property()
     daily_newsletter_title: dict_property[str | None] = meta_property()
+    show_only_previews: dict_property[bool] = meta_property(default=False)
 
     # Chat Settings
     chat_staff: dict_property[list[str] | None] = meta_property()

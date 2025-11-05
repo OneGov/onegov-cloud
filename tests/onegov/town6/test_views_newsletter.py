@@ -576,7 +576,6 @@ def test_newsletter_send(client: Client) -> None:
     page.form['title'] = 'Testnews'
     page.form['lead'] = 'My Lead Text'
     page.form['text'] = '<p>My Html editor text</p>'
-    page.form['text_in_newsletter'] = True
     page.form.submit().follow()
 
     # add a newsletter
@@ -693,7 +692,6 @@ def test_newsletter_send_with_categories(client: Client) -> None:
     page.form['title'] = 'Testnews'
     page.form['lead'] = 'My Lead Text'
     page.form['text'] = '<p>My Html editor text</p>'
-    page.form['text_in_newsletter'] = True
     page.form.submit().follow()
 
     # add a newsletter

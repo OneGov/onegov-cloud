@@ -31,7 +31,8 @@ class NewsletterCollection:
         lead: str | None = None,
         meta: dict[str, Any] | None = None,
         content: dict[str, Any] | None = None,
-        scheduled: datetime | None = None
+        scheduled: datetime | None = None,
+        show_only_previews: bool = False
     ) -> Newsletter:
 
         name = normalize_for_url(title)
@@ -46,7 +47,8 @@ class NewsletterCollection:
             lead=lead,
             meta=meta or {},
             content=content or {},
-            scheduled=scheduled
+            scheduled=scheduled,
+            show_only_previews=show_only_previews
         )
 
         self.session.add(newsletter)
