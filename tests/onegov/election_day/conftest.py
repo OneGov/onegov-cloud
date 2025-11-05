@@ -119,7 +119,7 @@ if TYPE_CHECKING:
             domain: DomainOfInfluence,
             *,
             dataset_name: str,
-            election: ProporzElection | None = None,
+            election: ProporzElection | ElectionCompound | None = None,
             app_session: Session | None = None
         ) -> dict[str, list[FileImportError] | list[str]]: ...
         @overload
@@ -547,7 +547,7 @@ def import_parties_internal(
     principal: str,
     domain: DomainOfInfluence,
     dataset_name: str,
-    election: ProporzElection,
+    election: ProporzElection | ElectionCompound,
 ) -> list[FileImportError] | list[str]:
     """
     Import test datasets with party results in internal formats. For one
@@ -855,7 +855,7 @@ def import_test_datasets(session: Session) -> ImportTestDatasets:
         domain: DomainOfInfluence,
         *,
         dataset_name: str,
-        election: ProporzElection | None = None,
+        election: ProporzElection | ElectionCompound | None = None,
         app_session: Session | None = None
     ) -> dict[str, list[FileImportError] | list[str]]: ...
     @overload

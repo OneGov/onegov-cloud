@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
+from webob.exc import HTTPNotFound
 
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
@@ -88,6 +89,8 @@ def view_political_businesses(
     request: TownRequest,
     layout: PoliticalBusinessCollectionLayout | None = None
 ) -> RenderData | Response:
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
 
     count_per_business_type = count_political_businesses_by_type(request)
     types = sorted((
@@ -149,6 +152,9 @@ def view_add_political_business(
     request: TownRequest,
     form: PoliticalBusinessForm,
 ) -> RenderData | Response:
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
+
     layout = PoliticalBusinessCollectionLayout(self, request)
 
     if form.submitted(request):
@@ -185,6 +191,9 @@ def edit_political_business(
     request: TownRequest,
     form: PoliticalBusinessForm,
 ) -> RenderData | Response:
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
+
     layout = PoliticalBusinessLayout(self, request)
 
     if form.submitted(request):
@@ -214,6 +223,8 @@ def view_political_business(
     self: PoliticalBusiness,
     request: TownRequest,
 ) -> RenderData | Response:
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
 
     layout = PoliticalBusinessLayout(self, request)
     groups = [self.parliamentary_group] if self.parliamentary_group else []
@@ -254,6 +265,8 @@ def delete_political_business(
     self: PoliticalBusiness,
     request: TownRequest,
 ) -> None:
+    if not request.app.org.ris_enabled:
+        raise HTTPNotFound()
 
     request.assert_valid_csrf_token()
 

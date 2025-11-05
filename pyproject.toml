@@ -78,8 +78,6 @@ module = [
     "tests.onegov.election_day.forms.*",
     "tests.onegov.election_day.layouts.*",
     "tests.onegov.election_day.models.*",
-    "tests.onegov.election_day.screen_widgets.*",
-    "tests.onegov.election_day.utils.*",
     "tests.onegov.election_day.views.*",
     "tests.onegov.feriennet.*",
 ]

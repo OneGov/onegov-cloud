@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-10-21 13:49+0200\n"
+"POT-Creation-Date: 2025-11-04 12:21+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1306,16 +1306,12 @@ msgstr "Schlussbemerkung am Ende des Newsletters"
 msgid "Latest news"
 msgstr "Aktuelles"
 
-msgid "Show news as tiles"
-msgstr "Aktuelles als Kacheln anzeigen"
+msgid "Show only lead of news"
+msgstr "Nur Einleitung der News anzeigen"
 
-msgid ""
-"If checked, news are displayed as tiles. Otherwise, news are listed in full "
-"length."
+msgid "Only show the lead of the news and a \"read more\"link."
 msgstr ""
-"Wenn diese Option aktiviert ist, werden die Nachrichten als Kacheln "
-"angezeigt. Anderfalls werden die Nachrichten in voller Länge untereinander "
-"aufgelistet."
+"Nur die Einleitung der News und einen \"Weiterlesen\"-Link anzeigen."
 
 msgid "Events"
 msgstr "Veranstaltungen"
@@ -3221,6 +3217,12 @@ msgstr "Neue Notiz"
 msgid "PDF"
 msgstr "PDF"
 
+msgid "Only this ticket"
+msgstr "Nur dieses Ticket"
+
+msgid "With related tickets"
+msgstr "Mit verknüpften Tickets"
+
 msgid "Download files"
 msgstr "Dateien herunterladen"
 
@@ -4018,6 +4020,9 @@ msgstr "iFrame wurde hinzugefügt"
 
 msgid "Edit iFrame"
 msgstr "iFrame bearbeiten"
+
+msgid "Move iFrame"
+msgstr "iFrame verschieben"
 
 msgid "The iFrame was deleted"
 msgstr "Das iFrame wurde gelöscht"
@@ -7584,6 +7589,29 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid ""
+#~ "If checked, only the lead of the news and a \"read more\"link is shown."
+#~ msgstr ""
+#~ "Falls ausgewählt, wird nur die Einleitung der News und ein "
+#~ "\"Weiterlesen\"-Link angezeigt."
+
+#~ msgid "Show only previews of news"
+#~ msgstr "Nur Vorschau der News anzeigen"
+
+#~ msgid "If checked, only the preview of the news is shown."
+#~ msgstr "Falls ausgewählt, wird nur die Vorschau der News angezeigt."
+
+#~ msgid "Show news as tiles"
+#~ msgstr "Aktuelles als Kacheln anzeigen"
+
+#~ msgid ""
+#~ "If checked, news are displayed as tiles. Otherwise, news are listed in "
+#~ "full length."
+#~ msgstr ""
+#~ "Wenn diese Option aktiviert ist, werden die Nachrichten als Kacheln "
+#~ "angezeigt. Anderfalls werden die Nachrichten in voller Länge "
+#~ "untereinander aufgelistet."
 
 #~ msgid "New news since the last newsletter:"
 #~ msgstr "Neue Einträge seit dem letzten Newsletter:"

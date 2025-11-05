@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from decimal import Decimal
 from freezegun import freeze_time
@@ -35,7 +37,17 @@ from onegov.election_day.screen_widgets import (
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.widgets import Widget
+    from ..conftest import ImportTestDatasets, TestApp
+
+
+def test_majorz_election_widgets(
+    election_day_app_zg: TestApp,
+    import_test_datasets: ImportTestDatasets
+) -> None:
+
     structure = """
         <model-title class="my-class-1"/>
         <model-progress class="my-class-2"/>
@@ -58,7 +70,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
         <if-absolute-majority>is-am</if-absolute-majority>
         <if-relative-majority>is-rm</if-relative-majority>
     """
-    widgets = [
+    widgets: list[Widget] = [
         AbsoluteMajorityWidget(),
         AllocatedMandatesWidget(),
         CountedEntitiesWidget(),
@@ -86,7 +98,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     )
     session.flush()
     model = session.query(Election).one()
-    request = DummyRequest(app=election_day_app_zg, session=session)
+    request: Any = DummyRequest(app=election_day_app_zg, session=session)
     layout = ElectionLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
@@ -456,7 +468,11 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-f' in result
 
 
-def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
+def test_proporz_election_widgets(
+    election_day_app_zg: TestApp,
+    import_test_datasets: ImportTestDatasets
+) -> None:
+
     structure = """
         <model-title class="my-class-1"/>
         <model-progress class="my-class-2"/>
@@ -485,7 +501,7 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
         <election-party-strengths-table class="my-class-j"/>
         <election-party-strengths-table class="my-class-k" year="2019"/>
     """
-    widgets = [
+    widgets: list[Widget] = [
         AllocatedMandatesWidget(),
         CountedEntitiesWidget(),
         ElectionCandidatesChartWidget(),
@@ -514,7 +530,7 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
         )
     )
     model = session.query(ProporzElection).one()
-    request = DummyRequest(app=election_day_app_zg, session=session)
+    request: Any = DummyRequest(app=election_day_app_zg, session=session)
     layout = ElectionLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
@@ -759,18 +775,17 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
         assert not errors
         session.add(model)
         session.flush()
-        results = import_test_datasets(
+        results_ = import_test_datasets(
             'internal',
             'parties',
             'zg',
             'canton',
-            'proporz',
             election=model,
             dataset_name='nationalratswahlen-2015-parteien',
         )
         assert len(results) == 1
-        errors = next(iter(results.values()))
-        assert not errors
+        errors_ = next(iter(results_.values()))
+        assert not errors_
 
     layout = ElectionLayout(model, request)
     default = {'layout': layout, 'request': request}

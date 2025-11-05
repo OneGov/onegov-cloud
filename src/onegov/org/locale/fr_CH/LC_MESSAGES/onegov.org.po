@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-10-21 13:49+0200\n"
+"POT-Creation-Date: 2025-11-04 12:21+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1304,16 +1304,12 @@ msgstr "Remarque de clôture à la fin de la lettre d'informations"
 msgid "Latest news"
 msgstr "Dernières nouvelles"
 
-msgid "Show news as tiles"
-msgstr "Afficher les actualités sous forme de tuiles"
+msgid "Show only lead of news"
+msgstr "Afficher uniquement l'accroche des nouvelles"
 
-msgid ""
-"If checked, news are displayed as tiles. Otherwise, news are listed in full "
-"length."
+msgid "Only show the lead of the news and a \"read more\"link."
 msgstr ""
-"Si cette case est activée, les nouvelles sont affichées sous forme de "
-"tuiles. Dans le cas contraire, les nouvelles sont listés dans leur "
-"intégralité."
+"Afficher uniquement l'accroche des nouvelles et un lien \"lire la suite\"."
 
 msgid "Events"
 msgstr "Événements"
@@ -3095,7 +3091,7 @@ msgid "Homepage"
 msgstr "Page d'accueil"
 
 msgid "Save"
-msgstr "Sauver"
+msgstr "Enregistrer"
 
 msgid "Edit"
 msgstr "Modifier"
@@ -3225,6 +3221,12 @@ msgstr "Nouveau commentaire"
 
 msgid "PDF"
 msgstr "PDF"
+
+msgid "Only this ticket"
+msgstr "Seulement ce billet"
+
+msgid "With related tickets"
+msgstr "Avec les tickets associés"
 
 msgid "Download files"
 msgstr "Télécharger les fichiers"
@@ -4021,6 +4023,9 @@ msgstr "Ajout d'une iFrame"
 
 msgid "Edit iFrame"
 msgstr "Modifier l'iFrame"
+
+msgid "Move iFrame"
+msgstr "Déplacer l'iFrame"
 
 msgid "The iFrame was deleted"
 msgstr "L'iFrame a été supprimée"
@@ -7594,6 +7599,23 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
+
+#~ msgid ""
+#~ "If checked, only the lead of the news and a \"read more\"link is shown."
+#~ msgstr ""
+#~ "Si coché, seule l'accroche des nouvelles et un lien \"lire la suite\" "
+#~ "sont affichés."
+
+#~ msgid "Show news as tiles"
+#~ msgstr "Afficher les actualités sous forme de tuiles"
+
+#~ msgid ""
+#~ "If checked, news are displayed as tiles. Otherwise, news are listed in "
+#~ "full length."
+#~ msgstr ""
+#~ "Si cette case est activée, les nouvelles sont affichées sous forme de "
+#~ "tuiles. Dans le cas contraire, les nouvelles sont listés dans leur "
+#~ "intégralité."
 
 #~ msgid "New news since the last newsletter:"
 #~ msgstr "Nouvelles depuis la dernière newsletter :"

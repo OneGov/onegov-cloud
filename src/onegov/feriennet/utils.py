@@ -2,9 +2,13 @@ from __future__ import annotations
 
 from contextlib import suppress
 
-
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
+    from onegov.activity import Activity
+    from onegov.activity import Occasion
+    from onegov.activity.types import BoundedIntegerRange
+    from onegov.feriennet.request import FeriennetRequest
     from collections.abc import Iterable, Iterator
     from decimal import Decimal
 
@@ -53,3 +57,67 @@ def format_donation_amounts(amounts: Iterable[Decimal | float]) -> str:
                 yield f'{amount:.2f}'
 
     return '\n'.join(lines())
+
+
+def period_bound_occasions(
+    activity: Activity,
+    request: FeriennetRequest
+) -> list[Occasion]:
+
+    if not hasattr(request.app, 'active_period'):
+        return []
+    active_period = request.app.active_period
+
+    if not active_period:
+        return []
+
+    return [o for o in activity.occasions if o.period_id == active_period.id]
+
+
+def activity_ages(
+    activity: Activity,
+    request: FeriennetRequest
+) -> tuple[BoundedIntegerRange, ...]:
+    return tuple(o.age for o in period_bound_occasions(activity, request))
+
+
+def activity_spots(
+    activity: Activity,
+    request: FeriennetRequest
+) -> int:
+
+    if not request.app.active_period:
+        return 0
+
+    if not request.app.active_period.confirmed:
+        return sum(o.max_spots for o in period_bound_occasions(
+            activity, request))
+
+    return sum(o.available_spots for o in period_bound_occasions(
+        activity, request))
+
+
+def activity_min_cost(
+    activity: Activity,
+    request: FeriennetRequest
+) -> Decimal | None:
+
+    occasions = period_bound_occasions(activity, request)
+
+    if not occasions:
+        return None
+
+    return min(o.total_cost for o in occasions)
+
+
+def activity_max_cost(
+    activity: Activity,
+    request: FeriennetRequest
+) -> Decimal | None:
+
+    occasions = period_bound_occasions(activity, request)
+
+    if not occasions:
+        return None
+
+    return max(o.total_cost for o in occasions)

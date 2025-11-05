@@ -2527,6 +2527,14 @@ def test_reserve_session_separation(client: Client) -> None:
     assert 'meeting-room' in tickets
     assert 'gym' in tickets
 
+    # the two tickets should be linked
+    client.login_admin()
+    open_tickets = client.get('/tickets/ALL/open')
+    ticket = open_tickets.click('Annehmen', index=0).follow()
+    assert 'Verknüpfte Tickets' in ticket
+    # we can create a multi-ticket pdf
+    pdf = ticket.click('Mit verknüpften Tickets')
+
 
 def test_reserve_reservation_prediction(client: Client) -> None:
     client.login_admin()
@@ -3972,6 +3980,12 @@ def test_my_reservations_view(client: Client) -> None:
     assert '28. August 2015 - 29. August 2015' in pdf_content
     assert 'Keine Daten verfügbar' in pdf_content
 
+    # let's also check out the ticket specific pdf
+    tickets = client.get('/tickets/ALL/all/my-tickets')
+    pdf = tickets.click(href='reservations-pdf')
+    _, pdf_content = extract_pdf_info(BytesIO(pdf.body))
+    assert 'Ganztägig' in pdf_content
+
     subscribe = client.get('/resources/my-reservations-subscribe')
     assert 'webcal://' in subscribe
     ical_url = re.search(  # type: ignore[union-attr]
@@ -3986,3 +4000,6 @@ def test_my_reservations_view(client: Client) -> None:
 
     # someone else can open the same ical link without authentication
     assert client2.get(ical_url).status_code == 200
+    # but not the other views
+    client2.get('/resources/my-reservations-json', status=403)
+    client2.get('/resources/my-reservations-pdf', status=403)

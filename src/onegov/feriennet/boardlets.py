@@ -112,7 +112,7 @@ class PeriodBoardlet(FeriennetBoardlet):
             return
 
         def icon(checked: bool) -> str:
-            return 'fa-check-square-o' if checked else 'fa-square-o'
+            return 'far fa-check-circle' if checked else 'far fa-circle'
 
         yield BoardletFact(
             text=_('Prebooking: ${dates}', mapping={
@@ -121,7 +121,7 @@ class PeriodBoardlet(FeriennetBoardlet):
                     self.period.prebooking_end,
                 )
             }),
-            icon=icon(self.period.confirmed)
+            icon=icon(self.period.confirmed),
         )
 
         yield BoardletFact(
@@ -131,7 +131,7 @@ class PeriodBoardlet(FeriennetBoardlet):
                     self.period.booking_end,
                 )
             }),
-            icon=icon(self.period.is_booking_in_past)
+            icon=icon(self.period.is_booking_in_past),
         )
 
         yield BoardletFact(
@@ -141,7 +141,7 @@ class PeriodBoardlet(FeriennetBoardlet):
                     self.period.execution_end,
                 )
             }),
-            icon=icon(self.period.is_execution_in_past)
+            icon=icon(self.period.is_execution_in_past),
         )
 
 
@@ -207,9 +207,11 @@ class ActivitiesBoardlet(FeriennetBoardlet):
 
     @property
     def title(self) -> str:
-        return _('${count} Activities', mapping={
-            'count': self.activities_count
-        })
+        return _('Activities')
+
+    @property
+    def number(self) -> int:
+        return self.activities_count
 
     @property
     def state(self) -> Literal['success', 'warning', 'failure']:
@@ -224,66 +226,50 @@ class ActivitiesBoardlet(FeriennetBoardlet):
             return
 
         yield BoardletFact(
-            text=_('${count} Activities', mapping={
-                'count': self.activities_count
-            }),
-            icon='fa-square'
+            text=_('Activities'),
+            number=self.activities_count
         )
 
         yield BoardletFact(
-            text=_('${count} Occasions', mapping={
-                'count': self.occasions_count
-            }),
-            icon='fa-chevron-circle-down'
+            text=_('Occasions'),
+            number=self.occasions_count
         )
 
         states = self.occasion_states()
 
         yield BoardletFact(
-            text=_('${count} overfull', mapping={
-                'count': states['overfull'],
-            }),
-            icon='fa-exclamation-circle',
+            text=_('overfull'),
+            number=states['overfull'],
             css_class='' if states['overfull'] else 'zero'
         )
 
         yield BoardletFact(
-            text=_('${count} full', mapping={
-                'count': states['full'],
-            }),
-            icon='fa-circle',
+            text=_('full'),
+            number=states['full'],
             css_class='' if states['full'] else 'zero'
         )
 
         yield BoardletFact(
-            text=_('${count} operable', mapping={
-                'count': states['operable'],
-            }),
-            icon='fa-check-circle',
+            text=_('operable'),
+            number=states['operable'],
             css_class='' if states['operable'] else 'zero'
         )
 
         yield BoardletFact(
-            text=_('${count} unoperable', mapping={
-                'count': states['unoperable'],
-            }),
-            icon='fa-stop-circle',
+            text=_('unoperable'),
+            number=states['unoperable'],
             css_class='' if states['unoperable'] else 'zero'
         )
 
         yield BoardletFact(
-            text=_('${count} empty', mapping={
-                'count': states['empty'],
-            }),
-            icon='fa-circle-o',
+            text=_('empty'),
+            number=states['empty'],
             css_class='' if states['empty'] else 'zero'
         )
 
         yield BoardletFact(
-            text=_('${count} cancelled', mapping={
-                'count': states['cancelled'],
-            }),
-            icon='fa-times-circle',
+            text=_('cancelled'),
+            number=states['cancelled'],
             css_class='' if states['cancelled'] else 'zero'
         )
 
@@ -329,13 +315,13 @@ class BookingsBoardlet(FeriennetBoardlet):
     @property
     def title(self) -> str:
         if not self.period or not self.period.confirmed:
-            return _('${count} Wishes', mapping={
-                'count': self.counts['total']
-            })
+            return _('Wishes')
         else:
-            return _('${count} Bookings', mapping={
-                'count': self.counts['total']
-            })
+            return _('Bookings')
+
+    @property
+    def number(self) -> int:
+        return self.counts['total']
 
     @property
     def state(self) -> Literal['success', 'warning', 'failure']:
@@ -351,61 +337,45 @@ class BookingsBoardlet(FeriennetBoardlet):
 
         if not self.period.confirmed:
             yield BoardletFact(
-                text=_('${count} Wishes', mapping={
-                    'count': self.counts['total']
-                }),
-                icon='fa-square',
+                text=_('Wishes'),
+                number=str(self.counts['total'])
             )
             yield BoardletFact(
-                text=_('${count} Wishes per Attendee', mapping={
-                    'count': self.attendees_count and (
-                        round(self.counts['total'] / self.attendees_count, 1)
-                    ) or 0
-                }),
-                icon='fa-line-chart',
+                text=_('Wishes per Attendee'),
+                number=self.attendees_count and (
+                    round(self.counts['total'] / self.attendees_count, 1)
+                ) or 0
             )
         else:
             yield BoardletFact(
-                text=_('${count} Bookings', mapping={
-                    'count': self.counts['total']
-                }),
-                icon='fa-square',
+                text=_('Bookings'),
+                number=self.counts['total']
             )
             yield BoardletFact(
-                text=_('${count} accepted', mapping={
-                    'count': self.counts['accepted']
-                }),
-                icon='fa-check-square',
+                text=_('accepted'),
+                number=self.counts['accepted'],
                 css_class='' if self.counts['accepted'] else 'zero'
             )
             yield BoardletFact(
-                text=_('${count} not carried out or cancelled', mapping={
-                    'count': self.counts['cancelled']
-                }),
-                icon='fa-minus-square',
+                text=_('not carried out or cancelled'),
+                number=self.counts['cancelled'],
                 css_class='' if self.counts['cancelled'] else 'zero'
             )
             yield BoardletFact(
-                text=_('${count} denied', mapping={
-                    'count': self.counts['denied']
-                }),
-                icon='fa-minus-square',
+                text=_('denied'),
+                number=self.counts['denied'],
                 css_class='' if self.counts['denied'] else 'zero'
             )
             yield BoardletFact(
-                text=_('${count} blocked', mapping={
-                    'count': self.counts['blocked']
-                }),
-                icon='fa-minus-square',
+                text=_('blocked'),
+                number=self.counts['blocked'],
                 css_class='' if self.counts['blocked'] else 'zero'
             )
             yield BoardletFact(
-                text=_('${count} Bookings per Attendee', mapping={
-                    'count': self.attendees_count and round(
+                text=_('Bookings per Attendee'),
+                number=self.attendees_count and round(
                         self.counts['accepted'] / self.attendees_count, 1
-                    ) or 0
-                }),
-                icon='fa-line-chart',
+                    ) or 0,
             )
 
 
@@ -451,9 +421,11 @@ class AttendeesBoardlet(FeriennetBoardlet):
 
     @property
     def title(self) -> str:
-        return _('${count} Attendees', mapping={
-            'count': self.attendee_counts['total']
-        })
+        return _('Attendees')
+
+    @property
+    def number(self) -> int:
+        return self.attendee_counts['total']
 
     @property
     def state(self) -> Literal['success', 'warning', 'failure']:
@@ -468,27 +440,20 @@ class AttendeesBoardlet(FeriennetBoardlet):
             return
 
         yield BoardletFact(
-            text=_('${count} Girls', mapping={
-                'count': self.attendee_counts['girls']
-            }),
-            icon='fa-female',
+            text=_('Girls'),
+            number=self.attendee_counts['girls'],
             css_class='' if self.attendee_counts['girls'] else 'zero'
         )
 
         yield BoardletFact(
-            text=_('${count} Boys', mapping={
-                'count': self.attendee_counts['boys']
-            }),
-            icon='fa-male',
+            text=_('Boys'),
+            number=self.attendee_counts['boys'],
             css_class='' if self.attendee_counts['boys'] else 'zero'
         )
 
         yield BoardletFact(
-            text=_('${count} of which without accepted bookings',
-                   mapping={
-                       'count': self.attendee_counts['without_booking']
-                   }),
-            icon='fa-minus',
+            text=_('of which without accepted bookings'),
+            number=self.attendee_counts['without_booking'],
             css_class='' if self.attendee_counts['without_booking'] else 'zero'
         )
 
@@ -513,9 +478,11 @@ class MatchingBoardlet(FeriennetBoardlet):
 
     @property
     def title(self) -> str:
-        return _('${amount}% Happiness', mapping={
-            'amount': self.happiness
-        })
+        return _('Happiness')
+
+    @property
+    def number(self) -> str:
+        return f'{self.happiness}%'
 
     @property
     def state(self) -> Literal['success', 'warning', 'failure']:
@@ -530,17 +497,8 @@ class MatchingBoardlet(FeriennetBoardlet):
             return
 
         yield BoardletFact(
-            text=_('${amount}% Happiness', mapping={
-                'amount': self.happiness
-            }),
-            icon='fa-smile-o',
-        )
-
-        yield BoardletFact(
-            text=_('${count} Attendees Without Occasion', mapping={
-                'count': self.unlucky_count
-            }),
-            icon='fa-frown-o',
+            text=_('Attendees Without Occasion'),
+            number=str(self.unlucky_count),
             css_class='' if self.unlucky_count else 'zero'
         )
 
@@ -569,9 +527,11 @@ class BillingPortlet(FeriennetBoardlet):
 
     @property
     def title(self) -> str:
-        return _('${amount} CHF outstanding', mapping={
-            'amount': self.layout.format_number(self.amounts['outstanding'])
-        })
+        return _('CHF outstanding')
+
+    @property
+    def number(self) -> str:
+        return self.layout.format_number(self.amounts['outstanding'])
 
     @property
     def state(self) -> Literal['success', 'warning', 'failure']:
@@ -586,25 +546,17 @@ class BillingPortlet(FeriennetBoardlet):
             return
 
         yield BoardletFact(
-            text=_('${amount} CHF total', mapping={
-                'amount': self.layout.format_number(self.amounts['total'])
-            }),
-            icon='fa-circle',
+            text=_('CHF total'),
+            number=self.layout.format_number(self.amounts['total']),
             css_class='' if self.amounts['total'] else 'zero'
         )
         yield BoardletFact(
-            text=_('${amount} CHF paid', mapping={
-                'amount': self.layout.format_number(self.amounts['paid'])
-            }),
-            icon='fa-plus-circle',
+            text=_('CHF paid'),
+            number=self.layout.format_number(self.amounts['paid']),
             css_class='' if self.amounts['paid'] else 'zero'
         )
         yield BoardletFact(
-            text=_('${amount} CHF outstanding', mapping={
-                'amount': self.layout.format_number(
-                    self.amounts['outstanding']
-                )
-            }),
-            icon='fa-minus-circle',
+            text=_('CHF outstanding'),
+            number=self.layout.format_number(self.amounts['outstanding']),
             css_class='' if self.amounts['outstanding'] else 'zero'
         )

@@ -101,6 +101,10 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
         secondary=newsletter_recipients,
         back_populates='newsletters')
 
+    #: whether the newsletter should only show previews instead of full text
+    show_only_previews: Column[bool] = Column(
+        Boolean, nullable=False, default=True)
+
     @property
     def open_recipients(self) -> tuple[Recipient, ...]:
         received = select([newsletter_recipients.c.recipient_id]).where(
@@ -114,8 +118,6 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
                 Recipient.confirmed == True
             )
         ))
-
-    show_news_as_tiles: dict_property[bool] = content_property(default=True)
 
     #: categories the newsletter reports on
     newsletter_categories: dict_property[list[str] | None] = content_property()

@@ -214,3 +214,137 @@ def convert_text_to_html_for_notification_templates(
             template.text = Markup('\n').join(as_paragraphs(template.text))
 
         context.session.flush()
+
+
+@upgrade_task('Add structure for foundation layout')
+def migrate_homepage_structure_for_feriennet(context: UpgradeContext) -> None:
+    org = context.session.query(Organisation).first()
+
+    if org is None:
+        return
+
+    if 'Nouvelle' not in org.meta['homepage_structure']:
+        org.meta['homepage_structure'] = textwrap.dedent("""\
+    <slider height-d="100vh" height-m="55vw" />
+    <row>
+        <column span="12">
+            <row>
+                <column span="12">
+                    <title>Angebote</title>
+                    <activities/>
+                </column>
+            </row>
+        </column>
+    </row>
+    <row-wide bgcolor="gray">
+        <column span="12">
+            <row>
+                <column span="12">
+                    <homepage-tiles show-title="True"/>
+                </column>
+            </row>
+        </column>
+    </row-wide>
+    <row-wide bgcolor="primary">
+        <row class="columns small-up-1 medium-up-2 large-up-3 align-center">
+            <column class="cell">
+                <icon_link
+                    icon="fa-envelope"
+                    title="Kontakt"
+                    link="/form/kontakt"
+                    text="Haben Sie Fragen oder Anregungen?"
+                />
+            </column>
+            <column class="cell">
+                <icon_link
+                    icon="fa-images"
+                    link="/photoalbums"
+                    title="Fotoalben"
+                    text="Impressionen der Aktivitäten"
+                />
+            </column>
+            <column class="cell">
+                <icon_link
+                    icon="fa-child"
+                    link="/activities/volunteer"
+                    title="Helfen"
+                    text="Helfen sie mit"
+                />
+            </column>
+        </row>
+    </row-wide>
+
+    <row-wide>
+        <column span="12">
+            <row>
+                <column span="12">
+                    <title>News</title>
+                    <news />
+                </column>
+            </row>
+        </column>
+    </row-wide>
+
+        """)
+    else:
+        org.meta['homepage_structure'] = textwrap.dedent("""\
+    <slider height-d="100vh" height-m="55vw" />
+    <row>
+        <column span="12">
+            <row>
+                <column span="12">
+                    <title>Activités</title>
+                    <activities/>
+                </column>
+            </row>
+        </column>
+    </row>
+    <row-wide bgcolor="gray">
+        <column span="12">
+            <row>
+                <column span="12">
+                    <homepage-tiles show-title="True"/>
+                </column>
+            </row>
+        </column>
+    </row-wide>
+    <row-wide bgcolor="primary">
+        <row class="columns small-up-1 medium-up-2 large-up-3 align-center">
+            <column class="cell">
+                <icon_link
+                    icon="fa-envelope"
+                    title="Contact"
+                    link="/form/kontakt"
+                    text="Vous avez des questions ou des suggestions?"
+                />
+            </column>
+            <column class="cell">
+                <icon_link
+                    icon="fa-images"
+                    link="/photoalbums"
+                    title="Photos"
+                    text="Impressions des activités"
+                />
+            </column>
+            <column class="cell">
+                <icon_link
+                    icon="fa-child"
+                    link="/activities/volunteer"
+                    title="Aider"
+                    text="Aidez nous"
+                />
+            </column>
+        </row>
+    </row-wide>
+
+    <row-wide>
+        <column span="12">
+            <row>
+                <column span="12">
+                    <title>Nouvelles</title>
+                    <news />
+                </column>
+            </row>
+        </column>
+    </row-wide>
+        """)

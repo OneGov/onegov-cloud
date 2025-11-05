@@ -7,13 +7,14 @@ import transaction
 from datetime import datetime
 from onegov.people import PersonCollection
 from onegov.search import Searchable
+from onegov.search.datamanager import IndexerDataManager
 from onegov.search.indexer import (
     Indexer,
     ORMEventTranslator,
     TypeMappingRegistry
 )
 from onegov.search.search_index import SearchIndex
-from queue import Queue
+from unittest.mock import patch, Mock
 
 
 from typing import Any, TYPE_CHECKING
@@ -21,10 +22,15 @@ if TYPE_CHECKING:
     from onegov.core.orm import SessionManager
     from onegov.search.indexer import Task
     from sqlalchemy.orm import Session
+    from unittest.mock import MagicMock
     from tests.shared.capturelog import CaptureLogFixture
 
 
-def test_orm_event_translator_properties() -> None:
+@patch('onegov.search.indexer.object_session')
+def test_orm_event_translator_properties(object_session: MagicMock) -> None:
+
+    session: Any = Mock()
+    object_session.return_value = session
 
     class Page(Searchable):
 
@@ -70,7 +76,8 @@ def test_orm_event_translator_properties() -> None:
     mappings = TypeMappingRegistry()
     mappings.register_type('Page', Page.fts_properties)
 
-    translator = ORMEventTranslator(mappings)
+    indexer = Indexer(mappings)
+    translator = ORMEventTranslator(indexer)
 
     creation_date = datetime(2015, 9, 11)
     translator.on_insert('my-schema', Page(
@@ -106,9 +113,11 @@ def test_orm_event_translator_properties() -> None:
             'published': 'True',
         }
     }
-    assert translator.queue.qsize() == 1
-    assert translator.queue.get() == expected
-    assert translator.queue.empty()
+    queue = IndexerDataManager.get_queue(session, indexer)
+    assert queue is not None
+    assert len(queue) == 1
+    assert queue.pop() == expected
+    assert len(queue) == 0
 
     translator.on_update('my-schema', Page(
         id=1,
@@ -119,7 +128,7 @@ def test_orm_event_translator_properties() -> None:
         published=True,
         likes=1000
     ))
-    assert translator.queue.qsize() == 1
+    assert len(queue) == 1
 
     expected = {
         'action': 'index',
@@ -144,11 +153,15 @@ def test_orm_event_translator_properties() -> None:
             'published': 'True',
         },
     }
-    assert translator.queue.get() == expected
-    assert translator.queue.empty()
+    assert queue.pop() == expected
+    assert len(queue) == 0
 
 
-def test_orm_event_translator_delete() -> None:
+@patch('onegov.search.indexer.object_session')
+def test_orm_event_translator_delete(object_session: MagicMock) -> None:
+
+    session: Any = Mock()
+    object_session.return_value = session
 
     class Page(Searchable):
 
@@ -162,8 +175,9 @@ def test_orm_event_translator_delete() -> None:
     mappings = TypeMappingRegistry()
     mappings.register_type('Page', {})
 
-    translator = ORMEventTranslator(mappings)
-    translator.on_delete('foobar', Page(123))
+    indexer = Indexer(mappings)
+    translator = ORMEventTranslator(indexer)
+    translator.on_delete('foobar', session, Page(123))
 
     expected = {
         'action': 'delete',
@@ -172,11 +186,20 @@ def test_orm_event_translator_delete() -> None:
         'owner_type': 'Page',
         'id': 123
     }
-    assert translator.queue.get() == expected
-    assert translator.queue.empty()
+    queue = IndexerDataManager.get_queue(session, indexer)
+    assert queue is not None
+    assert queue.pop() == expected
+    assert len(queue) == 0
 
 
-def test_orm_event_queue_overflow(capturelog: CaptureLogFixture) -> None:
+@patch('onegov.search.indexer.object_session')
+def test_orm_event_queue_overflow(
+    object_session: MagicMock,
+    capturelog: CaptureLogFixture
+) -> None:
+
+    session: Any = Mock()
+    object_session.return_value = session
 
     capturelog.setLevel(logging.ERROR, logger='onegov.search')
 
@@ -199,10 +222,11 @@ def test_orm_event_queue_overflow(capturelog: CaptureLogFixture) -> None:
     mappings = TypeMappingRegistry()
     mappings.register_type('Tweet', {})
 
-    translator = ORMEventTranslator(mappings, max_queue_size=3)
+    indexer = Indexer(mappings)
+    translator = ORMEventTranslator(indexer, max_queue_size=3)
     translator.on_insert('foobar', Tweet(1))
     translator.on_update('foobar', Tweet(2))
-    translator.on_delete('foobar', Tweet(3))
+    translator.on_delete('foobar', session, Tweet(3))
 
     assert len(capturelog.records(logging.ERROR)) == 0
 
@@ -245,7 +269,7 @@ def test_indexer_process(
     mappings.register_type('Page', {
         'title': {'type': 'localized', 'weight': 'A'},
     })
-    indexer = Indexer(mappings, Queue(), engine)
+    indexer = Indexer(mappings)
 
     task: Task = {
         'action': 'index',
@@ -264,9 +288,7 @@ def test_indexer_process(
         'language': 'en',
         'properties': {'title': 'Go ahead and jump'},
     }
-    indexer.queue.put(task)
-    assert indexer.process() == 1
-    assert indexer.process() == 0
+    assert indexer.process([task], session) == 1
 
     # TODO: search indexed entry in search index
 
@@ -278,14 +300,12 @@ def test_indexer_process(
         'owner_type': 'Page',
         'id': 1
     }
-    indexer.queue.put(task)
-    assert indexer.process() == 1
-    assert indexer.process() == 0
+    assert indexer.process([task], session) == 1
 
     # TODO: search deleted entry in search index
 
 
-def test_indexer_bulk_process_mid_transaction(
+def test_indexer_process_mid_transaction(
     session_manager: SessionManager,
     session: Session
 ) -> None:
@@ -296,11 +316,12 @@ def test_indexer_bulk_process_mid_transaction(
         'title': {'type': 'text', 'weight': 'A'},
     })
     engine = session_manager.engine
-    indexer = Indexer(mappings, Queue(), engine)
+    indexer = Indexer(mappings)
+    tasks: list[Task] = []
 
     people = PersonCollection(session)
     person1 = people.add(first_name='John', last_name='Doe')
-    indexer.queue.put({
+    tasks.append({
         'action': 'index',
         'schema': session_manager.current_schema,
         'tablename': 'people',
@@ -318,7 +339,7 @@ def test_indexer_bulk_process_mid_transaction(
         'properties': {'title': person1.title},
     })
     person2 = people.add(first_name='Jane', last_name='Doe')
-    indexer.queue.put({
+    tasks.append({
         'action': 'index',
         'schema': session_manager.current_schema,
         'tablename': 'people',
@@ -335,9 +356,10 @@ def test_indexer_bulk_process_mid_transaction(
         'last_change': person2.last_change,
         'properties': {'title': person2.title}
     })
-    indexer.process(session)
+    indexer.process(tasks, session)
+    tasks.clear()
     person3 = people.add(first_name='Paul', last_name='Atishon')
-    indexer.queue.put({
+    tasks.append({
         'action': 'index',
         'schema': session_manager.current_schema,
         'tablename': 'people',
@@ -354,7 +376,7 @@ def test_indexer_bulk_process_mid_transaction(
         'last_change': person3.last_change,
         'properties': {'title': person3.title}
     })
-    indexer.process(session)
+    indexer.process(tasks, session)
     # make sure we can commit
     transaction.commit()
     transaction.begin()
@@ -373,7 +395,7 @@ def test_tags(
     mappings.register_type('Page', {})
     schema = session_manager.current_schema
     assert schema is not None
-    indexer = Indexer(mappings, Queue(), session_manager.engine)
+    indexer = Indexer(mappings)
 
     task: Task = {
         'action': 'index',
@@ -392,7 +414,6 @@ def test_tags(
         'last_change': None,
         'properties': {},
     }
-    indexer.queue.put(task)
-    assert indexer.process()
+    assert indexer.process([task], session)
 
     # TODO search indexed entry using search index via tags

@@ -18,7 +18,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr tal:repeat="period periods" class="${period.active and 'active' or ''}">
+                <tr tal:repeat="period periods" class="${period.active and 'active' or '' or period.archived and 'archived' or ''}">
                     <td>${period.title}</td>
                     <td>
                         <dl class="period-dates">
@@ -67,7 +67,8 @@
                     </td>
                     <td>
                         <ul class="small dense">
-                            <li tal:repeat="link links(period)" tal:content="link(layout)" />
+                            <li tal:repeat="link links(period)" tal:content="link(layout)"
+                            />
                         </ul>
                     </td>
                 </tr>

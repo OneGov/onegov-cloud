@@ -90,7 +90,7 @@
 </metal:navigation>
 
 <metal:navigation define-macro="side-navigation">
-    <ul class="vertical menu side-navigation drilldown"  data-drildown data-auto-height="true" data-responsive-menu="drilldown medium-accordion" data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
+    <ul class="vertical menu side-navigation drilldown" data-auto-height="true" data-responsive-menu="drilldown medium-accordion" data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
         <li tal:repeat="(nav_page, link, children) links" data-sortable-id="${nav_page.id}">
             <metal:b use-macro="layout.macros['side_navigation_nested']" />
         </li>
@@ -130,7 +130,7 @@
         <ul class="dropdown menu edit-bar" data-dropdown-menu tal:condition="editbar_links">
             <li tal:repeat="group editbar_links|layout.editbar_links">
                 <tal:b condition="group.links|nothing">
-                    <a href="#">${group.title}</a>
+                    <a href="#" class="${' '.join(group.classes or ())}">${group.title}</a>
                     <ul class="menu">
                         <li tal:repeat="link group.links">
                             <tal:b replace="link(layout)" />
@@ -222,32 +222,32 @@
 <metal:footer_custom_links define-macro="footer_custom_links">
     <tal:b define="custom_links layout.custom_links">
         <tal:b tal:condition="custom_links" tal:repeat="link custom_links">
-            <h5 class="custom-links"><a href="${link[1]}">${link[0]}</a></h5>
+            <h5 class="custom-links"><a class="footer-link" href="${link[1]}">${link[0]}</a></h5>
         </tal:b>
     </tal:b>
 </metal:footer_custom_links>
 
 <metal:footer_links define-macro="footer_links" i18n:domain="onegov.town6">
 <div class="medium-4 cell"></div>
-<div class="small-12 medium-4 cell footer-links">
-    <tal:b tal:condition="not request.app.org.hide_onegov_footer|True">
+<div class="small-12 medium-6 cell footer-links">
+    <tal:b condition="not request.app.org.hide_onegov_footer|True">
         <span>
-            <a href="https://www.admin.digital">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
+            <a class="footer-link" href="https://www.admin.digital">OneGov Cloud</a> | <a class="footer-link" href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
         </span>
         <br/>
         <span>
-            <a href="https://www.admin.digital/datenschutz" i18n:translate>
+            <a class="footer-link" href="https://www.admin.digital/datenschutz" i18n:translate>
                 Privacy Protection
             </a>
         </span>
         <span tal:condition="request.app.org.impressum_url|None">
-            <a href="${request.app.org.impressum_url}" i18n:translate>
+            <a class="footer-link" href="${request.app.org.impressum_url}" i18n:translate>
                 Impressum
             </a>
         </span>
     </tal:b>
     <span tal:condition="not request.is_logged_in">
-        <a href="${layout.login_from_path()}" i18n:translate>
+        <a class="footer-link" href="${layout.login_from_path()}" i18n:translate>
             Login
         </a>
     </span>
@@ -257,7 +257,7 @@
         </a>
     </span>
     <span tal:define="about_url layout.org.meta.about_url|nothing" tal:condition="about_url">
-        <a href="${about_url}" i18n:translate>
+        <a class="footer-link" href="${about_url}" i18n:translate>
             About
         </a>
     </span>
@@ -267,13 +267,13 @@
 <metal:footer_contact define-macro="footer_contact" i18n:domain="onegov.town6">
     <h5 i18n:translate tal:condition="contact or contact_url">Contact</h5>
     <div tal:content="layout.org.contact_html" />
-    <a tal:condition="contact_url" tal:attributes="href contact_url"><strong><tal:b i18n:translate>more</tal:b>…</strong></a>
+    <a class="footer-link" tal:condition="contact_url" tal:attributes="href contact_url"><strong><tal:b i18n:translate>more</tal:b>…</strong></a>
 </metal:footer_contact>
 
 <metal:footer_opening_hours define-macro="footer_opening_hours" i18n:domain="onegov.town6">
     <h5 i18n:translate tal:condition="opening_hours or opening_hours_url">Opening Hours</h5>
     <div tal:content="opening_hours" />
-    <a tal:condition="opening_hours_url" tal:attributes="href opening_hours_url"><strong><tal:b i18n:translate>more</tal:b>…</strong></a>
+    <a class="footer-link" tal:condition="opening_hours_url" tal:attributes="href opening_hours_url"><strong><tal:b i18n:translate>more</tal:b>…</strong></a>
 </metal:footer_opening_hours>
 
 <metal:footer_social_media define-macro="footer_social_media">
@@ -289,32 +289,32 @@
         <h5 i18n:translate>Social Media</h5>
         <ul class="social-media-links">
             <li tal:condition="facebook">
-                <a tal:attributes="href facebook">
+                <a class="footer-link" tal:attributes="href facebook">
                     <i class="fab fa-facebook fa-fw"></i> Facebook
                 </a>
             </li>
             <li tal:condition="twitter">
-                <a tal:attributes="href twitter">
+                <a class="footer-link" tal:attributes="href twitter">
                     <i class="fab fa-twitter fa-fw"></i> Twitter
                 </a>
             </li>
             <li tal:condition="instagram">
-                <a tal:attributes="href instagram">
+                <a class="footer-link" tal:attributes="href instagram">
                     <i class="fab fa-instagram fa-fw"></i> Instagram
                 </a>
             </li>
             <li tal:condition="youtube">
-                <a tal:attributes="href youtube">
+                <a class="footer-link" tal:attributes="href youtube">
                     <i class="fab fa-youtube fa-fw"></i> YouTube
                 </a>
             </li>
             <li tal:condition="linkedin">
-                <a tal:attributes="href linkedin">
+                <a class="footer-link" tal:attributes="href linkedin">
                     <i class="fab fa-linkedin fa-fw"></i> LinkedIn
                 </a>
             </li>
             <li tal:condition="tiktok">
-                <a tal:attributes="href tiktok">
+                <a class="footer-link" tal:attributes="href tiktok">
                     <i class="fab fa-tiktok fa-fw"></i> TikTok
                 </a>
             </li>
@@ -327,8 +327,8 @@
         <h5>Languages</h5>
         <div class="text-links">
             <tal:b repeat="(name, url) layout.locales">
-                <a tal:condition="request.locale not in url" href="${url}">${name}</a>
-                <a tal:condition="request.locale in url" style="cursor: default"><strong>${name}</strong></a>
+                <a class="footer-link" tal:condition="request.locale not in url" href="${url}">${name}</a>
+                <a class="footer-link" tal:condition="request.locale in url" style="cursor: default"><strong>${name}</strong></a>
             </tal:b>
         </div>
     </div>
@@ -596,12 +596,12 @@
 
 
 <metal:newslist define-macro="newslist" i18n:domain="onegov.town6">
-    <div tal:condition="newsletter.show_news_as_tiles|True and news" class="newslist grid-x grid-padding-x align-center" >
+    <div tal:condition="newsletter.show_only_previews|True and news" class="newslist grid-x grid-padding-x align-center" >
         <div class="cell small-12 medium-${md_span|6} large-${lg_span|4} news-list-item" tal:repeat="item news">
             <metal:newlist use-macro="layout.macros['news-item-card']" tal:define="heading 'h4'" />
         </div>
     </div>
-    <div tal:condition="not: newsletter.show_news_as_tiles|True" class="newslist grid-x align-center" tal:repeat="item news">
+    <div tal:condition="not: newsletter.show_only_previews|True" class="newslist grid-x align-center" tal:repeat="item news">
         <metal:newlist use-macro="layout.macros['news-item-full']" tal:define="heading 'h4'" />
     </div>
     <div class="newslist grid-x align-center">
@@ -727,7 +727,7 @@
     <div tal:condition="no_sidebar_offset|False" class="small-12 medium-4 cell sidebar ${'filter-panel' if filter_panel else ''}" tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False"
     tal:define="files files|None; highlight_contacts highlight_contacts|True; filter_panel filter_panel|False; sidepanel_contact page.sidepanel_contact|None;">
         <div class="sidebar-wrapper">
-            <div metal:define-slot="before-panels"></div>
+            <tal:b metal:define-slot="before-panels"></tal:b>
             <div tal:define="hide page.hide_contact|hide_contact|False" class="side-panel contact-panel" tal:condition="not hide and contact or coordinates or location">
                 <div tal:condition="contact and not hide">
                     <h3 i18n:translate>Contact</h3>
@@ -745,7 +745,7 @@
                 </div>
                 <br tal:condition="coordinates and contact" />
                 <h3 i18n:translate tal:condition="not contact">Map</h3>
-                <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div>
+                <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div><br>
                 <div class="location" tal:condition="location">${location}</div>
             </div>
             <div class="side-panel people-panel" tal:condition="people and not show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
@@ -2125,7 +2125,7 @@
 </metal:checkout_form>
 
 <metal:tags define-macro="tags">
-    <ul class="tags">
+    <ul class="tags" >
         <li tal:repeat="link tags" class="click-through">
             <span tal:content="link(layout)"
                 class="${link.active and 'active' or ''} blank-label ${getattr(link, 'rounded', None) and 'rounded'}"
@@ -2686,7 +2686,7 @@
 <metal:file_links define-macro="file-links" i18n:domain="onegov.town6">
     <ul class="more-list">
         <tal:b repeat="result file.links">
-            <li class="search-result-${result.es_type_name}" tal:condition="result">
+            <li class="search-result-${result.__tablename__}" tal:condition="result">
                 <tal:b
                     define="macro 'search_result_{}'.format(result.__tablename__); tenant_macro 'search_result_{}_{}'.format(result.__tablename__, request.app.application_id.split('/')[-1])"
                     metal:use-macro="layout.macros[tenant_macro]|layout.macros[macro]|layout.macros['search_result_default']"

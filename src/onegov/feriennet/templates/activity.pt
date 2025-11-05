@@ -16,7 +16,7 @@
 
         <tal:b condition="activity.state == 'proposed' and request.is_organiser_only">
             <div class="panel callout" i18n:translate>
-                This activity is currently being reviewd by an administrator.
+                This activity is currently being reviewed by an administrator.
             </div>
         </tal:b>
 
@@ -28,40 +28,51 @@
 
         <tal:b metal:use-macro="layout.macros.activity_detailed" tal:define="show_ticket_panel True">
             <metal:b fill-slot="after-text">
-                <div tal:condition="not: occasions_by_period">
+                <div tal:condition="not occasions_by_period and not occasions_current_period">
                     <h3 i18n:translate>Occasions</h3>
                     <p i18n:translate>
                         There are currently no occasions planned.
                     </p>
                 </div>
 
-                <tal:b define="today layout.today()" condition="occasions_by_period" repeat="(title, occasions) occasions_by_period">
-                    <div tal:define="period occasions[0].period" class="occasions-by-period" tal:condition="period.active or (request.is_admin or activity.username == request.current_username)">
-                        <div class="title-with-toggle">
-                            <div class="toggle" data-toggle="#occasions-for-${period.id.hex}">
-                                <i class="fa fa-plus-circle toggle-on" aria-hidden="true"></i>
-                                <i class="fa fa-minus-circle toggle-off" aria-hidden="true"></i>
-                            </div>
 
+                <tal:b condition="occasions_current_period">
+                    <tal:b tal:define="(title, occasions) occasions_current_period[0]; period occasions[0].period">
+                        <div class="activity-active-period">
                             <h3>${title}</h3>
+                            <p class="hint">
+                                <tal:b tal:condition="len(phases_date) == 2">
+                                    <span>
+                                        <b><tal:b i18n:translate>Prebooking</tal:b>: </b><span>${phases_date[1]}</span>
+                                    </span>
+                                </tal:b>
+                                <tal:b tal:condition="len(phases_date)">
+                                    <span>
+                                        <b><tal:b i18n:translate>Booking</tal:b>: </b><span>${phases_date[0]}</span>
+                                    </span>
+                                </tal:b>
+                            </p>
                         </div>
-
-                        <div id="occasions-for-${period.id.hex}" style="display: ${period.active and 'block' or 'none'};">
-                            <div class="panel">
-                                <div class="hints">
-                                    <tal:b metal:use-macro="layout.macros.period_hints" />
-                                </div>
-                            </div>
-
-                            <ul class="occasions">
-                                <li tal:repeat="occasion occasions">
-                                    <h4><tal:b>${repeat.occasion.number}.</tal:b> <tal:b i18n:translate>Occasion</tal:b></h4>
-                                    <tal:b metal:use-macro="layout.macros.occasion" tal:define="show_links True; show_enroll show_enroll(occasion); show_needs request.is_admin" />
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+                        <tal:b metal:use-macro="layout.macros['occasions-by-period']" />
+                    </tal:b>
                 </tal:b>
+                <h3 i18n:translate tal:condition="occasions_by_period">Other Occasions</h3>
+                <ul class="accordion" data-accordion data-allow-all-closed="true">
+
+                    <tal:b define="today layout.today()" condition="occasions_by_period" repeat="(title, occasions) occasions_by_period">
+                        <li tal:define="period occasions[0].period" class="occasions-by-period accordion-item" data-accordion-item tal:condition="period.active or (request.is_admin or activity.username == request.current_username)">
+                            <a href="occasions-for-${period.id.hex}" class="accordion-title">
+                                <b>${title}</b> - <span>${layout.format_date_range(period.booking_start, period.booking_end)}</span>
+                            </a>
+
+                            <div class="accordion-content" data-tab-content id="occasions-for-${period.id.hex}">
+                                <tal:b metal:use-macro="layout.macros['occasions-by-period']" />
+                            </div>
+                        </li>
+                    </tal:b>
+
+                </ul>
+
             </metal:b>
         </tal:b>
     </tal:b>

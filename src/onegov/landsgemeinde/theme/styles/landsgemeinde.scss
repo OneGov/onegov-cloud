@@ -571,6 +571,7 @@ h1.main-title small {
     background: $white-smoke;
     display: flex;
     font-weight: bold;
+    line-height: 1.4rem;
     margin-bottom: .5rem;
     padding: 1rem;
     transition: background 200ms linear;
@@ -580,7 +581,8 @@ h1.main-title small {
         transition: background 200ms linear;
     }
 
-    .fa-download {
+    .fa,
+    .fas {
         margin-right: 1rem;
     }
 }

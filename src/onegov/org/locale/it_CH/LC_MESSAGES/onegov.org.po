@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-10-21 13:49+0200\n"
+"POT-Creation-Date: 2025-11-04 12:21+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1309,15 +1309,12 @@ msgstr "Osservazione finale alla fine della newsletter"
 msgid "Latest news"
 msgstr "Ultime notizie"
 
-msgid "Show news as tiles"
-msgstr "Mostra le notizie come piastrelle"
+msgid "Show only lead of news"
+msgstr "Mostra solo l'estratto delle notizie"
 
-msgid ""
-"If checked, news are displayed as tiles. Otherwise, news are listed in full "
-"length."
+msgid "Only show the lead of the news and a \"read more\"link."
 msgstr ""
-"Se questa opzione è attivata, i notizie vengono visualizzati come tessere. "
-"Altrimenti, i notizie sono elencati per intero."
+"Mostra solo l'estratto delle notizie e un link \"leggi di più\"."
 
 msgid "Events"
 msgstr "Evento"
@@ -3227,6 +3224,12 @@ msgstr "Nuova nota"
 msgid "PDF"
 msgstr "PDF"
 
+msgid "Only this ticket"
+msgstr "Solo questo biglietto"
+
+msgid "With related tickets"
+msgstr "Con biglietti correlati"
+
 msgid "Download files"
 msgstr "Scarica i file"
 
@@ -4021,6 +4024,9 @@ msgstr "Aggiunto iFrame"
 
 msgid "Edit iFrame"
 msgstr "Modifica iFrame"
+
+msgid "Move iFrame"
+msgstr "Spostare iFrame"
 
 msgid "The iFrame was deleted"
 msgstr "L'iFrame è stato eliminato"
@@ -7570,6 +7576,22 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid ""
+#~ "If checked, only the lead of the news and a \"read more\"link is shown."
+#~ msgstr ""
+#~ "Se selezionato, viene mostrato solo l'estratto delle notizie e un link "
+#~ "\"leggi di più\"."
+
+#~ msgid "Show news as tiles"
+#~ msgstr "Mostra le notizie come piastrelle"
+
+#~ msgid ""
+#~ "If checked, news are displayed as tiles. Otherwise, news are listed in "
+#~ "full length."
+#~ msgstr ""
+#~ "Se questa opzione è attivata, i notizie vengono visualizzati come "
+#~ "tessere. Altrimenti, i notizie sono elencati per intero."
 
 #~ msgid "New news since the last newsletter:"
 #~ msgstr "Nuove notizie dalla newsletter precedente:"

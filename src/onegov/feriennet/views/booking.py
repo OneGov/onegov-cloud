@@ -24,7 +24,7 @@ from onegov.feriennet.layout import (
 from onegov.feriennet.models import AttendeeCalendar, GroupInvite
 from onegov.feriennet.utils import decode_name
 from onegov.feriennet.views.shared import users_for_select_element
-from onegov.org.layout import DefaultMailLayout
+from onegov.town6.layout import DefaultMailLayout
 from onegov.user import User
 from purl import URL
 from sortedcontainers import SortedList
@@ -715,17 +715,17 @@ def view_group_invite(
             traits = ()
 
         if action == 'join':
-            text = (
-                ('👦 ' if attendee.gender == 'male' else '👧 ')
-                + attendee.name
-            )
+            text = _('add to group')
+            icon = 'plus-icon'
         else:
-            text = _('Leave Group')
+            text = _('remove from group')
+            icon = 'minus-icon'
 
         return Link(
             text=text,
             url=layout.csrf_protected_url(url),
-            traits=traits
+            traits=traits,
+            attrs={'class': (icon, 'before')}
         )
 
     # https://stackoverflow.com/a/23847977/138103
@@ -763,9 +763,7 @@ def view_group_invite(
 
     return {
         'layout': layout,
-        'title': _('Group for "${title}"', mapping={
-            'title': occasion.activity.title
-        }),
+        'title': _('Group'),
         'occasion': occasion,
         'model': self,
         'group_action': group_action,

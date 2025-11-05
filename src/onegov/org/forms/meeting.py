@@ -35,7 +35,7 @@ class MeetingForm(Form):
     start_datetime = TimezoneDateTimeField(
         timezone='Europe/Zurich',
         label=_('Start'),
-        validators=[Optional()],
+        validators=[InputRequired()],
     )
 
     end_datetime = TimezoneDateTimeField(
@@ -82,6 +82,9 @@ class MeetingForm(Form):
         # prevent showing access field as all ris information is public
         if hasattr(self, 'access'):
             self.delete_field('access')
+
+        if not self.meeting_items.data:
+            self.meeting_items.data = self.items_to_json(None, None)
 
     def populate_obj(  # type:ignore[override]
         self,
@@ -201,8 +204,8 @@ class MeetingForm(Form):
 
     def items_to_json(
         self,
-        values: Sequence[MeetingItem],
-        options: Sequence[PoliticalBusiness],
+        values: Sequence[MeetingItem] | None = None,
+        options: Sequence[PoliticalBusiness] | None = None,
     ) -> str:
         values = values or []
         options = options or []
@@ -227,8 +230,7 @@ class MeetingForm(Form):
                             agenda_item.political_business.display_name
                             if agenda_item.political_business else
                             agenda_item.display_name),
-                        'error': '',
-                        # 'error': self.agenda_items_errors.get(ix, ''),
+                        'error': self.agenda_items_errors.get(ix, ''),
                     }
                     for ix, agenda_item in enumerate(sorted(
                         values, key=lambda x: (x.number or '', x.title)))

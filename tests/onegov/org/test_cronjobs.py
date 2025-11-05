@@ -136,8 +136,8 @@ def test_daily_ticket_statistics(
 
     # those will be ignored as they are inactive or not editors/admins
     request: Any = Bunch(client_addr='127.0.0.1')
-    UserCollection(session).register('a', 'p@ssw0rd', request, role='editor')
-    UserCollection(session).register('b', 'p@ssw0rd', request, role='member')
+    UserCollection(session).register('a', 'p@ssw0rd12', request, role='editor')
+    UserCollection(session).register('b', 'p@ssw0rd12', request, role='member')
 
     users = UserCollection(session).query().all()
     user = users[0]
@@ -269,8 +269,8 @@ def test_weekly_ticket_statistics(
 
     # those will be ignored as they are inactive or not editors/admins
     request: Any = Bunch(client_addr='127.0.0.1')
-    UserCollection(session).register('a', 'p@ssw0rd', request, role='editor')
-    UserCollection(session).register('b', 'p@ssw0rd', request, role='member')
+    UserCollection(session).register('a', 'p@ssw0rd12', request, role='editor')
+    UserCollection(session).register('b', 'p@ssw0rd12', request, role='member')
 
     users = UserCollection(session).query().all()
     user = users[0]
@@ -414,8 +414,8 @@ def test_monthly_ticket_statistics(
 
     # those will be ignored as they are inactive or not editors/admins
     request: Any = Bunch(client_addr='127.0.0.1')
-    UserCollection(session).register('a', 'p@ssw0rd', request, role='editor')
-    UserCollection(session).register('b', 'p@ssw0rd', request, role='member')
+    UserCollection(session).register('a', 'p@ssw0rd12', request, role='editor')
+    UserCollection(session).register('b', 'p@ssw0rd12', request, role='member')
 
     users = UserCollection(session).query().all()
     user = users[0]
@@ -773,6 +773,7 @@ def test_send_daily_newsletter(client: Client[TestOrgApp]) -> None:
     client.app.org.enable_automatic_newsletters = True
     client.app.org.daily_newsletter_title = 'News aus Govikon'
     client.app.org.newsletter_times = ['10', '11', '16']
+    client.app.org.show_only_previews = True
 
     news = PageCollection(session)
     news_parent = news.query().filter_by(name='news').one()
@@ -787,7 +788,8 @@ def test_send_daily_newsletter(client: Client[TestOrgApp]) -> None:
     with freeze_time(datetime(2018, 3, 2, 17, 0, tzinfo=tz)):
         # Created three days ago, published yesterday at 17:00
         news.add(
-            parent=news_parent, title='News1', type='news', access='public',
+            parent=news_parent, title='News1', lead='news1-lead',
+            text=Markup("<h1>News1 Text</h1>"), type='news', access='public',
             publication_start=utcnow() + timedelta(days=2))
 
     with freeze_time(datetime(2018, 3, 4, 17, 0, tzinfo=tz)):
@@ -819,6 +821,8 @@ def test_send_daily_newsletter(client: Client[TestOrgApp]) -> None:
         assert mail is not None
         assert "News aus Govikon" in mail['Subject']
         assert "News1" in mail['TextBody']
+        assert "news1-lead" in mail['TextBody']
+        assert "News1 Text" not in mail['TextBody']
         assert "News2" in mail['TextBody']
         assert "News3" not in mail['TextBody']
         assert "News4" not in mail['TextBody']
@@ -876,7 +880,7 @@ def test_auto_archive_tickets_and_delete(
 
         request: Any = Bunch(client_addr='127.0.0.1')
         UserCollection(session).register(
-            'b', 'p@ssw0rd', request, role='admin'
+            'b', 'p@ssw0rd12', request, role='admin'
         )
         users = UserCollection(session).query().all()
         user = users[0]

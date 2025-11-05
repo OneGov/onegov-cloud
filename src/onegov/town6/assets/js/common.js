@@ -23,7 +23,7 @@ var processCommonNodes = function(elements, out_of_band) {
     targets.find('.page-text a[href*="/datei/"]').attr('target', '_blank');
 
     // generic toggle button
-    // targets.find('[data-toggle]').not('header *').toggleButton();
+    targets.find('[data-ogc-toggle]').toggleButton();
 
     // send an event to allow optional scripts to hook themselves up
     // (we only do out of band updates since it's not guaranteed that these

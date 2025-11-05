@@ -107,9 +107,11 @@ def clone_occasion(
         form.process(obj=self)
         form.dates.data = form.dates_to_json(dates=None)
 
+    layout = OccasionFormLayout(self.activity, request, _('Clone Occasion'))
+    layout.edit_mode = True
+
     return {
-        'layout': OccasionFormLayout(
-            self.activity, request, _('Clone Occasion')),
+        'layout': layout,
         'title': _('Clone Occasion'),
         'form': form
     }

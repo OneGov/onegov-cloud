@@ -35,7 +35,7 @@ def archive_all_tickets(
     tz: TzInfo
 ) -> None:
     request: Any = Bunch(client_addr='127.0.0.1')
-    UserCollection(session).register('b', 'p@ssw0rd', request, role='admin')
+    UserCollection(session).register('b', 'p@ssw0rd12', request, role='admin')
     users = UserCollection(session).query().all()
     user = users[0]
     for t in tickets:

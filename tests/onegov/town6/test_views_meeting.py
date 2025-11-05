@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 import json
 import zipfile
+from datetime import datetime, timedelta
 
 from freezegun import freeze_time
 from tests.shared.utils import create_image
@@ -40,14 +41,14 @@ def test_meetings(client: Client) -> None:
         new = page.click('Sitzung', index=0)
         new.form['title'] = 'Test Meeting'
         new.form['address'] = 'Town Hall'
+        new.form['start_datetime'] = datetime.now() + timedelta(days=1)
         meeting = new.form.submit().follow()
         assert 'Test Meeting' in meeting
         assert 'Es wurden noch keine Traktanden erfasst' in meeting
         assert 'Town Hall' in meeting
 
         page = client.get('/meetings')
-        # FIXME: the meeting is kind of lost as there is no date set
-        # assert 'Test Meeting' in page
+        assert 'Test Meeting' in page
 
         # edit meeting
         edit = meeting.click('Bearbeiten')

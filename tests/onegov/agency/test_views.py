@@ -11,7 +11,6 @@ from onegov.agency.models import ExtendedPerson
 from onegov.core.utils import linkify
 from onegov.org.models import Organisation
 from onegov.pdf.utils import extract_pdf_info
-from pytest import mark
 from sedate import utcnow
 from tests.onegov.core.test_utils import valid_test_phone_numbers
 from tests.shared.utils import encode_map_value
@@ -719,8 +718,8 @@ def test_excel_export_for_editor(client: Client[AgencyApp]) -> None:
     # Download the file
     page = client.get('/people')
     page = page.click('Download Excel Personen')
-    assert page.content_type == \
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    assert page.content_type == (
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 
 def test_excel_export_not_logged_in(client: Client[AgencyApp]) -> None:
@@ -738,7 +737,6 @@ def test_excel_export_not_logged_in(client: Client[AgencyApp]) -> None:
     assert page.status == '403 Forbidden'
 
 
-@mark.flaky(reruns=3, only_rerun=None)
 def test_basic_search(client_with_fts: Client[AgencyApp]) -> None:
     client = client_with_fts
     client.login_admin()
@@ -789,7 +787,6 @@ def test_basic_search(client_with_fts: Client[AgencyApp]) -> None:
         '/search/suggest?q=78').json
 
 
-@mark.flaky(reruns=3, only_rerun=None)
 def test_search_recently_published_object(
     client_with_fts: Client[AgencyApp]
 ) -> None:
@@ -831,7 +828,6 @@ def test_search_recently_published_object(
     session.query(ExtendedAgencyMembership).one().publication_start = then
     session.query(ExtendedAgency).one().publication_start = then
     commit()
-    client.app.fts_indexer.process()
 
     assert 'Nick' in client.get('/search?q=Rivera')
     assert 'Nick' in anom.get('/search?q=Rivera')
@@ -851,7 +847,6 @@ def test_search_recently_published_object(
     session.query(ExtendedAgency).one().publication_start = None
     session.query(ExtendedAgency).one().publication_end = then
     commit()
-    client.app.fts_indexer.process()
 
     assert 'Nick' in client.get('/search?q=Rivera')
     assert 'Nick' not in anom.get('/search?q=Rivera')

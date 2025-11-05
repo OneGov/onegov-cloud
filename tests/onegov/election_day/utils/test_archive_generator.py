@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import Counter
 from datetime import date
 from fs.copy import copy_file
@@ -14,7 +16,15 @@ from onegov.election_day.utils import add_local_results
 from onegov.election_day.utils.archive_generator import ArchiveGenerator
 
 
-def test_query_only_counted_votes_that_have_results(election_day_app_zg):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import ImportTestDatasets, TestApp
+
+
+def test_query_only_counted_votes_that_have_results(
+    election_day_app_zg: TestApp
+) -> None:
+
     archive_generator = ArchiveGenerator(election_day_app_zg)
     session = election_day_app_zg.session()
 
@@ -39,6 +49,7 @@ def test_query_only_counted_votes_that_have_results(election_day_app_zg):
     for sample_vote, ballot_result in zip(sample_votes, ballot_results):
         session.add(sample_vote)
         vote = session.query(Vote).filter_by(date=sample_vote.date).first()
+        assert vote is not None
         vote.proposal.results.append(ballot_result)
 
     bern = Municipality(
@@ -53,7 +64,7 @@ def test_query_only_counted_votes_that_have_results(election_day_app_zg):
     assert len(votes) == 1
 
 
-def test_archive_generation_from_scratch(election_day_app_zg):
+def test_archive_generation_from_scratch(election_day_app_zg: TestApp) -> None:
     archive_generator = ArchiveGenerator(election_day_app_zg)
     session = election_day_app_zg.session()
 
@@ -84,6 +95,7 @@ def test_archive_generation_from_scratch(election_day_app_zg):
     for sample_vote, ballot_result in zip(sample_votes, ballot_results):
         session.add(sample_vote)
         vote = session.query(Vote).filter_by(date=sample_vote.date).first()
+        assert vote is not None
         vote.proposal.results.append(ballot_result)
 
     bern = Municipality(
@@ -113,6 +125,7 @@ def test_archive_generation_from_scratch(election_day_app_zg):
         assert str(item.date.year) == "2022"
 
     zip_path = archive_generator.generate_archive()
+    assert zip_path is not None
 
     with archive_generator.archive_dir.open(zip_path, mode="rb") as fi:
         with ReadZipFS(fi) as zip_fs:
@@ -122,7 +135,7 @@ def test_archive_generation_from_scratch(election_day_app_zg):
             assert {"all_votes.csv", "2022", "2013"} == set(years)
 
             votes = zip_fs.opendir("votes")
-            counter = Counter()
+            counter: Counter[str] = Counter()
             total_bytes_csv = 0
             walker = Walker()
             for _, _, files in walker.walk(
@@ -131,14 +144,14 @@ def test_archive_generation_from_scratch(election_day_app_zg):
                 for file in files:
                     counter[file.name] += 1
 
-                total_bytes_csv = sum(info.size for info in files)
+                total_bytes_csv += sum(info.size for info in files)
             # We expect 3 csv because we have 3 votes,
             # Plus a csv that contains everything = 4
             assert sum(counter.values()) == 4
             assert total_bytes_csv > 10  # check to ensure files are not empty
 
 
-def test_zipping_multiple_directories(election_day_app_zg):
+def test_zipping_multiple_directories(election_day_app_zg: TestApp) -> None:
     archive_generator = ArchiveGenerator(election_day_app_zg)
     tmp_fs = TempFS()
     empty_dir = tmp_fs.opendir("/")
@@ -174,6 +187,7 @@ def test_zipping_multiple_directories(election_day_app_zg):
         )
 
     zip_path = archive_generator.zip_dir(root)
+    assert zip_path is not None
 
     with archive_generator.archive_dir.open(zip_path, mode="rb") as fi:
         with ReadZipFS(fi) as zip_fs:
@@ -185,13 +199,15 @@ def test_zipping_multiple_directories(election_day_app_zg):
                 assert zip_path.info.size > 100
 
 
-def test_long_filenames_are_truncated(election_day_app_zg):
-    long_title = "Bundesbeschluss vom 28. September 2018 über die "\
-                 "Genehmigung und die Umsetzung des Notenaustauschs zwischen "\
-                 "der Schweiz und der EU betreffend die Übernahme der "\
-                 "Richtlinie (EU) 2017 /853 zur Änderung der "\
-                 "EU-Waffenrichtlinie (Weiterentwicklung des Schengen "\
-                 "Besitzstands) "
+def test_long_filenames_are_truncated(election_day_app_zg: TestApp) -> None:
+    long_title = (
+        "Bundesbeschluss vom 28. September 2018 über die "
+        "Genehmigung und die Umsetzung des Notenaustauschs zwischen "
+        "der Schweiz und der EU betreffend die Übernahme der "
+        "Richtlinie (EU) 2017 /853 zur Änderung der "
+        "EU-Waffenrichtlinie (Weiterentwicklung des Schengen "
+        "Besitzstands) "
+    )
 
     session = election_day_app_zg.session()
     session.add(Vote(title=long_title, domain='federation',
@@ -209,12 +225,13 @@ def test_long_filenames_are_truncated(election_day_app_zg):
         name='Bern', municipality='351', canton='be', canton_name='Kanton Bern'
     )
     target = ArchivedResult()
-    source = ArchivedResult(type='vote', external_id=vote.id)
+    source = ArchivedResult(type='vote', external_id=vote.id)  # type: ignore[misc]
     add_local_results(source, target, bern, session)
 
     archive_generator = ArchiveGenerator(election_day_app_zg)
 
     zip_path = archive_generator.generate_archive()
+    assert zip_path is not None
     with archive_generator.archive_dir.open(zip_path, mode="rb") as fi:
         with ReadZipFS(fi) as zip_fs:
             csv = [csv for csv in zip_fs.scandir("votes/2022",
@@ -225,7 +242,11 @@ def test_long_filenames_are_truncated(election_day_app_zg):
             assert len(filename) <= archive_generator.MAX_FILENAME_LENGTH + 4
 
 
-def test_election_generation(election_day_app_zg, import_test_datasets):
+def test_election_generation(
+    election_day_app_zg: TestApp,
+    import_test_datasets: ImportTestDatasets
+) -> None:
+
     results = import_test_datasets(
         'internal',
         'election',
@@ -240,21 +261,21 @@ def test_election_generation(election_day_app_zg, import_test_datasets):
     assert len(results) == 1
     election, errors = next(iter(results.values()))
     assert not errors
-    results = import_test_datasets(
+    results_ = import_test_datasets(
         'internal',
         'parties',
         'zg',
         'canton',
-        'proporz',
         election=election,
         dataset_name='nationalratswahlen-2015-parteien',
     )
-    assert len(results) == 1
-    errors = next(iter(results.values()))
-    assert not errors
+    assert len(results_) == 1
+    errors_ = next(iter(results_.values()))
+    assert not errors_
 
     archive_generator = ArchiveGenerator(election_day_app_zg)
     zip_path = archive_generator.generate_archive()
+    assert zip_path is not None
     with archive_generator.archive_dir.open(zip_path, mode="rb") as fi:
         with ReadZipFS(fi) as zip_fs:
             top_level_dir = zip_fs.listdir(".")

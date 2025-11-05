@@ -23,14 +23,12 @@
 </metal:favicon>
 
 <metal:footer define-macro="footer">
-    <footer>
-        <div>
-            <div class="row footer-content">
-                <div class="small-12 columns">
-                    <metal:b use-macro="layout.macros['footer_columns']" />
-                    <metal:b use-macro="layout.macros['footer_sponsors']" />
-                    <metal:b use-macro="layout.macros['footer_links']" />
-                </div>
+    <footer id="footer" class="footer-container">
+        <div class="grid-container">
+            <div class="grid-x grid-padding-x footer-content">
+                <metal:b use-macro="layout.macros['footer_columns']" />
+                <metal:b use-macro="layout.macros['footer_sponsors']" />
+                <metal:b use-macro="layout.macros['footer_links']" />
             </div>
         </div>
     </footer>
@@ -44,13 +42,95 @@
     <!-- End Google Tag Manager (noscript) -->
 </metal:footer>
 
-<metal:footer_sponsors define-macro="footer_sponsors" i18n:domain="onegov.feriennet">
-    <div class="row sponsor-footer">
-        <div class="columns small-12">
-            <h2 i18n:translate>Pro Juventute Feriennet</h2>
+<metal:footer_columns define-macro="footer_columns">
+    <tal:b define="contact layout.org.contact_html|nothing;
+        contact_url layout.org.contact_url|nothing;
+        opening_hours layout.org.opening_hours_html|nothing;
+        opening_hours_url layout.org.opening_hours_url|nothing;
+        facebook layout.org.facebook_url|nothing;
+        twitter layout.org.twitter_url|nothing;
+        instagram layout.org.instagram_url|nothing;
+        youtube layout.org.youtube_url|nothing;
+        linkedin layout.org.linkedin_url|nothing;
+        tiktok layout.org.tiktok_url|nothing;
+        custom_links layout.custom_links|nothing;">
+        <tal:b tal:condition="any((
+            contact,
+            contact_url,
+            opening_hours,
+            opening_hours_url,
+            facebook,
+            twitter,
+            instagram,
+            youtube,
+            linkedin,
+            tiktok,
+            custom_links
+        ))">
+            <div class="small-12 medium-3 cell">
+                <metal:b use-macro="layout.macros['footer_contact']" />
+            </div>
 
-            <div class="row">
-                <div class="columns small-12 medium-3">
+            <div class="small-12 medium-5 cell">
+                <metal:b use-macro="layout.macros['footer_opening_hours']" />
+            </div>
+
+            <div class="small-12 medium-4 cell">
+                <metal:b use-macro="layout.macros['footer_social_media']" />
+                <metal:b use-macro="layout.macros['footer_custom_links']" />
+            </div>
+        </tal:b>
+    </tal:b>
+</metal:footer_columns>
+
+<metal:footer_social_media define-macro="footer_social_media">
+    <tal:b condition="any((
+            facebook,
+            twitter,
+            instagram,
+            youtube,
+            linkedin,
+            tiktok,
+        ))">
+
+        <h5 i18n:translate>Follow us on</h5>
+        <ul class="social-media-links">
+            <a tal:condition="facebook" tal:attributes="href facebook">
+                <i class="fab fa-facebook fa-fw fa-2x"></i>
+            </a>
+            <a tal:condition="twitter" tal:attributes="href twitter">
+                <i class="fab fa-twitter fa-fw fa-2x"></i>
+            </a>
+            <a tal:condition="instagram" tal:attributes="href instagram">
+                <i class="fab fa-instagram fa-fw fa-2x"></i>
+            </a>
+            <a tal:condition="youtube" tal:attributes="href youtube">
+                <i class="fab fa-youtube fa-fw fa-2x"></i>
+            </a>
+            <a tal:condition="linkedin" tal:attributes="href linkedin">
+                <i class="fab fa-linkedin fa-fw fa-2x"></i>
+            </a>
+            <a tal:condition="tiktok" tal:attributes="href tiktok">
+                <i class="fab fa-tiktok fa-fw fa-2x"></i>
+            </a>
+        </ul>
+    </tal:b>
+</metal:footer_social_media>
+
+
+<metal:footer_custom_links define-macro="footer_custom_links">
+    <tal:b define="custom_links layout.custom_links">
+        <tal:b tal:condition="custom_links" tal:repeat="link custom_links">
+            <h5 class="custom-links" i18n:translate="">Links</h5>
+            <a class="footer-link" href="${link[1]}"><i class="fa fa-link fa-fw"></i> ${link[0]}</a>
+        </tal:b>
+    </tal:b>
+</metal:footer_custom_links>
+
+<metal:footer_sponsors define-macro="footer_sponsors" i18n:domain="onegov.feriennet">
+        <div class="cell small-12">
+            <div class="grid-x grid-padding-x">
+                <div class="cell small-12 medium-3">
                     <tal:b condition="request.locale.startswith('de')">
                         <a href="https://www.projuventute.ch/de/eltern/lehrpersonen-fachpersonen/feriennet" class="pro-juventute-logo">
                             <img src="${layout.static_file_path('projuventute.svg')}"
@@ -82,67 +162,72 @@
                         </a>
                     </tal:b>
                 </div>
-                <div class="columns small-12 medium-5 pro-juventute-ad-text">
+                <div class="cell small-12 medium-3 pro-juventute-ad-text">
+                    <h5 i18n:translate>Pro Juventute Feriennet</h5>
                     <!--! This is not being translated with our translation machinery as the content of this is very explicitly specified. -->
 
                     <div class="platform-promotion">
                         <tal:b condition="request.locale.startswith('de')">
-                            <div>
-                                <a href="https://www.projuventute.ch/de/eltern/lehrpersonen-fachpersonen/feriennet">
-                                    Feriennet ist die Buchungsplattform von Pro Juventute für betreute Ferienangebote.
-                                </a>
-                                <span>
-                                    Weitere Angebote der Stiftung finden Sie <a href="https://www.projuventute.ch/de/angebote">hier</a>.
-                                </span>
-                            </div>
-
-                            <div>
-                                Sie möchten unsere Arbeit für Kinder und Jugendliche in der Schweiz unterstützen? Dann können Sie hier <a href="https://www.projuventute.ch/de/helfen/spenden" class="donate-link">spenden</a>. Herzlichen Dank.
-                            </div>
-
-                            <div>
-                                Diese Plattform wurde dank der grosszügigen Unterstützung unserer <a href="https://www.projuventute.ch/de/eltern/lehrpersonen-fachpersonen/feriennet">Partner</a> realisiert und von <a href="https://www.seantis.ch">Seantis GmbH</a> mit <a href="https://www.admin.digital">Onegov Cloud</a>, unterstützt von <a href="https://www.netcetera.com">Netcetera AG</a> entwickelt.
-                            </div>
+                            <ul>
+                                <li>
+                                    <a class="footer-link" href="https://www.projuventute.ch/de/eltern/lehrpersonen-fachpersonen/feriennet">Über das Feriennet</a>
+                                </li>
+                                <li>
+                                    <a class="footer-link" href="https://www.projuventute.ch/de/angebote">Weitere Angebote</a>
+                                </li>
+                                <li>
+                                    <a href="https://www.projuventute.ch/de/helfen/spenden" class="donate-link footer-link">Spenden</a>
+                                </li>
+                            </ul>
                         </tal:b>
                         <tal:b condition="request.locale.startswith('fr')">
-                            <div>
-                                <a href="https://www.projuventute.ch/fr/parents/enseignantes-et-specialistes/reseau-vacances">
-                                    Réseau vacances est une plateforme, développée par Pro Juventute, qui permet de mettre en ligne des passeports vacances et d’en assurer la gestion et l’utilisation complète.
-                                </a>
-                                <span>
-                                    Pour de plus amples informations sur les offres de la Fondation Pro Juventute : <a href="https://www.projuventute.ch/fr/prestations">Programmes</a>.
-                                </span>
-                            </div>
-
-                            <div>
-                                Vous souhaitez soutenir notre travail auprès des enfants et des jeunes en Suisse? Pour faire un don : <a href="https://www.projuventute.ch/fr/soutenir/dons" class="donate-link">Dons</a>. Nous vous remercions.
-                            </div>
-
-                            <div>
-                                Cette plateforme a été réalisée grâce au soutien généreux de nos <a href="https://www.projuventute.ch/fr/parents/enseignantes-et-specialistes/reseau-vacances">partenaires</a> et développée par <a href="https://www.seantis.ch">Seantis GmbH</a> et <a href="https://www.admin.digital">Onegov Cloud</a>, avec le soutien de <a href="https://www.netcetera.com">Netcetera SA</a>.
-                            </div>
+                            <ul>
+                                <li>
+                                    <a class="footer-link" href="https://www.projuventute.ch/fr/parents/enseignantes-et-specialistes/reseau-vacances">À propos de Feriennet</a>
+                                </li>
+                                <li>
+                                    <a class="footer-link" href="https://www.projuventute.ch/fr/prestations">Programmes</a>
+                                </li>
+                                <li>
+                                    <a href="https://www.projuventute.ch/fr/soutenir/dons" class="donate-link footer-link">Dons</a>
+                                </li>
+                            </ul>
                         </tal:b>
                         <tal:b condition="request.locale.startswith('it')">
                             <div>
-                                <a href="https://www.projuventute.ch/it">
+                                <a class="footer-link" href="https://www.projuventute.ch/it">
                                     Feriennet è la piattaforma di prenotazione di Pro Juventute per campi e colonie di vacanza.
                                 </a>
                                 <span>
-                                    Potete trovare altri progetti della fondazione <a href="https://www.projuventute.ch/it/servizi">qui</a>.
+                                    Potete trovare altri progetti della fondazione <a class="footer-link" href="https://www.projuventute.ch/it/servizi">qui</a>.
                                 </span>
                             </div>
 
                             <div>
-                                Volete sostenere il nostro lavoro per i bambini e i giovani in Svizzera? Allora potete effettuare una donazione <a href="https://www.projuventute.ch/it/supporto/donare?utm_source=spendenLink&utm_medium=spendenLinkFooter&utm_campaign=feriennet" class="donate-link">qui</a>. Grazie mille.
+                                Volete sostenere il nostro lavoro per i bambini e i giovani in Svizzera? Allora potete effettuare una donazione <a href="https://www.projuventute.ch/it/supporto/donare?utm_source=spendenLink&utm_medium=spendenLinkFooter&utm_campaign=feriennet" class="donate-link footer-link">qui</a>. Grazie mille.
                             </div>
 
                             <div>
-                                Questa piattaforma è stata realizzata grazie al generoso sostegno dei nostri <a href="https://www.projuventute.ch/it">partner</a> e sviluppata da <a href="https://www.seantis.ch">Seantis GmbH</a> con <a href="https://www.admin.digital">Onegov Cloud</a>, supportata da <a href="https://www.netcetera.com">Netcetera AG</a>.
+                                Questa piattaforma è stata realizzata grazie al generoso sostegno dei nostri <a class="footer-link" href="https://www.projuventute.ch/it">partner</a> e sviluppata da <a class="footer-link" href="https://www.seantis.ch">Seantis GmbH</a> con <a class="footer-link" href="https://www.admin.digital">Onegov Cloud</a>, supportata da <a class="footer-link" href="https://www.netcetera.com">Netcetera AG</a>.
                             </div>
                         </tal:b>
                     </div>
                 </div>
-                <div class="columns small-12 medium-4">
+                <div class="cell small-12 medium-3">
+                    <h5 i18n:translate>Implementation</h5>
+                    <ul>
+                        <li>
+                            <a class="footer-link" href="https://www.seantis.ch">Seantis GmbH</a>
+                        </li>
+                        <li>
+                            <a class="footer-link" href="https://www.admin.digital">Onegov Cloud</a>
+                        </li>
+                        <li>
+                            <a class="footer-link" href="https://www.netcetera.com">Netcetera AG</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="cell small-12 medium-3">
                     <div class="platform-awards">
                         <metal:b use-macro="layout.macros.bosw_award" />
                         <metal:b use-macro="layout.macros.onegov_award" />
@@ -150,13 +235,11 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row sponsor-footer">
-        <div class="columns small-12">
-            <h2 i18n:translate>Feriennet Partner</h2>
+        <div class="cell small-12 sponsor-footer">
+            <h5 i18n:translate>Feriennet Partner</h5>
 
-            <div tal:repeat="batch layout.batched(layout.app.sponsors, 4)" class="row sponsors-row">
-                <div tal:repeat="sponsor batch" class="columns small-12 medium-3 large-3 ${repeat.sponsor.end and 'end' or ''}">
+            <div tal:repeat="batch layout.batched(layout.app.sponsors, 4)" class="grid-x grid-padding-x">
+                <div tal:repeat="sponsor batch" class="cell small-12 medium-3 large-3 ${repeat.sponsor.end and 'end' or ''}">
                     <div tal:define="sponsor sponsor and sponsor.compiled(request)" tal:condition="sponsor and sponsor.logo|False" class="sponsor" style="background-color: ${sponsor.background};">
                         <a href="${sponsor.logo_url}" title="${sponsor.name}">
                             <div style="background-image: url('${sponsor.url_for(request, sponsor.logo)}')"></div>
@@ -165,45 +248,47 @@
                 </div>
             </div>
         </div>
-    </div>
 </metal:footer_sponsors>
 
 <metal:footer_links define-macro="footer_links" i18n:domain="onegov.org">
-    <div class="row footer-links">
-      <div class="small-12 columns">
+    <div class="small-12 cell footer-links">
         <span>&copy; Pro Juventute ${layout.today().year}</span>
         <span>
-            <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">Feriennet ${layout.app.version}</a>
+            <a class="footer-link" href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">Feriennet ${layout.app.version}</a>
         </span>
         <span>
             <tal:b condition="request.locale.startswith('de')">
-            <a href="https://www.projuventute.ch/de/datenschutz" i18n:translate>
+            <a class="footer-link" href="https://www.projuventute.ch/de/datenschutz" i18n:translate>
                 Privacy Protection</a>
             </tal:b>
             <tal:b condition="request.locale.startswith('fr')">
-            <a href="https://www.projuventute.ch/fr/protection-des-donnees" i18n:translate>
+            <a class="footer-link" href="https://www.projuventute.ch/fr/protection-des-donnees" i18n:translate>
                 Privacy Protection</a>
             </tal:b>
             <tal:b condition="request.locale.startswith('it')">
-            <a href="https://www.projuventute.ch/it/protezione-dei-dati" i18n:translate>
+            <a class="footer-link" href="https://www.projuventute.ch/it/protezione-dei-dati" i18n:translate>
                 Privacy Protection</a>
             </tal:b>
         </span>
         <span>
             <tal:b condition="request.locale.startswith('de')">
-            <a href="https://www.projuventute.ch/de/nutzungsbestimmungen">
-                Nutzungsbestimmungen</a>
+            <a class="footer-link" href="https://www.projuventute.ch/de/nutzungsbedingungen">
+                Nutzungsbedingungen</a>
             </tal:b>
             <tal:b condition="request.locale.startswith('fr')">
-            <a href="https://www.projuventute.ch/fr/conditions-dutilisation">
+            <a class="footer-link" href="https://www.projuventute.ch/fr/conditions-dutilisation">
                 Conditions d'utilisation</a>
             </tal:b>
             <tal:b condition="request.locale.startswith('it')">
-            <a href="https://www.projuventute.ch/it/condizioni-di-utilizzo">
+            <a class="footer-link" href="https://www.projuventute.ch/it/condizioni-di-utilizzo">
                 Condizioni di utilizzo</a>
             </tal:b>
         </span>
-      </div>
+        <span tal:condition="not request.is_logged_in">
+            <a class="footer-link" href="${layout.login_from_path()}" i18n:translate>
+                Login
+            </a>
+        </span>
     </div>
 </metal:footer_links>
 
@@ -283,7 +368,7 @@
         <dt i18n:translate>Phone</dt>
         <dd><a href="tel:${layout.format_phone_number(phone)}">${layout.format_phone_number(phone)}</a></dd>
     </div>
-</metal:b
+</metal:b>
 
 <metal:activity_ticket_summary define-macro="activity_ticket_summary" i18n:domain="onegov.feriennet">
     <tal:b define="user activity.user.data.organisation or activity.user.title|activity.user.title">
@@ -337,16 +422,16 @@
             </ul>
         </div>
 
-        <div metal:fill-slot="before-panels">
-            <div class="side-panel highlighted organiser-panel" tal:define="organiser activity.user; public request.app.public_organiser_data" tal:condition="public">
-                <h2 i18n:translate>Organiser</h2>
+        <tal:b metal:fill-slot="before-panels">
+            <div class="side-panel organiser-panel" tal:define="organiser activity.user; public request.app.public_organiser_data" tal:condition="public">
+                <h3 i18n:translate>Organiser</h3>
                 <metal:b use-macro="layout.macros.organiser" />
             </div>
-        </div>
+        </tal:b>
 
-        <div metal:fill-slot="after-panels" tal:condition="show_ticket_panel and request.is_organiser">
+        <tal:b metal:fill-slot="after-panels" tal:condition="show_ticket_panel and request.is_organiser">
             <div class="side-panel activity-status-panel">
-                <h2 class="show-for-sr" i18n:translate>Activity</h2>
+                <h3 i18n:translate>Activity</h3>
 
                 <dl>
                     <dt i18n:translate>
@@ -366,7 +451,7 @@
                     </tal:b>
                 </dl>
             </div>
-        </div>
+        </tal:b>
 
     </tal:b>
 </metal:activity_detailed>
@@ -385,6 +470,71 @@
         <tal:b i18n:translate case="string:archived">Archived</tal:b>
     </tal:b>
 </metal:activity_state_text>
+
+<metal:activity_card define-macro="activity_card" i18n:domain="onegov.feriennet">
+    <div class="activity-list-item card">
+        <a href="${request.link(activity)}">
+            <div class="grid-x align-middle">
+                <div tal:condition="activity.thumbnail|nothing" style="width: 100%; padding-bottom: 60%; background-image: url('${activity.thumbnail}'); background-size: cover;"></div>
+                <div class="cell small-12 card-section">
+
+                    <h5>${activity.title}</h5>
+
+                    <span class="page-lead" tal:content="layout.paragraphify(activity.lead)"/>
+
+                    <div class="row collapse" tal:define="
+                        ages activity_ages(activity, request);
+                        min_cost activity_min_cost(activity, request);
+                        available_spots activity_spots(activity, request);
+                    ">
+                        <div class="small-12 columns factoids">
+                            <tal:b condition="ages">
+                                <span class="age" tal:define="
+                                    min_age min(age.lower for age in ages);
+                                    max_age max(age.upper - 1 for age in ages);
+                                ">
+                                    <i class="fa fa-child"></i>
+                                    <span i18n:translate class="show-for-sr">Age</span>
+                                    <span i18n:translate>
+                                        <tal:b replace="min_age" i18n:name='min_age' />
+                                        -
+                                        <tal:b replace="max_age" i18n:name='max_age' />
+                                        years
+                                    </span>
+                                </span>
+                            </tal:b>
+                            <tal:b condition="min_cost is not None">
+                                <span class="cost">
+                                    <i class="fa fa-money-bill-wave"></i>
+                                    <span i18n:translate class="show-for-sr">Cost</span>
+
+                                    <span i18n:translate>
+                                        starting at <tal:b i18n:name='price'>${'{:.2f}'.format(min_cost)}</tal:b> CHF
+                                    </span>
+                                </span>
+                            </tal:b>
+                            <tal:b>
+                                <span class="${available_spots and 'available-spots' or 'full'}">
+                                    <span i18n:translate class="show-for-sr">Free Spots</span>
+
+                                    <span i18n:translate tal:condition="not available_spots">
+                                        No free spots
+                                    </span>
+                                    <span i18n:translate tal:condition="available_spots == 1">
+                                        1 free spot
+                                    </span>
+                                    <span i18n:translate tal:condition="available_spots > 1">
+                                        <tal:b i18n:name="count">${available_spots}</tal:b> free spots
+                                    </span>
+                                </span>
+                            </tal:b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+</metal:activity_card>
 
 <metal:organiser define-macro="organiser" i18n:domain="onegov.feriennet">
     <div class="organiser">
@@ -409,18 +559,18 @@
                 </li>
             </tal:b>
             <tal:b condition="'email' in public">
-                <li class="organiser-email" tal:define="email organiser.data.email or organiser.username|organiser.username">
-                    <a href="mailto:${email}">${email}</a>
+                <li tal:define="email organiser.data.email or organiser.username|organiser.username">
+                    <a href="mailto:${email}"><i class="fa fa-envelope"></i> ${email}</a>
                 </li>
             </tal:b>
             <tal:b condition="'phone' in public">
-                <li class="organiser-phone" tal:condition="organiser.data.phone|nothing">
-                    <a href="tel:${layout.format_phone_number(organiser.data.phone)}">${layout.format_phone_number(organiser.data.phone)}</a>
+                <li tal:condition="organiser.data.phone|nothing">
+                    <a href="tel:${layout.format_phone_number(organiser.data.phone)}"><i class="fa fa-phone"></i> ${layout.format_phone_number(organiser.data.phone)}</a>
                 </li>
             </tal:b>
             <tal:b condition="'website' in public">
-                <li class="organiser-website" tal:condition="organiser.data.website|nothing">
-                    <a href="${organiser.data.website}">${organiser.data.website.replace('http://', '').replace('https://', '').rstrip('/')}</a>
+                <li tal:condition="organiser.data.website|nothing">
+                    <a href="${organiser.data.website}"><i class="fa fa-link"></i> ${organiser.data.website.replace('http://', '').replace('https://', '').rstrip('/')}</a>
                 </li>
             </tal:b>
         </ul>
@@ -428,176 +578,204 @@
 </metal:organiser>
 
 <metal:occasion define-macro="occasion" i18n:domain="onegov.feriennet">
-    <div class="occasion" tal:define="
+    <div class="occasion occasion-card card" tal:define="
         show_enroll show_enroll|nothing;
         show_links show_links|nothing;
         show_needs show_needs|nothing;
         period occasion.period;
         wrap_occasion_link wrap_occasion_link|lambda url: url">
 
-        <div class="state" tal:condition="period.phase not in ('inactive', 'wishlist')">
-            <div class="full" tal:condition="not occasion.cancelled and occasion.full">
-                <span i18n:translate>Fully booked</span>
+        <div class="card-section info">
+
+            <div class="factoids">
+                <div class="dates">
+                    <ul>
+                        <li tal:repeat="date occasion.dates">
+                            ${layout.format_datetime_range(date.localized_start, date.localized_end)}
+                        </li>
+                    </ul>
+                </div>
+                <div class="location" tal:condition="occasion.meeting_point">
+                    <p>
+                        <span i18n:translate class="show-for-sr">Meeting Point</span>
+                        <span>${occasion.meeting_point}</span>
+                    </p>
+                </div>
+
+                <div class="overlap-check" tal:condition="occasion.exclude_from_overlap_check">
+                    <p><span i18n:translate>Independent of other occasions</span></p>
+                </div>
+
+                <div class="bring-cash" tal:condition="period.all_inclusive and occasion.cost and period.pay_organiser_directly" >
+                    <p i18n:translate>Please bring <tal:b i18n:name="cost" replace="occasion.cost" /> CHF in cash.</p>
+                </div>
             </div>
 
-            <div class="cancelled" tal:condition="occasion.cancelled">
-                <span i18n:translate>Rescinded</span>
-            </div>
+            <div class="factoids">
+                <div class="age">
+                    <p>
+                        <span i18n:translate class="show-for-sr">Age</span>
+                        <span i18n:translate>
+                            <tal:b replace="occasion.age.lower" i18n:name='min_age' />
+                            -
+                            <tal:b replace="occasion.age.upper - 1" i18n:name='max_age' />
+                            years
+                        </span>
+                    </p>
+                </div>
 
-            <div class="available-spots" tal:condition="not occasion.cancelled and not occasion.full and not period.is_booking_in_past">
-                <span i18n:translate><tal:b i18n:name="count" replace="occasion.available_spots" /> spots available</span>
-            </div>
+                <div class="spots" tal:condition="not period.finalized">
+                    <span i18n:translate class="show-for-sr">Participants</span>
 
-            <div class="spots" tal:condition="not occasion.cancelled and period.is_booking_in_past">
-                <span i18n:translate><tal:b i18n:name="count" replace="occasion.attendee_count" /> attendees</span>
+                    <p i18n:translate tal:condition="occasion.spots.lower">
+                        <tal:b replace="occasion.spots.lower" i18n:name='min_spots' />
+                        -
+                        <tal:b replace="occasion.spots.upper - 1" i18n:name='max_spots' />
+                        participants
+                    </p>
+
+                    <p i18n:translate tal:condition="not:occasion.spots.lower">
+                        up to
+                        <tal:b replace="occasion.spots.upper - 1" i18n:name='max_spots' />
+                        participants
+                    </p>
+                </div>
+
+                <tal:b condition="period.all_inclusive and occasion.cost">
+                    <div class="cost">
+                        <p>
+                            <span i18n:translate class="show-for-sr">Cost</span>
+
+                            <tal:b i18n:translate>
+                                <tal:b i18n:name="cost" replace="occasion.cost" /> CHF
+                            </tal:b>
+                        </p>
+                    </div>
+                </tal:b>
+
+                <tal:b condition="not period.all_inclusive">
+                    <div class="cost" tal:define="cost occasion.total_cost">
+                        <p>
+                            <span i18n:translate class="show-for-sr">Cost</span>
+
+                            <tal:b condition="cost" i18n:translate>
+                                <tal:b i18n:name="cost" replace="cost" /> CHF
+                            </tal:b>
+                            <tal:b condition="not:cost" i18n:translate>
+                                Free of charge
+                            </tal:b>
+                        </p>
+                    </div>
+                </tal:b>
+            </div>
+        </div>
+        <div class="card-section note" tal:condition="occasion.note">
+            <div class="factoids">
+                <div class="note">
+                    <p><i>${occasion.note}</i></p>
+                </div>
+            </div>
+        </div>
+        <div class="card-section" tal:condition="show_links and layout.is_editable">
+            <div class="factoids">
+                <tal:b define="links tuple(occasion_links(occasion))" condition="links">
+                    <div>
+                        <p>
+                            <tal:b repeat="link links">
+                                <tal:b replace="link(layout)" />
+                            </tal:b>
+                        </p>
+                    </div>
+                </tal:b>
             </div>
         </div>
 
-        <div class="factoids">
-            <div class="dates">
-                <ul>
-                    <li tal:repeat="date occasion.dates">
-                        ${layout.format_datetime_range(date.localized_start, date.localized_end)}
+        <div class="card-section" tal:condition="show_needs">
+
+            <div class="occasion-needs" >
+                <h5 i18n:translate>Needs</h5>
+
+                <div class="need-add">
+                    <a href="${request.link(occasion, 'add-need')}"><i class="fa fa-plus"></i> <tal:b i18n:translate>Enter a need</tal:b></a>
+                </div>
+
+                <div tal:condition="not:occasion.needs" class="need-info">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    <span i18n:translate>Keep track of required resources by adding needs.</span>
+                </div>
+
+                <ul tal:condition="occasion.needs">
+                    <li tal:repeat="need occasion.needs">
+                        <span class="need-number">
+                            ${need.number.lower} - ${need.number.upper - 1}
+                        </span>
+                        <span class="need-name">
+                            ${need.name}
+
+                            <tal:b condition="not:need.accept_signups">
+                                <i class="fa fa-eye-slash" aria-hidden="true" title="Accept signups" i18n:attributes="title"></i>
+                            </tal:b>
+                        </span>
+                        <span class="need-actions" tal:condition="request.is_admin">
+                            <a href="${request.link(need, 'edit')}" i18n:translate>Edit</a>
+                            <a class="confirm" data-confirm="Do you really want to delete this need?" data-confirm-yes="Delete need" data-confirm-no="Cancel" ic-delete-from="${layout.csrf_protected_url(request.link(need))}" ic-verb="DELETE" redirect-after="${request.link(occasion)}" i18n:translate i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no">
+                                Delete
+                            </a>
+                        </span>
+                        <span class="need-description">
+                            <tal:b replace="layout.paragraphify(layout.linkify(need.description))" />
+                        </span>
                     </li>
                 </ul>
             </div>
         </div>
-
-        <div class="factoids right-align">
-            <div class="age">
-                <span i18n:translate class="show-for-sr">Age</span>
-                <span i18n:translate>
-                    <tal:b replace="occasion.age.lower" i18n:name='min_age' />
-                    -
-                    <tal:b replace="occasion.age.upper - 1" i18n:name='max_age' />
-                    years
-                </span>
-            </div>
-
-            <div class="spots" tal:condition="not period.finalized">
-                <span i18n:translate class="show-for-sr">Participants</span>
-
-                <span i18n:translate tal:condition="occasion.spots.lower">
-                    <tal:b replace="occasion.spots.lower" i18n:name='min_spots' />
-                    -
-                    <tal:b replace="occasion.spots.upper - 1" i18n:name='max_spots' />
-                    participants
-                </span>
-
-                <span i18n:translate tal:condition="not:occasion.spots.lower">
-                    up to
-                    <tal:b replace="occasion.spots.upper - 1" i18n:name='max_spots' />
-                    participants
-                </span>
-            </div>
-
-            <tal:b condition="period.all_inclusive and occasion.cost">
-                <div class="cost">
-                    <span i18n:translate class="show-for-sr">Cost</span>
-
-                    <tal:b i18n:translate>
-                        <tal:b i18n:name="cost" replace="occasion.cost" /> CHF
-                    </tal:b>
-                </div>
-            </tal:b>
-
-            <tal:b condition="not period.all_inclusive">
-                <div class="cost" tal:define="cost occasion.total_cost">
-                    <span i18n:translate class="show-for-sr">Cost</span>
-
-                    <tal:b condition="cost" i18n:translate>
-                        <tal:b i18n:name="cost" replace="cost" /> CHF
-                    </tal:b>
-                    <tal:b condition="not:cost" i18n:translate>
-                        Free of charge
-                    </tal:b>
-                </div>
-            </tal:b>
-        </div>
-
-        <div class="factoids spacer">
-            <div class="location" tal:condition="occasion.meeting_point">
-                <span i18n:translate class="show-for-sr">Meeting Point</span>
-                <span>${occasion.meeting_point}</span>
-            </div>
-
-            <div class="overlap-check" tal:condition="occasion.exclude_from_overlap_check">
-                <span i18n:translate>Independent of other occasions</span>
-            </div>
-
-            <div class="bring-cash" tal:condition="period.all_inclusive and occasion.cost and period.pay_organiser_directly" i18n:translate>
-                Please bring <tal:b i18n:name="cost" replace="occasion.cost" /> CHF in cash.
-            </div>
-
-            <div class="note" tal:condition="occasion.note">
-                <p tal:condition="occasion.note">${occasion.note}</p>
-            </div>
-
-            <tal:b condition="show_links and layout.is_editable">
-                <tal:b define="links tuple(occasion_links(occasion))" condition="links">
-                    <div class="text-links">
-                        <tal:b repeat="link links">
-                            <tal:b replace="link(layout)" />
-                        </tal:b>
-                    </div>
-                </tal:b>
-            </tal:b>
-        </div>
-
-        <div class="occasion-needs" tal:condition="show_needs">
-            <h5 i18n:translate>Needs</h5>
-
-            <div class="need-add">
-                <a href="${request.link(occasion, 'add-need')}" i18n:translate>Enter a need</a>
-            </div>
-
-            <div tal:condition="not:occasion.needs" class="need-info">
-                <i class="fa fa-info-circle" aria-hidden="true"></i>
-                <span i18n:translate>Keep track of required resources by adding needs.</span>
-            </div>
-
-            <ul tal:condition="occasion.needs">
-                <li tal:repeat="need occasion.needs">
-                    <span class="need-number">
-                        ${need.number.lower} - ${need.number.upper - 1}
-                    </span>
-                    <span class="need-name">
-                        ${need.name}
-
-                        <tal:b condition="not:need.accept_signups">
-                            <i class="fa fa-eye-slash" aria-hidden="true" title="Accept signups" i18n:attributes="title"></i>
-                        </tal:b>
-                    </span>
-                    <span class="need-actions text-links" tal:condition="request.is_admin">
-                        <a href="${request.link(need, 'edit')}" i18n:translate>Edit</a>
-                        <a class="confirm" data-confirm="Do you really want to delete this need?" data-confirm-yes="Delete need" data-confirm-no="Cancel" ic-delete-from="${layout.csrf_protected_url(request.link(need))}" ic-verb="DELETE" redirect-after="${request.link(occasion)}" i18n:translate i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no">
-                            Delete
-                        </a>
-                    </span>
-                    <span class="need-description">
-                        <tal:b replace="layout.paragraphify(layout.linkify(need.description))" />
-                    </span>
-                </li>
-            </ul>
-        </div>
-
-        <div class="call-to-action" tal:condition="show_enroll">
-            <span i18n:translate>
-                Enroll your child now.
-            </span>
-
+        <div class="card-section enroll" tal:condition="show_enroll">
             <tal:b switch="request.is_logged_in">
                 <a tal:case="True" class="button" href="${wrap_occasion_link(request.link(occasion, 'book'))}" i18n:translate>Enroll</a>
                 <a tal:case="False" class="button" href="${layout.login_to_url(wrap_occasion_link(request.link(occasion, 'book')), skip=True)}" i18n:translate>Enroll</a>
             </tal:b>
         </div>
-
     </div>
 </metal:occasion>
 
+<metal:occasions-by-period define-macro="occasions_by_period" i18n:domain="onegov.feriennet">
+    <ul class="occasions">
+        <li tal:repeat="occasion occasions">
+            <div class="occasion-title">
+                <h4><tal:b>${repeat.occasion.number}.</tal:b> <tal:b i18n:translate>Occasion</tal:b></h4>
+
+                <div class="state" tal:condition="period.phase not in ('inactive', 'wishlist')">
+                    <div class="full" tal:condition="not occasion.cancelled and occasion.full">
+                        <span i18n:translate>Fully booked</span>
+                    </div>
+
+                    <div class="cancelled" tal:condition="occasion.cancelled">
+                        <span i18n:translate>Rescinded</span>
+                    </div>
+                    <div class="available-spots" tal:condition="not occasion.cancelled and not occasion.full and not period.is_booking_in_past">
+                        <span i18n:translate><tal:b i18n:name="count" replace="occasion.available_spots" /> spots available</span>
+                    </div>
+
+                    <div class="spots" tal:condition="not occasion.cancelled and period.is_booking_in_past">
+                        <span i18n:translate><tal:b i18n:name="count" replace="occasion.attendee_count" /> attendees</span>
+                    </div>
+                </div>
+            </div>
+
+            <tal:b metal:use-macro="layout.macros.occasion" tal:define="show_links True; show_enroll show_enroll(occasion); show_needs request.is_admin" />
+        </li>
+    </ul>
+
+    <div class="panel period-hint-panel">
+        <div class="hints">
+            <tal:b metal:use-macro="layout.macros.period_hints" tal:define="activity_view True" />
+        </div>
+    </div>
+</metal:occasions-by-period>
+
 <metal:star define-macro="star" i18n:domain="onegov.feriennet">
     <tal:b condition="not booking.starred">
-        <i id="star-${booking.id}" class="fa fa-star-o" aria-hidden="true"></i>
+        <i id="star-${booking.id}" class="far fa-star" aria-hidden="true"></i>
         <span class="show-for-sr" i18n:translate>Mark activity as favorite</span>
     </tal:b>
     <tal:b condition="booking.starred">
@@ -609,46 +787,17 @@
 <metal:star define-macro="nobble" i18n:domain="onegov.feriennet">
     <tal:b define="booking_id booking.id|record.booking_id; nobbled booking.nobbled|record.booking_nobbled">
         <tal:b condition="not nobbled">
-            <i id="nobble-${booking_id}" class="fa fa-fw fa-square-o" aria-hidden="true"></i>
+            <i id="nobble-${booking_id}" class="far fa-fw fa-square" aria-hidden="true"></i>
             <span class="show-for-sr" i18n:translate>Increase the bookings priority</span>
         </tal:b>
         <tal:b condition="nobbled">
-            <i id="nobble-${booking_id}" class="fa fa-fw fa-check-square-o" aria-hidden="true"></i>
+            <i id="nobble-${booking_id}" class="fas fa-fw fa-check-square" aria-hidden="true"></i>
             <span class="show-for-sr" i18n:translate>Decrease the bookings priority</span>
         </tal:b>
     </tal:b>
 </metal:star>
 
 <metal:hints define-macro="period_hints" i18n:domain="onegov.feriennet">
-    <div tal:condition="period.confirmable and period.is_prebooking_in_future"
-         class="hint hint-prebooking" i18n:translate>
-            Prebooking begins on <strong tal:content="layout.format_date(period.prebooking_start, 'date_long')" i18n:name="date" />.
-    </div>
-
-    <div tal:condition="period.confirmable and period.is_currently_prebooking"
-         class="hint hint-prebooking active" i18n:translate>
-            Prebooking is now active until <strong tal:content="layout.format_date(period.prebooking_end, 'date_long')" i18n:name="date" />.
-    </div>
-
-    <div tal:condition="period.confirmable and period.is_prebooking_in_past and period.confirmed and not period.finalized"
-         class="hint hint-prebooking finish" i18n:translate>
-            Prebooking has ended.
-    </div>
-
-    <div tal:condition="period.is_booking_in_future"
-         class="hint hint-booking" i18n:translate>
-            Booking begins on <strong tal:content="layout.format_date(period.booking_start, 'date_long')" i18n:name="date" />.
-    </div>
-
-    <div tal:condition="period.is_currently_booking"
-         class="hint hint-booking active" i18n:translate>
-            Booking is now active until <strong tal:content="layout.format_date(period.booking_end, 'date_long')" i18n:name="date" />.
-    </div>
-
-    <div tal:condition="period.is_booking_in_past and period.confirmed and not period.finalized"
-         class="hint hint-booking finish" i18n:translate>
-            Booking has ended.
-    </div>
 
     <div tal:condition="period.finalized and not period.book_finalized"
          class="hint hint-finalized" i18n:translate>
@@ -698,31 +847,61 @@
         class="hint hint-minutes">
         <tal:b i18n:translate>Attendees are limited to one activity per day</tal:b>.
     </div>
+
+    <div tal:condition="period.confirmable and period.is_prebooking_in_future and not activity_view|False"
+        class="hint hint-prebooking" i18n:translate>
+        Prebooking begins on <strong tal:content="layout.format_date(period.prebooking_start, 'date_long')" i18n:name="date" />.
+    </div>
+
+    <div tal:condition="period.confirmable and period.is_currently_prebooking and not activity_view|False"
+        class="hint hint-prebooking active" i18n:translate>
+        Prebooking is now active until <strong tal:content="layout.format_date(period.prebooking_end, 'date_long')" i18n:name="date" />.
+    </div>
+
+    <div tal:condition="period.confirmable and period.is_prebooking_in_past and period.confirmed and not period.finalized"
+        class="hint hint-prebooking finish" i18n:translate>
+        Prebooking has ended.
+    </div>
+
+    <div tal:condition="period.is_booking_in_future and not activity_view|False"
+        class="hint hint-booking" i18n:translate>
+        Booking begins on <strong tal:content="layout.format_date(period.booking_start, 'date_long')" i18n:name="date" />.
+    </div>
+
+    <div tal:condition="period.is_currently_booking and not activity_view|False"
+        class="hint hint-booking active" i18n:translate>
+        Booking is now active until <strong tal:content="layout.format_date(period.booking_end, 'date_long')" i18n:name="date" />.
+    </div>
+
+    <div tal:condition="period.is_booking_in_past and period.confirmed and not period.finalized"
+        class="hint hint-booking finish" i18n:translate>
+        Booking has ended.
+    </div>
 </metal:hints>
 
 <metal:booking_state define-macro="booking_state" i18n:domain="onegov.feriennet">
     <tal:b switch="state">
-        <div tal:case="'open'" class="state ${state}" i18n:translate>
+        <span tal:case="'open'" class="state ${state}" i18n:translate>
             Open
-        </div>
-        <div tal:case="'accepted'" class="state ${state}" i18n:translate>
+        </span>
+        <span tal:case="'accepted'" class="state ${state}" i18n:translate>
             Accepted
-        </div>
-        <div tal:case="'cancelled'" class="state ${state}" i18n:translate>
+        </span>
+        <span tal:case="'cancelled'" class="state ${state}" i18n:translate>
             Cancelled
-        </div>
-        <div tal:case="'denied'" class="state ${state}" i18n:translate>
+        </span>
+        <span tal:case="'denied'" class="state ${state}" i18n:translate>
             Denied
-        </div>
-        <div tal:case="'blocked'" class="state ${state}" i18n:translate>
+        </span>
+        <span tal:case="'blocked'" class="state ${state}" i18n:translate>
             Blocked
-        </div>
+        </span>
     </tal:b>
 </metal:booking_state>
 
 <metal:periods define-macro="periods" i18n:domain="onegov.feriennet" i18n:domain="onegov.feriennet">
-    <div class="filter-panel" tal:condition="len(periods) > 1">
-        <h2 class="filter-title" i18n:translate tal:condition="not hide_title|True">Period</h2>
+    <div class="filter-panel side-panel" tal:condition="len(periods) > 1">
+        <h3 class="filter-title" i18n:translate tal:condition="not hide_title|True">Period</h3>
         <select onchange="location = this.value;" tal:define="view_name view_name|None">
             <option tal:repeat="p periods" value="${request.link(model.for_period(p), name=view_name)}" tal:attributes="selected p.id == period.id">
                 ${p.title}
@@ -732,8 +911,8 @@
 </metal:periods>
 
 <metal:users define-macro="users" i18n:domain="onegov.feriennet">
-    <div class="filter-panel" tal:condition="request.is_admin and users">
-        <h2 class="filter-title" i18n:translate>User</h2>
+    <div class="filter-panel side-panel" tal:condition="request.is_admin and users">
+        <h3 class="filter-title" i18n:translate>User</h3>
         <select onchange="location = this.value;">
             <tal:b repeat="u users">
                 <option tal:condition="u.username == request.current_username or u.realname"
@@ -747,16 +926,18 @@
 </metal:users>
 
 <metal:actions_button define-macro="actions-button" i18n:domain="onegov.feriennet" i18n:domain="onegov.feriennet">
-    <a href="#" data-dropdown="${action_id}" aria-expanded="false" class="tiny button actions-button">
+
+    <button type="button" data-toggle="${action_id}" aria-expanded="false" class="tiny button dropdown-button actions-button">
         <span class="show-for-sr" i18n:translate>Actions</span>
         <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
-    </a>
-    <ul id="${action_id}" data-dropdown-content class="f-dropdown" aria-hidden="true">
+    </button>
+    <ul id="${action_id}" data-dropdown data-auto-focus="true" class="dropdown-pane dropdown-options" data-position="bottom" data-alignment="right" data-auto-focus="true" aria-hidden="true" data-close-on-click="true" >
         <li
             tal:repeat="link links"
             tal:content="link(layout)"
         />
     </ul>
+
 </metal:actions_button>
 
 <metal:search_result_attendees define-macro="search_result_attendees" i18n:domain="onegov.feriennet">
@@ -800,9 +981,67 @@
 </metal:accept_tos>
 
 
+<metal:filters define-macro="filters" i18n:domain="onegov.feriennet">
+
+    <div class="show-for-medium" id="filters-top" ic-push-url="true">
+        <tal:b tal:repeat="filter filters.keys()">
+            <button class="button hollow dropdown-button ${'active' if count_active(filters[filter]) else ''}" type="button" data-toggle="filter-${filter}" tal:condition="filters[filter]">
+                <i class="fa fa-chevron-down"></i>${filters[filter][0]} (${count_active(filters[filter])})
+            </button>
+            <div class="dropdown-pane" data-close-on-click="true" id="filter-${filter}" ic-select-from-response="#filter-${filter}" ic-target="#filter-${filter}" data-dropdown tal:condition="filters[filter][1]">
+                <div class="filter-panel">
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters[filter][1]" />
+                    <div class="grid-x grid-padding-x align-center">
+                        <button  ic-select-from-response="#content" ic-target="#content" ic-get-from="${request.url.replace('/filters','',1)}" class="button apply-filters" type="button" data-toggle="filter-${filter}" i18n:translate>Apply filters</button>
+                    </div>
+                </div>
+            </div>
+        </tal:b>
+    </div>
+
+    <button id="mobile-filters-button" class="button hollow show-for-small-only" type="button" data-toggle="offCanvasFilters">
+        <i class="fas fa-sliders-h"></i><tal:b i18n:translate>Filters</tal:b>
+    </button>
+
+    <div data-transition="overlap" data-off-canvas data-auto-focus="false" class="off-canvas position-right filters-mobile" id="offCanvasFilters" ic-push-url="true">
+        <!-- Close button -->
+        <div class="button-area">
+            <button class="off-canvas-close-button" aria-label="Close menu" type="button" data-close>
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        <div class="grid-x align-center">
+            <h3><i class="fas fa-sliders-h"></i> <tal:b i18n:translate>Filters</tal:b></h3>
+        </div>
+
+        <div class="navigation-area">
+            <div class="menu-wrapper">
+                <ul class="accordion" data-accordion data-allow-all-closed="true" data-slide-speed="0">
+                    <tal:b tal:repeat="filter mobile_filters.keys()">
+                        <li class="accordion-item ${'is-active' if f'mobile-filter-{filter}' == active_filter else ''}" data-accordion-item>
+                            <a href="#" class="accordion-title">
+                                ${mobile_filters[filter][0]} (${count_active(filters[filter])})
+                            </a>
+                            <ul class="filter-panel accordion-content" data-tab-content id="mobile-filter-${filter}" ic-select-from-response="#offCanvasFilters" ic-target="#offCanvasFilters" data-tab-content >
+                                <div metal:use-macro="layout.macros['tags']" tal:define="tags mobile_filters[filter][1]"/>
+                            </ul>
+                        </li>
+                    </tal:b>
+                </ul>
+            </div>
+        </div>
+
+        <div class="grid-x align-center">
+            <button ic-select-from-response="#activities" ic-target="#activities" ic-get-from="${request.url.replace('/filters','',1)}" class="button apply-filters" type="button" i18n:translate data-close>Apply filters</button>
+        </div>
+    </div>
+
+</metal:filters>
+
+
 <metal:user_panel define-macro="user_panel" i18n:domain="onegov.feriennet">
-    <div class="borderless-side-panel without-title highlighted filter-panel">
-        <h2 class="filter-title" i18n:translate>Contact</h2>
+    <div class="side-panel filter-panel">
+        <h3 class="filter-title" i18n:translate>Contact</h3>
         <dl class="field-display">
             <div>
                 <dt i18n:translate>Name</dt>
@@ -825,7 +1064,7 @@
                 <dd><a href="tel:${phone}">${phone}</a></dd>
             </div>
             <div tal:condition="request.is_admin">
-                <a href="${request.link(user)}" i18n:translate class="button radius secondary" style="width: 100%">
+                <a href="${request.link(user)}" i18n:translate class="button radius secondary">
                     Manage user
                 </a>
             </div>
@@ -841,8 +1080,45 @@
         data-cart-url="${cart_url}"
         data-cart-submit-url="${cart_submit_url}"
         data-cart-action-url="${cart_action_url}"
-        i18n:attributes="data-empty-label;data-button-label;data-remove-label"></div>
+        data-list-label="My List"
+        data-is-dropdown="${is_dropdown}"
+        i18n:attributes="data-empty-label;data-button-label;data-remove-label;data-list-label"></div>
 </metal:volunteer_cart>
+
+<metal:feriennet_links define-macro="feriennet_links">
+    <div id="feriennet-links" class="text-center">
+        <div class="grid-container">
+            <div class="top-bar-left">
+                <ul class="menu align-right">
+                    <li tal:condition="volunteer_link">
+                        <tal:b replace="volunteer_link(layout)" />
+                    </li>
+                    <li tal:condition="not request.is_logged_in">
+                        <a href="${request.link(request.app.org, name='auth/register')}" i18n:translate>
+                            Register
+                        </a>
+                    </li>
+                    <li tal:condition="not request.is_logged_in">
+                        <a href="${layout.login_from_path()}" i18n:translate>Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</metal:feriennet_links>
+
+<metal:activities define-macro="activities_homepage" i18n:domain="onegov.feriennet">
+    <div class="grid-x grid-padding-x">
+        <tal:b tal:repeat="activity activities">
+            <div class="subpage-cards what small-12 medium-6 large-4 cell">
+                <tal:b metal:use-macro="layout.macros['activity_card']" />
+            </div>
+        </tal:b>
+    </div>
+    <div class="grid-x align-center">
+        <a class="button hollow" href="${activities_link}" i18n:translate="">All activities</a>
+    </div>
+</metal:activities>
 
 <metal:banner define-macro="banner" i18n:domain="onegov.feriennet">
     <div class="sponsor-banner ${position}">
