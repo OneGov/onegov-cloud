@@ -555,7 +555,10 @@ def add_time_report(
             * duration_hours
             * (1 + surcharge_pct / Decimal(100))
         )
-        total_comp = base_comp + travel_comp
+        meal_allowance = (
+            Decimal('40.0') if duration_hours >= 6 else Decimal('0')
+        )
+        total_comp = base_comp + travel_comp + meal_allowance
 
         report = TranslatorTimeReport(
             translator=self,

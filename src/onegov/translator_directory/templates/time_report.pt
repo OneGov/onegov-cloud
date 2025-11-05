@@ -40,6 +40,13 @@
                         <dd>${layout.format_currency(
                             report.travel_compensation)}</dd>
 
+                        <dt i18n:translate=""
+                            tal:condition="report.meal_allowance">
+                            Meal Allowance (6+ hours)</dt>
+                        <dd tal:condition="report.meal_allowance">
+                            ${layout.format_currency(report.meal_allowance)}
+                        </dd>
+
                         <dt i18n:translate="">Base Compensation</dt>
                         <dd>${layout.format_currency(
                             report.base_compensation)}</dd>

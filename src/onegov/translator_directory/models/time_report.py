@@ -103,6 +103,11 @@ class TranslatorTimeReport(Base, TimestampMixin):
         )
 
     @property
+    def meal_allowance(self) -> Decimal:
+        """Return meal allowance if duration >= 6 hours."""
+        return Decimal('40.0') if self.duration_hours >= 6 else Decimal('0')
+
+    @property
     def title(self) -> str:
         """Return a readable title for this time report."""
         date_str = self.assignment_date.strftime('%Y-%m-%d')

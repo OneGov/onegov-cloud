@@ -282,6 +282,20 @@ class TimeReportHandler(Handler):
                 f"<dt>{request.translate(_('Travel'))}</dt>",
                 f'<dd>{layout.format_currency(report.travel_compensation)}'
                 f'</dd>',
+            ]
+        )
+
+        if report.meal_allowance:
+            meal_label = request.translate(_('Meal Allowance (6+ hours)'))
+            summary_parts.extend(
+                [
+                    f'<dt>{meal_label}</dt>',
+                    f'<dd>{layout.format_currency(report.meal_allowance)}</dd>',
+                ]
+            )
+
+        summary_parts.extend(
+            [
                 f"<dt><strong>{request.translate(_('Total'))}</strong></dt>",
                 f'<dd><strong>{layout.format_currency(report.total_compensation)}</strong></dd>',
                 '</dl>',

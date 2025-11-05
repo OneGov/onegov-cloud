@@ -171,4 +171,9 @@ class TranslatorTimeReportForm(Form):
         duration_hours = Decimal(model.duration) / Decimal(60)
         base = hourly_rate * duration_hours
         surcharge_amount = base * (surcharge_pct / Decimal(100))
-        model.total_compensation = base + surcharge_amount + travel_comp
+        meal_allowance = (
+            Decimal('40.0') if duration_hours >= 6 else Decimal('0')
+        )
+        model.total_compensation = (
+            base + surcharge_amount + travel_comp + meal_allowance
+        )
