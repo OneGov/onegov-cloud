@@ -63,7 +63,7 @@ def get_admin_tools(
         if request.is_admin:
             links.append(
                 Link(
-                    text=_('Dashboard'),
+                    text=_('Overview'),
                     url=request.class_link(Dashboard),
                     attrs={'class': 'show-dashboard'}
                 )
