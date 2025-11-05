@@ -211,7 +211,6 @@ def view_meeting(
     template='form.pt',
     permission=Private,
     form=get_meeting_form_class,
-    pass_model=True,
 )
 def edit_meeting(
     self: Meeting,
@@ -228,6 +227,9 @@ def edit_meeting(
         form.populate_obj(self)
         request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
+
+    elif not request.POST:
+        form.process(obj=self)
 
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.include_editor()
