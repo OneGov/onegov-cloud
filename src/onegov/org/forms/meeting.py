@@ -35,7 +35,7 @@ class MeetingForm(Form):
     start_datetime = TimezoneDateTimeField(
         timezone='Europe/Zurich',
         label=_('Start'),
-        validators=[Optional()],
+        validators=[InputRequired()],
     )
 
     end_datetime = TimezoneDateTimeField(
