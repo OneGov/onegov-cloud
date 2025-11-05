@@ -1331,7 +1331,7 @@ def view_my_reservations(
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_('Homepage'), layout.homepage_url),
-        Link(_('Dashboard'), request.class_link(CitizenDashboard)),
+        Link(_('Overview'), request.class_link(CitizenDashboard)),
         Link(_('My Reservations'), '#')
     ]
 
@@ -1389,7 +1389,7 @@ def view_my_reservations_subscribe(
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_('Homepage'), layout.homepage_url),
-        Link(_('Dashboard'), request.class_link(CitizenDashboard)),
+        Link(_('Overview'), request.class_link(CitizenDashboard)),
         Link(_('My Reservations'), request.url.replace('-subscribe', '')),
         Link(_('Subscribe'), '#')
     ]
