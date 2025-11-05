@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-04 12:21+0100\n"
+"POT-Creation-Date: 2025-11-05 10:21+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1929,6 +1929,24 @@ msgstr ""
 
 msgid "Standard Image"
 msgstr "Image standard"
+
+msgid "Table of Contents"
+msgstr "Table des matières"
+
+msgid "No Table of Contents"
+msgstr "Pas de table des matières"
+
+msgid "1 Level"
+msgstr "1 Niveau"
+
+msgid "2 Levels"
+msgstr "2 Niveaux"
+
+msgid "3 Levels"
+msgstr "3 Niveaux"
+
+msgid "4 Levels"
+msgstr "4 Niveaux"
 
 msgid "Column width left side"
 msgstr "Largeur de la colonne côté gauche"
@@ -5968,9 +5986,14 @@ msgid "An existing reservation would be affected by the requested change."
 msgstr ""
 "Une réservation existante serait affectée par la modification demandée."
 
-msgid "A pending reservation would be affected by the requested change."
+msgid ""
+"This change cannot be made because there is still an open reservation in "
+"someone's cart. The reservation needs to be submitted or expire before you "
+"can proceed."
 msgstr ""
-"Une réservation en attente serait affectée par la modification demandée."
+"Ce changement ne peut pas être effectué car il y a encore une réservation "
+"ouverte dans le panier de quelqu'un. La réservation doit être soumise ou "
+"expirer avant que vous puissiez continuer."
 
 msgid "The requested period is no longer available."
 msgstr "La période demandée n'est plus disponible."
@@ -6038,6 +6061,9 @@ msgstr "Supprimer la période de disponibilité"
 
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
+
+msgid "The allocation was deleted"
+msgstr "L'allocation a été supprimée"
 
 #, python-format
 msgid "New availability period active, ${n} allocations created"
@@ -7600,22 +7626,9 @@ msgstr "L'utilisateur a bien été créé"
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 
-#~ msgid ""
-#~ "If checked, only the lead of the news and a \"read more\"link is shown."
+#~ msgid "A pending reservation would be affected by the requested change."
 #~ msgstr ""
-#~ "Si coché, seule l'accroche des nouvelles et un lien \"lire la suite\" "
-#~ "sont affichés."
-
-#~ msgid "Show news as tiles"
-#~ msgstr "Afficher les actualités sous forme de tuiles"
-
-#~ msgid ""
-#~ "If checked, news are displayed as tiles. Otherwise, news are listed in "
-#~ "full length."
-#~ msgstr ""
-#~ "Si cette case est activée, les nouvelles sont affichées sous forme de "
-#~ "tuiles. Dans le cas contraire, les nouvelles sont listés dans leur "
-#~ "intégralité."
+#~ "Une réservation en attente serait affectée par la modification demandée."
 
 #~ msgid "New news since the last newsletter:"
 #~ msgstr "Nouvelles depuis la dernière newsletter :"

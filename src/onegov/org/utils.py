@@ -1154,7 +1154,9 @@ libres_error_messages = {
     _('An existing reservation would be affected by the requested change.'),
 
     libres_errors.AffectedPendingReservationError:
-    _('A pending reservation would be affected by the requested change.'),
+    _("This change cannot be made because there is still an open reservation "
+      "in someone's cart. The reservation needs to be submitted or expire "
+      "before you can proceed."),
 
     libres_errors.AlreadyReservedError:
     _('The requested period is no longer available.'),
