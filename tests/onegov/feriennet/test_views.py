@@ -2946,8 +2946,8 @@ def test_registration(client):
     register = client.get('/auth/register')
     assert 'volljährige Person eröffnet werden' in register
     register.form['username'] = 'user@example.org'
-    register.form['password'] = 'p@ssw0rd12'
-    register.form['confirm'] = 'p@ssw0rd12'
+    register.form['password'] = 'known_very_secure_password'
+    register.form['confirm'] = 'known_very_secure_password'
 
     assert "Vielen Dank" in register.form.submit().follow()
 
@@ -2961,7 +2961,8 @@ def test_registration(client):
     assert "Konto wurde aktiviert" in client.get(url).follow()
     assert "Konto wurde bereits aktiviert" in client.get(url).follow()
 
-    logged_in = client.login('user@example.org', 'p@ssw0rd12').follow()
+    logged_in = client.login(
+        'user@example.org', 'known_very_secure_password').follow()
     assert "Ihr Benutzerprofil ist unvollständig" in logged_in
 
 

@@ -95,8 +95,8 @@ msgstr "mTAN"
 msgid "Phone number"
 msgstr ""
 
-msgid "The password must be at least eight characters long"
-msgstr "Il pled-clav sto avair almain 8 segns"
+msgid "The password must be at least ten characters long"
+msgstr "Il pled-clav sto avair almain 10 segns"
 
 msgid "Password Confirmation"
 msgstr "Confermar il pled-clav"

@@ -212,17 +212,19 @@ def test_view_translator(client: Client) -> None:
         ).group()
         page = client.get(reset_password_url)
         page.form['email'] = 'test@test.com'
-        page.form['password'] = 'p@ssw0rd12'
+        page.form['password'] = 'known_very_secure_password'
         page.form.submit()
 
     with freeze_time('2021-12-31'):
-        page = client.login('test@test.com', 'p@ssw0rd12', None).maybe_follow()
+        page = client.login(
+            'test@test.com', 'known_very_secure_password').maybe_follow()
         assert 'Sind ihre Daten noch aktuell? Bitte überprüfen Sie' not in page
         assert '978654' in page
         assert 'Uncle' in page
         assert 'BOB' in page
 
-    page = client.login('test@test.com', 'p@ssw0rd12', None).maybe_follow()
+    page = client.login(
+        'test@test.com', 'known_very_secure_password').maybe_follow()
     assert 'Sind ihre Daten noch aktuell? Bitte überprüfen Sie' in page
     assert '978654' in page
     assert 'Uncle' in page
@@ -909,7 +911,7 @@ def test_view_redirects(client: Client) -> None:
     ).group()
     page = client.get(reset_password_url)
     page.form['email'] = 'translator@example.org'
-    page.form['password'] = 'p@ssword12'
+    page.form['password'] = 'known_very_secure_password'
     page.form.submit()
 
     # Test redirects
@@ -918,7 +920,7 @@ def test_view_redirects(client: Client) -> None:
             'homepage': translator_url,
             'login': translator_url,
             'logout': 'http://localhost/auth/login',
-            'password': 'p@ssword12',
+            'password': 'known_very_secure_password',
             'to': 'http://localhost/topics/informationen'
         },
         'member@example.org': {
@@ -1033,7 +1035,7 @@ def test_view_translator_mutation(
     ).group()
     page = client.get(reset_password_url)
     page.form['email'] = 'test@test.com'
-    page.form['password'] = 'p@ssw0rd12'
+    page.form['password'] = 'known_very_secure_password'
     page.form.submit()
 
     # Report change as editor
@@ -1150,7 +1152,7 @@ def test_view_translator_mutation(
 
     # Report change as translator
     client.logout()
-    client.login('test@test.com', 'p@ssw0rd12', None)
+    client.login('test@test.com', 'known_very_secure_password', None)
     page = client.get('/').maybe_follow()
     page = page.click('Mutation melden')
     page.form['submitter_message'] = 'Hallo!'
@@ -1698,10 +1700,11 @@ def test_view_accreditation(
     # Login as translator
     page = client.get(reset_password_url)
     page.form['email'] = 'hugo.benito@translators.com'
-    page.form['password'] = 'p@ssw0rd12'
+    page.form['password'] = 'known_very_secure_password'
     page.form.submit()
 
-    page = client.login('hugo.benito@translators.com', 'p@ssw0rd12', None)
+    page = client.login(
+        'hugo.benito@translators.com', 'known_very_secure_password')
     page = page.maybe_follow()
     assert 'BENITO, Hugo' in page
     assert '756.1234.4568.94' in page
@@ -2097,7 +2100,7 @@ def test_member_cannot_submit_mutation(
     ).group()
     page = client.get(reset_password_url)
     page.form['email'] = 'member@test.com'
-    page.form['password'] = 'p@ssw0rd12'
+    page.form['password'] = 'known_very_secure_password'
     page.form.submit()
 
     client.login_member()
