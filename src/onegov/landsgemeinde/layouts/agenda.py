@@ -79,8 +79,6 @@ class AgendaItemLayout(DefaultLayout):
 
         super().__init__(model, request)
         self.request.include('agenda_items')
-        self.include_editor()
-        self.request.include('tags-input')
 
     @cached_property
     def title(self) -> str:
