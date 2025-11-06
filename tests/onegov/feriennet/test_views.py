@@ -1763,9 +1763,8 @@ def test_provide_activity_again(client: Client, scenario: Scenario) -> None:
     assert "Erneut anbieten" not in admin.get('/activities')
 
     with scenario.update():
-        activity = scenario.latest_activity
-        assert activity is not None
-        activity.state = 'archived'
+        assert scenario.latest_activity is not None
+        scenario.latest_activity.state = 'archived'
 
     assert "Erneut anbieten" in admin.get('/activities')
 
@@ -1774,12 +1773,13 @@ def test_provide_activity_again(client: Client, scenario: Scenario) -> None:
 
     editor.post('/activity/learn-how-to-program/offer-again', status=404)
     scenario.refresh()
-    assert activity.state == 'archived'
+    assert scenario.latest_activity.state == 'archived'
 
     admin.post('/activity/learn-how-to-program/offer-again')
     scenario.refresh()
-    activity = activity  # undo mypy narrowing
-    assert activity.state == 'preview'
+    scenario = scenario  # undo mypy narrowing
+    assert scenario.latest_activity is not None
+    assert scenario.latest_activity.state == 'preview'
 
 
 def test_online_payment(client: Client, scenario: Scenario) -> None:
