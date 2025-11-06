@@ -20,8 +20,8 @@ if TYPE_CHECKING:
     from onegov.core.types import EmailJsonDict
     from onegov.election_day.models import ProporzElection
     from sqlalchemy.orm import Session
-    from tests.shared.client import Client, ExtendedResponse
     from webob.multidict import MultiDict
+    from webtest import TestApp as Client, TestResponse
     from .conftest import TestApp
 
     DummyPostDataBase = MultiDict[str, Any]
@@ -311,22 +311,22 @@ class DummyRequest:
         return registry._template_loaders['.pt']
 
 
-# FIXME: Remove these useless helpers, use the client method instead
-def login(client: Client[TestApp], to: str = '') -> ExtendedResponse:
+# FIXME: Switch to our shared test client that has a login method
+def login(client: Client[TestResponse, TestApp], to: str = '') -> TestResponse:
     login = client.get(f'/auth/login?to={to}')
     login.form['username'] = 'admin@example.org'
     login.form['password'] = 'hunter2'
     return login.form.submit()
 
-def logout(client: Client[TestApp], to: str = '') -> None:
+def logout(client: Client[TestResponse, TestApp], to: str = '') -> None:
     client.get(f'/auth/logout?to={to}')
 
 
 def upload_vote(
-    client: Client[TestApp],
+    client: Client[TestResponse, TestApp],
     create: bool = True,
     canton: str = 'zg'
-) -> ExtendedResponse:
+) -> TestResponse:
 
     if create:
         new = client.get('/manage/votes/new-vote')
@@ -374,10 +374,10 @@ def upload_vote(
 
 
 def upload_complex_vote(
-    client: Client[TestApp],
+    client: Client[TestResponse, TestApp],
     create: bool = True,
     canton: str = 'zg'
-) -> ExtendedResponse:
+) -> TestResponse:
 
     if create:
         new = client.get('/manage/votes/new-vote')
@@ -424,11 +424,11 @@ def upload_complex_vote(
 
 
 def upload_majorz_election(
-    client: Client[TestApp],
+    client: Client[TestResponse, TestApp],
     create: bool = True,
     canton: str = 'gr',
     status: str = 'unknown'
-) -> ExtendedResponse:
+) -> TestResponse:
 
     if create:
         new = client.get('/manage/elections/new-election')
@@ -483,11 +483,11 @@ def upload_majorz_election(
 
 
 def upload_proporz_election(
-    client: Client[TestApp],
+    client: Client[TestResponse, TestApp],
     create: bool = True,
     canton: str = 'gr',
     status: str = 'unknown'
-) -> ExtendedResponse:
+) -> TestResponse:
 
     if create:
         new = client.get('/manage/elections/new-election')
@@ -535,11 +535,11 @@ def upload_proporz_election(
 
 
 def upload_party_results(
-    client: Client[TestApp],
+    client: Client[TestResponse, TestApp],
     slug: str = 'election/proporz-election',
     domain: str = '',
     domain_segment: str = ''
-) -> ExtendedResponse:
+) -> TestResponse:
 
     csv_parties = (
         "domain,domain_segment,year,total_votes,id,name,color,mandates,"
@@ -563,7 +563,7 @@ def upload_party_results(
 
 
 def create_election_compound(
-    client: Client[TestApp],
+    client: Client[TestResponse, TestApp],
     canton: str = 'gr',
     pukelsheim: bool = False,
     completes_manually: bool = False,
@@ -633,7 +633,7 @@ def create_election_compound(
 
 
 def upload_election_compound(
-    client: Client[TestApp],
+    client: Client[TestResponse, TestApp],
     create: bool = True,
     canton: str = 'gr',
     status: str = 'unknown',
@@ -641,7 +641,7 @@ def upload_election_compound(
     completes_manually: bool = False,
     voters_counts: bool = True,
     exact_voters_counts: bool = True
-) -> ExtendedResponse:
+) -> TestResponse:
 
     entities = {
         'bl': [2761, 2762],

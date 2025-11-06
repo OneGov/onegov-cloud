@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import transaction
 
 from io import BytesIO
@@ -13,7 +15,12 @@ from webtest import TestApp as Client
 from webtest import Upload
 
 
-def create_vote(app):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import TestApp
+
+
+def create_vote(app: TestApp) -> None:
     client = Client(app)
     login(client)
     new = client.get('/manage/votes/new-vote')
@@ -24,7 +31,12 @@ def create_vote(app):
     new.form.submit()
 
 
-def create_election(app, type, create_compound=False):
+def create_election(
+    app: TestApp,
+    type: str,
+    create_compound: bool = False
+) -> None:
+
     client = Client(app)
     login(client)
     new = client.get('/manage/elections/new-election')
@@ -47,7 +59,7 @@ def create_election(app, type, create_compound=False):
         new.form.submit()
 
 
-def test_view_rest_authenticate(election_day_app_zg):
+def test_view_rest_authenticate(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
 
     client.post('/upload', status=401)
@@ -56,11 +68,11 @@ def test_view_rest_authenticate(election_day_app_zg):
     client.post('/upload', status=401)
 
     collection = UploadTokenCollection(election_day_app_zg.session())
-    token = str(collection.create().token)
+    token_str = str(collection.create().token)
     transaction.commit()
     client.post('/upload', status=401)
 
-    client.authorization = ('Basic', ('', token))
+    client.authorization = ('Basic', ('', token_str))
     client.post('/upload', status=400)
 
     for token in collection.query():
@@ -69,13 +81,13 @@ def test_view_rest_authenticate(election_day_app_zg):
     client.post('/upload', status=401)
 
 
-def test_view_rest_validation(election_day_app_zg):
+def test_view_rest_validation(election_day_app_zg: TestApp) -> None:
     token = UploadTokenCollection(election_day_app_zg.session()).create()
-    token = str(token.token)
+    token_str = str(token.token)
     transaction.commit()
 
     client = Client(election_day_app_zg)
-    client.authorization = ('Basic', ('', token))
+    client.authorization = ('Basic', ('', token_str))
 
     # No parameters
     result = client.post('/upload', status=400).json
@@ -121,13 +133,13 @@ def test_view_rest_validation(election_day_app_zg):
     }]
 
 
-def test_view_rest_translations(election_day_app_zg):
+def test_view_rest_translations(election_day_app_zg: TestApp) -> None:
     token = UploadTokenCollection(election_day_app_zg.session()).create()
-    token = str(token.token)
+    token_str = str(token.token)
     transaction.commit()
 
     client = Client(election_day_app_zg)
-    client.authorization = ('Basic', ('', token))
+    client.authorization = ('Basic', ('', token_str))
 
     params = (
         ('id', 'vote-id'),
@@ -143,7 +155,7 @@ def test_view_rest_translations(election_day_app_zg):
     assert result['errors']['id'][0]['message'] == 'Invalid id'
 
     # Invalid header
-    headers = [('Accept-Language', 'xxx')]
+    headers = {'Accept-Language': 'xxx'}
     result = client.post('/upload', status=400, headers=headers).json
     assert result['errors']['id'][0]['message'] == 'This field is required.'
 
@@ -152,7 +164,7 @@ def test_view_rest_translations(election_day_app_zg):
     assert result['errors']['id'][0]['message'] == 'Invalid id'
 
     # German
-    headers = [('Accept-Language', 'de_CH')]
+    headers = {'Accept-Language': 'de_CH'}
     result = client.post('/upload', status=400, headers=headers).json
     assert result['errors']['id'][0]['message'] == 'Dieses Feld wird benötigt.'
 
@@ -161,13 +173,13 @@ def test_view_rest_translations(election_day_app_zg):
     assert result['errors']['id'][0]['message'] == 'Ungültige ID'
 
 
-def test_view_rest_vote(election_day_app_zg):
+def test_view_rest_vote(election_day_app_zg: TestApp) -> None:
     token = UploadTokenCollection(election_day_app_zg.session()).create()
-    token = str(token.token)
+    token_str = str(token.token)
     transaction.commit()
 
     client = Client(election_day_app_zg)
-    client.authorization = ('Basic', ('', token))
+    client.authorization = ('Basic', ('', token_str))
 
     create_vote(election_day_app_zg)
 
@@ -191,13 +203,13 @@ def test_view_rest_vote(election_day_app_zg):
             assert import_.call_args[0][3] == 'application/octet-stream'
 
 
-def test_view_rest_majorz(election_day_app_zg):
+def test_view_rest_majorz(election_day_app_zg: TestApp) -> None:
     token = UploadTokenCollection(election_day_app_zg.session()).create()
-    token = str(token.token)
+    token_str = str(token.token)
     transaction.commit()
 
     client = Client(election_day_app_zg)
-    client.authorization = ('Basic', ('', token))
+    client.authorization = ('Basic', ('', token_str))
 
     create_election(election_day_app_zg, 'majorz')
 
@@ -224,13 +236,13 @@ def test_view_rest_majorz(election_day_app_zg):
             assert import_.call_args[0][3] == 'application/octet-stream'
 
 
-def test_view_rest_proporz(election_day_app_zg):
+def test_view_rest_proporz(election_day_app_zg: TestApp) -> None:
     token = UploadTokenCollection(election_day_app_zg.session()).create()
-    token = str(token.token)
+    token_str = str(token.token)
     transaction.commit()
 
     client = Client(election_day_app_zg)
-    client.authorization = ('Basic', ('', token))
+    client.authorization = ('Basic', ('', token_str))
 
     create_election(election_day_app_zg, 'proporz', True)
 
@@ -281,13 +293,13 @@ def test_view_rest_proporz(election_day_app_zg):
             assert import_.call_args[0][3] == 'application/octet-stream'
 
 
-def test_view_rest_parties(election_day_app_zg):
+def test_view_rest_parties(election_day_app_zg: TestApp) -> None:
     token = UploadTokenCollection(election_day_app_zg.session()).create()
-    token = str(token.token)
+    token_str = str(token.token)
     transaction.commit()
 
     client = Client(election_day_app_zg)
-    client.authorization = ('Basic', ('', token))
+    client.authorization = ('Basic', ('', token_str))
 
     create_election(election_day_app_zg, 'proporz', True)
 
@@ -334,13 +346,13 @@ def test_view_rest_parties(election_day_app_zg):
             assert import_.call_args[0][3] == 'application/octet-stream'
 
 
-def test_view_rest_xml(election_day_app_zg):
+def test_view_rest_xml(election_day_app_zg: TestApp) -> None:
     token = UploadTokenCollection(election_day_app_zg.session()).create()
-    token = str(token.token)
+    token_str = str(token.token)
     transaction.commit()
 
     client = Client(election_day_app_zg)
-    client.authorization = ('Basic', ('', token))
+    client.authorization = ('Basic', ('', token_str))
 
     params = (
         ('type', 'xml'),

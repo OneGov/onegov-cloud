@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from freezegun import freeze_time
 from onegov.election_day.layouts import ElectionCompoundPartLayout
@@ -10,9 +12,14 @@ from tests.onegov.election_day.common import DummyRequest
 from unittest.mock import Mock
 
 
-def test_election_compound_part_layout_general(session):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_election_compound_part_layout_general(session: Session) -> None:
     date_ = date(2011, 1, 1)
-    election = ProporzElection(
+    election = ProporzElection(  # type: ignore[misc]
         title="election",
         domain='region',
         domain_segment='Allschwil',
@@ -24,7 +31,7 @@ def test_election_compound_part_layout_general(session):
     session.flush()
     compound = session.query(ElectionCompound).one()
     part = ElectionCompoundPart(compound, 'superregion', 'Region 1')
-    request = DummyRequest()
+    request: Any = DummyRequest()
     layout = ElectionCompoundPartLayout(part, request)
     assert layout.all_tabs == (
         'districts',
@@ -54,7 +61,7 @@ def test_election_compound_part_layout_general(session):
             eligible_voters=500,
         )
     )
-    layout = ElectionCompoundPartLayout(part, DummyRequest())
+    layout = ElectionCompoundPartLayout(part, DummyRequest())  # type: ignore[arg-type]
     assert layout.has_results
 
     # test party results
@@ -70,7 +77,7 @@ def test_election_compound_part_layout_general(session):
             party_id='1'
         )
     )
-    layout = ElectionCompoundPartLayout(part, DummyRequest())
+    layout = ElectionCompoundPartLayout(part, DummyRequest())  # type: ignore[arg-type]
     assert layout.has_party_results is True
 
     # test main view
@@ -117,12 +124,12 @@ def test_election_compound_part_layout_general(session):
         ('party-strengths', 'ElectionCompoundPart/party-strengths-table'),
         ('statistics', 'ElectionCompoundPart/statistics-table')
     ):
-        layout = ElectionCompoundPartLayout(part, DummyRequest(), tab=tab)
+        layout = ElectionCompoundPartLayout(part, DummyRequest(), tab=tab)  # type: ignore[arg-type]
         assert not expected or f'{expected}?locale=de' == layout.table_link()
 
 
-def test_election_compound_part_layout_menu(session):
-    election = ProporzElection(
+def test_election_compound_part_layout_menu(session: Session) -> None:
+    election = ProporzElection(  # type: ignore[misc]
         title="Election",
         domain='region',
         domain_segment='Allschwil',
@@ -141,7 +148,7 @@ def test_election_compound_part_layout_menu(session):
     part = ElectionCompoundPart(compound, 'superregion', 'Region 1')
 
     # No results yet
-    request = DummyRequest()
+    request: Any = DummyRequest()
     assert ElectionCompoundPartLayout(part, request).menu == []
     assert ElectionCompoundPartLayout(part, request, 'data').menu == []
 

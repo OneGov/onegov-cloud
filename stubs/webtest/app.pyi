@@ -23,7 +23,7 @@ _Params: TypeAlias = SupportsItems[str | bytes, _ParamValue] | Sequence[tuple[st
 _ExtraEnviron: TypeAlias = SupportsKeysAndGetItem[str, Any] | Iterable[tuple[str, Any]]
 _Files: TypeAlias = Sequence[tuple[str, str] | tuple[str, str, bytes]]
 _AppT = TypeVar("_AppT", bound=WSGIApplication, default=WSGIApplication, covariant=True)
-_ResponseT = TypeVar("_ResponseT", bound=TestResponse, default=TestResponse)
+_ResponseT = TypeVar("_ResponseT", bound=TestResponse, default=TestResponse, covariant=True)
 
 __all__ = ["TestApp", "TestRequest"]
 
