@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 
 from freezegun import freeze_time
@@ -16,7 +18,12 @@ from tests.onegov.election_day.common import upload_vote
 from tests.shared import Client
 
 
-def test_view_login_logout(election_day_app_zg):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import TestApp
+
+
+def test_view_login_logout(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -24,8 +31,8 @@ def test_view_login_logout(election_day_app_zg):
     login.form['username'] = 'admin@example.org'
     login.form['password'] = 'hunter1'
 
-    assert "Unbekannter Benutzername oder falsches Passwort" \
-        in login.form.submit()
+    assert "Unbekannter Benutzername oder falsches Passwort" in (
+        login.form.submit())
     assert 'Anmelden' in client.get('/')
 
     login.form['password'] = 'hunter2'
@@ -38,7 +45,7 @@ def test_view_login_logout(election_day_app_zg):
     assert 'Anmelden' in client.get('/').click('Abmelden').follow()
 
 
-def test_view_manage_elections(election_day_app_zg):
+def test_view_manage_elections(election_day_app_zg: TestApp) -> None:
     archive = ArchivedResultCollection(election_day_app_zg.session())
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
@@ -90,7 +97,7 @@ def test_view_manage_elections(election_day_app_zg):
     assert archive.query().count() == 0
 
 
-def test_view_manage_election_compounds(election_day_app_gr):
+def test_view_manage_election_compounds(election_day_app_gr: TestApp) -> None:
     archive = ArchivedResultCollection(election_day_app_gr.session())
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
@@ -164,7 +171,7 @@ def test_view_manage_election_compounds(election_day_app_gr):
     assert archive.query().count() == 2
 
 
-def test_view_manage_votes(election_day_app_zg):
+def test_view_manage_votes(election_day_app_zg: TestApp) -> None:
     archive = ArchivedResultCollection(election_day_app_zg.session())
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
@@ -212,7 +219,7 @@ def test_view_manage_votes(election_day_app_zg):
     assert archive.query().count() == 0
 
 
-def test_upload_proporz_election(election_day_app_zg):
+def test_upload_proporz_election(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -223,13 +230,13 @@ def test_upload_proporz_election(election_day_app_zg):
     election = session.query(ProporzElection).one()
     assert election.type == 'proporz'
 
-    request = DummyRequest(session, election_day_app_zg)
+    request: Any = DummyRequest(session, election_day_app_zg)
 
     layout = ElectionLayout(election, request, 'lists-panachage')
     assert layout.visible
 
 
-def test_view_clear_results(election_day_app_zg):
+def test_view_clear_results(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -275,7 +282,7 @@ def test_view_clear_results(election_day_app_zg):
     assert '01.01.2023' not in client.get('/archive/2022')
 
 
-def test_view_manage_upload_tokens(election_day_app_zg):
+def test_view_manage_upload_tokens(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
     login(client)
@@ -290,7 +297,7 @@ def test_view_manage_upload_tokens(election_day_app_zg):
     assert "Noch keine Token." in client.get('/manage/upload-tokens')
 
 
-def test_view_manage_data_sources(election_day_app_zg):
+def test_view_manage_data_sources(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
     login(client)
@@ -419,7 +426,7 @@ def test_view_manage_data_sources(election_day_app_zg):
     assert 'Noch keine Datenquellen' in client.get('/manage/sources')
 
 
-def test_reset_password(election_day_app_zg):
+def test_reset_password(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -481,7 +488,7 @@ def test_reset_password(election_day_app_zg):
     assert "Sie sind angemeldet" in login_page
 
 
-def test_view_manage_screens(election_day_app_zg):
+def test_view_manage_screens(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -594,7 +601,7 @@ def test_view_manage_screens(election_day_app_zg):
     assert 'Noch keine Screens' in manage
 
 
-def test_view_manage_cache(election_day_app_zg):
+def test_view_manage_cache(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 

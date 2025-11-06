@@ -1,10 +1,24 @@
+from __future__ import annotations
+
 from tests.onegov.election_day.common import login
 from webtest import TestApp as Client
 from webtest import Upload
 from unittest.mock import patch
 
 
-def add_data_source(client, name='name', upload_type='vote', fill=False):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from webtest import TestResponse
+    from ..conftest import TestApp
+
+
+def add_data_source(
+    client: Client[TestResponse, TestApp],
+    name: str = 'name',
+    upload_type: str = 'vote',
+    fill: bool = False
+) -> tuple[str, str]:
+
     login(client)
 
     manage = client.get('/manage/sources/new-source')
@@ -40,7 +54,11 @@ def add_data_source(client, name='name', upload_type='vote', fill=False):
     return id_, token
 
 
-def regenerate_token(client, id_):
+def regenerate_token(
+    client: Client[TestResponse, TestApp],
+    id_: str
+) -> str:
+
     login(client)
 
     client.get('/data-source/{}/generate-token'.format(id_)).form.submit()
@@ -50,33 +68,33 @@ def regenerate_token(client, id_):
     return token
 
 
-def test_view_wabstic_authenticate(election_day_app_zg):
+def test_view_wabstic_authenticate(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     urls = ('vote', 'majorz', 'proporz')
 
-    def post(url):
+    def post(url: str) -> TestResponse:
         return client.post('/upload-wabsti-{}'.format(url), expect_errors=True)
 
-    assert all((post(url).status_code == 403 for url in urls))
+    assert all(post(url).status_code == 403 for url in urls)
 
     client.authorization = ('Basic', ('', 'password'))
 
-    assert all((post(url).status_code == 403 for url in urls))
+    assert all(post(url).status_code == 403 for url in urls)
 
     id_, token = add_data_source(Client(election_day_app_zg))
 
-    assert all((post(url).status_code == 403 for url in urls))
+    assert all(post(url).status_code == 403 for url in urls)
 
     client.authorization = ('Basic', ('', token))
 
-    assert all((post(url).status_code == 200 for url in urls))
+    assert all(post(url).status_code == 200 for url in urls)
 
     regenerate_token(Client(election_day_app_zg), id_)
 
-    assert all((post(url).status_code == 403 for url in urls))
+    assert all(post(url).status_code == 403 for url in urls)
 
 
-def test_view_wabstic_translations(election_day_app_zg):
+def test_view_wabstic_translations(election_day_app_zg: TestApp) -> None:
     id_, token = add_data_source(Client(election_day_app_zg), fill=True)
 
     client = Client(election_day_app_zg)
@@ -102,7 +120,7 @@ def test_view_wabstic_translations(election_day_app_zg):
     )
 
     # Invalid header
-    headers = [('Accept-Language', 'xxx')]
+    headers = {'Accept-Language': 'xxx'}
     result = client.post('/upload-wabsti-vote', headers=headers)
     assert result.json['errors']['sg_gemeinden'] == ['This field is required.']
 
@@ -117,7 +135,7 @@ def test_view_wabstic_translations(election_day_app_zg):
     )
 
     # German
-    headers = [('Accept-Language', 'de_CH')]
+    headers = {'Accept-Language': 'de_CH'}
     result = client.post('/upload-wabsti-vote', headers=headers)
     assert result.json['errors']['sg_gemeinden'] == [
         'Dieses Feld wird benötigt.'
@@ -134,7 +152,7 @@ def test_view_wabstic_translations(election_day_app_zg):
     )
 
     # Italian
-    headers = [('Accept-Language', 'it_CH')]
+    headers = {'Accept-Language': 'it_CH'}
     result = client.post('/upload-wabsti-vote', headers=headers)
     assert result.json['errors']['sg_gemeinden'] == [
         'Questo campo è obbligatorio.'
@@ -151,7 +169,7 @@ def test_view_wabstic_translations(election_day_app_zg):
     )
 
 
-def test_view_wabstic_vote(election_day_app_zg):
+def test_view_wabstic_vote(election_day_app_zg: TestApp) -> None:
     id_, token = add_data_source(Client(election_day_app_zg), fill=True)
 
     client = Client(election_day_app_zg)
@@ -172,7 +190,7 @@ def test_view_wabstic_vote(election_day_app_zg):
         assert result.json['status'] == 'success'
 
 
-def test_view_wabstic_majorz(election_day_app_zg):
+def test_view_wabstic_majorz(election_day_app_zg: TestApp) -> None:
     id_, token = add_data_source(
         Client(election_day_app_zg),
         upload_type='majorz',
@@ -204,7 +222,7 @@ def test_view_wabstic_majorz(election_day_app_zg):
         assert result.json['status'] == 'success'
 
 
-def test_view_wabstic_proporz(election_day_app_zg):
+def test_view_wabstic_proporz(election_day_app_zg: TestApp) -> None:
     id_, token = add_data_source(
         Client(election_day_app_zg),
         upload_type='proporz',

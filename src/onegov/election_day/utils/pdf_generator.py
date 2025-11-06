@@ -811,7 +811,7 @@ class PdfGenerator:
             accepted = result.accepted
             direct = ballot.vote.direct
             if accepted is None:
-                return _('Intermediate results abbrev')  # type:ignore
+                return _('Intermediate results abbrev')
             if tie_breaker:
                 if accepted:
                     return _('Proposal')
@@ -832,7 +832,7 @@ class PdfGenerator:
         ) -> str:
 
             if result.accepted is None:
-                return nan  # type:ignore[unreachable]
+                return nan
             return fmt(getattr(result, attr))
 
         # Answer

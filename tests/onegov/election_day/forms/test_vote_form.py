@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from cgi import FieldStorage
 from datetime import date
 from io import BytesIO
@@ -11,11 +13,17 @@ from tests.onegov.election_day.common import DummyRequest
 from wtforms.validators import InputRequired
 
 
-def test_vote_form_on_request():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from ..conftest import TestApp
+
+
+def test_vote_form_on_request() -> None:
     form = VoteForm()
-    form.request = DummyRequest()
+    form.request = DummyRequest()  # type: ignore[assignment]
     form.request.default_locale = 'de_CH'
-    form.request.app.principal = Canton(name='be', canton='be')
+    form.request.app.principal = Canton(name='be', canton='be')  # type: ignore[misc]
     form.on_request()
     assert form.domain.choices == [
         ('federation', 'Federal'),
@@ -28,9 +36,9 @@ def test_vote_form_on_request():
     assert form.title_rm.validators == []
 
     form = VoteForm()
-    form.request = DummyRequest()
+    form.request = DummyRequest()  # type: ignore[assignment]
     form.request.default_locale = 'fr_CH'
-    form.request.app.principal = Municipality(
+    form.request.app.principal = Municipality(  # type: ignore[misc]
         name='bern', municipality='351', canton='be', canton_name='Kanton Bern'
     )
     form.on_request()
@@ -45,8 +53,12 @@ def test_vote_form_on_request():
     assert form.title_rm.validators == []
 
 
-def test_vote_form_model(election_day_app_zg, related_link_labels,
-                         explanations_pdf):
+def test_vote_form_model(
+    election_day_app_zg: TestApp,
+    related_link_labels: dict[str, str],
+    explanations_pdf: BytesIO
+) -> None:
+
     model = Vote()
     model.id = 'vote'
     model.title_translations = {
@@ -97,7 +109,7 @@ def test_vote_form_model(election_day_app_zg, related_link_labels,
     assert form.related_link_label_fr.data == 'FR'
     assert form.related_link_label_it.data == 'IT'
     assert form.related_link_label_rm.data == 'RM'
-    assert form.explanations_pdf.data['mimetype'] == 'application/pdf'
+    assert form.explanations_pdf.data['mimetype'] == 'application/pdf'  # type: ignore[index]
     assert form.type.data == 'simple'
     assert form.has_expats.data is False
 
@@ -124,7 +136,8 @@ def test_vote_form_model(election_day_app_zg, related_link_labels,
     form.has_expats.data = True
 
     form.update_model(model)
-
+    # undo mypy narrowing
+    model = model
     assert model.id == 'a-vote'
     assert model.external_id == '710'
     assert model.title_translations == {
@@ -147,8 +160,6 @@ def test_vote_form_model(election_day_app_zg, related_link_labels,
     assert model.type == 'simple'
     assert model.has_expats is True
 
-    form.explanations_pdf.action = 'upload'
-
     field_storage = FieldStorage()
     field_storage.file = BytesIO('my-file'.encode())
     field_storage.type = 'image/png'  # ignored
@@ -158,13 +169,15 @@ def test_vote_form_model(election_day_app_zg, related_link_labels,
     )
 
     form.update_model(model)
-
+    # undo mypy narrowing
+    model = model
+    assert model.explanations_pdf is not None
     assert model.explanations_pdf.name == 'explanations_pdf'
     assert model.explanations_pdf.reference.filename == 'my-file.pdf'
     assert model.explanations_pdf.reference.file.read() == b'my-file'
 
 
-def test_vote_form_validate(session):
+def test_vote_form_validate(session: Session) -> None:
     model = Vote(
         id='vote',
         title='Vote',
@@ -185,9 +198,9 @@ def test_vote_form_validate(session):
     session.flush()
 
     form = VoteForm()
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
     form.request.default_locale = 'de_CH'
-    form.request.app.principal = Canton(name='be', canton='be')
+    form.request.app.principal = Canton(name='be', canton='be')  # type: ignore[misc]
     form.on_request()
     form.apply_model(model)
     assert form.id.data == 'vote'
@@ -201,9 +214,9 @@ def test_vote_form_validate(session):
     }
 
     form = VoteForm(DummyPostData({'id': 'vote copy'}))
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
     form.request.default_locale = 'de_CH'
-    form.request.app.principal = Canton(name='be', canton='be')
+    form.request.app.principal = Canton(name='be', canton='be')  # type: ignore[misc]
     form.on_request()
     form.model = model
     assert not form.validate()
@@ -215,9 +228,9 @@ def test_vote_form_validate(session):
         'external_id_counter_proposal': 'ext',
         'external_id_tie_breaker': 'ext'
     }))
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
     form.request.default_locale = 'de_CH'
-    form.request.app.principal = Canton(name='be', canton='be')
+    form.request.app.principal = Canton(name='be', canton='be')  # type: ignore[misc]
     form.on_request()
     form.model = model
     assert not form.validate()
@@ -231,9 +244,9 @@ def test_vote_form_validate(session):
         'external_id_counter_proposal':
         'e100', 'external_id_tie_breaker': 'e100'
     }))
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
     form.request.default_locale = 'de_CH'
-    form.request.app.principal = Canton(name='be', canton='be')
+    form.request.app.principal = Canton(name='be', canton='be')  # type: ignore[misc]
     form.on_request()
     form.model = model
     assert not form.validate()
@@ -248,9 +261,9 @@ def test_vote_form_validate(session):
         'title_de': 'Vote',
         'type': 'simple'
     }))
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
     form.request.default_locale = 'de_CH'
-    form.request.app.principal = Canton(name='be', canton='be')
+    form.request.app.principal = Canton(name='be', canton='be')  # type: ignore[misc]
     form.on_request()
     form.model = model
     assert form.validate()
@@ -259,8 +272,12 @@ def test_vote_form_validate(session):
     assert session.query(Vote).filter_by(id='vote-new').one()
 
 
-def test_vote_form_model_complex(election_day_app_zg, related_link_labels,
-                                 explanations_pdf):
+def test_vote_form_model_complex(
+    election_day_app_zg: TestApp,
+    related_link_labels: dict[str, str],
+    explanations_pdf: BytesIO
+) -> None:
+
     model = ComplexVote()
     model.id = 'vote'
     model.title_translations = {
@@ -324,7 +341,7 @@ def test_vote_form_model_complex(election_day_app_zg, related_link_labels,
     assert form.related_link_label_fr.data == 'FR'
     assert form.related_link_label_it.data == 'IT'
     assert form.related_link_label_rm.data == 'RM'
-    assert form.explanations_pdf.data['mimetype'] == 'application/pdf'
+    assert form.explanations_pdf.data['mimetype'] == 'application/pdf'  # type: ignore[index]
     assert form.type.data == 'complex'
 
     fieldsets = [f.label for f in form.fieldsets if f.label]
@@ -360,7 +377,8 @@ def test_vote_form_model_complex(election_day_app_zg, related_link_labels,
     form.type.data = 'complex'
 
     form.update_model(model)
-
+    # undo mypy narrowing
+    model = model
     assert model.id == 'a-vote'
     assert model.external_id == '740'
     assert model.direct is False
@@ -398,8 +416,6 @@ def test_vote_form_model_complex(election_day_app_zg, related_link_labels,
     assert model.explanations_pdf is None
     assert model.type == 'complex'
 
-    form.explanations_pdf.action = 'upload'
-
     field_storage = FieldStorage()
     field_storage.file = BytesIO('my-file'.encode())
     field_storage.type = 'image/png'  # ignored
@@ -409,7 +425,9 @@ def test_vote_form_model_complex(election_day_app_zg, related_link_labels,
     )
 
     form.update_model(model)
-
+    # undo mypy narrowing
+    model = model
+    assert model.explanations_pdf is not None
     assert model.explanations_pdf.name == 'explanations_pdf'
     assert model.explanations_pdf.reference.filename == 'my-file.pdf'
     assert model.explanations_pdf.reference.file.read() == b'my-file'
