@@ -41,7 +41,7 @@
                         <div class="activity-active-period">
                             <h3>${title}</h3>
                             <p class="hint">
-                                <tal:b tal:condition="len(phases_date) == 2">
+                                <tal:b tal:condition="len(phases_date) > 1">
                                     <span>
                                         <b><tal:b i18n:translate>Prebooking</tal:b>: </b><span>${phases_date[1]}</span>
                                     </span>
