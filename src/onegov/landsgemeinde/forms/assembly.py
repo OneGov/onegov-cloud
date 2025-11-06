@@ -24,7 +24,6 @@ from wtforms.validators import Optional
 from wtforms.validators import URL
 from wtforms.validators import ValidationError
 
-from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.landsgemeinde.request import LandsgemeindeRequest
@@ -153,10 +152,6 @@ class AssemblyForm(NamedFileForm):
             'The URL to the video of the ${assembly_type}.',
             mapping={'assembly_type': DefaultLayout(self.model, self.request
                                                     ).assembly_type})
-
-    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
-        data = super().get_useful_data(exclude=['info_video'])
-        return data
 
     def validate_date(self, field: DateField) -> None:
         if field.data:
