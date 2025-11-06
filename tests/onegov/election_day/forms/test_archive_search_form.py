@@ -29,6 +29,12 @@ def test_apply_model_archive_search_form_election(session: Session) -> None:
 
 def test_apply_model_archive_search_form_vote(session: Session) -> None:
     archive = SearchableArchivedResultCollection(DummyApp(session))  # type: ignore[arg-type]
+    archive.term = 'xxx'
+    archive.from_date = date(2222, 1, 1)
+    archive.to_date = date(2222, 1, 1)
+    archive.answers = ['accepted']
+    archive.domains = ['region', 'municipality']
+
     form = ArchiveSearchFormVote()
     form.apply_model(archive)
     assert form.term.data == archive.term
