@@ -866,4 +866,13 @@ def handle_citizen_logout(
     if request.authenticated_email:
         del request.browser_session['authenticated_email']
 
+    # NOTE: We don't perform a full logout here, since you can currently
+    #       be logged in as both a citizen and a regular user at the same
+    #       time for convenience. We may revisit that decision in the
+    #       future, but until then we at least make sure to clear the
+    #       browser cache on citizen logout.
+    @request.after
+    def clear_site_data(response: Response) -> None:
+        response.headers['Clear-Site-Data'] = '"cache"'
+
     return self.redirect(request, self.to)
