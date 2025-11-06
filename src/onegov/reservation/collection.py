@@ -137,15 +137,28 @@ class ResourceCollection:
             scheduler.managed_allocations().delete('fetch')
         else:
             if callable(handle_reservation):
-                for res in scheduler.managed_reservations():
+
+                for reservation in scheduler.managed_reservations():
+                    if reservation.payment:
+                        reservation.payment = None  # unlink payment
+                self.session.flush()
+
+                for index, res in enumerate(
+                        scheduler.managed_reservations(), start=1):
                     # e.g. create a ticket snapshot
                     handle_reservation(res)
+
+                    if index % 100 == 0:
+                        self.session.flush()
+                        self.session.expunge_all()
+
             scheduler.extinguish_managed_records()
 
-        if resource.files:
-            # unlink any linked files
-            resource.files = []
+        # reload resource as it is detached meanwhile
+        res = ResourceCollection(self.libres_context).by_id(resource.id)
+        if res and res.files:
+            res.files = []  # unlink files
             self.session.flush()
 
-        self.session.delete(resource)
+        self.session.delete(res)
         self.session.flush()
