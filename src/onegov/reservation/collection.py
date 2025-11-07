@@ -139,14 +139,15 @@ class ResourceCollection:
             if callable(handle_reservation):
 
                 for reservation in scheduler.managed_reservations():
-                    if reservation.payment:
-                        reservation.payment = None  # unlink payment
-                self.session.flush()
+                    if reservation.payment:  # type:ignore[attr-defined]
+                        # unlink payment
+                        reservation.payment = None  # type:ignore[attr-defined]
+                        self.session.flush()
 
-                for index, res in enumerate(
+                for index, reservation in enumerate(
                         scheduler.managed_reservations(), start=1):
                     # e.g. create a ticket snapshot
-                    handle_reservation(res)
+                    handle_reservation(reservation)
 
                     if index % 100 == 0:
                         self.session.flush()
@@ -157,7 +158,8 @@ class ResourceCollection:
         # reload resource as it is detached meanwhile
         res = ResourceCollection(self.libres_context).by_id(resource.id)
         if res and res.files:
-            res.files = []  # unlink files
+            # unlink files
+            res.files = []
             self.session.flush()
 
         self.session.delete(res)
