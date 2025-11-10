@@ -980,6 +980,10 @@ def handle_delete_resource(self: Resource, request: OrgRequest) -> None:
             close_ticket(ticket, request.current_user, request)
             ticket.create_snapshot(request)
 
+            if reservation.payment:  # type: ignore[attr-defined]
+                # unlink payment
+                reservation.payment = None  # type: ignore[attr-defined]
+
             payment = ticket.handler.payment
             if payment and payments.query().filter_by(id=payment.id).first():
                 payments.delete(payment)

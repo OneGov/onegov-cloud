@@ -138,13 +138,8 @@ class ResourceCollection:
         else:
             if callable(handle_reservation):
                 for res in scheduler.managed_reservations():
-                    if res.payment:  # type:ignore[attr-defined]
-                        # unlink payment
-                        res.payment = None  # type:ignore[attr-defined]
-
                     # e.g. create a ticket snapshot
                     handle_reservation(res)
-
             scheduler.extinguish_managed_records()
 
         if resource.files:
