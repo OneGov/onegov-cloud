@@ -1,8 +1,12 @@
 # Changes
 
+## 2025.63
+
+`2025-11-10` | [6a3efb41f9...3d045dbd0c](https://github.com/OneGov/onegov-cloud/compare/6a3efb41f9^...3d045dbd0c)
+
 ## 2025.62
 
-`2025-11-07` | [d90bbc51b7...dfd0c98268](https://github.com/OneGov/onegov-cloud/compare/d90bbc51b7^...dfd0c98268)
+`2025-11-07` | [d90bbc51b7...c296944343](https://github.com/OneGov/onegov-cloud/compare/d90bbc51b7^...c296944343)
 
 ### Core
 
@@ -2491,16 +2495,4 @@ is the default and can safely be ignored.
 ##### Avoids N+1 query for page slides
 
 `Performance` | [c88b3b5493](https://github.com/onegov/onegov-cloud/commit/c88b3b5493bf2fee8e0d73d2c9df8734f6ee7e23)
-
-## 2025.14
-
-`2025-03-14` | [d54f9470e7...d92404c116](https://github.com/OneGov/onegov-cloud/compare/d54f9470e7^...d92404c116)
-
-### Org
-
-##### Display phone numbers in international format
-
-The international format prefixes the country code e.g. +41 for Switzerland
-
-`Feature` | [OGC-2113](https://linear.app/onegovcloud/issue/OGC-2113) | [d54f9470e7](https://github.com/onegov/onegov-cloud/commit/d54f9470e7636d9140199e75a3ab827322115856)
 
