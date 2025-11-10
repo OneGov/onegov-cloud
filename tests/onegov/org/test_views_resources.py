@@ -10,19 +10,22 @@ import transaction
 import warnings
 
 from base64 import b64decode
-from datetime import datetime, date, timedelta
+from datetime import datetime, date
+from decimal import Decimal
 from freezegun import freeze_time
 from io import BytesIO
 from libres.db.models import Reservation
 from libres.modules.errors import AffectedReservationError
+
 from onegov.core.utils import module_path, normalize_for_url
 from onegov.file import FileCollection
 from onegov.form import FormSubmission
 from onegov.org.models import ResourceRecipientCollection
-from onegov.pay import Payment
+from onegov.pay import Payment, ManualPayment
 from onegov.pdf.utils import extract_pdf_info
 from onegov.reservation import Resource, ResourceCollection
 from onegov.ticket import TicketCollection
+from onegov.user import UserCollection, User
 from openpyxl import load_workbook
 from pathlib import Path
 from sqlalchemy import exc
@@ -31,8 +34,8 @@ from tests.shared.utils import add_reservation
 from unittest.mock import patch
 from webtest import Upload
 
-
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from unittest.mock import MagicMock
     from .conftest import Client
@@ -497,64 +500,92 @@ def test_resource_room_deletion(client: Client) -> None:
     assert ticket.state == 'closed'
 
 
-def test_resource_room_deletion_with_future_allocation_and_payment(
-    client: Client
+def test_resource_room_deletion_with_future_reservation_file_and_payment(
+        client: Client,
 ) -> None:
-
+    session = client.app.session()
     resources = ResourceCollection(client.app.libres_context)
-    resource = resources.by_name('tageskarte')
-    assert resource is not None
-    resource.pricing_method = 'per_item'
-    resource.price_per_item = 15.00
-    resource.payment_method = 'manual'
-    resource.definition = 'Email = ___'
+    tickets = TicketCollection(session)
+    users = UserCollection(session)
+    admin = users.query().filter(User.role == 'admin').first()
+    assert admin
+    files = FileCollection(session)
 
-    tomorrow = date.today() + timedelta(days=1)
-    scheduler = resource.get_scheduler(client.app.libres_context)
-    allocations = scheduler.allocate(
-        dates=(
-            datetime(tomorrow.year, tomorrow.month, tomorrow.day, 10),
-            datetime(tomorrow.year, tomorrow.month, tomorrow.day, 14),
-        ),
+    daypass = resources.add('Daypass', 'Europe/Zurich', type='daypass')
+    add_reservation(
+        daypass,
+        session,
+        datetime(2037, 11, 6, 12),
+        datetime(2037, 11, 6, 16),
+    )
+    readme_file = files.add('readme', b'content.', published=True)
+    daypass.files = [readme_file]
+
+    hall = resources.add('Town Hall', 'Europe/Zurich', type='room')
+    add_reservation(
+        hall,
+        session,
+        datetime(2038, 11, 6, 12),
+        datetime(2038, 11, 6, 16),
+    )
+    hall.pricing_method = 'per_item'
+    hall.price_per_hour = 999.00
+    hall.payment_method = 'manual'
+
+    lopper = resources.add('Lopper', 'Europe/Zurich', type='daily-item')
+    add_reservation(
+        lopper,
+        session,
+        datetime(2039, 11, 6, 12),
+        datetime(2039, 11, 6, 16),
     )
 
-    reserve = client.bound_reserve(allocations[0])
     transaction.commit()
 
-    # create a reservation
-    assert reserve().json == {'success': True}
+    assert resources.query().count() == 5  # as two are by default
+    resource_titles = [r.title for r in resources.query().all()]
+    assert 'Daypass' in resource_titles
+    assert 'Town Hall' in resource_titles
+    assert 'Lopper' in resource_titles
+    resource = resources.query().filter_by(title='Daypass').first()
+    assert resource and resource.files[0].name == 'readme'
 
-    page = client.get('/resource/tageskarte/form')
-    page.form['email'] = 'info@example.org'
+    for ticket in tickets.query().all():
+        assert ticket.state == 'open'
+    ticket.accept_ticket(admin)
+    if 'Town Hall' in ticket.group:
+        ticket.payment = ManualPayment(
+            amount=Decimal(999), currency='CHF', state='paid')
+    if 'Daypass' in ticket.group:
+        ticket.payment = ManualPayment(
+            amount=Decimal(10), currency='CHF', state='open')
 
-    ticket_page = page.form.submit().follow().form.submit().follow()
-    assert 'RSV-' in ticket_page.text
-
-    # mark it as paid
-    client.login_supporter()
-    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
-
-    assert page.pyquery('.payment-state').text() == "Offen"
-
-    client.post(page.pyquery('.mark-as-paid').attr('ic-post-to'))
-    page = client.get(page.request.url)
-
-    assert page.pyquery('.payment-state').text() == "Bezahlt"
+    transaction.commit()
 
     # delete resource
     client.login_admin()
-    page = client.get('/resources').click('Tageskarte', index=1)
-    delete_link = page.pyquery('a.delete-link').attr('ic-delete-from')
-    assert delete_link
-    assert client.delete(delete_link, status=200)
-    page = client.get('/resources')
-    assert 'Tageskarte' not in page.pyquery('a.list-title').text()
+    for resource_title in ['Daypass', 'Town Hall', 'Lopper']:
+        page = client.get('/resources').click(resource_title)
+        delete_link = page.pyquery('a.delete-link').attr('ic-delete-from')
+        assert delete_link
+        assert client.delete(delete_link, status=200)
+        page = client.get('/resources')
+        assert resource_title not in page.pyquery('a.list-title').text()
+
+    assert resources.query().count() == 2  # as two are by default
 
     # check if the tickets have been closed
     tickets = TicketCollection(client.app.session())
-    for ticket in tickets.query().all():
+    for index, ticket in enumerate(tickets.query().all()):
         assert ticket.state == 'closed'
-        assert ticket.snapshot is not None
+    assert ticket.snapshot is not None
+    if 'Daypass' in ticket.group:
+        assert ticket.payment and ticket.payment.paid is False
+    if 'Town Hall' in ticket.group:
+        assert ticket.payment and ticket.payment.paid is True
+    print('Found paid payment')
+    if 'Lopper' in ticket.group:
+        assert ticket.payment is None
 
 
 def test_reserved_resources_fields(client: Client) -> None:
