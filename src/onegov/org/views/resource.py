@@ -970,6 +970,7 @@ def handle_delete_resource(self: Resource, request: OrgRequest) -> None:
 
     request.assert_valid_csrf_token()
     tickets = TicketCollection(request.session)
+    payments = PaymentCollection(request.session)
 
     def handle_reservation_tickets(reservation: BaseReservation) -> None:
         ticket = tickets.by_handler_id(reservation.token.hex)
@@ -979,10 +980,13 @@ def handle_delete_resource(self: Resource, request: OrgRequest) -> None:
             close_ticket(ticket, request.current_user, request)
             ticket.create_snapshot(request)
 
+            if reservation.payment:  # type: ignore[attr-defined]
+                # unlink payment
+                reservation.payment = None  # type: ignore[attr-defined]
+
             payment = ticket.handler.payment
-            if (payment and PaymentCollection(request.session).query()
-                    .filter_by(id=payment.id).first()):
-                PaymentCollection(request.session).delete(payment)
+            if payment and payments.query().filter_by(id=payment.id).first():
+                payments.delete(payment)
 
     collection = ResourceCollection(request.app.libres_context)
     collection.delete(
