@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import click
 
-from onegov.core.cli import GroupContext, command_group, pass_group_context
+from onegov.core.cli import command_group
 from onegov.activity.models import BookingPeriod
 from onegov.activity.models import Occasion
 from sqlalchemy import text
@@ -10,10 +10,6 @@ from sqlalchemy import text
 
 from typing import TYPE_CHECKING
 
-from onegov.core.utils import Bunch
-from onegov.feriennet.upgrade import (UpgradeContext,
-                                      migrate_homepage_structure_for_feriennet)
-from onegov.town6.upgrade import migrate_theme_options
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.feriennet.app import FeriennetApp
@@ -176,22 +172,3 @@ def compute_occasion_durations(
             o.duration = o.compute_duration(o.dates)
 
     return compute_occasion_durations
-
-
-@cli.command('migrate-feriennet', context_settings={'default_selector': '*'})
-@pass_group_context
-def migrate_feriennet(
-    group_context: GroupContext
-) -> Callable[[FeriennetRequest, FeriennetApp], None]:
-    """ Migrates the database from an old feriennet to the new feriennet like
-    in the upgrades.
-
-    """
-
-    def migrate_to_new_feriennet(request: FeriennetRequest,
-                                 app: FeriennetApp) -> None:
-        context: UpgradeContext = Bunch(session=app.session())  # type:ignore
-        migrate_theme_options(context)
-        migrate_homepage_structure_for_feriennet(context)
-
-    return migrate_to_new_feriennet
