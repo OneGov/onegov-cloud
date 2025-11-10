@@ -137,7 +137,6 @@ class ResourceCollection:
             scheduler.managed_allocations().delete('fetch')
         else:
             if callable(handle_reservation):
-
                 for res in scheduler.managed_reservations():
                     if res.payment:  # type:ignore[attr-defined]
                         # unlink payment
