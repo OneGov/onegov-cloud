@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 
 from freezegun import freeze_time
@@ -6,7 +8,12 @@ from onegov.feriennet.sponsors import Sponsor
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 
 
-def test_translate_sponsor():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client, Scenario
+
+
+def test_translate_sponsor() -> None:
 
     sponsor = Sponsor(
         name="Evilcorp",
@@ -26,7 +33,7 @@ def test_translate_sponsor():
         }
     )
 
-    de = sponsor.compiled(Bunch(locale='de_CH'))
+    de = sponsor.compiled(Bunch(locale='de_CH'))  # type: ignore[call-overload]
     assert de.name == "Evilcorp"
     assert de.background is None
     assert de.logo == 'das-logo.png'
@@ -35,7 +42,7 @@ def test_translate_sponsor():
         'info': 'Partner'
     }
 
-    fr = sponsor.compiled(Bunch(locale='fr_CH'))
+    fr = sponsor.compiled(Bunch(locale='fr_CH'))  # type: ignore[call-overload]
     assert fr.name == "Evilcorp"
     assert fr.background is None
     assert fr.logo == 'le-logo.png'
@@ -45,7 +52,7 @@ def test_translate_sponsor():
     }
 
 
-def test_sponsors(client, scenario):
+def test_sponsors(client: Client, scenario: Scenario) -> None:
     client.login_admin()
 
     scenario.add_period(
@@ -103,7 +110,7 @@ def test_sponsors(client, scenario):
     assert "Partenaiere" not in page
 
 
-def test_timestamp_sponsor():
+def test_timestamp_sponsor() -> None:
 
     sponsor = Sponsor(
         name="Evilcorp",
@@ -115,13 +122,17 @@ def test_timestamp_sponsor():
     )
 
     with freeze_time("2017-10-12 16:30"):
-        de = sponsor.compiled(Bunch(locale='de_CH'))
+        de = sponsor.compiled(Bunch(locale='de_CH'))  # type: ignore[call-overload]
         assert de.name == "Evilcorp"
         assert de.logo == '1507825800000'
         assert de.banners == '1507825800000'
 
 
-def test_random_sponsors_at_activities(client, scenario):
+def test_random_sponsors_at_activities(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
     client.login_admin()
 
     # Add activities for the list
@@ -200,7 +211,7 @@ def test_random_sponsors_at_activities(client, scenario):
     assert 'other sponsor' in activities[3]
 
 
-def test_banner_in_mail(client):
+def test_banner_in_mail(client: Client) -> None:
     with freeze_time('2023-02-13'):
         client.login_admin()
         page = client.get('/userprofile')
@@ -235,6 +246,7 @@ def test_banner_in_mail(client):
         client.app.sponsors = [Sponsor(**sponsor) for sponsor in data]
 
         job = get_cronjob_by_name(client.app, 'send_daily_ticket_statistics')
+        assert job is not None
         job.app = client.app
 
         url = get_cronjob_url(job)

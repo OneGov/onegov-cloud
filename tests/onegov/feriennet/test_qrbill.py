@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from base64 import b64decode
+from decimal import Decimal
 from onegov.activity.models import BookingPeriodInvoice
 from onegov.core.utils import Bunch
 from onegov.feriennet.qrbill import beneficiary_to_creditor
@@ -8,11 +11,14 @@ from onegov.feriennet.qrbill import swiss_iban
 from onegov.pay.models import InvoiceReference
 
 
+from typing import Any
+
+
 SWISS_IBAN = 'CH5604835012345678009'
 SWISS_QRIBAN = 'CH4431999123000889012'
 
 
-def test_beneficiary_to_creditor():
+def test_beneficiary_to_creditor() -> None:
     assert beneficiary_to_creditor(None) is None
     assert beneficiary_to_creditor('') is None
     assert beneficiary_to_creditor('Street') is None
@@ -21,7 +27,7 @@ def test_beneficiary_to_creditor():
     }
 
 
-def test_iban():
+def test_iban() -> None:
     assert swiss_iban(SWISS_IBAN)
     assert swiss_iban('LI21 0881 0000 2324 013A A')
     assert not swiss_iban('DK9520000123456789')
@@ -30,8 +36,8 @@ def test_iban():
     assert not qr_iban(SWISS_IBAN)
 
 
-def test_qrbill():
-    def qr_bill(**kwargs):
+def test_qrbill() -> None:
+    def qr_bill(**kwargs: Any) -> str | None:
         enabled = kwargs.pop('enabled', True)
         schema = kwargs.pop('schema', 'feriennet-v1')
         locale = kwargs.pop('locale', 'en_US')
@@ -45,7 +51,7 @@ def test_qrbill():
         zip_code = kwargs.pop('zip_code', '1234')
         place = kwargs.pop('place', 'Govikon')
 
-        request = Bunch(
+        request: Any = Bunch(
             locale=locale,
             app=Bunch(
                 org=Bunch(meta={
@@ -56,7 +62,7 @@ def test_qrbill():
                 invoice_bucket=lambda: bucket
             )
         )
-        user = Bunch(
+        user: Any = Bunch(
             realname=name,
             data={
                 'name': name,
@@ -66,18 +72,19 @@ def test_qrbill():
             }
         )
         invoice = BookingPeriodInvoice()
-        invoice.add('group', 'text', amount, 1, flush=False)
+        invoice.add('group', 'text', amount, Decimal('1'), flush=False)
         invoice.references.append(
             InvoiceReference(reference=reference, bucket=bucket, schema=schema)
         )
 
         result = generate_qr_bill(schema, request, user, invoice)
         if result:
-            result = b64decode(result).decode()
-        return result
+            return b64decode(result).decode()
+        return None
 
     # feriennet-v1 / en
     result = qr_bill()
+    assert result is not None
     assert 'Receipt' in result
     assert 'CH56 0483 5012 3456 7800 9' in result
     assert 'Additional information' in result
@@ -91,9 +98,9 @@ def test_qrbill():
     assert 'CH-1234 Govikon' in result
 
     # locales
-    assert 'Empfangsschein' in qr_bill(locale='de_CH')
-    assert 'Récépissé' in qr_bill(locale='fr_CH')
-    assert 'Ricevuta' in qr_bill(locale='it_CH')
+    assert 'Empfangsschein' in qr_bill(locale='de_CH')  # type: ignore[operator]
+    assert 'Récépissé' in qr_bill(locale='fr_CH')  # type: ignore[operator]
+    assert 'Ricevuta' in qr_bill(locale='it_CH')  # type: ignore[operator]
 
     # esr-v1
     result = qr_bill(
@@ -102,13 +109,14 @@ def test_qrbill():
         invoice_bucket='esr-v1',
         reference='277409152814488798004124782'
     )
+    assert result is not None
     assert 'Additional information' not in result
     assert 'Reference' in result
     assert '27 74091 52814 48879 80041 24782' in result
 
     # silent fixes
-    address = ''.join(71 * ['x'])
-    assert f'>{address[:70]}<' in qr_bill(address=address)
+    address = 'x' * 71
+    assert f'>{address[:70]}<' in qr_bill(address=address)  # type: ignore[operator]
 
     # fails
     assert qr_bill(enabled=False) is None

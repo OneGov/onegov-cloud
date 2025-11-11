@@ -1,0 +1,74 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.translator_directory">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x">
+            <div class="cell small-12">
+                <div class="time-report-detail">
+                    <h2>
+                        <a href="${request.link(report.translator)}"
+                           tal:condition="report.translator">
+                            ${report.translator.title}
+                        </a>
+                    </h2>
+                    <dl class="field-display">
+                        <dt i18n:translate="">Assignment Date</dt>
+                        <dd>${layout.format_date(
+                            report.assignment_date, 'date')}</dd>
+
+                        <dt i18n:translate="">Duration</dt>
+                        <dd>${report.duration} min
+                            (${report.duration_hours} hours)</dd>
+
+                        <dt i18n:translate="">Type</dt>
+                        <dd>${layout.format_interpreting_type(
+                            report.assignment_type) if report.assignment_type else '-'}</dd>
+
+                        <dt i18n:translate="" tal:condition="report.case_number">
+                            Case Number</dt>
+                        <dd tal:condition="report.case_number">
+                            ${report.case_number}</dd>
+
+                        <dt i18n:translate="">Hourly Rate</dt>
+                        <dd>${layout.format_currency(report.hourly_rate)}</dd>
+
+                        <dt i18n:translate="">Surcharge</dt>
+                        <dd>${report.surcharge_percentage}%</dd>
+
+                        <dt i18n:translate="">Travel Compensation</dt>
+                        <dd>${layout.format_currency(
+                            report.travel_compensation)}</dd>
+
+                        <dt i18n:translate=""
+                            tal:condition="report.meal_allowance">
+                            Meal Allowance (6+ hours)</dt>
+                        <dd tal:condition="report.meal_allowance">
+                            ${layout.format_currency(report.meal_allowance)}
+                        </dd>
+
+                        <dt i18n:translate="">Base Compensation</dt>
+                        <dd>${layout.format_currency(
+                            report.base_compensation)}</dd>
+
+                        <dt><strong i18n:translate="">Total</strong></dt>
+                        <dd><strong>${layout.format_currency(
+                            report.total_compensation)}</strong></dd>
+
+                        <dt i18n:translate="">Status</dt>
+                        <dd>
+                            <span tal:condition="report.status == 'pending'"
+                                  i18n:translate="">Pending</span>
+                            <span tal:condition="report.status == 'confirmed'"
+                                  i18n:translate="">Confirmed</span>
+                        </dd>
+
+                        <dt i18n:translate="" tal:condition="report.notes">
+                            Notes</dt>
+                        <dd tal:condition="report.notes">${report.notes}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>

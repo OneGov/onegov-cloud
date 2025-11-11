@@ -48,7 +48,7 @@
 
             <div class="large-4 medium-4 cell medium-offset-1 sidebar">
                 <div class="sidebar-wrapper">
-                    <div class="side-panel content-panel" style="display: none;">
+                    <div class="side-panel content-panel" style="display: none;" data-toc-level="${layout.org.level_table_of_contents}">
                         <h3 i18n:translate>Content</h3>
                         <ul class="more-list"></ul>
                     </div>

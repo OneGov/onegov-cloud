@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-02-18 09:27+0100\n"
+"POT-Creation-Date: 2025-11-05 14:46+0100\n"
 "PO-Revision-Date: 2019-01-31 08:31+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -155,6 +155,13 @@ msgstr ""
 
 msgid "Files of this type are not supported."
 msgstr "Les fichiers de ce type ne sont pas pris en charge."
+
+msgid ""
+"The password you wanted to use was found on list of commonly used passwords, "
+"please use a more secure password."
+msgstr ""
+"Le mot de passe que vous avez choisi figure dans la liste des mots de passe "
+"couramment utilisés. Veuillez utiliser un mot de passe plus sécurisé."
 
 msgid "The form could not be parsed."
 msgstr "Le formulaire ne peut pas être analysé."

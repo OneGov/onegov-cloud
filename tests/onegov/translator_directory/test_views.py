@@ -8,7 +8,9 @@ import transaction
 from freezegun import freeze_time
 from io import BytesIO
 from onegov.core.utils import module_path
-from onegov.translator_directory.models.ticket import AccreditationTicket
+from onegov.translator_directory.models.ticket import (
+    AccreditationTicket,
+)
 from onegov.translator_directory.models.translator import Translator
 from os.path import basename
 from onegov.file import FileCollection
@@ -212,17 +214,19 @@ def test_view_translator(client: Client) -> None:
         ).group()
         page = client.get(reset_password_url)
         page.form['email'] = 'test@test.com'
-        page.form['password'] = 'p@ssw0rd12'
+        page.form['password'] = 'known_very_secure_password'
         page.form.submit()
 
     with freeze_time('2021-12-31'):
-        page = client.login('test@test.com', 'p@ssw0rd12', None).maybe_follow()
+        page = client.login(
+            'test@test.com', 'known_very_secure_password').maybe_follow()
         assert 'Sind ihre Daten noch aktuell? Bitte überprüfen Sie' not in page
         assert '978654' in page
         assert 'Uncle' in page
         assert 'BOB' in page
 
-    page = client.login('test@test.com', 'p@ssw0rd12', None).maybe_follow()
+    page = client.login(
+        'test@test.com', 'known_very_secure_password').maybe_follow()
     assert 'Sind ihre Daten noch aktuell? Bitte überprüfen Sie' in page
     assert '978654' in page
     assert 'Uncle' in page
@@ -909,7 +913,7 @@ def test_view_redirects(client: Client) -> None:
     ).group()
     page = client.get(reset_password_url)
     page.form['email'] = 'translator@example.org'
-    page.form['password'] = 'p@ssword12'
+    page.form['password'] = 'known_very_secure_password'
     page.form.submit()
 
     # Test redirects
@@ -918,7 +922,7 @@ def test_view_redirects(client: Client) -> None:
             'homepage': translator_url,
             'login': translator_url,
             'logout': 'http://localhost/auth/login',
-            'password': 'p@ssword12',
+            'password': 'known_very_secure_password',
             'to': 'http://localhost/topics/informationen'
         },
         'member@example.org': {
@@ -1033,7 +1037,7 @@ def test_view_translator_mutation(
     ).group()
     page = client.get(reset_password_url)
     page.form['email'] = 'test@test.com'
-    page.form['password'] = 'p@ssw0rd12'
+    page.form['password'] = 'known_very_secure_password'
     page.form.submit()
 
     # Report change as editor
@@ -1150,7 +1154,7 @@ def test_view_translator_mutation(
 
     # Report change as translator
     client.logout()
-    client.login('test@test.com', 'p@ssw0rd12', None)
+    client.login('test@test.com', 'known_very_secure_password', None)
     page = client.get('/').maybe_follow()
     page = page.click('Mutation melden')
     page.form['submitter_message'] = 'Hallo!'
@@ -1698,10 +1702,11 @@ def test_view_accreditation(
     # Login as translator
     page = client.get(reset_password_url)
     page.form['email'] = 'hugo.benito@translators.com'
-    page.form['password'] = 'p@ssw0rd12'
+    page.form['password'] = 'known_very_secure_password'
     page.form.submit()
 
-    page = client.login('hugo.benito@translators.com', 'p@ssw0rd12', None)
+    page = client.login(
+        'hugo.benito@translators.com', 'known_very_secure_password')
     page = page.maybe_follow()
     assert 'BENITO, Hugo' in page
     assert '756.1234.4568.94' in page
@@ -2018,6 +2023,75 @@ def test_basic_search(client_with_fts: Client) -> None:
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
+def test_view_time_report(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
+    """Test editor submitting time report."""
+    session = client.app.session()
+    languages = create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator_id = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+    ).id
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    assert 'Zeit erfassen' in page
+
+    page = page.click('Zeit erfassen')
+    page.form['assignment_type'] = 'consecutive'
+    page.form['duration'] = 1.5
+    page.form['case_number'] = 'CASE-123'
+    page.form['assignment_date'] = '2025-01-15'
+    page.form['is_night_work'] = False
+    page.form['is_weekend_holiday'] = True
+    page.form['is_urgent'] = False
+    page.form['travel_distance'] = '50'
+    page.form['notes'] = 'Test notes'
+    anfrage_eingereicht_page = page.form.submit()
+    mail = client.get_email(0, flush_queue=True)
+
+    assert 'Ihr Ticket wurde eröffnet' in mail['Subject']
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+
+    translator = session.query(Translator).filter_by(id=translator_id).one()
+    assert len(translator.time_reports) == 1
+    report = translator.time_reports[0]
+    assert report.duration == 90
+    assert report.hourly_rate == 90.0
+    assert report.surcharge_percentage == 25.0
+    assert report.travel_compensation == 50.0
+    assert report.case_number == 'CASE-123'
+    assert report.status == 'pending'
+
+    client.login_admin()
+    client.use_intercooler = True
+
+    ticket_page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    accept_url = ticket_page.pyquery('a.accept-link')[0].attrib['ic-post-to']
+    page = client.post(accept_url).follow()
+    assert 'Zeiterfassung akzeptiert' in page
+
+    session.expire_all()  # *do* we need this?
+    report = session.query(Translator).filter_by(
+        id=translator_id).one().time_reports[0]
+    assert report.status == 'confirmed'
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
 def test_member_cannot_submit_mutation(
     broadcast: MagicMock,
     authenticate: MagicMock,
@@ -2097,7 +2171,7 @@ def test_member_cannot_submit_mutation(
     ).group()
     page = client.get(reset_password_url)
     page.form['email'] = 'member@test.com'
-    page.form['password'] = 'p@ssw0rd12'
+    page.form['password'] = 'known_very_secure_password'
     page.form.submit()
 
     client.login_member()

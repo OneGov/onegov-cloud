@@ -907,7 +907,7 @@ def view_activity(
         phases.append(
             f'{text} {layout.format_date(date, "date_long")}')
     # Pre booking date
-    if active_period and active_period.wishlist_phase:
+    if active_period and not active_period.is_prebooking_in_past:
         text = text_until
         date = active_period.prebooking_end
         if active_period.is_prebooking_in_future:

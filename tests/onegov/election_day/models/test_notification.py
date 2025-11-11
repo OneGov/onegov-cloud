@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from datetime import datetime
 from datetime import timezone
@@ -29,7 +31,13 @@ from unittest.mock import PropertyMock
 from uuid import uuid4
 
 
-def test_notification_generic(session):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from ..conftest import TestApp
+
+
+def test_notification_generic(session: Session) -> None:
     notification = Notification()
     notification.last_modified = datetime(
         2007, 1, 1, 0, 0, tzinfo=timezone.utc
@@ -111,11 +119,11 @@ def test_notification_generic(session):
         )
 
     with raises(NotImplementedError):
-        notification.trigger(DummyRequest(), election)
+        notification.trigger(DummyRequest(), election)  # type: ignore[arg-type]
     with raises(NotImplementedError):
-        notification.trigger(DummyRequest(), election_compound)
+        notification.trigger(DummyRequest(), election_compound)  # type: ignore[arg-type]
     with raises(NotImplementedError):
-        notification.trigger(DummyRequest(), vote)
+        notification.trigger(DummyRequest(), vote)  # type: ignore[arg-type]
 
     assert session.query(Notification).count() == 4
     session.query(Vote).delete()
@@ -124,7 +132,7 @@ def test_notification_generic(session):
     assert session.query(Notification).count() == 1
 
 
-def test_webhook_notification(session):
+def test_webhook_notification(session: Session) -> None:
     with freeze_time("2008-01-01 00:00"):
         session.add(
             Election(
@@ -136,7 +144,7 @@ def test_webhook_notification(session):
         election = session.query(Election).one()
 
         notification = WebhookNotification()
-        notification.trigger(DummyRequest(), election)
+        notification.trigger(DummyRequest(), election)  # type: ignore[arg-type]
 
         assert notification.type == 'webhooks'
         assert notification.election_id == election.id
@@ -154,7 +162,7 @@ def test_webhook_notification(session):
         election_compound = session.query(ElectionCompound).one()
 
         notification = WebhookNotification()
-        notification.trigger(DummyRequest(), election_compound)
+        notification.trigger(DummyRequest(), election_compound)  # type: ignore[arg-type]
 
         assert notification.type == 'webhooks'
         assert notification.election_compound_id == election_compound.id
@@ -171,7 +179,7 @@ def test_webhook_notification(session):
         )
         vote = session.query(Vote).one()
 
-        notification.trigger(DummyRequest(), vote)
+        notification.trigger(DummyRequest(), vote)  # type: ignore[arg-type]
 
         assert notification.type == 'webhooks'
         assert notification.vote_id == vote.id
@@ -180,7 +188,7 @@ def test_webhook_notification(session):
         )
 
         with patch('urllib.request.urlopen') as urlopen:
-            request = DummyRequest()
+            request: Any = DummyRequest()
             request.app.principal.webhooks = {'https://example.org/1': None}
 
             notification.trigger(request, election)
@@ -252,11 +260,14 @@ def test_webhook_notification(session):
             }
 
 
-def test_email_notification_vote(election_day_app_zg, session):
+def test_email_notification_vote(
+    election_day_app_zg: TestApp,
+    session: Session
+) -> None:
 
     with freeze_time("2008-01-01 00:00"):
         mock = Mock()
-        election_day_app_zg.send_marketing_email_batch = mock
+        election_day_app_zg.send_marketing_email_batch = mock  # type: ignore[method-assign]
 
         principal = election_day_app_zg.principal
         principal.email_notification = True
@@ -277,7 +288,7 @@ def test_email_notification_vote(election_day_app_zg, session):
         simple_vote = session.query(Vote).one()
 
         session.add(
-            ComplexVote(
+            ComplexVote(  # type: ignore[misc]
                 title_translations={
                     'de_CH': "Vorlage mit Gegenentwurf",
                     'fr_CH': "Vote avec contre-projet",
@@ -291,7 +302,7 @@ def test_email_notification_vote(election_day_app_zg, session):
         )
         complex_vote = session.query(ComplexVote).one()
 
-        request = DummyRequest(
+        request: Any = DummyRequest(
             app=election_day_app_zg,
             session=session,
             # Otherwise we will hit an assertion in send_mail
@@ -331,33 +342,33 @@ def test_email_notification_vote(election_day_app_zg, session):
         )
         assert mock.call_count == 1
         emails = list(mock.call_args.args[0])
-        assert sorted([email['Subject'] for email in emails]) == [
+        assert sorted(email['Subject'] for email in emails) == [
             'Abstimmung - Neue Zwischenresultate',
             'Abstimmung - Neue Zwischenresultate',
             'Votazione - Nuovi risultati provvisori',
             'Votaziun - Novs resultats intermediars',
             'Vote - Nouveaux résultats intermédiaires'
         ]
-        assert sorted([email['To'] for email in emails]) == [
+        assert sorted(email['To'] for email in emails) == [
             'aa@examp.le',
             'de@examp.le',
             'fr@examp.le',
             'it@examp.le',
             'rm@examp.le'
         ]
-        assert set(email['ReplyTo'] for email in emails) == {
+        assert {email['ReplyTo'] for email in emails} == {
             'Kanton Govikon <mails@govikon.ch>'
         }
         headers_per_email = [
             {h['Name']: h['Value'] for h in email['Headers']}
             for email in emails
         ]
-        assert set(
+        assert {
             headers['List-Unsubscribe-Post'] for headers in headers_per_email
-        ) == {'List-Unsubscribe=One-Click'}
-        assert sorted([
+        } == {'List-Unsubscribe=One-Click'}
+        assert sorted(
             headers['List-Unsubscribe'] for headers in headers_per_email
-        ]) == [
+        ) == [
             "<Principal/unsubscribe-email?opaque={address: aa@examp.le}>",
             "<Principal/unsubscribe-email?opaque={address: de@examp.le}>",
             "<Principal/unsubscribe-email?opaque={address: fr@examp.le}>",
@@ -518,10 +529,14 @@ def test_email_notification_vote(election_day_app_zg, session):
         assert "61.34 %" in contents
 
 
-def test_email_notification_election(election_day_app_zg, session):
+def test_email_notification_election(
+    election_day_app_zg: TestApp,
+    session: Session
+) -> None:
+
     with freeze_time("2008-01-01 00:00"):
         mock = Mock()
-        election_day_app_zg.send_marketing_email_batch = mock
+        election_day_app_zg.send_marketing_email_batch = mock  # type: ignore[method-assign]
 
         principal = election_day_app_zg.principal
         principal.email_notification = True
@@ -544,7 +559,7 @@ def test_email_notification_election(election_day_app_zg, session):
         majorz = session.query(Election).one()
 
         session.add(
-            ProporzElection(
+            ProporzElection(  # type: ignore[misc]
                 title_translations={
                     'de_CH': "Proporzwahl",
                     'fr_CH': "Election selon le système proportionnel",
@@ -559,7 +574,7 @@ def test_email_notification_election(election_day_app_zg, session):
         )
         proporz = session.query(ProporzElection).one()
 
-        request = DummyRequest(
+        request: Any = DummyRequest(
             app=election_day_app_zg,
             session=session,
             # Otherwise we will hit an assertion in send_mail
@@ -691,7 +706,10 @@ def test_email_notification_election(election_day_app_zg, session):
             ('1', 'Peter', 'Maier', False),
             ('2', 'Hans', 'Müller', False),
         ):
-            kw = {key: values[index] for index, key in enumerate(keys)}
+            kw: dict[str, Any] = {
+                key: values[index]
+                for index, key in enumerate(keys)
+            }
 
             kw['id'] = mcids[kw['candidate_id']]
             majorz.candidates.append(Candidate(**kw))
@@ -705,7 +723,7 @@ def test_email_notification_election(election_day_app_zg, session):
             'received_ballots', 'blank_ballots', 'invalid_ballots',
             'blank_votes', 'invalid_votes'
         ]
-        for values in (
+        for vals in (
             (1711, 'Zug', False, 16516, 8516, 80, 1, 0, 0),
             (1706, 'Oberägeri', True, 3560, 1560, 18, 0, 0, 0),
             (1709, 'Unterägeri', True, 5245, 2245, 18, 1, 0, 0),
@@ -718,7 +736,7 @@ def test_email_notification_election(election_day_app_zg, session):
             (1710, 'Walchwil', True, 2016, 1016, 8, 0, 0, 0),
             (1705, 'Neuheim', True, 1289, 689, 10, 1, 0, 0),
         ):
-            kw = {key: values[index] for index, key in enumerate(keys)}
+            kw = {key: vals[index] for index, key in enumerate(keys)}
             result = ElectionResult(**kw)
             result.candidate_results.append(
                 CandidateResult(candidate_id=mcids['1'], votes=500)
@@ -749,7 +767,7 @@ def test_email_notification_election(election_day_app_zg, session):
         notification = EmailNotification()
         notification.trigger(request, majorz)
         emails = list(mock.call_args.args[0])
-        assert sorted([email['Subject'] for email in emails]) == [
+        assert sorted(email['Subject'] for email in emails) == [
             (
                 'Election selon le système majoritaire - '
                 'Nouveaux résultats intermédiaires'
@@ -780,7 +798,7 @@ def test_email_notification_election(election_day_app_zg, session):
         notification = EmailNotification()
         notification.trigger(request, proporz)
         emails = list(mock.call_args.args[0])
-        assert sorted([email['Subject'] for email in emails]) == [
+        assert sorted(email['Subject'] for email in emails) == [
             (
                 'Election selon le système proportionnel - '
                 'Nouveaux résultats intermédiaires'
@@ -822,7 +840,7 @@ def test_email_notification_election(election_day_app_zg, session):
         notification = EmailNotification()
         notification.trigger(request, majorz)
         emails = list(mock.call_args.args[0])
-        assert sorted([email['Subject'] for email in emails]) == [
+        assert sorted(email['Subject'] for email in emails) == [
             'Election selon le système majoritaire - Résultats finaux',
             'Elecziun da maiorz - Resultats finals',
             'Elezione secondo il sistema maggioritario - Risultati finali',
@@ -839,7 +857,7 @@ def test_email_notification_election(election_day_app_zg, session):
         notification = EmailNotification()
         notification.trigger(request, proporz)
         emails = list(mock.call_args.args[0])
-        assert sorted([email['Subject'] for email in emails]) == [
+        assert sorted(email['Subject'] for email in emails) == [
             'Election selon le système proportionnel - Résultats finaux',
             'Elecziun da proporz - Resultats finals',
             'Proporzwahl - Risultati finali',
@@ -854,10 +872,14 @@ def test_email_notification_election(election_day_app_zg, session):
         assert "49.83 %" in contents
 
 
-def test_email_notification_election_compound(election_day_app_zg, session):
+def test_email_notification_election_compound(
+    election_day_app_zg: TestApp,
+    session: Session
+) -> None:
+
     with freeze_time("2008-01-01 00:00"):
         mock = Mock()
-        election_day_app_zg.send_marketing_email_batch = mock
+        election_day_app_zg.send_marketing_email_batch = mock  # type: ignore[method-assign]
 
         principal = election_day_app_zg.principal
         principal.email_notification = True
@@ -891,7 +913,7 @@ def test_email_notification_election_compound(election_day_app_zg, session):
         compound = session.query(ElectionCompound).one()
         compound.elections = [election]
 
-        request = DummyRequest(
+        request: Any = DummyRequest(
             app=election_day_app_zg,
             session=session,
             # Otherwise we will hit an assertion in send_mail
@@ -956,7 +978,10 @@ def test_email_notification_election_compound(election_day_app_zg, session):
             ('1', 'Peter', 'Maier', False),
             ('2', 'Hans', 'Müller', False),
         ):
-            kw = {key: values[index] for index, key in enumerate(keys)}
+            kw: dict[str, Any] = {
+                key: values[index]
+                for index, key in enumerate(keys)
+            }
             kw['list_id'] = lids[kw['candidate_id']]
             kw['id'] = pcids[kw['candidate_id']]
             election.candidates.append(Candidate(**kw))
@@ -966,7 +991,7 @@ def test_email_notification_election_compound(election_day_app_zg, session):
             'received_ballots', 'blank_ballots', 'invalid_ballots',
             'blank_votes', 'invalid_votes'
         ]
-        for values in (
+        for vals in (
             (1711, 'Zug', False, 16516, 8516, 80, 1, 0, 0),
             (1706, 'Oberägeri', True, 3560, 1560, 18, 0, 0, 0),
             (1709, 'Unterägeri', True, 5245, 2245, 18, 1, 0, 0),
@@ -979,7 +1004,7 @@ def test_email_notification_election_compound(election_day_app_zg, session):
             (1710, 'Walchwil', True, 2016, 1016, 8, 0, 0, 0),
             (1705, 'Neuheim', True, 1289, 689, 10, 1, 0, 0),
         ):
-            kw = {key: values[index] for index, key in enumerate(keys)}
+            kw = {key: vals[index] for index, key in enumerate(keys)}
             result = ElectionResult(**kw)
             result.candidate_results.append(
                 CandidateResult(candidate_id=pcids['1'], votes=500)
@@ -1038,9 +1063,13 @@ def test_email_notification_election_compound(election_day_app_zg, session):
         assert "Maier Peter" in contents
 
 
-def test_email_notification_send_segmented(election_day_app_zg, session):
+def test_email_notification_send_segmented(
+    election_day_app_zg: TestApp,
+    session: Session
+) -> None:
+
     mock = Mock()
-    election_day_app_zg.send_marketing_email_batch = mock
+    election_day_app_zg.send_marketing_email_batch = mock  # type: ignore[method-assign]
 
     principal = election_day_app_zg.principal
     principal.email_notification = True
@@ -1062,13 +1091,13 @@ def test_email_notification_send_segmented(election_day_app_zg, session):
         )
     ]
     votes = [
-        Vote(
+        Vote(  # type: ignore[misc]
             title="AbstimmungZ",
             domain='municipality',
             domain_segment='Zug',
             date=date(2011, 1, 1),
         ),
-        Vote(
+        Vote(  # type: ignore[misc]
             title="AbstimmungB",
             domain='municipality',
             domain_segment='Baar',
@@ -1098,7 +1127,7 @@ def test_email_notification_send_segmented(election_day_app_zg, session):
             )
         )
 
-    request = DummyRequest(
+    request: Any = DummyRequest(
         app=election_day_app_zg,
         session=session,
         # Otherwise we will hit an assertion in send_mail
@@ -1132,14 +1161,18 @@ def test_email_notification_send_segmented(election_day_app_zg, session):
     ]
 
 
-def test_sms_notification(election_day_app_zg, session):
-    with freeze_time("2008-01-01 00:00"):
-        election_day_app_zg.send_sms = Mock()
+def test_sms_notification(
+    election_day_app_zg: TestApp,
+    session: Session
+) -> None:
 
-        def sms_queue():
+    with freeze_time("2008-01-01 00:00"):
+        election_day_app_zg.send_sms = Mock()  # type: ignore[method-assign]
+
+        def sms_queue() -> tuple[tuple[set[str], str], ...]:
             return tuple(
                 (set(call[0][0]), call[0][1])
-                for call in election_day_app_zg.send_sms.call_args_list
+                for call in election_day_app_zg.send_sms.call_args_list  # type: ignore[attr-defined]
             )
 
         principal = election_day_app_zg.principal
@@ -1166,7 +1199,7 @@ def test_sms_notification(election_day_app_zg, session):
         election_compound = session.query(ElectionCompound).one()
 
         session.add(
-            Vote(
+            Vote(  # type: ignore[misc]
                 title="Vote",
                 domain='municipality',
                 domain_segment='Zug',
@@ -1176,7 +1209,7 @@ def test_sms_notification(election_day_app_zg, session):
         vote = session.query(Vote).one()
 
         session.add(
-            Vote(
+            Vote(  # type: ignore[misc]
                 title="Vote",
                 domain='municipality',
                 domain_segment='Baar',
@@ -1184,7 +1217,7 @@ def test_sms_notification(election_day_app_zg, session):
             )
         )
 
-        request = DummyRequest(app=election_day_app_zg, session=session)
+        request: Any = DummyRequest(app=election_day_app_zg, session=session)
         freezed = datetime(2008, 1, 1, 0, 0, tzinfo=timezone.utc)
 
         notification = SmsNotification()

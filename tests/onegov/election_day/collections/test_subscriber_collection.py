@@ -1,7 +1,8 @@
-from io import BytesIO
+from __future__ import annotations
 
 import pytest
 
+from io import BytesIO
 from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
@@ -9,8 +10,15 @@ from tests.onegov.election_day.common import DummyRequest
 from unittest.mock import Mock
 
 
-def test_subscriber_collection(session):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from ..conftest import TestApp
+
+
+def test_subscriber_collection(session: Session) -> None:
     # add generic
+    collection: SubscriberCollection[Any]
     collection = SubscriberCollection(session)
     collection.add('endpoint', 'municipality', 'Govikon', 'de_CH', True)
     subscriber = collection.query().one()
@@ -19,8 +27,8 @@ def test_subscriber_collection(session):
     assert subscriber.domain_segment == 'Govikon'
     assert subscriber.locale == 'de_CH'
     assert collection.by_id(subscriber.id) == subscriber
-    assert collection.by_address('endpoint', 'municipality', 'Govikon') \
-        == subscriber
+    assert collection.by_address(
+        'endpoint', 'municipality', 'Govikon') == subscriber
 
     # add email
     collection = EmailSubscriberCollection(session)
@@ -31,8 +39,8 @@ def test_subscriber_collection(session):
     assert subscriber.domain_segment == 'Govikon'
     assert subscriber.locale == 'fr_CH'
     assert collection.by_id(subscriber.id) == subscriber
-    assert collection.by_address('a@example.org', 'municipality', 'Govikon') \
-        == subscriber
+    assert collection.by_address(
+        'a@example.org', 'municipality', 'Govikon') == subscriber
 
     # add sms
     collection = SmsSubscriberCollection(session)
@@ -43,8 +51,8 @@ def test_subscriber_collection(session):
     assert subscriber.domain_segment == 'Govikon'
     assert subscriber.locale == 'it_CH'
     assert collection.by_id(subscriber.id) == subscriber
-    assert collection.by_address('+41791112233', 'municipality', 'Govikon') \
-        == subscriber
+    assert collection.by_address(
+        '+41791112233', 'municipality', 'Govikon') == subscriber
 
     # active_only
     subscriber.active = False
@@ -56,10 +64,14 @@ def test_subscriber_collection(session):
     assert collection.query(active_only=False).count() == 3
 
 
-def test_subscriber_collection_subscribe_email(election_day_app_zg, session):
+def test_subscriber_collection_subscribe_email(
+    election_day_app_zg: TestApp
+) -> None:
+
     mock = Mock()
-    election_day_app_zg.send_marketing_email = mock
-    request = DummyRequest(
+    election_day_app_zg.send_marketing_email = mock  # type: ignore[method-assign]
+    session = election_day_app_zg.session()
+    request: Any = DummyRequest(
         app=election_day_app_zg, session=session, locale='de_CH'
     )
     collection = EmailSubscriberCollection(session, active_only=False)
@@ -209,6 +221,7 @@ def test_subscriber_collection_subscribe_email(election_day_app_zg, session):
     assert collection.confirm_subscription('hue@the.org', None, None, 'de_CH')
     subscriber = collection.query().one()
     assert subscriber.active is True
+    assert subscriber.active_since is not None
     assert subscriber.active_since > activated
     assert subscriber.inactive_since is None
 
@@ -231,10 +244,14 @@ def test_subscriber_collection_subscribe_email(election_day_app_zg, session):
     }
 
 
-def test_subscriber_collection_subscribe_sms(election_day_app_zg, session):
+def test_subscriber_collection_subscribe_sms(
+    election_day_app_zg: TestApp
+) -> None:
+
     mock = Mock()
-    election_day_app_zg.send_sms = mock
-    request = DummyRequest(
+    election_day_app_zg.send_sms = mock  # type: ignore[method-assign]
+    session = election_day_app_zg.session()
+    request: Any = DummyRequest(
         app=election_day_app_zg, session=session, locale='de_CH'
     )
     collection = SmsSubscriberCollection(session, active_only=False)
@@ -294,6 +311,7 @@ def test_subscriber_collection_subscribe_sms(election_day_app_zg, session):
     assert mock.call_count == 3
     subscriber = collection.query().one()
     assert subscriber.active is True
+    assert subscriber.active_since is not None
     assert subscriber.active_since > activated
     assert subscriber.inactive_since is None
 
@@ -305,7 +323,8 @@ def test_subscriber_collection_subscribe_sms(election_day_app_zg, session):
     }
 
 
-def test_subscriber_collection_pagination(session):
+def test_subscriber_collection_pagination(session: Session) -> None:
+    collection: SubscriberCollection[Any]
     # Add email subscribers
     collection = EmailSubscriberCollection(session)
     for number in range(100):
@@ -333,48 +352,48 @@ def test_subscriber_collection_pagination(session):
     assert SubscriberCollection(session).query().count() == 200
 
     # Test Email pagination
-    assert EmailSubscriberCollection(session, page=0).batch[0].address == \
-        'user00@example.org'
-    assert EmailSubscriberCollection(session, page=4).batch[4].address == \
-        'user44@example.org'
-    assert EmailSubscriberCollection(session, page=5).batch[5].address == \
-        'user55@example.org'
-    assert EmailSubscriberCollection(session, page=9).batch[9].address == \
-        'user99@example.org'
+    assert EmailSubscriberCollection(
+        session, page=0).batch[0].address == 'user00@example.org'
+    assert EmailSubscriberCollection(
+        session, page=4).batch[4].address == 'user44@example.org'
+    assert EmailSubscriberCollection(
+        session, page=5).batch[5].address == 'user55@example.org'
+    assert EmailSubscriberCollection(
+        session, page=9).batch[9].address == 'user99@example.org'
     assert len(EmailSubscriberCollection(session, page=10).batch) == 0
 
     # Test SMS pagination
-    assert SmsSubscriberCollection(session, page=0).batch[0].address == \
-        '+41791112200'
-    assert SmsSubscriberCollection(session, page=4).batch[4].address == \
-        '+41791112244'
-    assert SmsSubscriberCollection(session, page=5).batch[5].address == \
-        '+41791112255'
-    assert SmsSubscriberCollection(session, page=9).batch[9].address == \
-        '+41791112299'
+    assert SmsSubscriberCollection(
+        session, page=0).batch[0].address == '+41791112200'
+    assert SmsSubscriberCollection(
+        session, page=4).batch[4].address == '+41791112244'
+    assert SmsSubscriberCollection(
+        session, page=5).batch[5].address == '+41791112255'
+    assert SmsSubscriberCollection(
+        session, page=9).batch[9].address == '+41791112299'
     assert len(SmsSubscriberCollection(session, page=10).batch) == 0
 
     # Test mixed pagination
-    assert SubscriberCollection(session, page=0).batch[0].address == \
-        '+41791112200'
-    assert SubscriberCollection(session, page=4).batch[4].address == \
-        '+41791112244'
-    assert SubscriberCollection(session, page=5).batch[5].address == \
-        '+41791112255'
-    assert SubscriberCollection(session, page=9).batch[9].address == \
-        '+41791112299'
-    assert SubscriberCollection(session, page=10).batch[0].address == \
-        'user00@example.org'
-    assert SubscriberCollection(session, page=14).batch[4].address == \
-        'user44@example.org'
-    assert SubscriberCollection(session, page=15).batch[5].address == \
-        'user55@example.org'
-    assert SubscriberCollection(session, page=19).batch[9].address == \
-        'user99@example.org'
+    assert SubscriberCollection(
+        session, page=0).batch[0].address == '+41791112200'
+    assert SubscriberCollection(
+        session, page=4).batch[4].address == '+41791112244'
+    assert SubscriberCollection(
+        session, page=5).batch[5].address == '+41791112255'
+    assert SubscriberCollection(
+        session, page=9).batch[9].address == '+41791112299'
+    assert SubscriberCollection(
+        session, page=10).batch[0].address == 'user00@example.org'
+    assert SubscriberCollection(
+        session, page=14).batch[4].address == 'user44@example.org'
+    assert SubscriberCollection(
+        session, page=15).batch[5].address == 'user55@example.org'
+    assert SubscriberCollection(
+        session, page=19).batch[9].address == 'user99@example.org'
     assert len(SubscriberCollection(session, page=20).batch) == 0
 
 
-def test_subscriber_pagination_negative_page_index(session):
+def test_subscriber_pagination_negative_page_index(session: Session) -> None:
     collection = SubscriberCollection(session, page=-13)
     assert collection.page == 0
     assert collection.page_index == 0
@@ -382,10 +401,11 @@ def test_subscriber_pagination_negative_page_index(session):
     assert collection.page_by_index(-5).page_index == 0
 
     with pytest.raises(AssertionError):
-        SubscriberCollection(session, page=None)
+        SubscriberCollection(session, page=None)  # type: ignore[arg-type]
 
 
-def test_subscriber_collection_term(session):
+def test_subscriber_collection_term(session: Session) -> None:
+    collection: SubscriberCollection[Any]
     # Add email subscribers
     collection = EmailSubscriberCollection(session)
     for number in range(100):
@@ -479,7 +499,7 @@ def test_subscriber_collection_term(session):
     assert collection.query().one().address == '+41791112233'
 
 
-def test_subscriber_collection_export(session):
+def test_subscriber_collection_export(session: Session) -> None:
     # Add email subscribers
     emails = EmailSubscriberCollection(session, active_only=False)
     emails.add('a@example.org', None, None, 'de_CH', True)
@@ -547,7 +567,8 @@ def test_subscriber_collection_export(session):
     ]
 
 
-def test_subscriber_collection_cleanup(session):
+def test_subscriber_collection_cleanup(session: Session) -> None:
+    collection: SubscriberCollection[Any]
     # Add email subscribers
     collection = EmailSubscriberCollection(session)
     collection.add('a@example.org', None, None, 'de_CH', True)

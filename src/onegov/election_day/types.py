@@ -62,7 +62,7 @@ if TYPE_CHECKING:
 
     class BallotTotalResultJson(TypedDict):
         counted: bool
-        accepted: bool
+        accepted: bool | None
         eligible_voters: int
         invalid: int
         cast_ballots: int

@@ -107,7 +107,7 @@ msgid "Help us"
 msgstr "Helfen"
 
 msgid "Dashboard"
-msgstr "Dashboard"
+msgstr "Übersicht"
 
 msgid "Periods"
 msgstr "Zeiträume"

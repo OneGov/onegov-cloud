@@ -77,7 +77,11 @@ def add_assembly(
     layout.edit_mode = True
 
     if form.submitted(request):
-        assembly = self.add(**form.get_useful_data())
+        assembly = self.add(
+            date=form.date.data,
+            state=form.state.data,
+        )
+        form.populate_obj(assembly)
         request.success(_('Added a new ${assembly}',
                           mapping={'assembly': layout.assembly_type}))
 
@@ -194,7 +198,8 @@ def view_assembly_states(
     name='edit',
     template='form.pt',
     permission=Private,
-    form=get_assembly_form_class
+    form=AssemblyForm,
+    pass_model=True
 )
 def edit_assembly(
     self: Assembly,
@@ -209,8 +214,6 @@ def edit_assembly(
         update_ticker(request, updated)
         request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
-
-    form.process(obj=self)
 
     layout = AssemblyLayout(self, request)
     layout.breadcrumbs.append(Link(_('Edit'), '#'))

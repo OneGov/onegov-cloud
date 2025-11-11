@@ -35,7 +35,7 @@ repos:
         - stylelint@16.19.1
         - stylelint-config-standard-scss@15.0.0
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.39.0
+    rev: v9.39.1
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'
@@ -70,6 +70,6 @@ repos:
         files:  '^stubs/.*\.pyi$'
         pass_filenames: false
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.28.0
+    rev: v8.29.0
     hooks:
       - id: gitleaks

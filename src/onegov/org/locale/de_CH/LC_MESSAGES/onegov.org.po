@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-04 12:21+0100\n"
+"POT-Creation-Date: 2025-11-05 14:16+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -222,8 +222,8 @@ msgstr "Keine Registrierung erforderlich"
 msgid "Register"
 msgstr "Registrierung"
 
-msgid "Dashboard"
-msgstr "Dashboard"
+msgid "Overview"
+msgstr "Übersicht"
 
 msgid "Timeline"
 msgstr "Aktivität"
@@ -1310,8 +1310,7 @@ msgid "Show only lead of news"
 msgstr "Nur Einleitung der News anzeigen"
 
 msgid "Only show the lead of the news and a \"read more\"link."
-msgstr ""
-"Nur die Einleitung der News und einen \"Weiterlesen\"-Link anzeigen."
+msgstr "Nur die Einleitung der News und einen \"Weiterlesen\"-Link anzeigen."
 
 msgid "Events"
 msgstr "Veranstaltungen"
@@ -1932,6 +1931,24 @@ msgstr ""
 
 msgid "Standard Image"
 msgstr "Standardbild"
+
+msgid "Table of Contents"
+msgstr "Inhaltsverzeichnis"
+
+msgid "No Table of Contents"
+msgstr "Kein Inhaltsverzeichnis"
+
+msgid "1 Level"
+msgstr "1 Ebene"
+
+msgid "2 Levels"
+msgstr "2 Ebenen"
+
+msgid "3 Levels"
+msgstr "3 Ebenen"
+
+msgid "4 Levels"
+msgstr "4 Ebenen"
 
 msgid "Column width left side"
 msgstr "Breite linke Seite"
@@ -3563,9 +3580,6 @@ msgstr "Kontaktinformationen in Sidebar ausblenden"
 msgid "Show people on bottom of main page (instead of sidebar)"
 msgstr "Personen am unteren Rand der Hauptseite anzeigen (statt in Sidebar)"
 
-msgid "Use text instead of lead in the newsletter"
-msgstr "Text statt Einleitung im Newsletter benutzen"
-
 msgid "Select additional person"
 msgstr "Zusätzliche Person auswählen"
 
@@ -5103,6 +5117,9 @@ msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""
 "Um Ihr Konto zu verwenden benötigen Sie den YubiKey mit der Seriennummer "
 "${number}"
+
+msgid "read more"
+msgstr "mehr lesen"
 
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
@@ -7589,6 +7606,12 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid "Dashboard"
+#~ msgstr "Dashboard"
+
+#~ msgid "Use text instead of lead in the newsletter"
+#~ msgstr "Text statt Einleitung im Newsletter benutzen"
 
 #~ msgid ""
 #~ "If checked, only the lead of the news and a \"read more\"link is shown."

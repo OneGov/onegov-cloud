@@ -70,20 +70,6 @@ module = [
 ]
 ignore_missing_imports = true
 
-[[tool.mypy.overrides]]
-# very lax rules for tests that don't have type hints yet
-module = [
-    "tests.onegov.election_day.collections.*",
-    "tests.onegov.election_day.formats.exports.*",
-    "tests.onegov.election_day.forms.*",
-    "tests.onegov.election_day.layouts.*",
-    "tests.onegov.election_day.models.*",
-    "tests.onegov.election_day.views.*",
-    "tests.onegov.feriennet.*",
-]
-check_untyped_defs = false
-ignore_errors = true
-
 
 [tool.bandit]
 exclude_dirs = [
@@ -247,6 +233,7 @@ preview = true
 [tool.ruff.lint.extend-per-file-ignores]
 "src/onegov/core/types.py" = ["B018"]
 "reportlab_settings.py" = ["N", "I002"]
+"*/__init__.py" = ["I002"]
 "*.pyi" = [
     "E501",
     "FURB",
@@ -272,7 +259,6 @@ preview = true
     "F841",
     "FLY002",
     "FURB",
-    "I002",
     "ISC",
     "N",
     "Q",

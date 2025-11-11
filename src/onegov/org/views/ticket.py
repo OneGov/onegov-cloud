@@ -1873,7 +1873,7 @@ def view_my_tickets(
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_('Homepage'), layout.homepage_url),
-        Link(_('Dashboard'), request.class_link(CitizenDashboard)),
+        Link(_('Overview'), request.class_link(CitizenDashboard)),
         Link(_('Submitted Requests'), '#')
     ]
 
