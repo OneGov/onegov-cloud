@@ -5,7 +5,7 @@ import pytest
 from datetime import date, datetime, timedelta, time
 from faker import Faker
 from functools import cached_property
-from onegov.activity import Activity
+from onegov.activity import Activity, Volunteer
 from onegov.activity import ActivityCollection
 from onegov.activity import Attendee
 from onegov.activity import AttendeeCollection
@@ -129,6 +129,7 @@ class Scenario(BaseScenario, Generic[ActivityT]):
     needs: list[OccasionNeed]
     periods: list[BookingPeriod]
     users: list[User]
+    volunteers: list[Volunteer]
 
     def __init__(
         self,
@@ -149,6 +150,7 @@ class Scenario(BaseScenario, Generic[ActivityT]):
         self.needs = []
         self.periods = []
         self.users = []
+        self.volunteers = []
 
     @cached_property
     def c(self) -> Collections[ActivityT]:
@@ -324,6 +326,12 @@ class Scenario(BaseScenario, Generic[ActivityT]):
         need = self.add(model=OccasionNeed, **columns)
         self.needs.append(need)
         return need
+
+    def add_volunteer(self, **columns: Any) -> Volunteer:
+        columns.setdefault('need', self.latest_need)
+        volunteer = self.add(model=Volunteer, **columns)
+        self.volunteers.append(volunteer)
+        return volunteer
 
     def add_attendee(self, **columns: Any) -> Attendee:
         columns.setdefault('name', self.faker.name())
