@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-11-05 14:16+0100\n"
+"POT-Creation-Date: 2025-11-11 15:19-0500\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1972,6 +1972,12 @@ msgstr "L'indirizzo e il numero di telefono del comune"
 
 msgid "Information"
 msgstr "Conferma"
+
+msgid "Contact Link Label"
+msgstr "Etichetta del collegamento ai contatti"
+
+msgid "Label for Contact Link. Default: 'more'"
+msgstr "Etichetta per il collegamento ai contatti. Predefinito: 'altro'"
 
 msgid "Contact Link"
 msgstr "Collegamento ai contatti"
@@ -4894,8 +4900,8 @@ msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} ha scritto"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 

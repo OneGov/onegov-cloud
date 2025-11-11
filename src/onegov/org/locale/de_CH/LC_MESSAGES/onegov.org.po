@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-05 14:16+0100\n"
+"POT-Creation-Date: 2025-11-11 15:19-0500\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1970,6 +1970,12 @@ msgstr "Die Adresse, Telefonnummer und E-Mail Adresse der Gemeindeverwaltung"
 
 msgid "Information"
 msgstr "Information"
+
+msgid "Contact Link Label"
+msgstr "Bezeichnung Kontakt Link"
+
+msgid "Label for Contact Link. Default: 'more'"
+msgstr "Bezeichnung für den Kontakt Link. Standard: 'mehr'"
 
 msgid "Contact Link"
 msgstr "Kontakt Link"
@@ -4903,8 +4909,8 @@ msgstr "Neue Kunden Nachricht in Ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} schrieb"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 
