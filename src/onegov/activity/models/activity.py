@@ -177,6 +177,18 @@ class Activity(Base, ContentMixin, TimestampMixin):
     def tags(self, value: Iterable[str]) -> None:
         self._tags = dict.fromkeys(value, '') if value else None
 
+    @property
+    def active_occasions(self) -> list[Occasion]:
+        """ Returns the list of active occasions for this activity. An occasion
+        is active if its period is the currently active period.
+        """
+        session = object_session(self)
+        active_periods = session.query(BookingPeriod.id).filter_by(active=True)
+        return [
+            occasion for occasion in self.occasions
+            if occasion.period_id in (pid for (pid,) in active_periods)
+        ]
+
     def propose(self) -> Self:
         assert self.state in ('preview', 'proposed')
         self.state = 'proposed'

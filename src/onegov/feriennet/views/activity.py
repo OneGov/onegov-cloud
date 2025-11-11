@@ -49,6 +49,7 @@ from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Sequence
     from onegov.activity.models import OccasionDate
+    from onegov.activity.models.occasion_need import OccasionNeed
     from onegov.core.types import JSON_ro, RenderData
     from onegov.feriennet.request import FeriennetRequest
     from onegov.ticket import Ticket
@@ -691,6 +692,7 @@ def view_activities_for_volunteers(
 
     layout = VacationActivityCollectionLayout(self, request)
     layout.breadcrumbs[-1].text = _('Join as a Volunteer')
+    layout.editbar_links = []
 
     # always limit to activities seeking volunteers
     self.filter.volunteers = {True}
@@ -720,6 +722,31 @@ def view_activities_for_volunteers(
     adjust_filter_path(filters, suffix='volunteer')
     adjust_filter_path(mobile_filters, suffix='volunteer')
 
+    def occasions_for_volunteer(
+        activity: Activity,
+    ) -> list[Occasion]:
+
+        query = OccasionCollection(request.session).query()
+        query = query.filter(Occasion.activity_id == activity.id)
+
+        query = query.join(Occasion.period)
+        query = query.options(contains_eager(Occasion.period))
+
+        query = query.filter(BookingPeriod.active == True)
+        query = query.filter(BookingPeriod.archived == False)
+
+        query = query.order_by(
+            desc(BookingPeriod.active),
+            BookingPeriod.execution_start,
+            Occasion.order)
+
+        return query.all()
+
+    def wants_more_volunteers(need: OccasionNeed) -> bool:
+        needed = need.number.upper - 1
+        current = sum(v.state == 'confirmed' for v in need.volunteers)
+        return current < needed
+
     return {
         'activities': self.batch if show_activities else None,
         'layout': layout,
@@ -731,6 +758,8 @@ def view_activities_for_volunteers(
         'filtered': is_filtered(filters),
         'period': active_period,
         'exclude_filtered_dates': exclude_filtered_dates,
+        'occasions_for_volunteer': occasions_for_volunteer,
+        'wants_more_volunteers': wants_more_volunteers,
         'cart_url': request.class_link(VolunteerCart),
         'cart_submit_url': request.class_link(VolunteerCart, name='submit'),
         'cart_action_url': request.class_link(VolunteerCartAction, {
