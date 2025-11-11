@@ -280,8 +280,37 @@ class TimeReportHandler(Handler):
             [
                 f"<dt>{request.translate(_('Hourly Rate'))}</dt>",
                 f'<dd>{layout.format_currency(report.hourly_rate)}</dd>',
-                f"<dt>{request.translate(_('Surcharge'))}</dt>",
-                f'<dd>{report.surcharge_percentage}%</dd>',
+            ]
+        )
+
+        surcharge_labels = {
+            'night_work': _('Night work (20:00 - 06:00)'),
+            'weekend_holiday': _('Weekend or holiday'),
+            'urgent': _('Exceptionally urgent'),
+        }
+
+        if report.surcharge_types:
+            for surcharge_type in report.surcharge_types:
+                label = surcharge_labels.get(surcharge_type)
+                if label:
+                    rate = report.SURCHARGE_RATES.get(surcharge_type)
+                    surcharge_label = request.translate(label)
+                    summary_parts.extend(
+                        [
+                            f'<dt>{escape(surcharge_label)}</dt>',
+                            f'<dd>{rate}%</dd>',
+                        ]
+                    )
+        elif report.surcharge_percentage:
+            summary_parts.extend(
+                [
+                    f"<dt>{request.translate(_('Surcharge'))}</dt>",
+                    f'<dd>{report.surcharge_percentage}%</dd>',
+                ]
+            )
+
+        summary_parts.extend(
+            [
                 f"<dt>{request.translate(_('Travel'))}</dt>",
                 f'<dd>{layout.format_currency(report.travel_compensation)}'
                 f'</dd>',
