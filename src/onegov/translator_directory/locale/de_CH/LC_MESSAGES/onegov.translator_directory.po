@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-10-06 10:39+0200\n"
+"POT-Creation-Date: 2025-10-22 14:11+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -102,6 +102,9 @@ msgstr "Verzeichniseinstellungen"
 
 msgid "Users"
 msgstr "Benutzer"
+
+msgid "Time Reports"
+msgstr "Zeiterfassungen"
 
 msgid "Tickets"
 msgstr "Tickets"
@@ -412,9 +415,6 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nein"
 
-msgid "You can use this form to report mutations."
-msgstr "Mit diesem Formular können Sie Mutationen melden."
-
 msgid ""
 "You can either leave us a message or directly suggest changes in the "
 "corresponding fields."
@@ -453,13 +453,6 @@ msgstr ""
 "Wenn Sie die E-Mail Adresse ändern möchten, vermerken Sie dies bitte in "
 "Ihrer Nachricht."
 
-msgid ""
-"You can upload supporting documents (e.g. updated certificates, ID scans) as "
-"PDFs."
-msgstr ""
-"Sie können unterstützende Dokumente (z.B. aktualisierte Zertifikate, "
-"Ausweiskopien) als PDFs hochladen."
-
 msgid "Please enter a message, suggest changes, or upload documents."
 msgstr ""
 "Bitte geben Sie eine Nachricht ein, schlagen Sie Änderungen vor oder laden "
@@ -470,13 +463,6 @@ msgstr "Ihre Nachricht"
 
 msgid "Message"
 msgstr "Nachricht"
-
-msgid ""
-"Upload supporting documents (e.g. updated certificates, ID scans). Maximum "
-"file size: 100 MB per file."
-msgstr ""
-"Laden Sie unterstützende Dokumente hoch (z.B. aktualisierte Zertifikate, "
-"Ausweiskopien). Maximale Dateigrösse: 100 MB pro Datei."
 
 msgid "Proposed changes"
 msgstr "Vorgeschlagene Änderungen"
@@ -522,6 +508,60 @@ msgstr "Link zur Einverständniserklärung"
 
 msgid "Accreditation"
 msgstr "Akkreditierung"
+
+msgid "Type of translation/interpreting"
+msgstr "Art der Übersetzung/Dolmetschung"
+
+msgid "Duration (hours)"
+msgstr "Zeitdauer (Stunden)"
+
+msgid "Minimum 0.5 hours"
+msgstr "Minimum halbe Stunde"
+
+msgid "Case number (Police)"
+msgstr "Geschäftsnummer (Polizei)"
+
+msgid "Geschäftsnummer Police for linking if needed"
+msgstr "Geschäftsnummer Polizei zur Verknüpfung, falls erforderlich"
+
+msgid "Assignment date"
+msgstr "Einsatzdatum"
+
+msgid "Night work (20:00 - 06:00)"
+msgstr "Nachtarbeit (20:00 - 06:00)"
+
+msgid "50% surcharge"
+msgstr "50% Zuschlag"
+
+msgid "Weekend or holiday"
+msgstr "Wochenende oder Feiertag"
+
+msgid "25% surcharge"
+msgstr "25% Zuschlag"
+
+msgid "Exceptionally urgent"
+msgstr "Ausserordenlich dringlich"
+
+msgid "Travel distance"
+msgstr "Wegpauschalen"
+
+msgid "Notes"
+msgstr "Notizen"
+
+msgid "No travel"
+msgstr "Keine Reise"
+
+msgid "Up to 25 km (CHF 20)"
+msgstr "Bis 25 km (CHF 20)"
+
+msgid "25-50 km (CHF 50)"
+msgstr "25-50 km (CHF 50)"
+
+msgid "50-100 km (CHF 100)"
+msgstr "50-100 km (CHF 100)"
+
+msgid "Over 100 km (CHF 150)"
+msgstr "Über 100 km (CHF 150)"
 
 msgid "Address"
 msgstr "Anschrift"
@@ -610,6 +650,9 @@ msgstr "Abbrechen"
 msgid "Mail templates"
 msgstr "Briefvorlagen"
 
+msgid "Add Time Report"
+msgstr "Zeit erfassen"
+
 msgid "Report change"
 msgstr "Mutation melden"
 
@@ -648,6 +691,42 @@ msgstr "Zulassung verweigern"
 
 msgid "Mutation"
 msgstr "Mutation"
+
+msgid "Time Report"
+msgstr "Zeiterfassung"
+
+msgid "Assignment Date"
+msgstr "Einsatzdatum"
+
+msgid "Duration"
+msgstr "Dauer"
+
+msgid "Type"
+msgstr "Art"
+
+msgid "Case Number"
+msgstr "Geschäftsnummer"
+
+msgid "Hourly Rate"
+msgstr "Stundenansatz"
+
+msgid "Surcharge"
+msgstr "Zuschlag"
+
+msgid "Travel"
+msgstr "Reise"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "View Time Report"
+msgstr "Zeiterfassung anzeigen"
+
+msgid "Accept time report"
+msgstr "Zeiterfassung akzeptieren"
+
+msgid "View translator"
+msgstr "Übersetzer/in anzeigen"
 
 msgid "Accreditations"
 msgstr "Akkreditierungen"
@@ -747,6 +826,24 @@ msgstr "Zulassung verweigert."
 msgid "Proposed changes applied"
 msgstr "Vorgeschlagene Änderungen übernommen"
 
+msgid "Travel Compensation"
+msgstr "Wegpauschale"
+
+msgid "Base Compensation"
+msgstr "Grundentschädigung"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Pending"
+msgstr "Ausstehend"
+
+msgid "Confirmed"
+msgstr "Bestätigt"
+
+msgid "No time reports found"
+msgstr "Keine Zeiterfassungen gefunden"
+
 msgid "This translator is in the admission process!"
 msgstr "Dieser Übersetzer ist im Zulassungsverfahren!"
 
@@ -831,6 +928,15 @@ msgstr "Übersetzer/in erfolgreich gelöscht"
 msgid "Your data has been confirmed"
 msgstr "Ihre Daten wurden bestätigt"
 
+msgid "Time report submitted for review"
+msgstr "Zeiterfassung zur Überprüfung eingereicht"
+
+msgid "Time report not found"
+msgstr "Zeiterfassung nicht gefunden"
+
+msgid "Time report accepted"
+msgstr "Zeiterfassung akzeptiert"
+
 msgid "This file does not seem to exist."
 msgstr "Diese Datei wurde nicht gefunden."
 
@@ -851,26 +957,20 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 msgid "Download"
 msgstr "Herunterladen"
 
-#~ msgid "Please provide at least one phone number."
-#~ msgstr "Bitte geben Sie mindestens eine Telefonnummer an."
+#~ msgid "Date"
+#~ msgstr "Datum"
 
-#~ msgid ""
-#~ "Please enter a message or suggest some changes using the fields below."
-#~ msgstr ""
-#~ "Bitte geben Sie entweder eine Nachricht oder mindestens einen "
-#~ "Änderungsvorschlag in die unten stehenden Felder ein."
+#~ msgid "Rate"
+#~ msgstr "Tarif"
 
-#~ msgid "Export Excel"
-#~ msgstr "Export Excel"
+#~ msgid "Translator not found"
+#~ msgstr "Übersetzer/in nicht gefunden"
 
-#~ msgid ""
-#~ "In order for your application for inclusion in the directory to be "
-#~ "processed, a complete application must be submitted. This includes the "
-#~ "following documents:"
-#~ msgstr ""
-#~ "Damit Ihr Antrag um Aufnahme in das Übersetzendenverzeichnis bearbeitet "
-#~ "werden kann, ist ein vollständiger Antrag einzureichen. Dazu gehören "
-#~ "folgende Unterlagen:"
+#~ msgid "Duration (minutes)"
+#~ msgstr "Zeitdauer (Minuten)"
 
-#~ msgid "This field is required."
-#~ msgstr "Dieses Feld wird benötigt."
+#~ msgid "Minimum 30 minutes"
+#~ msgstr "Miniumum 30 Minuten"
+
+#~ msgid "Time report added successfully"
+#~ msgstr "Zeiterfassung erfolgreich hinzugefügt"

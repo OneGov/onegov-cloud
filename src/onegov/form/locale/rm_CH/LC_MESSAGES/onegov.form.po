@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-02-18 09:27+0100\n"
+"POT-Creation-Date: 2025-11-05 14:46+0100\n"
 "PO-Revision-Date: 2017-06-28 12:03+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Romansh\n"
@@ -149,6 +149,11 @@ msgid "The file is too large, please provide a file smaller than {}."
 msgstr ""
 
 msgid "Files of this type are not supported."
+msgstr ""
+
+msgid ""
+"The password you wanted to use was found on list of commonly used passwords, "
+"please use a more secure password."
 msgstr ""
 
 msgid "The form could not be parsed."

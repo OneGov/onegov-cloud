@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from datetime import date
 from datetime import datetime
+from decimal import Decimal
 from onegov.election_day.models import Candidate
 from onegov.election_day.models import Election
 from onegov.election_day.models import ElectionCompound
@@ -10,9 +13,14 @@ from onegov.election_day.models import PartyResult
 from pytz import UTC
 
 
-def test_election_compound_part_model(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_election_compound_part_model(session: Session) -> None:
     session.add(
-        ElectionCompound(
+        ElectionCompound(  # type: ignore[misc]
             title='Elections',
             short_title='E',
             domain='canton',
@@ -33,7 +41,7 @@ def test_election_compound_part_model(session):
     assert part != []
     assert part != ''
     assert part != ElectionCompoundPart(
-        None, 'superregion', 'First Superregion'
+        None, 'superregion', 'First Superregion'  # type: ignore[arg-type]
     )
     assert part != ElectionCompoundPart(
         compound, 'superregion', 'Second Superregion'
@@ -75,7 +83,7 @@ def test_election_compound_part_model(session):
     # Add two elections
     last_result_change = datetime(2015, 6, 14, 14, 1, tzinfo=UTC)
     session.add(
-        Election(
+        Election(  # type: ignore[misc]
             title="First election",
             domain='region',
             domain_segment='First Region',
@@ -86,7 +94,7 @@ def test_election_compound_part_model(session):
         )
     )
     session.add(
-        Election(
+        Election(  # type: ignore[misc]
             title="Second election",
             domain='region',
             domain_segment='Second Region',
@@ -99,6 +107,8 @@ def test_election_compound_part_model(session):
     compound.elections = session.query(Election).all()
     session.flush()
 
+    # undo mypy narrowing
+    part = part
     assert part.completed is False
     assert part.elected_candidates == []
     assert part.last_result_change == last_result_change
@@ -205,6 +215,8 @@ def test_election_compound_part_model(session):
 
     # Set results as counted
     part.elections[0].results[0].counted = True
+    # undo mypy narrowing
+    part = part
     assert part.completed is False
     assert part.elected_candidates == []
     assert part.counted is False
@@ -234,6 +246,8 @@ def test_election_compound_part_model(session):
 
     part.elections[0].results[1].counted = True
     part.elections[0].candidates[0].elected = True
+    # undo mypy narrowing
+    part = part
     assert part.completed is True
     assert part.elected_candidates == [('Peter', 'Paul')]
     assert part.counted is True
@@ -298,12 +312,14 @@ def test_election_compound_part_model(session):
     assert part.has_party_results is False
     party_result.votes = 10
     assert part.party_results[0].votes == 10
+    # undo mypy narrowing
+    part = part
     assert part.has_party_results is True
     party_result.votes = 0
-    party_result.voters_count = 10
+    party_result.voters_count = Decimal('10')
     assert part.has_party_results is True
     party_result.votes = 0
-    party_result.voters_count = 0
+    party_result.voters_count = Decimal('0')
     party_result.number_of_mandates = 1
     assert part.has_party_results is True
 
@@ -313,20 +329,22 @@ def test_election_compound_part_model(session):
     assert part.party_results == []
 
 
-def test_election_compound_part_historical_party_strengths(session):
-    first_compound = ElectionCompound(
+def test_election_compound_part_historical_party_strengths(
+    session: Session
+) -> None:
+    first_compound = ElectionCompound(  # type: ignore[misc]
         title='First',
         domain='canton',
         date=date(2014, 1, 1),
         colors={'a': 'x'}
     )
-    second_compound = ElectionCompound(
+    second_compound = ElectionCompound(  # type: ignore[misc]
         title='Second',
         domain='canton',
         date=date(2018, 1, 1),
         colors={'a': 'y', 'b': 'y'}
     )
-    third_compound = ElectionCompound(
+    third_compound = ElectionCompound(  # type: ignore[misc]
         title='Third',
         domain='canton',
         date=date(2022, 1, 1),
@@ -402,7 +420,9 @@ def test_election_compound_part_historical_party_strengths(session):
             )
         )
 
-    def extract(compound):
+    def extract(
+        compound: ElectionCompoundPart
+    ) -> list[tuple[str | None, int, str]]:
         return sorted(
             (result.election_compound_id, result.year, result.party_id)
             for result in compound.historical_party_results

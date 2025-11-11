@@ -3798,7 +3798,7 @@ class DashboardLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Dashboard'), '#')
+            Link(_('Overview'), '#')
         ]
 
 

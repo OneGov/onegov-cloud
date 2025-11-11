@@ -230,7 +230,7 @@ def prepare_email(
     to the Postmark API.
 
     :param content: HTML content.
-    :param attachments: Either a list of :class:`onegov.core.email.Attachment`
+    :param attachments: Either a list of :class:`onegov.core.mail.Attachment`
         or a list of filenames/os.PathLike to attach to the email.
     :param headers: Dictionary containing additional headers to be set
 

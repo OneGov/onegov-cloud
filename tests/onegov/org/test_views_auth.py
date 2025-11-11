@@ -244,7 +244,7 @@ def test_reset_password(client: Client) -> None:
     assert token in reset_page.text
 
     reset_page.form['email'] = 'someone_else@example.org'
-    reset_page.form['password'] = 'new_password'
+    reset_page.form['password'] = 'known_very_secure_password'
     reset_page = reset_page.form.submit()
     assert "Ungültige Adresse oder abgelaufener Link" in reset_page.text
     assert token in reset_page.text
@@ -252,28 +252,36 @@ def test_reset_password(client: Client) -> None:
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = '1234'
     reset_page = reset_page.form.submit()
-    assert "Feld muss mindestens 10 Zeichen beinhalten" in reset_page.text
+    assert ("Das Passwort muss mindestens zehn Zeichen lang sein"
+    ) in reset_page.text
     assert token in reset_page.text
 
     reset_page.form['email'] = 'admin@example.org'
-    reset_page.form['password'] = 'new_password'
+    reset_page.form['password'] = 'qwertqwert123'
+    reset_page = reset_page.form.submit()
+    assert ("Das gewünschte Passwort befindet sich auf einer Liste"
+    ) in reset_page.text
+    assert token in reset_page.text
+
+    reset_page.form['email'] = 'admin@example.org'
+    reset_page.form['password'] = 'known_very_secure_password'
     homepage = reset_page.form.submit().follow().text
     assert "Passwort geändert" in homepage
     assert "Anmelden" in homepage  # do not automatically log in the user
 
     reset_page.form['email'] = 'admin@example.org'
-    reset_page.form['password'] = 'new_password'
+    reset_page.form['password'] = 'known_very_secure_password'
     reset_page = reset_page.form.submit()
     assert "Ungültige Adresse oder abgelaufener Link" in reset_page.text
 
     login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'
     login_page = login_page.form.submit()
-    assert "Falsche E-Mail Adresse, falsches Passwort oder falscher Yubikey."\
-        in login_page.text
+    assert ("Falsche E-Mail Adresse, falsches Passwort oder falscher Yubikey."
+        in login_page.text)
 
     login_page.form['username'] = 'admin@example.org'
-    login_page.form['password'] = 'new_password'
+    login_page.form['password'] = 'known_very_secure_password'
     assert "Sie wurden angemeldet" in login_page.form.submit().follow().text
 
     # Deactivate member login
@@ -322,8 +330,8 @@ def test_registration_honeypot(client: Client) -> None:
 
     register = client.get('/auth/register')
     register.form['username'] = 'spam@example.org'
-    register.form['password'] = 'p@ssw0rd12'
-    register.form['confirm'] = 'p@ssw0rd12'
+    register.form['password'] = 'known_very_secure_password'
+    register.form['confirm'] = 'known_very_secure_password'
     register.form['roboter_falle'] = 'buy pills now'
 
     assert "Das Feld ist nicht leer" in register.form.submit()
@@ -336,7 +344,11 @@ def test_registration(client: Client) -> None:
     register.form['username'] = 'user@example.org'
     register.form['password'] = 'p@ssw0rd12'
     register.form['confirm'] = 'p@ssw0rd12'
+    assert ("Das gewünschte Passwort befindet sich auf einer Liste"
+    ) in register.form.submit()
 
+    register.form['password'] = 'known_very_secure_password'
+    register.form['confirm'] = 'known_very_secure_password'
     assert "Vielen Dank" in register.form.submit().follow()
 
     message = client.get_email(0)['HtmlBody']
@@ -350,7 +362,10 @@ def test_registration(client: Client) -> None:
     assert "Konto wurde aktiviert" in client.get(url).follow()
     assert "Konto wurde bereits aktiviert" in client.get(url).follow()
 
-    logged_in = client.login('user@example.org', 'p@ssw0rd12').follow()
+    logged_in = client.login(
+        'user@example.org',
+        'known_very_secure_password'
+    ).follow()
     assert "angemeldet" in logged_in
 
 

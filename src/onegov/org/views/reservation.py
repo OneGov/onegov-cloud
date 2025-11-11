@@ -10,6 +10,7 @@ from datetime import date, time, timedelta
 from libres.modules.errors import LibresError
 from onegov.core.custom import json, msgpack
 from onegov.core.html import html_to_text
+from onegov.core.mail import Attachment
 from onegov.core.security import Public, Private
 from onegov.core.templates import render_template
 from onegov.form import FormCollection, merge_forms, as_internal_id
@@ -29,6 +30,7 @@ from onegov.org.models import (
     ReservationMessage, ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ReservationTicket
+from onegov.org.pdf.my_reservations import MyReservationsPdf
 from onegov.org.utils import emails_for_new_ticket, group_invoice_items
 from onegov.pay import InvoiceItemMeta, PaymentError, Price
 from onegov.reservation import Allocation, Reservation, Resource
@@ -1035,6 +1037,13 @@ def accept_reservation(
                     request, self.email
                 ),
             },
+            attachments=(
+                Attachment(
+                    f'{ticket.number}-reservations-summary.pdf',
+                    MyReservationsPdf.from_ticket(request, ticket),
+                    'application/pdf'
+                ),
+            )
         )
 
         def recipients_which_have_registered_for_mail() -> Iterator[str]:

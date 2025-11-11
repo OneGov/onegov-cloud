@@ -40,7 +40,12 @@ def add_agenda_item(
 ) -> RenderData | Response:
 
     if form.submitted(request):
-        agenda_item = self.add(**form.get_useful_data())
+        agenda_item = self.add(
+            number=form.number.data,
+            assembly_id=self.assembly.id,  # type: ignore
+            state=form.state.data,
+        )
+        form.populate_obj(agenda_item)
         updated = ensure_states(agenda_item)
         updated.add(agenda_item.assembly)
         update_ticker(request, updated)

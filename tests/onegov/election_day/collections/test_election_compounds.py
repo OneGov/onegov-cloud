@@ -1,9 +1,16 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.election_day.collections import ElectionCompoundCollection
 from onegov.election_day.models import ElectionCompound
 
 
-def test_elections_by_date(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_elections_by_date(session: Session) -> None:
     session.add(ElectionCompound(
         title="first",
         domain='federation',
@@ -37,7 +44,7 @@ def test_elections_by_date(session):
     ]
 
 
-def test_elections_by_id(session):
+def test_elections_by_id(session: Session) -> None:
     session.add(ElectionCompound(
         title="first",
         domain='federation',
@@ -53,11 +60,11 @@ def test_elections_by_id(session):
 
     collection = ElectionCompoundCollection(session)
 
-    assert collection.by_id('first').title == "first"
-    assert collection.by_id('second').title == "second"
+    assert collection.by_id('first').title == "first"  # type: ignore[union-attr]
+    assert collection.by_id('second').title == "second"  # type: ignore[union-attr]
 
 
-def test_elections_get_latest(session):
+def test_elections_get_latest(session: Session) -> None:
     collection = ElectionCompoundCollection(session)
 
     assert collection.get_latest() is None
@@ -76,10 +83,10 @@ def test_elections_get_latest(session):
     session.flush()
 
     # sort by domain, then by date
-    assert [v.title for v in collection.get_latest()] == ['latest']
+    assert [v.title for v in collection.get_latest()] == ['latest']  # type: ignore[union-attr]
 
 
-def test_elections_get_years(session):
+def test_elections_get_years(session: Session) -> None:
     session.add(ElectionCompound(
         title="latest",
         domain='federation',
@@ -101,7 +108,7 @@ def test_elections_get_years(session):
     assert ElectionCompoundCollection(session).get_years() == [2015, 2013]
 
 
-def test_elections_by_years(session):
+def test_elections_by_years(session: Session) -> None:
     session.add(ElectionCompound(
         title="latest",
         domain='federation',
@@ -125,12 +132,12 @@ def test_elections_by_years(session):
     assert len(elections.by_year(2013)) == 0
 
 
-def test_elections_for_years(session):
+def test_elections_for_years(session: Session) -> None:
     elections = ElectionCompoundCollection(session, year=2015)
     assert elections.for_year(2016).year == 2016
 
 
-def test_elections_shortcode_order(session):
+def test_elections_shortcode_order(session: Session) -> None:
     session.add(ElectionCompound(
         title="A",
         shortcode="Z",
@@ -151,7 +158,7 @@ def test_elections_shortcode_order(session):
     assert elections[1].title == "A"
 
 
-def test_elections_pagination(session):
+def test_elections_pagination(session: Session) -> None:
     elections = ElectionCompoundCollection(session)
 
     assert elections.page_index == 0
@@ -172,35 +179,38 @@ def test_elections_pagination(session):
     elections = ElectionCompoundCollection(session)
     assert elections.subset_count == 3 * 12
 
-    elections = ElectionCompoundCollection(session, year='2007')
+    elections = ElectionCompoundCollection(session, year=2007)
     assert elections.subset_count == 0
 
-    elections = ElectionCompoundCollection(session, year='2008')
+    elections = ElectionCompoundCollection(session, year=2008)
     assert elections.subset_count == 12
-    assert all([e.date.year == 2008 for e in elections.batch])
-    assert all([e.date.month > 2 for e in elections.batch])
+    assert all(e.date.year == 2008 for e in elections.batch)
+    assert all(e.date.month > 2 for e in elections.batch)
+    assert elections.next is not None
     assert len(elections.next.batch) == 12 - elections.batch_size
-    assert all([e.date.year == 2008 for e in elections.next.batch])
-    assert all([e.date.month < 3 for e in elections.next.batch])
+    assert all(e.date.year == 2008 for e in elections.next.batch)
+    assert all(e.date.month < 3 for e in elections.next.batch)
 
-    elections = ElectionCompoundCollection(session, year='2009')
+    elections = ElectionCompoundCollection(session, year=2009)
     assert elections.subset_count == 12
-    assert all([e.date.year == 2009 for e in elections.batch])
-    assert all([e.date.month > 2 for e in elections.batch])
+    assert all(e.date.year == 2009 for e in elections.batch)
+    assert all(e.date.month > 2 for e in elections.batch)
+    assert elections.next is not None
     assert len(elections.next.batch) == 12 - elections.batch_size
-    assert all([e.date.year == 2009 for e in elections.next.batch])
-    assert all([e.date.month < 3 for e in elections.next.batch])
+    assert all(e.date.year == 2009 for e in elections.next.batch)
+    assert all(e.date.month < 3 for e in elections.next.batch)
 
-    elections = ElectionCompoundCollection(session, year='2010')
+    elections = ElectionCompoundCollection(session, year=2010)
     assert elections.subset_count == 12
-    assert all([e.date.year == 2010 for e in elections.batch])
-    assert all([e.date.month > 2 for e in elections.batch])
+    assert all(e.date.year == 2010 for e in elections.batch)
+    assert all(e.date.month > 2 for e in elections.batch)
+    assert elections.next is not None
     assert len(elections.next.batch) == 12 - elections.batch_size
-    assert all([e.date.year == 2010 for e in elections.next.batch])
-    assert all([e.date.month < 3 for e in elections.next.batch])
+    assert all(e.date.year == 2010 for e in elections.next.batch)
+    assert all(e.date.month < 3 for e in elections.next.batch)
 
 
-def test_elections_pagination_negative_page_index(session):
+def test_elections_pagination_negative_page_index(session: Session) -> None:
     elections = ElectionCompoundCollection(session, page=-1)
     assert elections.page == 0
     assert elections.page_index == 0

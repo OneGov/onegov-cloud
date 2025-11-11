@@ -98,7 +98,7 @@ def get_global_tools(
 
         links.append(
             Link(
-                _('Dashboard'), request.class_link(Dashboard),
+                _('Overview'), request.class_link(Dashboard),
                 attrs={'class': 'dashboard'}
             )
         )
@@ -319,7 +319,7 @@ def get_global_tools(
             )
 
             yield Link(
-                _('Dashboard'),
+                _('Overview'),
                 request.class_link(CitizenDashboard),
                 attrs={'class': 'dashboard'}
             )

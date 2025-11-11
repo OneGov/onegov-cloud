@@ -100,8 +100,8 @@ msgstr "mTAN"
 msgid "Phone number"
 msgstr "Numéro de téléphone"
 
-msgid "The password must be at least eight characters long"
-msgstr "Le mot de passe doit comporter au minimum 8 caractères"
+msgid "The password must be at least ten characters long"
+msgstr "Le mot de passe doit comporter au minimum 10 caractères"
 
 msgid "Password Confirmation"
 msgstr "Confirmation du mot de passe"

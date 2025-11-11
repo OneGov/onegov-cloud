@@ -8,6 +8,7 @@ import textwrap
 import transaction
 import warnings
 
+from base64 import b64decode
 from datetime import datetime, date, timedelta
 from freezegun import freeze_time
 from io import BytesIO
@@ -978,6 +979,13 @@ def test_auto_accept_reservations(client: Client) -> None:
     assert message is not None
     assert 'Ihre Reservationen wurden bestätigt' in message['Subject']
     assert 'Foobar' in message['TextBody']
+    assert message['Attachments']
+    _, pdf_content = extract_pdf_info(BytesIO(
+        b64decode(message['Attachments'][0]['Content'])
+    ))
+    assert 'Tageskarte' in pdf_content
+    assert '28.08.2015' in pdf_content
+    assert 'Ganztägig' in pdf_content
 
     # close the ticket and check not email is sent
     tickets = client.get('/tickets/ALL/closed')

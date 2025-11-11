@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from onegov.election_day.collections import ArchivedResultCollection
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_election_compound
@@ -7,7 +9,14 @@ from webtest import TestApp as Client
 from webtest.forms import Upload
 
 
-def test_upload_election_compound_year_unavailable(election_day_app_zg):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import TestApp
+
+
+def test_upload_election_compound_year_unavailable(
+    election_day_app_zg: TestApp
+) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -55,7 +64,9 @@ def test_upload_election_compound_year_unavailable(election_day_app_zg):
     assert "Das Jahr 1990 wird noch nicht unterstützt" in upload
 
 
-def test_upload_election_compound_invalidate_cache(election_day_app_gr):
+def test_upload_election_compound_invalidate_cache(
+    election_day_app_gr: TestApp
+) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -70,11 +81,12 @@ def test_upload_election_compound_invalidate_cache(election_day_app_gr):
     assert ">56<" in anonymous.get('/election/regional-election-b').follow()
 
     csv = anonymous.get('/elections/elections/data-csv').text
-    csv = csv.replace('56', '58').encode('utf-8')
+    csv = csv.replace('56', '58')
 
     upload = client.get('/elections/elections/upload')
     upload.form['file_format'] = 'internal'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload.form['results'] = Upload(
+        'data.csv', csv.encode('utf-8'), 'text/plain')
     upload = upload.form.submit()
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
@@ -86,7 +98,9 @@ def test_upload_election_compound_invalidate_cache(election_day_app_gr):
     assert ">58<" in b
 
 
-def test_upload_election_compound_temporary_results(election_day_app_gr):
+def test_upload_election_compound_temporary_results(
+    election_day_app_gr: TestApp
+) -> None:
     archive = ArchivedResultCollection(election_day_app_gr.session())
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
@@ -175,7 +189,9 @@ def test_upload_election_compound_temporary_results(election_day_app_gr):
     ]
 
 
-def test_upload_election_compound_notify_zulip(election_day_app_zg):
+def test_upload_election_compound_notify_zulip(
+    election_day_app_zg: TestApp
+) -> None:
 
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
@@ -194,11 +210,12 @@ def test_upload_election_compound_notify_zulip(election_day_app_zg):
         election_day_app_zg.zulip_key = 'aabbcc'
         upload_election_compound(client, canton='zg')
         sleep(5)
+        urlopen = urlopen  # undo mypy narrowing
         assert urlopen.called
         assert 'zulipchat.com' in urlopen.call_args[0][0].get_full_url()
 
 
-def test_upload_election_compound_submit(election_day_app_zg):
+def test_upload_election_compound_submit(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 

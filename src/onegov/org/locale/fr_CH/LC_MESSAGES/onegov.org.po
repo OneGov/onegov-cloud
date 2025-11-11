@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-05 10:21+0100\n"
+"POT-Creation-Date: 2025-11-05 14:16+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -221,8 +221,8 @@ msgstr "Aucune inscription n'est nécessaire"
 msgid "Register"
 msgstr "S'inscrire"
 
-msgid "Dashboard"
-msgstr "Dashboard"
+msgid "Overview"
+msgstr "Aperçu"
 
 msgid "Timeline"
 msgstr "Chronologie"
@@ -3586,9 +3586,6 @@ msgstr ""
 "Afficher les personnes en bas de la page principale (au lieu de la barre "
 "latérale)"
 
-msgid "Use text instead of lead in the newsletter"
-msgstr "Utiliser le texte au lieu de l'introduction dans le newsletter"
-
 msgid "Select additional person"
 msgstr "Sélectionnez une personne supplémentaire"
 
@@ -5125,6 +5122,9 @@ msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""
 "Pour utiliser votre compte, vous aurez besoin de la Yubikey avec le numéro "
 "de série ${number}"
+
+msgid "read more"
+msgstr "lire la suite"
 
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
@@ -7626,7 +7626,24 @@ msgstr "L'utilisateur a bien été créé"
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 
-#~ msgid "A pending reservation would be affected by the requested change."
+#~ msgid "Dashboard"
+#~ msgstr "Dashboard"
+
+#~ msgid "Use text instead of lead in the newsletter"
+#~ msgstr "Utiliser le texte au lieu de l'introduction dans le newsletter"
+
+#~ msgid ""
+#~ "If checked, only the lead of the news and a \"read more\"link is shown."
+#~ msgstr ""
+#~ "Si coché, seule l'accroche des nouvelles et un lien \"lire la suite\" "
+#~ "sont affichés."
+
+#~ msgid "Show news as tiles"
+#~ msgstr "Afficher les actualités sous forme de tuiles"
+
+#~ msgid ""
+#~ "If checked, news are displayed as tiles. Otherwise, news are listed in "
+#~ "full length."
 #~ msgstr ""
 #~ "Une réservation en attente serait affectée par la modification demandée."
 
