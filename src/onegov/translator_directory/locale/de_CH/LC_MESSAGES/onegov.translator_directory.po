@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-10-22 14:11+0200\n"
+"POT-Creation-Date: 2025-11-06 14:43+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -716,17 +716,20 @@ msgstr "Zuschlag"
 msgid "Travel"
 msgstr "Reise"
 
+msgid "Meal Allowance (6+ hours)"
+msgstr "Verpflegungsentschädigung (6+ Stunden)"
+
 msgid "Total"
 msgstr "Total"
 
 msgid "View Time Report"
 msgstr "Zeiterfassung anzeigen"
 
-msgid "Accept time report"
-msgstr "Zeiterfassung akzeptieren"
-
 msgid "View translator"
 msgstr "Übersetzer/in anzeigen"
+
+msgid "Accept time report"
+msgstr "Zeiterfassung akzeptieren"
 
 msgid "Accreditations"
 msgstr "Akkreditierungen"
@@ -841,6 +844,58 @@ msgstr "Ausstehend"
 msgid "Confirmed"
 msgstr "Bestätigt"
 
+msgid ""
+"No confirmed time reports available for export. Time reports must be "
+"confirmed before they can be exported."
+msgstr ""
+"Keine bestätigten Zeiterfassungen für den Export verfügbar. "
+"Zeiterfassungen müssen bestätigt werden, bevor sie exportiert werden können."
+
+msgid "Month"
+msgstr "Monat"
+
+msgid "January"
+msgstr "Januar"
+
+msgid "February"
+msgstr "Februar"
+
+msgid "March"
+msgstr "März"
+
+msgid "April"
+msgstr "April"
+
+msgid "May"
+msgstr "Mai"
+
+msgid "June"
+msgstr "Juni"
+
+msgid "July"
+msgstr "Juli"
+
+msgid "August"
+msgstr "August"
+
+msgid "September"
+msgstr "September"
+
+msgid "October"
+msgstr "Oktober"
+
+msgid "November"
+msgstr "November"
+
+msgid "December"
+msgstr "Dezember"
+
+msgid "Year"
+msgstr "Jahr"
+
+msgid "Export für Buchhaltung"
+msgstr "Export für Buchhaltung"
+
 msgid "No time reports found"
 msgstr "Keine Zeiterfassungen gefunden"
 
@@ -899,6 +954,18 @@ msgstr "E-Mail / Benutzername / Kürzel"
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
+
+#, python-format
+msgid "No confirmed time reports found for ${month}/${year}"
+msgstr "Keine bestätigten Zeiterfassungen gefunden für ${month}/${year}"
+
+#, python-format
+msgid ""
+"Cannot export: The following translators are missing a personnel number "
+"(Personal-Nr.): ${names}"
+msgstr ""
+"Export nicht möglich: Den folgenden Übersetzern fehlt eine Personalnummer "
+"(Personal-Nr.): ${names}"
 
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
