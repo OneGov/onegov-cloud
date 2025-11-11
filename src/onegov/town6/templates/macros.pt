@@ -181,6 +181,7 @@
 <metal:footer_columns define-macro="footer_columns">
     <tal:b define="contact layout.org.contact_html|nothing;
         contact_url layout.org.contact_url|nothing;
+        contact_url_label layout.org.contact_url_label|nothing;
         opening_hours layout.org.opening_hours_html|nothing;
         opening_hours_url layout.org.opening_hours_url|nothing;
         facebook layout.org.facebook_url|nothing;
@@ -267,7 +268,9 @@
 <metal:footer_contact define-macro="footer_contact" i18n:domain="onegov.town6">
     <h5 i18n:translate tal:condition="contact or contact_url">Contact</h5>
     <div tal:content="layout.org.contact_html" />
-    <a class="footer-link" tal:condition="contact_url" tal:attributes="href contact_url"><strong><tal:b i18n:translate>more</tal:b>…</strong></a>
+    <a class="footer-link" tal:condition="contact_url" tal:attributes="href contact_url">
+        <strong><tal:b i18n:translate="" tal:content="contact_url_label or 'more'" />…</strong>
+    </a>
 </metal:footer_contact>
 
 <metal:footer_opening_hours define-macro="footer_opening_hours" i18n:domain="onegov.town6">
