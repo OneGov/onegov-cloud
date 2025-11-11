@@ -3360,3 +3360,43 @@ def test_view_dashboard(client: Client, scenario: Scenario) -> None:
 
     # ensure only feriennet boardlets are shown
     assert len(page.pyquery('.boardlet')) == 6
+
+
+def test_view_volunteer_activities(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
+    scenario.add_period(title="2019", confirmed=True, finalized=False)
+    scenario.add_activity(title="Pet Zoo", state='accepted')
+    scenario.add_occasion(cost=200)
+    scenario.add_need(
+        name="Begleiter", number=NumericRange(1, 2), accept_signups=True)
+
+    scenario.commit()
+
+    client.login_admin()
+
+    page = client.get('/feriennet-settings')
+    page.form['volunteers'] = 'enabled'
+    page.form.submit()
+
+    page = client.get('/activities/volunteer')
+    assert "Pet Zoo" in page
+
+    scenario.add_volunteer(
+        first_name='V',
+        last_name='P',
+        address='street',
+        zip_code='12',
+        place='some place',
+        birth_date=date(2019, 1, 1),
+        email='test@test.com',
+        phone='041 322 22 22',
+        state='confirmed'
+    )
+
+    scenario.commit()
+
+    page = client.get('/activities/volunteer')
+    assert "Pet Zoo" not in page

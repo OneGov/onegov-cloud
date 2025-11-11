@@ -24,7 +24,7 @@
 
                 <div id="activities" class="activities-list grid-x grid-padding-x">
                     <tal:b tal:repeat="activity activities" tal:condition="activities">
-                        <div class="subpage-cards small-12 medium-6 large-4 cell">
+                        <div class="subpage-cards small-12 medium-6 large-4 cell" tal:define="occasions occasions_for_volunteer(activity)" tal:condition="python: any(wants_more_volunteers(need) for occasion in occasions for need in occasion.needs)">
                             <div class="activity-list-item card">
                                 <div class="grid-x align-middle">
                                     <div tal:condition="activity.thumbnail|nothing" style="width: 100%; padding-bottom: 60%; background-image: url('${activity.thumbnail}'); background-size: cover;"></div>
@@ -34,8 +34,8 @@
                                         <span class="page-lead" tal:content="layout.paragraphify(layout.linkify(activity.lead))"/></a>
 
                                         <div class="columns small-10">
-                                            <tal:b repeat="occasion activity.occasions">
-                                                <div class="call-for-volunteers" tal:define="dates exclude_filtered_dates(layout.model, occasion.dates)" tal:condition="occasion.seeking_volunteers and dates">
+                                            <tal:b repeat="occasion occasions">
+                                                <div class="call-for-volunteers" tal:define="dates exclude_filtered_dates(layout.model, occasion.dates)" tal:condition="any(wants_more_volunteers(need) for need in occasion.needs) and occasion.seeking_volunteers and dates">
 
                                                     <h3 i18n:translate>Occasion</h3>
                                                     <ul class="dense">
@@ -43,19 +43,19 @@
                                                             ${layout.format_datetime_range(date.localized_start, date.localized_end)}
                                                         </li>
                                                     </ul>
+                                                        <h3 i18n:translate>Needs</h3>
+                                                        <ul class="dense needs">
+                                                            <tal:b repeat="need occasion.needs">
+                                                                <li tal:condition="need.accept_signups" tal:condition="wants_more_volunteers(need)">
+                                                                    <span>${need.name}</span>
 
-                                                    <h3 i18n:translate tal:condition="occasion.needs">Needs</h3>
-                                                    <ul class="dense needs">
-                                                        <tal:b repeat="need occasion.needs">
-                                                            <li tal:condition="need.accept_signups">
-                                                                <span>${need.name}</span>
-                                                                <a class="button narrow" onclick="volunteerCart.append('${need.id.hex}', '#error-for-${occasion.id.hex}')">
-                                                                    <i class="fa fa-plus" aria-hidden="true"></i>
-                                                                    <span><tal:b i18n:translate>To my list</tal:b></span>
-                                                                </a>
-                                                            </li>
-                                                        </tal:b>
-                                                    </ul>
+                                                                    <a class="button narrow" onclick="volunteerCart.append('${need.id.hex}', '#error-for-${occasion.id.hex}')">
+                                                                        <i class="fa fa-plus" aria-hidden="true"></i>
+                                                                        <span><tal:b i18n:translate>To my list</tal:b></span>
+                                                                    </a>
+                                                                </li>
+                                                            </tal:b>
+                                                        </ul>
 
                                                     <div id="error-for-${occasion.id.hex}" class="alert" style="display: none;"></div>
                                                 </div>
