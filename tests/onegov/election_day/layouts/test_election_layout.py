@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from freezegun import freeze_time
 from onegov.election_day.layouts import ElectionLayout
@@ -13,7 +15,12 @@ from tests.onegov.election_day.common import DummyRequest
 from unittest.mock import Mock
 
 
-def test_election_layout_general(session):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_election_layout_general(session: Session) -> None:
     majorz = Election(
         title='Majorz Election',
         domain='canton',
@@ -28,7 +35,7 @@ def test_election_layout_general(session):
     session.add(proporz)
     session.flush()
 
-    layout = ElectionLayout(majorz, DummyRequest())
+    layout = ElectionLayout(majorz, DummyRequest())  # type: ignore[arg-type]
     assert layout.all_tabs == (
         'lists',
         'list-by-entity',
@@ -62,15 +69,15 @@ def test_election_layout_general(session):
     assert layout.subtitle() == ''
     assert layout.subtitle('undefined') == ''
     assert layout.subtitle('lists') == ''
-    assert layout.subtitle('list-by-entity').interpolate() == 'By __entity'
-    assert layout.subtitle('list-by-district').interpolate() == 'By __district'
+    assert layout.subtitle('list-by-entity').interpolate() == 'By __entity'  # type: ignore[attr-defined]
+    assert layout.subtitle('list-by-district').interpolate() == 'By __district'  # type: ignore[attr-defined]
     assert layout.subtitle('connections') == 'List connections'
     assert layout.subtitle('lists-panachage') == 'Panachage'
     assert layout.subtitle('candidates') == ''
-    assert layout.subtitle('candidate-by-entity').interpolate() == \
-        'By __entity'
-    assert layout.subtitle('candidate-by-district').interpolate() == \
-        'By __district'
+    assert layout.subtitle(  # type: ignore[attr-defined]
+        'candidate-by-entity').interpolate() == 'By __entity'
+    assert layout.subtitle(  # type: ignore[attr-defined]
+        'candidate-by-district').interpolate() == 'By __district'
     assert layout.subtitle('party-strengths') == 'Party strengths'
     assert layout.subtitle('parties-panachage') == 'Panachage'
     assert layout.subtitle('statistics') == ''
@@ -82,7 +89,7 @@ def test_election_layout_general(session):
     assert not layout.tacit
     assert not layout.has_party_results
 
-    layout = ElectionLayout(proporz, DummyRequest())
+    layout = ElectionLayout(proporz, DummyRequest())  # type: ignore[arg-type]
     assert not layout.majorz
     assert layout.proporz
     assert layout.main_view == 'ProporzElection/lists'
@@ -90,7 +97,7 @@ def test_election_layout_general(session):
     assert not layout.has_party_results
 
     majorz.tacit = True
-    layout = ElectionLayout(majorz, DummyRequest())
+    layout = ElectionLayout(majorz, DummyRequest())  # type: ignore[arg-type]
     assert layout.tacit
 
     with freeze_time("2014-01-01 12:00"):
@@ -107,7 +114,7 @@ def test_election_layout_general(session):
             '.1388577600'
         )
 
-        request = DummyRequest()
+        request: Any = DummyRequest()
         request.app.filestorage = Mock()
 
         layout = ElectionLayout(election, request)
@@ -186,17 +193,17 @@ def test_election_layout_general(session):
             party_id='1'
         )
     )
-    assert ElectionLayout(proporz, DummyRequest()).has_party_results
+    assert ElectionLayout(proporz, DummyRequest()).has_party_results  # type: ignore[arg-type]
 
 
-def test_election_layout_menu_majorz(session):
+def test_election_layout_menu_majorz(session: Session) -> None:
     election = Election(
         title='Vote', date=date(2000, 1, 1), domain='federation'
     )
     session.add(election)
     session.flush()
 
-    request = DummyRequest()
+    request: Any = DummyRequest()
     assert ElectionLayout(election, request).menu == []
     assert ElectionLayout(election, request, 'data').menu == []
 
@@ -270,14 +277,14 @@ def test_election_layout_menu_majorz(session):
     ]
 
 
-def test_election_layout_menu_proporz(session):
+def test_election_layout_menu_proporz(session: Session) -> None:
     election = ProporzElection(
         title='Vote', date=date(2000, 1, 1), domain='federation'
     )
     session.add(election)
     session.flush()
 
-    request = DummyRequest()
+    request: Any = DummyRequest()
     assert ElectionLayout(election, request).menu == []
     assert ElectionLayout(election, request, 'data').menu == []
 
@@ -417,7 +424,7 @@ def test_election_layout_menu_proporz(session):
     ]
 
 
-def test_election_layout_table_links():
+def test_election_layout_table_links() -> None:
     election = Election(date=date(2100, 1, 1), domain='federation')
     for tab, expected in (
         ('lists', 'Election/lists-table'),
@@ -433,5 +440,5 @@ def test_election_layout_table_links():
         ('statistics', 'Election/statistics-table'),
         ('data', None)
     ):
-        layout = ElectionLayout(election, DummyRequest(), tab=tab)
+        layout = ElectionLayout(election, DummyRequest(), tab=tab)  # type: ignore[arg-type]
         assert not expected or f'{expected}?locale=de' == layout.table_link()

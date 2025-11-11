@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import transaction
 import pytest
 
@@ -9,7 +11,12 @@ from tests.onegov.election_day.common import upload_majorz_election
 from tests.onegov.election_day.common import upload_vote
 
 
-def test_view_archive(election_day_app_zg):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import TestApp
+
+
+def test_view_archive(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -77,9 +84,9 @@ def test_view_archive(election_day_app_zg):
     assert len(client.get('/json').json['results']) == 2
 
     session = election_day_app_zg.session()
-    archive = ArchivedResultCollection(session)
+    collection = ArchivedResultCollection(session)
 
-    results = archive.query().all()
+    results = collection.query().all()
     assert len(results) == 2
 
     for result in results:
@@ -87,17 +94,17 @@ def test_view_archive(election_day_app_zg):
 
     transaction.commit()
 
-    results = archive.query().count() == 0
+    assert collection.query().count() == 0
     assert len(client.get('/json').json['results']) == 0
 
     client.get('/update-results').form.submit()
 
-    results = archive.query().count() == 2
+    assert collection.query().count() == 2
     assert len(client.get('/json').json['results']) == 2
 
 
 @pytest.mark.parametrize("url", ['vote', 'election'])
-def test_view_filter_archive(url, election_day_app_zg):
+def test_view_filter_archive(url: str, election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
     new = client.get(f'/archive-search/{url}')
@@ -107,7 +114,7 @@ def test_view_filter_archive(url, election_day_app_zg):
     assert resp.status_code == 200
 
 
-def test_download_archive(election_day_app_zg, session):
+def test_download_archive(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 

@@ -1,8 +1,113 @@
 # Changes
 
+## 2025.62
+
+`2025-11-07` | [d90bbc51b7...dfd0c98268](https://github.com/OneGov/onegov-cloud/compare/d90bbc51b7^...dfd0c98268)
+
+### Core
+
+##### Clears browser cache on user logout
+
+This provides a small extra layer of protection, in case any sensitive
+content accidentally ended up in the browser's cache.
+
+`Feature` | [OGC-2745](https://linear.app/onegovcloud/issue/OGC-2745) | [93be9cbff0](https://github.com/onegov/onegov-cloud/commit/93be9cbff0a4f72cf0399a358fbb7b47982575a4)
+
+### Feriennet
+
+##### Display wishphase if it's not in the past
+
+`Bugfix` | [OGC-1444](https://linear.app/onegovcloud/issue/OGC-1444) | [ff53601345](https://github.com/onegov/onegov-cloud/commit/ff536013458acfad310e10d511d935c3f98c97dc)
+
+### Landsgemeinde
+
+##### Additional Documents for assembly
+
+`Feature` | [OGC-2699](https://linear.app/onegovcloud/issue/OGC-2699) | [0f94d3a43a](https://github.com/onegov/onegov-cloud/commit/0f94d3a43afb228ef5b41ed8cda5264e7fb6a734)
+
+##### Assembly item creation Bugfix
+
+`Bugfix` | [OGC-2696](https://linear.app/onegovcloud/issue/OGC-2696) | [8b5bfd1595](https://github.com/onegov/onegov-cloud/commit/8b5bfd15954a3d55511747be9cbcc678ea5d240d)
+
+### Org
+
+##### Lowers refresh interval for resource iCal to 30 minutes
+
+`Feature` | [OGC-2548](https://linear.app/onegovcloud/issue/OGC-2548) | [d90bbc51b7](https://github.com/onegov/onegov-cloud/commit/d90bbc51b7be17b447275cfd9147a2fa379aa971)
+
+##### Adds another ticket PDF option which includes related tickets
+
+`Feature` | [OGC-2708](https://linear.app/onegovcloud/issue/OGC-2708) | [1609c54ef6](https://github.com/onegov/onegov-cloud/commit/1609c54ef6c684c3d3cbf277f372850d6453efdc)
+
+##### Add subsubsubtitle and h5
+
+`Feature` | [bdc5e9b5de](https://github.com/onegov/onegov-cloud/commit/bdc5e9b5de017f305b36bb80cab70e79a264e99a)
+
+##### Newsletter just show lead
+
+Add option to just show the lead text of the news items in the newsletters.
+
+`Feature` | [OGC-2343](https://linear.app/onegovcloud/issue/OGC-2343) | [ffba57f239](https://github.com/onegov/onegov-cloud/commit/ffba57f2399fdd6ffe8cc9d54ae9d94597ea0679)
+
+##### Content Sidepanel
+
+Option to define how many levels are displayed in the TOC-Sidepanel.
+
+`Feature` | [OGC-2715](https://linear.app/onegovcloud/issue/OGC-2715) | [698fb15f40](https://github.com/onegov/onegov-cloud/commit/698fb15f405b5e04003c93ab9d51e1a6e05b208b)
+
+##### Rename dashboard to overview
+
+`Feature` | [OGC-2728](https://linear.app/onegovcloud/issue/OGC-2728) | [348e70a641](https://github.com/onegov/onegov-cloud/commit/348e70a641b744a3f9090497c1a873d93baff6e3)
+
+##### Attaches reservations summary PDF to reservation acceptance mail
+
+`Feature` | [OGC-2765](https://linear.app/onegovcloud/issue/OGC-2765) | [5d75b5d66b](https://github.com/onegov/onegov-cloud/commit/5d75b5d66be40defac0e5632516600d30dea8b4a)
+
+##### Fixes reservation dates not being linked for migrated invoices
+
+`Bugfix` | [OGC-2767](https://linear.app/onegovcloud/issue/OGC-2767) | [0d9d4c8ee2](https://github.com/onegov/onegov-cloud/commit/0d9d4c8ee2b68fd074acafd2d6c3750b99c057fa)
+
+### Pas
+
+##### Adds cronjob to sync parliamentarians and `User` accounts.
+
+`Feature` | [OGC-2725](https://linear.app/onegovcloud/issue/OGC-2725) | [38ef00156a](https://github.com/onegov/onegov-cloud/commit/38ef00156a2734a2f3b9559f08f4b40bc38469a5)
+
+### Ris
+
+##### Properly handle interest ties for new parliamentarians
+
+`Feature` | [OGC-2766](https://linear.app/onegovcloud/issue/OGC-2766) | [f5b2b91246](https://github.com/onegov/onegov-cloud/commit/f5b2b912462299ac037fbe7a5926d717a8ec5b25)
+
+##### Cleanup unused relationships
+
+They got replaced with relationships to meeting items
+
+`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [d2f1272a27](https://github.com/onegov/onegov-cloud/commit/d2f1272a27a23963b2724c12cda7b17ded5706c2)
+
+### Town6
+
+##### Adds unit tests for political businesses views
+
+`Feature` | [OGC-2481](https://linear.app/onegovcloud/issue/OGC-2481) | [5471bbd824](https://github.com/onegov/onegov-cloud/commit/5471bbd8248f71f568ef0e769353e0543655ea4c)
+
+##### Adds unit tests for parliamentarian views including parliamentary group and commission
+
+`Feature` | [OGC-2381](https://linear.app/onegovcloud/issue/OGC-2381) | [fce241c9be](https://github.com/onegov/onegov-cloud/commit/fce241c9bef6d43496d20c6f176851f657366e73)
+
+##### Prefer `reply_to` in template over general email.
+
+`Feature` | [OGC-2671](https://linear.app/onegovcloud/issue/OGC-2671) | [4637af1a54](https://github.com/onegov/onegov-cloud/commit/4637af1a540e574e93597f1b0de4cb52def750bf)
+
+### User
+
+##### Adds validation against a list of commonly used passwords
+
+`Feature` | [OGC-2737](https://linear.app/onegovcloud/issue/OGC-2737) | [a048ece0af](https://github.com/onegov/onegov-cloud/commit/a048ece0afad0cffeb90d246c6a33c9733361e75)
+
 ## 2025.61
 
-`2025-11-03` | [93a5f5203e...f973ae4c6c](https://github.com/OneGov/onegov-cloud/compare/93a5f5203e^...f973ae4c6c)
+`2025-11-03` | [93a5f5203e...c79c709d87](https://github.com/OneGov/onegov-cloud/compare/93a5f5203e^...c79c709d87)
 
 ### Feriennet
 
@@ -2398,20 +2503,4 @@ is the default and can safely be ignored.
 The international format prefixes the country code e.g. +41 for Switzerland
 
 `Feature` | [OGC-2113](https://linear.app/onegovcloud/issue/OGC-2113) | [d54f9470e7](https://github.com/onegov/onegov-cloud/commit/d54f9470e7636d9140199e75a3ab827322115856)
-
-## test
-
-`2025-03-12` | [9c3aee5da3...db0da8dbdf](https://github.com/OneGov/onegov-cloud/compare/9c3aee5da3^...db0da8dbdf)
-
-### Core
-
-##### Switches Redis cache serialization over to MessagePack
-
-`Feature` | [OGC-1893](https://linear.app/onegovcloud/issue/OGC-1893) | [b33e6c99a9](https://github.com/onegov/onegov-cloud/commit/b33e6c99a98040b05efc03099532f483a519a8b3)
-
-### Org
-
-##### Adds a button to show a modal with file links in the file details
-
-`Feature` | [OGC-2077](https://linear.app/onegovcloud/issue/OGC-2077) | [65267dc3b5](https://github.com/onegov/onegov-cloud/commit/65267dc3b5c03a5ee84e79e25e8e8eed68496ca5)
 

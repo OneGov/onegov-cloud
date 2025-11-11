@@ -2023,7 +2023,12 @@ def test_basic_search(client_with_fts: Client) -> None:
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
-def test_view_time_report(broadcast, authenticate, connect, client):
+def test_view_time_report(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
     """Test editor submitting time report."""
     session = client.app.session()
     languages = create_languages(session)

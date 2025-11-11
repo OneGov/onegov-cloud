@@ -1,5 +1,6 @@
-from freezegun import freeze_time
+from __future__ import annotations
 
+from freezegun import freeze_time
 from onegov.election_day.layouts import ElectionCompoundLayout
 from tests.onegov.election_day.common import create_election_compound
 from tests.onegov.election_day.common import login
@@ -9,7 +10,12 @@ from webtest import TestApp as Client
 from webtest.forms import Upload
 
 
-def test_view_election_compound_redirect(election_day_app_gr):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import TestApp
+
+
+def test_view_election_compound_redirect(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -21,7 +27,10 @@ def test_view_election_compound_redirect(election_day_app_gr):
     assert 'elections/districts' in response.headers['Location']
 
 
-def test_view_election_compound_superregions(election_day_app_bl):
+def test_view_election_compound_superregions(
+    election_day_app_bl: TestApp
+) -> None:
+
     client = Client(election_day_app_bl)
     client.get('/locale/de_CH').follow()
 
@@ -74,7 +83,10 @@ def test_view_election_compound_superregions(election_day_app_bl):
     }
 
 
-def test_view_election_compound_districts(election_day_app_gr):
+def test_view_election_compound_districts(
+    election_day_app_gr: TestApp
+) -> None:
+
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -116,7 +128,9 @@ def test_view_election_compound_districts(election_day_app_gr):
     }
 
 
-def test_view_election_compound_elected_candidates(election_day_app_gr):
+def test_view_election_compound_elected_candidates(
+    election_day_app_gr: TestApp
+) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -134,7 +148,9 @@ def test_view_election_compound_elected_candidates(election_day_app_gr):
     assert "Belfort" in candidates
 
 
-def test_view_election_compound_party_strengths(election_day_app_gr):
+def test_view_election_compound_party_strengths(
+    election_day_app_gr: TestApp
+) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -145,8 +161,7 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     main = client.get('/elections/elections/party-strengths')
     assert '<h3>Parteistärken</h3>' in main
 
-    parties = client.get('/elections/elections/party-strengths-data')
-    parties = parties.json
+    parties = client.get('/elections/elections/party-strengths-data').json
     assert parties['groups'] == ['BDP', 'CVP', 'FDP']
     assert parties['labels'] == ['2022']
     assert parties['maximum']['back'] == 100
@@ -298,8 +313,7 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     upload = upload.form.submit()
     assert "erfolgreich hochgeladen" in upload
 
-    parties = client.get('/elections/elections/party-strengths-data')
-    parties = parties.json
+    parties = client.get('/elections/elections/party-strengths-data').json
     assert parties['groups'] == ['BDP', 'Die Mitte', 'FDP']
     assert parties['labels'] == ['2018', '2022']
     assert parties['maximum']['back'] == 100
@@ -443,7 +457,10 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     assert data['results'][0]['percentage'] == True
 
 
-def test_view_election_compound_seat_allocation(election_day_app_gr):
+def test_view_election_compound_seat_allocation(
+    election_day_app_gr: TestApp
+) -> None:
+
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -454,8 +471,7 @@ def test_view_election_compound_seat_allocation(election_day_app_gr):
     main = client.get('/elections/elections/seat-allocation')
     assert '<h3>Sitzverteilung</h3>' in main
 
-    parties = client.get('/elections/elections/seat-allocation-data')
-    parties = parties.json
+    parties = client.get('/elections/elections/seat-allocation-data').json
     assert parties['groups'] == ['BDP', 'CVP', 'FDP']
     assert parties['labels'] == ['2022']
     assert parties['maximum']['front'] == 15
@@ -481,8 +497,7 @@ def test_view_election_compound_seat_allocation(election_day_app_gr):
     upload = upload.form.submit()
     assert "erfolgreich hochgeladen" in upload
 
-    parties = client.get('/elections/elections/seat-allocation-data')
-    parties = parties.json
+    parties = client.get('/elections/elections/seat-allocation-data').json
     assert parties['groups'] == ['BDP', 'Die Mitte', 'FDP']
     assert parties['labels'] == ['2018', '2022']
     assert parties['maximum']['front'] == 15
@@ -523,15 +538,17 @@ def test_view_election_compound_seat_allocation(election_day_app_gr):
 
     # translations
     client.get('/locale/fr_CH')
-    parties = client.get('/elections/elections/seat-allocation-data')
-    parties = parties.json
+    parties = client.get('/elections/elections/seat-allocation-data').json
     assert parties['groups'] == ['BDP', 'Le Centre', 'FDP']
     results = client.get('/elections/elections/seat-allocation').text
     assert 'Le Centre' in results
     assert 'BDP' in results
 
 
-def test_view_election_compound_list_groups(election_day_app_gr):
+def test_view_election_compound_list_groups(
+    election_day_app_gr: TestApp
+) -> None:
+
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -547,8 +564,7 @@ def test_view_election_compound_list_groups(election_day_app_gr):
     assert 'BDP' in main
     assert 'data-text="603.01"' in main
 
-    groups = client.get('/elections/elections/list-groups-data')
-    groups = groups.json
+    groups = client.get('/elections/elections/list-groups-data').json
     assert groups == {
         'results': [
             {
@@ -588,8 +604,7 @@ def test_view_election_compound_list_groups(election_day_app_gr):
     assert '<h3>Listengruppen</h3>' in main
     assert 'BDP' in main
 
-    groups = client.get('/elections/elections/list-groups-data')
-    groups = groups.json
+    groups = client.get('/elections/elections/list-groups-data').json
     assert groups == {
         'results': [
             {
@@ -624,7 +639,10 @@ def test_view_election_compound_list_groups(election_day_app_gr):
     assert 'data-text="603"' in main
 
 
-def test_view_election_compound_parties_panachage(election_day_app_gr):
+def test_view_election_compound_parties_panachage(
+    election_day_app_gr: TestApp
+) -> None:
+
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -658,7 +676,9 @@ def test_view_election_compound_parties_panachage(election_day_app_gr):
     assert 'elections/elections/parties-panachage-data' in chart
 
 
-def test_view_election_compound_statistics(election_day_app_gr):
+def test_view_election_compound_statistics(
+    election_day_app_gr: TestApp
+) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -675,7 +695,9 @@ def test_view_election_compound_statistics(election_day_app_gr):
     assert ">37<" in statistics
 
 
-def test_view_election_compound_json(election_day_app_gr):
+def test_view_election_compound_json(
+    election_day_app_gr: TestApp
+) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -732,7 +754,7 @@ def test_view_election_compound_json(election_day_app_gr):
     assert data['url']
 
 
-def test_view_election_compound_summary(election_day_app_gr):
+def test_view_election_compound_summary(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -760,7 +782,7 @@ def test_view_election_compound_summary(election_day_app_gr):
         }
 
 
-def test_view_election_compound_data(election_day_app_gr):
+def test_view_election_compound_data(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -773,18 +795,21 @@ def test_view_election_compound_data(election_day_app_gr):
 
     data = client.get('/elections/elections/data-json')
     assert data.headers['Content-Type'] == 'application/json; charset=utf-8'
-    assert data.headers['Content-Disposition'] == \
-        'inline; filename=elections.json'
+    assert data.headers['Content-Disposition'] == (
+        'inline; filename=elections.json')
     assert all((expected in data for expected in ("3506", "Sieger", "153")))
 
     data = client.get('/elections/elections/data-csv')
     assert data.headers['Content-Type'] == 'text/csv; charset=UTF-8'
-    assert data.headers['Content-Disposition'] == \
-        'inline; filename=elections.csv'
+    assert data.headers['Content-Disposition'] == (
+        'inline; filename=elections.csv')
     assert all((expected in data for expected in ("3506", "Sieger", "153")))
 
 
-def test_view_election_compound_relations(election_day_app_zg):
+def test_view_election_compound_relations(
+    election_day_app_zg: TestApp
+) -> None:
+
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -831,7 +856,9 @@ def test_view_election_compound_relations(election_day_app_zg):
         assert 'First Compound' in result
 
 
-def test_views_election_compound_embedded_tables(election_day_app_gr):
+def test_views_election_compound_embedded_tables(
+    election_day_app_gr: TestApp
+) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
