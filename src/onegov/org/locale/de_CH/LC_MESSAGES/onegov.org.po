@@ -5973,8 +5973,14 @@ msgid "An existing reservation would be affected by the requested change."
 msgstr ""
 "Eine bestehende Reservation wäre von der gewünschten Änderung betroffen."
 
-msgid "A pending reservation would be affected by the requested change."
-msgstr "Eine offene Reservation wäre von der gewünschten Änderung betroffen."
+msgid ""
+"This change cannot be made because there is still an open reservation in "
+"someone's cart. The reservation needs to be submitted or expire before you "
+"can proceed."
+msgstr ""
+"Diese Änderung kann nicht vorgenommen werden, da sich noch eine offene "
+"Reservation im Warenkorb einer Person befindet. Die Reservation muss "
+"abgeschlossen werden oder ablaufen bevor Sie fortfahren können."
 
 msgid "The requested period is no longer available."
 msgstr "Der gewünschte Zeitraum ist nicht mehr verfügbar."
@@ -6044,6 +6050,9 @@ msgstr "Verfügbarkeitszeitraum löschen"
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
+
+msgid "The allocation was deleted"
+msgstr "Die Verfügbarkeit wurde gelöscht"
 
 #, python-format
 msgid "New availability period active, ${n} allocations created"
@@ -7632,9 +7641,7 @@ msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
 #~ "If checked, news are displayed as tiles. Otherwise, news are listed in "
 #~ "full length."
 #~ msgstr ""
-#~ "Wenn diese Option aktiviert ist, werden die Nachrichten als Kacheln "
-#~ "angezeigt. Anderfalls werden die Nachrichten in voller Länge "
-#~ "untereinander aufgelistet."
+#~ "Eine offene Reservation wäre von der gewünschten Änderung betroffen."
 
 #~ msgid "New news since the last newsletter:"
 #~ msgstr "Neue Einträge seit dem letzten Newsletter:"
