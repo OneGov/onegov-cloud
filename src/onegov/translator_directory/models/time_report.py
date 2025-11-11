@@ -6,7 +6,8 @@ from uuid import uuid4
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from sqlalchemy import Column, Date, Enum, ForeignKey, Integer, Numeric, Text
+from sqlalchemy import ARRAY, Column, Date, Enum, ForeignKey, Integer, Numeric
+from sqlalchemy import Text
 from sqlalchemy.orm import relationship
 
 
@@ -19,6 +20,7 @@ if TYPE_CHECKING:
     from onegov.user import User
 
 TimeReportStatus = Literal['pending', 'confirmed']
+SurchargeType = Literal['night_work', 'weekend_holiday', 'urgent']
 
 
 class TranslatorTimeReport(Base, TimestampMixin):
@@ -63,6 +65,13 @@ class TranslatorTimeReport(Base, TimestampMixin):
         nullable=False,
     )
 
+    surcharge_types: Column[list[str] | None] = Column(
+        ARRAY(Text),
+        nullable=True,
+        default=list,
+    )
+
+    #: Zuschlag
     surcharge_percentage: Column[Decimal] = Column(
         Numeric(precision=5, scale=2),
         nullable=False,
@@ -88,10 +97,32 @@ class TranslatorTimeReport(Base, TimestampMixin):
         default='pending',
     )
 
+    SURCHARGE_RATES: dict[str, Decimal] = {
+        'night_work': Decimal('50'),
+        'weekend_holiday': Decimal('25'),
+        'urgent': Decimal('25'),
+    }
+
     @property
     def duration_hours(self) -> Decimal:
         """Return duration in hours for display."""
         return Decimal(self.duration) / Decimal(60)
+
+    def calculate_surcharge_from_types(self) -> Decimal:
+        """Calculate surcharge percentage from surcharge_types."""
+        if not self.surcharge_types:
+            return Decimal('0')
+        total = Decimal('0')
+        for surcharge_type in self.surcharge_types:
+            total += self.SURCHARGE_RATES.get(surcharge_type, Decimal('0'))
+        return total
+
+    @property
+    def effective_surcharge_percentage(self) -> Decimal:
+        """Return effective surcharge, preferring types over percentage."""
+        if self.surcharge_types:
+            return self.calculate_surcharge_from_types()
+        return self.surcharge_percentage
 
     @property
     def base_compensation(self) -> Decimal:
@@ -99,7 +130,7 @@ class TranslatorTimeReport(Base, TimestampMixin):
         return (
             self.hourly_rate
             * self.duration_hours
-            * (1 + self.surcharge_percentage / Decimal(100))
+            * (1 + self.effective_surcharge_percentage / Decimal(100))
         )
 
     @property

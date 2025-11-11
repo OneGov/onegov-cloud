@@ -88,19 +88,11 @@ class TranslatorTimeReportForm(Form):
     )
 
     def on_request(self) -> None:
-        self.assignment_type.choices = self.get_assignment_type_choices()
-        self.travel_distance.choices = self.get_travel_choices()
-
-    def get_assignment_type_choices(self) -> list[_Choice]:
-        """Return assignment type choices."""
-        return [
+        self.assignment_type.choices = [
             (key, self.request.translate(value))
             for key, value in INTERPRETING_TYPES.items()
         ]
-
-    def get_travel_choices(self) -> list[_Choice]:
-        """Return travel distance choices with compensation."""
-        return [
+        self.travel_distance.choices = [
             ('0', self.request.translate(_('No travel'))),
             ('20', self.request.translate(_('Up to 25 km (CHF 20)'))),
             ('50', self.request.translate(_('25-50 km (CHF 50)'))),
@@ -144,6 +136,26 @@ class TranslatorTimeReportForm(Form):
             if duration_minutes is not None:
                 self.duration.data = duration_minutes / 60.0
 
+            if hasattr(obj, 'surcharge_types'):
+                surcharge_types = getattr(obj, 'surcharge_types', None)
+                if surcharge_types:
+                    self.is_night_work.data = 'night_work' in surcharge_types
+                    self.is_weekend_holiday.data = (
+                        'weekend_holiday' in surcharge_types
+                    )
+                    self.is_urgent.data = 'urgent' in surcharge_types
+
+    def get_surcharge_types(self) -> list[str]:
+        """Get list of active surcharge types from form."""
+        types: list[str] = []
+        if self.is_night_work.data:
+            types.append('night_work')
+        if self.is_weekend_holiday.data:
+            types.append('weekend_holiday')
+        if self.is_urgent.data:
+            types.append('urgent')
+        return types
+
     def update_model(self, model: TranslatorTimeReport) -> None:
         """Update the time report model with form data."""
         assert self.duration.data is not None
@@ -161,6 +173,9 @@ class TranslatorTimeReportForm(Form):
 
         hourly_rate = self.get_hourly_rate(model.translator)
         model.hourly_rate = hourly_rate
+
+        surcharge_types = self.get_surcharge_types()
+        model.surcharge_types = surcharge_types if surcharge_types else None
 
         surcharge_pct = self.calculate_surcharge()
         model.surcharge_percentage = surcharge_pct

@@ -547,6 +547,7 @@ def add_time_report(
         duration_minutes = int(rounded_hours * 60)
 
         hourly_rate = form.get_hourly_rate(self)
+        surcharge_types = form.get_surcharge_types()
         surcharge_pct = form.calculate_surcharge()
         travel_comp = Decimal(form.travel_distance.data or 0)
         duration_hours = Decimal(duration_minutes) / Decimal(60)
@@ -568,12 +569,12 @@ def add_time_report(
             case_number=form.case_number.data or None,
             assignment_date=form.assignment_date.data,
             hourly_rate=hourly_rate,
+            surcharge_types=surcharge_types if surcharge_types else None,
             surcharge_percentage=surcharge_pct,
             travel_compensation=travel_comp,
             total_compensation=total_comp,
             notes=form.notes.data or None,
         )
-
         session.add(report)
         session.flush()
 

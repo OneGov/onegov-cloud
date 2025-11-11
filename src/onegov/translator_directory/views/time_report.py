@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 from io import StringIO
 from webob import Response
+from datetime import datetime
 
 from onegov.core.security import Secret
 from onegov.translator_directory import TranslatorDirectoryApp, _
@@ -19,7 +20,6 @@ from onegov.translator_directory.models.time_report import (
 
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.translator_directory.request import TranslatorAppRequest
@@ -35,7 +35,6 @@ def view_time_reports(
     self: TimeReportCollection,
     request: TranslatorAppRequest,
 ) -> RenderData:
-    from datetime import datetime
 
     layout = TimeReportCollectionLayout(self, request)
 
@@ -109,7 +108,7 @@ def generate_accounting_export_rows(
 
         duration_hours = str(report.duration_hours)
         effective_rate = report.hourly_rate * (
-            1 + report.surcharge_percentage / Decimal(100)
+            1 + report.effective_surcharge_percentage / Decimal(100)
         )
         effective_rate_str = str(effective_rate.quantize(Decimal('0.01')))
         travel_and_meal = report.travel_compensation + report.meal_allowance
@@ -202,8 +201,8 @@ def export_accounting_csv(
     """Export confirmed time reports as CSV for accounting."""
 
     try:
-        year = int(request.POST.get('year', 0))
-        month = int(request.POST.get('month', 0))
+        year = int(str(request.POST.get('year', '0')))
+        month = int(str(request.POST.get('month', '0')))
     except (ValueError, TypeError):
         request.message(_('Invalid form data'), 'warning')
         return request.redirect(request.link(self))
