@@ -3,7 +3,9 @@ from __future__ import annotations
 from onegov.form import Form
 from onegov.gis import CoordinatesField
 from onegov.translator_directory import _
+from wtforms.fields import EmailField
 from wtforms.fields import URLField
+from wtforms.validators import Email
 from wtforms.validators import Optional
 from wtforms.validators import URL
 
@@ -34,15 +36,23 @@ class TranslatorDirectorySettingsForm(Form):
         validators=[URL(), Optional()]
     )
 
+    accountant_email = EmailField(
+        label=_('Accountant email'),
+        fieldset=_('Accounting'),
+        description=_(
+            'Email address of the person responsible for accounting'
+        ),
+        validators=[Email(), Optional()],
+    )
+
     def update_model(self, app: TranslatorDirectoryApp) -> None:
         app.org.meta = app.org.meta or {}
         if self.coordinates.data:
             app.coordinates = self.coordinates.data
-        app.org.meta['declaration_link'] = (
-            self.declaration_link.data)
+        app.org.meta['declaration_link'] = self.declaration_link.data
+        app.org.meta['accountant_email'] = self.accountant_email.data
 
     def apply_model(self, app: TranslatorDirectoryApp) -> None:
         self.coordinates.data = app.coordinates
-        self.declaration_link.data = app.org.meta.get(
-            'declaration_link', ''
-        )
+        self.declaration_link.data = app.org.meta.get('declaration_link', '')
+        self.accountant_email.data = app.org.meta.get('accountant_email', '')

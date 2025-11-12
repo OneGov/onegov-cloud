@@ -42,9 +42,9 @@ from onegov.translator_directory.layout import (
     MailTemplatesLayout,
 )
 from onegov.translator_directory.models.time_report import TranslatorTimeReport
-from onegov.translator_directory.models.ticket import TimeReportTicket
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.utils import country_code_to_name
+from onegov.translator_directory.utils import get_accountant_email
 
 from uuid import uuid4
 from xlsxwriter import Workbook
@@ -53,7 +53,6 @@ from webob.exc import HTTPForbidden
 
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from datetime import date, datetime
     from collections.abc import Iterable
@@ -535,6 +534,19 @@ def add_time_report(
 ) -> RenderData | BaseResponse:
 
     if form.submitted(request):
+        try:
+            accountant_email = get_accountant_email(request)
+        except ValueError as e:
+            request.alert(str(e))
+            layout = TranslatorLayout(self, request)
+            layout.edit_mode = True
+            return {
+                'layout': layout,
+                'model': self,
+                'form': form,
+                'title': _('Add Time Report'),
+            }
+
         assert request.current_username is not None
         assert form.duration.data is not None
         assert form.assignment_date.data is not None
@@ -599,6 +611,8 @@ def add_time_report(
             ticket=ticket,
             send_self=True,
         )
+
+        notified_emails = set()
         for email in emails_for_new_ticket(request, ticket):
             send_ticket_mail(
                 request=request,
@@ -606,6 +620,17 @@ def add_time_report(
                 subject=_('New ticket'),
                 ticket=ticket,
                 receivers=(email,),
+                content={'model': ticket},
+            )
+            notified_emails.add(str(email))
+
+        if accountant_email not in notified_emails:
+            send_ticket_mail(
+                request=request,
+                template='mail_ticket_opened_info.pt',
+                subject=_('New ticket'),
+                ticket=ticket,
+                receivers=(accountant_email,),
                 content={'model': ticket},
             )
 
@@ -631,31 +656,6 @@ def add_time_report(
         'form': form,
         'title': _('Add Time Report'),
     }
-
-
-@TranslatorDirectoryApp.view(
-    model=TimeReportTicket,
-    name='accept-time-report',
-    permission=Private,
-    request_method='POST',
-)
-def accept_time_report(
-    self: TimeReportTicket, request: TranslatorAppRequest
-) -> BaseResponse:
-    """Accept time report."""
-    request.assert_valid_csrf_token()
-
-    handler = self.handler
-    assert hasattr(handler, 'time_report')
-    if not handler.time_report:
-        request.alert(_('Time report not found'))
-        return request.redirect(request.link(self))
-
-    handler.time_report.status = 'confirmed'
-    handler.data['state'] = 'accepted'
-    TicketMessage.create(self, request, 'accepted')
-    request.success(_('Time report accepted'))
-    return request.redirect(request.link(self))
 
 
 @TranslatorDirectoryApp.form(

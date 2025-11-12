@@ -5,8 +5,9 @@ from io import StringIO
 from webob import Response
 from datetime import datetime
 
-from onegov.core.security import Secret
+from onegov.core.security import Private
 from onegov.translator_directory import TranslatorDirectoryApp, _
+from onegov.org.models import TicketMessage
 from onegov.translator_directory.collections.time_report import (
     TimeReportCollection,
 )
@@ -14,6 +15,8 @@ from onegov.translator_directory.layout import (
     TimeReportCollectionLayout,
     TimeReportLayout,
 )
+
+from onegov.translator_directory.models.ticket import TimeReportTicket
 from onegov.translator_directory.models.time_report import (
     TranslatorTimeReport,
 )
@@ -24,12 +27,13 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.translator_directory.request import TranslatorAppRequest
     from collections.abc import Iterator
+    from webob import Response as BaseResponse
 
 
 @TranslatorDirectoryApp.html(
     model=TimeReportCollection,
     template='time_reports.pt',
-    permission=Secret,
+    permission=Private,
 )
 def view_time_reports(
     self: TimeReportCollection,
@@ -77,7 +81,7 @@ def view_time_reports(
 @TranslatorDirectoryApp.html(
     model=TranslatorTimeReport,
     template='time_report.pt',
-    permission=Secret,
+    permission=Private,
 )
 def view_time_report(
     self: TranslatorTimeReport,
@@ -92,6 +96,31 @@ def view_time_report(
         'title': _('Time Report'),
         'report': self,
     }
+
+
+@TranslatorDirectoryApp.view(
+    model=TimeReportTicket,
+    name='accept-time-report',
+    permission=Private,
+    request_method='POST',
+)
+def accept_time_report(
+    self: TimeReportTicket, request: TranslatorAppRequest
+) -> BaseResponse:
+    """Accept time report."""
+    request.assert_valid_csrf_token()
+
+    handler = self.handler
+    assert hasattr(handler, 'time_report')
+    if not handler.time_report:
+        request.alert(_('Time report not found'))
+        return request.redirect(request.link(self))
+
+    handler.time_report.status = 'confirmed'
+    handler.data['state'] = 'accepted'
+    TicketMessage.create(self, request, 'accepted')
+    request.success(_('Time report accepted'))
+    return request.redirect(request.link(self))
 
 
 def generate_accounting_export_rows(
@@ -191,7 +220,7 @@ def generate_accounting_export_rows(
 @TranslatorDirectoryApp.view(
     model=TimeReportCollection,
     name='export-accounting',
-    permission=Secret,
+    permission=Private,
     request_method='POST',
 )
 def export_accounting_csv(
@@ -211,9 +240,8 @@ def export_accounting_csv(
         request.message(_('Invalid form data'), 'warning')
         return request.redirect(request.link(self))
 
-    reports = list(self.for_accounting_export(year, month))
-
-    if not reports:
+    confirmed_reports = list(self.for_accounting_export(year, month))
+    if not confirmed_reports:
         request.message(
             _(
                 'No confirmed time reports found for ${month}/${year}',
@@ -223,7 +251,9 @@ def export_accounting_csv(
         )
         return request.redirect(request.link(self))
 
-    missing_pers_id = [r for r in reports if not r.translator.pers_id]
+    missing_pers_id = [
+        r for r in confirmed_reports if not r.translator.pers_id
+    ]
     if missing_pers_id:
         translator_names = ', '.join(
             r.translator.title for r in missing_pers_id
@@ -277,7 +307,7 @@ def export_accounting_csv(
     ]
     writer.writerow(header)
 
-    for row in generate_accounting_export_rows(reports):
+    for row in generate_accounting_export_rows(confirmed_reports):
         writer.writerow(row)
 
     csv_content = output.getvalue()

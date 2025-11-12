@@ -26,7 +26,6 @@ if TYPE_CHECKING:
     )
     from onegov.translator_directory.models.translator import Translator
     from onegov.translator_directory.request import TranslatorAppRequest
-    from wtforms.fields.choices import _Choice
 
 
 class TranslatorTimeReportForm(Form):

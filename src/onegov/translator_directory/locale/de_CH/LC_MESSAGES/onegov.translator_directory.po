@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-06 14:43+0100\n"
+"POT-Creation-Date: 2025-11-12 10:29+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -509,6 +509,15 @@ msgstr "Link zur Einverständniserklärung"
 msgid "Accreditation"
 msgstr "Akkreditierung"
 
+msgid "Accountant email"
+msgstr "E-Mail Rechnungsführer:in"
+
+msgid "Accounting"
+msgstr "Buchhaltung"
+
+msgid "Email address of the person responsible for accounting"
+msgstr "E-Mail-Adresse der für die Buchhaltung verantwortlichen Person"
+
 msgid "Type of translation/interpreting"
 msgstr "Art der Übersetzung/Dolmetschung"
 
@@ -848,47 +857,11 @@ msgid ""
 "No confirmed time reports available for export. Time reports must be "
 "confirmed before they can be exported."
 msgstr ""
-"Keine bestätigten Zeiterfassungen für den Export verfügbar. "
-"Zeiterfassungen müssen bestätigt werden, bevor sie exportiert werden können."
+"Keine bestätigten Zeiterfassungen für den Export verfügbar. Zeiterfassungen "
+"müssen bestätigt werden, bevor sie exportiert werden können."
 
 msgid "Month"
 msgstr "Monat"
-
-msgid "January"
-msgstr "Januar"
-
-msgid "February"
-msgstr "Februar"
-
-msgid "March"
-msgstr "März"
-
-msgid "April"
-msgstr "April"
-
-msgid "May"
-msgstr "Mai"
-
-msgid "June"
-msgstr "Juni"
-
-msgid "July"
-msgstr "Juli"
-
-msgid "August"
-msgstr "August"
-
-msgid "September"
-msgstr "September"
-
-msgid "October"
-msgstr "Oktober"
-
-msgid "November"
-msgstr "November"
-
-msgid "December"
-msgstr "Dezember"
 
 msgid "Year"
 msgstr "Jahr"
@@ -916,6 +889,14 @@ msgstr "Telefonischer Kontakt"
 
 msgid "Error: No custom texts found"
 msgstr "Fehler: Keine benutzerdefinierten Texte gefunden"
+
+#, python-format
+msgid ""
+"Accountant email is not configured. Please configure it in the settings: "
+"${settings_url}"
+msgstr ""
+"E-Mail Rechnungsführer:in ist noch nicht konfiguriert. Bitte fügen sie eine E-Mail hinzu: "
+"${settings_url}"
 
 msgid "Your ticket has been opened"
 msgstr "Ihr Ticket wurde eröffnet"
@@ -954,6 +935,51 @@ msgstr "E-Mail / Benutzername / Kürzel"
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
+
+msgid "January"
+msgstr "Januar"
+
+msgid "February"
+msgstr "Februar"
+
+msgid "March"
+msgstr "März"
+
+msgid "April"
+msgstr "April"
+
+msgid "May"
+msgstr "Mai"
+
+msgid "June"
+msgstr "Juni"
+
+msgid "July"
+msgstr "Juli"
+
+msgid "August"
+msgstr "August"
+
+msgid "September"
+msgstr "September"
+
+msgid "October"
+msgstr "Oktober"
+
+msgid "November"
+msgstr "November"
+
+msgid "December"
+msgstr "Dezember"
+
+msgid "Time report not found"
+msgstr "Zeiterfassung nicht gefunden"
+
+msgid "Time report accepted"
+msgstr "Zeiterfassung akzeptiert"
+
+msgid "Invalid form data"
+msgstr "Ungültige Formulardaten"
 
 #, python-format
 msgid "No confirmed time reports found for ${month}/${year}"
@@ -998,12 +1024,6 @@ msgstr "Ihre Daten wurden bestätigt"
 msgid "Time report submitted for review"
 msgstr "Zeiterfassung zur Überprüfung eingereicht"
 
-msgid "Time report not found"
-msgstr "Zeiterfassung nicht gefunden"
-
-msgid "Time report accepted"
-msgstr "Zeiterfassung akzeptiert"
-
 msgid "This file does not seem to exist."
 msgstr "Diese Datei wurde nicht gefunden."
 
@@ -1023,6 +1043,20 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 
 msgid "Download"
 msgstr "Herunterladen"
+
+#, python-format
+#~ msgid ""
+#~ "Accountant email is not configured. Please configure it in the <a "
+#~ "href=\"${settings_url}\">settings</a>."
+#~ msgstr ""
+#~ "E-Mail Rechnungsführer ist nicht konfiguriert. Bitte konfigurieren Sie "
+#~ "diese in den <a href=\"${settings_url}\">Einstellungen</a>."
+
+#~ msgid ""
+#~ "Accountant email is not configured. Please configure it in the settings."
+#~ msgstr ""
+#~ "E-Mail Rechnungsführer ist nicht konfiguriert. Bitte konfigurieren Sie "
+#~ "diese in den Einstellungen."
 
 #~ msgid "Date"
 #~ msgstr "Datum"
