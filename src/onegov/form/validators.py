@@ -129,17 +129,49 @@ class WhitelistedMimeType:
     """
 
     whitelist: Collection[str] = {
-        'application/excel',
-        'application/vnd.ms-excel',
-        'application/msword',
+        # documents
+        'application/msword',  # doc
         'application/pdf',
+        'application/rtf',
+        'application/vnd.ms-excel',  # xls
+        ('application/vnd.openxmlformats-officedocument.'
+         'presentationml.presentation'),  # pptx
+        ('application/vnd.openxmlformats-officedocument.'
+         'spreadsheetml.sheet'),  # xlsx
+         ('application/vnd.openxmlformats-officedocument.'
+          'wordprocessingml.document'),  # docx
+
+        # archives
         'application/zip',
-        'image/gif',
-        'image/jpeg',
-        'image/png',
-        'image/x-ms-bmp',
+
+        # text / data
+        'text/csv',
         'text/plain',
-        'text/csv'
+
+        # images
+        'image/bmp',
+        'image/gif',
+        'image/jpeg',  # jpeg, jpg
+        'image/png',
+        'image/svg',
+        'image/svg+xml',
+        'image/tiff',
+        'image/webp',  # shall we allow it?
+        'image/x-ms-bmp',
+
+        # audio
+        'audio/mp4',
+        'audio/mpeg',
+        'audio/wav',
+        'audio/webm',  # weba
+
+        # video
+        'video/mp4',
+        'video/mpeg',  # mpg, mpeg
+        'video/ogg',
+        'video/quicktime',  # mov
+        'video/webm',  # webm
+        'video/x-msvideo',  # avi
     }
 
     message = _('Files of this type are not supported.')
