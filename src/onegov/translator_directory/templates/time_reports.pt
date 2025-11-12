@@ -54,12 +54,13 @@
                     <table class="fullwidth" tal:condition="reports">
                         <thead>
                             <th i18n:translate="">Translator</th>
+                            <th i18n:translate="">Created</th>
                             <th i18n:translate="">Assignment Date</th>
                             <th i18n:translate="">Type</th>
                             <th i18n:translate="">Duration</th>
-                            <th i18n:translate="">Case Number</th>
                             <th i18n:translate="">Total</th>
                             <th i18n:translate="">Status</th>
+                            <th i18n:translate="">Ticket</th>
                         </thead>
                         <tbody>
                             <tr tal:repeat="report reports">
@@ -70,6 +71,9 @@
                                     </a>
                                 </td>
                                 <td>
+                                    ${layout.format_date(report.created, 'datetime')}
+                                </td>
+                                <td>
                                     <a href="${request.link(report)}">
                                         ${layout.format_date(
                                             report.assignment_date, 'date')}
@@ -78,7 +82,6 @@
                                 <td>${layout.format_interpreting_type(
                                     report.assignment_type) if report.assignment_type else '-'}</td>
                                 <td>${report.duration} min</td>
-                                <td>${report.case_number or '-'}</td>
                                 <td>${layout.format_currency(
                                     report.total_compensation)}</td>
                                 <td>
@@ -86,6 +89,13 @@
                                           i18n:translate="">Pending</span>
                                     <span tal:condition="report.status == 'confirmed'"
                                           i18n:translate="">Confirmed</span>
+                                </td>
+                                <td tal:define="ticket report_tickets.get(
+                                    str(report.id))">
+                                    <a href="${request.link(ticket)}"
+                                       tal:condition="ticket"
+                                       i18n:translate="">View Ticket</a>
+                                    <span tal:condition="not: ticket">-</span>
                                 </td>
                             </tr>
                         </tbody>

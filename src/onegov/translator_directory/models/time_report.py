@@ -16,8 +16,10 @@ from typing import TYPE_CHECKING, Literal
 if TYPE_CHECKING:
     import uuid
     from datetime import date
+    from sqlalchemy.orm import Session
     from .translator import Translator
     from onegov.user import User
+    from .ticket import TimeReportTicket
 
 TimeReportStatus = Literal['pending', 'confirmed']
 SurchargeType = Literal['night_work', 'weekend_holiday', 'urgent']
@@ -145,3 +147,18 @@ class TranslatorTimeReport(Base, TimestampMixin):
         if self.assignment_type:
             return f'{self.assignment_type} - {date_str}'
         return f'Time Report - {date_str}'
+
+    def get_ticket(self, session: Session) -> TimeReportTicket | None:
+        """Get the ticket associated with this time report."""
+        from onegov.translator_directory.models.ticket import TimeReportTicket
+
+        return (
+            session.query(TimeReportTicket)
+            .filter(
+                TimeReportTicket.handler_data['handler_data'][
+                    'time_report_id'
+                ].astext
+                == str(self.id)
+            )
+            .first()
+        )

@@ -4,6 +4,7 @@ import csv
 from io import StringIO
 from webob import Response
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 from onegov.core.security import Private
 from onegov.translator_directory import TranslatorDirectoryApp, _
@@ -44,8 +45,9 @@ def view_time_reports(
 
     now = datetime.now()
     current_year = now.year
-    default_month = now.month
-    default_year = now.year
+    last_month = now - relativedelta(months=1)
+    default_month = last_month.month
+    default_year = last_month.year
 
     months = [
         (1, request.translate(_('January'))),
@@ -65,11 +67,27 @@ def view_time_reports(
     years = [current_year, current_year - 1, current_year - 2]
     export_url = request.link(self, 'export-accounting')
 
+    report_ids = [str(report.id) for report in self.batch]
+    tickets = (
+        request.session.query(TimeReportTicket)
+        .filter(
+            TimeReportTicket.handler_data['handler_data'][
+                'time_report_id'
+            ].astext.in_(report_ids)
+        )
+        .all()
+    )
+    report_tickets = {
+        ticket.handler_data['handler_data']['time_report_id']: ticket
+        for ticket in tickets
+    }
+
     return {
         'layout': layout,
         'model': self,
         'title': layout.title,
         'reports': self.batch,
+        'report_tickets': report_tickets,
         'months': months,
         'years': years,
         'default_month': default_month,
