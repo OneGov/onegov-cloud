@@ -203,7 +203,7 @@
                                                                 </thead>
                                                                 <tbody>
                                                                     <tr tal:repeat="row related[booking.occasion_id]">
-                                                                        <td>${row.parent} ${row.show_contact_data_to_others}</td>
+                                                                        <td>${row.parent}</td>
                                                                         <td>
                                                                             <span class="show-for-sr">
                                                                                 ${row.children} <tal:b i18n:translate>Children</tal:b>
