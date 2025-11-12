@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-11 15:19-0500\n"
+"POT-Creation-Date: 2025-11-12 06:58-0500\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1988,6 +1988,12 @@ msgstr "Öffnungszeiten"
 
 msgid "The opening hours of the municipality"
 msgstr "Öffnungszeiten"
+
+msgid "Opening Hours Link Label"
+msgstr "Bezeichnung für den Öffnungszeiten Link"
+
+msgid "Label for Opening Hours Link. Default: 'more'"
+msgstr "Bezeichnung für den Öffnungszeiten Link. Standard: 'mehr'"
 
 msgid "Opening Hours Link"
 msgstr "Öffnungszeiten Link"

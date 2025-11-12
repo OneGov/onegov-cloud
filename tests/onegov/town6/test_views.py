@@ -343,3 +343,30 @@ def test_footer_settings_contact_url_label(client: Client) -> None:
     page = settings.form.submit().follow()
     assert 'mehr' in page
     assert url in page
+
+
+def test_footer_settings_opening_hours_url_label(client: Client) -> None:
+    client.login_admin()
+
+    url = 'https://www.abc.ch'
+
+    # initial, no opening hours url set, no link
+    page = client.get('/')
+    assert 'mehr' not in page
+    assert url not in page
+
+    # footer settings custom opening our link label
+    settings = client.get('/footer-settings')
+    settings.form['opening_hours_url_label'] = 'Special abc'
+    settings.form['opening_hours_url'] = url
+    page = settings.form.submit().follow()
+    assert 'Special abc' in page
+    assert url in page
+
+    # footer settings default opening hour link label
+    settings = client.get('/footer-settings')
+    settings.form['opening_hours_url_label'] = ''
+    settings.form['opening_hours_url'] = url
+    page = settings.form.submit().follow()
+    assert 'mehr' in page
+    assert url in page

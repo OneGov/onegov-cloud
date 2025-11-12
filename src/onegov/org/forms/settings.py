@@ -252,6 +252,13 @@ class FooterSettingsForm(Form):
         render_kw={'rows': 8},
         fieldset=_('Information'))
 
+    opening_hours_url_label = StringField(
+        label=_('Opening Hours Link Label'),
+        description=_("Label for Opening Hours Link. Default: 'more'"),
+        fieldset=_('Information'),
+        validators=[Optional()],
+    )
+
     opening_hours_url = URLField(
         label=_('Opening Hours Link'),
         description=_('URL pointing to an opening hours page'),
