@@ -22,7 +22,8 @@ from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.constants import (
     member_can_see, editor_can_see, translator_can_see,
-    GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS, INTERPRETING_TYPES)
+    GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS,
+    TIME_REPORT_INTERPRETING_TYPES)
 
 
 from typing import TYPE_CHECKING, Any
@@ -94,8 +95,8 @@ class DefaultLayout(BaseLayout):
         return key
 
     def format_interpreting_type(self, key: str) -> str:
-        if key in INTERPRETING_TYPES:
-            return self.request.translate(INTERPRETING_TYPES[key])
+        if key in TIME_REPORT_INTERPRETING_TYPES:
+            return self.request.translate(TIME_REPORT_INTERPRETING_TYPES[key])
         return key
 
     @staticmethod

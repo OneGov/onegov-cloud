@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from onegov.translator_directory import _
 
 full_text_max_chars = 25
@@ -143,5 +144,14 @@ INTERPRETING_TYPES = {
     'negotiation': _('Negotiation interpreting'),
     'whisper': _('Whisper interpreting'),
 }
+
+
+TIME_REPORT_INTERPRETING_TYPES = {
+    'telephonic': _('telephonic'),
+    'on-site': _('On Site'),
+}
+
+HOURLY_RATE_CERTIFIED = Decimal('90.00')
+HOURLY_RATE_UNCERTIFIED = Decimal('75.00')
 
 TRANSLATOR_FA_ICON = 'translator'

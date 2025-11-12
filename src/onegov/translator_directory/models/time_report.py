@@ -5,7 +5,7 @@ from uuid import uuid4
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
+from onegov.core.orm.types import UUID, UTCDateTime
 from sqlalchemy import ARRAY, Column, Date, Enum, ForeignKey, Integer, Numeric
 from sqlalchemy import Text
 from sqlalchemy.orm import relationship
@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     import uuid
-    from datetime import date
+    from datetime import date, datetime
     from sqlalchemy.orm import Session
     from .translator import Translator
     from onegov.user import User
@@ -61,6 +61,10 @@ class TranslatorTimeReport(Base, TimestampMixin):
     case_number: Column[str | None] = Column(Text)
 
     assignment_date: Column[date] = Column(Date, nullable=False)
+
+    start: Column[datetime | None] = Column(UTCDateTime)
+
+    end: Column[datetime | None] = Column(UTCDateTime)
 
     hourly_rate: Column[Decimal] = Column(
         Numeric(precision=10, scale=2),

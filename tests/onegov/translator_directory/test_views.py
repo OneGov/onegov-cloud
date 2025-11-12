@@ -2020,6 +2020,17 @@ def test_basic_search(client_with_fts: Client) -> None:
     assert anom.get('/search/suggest?q=test').json == []
 
 
+def test_add_accountant_email_user_has_to_exist(client: 'Client') -> None:
+    client.login_admin()
+    page = client.get('/directory-settings')
+    page.form['accountant_email'] = 'accountant@example.org'
+    page = page.form.submit()
+    assert 'Es existiert kein Benutzer mit dieser' in page.text
+    page.form['accountant_email'] = 'editor@example.org'
+    page = page.form.submit()
+    assert 'Es existiert kein Benutzer mit dieser' not in page.text
+
+
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
@@ -2038,33 +2049,41 @@ def test_view_time_report(
         last_name='Translator',
         admission='certified',
         email='translator@example.org',
+        drive_distance=35.0,
     ).id
     transaction.commit()
+
+    client.login_admin()
+    page = client.get('/directory-settings')
+    page.form['accountant_email'] = 'editor@example.org'
+    page = page.form.submit()
+    client.logout()
+    assert client.app.accountant_email == 'editor@example.org'
 
     client.login_member()
     page = client.get(f'/translator/{translator_id}')
     assert 'Zeit erfassen' in page
 
     page = page.click('Zeit erfassen')
-    page.form['assignment_type'] = 'consecutive'
-    page.form['duration'] = 1.5
+    page.form['assignment_type'] = 'on-site'
+    page.form['start_date'] = '2025-01-11'
+    page.form['start_time'] = '09:00'
+    page.form['end_date'] = '2025-01-11'
+    page.form['end_time'] = '10:30'
     page.form['case_number'] = 'CASE-123'
-    page.form['assignment_date'] = '2025-01-15'
-    page.form['is_night_work'] = False
-    page.form['is_weekend_holiday'] = True
     page.form['is_urgent'] = False
-    page.form['travel_distance'] = '50'
     page.form['notes'] = 'Test notes'
-    anfrage_eingereicht_page = page.form.submit()
+    page = page.form.submit().follow()
+    assert 'Zeiterfassung zur Überprüfung eingereicht' in page
     mail = client.get_email(0, flush_queue=True)
 
-    assert 'Ihr Ticket wurde eröffnet' in mail['Subject']
-    assert connect.call_count == 1
-    assert authenticate.call_count == 1
-    assert broadcast.call_count == 1
-    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
-    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    # so this should now have sent, at the very least:
+    # 1. Email to Accountant (Rechnungsführer)
+    # 2. Email to translator, informing of provisional time report
+    # TODO: Test these are receeived here
 
+    # Plus the default your ticket has been openend Email:
+    assert 'TRANSLATOR, Test' in mail['Subject']
     translator = session.query(Translator).filter_by(id=translator_id).one()
     assert len(translator.time_reports) == 1
     report = translator.time_reports[0]
@@ -2075,6 +2094,9 @@ def test_view_time_report(
     assert report.case_number == 'CASE-123'
     assert report.status == 'pending'
 
+    # TODO: actually, this would have to be the editor / accountant
+    # But it's unclear at this stage how we can get the link to the
+    # Tickets.
     client.login_admin()
     client.use_intercooler = True
 

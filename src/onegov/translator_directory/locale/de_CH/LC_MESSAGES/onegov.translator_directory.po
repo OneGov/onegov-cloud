@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-12 10:56+0100\n"
+"POT-Creation-Date: 2025-11-12 17:11+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -84,6 +84,12 @@ msgstr "Verhandlungsdolmetschen"
 
 msgid "Whisper interpreting"
 msgstr "Flüsterdolmetschen"
+
+msgid "telephonic"
+msgstr "telefonisch"
+
+msgid "On Site"
+msgstr "Vor Ort"
 
 msgid "Logout"
 msgstr "Abmelden"
@@ -527,11 +533,17 @@ msgstr ""
 msgid "Type of translation/interpreting"
 msgstr "Art der Übersetzung/Dolmetschung"
 
-msgid "Duration (hours)"
-msgstr "Zeitdauer (Stunden)"
+msgid "Start date"
+msgstr "Startdatum"
 
-msgid "Minimum 0.5 hours"
-msgstr "Minimum halbe Stunde"
+msgid "Start time"
+msgstr "Startzeit"
+
+msgid "End date"
+msgstr "Enddatum"
+
+msgid "End time"
+msgstr "Endzeit"
 
 msgid "Case number (Police)"
 msgstr "Geschäftsnummer (Polizei)"
@@ -539,44 +551,17 @@ msgstr "Geschäftsnummer (Polizei)"
 msgid "Geschäftsnummer Police for linking if needed"
 msgstr "Geschäftsnummer Polizei zur Verknüpfung, falls erforderlich"
 
-msgid "Assignment date"
-msgstr "Einsatzdatum"
-
-msgid "Night work (20:00 - 06:00)"
-msgstr "Nachtarbeit (20:00 - 06:00)"
-
-msgid "50% surcharge"
-msgstr "50% Zuschlag"
-
-msgid "Weekend or holiday"
-msgstr "Wochenende oder Feiertag"
+msgid "Exceptionally urgent"
+msgstr "Ausserordenlich dringlich"
 
 msgid "25% surcharge"
 msgstr "25% Zuschlag"
 
-msgid "Exceptionally urgent"
-msgstr "Ausserordenlich dringlich"
-
-msgid "Travel distance"
-msgstr "Wegpauschalen"
-
 msgid "Notes"
 msgstr "Notizen"
 
-msgid "No travel"
-msgstr "Keine Reise"
-
-msgid "Up to 25 km (CHF 20)"
-msgstr "Bis 25 km (CHF 20)"
-
-msgid "25-50 km (CHF 50)"
-msgstr "25-50 km (CHF 50)"
-
-msgid "50-100 km (CHF 100)"
-msgstr "50-100 km (CHF 100)"
-
-msgid "Over 100 km (CHF 150)"
-msgstr "Über 100 km (CHF 150)"
+msgid "End time must be after start time"
+msgstr "Endzeit muss nach Startzeit liegen"
 
 msgid "Address"
 msgstr "Anschrift"
@@ -713,9 +698,6 @@ msgstr "Zeiterfassung"
 msgid "Assignment Date"
 msgstr "Einsatzdatum"
 
-msgid "Duration"
-msgstr "Dauer"
-
 msgid "Type"
 msgstr "Art"
 
@@ -725,8 +707,26 @@ msgstr "Geschäftsnummer"
 msgid "Hourly Rate"
 msgstr "Stundenansatz"
 
+msgid "Duration"
+msgstr "Dauer"
+
+msgid "Base pay"
+msgstr "Grundentschädigung"
+
+msgid "Night work (20:00 - 06:00)"
+msgstr "Nachtarbeit (20:00 - 06:00)"
+
+msgid "Weekend or holiday"
+msgstr "Wochenende oder Feiertag"
+
 msgid "Surcharge"
 msgstr "Zuschlag"
+
+msgid "Surcharge amount"
+msgstr "Zuschlagsbetrag"
+
+msgid "Subtotal (work compensation)"
+msgstr "Zwischensumme (Arbeitsentschädigung)"
 
 msgid "Travel"
 msgstr "Reise"
