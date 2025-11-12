@@ -58,8 +58,8 @@ from wtforms.validators import Optional
 from wtforms.validators import URL as URLValidator
 from wtforms.validators import ValidationError
 
-
 from typing import Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from onegov.org.models import Organisation
@@ -231,6 +231,13 @@ class FooterSettingsForm(Form):
         render_kw={'rows': 8},
         fieldset=_('Information'))
 
+    contact_url_label = StringField(
+        label=_('Contact Link Label'),
+        description=_("Label for Contact Link. Default: 'more'"),
+        fieldset=_('Information'),
+        validators=[Optional()],
+    )
+
     contact_url = URLField(
         label=_('Contact Link'),
         description=_('URL pointing to a contact page'),
@@ -244,6 +251,13 @@ class FooterSettingsForm(Form):
         description=_('The opening hours of the municipality'),
         render_kw={'rows': 8},
         fieldset=_('Information'))
+
+    opening_hours_url_label = StringField(
+        label=_('Opening Hours Link Label'),
+        description=_("Label for Opening Hours Link. Default: 'more'"),
+        fieldset=_('Information'),
+        validators=[Optional()],
+    )
 
     opening_hours_url = URLField(
         label=_('Opening Hours Link'),
