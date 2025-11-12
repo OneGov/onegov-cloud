@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-12 10:29+0100\n"
+"POT-Creation-Date: 2025-11-12 10:56+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -518,6 +518,12 @@ msgstr "Buchhaltung"
 msgid "Email address of the person responsible for accounting"
 msgstr "E-Mail-Adresse der für die Buchhaltung verantwortlichen Person"
 
+msgid ""
+"No user with this email address exists. Please create a user account first."
+msgstr ""
+"Es existiert kein Benutzer mit dieser E-Mail-Adresse. Bitte erstellen Sie "
+"zuerst ein Benutzerkonto."
+
 msgid "Type of translation/interpreting"
 msgstr "Art der Übersetzung/Dolmetschung"
 
@@ -872,6 +878,12 @@ msgstr "Export für Buchhaltung"
 msgid "No time reports found"
 msgstr "Keine Zeiterfassungen gefunden"
 
+msgid "Created"
+msgstr "Erstellt"
+
+msgid "View Ticket"
+msgstr "Ticket anzeigen"
+
 msgid "This translator is in the admission process!"
 msgstr "Dieser Übersetzer ist im Zulassungsverfahren!"
 
@@ -895,8 +907,8 @@ msgid ""
 "Accountant email is not configured. Please configure it in the settings: "
 "${settings_url}"
 msgstr ""
-"E-Mail Rechnungsführer:in ist noch nicht konfiguriert. Bitte fügen sie eine E-Mail hinzu: "
-"${settings_url}"
+"E-Mail Rechnungsführer:in ist noch nicht konfiguriert. Bitte fügen sie eine "
+"E-Mail hinzu: ${settings_url}"
 
 msgid "Your ticket has been opened"
 msgstr "Ihr Ticket wurde eröffnet"
