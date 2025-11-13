@@ -445,6 +445,16 @@ var ReservationSelection = React.createClass({
                     this.props.reservations.length === 0 &&
                         <p>{locale("Select allocations in the list to reserve them")}</p>
                 }
+                {this.props.reservations.length > 8 && (
+                    <div>
+                        <a onClick={self.handleRemoveAll} role="button" className={this.props.reservations.length === 0 && 'disabled button secondary' || 'button alert'}>
+                            {locale("Remove all")}
+                        </a>
+                        <a onClick={self.handleSubmit} role="button" className={this.props.reservations.length === 0 && this.props.delete_link && 'disabled button secondary' || 'button'}>
+                            {locale("Reserve")}
+                        </a>
+                    </div>
+                )}
                 {
                     this.props.reservations.length > 0 &&
                         <ul>{
