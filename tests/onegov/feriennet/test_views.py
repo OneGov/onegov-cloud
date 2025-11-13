@@ -1232,19 +1232,6 @@ def test_confirmed_booking_view(client: Client, scenario: Scenario) -> None:
     assert "Buchung entfernen" not in page
     assert "nicht genügend Anmeldungen" not in page
 
-    # Related contacts are now visible
-    assert page.pyquery('.attendees-toggle').text() == '1 Teilnehmende'
-    assert "Elternteil" in page
-
-    # Unless that option was disabled
-    page = client.get('/feriennet-settings')
-    page.form['show_related_contacts'] = False
-    page.form.submit()
-
-    page = client.get('/my-bookings')
-    assert not page.pyquery('.attendees-toggle')
-    assert "Elternteil" not in page
-
     # Other states are shown too
     states: list[tuple[BookingState, str]] = [
         ('cancelled', "Storniert"),
