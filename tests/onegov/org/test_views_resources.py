@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import os
+from uuid import uuid4
+
 import pytest
 import re
 import tempfile
@@ -21,10 +23,10 @@ from onegov.core.utils import module_path, normalize_for_url
 from onegov.file import FileCollection
 from onegov.form import FormSubmission
 from onegov.org.models import ResourceRecipientCollection
-from onegov.pay import Payment, ManualPayment
+from onegov.pay import Payment, ManualPayment, PaymentCollection, InvoiceCollection
 from onegov.pdf.utils import extract_pdf_info
 from onegov.reservation import Resource, ResourceCollection
-from onegov.ticket import TicketCollection
+from onegov.ticket import TicketCollection, TicketInvoice
 from onegov.user import UserCollection, User
 from openpyxl import load_workbook
 from pathlib import Path
@@ -501,7 +503,7 @@ def test_resource_room_deletion(client: Client) -> None:
 
 
 def test_resource_room_deletion_with_future_reservation_file_and_payment(
-        client: Client,
+    client: Client,
 ) -> None:
     session = client.app.session()
     resources = ResourceCollection(client.app.libres_context)
@@ -522,15 +524,15 @@ def test_resource_room_deletion_with_future_reservation_file_and_payment(
     daypass.files = [readme_file]
 
     hall = resources.add('Town Hall', 'Europe/Zurich', type='room')
+    hall.pricing_method = 'per_item'
+    hall.price_per_hour = 999.00
+    hall.payment_method = 'manual'
     add_reservation(
         hall,
         session,
         datetime(2038, 11, 6, 12),
         datetime(2038, 11, 6, 16),
     )
-    hall.pricing_method = 'per_item'
-    hall.price_per_hour = 999.00
-    hall.payment_method = 'manual'
 
     lopper = resources.add('Lopper', 'Europe/Zurich', type='daily-item')
     add_reservation(
@@ -552,15 +554,68 @@ def test_resource_room_deletion_with_future_reservation_file_and_payment(
 
     for ticket in tickets.query().all():
         assert ticket.state == 'open'
-    ticket.accept_ticket(admin)
-    if 'Town Hall' in ticket.group:
-        ticket.payment = ManualPayment(
-            amount=Decimal(999), currency='CHF', state='paid')
-    if 'Daypass' in ticket.group:
-        ticket.payment = ManualPayment(
-            amount=Decimal(10), currency='CHF', state='open')
+        ticket.accept_ticket(admin)
+
+        if 'Town Hall' in ticket.group:
+            # ticket.payment = ManualPayment(
+            ticket.payment = Payment(
+                source='manual',
+                amount=Decimal(999),
+                currency='CHF',
+                state='paid'
+            )
+            invoice = TicketInvoice(id=uuid4())
+            session.add(invoice)
+            ticket.invoice = invoice
+            invoice_item = ticket.invoice.add(
+                text='Town Hall Cleaning',
+                group='manual',
+                kind='surcharge',
+                cost_object='Town Hall',
+                unit=Decimal(100)
+            )
+            invoice_item.payment_date = date.today()
+            invoice_item.payments.append(ticket.payment)
+            invoice_item.paid = ticket.payment.state == 'paid'
+
+        if 'Daypass' in ticket.group:
+            ticket.payment = Payment(
+                source='stripe_connect',
+                amount=Decimal(10),
+                currency='CHF',
+                state='open'
+            )
+            invoice = TicketInvoice(id=uuid4())
+            session.add(invoice)
+            ticket.invoice = invoice
+            invoice_item = ticket.invoice.add(
+                text='Daypass Discount',
+                group='manual',
+                kind='discount',
+                cost_object='Daypass',
+                unit=Decimal(1)
+            )
+            invoice_item.payment_date = date.today()
+            invoice_item.payments.append(ticket.payment)
+            invoice_item.paid = ticket.payment.state == 'paid'
 
     transaction.commit()
+
+    assert PaymentCollection(session).query().count() == 2
+    assert InvoiceCollection(session).query().count() == 2
+    assert InvoiceCollection(session).query_items().count() == 2
+
+    tickets = TicketCollection(session)
+    for index, ticket in enumerate(tickets.query().all()):
+        assert ticket.state == 'pending'
+        assert not ticket.snapshot
+
+        if 'Daypass' in ticket.group:
+            assert ticket.payment and ticket.payment.paid is False
+        if 'Town Hall' in ticket.group:
+            assert ticket.payment and ticket.payment.paid is True
+        if 'Lopper' in ticket.group:
+            assert ticket.payment is None
 
     # delete resource
     client.login_admin()
@@ -578,14 +633,18 @@ def test_resource_room_deletion_with_future_reservation_file_and_payment(
     tickets = TicketCollection(client.app.session())
     for index, ticket in enumerate(tickets.query().all()):
         assert ticket.state == 'closed'
-    assert ticket.snapshot is not None
-    if 'Daypass' in ticket.group:
-        assert ticket.payment and ticket.payment.paid is False
-    if 'Town Hall' in ticket.group:
-        assert ticket.payment and ticket.payment.paid is True
-    print('Found paid payment')
-    if 'Lopper' in ticket.group:
-        assert ticket.payment is None
+        assert ticket.snapshot is not None
+
+        if 'Daypass' in ticket.group:
+            assert ticket.payment is None
+        if 'Town Hall' in ticket.group:
+            assert ticket.payment is None
+        if 'Lopper' in ticket.group:
+            assert ticket.payment is None
+
+    assert PaymentCollection(session).query().count() == 0
+    assert InvoiceCollection(session).query().count() == 0
+    assert InvoiceCollection(session).query_items().count() == 0
 
 
 def test_reserved_resources_fields(client: Client) -> None:

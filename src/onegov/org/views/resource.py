@@ -31,6 +31,7 @@ from onegov.org.models.resource import (
     DaypassResource, FindYourSpotCollection, RoomResource, ItemResource)
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
+from onegov.org.models.ticket import ReservationTicket
 from onegov.org.pdf.my_reservations import MyReservationsPdf
 from onegov.org.utils import group_by_column, keywords_first
 from onegov.org.views.utils import assert_citizen_logged_in
@@ -41,7 +42,7 @@ from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
 from sqlalchemy import and_, func, select, cast as sa_cast, Boolean
-from sqlalchemy.orm import undefer
+from sqlalchemy.orm import undefer, joinedload
 from webob import exc
 
 
@@ -972,27 +973,34 @@ def handle_delete_resource(self: Resource, request: OrgRequest) -> None:
     tickets = TicketCollection(request.session)
     payments = PaymentCollection(request.session)
 
-    def handle_reservation_tickets(reservation: BaseReservation) -> None:
-        ticket = tickets.by_handler_id(reservation.token.hex)
+    def handle_reservation_ticket(ticket: ReservationTicket) -> None:
         if ticket:
             assert request.current_user is not None
 
             close_ticket(ticket, request.current_user, request)
             ticket.create_snapshot(request)
 
-            if reservation.payment:  # type: ignore[attr-defined]
-                # unlink payment
-                reservation.payment = None  # type: ignore[attr-defined]
+            if ticket.payment:
+                for invoice_item in ticket.invoice.items:
+                    invoice_item.payments = []
+                    request.session.delete(invoice_item)
 
-            payment = ticket.handler.payment
-            if payment and payments.query().filter_by(id=payment.id).first():
-                payments.delete(payment)
+                if ticket.invoice:
+                    request.session.delete(ticket.invoice)
+
+                ticket.payment.invoice = None
+                ticket.invoice = None
+                ticket.invoice_id = None
+
+                request.session.delete(ticket.payment)  # ?
+                ticket.payment = None
+                ticket.payment_id = None
 
     collection = ResourceCollection(request.app.libres_context)
     collection.delete(
         self,
         including_reservations=True,
-        handle_reservation=handle_reservation_tickets
+        handle_reservation_ticket=handle_reservation_ticket,
     )
 
 
