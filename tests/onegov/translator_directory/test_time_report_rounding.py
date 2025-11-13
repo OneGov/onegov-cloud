@@ -1,17 +1,8 @@
-"""
-Tests for time report duration rounding logic.
-
-This is critical as actual money is involved in translator compensation.
-The rounding logic ensures translators are billed in 30-minute increments,
-always rounding UP.
-"""
 from __future__ import annotations
 
 from datetime import datetime, time
 from decimal import Decimal
-
 import pytest
-
 from onegov.core.utils import Bunch
 from onegov.translator_directory.forms.time_report import (
     TranslatorTimeReportForm
@@ -23,6 +14,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .conftest import TestApp
 
+"""
+Should generally round UP to the nearest 0.5 hour (30 minutes).
+"""
 
 def test_rounding_to_nearest_half_hour(translator_app: TestApp) -> None:
     """Test that duration is rounded up to nearest 0.5 hour."""
@@ -284,3 +278,147 @@ def test_parametric_rounding(
         f'{minutes} minutes should round to {expected_rounded_hours} hours, '
         f'but got {result}'
     )
+
+
+def test_money_calculation_accuracy(translator_app: TestApp) -> None:
+    """Test that rounding affects payment amounts correctly."""
+    session = translator_app.session()
+    translator = create_translator(translator_app, admission='certified')
+
+    request: object = Bunch(
+        app=translator_app,
+        session=session,
+        locale='de_CH',
+        translate=lambda x: str(x),
+    )
+
+    form = TranslatorTimeReportForm()
+    form.request = request  # type: ignore[assignment]
+    form.on_request()
+
+    # Scenario 1: 35 minutes work (0.58... hours actual)
+    # Should round to 1.0 hour
+    # Payment: 90 CHF (certified rate) * 1.0 = 90 CHF
+    form.start_date.data = datetime(2025, 1, 1).date()
+    form.start_time.data = time(9, 0)
+    form.end_date.data = datetime(2025, 1, 1).date()
+    form.end_time.data = time(9, 35)
+
+    duration = form.get_duration_hours()
+    assert duration == Decimal('1.0')
+    payment = form.get_hourly_rate(translator) * duration
+    assert payment == Decimal('90.00')
+
+    # Scenario 2: 2 hours 1 minute work (2.0166... hours actual)
+    # Should round to 2.5 hours
+    # Payment: 90 CHF * 2.5 = 225 CHF
+    form.end_time.data = time(11, 1)
+    duration = form.get_duration_hours()
+    assert duration == Decimal('2.5')
+    payment = form.get_hourly_rate(translator) * duration
+    assert payment == Decimal('225.00')
+
+    # Scenario 3: Uncertified translator, 45 minutes
+    # Should round to 1.0 hour
+    # Payment: 75 CHF * 1.0 = 75 CHF
+    translator_uncert = create_translator(
+        translator_app,
+        admission='uncertified',
+        email='uncert@test.com',
+        pers_id=9999,
+    )
+    form.end_time.data = time(9, 45)
+    duration = form.get_duration_hours()
+    assert duration == Decimal('1.0')
+    payment = form.get_hourly_rate(translator_uncert) * duration
+    assert payment == Decimal('75.00')
+
+
+def test_rounding_never_rounds_down(translator_app: TestApp) -> None:
+    """Test that rounding always rounds up, never down."""
+    session = translator_app.session()
+    translator = create_translator(translator_app)
+
+    request: object = Bunch(
+        app=translator_app,
+        session=session,
+        locale='de_CH',
+        translate=lambda x: str(x),
+    )
+
+    form = TranslatorTimeReportForm()
+    form.request = request  # type: ignore[assignment]
+    form.on_request()
+
+    test_cases = [
+        # (minutes, minimum_expected_hours)
+        (1, 0.5),  # Even 1 minute gets paid 30 minutes
+        (25, 0.5),
+        (29, 0.5),
+        (31, 1.0),  # Just over 30 min rounds to full hour
+        (59, 1.0),
+        (61, 1.5),
+        (89, 1.5),
+        (91, 2.0),
+    ]
+
+    for minutes, min_expected_hours in test_cases:
+        hours = minutes // 60
+        remaining_minutes = minutes % 60
+
+        form.start_date.data = datetime(2025, 1, 1).date()
+        form.start_time.data = time(9, 0)
+        form.end_date.data = datetime(2025, 1, 1).date()
+        form.end_time.data = time(9 + hours, remaining_minutes)
+
+        duration = form.get_duration_hours()
+        actual_hours = Decimal(minutes) / Decimal(60)
+
+        # Rounded duration must be >= actual duration
+        assert duration >= actual_hours, (
+            f'{minutes} min: rounded {duration}h '
+            f'should be >= actual {actual_hours}h'
+        )
+
+        # Rounded duration must be >= minimum expected
+        assert duration >= Decimal(str(min_expected_hours)), (
+            f'{minutes} min: rounded {duration}h '
+            f'should be >= {min_expected_hours}h'
+        )
+
+
+def test_rounding_consistency(translator_app: TestApp) -> None:
+    """Test that the same duration produces consistent rounding."""
+    session = translator_app.session()
+    translator = create_translator(translator_app)
+
+    request = Bunch(
+        app=translator_app,
+        session=session,
+        locale='de_CH',
+        translate=lambda x: str(x),
+    )
+
+    form = TranslatorTimeReportForm()
+    form.request = request  # type: ignore[assignment]
+    form.on_request()
+
+    # Test: 1 hour 25 minutes via different start times
+    # All should round to 1.5 hours
+    test_times = [
+        (time(9, 0), time(10, 25)),
+        (time(14, 30), time(15, 55)),
+        (time(22, 0), time(23, 25)),
+    ]
+
+    for start_time, end_time in test_times:
+        form.start_date.data = datetime(2025, 1, 1).date()
+        form.start_time.data = start_time
+        form.end_date.data = datetime(2025, 1, 1).date()
+        form.end_time.data = end_time
+
+        duration = form.get_duration_hours()
+        assert duration == Decimal('1.5'), (
+            f'1h 25m from {start_time} to {end_time} '
+            f'should always be 1.5h, got {duration}h'
+        )
