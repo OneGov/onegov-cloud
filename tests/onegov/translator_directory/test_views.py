@@ -5,6 +5,9 @@ import re
 import docx
 import transaction
 
+from decimal import Decimal
+from datetime import date
+
 from freezegun import freeze_time
 from io import BytesIO
 from onegov.core.utils import module_path
@@ -20,6 +23,9 @@ from onegov.gis import Coordinates
 from onegov.pdf import Pdf
 from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
+from onegov.translator_directory.models.time_report import (
+    TranslatorTimeReport
+)
 from onegov.user import UserCollection
 from openpyxl import load_workbook
 from pdftotext import PDF  # type: ignore[import-not-found]
@@ -2023,7 +2029,12 @@ def test_basic_search(client_with_fts: Client) -> None:
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
-def test_view_time_report(broadcast, authenticate, connect, client):
+def test_view_time_report(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
     """Test editor submitting time report."""
     session = client.app.session()
     languages = create_languages(session)
@@ -2180,3 +2191,39 @@ def test_member_cannot_submit_mutation(
     assert translator is not None
 
     client.get(f'/translator/{translator.id.hex}/report-change', status=403)
+
+
+def test_view_time_reports(client: Client) -> None:
+
+    session = client.app.session()
+    translators = TranslatorCollection(client.app)
+    translator = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+    )
+
+    report = TranslatorTimeReport(
+        translator_id=translator.id,
+        assignment_type='consecutive',
+        duration=90,
+        case_number='CASE-001',
+        assignment_date=date(2025, 1, 15),
+        hourly_rate=Decimal('90.0'),
+        surcharge_percentage=Decimal('25.0'),
+        travel_compensation=Decimal('50.0'),
+        total_compensation=Decimal('162.75'),
+        status='pending',
+    )
+    session.add(report)
+    session.flush()
+    report_id = report.id
+    transaction.commit()
+
+    client.login_admin()
+    page = client.get('/time-reports')
+    assert 'CASE-001' in page
+
+    page = client.get(f'/time-report/{report_id}')
+    assert 'CASE-001' in page

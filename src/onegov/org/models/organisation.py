@@ -93,8 +93,10 @@ class Organisation(Base, TimestampMixin):
     # meta bound values
     custom_css: dict_property[str | None] = meta_property()
     contact: dict_property[str | None] = meta_property()
+    contact_url_label: dict_property[str | None] = meta_property()
     contact_url: dict_property[str | None] = meta_property()
     opening_hours: dict_property[str | None] = meta_property()
+    opening_hours_url_label: dict_property[str | None] = meta_property()
     opening_hours_url: dict_property[str | None] = meta_property()
     about_url: dict_property[str | None] = meta_property()
     reply_to: dict_property[str | None] = meta_property()

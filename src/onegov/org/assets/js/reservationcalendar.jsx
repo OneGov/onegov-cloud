@@ -111,7 +111,7 @@ rc.getFullcalendarOptions = function(rcExtendOptions) {
         // the fullcalendar default options
         fc: {
             allDaySlot: false,
-            height: '800px',
+            height: 'auto',
             events: rcOptions.feed,
             slotMinTime: rcOptions.minTime,
             slotMaxTime: rcOptions.maxTime,

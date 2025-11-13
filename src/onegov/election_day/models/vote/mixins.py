@@ -21,7 +21,7 @@ class DerivedAttributesMixin:
     if TYPE_CHECKING:
         yeas_percentage: Column[float]
         nays_percentage: Column[float]
-        accepted: Column[bool]
+        accepted: Column[bool | None]
 
     @hybrid_property  # type: ignore[no-redef]
     def yeas_percentage(self) -> float:
@@ -50,11 +50,11 @@ class DerivedAttributesMixin:
         return 100 - self.yeas_percentage
 
     @hybrid_property  # type:ignore[no-redef]
-    def accepted(self) -> bool:
+    def accepted(self) -> bool | None:
         return self.yeas > self.nays if self.counted else None
 
     @accepted.expression  # type:ignore[no-redef]
-    def accepted(cls) -> ColumnElement[bool]:
+    def accepted(cls) -> ColumnElement[bool | None]:
         return case({True: cls.yeas > cls.nays}, cls.counted)
 
 

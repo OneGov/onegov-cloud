@@ -6,8 +6,8 @@ import transaction
 from onegov.chat.collections import ChatCollection
 from tests.shared import utils
 
-
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from .conftest import Client
 
@@ -144,12 +144,12 @@ def test_announcement(client: Client) -> None:
 
     assert text in page
     assert (
-        f'<div id="header_announcement" '
-        f'style="background-color: {bg_color};">'
-    ) in page
+               f'<div id="header_announcement" '
+               f'style="background-color: {bg_color};">'
+           ) in page
     assert (
-        f'<a style="color: {color}" href="https://other-town.ch"'
-    ) in page
+               f'<a style="color: {color}" href="https://other-town.ch"'
+           ) in page
 
 
 def test_search_in_header(client_with_fts: Client) -> None:
@@ -246,10 +246,10 @@ def test_chat_archive(client: Client) -> None:
 
     chat.chat_history = [
         {"text": "Heyhey", "time": "18:22",
-            "user": "Chantal Trutmann", "userId": "customer"},
+         "user": "Chantal Trutmann", "userId": "customer"},
         {"text": "Guten Tag, wie kann ich Ihnen helfen?", "time": "18:25",
-            "user": "admin@example.org", "userId":
-            "7f9f7fb2a56f4c0eb1e63f667e0e64dc"},
+         "user": "admin@example.org", "userId":
+             "7f9f7fb2a56f4c0eb1e63f667e0e64dc"},
         {"text": "Ich habe eine Frage zu Thema XYZ. ", "time": "18:26", "user":
             "Chantal Trutmann", "userId": "customer"}]
     chat.active = False
@@ -316,3 +316,57 @@ def test_footer_settings_custom_links(client: Client) -> None:
     assert (f'<a class="footer-link" '
             f'href="{custom_url}">{custom_name}</a>') in page
     assert 'Custom2' not in page
+
+
+def test_footer_settings_contact_url_label(client: Client) -> None:
+    client.login_admin()
+
+    url = 'https://www.happy.coding.ch'
+
+    # initial, no contact url set, no link
+    page = client.get('/')
+    assert 'mehr' not in page
+    assert url not in page
+
+    # footer settings custom contact link label
+    settings = client.get('/footer-settings')
+    settings.form['contact_url_label'] = 'Contact Form'
+    settings.form['contact_url'] = url
+    page = settings.form.submit().follow()
+    assert 'Contact Form' in page
+    assert url in page
+
+    # footer settings default contact link label
+    settings = client.get('/footer-settings')
+    settings.form['contact_url_label'] = ''
+    settings.form['contact_url'] = url
+    page = settings.form.submit().follow()
+    assert 'mehr' in page
+    assert url in page
+
+
+def test_footer_settings_opening_hours_url_label(client: Client) -> None:
+    client.login_admin()
+
+    url = 'https://www.abc.ch'
+
+    # initial, no opening hours url set, no link
+    page = client.get('/')
+    assert 'mehr' not in page
+    assert url not in page
+
+    # footer settings custom opening our link label
+    settings = client.get('/footer-settings')
+    settings.form['opening_hours_url_label'] = 'Special abc'
+    settings.form['opening_hours_url'] = url
+    page = settings.form.submit().follow()
+    assert 'Special abc' in page
+    assert url in page
+
+    # footer settings default opening hour link label
+    settings = client.get('/footer-settings')
+    settings.form['opening_hours_url_label'] = ''
+    settings.form['opening_hours_url'] = url
+    page = settings.form.submit().follow()
+    assert 'mehr' in page
+    assert url in page

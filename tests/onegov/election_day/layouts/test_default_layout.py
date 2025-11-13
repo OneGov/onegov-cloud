@@ -1,16 +1,21 @@
+from __future__ import annotations
+
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_default_layout():
-    layout_de = DefaultLayout(None, DummyRequest(locale='de'))
-    layout_en = DefaultLayout(None, DummyRequest(locale='en'))
-    layout_fr = DefaultLayout(None, DummyRequest(locale='fr'))
-    layout_it = DefaultLayout(None, DummyRequest(locale='it'))
-    layout_rm = DefaultLayout(None, DummyRequest(locale='rm'))
+from typing import Any
 
-    request = DummyRequest()
+
+def test_default_layout() -> None:
+    layout_de = DefaultLayout(None, DummyRequest(locale='de'))  # type: ignore[arg-type]
+    layout_en = DefaultLayout(None, DummyRequest(locale='en'))  # type: ignore[arg-type]
+    layout_fr = DefaultLayout(None, DummyRequest(locale='fr'))  # type: ignore[arg-type]
+    layout_it = DefaultLayout(None, DummyRequest(locale='it'))  # type: ignore[arg-type]
+    layout_rm = DefaultLayout(None, DummyRequest(locale='rm'))  # type: ignore[arg-type]
+
+    request: Any = DummyRequest()
     model = Vote()
     layout = DefaultLayout(model, request)
     assert layout.principal == request.app.principal
@@ -33,8 +38,10 @@ def test_default_layout():
     assert layout_it.terms_link == 'https://opendata.swiss/it/terms-of-use'
     assert layout_rm.terms_link == 'https://opendata.swiss/rm/terms-of-use'
 
-    base_url = 'https://github.com/OneGov/onegov-cloud/blob/master/src' \
-               '/onegov/election_day/static/docs/api/'
+    base_url = (
+        'https://github.com/OneGov/onegov-cloud/blob/master/src'
+        '/onegov/election_day/static/docs/api/'
+    )
 
     assert layout_de.opendata_link == (
         base_url + 'open_data_de.md'
@@ -75,7 +82,7 @@ def test_default_layout():
     )
 
     layout_de = DefaultLayout(
-        None, DummyRequest(locale='de', is_logged_in=True)
+        None, DummyRequest(locale='de', is_logged_in=True)  # type: ignore[arg-type]
     )
 
     assert layout_de.login_link is None
