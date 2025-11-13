@@ -233,6 +233,7 @@ class Scenario(BaseScenario, Generic[ActivityT]):
     def add_user(
         self,
         complete_profile: bool = True,
+        show_contact_data_to_others: bool = False,
         **columns: Any
     ) -> User:
         columns.setdefault('role', 'admin')
@@ -255,6 +256,9 @@ class Scenario(BaseScenario, Generic[ActivityT]):
             user.data['place'] = self.faker.city()
             user.data['political_municipality'] = self.faker.city()
             user.data['emergency'] = f'123 456 789 ({self.faker.name()})'
+            user.data['show_contact_data_to_others'] = (
+                show_contact_data_to_others
+            )
 
         return user
 
