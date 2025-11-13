@@ -166,12 +166,6 @@ class ResourceCollection:
                 for ticket in stmt:
                     handle_reservation_ticket(ticket)
 
-            for reservation in scheduler.managed_reservations():
-                if reservation.payment:  # type:ignore[attr-defined]
-                    self.session.delete(reservation.payment)
-                    # unlink payment
-                    reservation.payment = None  # type:ignore[attr-defined]
-
             scheduler.extinguish_managed_records()
 
         if resource.files:

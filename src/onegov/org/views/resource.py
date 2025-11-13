@@ -31,18 +31,16 @@ from onegov.org.models.resource import (
     DaypassResource, FindYourSpotCollection, RoomResource, ItemResource)
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
-from onegov.org.models.ticket import ReservationTicket
 from onegov.org.pdf.my_reservations import MyReservationsPdf
 from onegov.org.utils import group_by_column, keywords_first
 from onegov.org.views.utils import assert_citizen_logged_in
 from onegov.reservation import ResourceCollection, Resource, Reservation
-from onegov.ticket import Ticket, TicketCollection
-from onegov.pay import PaymentCollection
+from onegov.ticket import Ticket
 from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
 from sqlalchemy import and_, func, select, cast as sa_cast, Boolean
-from sqlalchemy.orm import undefer, joinedload
+from sqlalchemy.orm import undefer
 from webob import exc
 
 
@@ -52,6 +50,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Mapping
     from libres.db.models import Reservation as BaseReservation
     from onegov.core.types import JSON_ro, RenderData
+    from onegov.org.models.ticket import ReservationTicket
     from onegov.org.request import OrgRequest
     from onegov.reservation import Allocation
     from sedate.types import DateLike
@@ -970,8 +969,6 @@ def view_resource(
 def handle_delete_resource(self: Resource, request: OrgRequest) -> None:
 
     request.assert_valid_csrf_token()
-    tickets = TicketCollection(request.session)
-    payments = PaymentCollection(request.session)
 
     def handle_reservation_ticket(ticket: ReservationTicket) -> None:
         if ticket:
@@ -981,6 +978,8 @@ def handle_delete_resource(self: Resource, request: OrgRequest) -> None:
             ticket.create_snapshot(request)
 
             if ticket.payment:
+                # unlink payment from invoice items, delete invoice
+                # items and finally delete invoice
                 for invoice_item in ticket.invoice.items:
                     invoice_item.payments = []
                     request.session.delete(invoice_item)
@@ -988,11 +987,17 @@ def handle_delete_resource(self: Resource, request: OrgRequest) -> None:
                 if ticket.invoice:
                     request.session.delete(ticket.invoice)
 
+                # unlink payment and invoice from ticket
                 ticket.payment.invoice = None
                 ticket.invoice = None
                 ticket.invoice_id = None
 
-                request.session.delete(ticket.payment)  # ?
+                # unlink payment from reservation
+                for reservation in ticket.handler.reservations:
+                    reservation.payment = None
+
+                # delete payment
+                request.session.delete(ticket.payment)
                 ticket.payment = None
                 ticket.payment_id = None
 
