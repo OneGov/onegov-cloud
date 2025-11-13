@@ -23,7 +23,7 @@ from onegov.core.utils import module_path, normalize_for_url
 from onegov.file import FileCollection
 from onegov.form import FormSubmission
 from onegov.org.models import ResourceRecipientCollection
-from onegov.pay import Payment, ManualPayment, PaymentCollection, InvoiceCollection
+from onegov.pay import Payment, PaymentCollection, InvoiceCollection
 from onegov.pdf.utils import extract_pdf_info
 from onegov.reservation import Resource, ResourceCollection
 from onegov.ticket import TicketCollection, TicketInvoice

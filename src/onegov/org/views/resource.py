@@ -977,25 +977,25 @@ def handle_delete_resource(self: Resource, request: OrgRequest) -> None:
             close_ticket(ticket, request.current_user, request)
             ticket.create_snapshot(request)
 
+            # unlink payment from invoice items, delete invoice
+            # items and finally delete invoice and unlink from ticket
+            if ticket.invoice:
+                for invoice_item in ticket.invoice.items:
+                    invoice_item.payments = []
+                    request.session.delete(invoice_item)
+
+                request.session.delete(ticket.invoice)
+
+                # unlink invoice from ticket
+                ticket.invoice = None
+                ticket.invoice_id = None
+
+            # unlink payment from reservation
+            for reservation in ticket.handler.reservations:
+                reservation.payment = None
+
             if ticket.payment:
-                # unlink payment from invoice items, delete invoice
-                # items and finally delete invoice
-                if ticket.invoice:
-                    for invoice_item in ticket.invoice.items:
-                        invoice_item.payments = []
-                        request.session.delete(invoice_item)
-
-                    request.session.delete(ticket.invoice)
-
-                    # unlink invoice from ticket
-                    ticket.invoice = None
-                    ticket.invoice_id = None
-
-                # unlink payment from reservation
-                for reservation in ticket.handler.reservations:
-                    reservation.payment = None
-
-                # unlink and delete payment from ticket
+                # delete payment from ticket
                 request.session.delete(ticket.payment)
                 ticket.payment = None
                 ticket.payment_id = None
