@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-10-22 14:11+0200\n"
+"POT-Creation-Date: 2025-11-12 17:11+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -84,6 +84,12 @@ msgstr "Verhandlungsdolmetschen"
 
 msgid "Whisper interpreting"
 msgstr "Flüsterdolmetschen"
+
+msgid "telephonic"
+msgstr "telefonisch"
+
+msgid "On Site"
+msgstr "Vor Ort"
 
 msgid "Logout"
 msgstr "Abmelden"
@@ -509,14 +515,35 @@ msgstr "Link zur Einverständniserklärung"
 msgid "Accreditation"
 msgstr "Akkreditierung"
 
+msgid "Accountant email"
+msgstr "E-Mail Rechnungsführer:in"
+
+msgid "Accounting"
+msgstr "Buchhaltung"
+
+msgid "Email address of the person responsible for accounting"
+msgstr "E-Mail-Adresse der für die Buchhaltung verantwortlichen Person"
+
+msgid ""
+"No user with this email address exists. Please create a user account first."
+msgstr ""
+"Es existiert kein Benutzer mit dieser E-Mail-Adresse. Bitte erstellen Sie "
+"zuerst ein Benutzerkonto."
+
 msgid "Type of translation/interpreting"
 msgstr "Art der Übersetzung/Dolmetschung"
 
-msgid "Duration (hours)"
-msgstr "Zeitdauer (Stunden)"
+msgid "Start date"
+msgstr "Startdatum"
 
-msgid "Minimum 0.5 hours"
-msgstr "Minimum halbe Stunde"
+msgid "Start time"
+msgstr "Startzeit"
+
+msgid "End date"
+msgstr "Enddatum"
+
+msgid "End time"
+msgstr "Endzeit"
 
 msgid "Case number (Police)"
 msgstr "Geschäftsnummer (Polizei)"
@@ -524,44 +551,17 @@ msgstr "Geschäftsnummer (Polizei)"
 msgid "Geschäftsnummer Police for linking if needed"
 msgstr "Geschäftsnummer Polizei zur Verknüpfung, falls erforderlich"
 
-msgid "Assignment date"
-msgstr "Einsatzdatum"
-
-msgid "Night work (20:00 - 06:00)"
-msgstr "Nachtarbeit (20:00 - 06:00)"
-
-msgid "50% surcharge"
-msgstr "50% Zuschlag"
-
-msgid "Weekend or holiday"
-msgstr "Wochenende oder Feiertag"
+msgid "Exceptionally urgent"
+msgstr "Ausserordenlich dringlich"
 
 msgid "25% surcharge"
 msgstr "25% Zuschlag"
 
-msgid "Exceptionally urgent"
-msgstr "Ausserordenlich dringlich"
-
-msgid "Travel distance"
-msgstr "Wegpauschalen"
-
 msgid "Notes"
 msgstr "Notizen"
 
-msgid "No travel"
-msgstr "Keine Reise"
-
-msgid "Up to 25 km (CHF 20)"
-msgstr "Bis 25 km (CHF 20)"
-
-msgid "25-50 km (CHF 50)"
-msgstr "25-50 km (CHF 50)"
-
-msgid "50-100 km (CHF 100)"
-msgstr "50-100 km (CHF 100)"
-
-msgid "Over 100 km (CHF 150)"
-msgstr "Über 100 km (CHF 150)"
+msgid "End time must be after start time"
+msgstr "Endzeit muss nach Startzeit liegen"
 
 msgid "Address"
 msgstr "Anschrift"
@@ -698,9 +698,6 @@ msgstr "Zeiterfassung"
 msgid "Assignment Date"
 msgstr "Einsatzdatum"
 
-msgid "Duration"
-msgstr "Dauer"
-
 msgid "Type"
 msgstr "Art"
 
@@ -710,11 +707,32 @@ msgstr "Geschäftsnummer"
 msgid "Hourly Rate"
 msgstr "Stundenansatz"
 
+msgid "Duration"
+msgstr "Dauer"
+
+msgid "Base pay"
+msgstr "Grundentschädigung"
+
+msgid "Night work (20:00 - 06:00)"
+msgstr "Nachtarbeit (20:00 - 06:00)"
+
+msgid "Weekend or holiday"
+msgstr "Wochenende oder Feiertag"
+
 msgid "Surcharge"
 msgstr "Zuschlag"
 
+msgid "Surcharge amount"
+msgstr "Zuschlagsbetrag"
+
+msgid "Subtotal (work compensation)"
+msgstr "Zwischensumme (Arbeitsentschädigung)"
+
 msgid "Travel"
 msgstr "Reise"
+
+msgid "Meal Allowance (6+ hours)"
+msgstr "Verpflegungsentschädigung (6+ Stunden)"
 
 msgid "Total"
 msgstr "Total"
@@ -722,11 +740,11 @@ msgstr "Total"
 msgid "View Time Report"
 msgstr "Zeiterfassung anzeigen"
 
-msgid "Accept time report"
-msgstr "Zeiterfassung akzeptieren"
-
 msgid "View translator"
 msgstr "Übersetzer/in anzeigen"
+
+msgid "Accept time report"
+msgstr "Zeiterfassung akzeptieren"
 
 msgid "Accreditations"
 msgstr "Akkreditierungen"
@@ -841,8 +859,30 @@ msgstr "Ausstehend"
 msgid "Confirmed"
 msgstr "Bestätigt"
 
+msgid ""
+"No confirmed time reports available for export. Time reports must be "
+"confirmed before they can be exported."
+msgstr ""
+"Keine bestätigten Zeiterfassungen für den Export verfügbar. Zeiterfassungen "
+"müssen bestätigt werden, bevor sie exportiert werden können."
+
+msgid "Month"
+msgstr "Monat"
+
+msgid "Year"
+msgstr "Jahr"
+
+msgid "Export für Buchhaltung"
+msgstr "Export für Buchhaltung"
+
 msgid "No time reports found"
 msgstr "Keine Zeiterfassungen gefunden"
+
+msgid "Created"
+msgstr "Erstellt"
+
+msgid "View Ticket"
+msgstr "Ticket anzeigen"
 
 msgid "This translator is in the admission process!"
 msgstr "Dieser Übersetzer ist im Zulassungsverfahren!"
@@ -861,6 +901,14 @@ msgstr "Telefonischer Kontakt"
 
 msgid "Error: No custom texts found"
 msgstr "Fehler: Keine benutzerdefinierten Texte gefunden"
+
+#, python-format
+msgid ""
+"Accountant email is not configured. Please configure it in the settings: "
+"${settings_url}"
+msgstr ""
+"E-Mail Rechnungsführer:in ist noch nicht konfiguriert. Bitte fügen sie eine "
+"E-Mail hinzu: ${settings_url}"
 
 msgid "Your ticket has been opened"
 msgstr "Ihr Ticket wurde eröffnet"
@@ -900,6 +948,63 @@ msgstr "E-Mail / Benutzername / Kürzel"
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
+msgid "January"
+msgstr "Januar"
+
+msgid "February"
+msgstr "Februar"
+
+msgid "March"
+msgstr "März"
+
+msgid "April"
+msgstr "April"
+
+msgid "May"
+msgstr "Mai"
+
+msgid "June"
+msgstr "Juni"
+
+msgid "July"
+msgstr "Juli"
+
+msgid "August"
+msgstr "August"
+
+msgid "September"
+msgstr "September"
+
+msgid "October"
+msgstr "Oktober"
+
+msgid "November"
+msgstr "November"
+
+msgid "December"
+msgstr "Dezember"
+
+msgid "Time report not found"
+msgstr "Zeiterfassung nicht gefunden"
+
+msgid "Time report accepted"
+msgstr "Zeiterfassung akzeptiert"
+
+msgid "Invalid form data"
+msgstr "Ungültige Formulardaten"
+
+#, python-format
+msgid "No confirmed time reports found for ${month}/${year}"
+msgstr "Keine bestätigten Zeiterfassungen gefunden für ${month}/${year}"
+
+#, python-format
+msgid ""
+"Cannot export: The following translators are missing a personnel number "
+"(Personal-Nr.): ${names}"
+msgstr ""
+"Export nicht möglich: Den folgenden Übersetzern fehlt eine Personalnummer "
+"(Personal-Nr.): ${names}"
+
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
 
@@ -931,12 +1036,6 @@ msgstr "Ihre Daten wurden bestätigt"
 msgid "Time report submitted for review"
 msgstr "Zeiterfassung zur Überprüfung eingereicht"
 
-msgid "Time report not found"
-msgstr "Zeiterfassung nicht gefunden"
-
-msgid "Time report accepted"
-msgstr "Zeiterfassung akzeptiert"
-
 msgid "This file does not seem to exist."
 msgstr "Diese Datei wurde nicht gefunden."
 
@@ -956,6 +1055,20 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 
 msgid "Download"
 msgstr "Herunterladen"
+
+#, python-format
+#~ msgid ""
+#~ "Accountant email is not configured. Please configure it in the <a "
+#~ "href=\"${settings_url}\">settings</a>."
+#~ msgstr ""
+#~ "E-Mail Rechnungsführer ist nicht konfiguriert. Bitte konfigurieren Sie "
+#~ "diese in den <a href=\"${settings_url}\">Einstellungen</a>."
+
+#~ msgid ""
+#~ "Accountant email is not configured. Please configure it in the settings."
+#~ msgstr ""
+#~ "E-Mail Rechnungsführer ist nicht konfiguriert. Bitte konfigurieren Sie "
+#~ "diese in den Einstellungen."
 
 #~ msgid "Date"
 #~ msgstr "Datum"

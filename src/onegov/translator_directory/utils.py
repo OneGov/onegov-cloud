@@ -258,3 +258,19 @@ def get_custom_text(request: OrgRequest, key: str) -> str:
 
     return custom_texts.get(
         key, _(f"Error: No custom text found for '{key}'"))
+
+
+def get_accountant_email(request: TranslatorAppRequest) -> str:
+    """Returns the accountant email or raises an error if not configured."""
+    email = request.app.accountant_email
+    if not email:
+        settings_url = request.link(request.app.org, 'directory-settings')
+        error_msg = request.translate(
+            _(
+                'Accountant email is not configured. '
+                'Please configure it in the settings: ${settings_url}',
+                mapping={'settings_url': settings_url},
+            )
+        )
+        raise ValueError(error_msg)
+    return email

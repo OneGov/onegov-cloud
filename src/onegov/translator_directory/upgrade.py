@@ -4,9 +4,9 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from __future__ import annotations
 
-from onegov.core.orm.types import JSON, UUID
+from onegov.core.orm.types import JSON, UUID, UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
-from sqlalchemy import Column, Boolean, Enum, ForeignKey, Text
+from sqlalchemy import ARRAY, Column, Boolean, Enum, ForeignKey, Text
 
 
 @upgrade_task('Change withholding tax column to boolean')
@@ -175,3 +175,30 @@ def convert_float_to_numeric_in_time_reports(context: UpgradeContext) -> None:
                 f'ALTER COLUMN {col} TYPE NUMERIC({precision},{scale}) '
                 f'USING {col}::NUMERIC({precision},{scale})'
             )
+
+
+@upgrade_task('Add surcharge_types array column to time reports')
+def add_surcharge_types_to_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if not context.has_column('translator_time_reports', 'surcharge_types'):
+        context.operations.add_column(
+            'translator_time_reports',
+            Column('surcharge_types', ARRAY(Text), nullable=True),
+        )
+
+
+@upgrade_task('Add start and end datetime to time reports')
+def add_start_end_datetime_to_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if not context.has_column('translator_time_reports', 'start'):
+        context.operations.add_column(
+            'translator_time_reports',
+            Column('start', UTCDateTime, nullable=True),
+        )
+    if not context.has_column('translator_time_reports', 'end'):
+        context.operations.add_column(
+            'translator_time_reports',
+            Column('end', UTCDateTime, nullable=True),
+        )

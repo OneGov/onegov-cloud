@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+
 from functools import cached_property
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -22,7 +23,8 @@ from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.constants import (
     member_can_see, editor_can_see, translator_can_see,
-    GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS, INTERPRETING_TYPES)
+    GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS,
+    INTERPRETING_TYPES, TIME_REPORT_INTERPRETING_TYPES)
 
 
 from typing import TYPE_CHECKING, Any
@@ -96,6 +98,8 @@ class DefaultLayout(BaseLayout):
     def format_interpreting_type(self, key: str) -> str:
         if key in INTERPRETING_TYPES:
             return self.request.translate(INTERPRETING_TYPES[key])
+        if key in TIME_REPORT_INTERPRETING_TYPES:
+            return self.request.translate(TIME_REPORT_INTERPRETING_TYPES[key])
         return key
 
     @staticmethod
@@ -658,6 +662,20 @@ class TimeReportCollectionLayout(DefaultLayout):
         assert isinstance(links, list)
         links.append(Link(_('Time Reports')))
         return links
+
+    @cached_property
+    def has_confirmed_reports(self) -> bool:
+        """Check if there are any confirmed reports available."""
+        from onegov.translator_directory.models.time_report import (
+            TranslatorTimeReport,
+        )
+
+        return (
+            self.model.session.query(TranslatorTimeReport)
+            .filter(TranslatorTimeReport.status == 'confirmed')
+            .count()
+            > 0
+        )
 
 
 class TimeReportLayout(DefaultLayout):
