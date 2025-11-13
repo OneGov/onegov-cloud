@@ -255,14 +255,9 @@ class TimeReportHandler(Handler):
         assignment_type_key = report.assignment_type
         assignment_type_translated = '-'
         if assignment_type_key:
-            if assignment_type_key in TIME_REPORT_INTERPRETING_TYPES:
-                assignment_type_translated = request.translate(
-                    TIME_REPORT_INTERPRETING_TYPES[assignment_type_key]
-                )
-            elif assignment_type_key in INTERPRETING_TYPES:
-                assignment_type_translated = request.translate(
-                    INTERPRETING_TYPES[assignment_type_key]
-                )
+            assignment_type_translated = request.translate(
+                TIME_REPORT_INTERPRETING_TYPES[assignment_type_key]
+            )
 
         assignment_date_formatted = escape(
             layout.format_date(report.assignment_date, 'date')

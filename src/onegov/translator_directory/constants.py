@@ -145,13 +145,13 @@ INTERPRETING_TYPES = {
     'whisper': _('Whisper interpreting'),
 }
 
-
+# SHPOL ====
 TIME_REPORT_INTERPRETING_TYPES = {
     'telephonic': _('telephonic'),
     'on-site': _('On Site'),
 }
-
 HOURLY_RATE_CERTIFIED = Decimal('90.00')
 HOURLY_RATE_UNCERTIFIED = Decimal('75.00')
+# ====
 
 TRANSLATOR_FA_ICON = 'translator'

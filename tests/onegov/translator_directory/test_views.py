@@ -1335,6 +1335,8 @@ def test_view_translator_mutation(
     assert 'French' in page
     assert 'German' in page
     assert 'Italian' in page
+    page.showbrowser()
+    breakpoint()
     assert 'Konsektutivdolmetschen' in page
     assert 'Verhandlungsdolmetschen' in page
     assert 'Wirtschaft' in page
@@ -2075,15 +2077,26 @@ def test_view_time_report(
     page.form['notes'] = 'Test notes'
     page = page.form.submit().follow()
     assert 'Zeiterfassung zur Überprüfung eingereicht' in page
-    mail = client.get_email(0, flush_queue=True)
 
-    # so this should now have sent, at the very least:
-    # 1. Email to Accountant (Rechnungsführer)
-    # 2. Email to translator, informing of provisional time report
-    # TODO: Test these are receeived here
+    mail_to_submitter = client.get_email(0)
+    assert 'TRANSLATOR, Test' in mail_to_submitter['Subject']
 
-    # Plus the default your ticket has been openend Email:
-    assert 'TRANSLATOR, Test' in mail['Subject']
+    all_emails = []
+    for i in range(10):
+        try:
+            email = client.get_email(i)
+            if email:
+                all_emails.append(email)
+        except IndexError:
+            break
+    client.flush_email_queue()
+
+    accountant_emails = [
+        e for e in all_emails if 'editor@example.org' in e['To']
+    ]
+    assert len(accountant_emails) >= 1
+    mail_to_accountant = accountant_emails[0]
+    assert 'TRANSLATOR, Test' in mail_to_accountant['Subject']
     translator = session.query(Translator).filter_by(id=translator_id).one()
     assert len(translator.time_reports) == 1
     report = translator.time_reports[0]
@@ -2105,7 +2118,12 @@ def test_view_time_report(
     page = client.post(accept_url).follow()
     assert 'Zeiterfassung akzeptiert' in page
 
-    session.expire_all()  # *do* we need this?
+    mail_to_translator = client.get_email(0, flush_queue=True)
+    assert 'TRANSLATOR, Test' in mail_to_translator['Subject']
+    assert 'translator@example.org' in mail_to_translator['To']
+    assert 'Zeiterfassung akzeptiert' in mail_to_translator['Subject']
+
+    session.expire_all()
     report = session.query(Translator).filter_by(
         id=translator_id).one().time_reports[0]
     assert report.status == 'confirmed'
