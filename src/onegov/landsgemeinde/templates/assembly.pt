@@ -9,6 +9,9 @@
                 <div class="videowrapper" tal:condition="assembly.video_url">
                     <iframe allow="fullscreen" frameborder="0" src="${assembly.video_url}"></iframe>
                 </div>
+                <div class="print-button">
+                    <i onclick="window.print()" class="fa fa-print" aria-hidden="true"></i>
+                </div>
                 <div class="assembly-overview" tal:content="assembly.overview"></div>
             </div>
 

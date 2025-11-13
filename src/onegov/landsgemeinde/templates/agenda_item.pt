@@ -15,6 +15,9 @@
                         <iframe allow="fullscreen" width="100%" frameborder="0" src="${video_url}"></iframe>
                     </div>
                 </div>
+                <div class="print-button">
+                    <i onclick="window.print()" class="fa fa-print" aria-hidden="true"></i>
+                </div>
                 <div class="callout secondary agenda-item-resolution" tal:condition="agenda_item.resolution or agenda_item.tacitly_accepted">
                     <strong i18n:translate="">Resolution</strong>
                     <tal:block tal:content="agenda_item.resolution">
