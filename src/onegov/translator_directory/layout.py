@@ -24,7 +24,7 @@ from onegov.translator_directory.collections.translator import \
 from onegov.translator_directory.constants import (
     member_can_see, editor_can_see, translator_can_see,
     GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS,
-    INTERPRETING_TYPES, TIME_REPORT_INTERPRETING_TYPES )
+    INTERPRETING_TYPES, TIME_REPORT_INTERPRETING_TYPES)
 
 
 from typing import TYPE_CHECKING, Any

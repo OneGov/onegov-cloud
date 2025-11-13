@@ -18,7 +18,6 @@ from onegov.core.elements import Intercooler
 from onegov.translator_directory.collections.documents import (
     TranslatorDocumentCollection)
 from onegov.translator_directory.constants import (
-    INTERPRETING_TYPES,
     TIME_REPORT_INTERPRETING_TYPES,
 )
 from onegov.translator_directory.layout import AccreditationLayout

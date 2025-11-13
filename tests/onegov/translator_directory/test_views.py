@@ -1335,8 +1335,6 @@ def test_view_translator_mutation(
     assert 'French' in page
     assert 'German' in page
     assert 'Italian' in page
-    page.showbrowser()
-    breakpoint()
     assert 'Konsektutivdolmetschen' in page
     assert 'Verhandlungsdolmetschen' in page
     assert 'Wirtschaft' in page
