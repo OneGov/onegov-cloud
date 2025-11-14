@@ -5,10 +5,12 @@ from io import StringIO
 from webob import Response
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from decimal import Decimal
 
 from onegov.core.security import Private
 from onegov.translator_directory import TranslatorDirectoryApp, _
 from onegov.org.models import TicketMessage
+from onegov.org.mail import send_ticket_mail
 from onegov.translator_directory.collections.time_report import (
     TimeReportCollection,
 )
@@ -126,6 +128,7 @@ def accept_time_report(
     self: TimeReportTicket, request: TranslatorAppRequest
 ) -> BaseResponse:
     """Accept time report."""
+
     request.assert_valid_csrf_token()
 
     handler = self.handler
@@ -134,9 +137,26 @@ def accept_time_report(
         request.alert(_('Time report not found'))
         return request.redirect(request.link(self))
 
-    handler.time_report.status = 'confirmed'
+    time_report = handler.time_report
+    time_report.status = 'confirmed'
     handler.data['state'] = 'accepted'
     TicketMessage.create(self, request, 'accepted')
+
+    translator = time_report.translator
+    if translator and translator.email:
+        send_ticket_mail(
+            request=request,
+            template='mail_time_report_accepted.pt',
+            subject=_('Time report accepted'),
+            ticket=self,
+            receivers=(translator.email,),
+            content={
+                'model': self,
+                'translator': translator,
+                'time_report': time_report,
+            },
+        )
+
     request.success(_('Time report accepted'))
     return request.redirect(request.link(self))
 
@@ -145,7 +165,6 @@ def generate_accounting_export_rows(
     reports: list[TranslatorTimeReport],
 ) -> Iterator[list[str]]:
     """Generate CSV rows for accounting export in the required format."""
-    from decimal import Decimal
 
     for report in reports:
         translator = report.translator

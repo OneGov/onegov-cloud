@@ -620,27 +620,29 @@ def add_time_report(
             send_self=True,
         )
 
-        notified_emails = set()
         for email in emails_for_new_ticket(request, ticket):
-            send_ticket_mail(
-                request=request,
-                template='mail_ticket_opened_info.pt',
-                subject=_('New ticket'),
-                ticket=ticket,
-                receivers=(email,),
-                content={'model': ticket},
-            )
-            notified_emails.add(str(email))
+            if email != accountant_email:
+                send_ticket_mail(
+                    request=request,
+                    template='mail_ticket_opened_info.pt',
+                    subject=_('New ticket'),
+                    ticket=ticket,
+                    receivers=(email,),
+                    content={'model': ticket},
+                )
 
-        if accountant_email not in notified_emails:
-            send_ticket_mail(
-                request=request,
-                template='mail_ticket_opened_info.pt',
-                subject=_('New ticket'),
-                ticket=ticket,
-                receivers=(accountant_email,),
-                content={'model': ticket},
-            )
+        send_ticket_mail(
+            request=request,
+            template='mail_time_report_created.pt',
+            subject=_('New time report for review'),
+            ticket=ticket,
+            receivers=(accountant_email,),
+            content={
+                'model': ticket,
+                'translator': self,
+                'time_report': report,
+            },
+        )
 
         request.app.send_websocket(
             channel=request.app.websockets_private_channel,

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-12 17:11+0100\n"
+"POT-Creation-Date: 2025-11-13 11:35+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -554,8 +554,8 @@ msgstr "Geschäftsnummer Polizei zur Verknüpfung, falls erforderlich"
 msgid "Exceptionally urgent"
 msgstr "Ausserordenlich dringlich"
 
-msgid "25% surcharge"
-msgstr "25% Zuschlag"
+msgid "25%% surcharge"
+msgstr "25%% Zuschlag"
 
 msgid "Notes"
 msgstr "Notizen"
@@ -835,6 +835,27 @@ msgstr ""
 "Diese Seite ist nicht öffentlich, kann aber von Mitgliedern eingesehen "
 "werden."
 
+msgid "Hello!"
+msgstr "Guten Tag!"
+
+msgid "Your time report has been accepted and approved for payment."
+msgstr "Ihre Zeiterfassung wurde akzeptiert und zur Zahlung freigegeben."
+
+msgid "Assignment Date:"
+msgstr "Einsatzdatum:"
+
+msgid "Total Compensation:"
+msgstr "Gesamtentschädigung:"
+
+msgid "View the time report"
+msgstr "Zeiterfassung anzeigen"
+
+msgid "A new time report has been submitted for review."
+msgstr "Eine neue Zeiterfassung wurde zur Überprüfung eingereicht."
+
+msgid "Translator:"
+msgstr "Übersetzer/in:"
+
 msgid "Admission granted."
 msgstr "Zulassung erteilt."
 
@@ -1032,6 +1053,9 @@ msgstr "Übersetzer/in erfolgreich gelöscht"
 
 msgid "Your data has been confirmed"
 msgstr "Ihre Daten wurden bestätigt"
+
+msgid "New time report for review"
+msgstr "Neue Zeiterfassung zur Überprüfung"
 
 msgid "Time report submitted for review"
 msgstr "Zeiterfassung zur Überprüfung eingereicht"

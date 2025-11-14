@@ -2169,3 +2169,99 @@ def test_view_time_reports(client: Client) -> None:
 
     page = client.get(f'/time-report/{report_id}')
     assert 'CASE-001' in page
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_time_report_workflow(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
+    """Test editor submitting time report."""
+    session = client.app.session()
+    languages = create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator_id = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+        drive_distance=35.0,
+    ).id
+    transaction.commit()
+
+    client.login_admin()
+    page = client.get('/directory-settings')
+    page.form['accountant_email'] = 'editor@example.org'
+    page = page.form.submit()
+    client.logout()
+    assert client.app.accountant_email == 'editor@example.org'
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    assert 'Zeit erfassen' in page
+
+    page = page.click('Zeit erfassen')
+    page.form['assignment_type'] = 'on-site'
+    page.form['start_date'] = '2025-01-11'
+    page.form['start_time'] = '09:00'
+    page.form['end_date'] = '2025-01-11'
+    page.form['end_time'] = '10:30'
+    page.form['case_number'] = 'CASE-123'
+    page.form['is_urgent'] = False
+    page.form['notes'] = 'Test notes'
+    page = page.form.submit().follow()
+    assert 'Zeiterfassung zur Überprüfung eingereicht' in page
+
+    mail_to_submitter = client.get_email(0)
+    assert 'TRANSLATOR, Test' in mail_to_submitter['Subject']
+
+    all_emails = []
+    for i in range(10):
+        try:
+            email = client.get_email(i)
+            if email:
+                all_emails.append(email)
+        except IndexError:
+            break
+    client.flush_email_queue()
+
+    accountant_emails = [
+        e for e in all_emails if 'editor@example.org' in e['To']
+    ]
+    assert len(accountant_emails) >= 1
+    mail_to_accountant = accountant_emails[0]
+    assert 'TRANSLATOR, Test' in mail_to_accountant['Subject']
+    translator = session.query(Translator).filter_by(id=translator_id).one()
+    assert len(translator.time_reports) == 1
+    report = translator.time_reports[0]
+    assert report.duration == 90
+    assert report.hourly_rate == 90.0
+    assert report.surcharge_percentage == 25.0
+    assert report.travel_compensation == 50.0
+    assert report.case_number == 'CASE-123'
+    assert report.status == 'pending'
+
+    # TODO: actually, this would have to be the editor / accountant
+    # But it's unclear at this stage how we can get the link to the
+    # Tickets.
+    client.login_admin()
+    client.use_intercooler = True
+
+    ticket_page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    accept_url = ticket_page.pyquery('a.accept-link')[0].attrib['ic-post-to']
+    page = client.post(accept_url).follow()
+    assert 'Zeiterfassung akzeptiert' in page
+
+    mail_to_translator = client.get_email(0, flush_queue=True)
+    assert 'TRANSLATOR, Test' in mail_to_translator['Subject']
+    assert 'translator@example.org' in mail_to_translator['To']
+    assert 'Zeiterfassung akzeptiert' in mail_to_translator['Subject']
+
+    session.expire_all()
+    report = session.query(Translator).filter_by(
+        id=translator_id).one().time_reports[0]
+    assert report.status == 'confirmed'
