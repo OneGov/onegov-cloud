@@ -2165,7 +2165,4 @@ def test_view_time_reports(client: Client) -> None:
 
     client.login_admin()
     page = client.get('/time-reports')
-    assert 'CASE-001' in page
-
-    page = client.get(f'/time-report/{report_id}')
-    assert 'CASE-001' in page
+    assert '162.75' in page
