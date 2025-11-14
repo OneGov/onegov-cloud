@@ -155,6 +155,9 @@ def accept_time_report(
 
     time_report = handler.time_report
     time_report.status = 'confirmed'
+    # FIXME: (minor)
+    # do we even need to maintain the state seperately in handler data?
+    # Seems that accepting the ticket should be enough or no?
     handler.data['state'] = 'accepted'
 
     translator = time_report.translator
@@ -174,7 +177,8 @@ def accept_time_report(
             content=pdf_bytes,
             content_type='application/pdf',
         )
-
+    translator = time_report.translator
+    if translator and translator.email:
         send_ticket_mail(
             request=request,
             template='mail_time_report_accepted.pt',
