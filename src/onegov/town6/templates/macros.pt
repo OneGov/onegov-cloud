@@ -2788,7 +2788,7 @@
                 ${file.name}
             </td>
             <td>
-                <a id="button-${file_number}" data-toggle="details-${file_number}">
+                <a id="button-${file_number}" data-ogc-toggle="#details-${file_number}">
                     <i class="fa fa-chevron-down rotate" aria-hidden="true"></i>
                 </a>
             </td>
