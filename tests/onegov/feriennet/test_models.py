@@ -115,9 +115,9 @@ def test_period(scenario: Scenario) -> None:
 
 
 def test_add_vacation_activity(owner: User) -> None:
-    owner.realname = ''
+    owner.realname = None
 
-    activity = VacationActivity(
+    activity = VacationActivity(  # type:ignore[misc]
         title='Visit the Donut Shop',
         username=owner.username,
         lead='Come visit the local donut shop and get some samples!',
