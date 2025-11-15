@@ -19,6 +19,7 @@ from onegov.translator_directory.collections.documents import (
     TranslatorDocumentCollection)
 from onegov.translator_directory.constants import (
     TIME_REPORT_INTERPRETING_TYPES,
+    TIME_REPORT_SURCHARGE_LABELS,
 )
 from onegov.translator_directory.layout import AccreditationLayout
 from onegov.translator_directory.layout import TranslatorLayout
@@ -296,20 +297,17 @@ class TimeReportHandler(Handler):
             ]
         )
 
-        surcharge_labels = {
-            'night_work': _('Night work (20:00 - 06:00)'),
-            'weekend_holiday': _('Weekend or holiday'),
-            'urgent': _('Exceptionally urgent'),
-        }
-
         effective_surcharge_pct = report.effective_surcharge_percentage
         if effective_surcharge_pct > 0:
             if report.surcharge_types:
                 for surcharge_type in report.surcharge_types:
-                    label = surcharge_labels.get(surcharge_type)
+                    label = TIME_REPORT_SURCHARGE_LABELS.get(surcharge_type)
                     if label:
                         rate = report.SURCHARGE_RATES.get(surcharge_type)
-                        surcharge_label = request.translate(label)
+                        if surcharge_type == 'urgent':
+                            surcharge_label = request.translate(label)
+                        else:
+                            surcharge_label = label
                         summary_parts.extend(
                             [
                                 f'<dt>{escape(surcharge_label)}</dt>',
@@ -412,6 +410,15 @@ class TimeReportHandler(Handler):
                     text=_('View Time Report'),
                     url=request.return_here(request.link(self.time_report)),
                     attrs={'class': 'time'},
+                )
+            )
+            time_report_links.append(
+                Link(
+                    text=_('Download PDF'),
+                    url=request.link(
+                        self.ticket, 'time-report-pdf-for-translator'
+                    ),
+                    attrs={'class': 'pdf'},
                 )
             )
 

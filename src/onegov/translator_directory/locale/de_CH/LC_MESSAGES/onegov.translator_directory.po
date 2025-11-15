@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-13 11:35+0100\n"
+"POT-Creation-Date: 2025-11-15 11:57+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -554,8 +554,8 @@ msgstr "Geschäftsnummer Polizei zur Verknüpfung, falls erforderlich"
 msgid "Exceptionally urgent"
 msgstr "Ausserordenlich dringlich"
 
-msgid "25%% surcharge"
-msgstr "25%% Zuschlag"
+msgid "25% surcharge"
+msgstr "25% Zuschlag"
 
 msgid "Notes"
 msgstr "Notizen"
@@ -726,10 +726,10 @@ msgid "Surcharge amount"
 msgstr "Zuschlagsbetrag"
 
 msgid "Subtotal (work compensation)"
-msgstr "Zwischensumme (Arbeitsentschädigung)"
+msgstr "Zwisch.total"
 
 msgid "Travel"
-msgstr "Reise"
+msgstr "Wegentschädigung"
 
 msgid "Meal Allowance (6+ hours)"
 msgstr "Verpflegungsentschädigung (6+ Stunden)"
@@ -739,6 +739,9 @@ msgstr "Total"
 
 msgid "View Time Report"
 msgstr "Zeiterfassung anzeigen"
+
+msgid "Download PDF"
+msgstr "PDF herunterladen"
 
 msgid "View translator"
 msgstr "Übersetzer/in anzeigen"
@@ -854,7 +857,7 @@ msgid "A new time report has been submitted for review."
 msgstr "Eine neue Zeiterfassung wurde zur Überprüfung eingereicht."
 
 msgid "Translator:"
-msgstr "Übersetzer/in:"
+msgstr "Dolmetscher/in:"
 
 msgid "Admission granted."
 msgstr "Zulassung erteilt."
@@ -1026,6 +1029,15 @@ msgstr ""
 "Export nicht möglich: Den folgenden Übersetzern fehlt eine Personalnummer "
 "(Personal-Nr.): ${names}"
 
+msgid "Assignment Details"
+msgstr "Einsatzdetails"
+
+msgid "Start Time"
+msgstr "Startzeit"
+
+msgid "End Time"
+msgstr "Endzeit"
+
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
 
@@ -1079,6 +1091,12 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 
 msgid "Download"
 msgstr "Herunterladen"
+
+#~ msgid "Compensation Breakdown"
+#~ msgstr "Entschädigungsaufschlüsselung"
+
+#~ msgid "25%% surcharge"
+#~ msgstr "25%% Zuschlag"
 
 #, python-format
 #~ msgid ""

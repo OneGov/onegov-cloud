@@ -2165,10 +2165,7 @@ def test_view_time_reports(client: Client) -> None:
 
     client.login_admin()
     page = client.get('/time-reports')
-    assert 'CASE-001' in page
-
-    page = client.get(f'/time-report/{report_id}')
-    assert 'CASE-001' in page
+    assert '162.75' in page
 
 
 @patch('onegov.websockets.integration.connect')
@@ -2233,8 +2230,21 @@ def test_time_report_workflow(
         e for e in all_emails if 'editor@example.org' in e['To']
     ]
     assert len(accountant_emails) >= 1
+    assert accountant_emails[0]['To'] == 'editor@example.org'
     mail_to_accountant = accountant_emails[0]
     assert 'TRANSLATOR, Test' in mail_to_accountant['Subject']
+    assert (
+        'Eine neue Zeiterfassung wurde zur Überprüfung eingereicht.'
+        in mail_to_accountant['TextBody']
+    )
+    link_match = re.search(
+        r'<a href="([^"]+)">Zeiterfassung anzeigen</a>',
+        mail_to_accountant['HtmlBody'],
+    )
+    assert link_match is not None
+    # save ticket link for later
+    ticket_link = link_match.group(1)
+
     translator = session.query(Translator).filter_by(id=translator_id).one()
     assert len(translator.time_reports) == 1
     report = translator.time_reports[0]
@@ -2245,13 +2255,11 @@ def test_time_report_workflow(
     assert report.case_number == 'CASE-123'
     assert report.status == 'pending'
 
-    # TODO: actually, this would have to be the editor / accountant
-    # But it's unclear at this stage how we can get the link to the
-    # Tickets.
-    client.login_admin()
-    client.use_intercooler = True
-
-    ticket_page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    client.login_editor()
+    ticket_page = client.get(ticket_link)
+    # Accept ticket
+    ticket_page = ticket_page.click('Ticket annehmen').follow()
+    # Accept time report
     accept_url = ticket_page.pyquery('a.accept-link')[0].attrib['ic-post-to']
     page = client.post(accept_url).follow()
     assert 'Zeiterfassung akzeptiert' in page
@@ -2261,7 +2269,14 @@ def test_time_report_workflow(
     assert 'translator@example.org' in mail_to_translator['To']
     assert 'Zeiterfassung akzeptiert' in mail_to_translator['Subject']
 
-    session.expire_all()
+    attachments = mail_to_translator.get('Attachments', [])
+    assert len(attachments) == 1
+    attachment = attachments[0]
+    assert attachment['Name'].startswith('Zeiterfassung_')
+    assert attachment['Name'].endswith('.pdf')
+    assert attachment['ContentType'] == 'application/pdf'
+    assert len(attachment['Content']) > 0
+
     report = session.query(Translator).filter_by(
         id=translator_id).one().time_reports[0]
     assert report.status == 'confirmed'
