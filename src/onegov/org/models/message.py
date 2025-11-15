@@ -341,3 +341,18 @@ class DirectoryMessage(Message, TicketMessageMixin):
             directory_id=directory.id.hex,
             action=action
         )
+
+
+class TimeReportMessage(Message, TicketMessageMixin):
+
+    __mapper_args__ = {'polymorphic_identity': 'time_report'}
+
+    @classmethod
+    def create(  # type:ignore[override]
+        cls,
+        ticket: Ticket,
+        request: OrgRequest,
+        change: str,
+        origin: str = 'internal',
+    ) -> Self:
+        return super().create(ticket, request, change=change, origin=origin)

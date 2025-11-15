@@ -14,7 +14,7 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration,
 )
 
-from onegov.core.security import Private
+from onegov.core.security import Private, Personal
 from onegov.translator_directory import TranslatorDirectoryApp, _
 from onegov.org.mail import send_ticket_mail
 from onegov.translator_directory.collections.time_report import (
@@ -22,6 +22,9 @@ from onegov.translator_directory.collections.time_report import (
 )
 from onegov.translator_directory.constants import (
     TIME_REPORT_SURCHARGE_LABELS,
+)
+from onegov.translator_directory.forms.time_report import (
+    TranslatorTimeReportForm,
 )
 from onegov.translator_directory.generate_docx import gendered_greeting
 from onegov.translator_directory.layout import (
@@ -36,6 +39,7 @@ from onegov.translator_directory.models.ticket import (
 from onegov.translator_directory.models.time_report import (
     TranslatorTimeReport,
 )
+from onegov.org.models.message import TimeReportMessage
 from onegov.user import User
 from sqlalchemy import func
 
@@ -114,23 +118,52 @@ def view_time_reports(
     }
 
 
-@TranslatorDirectoryApp.html(
+@TranslatorDirectoryApp.form(
     model=TranslatorTimeReport,
-    template='time_report.pt',
-    permission=Private,
+    name='edit',
+    template='form.pt',
+    permission=Personal,
+    form=TranslatorTimeReportForm,
 )
-def view_time_report(
+def edit_time_report(
     self: TranslatorTimeReport,
     request: TranslatorAppRequest,
-) -> RenderData:
+    form: TranslatorTimeReportForm,
+) -> RenderData | BaseResponse:
+    if self.status != 'pending':
+        request.alert(_('Only pending time reports can be edited'))
+        ticket = self.get_ticket(request.session)
+        if ticket:
+            return request.redirect(request.link(ticket))
+        return request.redirect(
+            request.link(TimeReportCollection(request.app))
+        )
 
     layout = TimeReportLayout(self, request)
+
+    if form.submitted(request):
+        form.update_model(self)
+        request.success(_('Time report updated successfully'))
+        ticket = self.get_ticket(request.session)
+        if ticket:
+            TimeReportMessage.create(
+                ticket=ticket,
+                request=request,
+                change=request.translate(_('Edit Time Report')),
+            )
+            return request.redirect(request.link(ticket))
+        return request.redirect(
+            request.link(TimeReportCollection(request.app))
+        )
+
+    if not form.errors:
+        form.process(obj=self)
 
     return {
         'layout': layout,
         'model': self,
-        'title': _('Time Report'),
-        'report': self,
+        'title': _('Edit Time Report'),
+        'form': form,
     }
 
 
