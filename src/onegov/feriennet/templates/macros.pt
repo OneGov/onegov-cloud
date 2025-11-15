@@ -45,8 +45,10 @@
 <metal:footer_columns define-macro="footer_columns">
     <tal:b define="contact layout.org.contact_html|nothing;
         contact_url layout.org.contact_url|nothing;
+        contact_url_label layout.org.contact_url_label|nothing;
         opening_hours layout.org.opening_hours_html|nothing;
         opening_hours_url layout.org.opening_hours_url|nothing;
+        opening_hours_url_label layout.org.opening_hours_url_label|nothing;
         facebook layout.org.facebook_url|nothing;
         twitter layout.org.twitter_url|nothing;
         instagram layout.org.instagram_url|nothing;
