@@ -2166,9 +2166,12 @@ def test_view_time_reports(client: Client) -> None:
     client.login_admin()
     page = client.get('/time-reports')
     assert '162.75' in page
+<<<<<<< HEAD
 
     page = client.get(f'/time-report/{report_id}')
     assert 'CASE-001' in page
+=======
+>>>>>>> 5bee6befe (Add time report PDF and sending mail with pdf to translator)
 
 
 @patch('onegov.websockets.integration.connect')
@@ -2233,7 +2236,10 @@ def test_time_report_workflow(
         e for e in all_emails if 'editor@example.org' in e['To']
     ]
     assert len(accountant_emails) >= 1
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5bee6befe (Add time report PDF and sending mail with pdf to translator)
     assert accountant_emails[0]['To'] == 'editor@example.org'
     mail_to_accountant = accountant_emails[0]
     assert 'TRANSLATOR, Test' in mail_to_accountant['Subject']
