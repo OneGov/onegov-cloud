@@ -46,12 +46,10 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
     @property
     def organiser(self) -> list[str]:
         organiser: list[str] = [
-            self.user.username,
-            # FIXME: For now we assume this is always set, if it
-            #        is sometimes not set, then perhaps we should
-            #        only append it when it is set.
-            self.user.realname  # type:ignore[list-item]
+            self.user.username
         ]
+        if self.user.realname:
+            organiser.append(self.user.realname)
 
         userprofile_keys = (
             'organisation',
