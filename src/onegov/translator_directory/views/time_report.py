@@ -1,30 +1,48 @@
 from __future__ import annotations
 
+
 import csv
 from io import StringIO
 from webob import Response
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from decimal import Decimal
+from onegov.core.mail import Attachment
+from onegov.core.utils import module_path
+from weasyprint import HTML, CSS  # type: ignore[import-untyped]
+from weasyprint.text.fonts import (  # type: ignore[import-untyped]
+    FontConfiguration,
+)
 
 from onegov.core.security import Private
 from onegov.translator_directory import TranslatorDirectoryApp, _
-from onegov.org.models import TicketMessage
+from onegov.org.mail import send_ticket_mail
 from onegov.translator_directory.collections.time_report import (
     TimeReportCollection,
 )
+from onegov.translator_directory.constants import (
+    TIME_REPORT_SURCHARGE_LABELS,
+)
+from onegov.translator_directory.generate_docx import gendered_greeting
 from onegov.translator_directory.layout import (
     TimeReportCollectionLayout,
     TimeReportLayout,
+    TranslatorLayout,
 )
-
-from onegov.translator_directory.models.ticket import TimeReportTicket
+from onegov.translator_directory.models.ticket import (
+    TimeReportTicket,
+    TimeReportHandler,
+)
 from onegov.translator_directory.models.time_report import (
     TranslatorTimeReport,
 )
+from onegov.user import User
+from sqlalchemy import func
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.translator_directory.models.translator import Translator
     from onegov.core.types import RenderData
     from onegov.translator_directory.request import TranslatorAppRequest
     from collections.abc import Iterator
@@ -126,6 +144,7 @@ def accept_time_report(
     self: TimeReportTicket, request: TranslatorAppRequest
 ) -> BaseResponse:
     """Accept time report."""
+
     request.assert_valid_csrf_token()
 
     handler = self.handler
@@ -134,9 +153,43 @@ def accept_time_report(
         request.alert(_('Time report not found'))
         return request.redirect(request.link(self))
 
-    handler.time_report.status = 'confirmed'
+    time_report = handler.time_report
+    time_report.status = 'confirmed'
     handler.data['state'] = 'accepted'
-    TicketMessage.create(self, request, 'accepted')
+
+    translator = time_report.translator
+    if translator and translator.email:
+        call_to_action_link = request.link(self)
+
+        pdf_bytes = generate_time_report_pdf_bytes(
+            time_report, translator, request
+        )
+        filename = (
+            f'Zeiterfassung_{translator.last_name}_'
+            f'{time_report.assignment_date.strftime("%Y%m%d")}.pdf'
+        )
+
+        pdf_attachment = Attachment(
+            filename=filename,
+            content=pdf_bytes,
+            content_type='application/pdf',
+        )
+
+        send_ticket_mail(
+            request=request,
+            template='mail_time_report_accepted.pt',
+            subject=_('Time report accepted'),
+            ticket=self,
+            receivers=(translator.email,),
+            content={
+                'model': self,
+                'translator': translator,
+                'time_report': time_report,
+                'call_to_action_link': call_to_action_link,
+            },
+            attachments=[pdf_attachment],
+        )
+
     request.success(_('Time report accepted'))
     return request.redirect(request.link(self))
 
@@ -145,7 +198,6 @@ def generate_accounting_export_rows(
     reports: list[TranslatorTimeReport],
 ) -> Iterator[list[str]]:
     """Generate CSV rows for accounting export in the required format."""
-    from decimal import Decimal
 
     for report in reports:
         translator = report.translator
@@ -334,5 +386,352 @@ def export_accounting_csv(
     response = Response(csv_bytes)
     response.content_type = 'text/csv; charset=iso-8859-1'
     response.content_disposition = f'attachment; filename="{filename}"'
+
+    return response
+
+
+def generate_time_report_pdf_bytes(
+    time_report: TranslatorTimeReport,
+    translator: Translator,
+    request: TranslatorAppRequest,
+) -> bytes:
+    layout = TranslatorLayout(translator, request)
+    font_config = FontConfiguration()
+    css_path = module_path(
+        'onegov.translator_directory', 'views/templates/time_report_pdf.css'
+    )
+    with open(css_path) as f:
+        css = CSS(string=f.read(), font_config=font_config)
+
+    assignment_date_display = layout.format_date(
+        time_report.assignment_date, 'date'
+    )
+
+    if time_report.start and time_report.end:
+        start_date = time_report.start.date()
+        end_date = time_report.end.date()
+        start_time = layout.format_date(time_report.start, 'time')
+        end_time = layout.format_date(time_report.end, 'time')
+
+        if start_date != end_date:
+            assignment_date_display = (
+                f'{layout.format_date(start_date, "date")} {start_time} - '
+                f'{layout.format_date(end_date, "date")} {end_time}'
+            )
+        else:
+            assignment_date_display = (
+                f'{layout.format_date(start_date, "date")}, '
+                f'{start_time} - {end_time}'
+            )
+
+    base_without_surcharge = (
+        time_report.hourly_rate * time_report.duration_hours
+    )
+
+    today = datetime.now()
+    letter_date = f'Schaffhausen, {layout.format_date(today, "date_long")}'
+
+    match translator.gender:
+        case 'M':
+            title = 'Herr'
+        case 'F':
+            title = 'Frau'
+        case _:
+            title = 'Herr/Frau'
+
+    salutation = f'{gendered_greeting(translator)} {translator.last_name}'
+    translator_name = f'{translator.first_name} {translator.last_name}'
+
+    duration_text = (
+        f'{time_report.duration_hours} Stunde'
+        if time_report.duration_hours == 1
+        else f'{time_report.duration_hours} Stunden'
+    )
+
+    logo_url = request.app.org.logo_url if request.app.org.logo_url else None
+    html_content = """
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="utf-8"></head>
+        <body>
+    """
+
+    html_content += """
+            <div class="header-row">
+                <div class="logo">
+    """
+
+    if logo_url:
+        html_content += f"""
+                    <img src="{logo_url}" alt="Logo" />
+        """
+
+    html_content += f"""
+                </div>
+                <div class="letter-date">
+                    {letter_date}
+                </div>
+            </div>
+
+            <div class="translator-info">
+                <p>
+                    {title}<br>
+                    <strong>{translator_name}</strong><br>
+    """
+
+    if translator.address:
+        html_content += f'                    {translator.address}<br>\n'
+    if translator.zip_code and translator.city:
+        html_content += (
+            f'                    {translator.zip_code} '
+            f'{translator.city}<br>\n'
+        )
+
+    html_content += f"""
+                </p>
+            </div>
+
+            <div class="section-title">
+                <h2>Dolmetscher-Entschädigungen</h2>
+            </div>
+
+            <div class="salutation">
+                {salutation}
+            </div>
+
+            <div class="intro-text">
+                <p>
+                    Ihre Rapportierung wurde durch die Rechnungsführerin
+                    bestätigt.
+                </p>
+            </div>
+
+            <div class="assignment-info">
+                <p>
+                    <strong>
+                        {request.translate(_('Assignment Date'))}:
+                    </strong>
+                    {assignment_date_display}
+                </p>
+            </div>
+
+            <div class="compensation">
+                <table class="compensation-table">
+                    <tr>
+                        <td class="label">
+                            {request.translate(_('Hourly Rate'))}:
+                        </td>
+                        <td class="amount">
+                            {layout.format_currency(time_report.hourly_rate)}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">
+                            {request.translate(_('Base pay'))}
+                            ({layout.format_currency(time_report.hourly_rate)}
+                            × {duration_text}):
+                        </td>
+                        <td class="amount">
+                            {layout.format_currency(base_without_surcharge)}
+                        </td>
+                    </tr>
+    """
+
+    effective_surcharge_pct = time_report.effective_surcharge_percentage
+    if effective_surcharge_pct > 0:
+        if time_report.surcharge_types:
+            for surcharge_type in time_report.surcharge_types:
+                label = TIME_REPORT_SURCHARGE_LABELS.get(surcharge_type)
+                if label:
+                    rate = time_report.SURCHARGE_RATES.get(
+                        surcharge_type, Decimal('0')
+                    )
+                    individual_amount = (
+                        base_without_surcharge * rate / Decimal(100)
+                    )
+                    if surcharge_type == 'urgent':
+                        surcharge_label = request.translate(label)
+                        label_display = f'{surcharge_label} (+{rate}%)'
+                    else:
+                        label_display = f'{label} ({duration_text}, +{rate}%)'
+
+                    html_content += f"""
+                    <tr>
+                        <td class="label">
+                            {label_display}:
+                        </td>
+                        <td class="amount">
+                            {layout.format_currency(individual_amount)}
+                        </td>
+                    </tr>
+                    """
+
+        surcharge_amount = (
+            base_without_surcharge * effective_surcharge_pct / Decimal(100)
+        )
+        html_content += f"""
+                    <tr>
+                        <td class="label">
+                            {request.translate(_('Surcharge amount'))}
+                            ({layout.format_currency(base_without_surcharge)}
+                            × {effective_surcharge_pct}%):
+                        </td>
+                        <td class="amount">
+                            {layout.format_currency(surcharge_amount)}
+                        </td>
+                    </tr>
+        """
+
+    base_comp = time_report.base_compensation
+    html_content += f"""
+                    <tr class="subtotal">
+                        <td class="label">
+                            <strong>
+                                {request.translate(
+                                    _('Subtotal (work compensation)')
+                                )}:
+                            </strong>
+                        </td>
+                        <td class="amount">
+                            <strong>
+                                {layout.format_currency(base_comp)}
+                            </strong>
+                        </td>
+                    </tr>
+    """
+
+    travel_label = request.translate(_('Travel'))
+    if translator.drive_distance:
+        travel_label = (
+            f"{request.translate(_('Travel'))} "
+            f"({translator.drive_distance} km)"
+        )
+
+    html_content += f"""
+                    <tr>
+                        <td class="label">{travel_label}:</td>
+                        <td class="amount">
+                            {layout.format_currency(
+                                time_report.travel_compensation
+                            )}
+                        </td>
+                    </tr>
+    """
+
+    if time_report.meal_allowance:
+        meal_label = request.translate(_('Meal Allowance (6+ hours)'))
+        html_content += f"""
+                    <tr>
+                        <td class="label">
+                            {meal_label}:
+                        </td>
+                        <td class="amount">
+                            {layout.format_currency(time_report.meal_allowance)}
+                        </td>
+                    </tr>
+        """
+
+    html_content += f"""
+                    <tr class="total">
+                        <td class="label">
+                            <strong>{request.translate(_('Total'))}</strong>:
+                        </td>
+                        <td class="amount">
+                            <strong>
+                                {layout.format_currency(
+                                    time_report.total_compensation
+                                )}
+                            </strong>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+    """
+
+    accountant_email = request.app.accountant_email
+    accountant_name = ''
+    if (
+        accountant_email
+        and (
+            accountant_user := request.session.query(User)
+            .filter(func.lower(User.username) == accountant_email.lower())
+            .first()
+        )
+        and accountant_user.realname
+    ):
+        accountant_name = accountant_user.realname
+
+    closing_text = 'Mit freundlichen Grüssen<br><br>Rechnungsbüro'
+    if accountant_name:
+        closing_text = (
+            f'Mit freundlichen Grüssen<br><br>Rechnungsbüro<br>'
+            f'{accountant_name}'
+        )
+
+    html_content += f"""
+            <div class="thank-you">
+                <p>
+                    Wir danken Ihnen für Ihre Einsätze und bitten um
+                    entsprechende Kenntnisnahme.
+                </p>
+            </div>
+
+            <div class="closing">
+                <p>
+                    {closing_text}
+                </p>
+            </div>
+    """
+
+    if time_report.notes:
+        html_content += f"""
+            <div class="notes">
+                <h2>{request.translate(_('Notes'))}</h2>
+                <p>{time_report.notes}</p>
+            </div>
+        """
+
+    html_content += """
+        </body>
+        </html>
+    """
+
+    pdf_bytes = HTML(string=html_content).write_pdf(
+        stylesheets=[css], font_config=font_config
+    )
+
+    return pdf_bytes
+
+
+@TranslatorDirectoryApp.view(
+    model=TimeReportTicket,
+    name='time-report-pdf-for-translator',
+    permission=Private,
+)
+def generate_time_report_pdf_for_translator(
+    self: TimeReportTicket,
+    request: TranslatorAppRequest,
+) -> Response:
+    handler = self.handler
+    assert isinstance(handler, TimeReportHandler)
+    if not handler.time_report or not handler.translator:
+        request.alert(_('Time report not found'))
+        return request.redirect(request.link(self))
+
+    time_report = handler.time_report
+    translator = handler.translator
+
+    pdf_bytes = generate_time_report_pdf_bytes(
+        time_report, translator, request
+    )
+
+    filename = (
+        f'Zeiterfassung_{translator.last_name}_'
+        f'{time_report.assignment_date.strftime("%Y%m%d")}.pdf'
+    )
+
+    response = Response(pdf_bytes)
+    response.content_type = 'application/pdf'
+    response.content_disposition = f'inline; filename="{filename}"'
 
     return response

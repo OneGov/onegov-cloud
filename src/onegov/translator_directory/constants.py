@@ -152,6 +152,12 @@ TIME_REPORT_INTERPRETING_TYPES = {
 }
 HOURLY_RATE_CERTIFIED = Decimal('90.00')
 HOURLY_RATE_UNCERTIFIED = Decimal('75.00')
+
+TIME_REPORT_SURCHARGE_LABELS = {
+    'night_work': 'Zuschlag Nacht',
+    'weekend_holiday': 'Zuschlag WE',
+    'urgent': _('Exceptionally urgent'),
+}
 # ====
 
 TRANSLATOR_FA_ICON = 'translator'
