@@ -554,19 +554,11 @@ msgstr "Geschäftsnummer (Polizei)"
 msgid "Geschäftsnummer Police for linking if needed"
 msgstr "Geschäftsnummer Polizei zur Verknüpfung, falls erforderlich"
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-msgid "25% surcharge"
-msgstr ""
-=======
 msgid "Exceptionally urgent"
 msgstr "Ausserordenlich dringlich"
 
-=======
->>>>>>> 474eee9a1 (add edit possibility)
 msgid "25% surcharge"
 msgstr "25% Zuschlag"
->>>>>>> 5bee6befe (Add time report PDF and sending mail with pdf to translator)
 
 msgid "Notes"
 msgstr "Notizen"
@@ -1097,18 +1089,6 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 msgid "Download"
 msgstr "Herunterladen"
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#~ msgid "25%% surcharge"
-#~ msgstr "25%% Zuschlag"
-=======
-=======
-#~ msgid "Night work (20:00 - 06:00)"
-#~ msgstr "Nachtarbeit (20:00 - 06:00)"
-
-#~ msgid "Weekend or holiday"
-#~ msgstr "Wochenende oder Feiertag"
-
 #~ msgid "View Time Report"
 #~ msgstr "Zeiterfassung anzeigen"
 
@@ -1121,7 +1101,6 @@ msgstr "Herunterladen"
 #~ msgid "End Time"
 #~ msgstr "Endzeit"
 
->>>>>>> 474eee9a1 (add edit possibility)
 #~ msgid "Compensation Breakdown"
 #~ msgstr "Entschädigungsaufschlüsselung"
 
@@ -1135,7 +1114,6 @@ msgstr "Herunterladen"
 #~ msgstr ""
 #~ "E-Mail Rechnungsführer ist nicht konfiguriert. Bitte konfigurieren Sie "
 #~ "diese in den <a href=\"${settings_url}\">Einstellungen</a>."
->>>>>>> 5bee6befe (Add time report PDF and sending mail with pdf to translator)
 
 #~ msgid "Night work (20:00 - 06:00)"
 #~ msgstr "Nachtarbeit (20:00 - 06:00)"

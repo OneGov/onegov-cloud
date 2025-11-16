@@ -210,12 +210,8 @@ def accept_time_report(
             content=pdf_bytes,
             content_type='application/pdf',
         )
-<<<<<<< HEAD
     translator = time_report.translator
     if translator and translator.email:
-=======
-
->>>>>>> 5bee6befe (Add time report PDF and sending mail with pdf to translator)
         send_ticket_mail(
             request=request,
             template='mail_time_report_accepted.pt',
