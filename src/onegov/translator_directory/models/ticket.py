@@ -252,6 +252,22 @@ class TimeReportHandler(Handler):
         layout = TranslatorLayout(self.translator, request)
         report = self.time_report
 
+        # Status badge at the top
+        if report.status == 'confirmed':
+            status_class = 'success'
+            status_text = request.translate(_('Confirmed'))
+        else:
+            status_class = 'warning'
+            status_text = request.translate(_('Pending'))
+
+        status_badge = (
+            f'<div class="alert-box callout {status_class}" '
+            f'style="margin-bottom: 1rem;">'
+            f'<strong>{request.translate(_("Status"))}: </strong>'
+            f'{status_text}'
+            f'</div>'
+        )
+
         assignment_type_key = report.assignment_type
         assignment_type_translated = '-'
         if assignment_type_key:
@@ -263,6 +279,7 @@ class TimeReportHandler(Handler):
             layout.format_date(report.assignment_date, 'date')
         )
         summary_parts = [
+            status_badge,
             "<dl class='field-display'>",
             f"<dt>{request.translate(_('Assignment Date'))}</dt>",
             f'<dd>{assignment_date_formatted}</dd>',
@@ -405,13 +422,19 @@ class TimeReportHandler(Handler):
         time_report_links = []
 
         if self.time_report:
-            time_report_links.append(
-                Link(
-                    text=_('View Time Report'),
-                    url=request.return_here(request.link(self.time_report)),
-                    attrs={'class': 'time'},
+            if self.time_report.status == 'pending' and (
+                request.is_editor or request.is_admin
+            ):
+                time_report_links.append(
+                    Link(
+                        text=_('Edit'),
+                        url=request.return_here(
+                            request.link(self.time_report, 'edit')
+                        ),
+                        attrs={'class': 'edit-link'},
+                    )
                 )
-            )
+
             time_report_links.append(
                 Link(
                     text=_('Download PDF'),

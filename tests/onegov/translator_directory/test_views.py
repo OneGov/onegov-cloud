@@ -2230,6 +2230,7 @@ def test_time_report_workflow(
         e for e in all_emails if 'editor@example.org' in e['To']
     ]
     assert len(accountant_emails) >= 1
+
     assert accountant_emails[0]['To'] == 'editor@example.org'
     mail_to_accountant = accountant_emails[0]
     assert 'TRANSLATOR, Test' in mail_to_accountant['Subject']
@@ -2259,10 +2260,67 @@ def test_time_report_workflow(
     ticket_page = client.get(ticket_link)
     # Accept ticket
     ticket_page = ticket_page.click('Ticket annehmen').follow()
-    # Accept time report
+
+    # Test edit functionality as editor
+    # Should see edit link since status is pending and user is editor
+    edit_links = [
+        link
+        for link in ticket_page.pyquery('a')
+        if 'bearbeiten' in link.text_content().lower()
+    ]
+    assert len(edit_links) > 0, 'No edit link found'
+    edit_url = edit_links[0].attrib['href']
+    edit_page = client.get(edit_url)
+    assert 'Zeiterfassung bearbeiten' in edit_page or 'Edit' in edit_page
+
+    # Edit the time report
+    assert edit_page.form['start_date'].value == '2025-01-11'
+    assert edit_page.form['start_time'].value
+    assert edit_page.form['end_time'].value
+    edit_page.form['end_time'] = '12:00'
+    edit_page.form['case_number'] = 'CASE-456-UPDATED'
+    edit_page.form['is_urgent'] = True
+    edit_page = edit_page.form.submit().follow()
+    assert (
+        'Zeiterfassung erfolgreich aktualisiert' in edit_page
+    )
+
+    # Verify updated values in database
+    report = (
+        session.query(Translator)
+        .filter_by(id=translator_id)
+        .one()
+        .time_reports[0]
+    )
+    assert report.duration == 240
+    assert report.case_number == 'CASE-456-UPDATED'
+    assert report.surcharge_percentage == 50.0
+    assert report.surcharge_types is not None
+    assert 'urgent' in report.surcharge_types
+
+    # Test that member can also edit (Personal permission)
+    client.login_member()
+    member_edit_page = client.get(edit_url)
+    assert member_edit_page.status_code == 200
+
+    # Accept time report as editor
+    client.login_editor()
+    ticket_page = client.get(ticket_link)
     accept_url = ticket_page.pyquery('a.accept-link')[0].attrib['ic-post-to']
     page = client.post(accept_url).follow()
     assert 'Zeiterfassung akzeptiert' in page
+
+    # Test that edit is not available after confirmation
+    report = (
+        session.query(Translator)
+        .filter_by(id=translator_id)
+        .one()
+        .time_reports[0]
+    )
+    assert report.status == 'confirmed'
+    ticket_page = client.get(ticket_link)
+    edit_links = ticket_page.pyquery('a.edit-link')
+    assert len(edit_links) == 0
 
     mail_to_translator = client.get_email(0, flush_queue=True)
     assert 'TRANSLATOR, Test' in mail_to_translator['Subject']

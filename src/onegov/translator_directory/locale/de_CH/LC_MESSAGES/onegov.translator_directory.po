@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-15 11:57+0100\n"
+"POT-Creation-Date: 2025-11-16 11:33+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -90,6 +90,9 @@ msgstr "telefonisch"
 
 msgid "On Site"
 msgstr "Vor Ort"
+
+msgid "Exceptionally urgent"
+msgstr "Ausserordenlich dringlich"
 
 msgid "Logout"
 msgstr "Abmelden"
@@ -695,6 +698,15 @@ msgstr "Mutation"
 msgid "Time Report"
 msgstr "Zeiterfassung"
 
+msgid "Confirmed"
+msgstr "Bestätigt"
+
+msgid "Pending"
+msgstr "Noch nicht bestätigt"
+
+msgid "Status"
+msgstr "Status"
+
 msgid "Assignment Date"
 msgstr "Einsatzdatum"
 
@@ -712,12 +724,6 @@ msgstr "Dauer"
 
 msgid "Base pay"
 msgstr "Grundentschädigung"
-
-msgid "Night work (20:00 - 06:00)"
-msgstr "Nachtarbeit (20:00 - 06:00)"
-
-msgid "Weekend or holiday"
-msgstr "Wochenende oder Feiertag"
 
 msgid "Surcharge"
 msgstr "Zuschlag"
@@ -737,8 +743,8 @@ msgstr "Verpflegungsentschädigung (6+ Stunden)"
 msgid "Total"
 msgstr "Total"
 
-msgid "View Time Report"
-msgstr "Zeiterfassung anzeigen"
+msgid "Edit Time Report"
+msgstr "Zeiterfassung bearbeiten"
 
 msgid "Download PDF"
 msgstr "PDF herunterladen"
@@ -874,15 +880,6 @@ msgstr "Wegpauschale"
 msgid "Base Compensation"
 msgstr "Grundentschädigung"
 
-msgid "Status"
-msgstr "Status"
-
-msgid "Pending"
-msgstr "Ausstehend"
-
-msgid "Confirmed"
-msgstr "Bestätigt"
-
 msgid ""
 "No confirmed time reports available for export. Time reports must be "
 "confirmed before they can be exported."
@@ -1008,6 +1005,15 @@ msgstr "November"
 msgid "December"
 msgstr "Dezember"
 
+msgid "Only pending time reports can be edited"
+msgstr "Nur ausstehende Zeiterfassungen können bearbeitet werden"
+
+msgid "Time report updated successfully"
+msgstr "Zeiterfassung erfolgreich aktualisiert"
+
+msgid "Time report edited"
+msgstr "Zeiterfassung bearbeitet"
+
 msgid "Time report not found"
 msgstr "Zeiterfassung nicht gefunden"
 
@@ -1028,15 +1034,6 @@ msgid ""
 msgstr ""
 "Export nicht möglich: Den folgenden Übersetzern fehlt eine Personalnummer "
 "(Personal-Nr.): ${names}"
-
-msgid "Assignment Details"
-msgstr "Einsatzdetails"
-
-msgid "Start Time"
-msgstr "Startzeit"
-
-msgid "End Time"
-msgstr "Endzeit"
 
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
@@ -1092,6 +1089,18 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 msgid "Download"
 msgstr "Herunterladen"
 
+#~ msgid "View Time Report"
+#~ msgstr "Zeiterfassung anzeigen"
+
+#~ msgid "Assignment Details"
+#~ msgstr "Einsatzdetails"
+
+#~ msgid "Start Time"
+#~ msgstr "Startzeit"
+
+#~ msgid "End Time"
+#~ msgstr "Endzeit"
+
 #~ msgid "Compensation Breakdown"
 #~ msgstr "Entschädigungsaufschlüsselung"
 
@@ -1106,26 +1115,17 @@ msgstr "Herunterladen"
 #~ "E-Mail Rechnungsführer ist nicht konfiguriert. Bitte konfigurieren Sie "
 #~ "diese in den <a href=\"${settings_url}\">Einstellungen</a>."
 
-#~ msgid ""
-#~ "Accountant email is not configured. Please configure it in the settings."
-#~ msgstr ""
-#~ "E-Mail Rechnungsführer ist nicht konfiguriert. Bitte konfigurieren Sie "
-#~ "diese in den Einstellungen."
+#~ msgid "Night work (20:00 - 06:00)"
+#~ msgstr "Nachtarbeit (20:00 - 06:00)"
 
-#~ msgid "Date"
-#~ msgstr "Datum"
+#~ msgid "Weekend or holiday"
+#~ msgstr "Wochenende oder Feiertag"
 
-#~ msgid "Rate"
-#~ msgstr "Tarif"
+#~ msgid "Assignment Details"
+#~ msgstr "Einsatzdetails"
 
-#~ msgid "Translator not found"
-#~ msgstr "Übersetzer/in nicht gefunden"
+#~ msgid "Start Time"
+#~ msgstr "Startzeit"
 
-#~ msgid "Duration (minutes)"
-#~ msgstr "Zeitdauer (Minuten)"
-
-#~ msgid "Minimum 30 minutes"
-#~ msgstr "Miniumum 30 Minuten"
-
-#~ msgid "Time report added successfully"
-#~ msgstr "Zeiterfassung erfolgreich hinzugefügt"
+#~ msgid "End Time"
+#~ msgstr "Endzeit"
