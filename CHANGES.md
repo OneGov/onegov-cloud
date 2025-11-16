@@ -1,8 +1,24 @@
 # Changes
 
+## 2025.65
+
+`2025-11-16` | [cb11e65b71...0bada54d1e](https://github.com/OneGov/onegov-cloud/compare/cb11e65b71^...0bada54d1e)
+
+### Town
+
+##### Fix file details not shown
+
+`Bugfix` | [OGC-2784](https://linear.app/onegovcloud/issue/OGC-2784) | [1bf4dda93d](https://github.com/onegov/onegov-cloud/commit/1bf4dda93d8bb51a69b8b5dd3501a3332c6e2ad9)
+
+### Town6
+
+##### Fixes footer contact and opening hours label for feriennet
+
+`Bugfix` | [OGC-2424](https://linear.app/onegovcloud/issue/OGC-2424) | [0acc673b40](https://github.com/onegov/onegov-cloud/commit/0acc673b40084bd897acd5b2d5d15657c5260d9a)
+
 ## 2025.64
 
-`2025-11-13` | [12f9839782...130ce35d62](https://github.com/OneGov/onegov-cloud/compare/12f9839782^...130ce35d62)
+`2025-11-13` | [12f9839782...af0f368d08](https://github.com/OneGov/onegov-cloud/compare/12f9839782^...af0f368d08)
 
 ### Assembly
 
@@ -2427,59 +2443,4 @@ Decreases the log level for failed payment provider connections.
 ##### Fixes crash in `User.get_initials`
 
 `Bugfix` | [5360b64cc6](https://github.com/onegov/onegov-cloud/commit/5360b64cc6461aea4298df64e76b8a1ebf9801ab)
-
-## 2025.16
-
-`2025-03-28` | [fb3aa7cd1f...1b2949f6c2](https://github.com/OneGov/onegov-cloud/compare/fb3aa7cd1f^...1b2949f6c2)
-
-### Form
-
-##### Switches from native URL field to a text field with URL validation
-
-`Feature` | [OGC-2055](https://linear.app/onegovcloud/issue/OGC-2055) | [de7e75b638](https://github.com/onegov/onegov-cloud/commit/de7e75b6389e11650f7a44f29668cfbc264529f5)
-
-### Fsi
-
-##### Ignore 6 year limits for admins
-
-Admins can now register attendees without the 6 year limit.
-CSRF messages now contain instruction.
-
-`Feature` | [OGC-2102](https://linear.app/onegovcloud/issue/OGC-2102) | [a8c52f80c1](https://github.com/onegov/onegov-cloud/commit/a8c52f80c1a6cc09b50e971af78e51874dbd9e73)
-
-### Org
-
-##### Additional Field in Newsletter
-
-Add Field "closing remark" to newsletter
-
-`Feature` | [OGC-2006](https://linear.app/onegovcloud/issue/OGC-2006) | [fa483b81e4](https://github.com/onegov/onegov-cloud/commit/fa483b81e418de0af0098426220c42f6bc1218aa)
-
-##### Integrate email bounce statistics in directory entry subscriptions
-
-`Feature` | [OGC-2070](https://linear.app/onegovcloud/issue/OGC-2070) | [992f131ce6](https://github.com/onegov/onegov-cloud/commit/992f131ce6c26565776e304d09462067a35fa7bd)
-
-##### Add extensions to document form
-
-`Feature` | [OGC-2142](https://linear.app/onegovcloud/issue/OGC-2142) | [f45acf604f](https://github.com/onegov/onegov-cloud/commit/f45acf604f30cf667f49fdaa3e61c4a81b9fb9ac)
-
-##### Fixes rendering of newsletter categories
-
-`Bugfix` | [OGC-2118](https://linear.app/onegovcloud/issue/OGC-2118) | [02d2615681](https://github.com/onegov/onegov-cloud/commit/02d2615681b1f4b6caf581cd1acf9797b17a82b1)
-
-##### Fix reoccurring dates bug
-
-Fix bug where editing an event with reoccurring dates lost the dates.
-
-`Bugfix` | [OGC-2133](https://linear.app/onegovcloud/issue/OGC-2133) | [737819e1f3](https://github.com/onegov/onegov-cloud/commit/737819e1f350097ba9323ed0ded577ec2e4ad04c)
-
-##### Adds pagination for News and refactors logic into `NewsCollection`
-
-`Performance` | [OGC-2146](https://linear.app/onegovcloud/issue/OGC-2146) | [fe76277190](https://github.com/onegov/onegov-cloud/commit/fe762771908fcad427f2f6ce838206e755b1507c)
-
-### User
-
-##### Extend cli list command to run over all instances
-
-`Feature` | [NONE](#NONE) | [f770378d11](https://github.com/onegov/onegov-cloud/commit/f770378d1191fa3a7ac7cada483f24ccf763da02)
 
