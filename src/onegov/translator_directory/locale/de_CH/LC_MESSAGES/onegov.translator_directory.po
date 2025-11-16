@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-16 11:33+0100\n"
+"POT-Creation-Date: 2025-11-16 16:19+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -554,9 +554,6 @@ msgstr "Geschäftsnummer (Polizei)"
 msgid "Geschäftsnummer Police for linking if needed"
 msgstr "Geschäftsnummer Polizei zur Verknüpfung, falls erforderlich"
 
-msgid "Exceptionally urgent"
-msgstr "Ausserordenlich dringlich"
-
 msgid "25% surcharge"
 msgstr "25% Zuschlag"
 
@@ -589,6 +586,15 @@ msgstr "Sprachausbildung und Expertise"
 
 msgid "Hidden"
 msgstr "Versteckt"
+
+msgid "IBAN is required for self-employed translators"
+msgstr "IBAN ist für selbständige Übersetzer/innen erforderlich"
+
+msgid "Address is required for self-employed translators"
+msgstr "Adresse ist für selbständige Übersetzer/innen erforderlich"
+
+msgid "City is required for self-employed translators"
+msgstr "Ort ist für selbständige Übersetzer/innen erforderlich"
 
 msgid "Search in first and last name"
 msgstr "Suche in Vor- und Nachname"
@@ -743,11 +749,11 @@ msgstr "Verpflegungsentschädigung (6+ Stunden)"
 msgid "Total"
 msgstr "Total"
 
-msgid "Edit Time Report"
-msgstr "Zeiterfassung bearbeiten"
-
 msgid "Download PDF"
 msgstr "PDF herunterladen"
+
+msgid "Download QR Bill"
+msgstr "QR-Rechnung herunterladen"
 
 msgid "View translator"
 msgstr "Übersetzer/in anzeigen"
@@ -864,6 +870,9 @@ msgstr "Eine neue Zeiterfassung wurde zur Überprüfung eingereicht."
 
 msgid "Translator:"
 msgstr "Dolmetscher/in:"
+
+msgid "Time report edited"
+msgstr "Zeiterfassung bearbeitet"
 
 msgid "Admission granted."
 msgstr "Zulassung erteilt."
@@ -1011,11 +1020,24 @@ msgstr "Nur ausstehende Zeiterfassungen können bearbeitet werden"
 msgid "Time report updated successfully"
 msgstr "Zeiterfassung erfolgreich aktualisiert"
 
-msgid "Time report edited"
-msgstr "Zeiterfassung bearbeitet"
+msgid "Edit Time Report"
+msgstr "Zeiterfassung bearbeiten"
 
 msgid "Time report not found"
 msgstr "Zeiterfassung nicht gefunden"
+
+msgid ""
+"Cannot accept time report: Self-employed translator must have valid IBAN"
+msgstr ""
+"Zeiterfassung kann nicht akzeptiert werden: Selbständige Übersetzer/innen "
+"müssen eine gültige IBAN haben"
+
+msgid ""
+"Cannot accept time report: Self-employed translator must have complete "
+"address"
+msgstr ""
+"Zeiterfassung kann nicht akzeptiert werden: Selbständige Übersetzer/innen "
+"müssen eine vollständige Adresse haben"
 
 msgid "Time report accepted"
 msgstr "Zeiterfassung akzeptiert"
@@ -1034,6 +1056,15 @@ msgid ""
 msgstr ""
 "Export nicht möglich: Den folgenden Übersetzern fehlt eine Personalnummer "
 "(Personal-Nr.): ${names}"
+
+msgid "QR bill only available for self-employed"
+msgstr "QR-Rechnung nur für selbständige Übersetzer/innen verfügbar"
+
+msgid "QR bill only available for confirmed reports"
+msgstr "QR-Rechnung nur für bestätigte Zeiterfassungen verfügbar"
+
+msgid "Could not generate QR bill"
+msgstr "QR-Rechnung konnte nicht erstellt werden"
 
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
@@ -1120,12 +1151,3 @@ msgstr "Herunterladen"
 
 #~ msgid "Weekend or holiday"
 #~ msgstr "Wochenende oder Feiertag"
-
-#~ msgid "Assignment Details"
-#~ msgstr "Einsatzdetails"
-
-#~ msgid "Start Time"
-#~ msgstr "Startzeit"
-
-#~ msgid "End Time"
-#~ msgstr "Endzeit"

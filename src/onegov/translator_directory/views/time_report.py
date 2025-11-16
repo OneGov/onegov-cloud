@@ -2,6 +2,7 @@ from __future__ import annotations
 
 
 import csv
+import json
 from io import StringIO
 from webob import Response
 from datetime import datetime
@@ -9,6 +10,10 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from onegov.core.mail import Attachment
 from onegov.core.utils import module_path
+from onegov.translator_directory.qrbill import (
+    generate_translator_qr_bill,
+    is_valid_iban,
+)
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration,
@@ -167,6 +172,29 @@ def edit_time_report(
     }
 
 
+def show_warning_for_intercooler(
+    request: TranslatorAppRequest, message: str
+) -> BaseResponse:
+    """Using just a normal request.warning gets suppressed.
+    So we use this.
+    """
+
+    translated_message = request.translate(message)
+
+    @request.after
+    def add_warning_headers(response: Response) -> None:
+        response.headers.add('X-IC-Trigger', 'show-alert')
+        response.headers.add(
+            'X-IC-Trigger-Data',
+            json.dumps(
+                {'type': 'warning', 'message': translated_message},
+                ensure_ascii=True,
+            ),
+        )
+
+    return Response()
+
+
 @TranslatorDirectoryApp.view(
     model=TimeReportTicket,
     name='accept-time-report',
@@ -183,17 +211,35 @@ def accept_time_report(
     handler = self.handler
     assert hasattr(handler, 'time_report')
     if not handler.time_report:
-        request.alert(_('Time report not found'))
-        return request.redirect(request.link(self))
+        return show_warning_for_intercooler(
+            request, _('Time report not found')
+        )
 
     time_report = handler.time_report
+    translator = time_report.translator
+
+    if translator and translator.self_employed:
+        if not is_valid_iban(translator.iban):
+            return show_warning_for_intercooler(
+                request,
+                _(
+                    'Cannot accept time report: '
+                    'Self-employed translator must have valid IBAN'
+                ),
+            )
+
+        if not all([translator.address, translator.zip_code, translator.city]):
+            return show_warning_for_intercooler(
+                request,
+                _(
+                    'Cannot accept time report: '
+                    'Self-employed translator must have complete address'
+                ),
+            )
+
     time_report.status = 'confirmed'
-    # FIXME: (minor)
-    # do we even need to maintain the state seperately in handler data?
-    # Seems that accepting the ticket should be enough or no?
     handler.data['state'] = 'accepted'
 
-    translator = time_report.translator
     if translator and translator.email:
         call_to_action_link = request.link(self)
 
@@ -210,8 +256,7 @@ def accept_time_report(
             content=pdf_bytes,
             content_type='application/pdf',
         )
-    translator = time_report.translator
-    if translator and translator.email:
+
         send_ticket_mail(
             request=request,
             template='mail_time_report_accepted.pt',
@@ -768,6 +813,52 @@ def generate_time_report_pdf_for_translator(
     )
 
     response = Response(pdf_bytes)
+    response.content_type = 'application/pdf'
+    response.content_disposition = f'inline; filename="{filename}"'
+
+    return response
+
+
+@TranslatorDirectoryApp.view(
+    model=TimeReportTicket,
+    name='qr-bill-pdf',
+    permission=Private,
+)
+def generate_qr_bill_pdf_for_translator(
+    self: TimeReportTicket,
+    request: TranslatorAppRequest,
+) -> Response:
+    handler = self.handler
+    assert isinstance(handler, TimeReportHandler)
+    if not handler.time_report or not handler.translator:
+        request.alert(_('Time report not found'))
+        return request.redirect(request.link(self))
+
+    time_report = handler.time_report
+    translator = handler.translator
+
+    if not translator.self_employed:
+        request.alert(_('QR bill only available for self-employed'))
+        return request.redirect(request.link(self))
+
+    if time_report.status != 'confirmed':
+        request.alert(_('QR bill only available for confirmed reports'))
+        return request.redirect(request.link(self))
+
+    qr_bill_bytes = generate_translator_qr_bill(
+        translator, time_report, request
+    )
+
+    if not qr_bill_bytes:
+        request.alert(_('Could not generate QR bill'))
+        return request.redirect(request.link(self))
+
+    filename = (
+        f'QR_Rechnung_{translator.last_name}_'
+        f'{time_report.assignment_date.strftime("%Y%m%d")}.pdf'
+    )
+
+    response = Response(qr_bill_bytes)
     response.content_type = 'application/pdf'
     response.content_disposition = f'inline; filename="{filename}"'
 
