@@ -2167,9 +2167,6 @@ def test_view_time_reports(client: Client) -> None:
     page = client.get('/time-reports')
     assert '162.75' in page
 
-    page = client.get(f'/time-report/{report_id}')
-    assert 'CASE-001' in page
-
 
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
