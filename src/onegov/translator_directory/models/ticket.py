@@ -445,6 +445,19 @@ class TimeReportHandler(Handler):
                 )
             )
 
+            if (
+                self.time_report.status == 'confirmed'
+                and self.translator
+                and self.translator.self_employed
+            ):
+                time_report_links.append(
+                    Link(
+                        text=_('Download QR Bill'),
+                        url=request.link(self.ticket, 'qr-bill-pdf'),
+                        attrs={'class': 'pdf'},
+                    )
+                )
+
         time_report_links.append(
             Link(
                 text=_('View translator'),
@@ -464,10 +477,7 @@ class TimeReportHandler(Handler):
                     traits=(
                         Intercooler(
                             request_method='POST',
-                            redirect_after=request.link(
-                                self.translator if request.is_member
-                                else self.ticket
-                            )
+                            redirect_after=request.link(self.ticket)
                         )
                     ),
                 )
