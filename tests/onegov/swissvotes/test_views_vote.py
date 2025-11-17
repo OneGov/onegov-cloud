@@ -40,12 +40,12 @@ def test_view_vote(swissvotes_app: TestApp, sample_vote: SwissVote) -> None:
         "Wirtschaft &gt; Arbeit und Beschäftigung &gt; Arbeitsbedingungen"
     ) in page
     assert (
-        "Sozialpolitik &gt; Soziale Gruppen &gt; "
-        "Kinder und Jugendliche"
+        "Sozial- und Gesellschaftspolitik &gt; Gesellschaftsfragen &gt; "
+        "Kinder- und Jugendpolitik"
     ) in page
     assert (
-        "Sozialpolitik &gt; Soziale Gruppen &gt; "
-        "Stellung der Frau"
+        "Sozial- und Gesellschaftspolitik &gt; Gesellschaftsfragen &gt; "
+        "Frauen und Gleichstellungspolitik"
     ) in page
     assert "anneepolitique" in page
     assert "Befürwortend" in page
