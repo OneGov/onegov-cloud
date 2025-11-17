@@ -10,7 +10,7 @@ from onegov.form.errors import InvalidIndentSyntax
 from onegov.form.fields import (
     DateTimeLocalField, MultiCheckboxField, TimeField, URLField, VideoURLField)
 from onegov.form.parser.grammar import field_help_identifier
-from onegov.form.validators import LaxDataRequired
+from onegov.form.validators import LaxDataRequired, WhitelistedMimeType
 from onegov.form.validators import ValidDateRange
 from onegov.pay import Price
 from textwrap import dedent
@@ -341,6 +341,16 @@ def test_parse_fileinput() -> None:
     assert isinstance(form['file'], FileField)
     assert form['file'].widget.multiple is False  # type: ignore[attr-defined]
 
+    # verify mime type validator
+    field = form._fields['file']
+    assert any(isinstance(v, WhitelistedMimeType) for v in field.validators)
+    assert field.validators[1].whitelist == {'application/msword', 'application/pdf'}
+
+    form = parse_form("File = *.*")()
+    field = form._fields['file']
+    assert any(isinstance(v, WhitelistedMimeType) for v in field.validators)
+    assert field.validators[1].whitelist == WhitelistedMimeType.whitelist
+
 
 def test_parse_multiplefileinput() -> None:
     form = parse_form("Files = *.pdf|*.doc (multiple)")()
@@ -348,6 +358,17 @@ def test_parse_multiplefileinput() -> None:
     assert form['files'].label.text == 'Files'
     assert isinstance(form['files'], FileField)
     assert form['files'].widget.multiple is True  # type: ignore[attr-defined]
+
+    # verify mime type validator
+    field = form._fields['files']
+    assert field.validators
+    assert any(isinstance(v, WhitelistedMimeType) for v in field.validators)
+    assert field.validators[1].whitelist == {'application/msword', 'application/pdf'}
+
+    form = parse_form("File = *.*")()
+    field = form._fields['files']
+    assert any(isinstance(v, WhitelistedMimeType) for v in field.validators)
+    assert field.validators[1].whitelist == WhitelistedMimeType.whitelist
 
 
 def test_parse_radio() -> None:
