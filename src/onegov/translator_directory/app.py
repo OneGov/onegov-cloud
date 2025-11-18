@@ -55,6 +55,10 @@ class TranslatorDirectoryApp(TownApp):
     def coordinates(self, value: AnyCoordinates) -> None:
         self.org.meta['translator_directory_home'] = value or {}
 
+    @property
+    def accountant_email(self) -> str | None:
+        return self.org.meta.get('accountant_email')
+
     def redirect_after_login(
         self,
         identity: Identity | NoIdentity,

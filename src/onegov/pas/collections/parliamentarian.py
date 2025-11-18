@@ -151,6 +151,8 @@ class PASParliamentarianCollection(
                 users_cache[new_email.lower()] = new_user_obj
 
         if enable:
+            if enable.role == 'admin':
+                return
             role = (
                 'commission_president'
                 if self._is_current_commission_president(item)
@@ -161,15 +163,17 @@ class PASParliamentarianCollection(
                 'role': role,
                 'active': True,
                 'source': None,
-                'source_id': None
+                'source_id': None,
             }
             corrections = {
-                attribute: value for attribute, value in corrections.items()
+                attribute: value
+                for attribute, value in corrections.items()
                 if getattr(enable, attribute) != value
             }
             if corrections:
-                log.info('Correcting user'
-                    f' {enable.username} to {corrections}')
+                log.info(
+                    f'Correcting user {enable.username} to {corrections}'
+                )
                 for attribute, value in corrections.items():
                     setattr(enable, attribute, value)
                 enable.logout_all_sessions(self.app)

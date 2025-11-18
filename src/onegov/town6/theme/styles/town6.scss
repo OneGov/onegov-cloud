@@ -873,6 +873,10 @@ $pageref-color-hover: $iron;
 .side-panel {
     // reduce margin-bottom
     margin-bottom: 2rem !important;
+
+    .location {
+        white-space: pre-line;
+    }
 }
 
 .side-panel .more-list {

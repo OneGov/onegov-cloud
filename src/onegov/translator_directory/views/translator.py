@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-import math
 from decimal import Decimal
 from io import BytesIO
 from onegov.file import File
 from morepath import redirect
+from sedate import replace_timezone
+from datetime import datetime
 from morepath.request import Response
 from sedate import utcnow
 from onegov.core.custom import json
@@ -42,9 +43,9 @@ from onegov.translator_directory.layout import (
     MailTemplatesLayout,
 )
 from onegov.translator_directory.models.time_report import TranslatorTimeReport
-from onegov.translator_directory.models.ticket import TimeReportTicket
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.utils import country_code_to_name
+from onegov.translator_directory.utils import get_accountant_email
 
 from uuid import uuid4
 from xlsxwriter import Workbook
@@ -53,7 +54,6 @@ from webob.exc import HTTPForbidden
 
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from datetime import date, datetime
     from collections.abc import Iterable
@@ -535,21 +535,35 @@ def add_time_report(
 ) -> RenderData | BaseResponse:
 
     if form.submitted(request):
+        try:
+            accountant_email = get_accountant_email(request)
+        except ValueError as e:
+            request.alert(str(e))
+            layout = TranslatorLayout(self, request)
+            layout.edit_mode = True
+            return {
+                'layout': layout,
+                'model': self,
+                'form': form,
+                'title': _('Add Time Report'),
+            }
+
         assert request.current_username is not None
-        assert form.duration.data is not None
-        assert form.assignment_date.data is not None
+        assert form.start_date.data is not None
+        assert form.start_time.data is not None
+        assert form.end_date.data is not None
+        assert form.end_time.data is not None
 
         session = request.session
         current_user = request.current_user
 
-        hours = float(form.duration.data)
-        rounded_hours = math.ceil(hours * 2) / 2
-        duration_minutes = int(rounded_hours * 60)
+        duration_hours = form.get_duration_hours()
+        duration_minutes = int(float(duration_hours) * 60)
 
         hourly_rate = form.get_hourly_rate(self)
+        surcharge_types = form.get_surcharge_types()
         surcharge_pct = form.calculate_surcharge()
-        travel_comp = Decimal(form.travel_distance.data or 0)
-        duration_hours = Decimal(duration_minutes) / Decimal(60)
+        travel_comp = form.get_travel_compensation(self)
         base_comp = (
             hourly_rate
             * duration_hours
@@ -560,20 +574,27 @@ def add_time_report(
         )
         total_comp = base_comp + travel_comp + meal_allowance
 
+        start_dt = datetime.combine(form.start_date.data, form.start_time.data)
+        end_dt = datetime.combine(form.end_date.data, form.end_time.data)
+        start_dt = replace_timezone(start_dt, 'Europe/Zurich')
+        end_dt = replace_timezone(end_dt, 'Europe/Zurich')
+
         report = TranslatorTimeReport(
             translator=self,
             created_by=current_user,
             assignment_type=form.assignment_type.data or None,
             duration=duration_minutes,
             case_number=form.case_number.data or None,
-            assignment_date=form.assignment_date.data,
+            assignment_date=form.start_date.data,
+            start=start_dt,
+            end=end_dt,
             hourly_rate=hourly_rate,
+            surcharge_types=surcharge_types if surcharge_types else None,
             surcharge_percentage=surcharge_pct,
             travel_compensation=travel_comp,
             total_compensation=total_comp,
             notes=form.notes.data or None,
         )
-
         session.add(report)
         session.flush()
 
@@ -598,15 +619,30 @@ def add_time_report(
             ticket=ticket,
             send_self=True,
         )
+
         for email in emails_for_new_ticket(request, ticket):
-            send_ticket_mail(
-                request=request,
-                template='mail_ticket_opened_info.pt',
-                subject=_('New ticket'),
-                ticket=ticket,
-                receivers=(email,),
-                content={'model': ticket},
-            )
+            if email != accountant_email:
+                send_ticket_mail(
+                    request=request,
+                    template='mail_ticket_opened_info.pt',
+                    subject=_('New ticket'),
+                    ticket=ticket,
+                    receivers=(email,),
+                    content={'model': ticket},
+                )
+
+        send_ticket_mail(
+            request=request,
+            template='mail_time_report_created.pt',
+            subject=_('New time report for review'),
+            ticket=ticket,
+            receivers=(accountant_email,),
+            content={
+                'model': ticket,
+                'translator': self,
+                'time_report': report,
+            },
+        )
 
         request.app.send_websocket(
             channel=request.app.websockets_private_channel,
@@ -630,31 +666,6 @@ def add_time_report(
         'form': form,
         'title': _('Add Time Report'),
     }
-
-
-@TranslatorDirectoryApp.view(
-    model=TimeReportTicket,
-    name='accept-time-report',
-    permission=Private,
-    request_method='POST',
-)
-def accept_time_report(
-    self: TimeReportTicket, request: TranslatorAppRequest
-) -> BaseResponse:
-    """Accept time report."""
-    request.assert_valid_csrf_token()
-
-    handler = self.handler
-    assert hasattr(handler, 'time_report')
-    if not handler.time_report:
-        request.alert(_('Time report not found'))
-        return request.redirect(request.link(self))
-
-    handler.time_report.status = 'confirmed'
-    handler.data['state'] = 'accepted'
-    TicketMessage.create(self, request, 'accepted')
-    request.success(_('Time report accepted'))
-    return request.redirect(request.link(self))
 
 
 @TranslatorDirectoryApp.form(

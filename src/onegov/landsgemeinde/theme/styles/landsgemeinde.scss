@@ -311,11 +311,29 @@ h1.main-title small {
     iframe {
         height: 100%;
         left: 0;
-        padding-bottom: 2rem;
         position: absolute;
         top: 0;
         width: 100%;
     }
+}
+
+.print-button {
+    margin: 1rem 0;
+    text-align: right;
+
+    i {
+        background: $smoke;
+        border-radius: 100%;
+        color: $oil;
+        cursor: pointer;
+        padding: .7rem;
+        transition: background 200ms linear, color 200ms linear;
+
+        &:hover {
+            color: $primary-color;
+        }
+    }
+
 }
 
 /*

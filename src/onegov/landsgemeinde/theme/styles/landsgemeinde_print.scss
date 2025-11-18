@@ -1,0 +1,50 @@
+/*
+    Print Styles
+*/
+@media print {
+    h1 small {
+        font-size: 1.3rem;
+    }
+
+    .sidebar,
+    .videowrapper,
+    .video-link {
+        display: none !important;
+    }
+
+    .main-content {
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .votum {
+        // border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none;
+        margin: none !important;
+        padding: none !important;
+
+        .person-card-title,
+        .person-card-function {
+            font-size: .8rem !important;
+        }
+
+        .person-card-function {
+            font-size: .8rem !important;
+            font-style: italic !important;
+        }
+
+        blockquote {
+            border: none !important;
+        }
+    }
+
+    .person-list-card {
+        border-top: 0 !important;
+    }
+
+    .print-button {
+        display: none !important;
+    }
+}
+
