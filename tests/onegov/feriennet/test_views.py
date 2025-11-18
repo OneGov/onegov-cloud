@@ -1106,6 +1106,89 @@ def test_booking_view(client: Client, scenario: Scenario) -> None:
     assert count(m1_bookings) == 4
 
 
+def test_booking_contact_view(client: Client, scenario: Scenario) -> None:
+    scenario.add_period()
+
+    for i in range(4):
+        scenario.add_activity(title=f"A {i}", state='accepted')
+        scenario.add_occasion()
+
+    scenario.add_user(username='m1@example.org', role='member', realname="Tom",
+    phone="000 000 00 11", email="tom@example.org")
+    scenario.add_attendee(
+        name="Dustin",
+        birth_date=date(2000, 1, 1)
+    )
+
+    scenario.add_user(username='m2@example.org', role='member', realname="Doc",
+        show_contact_data_to_others=True, phone="000 000 00 12",
+        email="doc@example.org")
+    scenario.add_attendee(
+        name="Mike",
+        birth_date=date(2000, 1, 1)
+    )
+
+    scenario.add_user(username='m3@example.org', role='member', realname="Zak",
+        show_contact_data_to_others=True, phone="000 000 00 13",
+        email="zak@example.org")
+    scenario.add_attendee(
+        name="Luca",
+        birth_date=date(2000, 1, 1)
+    )
+
+    # sign Dustin up for all courses
+    for occasion in scenario.occasions:
+        scenario.add_booking(
+            occasion=occasion,
+            user=scenario.users[0],
+            attendee=scenario.attendees[0]
+        )
+
+    # sign Mike up for one course only for the permission check
+    scenario.add_booking(
+        occasion=scenario.occasions[0],
+        user=scenario.users[1],
+        attendee=scenario.attendees[1]
+    )
+
+    # sign Luca up for one course to see if he shows up in the contact list
+    scenario.add_booking(
+        occasion=scenario.occasions[0],
+        user=scenario.users[2],
+        attendee=scenario.attendees[2]
+    )
+
+    scenario.commit()
+
+    with scenario.update():
+        assert scenario.latest_period is not None
+        scenario.latest_period.confirm_and_start_booking_phase()
+        for b in scenario.bookings:
+            b.state = 'accepted'
+
+    c1 = client.spawn()
+    c1.login('m1@example.org', 'hunter2')
+
+    c2 = client.spawn()
+    c2.login('m2@example.org', 'hunter2')
+
+    # Tom can see the contact data of Doc and Zak
+    c1_bookings = c1.get('/').click('Buchungen')
+    assert "doc@example.org" in c1_bookings
+    assert 'href="tel:+41 000000012"' in c1_bookings
+    assert "zak@example.org" in c1_bookings
+    assert 'href="tel:+41 000000013"' in c1_bookings
+
+    # Doc can see the contact data of Zak and himself but not Tom
+    c2_bookings = c2.get('/').click('Buchungen')
+    assert "doc@example.org" in c2_bookings
+    assert 'href="tel:+41 000000012"' in c2_bookings
+    assert "zak@example.org" in c2_bookings
+    assert 'href="tel:+41 000000013"' in c2_bookings
+    assert "tom@example.org" not in c2_bookings
+    assert 'href="tel:+41 000000011"' not in c2_bookings
+
+
 def test_confirmed_booking_view(client: Client, scenario: Scenario) -> None:
     scenario.add_period()
     scenario.add_activity()
@@ -1130,11 +1213,6 @@ def test_confirmed_booking_view(client: Client, scenario: Scenario) -> None:
     assert "Wunsch entfernen" in page
     assert "Gebucht" not in page
 
-    # Related contacts are hidden at this point
-    page = client.get('/feriennet-settings')
-    page.form['show_related_contacts'] = True
-    page.form.submit()
-
     page = client.get('/my-bookings')
     assert not page.pyquery('.attendees-toggle')
     assert "Elternteil" not in page
@@ -1149,19 +1227,6 @@ def test_confirmed_booking_view(client: Client, scenario: Scenario) -> None:
     assert "Wunsch entfernen" not in page
     assert "Buchung entfernen" not in page
     assert "nicht genügend Anmeldungen" not in page
-
-    # Related contacts are now visible
-    assert page.pyquery('.attendees-toggle').text() == '1 Teilnehmende'
-    assert "Elternteil" in page
-
-    # Unless that option was disabled
-    page = client.get('/feriennet-settings')
-    page.form['show_related_contacts'] = False
-    page.form.submit()
-
-    page = client.get('/my-bookings')
-    assert not page.pyquery('.attendees-toggle')
-    assert "Elternteil" not in page
 
     # Other states are shown too
     states: list[tuple[BookingState, str]] = [

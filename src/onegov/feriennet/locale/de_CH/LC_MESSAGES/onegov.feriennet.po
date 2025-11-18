@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-04-28 14:53+0200\n"
+"POT-Creation-Date: 2025-11-12 10:03+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -106,7 +106,7 @@ msgstr "CHF bezahlt"
 msgid "Help us"
 msgstr "Helfen"
 
-msgid "Dashboard"
+msgid "Overview"
 msgstr "Übersicht"
 
 msgid "Periods"
@@ -1325,6 +1325,12 @@ msgstr "Bank Konto (IBAN)"
 
 msgid "Beneficiary"
 msgstr "Begünstigter"
+
+msgid "Allow contact for carpooling"
+msgstr "Kontaktaufnahme für Mitfahrgelegenheiten erlauben"
+
+msgid "Privacy"
+msgstr "Privatsphäre"
 
 msgid "Please enter both a phone number and a name"
 msgstr "Bitte geben Sie eine Telefonnummer und einen Namen ein"
@@ -3156,9 +3162,6 @@ msgstr ""
 "Mitglieder können die Kontaktdaten anderer Mitglieder des gleichen Angebots "
 "sehen"
 
-msgid "Privacy"
-msgstr "Privatsphäre"
-
 msgid "Public organiser data"
 msgstr "Öffentliche Daten Veranstaltende"
 
@@ -3235,6 +3238,9 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid "Dashboard"
+#~ msgstr "Übersicht"
 
 #~ msgid "The Swisspass ID must be 13 characters long."
 #~ msgstr "Die Swisspass ID muss 13 Zeichen lang sein."
