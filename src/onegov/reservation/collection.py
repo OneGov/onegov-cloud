@@ -1,17 +1,20 @@
 from __future__ import annotations
 
 import enum
+
 from onegov.core.utils import normalize_for_url
 from onegov.reservation.models import Resource
 from uuid import uuid4, UUID
 
-
 from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Callable
     from libres.context.core import Context
     from libres.db.models import Allocation, Reservation
-    from sqlalchemy.orm import Query
+    from libres.db.scheduler import Scheduler
+
+    from sqlalchemy.orm import Query, Session
     from typing import TypeAlias
 
 
@@ -125,7 +128,9 @@ class ResourceCollection:
         self,
         resource: Resource,
         including_reservations: bool = False,
-        handle_reservation: Callable[[Reservation], Any] | None = None
+        handle_linked_objects: (
+            Callable[[Scheduler, Session], Any] | None
+        ) = None,
     ) -> None:
 
         scheduler = resource.get_scheduler(self.libres_context)
@@ -136,10 +141,9 @@ class ResourceCollection:
 
             scheduler.managed_allocations().delete('fetch')
         else:
-            if callable(handle_reservation):
-                for res in scheduler.managed_reservations():
-                    # e.g. create a ticket snapshot
-                    handle_reservation(res)
+            if callable(handle_linked_objects):
+                handle_linked_objects(scheduler, self.session)
+
             scheduler.extinguish_managed_records()
 
         if resource.files:
