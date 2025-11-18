@@ -691,7 +691,7 @@ def generate_time_report_pdf_bytes(
     if translator.drive_distance:
         travel_label = (
             f"{request.translate(_('Travel'))} "
-            f"({translator.drive_distance} km)"
+            f"({translator.drive_distance} km \u00d7 2)"
         )
 
     html_content += f"""

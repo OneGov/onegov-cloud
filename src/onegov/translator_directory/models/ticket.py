@@ -367,7 +367,7 @@ class TimeReportHandler(Handler):
         if report.translator.drive_distance:
             travel_label = (
                 f"{request.translate(_('Travel'))} "
-                f"({report.translator.drive_distance} km)"
+                f"({report.translator.drive_distance} km \u00d7 2)"
             )
         summary_parts.extend(
             [

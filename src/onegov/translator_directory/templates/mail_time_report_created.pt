@@ -18,7 +18,7 @@
 
         <p tal:condition="time_report|nothing">
             <strong i18n:translate>Assignment Date:</strong>
-            ${time_report.assignment_date.strftime('%Y-%m-%d')}
+            ${time_report.assignment_date.strftime('%d.%m.%Y')}
         </p>
 
         <p tal:condition="time_report|nothing">

@@ -225,11 +225,15 @@ class TranslatorTimeReportForm(Form):
         return types
 
     def get_travel_compensation(self, translator: Translator) -> Decimal:
-        """Calculate travel compensation based on translator's distance."""
+        """Calculate travel compensation based on round trip distance.
+
+        The drive_distance is multiplied by 2 to account for the round trip
+        (Wegentschädigung * 2).
+        """
         if not translator.drive_distance:
             return Decimal('0')
 
-        distance = float(translator.drive_distance)
+        distance = float(translator.drive_distance) * 2
         if distance <= 25:
             return Decimal('20')
         elif distance <= 50:
