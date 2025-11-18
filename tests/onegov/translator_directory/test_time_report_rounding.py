@@ -422,3 +422,35 @@ def test_rounding_consistency(translator_app: TestApp) -> None:
             f'1h 25m from {start_time} to {end_time} '
             f'should always be 1.5h, got {duration}h'
         )
+
+
+def test_telephonic_has_no_travel_compensation(
+    translator_app: TestApp,
+) -> None:
+
+    session = translator_app.session()
+    translator = create_translator(translator_app, drive_distance=35.0)
+
+    request: object = Bunch(
+        app=translator_app,
+        session=session,
+        locale='de_CH',
+        translate=lambda x: str(x),
+    )
+
+    form = TranslatorTimeReportForm()
+    form.request = request  # type: ignore[assignment]
+    form.on_request()
+
+    form.assignment_type.data = 'telephonic'
+    travel_comp = form.get_travel_compensation(translator)
+    assert travel_comp == Decimal(
+        '0'
+    ), 'Telephonic assignments should have no travel compensation'
+
+    form.assignment_type.data = 'on-site'
+    travel_comp = form.get_travel_compensation(translator)
+    assert travel_comp == Decimal('100'), (
+        'On-site with 35km distance should have 100 compensation '
+        f'(35km * 2 = 70km), got {travel_comp}'
+    )

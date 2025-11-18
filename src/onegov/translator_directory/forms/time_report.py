@@ -36,6 +36,7 @@ class TranslatorTimeReportForm(Form):
     assignment_type = ChosenSelectField(
         label=_('Type of translation/interpreting'),
         choices=[],
+        default='on-site',
     )
 
     start_date = DateField(
@@ -229,7 +230,11 @@ class TranslatorTimeReportForm(Form):
 
         The drive_distance is multiplied by 2 to account for the round trip
         (Wegentschädigung * 2).
+        Returns 0 for telephonic assignments.
         """
+        if self.assignment_type.data == 'telephonic':
+            return Decimal('0')
+
         if not translator.drive_distance:
             return Decimal('0')
 

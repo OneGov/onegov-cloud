@@ -2269,7 +2269,7 @@ def test_time_report_workflow(
     assert report.duration == 90
     assert report.hourly_rate == 90.0
     assert report.surcharge_percentage == 25.0
-    assert report.travel_compensation == 50.0
+    assert report.travel_compensation == 100.0
     assert report.case_number == 'CASE-123'
     assert report.status == 'pending'
 
