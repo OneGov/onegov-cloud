@@ -29,7 +29,7 @@ class ParliamentaryGroup(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     fts_public = True
     fts_properties = {
-        'title': {'type': 'localized', 'weight': 'A'},
+        'name': {'type': 'localized', 'weight': 'A'},
         'description': {'type': 'localized', 'weight': 'B'},
     }
 
