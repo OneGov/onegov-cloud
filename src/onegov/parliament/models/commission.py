@@ -6,7 +6,7 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.parliament import _
-from onegov.search import Searchable
+from onegov.search import ORMSearchable
 
 from sqlalchemy import Column
 from sqlalchemy import Date
@@ -41,7 +41,7 @@ TYPES: dict[CommissionType, str] = {
 }
 
 
-class Commission(Base, ContentMixin, TimestampMixin, Searchable):
+class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'par_commissions'
 

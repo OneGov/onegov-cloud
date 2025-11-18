@@ -4,7 +4,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.parliament import _
-from onegov.search import Searchable
+from onegov.search import ORMSearchable
 
 from sqlalchemy import Column
 from sqlalchemy import Date
@@ -74,7 +74,7 @@ PARLIAMENTARY_GROUP_ROLES: dict[PartyRole, str] = {
 }
 
 
-class ParliamentarianRole(Base, TimestampMixin, Searchable):
+class ParliamentarianRole(Base, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'par_parliamentarian_roles'
 
