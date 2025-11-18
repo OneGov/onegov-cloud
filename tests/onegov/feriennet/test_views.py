@@ -1025,17 +1025,9 @@ def test_booking_view(client: Client, scenario: Scenario) -> None:
         birth_date=date(2000, 1, 1)
     )
 
-    scenario.add_user(username='m2@example.org', role='member', realname="Doc",
-        show_contact_data_to_others=True)
+    scenario.add_user(username='m2@example.org', role='member', realname="Doc")
     scenario.add_attendee(
         name="Mike",
-        birth_date=date(2000, 1, 1)
-    )
-
-    scenario.add_user(username='m3@example.org', role='member', realname="Zak",
-        show_contact_data_to_others=True)
-    scenario.add_attendee(
-        name="Luca",
         birth_date=date(2000, 1, 1)
     )
 
@@ -1052,13 +1044,6 @@ def test_booking_view(client: Client, scenario: Scenario) -> None:
         occasion=scenario.occasions[0],
         user=scenario.users[1],
         attendee=scenario.attendees[1]
-    )
-
-    # sign Luca up for one course to see if he shows up in the contact list
-    scenario.add_booking(
-        occasion=scenario.occasions[0],
-        user=scenario.users[2],
-        attendee=scenario.attendees[2]
     )
 
     scenario.commit()
@@ -1128,21 +1113,24 @@ def test_booking_contact_view(client: Client, scenario: Scenario) -> None:
         scenario.add_activity(title=f"A {i}", state='accepted')
         scenario.add_occasion()
 
-    scenario.add_user(username='m1@example.org', role='member', realname="Tom")
+    scenario.add_user(username='m1@example.org', role='member', realname="Tom",
+    phone="000 000 00 11", email="tom@example.org")
     scenario.add_attendee(
         name="Dustin",
         birth_date=date(2000, 1, 1)
     )
 
     scenario.add_user(username='m2@example.org', role='member', realname="Doc",
-        show_contact_data_to_others=True)
+        show_contact_data_to_others=True, phone="000 000 00 12",
+        email="doc@example.org")
     scenario.add_attendee(
         name="Mike",
         birth_date=date(2000, 1, 1)
     )
 
     scenario.add_user(username='m3@example.org', role='member', realname="Zak",
-        show_contact_data_to_others=True)
+        show_contact_data_to_others=True, phone="000 000 00 13",
+        email="zak@example.org")
     scenario.add_attendee(
         name="Luca",
         birth_date=date(2000, 1, 1)
@@ -1184,13 +1172,21 @@ def test_booking_contact_view(client: Client, scenario: Scenario) -> None:
     c2 = client.spawn()
     c2.login('m2@example.org', 'hunter2')
 
+    # Tom can see the contact data of Doc and Zak
     c1_bookings = c1.get('/').click('Buchungen')
-    assert "Luca" in c1_bookings
-    assert "Mike" in c1_bookings
+    assert "doc@example.org" in c1_bookings
+    assert 'href="tel:+41 000000012"' in c1_bookings
+    assert "zak@example.org" in c1_bookings
+    assert 'href="tel:+41 000000013"' in c1_bookings
+
+    # Doc can see the contact data of Zak and himself but not Tom
     c2_bookings = c2.get('/').click('Buchungen')
-    assert "Luca" in c2_bookings
-    assert "Mike" in c2_bookings
-    assert "Dustin" not in c2_bookings
+    assert "doc@example.org" in c2_bookings
+    assert 'href="tel:+41 000000012"' in c2_bookings
+    assert "zak@example.org" in c2_bookings
+    assert 'href="tel:+41 000000013"' in c2_bookings
+    assert "tom@example.org" not in c2_bookings
+    assert 'href="tel:+41 000000011"' not in c2_bookings
 
 
 def test_confirmed_booking_view(client: Client, scenario: Scenario) -> None:

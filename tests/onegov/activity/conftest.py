@@ -234,6 +234,8 @@ class Scenario(BaseScenario, Generic[ActivityT]):
         self,
         complete_profile: bool = True,
         show_contact_data_to_others: bool = False,
+        phone: str | None = None,
+        email: str | None = None,
         **columns: Any
     ) -> User:
         columns.setdefault('role', 'admin')
@@ -245,6 +247,10 @@ class Scenario(BaseScenario, Generic[ActivityT]):
             **columns
         )
         self.users.append(user)
+
+        user.data = user.data or {}
+        user.data['phone'] = phone if phone else self.faker.phone_number()
+        user.data['email'] = email if email else ''
 
         if complete_profile:
             user.realname = (
