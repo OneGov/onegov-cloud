@@ -2,22 +2,19 @@ from __future__ import annotations
 
 import enum
 
-from sqlalchemy import cast
-from sqlalchemy.orm import joinedload
-
 from onegov.core.utils import normalize_for_url
 from onegov.reservation.models import Resource
 from uuid import uuid4, UUID
 
 from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
 
-from onegov.ticket import TicketInvoice
-
 if TYPE_CHECKING:
     from collections.abc import Callable
     from libres.context.core import Context
     from libres.db.models import Allocation, Reservation
-    from sqlalchemy.orm import Query
+    from libres.db.scheduler import Scheduler
+
+    from sqlalchemy.orm import Query, Session
     from typing import TypeAlias
 
 
@@ -131,7 +128,9 @@ class ResourceCollection:
         self,
         resource: Resource,
         including_reservations: bool = False,
-        handle_reservation_ticket: Callable[[Reservation], Any] | None = None,
+        handle_linked_objects: (
+            Callable[[Scheduler, Session], Any] | None
+        ) = None,
     ) -> None:
 
         scheduler = resource.get_scheduler(self.libres_context)
@@ -142,30 +141,8 @@ class ResourceCollection:
 
             scheduler.managed_allocations().delete('fetch')
         else:
-            if callable(handle_reservation_ticket):
-                from sqlalchemy.dialects.postgresql import UUID as SA_UUID
-                from onegov.org.models.ticket import ReservationTicket
-                from libres.db.models.reservation import Reservation
-
-                stmt = (
-                    self.session.query(ReservationTicket)
-                    .options(
-                        joinedload(ReservationTicket.payment),
-                        joinedload(ReservationTicket.invoice).selectinload(
-                            TicketInvoice.items
-                        ),
-                    )
-                    .filter(
-                        cast(ReservationTicket.handler_id, SA_UUID).in_(
-                            scheduler.managed_reservations().with_entities(
-                                Reservation.token
-                            )
-                        )
-                    )
-                )
-                for ticket in stmt:
-                    handle_reservation_ticket(ticket)
-
+            if callable(handle_linked_objects):
+                handle_linked_objects(scheduler, self.session)
             scheduler.extinguish_managed_records()
 
         if resource.files:
