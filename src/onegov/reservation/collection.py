@@ -143,6 +143,7 @@ class ResourceCollection:
         else:
             if callable(handle_linked_objects):
                 handle_linked_objects(scheduler, self.session)
+
             scheduler.extinguish_managed_records()
 
         if resource.files:
