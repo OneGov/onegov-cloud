@@ -991,9 +991,9 @@ def handle_delete_resource(self: Resource, request: OrgRequest) -> None:
                 ticket.invoice_id = None
 
             if ticket.payment:
-              # unlink payment from reservation
-              for reservation in ticket.handler.reservations:
-                  reservation.payment = None
+                # unlink payment from reservation
+                for reservation in ticket.handler.reservations:
+                    reservation.payment = None
 
                 # delete payment from ticket
                 request.session.delete(ticket.payment)
