@@ -15,37 +15,64 @@
                 </div>
                 <div tal:condition="layout.has_confirmed_reports"
                      style="margin-bottom: 1rem;">
-                    <form action="${export_url}" method="POST" class="grid-x grid-padding-x">
-                        <div class="cell small-12 medium-6">
-                            <label>
-                                <span i18n:translate="">Month</span>
-                                <select name="month" required>
-                                    <option tal:repeat="month_item months"
-                                            value="${month_item[0]}"
-                                            selected="${month_item[0] == default_month or None}">
-                                        ${month_item[1]}
-                                    </option>
-                                </select>
-                            </label>
-                        </div>
-                        <div class="cell small-12 medium-6">
-                            <label>
-                                <span i18n:translate="">Year</span>
-                                <select name="year" required>
-                                    <option tal:repeat="year_item years"
-                                            value="${year_item}"
-                                            selected="${year_item == default_year or None}">
-                                        ${year_item}
-                                    </option>
-                                </select>
-                            </label>
+                    <div class="grid-x grid-padding-x">
+                        <div class="cell small-12">
+                            <form method="get" id="time-reports-filter">
+                                <div class="grid-x grid-padding-x">
+                                    <div class="cell small-12 medium-4">
+                                        <label>
+                                            <span i18n:translate="">
+                                                Month
+                                            </span>
+                                            <select name="month"
+                                                    onchange="this.form.submit()">
+                                                <option
+                                                    tal:repeat="month_item months"
+                                                    value="${month_item[0]}"
+                                                    selected="${month_item[0] == selected_month or None}">
+                                                    ${month_item[1]}
+                                                </option>
+                                            </select>
+                                        </label>
+                                    </div>
+                                    <div class="cell small-12 medium-4">
+                                        <label>
+                                            <span i18n:translate="">
+                                                Year
+                                            </span>
+                                            <select name="year"
+                                                    onchange="this.form.submit()">
+                                                <option
+                                                    tal:repeat="year_item years"
+                                                    value="${year_item}"
+                                                    selected="${year_item == selected_year or None}">
+                                                    ${year_item}
+                                                </option>
+                                            </select>
+                                        </label>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                         <div class="cell small-12">
-                            <button type="submit" class="button primary">
-                                <span i18n:translate="">Export für Buchhaltung</span>
-                            </button>
+                            <form action="${export_url}"
+                                  method="POST"
+                                  class="grid-x grid-padding-x">
+                                <input type="hidden"
+                                       name="month"
+                                       value="${selected_month or default_month}" />
+                                <input type="hidden"
+                                       name="year"
+                                       value="${selected_year or default_year}" />
+                                <button type="submit"
+                                        class="button primary">
+                                    <span i18n:translate="">
+                                        Export für Buchhaltung
+                                    </span>
+                                </button>
+                            </form>
                         </div>
-                    </form>
+                    </div>
                 </div>
                 <div class="time-reports-list">
                     <p tal:condition="not: reports" i18n:translate="">

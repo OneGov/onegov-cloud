@@ -76,6 +76,9 @@ def view_time_reports(
     default_month = last_month.month
     default_year = last_month.year
 
+    selected_month = self.month if self.month is not None else None
+    selected_year = self.year if self.year is not None else None
+
     months = [
         (1, request.translate(_('January'))),
         (2, request.translate(_('February'))),
@@ -119,6 +122,8 @@ def view_time_reports(
         'years': years,
         'default_month': default_month,
         'default_year': default_year,
+        'selected_month': selected_month,
+        'selected_year': selected_year,
         'export_url': export_url,
     }
 
