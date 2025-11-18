@@ -3143,4 +3143,29 @@ def subscribe_parliamentarians_to_newsletter(
                 )
                 click.secho(f'Subscribed {p.email_primary}', fg='green')
                 subscribe_counter += 1
+
     return subscribe_parliamentarians
+
+
+@cli.command(name='list-resources')
+def list_resources(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    Lists all resources of the selected org ordered by type
+
+    onegov-org --select '/foo/bar' list-resources
+    """
+
+    def list_all_resources(request: OrgRequest, app: OrgApp) -> None:
+        resources = ResourceCollection(app.libres_context)
+
+        click.echo('\n----------------------------------------')
+        click.secho(f'Resources of {request.app.org.name}', fg='blue')
+        type = None
+        for res in resources.ordered_by_type():
+            if type != res.type:
+                click.secho(f'\n{res.type.title()}', fg='blue')
+            type = res.type
+            click.secho(f'- {res.title}', fg='green')
+
+    return list_all_resources
