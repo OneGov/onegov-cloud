@@ -6,6 +6,8 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.parliament import _
+from onegov.search import Searchable
+
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Text
@@ -16,6 +18,7 @@ from sqlalchemy.orm import relationship
 
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     import uuid
     from datetime import date
@@ -38,9 +41,15 @@ TYPES: dict[CommissionType, str] = {
 }
 
 
-class Commission(Base, ContentMixin, TimestampMixin):
+class Commission(Base, ContentMixin, TimestampMixin, Searchable):
 
     __tablename__ = 'par_commissions'
+
+    fts_public = True
+    fts_properties = {
+        'name': {'type': 'localized', 'weight': 'A'},
+        'description': {'type': 'localized', 'weight': 'B'},
+    }
 
     poly_type: Column[str] = Column(
         Text,
