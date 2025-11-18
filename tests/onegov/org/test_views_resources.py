@@ -4,7 +4,6 @@ import json
 import os
 from uuid import uuid4
 
-import pytest
 import re
 import tempfile
 import textwrap
@@ -17,7 +16,6 @@ from decimal import Decimal
 from freezegun import freeze_time
 from io import BytesIO
 from libres.db.models import Reservation
-from libres.modules.errors import AffectedReservationError
 
 from onegov.core.utils import module_path, normalize_for_url
 from onegov.file import FileCollection
@@ -1155,8 +1153,15 @@ def test_reserve_allocation(
 
     assert len(slots.json) == 1
 
-    with pytest.raises(AffectedReservationError):
-        client.delete(client.extract_href(slots.json[0]['actions'][3]))
+    response = client.delete(client.extract_href(slots.json[0]['actions'][3]))
+    result = json.loads(response.headers['X-IC-Trigger-Data'])
+    assert result == {
+        'success': False,
+        'message': (
+            "Eine bestehende Reservation wäre von der gewünschten Änderung "
+            "betroffen."
+        )
+    }
 
     # open the created ticket
     client.login_supporter()

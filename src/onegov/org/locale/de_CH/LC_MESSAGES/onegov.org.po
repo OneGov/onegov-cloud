@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-05 14:16+0100\n"
+"POT-Creation-Date: 2025-11-12 06:58-0500\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1971,6 +1971,12 @@ msgstr "Die Adresse, Telefonnummer und E-Mail Adresse der Gemeindeverwaltung"
 msgid "Information"
 msgstr "Information"
 
+msgid "Contact Link Label"
+msgstr "Bezeichnung Kontakt Link"
+
+msgid "Label for Contact Link. Default: 'more'"
+msgstr "Bezeichnung für den Kontakt Link. Standard: 'mehr'"
+
 msgid "Contact Link"
 msgstr "Kontakt Link"
 
@@ -1982,6 +1988,12 @@ msgstr "Öffnungszeiten"
 
 msgid "The opening hours of the municipality"
 msgstr "Öffnungszeiten"
+
+msgid "Opening Hours Link Label"
+msgstr "Bezeichnung für den Öffnungszeiten Link"
+
+msgid "Label for Opening Hours Link. Default: 'more'"
+msgstr "Bezeichnung für den Öffnungszeiten Link. Standard: 'mehr'"
 
 msgid "Opening Hours Link"
 msgstr "Öffnungszeiten Link"
@@ -4903,8 +4915,8 @@ msgstr "Neue Kunden Nachricht in Ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} schrieb"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 
@@ -5973,8 +5985,14 @@ msgid "An existing reservation would be affected by the requested change."
 msgstr ""
 "Eine bestehende Reservation wäre von der gewünschten Änderung betroffen."
 
-msgid "A pending reservation would be affected by the requested change."
-msgstr "Eine offene Reservation wäre von der gewünschten Änderung betroffen."
+msgid ""
+"This change cannot be made because there is still an open reservation in "
+"someone's cart. The reservation needs to be submitted or expire before you "
+"can proceed."
+msgstr ""
+"Diese Änderung kann nicht vorgenommen werden, da sich noch eine offene "
+"Reservation im Warenkorb einer Person befindet. Die Reservation muss "
+"abgeschlossen werden oder ablaufen bevor Sie fortfahren können."
 
 msgid "The requested period is no longer available."
 msgstr "Der gewünschte Zeitraum ist nicht mehr verfügbar."
@@ -6044,6 +6062,9 @@ msgstr "Verfügbarkeitszeitraum löschen"
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
+
+msgid "The allocation was deleted"
+msgstr "Die Verfügbarkeit wurde gelöscht"
 
 #, python-format
 msgid "New availability period active, ${n} allocations created"
@@ -7632,9 +7653,7 @@ msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
 #~ "If checked, news are displayed as tiles. Otherwise, news are listed in "
 #~ "full length."
 #~ msgstr ""
-#~ "Wenn diese Option aktiviert ist, werden die Nachrichten als Kacheln "
-#~ "angezeigt. Anderfalls werden die Nachrichten in voller Länge "
-#~ "untereinander aufgelistet."
+#~ "Eine offene Reservation wäre von der gewünschten Änderung betroffen."
 
 #~ msgid "New news since the last newsletter:"
 #~ msgstr "Neue Einträge seit dem letzten Newsletter:"

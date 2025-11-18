@@ -9,6 +9,9 @@
                 <div class="videowrapper" tal:condition="assembly.video_url">
                     <iframe allow="fullscreen" frameborder="0" src="${assembly.video_url}"></iframe>
                 </div>
+                <div class="print-button">
+                    <i onclick="window.print()" class="fa fa-print" aria-hidden="true"></i>
+                </div>
                 <div class="assembly-overview" tal:content="assembly.overview"></div>
             </div>
 
@@ -19,8 +22,8 @@
                         <ul class="more-list"></ul>
                     </div>
                     <div class="side-panel downloads">
-                        <h3 i18n:translate="">Memorial</h3>
                         <p tal:condition="assembly.memorial_pdf">
+                            <h3 i18n:translate="">Memorial</h3>
                             <a href="${request.link(assembly.memorial_pdf)}" class="memorial-link">
                                 <i class="fa fa-file-pdf" aria-hidden="true"></i>
                                 <span tal:condition="not: assembly.memorial_2_pdf" i18n:translate="">Memorial</span>
@@ -41,8 +44,8 @@
                         </p>
                     </div>
                     <div class="side-panel downloads">
-                        <h3 i18n:translate="">Protocol</h3>
                         <tal:b tal:condition="assembly.protocol_pdf">
+                            <h3 i18n:translate="">Protocol</h3>
                             <a href="${request.link(assembly.protocol_pdf)}" class="protocol-link">
                                 <i class="fa fa-file-pdf" aria-hidden="true"></i>
                                 <span i18n:translate="">Protocol</span>
@@ -69,6 +72,17 @@
                             <i class="fa fa-download" aria-hidden="true"></i>
                             <span>Open Data</span>
                         </a>
+                    </div>
+                    <div class="side-panel links-panel" tal:condition="assembly.sidepanel_links|False">
+                        <h3 i18n:translate>Links</h3>
+                        <ul class="more-list">
+                            <li tal:repeat="sl python: sorted(assembly.sidepanel_links, key=lambda sl: sl[0] if sl[0] else sl[1])">
+                                <a class="list-link" title="${sl[0] if sl[0] else sl[1]}" href="${sl[1]}">
+                                    <i class="fa fa-link" aria-hidden="true"></i>
+                                    <span class="list-title">${sl[0] if sl[0] else sl[1]}</span>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
 
                     <div class="side-panel audio" tal:condition="assembly.audio_mp3">

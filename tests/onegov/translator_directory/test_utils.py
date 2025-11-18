@@ -1,3 +1,4 @@
+from __future__ import annotations
 import pytest
 
 from onegov.translator_directory.utils import out_of_tolerance

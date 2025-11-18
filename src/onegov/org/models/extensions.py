@@ -1026,6 +1026,7 @@ class SidebarLinksExtension(ContentExtension):
                     self.link_errors = {}
 
             def on_request(self) -> None:
+                super().on_request()
                 if not self.sidepanel_links.data:
                     self.sidepanel_links.data = self.links_to_json(None)
 

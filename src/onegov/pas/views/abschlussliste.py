@@ -227,8 +227,7 @@ def generate_abschlussliste_xlsx(
     )
 
     # Write Details tab with individual attendance records
-    details_row_num = 1
-    for att in attendances:
+    for details_row_num, att in enumerate(attendances, start=1):
         p = att.parliamentarian
         party = details_party_lookup[str(p.id)]
         is_president = is_commission_president(p, att, settlement_run)
@@ -253,7 +252,6 @@ def generate_abschlussliste_xlsx(
         ]
         for col, value in enumerate(details_row):
             details_ws.write(details_row_num, col, value, cell_format)
-        details_row_num += 1
 
     # Write Übersicht tab with aggregated data
     for row_num, row_data in enumerate(data, 1):

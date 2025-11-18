@@ -1,4 +1,5 @@
 from __future__ import annotations
+import json
 
 import morepath
 
@@ -337,11 +338,27 @@ def handle_delete_allocation(self: Allocation, request: OrgRequest) -> None:
 
     resource = request.app.libres_resources.by_allocation(self)
     assert resource is not None
-    resource.scheduler.remove_allocation(id=self.id)
+    try:
+        resource.scheduler.remove_allocation(id=self.id)
+    except LibresError as e:
+        message: JSON_ro = {
+            'message': utils.get_libres_error(e, request),
+            'success': False
+        }
 
-    @request.after
-    def trigger_calendar_update(response: Response) -> None:
-        response.headers.add('X-IC-Trigger', 'rc-allocations-changed')
+        @request.after
+        def trigger(response: Response) -> None:
+            response.headers.add('X-IC-Trigger', 'rc-reservation-error')
+            response.headers.add(
+                'X-IC-Trigger-Data',
+                json.dumps(message, ensure_ascii=True)
+            )
+    else:
+        request.success(_('The allocation was deleted'))
+
+        @request.after
+        def trigger_calendar_update(response: Response) -> None:
+            response.headers.add('X-IC-Trigger', 'rc-allocations-changed')
 
 
 @OrgApp.form(model=Resource, template='form.pt', name='new-rule',

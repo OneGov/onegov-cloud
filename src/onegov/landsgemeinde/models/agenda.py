@@ -14,6 +14,7 @@ from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
 from onegov.landsgemeinde.models.votum import Votum
 from onegov.landsgemeinde.models.mixins import TimestampedVideoMixin
+from onegov.org.models.extensions import SidebarLinksExtension
 from onegov.search import ORMSearchable
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -50,7 +51,7 @@ STATES: dict[AgendaItemState, TranslationString] = {
 
 class AgendaItem(
     Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable,
-    TimestampedVideoMixin
+    TimestampedVideoMixin, SidebarLinksExtension
 ):
 
     __tablename__ = 'landsgemeinde_agenda_items'

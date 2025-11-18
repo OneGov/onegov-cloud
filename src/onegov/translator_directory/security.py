@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from onegov.translator_directory.models.ticket import TimeReportTicket
+
 from onegov.core.security import Public, Personal
 from onegov.core.security.roles import (
     get_roles_setting as get_roles_setting_base)
@@ -285,3 +287,21 @@ def restrict_translator_mutation_ticket(
         return model.handler.email == identity.userid
 
     return identity.role == 'admin'
+
+
+@TranslatorDirectoryApp.permission_rule(
+    model=TimeReportTicket, permission=object)
+def restrict_translator_time_report_ticket(
+    app: TranslatorDirectoryApp,
+    identity: Identity,
+    model: TimeReportTicket,
+    permission: object
+) -> bool:
+    if (
+        permission == Public
+        and identity.role in ('member', 'translator')
+        and model.handler
+    ):
+        return model.handler.email == identity.userid
+
+    return identity.role in {'editor', 'admin'}

@@ -5,8 +5,9 @@ from uuid import uuid4
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
-from sqlalchemy import Column, Date, Enum, ForeignKey, Integer, Numeric, Text
+from onegov.core.orm.types import UUID, UTCDateTime
+from sqlalchemy import ARRAY, Column, Date, Enum, ForeignKey, Integer, Numeric
+from sqlalchemy import Text
 from sqlalchemy.orm import relationship
 
 
@@ -14,11 +15,14 @@ from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     import uuid
-    from datetime import date
+    from datetime import date, datetime
+    from sqlalchemy.orm import Session
     from .translator import Translator
     from onegov.user import User
+    from .ticket import TimeReportTicket
 
 TimeReportStatus = Literal['pending', 'confirmed']
+SurchargeType = Literal['night_work', 'weekend_holiday', 'urgent']
 
 
 class TranslatorTimeReport(Base, TimestampMixin):
@@ -58,11 +62,22 @@ class TranslatorTimeReport(Base, TimestampMixin):
 
     assignment_date: Column[date] = Column(Date, nullable=False)
 
+    start: Column[datetime | None] = Column(UTCDateTime)
+
+    end: Column[datetime | None] = Column(UTCDateTime)
+
     hourly_rate: Column[Decimal] = Column(
         Numeric(precision=10, scale=2),
         nullable=False,
     )
 
+    surcharge_types: Column[list[str] | None] = Column(
+        ARRAY(Text),
+        nullable=True,
+        default=list,
+    )
+
+    #: Zuschlag
     surcharge_percentage: Column[Decimal] = Column(
         Numeric(precision=5, scale=2),
         nullable=False,
@@ -88,10 +103,32 @@ class TranslatorTimeReport(Base, TimestampMixin):
         default='pending',
     )
 
+    SURCHARGE_RATES: dict[str, Decimal] = {
+        'night_work': Decimal('50'),
+        'weekend_holiday': Decimal('25'),
+        'urgent': Decimal('25'),
+    }
+
     @property
     def duration_hours(self) -> Decimal:
         """Return duration in hours for display."""
         return Decimal(self.duration) / Decimal(60)
+
+    def calculate_surcharge_from_types(self) -> Decimal:
+        """Calculate surcharge percentage from surcharge_types."""
+        if not self.surcharge_types:
+            return Decimal('0')
+        total = Decimal('0')
+        for surcharge_type in self.surcharge_types:
+            total += self.SURCHARGE_RATES.get(surcharge_type, Decimal('0'))
+        return total
+
+    @property
+    def effective_surcharge_percentage(self) -> Decimal:
+        """Return effective surcharge, preferring types over percentage."""
+        if self.surcharge_types:
+            return self.calculate_surcharge_from_types()
+        return self.surcharge_percentage
 
     @property
     def base_compensation(self) -> Decimal:
@@ -99,7 +136,7 @@ class TranslatorTimeReport(Base, TimestampMixin):
         return (
             self.hourly_rate
             * self.duration_hours
-            * (1 + self.surcharge_percentage / Decimal(100))
+            * (1 + self.effective_surcharge_percentage / Decimal(100))
         )
 
     @property
@@ -114,3 +151,18 @@ class TranslatorTimeReport(Base, TimestampMixin):
         if self.assignment_type:
             return f'{self.assignment_type} - {date_str}'
         return f'Time Report - {date_str}'
+
+    def get_ticket(self, session: Session) -> TimeReportTicket | None:
+        """Get the ticket associated with this time report."""
+        from onegov.translator_directory.models.ticket import TimeReportTicket
+
+        return (
+            session.query(TimeReportTicket)
+            .filter(
+                TimeReportTicket.handler_data['handler_data'][
+                    'time_report_id'
+                ].astext
+                == str(self.id)
+            )
+            .first()
+        )

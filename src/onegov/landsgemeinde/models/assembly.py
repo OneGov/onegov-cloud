@@ -12,6 +12,7 @@ from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.agenda import AgendaItem
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
 from onegov.landsgemeinde.models.mixins import StartTimeMixin
+from onegov.org.models.extensions import SidebarLinksExtension
 from onegov.search import ORMSearchable
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -46,7 +47,7 @@ STATES: dict[AssemblyState, TranslationString] = {
 
 class Assembly(
     Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable,
-    StartTimeMixin
+    StartTimeMixin, SidebarLinksExtension
 ):
 
     __tablename__ = 'landsgemeinde_assemblies'
