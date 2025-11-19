@@ -131,12 +131,10 @@ def delete_attendee(
             attendees.delete(self)
 
             name = self.name
-            possessive = _('his') if self.gender == 'female' else _('her')
             request.success(_(
-                '${name} and ${possessive} bookings were deleted',
+                '${name} and associated bookings were deleted.',
                 mapping={
-                    'name': name,
-                    'possessive': possessive
+                    'name': name
                 }
             ))
             request.redirect(request.class_link(BookingCollection))

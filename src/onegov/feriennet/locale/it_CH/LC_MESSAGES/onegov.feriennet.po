@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-04-28 14:53+0200\n"
+"POT-Creation-Date: 2025-11-19 09:57+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -106,8 +106,8 @@ msgstr "CHF pagato"
 msgid "Help us"
 msgstr "Aiutare"
 
-msgid "Dashboard"
-msgstr "Dashboard"
+msgid "Overview"
+msgstr "Panoramica"
 
 msgid "Periods"
 msgstr "Periodi"
@@ -675,8 +675,7 @@ msgid "Political municipality"
 msgstr "Comune politico"
 
 msgid "The Swisspass ID must be 13 characters long (including dashes)."
-msgstr ""
-"L'ID Swisspass deve essere lungo 13 caratteri (inclusi i trattini)."
+msgstr "L'ID Swisspass deve essere lungo 13 caratteri (inclusi i trattini)."
 
 msgid "The Swisspass ID must only contain digits and dashes."
 msgstr "L'ID Swisspass deve contenere solo cifre e trattini."
@@ -2625,6 +2624,23 @@ msgstr "Modificare partecipante"
 msgid "Booking Limit of ${name}"
 msgstr "Limite di prenotazione di ${name}"
 
+msgid ""
+"The attendee cannot be deleted because there are existing bookings in the "
+"current period."
+msgstr ""
+"L'attendente non può essere cancellato perché ci sono prenotazioni esistenti "
+"nel periodo attuale."
+
+#, python-format
+msgid "${name} and associated bookings were deleted."
+msgstr "${name} e le prenotazioni associate sono state cancellate."
+
+msgid ""
+"The attendee could not be deleted because there are existing bookings "
+"associated with it."
+msgstr ""
+"L'attendente non può essere cancellato perché ci sono prenotazioni associate."
+
 msgid "The user account must be opened by a parent or guardian of full age."
 msgstr ""
 "L'account utente deve essere aperto da una persona maggiorenne con autorità "
@@ -2779,6 +2795,17 @@ msgstr "Cancellare la prenotazione"
 #, python-format
 msgid "Do you really want to cancel \"${title}\"?"
 msgstr "Vuole davvero cancellare \"${title}\"?"
+
+#, python-format
+msgid "Do you really want to delete \"${name}\" and all associated bookings?"
+msgstr ""
+"Vuole davvero cancellare \"${name}\" e tutte le prenotazioni associate?"
+
+msgid "The invoices will not be deleted."
+msgstr "Le fatture non saranno cancellate."
+
+msgid "Delete attendee"
+msgstr "Cancellare partecipante"
 
 msgid "Only open, cancelled, denied or blocked bookings may be deleted"
 msgstr ""
@@ -3231,6 +3258,25 @@ msgstr "Prenotazioni ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
+
+#~ msgid "his"
+#~ msgstr "sue"
+
+#~ msgid "her"
+#~ msgstr "sue"
+
+#, python-format
+#~ msgid "${name} and ${possessive} bookings were deleted"
+#~ msgstr "${name} e le sue prenotazioni sono state cancellate"
+
+#, python-format
+#~ msgid ""
+#~ "Do you really want to delete \"${name}\" and all of ${possessive} "
+#~ "bookings?"
+#~ msgstr "Vuole davvero cancellare \"${name}\" e tutte le sue prenotazioni?"
+
+#~ msgid "Dashboard"
+#~ msgstr "Dashboard"
 
 #~ msgid "The Swisspass ID must be 13 characters long."
 #~ msgstr "L'ID Swisspass deve essere lungo 13 caratteri."

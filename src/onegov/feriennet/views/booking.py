@@ -438,8 +438,6 @@ def view_my_bookings(
         attendee: Attendee
     ) -> Link:
 
-        possessive = _('his') if attendee.gender == 'female' else _('her')
-
         link = Link(
                 text=_(''),
                 url=layout.csrf_protected_url(request.link(attendee)),
@@ -449,10 +447,9 @@ def view_my_bookings(
                     Confirm(
                         _(
                             'Do you really want to delete "${name}" and all '
-                            'of ${possessive} bookings?',
+                            'associated bookings?',
                             mapping={
                                 'name': attendee.name,
-                                'possessive': possessive
                             }
                         ),
                         _('The invoices will not be deleted.'),
