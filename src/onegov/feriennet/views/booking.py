@@ -434,9 +434,43 @@ def view_my_bookings(
 
         return attendees
 
+    def attendee_delete_link(
+        attendee: Attendee
+    ) -> Link:
+
+        possessive = _('his') if attendee.gender == 'female' else _('her')
+
+        link = Link(
+                text=_(''),
+                url=layout.csrf_protected_url(request.link(attendee)),
+                attrs={'class': 'delete-icon before hide-for-print'},
+                sr_text=_('Delete'),
+                traits=(
+                    Confirm(
+                        _(
+                            'Do you really want to delete "${name}" and all '
+                            'of ${possessive} bookings?',
+                            mapping={
+                                'name': attendee.name,
+                                'possessive': possessive
+                            }
+                        ),
+                        _('The invoices will not be deleted.'),
+                        _('Delete attendee'),
+                        _('Cancel')
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=request.link(self)
+                    ),
+                ),
+            )
+        return link
+
     return {
         'actions_by_booking': lambda b: actions_by_booking(layout, period, b),
         'attendees': attendees,
+        'attendee_delete_link': attendee_delete_link,
         'occasion_attendees': occasion_attendees,
         'subscribe_link': subscribe_link,
         'grouped_bookings': grouped_bookings,

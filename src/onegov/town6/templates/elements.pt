@@ -2,12 +2,15 @@
 
 <!--! A generic link element -->
 <metal:b define-macro="link">
-    <a tal:attributes="e.attrs">${e.text or ''}<tal:b condition="e.access != 'public'">
-        <metal:b
-            tal:define="item e.model"
-            use-macro="layout.macros['access_hint']"
-        />
-    </tal:b></a>
+    <a tal:attributes="e.attrs">${e.text or ''}
+        <tal:b condition="e.access != 'public'">
+            <metal:b
+                tal:define="item e.model"
+                use-macro="layout.macros['access_hint']"
+            />
+        </tal:b>
+        <span tal:condition="not e.text" class="show-for-sr">${e.props.sr_text or ''}</span>
+    </a>
 </metal:b>
 
 <!--! An img element -->

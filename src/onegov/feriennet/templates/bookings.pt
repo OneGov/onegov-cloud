@@ -65,6 +65,8 @@
                                     </div>
 
                                     <div class="icons">
+                                        ${attendee_delete_link(attendee)(layout)}
+
                                         <a class="calendar-edit-icon before hide-for-print" href="${request.link(attendee)}" title="Edit" i18n:attributes="title">
                                             <span class="show-for-sr" i18n:translate>Edit</span>
                                         </a>
