@@ -141,6 +141,9 @@ class WhitelistedMimeType:
          ('application/vnd.openxmlformats-officedocument.'
           'wordprocessingml.document'),  # docx
 
+        # xml
+        'application/xml',
+
         # archives
         'application/zip',
 
@@ -184,7 +187,15 @@ class WhitelistedMimeType:
         if not field.data:
             return
 
-        if field.data['mimetype'] not in self.whitelist:
+        if isinstance(field.data, list):  # UploadMultipleField
+            for data in field.data:
+                if not data:
+                    continue  # in case of file deletion
+
+                if data['mimetype'] not in self.whitelist:
+                    raise ValidationError(field.gettext(self.message))
+
+        elif field.data['mimetype'] not in self.whitelist:
             raise ValidationError(field.gettext(self.message))
 
 
