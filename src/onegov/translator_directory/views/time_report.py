@@ -288,6 +288,7 @@ def generate_accounting_export_rows(
 
     for report in reports:
         translator = report.translator
+        # the view has checked for missing pers_id before
         assert translator.pers_id is not None
         pers_nr = str(translator.pers_id)
         date_str = report.assignment_date.strftime('%d.%m.%Y')
