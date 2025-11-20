@@ -959,6 +959,9 @@ def view_resource(
     layout: ResourceLayout | None = None
 ) -> RenderData:
 
+    if hasattr(self, 'photo_album_id') and self.photo_album_id:
+        request.include('photoswipe')
+
     return {
         'title': self.title,
         'files': getattr(self, 'files', None),
