@@ -374,6 +374,7 @@ if (level !== 'none' && $('.sidebar-wrapper').length) {
                 var anchor = $('<a class="category-anchor"></a>');
                 anchor.attr('id', id);
                 $(heading).prepend(anchor);
+                $(heading).addClass('anchor-link-heading');
                 var headingLevel = parseInt(heading.tagName.charAt(1), 10);
                 var listItem = $('<li><a class="list-link level-' + headingLevel + '" href="#' + id + '">' + heading.textContent + '</a></li>');
                 list.append(listItem);
