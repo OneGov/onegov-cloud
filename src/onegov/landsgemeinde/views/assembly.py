@@ -28,6 +28,16 @@ if TYPE_CHECKING:
     from webob import Response
 
 
+def get_assembly_form_class(
+    model: object,
+    request: LandsgemeindeRequest
+) -> type[AssemblyForm]:
+
+    if isinstance(model, Assembly):
+        return model.with_content_extensions(AssemblyForm, request)
+    return Assembly().with_content_extensions(AssemblyForm, request)
+
+
 @LandsgemeindeApp.html(
     model=AssemblyCollection,
     template='assemblies.pt',
@@ -53,7 +63,7 @@ def view_assemblies(
     name='new',
     template='form.pt',
     permission=Private,
-    form=AssemblyForm
+    form=get_assembly_form_class
 )
 def add_assembly(
     self: AssemblyCollection,

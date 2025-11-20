@@ -181,7 +181,9 @@
 <metal:footer_columns define-macro="footer_columns">
     <tal:b define="contact layout.org.contact_html|nothing;
         contact_url layout.org.contact_url|nothing;
+        contact_url_label layout.org.contact_url_label|nothing;
         opening_hours layout.org.opening_hours_html|nothing;
+        opening_hours_url_label layout.org.opening_hours_url_label|nothing;
         opening_hours_url layout.org.opening_hours_url|nothing;
         facebook layout.org.facebook_url|nothing;
         twitter layout.org.twitter_url|nothing;
@@ -267,13 +269,23 @@
 <metal:footer_contact define-macro="footer_contact" i18n:domain="onegov.town6">
     <h5 i18n:translate tal:condition="contact or contact_url">Contact</h5>
     <div tal:content="layout.org.contact_html" />
-    <a class="footer-link" tal:condition="contact_url" tal:attributes="href contact_url"><strong><tal:b i18n:translate>more</tal:b>…</strong></a>
+    <a class="footer-link" tal:condition="contact_url" tal:attributes="href contact_url">
+        <strong>
+            <tal:b tal:condition="not contact_url_label|nothing" i18n:translate>more</tal:b>…
+            <tal:b tal:condition="contact_url_label|nothing" i18n:translate tal:content="contact_url_label" />…
+        </strong>
+    </a>
 </metal:footer_contact>
 
 <metal:footer_opening_hours define-macro="footer_opening_hours" i18n:domain="onegov.town6">
     <h5 i18n:translate tal:condition="opening_hours or opening_hours_url">Opening Hours</h5>
     <div tal:content="opening_hours" />
-    <a class="footer-link" tal:condition="opening_hours_url" tal:attributes="href opening_hours_url"><strong><tal:b i18n:translate>more</tal:b>…</strong></a>
+    <a class="footer-link" tal:condition="opening_hours_url" tal:attributes="href opening_hours_url">
+        <strong>
+            <tal:b tal:condition="not opening_hours_url_label|nothing" i18n:translate>more</tal:b>…
+            <tal:b tal:condition="opening_hours_url_label|nothing" i18n:translate tal:content="opening_hours_url_label" />…
+        </strong>
+    </a>
 </metal:footer_opening_hours>
 
 <metal:footer_social_media define-macro="footer_social_media">
@@ -2776,7 +2788,7 @@
                 ${file.name}
             </td>
             <td>
-                <a id="button-${file_number}" data-toggle="details-${file_number}">
+                <a id="button-${file_number}" data-ogc-toggle="#details-${file_number}">
                     <i class="fa fa-chevron-down rotate" aria-hidden="true"></i>
                 </a>
             </td>

@@ -148,12 +148,17 @@ def get_accreditation(
 
 
 @TranslatorDirectoryApp.path(
-    model=TimeReportCollection, path='/time-reports', converters={'page': int}
+    model=TimeReportCollection,
+    path='/time-reports',
+    converters={'page': int, 'month': int, 'year': int},
 )
 def get_time_reports(
-    app: TranslatorDirectoryApp, page: int = 0
+    app: TranslatorDirectoryApp,
+    page: int = 0,
+    month: int | None = None,
+    year: int | None = None,
 ) -> TimeReportCollection:
-    return TimeReportCollection(app, page)
+    return TimeReportCollection(app, page, month, year)
 
 
 @TranslatorDirectoryApp.path(
