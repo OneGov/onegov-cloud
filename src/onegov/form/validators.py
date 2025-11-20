@@ -14,7 +14,7 @@ from dateutil.relativedelta import relativedelta
 from mimetypes import types_map
 from onegov.form import _
 from onegov.form.errors import (DuplicateLabelError, InvalidIndentSyntax,
-                                EmptyFieldsetError)
+                                EmptyFieldsetError, InvalidHelpIndentSyntax)
 from onegov.form.errors import FieldCompileError
 from onegov.form.errors import InvalidFormSyntax
 from onegov.form.errors import MixedTypeError
@@ -214,6 +214,9 @@ class ValidFormDefinition:
     syntax = _('The syntax on line {line} is not valid.')
     indent = _('The indentation on line {line} is not valid. '
                'Please use a multiple of 4 spaces')
+    help_indent = _('The indentation on line {line} is not valid. '
+                    'Comment fields must be indented to the same level as '
+                    'they belong to.')
     duplicate = _("The field '{label}' exists more than once.")
     reserved = _("'{label}' is a reserved name. Please use a different name.")
     required = _('Define at least one required field')
@@ -256,6 +259,10 @@ class ValidFormDefinition:
         except InvalidIndentSyntax as exception:
             raise ValidationError(
                 field.gettext(self.indent).format(line=exception.line)
+            ) from exception
+        except InvalidHelpIndentSyntax as exception:
+            raise ValidationError(
+                field.gettext(self.help_indent).format(line=exception.line)
             ) from exception
         except EmptyFieldsetError as exception:
             raise ValidationError(
