@@ -19,6 +19,7 @@ from onegov.translator_directory.collections.documents import (
     TranslatorDocumentCollection)
 from onegov.translator_directory.constants import (
     TIME_REPORT_INTERPRETING_TYPES,
+    TIME_REPORT_SURCHARGE_LABELS,
 )
 from onegov.translator_directory.layout import AccreditationLayout
 from onegov.translator_directory.layout import TranslatorLayout
@@ -251,6 +252,22 @@ class TimeReportHandler(Handler):
         layout = TranslatorLayout(self.translator, request)
         report = self.time_report
 
+        # Status badge at the top
+        if report.status == 'confirmed':
+            status_class = 'success'
+            status_text = request.translate(_('Confirmed'))
+        else:
+            status_class = 'warning'
+            status_text = request.translate(_('Pending'))
+
+        status_badge = (
+            f'<div class="alert-box callout {status_class}" '
+            f'style="margin-bottom: 1rem;">'
+            f'<strong>{request.translate(_("Status"))}: </strong>'
+            f'{status_text}'
+            f'</div>'
+        )
+
         assignment_type_key = report.assignment_type
         assignment_type_translated = '-'
         if assignment_type_key:
@@ -262,6 +279,7 @@ class TimeReportHandler(Handler):
             layout.format_date(report.assignment_date, 'date')
         )
         summary_parts = [
+            status_badge,
             "<dl class='field-display'>",
             f"<dt>{request.translate(_('Assignment Date'))}</dt>",
             f'<dd>{assignment_date_formatted}</dd>',
@@ -296,20 +314,17 @@ class TimeReportHandler(Handler):
             ]
         )
 
-        surcharge_labels = {
-            'night_work': _('Night work (20:00 - 06:00)'),
-            'weekend_holiday': _('Weekend or holiday'),
-            'urgent': _('Exceptionally urgent'),
-        }
-
         effective_surcharge_pct = report.effective_surcharge_percentage
         if effective_surcharge_pct > 0:
             if report.surcharge_types:
                 for surcharge_type in report.surcharge_types:
-                    label = surcharge_labels.get(surcharge_type)
+                    label = TIME_REPORT_SURCHARGE_LABELS.get(surcharge_type)
                     if label:
                         rate = report.SURCHARGE_RATES.get(surcharge_type)
-                        surcharge_label = request.translate(label)
+                        if surcharge_type == 'urgent':
+                            surcharge_label = request.translate(label)
+                        else:
+                            surcharge_label = label
                         summary_parts.extend(
                             [
                                 f'<dt>{escape(surcharge_label)}</dt>',
@@ -407,13 +422,41 @@ class TimeReportHandler(Handler):
         time_report_links = []
 
         if self.time_report:
+            if self.time_report.status == 'pending' and (
+                request.is_editor or request.is_admin
+            ):
+                time_report_links.append(
+                    Link(
+                        text=_('Edit'),
+                        url=request.return_here(
+                            request.link(self.time_report, 'edit')
+                        ),
+                        attrs={'class': 'edit-link'},
+                    )
+                )
+
             time_report_links.append(
                 Link(
-                    text=_('View Time Report'),
-                    url=request.return_here(request.link(self.time_report)),
-                    attrs={'class': 'time'},
+                    text=_('Download PDF'),
+                    url=request.link(
+                        self.ticket, 'time-report-pdf-for-translator'
+                    ),
+                    attrs={'class': 'pdf'},
                 )
             )
+
+            if (
+                self.time_report.status == 'confirmed'
+                and self.translator
+                and self.translator.self_employed
+            ):
+                time_report_links.append(
+                    Link(
+                        text=_('Download QR Bill'),
+                        url=request.link(self.ticket, 'qr-bill-pdf'),
+                        attrs={'class': 'pdf'},
+                    )
+                )
 
         time_report_links.append(
             Link(
@@ -434,10 +477,7 @@ class TimeReportHandler(Handler):
                     traits=(
                         Intercooler(
                             request_method='POST',
-                            redirect_after=request.link(
-                                self.translator if request.is_member
-                                else self.ticket
-                            )
+                            redirect_after=request.link(self.ticket)
                         )
                     ),
                 )

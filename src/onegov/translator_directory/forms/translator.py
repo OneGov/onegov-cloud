@@ -268,7 +268,8 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     iban = StringField(
         label=_('IBAN'),
-        validators=[Optional(), Stdnum(format='iban')]
+        validators=[Optional(), Stdnum(format='iban')],
+        fieldset=_('Identification / bank account'),
     )
 
     email = EmailField(
@@ -485,6 +486,24 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         if trs:
             raise ValidationError(
                 _('A translator with this email already exists'))
+
+    def validate_iban(self, field: StringField) -> None:
+        if self.self_employed.data and not field.data:
+            raise ValidationError(
+                _('IBAN is required for self-employed translators')
+            )
+
+    def validate_address(self, field: StringField) -> None:
+        if self.self_employed.data and not field.data:
+            raise ValidationError(
+                _('Address is required for self-employed translators')
+            )
+
+    def validate_city(self, field: StringField) -> None:
+        if self.self_employed.data and not field.data:
+            raise ValidationError(
+                _('City is required for self-employed translators')
+            )
 
     def update_association(
         self,

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-12 17:11+0100\n"
+"POT-Creation-Date: 2025-11-16 16:19+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -90,6 +90,9 @@ msgstr "telefonisch"
 
 msgid "On Site"
 msgstr "Vor Ort"
+
+msgid "Exceptionally urgent"
+msgstr "Ausserordenlich dringlich"
 
 msgid "Logout"
 msgstr "Abmelden"
@@ -551,9 +554,6 @@ msgstr "Geschäftsnummer (Polizei)"
 msgid "Geschäftsnummer Police for linking if needed"
 msgstr "Geschäftsnummer Polizei zur Verknüpfung, falls erforderlich"
 
-msgid "Exceptionally urgent"
-msgstr "Ausserordenlich dringlich"
-
 msgid "25% surcharge"
 msgstr "25% Zuschlag"
 
@@ -586,6 +586,15 @@ msgstr "Sprachausbildung und Expertise"
 
 msgid "Hidden"
 msgstr "Versteckt"
+
+msgid "IBAN is required for self-employed translators"
+msgstr "IBAN ist für selbständige Übersetzer/innen erforderlich"
+
+msgid "Address is required for self-employed translators"
+msgstr "Adresse ist für selbständige Übersetzer/innen erforderlich"
+
+msgid "City is required for self-employed translators"
+msgstr "Ort ist für selbständige Übersetzer/innen erforderlich"
 
 msgid "Search in first and last name"
 msgstr "Suche in Vor- und Nachname"
@@ -695,6 +704,15 @@ msgstr "Mutation"
 msgid "Time Report"
 msgstr "Zeiterfassung"
 
+msgid "Confirmed"
+msgstr "Bestätigt"
+
+msgid "Pending"
+msgstr "Noch nicht bestätigt"
+
+msgid "Status"
+msgstr "Status"
+
 msgid "Assignment Date"
 msgstr "Einsatzdatum"
 
@@ -713,12 +731,6 @@ msgstr "Dauer"
 msgid "Base pay"
 msgstr "Grundentschädigung"
 
-msgid "Night work (20:00 - 06:00)"
-msgstr "Nachtarbeit (20:00 - 06:00)"
-
-msgid "Weekend or holiday"
-msgstr "Wochenende oder Feiertag"
-
 msgid "Surcharge"
 msgstr "Zuschlag"
 
@@ -726,10 +738,10 @@ msgid "Surcharge amount"
 msgstr "Zuschlagsbetrag"
 
 msgid "Subtotal (work compensation)"
-msgstr "Zwischensumme (Arbeitsentschädigung)"
+msgstr "Zwisch.total"
 
 msgid "Travel"
-msgstr "Reise"
+msgstr "Wegentschädigung"
 
 msgid "Meal Allowance (6+ hours)"
 msgstr "Verpflegungsentschädigung (6+ Stunden)"
@@ -737,8 +749,11 @@ msgstr "Verpflegungsentschädigung (6+ Stunden)"
 msgid "Total"
 msgstr "Total"
 
-msgid "View Time Report"
-msgstr "Zeiterfassung anzeigen"
+msgid "Download PDF"
+msgstr "PDF herunterladen"
+
+msgid "Download QR Bill"
+msgstr "QR-Rechnung herunterladen"
 
 msgid "View translator"
 msgstr "Übersetzer/in anzeigen"
@@ -835,6 +850,30 @@ msgstr ""
 "Diese Seite ist nicht öffentlich, kann aber von Mitgliedern eingesehen "
 "werden."
 
+msgid "Hello!"
+msgstr "Guten Tag!"
+
+msgid "Your time report has been accepted and approved for payment."
+msgstr "Ihre Zeiterfassung wurde akzeptiert und zur Zahlung freigegeben."
+
+msgid "Assignment Date:"
+msgstr "Einsatzdatum:"
+
+msgid "Total Compensation:"
+msgstr "Gesamtentschädigung:"
+
+msgid "View the time report"
+msgstr "Zeiterfassung anzeigen"
+
+msgid "A new time report has been submitted for review."
+msgstr "Eine neue Zeiterfassung wurde zur Überprüfung eingereicht."
+
+msgid "Translator:"
+msgstr "Dolmetscher/in:"
+
+msgid "Time report edited"
+msgstr "Zeiterfassung bearbeitet"
+
 msgid "Admission granted."
 msgstr "Zulassung erteilt."
 
@@ -849,15 +888,6 @@ msgstr "Wegpauschale"
 
 msgid "Base Compensation"
 msgstr "Grundentschädigung"
-
-msgid "Status"
-msgstr "Status"
-
-msgid "Pending"
-msgstr "Ausstehend"
-
-msgid "Confirmed"
-msgstr "Bestätigt"
 
 msgid ""
 "No confirmed time reports available for export. Time reports must be "
@@ -984,8 +1014,30 @@ msgstr "November"
 msgid "December"
 msgstr "Dezember"
 
+msgid "Only pending time reports can be edited"
+msgstr "Nur ausstehende Zeiterfassungen können bearbeitet werden"
+
+msgid "Time report updated successfully"
+msgstr "Zeiterfassung erfolgreich aktualisiert"
+
+msgid "Edit Time Report"
+msgstr "Zeiterfassung bearbeiten"
+
 msgid "Time report not found"
 msgstr "Zeiterfassung nicht gefunden"
+
+msgid ""
+"Cannot accept time report: Self-employed translator must have valid IBAN"
+msgstr ""
+"Zeiterfassung kann nicht akzeptiert werden: Selbständige Übersetzer/innen "
+"müssen eine gültige IBAN haben"
+
+msgid ""
+"Cannot accept time report: Self-employed translator must have complete "
+"address"
+msgstr ""
+"Zeiterfassung kann nicht akzeptiert werden: Selbständige Übersetzer/innen "
+"müssen eine vollständige Adresse haben"
 
 msgid "Time report accepted"
 msgstr "Zeiterfassung akzeptiert"
@@ -1004,6 +1056,15 @@ msgid ""
 msgstr ""
 "Export nicht möglich: Den folgenden Übersetzern fehlt eine Personalnummer "
 "(Personal-Nr.): ${names}"
+
+msgid "QR bill only available for self-employed"
+msgstr "QR-Rechnung nur für selbständige Übersetzer/innen verfügbar"
+
+msgid "QR bill only available for confirmed reports"
+msgstr "QR-Rechnung nur für bestätigte Zeiterfassungen verfügbar"
+
+msgid "Could not generate QR bill"
+msgstr "QR-Rechnung konnte nicht erstellt werden"
 
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
@@ -1033,6 +1094,9 @@ msgstr "Übersetzer/in erfolgreich gelöscht"
 msgid "Your data has been confirmed"
 msgstr "Ihre Daten wurden bestätigt"
 
+msgid "New time report for review"
+msgstr "Neue Zeiterfassung zur Überprüfung"
+
 msgid "Time report submitted for review"
 msgstr "Zeiterfassung zur Überprüfung eingereicht"
 
@@ -1056,6 +1120,24 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 msgid "Download"
 msgstr "Herunterladen"
 
+#~ msgid "View Time Report"
+#~ msgstr "Zeiterfassung anzeigen"
+
+#~ msgid "Assignment Details"
+#~ msgstr "Einsatzdetails"
+
+#~ msgid "Start Time"
+#~ msgstr "Startzeit"
+
+#~ msgid "End Time"
+#~ msgstr "Endzeit"
+
+#~ msgid "Compensation Breakdown"
+#~ msgstr "Entschädigungsaufschlüsselung"
+
+#~ msgid "25%% surcharge"
+#~ msgstr "25%% Zuschlag"
+
 #, python-format
 #~ msgid ""
 #~ "Accountant email is not configured. Please configure it in the <a "
@@ -1064,26 +1146,8 @@ msgstr "Herunterladen"
 #~ "E-Mail Rechnungsführer ist nicht konfiguriert. Bitte konfigurieren Sie "
 #~ "diese in den <a href=\"${settings_url}\">Einstellungen</a>."
 
-#~ msgid ""
-#~ "Accountant email is not configured. Please configure it in the settings."
-#~ msgstr ""
-#~ "E-Mail Rechnungsführer ist nicht konfiguriert. Bitte konfigurieren Sie "
-#~ "diese in den Einstellungen."
+#~ msgid "Night work (20:00 - 06:00)"
+#~ msgstr "Nachtarbeit (20:00 - 06:00)"
 
-#~ msgid "Date"
-#~ msgstr "Datum"
-
-#~ msgid "Rate"
-#~ msgstr "Tarif"
-
-#~ msgid "Translator not found"
-#~ msgstr "Übersetzer/in nicht gefunden"
-
-#~ msgid "Duration (minutes)"
-#~ msgstr "Zeitdauer (Minuten)"
-
-#~ msgid "Minimum 30 minutes"
-#~ msgstr "Miniumum 30 Minuten"
-
-#~ msgid "Time report added successfully"
-#~ msgstr "Zeiterfassung erfolgreich hinzugefügt"
+#~ msgid "Weekend or holiday"
+#~ msgstr "Wochenende oder Feiertag"
