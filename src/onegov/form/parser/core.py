@@ -1217,17 +1217,23 @@ def parse_formcode(
             CustomLoader
         )
     except yaml.YAMLError as e:
-        if (e.problem ==
+        problem = e.problem  # type:ignore[attr-defined]
+        mark = e.problem_mark  # type:ignore[attr-defined]
+        line = mark.line
+
+        if (problem ==
+            "expected <block end>, but found '<block sequence start>'"):
+            if 'field_help' in mark.buffer:
+                raise errors.InvalidHelpLocationSyntax(line) from e
+
+        if (problem ==
                 "expected <block end>, but found '<block mapping start>'"):
-            if 'field_help' in e.problem_mark.buffer:
-                raise errors.InvalidHelpIndentSyntax(
-                    e.problem_mark.line) from e
+            if 'field_help' in mark.buffer:
+                raise errors.InvalidHelpIndentSyntax(line) from e
 
-            raise errors.InvalidIndentSyntax(
-                e.problem_mark.line) from e
+            raise errors.InvalidIndentSyntax(line) from e
 
-        raise errors.InvalidFormSyntax(
-            e.problem_mark.line) from e
+        raise errors.InvalidFormSyntax(line) from e
 
     fieldsets = []
     field_classes: dict[str, type[ParsedField]] = {

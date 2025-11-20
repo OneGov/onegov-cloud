@@ -6,7 +6,11 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
-from onegov.form.errors import InvalidIndentSyntax, InvalidHelpIndentSyntax
+from onegov.form.errors import (
+    InvalidIndentSyntax,
+    InvalidHelpIndentSyntax,
+    InvalidHelpLocationSyntax,
+)
 from onegov.form.fields import (
     DateTimeLocalField, MultiCheckboxField, TimeField, URLField, VideoURLField)
 from onegov.form.parser.grammar import field_help_identifier
@@ -1135,19 +1139,7 @@ def test_indentation_error(
             pytest.fail('Unexpected exception {}'.format(type(e).__name__))
 
 
-def test_help_indentation_error() -> None:
-    text = dedent(
-        """
-        Contact person = ___
-            << Name of the contact person >>
-        """.format()
-    )
-
-    with pytest.raises(InvalidHelpIndentSyntax) as excinfo:
-        parse_formcode(text, enable_edit_checks=True)
-
-    assert excinfo.value.line == 2
-
+def test_comment_indentation_error() -> None:
     text = dedent(
         """
         Contact person = ___
@@ -1155,6 +1147,70 @@ def test_help_indentation_error() -> None:
         """.format()
     )
     assert parse_formcode(text, enable_edit_checks=True)
+
+    text = dedent(
+        """
+        Contact person = ___
+            << Name of the contact person >>
+        """.format()
+    )
+    with pytest.raises(InvalidHelpIndentSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 2
+
+    text = dedent(
+        """
+        Email *= @@@
+        << Put your personal email >>
+        Contact person = ___
+            << Name of the contact person >>
+        """.format()
+    )
+    with pytest.raises(InvalidHelpIndentSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 4
+
+
+def test_help_location_error() -> None:
+    text = dedent(
+        """
+        Email *= @@@
+        << Put your personal email >>
+        Terms of Use / User Agreement *=
+            ( ) I accept the Terms of Use / User Agreement
+        << Please find the terms attached below .. >>
+        """.format()
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
+
+    text = dedent(
+        """
+        Email *= @@@
+        << Put your personal email >>
+
+        Terms of Use / User Agreement *=
+        << Please find the terms attached below .. >>
+            ( ) I accept the Terms of Use / User Agreement
+        """.format()
+    )
+    with pytest.raises(InvalidHelpLocationSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 5
+
+    text = dedent(
+        """
+        Email *= @@@
+        << Put your personal email >>
+        Name = ___
+
+        Terms of Use / User Agreement *=
+        << Please find the terms attached below .. >>
+            ( ) I accept the Terms of Use / User Agreement
+        """.format()
+    )
+    with pytest.raises(InvalidHelpLocationSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 6
 
 
 def test_empty_fieldset_error() -> None:
