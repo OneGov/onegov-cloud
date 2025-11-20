@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
-from onegov.form.errors import InvalidIndentSyntax
+from onegov.form.errors import InvalidIndentSyntax, InvalidHelpIndentSyntax
 from onegov.form.fields import (
     DateTimeLocalField, MultiCheckboxField, TimeField, URLField, VideoURLField)
 from onegov.form.parser.grammar import field_help_identifier
@@ -1133,6 +1133,28 @@ def test_indentation_error(
             parse_formcode(text, enable_edit_checks=edit_checks)
         except InvalidIndentSyntax as e:
             pytest.fail('Unexpected exception {}'.format(type(e).__name__))
+
+
+def test_help_indentation_error() -> None:
+    text = dedent(
+        """
+        Contact person = ___
+            << Name of the contact person >>
+        """.format()
+    )
+
+    with pytest.raises(InvalidHelpIndentSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+
+    assert excinfo.value.line == 2
+
+    text = dedent(
+        """
+        Contact person = ___
+        << Name of the contact person >>
+        """.format()
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
 
 
 def test_empty_fieldset_error() -> None:

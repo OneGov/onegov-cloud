@@ -1211,10 +1211,23 @@ def parse_formcode(
     forms.validators.py
     """
     # CustomLoader is inherited from SafeLoader so no security issue here
-    parsed = yaml.load(  # nosec B506
-        '\n'.join(translate_to_yaml(formcode, enable_edit_checks)),
-        CustomLoader
-    )
+    try:
+        parsed = yaml.load(  # nosec B506
+            '\n'.join(translate_to_yaml(formcode, enable_edit_checks)),
+            CustomLoader
+        )
+    except yaml.YAMLError as e:
+        if (e.problem ==
+                "expected <block end>, but found '<block mapping start>'"):
+            if 'field_help' in e.problem_mark.buffer:
+                raise errors.InvalidHelpIndentSyntax(
+                    e.problem_mark.line) from e
+
+            raise errors.InvalidIndentSyntax(
+                e.problem_mark.line) from e
+
+        raise errors.InvalidFormSyntax(
+            e.problem_mark.line) from e
 
     fieldsets = []
     field_classes: dict[str, type[ParsedField]] = {
