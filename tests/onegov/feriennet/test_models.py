@@ -8,13 +8,11 @@ from uuid import uuid4
 
 from onegov.core.utils import Bunch
 from onegov.feriennet.models.notification_template import TemplateVariables
-from onegov.feriennet.models import VacationActivity
 
 from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .conftest import Scenario
-    from onegov.user import User
 
 
 def test_template_variables() -> None:
@@ -114,10 +112,16 @@ def test_period(scenario: Scenario) -> None:
         assert not period.is_prebooking_in_past
 
 
-def test_add_vacation_activity(owner: User) -> None:
-    owner.realname = None
+def test_add_vacation_activity(scenario: Scenario) -> None:
 
-    activity = VacationActivity(  # type:ignore[misc]
+    owner = scenario.add_user(
+        username='maxi@example.org',
+        realname=None,
+        phone='041 312 4567',
+        complete_profile=False,
+    )
+
+    activity = scenario.add_activity(
         title='Visit the Donut Shop',
         username=owner.username,
         lead='Come visit the local donut shop and get some samples!',
@@ -133,25 +137,26 @@ def test_add_vacation_activity(owner: User) -> None:
     )
     assert activity.text == Markup('<h1>Attack of the Killer Donuts</h1>')
     assert activity.username == owner.username
-    assert activity.organiser == ['owner@example.org']
-    assert activity.organiser_text == 'owner@example.org'
+
+    assert activity.organiser == ['maxi@example.org', '041 312 4567']
+    assert activity.organiser_text == 'maxi@example.org 041 312 4567'
 
     # set user realname and data
-    owner.realname = "Max"
+    owner.realname = 'Max'
     owner.data = {
-        "organisation": "Donut Lovers Inc.",
-        "place": "Donut City",
-        "zip_code": "12345",
+        'organisation': 'Donut Lovers Inc.',
+        'place': 'Donut City',
+        'zip_code': '12345',
     }
 
     assert activity.organiser == [
-        "owner@example.org",
-        "Max",
-        "Donut Lovers Inc.",
-        "12345",
-        "Donut City",
+        'maxi@example.org',
+        'Max',
+        'Donut Lovers Inc.',
+        '12345',
+        'Donut City',
     ]
     assert (
         activity.organiser_text
-        == "owner@example.org Max Donut Lovers Inc. 12345 Donut City"
+        == 'maxi@example.org Max Donut Lovers Inc. 12345 Donut City'
     )
