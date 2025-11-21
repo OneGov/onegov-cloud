@@ -36,6 +36,7 @@ class TranslatorTimeReportForm(Form):
     assignment_type = ChosenSelectField(
         label=_('Type of translation/interpreting'),
         choices=[],
+        default='on-site',
     )
 
     start_date = DateField(
@@ -225,11 +226,19 @@ class TranslatorTimeReportForm(Form):
         return types
 
     def get_travel_compensation(self, translator: Translator) -> Decimal:
-        """Calculate travel compensation based on translator's distance."""
+        """Calculate travel compensation based on round trip distance.
+
+        The drive_distance is multiplied by 2 to account for the round trip
+        (Wegentschädigung * 2).
+        Returns 0 for telephonic assignments.
+        """
+        if self.assignment_type.data == 'telephonic':
+            return Decimal('0')
+
         if not translator.drive_distance:
             return Decimal('0')
 
-        distance = float(translator.drive_distance)
+        distance = float(translator.drive_distance) * 2
         if distance <= 25:
             return Decimal('20')
         elif distance <= 50:
