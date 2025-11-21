@@ -4,7 +4,7 @@ from onegov.chat import MessageFile
 from onegov.core.security import Private
 from onegov.form import Form
 from onegov.form.fields import (ChosenSelectField,
-                                ChosenSelectMultipleEmailField)
+                                ChosenSelectMultipleEmailField, PanelField)
 from onegov.form.fields import TextAreaFieldWithTextModules
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.filters import strip_whitespace
@@ -71,6 +71,17 @@ class InternalTicketChatMessageForm(TicketChatMessageForm):
     if TYPE_CHECKING:
         request: OrgRequest
 
+    notify_hint = PanelField(
+        label=_('Notify about replies hint'),
+        kind='callout',
+        text=_(
+            'The "Always send email notifications for new ticket messages" '
+            'setting is enabled. You will receive an email whenever a new '
+            'message is posted to this ticket. You can change this behaviour '
+            'in the general ticket settings.'
+        )
+    )
+
     notify = BooleanField(
         label=_('Notify me about replies'),
         default=True,
@@ -79,11 +90,9 @@ class InternalTicketChatMessageForm(TicketChatMessageForm):
     def on_request(self) -> None:
         self.text.widget = TextAreaWithTextModules()
         if self.request.app.org.ticket_always_notify:
-            if isinstance(self.notify.render_kw, dict):
-                self.notify.render_kw.update({'disabled': True})
-            else:
-                self.notify.render_kw = {'disabled': True}  # type:ignore
-            self.notify.description = _('Setting "Always notify" is active')
+            self.delete_field('notify')
+        else:
+            self.delete_field('notify_hint')
 
 
 class ExtendedInternalTicketChatMessageForm(InternalTicketChatMessageForm):

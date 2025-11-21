@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-11-12 06:58-0500\n"
+"POT-Creation-Date: 2025-11-21 11:23+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1995,7 +1995,8 @@ msgid "Opening Hours Link Label"
 msgstr "Etichetta del collegamento agli orari di apertura"
 
 msgid "Label for Opening Hours Link. Default: 'more'"
-msgstr "Etichetta per il collegamento agli orari di apertura. Predefinito: 'altro'"
+msgstr ""
+"Etichetta per il collegamento agli orari di apertura. Predefinito: 'altro'"
 
 msgid "Opening Hours Link"
 msgstr "Collegamento agli orari di apertura"
@@ -2914,11 +2915,21 @@ msgstr "Messaggio"
 msgid "The message is empty"
 msgstr "Il messaggio è vuoto"
 
+msgid "Notify about replies hint"
+msgstr "Suggerimento per le notifiche sulle risposte"
+
+msgid ""
+"The \"Always send email notifications for new ticket messages\" setting is "
+"enabled. You will receive an email whenever a new message is posted to this "
+"ticket. You can change this behaviour in the general ticket settings."
+msgstr ""
+"L'impostazione \"Invia sempre notifiche via e-mail per i nuovi messaggi dei "
+"biglietti\" è abilitata. Riceverai un'e-mail ogni volta che viene pubblicato "
+"un nuovo messaggio su questo biglietto. È possibile modificare questo "
+"comportamento nelle impostazioni generali del biglietto."
+
 msgid "Notify me about replies"
 msgstr "Avvisami delle risposte"
-
-msgid "Setting \"Always notify\" is active"
-msgstr "L'impostazione \"Notifica sempre\" è attiva"
 
 msgid "BCC"
 msgstr "BCC"
@@ -4906,8 +4917,8 @@ msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} ha scritto"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 
@@ -7613,6 +7624,18 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid ""
+#~ "Setting \"Always send email notification if a new ticket message is "
+#~ "sent\" is active. You can change this behaviour in the general ticket "
+#~ "settings."
+#~ msgstr ""
+#~ "L'impostazione \"Invia sempre una notifica via e-mail se viene inviato un "
+#~ "nuovo messaggio per il biglietto\" è attiva. È possibile modificare "
+#~ "questo comportamento nelle impostazioni generali del biglietto."
+
+#~ msgid "Setting \"Always notify\" is active"
+#~ msgstr "L'impostazione \"Notifica sempre\" è attiva"
 
 #~ msgid "Dashboard"
 #~ msgstr "Pannello di controllo"

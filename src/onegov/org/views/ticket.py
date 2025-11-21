@@ -1029,7 +1029,7 @@ def message_to_submitter(
 
             request.success(_('Your message has been sent'))
             return morepath.redirect(request.link(self))
-    elif not request.POST:
+    elif not request.POST and form.notify is not None:
         # show the same notification setting as was selected with the
         # last internal message - otherwise default to False
         last_internal = last_internal_message(request.session, self.number)
