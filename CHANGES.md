@@ -1,8 +1,66 @@
 # Changes
 
+## 2025.66
+
+`2025-11-21` | [c001eb871d...d3040df735](https://github.com/OneGov/onegov-cloud/compare/c001eb871d^...d3040df735)
+
+### Feriennet
+
+##### Banners
+
+`Feature` | [PRO-1443](https://linear.app/projuventute/issue/PRO-1443) | [7a37fb75df](https://github.com/onegov/onegov-cloud/commit/7a37fb75dffcd7d2dade97583b942b7ffd6dec0d)
+
+##### New Privacy Settings
+
+Users can now decide themselves if their contact data is shown to other attendees of the same course.
+
+`Feature` | [OGC-1415](https://linear.app/onegovcloud/issue/OGC-1415) | [eef7415188](https://github.com/onegov/onegov-cloud/commit/eef7415188972d4a4cd2db48b4e011fca4e18116)
+
+##### Line break for occasion description
+
+`Bugfix` | [PRO-1449](https://linear.app/projuventute/issue/PRO-1449) | [6b98614db6](https://github.com/onegov/onegov-cloud/commit/6b98614db64d05f52a27be967d2e86aea4084d6e)
+
+### Org
+
+##### Adds cli command to list resources
+
+`Feature` | [OGC-2335](https://linear.app/onegovcloud/issue/OGC-2335) | [0a935fd78c](https://github.com/onegov/onegov-cloud/commit/0a935fd78c5a5dd9ce733daf82ef96d680f6e85b)
+
+##### Reservation button
+
+`Feature` | [OGC-2441](https://linear.app/onegovcloud/issue/OGC-2441) | [3ed6fa2867](https://github.com/onegov/onegov-cloud/commit/3ed6fa286762b50f4be78115192a0680425c59ad)
+
+##### Change editbar_links for allocation settings
+
+`Bugfix` | [OGC-2368](https://linear.app/onegovcloud/issue/OGC-2368) | [d3040df735](https://github.com/onegov/onegov-cloud/commit/d3040df7353081b8e97489f8c0283afe0c6721e2)
+
+### Search
+
+##### Index parliamentarians, commissions and parliamentary groups
+
+`Feature` | [OGC-2788](https://linear.app/onegovcloud/issue/OGC-2788) | [352d6a93c2](https://github.com/onegov/onegov-cloud/commit/352d6a93c232c15ed6d6e80590b7466737fcda8f)
+
+### Swissvotes
+
+##### News labels
+
+Some text changes
+
+`Feature` | [SWI-64](https://linear.app/swissvotes/issue/SWI-64) | [411fedc985](https://github.com/onegov/onegov-cloud/commit/411fedc98549ff46cc9727127010f1ef27b14ba4)
+
+### Town6
+
+##### Unlink Resource from payment and invoice before deleting it
+
+`Bugfix` | [OGC-2719](https://linear.app/onegovcloud/issue/OGC-2719) | [eeb3e22489](https://github.com/onegov/onegov-cloud/commit/eeb3e224891e292ac5805cea8e8b12a330b355d9)
+
+##### Anchor distance
+
+`Bugfix` | [OGC-2777](https://linear.app/onegovcloud/issue/OGC-2777) | [042ef0f258](https://github.com/onegov/onegov-cloud/commit/042ef0f2587811300bdb7389ea574c917ac5bb27)
+
 ## 2025.65
 
-`2025-11-16` | [cb11e65b71...0bada54d1e](https://github.com/OneGov/onegov-cloud/compare/cb11e65b71^...0bada54d1e)
+`2025-11-16` | [cb11e65b71...a53b5d5f13](https://github.com/OneGov/onegov-cloud/compare/cb11e65b71^...a53b5d5f13)
 
 ### Town
 
@@ -2383,64 +2441,4 @@ e.g., 1.5 hours was truncated to 1.0 hour.
 ##### Returns the last change date of news items using the published_or_created attribute to lower priority of older news items (in favor for topics)
 
 `Feature` | [OGC-2180](https://linear.app/onegovcloud/issue/OGC-2180) | [f21afb58e7](https://github.com/onegov/onegov-cloud/commit/f21afb58e766a75b26c64ab21e17a06d8208f3ab)
-
-## 2025.17
-
-`2025-04-04` | [1615b9b227...bb53914fba](https://github.com/OneGov/onegov-cloud/compare/1615b9b227^...bb53914fba)
-
-### Core
-
-##### Make AdjacencyList use midpoint for insertion of new items.
-
-It's essentially implementing a sparse ordering system where new
-items can be inserted between existing ones. This means we can
-now insert news items without having to reorder everything.
-
-`Performance` | [OGC-2134](https://linear.app/onegovcloud/issue/OGC-2134) | [40fd71992d](https://github.com/onegov/onegov-cloud/commit/40fd71992d385daddcac12c513239c66f39cf9e3)
-
-### Feriennet
-
-##### Replace banners
-
-Replace banners, create banner macro, add position classes
-
-`Feature` | [PRO-1379](https://linear.app/projuventute/issue/PRO-1379) | [8c0c594b47](https://github.com/onegov/onegov-cloud/commit/8c0c594b470539f5d4f45e530168f2edf25d52d7)
-
-### Org
-
-##### Option to hide personal mail in tickets
-
-Option to display a defined general mail instead of the personal admin/editor-mails for external users.
-
-`Feature` | [OGC-2050](https://linear.app/onegovcloud/issue/OGC-2050) | [faa3540d13](https://github.com/onegov/onegov-cloud/commit/faa3540d138e6de4f3d024cf7615ac5d0598ca06)
-
-##### Add organization hierarchy and option to assign multiple organizations
-
--    The organization hierarchy can be created in the people-settings
--    People can be assigned to multiple organizations and sub-organizations
--    The sub-organizations in the filter drop-down on the people view get reduced to possible choices according to the chosen organization
-
-`Feature` | [OGC-2096](https://linear.app/onegovcloud/issue/OGC-2096) | [7082f4d0e4](https://github.com/onegov/onegov-cloud/commit/7082f4d0e4211fe7229346e7bae16e357178b0cc)
-
-##### Adds a date picker to the reservation calendar
-
-`Feature` | [OGC-2149](https://linear.app/onegovcloud/issue/OGC-2149) | [e3fb87113b](https://github.com/onegov/onegov-cloud/commit/e3fb87113b923c08f33f7c84ca0d5bfd9f3208ac)
-
-##### Show newest PushNotifications first.
-
-`Feature` | [OGC-2134](https://linear.app/onegovcloud/issue/OGC-2134) | [3a749ca7b9](https://github.com/onegov/onegov-cloud/commit/3a749ca7b92e2705546bb4c3c242b5bda9051c69)
-
-### Pay
-
-##### Avoids crash when generating payment button fails
-
-Decreases the log level for failed payment provider connections.
-
-`Bugfix` | [883bd2bf77](https://github.com/onegov/onegov-cloud/commit/883bd2bf778e7a1faaa7c5ff43a4052c6ad5813e)
-
-### User
-
-##### Fixes crash in `User.get_initials`
-
-`Bugfix` | [5360b64cc6](https://github.com/onegov/onegov-cloud/commit/5360b64cc6461aea4298df64e76b8a1ebf9801ab)
 
