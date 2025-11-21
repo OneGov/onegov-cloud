@@ -20,7 +20,7 @@ from onegov.file.utils import as_fileintent
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import log, _
 from onegov.form.utils import path_to_filename
-from onegov.form.validators import ValidPhoneNumber
+from onegov.form.validators import ValidPhoneNumber, WhitelistedMimeType
 from onegov.form.widgets import ChosenSelectWidget
 from onegov.form.widgets import LinkPanelWidget
 from onegov.form.widgets import DurationInput
@@ -260,6 +260,7 @@ class UploadField(FileField):
     action: Literal['keep', 'replace', 'delete']
     file: IO[bytes] | None
     filename: str | None
+    validators = [WhitelistedMimeType()]
 
     if TYPE_CHECKING:
         def __init__(
@@ -448,6 +449,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
 
     upload_field_class: type[UploadField] = UploadField
     upload_widget: Widget[UploadField] = UploadWidget()
+    validators = [WhitelistedMimeType()]
 
     def __init__(
         self,

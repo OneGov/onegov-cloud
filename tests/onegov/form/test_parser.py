@@ -10,7 +10,7 @@ from onegov.form.errors import InvalidIndentSyntax
 from onegov.form.fields import (
     DateTimeLocalField, MultiCheckboxField, TimeField, URLField, VideoURLField)
 from onegov.form.parser.grammar import field_help_identifier
-from onegov.form.validators import LaxDataRequired
+from onegov.form.validators import LaxDataRequired, WhitelistedMimeType
 from onegov.form.validators import ValidDateRange
 from onegov.pay import Price
 from textwrap import dedent
@@ -334,6 +334,10 @@ def test_parse_time() -> None:
     assert isinstance(form['time'], TimeField)
 
 
+def _find_validator(field, cls):
+    return next((v for v in field.validators if isinstance(v, cls)), None)
+
+
 def test_parse_fileinput() -> None:
     form = parse_form("File = *.pdf|*.doc")()
 
@@ -341,17 +345,40 @@ def test_parse_fileinput() -> None:
     assert isinstance(form['file'], FileField)
     assert form['file'].widget.multiple is False  # type: ignore[attr-defined]
 
+    # verify attached mime type validator
+    assert form['file'].validators
+    validator = _find_validator(form['file'], WhitelistedMimeType)
+    assert validator.whitelist == {
+        'application/msword', 'application/pdf'
+    }
+
+    form = parse_form("File = *.*")()
+    field = form._fields['file']
+    assert any(isinstance(v, WhitelistedMimeType) for v in field.validators)
+    assert field.validators[1].whitelist == WhitelistedMimeType.whitelist
+
 
 def test_parse_multiplefileinput() -> None:
     form = parse_form("Files = *.pdf|*.doc (multiple)")()
+    # form = parse_form("Files = *.pdf (multiple)")()
 
     assert form['files'].label.text == 'Files'
     assert isinstance(form['files'], FileField)
     assert form['files'].widget.multiple is True  # type: ignore[attr-defined]
 
+    # verify attached mime type validator
+    validator = _find_validator(form['files'], WhitelistedMimeType)
+    assert validator.whitelist == {
+        'application/msword', 'application/pdf'
+    }
+
+    form = parse_form("Files = *.* (multiple)")()
+    field = form._fields['files']
+    assert any(isinstance(v, WhitelistedMimeType) for v in field.validators)
+    assert field.validators[0].whitelist == WhitelistedMimeType.whitelist
+
 
 def test_parse_radio() -> None:
-
     text = dedent("""
         Gender =
             ( ) Male
