@@ -1337,6 +1337,12 @@ msgstr "Compte bancaire (IBAN)"
 msgid "Beneficiary"
 msgstr "Bénéficiaire"
 
+msgid "Allow contact for carpooling"
+msgstr "Autoriser la prise de contact pour le covoiturage"
+
+msgid "Privacy"
+msgstr "Confidentialité"
+
 msgid "Please enter both a phone number and a name"
 msgstr "Veuillez entrer un numéro de téléphone et un nom"
 
@@ -3200,9 +3206,6 @@ msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""
 "Les parents peuvent voir les contacts d'autres parents pour la même activité"
 
-msgid "Privacy"
-msgstr "Confidentialité"
-
 msgid "Public organiser data"
 msgstr "Données contacts des prestataires"
 
@@ -3281,23 +3284,6 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
-
-#~ msgid "his"
-#~ msgstr "ses"
-
-#~ msgid "her"
-#~ msgstr "ses"
-
-#, python-format
-#~ msgid "${name} and ${possessive} bookings were deleted"
-#~ msgstr "${name} et ses réservations ont été supprimées"
-
-#, python-format
-#~ msgid ""
-#~ "Do you really want to delete \"${name}\" and all of ${possessive} "
-#~ "bookings?"
-#~ msgstr ""
-#~ "Voulez-vous vraiment supprimer « ${name} » et toutes ses réservations ?"
 
 #~ msgid "Dashboard"
 #~ msgstr "Dashboard"

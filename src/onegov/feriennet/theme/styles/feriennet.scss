@@ -586,9 +586,12 @@ ul.tags {
         @include icon('\f017');
     }
 
-
     .bring-cash::before {
         @include icon('\f0a2');
+    }
+
+    .note {
+        white-space: pre-line;
     }
 }
 

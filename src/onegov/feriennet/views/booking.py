@@ -158,7 +158,8 @@ def related_attendees(
         select(stmt.c).where(
             and_(
                 stmt.c.occasion_id.in_(occasion_ids),
-                stmt.c.booking_state == 'accepted'
+                stmt.c.booking_state == 'accepted',
+                stmt.c.show_contact_data_to_others == True
             )
         )
     )
@@ -368,9 +369,7 @@ def view_my_bookings(
     bookings = all_bookings(self)
     grouped_bookings = period and group_bookings(period, bookings) or {}
 
-    related = request.app.org.meta.get('show_related_contacts') or None
-
-    if period and period.confirmed and related:
+    if period and period.confirmed:
         related = related_attendees(self.session, occasion_ids={
             b.occasion_id for b in bookings
         })

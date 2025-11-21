@@ -20,7 +20,7 @@ from onegov.org.forms.allocation import (
     DailyItemAllocationForm, DailyItemAllocationEditForm)
 from onegov.org.layout import AllocationEditFormLayout
 from onegov.org.layout import AllocationRulesLayout
-from onegov.core.elements import Link, Confirm, Intercooler
+from onegov.core.elements import BackLink, Link, Confirm, Intercooler
 from onegov.reservation import Allocation
 from onegov.reservation import Reservation
 from onegov.reservation import Resource
@@ -320,6 +320,7 @@ def handle_edit_allocation(
 
     layout = layout or AllocationEditFormLayout(self, request)
     layout.edit_mode = True
+    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
 
     return {
         'layout': layout,
@@ -532,6 +533,13 @@ def handle_edit_rule(
         return request.redirect(request.link(self, name='rules'))
 
     form.rule = existing_rule
+
+    layout.edit_mode = True
+    layout.editmode_links[1] = Link(
+        text=_('Cancel'),
+        url=request.link(self, name='rules'),
+        attrs={'class': 'cancel-link'}
+    )
     return {
         'layout': layout,
         'title': _('Edit availabilty period'),

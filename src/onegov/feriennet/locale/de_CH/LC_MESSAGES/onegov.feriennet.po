@@ -1326,6 +1326,12 @@ msgstr "Bank Konto (IBAN)"
 msgid "Beneficiary"
 msgstr "Begünstigter"
 
+msgid "Allow contact for carpooling"
+msgstr "Kontaktaufnahme für Mitfahrgelegenheiten erlauben"
+
+msgid "Privacy"
+msgstr "Privatsphäre"
+
 msgid "Please enter both a phone number and a name"
 msgstr "Bitte geben Sie eine Telefonnummer und einen Namen ein"
 
@@ -3185,9 +3191,6 @@ msgstr ""
 "Mitglieder können die Kontaktdaten anderer Mitglieder des gleichen Angebots "
 "sehen"
 
-msgid "Privacy"
-msgstr "Privatsphäre"
-
 msgid "Public organiser data"
 msgstr "Öffentliche Daten Veranstaltende"
 
@@ -3264,23 +3267,6 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
-
-#~ msgid "his"
-#~ msgstr "seine"
-
-#~ msgid "her"
-#~ msgstr "ihre"
-
-#, python-format
-#~ msgid "${name} and ${possessive} bookings were deleted"
-#~ msgstr "${name} und ${possessive} Buchungen wurden gelöscht"
-
-#, python-format
-#~ msgid ""
-#~ "Do you really want to delete \"${name}\" and all of ${possessive} "
-#~ "bookings?"
-#~ msgstr ""
-#~ "Möchten Sie \"${name}\" und alle ${possessive} Buchungen wirklich löschen?"
 
 #~ msgid "Dashboard"
 #~ msgstr "Übersicht"

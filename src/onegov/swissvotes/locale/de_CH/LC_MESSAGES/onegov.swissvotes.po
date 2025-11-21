@@ -1199,7 +1199,7 @@ msgid "d-3-938"
 msgstr "Tierschutz"
 
 msgid "d-1-10"
-msgstr "Sozialpolitik"
+msgstr "Sozial- und Gesellschaftspolitik"
 
 msgid "d-2-101"
 msgstr "Gesundheit"
@@ -1247,31 +1247,31 @@ msgid "d-3-1028"
 msgstr "Fürsorge"
 
 msgid "d-2-103"
-msgstr "Soziale Gruppen"
+msgstr "Gesellschaftsfragen"
 
 msgid "d-3-1031"
-msgstr "Ausländer:innen"
+msgstr "Migrations- und Integrationspolitik"
 
 msgid "d-3-1032"
-msgstr "Flüchtlinge"
+msgstr "Asylpolitik"
 
 msgid "d-3-1033"
-msgstr "Stellung der Frau"
+msgstr "Frauen und Gleichstellungspolitik"
 
 msgid "d-3-1034"
 msgstr "Familienpolitik"
 
 msgid "d-3-1035"
-msgstr "Kinder und Jugendliche"
+msgstr "Kinder- und Jugendpolitik"
 
 msgid "d-3-1036"
-msgstr "Senior:innen"
+msgstr "Alterspolitik"
 
 msgid "d-3-1037"
-msgstr "Behinderte"
+msgstr "Menschen mit Behinderungen"
 
 msgid "d-3-1038"
-msgstr "Homosexuelle"
+msgstr "LGBTQIA+"
 
 msgid "d-1-11"
 msgstr "Bildung und Forschung"

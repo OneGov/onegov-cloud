@@ -187,12 +187,12 @@
                                                         <div class="actions" tal:define="actions actions_by_booking(booking)">
                                                             <tal:b tal:repeat="action actions" tal:content="action(layout)" />
                                                         </div>
-                                                        <div class="attendees-toggle" data-ogc-toggle="#attendees-table-${booking.id}" tal:condition="related and state == 'accepted'" tal:define="count related[booking.occasion_id][0].attendee_count|0" style="visibility: ${count and 'visible' or 'hidden'}">
+                                                        <div class="attendees-toggle" data-ogc-toggle="#attendees-table-${booking.id}" tal:condition="state == 'accepted'" tal:define="count len(related[booking.occasion_id])|0" style="visibility: ${count and 'visible' or 'hidden'}">
                                                             <span>${count}</span> <span i18n:translate>Attendees</span>
                                                             <i class="fa fa-chevron-down rotate"></i>
                                                         </div>
                                                     </div>
-                                                    <tal:b condition="related and state == 'accepted'" tal:define="count related[booking.occasion_id][0].attendee_count|0">
+                                                    <tal:b condition="state == 'accepted'" tal:define="count related[booking.occasion_id][0].attendee_count|0">
                                                         <div class="attendees-table hidden" id="attendees-table-${booking.id}" tal:condition="count">
                                                             <table>
                                                                 <thead>
