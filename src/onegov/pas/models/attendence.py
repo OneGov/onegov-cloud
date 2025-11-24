@@ -136,8 +136,9 @@ class Attendence(Base, TimestampMixin):
 
         The calculation follows these business rules:
         - Plenary sessions:
-            * Always counted as 0.5 (half day), regardless of actual duration
-            This is the special case!
+            * Returns actual hours from duration field for display
+            * CHF calculation is independent and always uses half-day rate
+            * This allows storing actual hours while paying fixed rate
 
         - Everything else is counted as actual hours:
             * First 2 hours are counted as given
@@ -148,8 +149,9 @@ class Attendence(Base, TimestampMixin):
         Examples:
             >>> # Plenary session
             >>> attendence.type = 'plenary'
+            >>> attendence.duration = 180  # 3 hours
             >>> calculate_value(attendence)
-            '0.5'
+            '3.0'
 
             >>> # Commission meeting, 2 hours
             >>> attendence.type = 'commission'
@@ -167,7 +169,10 @@ class Attendence(Base, TimestampMixin):
             raise ValueError('Duration cannot be negative')
 
         if self.type == 'plenary':
-            return Decimal('0.5')
+            duration_hours = Decimal(str(self.duration)) / Decimal('60')
+            return duration_hours.quantize(
+                Decimal('0.1'), rounding=ROUND_HALF_UP
+            )
 
         if self.type in ('commission', 'study', 'shortest'):
             # Convert minutes to hours with Decimal for precise calculation
