@@ -298,8 +298,6 @@ def generate_accounting_export_rows(
             1 + report.effective_surcharge_percentage / Decimal(100)
         )
         effective_rate_str = str(effective_rate.quantize(Decimal('0.01')))
-        travel_and_meal = report.travel_compensation + report.meal_allowance
-        travel_and_meal_str = str(travel_and_meal)
 
         row_2603 = [
             'L001',
@@ -337,8 +335,8 @@ def generate_accounting_export_rows(
         ]
         yield row_2603
 
-        if travel_and_meal > 0:
-            row_8102 = [
+        if report.travel_compensation > 0:
+            row_8102_travel = [
                 'L001',
                 pers_nr,
                 date_str,
@@ -347,7 +345,7 @@ def generate_accounting_export_rows(
                 '0',
                 '',
                 'VWG Reisespesen Dolmetscher',
-                travel_and_meal_str,
+                str(report.travel_compensation),
                 '1',
                 '0',
                 '0',
@@ -372,7 +370,44 @@ def generate_accounting_export_rows(
                 '',
                 'L001',
             ]
-            yield row_8102
+            yield row_8102_travel
+
+        if report.meal_allowance > 0:
+            row_8102_meal = [
+                'L001',
+                pers_nr,
+                date_str,
+                '0',
+                '8102',
+                '0',
+                '',
+                'VWG Reisespesen Dolmetscher',  # Verpflegung
+                str(report.meal_allowance),
+                '1',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '1',
+                '0',
+                '',
+                '0',
+                '0',
+                '0',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                'L001',
+            ]
+            yield row_8102_meal
 
 
 @TranslatorDirectoryApp.view(
@@ -429,41 +464,44 @@ def export_accounting_csv(
     output = StringIO()
     writer = csv.writer(output, delimiter=';')
 
-    header = [
-        'PreEntry',
-        'Personal-Nr.',
-        'Periodendatum',
-        'Periodennummer',
-        'Lohnart',
-        'Belegnummer',
-        'Währung',
-        'Text Lohnart',
-        'Anzahl',
-        'Mutationscode Anzahl',
-        'Ansatz',
-        'Mutationscode Ansatz',
-        'Kostenstelle 1',
-        'Kostenstelle 2',
-        'Freie Nummer',
-        'Funktion Gemeinde',
-        'Art Gemeinde',
-        'Subnummer Referenz',
-        'GB zum Verbuchen der Vorerfassung',
-        'AnsV-Nr.',
-        'Wiederkehrende Vorerfassung',
-        'Mehrwertsteuer-Code',
-        'Fibu-Konto',
-        'Freie Nummer 1',
-        'Freie Nummer 2',
-        'Freier Text 1',
-        'Freier Text 2',
-        'Freies Datum 1',
-        'Kommentar',
-        'Benutzername',
-        'Mutationsdatum',
-        'PostEntry',
-    ]
-    writer.writerow(header)
+    # Header row MUST NOT be included: the accounting system will reject
+    # the import if a header is present. Kept here for documentation and
+    # debugging purposes.
+    # header = [
+    #     'PreEntry',
+    #     'Personal-Nr.',
+    #     'Periodendatum',
+    #     'Periodennummer',
+    #     'Lohnart',
+    #     'Belegnummer',
+    #     'Währung',
+    #     'Text Lohnart',
+    #     'Anzahl',
+    #     'Mutationscode Anzahl',
+    #     'Ansatz',
+    #     'Mutationscode Ansatz',
+    #     'Kostenstelle 1',
+    #     'Kostenstelle 2',
+    #     'Freie Nummer',
+    #     'Funktion Gemeinde',
+    #     'Art Gemeinde',
+    #     'Subnummer Referenz',
+    #     'GB zum Verbuchen der Vorerfassung',
+    #     'AnsV-Nr.',
+    #     'Wiederkehrende Vorerfassung',
+    #     'Mehrwertsteuer-Code',
+    #     'Fibu-Konto',
+    #     'Freie Nummer 1',
+    #     'Freie Nummer 2',
+    #     'Freier Text 1',
+    #     'Freier Text 2',
+    #     'Freies Datum 1',
+    #     'Kommentar',
+    #     'Benutzername',
+    #     'Mutationsdatum',
+    #     'PostEntry',
+    # ]
+    # writer.writerow(header)
 
     for row in generate_accounting_export_rows(confirmed_reports):
         writer.writerow(row)
@@ -474,7 +512,6 @@ def export_accounting_csv(
     response = Response(csv_bytes)
     response.content_type = 'text/csv; charset=iso-8859-1'
     response.content_disposition = f'attachment; filename="{filename}"'
-
     return response
 
 
@@ -808,11 +845,9 @@ def generate_time_report_pdf_for_translator(
 
     time_report = handler.time_report
     translator = handler.translator
-
     pdf_bytes = generate_time_report_pdf_bytes(
         time_report, translator, request
     )
-
     filename = (
         f'Zeiterfassung_{translator.last_name}_'
         f'{time_report.assignment_date.strftime("%Y%m%d")}.pdf'
@@ -867,5 +902,4 @@ def generate_qr_bill_pdf_for_translator(
     response = Response(qr_bill_bytes)
     response.content_type = 'application/pdf'
     response.content_disposition = f'inline; filename="{filename}"'
-
     return response
