@@ -586,7 +586,8 @@ ul.tags {
         @include icon('\f0a2');
     }
 
-    .note {
+    .note p,
+    .location span {
         white-space: pre-line;
     }
 }
