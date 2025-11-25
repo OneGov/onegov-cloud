@@ -1133,18 +1133,19 @@ def test_indentation_error(
 
         assert excinfo.value.line == 6
     else:
-        try:
-            parse_formcode(text, enable_edit_checks=edit_checks)
-        except InvalidIndentSyntax as e:
-            pytest.fail('Unexpected exception {}'.format(type(e).__name__))
+        assert parse_formcode(text, enable_edit_checks=edit_checks)
 
 
-def test_comment_indentation_error() -> None:
+def test_help_indentation_error() -> None:
     text = dedent(
         """
-        Contact person = ___
+        Contact person *= ___
         << Name of the contact person >>
-        """.format()
+        Favorit fruit =
+            ( ) Apple
+            ( ) Banana
+        << Please select your favorit fruit >>
+        """
     )
     assert parse_formcode(text, enable_edit_checks=True)
 
@@ -1152,23 +1153,55 @@ def test_comment_indentation_error() -> None:
         """
         Contact person = ___
             << Name of the contact person >>
-        """.format()
-    )
+        """
+    ).lstrip('\n')
     with pytest.raises(InvalidHelpIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
-    assert excinfo.value.line == 2
+        assert excinfo.value.line == 2
 
     text = dedent(
         """
         Email *= @@@
         << Put your personal email >>
+
         Contact person = ___
             << Name of the contact person >>
-        """.format()
-    )
+        """
+    ).lstrip('\n')
     with pytest.raises(InvalidHelpIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
-    assert excinfo.value.line == 4
+        assert excinfo.value.line == 5
+
+    text = dedent(
+        """
+        Email *= @@@
+        << Put your personal email >>
+        Name = ___
+
+        Terms of Use / User Agreement *=
+            ( ) I accept the Terms of Use / User Agreement
+            << Please find the terms attached below .. >>
+            ( ) I DONT accept the Terms of Use / User Agreement
+        """
+    ).lstrip('\n')
+    with pytest.raises(InvalidHelpIndentSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 7
+
+    text = dedent(
+        """
+        Email *= @@@
+
+        Preferred Sports =
+            [ ] Baseball
+            [ ] Football
+            [ ] Skiing
+            << Please select all your preferred sports >>
+        """
+    ).lstrip('\n')
+    with pytest.raises(InvalidHelpIndentSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 7
 
 
 def test_help_location_error() -> None:
@@ -1179,9 +1212,20 @@ def test_help_location_error() -> None:
         Terms of Use / User Agreement *=
             ( ) I accept the Terms of Use / User Agreement
         << Please find the terms attached below .. >>
-        """.format()
+        """
     )
     assert parse_formcode(text, enable_edit_checks=True)
+
+    text = dedent(
+        """
+        # Comment
+        << Help text: Put your personal email >>
+        Email *= @@@
+        """
+    ).lstrip('\n')
+    with pytest.raises(InvalidHelpLocationSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 2
 
     text = dedent(
         """
@@ -1191,8 +1235,8 @@ def test_help_location_error() -> None:
         Terms of Use / User Agreement *=
         << Please find the terms attached below .. >>
             ( ) I accept the Terms of Use / User Agreement
-        """.format()
-    )
+        """
+    ).lstrip('\n')
     with pytest.raises(InvalidHelpLocationSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 5
@@ -1206,11 +1250,27 @@ def test_help_location_error() -> None:
         Terms of Use / User Agreement *=
         << Please find the terms attached below .. >>
             ( ) I accept the Terms of Use / User Agreement
-        """.format()
-    )
+        """
+    ).lstrip('\n')
     with pytest.raises(InvalidHelpLocationSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 6
+
+    text = dedent(
+        """
+        Email *= @@@
+        << Put your personal email >>
+        Name = ___
+
+        Terms of Use / User Agreement *=
+            ( ) I accept the Terms of Use / User Agreement
+        << Please find the terms attached below .. >>
+            ( ) I DONT accept the Terms of Use / User Agreement
+        """
+    )
+    with pytest.raises(InvalidHelpLocationSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 7
 
 
 def test_empty_fieldset_error() -> None:
