@@ -11,7 +11,8 @@ from onegov.core.orm.mixins import (
 from onegov.core.orm.types import UUID
 from onegov.form.models import FormSubmission
 from onegov.org.models.extensions import (
-    ContactExtension, GeneralFileLinkExtension, ResourceValidationExtension)
+    ContactExtension, GeneralFileLinkExtension,
+    InlinePhotoAlbumExtension, ResourceValidationExtension)
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PersonLinkExtension
@@ -235,7 +236,8 @@ class SharedMethods:
 class DaypassResource(Resource, AccessExtension, SearchableContent,
                       ContactExtension, PersonLinkExtension,
                       CoordinatesExtension, SharedMethods,
-                      ResourceValidationExtension, GeneralFileLinkExtension):
+                      ResourceValidationExtension, GeneralFileLinkExtension,
+                      InlinePhotoAlbumExtension):
     __mapper_args__ = {'polymorphic_identity': 'daypass'}
 
     # the selected view
@@ -251,7 +253,8 @@ class DaypassResource(Resource, AccessExtension, SearchableContent,
 class RoomResource(Resource, AccessExtension, SearchableContent,
                    ContactExtension, PersonLinkExtension,
                    CoordinatesExtension, SharedMethods,
-                   ResourceValidationExtension, GeneralFileLinkExtension):
+                   ResourceValidationExtension, GeneralFileLinkExtension,
+                   InlinePhotoAlbumExtension):
     __mapper_args__ = {'polymorphic_identity': 'room'}
 
     # the selected view (depends on the resource's default)
@@ -280,7 +283,8 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
 class ItemResource(Resource, AccessExtension, SearchableContent,
                    ContactExtension, PersonLinkExtension,
                    CoordinatesExtension, SharedMethods,
-                   ResourceValidationExtension, GeneralFileLinkExtension):
+                   ResourceValidationExtension, GeneralFileLinkExtension,
+                   InlinePhotoAlbumExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'daily-item'}
 
