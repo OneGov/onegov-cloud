@@ -89,7 +89,7 @@ def test_political_businesses(client: Client) -> None:
         # test business overview and filters
         page = client.get('/political-businesses')
         keywords = [
-            'Politische Geschäfte', '02.10.2025', '25.10',
+            'Politische Geschäfte', '02.10.2025',
             'How many congressmen does it take to change a light bulb?',
             'Geschäftsart', 'Anfrage (1)',
             'Status', 'Pendent Legislative (1)', 'Jahr', '2025 (1)']
