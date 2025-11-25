@@ -268,6 +268,15 @@ class TimeReportHandler(Handler):
             f'</div>'
         )
 
+        translator_link = (
+            f'<a href="{request.link(self.translator)}">'
+            f'{escape(self.translator.title)}</a>'
+        )
+
+        start_time = escape(layout.format_date(report.start, 'datetime'))
+        end_time = escape(layout.format_date(report.end, 'datetime'))
+        time_range = f'{start_time} - {end_time}'
+
         assignment_type_key = report.assignment_type
         assignment_type_translated = '-'
         if assignment_type_key:
@@ -278,9 +287,14 @@ class TimeReportHandler(Handler):
         assignment_date_formatted = escape(
             layout.format_date(report.assignment_date, 'date')
         )
+
         summary_parts = [
             status_badge,
             "<dl class='field-display'>",
+            f"<dt>{request.translate(_('Translator'))}</dt>",
+            f'<dd>{translator_link}</dd>',
+            f"<dt>{request.translate(_('Time'))}</dt>",
+            f'<dd>{time_range}</dd>',
             f"<dt>{request.translate(_('Assignment Date'))}</dt>",
             f'<dd>{assignment_date_formatted}</dd>',
             f"<dt>{request.translate(_('Type'))}</dt>",
