@@ -41,20 +41,20 @@ def search(
             'connection': False
         }
     try:
-        resultslabel = _('${count} Results', mapping={
-            'count': self.available_results
-        })
+        available_results = self.available_results
     except InternalError:
         # reset transaction machinery so our transaction is no longer doomed
         transaction.abort()
         transaction.begin()
         # probably some malicious search term, that tried to burn CPU cycles
         # we just pretend we succeeded but return no results
-        self.__dict__['available_results'] = 0
+        available_results = self.__dict__['available_results'] = 0
         self.__dict__['subset_count'] = 0
         self.__dict__['batch'] = ()
 
-        resultslabel = _('${count} Results', mapping={'count': 0})
+    resultslabel = _('${count} Results', mapping={
+        'count': available_results
+    })
 
     if 'lucky' in request.GET:
         url = self.feeling_lucky()
