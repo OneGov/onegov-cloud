@@ -45,9 +45,10 @@ class OccasionForm(Form):
         render_kw={'class_': 'many many-datetime-ranges'}
     )
 
-    meeting_point = StringField(
+    meeting_point = TextAreaField(
         label=_('Meeting Point'),
-        validators=[InputRequired()]
+        validators=[InputRequired()],
+        render_kw={'rows': 2}
     )
 
     note = TextAreaField(
