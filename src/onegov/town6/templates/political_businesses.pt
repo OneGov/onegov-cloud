@@ -12,7 +12,6 @@
                         <div class="card-header">
                             <div class="info">
                                 <span>${layout.format_date(business.entry_date, 'date')}</span>
-                                <b tal:condition="business.number">${business.number}</b>
                             </div>
                             <div class="tags">
                                 <span tal:condition="python: business.political_business_type in type_map" class="blank-label">${type_map[business.political_business_type]}</span>
