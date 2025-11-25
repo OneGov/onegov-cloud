@@ -1415,6 +1415,8 @@ def translate_to_yaml(
     expect_nested = False
     actual_fields = 0
     ix = 0
+    last_identifier_indent: int | None = None
+    prior_identifier_indents: list[int] = []
 
     def escape_single(text: str) -> str:
         return text.replace("'", "''")
@@ -1423,8 +1425,9 @@ def translate_to_yaml(
         return text.replace('"', '\\"')
 
     for ix, line in lines:
-
         indent = ' ' * (4 + (len(line) - len(line.lstrip())))
+        len_indent = len(indent)
+
         if enable_edit_checks and not validate_indent(indent):
             raise errors.InvalidIndentSyntax(line=ix + 1)
 
@@ -1449,11 +1452,21 @@ def translate_to_yaml(
             )
             expect_nested = len(indent) > 4
             actual_fields += 1
+            last_identifier_indent = len_indent
+            if last_identifier_indent not in prior_identifier_indents:
+                prior_identifier_indents.append(last_identifier_indent)
             continue
 
         # help descriptions following a field
         parse_result = try_parse(ELEMENTS.help_identifier, line)
         if parse_result is not None:
+            # test help indentation
+            if last_identifier_indent is None:
+                raise errors.InvalidHelpLocationSyntax(line=ix + 1)
+            if (len_indent != last_identifier_indent and
+                len_indent not in prior_identifier_indents):
+                raise errors.InvalidHelpIndentSyntax(line=ix + 1)
+
             yield '{indent}"{identifier}": \'{message}\''.format(
                 indent=indent + 2 * ' ',
                 identifier='field_help',
@@ -1489,6 +1502,9 @@ def translate_to_yaml(
 
             expect_nested = True
             actual_fields += 1
+            last_identifier_indent = len_indent
+            if last_identifier_indent not in prior_identifier_indents:
+                prior_identifier_indents.append(last_identifier_indent)
             continue
 
         raise errors.InvalidFormSyntax(line=ix + 1)

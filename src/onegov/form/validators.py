@@ -219,12 +219,12 @@ class ValidFormDefinition:
     syntax = _('The syntax on line {line} is not valid.')
     indent = _('The indentation on line {line} is not valid. '
                'Please use a multiple of 4 spaces')
-    help_indent = _('The indentation on line {line} is not valid. '
-                    'Comment fields must be indented to the same level as '
-                    'they belong to.')
-    help_location = _('Incorrect comment placement on line {line}. '
-                      'Field comments must be placed directly below the '
-                      'field definition and aligned with its indentation.')
+    comment_indent = _('The indentation on line {line} is not valid. '
+                    'Comments must be indented to the same level as '
+                    'the field definition (`=`) they belong to.')
+    comment_location = _('Incorrect placement of the field description on line {line}. '
+                      'The field description must be placed below the '
+                      'field definition (`=`) and with the same indentation.')
     duplicate = _("The field '{label}' exists more than once.")
     reserved = _("'{label}' is a reserved name. Please use a different name.")
     required = _('Define at least one required field')
@@ -270,11 +270,11 @@ class ValidFormDefinition:
             ) from exception
         except InvalidHelpIndentSyntax as exception:
             raise ValidationError(
-                field.gettext(self.help_indent).format(line=exception.line)
+                field.gettext(self.comment_indent).format(line=exception.line)
             ) from exception
         except InvalidHelpLocationSyntax as exception:
             raise ValidationError(
-                field.gettext(self.help_location).format(line=exception.line)
+                field.gettext(self.comment_location).format(line=exception.line)
             ) from exception
         except EmptyFieldsetError as exception:
             raise ValidationError(

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-05 14:46+0100\n"
+"POT-Creation-Date: 2025-11-25 08:49+0100\n"
 "PO-Revision-Date: 2019-01-31 08:31+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -182,6 +182,22 @@ msgstr ""
 "multiple de 4 espaces"
 
 #, python-format
+msgid ""
+"The indentation on line {line} is not valid. Comments must be indented to "
+"the same level as the field definition (`=`) they belong to."
+msgstr ""
+"L'indentation de la ligne {line} n'est pas valide. Les commentaires doivent "
+"être indentés au même niveau que la définition du champ (`=`) auquel ils "
+"appartiennent."
+
+#, python-format
+msgid ""
+"Incorrect placement of the field description on line {line}. The field "
+"description must be placed below the field definition (`=`) and with the "
+"same indentation."
+msgstr ""
+
+#, python-format
 msgid "The field '{label}' exists more than once."
 msgstr "Le champ '{label}' existe plus d'une fois."
 
@@ -283,6 +299,15 @@ msgstr "heures"
 
 msgid "minutes"
 msgstr "minutes"
+
+#, python-format
+#~ msgid ""
+#~ "Incorrect comment placement on line {line}. Field comments must be placed "
+#~ "directly below the field definition and aligned with its indentation."
+#~ msgstr ""
+#~ "Placement incorrect du commentaire à la ligne {line}. Les commentaires "
+#~ "des champs doivent être placés directement sous la définition du champ et "
+#~ "alignés avec son indentation."
 
 #~ msgid "Multiline"
 #~ msgstr "Multi-lignes"
