@@ -408,6 +408,7 @@ from functools import cached_property
 from dateutil import parser as dateutil_parser
 from decimal import Decimal
 from functools import lru_cache
+
 from onegov.core.utils import Bunch
 from onegov.form import errors
 from onegov.form.parser.grammar import checkbox, chip_nr, field_help_identifier
@@ -1398,6 +1399,7 @@ def translate_to_yaml(
     ix = 0
     last_identifier_indent: int | None = None
     prior_identifier_indents: list[int] = []
+    expect_option = False
 
     def escape_single(text: str) -> str:
         return text.replace("'", "''")
@@ -1441,12 +1443,14 @@ def translate_to_yaml(
         # help descriptions following a field
         parse_result = try_parse(ELEMENTS.help_identifier, line)
         if parse_result is not None:
-            # test help indentation
             if last_identifier_indent is None:
-                raise errors.InvalidHelpLocationSyntax(line=ix + 1)
+                raise errors.InvalidCommentLocationSyntax(line=ix + 1)
             if (len_indent != last_identifier_indent and
                 len_indent not in prior_identifier_indents):
-                raise errors.InvalidHelpIndentSyntax(line=ix + 1)
+                raise errors.InvalidCommentIndentSyntax(line=ix + 1)
+            # previous line cannot be an identifier (checkbox/radio)
+            if expect_option:
+                raise errors.InvalidCommentLocationSyntax(line=ix + 1)
 
             yield '{indent}"{identifier}": \'{message}\''.format(
                 indent=indent + 2 * ' ',
@@ -1467,6 +1471,8 @@ def translate_to_yaml(
                 type=parse_result.type,
                 definition=escape_single(line.strip())
             )
+
+            expect_option = False
             continue
 
         # identifiers which are alone contain nested checkboxes/radios
@@ -1482,6 +1488,7 @@ def translate_to_yaml(
             )
 
             expect_nested = True
+            expect_option = True
             actual_fields += 1
             last_identifier_indent = len_indent
             if last_identifier_indent not in prior_identifier_indents:

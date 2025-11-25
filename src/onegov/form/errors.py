@@ -32,12 +32,12 @@ class InvalidIndentSyntax(FormError):
         self.line = line
 
 
-class InvalidHelpIndentSyntax(FormError):
+class InvalidCommentIndentSyntax(FormError):
     def __init__(self, line: int):
         self.line = line
 
 
-class InvalidHelpLocationSyntax(FormError):
+class InvalidCommentLocationSyntax(FormError):
     def __init__(self, line: int):
         self.line = line
 

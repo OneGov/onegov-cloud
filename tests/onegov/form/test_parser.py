@@ -8,8 +8,8 @@ from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
 from onegov.form.errors import (
     InvalidIndentSyntax,
-    InvalidHelpIndentSyntax,
-    InvalidHelpLocationSyntax,
+    InvalidCommentIndentSyntax,
+    InvalidCommentLocationSyntax,
 )
 from onegov.form.fields import (
     DateTimeLocalField, MultiCheckboxField, TimeField, URLField, VideoURLField)
@@ -1155,7 +1155,7 @@ def test_help_indentation_error() -> None:
             << Name of the contact person >>
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidHelpIndentSyntax) as excinfo:
+    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
         assert excinfo.value.line == 2
 
@@ -1168,7 +1168,7 @@ def test_help_indentation_error() -> None:
             << Name of the contact person >>
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidHelpIndentSyntax) as excinfo:
+    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
         assert excinfo.value.line == 5
 
@@ -1184,7 +1184,7 @@ def test_help_indentation_error() -> None:
             ( ) I DONT accept the Terms of Use / User Agreement
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidHelpIndentSyntax) as excinfo:
+    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 7
 
@@ -1199,7 +1199,7 @@ def test_help_indentation_error() -> None:
             << Please select all your preferred sports >>
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidHelpIndentSyntax) as excinfo:
+    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 7
 
@@ -1219,11 +1219,11 @@ def test_help_location_error() -> None:
     text = dedent(
         """
         # Comment
-        << Help text: Put your personal email >>
+        << Put your personal email >>
         Email *= @@@
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidHelpLocationSyntax) as excinfo:
+    with pytest.raises(InvalidCommentLocationSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 2
 
@@ -1237,7 +1237,7 @@ def test_help_location_error() -> None:
             ( ) I accept the Terms of Use / User Agreement
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidHelpLocationSyntax) as excinfo:
+    with pytest.raises(InvalidCommentLocationSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 5
 
@@ -1252,25 +1252,9 @@ def test_help_location_error() -> None:
             ( ) I accept the Terms of Use / User Agreement
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidHelpLocationSyntax) as excinfo:
+    with pytest.raises(InvalidCommentLocationSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 6
-
-    text = dedent(
-        """
-        Email *= @@@
-        << Put your personal email >>
-        Name = ___
-
-        Terms of Use / User Agreement *=
-            ( ) I accept the Terms of Use / User Agreement
-        << Please find the terms attached below .. >>
-            ( ) I DONT accept the Terms of Use / User Agreement
-        """
-    )
-    with pytest.raises(InvalidHelpLocationSyntax) as excinfo:
-        parse_formcode(text, enable_edit_checks=True)
-    assert excinfo.value.line == 7
 
 
 def test_empty_fieldset_error() -> None:

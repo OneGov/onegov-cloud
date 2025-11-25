@@ -17,8 +17,8 @@ from onegov.form.errors import (
     DuplicateLabelError,
     InvalidIndentSyntax,
     EmptyFieldsetError,
-    InvalidHelpIndentSyntax,
-    InvalidHelpLocationSyntax
+    InvalidCommentIndentSyntax,
+    InvalidCommentLocationSyntax
 )
 from onegov.form.errors import FieldCompileError
 from onegov.form.errors import InvalidFormSyntax
@@ -220,11 +220,12 @@ class ValidFormDefinition:
     indent = _('The indentation on line {line} is not valid. '
                'Please use a multiple of 4 spaces')
     comment_indent = _('The indentation on line {line} is not valid. '
-                    'Comments must be indented to the same level as '
-                    'the field definition (`=`) they belong to.')
-    comment_location = _('Incorrect placement of the field description on line {line}. '
-                      'The field description must be placed below the '
-                      'field definition (`=`) and with the same indentation.')
+                       'Comments must be indented to the same level as '
+                       'the field definition (`=`) they belong to.')
+    comment_location = _('Incorrect placement of the field description on '
+                         'line {line}. The field description must be placed '
+                         'below the field definition (`=`) and with the same '
+                         'indentation.')
     duplicate = _("The field '{label}' exists more than once.")
     reserved = _("'{label}' is a reserved name. Please use a different name.")
     required = _('Define at least one required field')
@@ -268,11 +269,11 @@ class ValidFormDefinition:
             raise ValidationError(
                 field.gettext(self.indent).format(line=exception.line)
             ) from exception
-        except InvalidHelpIndentSyntax as exception:
+        except InvalidCommentIndentSyntax as exception:
             raise ValidationError(
                 field.gettext(self.comment_indent).format(line=exception.line)
             ) from exception
-        except InvalidHelpLocationSyntax as exception:
+        except InvalidCommentLocationSyntax as exception:
             raise ValidationError(
                 field.gettext(self.comment_location).format(line=exception.line)
             ) from exception
