@@ -42,7 +42,6 @@ from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
 from sqlalchemy import and_, func, select, cast as sa_cast, Boolean
-from sqlalchemy.dialects.postgresql import UUID as SA_UUID
 from sqlalchemy.orm import undefer, joinedload, Session
 
 from webob import exc
@@ -959,6 +958,9 @@ def view_resource(
     layout: ResourceLayout | None = None
 ) -> RenderData:
 
+    if hasattr(self, 'photo_album_id') and self.photo_album_id:
+        request.include('photoswipe')
+
     return {
         'title': self.title,
         'files': getattr(self, 'files', None),
@@ -990,7 +992,7 @@ def handle_delete_resource(self: Resource, request: OrgRequest) -> None:
                 ),
             )
             .filter(
-                sa_cast(ReservationTicket.handler_id, SA_UUID).in_(
+                sa_cast(ReservationTicket.handler_id, UUIDType).in_(
                     scheduler.managed_reservations().with_entities(
                         Reservation.token
                     )
