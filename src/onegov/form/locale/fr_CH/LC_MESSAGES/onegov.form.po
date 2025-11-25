@@ -300,14 +300,5 @@ msgstr "heures"
 msgid "minutes"
 msgstr "minutes"
 
-#, python-format
-#~ msgid ""
-#~ "Incorrect comment placement on line {line}. Field comments must be placed "
-#~ "directly below the field definition and aligned with its indentation."
-#~ msgstr ""
-#~ "Placement incorrect du commentaire à la ligne {line}. Les commentaires "
-#~ "des champs doivent être placés directement sous la définition du champ et "
-#~ "alignés avec son indentation."
-
 #~ msgid "Multiline"
 #~ msgstr "Multi-lignes"
