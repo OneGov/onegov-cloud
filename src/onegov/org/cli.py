@@ -3171,12 +3171,12 @@ def list_resources(
     return list_all_resources
 
 
-@cli.command(name='migrate-political-businesss-parliamentary-group')
+@cli.command(name='migrate-political-business-parliamentary-group')
 def migrate_political_businesss_parliamentary_group(
 ) -> Callable[[OrgRequest, OrgApp], None]:
     """
     onegov-org
-        --select /foo/bar migrate-political-businesss-parliamentary-group
+        --select /foo/bar migrate-political-business-parliamentary-group
     """
 
     def migrate(request: OrgRequest, app: OrgApp) -> None:
