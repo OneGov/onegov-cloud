@@ -47,6 +47,7 @@ class Votum(
 
     __tablename__ = 'landsgemeinde_vota'
 
+    fts_type_title = _('Vota')
     fts_public = True
     fts_properties = {
         'text': {'type': 'localized', 'weight': 'A'},

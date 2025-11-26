@@ -40,6 +40,7 @@ from onegov.org.forms.resource import ResourceCleanupForm
 from onegov.org.forms.resource import ResourceExportForm
 from onegov.org.forms.resource import ResourceForm
 from onegov.org.forms.resource_recipient import ResourceRecipientForm
+from onegov.org.forms.search import SearchForm
 from onegov.org.forms.settings import AnalyticsSettingsForm
 from onegov.org.forms.settings import FooterSettingsForm
 from onegov.org.forms.settings import GeneralSettingsForm
@@ -117,6 +118,7 @@ __all__ = (
     'ResourceRecipientForm',
     'RoomAllocationEditForm',
     'RoomAllocationForm',
+    'SearchForm',
     'SignupForm',
     'SurveySubmissionWindowForm',
     'TextModuleForm',

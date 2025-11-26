@@ -10,6 +10,7 @@ from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormCollection
 from onegov.reservation import ResourceCollection
+from onegov.org.i18n import _
 from onegov.org.models import AccessExtension
 from onegov.org.observer import observes
 from onegov.search import SearchableContent
@@ -32,6 +33,11 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
 
     __tablename__ = 'external_links'
 
+    __mapper_args__ = {
+        'polymorphic_on': 'member_of'
+    }
+
+    fts_type_title = _('External Link')
     fts_properties = {
         'title': {'type': 'localized', 'weight': 'A'},
         'lead': {'type': 'localized', 'weight': 'B'},
@@ -47,10 +53,10 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
     url: Column[str] = Column(Text, nullable=False)
     page_image: dict_property[str | None] = meta_property()
 
-    # The collection name this model should appear in
+    # FIXME: should this actually be nullable?
+    #: The collection name this model should appear in
     member_of: Column[str | None] = Column(Text, nullable=True)
     # TODO: Stop passing title (and maybe even to) as url parameters.
-    # Figure out a way to use the member_of attribute instead.
     group: Column[str | None] = Column(Text, nullable=True)
 
     #: The normalized title for sorting
@@ -61,6 +67,22 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
     @observes('title')
     def title_observer(self, title: str) -> None:
         self.order = normalize_for_url(title)
+
+
+class ExternalFormLink(ExternalLink):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'FormCollection'
+    }
+    fts_type_title = _('Forms')
+
+
+class ExternalResourceLink(ExternalLink):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'ResourceCollection'
+    }
+    fts_type_title = _('Resources')
 
 
 class ExternalLinkCollection(GenericCollection[ExternalLink]):
@@ -108,7 +130,9 @@ class ExternalLinkCollection(GenericCollection[ExternalLink]):
 
     @property
     def model_class(self) -> type[ExternalLink]:
-        return ExternalLink
+        if self.member_of is None:
+            return ExternalLink
+        return ExternalLink.get_polymorphic_class(self.member_of, ExternalLink)
 
     @classmethod
     def target(
@@ -120,8 +144,6 @@ class ExternalLinkCollection(GenericCollection[ExternalLink]):
 
     def query(self) -> Query[ExternalLink]:
         query = super().query()
-        if self.member_of:
-            query = query.filter_by(member_of=self.member_of)
         if self.group:
             query = query.filter_by(group=self.group)
         return query

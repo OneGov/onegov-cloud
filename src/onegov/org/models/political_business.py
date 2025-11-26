@@ -120,6 +120,7 @@ class PoliticalBusiness(
 
     __tablename__ = 'par_political_businesses'
 
+    fts_type_title = _('Political Businesses')
     fts_public = True
     fts_properties = {
         'title': {'type': 'text', 'weight': 'A'},

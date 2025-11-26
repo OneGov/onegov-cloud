@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from onegov.parliament.models import ParliamentaryGroup
+from onegov.pas.i18n import _
 from onegov.search import ORMSearchable
 
 
@@ -10,6 +11,7 @@ class PASParliamentaryGroup(ParliamentaryGroup, ORMSearchable):
         'polymorphic_identity': 'pas_parliamentary_group',
     }
 
+    fts_type_title = _('Parliamentary groups')
     fts_public = False
     fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
 

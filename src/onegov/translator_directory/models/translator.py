@@ -14,6 +14,7 @@ from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
 from onegov.search import ORMSearchable
 from onegov.translator_directory.constants import ADMISSIONS, GENDERS
+from onegov.translator_directory.i18n import _
 from onegov.translator_directory.models.certificate import (
     certificate_association_table
 )
@@ -53,6 +54,7 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     __tablename__ = 'translators'
 
+    fts_type_title = _('Translators')
     fts_public = False
     fts_properties = {
         # TODO: We may get better results if we use the fullname

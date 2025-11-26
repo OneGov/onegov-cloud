@@ -29,6 +29,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy_utils import aggregated
+from translationstring import TranslationString
 from uuid import uuid4
 from wtforms import FieldList
 
@@ -107,6 +108,10 @@ class Directory(Base, ContentMixin, TimestampMixin,
 
     __tablename__ = 'directories'
 
+    # HACK: We don't want to set up translations in this module for this single
+    #       string, we know we already have a translation in a different domain
+    #       so we just manually specify it for now.
+    fts_type_title = TranslationString('Directories', domain='onegov.org')
     fts_properties = {
         'title': {'type': 'localized', 'weight': 'A'},
         'lead': {'type': 'localized', 'weight': 'B'}

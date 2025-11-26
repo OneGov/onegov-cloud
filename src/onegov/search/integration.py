@@ -116,11 +116,17 @@ class SearchApp(morepath.App):
             for locale in self.locales
         } or {'simple'}
 
+    def searchable_models(self) -> set[type[Searchable]]:
+        return {
+            model
+            for base in self.session_manager.bases
+            for model in searchable_sqlalchemy_models(base)
+        }
+
     def indexable_base_models(self) -> set[type[Searchable | Base]]:
         return {
             get_polymorphic_base(model)
-            for base in self.session_manager.bases
-            for model in searchable_sqlalchemy_models(base)
+            for model in self.searchable_models()
         }
 
     def perform_reindex(self) -> None:
