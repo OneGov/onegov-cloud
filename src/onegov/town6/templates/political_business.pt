@@ -50,7 +50,7 @@
             </ul>
         </div>
         <div tal:condition="political_groups">
-            <h2 class="h3" i18n:translate>Parliamentary Group</h2>
+            <h2 class="h3" i18n:translate>Parliamentary Group(s)</h2>
             <ul class="more-list">
                 <li tal:repeat="group political_groups">
                     <a tal:attributes="href request.link(group)" class="list-link">

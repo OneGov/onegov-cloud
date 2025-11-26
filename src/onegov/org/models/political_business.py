@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date
 from sqlalchemy import and_, or_, func, case
 from sqlalchemy import Column, Date, Enum, ForeignKey, Text
+from sqlalchemy import Table
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -93,6 +94,25 @@ POLITICAL_BUSINESS_STATUS: dict[PoliticalBusinessStatus, str] = {
 }
 
 
+# join table between political businesses and parliamentary groups
+par_political_business_parliamentary_groups = Table(
+    'par_political_business_parliamentary_groups',
+    Base.metadata,
+    Column(
+        'political_business_id',
+        UUID,
+        ForeignKey('par_political_businesses.id'),
+        primary_key=True,
+    ),
+    Column(
+        'parliamentary_group_id',
+        UUID,
+        ForeignKey('par_parliamentary_groups.id'),
+        primary_key=True,
+    ),
+)
+
+
 class PoliticalBusiness(
     AccessExtension,
     MultiAssociatedFiles,
@@ -177,8 +197,8 @@ class PoliticalBusiness(
         order_by='desc(PoliticalBusinessParticipation.participant_type)',
     )
 
+    #### no longer needed after ogc-2816 is in production
     #: parliamentary group (Fraktion)
-    # FIXME: make multiple groups possible
     parliamentary_group_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('par_parliamentary_groups.id'),
@@ -188,6 +208,15 @@ class PoliticalBusiness(
     parliamentary_group = relationship(
         'RISParliamentaryGroup',
         back_populates='political_businesses'
+    )
+    #### no longer needed after ogc-2816 is in production
+
+    #: parliamentary groups (Fraktionen)
+    parliamentary_groups: relationship[list[RISParliamentaryGroup]]
+    parliamentary_groups = relationship(
+        'RISParliamentaryGroup',
+        secondary=par_political_business_parliamentary_groups,
+        back_populates='political_businesses',
     )
 
     meeting_items: relationship[list[MeetingItem]] = relationship(

@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from onegov.org.models.political_business import (
+    par_political_business_parliamentary_groups
+)
 from onegov.parliament.collections import CommissionCollection
 from onegov.parliament.collections import CommissionMembershipCollection
 from onegov.parliament.collections import ParliamentarianCollection
@@ -206,7 +209,8 @@ class RISParliamentaryGroup(ParliamentaryGroup, ORMSearchable):
     political_businesses: relationship[list[PoliticalBusiness]]
     political_businesses = relationship(
         'PoliticalBusiness',
-        back_populates='parliamentary_group'
+        secondary=par_political_business_parliamentary_groups,
+        back_populates='parliamentary_groups'
     )
 
 

@@ -260,9 +260,29 @@ def drop_personnel_number_unique_constraint(
         )
 
 
-@upgrade_task('Remove unused political businesses relationship from meeting')
-def remove_unused_political_businesses_relationship(
-        context: UpgradeContext
+@upgrade_task('Create relation table between political businesses '
+              'and parliamentary groups')
+def create_relation_table(
+    context: UpgradeContext
 ) -> None:
-    if context.has_column('par_meetings', 'political_business_id'):
-        context.operations.drop_column('par_meetings', 'political_business_id')
+
+    if context.has_table('par_political_business_parliamentary_groups'):
+        return
+
+    context.operations.execute(
+        """
+        CREATE TABLE par_political_business_parliamentary_groups (
+            political_business_id UUID NOT NULL,
+            parliamentary_group_id UUID NOT NULL,
+            PRIMARY KEY (political_business_id, parliamentary_group_id),
+            FOREIGN KEY (political_business_id) 
+                REFERENCES par_political_businesses(id) ON DELETE CASCADE,
+            FOREIGN KEY (parliamentary_group_id) 
+                REFERENCES par_parliamentary_groups(id) ON DELETE CASCADE
+        )
+        """
+    )
+
+    context.operations.drop_constraint(
+        'par_political_businesses_parliamentary_group_id_fkey',
+    )
