@@ -145,3 +145,49 @@
 .search-preview {
     color: $jumbo;
 }
+
+.slider .searchbox-wrapper {
+    position: absolute;
+    top: 62%;
+    width: 100%;
+
+    input {
+        background: $white;
+        border: 0;
+        border-radius: .7rem 0 0 .7rem !important;
+        box-shadow: none;
+        font-size: 1.2rem;
+        padding: 1.75rem;
+
+        &::placeholder {
+            color: $aluminum;
+            font-size: 1.2rem;
+            font-weight: normal;
+            opacity: .5;
+        }
+    }
+
+    .button {
+        background: white;
+        border: 0;
+        border-radius: 0 .7rem .7rem 0 !important;
+        color: $primary-color;
+        font-size: 1.5rem;
+        margin-left: 0;
+
+        &:hover {
+            color: $primary-color;
+            margin: 0 !important;
+            padding: .2rem .7rem !important;
+        }
+    }
+
+    .typeahead {
+        margin-top: 2.5rem;
+        position: absolute;
+    }
+}
+
+.slider .searchbox-wrapper .input-group-field:not(:focus) + .typeahead:not(:hover) {
+    display: none;
+}
