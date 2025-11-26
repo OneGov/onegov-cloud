@@ -98,7 +98,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'fsi_course_events'
 
-    fts_type_name = _('Course Events')
+    fts_type_title = _('Course Events')
     fts_properties = {
         'name': {'type': 'localized', 'weight': 'A'},
         'description': {'type': 'localized', 'weight': 'B'},

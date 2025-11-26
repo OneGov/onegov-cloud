@@ -10,7 +10,5 @@ class LandsgemeindeFile(File, SearchableFile):
 
     __mapper_args__ = {'polymorphic_identity': 'landsgemeinde'}
 
-    # FIXME: This conflicts with general files, do we use those?
-    #        If so we may need/want to disambiguate?
-    fts_type_name = _('Files')
+    fts_type_title = _('Files')
     fts_public = True
