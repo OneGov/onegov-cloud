@@ -30,6 +30,7 @@ if TYPE_CHECKING:
     from datetime import date as date_t
     from datetime import datetime
     from onegov.file.models.file import File
+    from onegov.landsgemeinde.request import LandsgemeindeRequest
     from translationstring import TranslationString
     from typing import TypeAlias
 
@@ -57,10 +58,20 @@ class Assembly(
         'overview': {'type': 'localized', 'weight': 'A'},
     }
 
+    @classmethod
+    def fts_type_title(cls, request: LandsgemeindeRequest) -> str:  # type: ignore[override]
+        from onegov.landsgemeinde.layouts import DefaultLayout
+        return DefaultLayout(None, request).assembly_type_plural
+
     @property
     def fts_suggestion(self) -> tuple[str, ...]:
         return (
             str(self.date.year),
+            # FIXME: This is quite the hack and probably won't result
+            #        in actually good results, we would need to insert
+            #        this suggestion as part of the search terms, but
+            #        even then we would probably want to localize this
+            #        and make it depend on the assembly_title setting.
             f'Landsgemeinde {self.date.year}',
         )
 

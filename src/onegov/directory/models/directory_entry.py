@@ -15,6 +15,7 @@ from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
+from translationstring import TranslationString
 from uuid import uuid4
 
 
@@ -31,6 +32,13 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
 
     __tablename__ = 'directory_entries'
 
+    # HACK: We don't want to set up translations in this module for this single
+    #       string, we know we already have a translation in a different domain
+    #       so we just manually specify it for now.
+    fts_type_title = TranslationString(
+        'Directory entries',
+        domain='onegov.org'
+    )
     fts_public = False
     fts_properties = {
         # FIXME: We may want to include the directory title, so you can

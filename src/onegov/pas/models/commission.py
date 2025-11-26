@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from onegov.parliament.models import Commission
+from onegov.pas.i18n import _
 from onegov.search import ORMSearchable
 from sqlalchemy.orm import relationship
 
@@ -16,6 +17,7 @@ class PASCommission(Commission, ORMSearchable):
         'polymorphic_identity': 'pas_commission',
     }
 
+    fts_type_title = _('Commission')
     fts_public = False
     fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
 

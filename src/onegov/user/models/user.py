@@ -10,6 +10,7 @@ from onegov.core.utils import remove_repeated_dots
 from onegov.core.utils import remove_repeated_spaces
 from onegov.core.utils import yubikey_otp_to_serial
 from onegov.search import ORMSearchable
+from onegov.user.i18n import _
 from onegov.user.models.group import UserGroup, group_association_table
 from sedate import utcnow
 from sqlalchemy import Boolean, Column, Index, Text, func
@@ -51,6 +52,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         'polymorphic_identity': 'generic',
     }
 
+    fts_type_title = _('Users')
     fts_properties = {
         'username': {'type': 'text', 'weight': 'A'},
         'realname': {'type': 'text', 'weight': 'A'},
