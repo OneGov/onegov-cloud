@@ -12,6 +12,8 @@ from dateutil.rrule import rrulestr
 from decimal import Decimal
 from functools import cached_property
 from markupsafe import Markup
+from os.path import splitext, basename
+
 from onegov.chat import TextModuleCollection
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
@@ -773,11 +775,26 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         versions, hence this only works for town6.
         """
         default_icon = 'fa-file'
-        if '.' not in filename:
-            return default_icon
-
-        ext = filename.split('.')[1].lower()
+        ext = self.get_filename_extension(filename)
         return self.file_extension_fa_icon_mapping.get(ext, default_icon)
+
+    def get_filename_extension(self, filename: str) -> str:
+        """ Returns the filename extension. """
+        base = self.get_filename_without_extension(filename)
+        ext = filename.lstrip(base).lstrip('.')
+        return ext.lower()
+
+    def get_filename_without_extension(self, filename: str) -> str:
+        """ Returns the filename stem (no extension)."""
+        name = basename(filename)
+        lower = name.lower()
+
+        # handle common compound extensions
+        for ext in ('.tar.gz', '.tar.bz2', '.tar.xz'):
+            if lower.endswith(ext):
+                return name[:-len(ext)]
+
+        return splitext(filename)[0]
 
 
 class DefaultLayoutMixin:
