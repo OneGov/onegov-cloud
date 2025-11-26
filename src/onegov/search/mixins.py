@@ -88,7 +88,10 @@ class Searchable:
         returns the display name.
 
         """
-        return cls.__name__
+        # NOTE: This fallback should generally not be relied upon, but it's
+        #       better if we have a bad name, rather than a crash, when we
+        #       add a new type and forget to add a custom title.
+        return cls.__name__  # pragma: no cover
 
     @property
     def fts_language(self) -> str:
