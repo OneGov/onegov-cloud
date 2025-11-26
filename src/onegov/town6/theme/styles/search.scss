@@ -186,8 +186,8 @@
         margin-top: 2.5rem;
         position: absolute;
     }
-}
 
-.slider .searchbox-wrapper .input-group-field:not(:focus) + .typeahead:not(:hover) {
-    display: none;
+    .input-group-field:not(:focus) + .typeahead:not(:hover) {
+        display: none;
+    }
 }
