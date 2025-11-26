@@ -63,7 +63,6 @@ class TranslatorTimeReportForm(Form):
 
     case_number = StringField(
         label=_('Case number (Police)'),
-        validators=[Optional()],
         description=_('Geschäftsnummer Police for linking if needed'),
     )
 
