@@ -808,14 +808,6 @@ def generate_time_report_pdf_bytes(
             </div>
     """
 
-    if time_report.notes:
-        html_content += f"""
-            <div class="notes">
-                <h2>{request.translate(_('Notes'))}</h2>
-                <p>{time_report.notes}</p>
-            </div>
-        """
-
     html_content += """
         </body>
         </html>

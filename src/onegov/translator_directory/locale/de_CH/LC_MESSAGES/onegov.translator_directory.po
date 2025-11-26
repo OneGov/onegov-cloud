@@ -92,7 +92,7 @@ msgid "On Site"
 msgstr "Vor Ort"
 
 msgid "Exceptionally urgent"
-msgstr "Ausserordenlich dringlich"
+msgstr "Ausserordentlich dringlich"
 
 msgid "Logout"
 msgstr "Abmelden"
@@ -738,7 +738,7 @@ msgid "Surcharge amount"
 msgstr "Zuschlagsbetrag"
 
 msgid "Subtotal (work compensation)"
-msgstr "Zwisch.total"
+msgstr "Zwischentotal"
 
 msgid "Travel"
 msgstr "Wegentschädigung"
@@ -759,7 +759,7 @@ msgid "View translator"
 msgstr "Übersetzer/in anzeigen"
 
 msgid "Accept time report"
-msgstr "Zeiterfassung akzeptieren"
+msgstr "Zeiterfassung abschliessen"
 
 msgid "Accreditations"
 msgstr "Akkreditierungen"
