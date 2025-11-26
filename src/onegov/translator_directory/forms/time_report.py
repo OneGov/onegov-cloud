@@ -229,9 +229,9 @@ class TranslatorTimeReportForm(Form):
 
         The drive_distance is multiplied by 2 to account for the round trip
         (Wegentschädigung * 2).
-        Returns 0 for telephonic assignments.
+        Returns 0 for telephonic and written assignments.
         """
-        if self.assignment_type.data == 'telephonic':
+        if self.assignment_type.data in ('telephonic', 'schriftlich'):
             return Decimal('0')
 
         if not translator.drive_distance:

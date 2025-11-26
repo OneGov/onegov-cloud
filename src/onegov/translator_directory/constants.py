@@ -149,6 +149,7 @@ INTERPRETING_TYPES = {
 TIME_REPORT_INTERPRETING_TYPES = {
     'telephonic': _('telephonic'),
     'on-site': _('On Site'),
+    'schriftlich': _('Written'),
 }
 HOURLY_RATE_CERTIFIED = Decimal('90.00')
 HOURLY_RATE_UNCERTIFIED = Decimal('75.00')

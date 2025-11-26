@@ -91,6 +91,9 @@ msgstr "telefonisch"
 msgid "On Site"
 msgstr "Vor Ort"
 
+msgid "Written"
+msgstr "schriftlich"
+
 msgid "Exceptionally urgent"
 msgstr "Ausserordentlich dringlich"
 
