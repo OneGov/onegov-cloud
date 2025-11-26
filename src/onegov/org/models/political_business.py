@@ -197,7 +197,7 @@ class PoliticalBusiness(
         order_by='desc(PoliticalBusinessParticipation.participant_type)',
     )
 
-    #### no longer needed after ogc-2816 is in production
+    # ---- no longer needed after ogc-2816 is in production
     #: parliamentary group (Fraktion)
     parliamentary_group_id: Column[uuid.UUID | None] = Column(
         UUID,  # type:ignore[arg-type]
@@ -209,7 +209,7 @@ class PoliticalBusiness(
         'RISParliamentaryGroup',
         back_populates='political_businesses'
     )
-    #### no longer needed after ogc-2816 is in production
+    # ---- no longer needed after ogc-2816 is in production
 
     #: parliamentary groups (Fraktionen)
     parliamentary_groups: relationship[list[RISParliamentaryGroup]]

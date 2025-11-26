@@ -275,9 +275,9 @@ def create_relation_table(
             political_business_id UUID NOT NULL,
             parliamentary_group_id UUID NOT NULL,
             PRIMARY KEY (political_business_id, parliamentary_group_id),
-            FOREIGN KEY (political_business_id) 
+            FOREIGN KEY (political_business_id)
                 REFERENCES par_political_businesses(id) ON DELETE CASCADE,
-            FOREIGN KEY (parliamentary_group_id) 
+            FOREIGN KEY (parliamentary_group_id)
                 REFERENCES par_parliamentary_groups(id) ON DELETE CASCADE
         )
         """
