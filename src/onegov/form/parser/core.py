@@ -1408,8 +1408,8 @@ def translate_to_yaml(
         return text.replace('"', '\\"')
 
     for ix, line in lines:
-        indent = ' ' * (4 + (len(line) - len(line.lstrip())))
-        len_indent = len(indent)
+        len_indent = len(line) - len(line.lstrip())
+        indent = ' ' * (4 + len_indent)
 
         if enable_edit_checks and not validate_indent(indent):
             raise errors.InvalidIndentSyntax(line=ix + 1)
