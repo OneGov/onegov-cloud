@@ -90,7 +90,7 @@
                         <li tal:repeat="file python: sorted(files, key=lambda f: f.name)">
                             <a class="list-link" title="${file.name}" href="${request.link(file)}">
                                 <i class="far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
-                                <span class="list-title">${file.name.split('.')[0]}</span>
+                                <span class="list-title">${layout.get_filename_without_extension(file.name)}</span>
                             </a>
                         </li>
                     </ul>
