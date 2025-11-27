@@ -273,9 +273,11 @@ class PoliticalBusinessForm(Form):
     def process_obj(self, obj: PoliticalBusiness) -> None:  # type:ignore[override]
         super().process_obj(obj)
 
-        self.parliamentary_groups.data = [
-            str(group.id) for group in obj.parliamentary_groups
-        ]
+        # only populate from model when the form did not receive formdata
+        if self.parliamentary_groups.raw_data is None:
+            self.parliamentary_groups.data = [
+                str(group.id) for group in obj.parliamentary_groups
+            ]
 
     def populate_obj(  # type: ignore[override]
         self,
@@ -293,9 +295,12 @@ class PoliticalBusinessForm(Form):
         )
 
         # convert multi-select ids into model instances
-        data = self.parliamentary_groups.raw_data or []
-        ids = [str(i) for i in data if i]
-        obj.parliamentary_groups = list(
-            self.request.session.query(RISParliamentaryGroup)
-            .filter(RISParliamentaryGroup.id.in_(ids))
-        )
+        data = self.parliamentary_groups.data or []
+        if data and data != ['']:
+            obj.parliamentary_groups = (
+                self.request.session.query(RISParliamentaryGroup)
+                .filter(RISParliamentaryGroup.id.in_(data))
+                .all()
+            )
+        else:
+            obj.parliamentary_groups = []
