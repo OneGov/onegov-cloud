@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-05 14:46+0100\n"
+"POT-Creation-Date: 2025-11-25 08:49+0100\n"
 "PO-Revision-Date: 2022-03-07 13:55+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Italian\n"
@@ -179,6 +179,22 @@ msgid ""
 msgstr ""
 "L'indentazione della riga {linea} non è valida. Si prega di utilizzare un "
 "multiplo di 4 spazi"
+
+#, python-format
+msgid ""
+"The indentation on line {line} is not valid. Comments must be indented to "
+"the same level as the field definition (`=`) they belong to."
+msgstr ""
+"L'indentazione della riga {linea} non è valida. I commenti devono essere "
+"rientrati allo stesso livello della definizione del campo (`=`) a cui "
+"appartengono."
+
+#, python-format
+msgid ""
+"Incorrect placement of the field description on line {line}. The field "
+"description must be placed below the field definition (`=`) and with the "
+"same indentation."
+msgstr ""
 
 #, python-format
 msgid "The field '{label}' exists more than once."

@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-05 14:46+0100\n"
+"POT-Creation-Date: 2025-11-25 08:49+0100\n"
 "PO-Revision-Date: 2022-03-07 13:56+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -181,6 +181,22 @@ msgid ""
 msgstr ""
 "Die Einrückung in Zeile {line} ist nicht gültig. Bitte verwenden Sie ein "
 "Vielfaches von 4 Leerzeichen"
+
+#, python-format
+msgid ""
+"The indentation on line {line} is not valid. Comments must be indented to "
+"the same level as the field definition (`=`) they belong to."
+msgstr ""
+
+#, python-format
+msgid ""
+"Incorrect placement of the field description on line {line}. The field "
+"description must be placed below the field definition (`=`) and with the "
+"same indentation."
+msgstr ""
+"Falsche Platzierung der Feldbeschreibung in Zeile {line}. Die "
+"Feldbeschreibung muss unterhalb der Felddefinition (`=`) und mit dem "
+"gleichen Einzug platziert werden."
 
 #, python-format
 msgid "The field '{label}' exists more than once."
