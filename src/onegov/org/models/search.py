@@ -259,7 +259,7 @@ class Search(Pagination[Any]):
             SearchIndex.fts_idx.op('@@')(ts_query)
         ).order_by(
             (
-                func.ts_rank_cd(SearchIndex.fts_idx, ts_query, 2 | 16)
+                func.ts_rank_cd(SearchIndex.fts_idx, ts_query, 2 | 4 | 16)
                 # FIXME: Whether or not we apply a time decay should depend
                 #        on the type of content, there's content that remains
                 #        relevant no matter how old it is, e.g. people, but
