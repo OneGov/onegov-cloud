@@ -101,13 +101,13 @@ par_political_business_parliamentary_groups = Table(
     Column(
         'political_business_id',
         UUID(as_uuid=True),
-        ForeignKey('par_political_businesses.id', on_delete='CASCADE'),
+        ForeignKey('par_political_businesses.id', ondelete='CASCADE'),
         primary_key=True,
     ),
     Column(
         'parliamentary_group_id',
         UUID(as_uuid=True),
-        ForeignKey('par_parliamentary_groups.id', on_delete='CASCADE'),
+        ForeignKey('par_parliamentary_groups.id', ondelete='CASCADE'),
         primary_key=True,
     ),
 )
