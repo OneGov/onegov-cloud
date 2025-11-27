@@ -562,39 +562,52 @@ def add_time_report(
 
         hourly_rate = form.get_hourly_rate(self)
         surcharge_types = form.get_surcharge_types()
-        surcharge_pct = form.calculate_surcharge()
         travel_comp = form.get_travel_compensation(self)
-        base_comp = (
-            hourly_rate
-            * duration_hours
-            * (1 + surcharge_pct / Decimal(100))
-        )
-        meal_allowance = (
-            Decimal('40.0') if duration_hours >= 6 else Decimal('0')
-        )
-        total_comp = base_comp + travel_comp + meal_allowance
 
         start_dt = datetime.combine(form.start_date.data, form.start_time.data)
         end_dt = datetime.combine(form.end_date.data, form.end_time.data)
         start_dt = replace_timezone(start_dt, 'Europe/Zurich')
         end_dt = replace_timezone(end_dt, 'Europe/Zurich')
 
+        # Calculate break time in minutes
+        break_minutes = 0
+        if form.break_time.data:
+            break_minutes = (
+                form.break_time.data.hour * 60 + form.break_time.data.minute
+            )
+
+        # Calculate night hours (in minutes)
+        night_hours = form.calculate_night_hours()
+        night_minutes = int(float(night_hours) * 60)
+
+        # Calculate weekend/holiday hours
+        weekend_holiday_hours = form.calculate_weekend_holiday_hours()
+        weekend_holiday_minutes = int(float(weekend_holiday_hours) * 60)
+
+        # Create report with all fields except total_compensation
         report = TranslatorTimeReport(
             translator=self,
             created_by=current_user,
             assignment_type=form.assignment_type.data or None,
             duration=duration_minutes,
+            break_time=break_minutes,
+            night_minutes=night_minutes,
+            weekend_holiday_minutes=weekend_holiday_minutes,
             case_number=form.case_number.data or None,
             assignment_date=form.start_date.data,
             start=start_dt,
             end=end_dt,
             hourly_rate=hourly_rate,
             surcharge_types=surcharge_types if surcharge_types else None,
-            surcharge_percentage=surcharge_pct,
             travel_compensation=travel_comp,
-            total_compensation=total_comp,
+            # Temporary, will be calculated next
+            total_compensation=Decimal('0'),
             notes=form.notes.data or None,
         )
+
+        # Use centralized calculation from model
+        breakdown = report.calculate_compensation_breakdown()
+        report.total_compensation = breakdown['total']
         session.add(report)
         session.flush()
 

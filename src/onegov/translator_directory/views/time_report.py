@@ -25,9 +25,6 @@ from onegov.org.mail import send_ticket_mail
 from onegov.translator_directory.collections.time_report import (
     TimeReportCollection,
 )
-from onegov.translator_directory.constants import (
-    TIME_REPORT_SURCHARGE_LABELS,
-)
 from onegov.translator_directory.forms.time_report import (
     TranslatorTimeReportForm,
 )
@@ -294,9 +291,14 @@ def generate_accounting_export_rows(
         date_str = report.assignment_date.strftime('%d.%m.%Y')
 
         duration_hours = str(report.duration_hours)
-        effective_rate = report.hourly_rate * (
-            1 + report.effective_surcharge_percentage / Decimal(100)
-        )
+
+        # Calculate effective rate from actual compensation
+        # (since we can't use a simple percentage with partial night work)
+        breakdown = report.calculate_compensation_breakdown()
+        if report.duration_hours > 0:
+            effective_rate = breakdown['subtotal'] / report.duration_hours
+        else:
+            effective_rate = report.hourly_rate
         effective_rate_str = str(effective_rate.quantize(Decimal('0.01')))
 
         row_2603 = [
@@ -549,10 +551,6 @@ def generate_time_report_pdf_bytes(
                 f'{start_time} - {end_time}'
             )
 
-    base_without_surcharge = (
-        time_report.hourly_rate * time_report.duration_hours
-    )
-
     today = datetime.now()
     letter_date = f'Schaffhausen, {layout.format_date(today, "date_long")}'
 
@@ -650,6 +648,52 @@ def generate_time_report_pdf_bytes(
                             {layout.format_currency(time_report.hourly_rate)}
                         </td>
                     </tr>
+    """
+
+    # Use centralized calculation from model
+    breakdown = time_report.calculate_compensation_breakdown()
+
+    # Show day/night hours breakdown if there are night hours
+    if time_report.night_minutes > 0:
+        day_hours = time_report.day_hours_decimal
+        night_hours = time_report.night_hours_decimal
+
+        day_hours_text = (
+            f'{day_hours} Stunde' if day_hours == 1
+            else f'{day_hours} Stunden'
+        )
+        night_hours_text = (
+            f'{night_hours} Stunde' if night_hours == 1
+            else f'{night_hours} Stunden'
+        )
+
+        day_rate = layout.format_currency(time_report.hourly_rate)
+        night_rate = layout.format_currency(
+            time_report.night_hourly_rate
+        )
+        html_content += f"""
+                    <tr>
+                        <td class="label">
+                            Tagstunden ({day_rate}
+                            × {day_hours_text}):
+                        </td>
+                        <td class="amount">
+                            {layout.format_currency(breakdown['day_pay'])}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">
+                            Nachtstunden 20-06 Uhr ({night_rate}
+                            × {night_hours_text}, +50%):
+                        </td>
+                        <td class="amount">
+                            {layout.format_currency(breakdown['night_pay'])}
+                        </td>
+                    </tr>
+        """
+    else:
+        # No night hours, show simple day pay
+        html_content += f"""
                     <tr>
                         <td class="label">
                             {request.translate(_('Base pay'))}
@@ -657,57 +701,49 @@ def generate_time_report_pdf_bytes(
                             × {duration_text}):
                         </td>
                         <td class="amount">
-                            {layout.format_currency(base_without_surcharge)}
-                        </td>
-                    </tr>
-    """
-
-    effective_surcharge_pct = time_report.effective_surcharge_percentage
-    if effective_surcharge_pct > 0:
-        if time_report.surcharge_types:
-            for surcharge_type in time_report.surcharge_types:
-                label = TIME_REPORT_SURCHARGE_LABELS.get(surcharge_type)
-                if label:
-                    rate = time_report.SURCHARGE_RATES.get(
-                        surcharge_type, Decimal('0')
-                    )
-                    individual_amount = (
-                        base_without_surcharge * rate / Decimal(100)
-                    )
-                    if surcharge_type == 'urgent':
-                        surcharge_label = request.translate(label)
-                        label_display = f'{surcharge_label} (+{rate}%)'
-                    else:
-                        label_display = f'{label} ({duration_text}, +{rate}%)'
-
-                    html_content += f"""
-                    <tr>
-                        <td class="label">
-                            {label_display}:
-                        </td>
-                        <td class="amount">
-                            {layout.format_currency(individual_amount)}
-                        </td>
-                    </tr>
-                    """
-
-        surcharge_amount = (
-            base_without_surcharge * effective_surcharge_pct / Decimal(100)
-        )
-        html_content += f"""
-                    <tr>
-                        <td class="label">
-                            {request.translate(_('Surcharge amount'))}
-                            ({layout.format_currency(base_without_surcharge)}
-                            × {effective_surcharge_pct}%):
-                        </td>
-                        <td class="amount">
-                            {layout.format_currency(surcharge_amount)}
+                            {layout.format_currency(breakdown['day_pay'])}
                         </td>
                     </tr>
         """
 
-    base_comp = time_report.base_compensation
+    # Show weekend surcharge if applicable
+    if breakdown['weekend_surcharge'] > 0:
+        # Calculate actual weekend hours that get the surcharge (non-night)
+        weekend_holiday_hours = time_report.weekend_holiday_hours_decimal
+        night_hours = time_report.night_hours_decimal
+        weekend_non_night_hours = weekend_holiday_hours - min(
+            weekend_holiday_hours, night_hours
+        )
+        weekend_hours_text = (
+            f'{weekend_non_night_hours} Stunde'
+            if weekend_non_night_hours == 1
+            else f'{weekend_non_night_hours} Stunden'
+        )
+        html_content += f"""
+                    <tr>
+                        <td class="label">
+                            Zuschlag WE ({weekend_hours_text}, +25%):
+                        </td>
+                        <td class="amount">
+                            {layout.format_currency(breakdown['weekend_surcharge'])}
+                        </td>
+                    </tr>
+        """
+
+    # Show urgent surcharge if applicable
+    if breakdown['urgent_surcharge'] > 0:
+        urgent_label = request.translate(_('Exceptionally urgent'))
+        html_content += f"""
+                    <tr>
+                        <td class="label">
+                            {urgent_label} (+25%):
+                        </td>
+                        <td class="amount">
+                            {layout.format_currency(breakdown['urgent_surcharge'])}
+                        </td>
+                    </tr>
+        """
+
     html_content += f"""
                     <tr class="subtotal">
                         <td class="label">
@@ -719,7 +755,7 @@ def generate_time_report_pdf_bytes(
                         </td>
                         <td class="amount">
                             <strong>
-                                {layout.format_currency(base_comp)}
+                                {layout.format_currency(breakdown['subtotal'])}
                             </strong>
                         </td>
                     </tr>

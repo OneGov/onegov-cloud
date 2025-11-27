@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 
-from decimal import Decimal
 from onegov.translator_directory.models.time_report import TranslatorTimeReport
 
 from functools import cached_property
@@ -318,61 +317,91 @@ class TimeReportHandler(Handler):
             ]
         )
 
-        base_without_surcharge = report.hourly_rate * report.duration_hours
-        summary_parts.extend(
-            [
-                f"<dt>{request.translate(_('Base pay'))} "
-                f"({layout.format_currency(report.hourly_rate)} × "
-                f"{report.duration_hours} h)</dt>",
-                f'<dd>{layout.format_currency(base_without_surcharge)}</dd>',
-            ]
-        )
+        # Use centralized calculation from model
+        breakdown = report.calculate_compensation_breakdown()
 
-        effective_surcharge_pct = report.effective_surcharge_percentage
-        if effective_surcharge_pct > 0:
-            if report.surcharge_types:
-                for surcharge_type in report.surcharge_types:
-                    label = TIME_REPORT_SURCHARGE_LABELS.get(surcharge_type)
-                    if label:
-                        rate = report.SURCHARGE_RATES.get(surcharge_type)
-                        if surcharge_type == 'urgent':
-                            surcharge_label = request.translate(label)
-                        else:
-                            surcharge_label = label
-                        summary_parts.extend(
-                            [
-                                f'<dt>{escape(surcharge_label)}</dt>',
-                                f'<dd>+{rate}%</dd>',
-                            ]
-                        )
-            elif report.surcharge_percentage:
-                summary_parts.extend(
-                    [
-                        f"<dt>{request.translate(_('Surcharge'))}</dt>",
-                        f'<dd>+{report.surcharge_percentage}%</dd>',
-                    ]
-                )
+        # Show day/night breakdown if there are night hours
+        if report.night_minutes > 0:
+            day_hours = report.day_hours_decimal
+            night_hours = report.night_hours_decimal
 
-            surcharge_amount = (
-                base_without_surcharge * effective_surcharge_pct / Decimal(100)
-            )
             summary_parts.extend(
                 [
-                    f"<dt>{request.translate(_('Surcharge amount'))} "
-                    f"({layout.format_currency(base_without_surcharge)} × "
-                    f"{effective_surcharge_pct}%)</dt>",
-                    f'<dd>{layout.format_currency(surcharge_amount)}</dd>',
+                    f"<dt>{request.translate(_('Day hours'))} "
+                    f"({layout.format_currency(report.hourly_rate)} × "
+                    f"{day_hours} h)</dt>",
+                    f'<dd>{layout.format_currency(breakdown["day_pay"])}</dd>',
+                    f"<dt>{request.translate(_('Night hours 20-06'))} "
+                    f"({layout.format_currency(report.night_hourly_rate)} × "
+                    f"{night_hours} h, +50%)</dt>",
+                    f'<dd>{layout.format_currency(breakdown["night_pay"])}</dd>',
+                ]
+            )
+        else:
+            # No night hours - show simple base pay
+            summary_parts.extend(
+                [
+                    f"<dt>{request.translate(_('Base pay'))} "
+                    f"({layout.format_currency(report.hourly_rate)} × "
+                    f"{report.duration_hours} h)</dt>",
+                    f'<dd>{layout.format_currency(breakdown["day_pay"])}</dd>',
                 ]
             )
 
-        base_comp = report.base_compensation
+        # Show surcharge types
+        if report.surcharge_types:
+            for surcharge_type in report.surcharge_types:
+                label = TIME_REPORT_SURCHARGE_LABELS.get(surcharge_type)
+                if label:
+                    rate = report.SURCHARGE_RATES.get(surcharge_type)
+                    if surcharge_type == 'urgent':
+                        surcharge_label = request.translate(label)
+                    else:
+                        surcharge_label = label
+                    summary_parts.extend(
+                        [
+                            f'<dt>{escape(surcharge_label)}</dt>',
+                            f'<dd>+{rate}%</dd>',
+                        ]
+                    )
+
+        # Show surcharge amounts if any
+        if breakdown['weekend_surcharge'] > 0:
+            # Calculate actual weekend hours that get the surcharge (non-night)
+            weekend_holiday_hours = report.weekend_holiday_hours_decimal
+            night_hours = report.night_hours_decimal
+            weekend_non_night_hours = weekend_holiday_hours - min(
+                weekend_holiday_hours, night_hours
+            )
+            label = (
+                f"{request.translate(_('Weekend surcharge'))} "
+                f"({layout.format_currency(report.hourly_rate)} × "
+                f"{weekend_non_night_hours} h, +25%)"
+            )
+            amount = layout.format_currency(breakdown['weekend_surcharge'])
+            summary_parts.extend(
+                [
+                    f'<dt>{label}</dt>',
+                    f'<dd>{amount}</dd>',
+                ]
+            )
+        if breakdown['urgent_surcharge'] > 0:
+            label = request.translate(_('Urgent surcharge amount'))
+            amount = layout.format_currency(breakdown['urgent_surcharge'])
+            summary_parts.extend(
+                [
+                    f'<dt>{label}</dt>',
+                    f'<dd>{amount}</dd>',
+                ]
+            )
+
         summary_parts.extend(
             [
                 f"<dt><strong>"
                 f"{request.translate(_('Subtotal (work compensation)'))} "
                 f"</strong></dt>",
                 f'<dd><strong>'
-                f'{layout.format_currency(base_comp)}'
+                f'{layout.format_currency(breakdown["subtotal"])}'
                 f'</strong></dd>',
             ]
         )
@@ -391,23 +420,23 @@ class TimeReportHandler(Handler):
             ]
         )
 
-        if report.meal_allowance:
+        if breakdown['meal'] > 0:
             meal_label = request.translate(_('Meal Allowance (6+ hours)'))
             summary_parts.extend(
                 [
                     f'<dt>{meal_label}</dt>',
-                    f'<dd>{layout.format_currency(report.meal_allowance)}</dd>',
+                    f'<dd>{layout.format_currency(breakdown["meal"])}</dd>',
                 ]
             )
 
-        calculation_parts = [layout.format_currency(base_comp)]
-        if report.travel_compensation > 0:
+        calculation_parts = [layout.format_currency(breakdown['subtotal'])]
+        if breakdown['travel'] > 0:
             calculation_parts.append(
-                layout.format_currency(report.travel_compensation)
+                layout.format_currency(breakdown['travel'])
             )
-        if report.meal_allowance > 0:
+        if breakdown['meal'] > 0:
             calculation_parts.append(
-                layout.format_currency(report.meal_allowance)
+                layout.format_currency(breakdown['meal'])
             )
 
         calculation_formula = ' + '.join(calculation_parts)
@@ -417,7 +446,7 @@ class TimeReportHandler(Handler):
                 f"<dt><strong>{request.translate(_('Total'))}</strong> "
                 f"({calculation_formula})</dt>",
                 f'<dd><strong>'
-                f'{layout.format_currency(report.total_compensation)}'
+                f'{layout.format_currency(breakdown["total"])}'
                 f'</strong></dd>',
                 '</dl>',
             ]

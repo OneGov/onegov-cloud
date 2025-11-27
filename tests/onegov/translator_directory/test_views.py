@@ -2170,7 +2170,6 @@ def test_view_time_reports(client: Client) -> None:
         case_number='CASE-001',
         assignment_date=date(2025, 1, 15),
         hourly_rate=Decimal('90.0'),
-        surcharge_percentage=Decimal('25.0'),
         travel_compensation=Decimal('50.0'),
         total_compensation=Decimal('162.75'),
         status='pending',
@@ -2228,7 +2227,9 @@ def test_time_report_workflow(
     page.form['is_urgent'] = False
     page.form['notes'] = 'Test notes'
     page = page.form.submit().follow()
+
     assert 'Zeiterfassung zur Überprüfung eingereicht' in page
+    assert '135' in page  # base compensation
 
     mail_to_submitter = client.get_email(0)
     assert 'TRANSLATOR, Test' in mail_to_submitter['Subject']
@@ -2268,7 +2269,7 @@ def test_time_report_workflow(
     report = translator.time_reports[0]
     assert report.duration == 90
     assert report.hourly_rate == 90.0
-    assert report.surcharge_percentage == 25.0
+    assert report.surcharge_types == ['weekend_holiday']  # Saturday
     assert report.travel_compensation == 100.0
     assert report.case_number == 'CASE-123'
     assert report.status == 'pending'
@@ -2311,7 +2312,6 @@ def test_time_report_workflow(
     )
     assert report.duration == 240
     assert report.case_number == 'CASE-456-UPDATED'
-    assert report.surcharge_percentage == 50.0
     assert report.surcharge_types is not None
     assert 'urgent' in report.surcharge_types
 

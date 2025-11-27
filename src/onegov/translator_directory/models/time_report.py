@@ -55,8 +55,19 @@ class TranslatorTimeReport(Base, TimestampMixin):
 
     assignment_type: Column[str | None] = Column(Text)
 
-    #: The duration in minutes
+    #: The duration in minutes (total work time excluding breaks)
     duration: Column[int] = Column(Integer, nullable=False)
+
+    #: Break time in minutes
+    break_time: Column[int] = Column(Integer, nullable=False, default=0)
+
+    #: Night work duration in MINUTES (20:00-06:00)
+    night_minutes: Column[int] = Column(Integer, nullable=False, default=0)
+
+    #: Weekend/holiday work duration in MINUTES
+    weekend_holiday_minutes: Column[int] = Column(
+        Integer, nullable=False, default=0
+    )
 
     case_number: Column[str | None] = Column(Text)
 
@@ -75,13 +86,6 @@ class TranslatorTimeReport(Base, TimestampMixin):
         ARRAY(Text),
         nullable=True,
         default=list,
-    )
-
-    #: Zuschlag
-    surcharge_percentage: Column[Decimal] = Column(
-        Numeric(precision=5, scale=2),
-        nullable=False,
-        default=0,
     )
 
     travel_compensation: Column[Decimal] = Column(
@@ -114,30 +118,119 @@ class TranslatorTimeReport(Base, TimestampMixin):
         """Return duration in hours for display."""
         return Decimal(self.duration) / Decimal(60)
 
-    def calculate_surcharge_from_types(self) -> Decimal:
-        """Calculate surcharge percentage from surcharge_types."""
-        if not self.surcharge_types:
-            return Decimal('0')
-        total = Decimal('0')
-        for surcharge_type in self.surcharge_types:
-            total += self.SURCHARGE_RATES.get(surcharge_type, Decimal('0'))
-        return total
+    @property
+    def break_time_hours(self) -> Decimal:
+        """Return break time in hours for display."""
+        return Decimal(self.break_time) / Decimal(60)
 
     @property
-    def effective_surcharge_percentage(self) -> Decimal:
-        """Return effective surcharge, preferring types over percentage."""
-        if self.surcharge_types:
-            return self.calculate_surcharge_from_types()
-        return self.surcharge_percentage
+    def night_hours_decimal(self) -> Decimal:
+        """Return night hours in decimal format for calculations."""
+        return Decimal(self.night_minutes) / Decimal(60)
+
+    @property
+    def weekend_holiday_hours_decimal(self) -> Decimal:
+        """Return weekend/holiday hours in decimal format for calculations."""
+        return Decimal(self.weekend_holiday_minutes) / Decimal(60)
+
+    @property
+    def day_hours_decimal(self) -> Decimal:
+        """Return day hours (total - night) in decimal format."""
+        return self.duration_hours - self.night_hours_decimal
+
+    @property
+    def night_hourly_rate(self) -> Decimal:
+        """Return night hourly rate (base rate + 50% surcharge)."""
+        return self.hourly_rate * (
+            1 + self.SURCHARGE_RATES['night_work'] / 100
+        )
+
+    def calculate_compensation_breakdown(self) -> dict[str, Decimal]:
+        """Calculate detailed compensation breakdown.
+
+        Returns a dictionary with all compensation components:
+        - day_pay: Payment for day hours (base rate)
+        - night_pay: Payment for night hours (base rate + 50% surcharge)
+        - night_surcharge: Just the surcharge portion for night hours
+        - weekend_surcharge: Weekend surcharge (only on non-night hours)
+        - urgent_surcharge: Urgent surcharge (25% on top of everything)
+        - total_surcharges: Sum of all surcharges
+        - subtotal: Total work compensation (before travel/meal)
+        - travel: Travel compensation
+        - meal: Meal allowance
+        - total: Final total compensation
+        """
+        hourly_rate = self.hourly_rate
+        total_hours = self.duration_hours
+        night_hours = self.night_hours_decimal
+        surcharge_types = self.surcharge_types or []
+
+        # Initialize all surcharge values
+        night_pay = Decimal('0')
+        night_surcharge = Decimal('0')
+        weekend_surcharge = Decimal('0')
+        urgent_surcharge = Decimal('0')
+
+        # Calculate day/night pay
+        if night_hours > 0:
+            # We have night work - split into day and night
+            day_hours = total_hours - night_hours
+            day_pay = hourly_rate * day_hours
+            night_pay = self.night_hourly_rate * night_hours
+            # Just the extra 50% portion
+            night_surcharge = night_pay - (hourly_rate * night_hours)
+        else:
+            # No night work - all hours are day hours
+            day_pay = hourly_rate * total_hours
+
+        # Weekend/holiday surcharge (only on non-night hours)
+        if 'weekend_holiday' in surcharge_types:
+            weekend_holiday_hours = self.weekend_holiday_hours_decimal
+            # Weekend surcharge only applies to hours that aren't night hours
+            weekend_non_night_hours = weekend_holiday_hours - min(
+                weekend_holiday_hours, night_hours
+            )
+            rate = self.SURCHARGE_RATES['weekend_holiday'] / 100
+            weekend_surcharge = (hourly_rate * weekend_non_night_hours) * rate
+
+        # Urgent surcharge stacks on top of actual work compensation
+        if 'urgent' in surcharge_types:
+            actual_work_pay = day_pay + night_pay + weekend_surcharge
+            rate = self.SURCHARGE_RATES['urgent'] / 100
+            urgent_surcharge = actual_work_pay * rate
+
+        # Totals
+        total_surcharges = (
+            night_surcharge + weekend_surcharge + urgent_surcharge
+        )
+        subtotal = day_pay + night_pay + weekend_surcharge + urgent_surcharge
+        travel = self.travel_compensation
+        meal = self.meal_allowance
+        total = subtotal + travel + meal
+
+        return {
+            'day_pay': day_pay,
+            'night_pay': night_pay,
+            'night_surcharge': night_surcharge,
+            'weekend_surcharge': weekend_surcharge,
+            'urgent_surcharge': urgent_surcharge,
+            'total_surcharges': total_surcharges,
+            'subtotal': subtotal,
+            'travel': travel,
+            'meal': meal,
+            'total': total,
+        }
 
     @property
     def base_compensation(self) -> Decimal:
-        """Calculate compensation without travel."""
-        return (
-            self.hourly_rate
-            * self.duration_hours
-            * (1 + self.effective_surcharge_percentage / Decimal(100))
-        )
+        """Calculate compensation without travel and meal
+        (work compensation only).
+
+        This uses the centralized breakdown calculation which handles
+        partial night work correctly.
+        """
+        breakdown = self.calculate_compensation_breakdown()
+        return breakdown['subtotal']
 
     @property
     def meal_allowance(self) -> Decimal:

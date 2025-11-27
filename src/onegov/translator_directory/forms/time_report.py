@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField, TimeField
@@ -61,8 +61,15 @@ class TranslatorTimeReportForm(Form):
         validators=[InputRequired()],
     )
 
+    break_time = TimeField(
+        label=_('Break time'),
+        validators=[Optional()],
+        default=time(0, 0),
+    )
+
     case_number = StringField(
         label=_('Case number (Police)'),
+        validators=[InputRequired()],
         description=_('Geschäftsnummer Police for linking if needed'),
     )
 
@@ -111,7 +118,10 @@ class TranslatorTimeReportForm(Form):
         return HOURLY_RATE_UNCERTIFIED
 
     def get_duration_hours(self) -> Decimal:
-        """Calculate duration in hours from start/end times, rounded."""
+        """Calculate duration in hours from start/end times, rounded.
+
+        Calculates raw time between start and end (ignoring breaks for now).
+        """
         if not all(
             [
                 self.start_date.data,
@@ -131,12 +141,18 @@ class TranslatorTimeReportForm(Form):
         end_dt = datetime.combine(self.end_date.data, self.end_time.data)
         duration = end_dt - start_dt
         hours = Decimal(duration.total_seconds()) / Decimal(3600)
+
+        # Ensure hours is not negative
+        if hours < 0:
+            hours = Decimal('0')
+
+        # Round to nearest 0.5 hour
         hours_times_two = hours * Decimal('2')
         rounded = hours_times_two.to_integral_value(rounding='ROUND_CEILING')
         return rounded / Decimal('2')
 
-    def is_night_work(self) -> bool:
-        """Check if work period overlaps with night hours (20:00-06:00)."""
+    def calculate_night_hours(self) -> Decimal:
+        """Calculate actual hours worked during night (20:00-06:00)."""
         if not all(
             [
                 self.start_date.data,
@@ -145,43 +161,136 @@ class TranslatorTimeReportForm(Form):
                 self.end_time.data,
             ]
         ):
-            return False
+            return Decimal('0')
 
         assert self.start_date.data is not None
         assert self.start_time.data is not None
         assert self.end_date.data is not None
         assert self.end_time.data is not None
 
-        night_start = time(20, 0)
-        night_end = time(6, 0)
-        start_t = self.start_time.data
-        end_t = self.end_time.data
+        start_dt = datetime.combine(self.start_date.data, self.start_time.data)
+        end_dt = datetime.combine(self.end_date.data, self.end_time.data)
 
-        if start_t >= night_start or start_t < night_end:
-            return True
-        if end_t >= night_start or end_t <= night_end:
-            return True
-        if self.start_date.data != self.end_date.data:
-            return True
+        # Calculate night hours by iterating through time range
+        night_seconds = 0
+        current = start_dt
 
-        return False
+        while current < end_dt:
+            # Determine if current time is in night period (20:00-06:00)
+            current_time = current.time()
+            is_night = current_time >= time(20, 0) or current_time < time(6, 0)
 
-    def is_weekend_or_holiday(self) -> bool:
-        """Check if assignment is on weekend (Sat/Sun)."""
-        if not self.start_date.data:
-            return False
-        return self.start_date.data.weekday() >= 5
+            if is_night:
+                # Find the end of current night period
+                if current_time >= time(20, 0):
+                    # Night goes until 06:00 next day
+                    period_end = datetime.combine(
+                        current.date() + timedelta(days=1), time(6, 0)
+                    )
+                else:
+                    # We're in early morning (before 06:00)
+                    period_end = datetime.combine(current.date(), time(6, 0))
 
-    def calculate_surcharge(self) -> Decimal:
-        """Calculate total surcharge percentage."""
-        surcharge = Decimal('0')
-        if self.is_night_work():
-            surcharge += Decimal('50')
-        if self.is_weekend_or_holiday():
-            surcharge += Decimal('25')
-        if self.is_urgent.data:
-            surcharge += Decimal('25')
-        return surcharge
+                # Calculate overlap
+                segment_end = min(end_dt, period_end)
+                night_seconds += int((segment_end - current).total_seconds())
+                current = segment_end
+            else:
+                # We're in day period (06:00-20:00), skip to next night
+                next_night = datetime.combine(current.date(), time(20, 0))
+                if next_night <= current:
+                    next_night = datetime.combine(
+                        current.date() + timedelta(days=1), time(20, 0)
+                    )
+                current = min(end_dt, next_night)
+
+        # Convert to hours
+        night_hours = Decimal(night_seconds) / Decimal(3600)
+
+        # Round to nearest 0.5 hour (same as total duration rounding)
+        night_hours_times_two = night_hours * Decimal('2')
+        rounded = night_hours_times_two.to_integral_value(
+            rounding='ROUND_CEILING'
+        )
+        return rounded / Decimal('2')
+
+    def is_night_work(self) -> bool:
+        """Check if work period overlaps with night hours (20:00-06:00)."""
+        return self.calculate_night_hours() > 0
+
+    def calculate_weekend_holiday_hours(self) -> Decimal:
+        """Calculate actual hours worked during weekends or public holidays.
+
+        Counts hours that fall on:
+        - Saturday or Sunday (any time)
+        - Public holidays (any time)
+
+        Returns hours as Decimal, rounded to nearest 0.5 hour.
+        """
+        if not all(
+            [
+                self.start_date.data,
+                self.start_time.data,
+                self.end_date.data,
+                self.end_time.data,
+            ]
+        ):
+            return Decimal('0')
+
+        assert self.start_date.data is not None
+        assert self.start_time.data is not None
+        assert self.end_date.data is not None
+        assert self.end_time.data is not None
+
+        start_dt = datetime.combine(self.start_date.data, self.start_time.data)
+        end_dt = datetime.combine(self.end_date.data, self.end_time.data)
+
+        # Get holidays if available
+        holidays: set[date] = set()
+        if self.request and self.request.app.org.holidays:
+            holiday_list = self.request.app.org.holidays.between(
+                self.start_date.data, self.end_date.data
+            )
+            holidays = {dt for dt, _ in holiday_list}
+
+        # Calculate weekend/holiday hours by iterating through time range
+        weekend_holiday_seconds = 0
+        current = start_dt
+
+        # Process day by day
+        while current < end_dt:
+            current_date = current.date()
+            is_weekend = current_date.weekday() >= 5  # Sat or Sun
+            is_holiday = current_date in holidays
+
+            if is_weekend or is_holiday:
+                # Find end of current day
+                day_end = datetime.combine(
+                    current_date + timedelta(days=1), time(0, 0)
+                )
+                segment_end = min(end_dt, day_end)
+                weekend_holiday_seconds += int(
+                    (segment_end - current).total_seconds()
+                )
+                current = segment_end
+            else:
+                # Skip to next day
+                next_day = datetime.combine(
+                    current_date + timedelta(days=1), time(0, 0)
+                )
+                current = min(end_dt, next_day)
+
+        # Convert to hours
+        weekend_holiday_hours = Decimal(weekend_holiday_seconds) / Decimal(
+            3600
+        )
+
+        # Round to nearest 0.5 hour
+        weekend_holiday_hours_times_two = weekend_holiday_hours * Decimal('2')
+        rounded = weekend_holiday_hours_times_two.to_integral_value(
+            rounding='ROUND_CEILING'
+        )
+        return rounded / Decimal('2')
 
     def populate_obj(  # type: ignore[override]
         self, obj: TranslatorTimeReport  # type: ignore[override]
@@ -208,17 +317,25 @@ class TranslatorTimeReportForm(Form):
             elif hasattr(obj, 'assignment_date'):
                 self.end_date.data = obj.assignment_date
 
+            if hasattr(obj, 'break_time'):
+                break_minutes = getattr(obj, 'break_time', 0)
+                if break_minutes:
+                    hours = break_minutes // 60
+                    minutes = break_minutes % 60
+                    self.break_time.data = time(hours, minutes)
+
             if hasattr(obj, 'surcharge_types'):
                 surcharge_types = getattr(obj, 'surcharge_types', None)
                 if surcharge_types:
                     self.is_urgent.data = 'urgent' in surcharge_types
 
     def get_surcharge_types(self) -> list[str]:
-        """Get list of active surcharge types from form."""
+        """Get list of active surcharge types from form based on actual
+        hours."""
         types: list[str] = []
-        if self.is_night_work():
+        if self.calculate_night_hours() > 0:
             types.append('night_work')
-        if self.is_weekend_or_holiday():
+        if self.calculate_weekend_holiday_hours() > 0:
             types.append('weekend_holiday')
         if self.is_urgent.data:
             types.append('urgent')
@@ -261,6 +378,23 @@ class TranslatorTimeReportForm(Form):
         duration_hours = self.get_duration_hours()
         model.duration = int(float(duration_hours) * 60)
 
+        # Store break time in minutes
+        if self.break_time.data:
+            break_minutes = (
+                self.break_time.data.hour * 60 + self.break_time.data.minute
+            )
+            model.break_time = break_minutes
+        else:
+            model.break_time = 0
+
+        # Calculate and store night hours (in minutes)
+        night_hours = self.calculate_night_hours()
+        model.night_minutes = int(float(night_hours) * 60)
+
+        # Calculate and store weekend/holiday hours (in minutes)
+        weekend_holiday_hours = self.calculate_weekend_holiday_hours()
+        model.weekend_holiday_minutes = int(float(weekend_holiday_hours) * 60)
+
         model.case_number = self.case_number.data or None
         model.assignment_date = self.start_date.data
 
@@ -276,17 +410,9 @@ class TranslatorTimeReportForm(Form):
         surcharge_types = self.get_surcharge_types()
         model.surcharge_types = surcharge_types if surcharge_types else None
 
-        surcharge_pct = self.calculate_surcharge()
-        model.surcharge_percentage = surcharge_pct
-
         travel_comp = self.get_travel_compensation(model.translator)
         model.travel_compensation = travel_comp
 
-        base = hourly_rate * duration_hours
-        surcharge_amount = base * (surcharge_pct / Decimal(100))
-        meal_allowance = (
-            Decimal('40.0') if duration_hours >= 6 else Decimal('0')
-        )
-        model.total_compensation = (
-            base + surcharge_amount + travel_comp + meal_allowance
-        )
+        # Use centralized calculation from model
+        breakdown = model.calculate_compensation_breakdown()
+        model.total_compensation = breakdown['total']
