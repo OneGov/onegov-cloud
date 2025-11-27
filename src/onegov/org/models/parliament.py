@@ -210,7 +210,8 @@ class RISParliamentaryGroup(ParliamentaryGroup, ORMSearchable):
     political_businesses = relationship(
         'PoliticalBusiness',
         secondary=par_political_business_parliamentary_groups,
-        back_populates='parliamentary_groups'
+        back_populates='parliamentary_groups',
+        passive_deletes=True
     )
 
 
