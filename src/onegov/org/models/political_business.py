@@ -217,6 +217,7 @@ class PoliticalBusiness(
         'RISParliamentaryGroup',
         secondary=par_political_business_parliamentary_groups,
         back_populates='political_businesses',
+        passive_deletes=True
     )
 
     meeting_items: relationship[list[MeetingItem]] = relationship(
