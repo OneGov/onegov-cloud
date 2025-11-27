@@ -12,7 +12,6 @@ from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
 from onegov.parliament import _
-from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
@@ -58,15 +57,9 @@ SHIPPING_METHODS: dict[ShippingMethod, str] = {
 }
 
 
-class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles,
-                      ORMSearchable):
+class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles):
 
     __tablename__ = 'par_parliamentarians'
-
-    fts_public = True
-    fts_properties = {
-        'title': {'type': 'localized', 'weight': 'A'},
-    }
 
     type: Column[str] = Column(
         Text,
@@ -81,7 +74,6 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, AssociatedFiles,
 
     @property
     def title(self) -> str:
-        """ Returns the Western-ordered name """
         return f'{self.first_name} {self.last_name}'
 
     #: Internal ID
