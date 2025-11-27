@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-11-26 14:40+0100\n"
+"POT-Creation-Date: 2025-11-27 13:54+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1602,8 +1602,14 @@ msgstr "Stato"
 msgid "Submission/publication date"
 msgstr "Data di invio/pubblicazione"
 
+msgid "Parliamentary Group(s)"
+msgstr "Gruppo/i parlamentare/i"
+
 msgid "Participations"
 msgstr "Partecipanti"
+
+msgid "No active parliamentary groups"
+msgstr "Nessun gruppo parlamentare attivo"
 
 msgid "Tag"
 msgstr "Tag"

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-26 14:40+0100\n"
+"POT-Creation-Date: 2025-11-27 13:54+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1598,8 +1598,14 @@ msgstr "Status"
 msgid "Submission/publication date"
 msgstr "Einreichungs-/Publikationsdatum"
 
+msgid "Parliamentary Group(s)"
+msgstr "Fraktion(en)"
+
 msgid "Participations"
 msgstr "Verfasser / Beteiligte"
+
+msgid "No active parliamentary groups"
+msgstr ""
 
 msgid "Tag"
 msgstr "Schlagwort"
