@@ -266,23 +266,17 @@ def create_relation_table(
     context: UpgradeContext
 ) -> None:
 
-    if context.has_table('par_political_business_parliamentary_groups'):
-        return
-
-    context.operations.execute(
-        """
-        CREATE TABLE par_political_business_parliamentary_groups (
-            political_business_id UUID NOT NULL,
-            parliamentary_group_id UUID NOT NULL,
-            PRIMARY KEY (political_business_id, parliamentary_group_id),
-            FOREIGN KEY (political_business_id)
-                REFERENCES par_political_businesses(id) ON DELETE CASCADE,
-            FOREIGN KEY (parliamentary_group_id)
-                REFERENCES par_parliamentary_groups(id) ON DELETE CASCADE
+    if context.has_column(
+        'par_political_businesses',
+        'parliamentary_group_id'
+    ):
+        context.operations.execute(
+            """
+            INSERT INTO par_political_business_parliamentary_groups
+            SELECT id AS political_business_id, parliamentary_group_id
+            FROM par_political_businesses
+            WHERE parliamentary_group_id IS NOT NULL
+            """
         )
-        """
-    )
-
-    context.operations.drop_constraint(
-        'par_political_businesses_parliamentary_group_id_fkey',
-    )
+        context.operations.drop_column(
+            'par_political_businesses', 'parliamentary_group_id')

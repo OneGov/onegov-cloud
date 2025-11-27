@@ -100,13 +100,13 @@ par_political_business_parliamentary_groups = Table(
     Base.metadata,
     Column(
         'political_business_id',
-        UUID,
+        UUID(as_uuid=True),
         ForeignKey('par_political_businesses.id', on_delete='CASCADE'),
         primary_key=True,
     ),
     Column(
         'parliamentary_group_id',
-        UUID,
+        UUID(as_uuid=True),
         ForeignKey('par_parliamentary_groups.id', on_delete='CASCADE'),
         primary_key=True,
     ),
@@ -196,20 +196,6 @@ class PoliticalBusiness(
         back_populates='political_business',
         order_by='desc(PoliticalBusinessParticipation.participant_type)',
     )
-
-    # ---- no longer needed after ogc-2816 is in production
-    #: parliamentary group (Fraktion)
-    parliamentary_group_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('par_parliamentary_groups.id'),
-        nullable=True,
-    )
-    parliamentary_group: relationship[RISParliamentaryGroup | None]
-    parliamentary_group = relationship(
-        'RISParliamentaryGroup',
-        back_populates='political_businesses'
-    )
-    # ---- no longer needed after ogc-2816 is in production
 
     #: parliamentary groups (Fraktionen)
     parliamentary_groups: relationship[list[RISParliamentaryGroup]]
