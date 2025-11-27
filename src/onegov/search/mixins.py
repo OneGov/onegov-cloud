@@ -157,7 +157,13 @@ class Searchable:
 
     @property
     def fts_last_change(self) -> datetime | None:
-        """ Returns the date the document was created/last modified. """
+        """
+        Returns the date the document was created/last modified.
+
+        Returning `None` indicates that the document's age/recency must not
+        influence search ranking: the item should be treated as equally
+        relevant regardless of how old it is.
+        """
         return None
 
     @property
