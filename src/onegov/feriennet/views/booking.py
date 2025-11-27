@@ -441,7 +441,7 @@ def view_my_bookings(
                 text=_(''),
                 url=layout.csrf_protected_url(request.link(attendee)),
                 attrs={'class': 'delete-icon before hide-for-print'},
-                sr_text=_('Delete'),
+                sr_text=_('Delete attendee'),
                 traits=(
                     Confirm(
                         _(

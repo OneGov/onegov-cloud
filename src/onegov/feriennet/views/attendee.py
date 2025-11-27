@@ -111,38 +111,30 @@ def delete_attendee(
         request.session
     )
     deletion_possible = True
-    try:
-        collection = BookingCollection(request.session)
-        for booking in self.bookings:
-            if request.app.active_period and (
-                booking.period.id == request.app.active_period.id
-            ):
-                deletion_possible = False
-                request.alert(_(
-                    'The attendee cannot be deleted because there are '
-                    'existing bookings in the current period.'))
-            else:
-                collection.delete(booking)
-        if deletion_possible:
-            invoice_items = request.session.query(ActivityInvoiceItem).filter(
-                ActivityInvoiceItem.attendee_id == self.id)
-            for item in invoice_items:
-                item.attendee_id = None
-            attendees.delete(self)
+    collection = BookingCollection(request.session)
+    for booking in self.bookings:
+        if request.app.active_period and (
+            booking.period.id == request.app.active_period.id
+        ):
+            deletion_possible = False
+        else:
+            collection.delete(booking)
+    if deletion_possible:
+        invoice_items = request.session.query(ActivityInvoiceItem).filter(
+            ActivityInvoiceItem.attendee_id == self.id)
+        for item in invoice_items:
+            item.attendee_id = None
+        attendees.delete(self)
 
-            name = self.name
-            request.success(_(
-                '${name} and associated bookings were deleted.',
-                mapping={
-                    'name': name
-                }
-            ))
-            request.redirect(request.class_link(BookingCollection))
-    except Exception as e:
-        if type(e).__name__ == 'IntegrityError':
-            request.alert(
-                _('The attendee could not be deleted because there are '
-                  'existing bookings associated with it.')
-            )
-            request.redirect(request.link(self))
-        request.alert(str(e))
+        name = self.name
+        request.success(_(
+            '${name} and associated bookings were deleted.',
+            mapping={
+                'name': name
+            }
+        ))
+    else:
+        request.alert(_(
+            'The attendee cannot be deleted because there are '
+            'existing bookings in the current period.'))
+    request.redirect(request.class_link(BookingCollection))

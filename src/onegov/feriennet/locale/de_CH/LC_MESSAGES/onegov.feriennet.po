@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-19 09:57+0100\n"
+"POT-Creation-Date: 2025-11-27 10:21+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2634,23 +2634,16 @@ msgstr "Teilnehmende bearbeiten"
 msgid "Booking Limit of ${name}"
 msgstr "Buchungslimite von ${name}"
 
+#, python-format
+msgid "${name} and associated bookings were deleted."
+msgstr "${name} und die zugehörigen Buchungen wurden gelöscht."
+
 msgid ""
 "The attendee cannot be deleted because there are existing bookings in the "
 "current period."
 msgstr ""
 "Der/die Teilnehmende kann nicht gelöscht werden, da es im aktuellen Zeitraum "
 "bestehende Buchungen gibt."
-
-#, python-format
-msgid "${name} and associated bookings were deleted."
-msgstr "${name} und die zugehörigen Buchungen wurden gelöscht."
-
-msgid ""
-"The attendee could not be deleted because there are existing bookings "
-"associated with it."
-msgstr ""
-"Der/die Teilnehmende konnte nicht gelöscht werden, da es bestehende "
-"Buchungen gibt."
 
 msgid "The user account must be opened by a parent or guardian of full age."
 msgstr ""
@@ -2807,6 +2800,9 @@ msgstr "Buchung stornieren"
 msgid "Do you really want to cancel \"${title}\"?"
 msgstr "Möchten Sie \"${title}\" wirklich stornieren?"
 
+msgid "Delete attendee"
+msgstr "Teilnehmende löschen"
+
 #, python-format
 msgid "Do you really want to delete \"${name}\" and all associated bookings?"
 msgstr ""
@@ -2814,9 +2810,6 @@ msgstr ""
 
 msgid "The invoices will not be deleted."
 msgstr "Die Rechnungen werden nicht gelöscht."
-
-msgid "Delete attendee"
-msgstr "Teilnehmende löschen"
 
 msgid "Only open, cancelled, denied or blocked bookings may be deleted"
 msgstr ""
@@ -3267,6 +3260,13 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid ""
+#~ "The attendee could not be deleted because there are existing bookings "
+#~ "associated with it."
+#~ msgstr ""
+#~ "Der/die Teilnehmende konnte nicht gelöscht werden, da es bestehende "
+#~ "Buchungen gibt."
 
 #~ msgid "Dashboard"
 #~ msgstr "Übersicht"

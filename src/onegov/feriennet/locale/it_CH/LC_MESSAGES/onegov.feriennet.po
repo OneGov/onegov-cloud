@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-11-19 09:57+0100\n"
+"POT-Creation-Date: 2025-11-27 10:21+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -2630,22 +2630,16 @@ msgstr "Modificare partecipante"
 msgid "Booking Limit of ${name}"
 msgstr "Limite di prenotazione di ${name}"
 
+#, python-format
+msgid "${name} and associated bookings were deleted."
+msgstr "${name} e le prenotazioni associate sono state cancellate."
+
 msgid ""
 "The attendee cannot be deleted because there are existing bookings in the "
 "current period."
 msgstr ""
 "L'attendente non può essere cancellato perché ci sono prenotazioni esistenti "
 "nel periodo attuale."
-
-#, python-format
-msgid "${name} and associated bookings were deleted."
-msgstr "${name} e le prenotazioni associate sono state cancellate."
-
-msgid ""
-"The attendee could not be deleted because there are existing bookings "
-"associated with it."
-msgstr ""
-"L'attendente non può essere cancellato perché ci sono prenotazioni associate."
 
 msgid "The user account must be opened by a parent or guardian of full age."
 msgstr ""
@@ -2802,6 +2796,9 @@ msgstr "Cancellare la prenotazione"
 msgid "Do you really want to cancel \"${title}\"?"
 msgstr "Vuole davvero cancellare \"${title}\"?"
 
+msgid "Delete attendee"
+msgstr "Cancellare partecipante"
+
 #, python-format
 msgid "Do you really want to delete \"${name}\" and all associated bookings?"
 msgstr ""
@@ -2809,9 +2806,6 @@ msgstr ""
 
 msgid "The invoices will not be deleted."
 msgstr "Le fatture non saranno cancellate."
-
-msgid "Delete attendee"
-msgstr "Cancellare partecipante"
 
 msgid "Only open, cancelled, denied or blocked bookings may be deleted"
 msgstr ""
@@ -3261,6 +3255,13 @@ msgstr "Prenotazioni ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
+
+#~ msgid ""
+#~ "The attendee could not be deleted because there are existing bookings "
+#~ "associated with it."
+#~ msgstr ""
+#~ "L'attendente non può essere cancellato perché ci sono prenotazioni "
+#~ "associate."
 
 #~ msgid "Dashboard"
 #~ msgstr "Dashboard"
