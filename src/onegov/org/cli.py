@@ -3169,29 +3169,3 @@ def list_resources(
             click.secho(f'- {res.title}', fg='green')
 
     return list_all_resources
-
-
-@cli.command(name='migrate-political-business-parliamentary-group')
-def migrate_political_businesss_parliamentary_group(
-) -> Callable[[OrgRequest, OrgApp], None]:
-    """
-    onegov-org
-        --select /foo/bar migrate-political-business-parliamentary-group
-    """
-
-    def migrate(request: OrgRequest, app: OrgApp) -> None:
-        parliamentary_groups_collection = (
-            RISParliamentaryGroupCollection(request.session))
-        businesses = request.session.query(PoliticalBusiness)
-        counter = 0
-
-        for b in businesses:
-            if b.parliamentary_group_id:
-                group = parliamentary_groups_collection.by_id(
-                    b.parliamentary_group_id)
-                if group:
-                    b.parliamentary_groups = [group]
-                    counter += 1
-        click.secho(f'Migrated {counter} parliamentary groups')
-
-    return migrate
