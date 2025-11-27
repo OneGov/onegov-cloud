@@ -97,7 +97,7 @@ def view_political_businesses(
     except exc.InternalError:
         # NOTE: Probably a malicious search term that tried to burn CPU
         #       cycles. Postgres guards against this and will throw an
-        #       exceptions. We just pretend everything is fine and we
+        #       exception. We just pretend everything is fine and we
         #       get no results when that happens.
         self.request.session.rollback()  # get back to a working state
         self.__dict__['subset_count'] = 0
