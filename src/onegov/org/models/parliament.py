@@ -102,7 +102,7 @@ class RISParliamentarian(Parliamentarian, ORMSearchable):
     }
 
     fts_type_title = _('Parliamentarians')
-    fts_public = False
+    fts_public = True
     fts_properties = {
         # FIXME: A single fullname property may yield better results
         'first_name': {'type': 'text', 'weight': 'A'},
