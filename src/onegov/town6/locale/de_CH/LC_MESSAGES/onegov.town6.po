@@ -2189,12 +2189,6 @@ msgstr "Verfasser/Beteiligte"
 msgid "Parliamentary Group"
 msgstr "Fraktion"
 
-msgid "Parliamentary Group(s)"
-msgstr "Fraktion(en)"
-
-msgid "No active parliamentary groups."
-msgstr "Keine aktiven Fraktionen."
-
 msgid "No political businesses defined yet."
 msgstr "Es wurden noch keine politischen Geschäfte erfasst."
 
