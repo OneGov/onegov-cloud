@@ -64,8 +64,6 @@ def test_political_businesses(client: Client) -> None:
         page.form['entry_date'] = '2025-10-02'
         page.form['status'] = 'pendent_legislative'
         options = page.form['parliamentary_groups'].options
-        # id = next((opt[0] for opt in options if opt[2] ==
-        #            'Für ein schöneres Luzern'))
         page.form['parliamentary_groups'] = [o[0] for o in options]
         page = page.form.submit().follow()
         assert title in page
