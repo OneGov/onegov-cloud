@@ -882,8 +882,7 @@ class ReservationEventInfo:
             'backgroundColor': self.color,
             'title': self.event_title,
             'classNames': list(self.event_classes),
-            'url': self.request.link(self.ticket)
-            if is_manager else self.request.link(self.ticket, name='status'),
+            'url': self.request.link(self.ticket),
             'display': 'block',
             # extended properties
             'wholeDay': self.whole_day,
