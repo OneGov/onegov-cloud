@@ -1607,7 +1607,7 @@ class PoliticalBusinessLayout(DefaultLayout):
 
     @cached_property
     def collection(self) -> PoliticalBusinessCollection:
-        return PoliticalBusinessCollection(self.request.session)
+        return PoliticalBusinessCollection(self.request)
 
     @cached_property
     def title(self) -> str:

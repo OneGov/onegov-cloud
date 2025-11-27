@@ -8,7 +8,8 @@ if TYPE_CHECKING:
     from .conftest import Client
 
 
-def test_political_businesses(client: Client) -> None:
+def test_political_businesses(client_with_fts: Client) -> None:
+    client = client_with_fts
     client.login_admin().follow()
 
     # ris views not enabled
@@ -95,6 +96,15 @@ def test_political_businesses(client: Client) -> None:
             'Status', 'Pendent Legislative (1)', 'Jahr', '2025 (1)']
         for keyword in keywords:
             assert keyword in page
+
+        # test search
+        assert '02.10.2025' in client.get('/political-businesses?q=light')
+        assert '02.10.2025' not in client.get('/political-businesses?q=bogus')
+
+        # test malicious search
+        assert '02.10.2025' not in client.get(
+            '/political-businesses?q=----------------------------------light'
+        )
 
     # delete businesses
     (client.get('/political-businesses')

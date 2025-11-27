@@ -16,10 +16,11 @@ from onegov.file import MultiAssociatedFiles
 from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
-from onegov.search import ORMSearchable
+from onegov.search import ORMSearchable, SearchIndex
+from onegov.search.utils import language_from_locale, normalize_text
+
 
 from typing import Literal, Self, TypeAlias, TYPE_CHECKING
-
 if TYPE_CHECKING:
     import uuid
 
@@ -30,6 +31,7 @@ if TYPE_CHECKING:
     from onegov.org.models import MeetingItem
     from onegov.org.models import RISParliamentarian
     from onegov.org.models import RISParliamentaryGroup
+    from onegov.org.request import OrgRequest
 
 PoliticalBusinessType: TypeAlias = Literal[
     'inquiry',  # Anfrage
@@ -275,18 +277,25 @@ class PoliticalBusinessCollection(
 
     def __init__(
         self,
-        session: Session,
+        request: OrgRequest,
         page: int = 0,
+        term: str | None = None,
         status: Collection[PoliticalBusinessStatus] | None = None,
         types: Collection[PoliticalBusinessType] | None = None,
         years: Collection[int] | None = None,
     ) -> None:
-        super().__init__(session)
+        super().__init__(request.session)
+        self.request = request
         self.page = page
+        self.term = term
         self.status = set(status) if status else set()
         self.types = set(types) if types else set()
         self.years = set(years) if years else set()
         self.batch_size = 20
+
+    @property
+    def q(self) -> str | None:
+        return self.term
 
     @property
     def model_class(self) -> type[PoliticalBusiness]:
@@ -300,6 +309,18 @@ class PoliticalBusinessCollection(
 
     def query(self) -> Query[PoliticalBusiness]:
         query = super().query()
+
+        if self.term:
+            query = query.join(
+                SearchIndex,
+                SearchIndex.owner_id_uuid == PoliticalBusiness.id
+            )
+            query = query.filter(SearchIndex.fts_idx.op('@@')(
+                func.websearch_to_tsquery(
+                    language_from_locale(self.request.locale),
+                    normalize_text(self.term)
+                )
+            ))
 
         if self.types:
             query = query.filter(
@@ -331,7 +352,8 @@ class PoliticalBusinessCollection(
 
     def page_by_index(self, index: int) -> Self:
         return self.__class__(
-            self.session,
+            self.request,
+            term=self.term,
             page=index,
             status=self.status,
             types=self.types,
@@ -353,8 +375,9 @@ class PoliticalBusinessCollection(
         years = toggle(self.years, year)
 
         return self.__class__(
-            self.session,
+            self.request,
             page=0,
+            term=self.term,
             status=status_,
             types=types,
             years=years,
