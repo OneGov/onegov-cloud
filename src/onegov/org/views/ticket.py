@@ -1658,6 +1658,7 @@ def view_tickets(
         'owner': self.owner,
         'submitter': self.submitter,
         'page': self.page,
+        'term': self.term,
         'extra_parameters': self.extra_parameters,
     }
 
