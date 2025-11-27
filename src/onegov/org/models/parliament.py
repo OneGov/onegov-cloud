@@ -33,7 +33,10 @@ class RISCommission(Commission, ORMSearchable):
 
     fts_type_title = _('Commissions')
     fts_public = True
-    fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
+    fts_properties = {
+        'name': {'type': 'text', 'weight': 'A'},
+        'description': {'type': 'text', 'weight': 'B'}
+    }
 
     @property
     def fts_suggestion(self) -> str:
@@ -201,7 +204,10 @@ class RISParliamentaryGroup(ParliamentaryGroup, ORMSearchable):
 
     fts_type_title = _('Parliamentary groups')
     fts_public = True
-    fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
+    fts_properties = {
+        'name': {'type': 'text', 'weight': 'A'},
+        'description': {'type': 'text', 'weight': 'B'}
+    }
 
     @property
     def fts_suggestion(self) -> str:
