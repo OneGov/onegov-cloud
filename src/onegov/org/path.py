@@ -1390,14 +1390,16 @@ def get_meeting(
     }
 )
 def get_political_businesses(
-    app: OrgApp,
+    request: OrgRequest,
     page: int = 0,
+    q: str | None = None,
     status: list[PoliticalBusinessStatus] | None = None,
     types: list[PoliticalBusinessType] | None = None,
     years: list[int] | None = None,
 ) -> PoliticalBusinessCollection:
     return PoliticalBusinessCollection(
-        app.session(),
+        request,
+        term=q,
         page=page,
         status=status,
         types=types,
@@ -1411,10 +1413,10 @@ def get_political_businesses(
     converters={'id': UUID}
 )
 def get_political_business(
-    app: OrgApp,
+    request: OrgRequest,
     id: UUID
 ) -> PoliticalBusiness | None:
-    return PoliticalBusinessCollection(app.session()).by_id(id)
+    return PoliticalBusinessCollection(request).by_id(id)
 
 
 @OrgApp.path(

@@ -54,6 +54,11 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     fts_type_title = _('Topics')
     fts_public = True
 
+    # NOTE: Topics should not decrease in relevance over time
+    @property
+    def fts_last_change(self) -> None:
+        return None
+
     @property
     def fts_skip(self) -> bool:
         return self.meta.get('trait') == 'link'  # do not index links
