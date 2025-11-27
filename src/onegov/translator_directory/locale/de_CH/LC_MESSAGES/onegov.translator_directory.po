@@ -719,6 +719,9 @@ msgstr "Status"
 msgid "Assignment Date"
 msgstr "Einsatzdatum"
 
+msgid "Time"
+msgstr "Einsatzzeit"
+
 msgid "Type"
 msgstr "Art"
 
