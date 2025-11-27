@@ -51,6 +51,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
+    fts_type_title = _('Topics')
     fts_public = True
 
     @property
@@ -150,6 +151,9 @@ class News(Page, TraitInfo, SearchableContent, AccessExtension,
 
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
+    # FIXME: A plural form of News would probably be better, for now
+    #        this label seems good enough
+    fts_type_title = _('Latest news')
     fts_public = True
 
     @property

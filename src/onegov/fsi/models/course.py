@@ -3,6 +3,7 @@ from __future__ import annotations
 from onegov.core.html import html_to_text
 from onegov.core.orm import Base
 from onegov.core.orm.types import MarkupText, UUID
+from onegov.fsi.i18n import _
 from onegov.search import ORMSearchable
 from sedate import utcnow
 from sqlalchemy import Column, Text, Boolean, Integer
@@ -23,6 +24,7 @@ if TYPE_CHECKING:
 class Course(Base, ORMSearchable):
     __tablename__ = 'fsi_courses'
 
+    fts_type_title = _('Courses')
     fts_public = True
     fts_properties = {
         'name': {'type': 'localized', 'weight': 'A'},

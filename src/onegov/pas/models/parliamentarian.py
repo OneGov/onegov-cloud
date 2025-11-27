@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from onegov.parliament.models import Parliamentarian
+from onegov.pas.i18n import _
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
 from onegov.search import ORMSearchable
 from sqlalchemy import or_
@@ -22,6 +23,7 @@ class PASParliamentarian(Parliamentarian, ORMSearchable):
         'polymorphic_identity': 'pas_parliamentarian',
     }
 
+    fts_type_title = _('Parliamentarians')
     fts_public = False
     fts_properties = {
         # FIXME: A fullname property may yield better results

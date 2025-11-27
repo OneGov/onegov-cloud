@@ -10,6 +10,7 @@ from onegov.core.orm.mixins import (
     dict_markup_property, dict_property, meta_property)
 from onegov.core.orm.types import UUID
 from onegov.form.models import FormSubmission
+from onegov.org.i18n import _
 from onegov.org.models.extensions import (
     ContactExtension, GeneralFileLinkExtension,
     InlinePhotoAlbumExtension, ResourceValidationExtension)
@@ -240,6 +241,8 @@ class DaypassResource(Resource, AccessExtension, SearchableContent,
                       InlinePhotoAlbumExtension):
     __mapper_args__ = {'polymorphic_identity': 'daypass'}
 
+    fts_type_title = _('Resources')
+
     # the selected view
     view = 'dayGridMonth'
 
@@ -256,6 +259,8 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
                    ResourceValidationExtension, GeneralFileLinkExtension,
                    InlinePhotoAlbumExtension):
     __mapper_args__ = {'polymorphic_identity': 'room'}
+
+    fts_type_title = _('Resources')
 
     # the selected view (depends on the resource's default)
     view = None
@@ -287,6 +292,8 @@ class ItemResource(Resource, AccessExtension, SearchableContent,
                    InlinePhotoAlbumExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'daily-item'}
+
+    fts_type_title = _('Resources')
 
     view = None
 

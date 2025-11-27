@@ -7,6 +7,7 @@ from onegov.core.security import Public
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.layout import DefaultLayout
+from onegov.org.forms import SearchForm
 from onegov.org.models import Search
 from onegov.search import SearchOfflineError
 from sqlalchemy.exc import InternalError
@@ -62,8 +63,17 @@ def search(
         if url:
             return morepath.redirect(url)
 
+    form = request.get_form(
+        SearchForm,
+        formdata=request.params,
+        model=self,
+        pass_model=True,
+        csrf_support=False,
+    )
+
     return {
         'title': _('Search'),
+        'form': form,
         'model': self,
         'layout': layout,
         'hide_search_header': True,

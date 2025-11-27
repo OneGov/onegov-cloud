@@ -4,8 +4,6 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.parliament import _
-from onegov.search import ORMSearchable
-
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
@@ -16,7 +14,6 @@ from uuid import uuid4
 
 
 from typing import Literal, TypeAlias, TYPE_CHECKING
-
 if TYPE_CHECKING:
     import uuid
     from datetime import date
@@ -74,15 +71,9 @@ PARLIAMENTARY_GROUP_ROLES: dict[PartyRole, str] = {
 }
 
 
-class ParliamentarianRole(Base, TimestampMixin, ORMSearchable):
+class ParliamentarianRole(Base, TimestampMixin):
 
     __tablename__ = 'par_parliamentarian_roles'
-
-    @property
-    def fts_skip(self) -> bool:
-        return True
-
-    fts_properties = {}
 
     type: Column[str] = Column(
         Text,

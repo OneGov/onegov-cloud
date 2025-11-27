@@ -386,6 +386,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
                         GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
+    fts_type_title = _('Directories')
     fts_public = True
 
     content_fields_containing_links_to_files = {
@@ -523,6 +524,7 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
         # technically not enforced, but it should be a given
         directory: relationship[ExtendedDirectory]
 
+    fts_type_title = _('Directory entries')
     fts_public = True
 
     @property

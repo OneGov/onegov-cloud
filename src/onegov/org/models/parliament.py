@@ -3,6 +3,7 @@ from __future__ import annotations
 from onegov.org.models.political_business import (
     par_political_business_parliamentary_groups
 )
+from onegov.org.i18n import _
 from onegov.parliament.collections import CommissionCollection
 from onegov.parliament.collections import CommissionMembershipCollection
 from onegov.parliament.collections import ParliamentarianCollection
@@ -33,6 +34,7 @@ class RISCommission(Commission, ORMSearchable):
         'polymorphic_identity': 'ris_commission',
     }
 
+    fts_type_title = _('Commissions')
     fts_public = True
     fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
 
@@ -102,6 +104,7 @@ class RISParliamentarian(Parliamentarian, ORMSearchable):
         'polymorphic_identity': 'ris_parliamentarian',
     }
 
+    fts_type_title = _('Parliamentarians')
     fts_public = False
     fts_properties = {
         # FIXME: A single fullname property may yield better results
@@ -199,6 +202,7 @@ class RISParliamentaryGroup(ParliamentaryGroup, ORMSearchable):
         'polymorphic_identity': 'ris_parliamentary_group',
     }
 
+    fts_type_title = _('Parliamentary groups')
     fts_public = True
     fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
 

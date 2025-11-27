@@ -4,10 +4,10 @@ import datetime
 import pytz
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, JSON
-from sqlalchemy import Boolean
+from onegov.fsi.i18n import _
 from onegov.search import ORMSearchable
 from sedate import utcnow
-from sqlalchemy import Column, Text, ForeignKey, ARRAY, desc
+from sqlalchemy import Boolean, Column, Text, ForeignKey, ARRAY, desc
 from sqlalchemy.orm import relationship, object_session, backref
 from uuid import uuid4
 
@@ -45,6 +45,7 @@ class CourseAttendee(Base, ORMSearchable):
 
     __tablename__ = 'fsi_attendees'
 
+    fts_type_title = _('Attendees')
     fts_public = False
     fts_properties = {
         # NOTE: We use both individual properties and title, it's

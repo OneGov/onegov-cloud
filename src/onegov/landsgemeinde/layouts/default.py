@@ -4,8 +4,8 @@ from functools import cached_property
 from onegov.core.static import StaticFile
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.collections import AssemblyCollection
-from onegov.town6.layout import DefaultLayout as BaseDefaultLayout
 from onegov.landsgemeinde.models import Assembly
+from onegov.town6.layout import DefaultLayout as BaseDefaultLayout
 
 
 from typing import Any

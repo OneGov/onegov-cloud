@@ -780,13 +780,21 @@ def get_event(app: OrgApp, name: str) -> Event | None:
     return EventCollection(app.session()).by_name(name)
 
 
-@OrgApp.path(model=Search, path='/search', converters={'page': int})
+@OrgApp.path(
+    model=Search,
+    path='/search',
+    converters={
+        'type': [str],
+        'page': int
+    }
+)
 def get_search(
     request: OrgRequest,
     q: str = '',
+    type: list[str] | None = None,
     page: int = 0
 ) -> Search:
-    return Search(request, q, page)
+    return Search(request, q, types=type, page=page)
 
 
 @OrgApp.path(model=AtoZPages, path='/a-z')

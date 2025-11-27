@@ -5,8 +5,6 @@ from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.search import ORMSearchable
-
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Text
@@ -15,23 +13,16 @@ from uuid import uuid4
 
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     import uuid
     from datetime import date
     from onegov.parliament.models import ParliamentarianRole
 
 
-class ParliamentaryGroup(Base, ContentMixin, TimestampMixin, ORMSearchable):
+class ParliamentaryGroup(Base, ContentMixin, TimestampMixin):
     """ Fraktion """
 
     __tablename__ = 'par_parliamentary_groups'
-
-    fts_public = True
-    fts_properties = {
-        'name': {'type': 'localized', 'weight': 'A'},
-        'description': {'type': 'localized', 'weight': 'B'},
-    }
 
     type: Column[str] = Column(
         Text,
