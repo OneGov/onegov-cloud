@@ -260,9 +260,8 @@ def drop_personnel_number_unique_constraint(
         )
 
 
-@upgrade_task('Create relation table between political businesses '
-              'and parliamentary groups')
-def create_relation_table(
+@upgrade_task('Migrate into par_political_business_parliamentary_groups')
+def migrate_into_par_political_business_parliamentary_groups(
     context: UpgradeContext
 ) -> None:
 
