@@ -281,6 +281,7 @@ def test_layout_get_file_extension() -> None:
     assert layout.get_filename_extension('.hiddenfile') == ''
     assert layout.get_filename_extension('archive.tar.gz') == 'tar.gz'
     assert layout.get_filename_extension('WORD.DOCX') == 'docx'
+    assert layout.get_filename_extension('this.is-(my)_filename.pdf') == 'pdf'
 
     for ext in layout.file_extension_fa_icon_mapping.keys():
         filename = f'file.{ext}'

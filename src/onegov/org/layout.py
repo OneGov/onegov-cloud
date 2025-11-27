@@ -781,7 +781,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def get_filename_extension(self, filename: str) -> str:
         """ Returns the filename extension. """
         base = self.get_filename_without_extension(filename)
-        ext = filename.lstrip(base).lstrip('.')
+        ext = filename.removeprefix(base).lstrip('.')
         return ext.lower()
 
     def get_filename_without_extension(self, filename: str) -> str:
