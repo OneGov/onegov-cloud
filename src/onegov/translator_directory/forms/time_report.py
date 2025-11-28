@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from sedate import to_timezone
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from onegov.form import Form
@@ -299,17 +300,24 @@ class TranslatorTimeReportForm(Form):
         self, formdata: object = None, obj: object = None, **kwargs: object
     ) -> None:
         """Process form data for editing existing time reports."""
+
         super().process(formdata, obj, **kwargs)  # type: ignore[arg-type]
         if formdata is None and obj is not None:
             if hasattr(obj, 'start') and obj.start:
-                self.start_date.data = obj.start.date()
-                self.start_time.data = obj.start.time()
+                # Convert UTC to Europe/Zurich timezone before
+                # extracting date/time
+                local_start = to_timezone(obj.start, 'Europe/Zurich')
+                self.start_date.data = local_start.date()
+                self.start_time.data = local_start.time()
             elif hasattr(obj, 'assignment_date'):
                 self.start_date.data = obj.assignment_date
 
             if hasattr(obj, 'end') and obj.end:
-                self.end_date.data = obj.end.date()
-                self.end_time.data = obj.end.time()
+                # Convert UTC to Europe/Zurich timezone before
+                # extracting date/time
+                local_end = to_timezone(obj.end, 'Europe/Zurich')
+                self.end_date.data = local_end.date()
+                self.end_time.data = local_end.time()
             elif hasattr(obj, 'assignment_date'):
                 self.end_date.data = obj.assignment_date
 
