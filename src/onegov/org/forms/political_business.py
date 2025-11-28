@@ -5,7 +5,7 @@ from itertools import zip_longest
 from markupsafe import Markup
 from onegov.core.templates import render_macro
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import TranslatedSelectField
 from onegov.org import _
 from onegov.org.models import PoliticalBusiness
@@ -169,9 +169,8 @@ class PoliticalBusinessForm(Form):
         default=date.today,
     )
 
-    # FIXME : make multiple groups possible ChosenSelectMultipleField
-    parliamentary_group_id = ChosenSelectField(
-        label=_('Parliamentary Group'),
+    parliamentary_groups = ChosenSelectMultipleField(
+        label=_('Parliamentary Group(s)'),
         validators=[Optional()],
         choices=[],
     )
@@ -263,10 +262,22 @@ class PoliticalBusinessForm(Form):
             .order_by(RISParliamentaryGroup.name)
             .all()
         )
-        self.parliamentary_group_id.choices = [
-            (str(g.id), g.name) for g in groups
-        ]
-        self.parliamentary_group_id.choices.insert(0, ('', '-'))
+        if not groups:
+            self.parliamentary_groups.choices.insert(  # type:ignore[union-attr]
+                0, ('', _('No active parliamentary groups')))
+        else:
+            self.parliamentary_groups.choices = [
+                (str(g.id), g.name) for g in groups
+            ]
+
+    def process_obj(self, obj: PoliticalBusiness) -> None:  # type:ignore[override]
+        super().process_obj(obj)
+
+        # only populate from model when the form did not receive formdata
+        if self.parliamentary_groups.raw_data is None:
+            self.parliamentary_groups.data = [
+                str(group.id) for group in obj.parliamentary_groups
+            ]
 
     def populate_obj(  # type: ignore[override]
         self,
@@ -277,11 +288,19 @@ class PoliticalBusinessForm(Form):
         super().populate_obj(
             obj,
             exclude={
-                'parliamentary_group_id',
+                'parliamentary_groups',
                 *(exclude or ())
             },
             include=include
         )
 
-        # handles the case when no parliamentary group is selected
-        obj.parliamentary_group_id = self.parliamentary_group_id.data or None
+        # convert multi-select ids into model instances
+        data = self.parliamentary_groups.data or []
+        if data and data != ['']:
+            obj.parliamentary_groups = (
+                self.request.session.query(RISParliamentaryGroup)
+                .filter(RISParliamentaryGroup.id.in_(data))
+                .all()
+            )
+        else:
+            obj.parliamentary_groups = []
