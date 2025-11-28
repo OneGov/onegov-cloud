@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-
-from onegov.translator_directory.models.time_report import TranslatorTimeReport
-
 from functools import cached_property
 from markupsafe import Markup, escape
+from onegov.translator_directory.models.time_report import TranslatorTimeReport
 from onegov.core.elements import Link, LinkGroup
 from onegov.core.templates import render_macro
 from onegov.core.utils import linkify
@@ -18,7 +16,6 @@ from onegov.translator_directory.collections.documents import (
     TranslatorDocumentCollection)
 from onegov.translator_directory.constants import (
     TIME_REPORT_INTERPRETING_TYPES,
-    TIME_REPORT_SURCHARGE_LABELS,
 )
 from onegov.translator_directory.layout import AccreditationLayout
 from onegov.translator_directory.layout import TranslatorLayout
@@ -348,23 +345,6 @@ class TimeReportHandler(Handler):
                 ]
             )
 
-        # Show surcharge types
-        if report.surcharge_types:
-            for surcharge_type in report.surcharge_types:
-                label = TIME_REPORT_SURCHARGE_LABELS.get(surcharge_type)
-                if label:
-                    rate = report.SURCHARGE_RATES.get(surcharge_type)
-                    if surcharge_type == 'urgent':
-                        surcharge_label = request.translate(label)
-                    else:
-                        surcharge_label = label
-                    summary_parts.extend(
-                        [
-                            f'<dt>{escape(surcharge_label)}</dt>',
-                            f'<dd>+{rate}%</dd>',
-                        ]
-                    )
-
         # Show surcharge amounts if any
         if breakdown['weekend_surcharge'] > 0:
             # Calculate actual weekend hours that get the surcharge (non-night)
@@ -386,7 +366,17 @@ class TimeReportHandler(Handler):
                 ]
             )
         if breakdown['urgent_surcharge'] > 0:
-            label = request.translate(_('Urgent surcharge amount'))
+            # Calculate the base amount for urgent surcharge
+            actual_work_pay = (
+                breakdown['day_pay']
+                + breakdown['night_pay']
+                + breakdown['weekend_surcharge']
+            )
+            rate = report.SURCHARGE_RATES['urgent']
+            label = (
+                f"{request.translate(_('Urgent surcharge'))} "
+                f"({layout.format_currency(actual_work_pay)} × {rate}%, +{rate}%)"
+            )
             amount = layout.format_currency(breakdown['urgent_surcharge'])
             summary_parts.extend(
                 [

@@ -136,7 +136,9 @@ class TranslatorTimeReport(Base, TimestampMixin):
     @property
     def day_hours_decimal(self) -> Decimal:
         """Return day hours (total - night) in decimal format."""
-        return self.duration_hours - self.night_hours_decimal
+        day_hours = self.duration_hours - self.night_hours_decimal
+        # Ensure non-negative (handle rounding edge cases)
+        return max(day_hours, Decimal('0'))
 
     @property
     def night_hourly_rate(self) -> Decimal:

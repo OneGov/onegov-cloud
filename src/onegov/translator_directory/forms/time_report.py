@@ -214,10 +214,6 @@ class TranslatorTimeReportForm(Form):
         )
         return rounded / Decimal('2')
 
-    def is_night_work(self) -> bool:
-        """Check if work period overlaps with night hours (20:00-06:00)."""
-        return self.calculate_night_hours() > 0
-
     def calculate_weekend_holiday_hours(self) -> Decimal:
         """Calculate actual hours worked during weekends or public holidays.
 

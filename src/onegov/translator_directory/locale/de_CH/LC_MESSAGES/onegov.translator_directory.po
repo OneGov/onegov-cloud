@@ -744,7 +744,7 @@ msgid "Night hours 20-06"
 msgstr "Nachtstunden (20:00 - 06:00 Uhr)"
 
 msgid "Base pay"
-msgstr "Grundentschädigung"
+msgstr "Grundlohn"
 
 msgid "Weekend surcharge amount"
 msgstr "Wochenendzuschlag"
@@ -1159,4 +1159,4 @@ msgstr "Herunterladen"
 #~ msgstr "Nachtarbeit (20:00 - 06:00)"
 
 #~ msgid "Weekend or holiday"
-#~ msgstr "Wochenende oder Feiertag"
+#~ msgstr "Wocheuende oder Feiertag"
