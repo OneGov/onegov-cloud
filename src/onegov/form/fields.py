@@ -481,7 +481,6 @@ class UploadMultipleField(UploadMultipleBase, FileField):
 
         # a lot of the arguments we just pass through to the subfield
         unbound_field = self.upload_field_class(
-            validators=validators,  # type:ignore[arg-type]
             filters=filters,
             description=description,
             widget=upload_widget,
