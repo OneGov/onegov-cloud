@@ -4,6 +4,7 @@ import copy
 import re
 import docx
 import transaction
+from pytest import approx
 
 from decimal import Decimal
 from datetime import date
@@ -87,6 +88,20 @@ def upload_file(
             Upload(basename(filename), f.read(), content_type)
         ]
         page.form.submit()
+
+
+def get_accountant_email(client: Client) -> str:
+    '''Get the configured accountant email from the app.'''
+    email = client.app.accountant_email
+    assert email is not None, 'Accountant email is not configured'
+    return email
+
+
+def filter_emails_by_recipient(
+    emails: list['EmailJsonDict'], recipient: str
+) -> list['EmailJsonDict']:
+    '''Filter emails to only those sent to the specified recipient.'''
+    return [e for e in emails if recipient in e['To']]
 
 
 def extract_ticket_link_from_email(
@@ -2244,12 +2259,13 @@ def test_time_report_workflow(
             break
     client.flush_email_queue()
 
-    accountant_emails = [
-        e for e in all_emails if 'editor@example.org' in e['To']
-    ]
+    accountant_email = get_accountant_email(client)
+    accountant_emails = filter_emails_by_recipient(
+        all_emails, accountant_email
+    )
     assert len(accountant_emails) >= 1
 
-    assert accountant_emails[0]['To'] == 'editor@example.org'
+    assert accountant_emails[0]['To'] == accountant_email
     mail_to_accountant = accountant_emails[0]
     assert 'TRANSLATOR, Test' in mail_to_accountant['Subject']
     assert (
@@ -2310,10 +2326,14 @@ def test_time_report_workflow(
         .one()
         .time_reports[0]
     )
-    assert report.duration == 240
+    assert report.duration == 180  # 09:00 to 12:00 = 3 hours = 180 minutes
     assert report.case_number == 'CASE-456-UPDATED'
     assert report.surcharge_types is not None
     assert 'urgent' in report.surcharge_types
+    breakdown = report.calculate_compensation_breakdown()
+    assert breakdown['subtotal'] == approx(
+        Decimal(421.87), abs=Decimal('0.01')
+    )
 
     # Test that member can also edit (Personal permission)
     client.login_member()
@@ -2414,9 +2434,8 @@ def test_time_report_workflow_self_employed(
             break
     client.flush_email_queue()
 
-    ticket_link = extract_ticket_link_from_email(
-        all_emails, 'editor@example.org'
-    )
+    accountant_email = get_accountant_email(client)
+    ticket_link = extract_ticket_link_from_email(all_emails, accountant_email)
 
     session = client.app.session()
     translator = session.query(Translator).filter_by(id=translator_id).one()
@@ -2518,9 +2537,8 @@ def test_time_report_workflow_self_employed_missing_iban(
             break
     client.flush_email_queue()
 
-    ticket_link = extract_ticket_link_from_email(
-        all_emails, 'editor@example.org'
-    )
+    accountant_email = get_accountant_email(client)
+    ticket_link = extract_ticket_link_from_email(all_emails, accountant_email)
 
     session = client.app.session()
     translator = session.query(Translator).filter_by(id=translator_id).one()
