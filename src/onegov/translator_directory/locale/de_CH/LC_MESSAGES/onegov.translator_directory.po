@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-28 11:42+0100\n"
+"POT-Creation-Date: 2025-12-01 11:42+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -539,6 +539,9 @@ msgstr ""
 msgid "Type of translation/interpreting"
 msgstr "Art der Übersetzung/Dolmetschung"
 
+msgid "Assignment Location"
+msgstr "Standort"
+
 msgid "Start date"
 msgstr "Startdatum"
 
@@ -558,7 +561,7 @@ msgid "Case number (Police)"
 msgstr "Geschäftsnummer (Polizei)"
 
 msgid "Geschäftsnummer Police for linking if needed"
-msgstr "Geschäftsnummer Polizei zur Verknüpfung, falls erforderlich"
+msgstr "Geschäftsnummer Polizei zur Verknüpfung"
 
 msgid "25% surcharge"
 msgstr "25% Zuschlag"
@@ -749,14 +752,20 @@ msgstr "Grundlohn"
 msgid "Weekend surcharge amount"
 msgstr "Wochenendzuschlag"
 
-msgid "Urgent surcharge amount"
-msgstr "Ausserordentlich dringend Zuschlag"
+msgid "Urgent surcharge"
+msgstr "Zuschlag für Ausserordentlich dringend"
 
 msgid "Subtotal (work compensation)"
 msgstr "Zwischentotal"
 
 msgid "Travel"
 msgstr "Wegentschädigung"
+
+msgid "from"
+msgstr "Von"
+
+msgid "to"
+msgstr "nach"
 
 msgid "Meal Allowance (6+ hours)"
 msgstr "Verpflegungsentschädigung (6+ Stunden)"
@@ -1035,6 +1044,9 @@ msgstr "Zeiterfassung erfolgreich aktualisiert"
 msgid "Edit Time Report"
 msgstr "Zeiterfassung bearbeiten"
 
+msgid "Update Time Report"
+msgstr "Zeiterfassung aktualisieren"
+
 msgid "Time report not found"
 msgstr "Zeiterfassung nicht gefunden"
 
@@ -1112,6 +1124,9 @@ msgstr "Neue Zeiterfassung zur Überprüfung"
 msgid "Time report submitted for review"
 msgstr "Zeiterfassung zur Überprüfung eingereicht"
 
+msgid "Submit Time Report"
+msgstr "Zeiterfassung einreichen"
+
 msgid "This file does not seem to exist."
 msgstr "Diese Datei wurde nicht gefunden."
 
@@ -1131,6 +1146,9 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 
 msgid "Download"
 msgstr "Herunterladen"
+
+#~ msgid "Urgent surcharge amount"
+#~ msgstr "Ausserordentlich dringend Zuschlag"
 
 #~ msgid "Assignment Details"
 #~ msgstr "Einsatzdetails"

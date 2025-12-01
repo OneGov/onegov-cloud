@@ -6,8 +6,8 @@ from uuid import uuid4
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
-from sqlalchemy import ARRAY, Column, Date, Enum, ForeignKey, Integer, Numeric
-from sqlalchemy import Text
+from sqlalchemy import ARRAY, Column, Date, Enum, Float, ForeignKey, Integer
+from sqlalchemy import Numeric, Text
 from sqlalchemy.orm import relationship
 
 
@@ -55,6 +55,12 @@ class TranslatorTimeReport(Base, TimestampMixin):
 
     assignment_type: Column[str | None] = Column(Text)
 
+    assignment_location: Column[str | None] = Column(
+        Text,
+        nullable=True,
+        comment='Key of selected assignment location for on-site work'
+    )
+
     #: The duration in minutes (total work time excluding breaks)
     duration: Column[int] = Column(Integer, nullable=False)
 
@@ -92,6 +98,12 @@ class TranslatorTimeReport(Base, TimestampMixin):
         Numeric(precision=10, scale=2),
         nullable=False,
         default=0,
+    )
+
+    travel_distance: Column[float | None] = Column(
+        Float(precision=2),  # type:ignore[arg-type]
+        nullable=True,
+        comment='One-way travel distance in km'
     )
 
     total_compensation: Column[Decimal] = Column(

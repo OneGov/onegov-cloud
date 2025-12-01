@@ -37,7 +37,15 @@ class TranslatorTimeReportForm(Form):
     assignment_type = ChosenSelectField(
         label=_('Type of translation/interpreting'),
         choices=[],
+        validators=[InputRequired()],
         default='on-site',
+    )
+
+    assignment_location = ChosenSelectField(
+        label=_('Assignment Location'),
+        choices=[],  # will be set in on_request
+        validators=[InputRequired()],
+        #   depends_on=('assignment_type', 'on-site'),
     )
 
     start_date = DateField(
@@ -107,9 +115,16 @@ class TranslatorTimeReportForm(Form):
             raise ValidationError(_('End time must be after start time'))
 
     def on_request(self) -> None:
+        from onegov.translator_directory.constants import ASSIGNMENT_LOCATIONS
+
         self.assignment_type.choices = [
             (key, self.request.translate(value))
             for key, value in TIME_REPORT_INTERPRETING_TYPES.items()
+        ]
+
+        # Set assignment location choices
+        self.assignment_location.choices = [
+            (key, name) for key, (name, _) in ASSIGNMENT_LOCATIONS.items()
         ]
 
     def get_hourly_rate(self, translator: Translator) -> Decimal:
@@ -333,6 +348,16 @@ class TranslatorTimeReportForm(Form):
                 if surcharge_types:
                     self.is_urgent.data = 'urgent' in surcharge_types
 
+            if hasattr(obj, 'assignment_type'):
+                self.assignment_type.data = getattr(
+                    obj, 'assignment_type', None
+                )
+
+            if hasattr(obj, 'assignment_location'):
+                self.assignment_location.data = getattr(
+                    obj, 'assignment_location', None
+                )
+
     def get_surcharge_types(self) -> list[str]:
         """Get list of active surcharge types from form based on actual
         hours."""
@@ -345,28 +370,84 @@ class TranslatorTimeReportForm(Form):
             types.append('urgent')
         return types
 
-    def get_travel_compensation(self, translator: Translator) -> Decimal:
-        """Calculate travel compensation based on round trip distance.
+    def calculate_travel_details(
+        self,
+        translator: Translator,
+        request: TranslatorAppRequest | None = None
+    ) -> tuple[Decimal, float | None]:
+        """Calculate travel compensation and distance.
 
-        The drive_distance is multiplied by 2 to account for the round trip
-        (Wegentschädigung * 2).
-        Returns 0 for telephonic and written assignments.
+        For on-site assignments with a selected location, calculates distance
+        from translator's address to the assignment location.
+        For other cases, falls back to translator's drive_distance.
+        The distance is multiplied by 2 to account for round trip.
+        Returns (compensation, one_way_distance_km).
         """
         if self.assignment_type.data in ('telephonic', 'schriftlich'):
-            return Decimal('0')
+            return Decimal('0'), None
 
-        if not translator.drive_distance:
-            return Decimal('0')
+        distance = None
+        one_way_km = None
 
-        distance = float(translator.drive_distance) * 2
+        # Try to calculate distance to specific assignment location
+        if (
+            self.assignment_type.data == 'on-site'
+            and self.assignment_location.data
+            and request
+            and translator.coordinates
+        ):
+            from onegov.translator_directory.utils import (
+                calculate_distance_to_location
+            )
+
+            one_way_distance = calculate_distance_to_location(
+                request,
+                translator.coordinates,
+                self.assignment_location.data
+            )
+
+            if one_way_distance is not None:
+                one_way_km = one_way_distance
+                distance = one_way_distance * 2  # Round trip
+
+        # Fall back to translator's pre-calculated drive_distance
+        if distance is None and translator.drive_distance:
+            one_way_km = float(translator.drive_distance)
+            distance = float(translator.drive_distance) * 2
+
+        # No distance available
+        if distance is None:
+            return Decimal('0'), None
+
+        # Apply compensation tiers
+        compensation = Decimal('0')
         if distance <= 25:
-            return Decimal('20')
+            compensation = Decimal('20')
         elif distance <= 50:
-            return Decimal('50')
+            compensation = Decimal('50')
         elif distance <= 100:
-            return Decimal('100')
+            compensation = Decimal('100')
         else:
-            return Decimal('150')
+            compensation = Decimal('150')
+
+        return compensation, one_way_km
+
+    def get_travel_compensation(
+        self,
+        translator: Translator,
+        request: TranslatorAppRequest | None = None
+    ) -> Decimal:
+        """Calculate travel compensation based on distance to assignment
+        location.
+
+        For on-site assignments with a selected location, calculates distance
+        from translator's address to the assignment location.
+        For other cases, falls back to translator's drive_distance.
+        The distance is multiplied by 2 to account for round trip.
+        Returns 0 for telephonic and written assignments.
+        """
+        compensation, _ = self.calculate_travel_details(translator, request)
+        return compensation
 
     def update_model(self, model: TranslatorTimeReport) -> None:
         """Update the time report model with form data."""
@@ -378,6 +459,7 @@ class TranslatorTimeReportForm(Form):
         assert self.end_time.data is not None
 
         model.assignment_type = self.assignment_type.data or None
+        model.assignment_location = self.assignment_location.data or None
 
         duration_hours = self.get_duration_hours()
         model.duration = int(float(duration_hours) * 60)
@@ -414,8 +496,11 @@ class TranslatorTimeReportForm(Form):
         surcharge_types = self.get_surcharge_types()
         model.surcharge_types = surcharge_types if surcharge_types else None
 
-        travel_comp = self.get_travel_compensation(model.translator)
+        travel_comp, travel_distance = self.calculate_travel_details(
+            model.translator, self.request
+        )
         model.travel_compensation = travel_comp
+        model.travel_distance = travel_distance
 
         # Use centralized calculation from model
         breakdown = model.calculate_compensation_breakdown()

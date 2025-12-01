@@ -38,6 +38,7 @@ from onegov.translator_directory.models.ticket import (
     TimeReportTicket,
     TimeReportHandler,
 )
+from onegov.translator_directory.constants import ASSIGNMENT_LOCATIONS
 from onegov.translator_directory.models.time_report import (
     TranslatorTimeReport,
 )
@@ -171,6 +172,7 @@ def edit_time_report(
         'model': self,
         'title': _('Edit Time Report'),
         'form': form,
+        'button_text': _('Update Time Report'),
     }
 
 
@@ -762,10 +764,37 @@ def generate_time_report_pdf_bytes(
     """
 
     travel_label = request.translate(_('Travel'))
-    if translator.drive_distance:
+    if time_report.assignment_location:
+        location_name, _address = ASSIGNMENT_LOCATIONS.get(
+            time_report.assignment_location,
+            (time_report.assignment_location, '')
+        )
+        translator_address = (
+            f'{translator.address}, '
+            f'{translator.zip_code} {translator.city}'
+        )
+        if time_report.travel_distance:
+            travel_label = (
+                f"{request.translate(_('Travel'))} "
+                f"({request.translate(_('from'))} {translator_address} "
+                f"{request.translate(_('to'))} {location_name}, "
+                f"{time_report.travel_distance} km \u00d7 2)"
+            )
+        else:
+            travel_label = (
+                f"{request.translate(_('Travel'))} "
+                f"({request.translate(_('from'))} {translator_address} "
+                f"{request.translate(_('to'))} {location_name})"
+            )
+    elif translator.drive_distance:
+        translator_address = (
+            f'{translator.address}, '
+            f'{translator.zip_code} {translator.city}'
+        )
         travel_label = (
             f"{request.translate(_('Travel'))} "
-            f"({translator.drive_distance} km \u00d7 2)"
+            f"({request.translate(_('from'))} {translator_address}, "
+            f"{translator.drive_distance} km \u00d7 2)"
         )
 
     html_content += f"""

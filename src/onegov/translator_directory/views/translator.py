@@ -562,7 +562,9 @@ def add_time_report(
 
         hourly_rate = form.get_hourly_rate(self)
         surcharge_types = form.get_surcharge_types()
-        travel_comp = form.get_travel_compensation(self)
+        travel_comp, travel_distance = form.calculate_travel_details(
+            self, request
+        )
 
         start_dt = datetime.combine(form.start_date.data, form.start_time.data)
         end_dt = datetime.combine(form.end_date.data, form.end_time.data)
@@ -589,6 +591,7 @@ def add_time_report(
             translator=self,
             created_by=current_user,
             assignment_type=form.assignment_type.data or None,
+            assignment_location=form.assignment_location.data or None,
             duration=duration_minutes,
             break_time=break_minutes,
             night_minutes=night_minutes,
@@ -600,6 +603,7 @@ def add_time_report(
             hourly_rate=hourly_rate,
             surcharge_types=surcharge_types if surcharge_types else None,
             travel_compensation=travel_comp,
+            travel_distance=travel_distance,
             # Temporary, will be calculated next
             total_compensation=Decimal('0'),
             notes=form.notes.data or None,
@@ -671,13 +675,13 @@ def add_time_report(
         return redirect(request.link(ticket, 'status'))
 
     layout = TranslatorLayout(self, request)
-    layout.edit_mode = True
 
     return {
         'layout': layout,
         'model': self,
         'form': form,
         'title': _('Add Time Report'),
+        'button_text': request.translate(_('Submit Time Report')),
     }
 
 

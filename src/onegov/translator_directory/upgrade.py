@@ -6,7 +6,8 @@ from __future__ import annotations
 
 from onegov.core.orm.types import JSON, UUID, UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
-from sqlalchemy import ARRAY, Column, Boolean, Enum, ForeignKey, Integer, Text
+from sqlalchemy import ARRAY, Column, Boolean, Enum, Float, ForeignKey, Integer
+from sqlalchemy import Text
 
 
 @upgrade_task('Change withholding tax column to boolean')
@@ -261,3 +262,27 @@ def remove_night_hours_from_time_reports(context: UpgradeContext) -> None:
     if context.has_column('translator_time_reports', 'night_hours'):
         context.operations.drop_column(
             'translator_time_reports', 'night_hours')
+
+
+@upgrade_task('Add assignment_location column to time reports')
+def add_assignment_location_to_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if not context.has_column(
+        'translator_time_reports', 'assignment_location'
+    ):
+        context.operations.add_column(
+            'translator_time_reports',
+            Column('assignment_location', Text, nullable=True)
+        )
+
+
+@upgrade_task('Add travel_distance column to time reports')
+def add_travel_distance_to_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if not context.has_column('translator_time_reports', 'travel_distance'):
+        context.operations.add_column(
+            'translator_time_reports',
+            Column('travel_distance', Float(precision=2), nullable=True)
+        )

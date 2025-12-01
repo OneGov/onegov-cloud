@@ -15,7 +15,7 @@ from onegov.core.elements import Intercooler
 from onegov.translator_directory.collections.documents import (
     TranslatorDocumentCollection)
 from onegov.translator_directory.constants import (
-    TIME_REPORT_INTERPRETING_TYPES,
+    TIME_REPORT_INTERPRETING_TYPES, ASSIGNMENT_LOCATIONS
 )
 from onegov.translator_directory.layout import AccreditationLayout
 from onegov.translator_directory.layout import TranslatorLayout
@@ -293,9 +293,30 @@ class TimeReportHandler(Handler):
             f'<dd>{time_range}</dd>',
             f"<dt>{request.translate(_('Assignment Date'))}</dt>",
             f'<dd>{assignment_date_formatted}</dd>',
-            f"<dt>{request.translate(_('Type'))}</dt>",
-            f'<dd>{escape(assignment_type_translated)}</dd>',
         ]
+
+        # Display assignment location if available
+        if report.assignment_location:
+            location_name, address = ASSIGNMENT_LOCATIONS.get(
+                report.assignment_location,
+                (report.assignment_location, '')
+            )
+            location_display = f'{escape(location_name)}'
+            if address:
+                location_display += f'<br>{escape(address)}'
+            summary_parts.extend(
+                [
+                    f"<dt>{request.translate(_('Assignment Location'))}</dt>",
+                    f'<dd>{location_display}</dd>',
+                ]
+            )
+
+        summary_parts.extend(
+            [
+                f"<dt>{request.translate(_('Type'))}</dt>",
+                f'<dd>{escape(assignment_type_translated)}</dd>',
+            ]
+        )
 
         if report.case_number:
             summary_parts.extend(
@@ -354,7 +375,7 @@ class TimeReportHandler(Handler):
                 weekend_holiday_hours, night_hours
             )
             label = (
-                f"{request.translate(_('Weekend surcharge'))} "
+                f"{request.translate(_('Weekend surcharge amount'))} "
                 f"({layout.format_currency(report.hourly_rate)} × "
                 f"{weekend_non_night_hours} h, +25%)"
             )
@@ -375,7 +396,8 @@ class TimeReportHandler(Handler):
             rate = report.SURCHARGE_RATES['urgent']
             label = (
                 f"{request.translate(_('Urgent surcharge'))} "
-                f"({layout.format_currency(actual_work_pay)} × {rate}%, +{rate}%)"
+                f"({layout.format_currency(actual_work_pay)} × {rate}%, "
+                f"+{rate}%)"
             )
             amount = layout.format_currency(breakdown['urgent_surcharge'])
             summary_parts.extend(
@@ -397,11 +419,44 @@ class TimeReportHandler(Handler):
         )
 
         travel_label = request.translate(_('Travel'))
-        if report.translator.drive_distance:
+
+        # Build travel details showing from-to addresses
+        if report.assignment_location:
+            location_name, address = ASSIGNMENT_LOCATIONS.get(
+                report.assignment_location,
+                (report.assignment_location, '')
+            )
+            translator_address = (
+                f'{report.translator.address}, '
+                f'{report.translator.zip_code} {report.translator.city}'
+            )
+            if report.travel_distance:
+                travel_label = (
+                    f"{request.translate(_('Travel'))} "
+                    f"({request.translate(_('from'))} "
+                    f"{escape(translator_address)} "
+                    f"{request.translate(_('to'))} {escape(location_name)}, "
+                    f"{report.travel_distance} km \u00d7 2)"
+                )
+            else:
+                travel_label = (
+                    f"{request.translate(_('Travel'))} "
+                    f"({request.translate(_('from'))} "
+                    f"{escape(translator_address)} "
+                    f"{request.translate(_('to'))} {escape(location_name)})"
+                )
+        elif report.translator.drive_distance:
+            translator_address = (
+                f'{report.translator.address}, '
+                f'{report.translator.zip_code} {report.translator.city}'
+            )
             travel_label = (
                 f"{request.translate(_('Travel'))} "
-                f"({report.translator.drive_distance} km \u00d7 2)"
+                f"({request.translate(_('from'))} "
+                f"{escape(translator_address)}, "
+                f"{report.translator.drive_distance} km \u00d7 2)"
             )
+
         summary_parts.extend(
             [
                 f'<dt>{travel_label}</dt>',

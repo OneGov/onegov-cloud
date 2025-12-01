@@ -12,12 +12,11 @@ from onegov.translator_directory import _
 
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     import requests
     from wtforms.fields.choices import _Choice
     from collections.abc import Collection
-    from onegov.gis.models.coordinates import RealCoordinates
+    from onegov.gis.models.coordinates import AnyCoordinates, RealCoordinates
     from onegov.org.request import OrgRequest
     from onegov.translator_directory.request import TranslatorAppRequest
     from onegov.translator_directory.models.translator import Translator
@@ -157,6 +156,75 @@ def update_drive_distances(
         else:
             no_routes.append(trs)
     return total, routes_found, distance_changed, no_routes, tol_failed
+
+
+def calculate_distance_to_location(
+    request: TranslatorAppRequest,
+    translator_coordinates: AnyCoordinates,
+    location_key: str
+) -> float | None:
+    """
+    Calculate driving distance from translator's coordinates to a specific
+    assignment location.
+
+    Args:
+        request: The request object with Mapbox token
+        translator_coordinates: The translator's geocoded coordinates
+        location_key: Key from ASSIGNMENT_LOCATIONS dict
+
+    Returns:
+        Distance in kilometers (one-way), or None if calculation fails
+    """
+    from onegov.translator_directory.constants import ASSIGNMENT_LOCATIONS
+
+    if not translator_coordinates or location_key not in ASSIGNMENT_LOCATIONS:
+        return None
+
+    # Get the address for this location
+    _, address = ASSIGNMENT_LOCATIONS[location_key]
+
+    # Geocode the assignment location address
+    geocoding_api = MapboxRequests(
+        request.app.mapbox_token,
+        endpoint='geocoding'
+    )
+
+    try:
+        geocode_response = geocoding_api.geocode(
+            text=address,
+            ctry='Schweiz'
+        )
+
+        if geocode_response.status_code != 200:
+            return None
+
+        data = geocode_response.json()
+        if not data.get('features'):
+            return None
+
+        # Get coordinates of the assignment location
+        location_coords = data['features'][0]['geometry']['coordinates']
+
+        # Calculate driving distance
+        directions_api = MapboxRequests(
+            request.app.mapbox_token,
+            endpoint='directions',
+            profile='driving'
+        )
+
+        response = directions_api.directions([
+            to_tuple(translator_coordinates),
+            (location_coords[0], location_coords[1])  # lon, lat
+        ])
+
+        if found_route(response):
+            return parse_directions_result(response)
+
+        return None
+
+    except Exception:
+        # Log error in production; for now return None
+        return None
 
 
 def geocode_translator_addresses(
