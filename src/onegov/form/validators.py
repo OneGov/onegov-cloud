@@ -31,7 +31,8 @@ from wtforms.validators import StopValidation
 from wtforms.validators import ValidationError
 
 
-from typing import Generic, TYPE_CHECKING
+from typing import Generic, TYPE_CHECKING, Any
+
 if TYPE_CHECKING:
     from collections.abc import Collection, Sequence
     from onegov.core.orm import Base
@@ -114,7 +115,18 @@ class FileSizeLimit:
         if not field.data:
             return
 
-        if field.data.get('size', 0) > self.max_bytes:
+        if isinstance(field.data, list):  # UploadMultipleField
+            for data in field.data:
+                if not data:
+                    continue  # in case of file deletion
+
+                self.validate_filesize(field, data)
+
+        else:
+            self.validate_filesize(field, field.data)
+
+    def validate_filesize(self, field: Field, data: dict[Any, Any]) -> None:
+        if data.get('size', 0) > self.max_bytes:
             message = field.gettext(self.message).format(
                 humanize.naturalsize(self.max_bytes)
             )
@@ -192,11 +204,15 @@ class WhitelistedMimeType:
                 if not data:
                     continue  # in case of file deletion
 
-                if data['mimetype'] not in self.whitelist:
-                    raise ValidationError(field.gettext(self.message))
+                self.validate_mimetype(field, data)
 
-        elif field.data['mimetype'] not in self.whitelist:
-            raise ValidationError(field.gettext(self.message))
+        else:
+            self.validate_mimetype(field, field.data)
+
+    def validate_mimetype(self, field: Field, data: dict[Any, Any]) -> None:
+        if data['mimetype'] not in self.whitelist:
+            message = field.gettext(self.message)
+            raise ValidationError(field.gettext(message))
 
 
 class ExpectedExtensions(WhitelistedMimeType):
