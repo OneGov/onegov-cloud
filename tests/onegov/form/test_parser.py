@@ -11,7 +11,12 @@ from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
 from onegov.form.errors import InvalidIndentSyntax
 from onegov.form.fields import (
-    DateTimeLocalField, MultiCheckboxField, TimeField, URLField, VideoURLField)
+    DateTimeLocalField,
+    MultiCheckboxField,
+    TimeField,
+    URLField,
+    VideoURLField,
+)
 from onegov.form.parser.grammar import field_help_identifier
 from onegov.form.validators import LaxDataRequired, WhitelistedMimeType
 from onegov.form.validators import ValidDateRange
@@ -38,6 +43,13 @@ if TYPE_CHECKING:
 
 def parse(expr: ParserElement, text: str) -> ParseResults:
     return expr.parseString(text)
+
+
+def find_validator(
+    field: Field | FileField,
+    cls: type
+) -> Validator[Any, Any] | None:
+    return next((v for v in field.validators if isinstance(v, cls)), None)
 
 
 @pytest.mark.parametrize('comment,output', [
@@ -340,13 +352,6 @@ def test_parse_time() -> None:
     assert isinstance(form['time'], TimeField)
 
 
-def _find_validator(
-    field: Field | FileField,
-    cls: type
-) -> Validator[Any, Any] | None:
-    return next((v for v in field.validators if isinstance(v, cls)), None)
-
-
 def test_parse_fileinput() -> None:
     form = parse_form("File = *.pdf|*.doc")()
 
@@ -356,14 +361,14 @@ def test_parse_fileinput() -> None:
 
     # verify attached mime type validator
     assert form['file'].validators
-    validator = _find_validator(form['file'], WhitelistedMimeType)
+    validator = find_validator(form['file'], WhitelistedMimeType)
     assert validator
     assert validator.whitelist == {  # type:ignore[attr-defined]
         'application/msword', 'application/pdf'
     }
 
     form = parse_form("File = *.*")()
-    validator = _find_validator(form['file'], WhitelistedMimeType)
+    validator = find_validator(form['file'], WhitelistedMimeType)
     assert validator
     assert validator.whitelist == WhitelistedMimeType.whitelist  # type:ignore[attr-defined]
 
@@ -376,14 +381,14 @@ def test_parse_multiplefileinput() -> None:
     assert form['files'].widget.multiple is True  # type: ignore[attr-defined]
 
     # verify attached mime type validator
-    validator = _find_validator(form['files'], WhitelistedMimeType)
+    validator = find_validator(form['files'], WhitelistedMimeType)
     assert validator
     assert validator.whitelist == {  # type:ignore[attr-defined]
         'application/msword', 'application/pdf'
     }
 
     form = parse_form("Files = *.* (multiple)")()
-    validator = _find_validator(form['files'], WhitelistedMimeType)
+    validator = find_validator(form['files'], WhitelistedMimeType)
     assert validator
     assert validator.whitelist == WhitelistedMimeType.whitelist  # type:ignore[attr-defined]
 
