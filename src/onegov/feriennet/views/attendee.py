@@ -112,14 +112,18 @@ def delete_attendee(
     )
     deletion_possible = True
     collection = BookingCollection(request.session)
+    bookings_to_delete = []
     for booking in self.bookings:
         if request.app.active_period and (
             booking.period.id == request.app.active_period.id
         ):
             deletion_possible = False
         else:
-            collection.delete(booking)
+            bookings_to_delete.append(booking)
+
     if deletion_possible:
+        for booking in bookings_to_delete:
+            collection.delete(booking)
         invoice_items = request.session.query(ActivityInvoiceItem).filter(
             ActivityInvoiceItem.attendee_id == self.id)
         for item in invoice_items:
