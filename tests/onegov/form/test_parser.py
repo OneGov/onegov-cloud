@@ -1203,6 +1203,22 @@ def test_help_indentation_error() -> None:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 7
 
+    text = dedent(
+        """
+        Email *= @@@
+        Preferred Sports =
+            [ ] Baseball
+            [ ] Football
+            [ ] Skiing
+        << Please select all your preferred sports >>
+        Name *= ___
+            << Please enter your name >>
+        """
+    ).lstrip('\n')
+    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 8
+
 
 def test_help_location_error() -> None:
     text = dedent(
