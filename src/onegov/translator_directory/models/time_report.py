@@ -169,10 +169,13 @@ class TranslatorTimeReport(Base, TimestampMixin):
         - weekend_surcharge: Weekend surcharge (only on non-night hours)
         - urgent_surcharge: Urgent surcharge (25% on top of everything)
         - total_surcharges: Sum of all surcharges
-        - subtotal: Total work compensation (before travel/meal)
+        - subtotal: Total work compensation (before break
+          deduction/travel/meal)
+        - break_deduction: Break time deduction at normal hourly rate
+        - adjusted_subtotal: Subtotal minus break deduction
         - travel: Travel compensation
         - meal: Meal allowance
-        - total: Final total compensation
+        - total: Final total compensation (including break deduction)
         """
         hourly_rate = self.hourly_rate
         total_hours = self.duration_hours
@@ -213,14 +216,19 @@ class TranslatorTimeReport(Base, TimestampMixin):
             rate = self.SURCHARGE_RATES['urgent'] / 100
             urgent_surcharge = actual_work_pay * rate
 
+        # Calculate break deduction
+        break_hours = self.break_time_hours
+        break_deduction = hourly_rate * break_hours
+
         # Totals
         total_surcharges = (
             night_surcharge + weekend_surcharge + urgent_surcharge
         )
         subtotal = day_pay + night_pay + weekend_surcharge + urgent_surcharge
+        adjusted_subtotal = subtotal - break_deduction
         travel = self.travel_compensation
         meal = self.meal_allowance
-        total = subtotal + travel + meal
+        total = adjusted_subtotal + travel + meal
 
         return {
             'day_pay': day_pay,
@@ -230,21 +238,12 @@ class TranslatorTimeReport(Base, TimestampMixin):
             'urgent_surcharge': urgent_surcharge,
             'total_surcharges': total_surcharges,
             'subtotal': subtotal,
+            'break_deduction': break_deduction,
+            'adjusted_subtotal': adjusted_subtotal,
             'travel': travel,
             'meal': meal,
             'total': total,
         }
-
-    @property
-    def base_compensation(self) -> Decimal:
-        """Calculate compensation without travel and meal
-        (work compensation only).
-
-        This uses the centralized breakdown calculation which handles
-        partial night work correctly.
-        """
-        breakdown = self.calculate_compensation_breakdown()
-        return breakdown['subtotal']
 
     @property
     def meal_allowance(self) -> Decimal:

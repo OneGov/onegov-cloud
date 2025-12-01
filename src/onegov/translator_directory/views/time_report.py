@@ -746,6 +746,22 @@ def generate_time_report_pdf_bytes(
                     </tr>
         """
 
+    # Show break time deduction if applicable
+    if breakdown['break_deduction'] > 0:
+        break_hours = time_report.break_time_hours
+        html_content += f"""
+                    <tr>
+                        <td class="label">
+                            Pausenzeit (
+                            {layout.format_currency(time_report.hourly_rate)}
+                            × -{break_hours} Stunden):
+                        </td>
+                        <td class="amount">
+                            -{layout.format_currency(breakdown['break_deduction'])}
+                        </td>
+                    </tr>
+        """
+
     html_content += f"""
                     <tr class="subtotal">
                         <td class="label">
@@ -757,7 +773,7 @@ def generate_time_report_pdf_bytes(
                         </td>
                         <td class="amount">
                             <strong>
-                                {layout.format_currency(breakdown['subtotal'])}
+                                {layout.format_currency(breakdown['adjusted_subtotal'])}
                             </strong>
                         </td>
                     </tr>
@@ -828,9 +844,7 @@ def generate_time_report_pdf_bytes(
                         </td>
                         <td class="amount">
                             <strong>
-                                {layout.format_currency(
-                                    time_report.total_compensation
-                                )}
+                                {layout.format_currency(breakdown['total'])}
                             </strong>
                         </td>
                     </tr>

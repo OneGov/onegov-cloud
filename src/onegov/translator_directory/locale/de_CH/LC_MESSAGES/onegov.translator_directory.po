@@ -557,8 +557,8 @@ msgstr "Endzeit"
 msgid "Break time"
 msgstr "Pausenzeit"
 
-msgid "Case number (Police)"
-msgstr "Geschäftsnummer (Polizei)"
+msgid "Case number"
+msgstr "Geschäftsnummer"
 
 msgid "Geschäftsnummer Police for linking if needed"
 msgstr "Geschäftsnummer Polizei zur Verknüpfung"

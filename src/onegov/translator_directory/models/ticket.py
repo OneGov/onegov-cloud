@@ -407,13 +407,25 @@ class TimeReportHandler(Handler):
                 ]
             )
 
+        # Show break time deduction if applicable
+        if breakdown['break_deduction'] > 0:
+            break_hours = report.break_time_hours
+            summary_parts.extend(
+                [
+                    f"<dt>{request.translate(_('Break time'))} "
+                    f"({layout.format_currency(report.hourly_rate)} × "
+                    f"-{break_hours} h)</dt>",
+                    f'<dd>-{layout.format_currency(breakdown["break_deduction"])}</dd>',
+                ]
+            )
+
         summary_parts.extend(
             [
                 f"<dt><strong>"
                 f"{request.translate(_('Subtotal (work compensation)'))} "
                 f"</strong></dt>",
                 f'<dd><strong>'
-                f'{layout.format_currency(breakdown["subtotal"])}'
+                f'{layout.format_currency(breakdown["adjusted_subtotal"])}'
                 f'</strong></dd>',
             ]
         )
@@ -474,7 +486,10 @@ class TimeReportHandler(Handler):
                 ]
             )
 
-        calculation_parts = [layout.format_currency(breakdown['subtotal'])]
+        # Build total calculation formula
+        calculation_parts = [
+            layout.format_currency(breakdown['adjusted_subtotal'])
+        ]
         if breakdown['travel'] > 0:
             calculation_parts.append(
                 layout.format_currency(breakdown['travel'])
