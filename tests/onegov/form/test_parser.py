@@ -1269,6 +1269,30 @@ def test_help_indentation_error() -> None:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 18
 
+    # wrong indentation but used previous valid indentation depth as
+    # for condiments
+    text = dedent(
+        """
+        Email *= @@@
+        Want Condiments =
+            (x) Yes
+                condiments =
+                    [ ] Relish
+                    [ ] Jalapenos
+                    [ ] Ketchup
+                    [ ] Other
+                        What else? = ___
+                << Choose your favorite condiments >>
+            ( ) No Condiments
+        << Whether or not you want condiments in your hotdog? >>
+        Name *= ___
+                << Please enter your name >>
+        """
+    ).lstrip('\n')
+    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 14
+
 
 def test_help_location_error() -> None:
     text = dedent(
