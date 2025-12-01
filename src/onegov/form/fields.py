@@ -498,6 +498,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             widget=widget,  # type:ignore[arg-type]
             render_kw=render_kw,
             name=name,
+            validators=validators,
             _form=_form,
             _prefix=_prefix,
             _translations=_translations,

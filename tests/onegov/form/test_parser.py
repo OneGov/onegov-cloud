@@ -373,9 +373,8 @@ def test_parse_multiplefileinput() -> None:
     }
 
     form = parse_form("Files = *.* (multiple)")()
-    field = form._fields['files']
-    assert any(isinstance(v, WhitelistedMimeType) for v in field.validators)
-    assert field.validators[0].whitelist == WhitelistedMimeType.whitelist
+    validator = _find_validator(form['files'], WhitelistedMimeType)
+    assert validator.whitelist == WhitelistedMimeType.whitelist
 
 
 def test_parse_radio() -> None:
