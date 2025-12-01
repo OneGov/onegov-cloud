@@ -7,7 +7,6 @@ from onegov.org.forms.commission_membership import CommissionMembershipAddForm
 from onegov.town6.views.commission import (
     view_commissions,
     add_commission,
-    edit_commission,
     delete_commission
 )
 from onegov.pas import _
@@ -102,8 +101,25 @@ def pas_edit_commission(
     request: TownRequest,
     form: CommissionForm
 ) -> RenderData | Response:
-    return edit_commission(
-        self, request, form, PASCommissionLayout(self, request))
+
+    if form.submitted(request):
+        form.populate_obj(self)
+        request.success(_('Your changes were saved'))
+        return request.redirect(request.link(self))
+
+    form.process(obj=self)
+
+    layout = PASCommissionLayout(self, request)
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
+    layout.include_editor()
+    layout.edit_mode = True
+
+    return {
+        'layout': layout,
+        'title': layout.title,
+        'form': form,
+        'form_width': 'large'
+    }
 
 
 @PasApp.view(

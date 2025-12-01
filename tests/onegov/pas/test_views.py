@@ -608,6 +608,48 @@ def test_fetch_commissions_parliamentarians_json(
     assert commission3_id not in data2
 
 
+def test_commission_edit_with_dates(client: Client[TestPasApp]) -> None:
+    """Test that commission editing works with start and end dates.
+
+    This is a regression test for the issue where editbar_links = []
+    prevented the form from being submitted.
+    """
+    client.login_admin()
+
+    settings = client.get('/').follow().click('PAS Einstellungen')
+
+    page = settings.click('Kommissionen')
+    page = page.click(href='new')
+    page.form['name'] = 'Test Commission'
+    page.form['type'] = 'normal'
+    page = page.form.submit().follow()
+    assert 'Test Commission' in page
+
+    page = page.click('Bearbeiten')
+    assert page.form['name'].value == 'Test Commission'
+
+    page.form['start'] = '2024-01-01'
+    page.form['end'] = '2024-12-31'
+    page.form['name'] = 'Updated Commission'
+
+    # Verify that the "Speichern" (Save) button exists in the editbar
+    # This was the actual bug - this button disappeared
+    editbar = page.pyquery('ul.edit-bar')
+    assert editbar, "Edit bar should be present"
+    save_button = page.pyquery('button.save-link')
+    assert save_button, "Save button should be present in editbar"
+    assert 'Speichern' in save_button.text()
+
+    page = page.form.submit().follow()
+    assert 'Updated Commission' in page
+
+    # Verify dates were saved by re-editing
+    page = page.click('Bearbeiten')
+    assert page.form['name'].value == 'Updated Commission'
+    assert page.form['start'].value == '2024-01-01'
+    assert page.form['end'].value == '2024-12-31'
+
+
 def test_add_new_user_without_activation_email(
     client: Client[TestPasApp]
 ) -> None:
