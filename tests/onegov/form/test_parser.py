@@ -4,6 +4,9 @@ import pytest
 
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
+
+from wtforms import Field
+
 from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
 from onegov.form.errors import InvalidIndentSyntax
@@ -25,9 +28,12 @@ from wtforms.validators import Optional
 from wtforms.validators import Regexp
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
+
 if TYPE_CHECKING:
     from pyparsing import ParserElement, ParseResults
+
+    from onegov.form.types import Validator
 
 
 def parse(expr: ParserElement, text: str) -> ParseResults:
@@ -334,7 +340,10 @@ def test_parse_time() -> None:
     assert isinstance(form['time'], TimeField)
 
 
-def _find_validator(field, cls):
+def _find_validator(
+    field: Field | FileField,
+    cls: type
+) -> Validator[Any, Any] | None:
     return next((v for v in field.validators if isinstance(v, cls)), None)
 
 
@@ -348,19 +357,19 @@ def test_parse_fileinput() -> None:
     # verify attached mime type validator
     assert form['file'].validators
     validator = _find_validator(form['file'], WhitelistedMimeType)
-    assert validator.whitelist == {
+    assert validator
+    assert validator.whitelist == {  # type:ignore[attr-defined]
         'application/msword', 'application/pdf'
     }
 
     form = parse_form("File = *.*")()
-    field = form._fields['file']
-    assert any(isinstance(v, WhitelistedMimeType) for v in field.validators)
-    assert field.validators[1].whitelist == WhitelistedMimeType.whitelist
+    validator = _find_validator(form['file'], WhitelistedMimeType)
+    assert validator
+    assert validator.whitelist == WhitelistedMimeType.whitelist  # type:ignore[attr-defined]
 
 
 def test_parse_multiplefileinput() -> None:
     form = parse_form("Files = *.pdf|*.doc (multiple)")()
-    # form = parse_form("Files = *.pdf (multiple)")()
 
     assert form['files'].label.text == 'Files'
     assert isinstance(form['files'], FileField)
@@ -368,13 +377,15 @@ def test_parse_multiplefileinput() -> None:
 
     # verify attached mime type validator
     validator = _find_validator(form['files'], WhitelistedMimeType)
-    assert validator.whitelist == {
+    assert validator
+    assert validator.whitelist == {  # type:ignore[attr-defined]
         'application/msword', 'application/pdf'
     }
 
     form = parse_form("Files = *.* (multiple)")()
     validator = _find_validator(form['files'], WhitelistedMimeType)
-    assert validator.whitelist == WhitelistedMimeType.whitelist
+    assert validator
+    assert validator.whitelist == WhitelistedMimeType.whitelist  # type:ignore[attr-defined]
 
 
 def test_parse_radio() -> None:
