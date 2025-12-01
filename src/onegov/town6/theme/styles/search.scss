@@ -146,10 +146,15 @@
     color: $jumbo;
 }
 
-.slider .searchbox-wrapper {
+.slider .searchbox-wrapper,
+.homepage-video .searchbox-wrapper {
     position: absolute;
     top: 62%;
     width: 100%;
+
+    &.top {
+        top: 32%;
+    }
 
     input {
         background: $white;
