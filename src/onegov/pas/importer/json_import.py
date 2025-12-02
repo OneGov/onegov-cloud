@@ -632,7 +632,7 @@ class MembershipImporter(DataImporter):
             person_id = None  # Initialize person_id
             try:
                 if not person_data:
-                    continue  # type: ignore[unreachable]
+                    continue
                 person_id = person_data.get('id')
                 if not person_id or person_id in self.parliamentarian_map:
                     continue
@@ -962,7 +962,7 @@ class MembershipImporter(DataImporter):
                 # Safely access nested keys
                 person_data = membership.get('person')
                 if not person_data:
-                    self.logger.warning(  # type: ignore[unreachable]
+                    self.logger.warning(
                         'Skipping membership: Missing person data.'
                     )
                     continue
@@ -975,7 +975,7 @@ class MembershipImporter(DataImporter):
 
                 org_data = membership.get('organization')
                 if not org_data:
-                    self.logger.warning(  # type: ignore[unreachable]
+                    self.logger.warning(
                         f'Skipping membership for person {person_id}: '
                         f'Missing organization data.'
                     )

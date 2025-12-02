@@ -322,7 +322,7 @@ class SessionManager:
 
         """
 
-        @event.listens_for(engine, 'before_cursor_execute')  # type:ignore[untyped-decorator]
+        @event.listens_for(engine, 'before_cursor_execute')  # type:ignore[misc]
         def activate_schema(
             connection: Connection,
             cursor: Any,
@@ -346,7 +346,7 @@ class SessionManager:
             if schema is not None:
                 cursor.execute('SET search_path TO %s, extensions', (schema, ))
 
-        @event.listens_for(engine, 'before_cursor_execute')  # type:ignore[untyped-decorator]
+        @event.listens_for(engine, 'before_cursor_execute')  # type:ignore[misc]
         def limit_session_lifetime(
             connection: Connection,
             cursor: Any,
@@ -392,7 +392,7 @@ class SessionManager:
                     to have both aggregates and bulk updates/deletes.
                 """
 
-        @event.listens_for(session, 'after_flush')  # type:ignore[untyped-decorator]
+        @event.listens_for(session, 'after_flush')  # type:ignore[misc]
         def on_after_flush(
             session: Session,
             flush_context: Any
@@ -408,7 +408,7 @@ class SessionManager:
                     self.on_delete.send(
                         self.current_schema, session=session, obj=obj)
 
-        @event.listens_for(session, 'after_bulk_update')  # type:ignore[untyped-decorator]
+        @event.listens_for(session, 'after_bulk_update')  # type:ignore[misc]
         def on_after_bulk_update(update_context: Any) -> None:
             if self._ignore_bulk_updates:
                 return
@@ -428,7 +428,7 @@ class SessionManager:
                 for obj in update_context.matched_objects:
                     self.on_update.send(self.current_schema, obj=obj)
 
-        @event.listens_for(session, 'after_bulk_delete')  # type:ignore[untyped-decorator]
+        @event.listens_for(session, 'after_bulk_delete')  # type:ignore[misc]
         def on_after_bulk_delete(delete_context: Any) -> None:
             prevent_bulk_changes_on_aggregate_modules(
                 delete_context.mapper.class_)
@@ -445,7 +445,7 @@ class SessionManager:
                         obj=obj
                     )
 
-        @event.listens_for(session, 'after_begin')  # type: ignore[untyped-decorator]
+        @event.listens_for(session, 'after_begin')  # type: ignore[misc]
         def on_after_begin(
             session: Session,
             transaction: SessionTransaction,
@@ -455,7 +455,7 @@ class SessionManager:
                 self.on_transaction_join.send(
                     self.current_schema, session=session)
 
-        @event.listens_for(session, 'after_attach')  # type: ignore[untyped-decorator]
+        @event.listens_for(session, 'after_attach')  # type: ignore[misc]
         def on_after_attach(session: Session, instance: object) -> None:
             if self.on_transaction_join.receivers:
                 self.on_transaction_join.send(
