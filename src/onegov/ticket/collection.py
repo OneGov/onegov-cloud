@@ -440,12 +440,12 @@ class TicketInvoiceCollection(
                 token_col == cast(Ticket.handler_id, UUIDType)
             )
             if self.reservation_start is not None:
-                subquery = subquery.filter(start_col >= self.align_date(
+                subquery = subquery.filter(end_col >= self.align_date(
                     self.reservation_start,
                     'down'
                 ))
             if self.reservation_end is not None:
-                subquery = subquery.filter(end_col <= self.align_date(
+                subquery = subquery.filter(start_col <= self.align_date(
                     self.reservation_end,
                     'up'
                 ))
