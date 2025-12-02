@@ -6,6 +6,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function handleBulkAddCommission() {
 
+   if (!window.location.href.includes('new-commission-bulk')) {
+        return;
+    }
+
   const commissionSelect = document.getElementById("commission_id");
   const parliamentarianList = document.getElementById("parliamentarian_id");
 
@@ -17,6 +21,8 @@ function handleBulkAddCommission() {
     .then((response) => response.json())
     .then((data) => {
       commissionParliamentarians = data;
+      // Filter commission options to only show those with parliamentarians
+      filterCommissionOptions();
       // Initial update based on selected commission
       updateParliamentarians(commissionSelect.value);
       isInitialLoad = false;
@@ -33,6 +39,30 @@ function handleBulkAddCommission() {
   $(commissionSelect).on("change", function () {
     updateParliamentarians(this.value);
   });
+
+  function filterCommissionOptions() {
+    // Hide commission options that have no parliamentarians
+    const commissionOptions = commissionSelect.querySelectorAll('option');
+
+    commissionOptions.forEach(option => {
+      // Skip the empty/placeholder option
+      if (!option.value) {
+        return;
+      }
+
+      const commissionId = option.value;
+      const parliamentarians = commissionParliamentarians[commissionId] || [];
+
+      // Hide commissions with no parliamentarians
+      if (parliamentarians.length === 0) {
+        option.style.display = 'none';
+        option.disabled = true;
+      }
+    });
+
+    // Update the chosen dropdown to reflect changes
+    $(commissionSelect).trigger('chosen:updated');
+  }
 
   function updateParliamentarians(commissionId) {
 
@@ -73,6 +103,10 @@ function handleBulkAddCommission() {
 
 
 function handleAttendanceFormSync() {
+   if (!window.location.href.includes('attendences/new')) {
+        return;
+    }
+
   const commissionSelect = document.getElementById("commission_id");
   const parliamentarianSelect = document.getElementById("parliamentarian_id");
 

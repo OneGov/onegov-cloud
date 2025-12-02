@@ -29,7 +29,7 @@
                                                 <option
                                                     tal:repeat="month_item months"
                                                     value="${month_item[0]}"
-                                                    selected="${month_item[0] == selected_month or None}">
+                                                    selected="${month_item[0] == (selected_month or default_month) or None}">
                                                     ${month_item[1]}
                                                 </option>
                                             </select>
@@ -45,7 +45,7 @@
                                                 <option
                                                     tal:repeat="year_item years"
                                                     value="${year_item}"
-                                                    selected="${year_item == selected_year or None}">
+                                                    selected="${year_item == (selected_year or default_year) or None}">
                                                     ${year_item}
                                                 </option>
                                             </select>

@@ -10,8 +10,10 @@ from onegov.core.orm.mixins import (
     dict_markup_property, dict_property, meta_property)
 from onegov.core.orm.types import UUID
 from onegov.form.models import FormSubmission
+from onegov.org.i18n import _
 from onegov.org.models.extensions import (
-    ContactExtension, GeneralFileLinkExtension, ResourceValidationExtension)
+    ContactExtension, GeneralFileLinkExtension,
+    InlinePhotoAlbumExtension, ResourceValidationExtension)
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PersonLinkExtension
@@ -235,8 +237,11 @@ class SharedMethods:
 class DaypassResource(Resource, AccessExtension, SearchableContent,
                       ContactExtension, PersonLinkExtension,
                       CoordinatesExtension, SharedMethods,
-                      ResourceValidationExtension, GeneralFileLinkExtension):
+                      ResourceValidationExtension, GeneralFileLinkExtension,
+                      InlinePhotoAlbumExtension):
     __mapper_args__ = {'polymorphic_identity': 'daypass'}
+
+    fts_type_title = _('Resources')
 
     # the selected view
     view = 'dayGridMonth'
@@ -251,8 +256,11 @@ class DaypassResource(Resource, AccessExtension, SearchableContent,
 class RoomResource(Resource, AccessExtension, SearchableContent,
                    ContactExtension, PersonLinkExtension,
                    CoordinatesExtension, SharedMethods,
-                   ResourceValidationExtension, GeneralFileLinkExtension):
+                   ResourceValidationExtension, GeneralFileLinkExtension,
+                   InlinePhotoAlbumExtension):
     __mapper_args__ = {'polymorphic_identity': 'room'}
+
+    fts_type_title = _('Resources')
 
     # the selected view (depends on the resource's default)
     view = None
@@ -280,9 +288,12 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
 class ItemResource(Resource, AccessExtension, SearchableContent,
                    ContactExtension, PersonLinkExtension,
                    CoordinatesExtension, SharedMethods,
-                   ResourceValidationExtension, GeneralFileLinkExtension):
+                   ResourceValidationExtension, GeneralFileLinkExtension,
+                   InlinePhotoAlbumExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'daily-item'}
+
+    fts_type_title = _('Resources')
 
     view = None
 

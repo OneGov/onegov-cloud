@@ -4,6 +4,7 @@ import uuid
 from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
+from onegov.org.i18n import _
 from onegov.search import ORMSearchable
 from sqlalchemy import Column, Text, ForeignKey
 from sqlalchemy.orm import relationship
@@ -22,6 +23,7 @@ class MeetingItem(Base, ORMSearchable):
 
     __tablename__ = 'par_meeting_items'
 
+    fts_type_title = _('Agenda')
     fts_public = True
     fts_properties = {
         'title': {'type': 'text', 'weight': 'A'},

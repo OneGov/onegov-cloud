@@ -194,6 +194,47 @@ def test_tickets(client: Client) -> None:
     anon.get(ticket_url + '/archive', status=403)
 
 
+def test_tickets_search(client_with_fts: Client) -> None:
+    client = client_with_fts
+    client.login_editor()
+
+    form_page = client.get('/forms/new')
+    form_page.form['title'] = "Newsletter"
+    form_page.form['definition'] = """
+        E-Mail *= @@@
+        Name *= ___
+    """
+    form_page = form_page.form.submit()
+
+    client.logout()
+
+    form_page = client.get('/form/newsletter')
+    form_page.form['e_mail'] = 'paul@example.org'
+    form_page.form['name'] = 'Paul Atishon'
+    status_page = form_page.form.submit().follow().form.submit().follow()
+
+    form_page = client.get('/form/newsletter')
+    form_page.form['e_mail'] = 'datz@notarebel.org'
+    form_page.form['name'] = 'Datz Arebal'
+    status_page = form_page.form.submit().follow().form.submit().follow()
+
+    client.login_editor()
+
+    page = client.get('/')
+    assert page.pyquery('.open-tickets').attr('data-count') == '2'
+    assert page.pyquery('.pending-tickets').attr('data-count') == '0'
+    assert page.pyquery('.closed-tickets').attr('data-count') == '0'
+
+    tickets_page = client.get('/tickets/ALL/open')
+    assert len(tickets_page.pyquery('tr.ticket')) == 2
+
+    tickets_page = client.get('/tickets/ALL/open?q=Paul')
+    assert len(tickets_page.pyquery('tr.ticket')) == 1
+
+    tickets_page = client.get('/tickets/ALL/open?q=Datz')
+    assert len(tickets_page.pyquery('tr.ticket')) == 1
+
+
 def test_ticket_states_idempotent(client: Client) -> None:
     client.login_editor()
 

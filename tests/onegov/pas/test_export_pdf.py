@@ -132,9 +132,10 @@ def test_parliamentarian_settlement_calculations(session: Session) -> None:
         )
 
         if attendence.type == 'plenary':
-            # Plenary sessions always count as half day
+            # Plenary sessions: CHF always half day, but value shows actual hrs
             assert base_rate == Decimal('1000')
-            assert attendence.calculate_value() == Decimal('0.5')
+            # Actual duration was 240 minutes (4 hours)
+            assert attendence.calculate_value() == Decimal('4.0')
         elif attendence.type == 'commission':
             if attendence.duration == 120:  # 2 hour meeting
                 assert base_rate == Decimal('300')  # Initial rate only

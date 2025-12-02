@@ -3,6 +3,7 @@ from __future__ import annotations
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.pas.i18n import _
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Date
@@ -20,6 +21,7 @@ class LegislativePeriod(Base, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'par_legislative_periods'
 
+    fts_type_title = _('Legislative periods')
     fts_public = False
     fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
 

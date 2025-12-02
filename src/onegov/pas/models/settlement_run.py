@@ -5,6 +5,7 @@ from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.pas.i18n import _
 from onegov.search import ORMSearchable
 from sqlalchemy import Boolean, Column, Date, Text
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -23,6 +24,7 @@ class SettlementRun(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'pas_settlements'
 
+    fts_type_title = _('Settlement runs')
     fts_public = False
     fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
 
