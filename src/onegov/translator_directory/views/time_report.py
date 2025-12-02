@@ -25,9 +25,6 @@ from onegov.org.mail import send_ticket_mail
 from onegov.translator_directory.collections.time_report import (
     TimeReportCollection,
 )
-from onegov.translator_directory.constants import (
-    TIME_REPORT_SURCHARGE_LABELS,
-)
 from onegov.translator_directory.forms.time_report import (
     TranslatorTimeReportForm,
 )
@@ -41,6 +38,7 @@ from onegov.translator_directory.models.ticket import (
     TimeReportTicket,
     TimeReportHandler,
 )
+from onegov.translator_directory.constants import ASSIGNMENT_LOCATIONS
 from onegov.translator_directory.models.time_report import (
     TranslatorTimeReport,
 )
@@ -174,6 +172,7 @@ def edit_time_report(
         'model': self,
         'title': _('Edit Time Report'),
         'form': form,
+        'button_text': _('Update Time Report'),
     }
 
 
@@ -288,17 +287,21 @@ def generate_accounting_export_rows(
 
     for report in reports:
         translator = report.translator
+        # the view has checked for missing pers_id before
         assert translator.pers_id is not None
         pers_nr = str(translator.pers_id)
         date_str = report.assignment_date.strftime('%d.%m.%Y')
 
         duration_hours = str(report.duration_hours)
-        effective_rate = report.hourly_rate * (
-            1 + report.effective_surcharge_percentage / Decimal(100)
-        )
+
+        # Calculate effective rate from actual compensation
+        # (since we can't use a simple percentage with partial night work)
+        breakdown = report.calculate_compensation_breakdown()
+        if report.duration_hours > 0:
+            effective_rate = breakdown['subtotal'] / report.duration_hours
+        else:
+            effective_rate = report.hourly_rate
         effective_rate_str = str(effective_rate.quantize(Decimal('0.01')))
-        travel_and_meal = report.travel_compensation + report.meal_allowance
-        travel_and_meal_str = str(travel_and_meal)
 
         row_2603 = [
             'L001',
@@ -336,8 +339,8 @@ def generate_accounting_export_rows(
         ]
         yield row_2603
 
-        if travel_and_meal > 0:
-            row_8102 = [
+        if report.travel_compensation > 0:
+            row_8102_travel = [
                 'L001',
                 pers_nr,
                 date_str,
@@ -346,7 +349,7 @@ def generate_accounting_export_rows(
                 '0',
                 '',
                 'VWG Reisespesen Dolmetscher',
-                travel_and_meal_str,
+                str(report.travel_compensation),
                 '1',
                 '0',
                 '0',
@@ -371,7 +374,44 @@ def generate_accounting_export_rows(
                 '',
                 'L001',
             ]
-            yield row_8102
+            yield row_8102_travel
+
+        if report.meal_allowance > 0:
+            row_8102_meal = [
+                'L001',
+                pers_nr,
+                date_str,
+                '0',
+                '8102',
+                '0',
+                '',
+                'VWG Reisespesen Dolmetscher',  # Verpflegung
+                str(report.meal_allowance),
+                '1',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '1',
+                '0',
+                '',
+                '0',
+                '0',
+                '0',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                'L001',
+            ]
+            yield row_8102_meal
 
 
 @TranslatorDirectoryApp.view(
@@ -428,41 +468,44 @@ def export_accounting_csv(
     output = StringIO()
     writer = csv.writer(output, delimiter=';')
 
-    header = [
-        'PreEntry',
-        'Personal-Nr.',
-        'Periodendatum',
-        'Periodennummer',
-        'Lohnart',
-        'Belegnummer',
-        'Währung',
-        'Text Lohnart',
-        'Anzahl',
-        'Mutationscode Anzahl',
-        'Ansatz',
-        'Mutationscode Ansatz',
-        'Kostenstelle 1',
-        'Kostenstelle 2',
-        'Freie Nummer',
-        'Funktion Gemeinde',
-        'Art Gemeinde',
-        'Subnummer Referenz',
-        'GB zum Verbuchen der Vorerfassung',
-        'AnsV-Nr.',
-        'Wiederkehrende Vorerfassung',
-        'Mehrwertsteuer-Code',
-        'Fibu-Konto',
-        'Freie Nummer 1',
-        'Freie Nummer 2',
-        'Freier Text 1',
-        'Freier Text 2',
-        'Freies Datum 1',
-        'Kommentar',
-        'Benutzername',
-        'Mutationsdatum',
-        'PostEntry',
-    ]
-    writer.writerow(header)
+    # Header row MUST NOT be included: the accounting system will reject
+    # the import if a header is present. Kept here for documentation and
+    # debugging purposes.
+    # header = [
+    #     'PreEntry',
+    #     'Personal-Nr.',
+    #     'Periodendatum',
+    #     'Periodennummer',
+    #     'Lohnart',
+    #     'Belegnummer',
+    #     'Währung',
+    #     'Text Lohnart',
+    #     'Anzahl',
+    #     'Mutationscode Anzahl',
+    #     'Ansatz',
+    #     'Mutationscode Ansatz',
+    #     'Kostenstelle 1',
+    #     'Kostenstelle 2',
+    #     'Freie Nummer',
+    #     'Funktion Gemeinde',
+    #     'Art Gemeinde',
+    #     'Subnummer Referenz',
+    #     'GB zum Verbuchen der Vorerfassung',
+    #     'AnsV-Nr.',
+    #     'Wiederkehrende Vorerfassung',
+    #     'Mehrwertsteuer-Code',
+    #     'Fibu-Konto',
+    #     'Freie Nummer 1',
+    #     'Freie Nummer 2',
+    #     'Freier Text 1',
+    #     'Freier Text 2',
+    #     'Freies Datum 1',
+    #     'Kommentar',
+    #     'Benutzername',
+    #     'Mutationsdatum',
+    #     'PostEntry',
+    # ]
+    # writer.writerow(header)
 
     for row in generate_accounting_export_rows(confirmed_reports):
         writer.writerow(row)
@@ -473,7 +516,6 @@ def export_accounting_csv(
     response = Response(csv_bytes)
     response.content_type = 'text/csv; charset=iso-8859-1'
     response.content_disposition = f'attachment; filename="{filename}"'
-
     return response
 
 
@@ -510,10 +552,6 @@ def generate_time_report_pdf_bytes(
                 f'{layout.format_date(start_date, "date")}, '
                 f'{start_time} - {end_time}'
             )
-
-    base_without_surcharge = (
-        time_report.hourly_rate * time_report.duration_hours
-    )
 
     today = datetime.now()
     letter_date = f'Schaffhausen, {layout.format_date(today, "date_long")}'
@@ -612,6 +650,52 @@ def generate_time_report_pdf_bytes(
                             {layout.format_currency(time_report.hourly_rate)}
                         </td>
                     </tr>
+    """
+
+    # Use centralized calculation from model
+    breakdown = time_report.calculate_compensation_breakdown()
+
+    # Show day/night hours breakdown if there are night hours
+    if time_report.night_minutes > 0:
+        day_hours = time_report.day_hours_decimal
+        night_hours = time_report.night_hours_decimal
+
+        day_hours_text = (
+            f'{day_hours} Stunde' if day_hours == 1
+            else f'{day_hours} Stunden'
+        )
+        night_hours_text = (
+            f'{night_hours} Stunde' if night_hours == 1
+            else f'{night_hours} Stunden'
+        )
+
+        day_rate = layout.format_currency(time_report.hourly_rate)
+        night_rate = layout.format_currency(
+            time_report.night_hourly_rate
+        )
+        html_content += f"""
+                    <tr>
+                        <td class="label">
+                            Tagstunden ({day_rate}
+                            × {day_hours_text}):
+                        </td>
+                        <td class="amount">
+                            {layout.format_currency(breakdown['day_pay'])}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">
+                            Nachtstunden 20-06 Uhr ({night_rate}
+                            × {night_hours_text}, +50%):
+                        </td>
+                        <td class="amount">
+                            {layout.format_currency(breakdown['night_pay'])}
+                        </td>
+                    </tr>
+        """
+    else:
+        # No night hours, show simple day pay
+        html_content += f"""
                     <tr>
                         <td class="label">
                             {request.translate(_('Base pay'))}
@@ -619,57 +703,65 @@ def generate_time_report_pdf_bytes(
                             × {duration_text}):
                         </td>
                         <td class="amount">
-                            {layout.format_currency(base_without_surcharge)}
-                        </td>
-                    </tr>
-    """
-
-    effective_surcharge_pct = time_report.effective_surcharge_percentage
-    if effective_surcharge_pct > 0:
-        if time_report.surcharge_types:
-            for surcharge_type in time_report.surcharge_types:
-                label = TIME_REPORT_SURCHARGE_LABELS.get(surcharge_type)
-                if label:
-                    rate = time_report.SURCHARGE_RATES.get(
-                        surcharge_type, Decimal('0')
-                    )
-                    individual_amount = (
-                        base_without_surcharge * rate / Decimal(100)
-                    )
-                    if surcharge_type == 'urgent':
-                        surcharge_label = request.translate(label)
-                        label_display = f'{surcharge_label} (+{rate}%)'
-                    else:
-                        label_display = f'{label} ({duration_text}, +{rate}%)'
-
-                    html_content += f"""
-                    <tr>
-                        <td class="label">
-                            {label_display}:
-                        </td>
-                        <td class="amount">
-                            {layout.format_currency(individual_amount)}
-                        </td>
-                    </tr>
-                    """
-
-        surcharge_amount = (
-            base_without_surcharge * effective_surcharge_pct / Decimal(100)
-        )
-        html_content += f"""
-                    <tr>
-                        <td class="label">
-                            {request.translate(_('Surcharge amount'))}
-                            ({layout.format_currency(base_without_surcharge)}
-                            × {effective_surcharge_pct}%):
-                        </td>
-                        <td class="amount">
-                            {layout.format_currency(surcharge_amount)}
+                            {layout.format_currency(breakdown['day_pay'])}
                         </td>
                     </tr>
         """
 
-    base_comp = time_report.base_compensation
+    # Show weekend surcharge if applicable
+    if breakdown['weekend_surcharge'] > 0:
+        # Calculate actual weekend hours that get the surcharge (non-night)
+        weekend_holiday_hours = time_report.weekend_holiday_hours_decimal
+        night_hours = time_report.night_hours_decimal
+        weekend_non_night_hours = weekend_holiday_hours - min(
+            weekend_holiday_hours, night_hours
+        )
+        weekend_hours_text = (
+            f'{weekend_non_night_hours} Stunde'
+            if weekend_non_night_hours == 1
+            else f'{weekend_non_night_hours} Stunden'
+        )
+        html_content += f"""
+                    <tr>
+                        <td class="label">
+                            Zuschlag WE ({weekend_hours_text}, +25%):
+                        </td>
+                        <td class="amount">
+                            {layout.format_currency(breakdown['weekend_surcharge'])}
+                        </td>
+                    </tr>
+        """
+
+    # Show urgent surcharge if applicable
+    if breakdown['urgent_surcharge'] > 0:
+        urgent_label = request.translate(_('Exceptionally urgent'))
+        html_content += f"""
+                    <tr>
+                        <td class="label">
+                            {urgent_label} (+25%):
+                        </td>
+                        <td class="amount">
+                            {layout.format_currency(breakdown['urgent_surcharge'])}
+                        </td>
+                    </tr>
+        """
+
+    # Show break time deduction if applicable
+    if breakdown['break_deduction'] > 0:
+        break_hours = time_report.break_time_hours
+        html_content += f"""
+                    <tr>
+                        <td class="label">
+                            Pausenzeit (
+                            {layout.format_currency(time_report.hourly_rate)}
+                            × -{break_hours} Stunden):
+                        </td>
+                        <td class="amount">
+                            -{layout.format_currency(breakdown['break_deduction'])}
+                        </td>
+                    </tr>
+        """
+
     html_content += f"""
                     <tr class="subtotal">
                         <td class="label">
@@ -681,17 +773,44 @@ def generate_time_report_pdf_bytes(
                         </td>
                         <td class="amount">
                             <strong>
-                                {layout.format_currency(base_comp)}
+                                {layout.format_currency(breakdown['adjusted_subtotal'])}
                             </strong>
                         </td>
                     </tr>
     """
 
     travel_label = request.translate(_('Travel'))
-    if translator.drive_distance:
+    if time_report.assignment_location:
+        location_name, _address = ASSIGNMENT_LOCATIONS.get(
+            time_report.assignment_location,
+            (time_report.assignment_location, '')
+        )
+        translator_address = (
+            f'{translator.address}, '
+            f'{translator.zip_code} {translator.city}'
+        )
+        if time_report.travel_distance:
+            travel_label = (
+                f"{request.translate(_('Travel'))} "
+                f"({request.translate(_('from'))} {translator_address} "
+                f"{request.translate(_('to'))} {location_name}, "
+                f"{time_report.travel_distance} km \u00d7 2)"
+            )
+        else:
+            travel_label = (
+                f"{request.translate(_('Travel'))} "
+                f"({request.translate(_('from'))} {translator_address} "
+                f"{request.translate(_('to'))} {location_name})"
+            )
+    elif translator.drive_distance:
+        translator_address = (
+            f'{translator.address}, '
+            f'{translator.zip_code} {translator.city}'
+        )
         travel_label = (
             f"{request.translate(_('Travel'))} "
-            f"({translator.drive_distance} km)"
+            f"({request.translate(_('from'))} {translator_address}, "
+            f"{translator.drive_distance} km \u00d7 2)"
         )
 
     html_content += f"""
@@ -725,9 +844,7 @@ def generate_time_report_pdf_bytes(
                         </td>
                         <td class="amount">
                             <strong>
-                                {layout.format_currency(
-                                    time_report.total_compensation
-                                )}
+                                {layout.format_currency(breakdown['total'])}
                             </strong>
                         </td>
                     </tr>
@@ -770,14 +887,6 @@ def generate_time_report_pdf_bytes(
             </div>
     """
 
-    if time_report.notes:
-        html_content += f"""
-            <div class="notes">
-                <h2>{request.translate(_('Notes'))}</h2>
-                <p>{time_report.notes}</p>
-            </div>
-        """
-
     html_content += """
         </body>
         </html>
@@ -807,11 +916,9 @@ def generate_time_report_pdf_for_translator(
 
     time_report = handler.time_report
     translator = handler.translator
-
     pdf_bytes = generate_time_report_pdf_bytes(
         time_report, translator, request
     )
-
     filename = (
         f'Zeiterfassung_{translator.last_name}_'
         f'{time_report.assignment_date.strftime("%Y%m%d")}.pdf'
@@ -866,5 +973,4 @@ def generate_qr_bill_pdf_for_translator(
     response = Response(qr_bill_bytes)
     response.content_type = 'application/pdf'
     response.content_disposition = f'inline; filename="{filename}"'
-
     return response

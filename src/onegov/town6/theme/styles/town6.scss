@@ -1697,17 +1697,23 @@ p.full-text-width {
     display: none !important;
 }
 
-.main-content .anchor-link {
-    color: $aluminum;
-    display: inline !important;
-    opacity: 0;
-    padding-left: .5rem;
-    position: absolute;
-    font-size: 80%;
-    transition: opacity 200ms linear;
+.main-content {
+    .anchor-link {
+        color: $aluminum;
+        display: inline !important;
+        font-size: 80%;
+        opacity: 0;
+        margin-left: .5rem;
+        position: absolute !important;
+        transition: opacity 200ms linear;
+    }
 
-    &:hover {
-        opacity: 1;
+    .anchor-link-heading {
+        position: relative;
+
+        &:hover .anchor-link {
+            opacity: 1;
+        }
     }
 }
 

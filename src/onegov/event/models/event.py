@@ -33,6 +33,7 @@ from sqlalchemy import Text
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
+from translationstring import TranslationString
 from uuid import uuid4
 
 
@@ -186,6 +187,10 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         lazy='joined',
     )
 
+    # HACK: We don't want to set up translations in this module for this single
+    #       string, we know we already have a translation in a different domain
+    #       so we just manually specify it for now.
+    fts_type_title = TranslationString('Events', domain='onegov.org')
     fts_properties = {
         'title': {'type': 'localized', 'weight': 'A'},
         'description': {'type': 'localized', 'weight': 'B'},

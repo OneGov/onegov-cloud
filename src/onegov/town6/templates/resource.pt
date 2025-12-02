@@ -87,5 +87,9 @@
             <tal:b metal:use-macro="layout.macros.page_content" />
         </tal:b>
 
+        <tal:b tal:define="imageset resource.photo_album|None;">
+            <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
+        </tal:b>
+
     </tal:b>
 </div>

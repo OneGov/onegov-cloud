@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from typing import TypeAlias
 from onegov.translator_directory import _
 
 full_text_max_chars = 25
@@ -149,6 +150,7 @@ INTERPRETING_TYPES = {
 TIME_REPORT_INTERPRETING_TYPES = {
     'telephonic': _('telephonic'),
     'on-site': _('On Site'),
+    'schriftlich': _('Written'),
 }
 HOURLY_RATE_CERTIFIED = Decimal('90.00')
 HOURLY_RATE_UNCERTIFIED = Decimal('75.00')
@@ -161,3 +163,59 @@ TIME_REPORT_SURCHARGE_LABELS = {
 # ====
 
 TRANSLATOR_FA_ICON = 'translator'
+
+# Tuple: (Display Name, Full Address)
+LocationMapping: TypeAlias = tuple[str, str]
+
+ASSIGNMENT_LOCATIONS: dict[str, LocationMapping] = {
+    'obergericht': ('Obergericht', 'Frauengasse 17, Schaffhausen'),
+    'kantonsgericht': ('Kantonsgericht', 'Herrenacker 26, Schaffhausen'),
+    'staatsanwaltschaft': (
+        'Staatsanwaltschaft Allgemeine Abteilung',
+        'Beckenstube 5, Schaffhausen'
+    ),
+    'verkehrsabteilung_staatsanwaltschaft': (
+        'Verkehrsabteilung der Staatsanwaltschaft',
+        'Bahnhofstrasse 29, Schaffhausen'
+    ),
+    'jugendanwaltschaft': (
+        'Abteilung Jugendanwaltschaft',
+        'J.J. Wepfer-Strasse 6, Schaffhausen'
+    ),
+    'migrationsamt': (
+        'Migrationsamt und Passbüro',
+        'Mühlentalstrasse 105, Schaffhausen'
+    ),
+    'kantonales_gefaengnis': (
+        'Kantonales Gefängnis',
+        'Beckenstube 5, Schaffhausen'
+    ),
+    'polizei': (
+        'Schaffhauser Polizei',
+        'Beckenstube 1, Schaffhausen'
+    ),
+    'polizei_verkehrsabteilung': (
+        'Schaffhauser Polizei Verkehrsabteilung',
+        'Emmersbergstrasse 1, Schaffhausen'
+    ),
+    'polizei_klettgau': (
+        'Schaffhauser Polizei Polizeistation Klettgau',
+        'Zelgstrasse 8, Klettgau'
+    ),
+    'polizei_neuhausen': (
+        'Schaffhauser Polizei Polizeistation Neuhausen',
+        'Rheingoldstrasse 26, Neuhausen am Rheinfall'
+    ),
+    'polizei_reiat': (
+        'Schaffhauser Polizei Polizeistation Reiat',
+        'Biberstrasse 33, Thayngen'
+    ),
+    'polizei_stein': (
+        'Schaffhauser Polizei Polizeistation Stein am Rhein',
+        'Chlini Schanz 12, Stein am Rhein'
+    ),
+    'spitaeler': (
+        'Spitäler Schaffhausen Einvernahme Polizei',
+        'Geissbergstrasse 81, Schaffhausen'
+    ),
+}

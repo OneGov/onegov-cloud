@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-04-28 14:53+0200\n"
+"POT-Creation-Date: 2025-11-12 10:03+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -106,8 +106,8 @@ msgstr "CHF pagato"
 msgid "Help us"
 msgstr "Aiutare"
 
-msgid "Dashboard"
-msgstr "Dashboard"
+msgid "Overview"
+msgstr "Panoramica"
 
 msgid "Periods"
 msgstr "Periodi"
@@ -675,8 +675,7 @@ msgid "Political municipality"
 msgstr "Comune politico"
 
 msgid "The Swisspass ID must be 13 characters long (including dashes)."
-msgstr ""
-"L'ID Swisspass deve essere lungo 13 caratteri (inclusi i trattini)."
+msgstr "L'ID Swisspass deve essere lungo 13 caratteri (inclusi i trattini)."
 
 msgid "The Swisspass ID must only contain digits and dashes."
 msgstr "L'ID Swisspass deve contenere solo cifre e trattini."
@@ -1327,6 +1326,12 @@ msgstr "Conto bancario (IBAN)"
 
 msgid "Beneficiary"
 msgstr "Beneficiario"
+
+msgid "Allow contact for carpooling"
+msgstr "Permettere il contatto per condividere il viaggio"
+
+msgid "Privacy"
+msgstr "Privacy"
 
 msgid "Please enter both a phone number and a name"
 msgstr "Inserisci un numero di telefono e un nome"
@@ -3152,9 +3157,6 @@ msgstr ""
 "I genitori possono vedere i dettagli di contatto di altri genitori della "
 "stessa offerta"
 
-msgid "Privacy"
-msgstr "Privacy"
-
 msgid "Public organiser data"
 msgstr "Dati pubblici dell'organizzatore"
 
@@ -3231,6 +3233,9 @@ msgstr "Prenotazioni ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
+
+#~ msgid "Dashboard"
+#~ msgstr "Dashboard"
 
 #~ msgid "The Swisspass ID must be 13 characters long."
 #~ msgstr "L'ID Swisspass deve essere lungo 13 caratteri."

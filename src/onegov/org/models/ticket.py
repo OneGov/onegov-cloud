@@ -18,6 +18,8 @@ from onegov.org.utils import (
 )
 from onegov.pay import ManualPayment
 from onegov.reservation import Allocation, Resource, Reservation
+from onegov.search import SearchIndex
+from onegov.search.utils import language_from_locale, normalize_text
 from onegov.ticket import handlers, Handler, Ticket, TicketInvoice
 from onegov.ticket.collection import TicketCollection, ArchivedTicketCollection
 from onegov.search.utils import extract_hashtags
@@ -1852,7 +1854,27 @@ def apply_ticket_permissions(
     ))
 
 
+def apply_search_term(
+    query: _Q,
+    term: str | None,
+    request: OrgRequest | None,
+) -> _Q:
+    if request is None or not term:
+        return query
+
+    query = query.join(SearchIndex, SearchIndex.owner_id_uuid == Ticket.id)  # type: ignore[no-untyped-call]
+    query = query.filter(SearchIndex.fts_idx.op('@@')(
+        func.websearch_to_tsquery(
+            language_from_locale(request.locale),
+            normalize_text(term)
+        )
+    ))
+    return query
+
+
 class FilteredTicketCollection(TicketCollection):
+
+    search_term_supported = True
 
     def __init__(
         self,
@@ -1863,6 +1885,7 @@ class FilteredTicketCollection(TicketCollection):
         group: str | None = None,
         owner: str = '*',
         submitter: str = '*',
+        term: str | None = None,
         extra_parameters: dict[str, Any] | None = None,
         # NOTE: This is pretty fragile since the `for_X` methods will
         #       not preserve the request, so if we rely on that being
@@ -1879,16 +1902,17 @@ class FilteredTicketCollection(TicketCollection):
             group=group,
             owner=owner,
             submitter=submitter,
+            term=term,
             extra_parameters=extra_parameters,
         )
         self.request = request
 
     def subset(self) -> Query[Ticket]:
-        return apply_ticket_permissions(
+        return apply_search_term(apply_ticket_permissions(
             super().subset(),
             self.handler,
             self.request
-        )
+        ), self.term, self.request)
 
     def groups_by_handler_code(self) -> Query[tuple[str, list[str]]]:
         return apply_ticket_permissions(
@@ -1900,6 +1924,8 @@ class FilteredTicketCollection(TicketCollection):
 
 class FilteredArchivedTicketCollection(ArchivedTicketCollection):
 
+    search_term_supported = True
+
     def __init__(
         self,
         session: Session,
@@ -1909,6 +1935,7 @@ class FilteredArchivedTicketCollection(ArchivedTicketCollection):
         group: str | None = None,
         owner: str = '*',
         submitter: str = '*',
+        term: str | None = None,
         extra_parameters: dict[str, Any] | None = None,
         # NOTE: This is pretty fragile since the `for_X` methods will
         #       not preserve the request, so if we rely on that being
@@ -1925,16 +1952,17 @@ class FilteredArchivedTicketCollection(ArchivedTicketCollection):
             group=group,
             owner=owner,
             submitter=submitter,
+            term=term,
             extra_parameters=extra_parameters,
         )
         self.request = request
 
     def subset(self) -> Query[Ticket]:
-        return apply_ticket_permissions(
+        return apply_search_term(apply_ticket_permissions(
             super().subset(),
             self.handler,
             self.request
-        )
+        ), self.term, self.request)
 
     def groups_by_handler_code(self) -> Query[tuple[str, list[str]]]:
         return apply_ticket_permissions(

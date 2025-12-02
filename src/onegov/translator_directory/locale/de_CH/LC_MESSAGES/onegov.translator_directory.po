@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-16 16:19+0100\n"
+"POT-Creation-Date: 2025-12-01 11:42+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -91,8 +91,11 @@ msgstr "telefonisch"
 msgid "On Site"
 msgstr "Vor Ort"
 
+msgid "Written"
+msgstr "schriftlich"
+
 msgid "Exceptionally urgent"
-msgstr "Ausserordenlich dringlich"
+msgstr "Ausserordentlich dringlich"
 
 msgid "Logout"
 msgstr "Abmelden"
@@ -536,6 +539,9 @@ msgstr ""
 msgid "Type of translation/interpreting"
 msgstr "Art der Übersetzung/Dolmetschung"
 
+msgid "Assignment Location"
+msgstr "Standort"
+
 msgid "Start date"
 msgstr "Startdatum"
 
@@ -548,11 +554,14 @@ msgstr "Enddatum"
 msgid "End time"
 msgstr "Endzeit"
 
-msgid "Case number (Police)"
-msgstr "Geschäftsnummer (Polizei)"
+msgid "Break time"
+msgstr "Pausenzeit"
+
+msgid "Case number"
+msgstr "Geschäftsnummer"
 
 msgid "Geschäftsnummer Police for linking if needed"
-msgstr "Geschäftsnummer Polizei zur Verknüpfung, falls erforderlich"
+msgstr "Geschäftsnummer Polizei zur Verknüpfung"
 
 msgid "25% surcharge"
 msgstr "25% Zuschlag"
@@ -713,6 +722,9 @@ msgstr "Noch nicht bestätigt"
 msgid "Status"
 msgstr "Status"
 
+msgid "Time"
+msgstr "Einsatzzeit"
+
 msgid "Assignment Date"
 msgstr "Einsatzdatum"
 
@@ -728,20 +740,32 @@ msgstr "Stundenansatz"
 msgid "Duration"
 msgstr "Dauer"
 
+msgid "Day hours"
+msgstr "Tagesstunden"
+
+msgid "Night hours 20-06"
+msgstr "Nachtstunden (20:00 - 06:00 Uhr)"
+
 msgid "Base pay"
-msgstr "Grundentschädigung"
+msgstr "Grundlohn"
 
-msgid "Surcharge"
-msgstr "Zuschlag"
+msgid "Weekend surcharge amount"
+msgstr "Wochenendzuschlag"
 
-msgid "Surcharge amount"
-msgstr "Zuschlagsbetrag"
+msgid "Urgent surcharge"
+msgstr "Zuschlag für Ausserordentlich dringend"
 
 msgid "Subtotal (work compensation)"
-msgstr "Zwisch.total"
+msgstr "Zwischentotal"
 
 msgid "Travel"
 msgstr "Wegentschädigung"
+
+msgid "from"
+msgstr "Von"
+
+msgid "to"
+msgstr "nach"
 
 msgid "Meal Allowance (6+ hours)"
 msgstr "Verpflegungsentschädigung (6+ Stunden)"
@@ -759,7 +783,7 @@ msgid "View translator"
 msgstr "Übersetzer/in anzeigen"
 
 msgid "Accept time report"
-msgstr "Zeiterfassung akzeptieren"
+msgstr "Zeiterfassung abschliessen"
 
 msgid "Accreditations"
 msgstr "Akkreditierungen"
@@ -853,8 +877,8 @@ msgstr ""
 msgid "Hello!"
 msgstr "Guten Tag!"
 
-msgid "Your time report has been accepted and approved for payment."
-msgstr "Ihre Zeiterfassung wurde akzeptiert und zur Zahlung freigegeben."
+msgid "Your assignment has been approved by the accounting department."
+msgstr "Ihr Einsatz wurde durch die Rechnungsführung freigegeben."
 
 msgid "Assignment Date:"
 msgstr "Einsatzdatum:"
@@ -871,6 +895,9 @@ msgstr "Eine neue Zeiterfassung wurde zur Überprüfung eingereicht."
 msgid "Translator:"
 msgstr "Dolmetscher/in:"
 
+msgid "Time:"
+msgstr "Zeit:"
+
 msgid "Time report edited"
 msgstr "Zeiterfassung bearbeitet"
 
@@ -882,12 +909,6 @@ msgstr "Zulassung verweigert."
 
 msgid "Proposed changes applied"
 msgstr "Vorgeschlagene Änderungen übernommen"
-
-msgid "Travel Compensation"
-msgstr "Wegpauschale"
-
-msgid "Base Compensation"
-msgstr "Grundentschädigung"
 
 msgid ""
 "No confirmed time reports available for export. Time reports must be "
@@ -1023,6 +1044,9 @@ msgstr "Zeiterfassung erfolgreich aktualisiert"
 msgid "Edit Time Report"
 msgstr "Zeiterfassung bearbeiten"
 
+msgid "Update Time Report"
+msgstr "Zeiterfassung aktualisieren"
+
 msgid "Time report not found"
 msgstr "Zeiterfassung nicht gefunden"
 
@@ -1100,6 +1124,9 @@ msgstr "Neue Zeiterfassung zur Überprüfung"
 msgid "Time report submitted for review"
 msgstr "Zeiterfassung zur Überprüfung eingereicht"
 
+msgid "Submit Time Report"
+msgstr "Zeiterfassung einreichen"
+
 msgid "This file does not seem to exist."
 msgstr "Diese Datei wurde nicht gefunden."
 
@@ -1120,8 +1147,8 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 msgid "Download"
 msgstr "Herunterladen"
 
-#~ msgid "View Time Report"
-#~ msgstr "Zeiterfassung anzeigen"
+#~ msgid "Urgent surcharge amount"
+#~ msgstr "Ausserordentlich dringend Zuschlag"
 
 #~ msgid "Assignment Details"
 #~ msgstr "Einsatzdetails"
@@ -1150,4 +1177,4 @@ msgstr "Herunterladen"
 #~ msgstr "Nachtarbeit (20:00 - 06:00)"
 
 #~ msgid "Weekend or holiday"
-#~ msgstr "Wochenende oder Feiertag"
+#~ msgstr "Wocheuende oder Feiertag"

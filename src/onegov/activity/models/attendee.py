@@ -19,6 +19,7 @@ from sqlalchemy import Numeric
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from sqlalchemy.orm import relationship, validates
+from translationstring import TranslationString
 from uuid import uuid4
 
 
@@ -62,6 +63,10 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'attendees'
 
+    # HACK: We don't want to set up translations in this module for this single
+    #       string, we know we already have a translation in a different domain
+    #       so we just manually specify it for now.
+    fts_type_title = TranslationString('Attendees', domain='onegov.feriennet')
     fts_properties = {
         'username': {'type': 'text', 'weight': 'A'},
         'name': {'type': 'text', 'weight': 'A'},

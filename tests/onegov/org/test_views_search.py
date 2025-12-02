@@ -57,6 +57,24 @@ def test_basic_search(client_with_fts: Client) -> None:
     assert client.get('/search/suggest?q=fulltext').json == []
 
 
+def test_malicious_search(client_with_fts: Client) -> None:
+    # ensures malicious queries don't result in a visible error
+
+    client = client_with_fts
+    client.login_admin()
+
+    add_news = client.get('/news').click('Nachricht')
+    add_news.form['title'] = "Foobar"
+    add_news.form['lead'] = "Foobar"
+    add_news.form.submit()
+
+    root_page = client.get('/')
+    root_page.form['q'] = '----------------------------------Foobar'
+    search_page = root_page.form.submit()
+
+    assert "0 Resultate" in search_page
+
+
 def test_view_search_is_limiting(client_with_fts: Client) -> None:
     # ensures that the search doesn't just return all results
     # a regression that occurred for anonymous uses only
@@ -210,6 +228,40 @@ def test_search_publication_files(client_with_fts: Client) -> None:
 
     assert 'Sample' in client.get('/search?q=Adobe')
     assert 'Sample' in client.spawn().get('/search?q=Adobe')
+
+
+def test_search_type_filter(client_with_fts: Client) -> None:
+    client = client_with_fts
+    client.login_editor()
+
+    people = client.get('/people')
+    new_person = people.click('Person')
+    new_person.form['first_name'] = 'Flash'
+    new_person.form['last_name'] = 'Gordon'
+    new_person.form.submit()
+
+    add_news = client.get('/news').click('Nachricht')
+    add_news.form['title'] = "Flash"
+    add_news.form['lead'] = "Newsflash"
+    add_news.form.submit()
+
+    add_news.form['title'] = "Foo"
+    add_news.form['lead'] = "Bar"
+    add_news.form.submit()
+
+    search = client.get('/search')
+    search.form['type'] = ['Personen']
+    search.form['q'] = 'Flash'
+    results = search.form.submit()
+    assert 'Gordon' in results
+    assert 'Newsflash' not in results
+    assert 'Foo' not in results
+
+    search.form['type'] = ['Aktuelles']
+    results = search.form.submit()
+    assert 'Gordon' not in results
+    assert 'Newsflash' in results
+    assert 'Foo' not in results
 
 
 def test_search_hashtags(client_with_fts: Client) -> None:

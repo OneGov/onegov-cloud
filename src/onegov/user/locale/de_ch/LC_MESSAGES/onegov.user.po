@@ -72,6 +72,14 @@ msgstr ""
 "Login fehlgeschlagen, da ihr Nutzer keine Gruppenzugehörigkeiten hat. "
 "Kontaktieren Sie ihren SAML2 System-Administrator"
 
+msgid "OpenID Connect"
+msgstr "OpenID Connect"
+
+msgid ""
+"Can't login because your user has no group. Contact your OpenID system "
+"administrator"
+msgstr "Login fehlgeschlagen, da der Nutzer keine Gruppen hat"
+
 #, python-format
 msgid "${mtan} - mTAN for ${organisation}."
 msgstr "${mtan} - mTAN für ${organisation}."
@@ -149,7 +157,8 @@ msgstr "30 Tage"
 msgid "Number of Signups"
 msgstr "Anzahl Anmeldungen"
 
-#~ msgid ""
-#~ "Can't login because user has no groups. Contact your AzureAD system "
-#~ "administrator"
-#~ msgstr "Login fehlgeschlagen, da der Nutzer keine Gruppen hat"
+msgid "Code"
+msgstr "Code"
+
+msgid "Users"
+msgstr "Benutzer"

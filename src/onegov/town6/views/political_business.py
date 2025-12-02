@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import func
+from sqlalchemy import func, exc
 from sqlalchemy.orm import joinedload
 from webob.exc import HTTPNotFound
 
@@ -91,6 +91,17 @@ def view_political_businesses(
 ) -> RenderData | Response:
     if not request.app.org.ris_enabled:
         raise HTTPNotFound()
+
+    try:
+        __ = self.subset_count
+    except exc.InternalError:
+        # NOTE: Probably a malicious search term that tried to burn CPU
+        #       cycles. Postgres guards against this and will throw an
+        #       exception. We just pretend everything is fine and we
+        #       get no results when that happens.
+        self.request.session.rollback()  # get back to a working state
+        self.__dict__['subset_count'] = 0
+        self.__dict__['batch'] = ()
 
     count_per_business_type = count_political_businesses_by_type(request)
     types = sorted((
@@ -276,5 +287,5 @@ def delete_political_business(
         PoliticalBusinessParticipation.political_business_id == self.id
     ).delete(synchronize_session=False)
 
-    collection = PoliticalBusinessCollection(request.session)
+    collection = PoliticalBusinessCollection(request)
     collection.delete(self)

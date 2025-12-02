@@ -6,7 +6,7 @@
         <p i18n:translate>Hello!</p>
         <p>
             <span i18n:translate>
-                Your time report has been accepted and approved for payment.
+                Your assignment has been approved by the accounting department.
             </span>
         </p>
 

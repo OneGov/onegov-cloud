@@ -15,6 +15,7 @@ from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import deferred, relationship
+from translationstring import TranslationString
 from uuid import uuid4
 
 
@@ -210,7 +211,10 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         Index('ix_ticket_payment_id', 'payment_id'),
     )
 
-    # limit the search to the ticket number -> the rest can be found
+    # HACK: We don't want to set up translations in this module for this single
+    #       string, we know we already have a translation in a different domain
+    #       so we just manually specify it for now.
+    fts_type_title = TranslationString('Tickets', domain='onegov.org')
     fts_public = False
     fts_properties = {
         'number': {'type': 'text', 'weight': 'A'},
@@ -226,6 +230,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     def fts_tags(self) -> list[str]:
         return list(self._tags.keys()) if self._tags else []
 
+    # limit the suggestions to the ticket number -> the rest can be found
     @property
     def fts_suggestion(self) -> list[str]:
         return [self.number]

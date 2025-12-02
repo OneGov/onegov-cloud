@@ -24,9 +24,12 @@ if TYPE_CHECKING:
     from onegov.org.models import Meeting
     from onegov.org.models import MeetingItem
     from onegov.org.models import PoliticalBusiness
+    from onegov.org.request import OrgRequest
 
 
 class MeetingForm(Form):
+    request: OrgRequest
+
     title = StringField(
         label=_('Title'),
         validators=[InputRequired()],
@@ -107,7 +110,7 @@ class MeetingForm(Form):
 
         meeting: Meeting = obj
         collection = MeetingItemCollection(self.request.session)
-        businesses = PoliticalBusinessCollection(self.request.session)
+        businesses = PoliticalBusinessCollection(self.request)
 
         # Somehow `meeting_items.data` is not set when the form is submitted,
         # so we use `meeting_items.raw_data[0]` instead.

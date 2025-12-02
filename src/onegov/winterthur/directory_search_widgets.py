@@ -10,6 +10,7 @@ from onegov.org.models.search import Search
 from onegov.search.search_index import SearchIndex
 from onegov.winterthur.app import WinterthurApp
 from sqlalchemy import func
+from sqlalchemy import exc
 from sqlalchemy.dialects.postgresql import array
 
 
@@ -73,12 +74,16 @@ class InlineDirectorySearch:
             (SearchIndex.owner_id_uuid == DirectoryEntry.id)
             & (DirectoryEntry.directory_id == self.directory.id)
         ).limit(100)  # TODO: We may be able to get rid of this limit
-        return tuple(
-            entry_id
-            for entry_id, in query.with_entities(
-                SearchIndex.owner_id_uuid
+        try:
+            return tuple(
+                entry_id
+                for entry_id, in query.with_entities(
+                    SearchIndex.owner_id_uuid
+                )
             )
-        )
+        except exc.InternalError:
+            self.request.session.rollback()
+            return ()
 
     def html(self, layout: DefaultLayout) -> Markup:
         return render_macro(layout.macros['inline_search'],

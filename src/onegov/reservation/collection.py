@@ -124,6 +124,9 @@ class ResourceCollection:
     def by_reservation(self, reservation: Reservation) -> Resource | None:
         return self.by_id(reservation.resource)
 
+    def ordered_by_type(self) -> Query[Resource]:
+        return self.query().order_by(Resource.type, Resource.title)
+
     def delete(
         self,
         resource: Resource,

@@ -29,6 +29,43 @@ form {
         &[type="checkbox"],
         &[type="radio"] {
             margin-bottom: .25rem;
+
+            &:checked + label .with-count::before {
+                background-color: $primary-color;
+                color: $white;
+            }
+
+            + label .with-count::before {
+                background-color: $secondary-color;
+                color: $body-font-color;
+                border: 0px solid #000;
+                border-radius: 1000px;
+                box-sizing: content-box;
+                content: attr(data-count);
+                display: inline-block;
+                font-size: .75rem;
+                line-height: 22px;
+                min-width: 4ex;
+                padding: 0 .5rem;
+                text-align: right;
+                margin-right: 1ex;
+            }
+        }
+    }
+
+    .two-columns ul {
+        -moz-column-count: 2;
+        -moz-column-gap: 2em;
+        -webkit-column-count: 2;
+        -webkit-column-gap: 2em;
+        column-count: 2;
+        column-gap: 2em;
+        max-width: calc(100% - 2em);
+        margin-left: 0;
+
+        li {
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
     }
 

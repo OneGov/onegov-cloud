@@ -43,6 +43,7 @@ class Meeting(
 
     __tablename__ = 'par_meetings'
 
+    fts_type_title = _('Meetings')
     fts_public = True
     fts_properties = {
         'title_text': {'type': 'text', 'weight': 'A'},
