@@ -1801,3 +1801,29 @@ def spawn_cronjob_thread_tween_factory(
         return handler(request)
 
     return spawn_cronjob_thread_tween
+
+
+@Framework.tween_factory(under=webassets_injector_tween)
+def cache_control_tween_factory(
+    app: Framework,
+    handler: Callable[[CoreRequest], Response]
+) -> Callable[[CoreRequest], Response]:
+
+    def set_cache_control_header_tween(request: CoreRequest) -> Response:
+        response = handler(request)
+        if (
+            (
+                # logged in as a user
+                request.is_logged_in
+                # logged in as a citizen
+                or getattr(request, 'authenticated_email', None)
+            )
+            # original headers take precedence
+            and 'Cache-Control' not in response.headers
+            # files have their own cache control handling
+            and '/storage/' not in request.path
+        ):
+            response.headers['Cache-Control'] = 'no-store'
+        return response
+
+    return set_cache_control_header_tween
