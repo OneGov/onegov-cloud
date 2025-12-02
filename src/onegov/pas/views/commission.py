@@ -229,16 +229,43 @@ def commissions_parliamentarians_json(
     self: PASCommissionCollection, request: TownRequest
 ) -> JSON_ro:
     """Returns all commissions with their parliamentarians."""
-    if (not request.is_admin
-        and (not hasattr(request.identity, 'role')
-             or request.identity.role != 'commission_president')):
-        return {}
+    # TODO: Should we consider all that have been active in
+    # current settlement run to be more precise?
+    # It might happen that some have been active just recently
+    # but not anymore, these will not be selectable currently.
+    if not request.is_admin:
+        if (not hasattr(request.identity, 'role')
+            or request.identity.role not in (
+                'parliamentarian', 'commission_president')):
+            return {}
 
     session = request.session
     memberships = session.query(PASCommissionMembership).all()
 
-    # If user is commission_president, filter to only their commissions
+    # If user is parliamentarian, filter to only their commissions
     if (hasattr(request.identity, 'role')
+        and request.identity.role == 'parliamentarian'):
+        user = session.query(User).filter_by(
+            username=request.identity.userid
+        ).first()
+
+        if not user or not user.parliamentarian:  # type: ignore[attr-defined]
+            return {}
+
+        # Get commission IDs where this parliamentarian is a member
+        parliamentarian_commission_ids = {
+            str(m.commission_id)
+            for m in user.parliamentarian.commission_memberships  # type: ignore[attr-defined]
+        }
+
+        # Filter memberships to only those commissions
+        valid_memberships = (
+            m for m in memberships
+            if m.parliamentarian
+            and str(m.commission_id) in parliamentarian_commission_ids
+        )
+    # If user is commission_president, filter to only their commissions
+    elif (hasattr(request.identity, 'role')
         and request.identity.role == 'commission_president'):
         user = session.query(User).filter_by(
             username=request.identity.userid
