@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-12-02 14:17+0100\n"
+"POT-Creation-Date: 2025-12-02 15:56+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1529,6 +1529,15 @@ msgstr "Filtra per data di prenotazione"
 
 msgid "To reservation date"
 msgstr "Alla data di prenotazione"
+
+msgid "Reference date"
+msgstr "Data di riferimento"
+
+msgid "Final reservation date"
+msgstr "Data di prenotazione finale"
+
+msgid "Any reservation date"
+msgstr "Qualsiasi data di prenotazione"
 
 msgid "Filter Payments"
 msgstr "Filtra pagamenti"
