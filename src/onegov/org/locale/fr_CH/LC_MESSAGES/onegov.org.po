@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-02 14:17+0100\n"
+"POT-Creation-Date: 2025-12-02 15:56+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1523,6 +1523,15 @@ msgstr "Filtrer par date de réservation"
 
 msgid "To reservation date"
 msgstr "À la date de réservation"
+
+msgid "Reference date"
+msgstr "Date de référence"
+
+msgid "Final reservation date"
+msgstr "Date de réservation finale"
+
+msgid "Any reservation date"
+msgstr "Toute date de réservation"
 
 msgid "Filter Payments"
 msgstr "Filtrer les paiements"

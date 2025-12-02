@@ -3,11 +3,11 @@ from __future__ import annotations
 from onegov.core.utils import normalize_for_url
 from onegov.form.core import Form
 from onegov.form.fields import ChosenSelectMultipleField, TranslatedSelectField
-from onegov.form.validators import StrictOptional
 from onegov.org import _
 from onegov.ticket import handlers as ticket_handlers
 from operator import itemgetter
-from wtforms import DateField
+from wtforms import DateField, RadioField
+from wtforms.validators import Optional
 
 
 from typing import TYPE_CHECKING
@@ -118,7 +118,7 @@ class TicketInvoiceSearchForm(Form):
         fieldset=_('Filter by Ticket Date'),
         description=_('Filters payments by the creation date of their '
                       'associated ticket.'),
-        validators=[StrictOptional()]
+        validators=[Optional()]
     )
 
     ticket_end_date = DateField(
@@ -126,19 +126,29 @@ class TicketInvoiceSearchForm(Form):
         fieldset=_('Filter by Ticket Date'),
         description=_('Filters payments by the creation date of their '
                       'associated ticket.'),
-        validators=[StrictOptional()]
+        validators=[Optional()]
     )
 
     reservation_start_date = DateField(
         label=_('From reservation date'),
         fieldset=_('Filter by Reservation Date'),
-        validators=[StrictOptional()]
+        validators=[Optional()]
     )
 
     reservation_end_date = DateField(
         label=_('To reservation date'),
         fieldset=_('Filter by Reservation Date'),
-        validators=[StrictOptional()]
+        validators=[Optional()]
+    )
+
+    reservation_reference_date = RadioField(
+        label=_('Reference date'),
+        choices=(
+            ('final', _('Final reservation date')),
+            ('any', _('Any reservation date')),
+        ),
+        fieldset=_('Filter by Reservation Date'),
+        default='final',
     )
 
     def on_request(self) -> None:
@@ -153,6 +163,7 @@ class TicketInvoiceSearchForm(Form):
         self.ticket_end_date.data = model.ticket_end
         self.reservation_start_date.data = model.reservation_start
         self.reservation_end_date.data = model.reservation_end
+        self.reservation_reference_date.data = model.reservation_reference_date
 
     def update_model(self, model: TicketInvoiceCollection) -> None:
         """Update the model's filter values from the form's data."""
@@ -163,6 +174,7 @@ class TicketInvoiceSearchForm(Form):
         model.ticket_end = self.ticket_end_date.data
         model.reservation_start = self.reservation_start_date.data
         model.reservation_end = self.reservation_end_date.data
+        model.reservation_reference_date = self.reservation_reference_date.data
         # Reset to the first page when filters change
         model.page = 0
 
@@ -205,7 +217,7 @@ class PaymentSearchForm(Form):
         fieldset=_('Filter by Ticket Date'),
         description=_('Filters payments by the creation date of their '
                       'associated ticket.'),
-                validators=[StrictOptional()]
+        validators=[Optional()]
     )
 
     ticket_end_date = DateField(
@@ -213,25 +225,37 @@ class PaymentSearchForm(Form):
         fieldset=_('Filter by Ticket Date'),
         description=_('Filters payments by the creation date of their '
                       'associated ticket.'),
-                validators=[StrictOptional()]
+        validators=[Optional()]
     )
 
     reservation_start_date = DateField(
         label=_('From reservation date'),
         fieldset=_('Filter by Reservation Date'),
-                validators=[StrictOptional()]
+        validators=[Optional()]
     )
 
     reservation_end_date = DateField(
         label=_('To reservation date'),
         fieldset=_('Filter by Reservation Date'),
-                validators=[StrictOptional()]
+        validators=[Optional()]
+    )
+
+    reservation_reference_date = RadioField(
+        label=_('Reference date'),
+        choices=(
+            ('final', _('Final reservation date')),
+            ('any', _('Any reservation date')),
+        ),
+        fieldset=_('Filter by Reservation Date'),
+        default='final',
+        validators=[Optional()]
     )
 
     def apply_model(self, model: PaymentCollection) -> None:
         """Populate the form fields from the model's filter values."""
         self.reservation_start_date.data = model.reservation_start
         self.reservation_end_date.data = model.reservation_end
+        self.reservation_reference_date.data = model.reservation_reference_date
         self.status.data = model.status or ''
         self.ticket_group.data = model.ticket_group or []
         self.ticket_start_date.data = model.ticket_start
@@ -242,6 +266,7 @@ class PaymentSearchForm(Form):
         """Update the model's filter values from the form's data."""
         model.reservation_start = self.reservation_start_date.data
         model.reservation_end = self.reservation_end_date.data
+        model.reservation_reference_date = self.reservation_reference_date.data
         model.status = self.status.data or None
         model.ticket_group = self.ticket_group.data or []
         model.ticket_start = self.ticket_start_date.data

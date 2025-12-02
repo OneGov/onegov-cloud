@@ -334,6 +334,7 @@ class TicketInvoiceCollection(
         ticket_end: date | None = None,
         reservation_start: date | None = None,
         reservation_end: date | None = None,
+        reservation_reference_date: Literal['final', 'any'] | None = None,
         has_payment: bool | None = None,
         invoiced: bool | None = None,
     ) -> None:
@@ -346,6 +347,7 @@ class TicketInvoiceCollection(
         self.ticket_end = ticket_end
         self.reservation_start = reservation_start
         self.reservation_end = reservation_end
+        self.reservation_reference_date = reservation_reference_date or 'final'
 
     @property
     def model_class(self) -> type[TicketInvoice]:
@@ -416,32 +418,37 @@ class TicketInvoiceCollection(
         if self.reservation_start or self.reservation_end:
             from onegov.reservation import Reservation
 
-            reservations = self.session.query(
-                func.max(Reservation.end).label('reference_date'),
-                Reservation.token,
-            ).group_by(
-                Reservation.token
-            ).subquery()
+            if self.reservation_reference_date == 'any':
+                subquery = self.session.query(Reservation.token)
+                token_col = Reservation.token
+                start_col = Reservation.start
+                end_col = Reservation.end
+            else:
+                reservations = self.session.query(
+                    func.max(Reservation.end).label('reference_date'),
+                    Reservation.token,
+                ).group_by(
+                    Reservation.token
+                ).subquery()
 
-            subquery = self.session.query(reservations.c.token)
+                subquery = self.session.query(reservations.c.token)
+                token_col = reservations.c.token
+                start_col = reservations.c.reference_date
+                end_col = reservations.c.reference_date
+
             subquery = subquery.filter(
-                reservations.c.token == cast(Ticket.handler_id, UUIDType)
+                token_col == cast(Ticket.handler_id, UUIDType)
             )
-
             if self.reservation_start is not None:
-                subquery = subquery.filter(
-                    reservations.c.reference_date >= self.align_date(
-                        self.reservation_start,
-                        'down'
-                    )
-                )
+                subquery = subquery.filter(start_col >= self.align_date(
+                    self.reservation_start,
+                    'down'
+                ))
             if self.reservation_end is not None:
-                subquery = subquery.filter(
-                    reservations.c.reference_date <= self.align_date(
-                        self.reservation_end,
-                        'up'
-                    )
-                )
+                subquery = subquery.filter(end_col <= self.align_date(
+                    self.reservation_end,
+                    'up'
+                ))
 
             query = query.filter(subquery.exists())
 
@@ -460,6 +467,7 @@ class TicketInvoiceCollection(
             ticket_end=self.ticket_end,
             reservation_start=self.reservation_start,
             reservation_end=self.reservation_end,
+            reservation_reference_date=self.reservation_reference_date,
             has_payment=self.has_payment,
             invoiced=self.invoiced
         )
@@ -498,6 +506,8 @@ class TicketInvoiceCollection(
             and self.ticket_end == other.ticket_end
             and self.reservation_start == other.reservation_start
             and self.reservation_end == other.reservation_end
+            and self.reservation_reference_date
+                == other.reservation_reference_date
         )
 
     def by_invoiced(self, invoiced: bool | None) -> Self:
@@ -509,6 +519,7 @@ class TicketInvoiceCollection(
             ticket_end=self.ticket_end,
             reservation_start=self.reservation_start,
             reservation_end=self.reservation_end,
+            reservation_reference_date=self.reservation_reference_date,
             has_payment=self.has_payment,
             invoiced=invoiced,
         )
