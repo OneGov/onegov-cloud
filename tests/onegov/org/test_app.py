@@ -73,3 +73,12 @@ def test_send_email(maildir: str) -> None:
     assert mail['ReplyTo'] == 'Gemeinde Govikon <info@govikon.ch>'
     assert mail['Subject'] == 'Test'
     assert mail['From'] == 'Gemeinde Govikon <mails@govikon.ch>'
+
+
+def test_cache_control_when_logged_in(client: Client[TestOrgApp]) -> None:
+    resp = client.get('/')
+    assert resp.headers.get('Cache-Control') != 'no-store'
+
+    client.login_admin()
+    resp = client.get('/')
+    assert resp.headers.get('Cache-Control') == 'no-store'
