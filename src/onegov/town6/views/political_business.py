@@ -238,7 +238,6 @@ def view_political_business(
         raise HTTPNotFound()
 
     layout = PoliticalBusinessLayout(self, request)
-    groups = [self.parliamentary_group] if self.parliamentary_group else []
 
     participations = self.participants
     participations.sort(key=lambda x: x.parliamentarian.title)
@@ -263,7 +262,7 @@ def view_political_business(
         'type_map': POLITICAL_BUSINESS_TYPE,
         'status_map': POLITICAL_BUSINESS_STATUS,
         'files': getattr(self, 'files', None),
-        'political_groups': groups,
+        'political_groups': self.parliamentary_groups,
     }
 
 

@@ -21,7 +21,7 @@ def test_political_businesses(client_with_fts: Client) -> None:
     settings.form['ris_enabled'] = True
     settings.form.submit()
 
-    # add parliamentary group first
+    # add parliamentary groups first
     groups = client.get('/parliamentary-groups')
     assert 'Noch keine Fraktionen erfasst' in groups
 
@@ -29,6 +29,11 @@ def test_political_businesses(client_with_fts: Client) -> None:
     page.form['name'] = 'Für ein schöneres Luzern'
     page = page.form.submit().follow()
     assert 'Für ein schöneres Luzern' in page
+
+    page = client.get('/parliamentary-groups/new')
+    page.form['name'] = 'Oberfraktion'
+    page = page.form.submit().follow()
+    assert 'Oberfraktion' in page
 
     # add parliamentarians
     new = client.get('/parliamentarians/new')
@@ -59,13 +64,12 @@ def test_political_businesses(client_with_fts: Client) -> None:
         page.form['political_business_type'] = 'inquiry'
         page.form['entry_date'] = '2025-10-02'
         page.form['status'] = 'pendent_legislative'
-        options = page.form['parliamentary_group_id'].options
-        id = next((opt[0] for opt in options if opt[2] ==
-                   'Für ein schöneres Luzern'))
-        page.form['parliamentary_group_id'] = id
+        options = page.form['parliamentary_groups'].options
+        page.form['parliamentary_groups'] = [o[0] for o in options]
         page = page.form.submit().follow()
         assert title in page
-        keywords = ['Geschäftsart', 'Anfrage', 'Status', 'Pendent Legislative',
+        keywords = ['Für ein schöneres Luzern', 'Oberfraktion',
+                    'Geschäftsart', 'Anfrage', 'Status', 'Pendent Legislative',
                     'Einreichungs-/Publikationsdatum', '02.10.2025']
         for keyword in keywords:
             assert keyword in page
@@ -110,10 +114,22 @@ def test_political_businesses(client_with_fts: Client) -> None:
     (client.get('/political-businesses')
      .click('ow many congressmen does it take to change a light bulb?')
      .click('Löschen'))
+    assert "Es wurden noch keine politischen Geschäfte erfasst" in client.get(
+        "/political-businesses"
+    )
 
     # delete parliamentarian
     client.get('/parliamentarians').click('Mann Bau').click('Löschen')
+    assert (
+        "Keine Filterergebnisse gefunden oder noch keine "
+        "Parlamentarier erfasst"
+        in client.get("/parliamentarians")
+    )
 
-    # delete parliamentary group
+    # delete parliamentary groups
     (client.get('/parliamentary-groups')
      .click('Für ein schöneres Luzern').click('Löschen'))
+    (client.get('/parliamentary-groups')
+     .click('Oberfraktion').click('Löschen'))
+    groups = client.get('/parliamentary-groups')
+    assert 'Noch keine Fraktionen erfasst' in groups
