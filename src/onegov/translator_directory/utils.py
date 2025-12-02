@@ -5,6 +5,7 @@ import json
 from babel import Locale
 from requests.exceptions import JSONDecodeError
 
+from onegov.translator_directory.constants import ASSIGNMENT_LOCATIONS
 from onegov.gis import Coordinates
 from onegov.gis.utils import MapboxRequests, outside_bbox
 from onegov.translator_directory import log
@@ -163,27 +164,11 @@ def calculate_distance_to_location(
     translator_coordinates: AnyCoordinates,
     location_key: str
 ) -> float | None:
-    """
-    Calculate driving distance from translator's coordinates to a specific
-    assignment location.
-
-    Args:
-        request: The request object with Mapbox token
-        translator_coordinates: The translator's geocoded coordinates
-        location_key: Key from ASSIGNMENT_LOCATIONS dict
-
-    Returns:
-        Distance in kilometers (one-way), or None if calculation fails
-    """
-    from onegov.translator_directory.constants import ASSIGNMENT_LOCATIONS
 
     if not translator_coordinates or location_key not in ASSIGNMENT_LOCATIONS:
         return None
 
-    # Get the address for this location
     _, address = ASSIGNMENT_LOCATIONS[location_key]
-
-    # Geocode the assignment location address
     geocoding_api = MapboxRequests(
         request.app.mapbox_token,
         endpoint='geocoding'
@@ -214,7 +199,8 @@ def calculate_distance_to_location(
 
         response = directions_api.directions([
             to_tuple(translator_coordinates),
-            (location_coords[0], location_coords[1])  # lon, lat
+            # lat, lon (GeoJSON returns [lon, lat])
+            (location_coords[1], location_coords[0])
         ])
 
         if found_route(response):
