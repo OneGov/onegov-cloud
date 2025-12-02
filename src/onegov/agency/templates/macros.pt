@@ -124,15 +124,15 @@
 
     <metal:person_card define-macro="person_card" i18n:domain="onegov.agency">
         <div class="person-card person-single-item" tal:define="memberships person.memberships_by_agency; exclude request.app.org.excluded_person_fields(request)">
-            <div class="row">
-                <div tal:condition="person.picture_url" class="columns medium-4">
+            <div class="grid-x grid-padding-x">
+                <div tal:condition="person.picture_url" class="cell medium-4">
                     <div aria-hidden="true" >
                         <div class="person-card-portrait">
                             <div class="cover-image" style='background-image: url("${person.picture_url}");'></div>
                         </div>
                     </div>
                 </div>
-                <div tal:define="size 8 if person.picture_url else 12" tal:attributes="class 'columns medium-{}'.format(size)">
+                <div tal:define="size 8 if person.picture_url else 12" tal:attributes="class 'cell medium-{}'.format(size)">
                     <dl>
                         <tal:block tal:condition="person.salutation and 'salutation' not in exclude">
                             <dt i18n:translate>Salutation</dt>

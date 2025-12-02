@@ -10,13 +10,13 @@
         <metal:hint use-macro="layout.macros['access_hint_long']" tal:define="item person"/>
         <metal:hint use-macro="layout.macros['publication_hint_long']" tal:define="item person"/>
 
-        <div class="row">
-            <div class="columns medium-8">
+        <div class="grid-x grid-padding-x">
+            <div class="cell medium-8">
 
                 <div metal:use-macro="layout.macros['person_card']" />
 
             </div>
-            <div class="columns medium-4">
+            <div class="cell medium-4">
 
                 <div class="borderless-side-panel" tal:condition="request.app.org.meta.report_changes|True">
                     <h2 i18n:translate>Changes</h2>

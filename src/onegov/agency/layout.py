@@ -14,12 +14,12 @@ from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.core.security import Private
-from onegov.org import _
-from onegov.org.layout import AdjacencyListLayout
-from onegov.org.layout import DefaultLayout
-from onegov.org.layout import PageLayout as OrgPageLayout
-from onegov.org.layout import PersonCollectionLayout
-from onegov.org.layout import PersonLayout as OrgPersonLayout
+from onegov.town6 import _
+from onegov.town6.layout import AdjacencyListLayout
+from onegov.town6.layout import DefaultLayout
+from onegov.town6.layout import PageLayout as TownPageLayout
+from onegov.town6.layout import PersonCollectionLayout
+from onegov.town6.layout import PersonLayout as TownPersonLayout
 
 
 from typing import Any
@@ -30,17 +30,17 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from onegov.agency.models import ExtendedAgency
     from onegov.agency.request import AgencyRequest
-    from onegov.org.elements import Trait
+    from onegov.core.elements import Trait
 
 
-class PageLayout(OrgPageLayout):
+class PageLayout(TownPageLayout):
 
     @cached_property
     def sidebar_links(self) -> None:  # type:ignore[override]
         return None
 
 
-class PersonLayout(OrgPersonLayout):
+class PersonLayout(TownPersonLayout):
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.has_model_permission(Private):

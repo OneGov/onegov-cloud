@@ -7,14 +7,14 @@
         <metal:hint use-macro="layout.macros['access_hint_long']" tal:define="item membership"/>
         <metal:hint use-macro="layout.macros['publication_hint_long']" tal:define="item membership"/>
 
-        <div class="row">
+        <div class="grid-x grid-padding-x">
 
-            <div class="columns medium-8">
+            <div class="cell medium-8">
 
                 <div metal:use-macro="layout.macros['membership_card']" />
 
             </div>
-            <div class="columns medium-4">
+            <div class="cell medium-4">
 
                 <div class="membership-exports borderless-side-panel">
                     <h2 i18n:translate>Exports</h2>
