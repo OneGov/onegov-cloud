@@ -8,6 +8,9 @@ from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections.commission_membership import (
     PASCommissionMembershipCollection
 )
+from onegov.pas.models import PASCommissionMembership
+from onegov.user import UserCollection
+from uuid import UUID
 from webtest import Upload
 
 
@@ -606,6 +609,58 @@ def test_fetch_commissions_parliamentarians_json(
     response2 = client.get('/commissions/commissions-parliamentarians-json')
     data2 = response2.json
     assert commission3_id not in data2
+
+    # Test commission_president role filtering
+    # Create a commission president for Commission A only
+    session = client.app.session()
+    parl_president = parliamentarians.add(
+        first_name='Alice',
+        last_name='President',
+        email_primary='alice.president@example.org'
+    )
+
+    # Add president to Commission A (using the ID we saved earlier)
+    president_membership = PASCommissionMembership(
+        parliamentarian_id=parl_president.id,
+        commission_id=UUID(commission1_id),
+        role='president'
+    )
+    session.add(president_membership)
+
+    # Create and configure user
+    users = UserCollection(session)
+    user = users.by_username('alice.president@example.org')
+    assert user is not None
+    user.role = 'commission_president'
+    user.password = 'test'
+
+    transaction.commit()
+
+    # Login as commission president
+    client.login('alice.president@example.org', 'test')
+
+    # Commission president should only see Commission A
+    # (where they're president)
+    response3 = client.get('/commissions/commissions-parliamentarians-json')
+    assert response3.status_code == 200
+    data3 = response3.json
+
+    # Should have Commission A (where they're president)
+    assert commission1_id in data3
+    # John, Jane, and Alice (the president)
+    assert len(data3[commission1_id]) == 3
+
+    # Verify Alice, John, and Jane are all present
+    parl_titles_in_commission_a = {p['title'] for p in data3[commission1_id]}
+    assert 'Alice President' in parl_titles_in_commission_a
+    assert parl1_title in parl_titles_in_commission_a
+    assert parl2_title in parl_titles_in_commission_a
+
+    # Should NOT have Commission B (where they're not president)
+    assert commission2_id not in data3
+
+    # Should NOT have empty Commission 3
+    assert commission3_id not in data3
 
 
 def test_commission_edit_with_dates(client: Client[TestPasApp]) -> None:

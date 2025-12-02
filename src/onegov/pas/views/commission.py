@@ -21,6 +21,7 @@ from onegov.pas.custom import check_attendance_in_closed_settlement_run
 from onegov.pas.models import Change
 from onegov.pas.models import PASCommission
 from onegov.pas.models import PASCommissionMembership
+from onegov.user import User
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -228,12 +229,40 @@ def commissions_parliamentarians_json(
     self: PASCommissionCollection, request: TownRequest
 ) -> JSON_ro:
     """Returns all commissions with their parliamentarians."""
-    if not request.is_admin:
+    if (not request.is_admin
+        and (not hasattr(request.identity, 'role')
+             or request.identity.role != 'commission_president')):
         return {}
+
     session = request.session
     memberships = session.query(PASCommissionMembership).all()
 
-    valid_memberships = (m for m in memberships if m.parliamentarian)
+    # If user is commission_president, filter to only their commissions
+    if (hasattr(request.identity, 'role')
+        and request.identity.role == 'commission_president'):
+        user = session.query(User).filter_by(
+            username=request.identity.userid
+        ).first()
+
+        if not user or not user.parliamentarian:  # type: ignore[attr-defined]
+            return {}
+
+        # Get commission IDs where this user is president
+        president_commission_ids = {
+            str(m.commission_id)
+            for m in user.parliamentarian.commission_memberships  # type: ignore[attr-defined]
+            if m.role == 'president'
+        }
+
+        # Filter memberships to only those commissions
+        valid_memberships = (
+            m for m in memberships
+            if m.parliamentarian
+            and str(m.commission_id) in president_commission_ids
+        )
+    else:
+        # Admin gets all commissions
+        valid_memberships = (m for m in memberships if m.parliamentarian)
 
     def key_func(m: PASCommissionMembership) -> str:
         return str(m.commission_id)
