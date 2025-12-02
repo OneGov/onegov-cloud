@@ -141,6 +141,9 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     #: the cost center / cost unit identifier for this resource
     cost_object: dict_property[str | None] = content_property()
 
+    #: extra field values to include in the occupancy view
+    occupancy_fields: dict_property[list[str]] = content_property(default=list)
+
     #: extra field values to include in the ical event description
     ical_fields: dict_property[list[str]] = content_property(default=list)
 
