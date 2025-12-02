@@ -1417,7 +1417,7 @@ def reject_reservation(
     if not request.headers.get('X-IC-Request'):
         if view_ticket is not None:
             return request.redirect(request.link(view_ticket))
-        return request.redirect(request.link(self))
+        return request.redirect(request.link(ticket))
     return None
 
 
