@@ -133,6 +133,70 @@ class FileSizeLimit:
             raise ValidationError(message)
 
 
+MIME_TYPES_PDF = {
+    'application/pdf',
+}
+
+# for now not allowed by default
+MIME_TYPES_JSON = {
+    'application/json',
+}
+
+MIME_TYPES_DOCUMENT = {
+    'application/msword',  # doc
+    'application/rtf',
+    *MIME_TYPES_PDF,
+    'application/vnd.ms-excel',  # xls
+    ('application/vnd.openxmlformats-officedocument.'
+     'presentationml.presentation'),  # pptx
+    ('application/vnd.openxmlformats-officedocument.'
+     'spreadsheetml.sheet'),  # xlsx
+    ('application/vnd.openxmlformats-officedocument.'
+     'wordprocessingml.document'),  # docx
+}
+
+MIME_TYPES_XML = {
+    'application/xml',
+}
+
+MIME_TYPES_ARCHIVE = {
+    'application/zip',
+}
+
+MIME_TYPES_TEXT_DATA = {
+    'text/csv',
+    'text/plain',
+}
+
+MIME_TYPES_IMAGE = {
+    'image/bmp',
+    'image/gif',
+    'image/jpeg',  # jpeg, jpg
+    'image/png',
+    'image/svg',
+    'image/svg+xml',
+    'image/tiff',
+    'image/webp',  # shall we allow it?
+    'image/x-ms-bmp',
+}
+
+MIME_TYPES_AUDIO = {
+    'audio/mp4',
+    'audio/mpeg',
+    'audio/wav',
+    'audio/webm',  # weba
+}
+
+MIME_TYPES_VIDEO = {
+    'video/mp4',
+    'video/mpeg',  # mpg, mpeg
+    'video/ogg',
+    'video/quicktime',  # mov
+    'video/webm',  # webm
+    'video/x-msvideo',  # avi
+}
+
+
 class WhitelistedMimeType:
     """ Makes sure an uploaded file is in a whitelist of allowed mimetypes.
 
@@ -141,52 +205,13 @@ class WhitelistedMimeType:
     """
 
     whitelist: Collection[str] = {
-        # documents
-        'application/msword',  # doc
-        'application/pdf',
-        'application/rtf',
-        'application/vnd.ms-excel',  # xls
-        ('application/vnd.openxmlformats-officedocument.'
-         'presentationml.presentation'),  # pptx
-        ('application/vnd.openxmlformats-officedocument.'
-         'spreadsheetml.sheet'),  # xlsx
-         ('application/vnd.openxmlformats-officedocument.'
-          'wordprocessingml.document'),  # docx
-
-        # xml
-        'application/xml',
-
-        # archives
-        'application/zip',
-
-        # text / data
-        'text/csv',
-        'text/plain',
-
-        # images
-        'image/bmp',
-        'image/gif',
-        'image/jpeg',  # jpeg, jpg
-        'image/png',
-        'image/svg',
-        'image/svg+xml',
-        'image/tiff',
-        'image/webp',  # shall we allow it?
-        'image/x-ms-bmp',
-
-        # audio
-        'audio/mp4',
-        'audio/mpeg',
-        'audio/wav',
-        'audio/webm',  # weba
-
-        # video
-        'video/mp4',
-        'video/mpeg',  # mpg, mpeg
-        'video/ogg',
-        'video/quicktime',  # mov
-        'video/webm',  # webm
-        'video/x-msvideo',  # avi
+        *MIME_TYPES_DOCUMENT,
+        *MIME_TYPES_XML,
+        *MIME_TYPES_ARCHIVE,
+        *MIME_TYPES_TEXT_DATA,
+        *MIME_TYPES_IMAGE,
+        *MIME_TYPES_AUDIO,
+        *MIME_TYPES_VIDEO,
     }
 
     message = _('Files of this type are not supported.')

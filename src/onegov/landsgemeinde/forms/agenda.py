@@ -19,7 +19,7 @@ from onegov.form.fields import TagsField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
-from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import FileSizeLimit, MIME_TYPES_PDF, MIME_TYPES_ARCHIVE
 from onegov.form.validators import WhitelistedMimeType
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.layouts import DefaultLayout
@@ -80,7 +80,7 @@ class AgendaItemForm(NamedFileForm):
         label=_('Excerpt from the Memorial (PDF)'),
         fieldset=_('Memorial'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
+            WhitelistedMimeType(MIME_TYPES_PDF),
             FileSizeLimit(100 * 1024 * 1024)
         ]
     )
@@ -226,7 +226,7 @@ class AgendaItemUploadForm(Form):
         label=_('Agenda Item ZIP'),
         fieldset=_('Import'),
         validators=[
-            WhitelistedMimeType({'application/zip'}),
+            WhitelistedMimeType(MIME_TYPES_ARCHIVE),
             FileSizeLimit(100 * 1024 * 1024)
         ]
     )

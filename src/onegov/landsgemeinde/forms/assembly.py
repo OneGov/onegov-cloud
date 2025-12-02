@@ -7,7 +7,7 @@ from onegov.form.fields import PanelField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
-from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import FileSizeLimit, MIME_TYPES_PDF, MIME_TYPES_AUDIO, MIME_TYPES_ARCHIVE
 from onegov.form.validators import WhitelistedMimeType
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.layouts import DefaultLayout
@@ -83,7 +83,7 @@ class AssemblyForm(NamedFileForm):
         label=_('Memorial part 1 (PDF)'),
         fieldset=_('Downloads'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
+            WhitelistedMimeType(MIME_TYPES_PDF),
             FileSizeLimit(100 * 1024 * 1024)
         ]
     )
@@ -92,7 +92,7 @@ class AssemblyForm(NamedFileForm):
         label=_('Memorial part 2 (PDF)'),
         fieldset=_('Downloads'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
+            WhitelistedMimeType(MIME_TYPES_PDF),
             FileSizeLimit(100 * 1024 * 1024)
         ]
     )
@@ -101,7 +101,7 @@ class AssemblyForm(NamedFileForm):
         label=_('Supplement to the memorial (PDF)'),
         fieldset=_('Downloads'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
+            WhitelistedMimeType(MIME_TYPES_PDF),
             FileSizeLimit(100 * 1024 * 1024)
         ]
     )
@@ -110,7 +110,7 @@ class AssemblyForm(NamedFileForm):
         label=_('Protocol (PDF)'),
         fieldset=_('Downloads'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
+            WhitelistedMimeType(MIME_TYPES_PDF),
             FileSizeLimit(100 * 1024 * 1024)
         ]
     )
@@ -119,7 +119,7 @@ class AssemblyForm(NamedFileForm):
         label=_('Audio (MP3)'),
         fieldset=_('Downloads'),
         validators=[
-            WhitelistedMimeType({'audio/mpeg'}),
+            WhitelistedMimeType(MIME_TYPES_AUDIO),
             FileSizeLimit(600 * 1024 * 1024)
         ]
     )
@@ -128,7 +128,7 @@ class AssemblyForm(NamedFileForm):
         label=_('Memorial as audio for the visually impaired and blind'),
         fieldset=_('Downloads'),
         validators=[
-            WhitelistedMimeType({'application/zip'}),
+            WhitelistedMimeType(MIME_TYPES_ARCHIVE),
             FileSizeLimit(600 * 1024 * 1024)
         ]
     )

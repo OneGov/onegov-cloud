@@ -16,7 +16,7 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField, HtmlField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import UploadField
-from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import FileSizeLimit, MIME_TYPES_IMAGE
 from onegov.form.validators import WhitelistedMimeType
 from onegov.gis import CoordinatesField
 from sqlalchemy import func
@@ -73,10 +73,7 @@ class ExtendedAgencyForm(Form):
     organigram = UploadField(
         label=_('Organigram'),
         validators=[
-            WhitelistedMimeType({
-                'image/jpeg',
-                'image/png',
-            }),
+            WhitelistedMimeType(MIME_TYPES_IMAGE),
             FileSizeLimit(1 * 1024 * 1024)
         ]
     )

@@ -6,7 +6,7 @@ from onegov.form.fields import PhoneNumberField
 from onegov.form.fields import TranslatedSelectField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
-from onegov.form.validators import ValidPhoneNumber
+from onegov.form.validators import ValidPhoneNumber, WhitelistedMimeType, MIME_TYPES_IMAGE
 from onegov.org import _
 from onegov.parliament.models.parliamentarian import GENDERS
 from wtforms.fields import DateField
@@ -49,6 +49,9 @@ class ParliamentarianForm(NamedFileForm):
     picture = UploadField(
         label=_('Picture'),
         fieldset=_('Basic properties'),
+        validators=[
+            WhitelistedMimeType(MIME_TYPES_IMAGE)
+        ]
     )
 
     party = StringField(
