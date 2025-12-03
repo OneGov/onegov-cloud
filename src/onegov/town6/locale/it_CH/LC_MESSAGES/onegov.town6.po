@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-10-16 11:34+0200\n"
+"POT-Creation-Date: 2025-12-03 10:18+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -428,6 +428,9 @@ msgstr "Proprietario:"
 
 msgid "Kind:"
 msgstr "Tipo:"
+
+msgid "Search"
+msgstr "Cerca"
 
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "The chat request got accepted."
@@ -2181,8 +2184,8 @@ msgstr "Data di invio/pubblicazione"
 msgid "Participants"
 msgstr "Autore / Partecipanti"
 
-msgid "Parliamentary Group"
-msgstr "Gruppo parlamentare"
+msgid "Parliamentary Group(s)"
+msgstr "Gruppo/i parlamentare/i"
 
 msgid "No political businesses defined yet."
 msgstr "Nessun affare politico ancora definito."
@@ -2345,9 +2348,6 @@ msgid ""
 msgstr ""
 "La ricerca non è attualmente disponibile a causa di difficoltà tecniche. Ci "
 "scusiamo dell'inconveniente, riprova più tardi."
-
-msgid "Search"
-msgstr "Cerca"
 
 msgid "Select the images that should be shown inside this album."
 msgstr ""
@@ -2520,6 +2520,12 @@ msgstr "Tempo di elaborazione"
 
 msgid "Related Tickets"
 msgstr "Biglietti correlati"
+
+msgid "Disable E-Mails for all related tickets"
+msgstr "Disabilita i messaggi e-mail per tutti i biglietti correlati"
+
+msgid "Enable E-Mails for all related tickets"
+msgstr "Abilita i messaggi e-mail per tutti i biglietti correlati"
 
 msgid "Summary"
 msgstr "Riepilogo"

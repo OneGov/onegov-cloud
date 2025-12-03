@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-02 15:56+0100\n"
+"POT-Creation-Date: 2025-12-03 10:17+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -5880,6 +5880,12 @@ msgstr "Schlagwort ändern"
 msgid "Related Tickets"
 msgstr "Verknüpfte Tickets"
 
+msgid "Disable E-Mails for all related tickets"
+msgstr "E-Mails für alle verknüpften Tickets deaktivieren"
+
+msgid "Enable E-Mails for all related tickets"
+msgstr "E-Mails für alle verknüpften Tickets aktivieren"
+
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
 "will become the author of the whole note."
@@ -7531,6 +7537,23 @@ msgstr "Sie haben E-Mails für das Ticket ${number} deaktiviert"
 #, python-format
 msgid "You have enabled e-mails for ticket ${number}"
 msgstr "Sie haben E-Mails für das Ticket ${number} aktiviert"
+
+#, python-format
+msgid "You have disabled e-mails for tickets ${numbers}"
+msgstr "Sie haben E-Mails für die Tickets ${numbers} deaktiviert"
+
+msgid "There were no related tickets to mute"
+msgstr ""
+"Es gab keine verknüpften Tickets für welche E-Mails deaktiviert werden "
+"konnten"
+
+#, python-format
+msgid "You have enabled e-mails for tickets ${numbers}"
+msgstr "Sie haben E-Mails für die Tickets ${numbers} aktiviert"
+
+msgid "There were no related tickets to unmute"
+msgstr ""
+"Es gab keine verknüpften Tickets für welche E-Mails aktiviert werden konnten"
 
 msgid "The ticket cannot be archived because it's not closed"
 msgstr "Das Ticket kann nicht archiviert werden, da es nicht geschlossen ist"
