@@ -2637,6 +2637,10 @@ def test_reserve_session_separation(client: Client) -> None:
     assert 'Verknüpfte Tickets' in ticket
     # we can create a multi-ticket pdf
     pdf = ticket.click('Mit verknüpften Tickets')
+    # we can mute all the related tickets
+    ticket = ticket.click(href='/mute-related').follow()
+    # and then unmute all the related tickets
+    ticket = ticket.click(href='/unmute-related').follow()
 
 
 def test_reserve_reservation_prediction(client: Client) -> None:

@@ -6465,6 +6465,68 @@ h2 + div.timeline {
         margin-top: -1px;
     }
 
+    a.mute {
+        color: #333;
+        display: inline-block;
+        text-align: center;
+        width: 1.2rem;
+
+        .fa-microphone-slash {
+            display: none;
+        }
+        .fa-microphone {
+            display: inline;
+        }
+
+        &:hover {
+            color: $red;
+
+            .fa-microphone-slash {
+                display: inline;
+            }
+            .fa-microphone {
+                display: none;
+            }
+        }
+    }
+
+    a.unmute {
+        color: $red;
+        display: inline-block;
+        text-align: center;
+        width: 1.2rem;
+
+        .fa-microphone-slash {
+            display: inline;
+        }
+        .fa-microphone {
+            display: none;
+        }
+
+        &:hover {
+            color: #333;
+
+            .fa-microphone-slash {
+                display: none;
+            }
+            .fa-microphone {
+                display: inline;
+            }
+
+            &.disabled {
+                color: $red;
+                cursor: disabled;
+
+                .fa-microphone-slash {
+                    display: inline;
+                }
+                .fa-microphone {
+                    display: none;
+                }
+            }
+        }
+    }
+
     .button {
         display: block;
         font-size: .875rem;
