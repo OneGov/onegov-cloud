@@ -16,7 +16,7 @@ from onegov.translator_directory.collections.translator import (
 from onegov.translator_directory import _
 from onegov.translator_directory.layout import DefaultLayout
 from onegov.user import Auth
-from onegov.user import UserCollection
+from onegov.user import UserCollection, UserGroupCollection
 
 
 from typing import TYPE_CHECKING
@@ -76,13 +76,18 @@ def get_global_tools(
                         attrs={'class': 'user'}
                     ),
                     Link(
+                        _('User groups'),
+                        request.class_link(UserGroupCollection),
+                        attrs={'class': 'users'},
+                    ),
+                    Link(
                         _('Time Reports'),
                         request.class_link(TimeReportCollection),
                         attrs={'class': 'time-reports'},
                     ),
                 ),
             )
-        elif request.is_editor:
+        elif request.is_accountant:
             yield LinkGroup(
                 _('Management'),
                 classes=('management',),

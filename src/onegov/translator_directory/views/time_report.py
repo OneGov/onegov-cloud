@@ -43,6 +43,9 @@ from onegov.translator_directory.constants import ASSIGNMENT_LOCATIONS
 from onegov.translator_directory.models.time_report import (
     TranslatorTimeReport,
 )
+from onegov.translator_directory.utils import (
+    get_accountant_emails_for_finanzstelle,
+)
 from onegov.org.models.message import TimeReportMessage
 from onegov.user import User
 from sqlalchemy import func
@@ -60,7 +63,7 @@ if TYPE_CHECKING:
 @TranslatorDirectoryApp.html(
     model=TimeReportCollection,
     template='time_reports.pt',
-    permission=Private,
+    permission=Personal,
 )
 def view_time_reports(
     self: TimeReportCollection,
@@ -436,7 +439,7 @@ def generate_accounting_export_rows(
 @TranslatorDirectoryApp.view(
     model=TimeReportCollection,
     name='export-accounting',
-    permission=Private,
+    permission=Personal,
     request_method='POST',
 )
 def export_accounting_csv(
@@ -890,18 +893,22 @@ def generate_time_report_pdf_bytes(
             </div>
     """
 
-    accountant_email = request.app.accountant_email
     accountant_name = ''
-    if (
-        accountant_email
-        and (
-            accountant_user := request.session.query(User)
-            .filter(func.lower(User.username) == accountant_email.lower())
-            .first()
+    try:
+        accountant_emails = get_accountant_emails_for_finanzstelle(
+            request, time_report.finanzstelle
         )
-        and accountant_user.realname
-    ):
-        accountant_name = accountant_user.realname
+        if accountant_emails:
+            first_email = next(iter(accountant_emails))
+            accountant_user = (
+                request.session.query(User)
+                .filter(func.lower(User.username) == first_email.lower())
+                .first()
+            )
+            if accountant_user and accountant_user.realname:
+                accountant_name = accountant_user.realname
+    except ValueError:
+        pass
 
     closing_text = 'Mit freundlichen Grüssen<br><br>Rechnungsbüro'
     if accountant_name:

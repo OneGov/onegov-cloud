@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import json
-
 from babel import Locale
 from requests.exceptions import JSONDecodeError
 
+from onegov.user import UserGroup, UserGroupCollection
 from onegov.translator_directory.constants import ASSIGNMENT_LOCATIONS
 from onegov.gis import Coordinates
 from onegov.gis.utils import MapboxRequests, outside_bbox
@@ -314,17 +314,34 @@ def get_custom_text(request: OrgRequest, key: str) -> str:
         key, _(f"Error: No custom text found for '{key}'"))
 
 
-def get_accountant_email(request: TranslatorAppRequest) -> str:
-    """Returns the accountant email or raises an error if not configured."""
-    email = request.app.accountant_email
-    if not email:
-        settings_url = request.link(request.app.org, 'directory-settings')
-        error_msg = request.translate(
-            _(
-                'Accountant email is not configured. '
-                'Please configure it in the settings: ${settings_url}',
-                mapping={'settings_url': settings_url},
+def get_accountant_emails_for_finanzstelle(
+    request: TranslatorAppRequest, finanzstelle_key: str | None
+) -> set[str]:
+    if not finanzstelle_key:
+        raise ValueError(_('No Finanzstelle specified'))
+
+    groups = (
+        request.session.query(UserGroup)
+        .filter(UserGroup.meta['finanzstelle'].astext == finanzstelle_key)
+        .all()
+    )
+
+    emails = set()
+    for group in groups:
+        emails.update(group.meta.get('accountant_emails', []))
+
+    if not emails:
+        raise ValueError(
+            request.translate(
+                _(
+                    'No accountant emails configured for Finanzstelle '
+                    '"${fs}". Please configure user groups: ${url}',
+                    mapping={
+                        'fs': finanzstelle_key,
+                        'url': request.class_link(UserGroupCollection),
+                    },
+                )
             )
         )
-        raise ValueError(error_msg)
-    return email
+
+    return emails

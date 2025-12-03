@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from typing import NamedTuple
 from typing import TypeAlias
 from onegov.translator_directory import _
 
@@ -164,8 +165,16 @@ TIME_REPORT_SURCHARGE_LABELS = {
 
 TRANSLATOR_FA_ICON = 'translator'
 
-# Tuple: (Display Name, Full Address)
 LocationMapping: TypeAlias = tuple[str, str]
+
+
+class Finanzstelle(NamedTuple):
+    name: str
+    street: str
+    zip_code: str
+    city: str
+    responsible: str
+
 
 ASSIGNMENT_LOCATIONS: dict[str, LocationMapping] = {
     'obergericht': ('Obergericht', 'Frauengasse 17, 8200 Schaffhausen'),
@@ -217,5 +226,50 @@ ASSIGNMENT_LOCATIONS: dict[str, LocationMapping] = {
     'spitaeler': (
         'Spitäler Schaffhausen Einvernahme Polizei',
         'Geissbergstrasse 81, 8208 Schaffhausen'
+    ),
+}
+
+FINANZSTELLE: dict[str, Finanzstelle] = {
+    'migrationsamt_und_passbuero': Finanzstelle(
+        name='Migrationsamt und Passbüro',
+        street='Mühlentalstrasse 105',
+        zip_code='8200',
+        city='Schaffhausen',
+        responsible='Pavlovic Sinisa',
+    ),
+    'staatsanwaltschaft': Finanzstelle(
+        name='Staatsanwaltschaft Allgemeine Abteilung',
+        street='Beckenstube 5',
+        zip_code='8200',
+        city='Schaffhausen',
+        responsible='Windels Tanja',
+    ),
+    'gefaengnisverwaltung': Finanzstelle(
+        name='Kantonales Gefängnis',
+        street='Beckenstube 5',
+        zip_code='8200',
+        city='Schaffhausen',
+        responsible='Trudel Astrid',
+    ),
+    'polizei': Finanzstelle(
+        name='Schaffhauser Polizei',
+        street='Beckenstube 1',
+        zip_code='8200',
+        city='Schaffhausen',
+        responsible='Mesonero Christina',
+    ),
+    'obergericht': Finanzstelle(
+        name='Obergericht',
+        street='Frauengasse 17',
+        zip_code='8200',
+        city='Schaffhausen',
+        responsible='vakant',
+    ),
+    'kantonsgericht': Finanzstelle(
+        name='Kantonsgericht',
+        street='Herrenacker 26',
+        zip_code='8200',
+        city='Schaffhausen',
+        responsible='vakant',
     ),
 }

@@ -286,3 +286,15 @@ def add_travel_distance_to_time_reports(context: UpgradeContext) -> None:
             'translator_time_reports',
             Column('travel_distance', Float(precision=2), nullable=True)
         )
+
+
+@upgrade_task('Add finanzstelle column to time reports')
+def add_finanzstelle_to_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if not context.has_column('translator_time_reports', 'finanzstelle'):
+        context.operations.add_column(
+            'translator_time_reports',
+            Column('finanzstelle', Text, nullable=True),
+        )
+

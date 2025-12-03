@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-02 17:09+0100\n"
+"POT-Creation-Date: 2025-12-03 15:34+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -114,6 +114,9 @@ msgstr "Verzeichniseinstellungen"
 
 msgid "Users"
 msgstr "Benutzer"
+
+msgid "User groups"
+msgstr "Benutzergruppen"
 
 msgid "Time Reports"
 msgstr "Zeiterfassungen"
@@ -542,6 +545,9 @@ msgstr "Art der Übersetzung/Dolmetschung"
 msgid "Assignment Location"
 msgstr "Einsatzort"
 
+msgid "Cost center"
+msgstr "Finanzstelle"
+
 msgid "Start date"
 msgstr "Startdatum"
 
@@ -637,6 +643,22 @@ msgstr "Mitglied"
 
 msgid "Translator"
 msgstr "Übersetzer/in"
+
+msgid "Cost Center (Finanzstelle)"
+msgstr "Finanzstelle"
+
+msgid "Select the cost center this user group is responsible for"
+msgstr "Wählen Sie die Finanzstelle für diese Benutzergruppe aus"
+
+msgid "Accountant Users"
+msgstr "Rechnungsführer:innen"
+
+msgid ""
+"Select users who are accountants for this cost center. Their emails will be "
+"used for notifications."
+msgstr ""
+"Wählen Sie Rechnungsführer:innen für diese Kostenstelle aus. Ihre E-Mail-"
+"Adressen werden für Benachrichtigungen verwendet."
 
 msgid "Add"
 msgstr "Hinzufügen"
@@ -964,6 +986,17 @@ msgstr ""
 "E-Mail Rechnungsführer:in ist noch nicht konfiguriert. Bitte fügen sie eine "
 "E-Mail hinzu: ${settings_url}"
 
+msgid "No Finanzstelle specified"
+msgstr "Keine Finanzstelle"
+
+#, python-format
+msgid ""
+"No accountant emails configured for Finanzstelle \"${fs}\". Please configure "
+"user groups: ${url}"
+msgstr ""
+"Keine Buchhaltungs-E-Mails für Finanzstelle \"${fs}\" konfiguriert. Bitte "
+"Benutzergruppen konfigurieren: ${url}"
+
 msgid "Your ticket has been opened"
 msgstr "Ihr Ticket wurde eröffnet"
 
@@ -1152,6 +1185,9 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 
 msgid "Download"
 msgstr "Herunterladen"
+
+#~ msgid "Accountant Emails"
+#~ msgstr "Rechnungsführer"
 
 #~ msgid "Urgent surcharge amount"
 #~ msgstr "Ausserordentlich dringend Zuschlag"

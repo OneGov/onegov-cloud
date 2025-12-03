@@ -318,6 +318,14 @@ class TimeReportHandler(Handler):
             ]
         )
 
+        if report.finanzstelle:
+            summary_parts.extend(
+                [
+                    f"<dt>{request.translate(_('Finanzstelle'))}</dt>",
+                    f'<dd>{escape(report.finanzstelle)}</dd>',
+                ]
+            )
+
         if report.case_number:
             summary_parts.extend(
                 [

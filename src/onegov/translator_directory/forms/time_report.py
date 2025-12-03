@@ -10,6 +10,7 @@ from onegov.translator_directory.utils import (
     calculate_distance_to_location
 )
 from onegov.translator_directory.constants import (
+    FINANZSTELLE,
     HOURLY_RATE_CERTIFIED,
     HOURLY_RATE_UNCERTIFIED,
     TIME_REPORT_INTERPRETING_TYPES
@@ -49,6 +50,13 @@ class TranslatorTimeReportForm(Form):
         choices=[],  # will be set in on_request
         validators=[InputRequired()],
         depends_on=('assignment_type', 'on-site'),
+    )
+
+    finanzstelle = ChosenSelectField(
+        label=_('Cost center'),
+        choices=[],
+        validators=[InputRequired()],
+        default='polizei',
     )
 
     start_date = DateField(
@@ -126,12 +134,26 @@ class TranslatorTimeReportForm(Form):
         self.assignment_location.choices = [
             (key, name) for key, (name, _) in ASSIGNMENT_LOCATIONS.items()
         ]
+        self.finanzstelle.choices = [
+            (key, fs.name) for key, fs in FINANZSTELLE.items()
+        ]
 
     def get_hourly_rate(self, translator: Translator) -> Decimal:
         """Determine hourly rate based on translator certification."""
         if translator.admission == 'certified':
             return HOURLY_RATE_CERTIFIED
         return HOURLY_RATE_UNCERTIFIED
+
+    def get_datetime_range(self) -> tuple[datetime, datetime]:
+        """Get start and end datetime with proper types."""
+        assert self.start_date.data is not None
+        assert self.start_time.data is not None
+        assert self.end_date.data is not None
+        assert self.end_time.data is not None
+
+        start_dt = datetime.combine(self.start_date.data, self.start_time.data)
+        end_dt = datetime.combine(self.end_date.data, self.end_time.data)
+        return start_dt, end_dt
 
     def get_duration_hours(self) -> Decimal:
         """Calculate duration in hours from start/end times, rounded.
@@ -358,6 +380,9 @@ class TranslatorTimeReportForm(Form):
                     obj, 'assignment_location', None
                 )
 
+            if hasattr(obj, 'finanzstelle'):
+                self.finanzstelle.data = getattr(obj, 'finanzstelle', None)
+
     def get_surcharge_types(self) -> list[str]:
         """Get list of active surcharge types from form based on actual
         hours."""
@@ -445,6 +470,7 @@ class TranslatorTimeReportForm(Form):
 
         model.assignment_type = self.assignment_type.data or None
         model.assignment_location = self.assignment_location.data or None
+        model.finanzstelle = self.finanzstelle.data or None
 
         duration_hours = self.get_duration_hours()
         model.duration = int(float(duration_hours) * 60)

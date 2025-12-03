@@ -61,6 +61,11 @@ class TranslatorTimeReport(Base, TimestampMixin):
         comment='Key of selected assignment location for on-site work'
     )
 
+    finanzstelle: Column[str | None] = Column(
+        Text,
+        nullable=False,
+    )
+
     #: The duration in minutes (total work time excluding breaks)
     duration: Column[int] = Column(Integer, nullable=False)
 
