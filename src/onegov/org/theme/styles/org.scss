@@ -2894,6 +2894,20 @@ $archive-ticket-icon: '\f1c6';
     margin-right: 1ex;
 }
 
+.FRM-option label::before { @include icon($frm-handler-icon); }
+.RSV-option label::before { @include icon($rsv-handler-icon); }
+.EVN-option label::before { @include icon($evn-handler-icon); }
+.DIR-option label::before { @include icon($dir-handler-icon); }
+
+.ALL-option label::before,
+.FRM-option label::before,
+.RSV-option label::before,
+.EVN-option label::before,
+.DIR-option label::before {
+    display: inline-block;
+    margin-right: 1ex;
+}
+
 .ticket-handler-FRM td:first-child::before {
     @include icon($frm-handler-icon);
 }

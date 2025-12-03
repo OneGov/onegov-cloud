@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from itertools import chain
 from onegov.core.utils import normalize_for_url
 from onegov.form.core import Form
-from onegov.form.fields import ChosenSelectMultipleField, TranslatedSelectField
+from onegov.form.fields import TranslatedSelectField, TreeSelectMultipleField
 from onegov.org import _
+from onegov.reservation import Resource
 from onegov.ticket import handlers as ticket_handlers
 from operator import itemgetter
 from wtforms import DateField, RadioField
@@ -12,10 +14,10 @@ from wtforms.validators import Optional
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.request import CoreRequest
+    from onegov.form.fields import TreeSelectNode
     from onegov.pay import PaymentCollection
+    from onegov.org.request import OrgRequest
     from onegov.ticket import TicketCollection, TicketInvoiceCollection
-    from wtforms.fields.choices import _Choice
 
 
 def coerce_optional_bool(choice: str | bool | None) -> bool | None:
@@ -30,7 +32,7 @@ def coerce_optional_bool(choice: str | bool | None) -> bool | None:
     return choice
 
 
-def get_ticket_group_choices(request: CoreRequest) -> list[_Choice]:
+def get_ticket_group_choices(request: OrgRequest) -> list[TreeSelectNode]:
     tickets: TicketCollection | None
     # NOTE: This is a little bit expensive, but since we don't use the
     #       same ticket collection class in every application this is
@@ -53,33 +55,125 @@ def get_ticket_group_choices(request: CoreRequest) -> list[_Choice]:
 
     handlers.sort(key=itemgetter(1))
 
-    choices: list[_Choice] = []
+    choices: list[TreeSelectNode] = []
 
     for handler_code, title in handlers:
         handler_groups = groups[handler_code]
         handler_groups.sort(key=normalize_for_url)
 
-        choices.append((
-            handler_code,
-            title,
-            {
-                'class': f'{handler_code}-link'
-                f'{" is-parent" if handler_groups else ""}'
-            }
-        ))
-        choices.extend(
-            (
-                f'{handler_code}-{group}',
-                group,
-                {'class': f'{handler_code}-sub-link ticket-group-filter'}
+        if handler_code == 'RSV':
+            # for RSV we group by resource group/subgroup
+            resources = request.app.libres_resources
+            resource_groups: dict[str, dict[str, list[str]]] = {}
+            default_group = request.translate(_('General'))
+            for item_title, group, subgroup in resources.query().with_entities(
+                Resource.title,
+                Resource.group,
+                Resource.subgroup
+            ):
+                resource_groups.setdefault(
+                    group or default_group,
+                    {}
+                ).setdefault(subgroup or '', []).append(item_title)
+                if item_title in handler_groups:
+                    handler_groups.remove(item_title)
+
+            children: list[TreeSelectNode] = [
+                {
+                    # expands to leaf values
+                    'value': '{}--{}:$:{}'.format(
+                        handler_code, group,
+                        ':$:'.join(
+                            f'{handler_code}-{item_name}'
+                            for subitems in items.values()
+                            for item_name in subitems
+                        )
+                    ),
+                    'name': group,
+                    'children': list(chain(
+                        (
+                            {
+                                # expands to leaf values
+                                'value': '{}--{}--{}:$:{}'.format(
+                                    handler_code,
+                                    group,
+                                    subgroup,
+                                    ':$:'.join(
+                                        f'{handler_code}-{item_name}'
+                                        for item_name in subitems
+                                    )
+                                ),
+                                'name': subgroup,
+                                'children': [
+                                    {
+                                        'value': f'{handler_code}-{item_name}',
+                                        'name': item_name,
+                                        'children': [],
+                                    }
+                                    for item_name in sorted(
+                                        subitems,
+                                        key=normalize_for_url
+                                    )
+                                ]
+                            }
+                            for subgroup, subitems in sorted(
+                                items.items(),
+                                key=lambda item: normalize_for_url(item[0])
+                            )
+                            if subgroup
+                        ),
+                        (
+                            {
+                                'value': f'{handler_code}-{item_name}',
+                                'name': item_name,
+                                'children': [],
+                            }
+                            for item_name in sorted(
+                                items.get('', ()),
+                                key=normalize_for_url
+                            )
+                        )
+                    ))
+                }
+                for group, items in sorted(
+                    resource_groups.items(),
+                    key=lambda item: normalize_for_url(item[0])
+                )
+            ]
+            children.extend(
+                {
+                    'value': f'{handler_code}-{group}',
+                    'name': group,
+                    'children': [],
+                }
+                for group in handler_groups
             )
-            for group in handler_groups
-        )
+
+        else:
+            children = [
+                {
+                    'value': f'{handler_code}-{group}',
+                    'name': group,
+                    'children': [],
+                }
+                for group in handler_groups
+            ]
+
+        choices.append({
+            'value': handler_code,
+            'name': title,
+            'htmlAttr': {
+                'class': f'{handler_code}-option'
+            },
+            'children': children
+        })
 
     return choices
 
 
 class TicketInvoiceSearchForm(Form):
+
+    request: OrgRequest
 
     css_class = 'resettable'
 
@@ -107,7 +201,7 @@ class TicketInvoiceSearchForm(Form):
         default=None,
     )
 
-    ticket_group = ChosenSelectMultipleField(
+    ticket_group = TreeSelectMultipleField(
         label=_('Ticket category'),
         fieldset=_('Filter Invoices'),
         choices=[],
@@ -152,7 +246,7 @@ class TicketInvoiceSearchForm(Form):
     )
 
     def on_request(self) -> None:
-        self.ticket_group.choices = get_ticket_group_choices(self.request)
+        self.ticket_group.set_choices(get_ticket_group_choices(self.request))
 
     def apply_model(self, model: TicketInvoiceCollection) -> None:
         """Populate the form fields from the model's filter values."""
@@ -181,6 +275,8 @@ class TicketInvoiceSearchForm(Form):
 
 class PaymentSearchForm(Form):
 
+    request: OrgRequest
+
     css_class = 'resettable'
 
     status = TranslatedSelectField(
@@ -206,7 +302,7 @@ class PaymentSearchForm(Form):
         default='',
     )
 
-    ticket_group = ChosenSelectMultipleField(
+    ticket_group = TreeSelectMultipleField(
         label=_('Ticket category'),
         fieldset=_('Filter Payments'),
         choices=[],
@@ -276,4 +372,4 @@ class PaymentSearchForm(Form):
         model.page = 0
 
     def on_request(self) -> None:
-        self.ticket_group.choices = get_ticket_group_choices(self.request)
+        self.ticket_group.set_choices(get_ticket_group_choices(self.request))
