@@ -81,20 +81,28 @@ def get_ticket_group_choices(request: OrgRequest) -> list[TreeSelectNode]:
             children: list[TreeSelectNode] = [
                 {
                     # expands to leaf values
-                    'value': '{}:$:{}'.format(group, ':$:'.join(
-                        f'{handler_code}-{item_name}'
-                        for subitems in items.values()
-                        for item_name in subitems
-                    )),
+                    'value': '{}--{}:$:{}'.format(
+                        handler_code, group,
+                        ':$:'.join(
+                            f'{handler_code}-{item_name}'
+                            for subitems in items.values()
+                            for item_name in subitems
+                        )
+                    ),
                     'name': group,
                     'children': list(chain(
                         (
                             {
                                 # expands to leaf values
-                                'value': '{}:$:{}'.format(subgroup, ':$:'.join(
-                                    f'{handler_code}-{item_name}'
-                                    for item_name in subitems
-                                )),
+                                'value': '{}--{}--{}:$:{}'.format(
+                                    handler_code,
+                                    group,
+                                    subgroup,
+                                    ':$:'.join(
+                                        f'{handler_code}-{item_name}'
+                                        for item_name in subitems
+                                    )
+                                ),
                                 'name': subgroup,
                                 'children': [
                                     {
