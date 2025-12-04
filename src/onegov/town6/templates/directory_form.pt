@@ -47,11 +47,11 @@
                 </li>
             </ul>
 
-            <div class="button primary" onclick="$('#confirm-migration form').submit();" i18n:translate>
+            <div class="button primary" data-submits-form="#confirm-migration form" i18n:translate>
                 Confirm
             </div>
 
-            <div class="button secondary" onclick="if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;" i18n:translate>
+            <div class="button secondary" data-back-link i18n:translate>
                 Cancel
             </div>
         </tal:b>
