@@ -59,7 +59,7 @@ var processCommonNodes = function(elements, out_of_band) {
 
     // submitting a targetted form based on the specified selector
     targets.find('.button[data-submits-form]').on('click', function() {
-        $($(this).data('submit-target')).submit();
+        $($(this).data('submits-form')).submit();
     });
 
     // Make sure files open in another window
