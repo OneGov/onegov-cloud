@@ -62,6 +62,11 @@ var processCommonNodes = function(elements, out_of_band) {
         $($(this).data('submits-form')).submit();
     });
 
+    // open the browser's printing dialogue
+    targets.find('[data-print-current-page]').on('click', function() {
+        window.print();
+    });
+
     // Make sure files open in another window
     targets.find('.page-text a[href*="/datei/"]').attr('target', '_blank');
 

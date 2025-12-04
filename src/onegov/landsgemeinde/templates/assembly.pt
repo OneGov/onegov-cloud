@@ -7,7 +7,7 @@
         <div class="grid-x grid-padding-x wrapper">
             <div class="medium-6 cell main-content content page-text">
                 <div class="print-button">
-                    <i onclick="window.print()" class="fa fa-print" aria-hidden="true"></i>
+                    <i class="fa fa-print" data-print-current-page aria-hidden="true"></i>
                 </div>
                 <div class="videowrapper" tal:condition="assembly.video_url">
                     <iframe allow="fullscreen" frameborder="0" src="${assembly.video_url}"></iframe>
