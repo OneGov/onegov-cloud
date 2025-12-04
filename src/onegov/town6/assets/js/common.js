@@ -11,6 +11,18 @@ var setupRedirectAfter = function(elements) {
     });
 };
 
+// qr code modals
+var addModalImage = function(parent, rawData, fmt) {
+    var src = 'data:image/' + fmt + ';base64,' + rawData;
+    parent.append($(`<img class="qr" src="${src}">`));
+};
+
+var addModalDownload = function(parent, rawData, fmt) {
+    var src = 'data:image/' + fmt + ';base64,' + rawData;
+    var title = window.document.title;
+    parent.append($(`<a class="button qr" download="qrcode_${title}.${fmt}" href="${src}">Download</a>`));
+};
+
 // sets up the given nodes with the functionality provided by common.js
 // this is done at document.ready and can be repeated for out of band content
 var processCommonNodes = function(elements, out_of_band) {
@@ -18,6 +30,37 @@ var processCommonNodes = function(elements, out_of_band) {
 
     // intercooler redirects
     setupRedirectAfter(targets.find('a'));
+
+    // auto resize some iframes
+    targets.find('iframe.resizeable').on('load', function() {
+        this.height = this.contentWindow.document.body.scrollHeight + 'px';
+        this.width = this.contentWindow.document.body.scrollWidth + 'px';
+    });
+
+    // back links
+    targets.find('a[data-back-link]').on('click', function() {
+        if (document.referrer) {
+            window.open(document.referrer, '_self');
+        } else {
+            history.go(-1);
+        }
+        return false;
+    });
+
+    // auto-submitting select dropdowns
+    targets.find('select[data-auto-submit]').on('change', function() {
+        this.form.submit();
+    });
+
+    // auto-redirecting select dropdowns
+    targets.find('select[data-auto-redirect]').on('change', function() {
+        window.location = this.value;
+    });
+
+    // submitting a targetted form based on the specified selector
+    targets.find('.button[data-submits-form]').on('click', function() {
+        $($(this).data('submit-target')).submit();
+    });
 
     // Make sure files open in another window
     targets.find('.page-text a[href*="/datei/"]').attr('target', '_blank');
@@ -46,6 +89,61 @@ var processCommonNodes = function(elements, out_of_band) {
         }
 
         return false;
+    });
+
+    // QR-Code modal links
+    targets.find('.qr-code-link').each(function() {
+        var el = $(this);
+        var imageParentID = el.data('image-parent');
+        var imageParent = $(`#${imageParentID}`);
+        var payload = el.data('payload') || window.location.href;
+        var endpoint = el.data('endpoint');
+        var fmt = 'png';
+
+        el.on('click', function() {
+            if (imageParent.find('img.qr').length) {
+                return;
+            }
+            $.ajax({
+                type: "GET",
+                contentType: "image/" + fmt,
+                url: `${endpoint}?encoding=base64&image_fmt=${fmt}&border=2&box_size=8&payload=${payload}`,
+                statusCode: {
+                    // eslint-disable-next-line quote-props
+                    200: function(resp) {
+                        addModalImage(imageParent, resp, fmt);
+                        addModalDownload(imageParent, resp, fmt);
+                    }
+                }
+            }).fail(function(jqXHR) {
+                // eslint-disable-next-line no-console
+                console.error(jqXHR.statusMessage);
+            });
+        });
+    });
+
+    // Disable scroll on elements which wish it disabled
+    targets.find('.disable-scroll').on('mouseover', function() {
+        var el = $(this);
+        var height = el.height();
+        var scrollHeight = el.get(0).scrollHeight;
+
+        $(this).on('mousewheel', function(event) {
+            var block = this.scrollTop === scrollHeight - height && event.deltaY < 0 || this.scrollTop === 0 && event.deltaY > 0;
+            return !block;
+        });
+    });
+
+    targets.find('.disable-scroll').on('mouseout', function() {
+        $(this).off('mousewheel');
+    });
+
+    // Toggle the selected state in image selection views when clicking the checkbox
+    targets.find('.image-select input[type="checkbox"]').on('click', function(e) {
+        var target = $(e.target);
+        var checked = target.is(':checked');
+
+        target.closest('.image-box').toggleClass('selected', checked);
     });
 };
 
@@ -93,7 +191,7 @@ var tagexpr = new RegExp('(^|[^a-zA-Z0-9/])(#[0-9a-zA-Zöäüéèà]{3,})', 'gi'
 
 var highlightTags = function(target) {
     $(target).find(tagselectors.join(',')).each(function() {
-        this.innerHTML = this.innerHTML.replace(tagexpr, function(fullMatch, beforeChar, hashtag) {
+        this.innerHTML = this.innerHTML.replace(tagexpr, function(_fullMatch, beforeChar, hashtag) {
             // `beforeChar` captures the character before the hashtag
             // `hashtag` captures the hashtag itself
 
@@ -106,30 +204,6 @@ highlightTags('#content');
 
 $(document).on('process-common-nodes', function(_e, elements) {
     highlightTags(elements);
-});
-
-// Disable scroll on elements which wish it disabled
-$('.disable-scroll').on('mouseover', function() {
-    var el = $(this);
-    var height = el.height();
-    var scrollHeight = el.get(0).scrollHeight;
-
-    $(this).on('mousewheel', function(event) {
-        var block = this.scrollTop === scrollHeight - height && event.deltaY < 0 || this.scrollTop === 0 && event.deltaY > 0;
-        return !block;
-    });
-});
-
-$('.disable-scroll').on('mouseout', function() {
-    $(this).off('mousewheel');
-});
-
-// Toggle the selected state in image selection views when clicking the checkbox
-$('.image-select input[type="checkbox"]').on('click', function(e) {
-    var target = $(e.target);
-    var checked = target.is(':checked');
-
-    target.closest('.image-container').toggleClass('selected', checked);
 });
 
 // A generic error messages handler
@@ -215,20 +289,6 @@ $(document).ready(function() {
     });
 });
 
-function autoResize() {
-    var newheight;
-    var newwidth;
-    var frame;
-
-    for (frame of document.getElementsByClassName('resizeable')) {
-        newheight = frame.contentWindow.document.body.scrollHeight;
-        newwidth = frame.contentWindow.document.body.scrollWidth;
-        frame.height = (newheight) + "px";
-        frame.width = (newwidth) + "px";
-    }
-
-}
-
 // Customize the sidebar. We need click events to browse to links with children
 $(document).ready(function() {
     $('[data-click-target]').each(function() {
@@ -237,44 +297,6 @@ $(document).ready(function() {
             var parent = el.parent();
             parent.off('click');
             window.location = el.data('click-target');
-        });
-    });
-});
-
-// qr code modals
-function addModalImage(parent, rawData, fmt) {
-    var src = 'data:image/' + fmt + ';base64,' + rawData;
-    parent.append($(`<img class="qr" src="${src}">`));
-}
-
-function addModalDownload(parent, rawData, fmt) {
-    var src = 'data:image/' + fmt + ';base64,' + rawData;
-    var title = window.document.title;
-    parent.append($(`<a class="button qr" download="qrcode_${title}.${fmt}" href="${src}">Download</a>`));
-}
-
-$('.qr-code-link').each(function() {
-    var el = $(this);
-    var imageParentID = el.data('image-parent');
-    var imageParent = $(`#${imageParentID}`);
-    var payload = el.data('payload') || window.location.href;
-    var endpoint = el.data('endpoint');
-    var fmt = 'png';
-
-    el.on('click', function() {
-        if (imageParent.find('img.qr').length) { return; }
-        $.ajax({
-            type: "GET",
-            contentType: "image/" + fmt,
-            url: `${endpoint}?encoding=base64&image_fmt=${fmt}&border=2&box_size=8&payload=${payload}`,
-            statusCode: {
-                200: function(resp) {
-                    addModalImage(imageParent, resp, fmt);
-                    addModalDownload(imageParent, resp, fmt);
-                }
-            }
-        }).fail(function(_jqXHR) {
-            // console.log(_jqXHR.statusMessage);
         });
     });
 });
@@ -299,9 +321,9 @@ $('.reveal[data-reveal-width]').on('open.zf.reveal', function() {
 // Page edit form style adjustments
 [...document.getElementsByClassName('indent-form-field')].forEach((formField) => {
     if (formField instanceof HTMLInputElement && formField.type === 'text') {
-       formField.style.width = '90%';
+        formField.style.width = '90%';
     }
-    let divWrapper = formField.parentElement.parentElement;
+    var divWrapper = formField.parentElement.parentElement;
     divWrapper.style.marginLeft = '1.55rem';
 });
 
@@ -311,27 +333,22 @@ var header_height = $('#header').height();
 
 if ($('.header-image .page-image').length) {
     var page_image = $('.header-image .page-image');
+    var new_height;
     if (w.matches) {
-            var new_height = '60vw';
+        new_height = '60vw';
     } else {
-            var new_height = 'calc(80vh - ' + header_height + 'px)';
+        new_height = 'calc(80vh - ' + header_height + 'px)';
     }
     page_image.css('padding-bottom', new_height);
 }
 
-$('a[data-back-link]').on('click', function(e) {
-    if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;
-});
-
-
 // if there are headings in the content and if there is a .sidebar-wrapper, add a div with the class "side-panel" to the sidebar and add the headings to it
 var level = $('.side-panel.content-panel').data('toc-level');
-console.log('level', level);
 
 if (level !== 'none' && $('.sidebar-wrapper').length) {
     // Create heading selector based on level
     var headingSelector;
-    switch(level) {
+    switch (level) {
         case 'h5':
             headingSelector = 'h1, h2, h3, h4, h5';
             break;
@@ -356,8 +373,7 @@ if (level !== 'none' && $('.sidebar-wrapper').length) {
         var list = $('<ul class="more-list"></ul>');
 
         headings.each(function() {
-            var heading = this;
-            if (heading.textContent === '') {
+            if (this.textContent === '') {
                 return; // skip empty headings
             }
             var id = this.textContent;
@@ -370,13 +386,13 @@ if (level !== 'none' && $('.sidebar-wrapper').length) {
 
             if (id) {
                 var link = $('<a class="anchor-link" href="#' + id + '"><i class="fa fa-link"></i></a>');
-                $(heading).append(link);
+                $(this).append(link);
                 var anchor = $('<a class="category-anchor"></a>');
                 anchor.attr('id', id);
-                $(heading).prepend(anchor);
-                $(heading).addClass('anchor-link-heading');
-                var headingLevel = parseInt(heading.tagName.charAt(1), 10);
-                var listItem = $('<li><a class="list-link level-' + headingLevel + '" href="#' + id + '">' + heading.textContent + '</a></li>');
+                $(this).prepend(anchor);
+                $(this).addClass('anchor-link-heading');
+                var headingLevel = parseInt(this.tagName.charAt(1), 10);
+                var listItem = $('<li><a class="list-link level-' + headingLevel + '" href="#' + id + '">' + this.textContent + '</a></li>');
                 list.append(listItem);
             }
         });
@@ -388,7 +404,6 @@ if (level !== 'none' && $('.sidebar-wrapper').length) {
 $('.is-accordion-submenu-parent a span').on('click', function(e) {
     e.stopPropagation();
 });
-
 
 $('.main-content table, .page-content-main table').each(function() {
     if ($(this).width() > $('.main-content').width() || $(this).width() > $('.page-content-main').width()) {
@@ -407,7 +422,9 @@ function setupScrollGradient() {
         const $table = $(this);
         const $gradient = $table.siblings('.scroll-gradient');
 
-        if ($gradient.length === 0) return;
+        if ($gradient.length === 0) {
+            return;
+        }
 
         function updateGradient() {
             const scrollWidth = $table[0].scrollWidth;
@@ -430,3 +447,11 @@ function setupScrollGradient() {
 }
 
 setupScrollGradient();
+
+// Add a 'framed' class to the body if a document is shown inside an iframe
+$('body').each(function() {
+    var params = new URLSearchParams(window.location.search);
+    if (window !== window.parent || params.get('framed') === 'true') {
+        this.className += " framed";
+    }
+});

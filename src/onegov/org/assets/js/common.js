@@ -17,6 +17,18 @@ var initFoundation = function() {
     });
 };
 
+// qr code modals
+var addModalImage = function(parent, rawData, fmt) {
+    var src = 'data:image/' + fmt + ';base64,' + rawData;
+    parent.append($(`<img class="qr" src="${src}">`));
+};
+
+var addModalDownload = function(parent, rawData, fmt) {
+    var src = 'data:image/' + fmt + ';base64,' + rawData;
+    var title = window.document.title;
+    parent.append($(`<a class="button qr" download="qrcode_${title}.${fmt}" href="${src}">Download</a>`));
+};
+
 // sets up the given nodes with the functionality provided by common.js
 // this is done at document.ready and can be repeated for out of band content
 var processCommonNodes = function(elements, out_of_band) {
@@ -35,6 +47,37 @@ var processCommonNodes = function(elements, out_of_band) {
 
     // initialise zurb foundation (only works on the document level)
     initFoundation();
+
+    // auto resize some iframes
+    targets.find('iframe.resizeable').on('load', function() {
+        this.height = this.contentWindow.document.body.scrollHeight + 'px';
+        this.width = this.contentWindow.document.body.scrollWidth + 'px';
+    });
+
+    // back links
+    targets.find('a[data-back-link]').on('click', function() {
+        if (document.referrer) {
+            window.open(document.referrer, '_self');
+        } else {
+            history.go(-1);
+        }
+        return false;
+    });
+
+    // auto-submitting select dropdowns
+    targets.find('select[data-auto-submit]').on('change', function() {
+        this.form.submit();
+    });
+
+    // auto-redirecting select dropdowns
+    targets.find('select[data-auto-redirect]').on('change', function() {
+        window.location = this.value;
+    });
+
+    // submitting a targetted form based on the specified selector
+    targets.find('.button[data-submits-form]').on('click', function() {
+        $($(this).data('submit-target')).submit();
+    });
 
     // Make sure files open in another window
     targets.find('.page-text a[href*="/datei/"]').attr('target', '_blank');
@@ -63,6 +106,61 @@ var processCommonNodes = function(elements, out_of_band) {
         }
 
         return false;
+    });
+
+    // QR-Code modal links
+    targets.find('.qr-code-link').each(function() {
+        var el = $(this);
+        var imageParentID = el.data('image-parent');
+        var imageParent = $(`#${imageParentID}`);
+        var payload = el.data('payload') || window.location.href;
+        var endpoint = el.data('endpoint');
+        var fmt = 'png';
+
+        el.on('click', function() {
+            if (imageParent.find('img.qr').length) {
+                return;
+            }
+            $.ajax({
+                type: "GET",
+                contentType: "image/" + fmt,
+                url: `${endpoint}?encoding=base64&image_fmt=${fmt}&border=2&box_size=8&payload=${payload}`,
+                statusCode: {
+                    // eslint-disable-next-line quote-props
+                    200: function(resp) {
+                        addModalImage(imageParent, resp, fmt);
+                        addModalDownload(imageParent, resp, fmt);
+                    }
+                }
+            }).fail(function(jqXHR) {
+                // eslint-disable-next-line no-console
+                console.error(jqXHR.statusMessage);
+            });
+        });
+    });
+
+    // Disable scroll on elements which wish it disabled
+    targets.find('.disable-scroll').on('mouseover', function() {
+        var el = $(this);
+        var height = el.height();
+        var scrollHeight = el.get(0).scrollHeight;
+
+        $(this).on('mousewheel', function(event) {
+            var block = this.scrollTop === scrollHeight - height && event.deltaY < 0 || this.scrollTop === 0 && event.deltaY > 0;
+            return !block;
+        });
+    });
+
+    targets.find('.disable-scroll').on('mouseout', function() {
+        $(this).off('mousewheel');
+    });
+
+    // Toggle the selected state in image selection views when clicking the checkbox
+    targets.find('.image-select input[type="checkbox"]').on('click', function(e) {
+        var target = $(e.target);
+        var checked = target.is(':checked');
+
+        target.closest('.image-box').toggleClass('selected', checked);
     });
 };
 
@@ -109,7 +207,7 @@ var tagexpr = new RegExp('(^|[^a-zA-Z0-9/])(#[0-9a-zA-Zöäüéèà]{3,})', 'gi'
 
 var highlightTags = function(target) {
     $(target).find(tagselectors.join(',')).each(function() {
-        this.innerHTML = this.innerHTML.replace(tagexpr, function(fullMatch, beforeChar, hashtag) {
+        this.innerHTML = this.innerHTML.replace(tagexpr, function(_fullMatch, beforeChar, hashtag) {
             // `beforeChar` captures the character before the hashtag
             // `hashtag` captures the hashtag itself
 
@@ -122,30 +220,6 @@ highlightTags('#content');
 
 $(document).on('process-common-nodes', function(_e, elements) {
     highlightTags(elements);
-});
-
-// Disable scroll on elements which wish it disabled
-$('.disable-scroll').on('mouseover', function() {
-    var el = $(this);
-    var height = el.height();
-    var scrollHeight = el.get(0).scrollHeight;
-
-    $(this).on('mousewheel', function(event) {
-        var block = this.scrollTop === scrollHeight - height && event.deltaY < 0 || this.scrollTop === 0 && event.deltaY > 0;
-        return !block;
-    });
-});
-
-$('.disable-scroll').on('mouseout', function() {
-    $(this).off('mousewheel');
-});
-
-// Toggle the selected state in image selection views when clicking the checkbox
-$('.image-select input[type="checkbox"]').on('click', function(e) {
-    var target = $(e.target);
-    var checked = target.is(':checked');
-
-    target.closest('.image-box').toggleClass('selected', checked);
 });
 
 // A generic error messages handler
@@ -239,77 +313,28 @@ $(document).ready(function() {
     });
 });
 
-
-function autoResize() {
-    var newheight;
-    var newwidth;
-    var frame;
-
-    for (frame of document.getElementsByClassName('resizeable')) {
-        newheight = frame.contentWindow.document.body.scrollHeight;
-        newwidth = frame.contentWindow.document.body.scrollWidth;
-        frame.height = (newheight) + "px";
-        frame.width = (newwidth) + "px";
-    }
-
-}
-
 // expandible people panel
 $('.side-panel .expand-people a').on('click', function(e) {
-    e.preventDefault()
-    $(e.target).parent().parent().children().filter('.hideable').toggleClass('hidden')
+    e.preventDefault();
+    $(e.target).parent().parent().children().filter('.hideable').toggleClass('hidden');
 });
-
-// qr code modals
-function addModalImage(parent, rawData, fmt) {
-    var src = 'data:image/' + fmt +';base64,' + rawData;
-    parent.append($(`<img class="qr" src="${src}">`));
-}
-
-function addModalDownload(parent, rawData, fmt) {
-    var src = 'data:image/' + fmt +';base64,' + rawData;
-    var title = window.document.title;
-    parent.append($(`<a class="button qr" download="qrcode_${title}.${fmt}" href="${src}">Download</a>`));
-}
-
-$('.qr-code-link').each(function () {
-    var el = $(this);
-    var imageParentID = el.data('image-parent');
-    var imageParent = $(`#${imageParentID}`);
-    var payload = el.data('payload') || window.location.href;
-    var endpoint = el.data('endpoint');
-    var fmt = 'png';
-
-    el.on('click', function () {
-        if (imageParent.find('img.qr').length) return
-        $.ajax({
-            type: "GET",
-            contentType: "image/" + fmt,
-            url: `${endpoint}?encoding=base64&image_fmt=${fmt}&border=2&box_size=8&payload=${payload}`,
-            statusCode : {
-                200: function (resp) {
-                    addModalImage(imageParent, resp, fmt);
-                    addModalDownload(imageParent, resp, fmt);
-                }
-            }
-        }).fail(function(jqXHR) {
-            console.log(jqXHR.statusMessage);
-        })
-    })
-})
 
 var page_refs = new ClipboardJS('.pageref');
 page_refs.on('success', function(e) {
     // var success_msg = e.trigger.getAttribute('data-on-success');
-    var msgContainer = $('#clipboard-copy')
+    var msgContainer = $('#clipboard-copy');
     msgContainer.toggleClass('hidden');
     setTimeout(
-        function () { msgContainer.toggleClass('hidden'); },
+        function() { msgContainer.toggleClass('hidden'); },
         1500
-    )
+    );
     e.clearSelection();
 });
 
-$('a[data-back-link]').on('click', function(e) {
-    if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;
+// Add a 'framed' class to the body if a document is shown inside an iframe
+$('body').each(function() {
+    var params = new URLSearchParams(window.location.search);
+    if (window !== window.parent || params.get('framed') === 'true') {
+        this.className += " framed";
+    }
 });
