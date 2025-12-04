@@ -79,7 +79,7 @@ def create_file(
 
 def test_upload_field() -> None:
     def create_field(
-        validators: Validators[FormT, Self] | None = None
+        validators: Validators[FormT, Self] | None = None  # type:ignore[misc]
     ) -> tuple[Form, UploadField]:
         form = Form()
         field = UploadField(validators=validators)
@@ -280,7 +280,7 @@ def test_upload_field() -> None:
 
 def test_upload_multiple_field() -> None:
     def create_field(
-        validators: Validators[FormT, Self] | None = None
+        validators: Validators[FormT, Self] | None = None  # type:ignore[misc]
     ) -> tuple[Form, UploadMultipleField]:
         form = Form()
         field = UploadMultipleField(validators=validators)
