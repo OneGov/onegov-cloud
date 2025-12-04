@@ -38,7 +38,7 @@ var processCommonNodes = function(elements, out_of_band) {
     });
 
     // back links
-    targets.find('a[data-back-link]').on('click', function() {
+    targets.find('a[data-back-link], .button[data-back-link]').on('click', function() {
         if (document.referrer) {
             window.open(document.referrer, '_self');
         } else {
