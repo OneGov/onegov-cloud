@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-12-03 10:17+0100\n"
+"POT-Creation-Date: 2025-12-04 09:50+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -395,6 +395,27 @@ msgstr "Nei giorni festivi"
 msgid "During school holidays"
 msgstr "Durante le vacanze scolastiche"
 
+msgid "Price"
+msgstr "Prezzo"
+
+msgid "Inherit from resource"
+msgstr "Eredita dalla risorsa"
+
+msgid "Free of charge"
+msgstr "Gratuito"
+
+msgid "Per item"
+msgstr "Per elemento"
+
+msgid "Per hour"
+msgstr "Per ora"
+
+msgid "Price per item"
+msgstr "Prezzo per elemento"
+
+msgid "Price per hour"
+msgstr "Tariffa oraria"
+
 msgid "Public"
 msgstr "Pubblico"
 
@@ -647,12 +668,6 @@ msgstr "Nuovi elementi"
 
 msgid "Guideline"
 msgstr "Linee guida"
-
-msgid "Price"
-msgstr "Prezzo"
-
-msgid "Free of charge"
-msgstr "Gratuito"
 
 msgid "Price per submission"
 msgstr "Prezzo per iscrizione"
@@ -1821,18 +1836,6 @@ msgid ""
 msgstr ""
 "Verrà indicato nelle fatture per eventuali costi direttamente associati alle "
 "prenotazioni su questa risorsa."
-
-msgid "Per item"
-msgstr "Per elemento"
-
-msgid "Per hour"
-msgstr "Per ora"
-
-msgid "Price per item"
-msgstr "Prezzo per elemento"
-
-msgid "Price per hour"
-msgstr "Tariffa oraria"
 
 msgid "Prices in extra fields are"
 msgstr "I prezzi nei campi extra sono"

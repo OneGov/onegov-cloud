@@ -292,6 +292,10 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         items: list[InvoiceItemMeta] = []
         extras_quantity = Decimal('0')
         for reservation in reservations:
+            # FIXME: We could speed this up by loading all of the
+            #        targeted allocations ahead of time and passing
+            #        the correct allocation here. Right now there's
+            #        a N+1 situation for loading target allocations.
             item = reservation.invoice_item(self)
             if item is not None:
                 items.append(item)

@@ -3370,6 +3370,108 @@ def test_manual_reservation_payment_without_extra(client: Client) -> None:
 
 
 @freeze_time("2017-07-09", tick=True)
+def test_manual_reservation_payment_allocation_override(
+    client: Client
+) -> None:
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.pricing_method = 'per_hour'
+    resource.price_per_hour = 10.00
+    resource.payment_method = 'manual'
+
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    allocations_inherit = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9, 10),
+            datetime(2017, 7, 9, 12)
+        )
+    )
+    allocations_free = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9, 12),
+            datetime(2017, 7, 9, 14)
+        ),
+        data={'pricing_method': 'free'}
+    )
+    allocations_per_item = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9, 14),
+            datetime(2017, 7, 9, 16)
+        ),
+        data={
+            'pricing_method': 'per_item',
+            'price_per_item': 23.00,
+            'currency': 'CHF'
+        }
+    )
+    allocations_per_hour = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9, 16),
+            datetime(2017, 7, 9, 18)
+        ),
+        data={
+            'pricing_method': 'per_hour',
+            'price_per_hour': 12.00,
+            'currency': 'CHF'
+        }
+    )
+
+    reserve_inherit = client.bound_reserve(allocations_inherit[0])
+    reserve_free = client.bound_reserve(allocations_free[0])
+    reserve_per_item = client.bound_reserve(allocations_per_item[0])
+    reserve_per_hour = client.bound_reserve(allocations_per_hour[0])
+    transaction.commit()
+
+    # create a reservation of each type
+    reserve_inherit()
+    reserve_free()
+    reserve_per_item()
+    reserve_per_hour()
+
+    page = client.get('/resource/tageskarte/form')
+    page.form['email'] = 'info@example.org'
+    assert '20.00' in page.form.submit().follow()
+    assert '24.00' in page.form.submit().follow()
+    assert '23.00' in page.form.submit().follow()
+    assert '67.00' in page.form.submit().follow()
+
+    ticket = page.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket.text
+
+    # mark it as paid
+    client.login_editor()
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    client.post(page.pyquery('.mark-as-paid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Bezahlt"
+
+    client.post(page.pyquery('.mark-as-unpaid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    payments = client.get('/payments')
+    assert "RSV-" in payments
+    assert "Manuell" in payments
+    assert "info@example.org" in payments
+    assert "67.00" in payments
+    assert "Offen" in payments
+
+    invoices = client.get('/invoices')
+    assert "RSV-" in invoices
+    assert "info@example.org" in invoices
+    assert "67.00" in invoices
+    assert "Unbezahlt" in invoices
+    assert "Unfakturiert" in invoices
+
+
+@freeze_time("2017-07-09", tick=True)
 def test_manual_reservation_payment_with_discount(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
