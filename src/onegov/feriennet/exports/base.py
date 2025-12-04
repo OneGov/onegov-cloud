@@ -209,6 +209,8 @@ class FeriennetExport(Export):
         yield _('User Beneficiary'), user_data.get('bank_beneficiary', '')
         yield _('User Status E-Mail'), FREQUENCIES.get(status_email, '')
         yield _('User TOS Accepted'), user_data.get('tos_accepted', False)
+        yield _('User Allow contact for carpooling'), user_data.get(
+            'show_contact_data_to_others', False)
 
     def invoice_item_fields(
         self,
