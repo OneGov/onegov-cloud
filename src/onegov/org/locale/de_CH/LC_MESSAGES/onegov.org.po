@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-03 10:17+0100\n"
+"POT-Creation-Date: 2025-12-04 09:50+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -394,6 +394,27 @@ msgstr "An Feiertagen"
 msgid "During school holidays"
 msgstr "Während Schulferien"
 
+msgid "Price"
+msgstr "Preis"
+
+msgid "Inherit from resource"
+msgstr "Von der Reservations-Ressource übernehmen"
+
+msgid "Free of charge"
+msgstr "Kostenlos"
+
+msgid "Per item"
+msgstr "Pro Eintrag"
+
+msgid "Per hour"
+msgstr "Pro Stunde"
+
+msgid "Price per item"
+msgstr "Preis pro Eintrag"
+
+msgid "Price per hour"
+msgstr "Preis pro Stunde"
+
 msgid "Public"
 msgstr "Öffentlich"
 
@@ -645,12 +666,6 @@ msgstr "Neue Einträge"
 
 msgid "Guideline"
 msgstr "Wegleitung"
-
-msgid "Price"
-msgstr "Preis"
-
-msgid "Free of charge"
-msgstr "Kostenlos"
 
 msgid "Price per submission"
 msgstr "Preis pro Eingabe"
@@ -1814,18 +1829,6 @@ msgid ""
 msgstr ""
 "Wird bei allen Rechnugnspositionen angezeigt, die direkt mit der Reservation "
 "von diesem Objekt im Zusammenhang stehen."
-
-msgid "Per item"
-msgstr "Pro Eintrag"
-
-msgid "Per hour"
-msgstr "Pro Stunde"
-
-msgid "Price per item"
-msgstr "Preis pro Eintrag"
-
-msgid "Price per hour"
-msgstr "Preis pro Stunde"
 
 msgid "Prices in extra fields are"
 msgstr "Preise in Extra-Felder gelten"
