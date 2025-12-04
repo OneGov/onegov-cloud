@@ -485,7 +485,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             description=description,
             widget=upload_widget,
             render_kw=render_kw,
-            validators=validators,
+            validators=validators,  # type:ignore[arg-type]
             **extra_arguments
         )
         super().__init__(

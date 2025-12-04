@@ -19,8 +19,12 @@ from onegov.form.fields import TagsField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
-from onegov.form.validators import FileSizeLimit, MIME_TYPES_PDF, MIME_TYPES_ARCHIVE
-from onegov.form.validators import WhitelistedMimeType
+from onegov.form.validators import (
+    FileSizeLimit,
+    MIME_TYPES_PDF,
+    MIME_TYPES_ARCHIVE,
+    WhitelistedMimeType
+)
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import AgendaItem, LandsgemeindeFile

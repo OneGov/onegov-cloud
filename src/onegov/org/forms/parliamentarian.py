@@ -6,7 +6,11 @@ from onegov.form.fields import PhoneNumberField
 from onegov.form.fields import TranslatedSelectField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
-from onegov.form.validators import ValidPhoneNumber, WhitelistedMimeType, MIME_TYPES_IMAGE
+from onegov.form.validators import (
+    MIME_TYPES_IMAGE,
+    ValidPhoneNumber,
+    WhitelistedMimeType
+)
 from onegov.org import _
 from onegov.parliament.models.parliamentarian import GENDERS
 from wtforms.fields import DateField
