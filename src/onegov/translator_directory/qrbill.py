@@ -65,7 +65,7 @@ def generate_translator_qr_bill(
     # TODO: Move to organization settings
     debtor = {
         'name': 'Zentrale Polizeistation',
-        'street': 'Beckstube 1',
+        'street': 'Beckenstube 1',
         'pcode': '8200',
         'city': 'Schaffhausen',
     }

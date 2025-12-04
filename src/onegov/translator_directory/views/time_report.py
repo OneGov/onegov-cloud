@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import csv
 import json
+from onegov.translator_directory.i18n import _
 from io import StringIO
 from webob import Response
 from datetime import datetime
@@ -20,7 +21,7 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
 )
 
 from onegov.core.security import Private, Personal
-from onegov.translator_directory import TranslatorDirectoryApp, _
+from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.org.mail import send_ticket_mail
 from onegov.translator_directory.collections.time_report import (
     TimeReportCollection,
@@ -261,6 +262,23 @@ def accept_time_report(
             content_type='application/pdf',
         )
 
+        travel_info = None
+        if (time_report.assignment_location
+                and time_report.travel_distance):
+            location_name, _address = ASSIGNMENT_LOCATIONS.get(
+                time_report.assignment_location,
+                (time_report.assignment_location, '')
+            )
+            translator_address = (
+                f'{translator.address}, '
+                f'{translator.zip_code} {translator.city}'
+            )
+            travel_info = {
+                'from_address': translator_address,
+                'to_location': location_name,
+                'distance': time_report.travel_distance
+            }
+
         send_ticket_mail(
             request=request,
             template='mail_time_report_accepted.pt',
@@ -272,6 +290,7 @@ def accept_time_report(
                 'translator': translator,
                 'time_report': time_report,
                 'call_to_action_link': call_to_action_link,
+                'travel_info': travel_info,
             },
             attachments=[pdf_attachment],
         )
@@ -532,6 +551,10 @@ def generate_time_report_pdf_bytes(
     with open(css_path) as f:
         css = CSS(string=f.read(), font_config=font_config)
 
+    # Get ticket number for display
+    ticket = time_report.get_ticket(request.session)
+    ticket_number = ticket.number if ticket else None
+
     assignment_date_display = layout.format_date(
         time_report.assignment_date, 'date'
     )
@@ -626,7 +649,7 @@ def generate_time_report_pdf_bytes(
 
             <div class="intro-text">
                 <p>
-                    Ihre Rapportierung wurde durch die Rechnungsführerin
+                    Ihre Rapportierung wurde durch das Rechnungswesen
                     bestätigt.
                 </p>
             </div>
@@ -638,8 +661,23 @@ def generate_time_report_pdf_bytes(
                     </strong>
                     {assignment_date_display}
                 </p>
-            </div>
+    """
 
+    if ticket_number:
+        html_content += f"""
+                <p>
+                    <strong>
+                        {request.translate(_('Ticket Number'))}:
+                    </strong>
+                    {ticket_number}
+                </p>
+    """
+
+    html_content += """
+            </div>
+    """
+
+    html_content += f"""
             <div class="compensation">
                 <table class="compensation-table">
                     <tr>

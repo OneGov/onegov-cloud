@@ -1186,18 +1186,26 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
         return ()
 
     # get all reservations and tickets
-    query: Query[tuple[Reservation, Ticket]]
+    query: Query[tuple[Reservation, Ticket, *tuple[str, ...]]]
     query = self.reservations_with_tickets_query(  # type:ignore[attr-defined]
         start, end, exclude_pending=False
     ).with_entities(Reservation, Ticket)
     query = query.options(undefer(Reservation.data))
+    if self.occupancy_fields:
+        query = query.outerjoin(
+            FormSubmission,
+            FormSubmission.id == Reservation.token
+        ).add_columns(*(
+            FormSubmission.data[as_internal_id(field)].astext.label(field)
+            for field in self.occupancy_fields
+        ))
 
     return *(
         res.as_dict()
         for res in utils.ReservationEventInfo.from_reservations(
             request,
             self,
-            query.with_entities(Reservation, Ticket)
+            query
         )
     ), *(
         av.as_dict()

@@ -235,11 +235,53 @@
                     </div>
                 </div>
                 <div class="ticket-panel" tal:condition="related_tickets">
-                    <h2 i18n:translate>Related Tickets</h2>
+                    <h2>
+                        <span i18n:translate>Related Tickets</span>
+                        <tal:b tal:condition="not all(t.muted for t in related_tickets)" tal:define="event_source all(t.handler.data.get('source') for t in related_tickets)">
+                            <a tal:condition="is_manager" href="${request.link(ticket, 'mute-related')}" class="mute" title="Disable E-Mails for all related tickets" i18n:attributes="title">
+                                <i class="fa fa-fw fa-microphone-slash" aria-hidden="true"></i>
+                                <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
+                            </a>
+                        </tal:b>
+                        <tal:b tal:condition="all(t.muted for t in related_tickets)">
+                            <tal:b tal:condition="not event_source">
+                                <a tal:condition="is_manager" href="${request.link(ticket, 'unmute-related')}" class="unmute" title="Enable E-Mails for all related tickets" i18n:attributes="title">
+                                    <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
+                                    <i class="fa fa-fw fa-microphone-slash" aria-hidden="true"></i>
+                                </a>
+                            </tal:b>
+                            <tal:b tal:condition="event_source">
+                                <a tal:condition="is_manager" class="unmute confirm disabled" title="E-Mails can not be sent for tickets of imported events" data-confirm="E-Mails can not be sent for tickets of imported events" data-confirm-no="Cancel" i18n:attributes="title;data-confirm;data-confirm-no">
+                                    <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
+                                    <i class="fa fa-fw fa-microphone-slash" aria-hidden="true"></i>
+                                </a>
+                            </tal:b>
+                        </tal:b>
+                    </h2>
                     <div class="field-display-block" tal:repeat="ticket related_tickets">
                         <div class="field-display-data">
-                            <span class="ticket-number" title="${ticket.reference_group(request)}"><a href="${request.link(ticket)}">${ticket.number}</a></span>
+                            <span class="ticket-number" title="${ticket.number}: ${ticket.reference_group(request)}"><a href="${request.link(ticket)}">${ticket.number[:8]}…</a></span>
                             <tal:b metal:use-macro="layout.macros['ticket_status']" />
+                            <tal:b tal:condition="not:ticket.muted">
+                                <a tal:condition="is_manager" href="${request.return_here(request.link(ticket, 'mute'))}" class="mute" title="Disable E-Mails" i18n:attributes="title">
+                                    <i class="fa fa-fw fa-microphone-slash" aria-hidden="true"></i>
+                                    <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
+                                </a>
+                            </tal:b>
+                            <tal:b tal:condition="ticket.muted" tal:define="event_source ticket.handler.data.get('source')">
+                                <tal:b condition="not event_source">
+                                    <a tal:condition="is_manager" href="${request.return_here(request.link(ticket, 'unmute'))}" class="unmute" title="Enable E-Mails" i18n:attributes="title">
+                                        <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
+                                        <i class="fa fa-fw fa-microphone-slash" aria-hidden="true"></i>
+                                    </a>
+                                </tal:b>
+                                <tal:b condition="event_source">
+                                    <a tal:condition="is_manager" class="unmute confirm disabled" title="E-Mails can not be sent for tickets of imported events" data-confirm="E-Mails can not be sent for tickets of imported events" data-confirm-no="Cancel" i18n:attributes="title;data-confirm;data-confirm-no">
+                                        <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
+                                        <i class="fa fa-fw fa-microphone-slash" aria-hidden="true"></i>
+                                    </a>
+                                </tal:b>
+                            </tal:b>
                         </div>
                     </div>
                 </div>

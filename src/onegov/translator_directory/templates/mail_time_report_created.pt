@@ -40,6 +40,12 @@
         </p>
 
         <p>
+            <span i18n:translate>
+                Please carefully review and report any discrepancies immediately.
+            </span>
+        </p>
+
+        <p>
             <a href="${request.link(ticket)}" i18n:translate>
                 View the time report
             </a>
