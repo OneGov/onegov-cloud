@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-11-26 14:40+0100\n"
+"POT-Creation-Date: 2025-12-03 10:17+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1530,6 +1530,15 @@ msgstr "Filtra per data di prenotazione"
 msgid "To reservation date"
 msgstr "Alla data di prenotazione"
 
+msgid "Reference date"
+msgstr "Data di riferimento"
+
+msgid "Final reservation date"
+msgstr "Data di prenotazione finale"
+
+msgid "Any reservation date"
+msgstr "Qualsiasi data di prenotazione"
+
 msgid "Filter Payments"
 msgstr "Filtra pagamenti"
 
@@ -1602,8 +1611,14 @@ msgstr "Stato"
 msgid "Submission/publication date"
 msgstr "Data di invio/pubblicazione"
 
+msgid "Parliamentary Group(s)"
+msgstr "Gruppo/i parlamentare/i"
+
 msgid "Participations"
 msgstr "Partecipanti"
+
+msgid "No active parliamentary groups"
+msgstr "Nessun gruppo parlamentare attivo"
 
 msgid "Tag"
 msgstr "Tag"
@@ -1692,6 +1707,22 @@ msgstr ""
 
 msgid "Extra Fields Definition"
 msgstr "Definizione dei campi aggiuntivi"
+
+msgid "Extra Field values to include in occupancy"
+msgstr "Valori del campo aggiuntivo da includere nella vista occupazione"
+
+msgid ""
+"By default the occupancy view displays the tag, e-mail, time slot and ticket "
+"number. Any fields selected would be included directly after the first line "
+"which contains either the tag or the e-mail."
+msgstr ""
+"Per impostazione predefinita, la vista occupazione mostra il tag, "
+"l'indirizzo e-mail, la fascia oraria e il numero del biglietto. Tutti i "
+"campi selezionati saranno inclusi direttamente dopo la prima riga che "
+"contiene il tag o l'indirizzo e-mail."
+
+msgid "Occupancy"
+msgstr "Occupazione"
 
 msgid "Extra Field values to include in calendar subscription"
 msgstr ""
@@ -3335,9 +3366,6 @@ msgstr ""
 
 msgid "Clean up"
 msgstr "Ripulisci"
-
-msgid "Occupancy"
-msgstr "Occupazione"
 
 msgid "Subscribe"
 msgstr "Iscriviti"
@@ -5844,6 +5872,12 @@ msgstr "Modificare il tag"
 msgid "Related Tickets"
 msgstr "Biglietti correlati"
 
+msgid "Disable E-Mails for all related tickets"
+msgstr "Disabilita i messaggi e-mail per tutti i biglietti correlati"
+
+msgid "Enable E-Mails for all related tickets"
+msgstr "Abilita i messaggi e-mail per tutti i biglietti correlati"
+
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
 "will become the author of the whole note."
@@ -7493,6 +7527,20 @@ msgstr "Hai disabilitato le e-mail per il biglietto ${number}"
 #, python-format
 msgid "You have enabled e-mails for ticket ${number}"
 msgstr "Hai abilitato le e-mail per il biglietto ${number}"
+
+#, python-format
+msgid "You have disabled e-mails for tickets ${numbers}"
+msgstr "Hai disabilitato le e-mail per il biglietti ${numbers}"
+
+msgid "There were no related tickets to mute"
+msgstr "Non ci sono stati biglietti correlati da silenziare."
+
+#, python-format
+msgid "You have enabled e-mails for tickets ${numbers}"
+msgstr "Hai abilitato le e-mail per il biglietti ${numbers}"
+
+msgid "There were no related tickets to unmute"
+msgstr "Non ci sono biglietti correlati da riattivare."
 
 msgid "The ticket cannot be archived because it's not closed"
 msgstr "Il biglietto non può essere archiviato perché non è chiuso"

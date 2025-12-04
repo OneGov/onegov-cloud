@@ -7,6 +7,8 @@ from uuid import uuid4
 import re
 import tempfile
 import textwrap
+
+import pytest
 import transaction
 import warnings
 
@@ -1087,6 +1089,9 @@ def test_auto_accept_reservations(client: Client) -> None:
     assert 'You can pick it up at the counter' in page
 
 
+@pytest.mark.parametrize(
+    'reject_type', ['reject-all', 'reject-all-with-message']
+)
 @freeze_time("2015-08-28", tick=True)
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
@@ -1095,7 +1100,8 @@ def test_reserve_allocation(
     broadcast: MagicMock,
     authenticate: MagicMock,
     connect: MagicMock,
-    client: Client
+    client: Client,
+    reject_type: str
 ) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
@@ -1201,8 +1207,16 @@ def test_reserve_allocation(
     assert client.app.session().query(Reservation).count() == 1
     assert client.app.session().query(FormSubmission).count() == 1
 
-    link = ticket.pyquery('a.delete-link')[0].attrib['ic-get-from']
-    ticket = client.get(link).follow()
+    if reject_type == 'reject-all':
+        link = ticket.pyquery('a.delete-link')[0].attrib['ic-get-from']
+        ticket = client.get(link).follow()
+    elif reject_type == 'reject-all-with-message':
+        link = ticket.pyquery('a.delete-link')[1].attrib['href']
+        comment = client.get(link)
+        comment.form['text'] = 'Sorry!'
+        ticket = comment.form.submit().follow()
+    else:
+        raise AssertionError('Unknown reject type')
 
     assert client.app.session().query(Reservation).count() == 0
     assert client.app.session().query(FormSubmission).count() == 0
@@ -2637,6 +2651,10 @@ def test_reserve_session_separation(client: Client) -> None:
     assert 'Verknüpfte Tickets' in ticket
     # we can create a multi-ticket pdf
     pdf = ticket.click('Mit verknüpften Tickets')
+    # we can mute all the related tickets
+    ticket = ticket.click(href='/mute-related').follow()
+    # and then unmute all the related tickets
+    ticket = ticket.click(href='/unmute-related').follow()
 
 
 def test_reserve_reservation_prediction(client: Client) -> None:

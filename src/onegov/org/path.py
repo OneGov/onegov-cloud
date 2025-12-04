@@ -926,7 +926,8 @@ def get_payment(app: OrgApp, id: UUID) -> Payment | None:
         'ticket_start': extended_date_converter,
         'ticket_end': extended_date_converter,
         'reservation_start': extended_date_converter,
-        'reservation_end': extended_date_converter
+        'reservation_end': extended_date_converter,
+        'reservation_reference_date': LiteralConverter('final', 'any'),
     }
 )
 def get_payments(
@@ -941,7 +942,8 @@ def get_payments(
     ticket_start: date | None = None,
     ticket_end: date | None = None,
     reservation_start: date | None = None,
-    reservation_end: date | None = None
+    reservation_end: date | None = None,
+    reservation_reference_date: Literal['final', 'any'] | None = None,
 ) -> PaymentCollection:
     return PaymentCollection(
         session=app.session(),
@@ -955,7 +957,8 @@ def get_payments(
         ticket_start=ticket_start,
         ticket_end=ticket_end,
         reservation_start=reservation_start,
-        reservation_end=reservation_end
+        reservation_end=reservation_end,
+        reservation_reference_date=reservation_reference_date,
     )
 
 
@@ -969,6 +972,7 @@ def get_payments(
         'ticket_end': extended_date_converter,
         'reservation_start': extended_date_converter,
         'reservation_end': extended_date_converter,
+        'reservation_reference_date': LiteralConverter('final', 'any'),
         'has_payment': bool,
         'invoiced': bool,
     }
@@ -981,6 +985,7 @@ def get_invoices(
     ticket_end: date | None = None,
     reservation_start: date | None = None,
     reservation_end: date | None = None,
+    reservation_reference_date: Literal['final', 'any'] | None = None,
     has_payment: bool | None = None,
     invoiced: bool | None = None,
 ) -> TicketInvoiceCollection:
@@ -992,6 +997,7 @@ def get_invoices(
         ticket_end=ticket_end,
         reservation_start=reservation_start,
         reservation_end=reservation_end,
+        reservation_reference_date=reservation_reference_date,
         has_payment=has_payment,
         invoiced=invoiced,
     )

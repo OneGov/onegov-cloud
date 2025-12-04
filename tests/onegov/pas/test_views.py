@@ -8,6 +8,9 @@ from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections.commission_membership import (
     PASCommissionMembershipCollection
 )
+from onegov.pas.models import PASCommissionMembership
+from onegov.user import UserCollection
+from uuid import UUID
 from webtest import Upload
 
 
@@ -606,6 +609,100 @@ def test_fetch_commissions_parliamentarians_json(
     response2 = client.get('/commissions/commissions-parliamentarians-json')
     data2 = response2.json
     assert commission3_id not in data2
+
+    # Test commission_president role filtering
+    # Create a commission president for Commission A only
+    session = client.app.session()
+    parl_president = parliamentarians.add(
+        first_name='Alice',
+        last_name='President',
+        email_primary='alice.president@example.org'
+    )
+
+    # Add president to Commission A (using the ID we saved earlier)
+    president_membership = PASCommissionMembership(
+        parliamentarian_id=parl_president.id,
+        commission_id=UUID(commission1_id),
+        role='president'
+    )
+    session.add(president_membership)
+
+    # Create and configure user
+    users = UserCollection(session)
+    user = users.by_username('alice.president@example.org')
+    assert user is not None
+    user.role = 'commission_president'
+    user.password = 'test'
+
+    transaction.commit()
+
+    # Login as commission president
+    client.login('alice.president@example.org', 'test')
+
+    # Commission president should only see Commission A
+    # (where they're president)
+    response3 = client.get('/commissions/commissions-parliamentarians-json')
+    assert response3.status_code == 200
+    data3 = response3.json
+
+    # Should have Commission A (where they're president)
+    assert commission1_id in data3
+    # John, Jane, and Alice (the president)
+    assert len(data3[commission1_id]) == 3
+
+    # Verify Alice, John, and Jane are all present
+    parl_titles_in_commission_a = {p['title'] for p in data3[commission1_id]}
+    assert 'Alice President' in parl_titles_in_commission_a
+    assert parl1_title in parl_titles_in_commission_a
+    assert parl2_title in parl_titles_in_commission_a
+
+    # Should NOT have Commission B (where they're not president)
+    assert commission2_id not in data3
+
+    # Should NOT have empty Commission 3
+    assert commission3_id not in data3
+
+
+def test_commission_edit_with_dates(client: Client[TestPasApp]) -> None:
+    """Test that commission editing works with start and end dates.
+
+    This is a regression test for the issue where editbar_links = []
+    prevented the form from being submitted.
+    """
+    client.login_admin()
+
+    settings = client.get('/').follow().click('PAS Einstellungen')
+
+    page = settings.click('Kommissionen')
+    page = page.click(href='new')
+    page.form['name'] = 'Test Commission'
+    page.form['type'] = 'normal'
+    page = page.form.submit().follow()
+    assert 'Test Commission' in page
+
+    page = page.click('Bearbeiten')
+    assert page.form['name'].value == 'Test Commission'
+
+    page.form['start'] = '2024-01-01'
+    page.form['end'] = '2024-12-31'
+    page.form['name'] = 'Updated Commission'
+
+    # Verify that the "Speichern" (Save) button exists in the editbar
+    # This was the actual bug - this button disappeared
+    editbar = page.pyquery('ul.edit-bar')
+    assert editbar, "Edit bar should be present"
+    save_button = page.pyquery('button.save-link')
+    assert save_button, "Save button should be present in editbar"
+    assert 'Speichern' in save_button.text()
+
+    page = page.form.submit().follow()
+    assert 'Updated Commission' in page
+
+    # Verify dates were saved by re-editing
+    page = page.click('Bearbeiten')
+    assert page.form['name'].value == 'Updated Commission'
+    assert page.form['start'].value == '2024-01-01'
+    assert page.form['end'].value == '2024-12-31'
 
 
 def test_add_new_user_without_activation_email(

@@ -6,6 +6,9 @@ from decimal import Decimal
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField, TimeField
 from onegov.translator_directory import _
+from onegov.translator_directory.utils import (
+    calculate_distance_to_location
+)
 from onegov.translator_directory.constants import (
     HOURLY_RATE_CERTIFIED,
     HOURLY_RATE_UNCERTIFIED,
@@ -45,7 +48,7 @@ class TranslatorTimeReportForm(Form):
         label=_('Assignment Location'),
         choices=[],  # will be set in on_request
         validators=[InputRequired()],
-        #   depends_on=('assignment_type', 'on-site'),
+        depends_on=('assignment_type', 'on-site'),
     )
 
     start_date = DateField(
@@ -77,9 +80,8 @@ class TranslatorTimeReportForm(Form):
     )
 
     case_number = StringField(
-        label=_('Case number (Police)'),
+        label=_('Case number'),
         validators=[InputRequired()],
-        description=_('Geschäftsnummer Police for linking if needed'),
     )
 
     is_urgent = BooleanField(
@@ -121,8 +123,6 @@ class TranslatorTimeReportForm(Form):
             (key, self.request.translate(value))
             for key, value in TIME_REPORT_INTERPRETING_TYPES.items()
         ]
-
-        # Set assignment location choices
         self.assignment_location.choices = [
             (key, name) for key, (name, _) in ASSIGNMENT_LOCATIONS.items()
         ]
@@ -379,9 +379,7 @@ class TranslatorTimeReportForm(Form):
 
         For on-site assignments with a selected location, calculates distance
         from translator's address to the assignment location.
-        For other cases, falls back to translator's drive_distance.
         The distance is multiplied by 2 to account for round trip.
-        Returns (compensation, one_way_distance_km).
         """
         if self.assignment_type.data in ('telephonic', 'schriftlich'):
             return Decimal('0'), None
@@ -396,16 +394,11 @@ class TranslatorTimeReportForm(Form):
             and request
             and translator.coordinates
         ):
-            from onegov.translator_directory.utils import (
-                calculate_distance_to_location
-            )
-
             one_way_distance = calculate_distance_to_location(
                 request,
                 translator.coordinates,
                 self.assignment_location.data
             )
-
             if one_way_distance is not None:
                 one_way_km = one_way_distance
                 distance = one_way_distance * 2  # Round trip
@@ -437,15 +430,7 @@ class TranslatorTimeReportForm(Form):
         translator: Translator,
         request: TranslatorAppRequest | None = None
     ) -> Decimal:
-        """Calculate travel compensation based on distance to assignment
-        location.
 
-        For on-site assignments with a selected location, calculates distance
-        from translator's address to the assignment location.
-        For other cases, falls back to translator's drive_distance.
-        The distance is multiplied by 2 to account for round trip.
-        Returns 0 for telephonic and written assignments.
-        """
         compensation, _ = self.calculate_travel_details(translator, request)
         return compensation
 

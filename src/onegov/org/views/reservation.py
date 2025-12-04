@@ -1506,7 +1506,8 @@ def reject_reservation_with_message_from_ticket(
         self.handler.reservations[0],
         request,
         form,
-        layout or TicketChatMessageLayout(self, request, internal=True)
+        layout or TicketChatMessageLayout(self, request, internal=True),
+        view_ticket=self
     )
 
 
