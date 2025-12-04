@@ -407,7 +407,13 @@ class Form(BaseForm):
         """
         if self.is_hidden(field):
             return None
-        if not self.is_visible_through_dependencies(field.id):
+        if (
+            # NOTE: It's a little sus to render fields that are not part
+            #       of our form at all, but for now we'll allow it.
+            field.id in self
+            and hasattr(self.__class__, field.id)
+            and not self.is_visible_through_dependencies(field.id)
+        ):
             return None
         return render_field(field)
 
