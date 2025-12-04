@@ -9,14 +9,14 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x wrapper">
             <div class="medium-7 cell main-content content">
+                <div class="print-button">
+                    <i onclick="window.print()" class="fa fa-print" aria-hidden="true"></i>
+                </div>
                 <div class="video" tal:condition="video_url">
                     <h2 i18n:translate="" class="visually-hidden">Video</h2>
                     <div class="videowrapper" id="assembly-video-iframe">
                         <iframe allow="fullscreen" width="100%" frameborder="0" src="${video_url}"></iframe>
                     </div>
-                </div>
-                <div class="print-button">
-                    <i onclick="window.print()" class="fa fa-print" aria-hidden="true"></i>
                 </div>
                 <div class="callout secondary agenda-item-resolution" tal:condition="agenda_item.resolution or agenda_item.tacitly_accepted">
                     <strong i18n:translate="">Resolution</strong>
