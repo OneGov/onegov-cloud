@@ -17,7 +17,7 @@ from onegov.form.fields import ColorField
 from onegov.form.fields import IconField, MultiCheckboxField
 from onegov.form.fields import UploadField
 from onegov.form.filters import as_float
-from onegov.form.validators import FileSizeLimit, MIME_TYPES_ARCHIVE
+from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import ValidFormDefinition
 from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _
