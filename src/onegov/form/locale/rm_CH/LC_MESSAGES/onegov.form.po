@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-05 14:46+0100\n"
+"POT-Creation-Date: 2025-11-25 08:49+0100\n"
 "PO-Revision-Date: 2017-06-28 12:03+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Romansh\n"
@@ -170,6 +170,19 @@ msgstr ""
 msgid ""
 "The indentation on line {line} is not valid. Please use a multiple of 4 "
 "spaces"
+msgstr ""
+
+#, python-format
+msgid ""
+"The indentation on line {line} is not valid. Comments must be indented to "
+"the same level as the field definition (`=`) they belong to."
+msgstr ""
+
+#, python-format
+msgid ""
+"Incorrect placement of the field description on line {line}. The field "
+"description must be placed below the field definition (`=`) and with the "
+"same indentation."
 msgstr ""
 
 #, python-format
