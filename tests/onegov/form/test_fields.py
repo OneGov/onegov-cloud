@@ -279,11 +279,25 @@ def test_upload_field() -> None:
 
 
 def test_upload_multiple_field() -> None:
-    def create_field() -> tuple[Form, UploadMultipleField]:
+    def create_field(
+        validators: Validators[FormT, Self] | None = None
+    ) -> tuple[Form, UploadMultipleField]:
         form = Form()
-        field = UploadMultipleField()
+        field = UploadMultipleField(validators=validators)
         field = field.bind(form, 'uploads')  # type: ignore[attr-defined]
         return form, field
+
+    # failing mime type validator
+    form, field = create_field(validators=[ExpectedExtensions(['.json'])])
+    file1 = create_file('text/plain', 'baz.txt', b'baz')
+    field.process(DummyPostData({'uploads': [file1]}))
+    assert not field.validate(form)
+    assert len(field.data) == 1
+    assert field.data[0]['filename'] == 'baz.txt'
+    assert field.data[0]['mimetype'] == 'text/plain'
+    validator = find_validator(field, WhitelistedMimeType)
+    assert validator
+    assert validator.whitelist == {'application/json'}  # type:ignore[attr-defined]
 
     # Test rendering and initial submit
     form, field = create_field()
@@ -321,8 +335,6 @@ def test_upload_multiple_field() -> None:
     assert dictionary_to_binary(file_field2.data) == b'foobar'  # type: ignore[arg-type]
     assert file_field2.filename == 'foobar.txt'
     assert file_field2.file.read() == b'foobar'  # type: ignore[union-attr]
-
-    # verify attached validators
     assert_whitelisted_mimetype_validator(field)
 
     html = field(force_simple=True)
