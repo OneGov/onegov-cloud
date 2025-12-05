@@ -335,7 +335,8 @@ def test_upload_multiple_field() -> None:
     assert dictionary_to_binary(file_field2.data) == b'foobar'  # type: ignore[arg-type]
     assert file_field2.filename == 'foobar.txt'
     assert file_field2.file.read() == b'foobar'  # type: ignore[union-attr]
-    assert_whitelisted_mimetype_validator(field)
+    for subfield in field:
+        assert_whitelisted_mimetype_validator(subfield)
 
     html = field(force_simple=True)
     assert field.validate(form)
