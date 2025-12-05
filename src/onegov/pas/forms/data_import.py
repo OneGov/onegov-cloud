@@ -24,6 +24,7 @@ class DataImportForm(Form):
     people_source = UploadMultipleField(
         label=_('People Data (JSON)'),
         description=_('JSON file containing parliamentarian data.'),
+        validators=[]  # no validators as files are not stored
     )
     organizations_source = UploadMultipleField(
         label=_('Organizations Data (JSON)'),
@@ -31,6 +32,7 @@ class DataImportForm(Form):
             'JSON file containing organization data (commissions, '
             'parties, etc.).'
         ),
+        validators=[]  # no validators as files are not stored
     )
     memberships_source = UploadMultipleField(
         label=_('Memberships Data (JSON)'),
@@ -38,6 +40,7 @@ class DataImportForm(Form):
             'JSON file containing membership data (who is member of '
             'what organization).'
         ),
+        validators=[]  # no validators as files are not stored
     )
 
     validate_schema = BooleanField(
