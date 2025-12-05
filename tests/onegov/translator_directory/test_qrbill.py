@@ -53,6 +53,7 @@ def test_generate_qr_bill_for_self_employed(translator_app: 'TestApp') -> None:
 
     time_report = TranslatorTimeReport(
         translator_id=translator.id,
+        assignment_type='on-site',
         assignment_date=date(2024, 3, 15),
         finanzstelle='test',
         duration=120,
@@ -99,6 +100,7 @@ def test_generate_qr_bill_missing_iban(translator_app: 'TestApp') -> None:
 
     time_report = TranslatorTimeReport(
         translator_id=translator.id,
+        assignment_type='on-site',
         assignment_date=date(2024, 3, 15),
         finanzstelle='test',
         duration=120,
@@ -142,6 +144,7 @@ def test_generate_qr_bill_missing_address(translator_app: 'TestApp') -> None:
 
     time_report = TranslatorTimeReport(
         translator_id=translator.id,
+        assignment_type='on-site',
         assignment_date=date(2024, 3, 15),
         finanzstelle='test',
         duration=120,
