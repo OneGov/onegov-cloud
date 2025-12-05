@@ -12,6 +12,8 @@ from datetime import datetime
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from mimetypes import types_map
+
+from onegov.file.utils import get_supported_image_mime_types
 from onegov.form import _
 from onegov.form.errors import (DuplicateLabelError, InvalidIndentSyntax,
                                 EmptyFieldsetError)
@@ -172,14 +174,9 @@ MIME_TYPES_TEXT_DATA = {
 }
 
 MIME_TYPES_IMAGE = {
-    'image/bmp',
-    'image/gif',
-    'image/jpeg',  # jpeg, jpg
-    'image/png',
+    # allowed types based on PIL
+    *get_supported_image_mime_types(),
     'image/svg+xml',
-    'image/tiff',
-    'image/webp',  # shall we allow it?
-    'image/x-ms-bmp',
 }
 
 MIME_TYPES_AUDIO = {

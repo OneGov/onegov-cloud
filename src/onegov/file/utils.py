@@ -74,15 +74,8 @@ def get_supported_image_mime_types() -> set[str]:
 
     # Not all PIL formats register a mime type, fill in the blanks ourselves.
     supported_types = {
-        'image/bmp',
-        'image/x-bmp',
         'image/x-MS-bmp',
-        'image/x-icon',
-        'image/x-ico',
-        'image/x-win-bitmap',
-        'image/x-pcx',
-        'image/x-portable-pixmap',
-        'image/x-tga'
+        'image/x-xcf',
     }
 
     for mime in Image.MIME.values():
