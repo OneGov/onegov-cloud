@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-03 15:34+0100\n"
+"POT-Creation-Date: 2025-12-05 13:20+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -524,15 +524,6 @@ msgstr "Link zur Einverständniserklärung"
 msgid "Accreditation"
 msgstr "Akkreditierung"
 
-msgid "Accountant email"
-msgstr "E-Mail Rechnungsführer:in"
-
-msgid "Accounting"
-msgstr "Buchhaltung"
-
-msgid "Email address of the person responsible for accounting"
-msgstr "E-Mail-Adresse der für die Buchhaltung verantwortlichen Person"
-
 msgid ""
 "No user with this email address exists. Please create a user account first."
 msgstr ""
@@ -660,6 +651,9 @@ msgstr ""
 "Wählen Sie Rechnungsführer:innen für diese Kostenstelle aus. Ihre E-Mail-"
 "Adressen werden für Benachrichtigungen verwendet."
 
+msgid "All accountant users must have the editor role"
+msgstr "Alle Benutzer des Rechnungswesen müssen Editoren sein."
+
 msgid "Add"
 msgstr "Hinzufügen"
 
@@ -749,6 +743,9 @@ msgstr "Einsatzdatum"
 
 msgid "Type"
 msgstr "Art"
+
+msgid "Finanzstelle"
+msgstr "Finanzstelle"
 
 msgid "Case Number"
 msgstr "Geschäftsnummer"
@@ -978,14 +975,6 @@ msgstr "Telefonischer Kontakt"
 msgid "Error: No custom texts found"
 msgstr "Fehler: Keine benutzerdefinierten Texte gefunden"
 
-#, python-format
-msgid ""
-"Accountant email is not configured. Please configure it in the settings: "
-"${settings_url}"
-msgstr ""
-"E-Mail Rechnungsführer:in ist noch nicht konfiguriert. Bitte fügen sie eine "
-"E-Mail hinzu: ${settings_url}"
-
 msgid "No Finanzstelle specified"
 msgstr "Keine Finanzstelle"
 
@@ -1185,38 +1174,3 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 
 msgid "Download"
 msgstr "Herunterladen"
-
-#~ msgid "Accountant Emails"
-#~ msgstr "Rechnungsführer"
-
-#~ msgid "Urgent surcharge amount"
-#~ msgstr "Ausserordentlich dringend Zuschlag"
-
-#~ msgid "Assignment Details"
-#~ msgstr "Einsatzdetails"
-
-#~ msgid "Start Time"
-#~ msgstr "Startzeit"
-
-#~ msgid "End Time"
-#~ msgstr "Endzeit"
-
-#~ msgid "Compensation Breakdown"
-#~ msgstr "Entschädigungsaufschlüsselung"
-
-#~ msgid "25%% surcharge"
-#~ msgstr "25%% Zuschlag"
-
-#, python-format
-#~ msgid ""
-#~ "Accountant email is not configured. Please configure it in the <a "
-#~ "href=\"${settings_url}\">settings</a>."
-#~ msgstr ""
-#~ "E-Mail Rechnungsführer ist nicht konfiguriert. Bitte konfigurieren Sie "
-#~ "diese in den <a href=\"${settings_url}\">Einstellungen</a>."
-
-#~ msgid "Night work (20:00 - 06:00)"
-#~ msgstr "Nachtarbeit (20:00 - 06:00)"
-
-#~ msgid "Weekend or holiday"
-#~ msgstr "Wocheuende oder Feiertag"

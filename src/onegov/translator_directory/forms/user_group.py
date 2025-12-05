@@ -21,7 +21,7 @@ class TranslatorUserGroupForm(ManageUserGroupForm):
 
     Links user groups to a Finanzstelle (cost center) and
     associated accountant emails for notifications.
-    Members of this group will have permission to view/edit
+    Editors defined as accountant_emails can see
     time report tickets for their assigned Finanzstelle.
     """
 
