@@ -11,10 +11,12 @@ from datetime import date
 
 from freezegun import freeze_time
 from io import BytesIO
+from onegov.user.models.user import User
 from onegov.core.utils import module_path
 from onegov.translator_directory.models.ticket import (
     AccreditationTicket,
 )
+from onegov.core.crypto.password import hash_password
 from onegov.translator_directory.models.translator import Translator
 from os.path import basename
 from onegov.file import FileCollection
@@ -23,11 +25,10 @@ from tests.onegov.translator_directory.shared import iter_block_items
 from onegov.gis import Coordinates
 from onegov.pdf import Pdf
 from onegov.translator_directory.collections.translator import (
-    TranslatorCollection)
-from onegov.translator_directory.models.time_report import (
-    TranslatorTimeReport
+    TranslatorCollection,
 )
-from onegov.user import UserCollection
+from onegov.translator_directory.models.time_report import TranslatorTimeReport
+from onegov.user import UserCollection, UserGroup, UserGroupCollection
 from openpyxl import load_workbook
 from pdftotext import PDF  # type: ignore[import-not-found]
 from tests.onegov.translator_directory.shared import (
@@ -91,10 +92,17 @@ def upload_file(
 
 
 def get_accountant_email(client: Client) -> str:
-    '''Get the configured accountant email from the app.'''
-    email = client.app.accountant_email
-    assert email is not None, 'Accountant email is not configured'
-    return email
+    '''Get accountant email from user group for testing.'''
+    session = client.app.session()
+    user_group = (
+        session.query(UserGroup)
+        .filter(UserGroup.meta['finanzstelle'].astext.isnot(None))
+        .first()
+    )
+    assert user_group is not None, 'No user group with finanzstelle found'
+    emails = user_group.meta.get('accountant_emails', [])
+    assert emails, 'No accountant emails in user group'
+    return emails[0]
 
 
 def filter_emails_by_recipient(
@@ -2058,17 +2066,6 @@ def test_basic_search(client_with_fts: Client) -> None:
     assert anom.get('/search/suggest?q=test').json == []
 
 
-def test_add_accountant_email_user_has_to_exist(client: 'Client') -> None:
-    client.login_admin()
-    page = client.get('/directory-settings')
-    page.form['accountant_email'] = 'accountant@example.org'
-    page = page.form.submit()
-    assert 'Es existiert kein Benutzer mit dieser' in page.text
-    page.form['accountant_email'] = 'editor@example.org'
-    page = page.form.submit()
-    assert 'Es existiert kein Benutzer mit dieser' not in page.text
-
-
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
@@ -2181,6 +2178,7 @@ def test_view_time_reports(client: Client) -> None:
     report = TranslatorTimeReport(
         translator_id=translator.id,
         assignment_type='consecutive',
+        finanzstelle='finanzstelle',
         duration=90,
         case_number='CASE-001',
         assignment_date=date(2025, 1, 15),
@@ -2219,14 +2217,14 @@ def test_time_report_workflow(
         email='translator@example.org',
         drive_distance=35.0,
     ).id
-    transaction.commit()
 
-    client.login_admin()
-    page = client.get('/directory-settings')
-    page.form['accountant_email'] = 'editor@example.org'
-    page = page.form.submit()
-    client.logout()
-    assert client.app.accountant_email == 'editor@example.org'
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='migrationsamt_und_passbuero')
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org']
+    }
+    transaction.commit()
 
     client.login_member()
     page = client.get(f'/translator/{translator_id}')
@@ -2234,6 +2232,7 @@ def test_time_report_workflow(
 
     page = page.click('Zeit erfassen')
     page.form['assignment_type'] = 'on-site'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-11'
     page.form['start_time'] = '09:00'
     page.form['end_date'] = '2025-01-11'
@@ -2402,18 +2401,20 @@ def test_time_report_workflow_self_employed(
         zip_code='8000',
         city='Zürich',
     ).id
-    transaction.commit()
 
-    client.login_admin()
-    page = client.get('/directory-settings')
-    page.form['accountant_email'] = 'editor@example.org'
-    page = page.form.submit()
-    client.logout()
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='migrationsamt_und_passbuero')
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org']
+    }
+    transaction.commit()
 
     client.login_member()
     page = client.get(f'/translator/{translator_id}')
     page = page.click('Zeit erfassen')
     page.form['assignment_type'] = 'on-site'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-11'
     page.form['start_time'] = '09:00'
     page.form['end_date'] = '2025-01-11'
@@ -2507,18 +2508,20 @@ def test_time_report_workflow_self_employed_missing_iban(
         zip_code='8000',
         city='Zürich',
     ).id
-    transaction.commit()
 
-    client.login_admin()
-    page = client.get('/directory-settings')
-    page.form['accountant_email'] = 'editor@example.org'
-    page = page.form.submit()
-    client.logout()
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='migrationsamt_und_passbuero')
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org']
+    }
+    transaction.commit()
 
     client.login_member()
     page = client.get(f'/translator/{translator_id}')
     page = page.click('Zeit erfassen')
     page.form['assignment_type'] = 'on-site'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-11'
     page.form['start_time'] = '09:00'
     page.form['end_date'] = '2025-01-11'
@@ -2550,6 +2553,89 @@ def test_time_report_workflow_self_employed_missing_iban(
     accept_url = ticket_page.pyquery('a.accept-link')[0].attrib['ic-post-to']
     page = client.post(accept_url).maybe_follow()
     # It will refuse, as no IBAN was set on translator
-
-    # assert 'müssen eine gültige IBAN haben"' in page
     assert time_report.status == 'pending'
+
+
+def test_user_groups(client: Client) -> None:
+    """Test creating and editing user groups with finanzstelle."""
+
+    transaction.begin()
+    client.app.session().add(
+        User(
+            username='editor2@example.org',
+            password_hash=hash_password('hunter2'),
+            role='editor',
+        )
+    )
+    transaction.commit()
+
+    client.login_admin()
+    page = client.get('/usergroups/new')
+
+    page.form['name'] = 'Accountants'
+    page.form['finanzstelle'] = 'polizei'
+    page.form['users'].select_multiple(texts=['member@example.org'])
+    page.form['accountant_emails'].select_multiple(
+        texts=['editor@example.org']
+    )
+
+    page = page.form.submit().follow()
+    assert 'Accountants' in page
+
+    session = client.app.session()
+    group = session.query(UserGroup).filter_by(name='Accountants').one()
+
+    assert group.meta['finanzstelle'] == 'polizei'
+    assert group.meta['accountant_emails'] == ['editor@example.org']
+
+    page = client.get(f'/user-groups/{str(group.id)}/edit')
+    assert 'Benutzergruppe bearbeiten' in page
+    assert page.form['name'].value == 'Accountants'
+    assert page.form['finanzstelle'].value == 'polizei'
+
+    page.form['finanzstelle'] = 'staatsanwaltschaft'
+    page.form['name'].value = 'Accountants2'
+    page.form['accountant_emails'].select_multiple(
+        texts=['editor2@example.org', 'editor@example.org']
+    )
+    page = page.form.submit().follow()
+
+    session = client.app.session()
+    group = session.query(UserGroup).filter_by(name='Accountants2').one()
+    assert group.meta['finanzstelle'] == 'staatsanwaltschaft'
+    assert set(group.meta['accountant_emails']) == {
+        'editor2@example.org',
+        'editor@example.org',
+    }
+    # empty re-submit
+    # This used to raise 'Uniqueness violation in ticket permissions'
+    page = client.get(f'/user-groups/{str(group.id)}/edit')
+    page = page.form.submit().follow()
+
+    # Create second user group with different finanzstelle
+    page = client.get('/usergroups/new')
+    page.form['name'] = 'Staatsanwaltschaft Group'
+    page.form['finanzstelle'] = 'staatsanwaltschaft'
+    page.form['users'].select_multiple(texts=['editor@example.org'])
+    page.form['accountant_emails'] = ['editor@example.org']
+    page = page.form.submit().follow()
+    assert 'Staatsanwaltschaft Group' in page
+
+    session = client.app.session()
+    group2 = (
+        session.query(UserGroup)
+        .filter_by(name='Staatsanwaltschaft Group')
+        .one()
+    )
+    assert group2.meta['finanzstelle'] == 'staatsanwaltschaft'
+    assert group2.meta['accountant_emails'] == ['editor@example.org']
+
+    # Verify both groups exist with correct permissions
+    all_groups = (
+        session.query(UserGroup)
+        .filter(
+            UserGroup.name.in_(['Accountants2', 'Staatsanwaltschaft Group'])
+        )
+        .all()
+    )
+    assert len(all_groups) == 2

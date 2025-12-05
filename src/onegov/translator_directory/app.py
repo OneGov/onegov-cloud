@@ -7,6 +7,9 @@ from onegov.translator_directory.initial_content import create_new_organisation
 from onegov.town6 import TownApp
 from onegov.town6.app import get_common_asset as default_common_asset
 from onegov.town6.app import get_i18n_localedirs as get_town_i18n_localedirs
+from onegov.translator_directory.forms.user_group import (
+    TranslatorUserGroupForm
+)
 from onegov.org.models import Organisation, GeneralFile, GeneralFileCollection
 from onegov.translator_directory.request import TranslatorAppRequest
 from onegov.translator_directory.theme import TranslatorDirectoryTheme
@@ -121,6 +124,11 @@ def get_create_new_organisation_factory(
 @TranslatorDirectoryApp.setting(section='org', name='citizen_login_enabled')
 def get_citizen_login_enabled() -> bool:
     return False
+
+
+@TranslatorDirectoryApp.setting(section='org', name='usergroup_form_class')
+def get_usergroup_form_class() -> type:
+    return TranslatorUserGroupForm
 
 
 @TranslatorDirectoryApp.setting(section='i18n', name='localedirs')

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-02 17:09+0100\n"
+"POT-Creation-Date: 2025-12-05 13:23+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -114,6 +114,9 @@ msgstr "Verzeichniseinstellungen"
 
 msgid "Users"
 msgstr "Benutzer"
+
+msgid "User groups"
+msgstr "Benutzergruppen"
 
 msgid "Time Reports"
 msgstr "Zeiterfassungen"
@@ -521,15 +524,6 @@ msgstr "Link zur Einverständniserklärung"
 msgid "Accreditation"
 msgstr "Akkreditierung"
 
-msgid "Accountant email"
-msgstr "E-Mail Rechnungsführer:in"
-
-msgid "Accounting"
-msgstr "Buchhaltung"
-
-msgid "Email address of the person responsible for accounting"
-msgstr "E-Mail-Adresse der für die Buchhaltung verantwortlichen Person"
-
 msgid ""
 "No user with this email address exists. Please create a user account first."
 msgstr ""
@@ -541,6 +535,9 @@ msgstr "Art der Übersetzung/Dolmetschung"
 
 msgid "Assignment Location"
 msgstr "Einsatzort"
+
+msgid "Cost center"
+msgstr "Finanzstelle"
 
 msgid "Start date"
 msgstr "Startdatum"
@@ -638,6 +635,26 @@ msgstr "Mitglied"
 msgid "Translator"
 msgstr "Übersetzer/in"
 
+msgid "Cost Center (Finanzstelle)"
+msgstr "Finanzstelle"
+
+msgid "Select the cost center this user group is responsible for"
+msgstr "Wählen Sie die Finanzstelle für diese Benutzergruppe aus"
+
+msgid "Accountant Users"
+msgstr "Rechnungsführer:innen"
+
+msgid ""
+"Select users who are accountants for this cost center. Their emails will be "
+"used for notifications."
+msgstr ""
+"Diese Personen sind verantwortlich für für die Zeiterfassung der oben "
+"ausgewählten Finanzstelle. Ihre E-Mail-Adressen werden für "
+"Benachrichtigungen verwendet."
+
+msgid "All accountant users must have the editor role"
+msgstr "Alle Benutzer des Rechnungswesen müssen Editoren sein."
+
 msgid "Add"
 msgstr "Hinzufügen"
 
@@ -727,6 +744,9 @@ msgstr "Einsatzdatum"
 
 msgid "Type"
 msgstr "Art"
+
+msgid "Finanzstelle"
+msgstr "Finanzstelle"
 
 msgid "Case Number"
 msgstr "Geschäftsnummer"
@@ -956,13 +976,16 @@ msgstr "Telefonischer Kontakt"
 msgid "Error: No custom texts found"
 msgstr "Fehler: Keine benutzerdefinierten Texte gefunden"
 
+msgid "No Finanzstelle specified"
+msgstr "Keine Finanzstelle"
+
 #, python-format
 msgid ""
-"Accountant email is not configured. Please configure it in the settings: "
-"${settings_url}"
+"No accountant emails configured for Finanzstelle \"${fs}\". Please configure "
+"user groups: ${url}"
 msgstr ""
-"E-Mail Rechnungsführer:in ist noch nicht konfiguriert. Bitte fügen sie eine "
-"E-Mail hinzu: ${settings_url}"
+"Keine Buchhaltungs-E-Mails für Finanzstelle \"${fs}\" konfiguriert. Bitte "
+"Benutzergruppen konfigurieren: ${url}"
 
 msgid "Your ticket has been opened"
 msgstr "Ihr Ticket wurde eröffnet"
@@ -1152,35 +1175,3 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 
 msgid "Download"
 msgstr "Herunterladen"
-
-#~ msgid "Urgent surcharge amount"
-#~ msgstr "Ausserordentlich dringend Zuschlag"
-
-#~ msgid "Assignment Details"
-#~ msgstr "Einsatzdetails"
-
-#~ msgid "Start Time"
-#~ msgstr "Startzeit"
-
-#~ msgid "End Time"
-#~ msgstr "Endzeit"
-
-#~ msgid "Compensation Breakdown"
-#~ msgstr "Entschädigungsaufschlüsselung"
-
-#~ msgid "25%% surcharge"
-#~ msgstr "25%% Zuschlag"
-
-#, python-format
-#~ msgid ""
-#~ "Accountant email is not configured. Please configure it in the <a "
-#~ "href=\"${settings_url}\">settings</a>."
-#~ msgstr ""
-#~ "E-Mail Rechnungsführer ist nicht konfiguriert. Bitte konfigurieren Sie "
-#~ "diese in den <a href=\"${settings_url}\">Einstellungen</a>."
-
-#~ msgid "Night work (20:00 - 06:00)"
-#~ msgstr "Nachtarbeit (20:00 - 06:00)"
-
-#~ msgid "Weekend or holiday"
-#~ msgstr "Wocheuende oder Feiertag"

@@ -22,6 +22,9 @@ from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
+from onegov.translator_directory.utils import (
+    get_accountant_emails_for_finanzstelle
+)
 from onegov.translator_directory.constants import (
     PROFESSIONAL_GUILDS, INTERPRETING_TYPES, ADMISSIONS, GENDERS, GENDER_MAP)
 from onegov.translator_directory.forms.mutation import TranslatorMutationForm
@@ -45,7 +48,6 @@ from onegov.translator_directory.layout import (
 from onegov.translator_directory.models.time_report import TranslatorTimeReport
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.utils import country_code_to_name
-from onegov.translator_directory.utils import get_accountant_email
 
 from uuid import uuid4
 from xlsxwriter import Workbook
@@ -535,24 +537,6 @@ def add_time_report(
 ) -> RenderData | BaseResponse:
 
     if form.submitted(request):
-        try:
-            accountant_email = get_accountant_email(request)
-        except ValueError as e:
-            request.alert(str(e))
-            layout = TranslatorLayout(self, request)
-            layout.edit_mode = True
-            return {
-                'layout': layout,
-                'model': self,
-                'form': form,
-                'title': _('Add Time Report'),
-            }
-
-        assert request.current_username is not None
-        assert form.start_date.data is not None
-        assert form.start_time.data is not None
-        assert form.end_date.data is not None
-        assert form.end_time.data is not None
 
         session = request.session
         current_user = request.current_user
@@ -566,8 +550,7 @@ def add_time_report(
             self, request
         )
 
-        start_dt = datetime.combine(form.start_date.data, form.start_time.data)
-        end_dt = datetime.combine(form.end_date.data, form.end_time.data)
+        start_dt, end_dt = form.get_datetime_range()
         start_dt = replace_timezone(start_dt, 'Europe/Zurich')
         end_dt = replace_timezone(end_dt, 'Europe/Zurich')
 
@@ -586,18 +569,30 @@ def add_time_report(
         weekend_holiday_hours = form.calculate_weekend_holiday_hours()
         weekend_holiday_minutes = int(float(weekend_holiday_hours) * 60)
 
+        try:
+            accountant_emails = set(
+                get_accountant_emails_for_finanzstelle(
+                    request, form.finanzstelle.data
+                )
+            )
+        except ValueError as e:
+            request.warning(str(e))
+            return redirect(request.link(self))
+
         # Create report with all fields except total_compensation
+        assert form.assignment_type.data is not None
         report = TranslatorTimeReport(
             translator=self,
             created_by=current_user,
-            assignment_type=form.assignment_type.data or None,
+            assignment_type=form.assignment_type.data,
             assignment_location=form.assignment_location.data or None,
+            finanzstelle=form.finanzstelle.data,
             duration=duration_minutes,
             break_time=break_minutes,
             night_minutes=night_minutes,
             weekend_holiday_minutes=weekend_holiday_minutes,
             case_number=form.case_number.data or None,
-            assignment_date=form.start_date.data,
+            assignment_date=start_dt.date(),
             start=start_dt,
             end=end_dt,
             hourly_rate=hourly_rate,
@@ -614,6 +609,8 @@ def add_time_report(
         report.total_compensation = breakdown['total']
         session.add(report)
         session.flush()
+
+        assert request.current_username is not None
 
         with session.no_autoflush:
             ticket = TicketCollection(session).open_ticket(
@@ -638,7 +635,7 @@ def add_time_report(
         )
 
         for email in emails_for_new_ticket(request, ticket):
-            if email != accountant_email:
+            if email in accountant_emails:
                 send_ticket_mail(
                     request=request,
                     template='mail_ticket_opened_info.pt',
@@ -647,19 +644,19 @@ def add_time_report(
                     receivers=(email,),
                     content={'model': ticket},
                 )
-
-        send_ticket_mail(
-            request=request,
-            template='mail_time_report_created.pt',
-            subject=_('New time report for review'),
-            ticket=ticket,
-            receivers=(accountant_email,),
-            content={
-                'model': ticket,
-                'translator': self,
-                'time_report': report,
-            },
-        )
+        for accountant_email in accountant_emails:
+            send_ticket_mail(
+                request=request,
+                template='mail_time_report_created.pt',
+                subject=_('New time report for review'),
+                ticket=ticket,
+                receivers=(accountant_email,),
+                content={
+                    'model': ticket,
+                    'translator': self,
+                    'time_report': report,
+                },
+            )
 
         request.app.send_websocket(
             channel=request.app.websockets_private_channel,
