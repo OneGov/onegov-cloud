@@ -11,6 +11,7 @@ from onegov.translator_directory.utils import (
 )
 from onegov.translator_directory.constants import (
     FINANZSTELLE,
+    ASSIGNMENT_LOCATIONS,
     HOURLY_RATE_CERTIFIED,
     HOURLY_RATE_UNCERTIFIED,
     TIME_REPORT_INTERPRETING_TYPES
@@ -27,7 +28,7 @@ from wtforms.validators import ValidationError
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.translator_directory.models.time_report import (
-        TranslatorTimeReport,
+        TranslatorTimeReport
     )
     from onegov.translator_directory.models.translator import Translator
     from onegov.translator_directory.request import TranslatorAppRequest
@@ -48,8 +49,19 @@ class TranslatorTimeReportForm(Form):
     assignment_location = ChosenSelectField(
         label=_('Assignment Location'),
         choices=[],  # will be set in on_request
-        validators=[InputRequired()],
+        validators=[Optional()],
         depends_on=('assignment_type', 'on-site'),
+    )
+
+    # Used only in edit mode - hidden when creating new reports
+    assignment_location_override = StringField(
+        label=_('Location Override (manual entry)'),
+        validators=[Optional()],
+        description=_(
+            'Enter a custom location address. Travel compensation '
+            'will be calculated based on the geocoded location. '
+            'Example: Beckenstube 1, 8200 Schaffhausen'
+        ),
     )
 
     finanzstelle = ChosenSelectField(
@@ -102,6 +114,13 @@ class TranslatorTimeReportForm(Form):
         label=_('Notes'), validators=[Optional()], render_kw={'rows': 3}
     )
 
+    def validate_assignment_location(self, field: ChosenSelectField) -> None:
+        if self.assignment_type.data != 'on-site':
+            return
+        else:
+            if not field.data:
+                raise ValidationError(_('Please select a location'))
+
     def validate_end_time(self, field: TimeField) -> None:
         if not all(
             [
@@ -125,7 +144,6 @@ class TranslatorTimeReportForm(Form):
             raise ValidationError(_('End time must be after start time'))
 
     def on_request(self) -> None:
-        from onegov.translator_directory.constants import ASSIGNMENT_LOCATIONS
 
         self.assignment_type.choices = [
             (key, self.request.translate(value))
@@ -339,6 +357,8 @@ class TranslatorTimeReportForm(Form):
         """Process form data for editing existing time reports."""
 
         super().process(formdata, obj, **kwargs)  # type: ignore[arg-type]
+
+        # Load existing time report data
         if formdata is None and obj is not None:
             if hasattr(obj, 'start') and obj.start:
                 # Convert UTC to Europe/Zurich timezone before
@@ -370,18 +390,21 @@ class TranslatorTimeReportForm(Form):
                 if surcharge_types:
                     self.is_urgent.data = 'urgent' in surcharge_types
 
+            if hasattr(obj, 'finanzstelle'):
+                self.finanzstelle.data = getattr(obj, 'finanzstelle', None)
+
             if hasattr(obj, 'assignment_type'):
                 self.assignment_type.data = getattr(
                     obj, 'assignment_type', None
                 )
 
             if hasattr(obj, 'assignment_location'):
-                self.assignment_location.data = getattr(
-                    obj, 'assignment_location', None
-                )
-
-            if hasattr(obj, 'finanzstelle'):
-                self.finanzstelle.data = getattr(obj, 'finanzstelle', None)
+                location = getattr(obj, 'assignment_location', None)
+                if location:
+                    if location in ASSIGNMENT_LOCATIONS:
+                        self.assignment_location.data = location
+                    else:
+                        self.assignment_location_override.data = location
 
     def get_surcharge_types(self) -> list[str]:
         """Get list of active surcharge types from form based on actual
@@ -412,21 +435,22 @@ class TranslatorTimeReportForm(Form):
         distance = None
         one_way_km = None
 
-        # Try to calculate distance to specific assignment location
+        # Try to calculate distance (handles both dropdown and override)
         if (
             self.assignment_type.data == 'on-site'
-            and self.assignment_location.data
             and request
             and translator.coordinates
         ):
+            location_key = self.assignment_location.data or ''
+            custom_address = None
+            custom_address = self.assignment_location_override.data or None
+
             one_way_distance = calculate_distance_to_location(
-                request,
-                translator.coordinates,
-                self.assignment_location.data
+                request, translator.coordinates, location_key, custom_address
             )
             if one_way_distance is not None:
                 one_way_km = one_way_distance
-                distance = one_way_distance * 2  # Round trip
+                distance = one_way_distance * 2
 
         # Fall back to translator's pre-calculated drive_distance
         if distance is None and translator.drive_distance:
@@ -472,6 +496,12 @@ class TranslatorTimeReportForm(Form):
         model.assignment_type = self.assignment_type.data
         model.assignment_location = self.assignment_location.data or None
         model.finanzstelle = self.finanzstelle.data
+
+        # Handle location override (only in edit mode)
+        if self.assignment_location_override.data:
+            model.assignment_location = self.assignment_location_override.data
+        else:
+            model.assignment_location = self.assignment_location.data or None
 
         duration_hours = self.get_duration_hours()
         model.duration = int(float(duration_hours) * 60)

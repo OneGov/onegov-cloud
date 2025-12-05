@@ -162,13 +162,20 @@ def update_drive_distances(
 def calculate_distance_to_location(
     request: TranslatorAppRequest,
     translator_coordinates: AnyCoordinates,
-    location_key: str
+    location_key: str,
+    custom_address: str | None = None,
 ) -> float | None:
 
-    if not translator_coordinates or location_key not in ASSIGNMENT_LOCATIONS:
+    if not translator_coordinates:
         return None
 
-    _, address = ASSIGNMENT_LOCATIONS[location_key]
+    if custom_address:
+        address = custom_address
+    elif location_key in ASSIGNMENT_LOCATIONS:
+        _, address = ASSIGNMENT_LOCATIONS[location_key]
+    else:
+        return None
+
     geocoding_api = MapboxRequests(
         request.app.mapbox_token,
         endpoint='geocoding'

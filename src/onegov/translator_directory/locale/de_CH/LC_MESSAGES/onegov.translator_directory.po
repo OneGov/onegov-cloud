@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-05 13:23+0100\n"
+"POT-Creation-Date: 2025-12-05 13:49+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -536,6 +536,17 @@ msgstr "Art der Übersetzung/Dolmetschung"
 msgid "Assignment Location"
 msgstr "Einsatzort"
 
+msgid "Location Override (manual entry)"
+msgstr "Ortsangabe überschreiben (manuelle Eingabe)"
+
+msgid ""
+"Enter a custom location address. Travel compensation will be calculated "
+"based on the geocoded location. Example: Beckenstube 1, 8200 Schaffhausen"
+msgstr ""
+"Geben Sie eine benutzerdefinierte Ortsadresse ein. Die "
+"Reisekostenentschädigung wird basierend auf dem geokodierten Standort "
+"berechnet. Beispiel: Beckenstube 1, 8200 Schaffhausen"
+
 msgid "Cost center"
 msgstr "Finanzstelle"
 
@@ -562,6 +573,9 @@ msgstr "25% Zuschlag"
 
 msgid "Notes"
 msgstr "Notizen"
+
+msgid "Please select a location"
+msgstr "Bitte wählen Sie einen Standort"
 
 msgid "End time must be after start time"
 msgstr "Endzeit muss nach Startzeit liegen"
