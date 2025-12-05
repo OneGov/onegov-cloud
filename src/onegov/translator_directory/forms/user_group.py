@@ -3,7 +3,6 @@ from __future__ import annotations
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.org.forms import ManageUserGroupForm
-from onegov.ticket import TicketPermission
 from onegov.user import UserCollection
 from onegov.user.models import User
 from onegov.translator_directory import _
@@ -89,31 +88,7 @@ class TranslatorUserGroupForm(ManageUserGroupForm):
         model.meta['finanzstelle'] = self.finanzstelle.data
         model.meta['accountant_emails'] = self.accountant_emails.data or []
 
-        assert hasattr(model, 'ticket_permissions')
-
         super().update_model(model)
-
-        trp_permission = (
-            self.request.session.query(TicketPermission)
-            .filter_by(user_group_id=model.id, handler_code='TRP')
-            .first()
-        )
-
-        if self.finanzstelle.data:
-            if trp_permission:
-                trp_permission.group = self.finanzstelle.data
-            else:
-                self.request.session.add(
-                    TicketPermission(
-                        user_group_id=model.id,
-                        handler_code='TRP',
-                        group=self.finanzstelle.data,
-                        exclusive=True,
-                    )
-                )
-        else:
-            if trp_permission:
-                self.request.session.delete(trp_permission)
 
     def apply_model(self, model: UserGroup) -> None:
         super().apply_model(model)

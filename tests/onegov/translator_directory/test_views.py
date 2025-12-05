@@ -28,7 +28,6 @@ from onegov.translator_directory.collections.translator import (
     TranslatorCollection,
 )
 from onegov.translator_directory.models.time_report import TranslatorTimeReport
-from onegov.ticket import TicketPermission
 from onegov.user import UserCollection, UserGroup, UserGroupCollection
 from openpyxl import load_workbook
 from pdftotext import PDF  # type: ignore[import-not-found]
@@ -2588,10 +2587,6 @@ def test_user_groups(client: Client) -> None:
 
     assert group.meta['finanzstelle'] == 'polizei'
     assert group.meta['accountant_emails'] == ['editor@example.org']
-    assert hasattr(group, 'ticket_permissions')
-    assert len(group.ticket_permissions) == 1
-    assert group.ticket_permissions[0].handler_code == 'TRP'
-    assert group.ticket_permissions[0].group == 'polizei'
 
     page = client.get(f'/user-groups/{str(group.id)}/edit')
     assert 'Benutzergruppe bearbeiten' in page
@@ -2612,10 +2607,6 @@ def test_user_groups(client: Client) -> None:
         'editor2@example.org',
         'editor@example.org',
     }
-    assert hasattr(group, 'ticket_permissions')
-    assert len(group.ticket_permissions) == 1
-    assert group.ticket_permissions[0].group == 'staatsanwaltschaft'
-
     # empty re-submit
     # This used to raise 'Uniqueness violation in ticket permissions'
     page = client.get(f'/user-groups/{str(group.id)}/edit')
@@ -2638,10 +2629,6 @@ def test_user_groups(client: Client) -> None:
     )
     assert group2.meta['finanzstelle'] == 'staatsanwaltschaft'
     assert group2.meta['accountant_emails'] == ['editor@example.org']
-    assert hasattr(group2, 'ticket_permissions')
-    assert len(group2.ticket_permissions) == 1
-    assert group2.ticket_permissions[0].handler_code == 'TRP'
-    assert group2.ticket_permissions[0].group == 'staatsanwaltschaft'
 
     # Verify both groups exist with correct permissions
     all_groups = (
@@ -2652,32 +2639,3 @@ def test_user_groups(client: Client) -> None:
         .all()
     )
     assert len(all_groups) == 2
-
-    all_trp_perms = (
-        session.query(TicketPermission).filter_by(handler_code='TRP').all()
-    )
-    assert len(all_trp_perms) == 2
-    trp_groups: list[str] = [p.group for p in all_trp_perms if p.group]
-    assert sorted(trp_groups) == ['staatsanwaltschaft', 'staatsanwaltschaft']
-
-    # Edit second group to use different finanzstelle
-    page = client.get(f'/user-groups/{str(group2.id)}/edit')
-    page.form['finanzstelle'] = 'polizei'
-    page = page.form.submit().follow()
-
-    session = client.app.session()
-    group2 = (
-        session.query(UserGroup)
-        .filter_by(name='Staatsanwaltschaft Group')
-        .one()
-    )
-    assert group2.meta['finanzstelle'] == 'polizei'
-    assert hasattr(group2, 'ticket_permissions')
-    assert len(group2.ticket_permissions) == 1
-    assert group2.ticket_permissions[0].group == 'polizei'
-
-    # Verify first group still has correct permission
-    group = session.query(UserGroup).filter_by(name='Accountants2').one()
-    assert hasattr(group, 'ticket_permissions')
-    assert len(group.ticket_permissions) == 1
-    assert group.ticket_permissions[0].group == 'staatsanwaltschaft'
