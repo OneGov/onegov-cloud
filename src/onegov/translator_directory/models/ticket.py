@@ -15,7 +15,9 @@ from onegov.core.elements import Intercooler
 from onegov.translator_directory.collections.documents import (
     TranslatorDocumentCollection)
 from onegov.translator_directory.constants import (
-    TIME_REPORT_INTERPRETING_TYPES, ASSIGNMENT_LOCATIONS
+    TIME_REPORT_INTERPRETING_TYPES,
+    ASSIGNMENT_LOCATIONS,
+    FINANZSTELLE
 )
 from onegov.translator_directory.layout import AccreditationLayout
 from onegov.translator_directory.layout import TranslatorLayout
@@ -319,10 +321,11 @@ class TimeReportHandler(Handler):
         )
 
         if report.finanzstelle:
+            finanzstelle_name = FINANZSTELLE[report.finanzstelle].name
             summary_parts.extend(
                 [
                     f"<dt>{request.translate(_('Finanzstelle'))}</dt>",
-                    f'<dd>{escape(report.finanzstelle)}</dd>',
+                    f'<dd>{escape(finanzstelle_name)}</dd>',
                 ]
             )
 

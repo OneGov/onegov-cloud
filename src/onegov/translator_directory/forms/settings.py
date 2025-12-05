@@ -7,7 +7,6 @@ from onegov.user import User
 from sqlalchemy import func
 from wtforms.fields import EmailField
 from wtforms.fields import URLField
-from wtforms.validators import Email
 from wtforms.validators import Optional
 from wtforms.validators import URL
 from wtforms.validators import ValidationError

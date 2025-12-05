@@ -4,6 +4,7 @@ from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.org.forms import ManageUserGroupForm
 from onegov.ticket import TicketPermission
+from onegov.user import UserCollection
 from onegov.translator_directory import _
 from onegov.translator_directory.constants import FINANZSTELLE
 from wtforms.validators import InputRequired
@@ -48,7 +49,6 @@ class TranslatorUserGroupForm(ManageUserGroupForm):
     )
 
     def on_request(self) -> None:
-        from onegov.user import UserCollection
 
         super().on_request()
         self.finanzstelle.choices = [

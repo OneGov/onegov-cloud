@@ -173,7 +173,6 @@ class Finanzstelle(NamedTuple):
     street: str
     zip_code: str
     city: str
-    responsible: str
 
 
 ASSIGNMENT_LOCATIONS: dict[str, LocationMapping] = {
@@ -235,41 +234,35 @@ FINANZSTELLE: dict[str, Finanzstelle] = {
         street='Mühlentalstrasse 105',
         zip_code='8200',
         city='Schaffhausen',
-        responsible='Pavlovic Sinisa',
     ),
     'staatsanwaltschaft': Finanzstelle(
         name='Staatsanwaltschaft Allgemeine Abteilung',
         street='Beckenstube 5',
         zip_code='8200',
         city='Schaffhausen',
-        responsible='Windels Tanja',
     ),
     'gefaengnisverwaltung': Finanzstelle(
         name='Kantonales Gefängnis',
         street='Beckenstube 5',
         zip_code='8200',
         city='Schaffhausen',
-        responsible='Trudel Astrid',
     ),
     'polizei': Finanzstelle(
         name='Schaffhauser Polizei',
         street='Beckenstube 1',
         zip_code='8200',
         city='Schaffhausen',
-        responsible='Mesonero Christina',
     ),
     'obergericht': Finanzstelle(
         name='Obergericht',
         street='Frauengasse 17',
         zip_code='8200',
         city='Schaffhausen',
-        responsible='vakant',
     ),
     'kantonsgericht': Finanzstelle(
         name='Kantonsgericht',
         street='Herrenacker 26',
         zip_code='8200',
         city='Schaffhausen',
-        responsible='vakant',
     ),
 }

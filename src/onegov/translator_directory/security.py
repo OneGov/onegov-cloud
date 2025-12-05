@@ -305,7 +305,7 @@ def restrict_translator_time_report_ticket(
         if model.handler.email == identity.userid:
             return True
 
-        if identity.role == 'member':
+        if identity.role == 'editor':
             time_report = model.handler.time_report  # type: ignore[attr-defined]
             if time_report and time_report.finanzstelle:
                 user_groups = (

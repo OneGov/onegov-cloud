@@ -1,6 +1,9 @@
 from __future__ import annotations
 from datetime import date
 from decimal import Decimal
+
+from onegov.translator_directory.request import TranslatorAppRequest
+from unittest.mock import Mock
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.models.time_report import TranslatorTimeReport
 from onegov.translator_directory.qrbill import (
@@ -51,6 +54,7 @@ def test_generate_qr_bill_for_self_employed(translator_app: 'TestApp') -> None:
     time_report = TranslatorTimeReport(
         translator_id=translator.id,
         assignment_date=date(2024, 3, 15),
+        finanzstelle='test',
         duration=120,
         hourly_rate=Decimal('100.00'),
         total_compensation=Decimal('200.00'),
@@ -58,9 +62,6 @@ def test_generate_qr_bill_for_self_employed(translator_app: 'TestApp') -> None:
     )
     session.add(time_report)
     session.flush()
-
-    from onegov.translator_directory.request import TranslatorAppRequest
-    from unittest.mock import Mock
 
     request = Mock(spec=TranslatorAppRequest)
     request.locale = 'de_CH'
@@ -99,6 +100,7 @@ def test_generate_qr_bill_missing_iban(translator_app: 'TestApp') -> None:
     time_report = TranslatorTimeReport(
         translator_id=translator.id,
         assignment_date=date(2024, 3, 15),
+        finanzstelle='test',
         duration=120,
         hourly_rate=Decimal('100.00'),
         total_compensation=Decimal('200.00'),
@@ -106,9 +108,6 @@ def test_generate_qr_bill_missing_iban(translator_app: 'TestApp') -> None:
     )
     session.add(time_report)
     session.flush()
-
-    from onegov.translator_directory.request import TranslatorAppRequest
-    from unittest.mock import Mock
 
     request = Mock(spec=TranslatorAppRequest)
     request.locale = 'de_CH'
@@ -144,6 +143,7 @@ def test_generate_qr_bill_missing_address(translator_app: 'TestApp') -> None:
     time_report = TranslatorTimeReport(
         translator_id=translator.id,
         assignment_date=date(2024, 3, 15),
+        finanzstelle='test',
         duration=120,
         hourly_rate=Decimal('100.00'),
         total_compensation=Decimal('200.00'),
@@ -151,9 +151,6 @@ def test_generate_qr_bill_missing_address(translator_app: 'TestApp') -> None:
     )
     session.add(time_report)
     session.flush()
-
-    from onegov.translator_directory.request import TranslatorAppRequest
-    from unittest.mock import Mock
 
     request = Mock(spec=TranslatorAppRequest)
     request.locale = 'de_CH'

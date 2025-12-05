@@ -297,4 +297,3 @@ def add_finanzstelle_to_time_reports(context: UpgradeContext) -> None:
             'translator_time_reports',
             Column('finanzstelle', Text, nullable=True),
         )
-
