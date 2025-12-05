@@ -2563,9 +2563,9 @@ def test_user_groups(client: Client) -> None:
     transaction.begin()
     client.app.session().add(
         User(
-            username='member2@example.org',
+            username='editor2@example.org',
             password_hash=hash_password('hunter2'),
-            role='member',
+            role='editor',
         )
     )
     transaction.commit()
@@ -2576,7 +2576,9 @@ def test_user_groups(client: Client) -> None:
     page.form['name'] = 'Accountants'
     page.form['finanzstelle'] = 'polizei'
     page.form['users'].select_multiple(texts=['member@example.org'])
-    page.form['accountant_emails'] = ['member@example.org']
+    page.form['accountant_emails'].select_multiple(
+        texts=['editor@example.org']
+    )
 
     page = page.form.submit().follow()
     assert 'Accountants' in page
@@ -2585,7 +2587,7 @@ def test_user_groups(client: Client) -> None:
     group = session.query(UserGroup).filter_by(name='Accountants').one()
 
     assert group.meta['finanzstelle'] == 'polizei'
-    assert group.meta['accountant_emails'] == ['member@example.org']
+    assert group.meta['accountant_emails'] == ['editor@example.org']
     assert hasattr(group, 'ticket_permissions')
     assert len(group.ticket_permissions) == 1
     assert group.ticket_permissions[0].handler_code == 'TRP'
@@ -2598,18 +2600,17 @@ def test_user_groups(client: Client) -> None:
 
     page.form['finanzstelle'] = 'staatsanwaltschaft'
     page.form['name'].value = 'Accountants2'
-    page.form['accountant_emails'] = [
-        'member2@example.org',
-        'member@example.org',
-    ]
+    page.form['accountant_emails'].select_multiple(
+        texts=['editor2@example.org', 'editor@example.org']
+    )
     page = page.form.submit().follow()
 
     session = client.app.session()
     group = session.query(UserGroup).filter_by(name='Accountants2').one()
     assert group.meta['finanzstelle'] == 'staatsanwaltschaft'
     assert set(group.meta['accountant_emails']) == {
-        'member2@example.org',
-        'member@example.org',
+        'editor2@example.org',
+        'editor@example.org',
     }
     assert hasattr(group, 'ticket_permissions')
     assert len(group.ticket_permissions) == 1

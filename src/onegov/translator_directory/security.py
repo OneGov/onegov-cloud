@@ -298,28 +298,35 @@ def restrict_translator_time_report_ticket(
     model: TimeReportTicket,
     permission: object
 ) -> bool:
+    def find_group_which_maps() -> UserGroup | None:
+        time_report = model.handler.time_report  # type: ignore[attr-defined]
+        if time_report and time_report.finanzstelle:
+            user_groups = (
+                app.session()
+                .query(UserGroup)
+                .filter(UserGroup.meta['finanzstelle'].astext.isnot(None))
+                .all()
+            )
+            for group in user_groups:
+                group_finanzstelle = (
+                    group.meta.get('finanzstelle') if group.meta else None
+                )
+                if group_finanzstelle == time_report.finanzstelle:
+                    return group
+        return None
+
     if (
         identity.role in ('member', 'translator')
         and model.handler
     ):
         if model.handler.email == identity.userid:
             return True
+        return False
 
-        if identity.role == 'editor':
-            time_report = model.handler.time_report  # type: ignore[attr-defined]
-            if time_report and time_report.finanzstelle:
-                user_groups = (
-                    app.session()
-                    .query(UserGroup)
-                    .all()
-                )
-                for group in user_groups:
-                    group_finanzstelle = (
-                        group.meta.get('finanzstelle') if group.meta else None
-                    )
-                    if group_finanzstelle == time_report.finanzstelle:
-                        return True
-
+    if identity.role == 'editor':
+        group = find_group_which_maps()
+        if group:
+            return identity.userid in group.meta.get('accountant_emails', [])
         return False
 
     return identity.role in {'editor', 'admin'}
