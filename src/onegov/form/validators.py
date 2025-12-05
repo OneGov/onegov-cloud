@@ -153,6 +153,9 @@ MIME_TYPES_DOCUMENT = {
      'spreadsheetml.sheet'),  # xlsx
     ('application/vnd.openxmlformats-officedocument.'
      'wordprocessingml.document'),  # docx
+    'application/CDFV2',  # old ms office docs
+    'application/x-ole-storage',  # old ms office docs
+    'application/CDFV2-unknown'  # old ms office docs
 }
 
 MIME_TYPES_XML = {
