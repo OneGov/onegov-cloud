@@ -53,7 +53,7 @@ class TranslatorTimeReport(Base, TimestampMixin):
 
     created_by: relationship[User | None] = relationship('User')
 
-    assignment_type: Column[str | None] = Column(Text)
+    assignment_type: Column[str] = Column(Text, nullable=False)
 
     assignment_location: Column[str | None] = Column(
         Text,
@@ -61,7 +61,7 @@ class TranslatorTimeReport(Base, TimestampMixin):
         comment='Key of selected assignment location for on-site work'
     )
 
-    finanzstelle: Column[str | None] = Column(
+    finanzstelle: Column[str] = Column(
         Text,
         nullable=False,
     )

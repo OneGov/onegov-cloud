@@ -39,7 +39,10 @@ from onegov.translator_directory.models.ticket import (
     TimeReportTicket,
     TimeReportHandler,
 )
-from onegov.translator_directory.constants import ASSIGNMENT_LOCATIONS
+from onegov.translator_directory.constants import (
+    ASSIGNMENT_LOCATIONS,
+    FINANZSTELLE,
+)
 from onegov.translator_directory.models.time_report import (
     TranslatorTimeReport,
 )
@@ -599,7 +602,14 @@ def generate_time_report_pdf_bytes(
         else f'{time_report.duration_hours} Stunden'
     )
 
-    logo_url = request.app.org.logo_url if request.app.org.logo_url else None
+    finanzstelle = FINANZSTELLE.get(time_report.finanzstelle)
+    show_logo = (
+        finanzstelle is not None
+        and 'polizei' in finanzstelle.name.lower()
+        and request.app.org.logo_url
+    )
+    logo_url = request.app.org.logo_url if show_logo else None
+
     html_content = """
         <!DOCTYPE html>
         <html>
@@ -622,6 +632,21 @@ def generate_time_report_pdf_bytes(
                 <div class="letter-date">
                     {letter_date}
                 </div>
+            </div>
+
+            <div class="sender-address">
+    """
+
+    if finanzstelle:
+        html_content += f"""
+                <p>
+                    {finanzstelle.name}<br>
+                    {finanzstelle.street}<br>
+                    {finanzstelle.zip_code} {finanzstelle.city}
+                </p>
+    """
+
+    html_content += f"""
             </div>
 
             <div class="translator-info">

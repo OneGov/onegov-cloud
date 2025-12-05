@@ -297,3 +297,13 @@ def add_finanzstelle_to_time_reports(context: UpgradeContext) -> None:
             'translator_time_reports',
             Column('finanzstelle', Text, nullable=True),
         )
+
+
+@upgrade_task('Make assignment_type non-nullable in time reports')
+def make_assignment_type_non_nullable(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if context.has_column('translator_time_reports', 'assignment_type'):
+        context.operations.alter_column(
+            'translator_time_reports', 'assignment_type', nullable=False
+        )

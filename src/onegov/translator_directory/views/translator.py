@@ -580,10 +580,11 @@ def add_time_report(
             return redirect(request.link(self))
 
         # Create report with all fields except total_compensation
+        assert form.assignment_type.data is not None
         report = TranslatorTimeReport(
             translator=self,
             created_by=current_user,
-            assignment_type=form.assignment_type.data or None,
+            assignment_type=form.assignment_type.data,
             assignment_location=form.assignment_location.data or None,
             finanzstelle=form.finanzstelle.data,
             duration=duration_minutes,

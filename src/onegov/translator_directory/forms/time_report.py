@@ -468,9 +468,10 @@ class TranslatorTimeReportForm(Form):
         assert self.end_date.data is not None
         assert self.end_time.data is not None
 
-        model.assignment_type = self.assignment_type.data or None
+        assert self.assignment_type.data is not None
+        model.assignment_type = self.assignment_type.data
         model.assignment_location = self.assignment_location.data or None
-        model.finanzstelle = self.finanzstelle.data or None
+        model.finanzstelle = self.finanzstelle.data
 
         duration_hours = self.get_duration_hours()
         model.duration = int(float(duration_hours) * 60)
