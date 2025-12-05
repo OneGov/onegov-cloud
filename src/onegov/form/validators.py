@@ -176,7 +176,6 @@ MIME_TYPES_IMAGE = {
     'image/gif',
     'image/jpeg',  # jpeg, jpg
     'image/png',
-    'image/svg',
     'image/svg+xml',
     'image/tiff',
     'image/webp',  # shall we allow it?
