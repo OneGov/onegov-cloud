@@ -148,6 +148,7 @@ MIME_TYPES_DOCUMENT = {
     'application/msword',  # doc
     'application/rtf',
     *MIME_TYPES_PDF,
+    'application/excel',
     'application/vnd.ms-excel',  # xls
     ('application/vnd.openxmlformats-officedocument.'
      'presentationml.presentation'),  # pptx
@@ -155,9 +156,19 @@ MIME_TYPES_DOCUMENT = {
      'spreadsheetml.sheet'),  # xlsx
     ('application/vnd.openxmlformats-officedocument.'
      'wordprocessingml.document'),  # docx
+    'application/vnd.ms-office',
     'application/CDFV2',  # old ms office docs
     'application/x-ole-storage',  # old ms office docs
     'application/CDFV2-unknown'  # old ms office docs
+}
+
+MIME_TYPES_EXCEL = {
+    'application/excel',
+    'application/vnd.ms-excel,'
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-office',
+    'application/octet-stream',
+    'application/x-ole-storage',
 }
 
 MIME_TYPES_XML = {

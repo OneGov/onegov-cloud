@@ -21,7 +21,11 @@ from onegov.form.fields import UploadField
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.utils import get_fields_from_class
 from onegov.form.validators import (
-    FileSizeLimit, ValidPhoneNumber, ValidFilterFormDefinition)
+    FileSizeLimit,
+    ValidPhoneNumber,
+    ValidFilterFormDefinition,
+    MIME_TYPES_EXCEL
+)
 from onegov.form.validators import WhitelistedMimeType
 from onegov.gis import CoordinatesField
 from onegov.org import _
@@ -537,7 +541,7 @@ class EventImportForm(Form):
         label=_('Import'),
         validators=[
             DataRequired(),
-            WhitelistedMimeType(),
+            WhitelistedMimeType(MIME_TYPES_EXCEL),
             FileSizeLimit(10 * 1024 * 1024)
         ],
         render_kw={'force_simple': True}
