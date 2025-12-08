@@ -59,7 +59,7 @@ from typing import Any, IO, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from datetime import datetime
-    from onegov.core.types import FileDict as StrictFileDict
+    from onegov.core.types import FileDict as StrictFileDict, LaxFileDict
     from onegov.file import File
     from onegov.form import Form
     from onegov.form.types import (
@@ -268,7 +268,7 @@ class UploadField(FileField):
         filters: Sequence[Filter] = (),
         description: str = '',
         id: str | None = None,
-        default: Sequence[StrictFileDict] = (),
+        default: LaxFileDict | None = None,
         widget: Widget[Self] | None = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
