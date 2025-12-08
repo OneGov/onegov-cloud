@@ -50,8 +50,8 @@ def assert_whitelisted_mimetype_validator(
 
 def find_validator(
     field: Field | FileField,
-    cls: type
-) -> Validator[Any, Any] | None:
+    cls: type[ValidatorT]
+) -> ValidatorT | None:
     return next((v for v in field.validators if isinstance(v, cls)), None)
 
 
