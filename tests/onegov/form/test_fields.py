@@ -139,7 +139,7 @@ def test_upload_field() -> None:
     assert data['mimetype'] == 'text/plain'
     validator = find_validator(field, WhitelistedMimeType)
     assert validator
-    assert validator.whitelist == {'application/pdf'}  # type:ignore[attr-defined]
+    assert validator.whitelist == ('application/pdf',)  # type:ignore[attr-defined]
     assert not field.validate(form)
     assert 'Files of this type are not supported.' in field.errors
 
@@ -306,7 +306,7 @@ def test_upload_multiple_field() -> None:
     for subfield in field:
         validator = find_validator(subfield, WhitelistedMimeType)
         assert validator
-        assert validator.whitelist == {'application/json'}  # type:ignore[attr-defined]
+        assert validator.whitelist == ('application/json',)  # type:ignore[attr-defined]
 
     # Test rendering and initial submit
     form, field = create_field()
