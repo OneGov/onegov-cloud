@@ -4,6 +4,7 @@ import json
 from onegov.core.utils import dictionary_to_binary
 from onegov.form import Form
 from onegov.form.fields import UploadMultipleField
+from onegov.form.validators import MIME_TYPES_JSON
 from onegov.pas import _
 from onegov.pas.importer.json_import import (
     MembershipData,
@@ -24,7 +25,8 @@ class DataImportForm(Form):
     people_source = UploadMultipleField(
         label=_('People Data (JSON)'),
         description=_('JSON file containing parliamentarian data.'),
-        validators=[]  # no validators as files are not stored
+        validators=[],  # no validators as files are not stored
+        allowed_mimetypes=tuple(MIME_TYPES_JSON),
     )
     organizations_source = UploadMultipleField(
         label=_('Organizations Data (JSON)'),
@@ -32,7 +34,8 @@ class DataImportForm(Form):
             'JSON file containing organization data (commissions, '
             'parties, etc.).'
         ),
-        validators=[]  # no validators as files are not stored
+        validators=[],  # no validators as files are not stored
+        allowed_mimetypes=tuple(MIME_TYPES_JSON),
     )
     memberships_source = UploadMultipleField(
         label=_('Memberships Data (JSON)'),
@@ -40,7 +43,8 @@ class DataImportForm(Form):
             'JSON file containing membership data (who is member of '
             'what organization).'
         ),
-        validators=[]  # no validators as files are not stored
+        validators=[],  # no validators as files are not stored
+        allowed_mimetypes=tuple(MIME_TYPES_JSON),
     )
 
     validate_schema = BooleanField(

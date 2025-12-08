@@ -260,30 +260,59 @@ class UploadField(FileField):
     action: Literal['keep', 'replace', 'delete']
     file: IO[bytes] | None
     filename: str | None
-    validators = [WhitelistedMimeType()]
 
-    if TYPE_CHECKING:
-        def __init__(
-            self,
-            label: str | None = None,
-            validators: Validators[FormT, Self] | None = None,
-            filters: Sequence[Filter] = (),
-            description: str = '',
-            id: str | None = None,
-            default: Sequence[StrictFileDict] = (),
-            widget: Widget[Self] | None = None,
-            render_kw: dict[str, Any] | None = None,
-            name: str | None = None,
-            _form: BaseForm | None = None,
-            _prefix: str = '',
-            _translations: _SupportsGettextAndNgettext | None = None,
-            _meta: DefaultMeta | None = None,
-            # onegov specific kwargs that get popped off
-            *,
-            fieldset: str | None = None,
-            depends_on: Sequence[Any] | None = None,
-            pricing: PricingRules | None = None,
-        ): ...
+    def __init__(
+        self,
+        label: str | None = None,
+        validators: Validators[FormT, Self] | None = None,
+        filters: Sequence[Filter] = (),
+        description: str = '',
+        id: str | None = None,
+        default: Sequence[StrictFileDict] = (),
+        widget: Widget[Self] | None = None,
+        render_kw: dict[str, Any] | None = None,
+        name: str | None = None,
+        allowed_mimetypes: Sequence[str] | None = None,
+        _form: BaseForm | None = None,
+        _prefix: str = '',
+        _translations: _SupportsGettextAndNgettext | None = None,
+        _meta: DefaultMeta | None = None,
+        # onegov specific kwargs that get popped off
+        *,
+        fieldset: str | None = None,
+        depends_on: Sequence[Any] | None = None,
+        pricing: PricingRules | None = None,
+    ):
+        validator = (
+            WhitelistedMimeType(allowed_mimetypes)
+            if allowed_mimetypes
+            else WhitelistedMimeType()
+        )
+
+        if validators:
+            validators = list(validators)
+            if not any(isinstance(validator, WhitelistedMimeType)
+                for validator in validators
+            ):
+                validators.append(validator)
+        else:
+            validators = [validator]
+
+        super().__init__(
+            label=label,
+            validators=validators,
+            filters=filters,
+            description=description,
+            id=id,
+            default=default,
+            widget=widget,
+            render_kw=render_kw,
+            name=name,
+            _form=_form,
+            _prefix=_prefix,
+            _translations=_translations,
+            _meta=_meta,
+        )
 
     # this is not quite accurate, since it is either a dictionary with all
     # the keys or none of the keys, which would make type narrowing easier
@@ -449,7 +478,6 @@ class UploadMultipleField(UploadMultipleBase, FileField):
 
     upload_field_class: type[UploadField] = UploadField
     upload_widget: Widget[UploadField] = UploadWidget()
-    validators = [WhitelistedMimeType()]
 
     def __init__(
         self,
@@ -463,6 +491,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
         upload_widget: Widget[UploadField] | None = None,
+        allowed_mimetypes: Sequence[str] | None = None,
         _form: BaseForm | None = None,
         _prefix: str = '',
         _translations: _SupportsGettextAndNgettext | None = None,
@@ -485,7 +514,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             description=description,
             widget=upload_widget,
             render_kw=render_kw,
-            validators=validators,  # type:ignore[arg-type]
+            allowed_mimetypes=allowed_mimetypes,
             **extra_arguments
         )
         super().__init__(
@@ -496,6 +525,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             id=id,
             default=default,
             widget=widget,  # type:ignore[arg-type]
+            validators=[*(validators or ())],
             render_kw=render_kw,
             name=name,
             _form=_form,

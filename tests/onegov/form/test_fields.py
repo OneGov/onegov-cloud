@@ -24,14 +24,14 @@ from onegov.form.fields import UploadField
 from onegov.form.fields import UploadMultipleField
 from onegov.form.fields import URLField
 from onegov.form.validators import (
-    ValidPhoneNumber, WhitelistedMimeType, ExpectedExtensions)
+    ValidPhoneNumber, WhitelistedMimeType, MIME_TYPES_JSON, MIME_TYPES_PDF)
 from unittest.mock import patch
 from wtforms import FileField, Field
 from wtforms.validators import Optional
 from wtforms.validators import URL
 
 
-from typing import Any, TYPE_CHECKING, Self
+from typing import Any, TYPE_CHECKING, Self, Sequence
 
 if TYPE_CHECKING:
     from webob.request import _FieldStorageWithFile
@@ -79,10 +79,14 @@ def create_file(
 
 def test_upload_field() -> None:
     def create_field(
-        validators: Validators[FormT, Self] | None = None  # type:ignore[misc]
+        validators: Validators[FormT, Self] | None = None,  # type:ignore[misc]
+        allowed_mimetypes: Sequence[str] | None = None,
     ) -> tuple[Form, UploadField]:
         form = Form()
-        field = UploadField(validators=validators)
+        field = UploadField(
+            validators=validators,
+            allowed_mimetypes=allowed_mimetypes,
+        )
         field = field.bind(form, 'upload')  # type: ignore[attr-defined]
         return form, field
 
@@ -128,7 +132,7 @@ def test_upload_field() -> None:
     assert_whitelisted_mimetype_validator(field)
 
     # failing mime type validator
-    form, field = create_field(validators=[ExpectedExtensions(['.pdf'])])
+    form, field = create_field(allowed_mimetypes=tuple(MIME_TYPES_PDF))
     textfile = create_file('text/plain', 'baz.txt', b'baz')
     data = field.data = field.process_fieldstorage(textfile)
     assert data['filename'] == 'baz.txt'
@@ -280,24 +284,29 @@ def test_upload_field() -> None:
 
 def test_upload_multiple_field() -> None:
     def create_field(
-        validators: Validators[FormT, Self] | None = None  # type:ignore[misc]
+        validators: Validators[FormT, Self] | None = None,  # type:ignore[misc]
+        allowed_mimetypes: Sequence[str] | None = None,
     ) -> tuple[Form, UploadMultipleField]:
         form = Form()
-        field = UploadMultipleField(validators=validators)
+        field = UploadMultipleField(
+            validators=validators,
+            allowed_mimetypes=allowed_mimetypes,
+        )
         field = field.bind(form, 'uploads')  # type: ignore[attr-defined]
         return form, field
 
     # failing mime type validator
-    form, field = create_field(validators=[ExpectedExtensions(['.json'])])
+    form, field = create_field(allowed_mimetypes=tuple(MIME_TYPES_JSON))
     file1 = create_file('text/plain', 'baz.txt', b'baz')
     field.process(DummyPostData({'uploads': [file1]}))
     assert not field.validate(form)
     assert len(field.data) == 1
     assert field.data[0]['filename'] == 'baz.txt'
     assert field.data[0]['mimetype'] == 'text/plain'
-    validator = find_validator(field, WhitelistedMimeType)
-    assert validator
-    assert validator.whitelist == {'application/json'}  # type:ignore[attr-defined]
+    for subfield in field:
+        validator = find_validator(subfield, WhitelistedMimeType)
+        assert validator
+        assert validator.whitelist == {'application/json'}  # type:ignore[attr-defined]
 
     # Test rendering and initial submit
     form, field = create_field()
