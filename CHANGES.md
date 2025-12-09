@@ -1,8 +1,24 @@
 # Changes
 
+## 2025.69
+
+`2025-12-09` | [b39432183e...4246ff777d](https://github.com/OneGov/onegov-cloud/compare/b39432183e^...4246ff777d)
+
+### Directory
+
+##### Accordion mode now reflects the content fields hide labels from configuration
+
+`Feature` | [OGC-2832](https://linear.app/onegovcloud/issue/OGC-2832) | [546a3bd918](https://github.com/onegov/onegov-cloud/commit/546a3bd9188472ab90d1a8088eb5ba11ac52ab3b)
+
+### Feriennet
+
+##### Remove privacy option in general settings and add in export
+
+`Feature` | [OGC-1454](https://linear.app/onegovcloud/issue/OGC-1454) | [4246ff777d](https://github.com/onegov/onegov-cloud/commit/4246ff777d51667de2dac8f11243b136d1943390)
+
 ## 2025.68
 
-`2025-12-05` | [5440ea7e83...a682c00145](https://github.com/OneGov/onegov-cloud/compare/5440ea7e83^...a682c00145)
+`2025-12-05` | [5440ea7e83...979b8b8912](https://github.com/OneGov/onegov-cloud/compare/5440ea7e83^...979b8b8912)
 
 ### Core
 
@@ -2442,45 +2458,4 @@ Refactors capturing of exceptions and re-emitting them as `APIException`
 ##### Import data.
 
 `Feature` | [OGC-2091](https://linear.app/onegovcloud/issue/OGC-2091) | [196ff526a9](https://github.com/onegov/onegov-cloud/commit/196ff526a9e3744fa7f3a64a9e0ffacc4ac93927)
-
-## 2025.19
-
-`2025-04-22` | [0e2daaf130...0515b72f63](https://github.com/OneGov/onegov-cloud/compare/0e2daaf130^...0515b72f63)
-
-### Feriennet
-
-##### Cancellation conditions in booking mail
-
-`Feature` | [PRO1375](#PRO1375) | [0e2daaf130](https://github.com/onegov/onegov-cloud/commit/0e2daaf1309b7059ba2a781ebe7f11a7730fa9c3)
-
-### Form
-
-##### Increases default filesize for Upload to 100MB.
-
-The comment regarding the filesize was referring to an
-earlier implementation and probably no longer valid.
-
-`Bugfix` | [OGC-2177](https://linear.app/onegovcloud/issue/OGC-2177) | [24ee549f89](https://github.com/onegov/onegov-cloud/commit/24ee549f892c8414c7070349c2c7fac04d438aea)
-
-### Landsgemeinde
-
-##### Navigation between assembly items
-
-Add buttons for navigating between assembly items
-
-`Feature` | [OGC-2198](https://linear.app/onegovcloud/issue/OGC-2198) | [f69359a71f](https://github.com/onegov/onegov-cloud/commit/f69359a71fcd27121caaccd89348c46a8df54b30)
-
-### Org
-
-##### Adds ticket tags with optional attached meta data
-
-`Feature` | [OGC-2186](https://linear.app/onegovcloud/issue/OGC-2186) | [278928a937](https://github.com/onegov/onegov-cloud/commit/278928a937d7ff30df505e87428b11e53ba071af)
-
-##### Adds copy/paste functionality for availability periods
-
-`Feature` | [OGC-2202](https://linear.app/onegovcloud/issue/OGC-2202) | [f663a72fd4](https://github.com/onegov/onegov-cloud/commit/f663a72fd4ba5de225e277808b45c9122a6265d6)
-
-##### Fixes crash when event filters are enabled without defining any
-
-`Bugfix` | [ea5aafc7bb](https://github.com/onegov/onegov-cloud/commit/ea5aafc7bbfd4b3f6d559d67e3b54e440fc33fac)
 
