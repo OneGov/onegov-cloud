@@ -107,6 +107,20 @@ $publications-icon: '\f1ea';
         margin: 0 -.5rem;
     }
 
+    #search {
+        @include smooth-edges;
+
+        + .input-group-button .button {
+            margin-left: 1.5rem;
+            padding: .2rem .7rem !important;
+
+            &:hover {
+                margin-left: 1rem;
+                padding: .2rem 1.2rem !important;
+            }
+        }
+    }
+
     .services-panel {
         a.online-counter::before { @include icon-bold($tasks-icon); }
         a.publications::before { @include icon-bold($publications-icon); }

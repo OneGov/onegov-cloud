@@ -7,7 +7,7 @@ from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.initial_content import create_new_organisation
 from onegov.feriennet.models import VacationActivity
-from onegov.user import User
+from onegov.user import User, UserCollection
 from pytest_localserver.http import WSGIServer  # type: ignore[import-untyped]
 from sqlalchemy.orm.session import close_all_sessions
 from tests.shared import Client as BaseClient
@@ -181,3 +181,12 @@ def scenario(
 def enter_observer_scope() -> None:
     """Ensures app specific observers are active"""
     ScopedPropertyObserver.enter_class_scope(FeriennetApp)
+
+
+@pytest.fixture(scope='function')
+def owner(session: Session) -> User:
+    return UserCollection(session).add(
+        username='owner@example.org',
+        password='hunter2',
+        role='editor'
+    )

@@ -104,14 +104,6 @@ class FeriennetSettingsForm(Form):
         render_kw={'rows': 10}
     )
 
-    show_related_contacts = BooleanField(
-        label=_(
-            'Parents can see the contacts of other parents in '
-            'the same activity'
-        ),
-        fieldset=_('Privacy')
-    )
-
     public_organiser_data = MultiCheckboxField(
         label=_('Public organiser data'),
         choices=(
@@ -242,7 +234,6 @@ class FeriennetSettingsForm(Form):
             ('require_swisspass', False),
             ('cancellation_conditions', ''),
             ('require_full_age_for_registration', False),
-            ('show_related_contacts', False),
             ('public_organiser_data', self.request.app.public_organiser_data),
             ('bank_account', ''),
             ('bank_beneficiary', ''),
@@ -278,7 +269,6 @@ class FeriennetSettingsForm(Form):
             'require_swisspass',
             'cancellation_conditions',
             'require_full_age_for_registration',
-            'show_related_contacts',
             'public_organiser_data',
             'bank_account',
             'bank_beneficiary',

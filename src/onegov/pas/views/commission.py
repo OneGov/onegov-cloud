@@ -7,7 +7,6 @@ from onegov.org.forms.commission_membership import CommissionMembershipAddForm
 from onegov.town6.views.commission import (
     view_commissions,
     add_commission,
-    edit_commission,
     delete_commission
 )
 from onegov.pas import _
@@ -22,6 +21,7 @@ from onegov.pas.custom import check_attendance_in_closed_settlement_run
 from onegov.pas.models import Change
 from onegov.pas.models import PASCommission
 from onegov.pas.models import PASCommissionMembership
+from onegov.user import User
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -102,8 +102,25 @@ def pas_edit_commission(
     request: TownRequest,
     form: CommissionForm
 ) -> RenderData | Response:
-    return edit_commission(
-        self, request, form, PASCommissionLayout(self, request))
+
+    if form.submitted(request):
+        form.populate_obj(self)
+        request.success(_('Your changes were saved'))
+        return request.redirect(request.link(self))
+
+    form.process(obj=self)
+
+    layout = PASCommissionLayout(self, request)
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
+    layout.include_editor()
+    layout.edit_mode = True
+
+    return {
+        'layout': layout,
+        'title': layout.title,
+        'form': form,
+        'form_width': 'large'
+    }
 
 
 @PasApp.view(
@@ -212,12 +229,67 @@ def commissions_parliamentarians_json(
     self: PASCommissionCollection, request: TownRequest
 ) -> JSON_ro:
     """Returns all commissions with their parliamentarians."""
+    # TODO: Should we consider all that have been active in
+    # current settlement run to be more precise?
+    # It might happen that some have been active just recently
+    # but not anymore, these will not be selectable currently.
     if not request.is_admin:
-        return {}
+        if (not hasattr(request.identity, 'role')
+            or request.identity.role not in (
+                'parliamentarian', 'commission_president')):
+            return {}
+
     session = request.session
     memberships = session.query(PASCommissionMembership).all()
 
-    valid_memberships = (m for m in memberships if m.parliamentarian)
+    # If user is parliamentarian, filter to only their commissions
+    if (hasattr(request.identity, 'role')
+        and request.identity.role == 'parliamentarian'):
+        user = session.query(User).filter_by(
+            username=request.identity.userid
+        ).first()
+
+        if not user or not user.parliamentarian:  # type: ignore[attr-defined]
+            return {}
+
+        # Get commission IDs where this parliamentarian is a member
+        parliamentarian_commission_ids = {
+            str(m.commission_id)
+            for m in user.parliamentarian.commission_memberships  # type: ignore[attr-defined]
+        }
+
+        # Filter memberships to only those commissions
+        valid_memberships = (
+            m for m in memberships
+            if m.parliamentarian
+            and str(m.commission_id) in parliamentarian_commission_ids
+        )
+    # If user is commission_president, filter to only their commissions
+    elif (hasattr(request.identity, 'role')
+        and request.identity.role == 'commission_president'):
+        user = session.query(User).filter_by(
+            username=request.identity.userid
+        ).first()
+
+        if not user or not user.parliamentarian:  # type: ignore[attr-defined]
+            return {}
+
+        # Get commission IDs where this user is president
+        president_commission_ids = {
+            str(m.commission_id)
+            for m in user.parliamentarian.commission_memberships  # type: ignore[attr-defined]
+            if m.role == 'president'
+        }
+
+        # Filter memberships to only those commissions
+        valid_memberships = (
+            m for m in memberships
+            if m.parliamentarian
+            and str(m.commission_id) in president_commission_ids
+        )
+    else:
+        # Admin gets all commissions
+        valid_memberships = (m for m in memberships if m.parliamentarian)
 
     def key_func(m: PASCommissionMembership) -> str:
         return str(m.commission_id)

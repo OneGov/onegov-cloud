@@ -7,6 +7,8 @@ from uuid import uuid4
 import re
 import tempfile
 import textwrap
+
+import pytest
 import transaction
 import warnings
 
@@ -1087,6 +1089,9 @@ def test_auto_accept_reservations(client: Client) -> None:
     assert 'You can pick it up at the counter' in page
 
 
+@pytest.mark.parametrize(
+    'reject_type', ['reject-all', 'reject-all-with-message']
+)
 @freeze_time("2015-08-28", tick=True)
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
@@ -1095,7 +1100,8 @@ def test_reserve_allocation(
     broadcast: MagicMock,
     authenticate: MagicMock,
     connect: MagicMock,
-    client: Client
+    client: Client,
+    reject_type: str
 ) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
@@ -1201,8 +1207,16 @@ def test_reserve_allocation(
     assert client.app.session().query(Reservation).count() == 1
     assert client.app.session().query(FormSubmission).count() == 1
 
-    link = ticket.pyquery('a.delete-link')[0].attrib['ic-get-from']
-    ticket = client.get(link).follow()
+    if reject_type == 'reject-all':
+        link = ticket.pyquery('a.delete-link')[0].attrib['ic-get-from']
+        ticket = client.get(link).follow()
+    elif reject_type == 'reject-all-with-message':
+        link = ticket.pyquery('a.delete-link')[1].attrib['href']
+        comment = client.get(link)
+        comment.form['text'] = 'Sorry!'
+        ticket = comment.form.submit().follow()
+    else:
+        raise AssertionError('Unknown reject type')
 
     assert client.app.session().query(Reservation).count() == 0
     assert client.app.session().query(FormSubmission).count() == 0
@@ -2637,6 +2651,10 @@ def test_reserve_session_separation(client: Client) -> None:
     assert 'Verknüpfte Tickets' in ticket
     # we can create a multi-ticket pdf
     pdf = ticket.click('Mit verknüpften Tickets')
+    # we can mute all the related tickets
+    ticket = ticket.click(href='/mute-related').follow()
+    # and then unmute all the related tickets
+    ticket = ticket.click(href='/unmute-related').follow()
 
 
 def test_reserve_reservation_prediction(client: Client) -> None:
@@ -3347,6 +3365,108 @@ def test_manual_reservation_payment_without_extra(client: Client) -> None:
     assert "RSV-" in invoices
     assert "info@example.org" in invoices
     assert "20.00" in invoices
+    assert "Unbezahlt" in invoices
+    assert "Unfakturiert" in invoices
+
+
+@freeze_time("2017-07-09", tick=True)
+def test_manual_reservation_payment_allocation_override(
+    client: Client
+) -> None:
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.pricing_method = 'per_hour'
+    resource.price_per_hour = 10.00
+    resource.payment_method = 'manual'
+
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    allocations_inherit = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9, 10),
+            datetime(2017, 7, 9, 12)
+        )
+    )
+    allocations_free = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9, 12),
+            datetime(2017, 7, 9, 14)
+        ),
+        data={'pricing_method': 'free'}
+    )
+    allocations_per_item = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9, 14),
+            datetime(2017, 7, 9, 16)
+        ),
+        data={
+            'pricing_method': 'per_item',
+            'price_per_item': 23.00,
+            'currency': 'CHF'
+        }
+    )
+    allocations_per_hour = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9, 16),
+            datetime(2017, 7, 9, 18)
+        ),
+        data={
+            'pricing_method': 'per_hour',
+            'price_per_hour': 12.00,
+            'currency': 'CHF'
+        }
+    )
+
+    reserve_inherit = client.bound_reserve(allocations_inherit[0])
+    reserve_free = client.bound_reserve(allocations_free[0])
+    reserve_per_item = client.bound_reserve(allocations_per_item[0])
+    reserve_per_hour = client.bound_reserve(allocations_per_hour[0])
+    transaction.commit()
+
+    # create a reservation of each type
+    reserve_inherit()
+    reserve_free()
+    reserve_per_item()
+    reserve_per_hour()
+
+    page = client.get('/resource/tageskarte/form')
+    page.form['email'] = 'info@example.org'
+    assert '20.00' in page.form.submit().follow()
+    assert '24.00' in page.form.submit().follow()
+    assert '23.00' in page.form.submit().follow()
+    assert '67.00' in page.form.submit().follow()
+
+    ticket = page.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket.text
+
+    # mark it as paid
+    client.login_editor()
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    client.post(page.pyquery('.mark-as-paid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Bezahlt"
+
+    client.post(page.pyquery('.mark-as-unpaid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    payments = client.get('/payments')
+    assert "RSV-" in payments
+    assert "Manuell" in payments
+    assert "info@example.org" in payments
+    assert "67.00" in payments
+    assert "Offen" in payments
+
+    invoices = client.get('/invoices')
+    assert "RSV-" in invoices
+    assert "info@example.org" in invoices
+    assert "67.00" in invoices
     assert "Unbezahlt" in invoices
     assert "Unfakturiert" in invoices
 

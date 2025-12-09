@@ -876,6 +876,44 @@ form {
             margin-left: 0;
             vertical-align: text-top;
         }
+
+        &:checked + label .with-count::before {
+            background-color: $primary-color;
+            color: $white;
+        }
+
+        + label .with-count::before {
+            background-color: $secondary-color;
+            color: $body-font-color;
+            border: 0px solid #000;
+            border-radius: 1000px;
+            box-sizing: content-box;
+            content: attr(data-count);
+            display: inline-block;
+            font-size: .75rem;
+            line-height: 22px;
+            min-width: 4ex;
+            padding: 0 .5rem;
+            text-align: right;
+            margin-right: 1ex;
+        }
+    }
+
+    .two-columns ul {
+        -moz-column-count: 2;
+        -moz-column-gap: 2em;
+        -webkit-column-count: 2;
+        -webkit-column-gap: 2em;
+        column-count: 2;
+        column-gap: 2em;
+        max-width: calc(100% - 2em);
+        margin-left: 0;
+        list-style: none;
+
+        li {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
     }
 
     input[type="radio"] {
@@ -2852,6 +2890,20 @@ $archive-ticket-icon: '\f1c6';
 .RSV-link::before,
 .EVN-link::before,
 .DIR-link::before {
+    display: inline-block;
+    margin-right: 1ex;
+}
+
+.FRM-option label::before { @include icon($frm-handler-icon); }
+.RSV-option label::before { @include icon($rsv-handler-icon); }
+.EVN-option label::before { @include icon($evn-handler-icon); }
+.DIR-option label::before { @include icon($dir-handler-icon); }
+
+.ALL-option label::before,
+.FRM-option label::before,
+.RSV-option label::before,
+.EVN-option label::before,
+.DIR-option label::before {
     display: inline-block;
     margin-right: 1ex;
 }
@@ -6425,6 +6477,68 @@ h2 + div.timeline {
         font-size: 1rem;
         font-weight: bold;
         margin-top: -1px;
+    }
+
+    a.mute {
+        color: #333;
+        display: inline-block;
+        text-align: center;
+        width: 1.2rem;
+
+        .fa-microphone-slash {
+            display: none;
+        }
+        .fa-microphone {
+            display: inline;
+        }
+
+        &:hover {
+            color: $red;
+
+            .fa-microphone-slash {
+                display: inline;
+            }
+            .fa-microphone {
+                display: none;
+            }
+        }
+    }
+
+    a.unmute {
+        color: $red;
+        display: inline-block;
+        text-align: center;
+        width: 1.2rem;
+
+        .fa-microphone-slash {
+            display: inline;
+        }
+        .fa-microphone {
+            display: none;
+        }
+
+        &:hover {
+            color: #333;
+
+            .fa-microphone-slash {
+                display: none;
+            }
+            .fa-microphone {
+                display: inline;
+            }
+
+            &.disabled {
+                color: $red;
+                cursor: disabled;
+
+                .fa-microphone-slash {
+                    display: inline;
+                }
+                .fa-microphone {
+                    display: none;
+                }
+            }
+        }
     }
 
     .button {

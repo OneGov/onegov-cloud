@@ -2092,7 +2092,7 @@ def import_political_business(
 
     def create_political_businesses(request: OrgRequest, app: OrgApp) -> None:
         session = request.session
-        political_business_collection = PoliticalBusinessCollection(session)
+        political_business_collection = PoliticalBusinessCollection(request)
 
         political_businesses = read_json_files(path)
         import_counter = 0
@@ -2555,7 +2555,7 @@ def create_polical_business_participants(
         business_participants = PoliticalBusinessParticipationCollection(
             session)
         people = RISParliamentarianCollection(session)
-        political_businesses = PoliticalBusinessCollection(session)
+        political_businesses = PoliticalBusinessCollection(request)
 
         for political_business in political_businesses.query():
             connect_ids = {}
@@ -2670,7 +2670,7 @@ def connect_political_business_meeting_items(
 
         session = request.session
         meeting_items = MeetingItemCollection(session)
-        political_businesses = PoliticalBusinessCollection(session)
+        political_businesses = PoliticalBusinessCollection(request)
 
         for political_business in political_businesses.query():
             self_id = political_business.meta.get('self_id')
@@ -2761,7 +2761,7 @@ def ris_resolve_parliamentarian_doublette(
     def resolve_doublette(request: OrgRequest, app: OrgApp) -> None:
         session = request.session
         parliamentarians = RISParliamentarianCollection(session)
-        businesses = PoliticalBusinessCollection(session)
+        businesses = PoliticalBusinessCollection(request)
         id = 'c0293891-7694-4da8-b846-844c7d1c7378'
         id_1 = 'dc83ffc4-2683-490f-ae30-1a0ab95fc0cc'
         business_id = '61964b73-f92e-40b4-8157-23c5048ca0d6'
@@ -2853,7 +2853,7 @@ def ris_rebuild_political_business_links_to_meetings(
         request: OrgRequest, app: OrgApp
     ) -> None:
         session = request.session
-        businesses = PoliticalBusinessCollection(session)
+        businesses = PoliticalBusinessCollection(request)
         meetings = MeetingCollection(session)
         meeting_items = MeetingItemCollection(session)
         already_ok_counter = 0
@@ -2966,7 +2966,7 @@ def ris_make_imported_files_general_file(
 
     def make_general_file(request: OrgRequest, app: OrgApp) -> None:
         session = request.session
-        businesses = PoliticalBusinessCollection(session)
+        businesses = PoliticalBusinessCollection(request)
         meetings = MeetingCollection(session)
 
         counter = 0

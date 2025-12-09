@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-import lxml
+import lxml.etree
+import lxml.html
 import random
 import re
 import sedate

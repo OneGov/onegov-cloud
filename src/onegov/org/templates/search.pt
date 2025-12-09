@@ -12,12 +12,13 @@
 
         <div class="row" tal:condition="connection">
             <div class="columns small-12 medium-8">
-                <form class="searchbox" action="${request.link(model).split('?')[0]}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+                <form class="searchbox" action="${request.link(model).split('?')[0]}" method="GET" data-typeahead="on" data-typeahead-source="${request.link(model, name='suggest')}" data-typeahead-target="${request.link(model)}" data-typeahead-filter-params='["type"]'>
                 <div class="row collapse">
-                    <label>${searchlabel}</label>
+                    <div class="two-columns" tal:condition="form.type">${form.type()}</div>
+                    <label for="search">${searchlabel}</label>
                     <div class="columns small-11">
                         <label for="search" class="show-for-sr" i18n:translate>Search</label>
-                        <input id="search" data-typeahead-subject type="text" name="q" value="${model.query}" autocomplete="off" autocorrect="off" required autofocus onfocus="this.select()"/> <button type="reset" class="reset-button" tabindex="-1"></button>
+                        ${form.q()} <button type="reset" class="reset-button" tabindex="-1"></button>
                     </div>
                     <div class="columns small-1">
                         <button type="submit" class="button postfix" aria-label="Search" i18n:attributes="aria-label">

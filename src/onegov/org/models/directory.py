@@ -386,6 +386,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
                         GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
+    fts_type_title = _('Directories')
     fts_public = True
 
     content_fields_containing_links_to_files = {
@@ -523,6 +524,7 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
         # technically not enforced, but it should be a given
         directory: relationship[ExtendedDirectory]
 
+    fts_type_title = _('Directory entries')
     fts_public = True
 
     @property
@@ -590,6 +592,13 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
                 if field.id in content_config and field.data
             )
         return None
+
+    @property
+    def content_labels(self) -> set[str]:
+        return {
+            as_internal_id(k)
+            for k in self.display_config.get('content', ())
+        }
 
     @property
     def hidden_label_fields(self) -> set[str]:

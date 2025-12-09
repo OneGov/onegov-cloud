@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-12 10:03+0100\n"
+"POT-Creation-Date: 2025-12-04 11:14+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -288,6 +288,9 @@ msgstr "Benutzer Status E-Mail"
 
 msgid "User TOS Accepted"
 msgstr "Benutzer AGB akzeptiert"
+
+msgid "User Allow contact for carpooling"
+msgstr "Benutzer Kontakt für Fahrgemeinschaft erlauben"
 
 msgid "Invoice Item Group"
 msgstr "Rechnungsposition Gruppe"
@@ -3157,11 +3160,6 @@ msgstr ""
 "Der Text wird unter dem Bestätigungstext für ein Angebot in der E-Mail "
 "angezeigt"
 
-msgid "Parents can see the contacts of other parents in the same activity"
-msgstr ""
-"Mitglieder können die Kontaktdaten anderer Mitglieder des gleichen Angebots "
-"sehen"
-
 msgid "Public organiser data"
 msgstr "Öffentliche Daten Veranstaltende"
 
@@ -3238,6 +3236,11 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid "Parents can see the contacts of other parents in the same activity"
+#~ msgstr ""
+#~ "Mitglieder können die Kontaktdaten anderer Mitglieder des gleichen "
+#~ "Angebots sehen"
 
 #~ msgid "Dashboard"
 #~ msgstr "Übersicht"

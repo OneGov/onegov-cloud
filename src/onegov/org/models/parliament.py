@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from onegov.org.models.political_business import (
+    par_political_business_parliamentary_groups
+)
+from onegov.org.i18n import _
 from onegov.parliament.collections import CommissionCollection
 from onegov.parliament.collections import CommissionMembershipCollection
 from onegov.parliament.collections import ParliamentarianCollection
@@ -30,12 +34,22 @@ class RISCommission(Commission, ORMSearchable):
         'polymorphic_identity': 'ris_commission',
     }
 
+    fts_type_title = _('Commissions')
     fts_public = True
-    fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
+    fts_properties = {
+        'name': {'type': 'text', 'weight': 'A'},
+        'description': {'type': 'text', 'weight': 'B'}
+    }
 
     @property
     def fts_suggestion(self) -> str:
         return self.name
+
+    # NOTE: When a commission was last changed should not influence how
+    #       relevant they are in the search results
+    @property
+    def fts_last_change(self) -> None:
+        return None
 
 
 class RISCommissionCollection(CommissionCollection[RISCommission]):
@@ -99,11 +113,12 @@ class RISParliamentarian(Parliamentarian, ORMSearchable):
         'polymorphic_identity': 'ris_parliamentarian',
     }
 
-    fts_public = False
+    fts_type_title = _('Parliamentarians')
+    fts_public = True
     fts_properties = {
-        # FIXME: A single fullname property may yield better results
         'first_name': {'type': 'text', 'weight': 'A'},
         'last_name': {'type': 'text', 'weight': 'A'},
+        'title': {'type': 'text', 'weight': 'A'},
     }
 
     @property
@@ -112,6 +127,12 @@ class RISParliamentarian(Parliamentarian, ORMSearchable):
             f'{self.first_name} {self.last_name}',
             f'{self.last_name} {self.first_name}'
         )
+
+    # NOTE: When a parliamentarian was last changed should not influence how
+    #       relevant they are in the search results
+    @property
+    def fts_last_change(self) -> None:
+        return None
 
     @property
     def title(self) -> str:
@@ -196,17 +217,29 @@ class RISParliamentaryGroup(ParliamentaryGroup, ORMSearchable):
         'polymorphic_identity': 'ris_parliamentary_group',
     }
 
+    fts_type_title = _('Parliamentary groups')
     fts_public = True
-    fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
+    fts_properties = {
+        'name': {'type': 'text', 'weight': 'A'},
+        'description': {'type': 'text', 'weight': 'B'}
+    }
 
     @property
     def fts_suggestion(self) -> str:
         return self.name
 
+    # NOTE: When a parliamentary group was last changed should not
+    #       influence how relevant they are in the search results
+    @property
+    def fts_last_change(self) -> None:
+        return None
+
     political_businesses: relationship[list[PoliticalBusiness]]
     political_businesses = relationship(
         'PoliticalBusiness',
-        back_populates='parliamentary_group'
+        secondary=par_political_business_parliamentary_groups,
+        back_populates='parliamentary_groups',
+        passive_deletes=True
     )
 
 

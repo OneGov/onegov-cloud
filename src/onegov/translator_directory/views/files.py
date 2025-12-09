@@ -1,21 +1,17 @@
 from __future__ import annotations
 
-import morepath
-
-from uuid import uuid4
 from webob.exc import HTTPForbidden
 
 from onegov.core.security import Public, Secret
-from onegov.core.templates import render_macro
 from onegov.file import File
 from onegov.file.integration import (
     render_depot_file,
-    respond_with_alt_text,
-    respond_with_caching_header,
-    respond_with_x_robots_tag_header,
+    view_file as original_view_file,
+    view_file_head as original_view_file_head,
+    view_thumbnail as original_view_thumbnail,
+    view_thumbnail_head as original_view_thumbnail_head,
 )
-from onegov.file.utils import extension_for_content_type
-from onegov.org import utils
+from onegov.org.views.files import view_file_details as org_view_file_details
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.layout import DefaultLayout
 
@@ -27,48 +23,9 @@ if TYPE_CHECKING:
     from webob import Response
 
 
-"""
-This is basically the file views from org, but consists of a change made
-to restrict translator `GeneralFile` view permissions.
-For private files, even knowing the unguessable URL should still return
-403 Forbidden when accessed.
-
-While some duplication is regrettable, putting this in org would pollute
-the generic module with translator-specific checks at runtime that don't
-exist for the majority of onegov apps.
-"""
-
-
 @TranslatorDirectoryApp.html(model=File, permission=Secret, name='details')
 def view_file_details(self: File, request: TranslatorAppRequest) -> str:
-    layout = DefaultLayout(self, request)
-    extension = extension_for_content_type(
-        self.reference.content_type,
-        self.reference.filename
-    )
-    color = utils.get_extension_color(extension)
-
-    # IE 11 caches all ajax requests otherwise
-    @request.after
-    def must_revalidate(response: Response) -> None:
-        response.headers.add('cache-control', 'must-revalidate')
-        response.headers.add('cache-control', 'no-cache')
-        response.headers.add('cache-control', 'no-store')
-        response.headers['pragma'] = 'no-cache'
-        response.headers['expires'] = '0'
-
-    return render_macro(
-        layout.macros['file-details'],
-        request,
-        {
-            'id': uuid4().hex,
-            'file': self,
-            'layout': layout,
-            'extension': extension,
-            'color': color,
-            'hide_publication': True
-        }
-    )
+    return org_view_file_details(self, request, DefaultLayout(self, request))  # type: ignore[arg-type]
 
 
 @TranslatorDirectoryApp.view(
@@ -78,10 +35,7 @@ def view_file(self: File, request: TranslatorAppRequest) -> StoredFile:
     if request.is_translator:
         raise HTTPForbidden()
 
-    respond_with_alt_text(self, request)
-    respond_with_caching_header(self, request)
-    respond_with_x_robots_tag_header(self, request)
-    return self.reference.file
+    return original_view_file(self, request)
 
 
 @TranslatorDirectoryApp.view(
@@ -99,21 +53,7 @@ def view_thumbnail(
     if request.is_translator:
         raise HTTPForbidden()
 
-    if request.view_name in ('small', 'medium'):
-        size = request.view_name
-    else:
-        size = 'small'
-
-    respond_with_alt_text(self, request)
-    respond_with_caching_header(self, request)
-    respond_with_x_robots_tag_header(self, request)
-
-    thumbnail_id = self.get_thumbnail_id(size)
-
-    if not thumbnail_id:
-        return morepath.redirect(request.link(self))
-
-    return request.app.bound_depot.get(thumbnail_id)  # type:ignore
+    return original_view_thumbnail(self, request)
 
 
 @TranslatorDirectoryApp.view(
@@ -126,11 +66,7 @@ def view_file_head(self: File, request: TranslatorAppRequest) -> StoredFile:
     if request.is_translator:
         raise HTTPForbidden()
 
-    @request.after
-    def set_cache(response: Response) -> None:
-        response.cache_control.max_age = 60
-
-    return view_file(self, request)
+    return original_view_file_head(self, request)
 
 
 @TranslatorDirectoryApp.view(
@@ -160,8 +96,4 @@ def view_thumbnail_head(
     if request.is_translator:
         raise HTTPForbidden()
 
-    @request.after
-    def set_cache(response: Response) -> None:
-        response.cache_control.max_age = 60
-
-    return view_thumbnail(self, request)
+    return original_view_thumbnail_head(self, request)

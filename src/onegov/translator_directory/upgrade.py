@@ -6,7 +6,8 @@ from __future__ import annotations
 
 from onegov.core.orm.types import JSON, UUID, UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
-from sqlalchemy import ARRAY, Column, Boolean, Enum, ForeignKey, Text
+from sqlalchemy import ARRAY, Column, Boolean, Enum, Float, ForeignKey, Integer
+from sqlalchemy import Text
 
 
 @upgrade_task('Change withholding tax column to boolean')
@@ -158,17 +159,13 @@ def convert_float_to_numeric_in_time_reports(context: UpgradeContext) -> None:
 
     monetary_columns = [
         'hourly_rate',
-        'surcharge_percentage',
         'travel_compensation',
         'total_compensation',
     ]
 
     for col in monetary_columns:
         if context.has_column('translator_time_reports', col):
-            if col == 'surcharge_percentage':
-                precision, scale = 5, 2
-            else:
-                precision, scale = 10, 2
+            precision, scale = 10, 2
 
             context.operations.execute(
                 f'ALTER TABLE translator_time_reports '
@@ -201,4 +198,112 @@ def add_start_end_datetime_to_time_reports(context: UpgradeContext) -> None:
         context.operations.add_column(
             'translator_time_reports',
             Column('end', UTCDateTime, nullable=True),
+        )
+
+
+@upgrade_task('Add break_time column to time reports')
+def add_break_time_to_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if not context.has_column('translator_time_reports', 'break_time'):
+        context.add_column_with_defaults(
+            table='translator_time_reports',
+            column=Column('break_time', Integer, nullable=False, default=0),
+            default=lambda x: 0,
+        )
+
+
+@upgrade_task('Add night_minutes column to time reports')
+def add_night_minutes_to_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if not context.has_column('translator_time_reports', 'night_minutes'):
+        context.add_column_with_defaults(
+            table='translator_time_reports',
+            column=Column('night_minutes', Integer, nullable=False, default=0),
+            default=lambda x: 0,
+        )
+
+
+@upgrade_task('Add weekend_holiday_minutes column to time reports')
+def add_weekend_holiday_minutes_to_time_reports(
+    context: UpgradeContext,
+) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if not context.has_column(
+        'translator_time_reports', 'weekend_holiday_minutes'
+    ):
+        context.add_column_with_defaults(
+            table='translator_time_reports',
+            column=Column(
+                'weekend_holiday_minutes', Integer, nullable=False, default=0
+            ),
+            default=lambda x: 0,
+        )
+
+
+@upgrade_task('Remove surcharge_percentage column from time reports')
+def remove_surcharge_percentage_from_time_reports(
+    context: UpgradeContext,
+) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if context.has_column('translator_time_reports', 'surcharge_percentage'):
+        context.operations.drop_column(
+            'translator_time_reports', 'surcharge_percentage'
+        )
+
+
+@upgrade_task('Remove old night_hours column from time reports')
+def remove_night_hours_from_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if context.has_column('translator_time_reports', 'night_hours'):
+        context.operations.drop_column(
+            'translator_time_reports', 'night_hours')
+
+
+@upgrade_task('Add assignment_location column to time reports')
+def add_assignment_location_to_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if not context.has_column(
+        'translator_time_reports', 'assignment_location'
+    ):
+        context.operations.add_column(
+            'translator_time_reports',
+            Column('assignment_location', Text, nullable=True)
+        )
+
+
+@upgrade_task('Add travel_distance column to time reports')
+def add_travel_distance_to_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if not context.has_column('translator_time_reports', 'travel_distance'):
+        context.operations.add_column(
+            'translator_time_reports',
+            Column('travel_distance', Float(precision=2), nullable=True)
+        )
+
+
+@upgrade_task('Add finanzstelle column to time reports')
+def add_finanzstelle_to_time_reports(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if not context.has_column('translator_time_reports', 'finanzstelle'):
+        context.operations.add_column(
+            'translator_time_reports',
+            Column('finanzstelle', Text, nullable=True),
+        )
+
+
+@upgrade_task('Make assignment_type non-nullable in time reports')
+def make_assignment_type_non_nullable(context: UpgradeContext) -> None:
+    if not context.has_table('translator_time_reports'):
+        return
+    if context.has_column('translator_time_reports', 'assignment_type'):
+        context.operations.alter_column(
+            'translator_time_reports', 'assignment_type', nullable=False
         )

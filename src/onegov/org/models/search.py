@@ -7,6 +7,8 @@ from onegov.core.collection import Pagination
 from onegov.event.models import Event
 from onegov.search import SearchIndex
 from onegov.search.utils import language_from_locale, normalize_text
+from markupsafe import Markup
+from operator import itemgetter
 from sedate import utcnow
 from sqlalchemy import case, func, inspect
 from sqlalchemy.dialects.postgresql import UUID
@@ -15,31 +17,98 @@ from sqlalchemy_utils import escape_like
 
 from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from onegov.org.request import OrgRequest
     from onegov.search import Searchable
     from sqlalchemy.orm import Query
+    from wtforms.fields.choices import _Choice
 
 
 class Search(Pagination[Any]):
     results_per_page = 10
+    TYPE_LABEL_TEMPLATE = Markup(
+        '<span class="with-count" data-count="{count}">{label}</span>'
+    )
 
     def __init__(
         self,
         request: OrgRequest,
         query: str,
-        page: int
+        types: Iterable[str] | str | None = None,
+        page: int = 0
     ) -> None:
         self.request = request
         self.query = query
+        self.types = (
+            {types}
+            if types and isinstance(types, str)
+            else set(types or ())
+        )
         self.page = page  # page index
 
         self.number_of_results: int | None = None
 
+    # for morepath link generation
+    @cached_property
+    def type(self) -> list[str] | None:
+        return list(self.types) if self.types else None
+
     @cached_property
     def available_documents(self) -> int:
-        return self.apply_common_filters(
-            self.request.session.query(func.count(SearchIndex.id))
-        ).scalar()
+        return sum(self.available_documents_per_type.values())
+
+    @cached_property
+    def available_documents_per_type(self) -> dict[str, int]:
+        return dict(self.apply_common_filters(
+            self.request.session.query(
+                SearchIndex.owner_type,
+                func.count(SearchIndex.id)
+            ),
+            with_type_filter=False
+        ).group_by(SearchIndex.owner_type))
+
+    @cached_property
+    def document_type_filter_labels(self) -> dict[str, set[str]]:
+        type_map = {
+            model.__name__: model
+            for model in self.request.app.searchable_models()
+        }
+        types_with_results = {
+            type_name: count
+            for type_name, count in self.available_documents_per_type.items()
+            if count > 0
+            if type_name in type_map
+        }
+        if not types_with_results:
+            return {}
+
+        labels: dict[str, set[str]] = {}
+        for type_name in types_with_results:
+            title = type_map[type_name].fts_type_title
+            if callable(title):
+                title = title(self.request)
+            label = self.request.translate(title)
+            labels.setdefault(label, set()).add(type_name)
+        return labels
+
+    @cached_property
+    def document_type_filter_choices(self) -> list[_Choice]:
+        return [
+            (
+                label,
+                self.TYPE_LABEL_TEMPLATE.format(
+                    label=label,
+                    count=sum(
+                        self.available_documents_per_type[type_name]
+                        for type_name in type_names
+                    )
+                ),
+            )
+            for label, type_names in sorted(
+                self.document_type_filter_labels.items(),
+                key=itemgetter(0)
+            )
+        ]
 
     @cached_property
     def available_results(self) -> int:
@@ -72,7 +141,7 @@ class Search(Pagination[Any]):
         return self.page
 
     def page_by_index(self, index: int) -> Search:
-        return Search(self.request, self.query, index)
+        return Search(self.request, self.query, self.types, index)
 
     @cached_property
     def batch(self) -> tuple[Any, ...]:
@@ -125,7 +194,11 @@ class Search(Pagination[Any]):
         )
         return (*future_events, *other)
 
-    def apply_common_filters(self, query: Any) -> Any:
+    def apply_common_filters(
+        self,
+        query: Any,
+        with_type_filter: bool = True
+    ) -> Any:
         """ Applies common search filters like e.g. access filters. """
         private_search = self.request.app.fts_may_use_private_search(
             self.request
@@ -160,6 +233,16 @@ class Search(Pagination[Any]):
         #        by the outcome of this method.
         if not private_search:
             query = query.filter(SearchIndex.public)
+
+        if with_type_filter:
+            labels = self.document_type_filter_labels
+            types = {
+                type_name
+                for label in self.types
+                for type_name in labels.get(label, ())
+            }
+            if types:
+                query = query.filter(SearchIndex.owner_type.in_(types))
 
         return query
 

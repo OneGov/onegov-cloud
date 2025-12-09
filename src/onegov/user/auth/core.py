@@ -251,9 +251,11 @@ class Auth:
                     # be completed without entering the password again
                     request.browser_session['pending_username'] = user.username
                     return response
-            except Exception as e:
-                log.info(f'Second factor exception for user {user.username}: '
-                         f'{e.args[0]}')
+            except Exception:
+                log.info(
+                    f'Second factor exception for user {user.username}:',
+                    exc_info=True
+                )
                 return None
 
         # users from external authentication providers may not login using

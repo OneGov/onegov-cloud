@@ -231,6 +231,8 @@ class GroupFilesByDateMixin(Generic[FileT]):
 class GeneralFile(File, SearchableFile):
     __mapper_args__ = {'polymorphic_identity': 'general'}
 
+    fts_type_title = _('Files')
+
     #: the access of all the linked models
     linked_accesses: dict_property[dict[str, str]]
     linked_accesses = meta_property(default=dict)
@@ -255,6 +257,7 @@ class ImageFile(File):
 class ImageSet(FileSet, AccessExtension, ORMSearchable):
     __mapper_args__ = {'polymorphic_identity': 'image'}
 
+    fts_type_title = _('Photo Albums')
     fts_public = True
     fts_properties = {
         'title': {'type': 'localized', 'weight': 'A'},

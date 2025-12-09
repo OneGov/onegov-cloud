@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import os
+import pytest
 import re
 
-
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from tests.shared.client import ExtendedResponse
     from .conftest import Client
@@ -61,7 +62,6 @@ def test_directory_prev_next(client: Client) -> None:
 
 
 def test_newline_in_directory_header(client: Client) -> None:
-
     client.login_admin()
     page = client.get('/directories')
     page = page.click('Verzeichnis')
@@ -185,21 +185,77 @@ def test_directory_entry_subscription(client: Client) -> None:
     assert "wurde erfolgreich abgemeldet" in page
 
 
-def test_create_directory_accordion_layout(client: Client) -> None:
+@pytest.mark.parametrize(
+    'index,content_labels,hide_labels', [
+    ('A1', '', ''),
+    ('A2', 'Question', ''),
+    ('A3', 'Answer', ''),
+    ('A4', 'Question\nAnswer', ''),
 
-    def create_directory(client: Client, title: str) -> ExtendedResponse:
-        page = (client.get('/directories').
-                click('Verzeichnis'))
-        page.form['title'] = title
+    ('B1', '', 'Question'),
+    ('B2', 'Question', 'Question'),
+    ('B3', 'Answer', 'Question'),
+    ('B4', 'Question\nAnswer', 'Question'),
+
+    ('C1', '', 'Answer'),
+    ('C2', 'Question', 'Answer'),
+    ('C3', 'Answer', 'Answer'),
+    ('C4', 'Question\nAnswer', 'Answer'),
+
+    ('D1', '', 'Question\nAnswer'),
+    ('D2', 'Question', 'Question\nAnswer'),
+    ('D3', 'Answer', 'Question\nAnswer'),
+    ('D4', 'Question\nAnswer', 'Question\nAnswer'),
+])
+def test_create_directory_accordion_layout(
+    index: str,
+    content_labels: str,
+    hide_labels: str,
+    client: Client
+) -> None:
+    question_label = '<strong>Question</strong>:'
+    answer_label = '<strong>Answer</strong>:'
+
+    def create_directory(
+        client: Client,
+        title: str,
+        hide_labels: str
+    ) -> ExtendedResponse:
+        page = (client.get('/directories').click('Verzeichnis'))
+        page.form['title'] = title + f' {index}'
         page.form['structure'] = "Question *= ___\nAnswer *= ___"
         page.form['title_format'] = '[Question]'
         page.form['layout'] = 'accordion'
+        page.form['content_fields'] = content_labels
+        page.form['content_hide_labels'] = hide_labels
         return page.form.submit().follow()
+
+    def test_labels() -> None:
+        assert question in page  # question always appears as accordion title
+        if 'Question' in content_labels:
+            assert page.text.count(question) == 2
+            if 'Question' in hide_labels:
+                assert question_label not in page
+            else:
+                assert question_label in page
+        else:
+            assert page.text.count(question) == 1
+            assert question_label not in page
+
+        if 'Answer' in content_labels:
+            assert answer in page
+            if 'Answer' in hide_labels:
+                assert answer_label not in page
+            else:
+                assert answer_label in page
+        else:
+            assert answer not in page
+            assert answer_label not in page
 
     client.login_admin()
     title = "Questions and Answers about smurfs"
 
-    faq_dir = create_directory(client, title)
+    faq_dir = create_directory(client, title, hide_labels)
     assert title in faq_dir
 
     question = "Are smurfs real?"
@@ -207,14 +263,17 @@ def test_create_directory_accordion_layout(client: Client) -> None:
     q1 = faq_dir.click('Eintrag')
     q1.form['question'] = question
     q1.form['answer'] = answer
-    q1 = q1.form.submit().follow()
-    assert question in q1
-    assert answer not in q1
+    q1.form.submit().follow()
+
+    page = client.get(
+        f'/directories/questions-and-answers-about-smurfs-{index.lower()}')
+    test_labels()
 
     question = "Who is the boss of the smurfs?"
     q2 = faq_dir.click('Eintrag')
     q2.form['question'] = question
     q2.form['answer'] = 'Papa Schlumpf'
-    q2 = q2.form.submit().follow()
-    assert question in q2
-    assert answer not in q2
+    q2.form.submit().follow()
+    page = client.get(
+        f'/directories/questions-and-answers-about-smurfs-{index.lower()}')
+    test_labels()

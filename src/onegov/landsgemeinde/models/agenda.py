@@ -56,6 +56,7 @@ class AgendaItem(
 
     __tablename__ = 'landsgemeinde_agenda_items'
 
+    fts_type_title = _('Agenda items')
     fts_public = True
     fts_properties = {
         'title': {'type': 'text', 'weight': 'A'},

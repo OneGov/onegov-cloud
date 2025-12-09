@@ -13,6 +13,7 @@ from sqlalchemy import Column
 from sqlalchemy import Text
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import relationship
+from translationstring import TranslationString
 from uuid import uuid4
 from vobject import vCard
 from vobject.vcard import Address
@@ -49,6 +50,10 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         'polymorphic_identity': 'generic',
     }
 
+    # HACK: We don't want to set up translations in this module for this single
+    #       string, we know we already have a translation in a different domain
+    #       so we just manually specify it for now.
+    fts_type_title = TranslationString('People', domain='onegov.org')
     fts_public = True
     fts_properties = {
         'title': {'type': 'text', 'weight': 'A'},
