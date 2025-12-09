@@ -594,6 +594,13 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
         return None
 
     @property
+    def content_labels(self) -> set[str]:
+        return {
+            as_internal_id(k)
+            for k in self.display_config.get('content', ())
+        }
+
+    @property
     def hidden_label_fields(self) -> set[str]:
         return {
             as_internal_id(k)

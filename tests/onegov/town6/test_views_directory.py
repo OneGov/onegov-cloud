@@ -187,23 +187,34 @@ def test_directory_entry_subscription(client: Client) -> None:
 
 @pytest.mark.parametrize(
     'index,content_labels,hide_labels', [
-    ('A', 'Question\nAnswer', ''),
-    ('B', 'Question\nAnswer', 'Question'),
-    ('C', 'Question\nAnswer', 'Answer'),
-    ('D', 'Question\nAnswer', 'Question\nAnswer'),
+    ('A1', '', ''),
+    ('A2', 'Question', ''),
+    ('A3', 'Answer', ''),
+    ('A4', 'Question\nAnswer', ''),
+
+    ('B1', '', 'Question'),
+    ('B2', 'Question', 'Question'),
+    ('B3', 'Answer', 'Question'),
+    ('B4', 'Question\nAnswer', 'Question'),
+
+    ('C1', '', 'Answer'),
+    ('C2', 'Question', 'Answer'),
+    ('C3', 'Answer', 'Answer'),
+    ('C4', 'Question\nAnswer', 'Answer'),
+
+    ('D1', '', 'Question\nAnswer'),
+    ('D2', 'Question', 'Question\nAnswer'),
+    ('D3', 'Answer', 'Question\nAnswer'),
+    ('D4', 'Question\nAnswer', 'Question\nAnswer'),
 ])
 def test_create_directory_accordion_layout(
-    index,
-    content_labels,
-    hide_labels,
+    index: str,
+    content_labels: str,
+    hide_labels: str,
     client: Client
 ) -> None:
     question_label = '<strong>Question</strong>:'
     answer_label = '<strong>Answer</strong>:'
-
-    print('*** tschupre index:', index)
-    print('*** tschupre content_labels:', content_labels)
-    print('*** tschupre hide_labels:', hide_labels)
 
     def create_directory(
         client: Client,
@@ -218,6 +229,28 @@ def test_create_directory_accordion_layout(
         page.form['content_fields'] = content_labels
         page.form['content_hide_labels'] = hide_labels
         return page.form.submit().follow()
+
+    def test_labels() -> None:
+        assert question in page  # question always appears as accordion title
+        if 'Question' in content_labels:
+            assert page.text.count(question) == 2
+            if 'Question' in hide_labels:
+                assert question_label not in page
+            else:
+                assert question_label in page
+        else:
+            assert page.text.count(question) == 1
+            assert question_label not in page
+
+        if 'Answer' in content_labels:
+            assert answer in page
+            if 'Answer' in hide_labels:
+                assert answer_label not in page
+            else:
+                assert answer_label in page
+        else:
+            assert answer not in page
+            assert answer_label not in page
 
     client.login_admin()
     title = "Questions and Answers about smurfs"
@@ -234,19 +267,7 @@ def test_create_directory_accordion_layout(
 
     page = client.get(
         f'/directories/questions-and-answers-about-smurfs-{index.lower()}')
-    # for ul in page.pyquery('ul'):
-    #     for li in ul.findall('li'):
-    #         print('*** tschupre li text:', li.text)
-    assert question in page
-    assert answer in page
-    if 'Question' in hide_labels:
-        assert question_label not in page
-    else:
-        assert question_label in page
-    if 'Answer' in hide_labels:
-        assert answer_label not in page
-    else:
-        assert answer_label in page
+    test_labels()
 
     question = "Who is the boss of the smurfs?"
     q2 = faq_dir.click('Eintrag')
@@ -255,13 +276,4 @@ def test_create_directory_accordion_layout(
     q2.form.submit().follow()
     page = client.get(
         f'/directories/questions-and-answers-about-smurfs-{index.lower()}')
-    assert question in page
-    assert answer in page
-    if 'Question' in hide_labels:
-        assert question_label not in page
-    else:
-        assert question_label in page
-    if 'Answer' in hide_labels:
-        assert answer_label not in page
-    else:
-        assert answer_label in page
+    test_labels()
