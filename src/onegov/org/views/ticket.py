@@ -1014,7 +1014,7 @@ def message_to_submitter(
                 text=form.text.data,
                 owner=request.current_username,
                 recipient=recipient,
-                notify=form.notify.data,
+                notify=form.notify.data if form.notify is not None else True,
                 origin='internal')
 
             fe = form.email_attachment

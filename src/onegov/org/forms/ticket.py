@@ -76,9 +76,9 @@ class InternalTicketChatMessageForm(TicketChatMessageForm):
         kind='callout',
         text=_(
             'The "Always send email notifications for new ticket messages" '
-            'setting is enabled. You will receive an email whenever a new '
-            'message is posted to this ticket. You can change this behaviour '
-            'in the general ticket settings.'
+            'setting is enabled. You will receive an email whenever theres a '
+            'reply to your messages. You can change this behaviour in the '
+            'general ticket settings.'
         )
     )
 
