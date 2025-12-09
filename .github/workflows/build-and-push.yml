@@ -110,8 +110,7 @@ jobs:
     - name: Install Chrome
       uses: browser-actions/setup-chrome@v1
       with:
-        # FIXME: Unpin once selenium works with newer version
-        chrome-version: 127
+        chrome-version: stable
         install-chromedriver: true
 
     - name: Checkout repo
