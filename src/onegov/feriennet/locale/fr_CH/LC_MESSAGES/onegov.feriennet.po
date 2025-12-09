@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-27 10:21+0100\n"
+"POT-Creation-Date: 2025-12-04 11:14+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -289,6 +289,9 @@ msgstr "Statut e-mail utilisateur·trice"
 
 msgid "User TOS Accepted"
 msgstr "Utilisateur·trice a accepté conditions de participation"
+
+msgid "User Allow contact for carpooling"
+msgstr "Utilisateur·trice autorise contact pour covoiturage"
 
 msgid "Invoice Item Group"
 msgstr "Participants·es facture"
@@ -3195,10 +3198,6 @@ msgstr ""
 "Le texte sera affiché sous le texte de confirmation d'une activité dans le "
 "mail"
 
-msgid "Parents can see the contacts of other parents in the same activity"
-msgstr ""
-"Les parents peuvent voir les contacts d'autres parents pour la même activité"
-
 msgid "Public organiser data"
 msgstr "Données contacts des prestataires"
 
@@ -3277,13 +3276,6 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
-
-#~ msgid ""
-#~ "The attendee could not be deleted because there are existing bookings "
-#~ "associated with it."
-#~ msgstr ""
-#~ "Le·la participant·e ne peut pas être supprimé·e car il·elle a des "
-#~ "réservations."
 
 #~ msgid "Dashboard"
 #~ msgstr "Dashboard"

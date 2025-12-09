@@ -6,8 +6,9 @@ from onegov.search.utils import extract_hashtags
 
 from typing import Any, ClassVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Callable, Sequence
     from datetime import datetime
+    from typing import Any as AnyRequest
 
 
 class Searchable:
@@ -37,6 +38,7 @@ class Searchable:
         #        consistently use one or the other
         fts_properties: ClassVar[dict[str, Any]]
         fts_id: ClassVar[str]
+        fts_type_title: ClassVar[str | Callable[[AnyRequest], str]]
         __tablename__: ClassVar[str]
 
     # TODO: rename to fts_properties
@@ -77,6 +79,19 @@ class Searchable:
 
         """
         raise NotImplementedError
+
+    @classproperty  # type:ignore[no-redef]
+    @classmethod
+    def fts_type_title(cls) -> str | Callable[[AnyRequest], str]:
+        """ Returns the display name for this type of document or a callable
+        which accepts the current request as a single positional argument and
+        returns the display name.
+
+        """
+        # NOTE: This fallback should generally not be relied upon, but it's
+        #       better if we have a bad name, rather than a crash, when we
+        #       add a new type and forget to add a custom title.
+        return cls.__name__  # pragma: no cover
 
     @property
     def fts_language(self) -> str:
@@ -142,7 +157,13 @@ class Searchable:
 
     @property
     def fts_last_change(self) -> datetime | None:
-        """ Returns the date the document was created/last modified. """
+        """
+        Returns the date the document was created/last modified.
+
+        Returning `None` indicates that the document's age/recency must not
+        influence search ranking: the item should be treated as equally
+        relevant regardless of how old it is.
+        """
         return None
 
     @property

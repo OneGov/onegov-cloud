@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date
 from sqlalchemy import and_, or_, func, case
 from sqlalchemy import Column, Date, Enum, ForeignKey, Text
+from sqlalchemy import Table
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -16,10 +17,11 @@ from onegov.file import MultiAssociatedFiles
 from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
-from onegov.search import ORMSearchable
+from onegov.search import ORMSearchable, SearchIndex
+from onegov.search.utils import language_from_locale, normalize_text
+
 
 from typing import Literal, Self, TypeAlias, TYPE_CHECKING
-
 if TYPE_CHECKING:
     import uuid
 
@@ -30,6 +32,7 @@ if TYPE_CHECKING:
     from onegov.org.models import MeetingItem
     from onegov.org.models import RISParliamentarian
     from onegov.org.models import RISParliamentaryGroup
+    from onegov.org.request import OrgRequest
 
 PoliticalBusinessType: TypeAlias = Literal[
     'inquiry',  # Anfrage
@@ -93,6 +96,25 @@ POLITICAL_BUSINESS_STATUS: dict[PoliticalBusinessStatus, str] = {
 }
 
 
+# join table between political businesses and parliamentary groups
+par_political_business_parliamentary_groups = Table(
+    'par_political_business_parliamentary_groups',
+    Base.metadata,
+    Column(
+        'political_business_id',
+        UUID(as_uuid=True),
+        ForeignKey('par_political_businesses.id', ondelete='CASCADE'),
+        primary_key=True,
+    ),
+    Column(
+        'parliamentary_group_id',
+        UUID(as_uuid=True),
+        ForeignKey('par_parliamentary_groups.id', ondelete='CASCADE'),
+        primary_key=True,
+    ),
+)
+
+
 class PoliticalBusiness(
     AccessExtension,
     MultiAssociatedFiles,
@@ -120,6 +142,7 @@ class PoliticalBusiness(
 
     __tablename__ = 'par_political_businesses'
 
+    fts_type_title = _('Political Businesses')
     fts_public = True
     fts_properties = {
         'title': {'type': 'text', 'weight': 'A'},
@@ -177,17 +200,13 @@ class PoliticalBusiness(
         order_by='desc(PoliticalBusinessParticipation.participant_type)',
     )
 
-    #: parliamentary group (Fraktion)
-    # FIXME: make multiple groups possible
-    parliamentary_group_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('par_parliamentary_groups.id'),
-        nullable=True,
-    )
-    parliamentary_group: relationship[RISParliamentaryGroup | None]
-    parliamentary_group = relationship(
+    #: parliamentary groups (Fraktionen)
+    parliamentary_groups: relationship[list[RISParliamentaryGroup]]
+    parliamentary_groups = relationship(
         'RISParliamentaryGroup',
-        back_populates='political_businesses'
+        secondary=par_political_business_parliamentary_groups,
+        back_populates='political_businesses',
+        passive_deletes=True
     )
 
     meeting_items: relationship[list[MeetingItem]] = relationship(
@@ -274,18 +293,25 @@ class PoliticalBusinessCollection(
 
     def __init__(
         self,
-        session: Session,
+        request: OrgRequest,
         page: int = 0,
+        term: str | None = None,
         status: Collection[PoliticalBusinessStatus] | None = None,
         types: Collection[PoliticalBusinessType] | None = None,
         years: Collection[int] | None = None,
     ) -> None:
-        super().__init__(session)
+        super().__init__(request.session)
+        self.request = request
         self.page = page
+        self.term = term
         self.status = set(status) if status else set()
         self.types = set(types) if types else set()
         self.years = set(years) if years else set()
         self.batch_size = 20
+
+    @property
+    def q(self) -> str | None:
+        return self.term
 
     @property
     def model_class(self) -> type[PoliticalBusiness]:
@@ -299,6 +325,18 @@ class PoliticalBusinessCollection(
 
     def query(self) -> Query[PoliticalBusiness]:
         query = super().query()
+
+        if self.term:
+            query = query.join(
+                SearchIndex,
+                SearchIndex.owner_id_uuid == PoliticalBusiness.id
+            )
+            query = query.filter(SearchIndex.fts_idx.op('@@')(
+                func.websearch_to_tsquery(
+                    language_from_locale(self.request.locale),
+                    normalize_text(self.term)
+                )
+            ))
 
         if self.types:
             query = query.filter(
@@ -330,7 +368,8 @@ class PoliticalBusinessCollection(
 
     def page_by_index(self, index: int) -> Self:
         return self.__class__(
-            self.session,
+            self.request,
+            term=self.term,
             page=index,
             status=self.status,
             types=self.types,
@@ -352,8 +391,9 @@ class PoliticalBusinessCollection(
         years = toggle(self.years, year)
 
         return self.__class__(
-            self.session,
+            self.request,
             page=0,
+            term=self.term,
             status=status_,
             types=types,
             years=years,

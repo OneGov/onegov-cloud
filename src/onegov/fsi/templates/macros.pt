@@ -50,7 +50,7 @@
         </dl>
         <dl class="field-display">
             <dt i18n:translate="">Text: </dt>
-            <iframe class="resizeable" src="${iframe_link|request.link(mail, name='embed')}" frameborder="0" width="100%" height="600px" onload="autoResize()"></iframe>
+            <iframe class="resizeable" src="${iframe_link|request.link(mail, name='embed')}" frameborder="0" width="100%" height="600px"></iframe>
             <div class="clearfix"></div>
         </dl>
     </tal:b>

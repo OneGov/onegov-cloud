@@ -460,6 +460,7 @@ def get_tickets(
     group: str | None = None,
     owner: str | None = None,
     submitter: str | None = None,
+    q: str | None = None,
     extra_parameters: dict[str, str] | None = None
 ) -> TicketCollection | None:
 
@@ -474,6 +475,7 @@ def get_tickets(
         group=group,
         owner=owner or '*',
         submitter=submitter or '*',
+        term=q,
         extra_parameters=extra_parameters,
         request=request,
     )
@@ -491,6 +493,7 @@ def get_archived_tickets(
     group: str | None = None,
     owner: str | None = None,
     submitter: str | None = None,
+    q: str | None = None,
     extra_parameters: dict[str, str] | None = None
 ) -> ArchivedTicketCollection:
     return FilteredArchivedTicketCollection(
@@ -501,6 +504,7 @@ def get_archived_tickets(
         group=group,
         owner=owner or '*',
         submitter=submitter or '*',
+        term=q,
         extra_parameters=extra_parameters,
         request=request,
     )
@@ -780,13 +784,21 @@ def get_event(app: OrgApp, name: str) -> Event | None:
     return EventCollection(app.session()).by_name(name)
 
 
-@OrgApp.path(model=Search, path='/search', converters={'page': int})
+@OrgApp.path(
+    model=Search,
+    path='/search',
+    converters={
+        'type': [str],
+        'page': int
+    }
+)
 def get_search(
     request: OrgRequest,
     q: str = '',
+    type: list[str] | None = None,
     page: int = 0
 ) -> Search:
-    return Search(request, q, page)
+    return Search(request, q, types=type, page=page)
 
 
 @OrgApp.path(model=AtoZPages, path='/a-z')
@@ -914,7 +926,8 @@ def get_payment(app: OrgApp, id: UUID) -> Payment | None:
         'ticket_start': extended_date_converter,
         'ticket_end': extended_date_converter,
         'reservation_start': extended_date_converter,
-        'reservation_end': extended_date_converter
+        'reservation_end': extended_date_converter,
+        'reservation_reference_date': LiteralConverter('final', 'any'),
     }
 )
 def get_payments(
@@ -929,7 +942,8 @@ def get_payments(
     ticket_start: date | None = None,
     ticket_end: date | None = None,
     reservation_start: date | None = None,
-    reservation_end: date | None = None
+    reservation_end: date | None = None,
+    reservation_reference_date: Literal['final', 'any'] | None = None,
 ) -> PaymentCollection:
     return PaymentCollection(
         session=app.session(),
@@ -943,7 +957,8 @@ def get_payments(
         ticket_start=ticket_start,
         ticket_end=ticket_end,
         reservation_start=reservation_start,
-        reservation_end=reservation_end
+        reservation_end=reservation_end,
+        reservation_reference_date=reservation_reference_date,
     )
 
 
@@ -957,6 +972,7 @@ def get_payments(
         'ticket_end': extended_date_converter,
         'reservation_start': extended_date_converter,
         'reservation_end': extended_date_converter,
+        'reservation_reference_date': LiteralConverter('final', 'any'),
         'has_payment': bool,
         'invoiced': bool,
     }
@@ -969,6 +985,7 @@ def get_invoices(
     ticket_end: date | None = None,
     reservation_start: date | None = None,
     reservation_end: date | None = None,
+    reservation_reference_date: Literal['final', 'any'] | None = None,
     has_payment: bool | None = None,
     invoiced: bool | None = None,
 ) -> TicketInvoiceCollection:
@@ -980,6 +997,7 @@ def get_invoices(
         ticket_end=ticket_end,
         reservation_start=reservation_start,
         reservation_end=reservation_end,
+        reservation_reference_date=reservation_reference_date,
         has_payment=has_payment,
         invoiced=invoiced,
     )
@@ -1378,14 +1396,16 @@ def get_meeting(
     }
 )
 def get_political_businesses(
-    app: OrgApp,
+    request: OrgRequest,
     page: int = 0,
+    q: str | None = None,
     status: list[PoliticalBusinessStatus] | None = None,
     types: list[PoliticalBusinessType] | None = None,
     years: list[int] | None = None,
 ) -> PoliticalBusinessCollection:
     return PoliticalBusinessCollection(
-        app.session(),
+        request,
+        term=q,
         page=page,
         status=status,
         types=types,
@@ -1399,10 +1419,10 @@ def get_political_businesses(
     converters={'id': UUID}
 )
 def get_political_business(
-    app: OrgApp,
+    request: OrgRequest,
     id: UUID
 ) -> PoliticalBusiness | None:
-    return PoliticalBusinessCollection(app.session()).by_id(id)
+    return PoliticalBusinessCollection(request).by_id(id)
 
 
 @OrgApp.path(

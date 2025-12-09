@@ -17,7 +17,7 @@ from sqlalchemy.orm import contains_eager, joinedload, selectinload, undefer
 from uuid import UUID
 
 
-from typing import Any, Literal, NamedTuple, Self, TYPE_CHECKING
+from typing import Any, ClassVar, Literal, NamedTuple, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import date, datetime
     from onegov.ticket.models.ticket import TicketState
@@ -40,6 +40,11 @@ class TicketCollectionPagination(Pagination[Ticket]):
         # forward declare query
         def query(self) -> Query[Ticket]: ...
 
+    # NOTE: Indicates whether or not passing `term` to the collection
+    #       has any influence on the results, the base implementation
+    #       does not support search, but our subclass in onegov.org does.
+    search_term_supported: ClassVar[bool] = False
+
     def __init__(
         self,
         session: Session,
@@ -49,6 +54,8 @@ class TicketCollectionPagination(Pagination[Ticket]):
         group: str | None = None,
         owner: str = '*',
         submitter: str = '*',
+        # NOTE: Only used by subclasses which implement fulltext search
+        term: str | None = None,
         extra_parameters: dict[str, Any] | None = None
     ):
         super().__init__(page)
@@ -59,11 +66,16 @@ class TicketCollectionPagination(Pagination[Ticket]):
         self.group = group
         self.owner = owner
         self.submitter = submitter
+        self.term = term
 
         if self.handler != 'ALL':
             self.extra_parameters = extra_parameters or {}
         else:
             self.extra_parameters = {}
+
+    @property
+    def q(self) -> str | None:
+        return self.term
 
     def __eq__(self, other: object) -> bool:
         return (
@@ -73,6 +85,7 @@ class TicketCollectionPagination(Pagination[Ticket]):
             and self.group == other.group
             and self.owner == other.owner
             and self.submitter == other.submitter
+            and self.term == other.term
             and self.extra_parameters == other.extra_parameters
             and self.page == other.page
         )
@@ -120,25 +133,25 @@ class TicketCollectionPagination(Pagination[Ticket]):
     def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session, index, self.state, self.handler, self.group,
-            self.owner, self.submitter, self.extra_parameters
+            self.owner, self.submitter, self.term, self.extra_parameters
         )
 
     def for_state(self, state: ExtendedTicketState) -> Self:
         return self.__class__(
             self.session, 0, state, self.handler, self.group, self.owner,
-            self.submitter, self.extra_parameters
+            self.submitter, self.term, self.extra_parameters
         )
 
     def for_handler(self, handler: str) -> Self:
         return self.__class__(
             self.session, 0, self.state, handler, self.group, self.owner,
-            self.submitter, self.extra_parameters
+            self.submitter, self.term, self.extra_parameters
         )
 
     def for_group(self, group: str) -> Self:
         return self.__class__(
             self.session, 0, self.state, self.handler, group, self.owner,
-            self.submitter, self.extra_parameters
+            self.submitter, self.term, self.extra_parameters
         )
 
     def for_owner(self, owner: str | UUID) -> Self:
@@ -147,13 +160,13 @@ class TicketCollectionPagination(Pagination[Ticket]):
 
         return self.__class__(
             self.session, 0, self.state, self.handler, self.group, owner,
-            self.submitter, self.extra_parameters
+            self.submitter, self.term, self.extra_parameters
         )
 
     def for_submitter(self, submitter: str) -> Self:
         return self.__class__(
             self.session, 0, self.state, self.handler, self.group,
-            self.owner, submitter, self.extra_parameters
+            self.owner, submitter, self.term, self.extra_parameters
         )
 
     def groups_by_handler_code(self) -> Query[tuple[str, list[str]]]:
@@ -321,6 +334,7 @@ class TicketInvoiceCollection(
         ticket_end: date | None = None,
         reservation_start: date | None = None,
         reservation_end: date | None = None,
+        reservation_reference_date: Literal['final', 'any'] | None = None,
         has_payment: bool | None = None,
         invoiced: bool | None = None,
     ) -> None:
@@ -333,6 +347,7 @@ class TicketInvoiceCollection(
         self.ticket_end = ticket_end
         self.reservation_start = reservation_start
         self.reservation_end = reservation_end
+        self.reservation_reference_date = reservation_reference_date or 'final'
 
     @property
     def model_class(self) -> type[TicketInvoice]:
@@ -403,32 +418,37 @@ class TicketInvoiceCollection(
         if self.reservation_start or self.reservation_end:
             from onegov.reservation import Reservation
 
-            reservations = self.session.query(
-                func.max(Reservation.end).label('reference_date'),
-                Reservation.token,
-            ).group_by(
-                Reservation.token
-            ).subquery()
+            if self.reservation_reference_date == 'any':
+                subquery = self.session.query(Reservation.token)
+                token_col = Reservation.token
+                start_col = Reservation.start
+                end_col = Reservation.end
+            else:
+                reservations = self.session.query(
+                    func.max(Reservation.end).label('reference_date'),
+                    Reservation.token,
+                ).group_by(
+                    Reservation.token
+                ).subquery()
 
-            subquery = self.session.query(reservations.c.token)
+                subquery = self.session.query(reservations.c.token)
+                token_col = reservations.c.token
+                start_col = reservations.c.reference_date
+                end_col = reservations.c.reference_date
+
             subquery = subquery.filter(
-                reservations.c.token == cast(Ticket.handler_id, UUIDType)
+                token_col == cast(Ticket.handler_id, UUIDType)
             )
-
             if self.reservation_start is not None:
-                subquery = subquery.filter(
-                    reservations.c.reference_date >= self.align_date(
-                        self.reservation_start,
-                        'down'
-                    )
-                )
+                subquery = subquery.filter(end_col >= self.align_date(
+                    self.reservation_start,
+                    'down'
+                ))
             if self.reservation_end is not None:
-                subquery = subquery.filter(
-                    reservations.c.reference_date <= self.align_date(
-                        self.reservation_end,
-                        'up'
-                    )
-                )
+                subquery = subquery.filter(start_col <= self.align_date(
+                    self.reservation_end,
+                    'up'
+                ))
 
             query = query.filter(subquery.exists())
 
@@ -447,6 +467,7 @@ class TicketInvoiceCollection(
             ticket_end=self.ticket_end,
             reservation_start=self.reservation_start,
             reservation_end=self.reservation_end,
+            reservation_reference_date=self.reservation_reference_date,
             has_payment=self.has_payment,
             invoiced=self.invoiced
         )
@@ -485,6 +506,8 @@ class TicketInvoiceCollection(
             and self.ticket_end == other.ticket_end
             and self.reservation_start == other.reservation_start
             and self.reservation_end == other.reservation_end
+            and self.reservation_reference_date
+                == other.reservation_reference_date
         )
 
     def by_invoiced(self, invoiced: bool | None) -> Self:
@@ -496,6 +519,7 @@ class TicketInvoiceCollection(
             ticket_end=self.ticket_end,
             reservation_start=self.reservation_start,
             reservation_end=self.reservation_end,
+            reservation_reference_date=self.reservation_reference_date,
             has_payment=self.has_payment,
             invoiced=invoiced,
         )

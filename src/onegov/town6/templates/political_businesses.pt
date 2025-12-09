@@ -12,7 +12,6 @@
                         <div class="card-header">
                             <div class="info">
                                 <span>${layout.format_date(business.entry_date, 'date')}</span>
-                                <b tal:condition="business.number">${business.number}</b>
                             </div>
                             <div class="tags">
                                 <span tal:condition="python: business.political_business_type in type_map" class="blank-label">${type_map[business.political_business_type]}</span>
@@ -31,6 +30,22 @@
 
             <div class="large-4 medium-4 large-offset-1 cell sidebar filter-panel">
                 <div class="sidebar-wrapper">
+                    <div class="side-panel filter-search-term">
+                        <h2 class="h3" i18n:translate>Search</h2>
+                        <form action="${request.path_url}" method="GET">
+                        <tal:b tal:condition="request.GET" tal:repeat="item request.GET.items()">
+                            <input type="hidden" name="${item[0]}" value="${item[1]}" tal:condition="item[0] not in ('page', 'q')" />
+                        </tal:b>
+                        <div class="input-group">
+                            <input class="input-group-field" id="search" data-typeahead-subject type="search" name="q" value="${layout.model.q}" autocomplete="off" autocorrect="off" autofocus />
+                            <div class="input-group-button">
+                                <button type="submit" class="button" aria-label="Search" i18n:attributes="aria-label">
+                                    <i class="fa fa-fw fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        </form>
+                    </div>
                     <div tal:condition="business_types" class="side-panel filter-business-types">
                         <h2 class="h3" i18n:translate>Business Type</h2>
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags business_types" />

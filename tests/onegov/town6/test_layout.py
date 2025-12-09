@@ -253,3 +253,50 @@ def test_default_layout_format_date() -> None:
     assert layout.format_date(then, 'weekday_long') == 'Sonntag'
     assert layout.format_date(then, 'month_long') == 'Juli'
     assert layout.format_date(then, 'event') == 'Sonntag, 5. Juli 2015'
+
+
+def test_layout_get_filename_without_extension() -> None:
+    layout = DefaultLayout(MockModel(), MockRequest())  # type: ignore[arg-type]
+    assert layout.get_filename_without_extension(
+        'document.pdf') == 'document'
+    assert layout.get_filename_without_extension(
+        'no_extension') == 'no_extension'
+    assert layout.get_filename_without_extension(
+        '.hiddenfile') == '.hiddenfile'
+    assert layout.get_filename_without_extension(
+        'archive.tar.gz') == 'archive'
+    assert layout.get_filename_without_extension(
+        'WORD.DOCX') == 'WORD'
+
+    for ext in layout.file_extension_fa_icon_mapping.keys():
+        filename = f'file.{ext}'
+        name_without_ext = layout.get_filename_without_extension(filename)
+        assert name_without_ext == 'file', f'Failed for extension: {ext}'
+
+
+def test_layout_get_file_extension() -> None:
+    layout = DefaultLayout(MockModel(), MockRequest())  # type: ignore[arg-type]
+    assert layout.get_filename_extension('document.pdf') == 'pdf'
+    assert layout.get_filename_extension('no_extension') == ''
+    assert layout.get_filename_extension('.hiddenfile') == ''
+    assert layout.get_filename_extension('archive.tar.gz') == 'tar.gz'
+    assert layout.get_filename_extension('WORD.DOCX') == 'docx'
+    assert layout.get_filename_extension('this.is-(my)_filename.pdf') == 'pdf'
+
+    for ext in layout.file_extension_fa_icon_mapping.keys():
+        filename = f'file.{ext}'
+        extracted_ext = layout.get_filename_extension(filename)
+        assert extracted_ext == ext, f'Failed for extension: {ext}'
+
+
+def test_layout_get_fa_file_icon() -> None:
+    layout = DefaultLayout(MockModel(), MockRequest())  # type: ignore[arg-type]
+    assert layout.get_fa_file_icon('document.pdf') == 'fa-file-pdf'
+    assert layout.get_fa_file_icon('no_extension') == 'fa-file'
+    assert layout.get_fa_file_icon('.hiddenfile') == 'fa-file'
+    assert layout.get_fa_file_icon('archive.tar.gz') == 'fa-file-zip'
+
+    for ext, icon in layout.file_extension_fa_icon_mapping.items():
+        filename = f'file.{ext}'
+        fa_icon = layout.get_fa_file_icon(filename)
+        assert fa_icon == icon, f'Failed for extension: {ext}'

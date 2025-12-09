@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import json
-
 from babel import Locale
 from requests.exceptions import JSONDecodeError
 
+from onegov.user import UserGroup, UserGroupCollection
+from onegov.translator_directory.constants import ASSIGNMENT_LOCATIONS
 from onegov.gis import Coordinates
 from onegov.gis.utils import MapboxRequests, outside_bbox
 from onegov.translator_directory import log
@@ -12,12 +13,11 @@ from onegov.translator_directory import _
 
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     import requests
     from wtforms.fields.choices import _Choice
     from collections.abc import Collection
-    from onegov.gis.models.coordinates import RealCoordinates
+    from onegov.gis.models.coordinates import AnyCoordinates, RealCoordinates
     from onegov.org.request import OrgRequest
     from onegov.translator_directory.request import TranslatorAppRequest
     from onegov.translator_directory.models.translator import Translator
@@ -159,6 +159,67 @@ def update_drive_distances(
     return total, routes_found, distance_changed, no_routes, tol_failed
 
 
+def calculate_distance_to_location(
+    request: TranslatorAppRequest,
+    translator_coordinates: AnyCoordinates,
+    location_key: str,
+    custom_address: str | None = None,
+) -> float | None:
+
+    if not translator_coordinates:
+        return None
+
+    if custom_address:
+        address = custom_address
+    elif location_key in ASSIGNMENT_LOCATIONS:
+        _, address = ASSIGNMENT_LOCATIONS[location_key]
+    else:
+        return None
+
+    geocoding_api = MapboxRequests(
+        request.app.mapbox_token,
+        endpoint='geocoding'
+    )
+
+    try:
+        geocode_response = geocoding_api.geocode(
+            text=address,
+            ctry='Schweiz'
+        )
+
+        if geocode_response.status_code != 200:
+            return None
+
+        data = geocode_response.json()
+        if not data.get('features'):
+            return None
+
+        # Get coordinates of the assignment location
+        location_coords = data['features'][0]['geometry']['coordinates']
+
+        # Calculate driving distance
+        directions_api = MapboxRequests(
+            request.app.mapbox_token,
+            endpoint='directions',
+            profile='driving'
+        )
+
+        response = directions_api.directions([
+            to_tuple(translator_coordinates),
+            # lat, lon (GeoJSON returns [lon, lat])
+            (location_coords[1], location_coords[0])
+        ])
+
+        if found_route(response):
+            return parse_directions_result(response)
+
+        return None
+
+    except Exception:
+        # Log error in production; for now return None
+        return None
+
+
 def geocode_translator_addresses(
     request: TranslatorAppRequest,
     only_empty: bool,
@@ -260,17 +321,34 @@ def get_custom_text(request: OrgRequest, key: str) -> str:
         key, _(f"Error: No custom text found for '{key}'"))
 
 
-def get_accountant_email(request: TranslatorAppRequest) -> str:
-    """Returns the accountant email or raises an error if not configured."""
-    email = request.app.accountant_email
-    if not email:
-        settings_url = request.link(request.app.org, 'directory-settings')
-        error_msg = request.translate(
-            _(
-                'Accountant email is not configured. '
-                'Please configure it in the settings: ${settings_url}',
-                mapping={'settings_url': settings_url},
+def get_accountant_emails_for_finanzstelle(
+    request: TranslatorAppRequest, finanzstelle_key: str | None
+) -> set[str]:
+    if not finanzstelle_key:
+        raise ValueError(_('No Finanzstelle specified'))
+
+    groups = (
+        request.session.query(UserGroup)
+        .filter(UserGroup.meta['finanzstelle'].astext == finanzstelle_key)
+        .all()
+    )
+
+    emails = set()
+    for group in groups:
+        emails.update(group.meta.get('accountant_emails', []))
+
+    if not emails:
+        raise ValueError(
+            request.translate(
+                _(
+                    'No accountant emails configured for Finanzstelle '
+                    '"${fs}". Please configure user groups: ${url}',
+                    mapping={
+                        'fs': finanzstelle_key,
+                        'url': request.class_link(UserGroupCollection),
+                    },
+                )
             )
         )
-        raise ValueError(error_msg)
-    return email
+
+    return emails

@@ -90,7 +90,6 @@ def pas_edit_parliamentarian(
         form.process(obj=self)
 
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
-    layout.editbar_links = []
     layout.edit_mode = True
 
     return {

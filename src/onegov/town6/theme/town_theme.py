@@ -111,6 +111,7 @@ class TownTheme(BaseTheme):
             'helpers',
             'footer',
             'chosen',
+            'treeselect',
             'news',
             'events',
             'homepage-tiles',

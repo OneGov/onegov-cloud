@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from onegov.core.orm.mixins import dict_property, meta_property
 from onegov.form.models import FormDefinition
+from onegov.org.i18n import _
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import ContactExtension
 from onegov.org.models.extensions import CoordinatesExtension
@@ -25,6 +26,7 @@ class BuiltinFormDefinition(FormDefinition, AccessExtension,
                             HoneyPotExtension, GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'builtin'}
 
+    fts_type_title = _('Forms')
     fts_id = 'name'
 
     show_vat: dict_property[bool] = meta_property(default=False)
@@ -41,6 +43,7 @@ class CustomFormDefinition(FormDefinition, AccessExtension,
                            HoneyPotExtension, GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'custom'}
 
+    fts_type_title = _('Forms')
     fts_id = 'name'
     default_extensions = ['honeypot']
 

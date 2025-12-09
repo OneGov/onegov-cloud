@@ -13,6 +13,7 @@ from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from onegov.file import File, MultiAssociatedFiles
 from onegov.form import FormCollection
+from onegov.org.i18n import _
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.observer import observes
 from onegov.reservation import ResourceCollection
@@ -42,6 +43,7 @@ class FormDocument(Base, ContentMixin, TimestampMixin, AccessExtension,
 
     __tablename__ = 'form_documents'
 
+    fts_type_title = _('Forms')
     fts_properties = {
         'title': {'type': 'localized', 'weight': 'A'},
         'lead': {'type': 'localized', 'weight': 'B'},

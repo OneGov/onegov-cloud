@@ -464,7 +464,7 @@
             <tal:b condition="button_text|nothing">
                 <input type="submit" value="${button_text}" class="button" role="button">
             </tal:b>
-            <a tal:condition="not hide_cancel|False" class="cancel-link" href="#" onclick="if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;"> <span i18n:translate="">Cancel</span></a>
+            <a tal:condition="not hide_cancel|False" class="cancel-link" href="#" data-back-link> <span i18n:translate="">Cancel</span></a>
         </tal:b>
     </form>
 </metal:form>
@@ -791,7 +791,7 @@
                     <li tal:repeat="file python: sorted(files, key=lambda f: f.name)">
                         <a class="list-link" title="${file.name}" href="${request.link(file)}">
                             <i class="far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
-                            <span class="list-title">${file.name.split('.')[0]}</span>
+                            <span class="list-title">${layout.get_filename_without_extension(file.name)}</span>
                         </a>
                     </li>
                 </ul>

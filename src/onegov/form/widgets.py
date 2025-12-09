@@ -477,6 +477,24 @@ class ChosenSelectWidget(Select):
         return super().__call__(field, **kwargs)
 
 
+class TreeSelectWidget(Select):
+
+    def __call__(self, field: SelectFieldBase, **kwargs: Any) -> Markup:
+        field.meta.request.include('treeselect')
+
+        kwargs['class_'] = '{} treeselect'.format(
+            kwargs.get('class_', '')
+        ).strip()
+        kwargs['data-placeholder'] = field.gettext(_('Select an Option'))
+        kwargs['data-no_results_text'] = field.gettext(_('No results match'))
+        if self.multiple:
+            kwargs['data-placeholder'] = field.gettext(
+                _('Select Some Options')
+            )
+
+        return super().__call__(field, **kwargs)
+
+
 class PreviewWidget:
     """ A widget that displays the html of a specific view whenever there's
     a change in other fields. JavaScript is used to facilitate this.

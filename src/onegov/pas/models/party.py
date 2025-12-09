@@ -5,6 +5,7 @@ from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.pas.i18n import _
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Date
@@ -24,6 +25,7 @@ class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'par_parties'
 
+    fts_type_title = _('Parties')
     fts_public = False
     fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
 

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from typing import NamedTuple
+from typing import TypeAlias
 from onegov.translator_directory import _
 
 full_text_max_chars = 25
@@ -149,6 +151,7 @@ INTERPRETING_TYPES = {
 TIME_REPORT_INTERPRETING_TYPES = {
     'telephonic': _('telephonic'),
     'on-site': _('On Site'),
+    'schriftlich': _('Written'),
 }
 HOURLY_RATE_CERTIFIED = Decimal('90.00')
 HOURLY_RATE_UNCERTIFIED = Decimal('75.00')
@@ -161,3 +164,105 @@ TIME_REPORT_SURCHARGE_LABELS = {
 # ====
 
 TRANSLATOR_FA_ICON = 'translator'
+
+LocationMapping: TypeAlias = tuple[str, str]
+
+
+class Finanzstelle(NamedTuple):
+    name: str
+    street: str
+    zip_code: str
+    city: str
+
+
+ASSIGNMENT_LOCATIONS: dict[str, LocationMapping] = {
+    'obergericht': ('Obergericht', 'Frauengasse 17, 8200 Schaffhausen'),
+    'kantonsgericht': ('Kantonsgericht', 'Herrenacker 26,  8200 Schaffhausen'),
+    'staatsanwaltschaft': (
+        'Staatsanwaltschaft Allgemeine Abteilung',
+        'Beckenstube 5, 8200 Schaffhausen'
+    ),
+    'verkehrsabteilung_staatsanwaltschaft': (
+        'Verkehrsabteilung der Staatsanwaltschaft',
+        'Bahnhofstrasse 29, 8200 Schaffhausen'
+    ),
+    'jugendanwaltschaft': (
+        'Abteilung Jugendanwaltschaft',
+        'J.J. Wepfer-Strasse 6, 8200 Schaffhausen'
+    ),
+    'migrationsamt': (
+        'Migrationsamt und Passbüro',
+        'Mühlentalstrasse 105, 8200 Schaffhausen'
+    ),
+    'kantonales_gefaengnis': (
+        'Kantonales Gefängnis',
+        'Beckenstube 5, 8200 Schaffhausen'
+    ),
+    'polizei': (
+        'Schaffhauser Polizei',
+        'Beckenstube 1, 8200 Schaffhausen'
+    ),
+    'polizei_verkehrsabteilung': (
+        'Schaffhauser Polizei Verkehrsabteilung',
+        'Emmersbergstrasse 1, 8200 Schaffhausen'
+    ),
+    'polizei_klettgau': (
+        'Schaffhauser Polizei Polizeistation Klettgau',
+        'Zelgstrasse 8, 8222 Beringen'
+    ),
+    'polizei_neuhausen': (
+        'Schaffhauser Polizei Polizeistation Neuhausen',
+        'Rheingoldstrasse 26, 8212 Neuhausen am Rheinfall'
+    ),
+    'polizei_reiat': (
+        'Schaffhauser Polizei Polizeistation Reiat',
+        'Biberstrasse 33, 8240 Thayngen'
+    ),
+    'polizei_stein': (
+        'Schaffhauser Polizei Polizeistation Stein am Rhein',
+        'Chlini Schanz 12, 8250, Stein am Rhein'
+    ),
+    'spitaeler': (
+        'Spitäler Schaffhausen Einvernahme Polizei',
+        'Geissbergstrasse 81, 8208 Schaffhausen'
+    ),
+}
+
+FINANZSTELLE: dict[str, Finanzstelle] = {
+    'migrationsamt_und_passbuero': Finanzstelle(
+        name='Migrationsamt und Passbüro',
+        street='Mühlentalstrasse 105',
+        zip_code='8200',
+        city='Schaffhausen',
+    ),
+    'staatsanwaltschaft': Finanzstelle(
+        name='Staatsanwaltschaft Allgemeine Abteilung',
+        street='Beckenstube 5',
+        zip_code='8200',
+        city='Schaffhausen',
+    ),
+    'gefaengnisverwaltung': Finanzstelle(
+        name='Kantonales Gefängnis',
+        street='Beckenstube 5',
+        zip_code='8200',
+        city='Schaffhausen',
+    ),
+    'polizei': Finanzstelle(
+        name='Schaffhauser Polizei',
+        street='Beckenstube 1',
+        zip_code='8200',
+        city='Schaffhausen',
+    ),
+    'obergericht': Finanzstelle(
+        name='Obergericht',
+        street='Frauengasse 17',
+        zip_code='8200',
+        city='Schaffhausen',
+    ),
+    'kantonsgericht': Finanzstelle(
+        name='Kantonsgericht',
+        street='Herrenacker 26',
+        zip_code='8200',
+        city='Schaffhausen',
+    ),
+}
