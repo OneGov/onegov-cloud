@@ -506,7 +506,7 @@ def test_copy_event(client: Client) -> None:
         page = page.click('Painting Cats')
         assert 'Painting Cats' in page
         assert 'Montag, 28. April 2025' in page
-        assert '18:00 - 22:00' in page
+        assert '18:00 - 22:00 Uhr' in page
         assert 'Art Gallery' in page
         assert 'Art Club' in page
 
@@ -524,6 +524,6 @@ def test_copy_event(client: Client) -> None:
 
         assert 'Painting Dogs' in page
         assert 'Montag, 28. April 2025' in page
-        assert '18:00 - 22:00' in page
+        assert '18:00 - 22:00 Uhr' in page
         assert 'Art Gallery' in page
         assert 'Art Club' in page

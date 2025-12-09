@@ -64,9 +64,11 @@ def test_event_steps(
     assert "Ausstellung" in preview_page
     assert "Bibliothek" in preview_page
     assert "The Organizer" in preview_page
-    assert "{} 18:00 - 22:00".format(
-        babel.dates.format_date(
-            start_date, format='d. MMMM yyyy', locale='de'
+    assert (
+        "{} 18:00 - 22:00 Uhr".format(
+            babel.dates.format_date(
+                start_date, format='d. MMMM yyyy', locale='de'
+            )
         )
     ) in preview_page
 
@@ -153,9 +155,11 @@ def test_event_steps(
     assert "Veranstaltung bearbeitet" in ticket_page
     assert "a@b.ch" in ticket_page
 
-    assert "{} 18:00 - 22:00".format(
-        babel.dates.format_date(
-            start_date, format='d. MMMM yyyy', locale='de'
+    assert (
+        "{} 18:00 - 22:00 Uhr".format(
+            babel.dates.format_date(
+                start_date, format='d. MMMM yyyy', locale='de'
+            )
         )
     ) in ticket_page
 
@@ -204,8 +208,10 @@ def test_event_steps(
     assert "A careful organizer" in message
     assert "+41 79 123 45 56" in ticket_page
     assert "a@b.ch" in ticket_page
-    assert "{} 18:00 - 22:00".format(
-        start_date.strftime('%d.%m.%Y')) in message
+    assert (
+        "{} 18:00 - 22:00 Uhr".format(start_date.strftime('%d.%m.%Y'))
+        in message
+    )
     for days in range(5):
         assert (start_date + timedelta(days=days)).strftime('%d.%m.%Y') in \
             message

@@ -3151,6 +3151,9 @@ msgstr "Association sportive"
 msgid "all day"
 msgstr "toute la journée"
 
+msgid "o'clock"
+msgstr "h"
+
 msgid "Homepage"
 msgstr "Page d'accueil"
 

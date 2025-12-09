@@ -426,9 +426,11 @@ def test_submit_event(
     assert "The Organizer" in preview_page
     assert "event@myevents.ch" in preview_page
     assert "+41 76 987 65 43" in preview_page
-    assert "{} 18:00 - 22:00".format(
-        babel.dates.format_date(
-            start_date, format='d. MMMM yyyy', locale='de'
+    assert (
+        "{} 18:00 - 22:00 Uhr".format(
+            babel.dates.format_date(
+                start_date, format='d. MMMM yyyy', locale='de'
+            )
         )
     ) in preview_page
 
@@ -530,9 +532,11 @@ def test_submit_event(
     assert "Bibliothek" in ticket_page
     assert "Veranstaltung bearbeitet" in ticket_page
 
-    assert "{} 18:00 - 22:00".format(
-        babel.dates.format_date(
-            start_date, format='d. MMMM yyyy', locale='de'
+    assert (
+        "{} 18:00 - 22:00 Uhr".format(
+            babel.dates.format_date(
+                start_date, format='d. MMMM yyyy', locale='de'
+            )
         )
     ) in ticket_page
     for d in next_dates + [start_date]:
@@ -579,9 +583,11 @@ def test_submit_event(
     assert "A carful organizer" in message_body
     assert "info@myevents.ch" in preview_page
     assert "+41 76 111 22 33" in preview_page
-    assert "{} 18:00 - 22:00".format(
-        babel.dates.format_date(
-            start_date, format='d. MMMM yyyy', locale='de'
+    assert (
+        "{} 18:00 - 22:00 Uhr".format(
+            babel.dates.format_date(
+                start_date, format='d. MMMM yyyy', locale='de'
+            )
         )
     ) in ticket_page
     for d in next_dates + [start_date]:

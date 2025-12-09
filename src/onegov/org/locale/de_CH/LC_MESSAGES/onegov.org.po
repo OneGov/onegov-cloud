@@ -3140,6 +3140,9 @@ msgstr "Sporverein"
 msgid "all day"
 msgstr "den ganzen Tag"
 
+msgid "o'clock"
+msgstr "Uhr"
+
 msgid "Homepage"
 msgstr "Startseite"
 
