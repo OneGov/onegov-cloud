@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from onegov.activity import Activity, Attendee
+from onegov.activity import (Activity, Attendee, Booking, BookingPeriod,
+                             Occasion)
 from onegov.activity.models.invoice import BookingPeriodInvoice
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
@@ -41,63 +42,78 @@ def view_user(
 def delete_user_group(self: User, request: FeriennetRequest) -> None:
     request.assert_valid_csrf_token()
 
+    session = request.session
+    app = request.app
+    active_period = getattr(app, 'active_period', None)
+
     # Check if there are any existing activities associated with the user
-    activities = request.session.query(Activity).filter_by(
-        username=self.username).all()
-    if activities:
+    if session.query(Activity).filter_by(username=self.username).first():
         request.alert(_(
-            'The user cannot be deleted because they are organizers '
-            'of existing activities.'))
+            'The user cannot be deleted because they are organizers of '
+            'existing activities.'))
         return
 
     # Check if the user has attendees with existing bookings in the
     # current period
-    attendees = request.session.query(Attendee).filter_by(
-        username=self.username).all()
-    bookings_to_delete = []
-    if attendees and request.app.active_period:
-        for attendee in attendees:
-            for booking in attendee.bookings:
-                bookings_to_delete.append(booking)
-                if booking.occasion.period.id == request.app.active_period.id:
-                    request.alert(_(
-                        'The account cannot be deleted because there are '
-                        'attendees with existing bookings in the current '
-                        'period. Wait for the period to end or delete the '
-                        'bookings first.'))
-                    return
+    if active_period:
+        booking_exists = session.query(session.query(Booking)
+            .join(Attendee, Booking.attendee_id == Attendee.id)
+            .join(Occasion, Booking.occasion_id == Occasion.id)
+            .filter(Attendee.username == self.username,
+                    Occasion.period_id == active_period.id)
+            .exists()).scalar()
+        if booking_exists:
+            request.alert(_(
+                'The account cannot be deleted because there are '
+                'attendees with existing bookings in the current '
+                'period. Wait for the period to end or delete the '
+                'bookings first.'))
+            return
 
-    invoices = request.session.query(BookingPeriodInvoice).filter_by(
-        user_id=self.id)
-    unpaid_invoices = invoices.filter(BookingPeriodInvoice.paid == False)
-    if unpaid_invoices.count() > 0:
-        for invoice in unpaid_invoices.all():
-            if invoice.period and invoice.period.finalized:
-                request.alert(_(
-                    'The account cannot be deleted because there are unpaid '
-                    'invoices associated with them. Mark all invoices as paid '
-                    'before deleting the user.'))
-                return
+    unpaid_finalized_exists = session.query(session.query(BookingPeriodInvoice)
+        .join(BookingPeriodInvoice.period)
+        .filter(BookingPeriodInvoice.user_id == self.id,
+                BookingPeriodInvoice.paid == False,
+                BookingPeriod.finalized == True)
+        .exists()).scalar()
+    if unpaid_finalized_exists:
+        request.alert(_(
+            'The account cannot be deleted because there are unpaid '
+            'invoices associated with them. Mark all invoices as paid '
+            'before deleting the user.'))
+        return
 
-    # Delete all invoices
-    for invoice in invoices.all():
-        request.session.delete(invoice)
+    try:
+        # this user's attendees
+        attendee_ids_subq = session.query(Attendee.id).filter(
+            Attendee.username == self.username
+        ).subquery()
 
-    # Delete all attendees
-    for attendee in attendees:
-        request.session.delete(attendee)
+        # delete bookings
+        session.query(Booking).filter(
+            Booking.attendee_id.in_(attendee_ids_subq)
+        ).delete(synchronize_session=False)
 
-    # Delete all bookings
-    for booking in bookings_to_delete:
-        request.session.delete(booking)
+        # delete attendees
+        session.query(Attendee).filter(
+            Attendee.username == self.username
+        ).delete(synchronize_session=False)
 
-    # Delete user
-    request.session.delete(self)
+        # delete invoices
+        session.query(BookingPeriodInvoice).filter(
+            BookingPeriodInvoice.user_id == self.id
+        ).delete(synchronize_session=False)
 
-    name = self.realname or self.username
-    request.success(_(
-        '${name} has been deleted, including all associated data.',
-        mapping={
-            'name': name
-        }
-    ))
+        # delete the user
+        session.delete(self)
+
+        name = self.realname or self.username
+        request.success(_(
+            '${name} has been deleted, including all associated data.',
+            mapping={'name': name}
+        ))
+    except Exception:
+        session.rollback()
+        request.alert(_('Could not delete account; try again or contact an '
+                        'administrator.'))
+        raise
