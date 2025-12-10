@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-09 11:57+0100\n"
+"POT-Creation-Date: 2025-12-10 13:49+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1846,6 +1846,19 @@ msgstr ""
 
 msgid "One-off"
 msgstr "Unique"
+
+msgid "Discounts in extra fields apply to"
+msgstr ""
+"Les remises en pourcentage dans les champs supplémentaires s'appliquent à"
+
+msgid "Just the price per item/hour"
+msgstr "Juste le prix par article/heure"
+
+msgid "Just the prices in extra fields"
+msgstr "Seulement les prix dans les champs supplémentaires"
+
+msgid "The total price at the end"
+msgstr "Le prix total à la fin"
 
 msgid ""
 "Failed to retrieve the doors from the dormakaba API please make sure your "
