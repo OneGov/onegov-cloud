@@ -807,8 +807,7 @@ class _TreeSelectMixin(_TreeSelectMixinBase):
         choices: Iterable[TreeSelectNode]
     ) -> Iterator[_Choice]:
         for choice in choices:
-            if ':$:' not in choice['value']:
-                yield choice['value'], choice['name']
+            yield choice['value'], choice['name']
             yield from self.flatten_choices(choice['children'])
 
     def set_choices(self, choices: Iterable[TreeSelectNode]) -> None:

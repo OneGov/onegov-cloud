@@ -17,18 +17,7 @@ $(document).ready(function() {
             clearable: true,
             isGroupedValue: true,
             inputCallback: function(value) {
-                var values = [];
-                for (var i = 0; i < value.length; i++) {
-                    if (value[i].indexOf(':$:') > 0) {
-                        var subvalues = value[i].split(':$:');
-                        for (var j = 0; j < subvalues.length; j++) {
-                            values[values.length] = subvalues[j];
-                        }
-                    } else {
-                        values[values.length] = value[i];
-                    }
-                }
-                $(select).val(values);
+                $(select).val(value);
             },
             iconElements: {
                 arrowUp: $('<i class="fa fa-caret-up">')[0],
