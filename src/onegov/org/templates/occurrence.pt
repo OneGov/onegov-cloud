@@ -7,9 +7,10 @@
         <div class="row">
             <div class="large-8 medium-8 columns">
                 <div class="page-lead">
-                    <div>
+                    <div tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end)">
                         ${layout.format_date(occurrence.localized_start, 'event')},
-                        ${layout.format_time_range(occurrence.localized_start, occurrence.localized_end)}
+                        <span tal:condition="python: '00:00' not in time">${time} ${time_suffix}</span>
+                        <span tal:condition="python: '00:00' in time">${time}</span>
                     </div>
                     <div tal:condition="occurrence.event.location">${occurrence.event.location}</div>
                 </div>

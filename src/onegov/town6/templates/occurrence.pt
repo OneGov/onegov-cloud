@@ -6,9 +6,10 @@
         <div class="grid-x grid-padding-x wrapper">
             <div class="medium-7 cell content">
                 <div class="page-lead h5 limit-line-width">
-                    <div>
+                    <div tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end); suffix time_suffix|nothing">
                         ${layout.format_date(occurrence.localized_start, 'event')},
-                        ${layout.format_time_range(occurrence.localized_start, occurrence.localized_end)}
+                        <span tal:condition="python: '00:00' not in time">${time}${' ' + suffix if suffix else ''}</span>
+                        <span tal:condition="python: '00:00' in time">${time}</span>
                     </div>
                     <div tal:condition="occurrence.event.location">${occurrence.event.location}</div>
                 </div>

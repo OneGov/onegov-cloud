@@ -1593,8 +1593,9 @@
                                     <div class="cell small-1 medium-2">
                                         <i class="fa fa-clock"></i>
                                     </div>
-                                    <div class="cell small-11 medium-10" tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end)">
-                                        <div> ${time[0].upper()}${time[1:]}</div>
+                                    <div class="cell small-11 medium-10" tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end); suffix time_suffix|nothing">
+                                        <div tal:condition="python: '00:00' not in time"> ${time[0].upper()}${time[1:]}${' ' + suffix if suffix else ''}</div>
+                                        <div tal:condition="python: '00:00' in time"> ${time[0].upper()}${time[1:]}</div>
                                     </div>
                                 </div>
                                 <hr/>
