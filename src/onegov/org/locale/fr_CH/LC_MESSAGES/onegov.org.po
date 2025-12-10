@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-04 09:50+0100\n"
+"POT-Creation-Date: 2025-12-09 11:57+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2948,11 +2948,21 @@ msgstr "Message"
 msgid "The message is empty"
 msgstr "Le message est vide"
 
+msgid "Notify about replies hint"
+msgstr "Indice de notification des réponses"
+
+msgid ""
+"The \"Always send email notifications for new ticket messages\" setting is "
+"enabled. You will receive an email whenever theres a reply to your messages. "
+"You can change this behaviour in the general ticket settings."
+msgstr ""
+"La fonction \"Toujours envoyer des notifications par e-mail pour les "
+"nouveaux messages de ticket\" est activée. Vous recevrez un e-mail chaque "
+"fois qu'il y aura une réponse à vos messages. Vous pouvez modifier ce "
+"comportement dans les paramètres généraux des tickets."
+
 msgid "Notify me about replies"
 msgstr "M'avertir des réponses"
-
-msgid "Setting \"Always notify\" is active"
-msgstr "Le paramètre \"Toujours notifier\" est actif"
 
 msgid "BCC"
 msgstr "BCC"
@@ -7713,6 +7723,19 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
+
+#~ msgid ""
+#~ "The \"Always send email notifications for new ticket messages\" setting "
+#~ "is enabled. You will receive an email whenever a new message is posted to "
+#~ "this ticket. You can change this behaviour in the general ticket settings."
+#~ msgstr ""
+#~ "La fonction \"Toujours envoyer des notifications par e-mail pour les "
+#~ "nouveaux messages de ticket\" est activée. Vous recevrez un e-mail chaque "
+#~ "fois qu'un nouveau message sera posté sur ce ticket. Vous pouvez modifier "
+#~ "ce comportement dans les paramètres généraux du ticket."
+
+#~ msgid "Setting \"Always notify\" is active"
+#~ msgstr "Le paramètre \"Toujours notifier\" est actif"
 
 #~ msgid "Dashboard"
 #~ msgstr "Dashboard"
