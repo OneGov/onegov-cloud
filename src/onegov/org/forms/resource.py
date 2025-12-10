@@ -339,6 +339,18 @@ class ResourceBaseForm(Form):
         )
     )
 
+    discount_method = RadioField(
+        label=_('Discounts in extra fields apply to'),
+        fieldset=_('Payments'),
+        default='resource',
+        validators=[InputRequired()],
+        choices=(
+            ('resource', _('Just the price per item/hour')),
+            ('extras', _('Just the prices in extra fields')),
+            ('everything', _('The total price at the end'))
+        ),
+    )
+
     def on_request(self) -> None:
         if hasattr(self.model, 'type'):
             if self.model.type == 'daypass':
