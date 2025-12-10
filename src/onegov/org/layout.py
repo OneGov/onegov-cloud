@@ -3160,7 +3160,7 @@ class UserLayout(DefaultLayout):
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
-                ),
+                )
             ]
         return None
 
