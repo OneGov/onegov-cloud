@@ -44,6 +44,7 @@ from onegov.newsletter import Subscription
 from onegov.org.app import OrgApp
 from onegov.org.auth import MTANAuth
 from onegov.org.converters import keywords_converter
+from onegov.org.forms.payments import get_ticket_group_choices
 from onegov.org.models import AtoZPages, PushNotificationCollection
 from onegov.org.models import RISCommissionMembershipCollection
 from onegov.org.models import RISCommissionMembership
@@ -121,6 +122,8 @@ from webob import exc, Response
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+    from onegov.form.fields import TreeSelectNode
     from onegov.org.request import OrgRequest
     from onegov.ticket.collection import ExtendedTicketState
 
@@ -913,6 +916,38 @@ def get_payment(app: OrgApp, id: UUID) -> Payment | None:
     return PaymentCollection(app.session()).by_id(id)
 
 
+def get_expand_ticket_group(
+    request: OrgRequest
+) -> Callable[[list[str]], list[str]]:
+
+    def expand_ticket_group(groups: list[str]) -> list[str]:
+        group_lookup = set(groups)
+        new_groups = []
+
+        def expand_subnodes(
+            nodes: Sequence[TreeSelectNode],
+            include: bool = False
+        ) -> None:
+
+            for node in nodes:
+                if include or node['value'] in group_lookup:
+                    if node['children']:
+                        expand_subnodes(node['children'], include=True)
+                    else:
+                        new_groups.append(node['value'])
+                else:
+                    expand_subnodes(node['children'])
+
+        for node in get_ticket_group_choices(request):
+            # we don't expand the first level
+            if node['value'] in group_lookup:
+                new_groups.append(node['value'])
+            else:
+                expand_subnodes(node['children'])
+        return new_groups
+    return expand_ticket_group
+
+
 @OrgApp.path(
     model=PaymentCollection,
     path='/payments',
@@ -922,6 +957,7 @@ def get_payment(app: OrgApp, id: UUID) -> Payment | None:
         'end': datetime_converter,
         'status': str,
         'payment_type': str,
+        'g': [str],
         'ticket_group': [str],
         'ticket_start': extended_date_converter,
         'ticket_end': extended_date_converter,
@@ -931,34 +967,41 @@ def get_payment(app: OrgApp, id: UUID) -> Payment | None:
     }
 )
 def get_payments(
-    app: OrgApp,
+    request: OrgRequest,
     source: str = '*',
     page: int = 0,
     start: datetime | None = None,
     end: datetime | None = None,
     status: str | None = None,
     payment_type: str | None = None,
-    ticket_group: list[str] | None = None,
+    g: list[str] | None = None,
     ticket_start: date | None = None,
     ticket_end: date | None = None,
     reservation_start: date | None = None,
     reservation_end: date | None = None,
     reservation_reference_date: Literal['final', 'any'] | None = None,
+    extra_parameters: dict[str, Any] | None = None,
 ) -> PaymentCollection:
+
+    if not g and extra_parameters and 'ticket_group' in extra_parameters:
+        # allow the full parameter name as a fallback
+        g = extra_parameters['ticket_group']
+
     return PaymentCollection(
-        session=app.session(),
+        session=request.session,
         source=source,
         page=page,
         start=start,
         end=end,
         status=status,
         payment_type=payment_type,
-        ticket_group=ticket_group,
+        ticket_group=g,
         ticket_start=ticket_start,
         ticket_end=ticket_end,
         reservation_start=reservation_start,
         reservation_end=reservation_end,
         reservation_reference_date=reservation_reference_date,
+        expand_ticket_group=get_expand_ticket_group(request)
     )
 
 
@@ -967,6 +1010,7 @@ def get_payments(
     path='/invoices',
     converters={
         'page': int,
+        'g': [str],
         'ticket_group': [str],
         'ticket_start': extended_date_converter,
         'ticket_end': extended_date_converter,
@@ -978,9 +1022,9 @@ def get_payments(
     }
 )
 def get_invoices(
-    app: OrgApp,
+    request: OrgRequest,
     page: int = 0,
-    ticket_group: list[str] | None = None,
+    g: list[str] | None = None,
     ticket_start: date | None = None,
     ticket_end: date | None = None,
     reservation_start: date | None = None,
@@ -988,11 +1032,17 @@ def get_invoices(
     reservation_reference_date: Literal['final', 'any'] | None = None,
     has_payment: bool | None = None,
     invoiced: bool | None = None,
+    extra_parameters: dict[str, Any] | None = None,
 ) -> TicketInvoiceCollection:
+
+    if not g and extra_parameters and 'ticket_group' in extra_parameters:
+        # allow the full parameter name as a fallback
+        g = extra_parameters['ticket_group']
+
     return TicketInvoiceCollection(
-        session=app.session(),
+        session=request.session,
         page=page,
-        ticket_group=ticket_group,
+        ticket_group=g,
         ticket_start=ticket_start,
         ticket_end=ticket_end,
         reservation_start=reservation_start,
@@ -1000,6 +1050,7 @@ def get_invoices(
         reservation_reference_date=reservation_reference_date,
         has_payment=has_payment,
         invoiced=invoiced,
+        expand_ticket_group=get_expand_ticket_group(request)
     )
 
 

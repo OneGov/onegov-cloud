@@ -19,6 +19,7 @@ from uuid import UUID
 
 from typing import Any, ClassVar, Literal, NamedTuple, Self, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from datetime import date, datetime
     from onegov.ticket.models.ticket import TicketState
     from sedate.types import Direction, TzInfo
@@ -324,6 +325,7 @@ class TicketInvoiceCollection(
 ):
 
     batch_size = 50
+    extra_parameters = None
 
     def __init__(
         self,
@@ -337,6 +339,7 @@ class TicketInvoiceCollection(
         reservation_reference_date: Literal['final', 'any'] | None = None,
         has_payment: bool | None = None,
         invoiced: bool | None = None,
+        expand_ticket_group: Callable[[list[str]], list[str]] | None = None,
     ) -> None:
         Pagination.__init__(self, page)
         self.session = session
@@ -348,6 +351,13 @@ class TicketInvoiceCollection(
         self.reservation_start = reservation_start
         self.reservation_end = reservation_end
         self.reservation_reference_date = reservation_reference_date or 'final'
+        self.expand_ticket_group = expand_ticket_group
+
+    @property
+    def g(self) -> list[str]:
+        # since this can have many many values
+        # a shorter name can help shorten urls significantly
+        return self.ticket_group
 
     @property
     def model_class(self) -> type[TicketInvoice]:
@@ -363,6 +373,12 @@ class TicketInvoiceCollection(
     @cached_property
     def tzinfo(self) -> TzInfo:
         return sedate.ensure_timezone('Europe/Zurich')
+
+    @cached_property
+    def real_ticket_group(self) -> list[str]:
+        if self.expand_ticket_group is None:
+            return self.ticket_group
+        return self.expand_ticket_group(self.ticket_group)
 
     def align_date(self, value: date, direction: Direction) -> datetime:
         return sedate.align_date_to_day(
@@ -389,9 +405,9 @@ class TicketInvoiceCollection(
         if self.invoiced is not None:
             query = query.filter(TicketInvoice.invoiced == self.invoiced)
 
-        if self.ticket_group:
+        if self.real_ticket_group:
             conditions = []
-            for group in self.ticket_group:
+            for group in self.real_ticket_group:
                 handler_code, *remainder = group.split('-', 1)
                 condition = Ticket.handler_code == handler_code
                 if remainder:
@@ -469,7 +485,8 @@ class TicketInvoiceCollection(
             reservation_end=self.reservation_end,
             reservation_reference_date=self.reservation_reference_date,
             has_payment=self.has_payment,
-            invoiced=self.invoiced
+            invoiced=self.invoiced,
+            expand_ticket_group=self.expand_ticket_group
         )
 
     def reservation_dates_by_batch(self) -> dict[UUID, tuple[date, date]]:
@@ -501,7 +518,7 @@ class TicketInvoiceCollection(
             and self.page == other.page
             and self.has_payment is other.has_payment
             and self.invoiced is other.invoiced
-            and self.ticket_group == other.ticket_group
+            and self.real_ticket_group == other.real_ticket_group
             and self.ticket_start == other.ticket_start
             and self.ticket_end == other.ticket_end
             and self.reservation_start == other.reservation_start
@@ -522,4 +539,5 @@ class TicketInvoiceCollection(
             reservation_reference_date=self.reservation_reference_date,
             has_payment=self.has_payment,
             invoiced=invoiced,
+            expand_ticket_group=self.expand_ticket_group
         )
