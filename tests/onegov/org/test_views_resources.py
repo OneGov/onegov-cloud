@@ -4118,6 +4118,7 @@ def test_zipcode_block(client: Client) -> None:
     page.select_radio('payment_method', "Keine Kreditkarten-Zahlungen")
     page.select_radio('pricing_method', "Kostenlos")
     page.select_radio('extras_pricing_method', "Pro Eintrag")
+    page.select_radio('discount_method', "Nur den Preis pro Eintrag/Stunde")
     page.form['zipcode_block_use'] = True
     page.form['zipcode_days'] = 1
     page.form['zipcode_field'] = 'PLZ'

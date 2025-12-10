@@ -1847,7 +1847,7 @@ msgid "Discounts in extra fields apply to"
 msgstr "Prozentuale Rabatte in Extra-Feldern gelten für"
 
 msgid "Just the price per item/hour"
-msgstr "Nur den Preis pro Einheit/Stunde"
+msgstr "Nur den Preis pro Eintrag/Stunde"
 
 msgid "Just the prices in extra fields"
 msgstr "Nur den Preis der ausgewählten Extra-Felder"

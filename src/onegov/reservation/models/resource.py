@@ -155,10 +155,11 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     lead_time: dict_property[int | None] = content_property()
 
     #: the pricing method to use for extras defined in formcode
-    extras_pricing_method: dict_property[str | None] = content_property()
+    extras_pricing_method: dict_property[str]
+    extras_pricing_method = content_property(default='per_item')
 
     #: the discount method to use
-    discount_method: dict_property[str | None] = content_property()
+    discount_method: dict_property[str] = content_property(default='resource')
 
     #: the default view
     default_view: dict_property[str | None] = content_property()
@@ -324,7 +325,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
                             / Decimal('3600')
                         )
 
-                    case 'per_item' | None:
+                    case 'per_item':
                         extras_quantity += Decimal(reservation.quota)
 
                     case _:  # pragma: unreachable
@@ -338,12 +339,14 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         extras_total = InvoiceItemMeta.total(extras)
 
         match self.discount_method:
-            case 'everything':
-                discount_total = total + extras_total
+            case 'resource':
+                discount_total = total
             case 'extras':
                 discount_total = extras_total
-            case _:
-                discount_total = total
+            case 'everything':
+                discount_total = total + extras_total
+            case _:  # pragma: unreachable
+                raise ValueError('unhandled extras pricing method')
 
         if extras_total and total:
             total += extras_total
