@@ -3523,57 +3523,65 @@ def test_footer_settings_opening_hours_url_label(client: Client) -> None:
     assert url in page
 
 
-@pytest.mark.parametrize('scenario_name,period_config,user_config,activity_config,booking_config,invoice_config,expected_deleted,expected_message', [
-    # Scenario 1: Delete user with past bookings and paid invoices (should succeed)
+@pytest.mark.parametrize(
+        'scenario_name, period_config,user_config,activity_config,'
+        'booking_config,invoice_config,expected_deleted,expected_message', [
+    # Scenario 1: Delete user with past bookings and paid invoices
     (
         'past_paid',
         {'title': '2020', 'active': False},
-        {'username': 'test_user@example.org', 'role': 'member', 'complete_profile': True},
+        {'username': 'test_user@example.org', 'role': 'member',
+         'complete_profile': True},
         {'title': 'Retreat', 'state': 'accepted'},
         {'state': 'accepted', 'cost': 100},
         {'paid': True},
         True,
         'wurde gelöscht, inklusive aller damit verbundenen Daten.'
     ),
-    # Scenario 2: Try to delete user with unpaid invoices from finalized period (should fail)
+    # Scenario 2: Try to delete user with unpaid invoices from finalized period
     (
         'unpaid_finalized',
         {'title': '2021', 'active': True, 'confirmed': True},
-        {'username': 'unpaid_user@example.org', 'role': 'member', 'complete_profile': True},
+        {'username': 'unpaid_user@example.org', 'role': 'member',
+         'complete_profile': True},
         {'title': 'Hiking', 'state': 'accepted'},
         {'state': 'accepted', 'cost': 50},
         {'paid': False},
         False,
         'Das Konto kann nicht gelöscht werden'
     ),
-    # Scenario 3: Delete user with unpaid invoice from unfinalized period (should succeed)
+    # Scenario 3: Delete user with unpaid invoice from unfinalized period
     (
         'unpaid_unfinalized',
         {'title': '2022', 'active': True, 'finalized': False},
-        {'username': 'unfinalized_user@example.org', 'role': 'member', 'complete_profile': True},
+        {'username': 'unfinalized_user@example.org', 'role': 'member',
+         'complete_profile': True},
         None,  # No activity needed
         None,  # No booking needed
         {'paid': False},
         True,
         'wurde gelöscht, inklusive aller damit verbundenen Daten.'
     ),
-    # Scenario 4: Try to delete user with bookings in active period (should fail)
+    # Scenario 4: Try to delete user with bookings in active period
     (
         'active_booking',
         {'title': '2023', 'active': True},
-        {'username': 'active_user@example.org', 'role': 'member', 'complete_profile': True},
+        {'username': 'active_user@example.org', 'role': 'member',
+         'complete_profile': True},
         {'title': 'Swimming', 'state': 'accepted'},
         {'state': 'open', 'cost': 100},
         None,  # No invoice
         False,
         'Das Konto kann nicht gelöscht werden'
     ),
-    # Scenario 5: Try to delete organizer with activities (should fail)
+    # Scenario 5: Try to delete organizer with activities
     (
         'organizer_with_activities',
         {'title': '2024', 'active': True},
-        {'username': 'organizer@example.org', 'role': 'editor', 'complete_profile': True},
-        {'title': 'Coding Class', 'state': 'accepted', 'username': 'organizer@example.org'},
+        {'username': 'organizer@example.org', 'role': 'editor',
+         'complete_profile': True},
+        {'title': 'Coding Class', 'state': 'accepted',
+         'username': 'organizer@example.org'},
         None,  # No booking needed
         None,  # No invoice
         False,
@@ -3584,33 +3592,33 @@ def test_delete_user_scenarios_parametrized(
     client: Client,
     scenario: Scenario,
     scenario_name: str,
-    period_config: dict,
-    user_config: dict,
-    activity_config: dict | None,
-    booking_config: dict | None,
-    invoice_config: dict | None,
+    period_config: dict[str, str | bool],
+    user_config: dict[str, str],
+    activity_config: dict[str, str] | None,
+    booking_config: dict[str, str | int] | None,
+    invoice_config: dict[str, int] | None,
     expected_deleted: bool,
     expected_message: str
 ) -> None:
     """Test various user deletion scenarios using parametrize."""
-    
+
     session = scenario.session
     admin = client.spawn()
     admin.login_admin()
-    
+
     # Setup period
-    scenario.add_period(**period_config)
-    
+    scenario.add_period(**period_config)  # type: ignore[arg-type]
+
     # Setup activity if needed
     if activity_config:
         scenario.add_activity(**activity_config)
         scenario.add_occasion()
-    
+
     # Setup user and attendee
     username = user_config['username']
-    scenario.add_user(**user_config)
+    scenario.add_user(**user_config)  # type: ignore[arg-type]
     scenario.add_attendee(name='Test Child', username=username)
-    
+
     # Setup booking if needed
     if booking_config:
         scenario.add_booking(
@@ -3619,60 +3627,62 @@ def test_delete_user_scenarios_parametrized(
             attendee=scenario.attendees[-1],
             **booking_config
         )
-    
+
     scenario.commit()
     scenario.refresh()
-    
+
     # Create invoice if needed
     if invoice_config is not None:
         user = session.query(User).filter_by(username=username).one()
         period = scenario.latest_period
-        
+
         invoice = BookingPeriodInvoice(
             user_id=user.id,
-            period_id=period.id
+            period_id=period.id  # type: ignore[union-attr]
         )
         session.add(invoice)
         session.flush()
-        
+
         # Mark invoice items as paid/unpaid if there are any
         if invoice_config.get('paid') is not None and invoice.items:
             for item in invoice.items:
-                item.paid = invoice_config['paid']
+                item.paid = invoice_config['paid']  # type: ignore[assignment]
             session.flush()
-        
+
         # Confirm period for unfinalized period
-        if period_config.get('finalized') is False and period_config.get('active'):
+        if period_config.get('finalized') is False and period_config.get(
+            'active'):
             page = admin.get('/matching')
             page.form['confirm'] = 'yes'
             page.form['sure'] = 'yes'
             page.form.submit()
-        
+
         # Finalize period if needed for invoice validation
         if period_config.get('confirmed'):
             page = admin.get('/billing')
             page.form['confirm'] = 'yes'
             page.form['sure'] = 'yes'
             page.form.submit()
-    
+
     # Attempt to delete user
     users = admin.get('/usermanagement')
     view_user_links = users.pyquery('.text-links a')
-    
+
     page = admin.get(view_user_links[2].attrib['href'])
     delete_link = page.pyquery('a.delete-link').attr('ic-delete-from')
-    
+
     if delete_link:
         admin.delete(delete_link)
         transaction.commit()
-    
+
     # Verify results
     page = admin.get('/usermanagement')
     assert expected_message in page
-    
-    user_exists = session.query(User).filter_by(username=username).first() is not None
+
+    user_exists = session.query(User).filter_by(
+        username=username).first() is not None
     assert user_exists != expected_deleted
-    
+
     # Additional check for organizer scenario
     if scenario_name == 'organizer_with_activities' and not expected_deleted:
         assert session.query(Activity).filter_by(
@@ -3680,22 +3690,23 @@ def test_delete_user_scenarios_parametrized(
         ).first() is not None
 
 
-def test_admin_user_no_delete_button(client: Client, scenario: Scenario) -> None:
+def test_admin_user_no_delete_button(
+        client: Client, scenario: Scenario) -> None:
     """Test that admin users don't have a delete button."""
-    
+
     scenario.add_user(
         username='another_admin@example.org',
         role='admin',
         complete_profile=True
     )
     scenario.commit()
-    
+
     admin = client.spawn()
     admin.login_admin()
-    
+
     users = admin.get('/usermanagement')
     view_user_links = users.pyquery('.text-links a')
     page = admin.get(view_user_links[0].attrib['href'])  # Administratoren
-    
+
     # Check that delete button is not present for admin users
     assert page.pyquery('a.delete-link').length == 0

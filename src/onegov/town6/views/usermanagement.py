@@ -53,8 +53,9 @@ def town_handle_create_signup_link(
 
 @TownApp.html(model=User, template='user.pt', permission=Secret)
 def town_view_user(self: User, request: TownRequest,
-                   layout: UserLayout) -> RenderData:
-    return view_user(self, request, layout or UserLayout(self, request))
+                   layout: UserLayout | None = None) -> RenderData:
+    layout = layout or UserLayout(self, request)
+    return view_user(self, request, layout)
 
 
 @TownApp.form(
