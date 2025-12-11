@@ -27,5 +27,8 @@ $(document).ready(function() {
                 clear: $('<i class="far fa-times-circle">')[0]
             }
         });
+        $(select).on('change', function() {
+            treeselect.updateValue($(select).val());
+        });
     });
 });
