@@ -844,7 +844,7 @@ def test_parse_formcode_duplicate_fieldname() -> None:
 
 
 def test_flatten_fieldsets() -> None:
-    fieldsets = parse_formcode(dedent("""
+    fieldsets = parse_formcode("""
         # General
         First Name *= ___
         Last Name *= ___[10]
@@ -856,7 +856,7 @@ def test_flatten_fieldsets() -> None:
                     (x) Default
                     ( ) Gluten-Free
             [x] Burger
-    """))
+    """)
 
     fields = list(flatten_fieldsets(fieldsets))
 
