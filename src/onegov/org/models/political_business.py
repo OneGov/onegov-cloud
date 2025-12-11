@@ -421,6 +421,25 @@ class PoliticalBusinessCollection(
             .first()
         )
 
+    def by_parliamentarian(
+        self,
+        parliamentarian_id: uuid.UUID
+    ) -> Query[PoliticalBusiness]:
+        """ Returns political businesses by given parliamentarian id """
+        return (
+            self.session.query(PoliticalBusiness)
+            .join(PoliticalBusinessParticipation)
+            .filter(
+                PoliticalBusinessParticipation.parliamentarian_id ==
+                parliamentarian_id
+            )
+            .order_by(
+                PoliticalBusiness.entry_date.desc(),
+                PoliticalBusiness.title
+            )
+            .distinct()
+        )
+
 
 class PoliticalBusinessParticipationCollection(
     GenericCollection[PoliticalBusinessParticipation]
