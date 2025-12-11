@@ -725,20 +725,20 @@ def test_invalid_syntax() -> None:
     assert e.value.line == 1
 
     with pytest.raises(errors.InvalidFormSyntax) as e:
-        parse_form(dedent('\n'.join((
+        parse_form('\n'.join((
             "# Fields",
             "",
             "First Name *= ___",
             "Last Name * __"
-        ))))
+        )))
     assert e.value.line == 4
 
     with pytest.raises(errors.InvalidFormSyntax) as e:
-        parse_form(dedent('\n'.join((
+        parse_form('\n'.join((
             "# Fields",
             "",
             "    [x] What",
-        ))))
+        )))
     assert e.value.line == 3
 
     with pytest.raises(errors.InvalidFormSyntax) as e:
@@ -746,13 +746,13 @@ def test_invalid_syntax() -> None:
     assert e.value.line == 1
 
     with pytest.raises(errors.InvalidFormSyntax) as e:
-        parse_form(dedent('\n'.join((
+        parse_form('\n'.join((
             "Ort * = ___",
             "(x) 6. Klasse",
             "(x) 7. Klasse",
             "(x) 8. Klasse",
             "(x) 9. Klasse",
-        ))))
+        )))
     assert e.value.line == 2
 
 
@@ -811,36 +811,36 @@ def test_parse_formcode() -> None:
 
 def test_parse_formcode_duplicate_fieldname() -> None:
     with pytest.raises(errors.DuplicateLabelError):
-        parse_formcode(dedent("""
+        parse_formcode("""
             # General
             Foo *= ___
             Foo = ___[10]
-        """))
+        """)
 
     with pytest.raises(errors.DuplicateLabelError):
-        parse_formcode(dedent("""
+        parse_formcode("""
             Foo *= ___
             Foo = ___[10]
-        """))
+        """)
 
     with pytest.raises(errors.DuplicateLabelError):
-        parse_formcode(dedent("""
+        parse_formcode("""
             # General
             Sure *=
                 ( ) Yes
                 ( ) No
                     Foo = ___
                     Foo = ___
-        """))
+        """)
 
     with pytest.raises(errors.DuplicateLabelError):
-        parse_formcode(dedent("""
+        parse_formcode("""
             Sure *=
                 ( ) Yes
                 ( ) No
                     Foo = ___
                     Foo = ___
-        """))
+        """)
 
 
 def test_flatten_fieldsets() -> None:
@@ -1056,12 +1056,12 @@ def test_field_ids() -> None:
 ])
 def test_dependency_validation_chain(field: str, invalid: object) -> None:
     for required in (True, False):
-        code = dedent("""
+        code = """
             select *=
                 ( ) ya
                     value {}= {}
                 (x) no
-        """).format(required and '*' or '', field)
+        """.format(required and '*' or '', field)
 
         form = parse_form(code)
 
