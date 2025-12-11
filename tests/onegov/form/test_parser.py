@@ -1139,10 +1139,12 @@ def test_indentation_error(
 def test_indentation_error_for_identifier() -> None:
     text = dedent(
         """
+        # Wahl 1
         Auswahl =
             (x) A
             ( ) B
             ( ) C
+        # Wahl 2
         Auswahl 2 =
             (x) A
             ( ) B
@@ -1153,6 +1155,7 @@ def test_indentation_error_for_identifier() -> None:
 
     text = dedent(
         """
+        # Wahl mit Unterauswahl
         Auswahl =
             (x) A
             ( ) B
@@ -1176,6 +1179,22 @@ def test_indentation_error_for_identifier() -> None:
                 (x) A
                 ( ) B
                 ( ) C
+        """
+    )
+
+    with pytest.raises(InvalidIndentSyntax):
+        parse_formcode(text, enable_edit_checks=True)
+
+    text = dedent(
+        """
+            Auswahl =
+                (x) A
+                ( ) B
+                ( ) C
+        Auswahl 2 =
+            (x) A
+            ( ) B
+            ( ) C
         """
     )
 
