@@ -725,20 +725,20 @@ def test_invalid_syntax() -> None:
     assert e.value.line == 1
 
     with pytest.raises(errors.InvalidFormSyntax) as e:
-        parse_form('\n'.join((
+        parse_form(dedent('\n'.join((
             "# Fields",
             "",
             "First Name *= ___",
             "Last Name * __"
-        )))
+        ))))
     assert e.value.line == 4
 
     with pytest.raises(errors.InvalidFormSyntax) as e:
-        parse_form('\n'.join((
+        parse_form(dedent('\n'.join((
             "# Fields",
             "",
             "    [x] What",
-        )))
+        ))))
     assert e.value.line == 3
 
     with pytest.raises(errors.InvalidFormSyntax) as e:
@@ -746,13 +746,13 @@ def test_invalid_syntax() -> None:
     assert e.value.line == 1
 
     with pytest.raises(errors.InvalidFormSyntax) as e:
-        parse_form('\n'.join((
+        parse_form(dedent('\n'.join((
             "Ort * = ___",
             "(x) 6. Klasse",
             "(x) 7. Klasse",
             "(x) 8. Klasse",
             "(x) 9. Klasse",
-        )))
+        ))))
     assert e.value.line == 2
 
 
@@ -811,40 +811,40 @@ def test_parse_formcode() -> None:
 
 def test_parse_formcode_duplicate_fieldname() -> None:
     with pytest.raises(errors.DuplicateLabelError):
-        parse_formcode("""
+        parse_formcode(dedent("""
             # General
             Foo *= ___
             Foo = ___[10]
-        """)
+        """))
 
     with pytest.raises(errors.DuplicateLabelError):
-        parse_formcode("""
+        parse_formcode(dedent("""
             Foo *= ___
             Foo = ___[10]
-        """)
+        """))
 
     with pytest.raises(errors.DuplicateLabelError):
-        parse_formcode("""
+        parse_formcode(dedent("""
             # General
             Sure *=
                 ( ) Yes
                 ( ) No
                     Foo = ___
                     Foo = ___
-        """)
+        """))
 
     with pytest.raises(errors.DuplicateLabelError):
-        parse_formcode("""
+        parse_formcode(dedent("""
             Sure *=
                 ( ) Yes
                 ( ) No
                     Foo = ___
                     Foo = ___
-        """)
+        """))
 
 
 def test_flatten_fieldsets() -> None:
-    fieldsets = parse_formcode("""
+    fieldsets = parse_formcode(dedent("""
         # General
         First Name *= ___
         Last Name *= ___[10]
@@ -856,7 +856,7 @@ def test_flatten_fieldsets() -> None:
                     (x) Default
                     ( ) Gluten-Free
             [x] Burger
-    """)
+    """))
 
     fields = list(flatten_fieldsets(fieldsets))
 
@@ -1056,12 +1056,12 @@ def test_field_ids() -> None:
 ])
 def test_dependency_validation_chain(field: str, invalid: object) -> None:
     for required in (True, False):
-        code = """
+        code = dedent("""
             select *=
                 ( ) ya
                     value {}= {}
                 (x) no
-        """.format(required and '*' or '', field)
+        """).format(required and '*' or '', field)
 
         form = parse_form(code)
 
@@ -1134,6 +1134,53 @@ def test_indentation_error(
         assert excinfo.value.line == 6
     else:
         assert parse_formcode(text, enable_edit_checks=edit_checks)
+
+
+def test_indentation_error_for_identifier() -> None:
+    text = dedent(
+        """
+        Auswahl =
+            (x) A
+            ( ) B
+            ( ) C
+        Auswahl 2 =
+            (x) A
+            ( ) B
+            ( ) C
+        """
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
+
+    text = dedent(
+        """
+        Auswahl =
+            (x) A
+            ( ) B
+            ( ) C
+                Auswahl 2 =
+                    (x) A
+                    ( ) B
+                    ( ) C
+        """
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
+
+    # wrong indent
+    text = dedent(
+        """
+        Auswahl =
+            (x) A
+            ( ) B
+            ( ) C
+            Auswahl 2 =
+                (x) A
+                ( ) B
+                ( ) C
+        """
+    )
+
+    with pytest.raises(InvalidIndentSyntax):
+        parse_formcode(text, enable_edit_checks=True)
 
 
 def test_help_indentation_error() -> None:

@@ -1408,9 +1408,14 @@ def translate_to_yaml(
 
     def handle_identifier_indent_stack(
         indent_stack: list[int],
-        ix: int, len_indent: int
+        ix: int,
+        len_indent: int
     ) -> list[int]:
         if not indent_stack or indent_stack[-1] < len_indent:
+            # identifiers must be indented n * 2 * 4 spaces,
+            # valid are 0, 8, 16, 24, ..
+            if len_indent % (2 * 4) != 0:
+                raise errors.InvalidIndentSyntax(line=ix + 1)
             indent_stack.append(len_indent)
         elif indent_stack[-1] > len_indent:
             if len_indent not in indent_stack:
