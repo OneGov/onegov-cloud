@@ -70,9 +70,17 @@ class MultiCheckboxWidget(ListWidget):
     def __init__(self, html_tag: Literal['ul', 'ol'] = 'ul'):
         super().__init__(html_tag=html_tag, prefix_label=False)
 
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
+        field.meta.request.include('multicheckbox')
+        return super().__call__(field, **kwargs)
+
 
 class OrderedMultiCheckboxWidget(MultiCheckboxWidget, OrderedListWidget):
     """ The sorted list widget with the label behind the checkbox. """
+
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
+        field.meta.request.include('multicheckbox')
+        return super().__call__(field, **kwargs)
 
 
 class CoordinateWidget(TextInput):
