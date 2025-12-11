@@ -16,11 +16,15 @@ from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.const import OWNER_EDITABLE_STATES
 from onegov.feriennet.models import InvoiceAction, VacationActivity
 from onegov.town6.layout import DefaultLayout as BaseLayout
+from onegov.town6.layout import UserLayout as TownUserLayout
 from onegov.pay import PaymentProviderCollection
 from onegov.ticket import TicketCollection
 
 
 from typing import Any, NamedTuple, TYPE_CHECKING
+
+from onegov.user.collections.user import UserCollection
+
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
     from markupsafe import Markup
@@ -977,4 +981,52 @@ class HomepageLayout(DefaultLayout):
                     attrs={'class': ('sort-link')}
                 )
             ]
+        return None
+
+
+class UserLayout(TownUserLayout):
+
+    model: User
+
+    if TYPE_CHECKING:
+        def __init__(
+            self,
+            model: User,
+            request: FeriennetRequest
+        ) -> None: ...
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        links: list[Link | LinkGroup] = []
+        if self.request.is_admin and not self.model.source:
+            links.append(
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                )
+            )
+
+            if self.model.role != 'admin':
+                links.append(Link(
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _('Do you really want to delete this user?'),
+                            _('This cannot be undone.'),
+                            _('Delete user'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(
+                                UserCollection)
+                        )
+                    )
+                ))
+            return links
         return None
