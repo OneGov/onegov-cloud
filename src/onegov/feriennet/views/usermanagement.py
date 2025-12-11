@@ -7,6 +7,7 @@ from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.layout import UserLayout
 from onegov.user import User
+from sqlalchemy.orm import joinedload
 from onegov.town6.views.usermanagement import town_view_user
 
 
@@ -84,27 +85,28 @@ def delete_user_group(self: User, request: FeriennetRequest) -> None:
         return
 
     try:
-        # this user's attendees
-        attendee_ids_subq = session.query(Attendee.id).filter(
-            Attendee.username == self.username
-        ).subquery()
+        attendees = session.query(Attendee).options(
+            joinedload(Attendee.bookings)
+        ).filter(Attendee.username == self.username).all()
 
-        # delete bookings
-        session.query(Booking).filter(
-            Booking.attendee_id.in_(attendee_ids_subq)
-        ).delete(synchronize_session=False)
+        # Delete bookings individually
+        for attendee in attendees:
+            for booking in attendee.bookings:
+                session.delete(booking)
+            session.flush()
 
-        # delete attendees
-        session.query(Attendee).filter(
-            Attendee.username == self.username
-        ).delete(synchronize_session=False)
+        # Delete attendees
+        for attendee in attendees:
+            session.delete(attendee)
 
-        # delete invoices
-        session.query(BookingPeriodInvoice).filter(
+        # Delete invoices
+        invoices = session.query(BookingPeriodInvoice).filter(
             BookingPeriodInvoice.user_id == self.id
-        ).delete(synchronize_session=False)
+        ).all()
+        for invoice in invoices:
+            session.delete(invoice)
 
-        # delete the user
+        # Delete the user
         session.delete(self)
 
         name = self.realname or self.username
