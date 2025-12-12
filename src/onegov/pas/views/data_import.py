@@ -95,6 +95,7 @@ def handle_data_import(
 
     error_message = None
 
+    # FIXME: why not use `form.submitted(request)` like in many places?
     if request.method == 'POST' and form.validate():
         try:
             # Load and concatenate data from uploaded files

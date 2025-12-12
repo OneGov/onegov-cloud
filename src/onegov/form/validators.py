@@ -12,6 +12,8 @@ from datetime import datetime
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from mimetypes import types_map
+
+from onegov.file.utils import get_supported_image_mime_types
 from onegov.form import _
 from onegov.form.errors import (
     DuplicateLabelError,
@@ -36,7 +38,8 @@ from wtforms.validators import StopValidation
 from wtforms.validators import ValidationError
 
 
-from typing import Generic, TYPE_CHECKING
+from typing import Generic, TYPE_CHECKING, Any
+
 if TYPE_CHECKING:
     from collections.abc import Collection, Sequence
     from onegov.core.orm import Base
@@ -119,11 +122,94 @@ class FileSizeLimit:
         if not field.data:
             return
 
-        if field.data.get('size', 0) > self.max_bytes:
+        if isinstance(field.data, list):  # UploadMultipleField
+            for data in field.data:
+                if not data:
+                    continue  # in case of file deletion
+
+                self.validate_filesize(field, data)
+
+        else:
+            self.validate_filesize(field, field.data)
+
+    def validate_filesize(self, field: Field, data: dict[Any, Any]) -> None:
+        if data.get('size', 0) > self.max_bytes:
             message = field.gettext(self.message).format(
                 humanize.naturalsize(self.max_bytes)
             )
             raise ValidationError(message)
+
+
+MIME_TYPES_PDF = {
+    'application/pdf',
+}
+
+# for now not allowed by default
+MIME_TYPES_JSON = {
+    'application/json',
+}
+
+MIME_TYPES_DOCUMENT = {
+    'application/msword',  # doc
+    'application/rtf',
+    *MIME_TYPES_PDF,
+    'application/excel',
+    'application/vnd.ms-excel',  # xls
+    ('application/vnd.openxmlformats-officedocument.'
+     'presentationml.presentation'),  # pptx
+    ('application/vnd.openxmlformats-officedocument.'
+     'spreadsheetml.sheet'),  # xlsx
+    ('application/vnd.openxmlformats-officedocument.'
+     'wordprocessingml.document'),  # docx
+    'application/vnd.ms-office',
+    'application/CDFV2',  # old ms office docs
+    'application/x-ole-storage',  # old ms office docs
+    'application/CDFV2-unknown'  # old ms office docs
+}
+
+MIME_TYPES_EXCEL = {
+    'application/excel',
+    'application/vnd.ms-excel,'
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-office',
+    'application/octet-stream',
+    'application/x-ole-storage',
+}
+
+MIME_TYPES_XML = {
+    'application/xml',
+}
+
+MIME_TYPES_ARCHIVE = {
+    'application/zip',
+}
+
+MIME_TYPES_TEXT_DATA = {
+    'text/csv',
+    'text/plain',
+}
+
+MIME_TYPES_IMAGE = {
+    # allowed types based on PIL
+    *get_supported_image_mime_types(),
+    'image/svg+xml',
+}
+
+MIME_TYPES_AUDIO = {
+    'audio/mp4',
+    'audio/mpeg',
+    'audio/wav',
+    'audio/webm',  # weba
+}
+
+MIME_TYPES_VIDEO = {
+    'video/mp4',
+    'video/mpeg',  # mpg, mpeg
+    'video/ogg',
+    'video/quicktime',  # mov
+    'video/webm',  # webm
+    'video/x-msvideo',  # avi
+}
 
 
 class WhitelistedMimeType:
@@ -134,17 +220,13 @@ class WhitelistedMimeType:
     """
 
     whitelist: Collection[str] = {
-        'application/excel',
-        'application/vnd.ms-excel',
-        'application/msword',
-        'application/pdf',
-        'application/zip',
-        'image/gif',
-        'image/jpeg',
-        'image/png',
-        'image/x-ms-bmp',
-        'text/plain',
-        'text/csv'
+        *MIME_TYPES_DOCUMENT,
+        *MIME_TYPES_XML,
+        *MIME_TYPES_ARCHIVE,
+        *MIME_TYPES_TEXT_DATA,
+        *MIME_TYPES_IMAGE,
+        *MIME_TYPES_AUDIO,
+        *MIME_TYPES_VIDEO,
     }
 
     message = _('Files of this type are not supported.')
@@ -157,8 +239,20 @@ class WhitelistedMimeType:
         if not field.data:
             return
 
-        if field.data['mimetype'] not in self.whitelist:
-            raise ValidationError(field.gettext(self.message))
+        if isinstance(field.data, list):  # UploadMultipleField
+            for data in field.data:
+                if not data:
+                    continue  # in case of file deletion
+
+                self.validate_mimetype(field, data)
+
+        else:
+            self.validate_mimetype(field, field.data)
+
+    def validate_mimetype(self, field: Field, data: dict[Any, Any]) -> None:
+        if data['mimetype'] not in self.whitelist:
+            message = field.gettext(self.message)
+            raise ValidationError(field.gettext(message))
 
 
 class ExpectedExtensions(WhitelistedMimeType):
