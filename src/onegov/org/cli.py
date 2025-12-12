@@ -3179,7 +3179,6 @@ def list_resources(
 @cli.command(name='check-forms')
 def check_forms(
 ) -> Callable[[OrgRequest, OrgApp], None]:
-
     """
     Pulling up all form definitions and parse the formcode as we
     made changes to how we parse it.
@@ -3193,17 +3192,26 @@ def check_forms(
     def check_forms(request: OrgRequest, app: OrgApp) -> None:
         click.echo(f'\nParsing forms of {app.org.name}')
         forms = FormDefinitionCollection(request.session).query()
+        ok_counter = 0
+        notok_counter = 0
+        count = forms.count()
+
         for form in forms:
             try:
                 parse_formcode(form.definition), f'{form.title} failed'
+                ok_counter += 1
                 click.secho(
                     f'Successfully parsed form definition: '
                     f'{form.title}', fg='green'
                 )
             except FormError as e:
+                notok_counter += 1
                 click.secho(
                     f'Failed parsing form definition: '
-                    f'{form.title} with error {e}', fg='red',
+                    f"'{form.title}' with: {e.__repr__()}", fg='red',
                 )
+
+        click.secho(f'Summary: {ok_counter} of {count} OK, '
+                    f'{notok_counter} of {count} NOK')
 
     return check_forms
