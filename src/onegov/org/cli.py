@@ -39,7 +39,12 @@ from onegov.event import OccurrenceCollection
 from onegov.event.collections.events import EventImportItem
 from onegov.file import File
 from onegov.file.collection import FileCollection
-from onegov.form import FormCollection, FormDefinition
+from onegov.form import (
+    FormCollection,
+    FormDefinition,
+    FormDefinitionCollection
+)
+from onegov.form.errors import FormError
 from onegov.newsletter.collection import RecipientCollection
 from onegov.org import log
 from onegov.org.formats import DigirezDB
@@ -3169,3 +3174,36 @@ def list_resources(
             click.secho(f'- {res.title}', fg='green')
 
     return list_all_resources
+
+
+@cli.command(name='check-forms')
+def check_forms(
+) -> Callable[[OrgRequest, OrgApp], None]:
+
+    """
+    Pulling up all form definitions and parse the formcode as we
+    made changes to how we parse it.
+
+    Usage:
+        onegov-org --select /onegov_town6/* check-forms
+
+    """
+    from onegov.form import parse_formcode
+
+    def check_forms(request: OrgRequest, app: OrgApp) -> None:
+        click.echo(f'\nParsing forms of {app.org.name}')
+        forms = FormDefinitionCollection(request.session).query()
+        for form in forms:
+            try:
+                parse_formcode(form.definition), f'{form.title} failed'
+                click.secho(
+                    f'Successfully parsed form definition: '
+                    f'{form.title}', fg='green'
+                )
+            except FormError as e:
+                click.secho(
+                    f'Failed parsing form definition: '
+                    f'{form.title} with error {e}', fg='red',
+                )
+
+    return check_forms
