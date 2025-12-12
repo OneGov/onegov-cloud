@@ -1424,7 +1424,7 @@ def translate_to_yaml(
             # pop back last level
             if current_indent not in stack:
                 raise errors.InvalidIndentSyntax(line=ix + 1)
-            return stack[:stack.index(current_indent)]
+            return stack[:stack.index(current_indent) + 1]
 
         else:
             # same level, nothing to do
