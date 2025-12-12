@@ -596,7 +596,7 @@ class EventCollection(Pagination[Event]):
             location_data = locations.get(location_id, {})
             location = ', '.join(
                 location_data[i] for i in ['title', 'street', 'zip', 'city']
-                if location_data[i]
+                if i in location_data
             )
             coordinates = None
             if (location_data.get('lat', None) and
