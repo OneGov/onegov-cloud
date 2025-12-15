@@ -434,6 +434,14 @@ def handle_file_upload(
 
     """
 
+    file_type = request.params['file_type']
+    supported_content_types = getattr(self, 'supported_content_types')
+
+    if supported_content_types != 'all':
+        if file_type not in supported_content_types:
+            request.alert(_('This file type is not supported'))
+            raise exc.HTTPUnsupportedMediaType()
+
     fs = request.params['file']
     assert not isinstance(fs, str)
 
@@ -441,12 +449,6 @@ def handle_file_upload(
         filename=fs.filename,
         content=fs.file
     )
-
-    supported_content_types = getattr(self, 'supported_content_types', 'all')
-
-    if supported_content_types != 'all':
-        if file.reference.content_type not in supported_content_types:
-            raise exc.HTTPUnsupportedMediaType()
 
     return file
 
@@ -474,6 +476,7 @@ def view_upload_file(
     request: OrgRequest,
     return_file: bool = False
 ) -> Response | File:
+    """ Gets called from upload.js Upload class """
 
     request.assert_valid_csrf_token()
 
