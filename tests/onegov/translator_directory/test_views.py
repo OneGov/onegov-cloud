@@ -2291,6 +2291,7 @@ def test_time_report_workflow(
 
     client.login_editor()
     ticket_page = client.get(ticket_link)
+    assert 'Test notes' in ticket_page
     # Accept ticket
     ticket_page = ticket_page.click('Ticket annehmen').follow()
 
