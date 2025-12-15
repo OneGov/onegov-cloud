@@ -1391,6 +1391,8 @@ def translate_to_yaml(
     :param text: string to be parsed
     :param enable_edit_checks: bool to activate additional checks after
     editing a form. Should only be active originating from forms.validators.py
+    :param strict: bool to activate strict checks when submitting formcode.
+    False to prevent formcode errors when loading formcode.
     """
 
     lines = ((ix, l) for ix, l in prepare(text))
@@ -1411,8 +1413,12 @@ def translate_to_yaml(
         stack: list[int],
         ix: int,
         current_indent: int,
+        enable_edit_checks: bool = False,
     ) -> list[int]:
         """ Handle indentation changes and return updated stack. """
+        if not enable_edit_checks:
+            return stack  # skip stack handling
+
         previous_indent = stack[-1] if stack else -1
 
         if previous_indent < current_indent:
@@ -1460,21 +1466,22 @@ def translate_to_yaml(
             actual_fields += 1
 
             identifier_indent_stack = handle_indent_stack(
-                identifier_indent_stack, ix, len_indent
+                identifier_indent_stack, ix, len_indent, enable_edit_checks
             )
             continue
 
         # help descriptions following a field
         parse_result = try_parse(ELEMENTS.help_identifier, line)
         if parse_result is not None:
-            if not identifier_indent_stack:
+            if enable_edit_checks and not identifier_indent_stack:
                 raise errors.InvalidCommentLocationSyntax(line=ix + 1)
 
             # check for a valid indentation level
-            if len_indent not in identifier_indent_stack:
+            if (enable_edit_checks and
+                    len_indent not in identifier_indent_stack):
                 raise errors.InvalidCommentIndentSyntax(line=ix + 1)
 
-            if expect_option:
+            if enable_edit_checks and expect_option:
                 raise errors.InvalidCommentLocationSyntax(line=ix + 1)
 
             yield '{indent}"{identifier}": \'{message}\''.format(
@@ -1483,7 +1490,7 @@ def translate_to_yaml(
                 message=parse_result.message
             )
             identifier_indent_stack = handle_indent_stack(
-                identifier_indent_stack, ix, len_indent
+                identifier_indent_stack, ix, len_indent, enable_edit_checks
             )
             continue
 
@@ -1501,11 +1508,11 @@ def translate_to_yaml(
             )
 
             # check for a valid indentation level
-            if len_indent in identifier_indent_stack:
+            if enable_edit_checks and len_indent in identifier_indent_stack:
                 raise errors.InvalidIndentSyntax(line=ix + 1)
 
             option_indent_stack = handle_indent_stack(
-                option_indent_stack, ix, len_indent
+                option_indent_stack, ix, len_indent, enable_edit_checks
             )
             expect_option = False
             continue
@@ -1525,11 +1532,11 @@ def translate_to_yaml(
             expect_nested = True
             actual_fields += 1
 
-            if len_indent in option_indent_stack:
+            if enable_edit_checks and len_indent in option_indent_stack:
                 raise errors.InvalidIndentSyntax(line=ix + 1)
 
             identifier_indent_stack = handle_indent_stack(
-                identifier_indent_stack, ix, len_indent
+                identifier_indent_stack, ix, len_indent, enable_edit_checks
             )
             expect_option = True
             continue

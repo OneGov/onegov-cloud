@@ -42,7 +42,7 @@ from onegov.file.collection import FileCollection
 from onegov.form import (
     FormCollection,
     FormDefinition,
-    FormDefinitionCollection
+    FormDefinitionCollection,
 )
 from onegov.form.errors import FormError
 from onegov.newsletter.collection import RecipientCollection

@@ -60,7 +60,7 @@ def test_parse_text() -> None:
         << like EUR, CHF >>
     """)
 
-    form_class = parse_form(text)
+    form_class = parse_form(text, enable_edit_checks=True)
     form = form_class()
 
     fields = form._fields.values()
@@ -1232,15 +1232,31 @@ def test_indentation_error_for_identifier_2() -> None:
     assert parse_formcode(text, enable_edit_checks=True)
 
 
+def test_parser_strict() -> None:
+    text = dedent(
+        """
+         Email *= @@@
+        Name = ___
+        """
+    )
+
+    # non-strict check
+    assert parse_formcode(text, enable_edit_checks=False)
+
+    # strict check
+    with pytest.raises(InvalidIndentSyntax):
+        parse_formcode(text, enable_edit_checks=True)
+
+
 def test_help_indentation_error() -> None:
     text = dedent(
         """
         Contact person *= ___
         << Name of the contact person >>
-        Favorit fruit =
+        Favorite fruit =
             ( ) Apple
             ( ) Banana
-        << Please select your favorit fruit >>
+        << Please select your favorite fruit >>
         """
     )
     assert parse_formcode(text, enable_edit_checks=True)
