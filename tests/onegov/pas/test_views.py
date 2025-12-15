@@ -382,7 +382,6 @@ def test_view_upload_json(
         result = page.form.submit().maybe_follow()
 
         # Add assertions as needed
-        assert result.status_code == 200
         assert result.status_code == 200, f"Import failed: {result.text}"
         return result
 

@@ -18,8 +18,13 @@ from onegov.form.fields import (
     VideoURLField,
 )
 from onegov.form.parser.grammar import field_help_identifier
-from onegov.form.validators import LaxDataRequired, WhitelistedMimeType
-from onegov.form.validators import ValidDateRange
+from onegov.form.validators import (
+    LaxDataRequired,
+    WhitelistedMimeType,
+    FileSizeLimit,
+    StrictOptional,
+    ValidDateRange
+)
 from onegov.pay import Price
 from textwrap import dedent
 from webob.multidict import MultiDict
@@ -31,7 +36,6 @@ from wtforms.fields import StringField
 from wtforms.validators import Length
 from wtforms.validators import Optional
 from wtforms.validators import Regexp
-
 
 from typing import TYPE_CHECKING, Any
 
@@ -360,6 +364,7 @@ def test_parse_fileinput() -> None:
     assert form['file'].widget.multiple is False  # type: ignore[attr-defined]
 
     # verify attached mime type validator
+    assert find_validator(form['file'], FileSizeLimit)
     assert form['file'].validators
     validator = find_validator(form['file'], WhitelistedMimeType)
     assert validator
@@ -371,6 +376,13 @@ def test_parse_fileinput() -> None:
     validator = find_validator(form['file'], WhitelistedMimeType)
     assert validator
     assert validator.whitelist == WhitelistedMimeType.whitelist  # type:ignore[attr-defined]
+
+    assert find_validator(form['file'], FileSizeLimit)
+
+    # ensure nickname field did not get validators from the upload field
+    form = parse_form("Nickname = ___\nFile = *.pdf|*.doc")()
+    assert find_validator(form['nickname'], StrictOptional)
+    assert not find_validator(form['nickname'], WhitelistedMimeType)
 
 
 def test_parse_multiplefileinput() -> None:
@@ -387,10 +399,12 @@ def test_parse_multiplefileinput() -> None:
         'application/msword', 'application/pdf'
     }
 
-    form = parse_form("Files = *.* (multiple)")()
-    validator = find_validator(form['files'], WhitelistedMimeType)
+    form = parse_form("My files = *.* (multiple)")()
+    validator = find_validator(form['my_files'], WhitelistedMimeType)
     assert validator
     assert validator.whitelist == WhitelistedMimeType.whitelist  # type:ignore[attr-defined]
+
+    assert find_validator(form['my_files'], FileSizeLimit)
 
 
 def test_parse_radio() -> None:
