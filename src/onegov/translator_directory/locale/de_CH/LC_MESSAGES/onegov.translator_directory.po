@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-05 13:49+0100\n"
+"POT-Creation-Date: 2025-12-15 23:45+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -570,6 +570,12 @@ msgstr "Geschäftsnummer"
 
 msgid "25% surcharge"
 msgstr "25% Zuschlag"
+
+msgid "ohne Wegberechnung"
+msgstr "ohne Wegberechnung"
+
+msgid "No travel compensation will be calculated"
+msgstr "Keine Wegentschädigung wird berechnet"
 
 msgid "Notes"
 msgstr "Notizen"
