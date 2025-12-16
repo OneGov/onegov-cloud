@@ -2279,6 +2279,25 @@ def test_time_report_workflow(
     # save ticket link for later
     ticket_link = link_match.group(1)
 
+    translator_emails = filter_emails_by_recipient(
+        all_emails, 'translator@example.org'
+    )
+    assert len(translator_emails) >= 1
+    mail_to_translator = translator_emails[0]
+    assert mail_to_translator['To'] == 'translator@example.org'
+    assert (
+        'Eine Zeiterfassung wurde für Sie eingereicht'
+        in mail_to_translator['Subject']
+    )
+    assert (
+        'Eine Zeiterfassung wurde für Sie eingereicht und wird nun '
+        'geprüft.' in mail_to_translator['TextBody']
+    )
+    assert (
+        'Bitte sorgfältig überprüfen und Unstimmigkeiten umgehend melden'
+        in mail_to_translator['TextBody']
+    )
+
     translator = session.query(Translator).filter_by(id=translator_id).one()
     assert len(translator.time_reports) == 1
     report = translator.time_reports[0]

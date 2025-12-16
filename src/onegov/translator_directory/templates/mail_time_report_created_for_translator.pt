@@ -6,15 +6,11 @@
         <p i18n:translate>Hello!</p>
         <p>
             <span i18n:translate>
-                A new time report has been submitted for review.
+                A time report has been submitted for you and is now under review.
             </span>
         </p>
 
         <p><span class="ticket-number">${ticket.reference(request)}</span></p>
-
-        <p tal:condition="translator|nothing">
-            <strong i18n:translate>Translator:</strong> ${translator.title}
-        </p>
 
         <p tal:condition="time_report|nothing">
             <strong i18n:translate>Assignment Date:</strong>
