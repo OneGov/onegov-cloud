@@ -223,7 +223,7 @@ class FieldTypeMigrations:
         return '{:%H:%M}'.format(value)
 
     def radio_to_checkbox(self, value: str) -> list[str]:
-        return [value]
+        return [value] if value else []
 
     def text_to_url(self, value: str) -> str:
         return value
