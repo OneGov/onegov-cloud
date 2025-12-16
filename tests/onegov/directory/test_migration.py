@@ -388,7 +388,7 @@ def test_directory_migration(session: Session) -> None:
     migration.execute()
 
 
-def test_directory_fieldtype_migrations(session: Session) -> None:
+def test_directory_field_type_migrations(session: Session) -> None:
     """
     The issue with migrations is that if one directory entry does not specify
     a value for a field the migration ends up in a `ValidationError`
@@ -416,18 +416,19 @@ def test_directory_fieldtype_migrations(session: Session) -> None:
 
     directories = DirectoryCollection(session)
     zoos = directories.add(
-        title="Zoos",
+        title='Zoos',
         lead="The town's zoos",
         structure=structure,
         configuration=DirectoryConfiguration(
-            title="[Main/Name]",
-            order=['Main/Name']
+            title='[Main/Name]', order=['Main/Name']
+        ),
+    )
+    zoo = zoos.add(
+        values=dict(
+            main_name='Luzerner Zoo',
+            general_landscapes='',  # No value is set
         )
     )
-    zoo = zoos.add(values=dict(
-        main_name="Luzerner Zoo",
-        general_landscapes='',  # No value is set
-    ))
 
     assert zoo.values['general_landscapes'] == ''  # radio
 
@@ -438,3 +439,96 @@ def test_directory_fieldtype_migrations(session: Session) -> None:
     migration.execute()
 
     assert zoo.values['general_landscapes'] == []  # checkbox
+
+
+def test_directory_migrations_removing_radio(session: Session) -> None:
+    """
+    Renaming a radio option, (checkbox option?) leads to a `ValidationError`
+    if the renamed option was selected in at least one entry. There is no
+    error for the user on the UI.
+    """
+    structure = """
+        # Main
+        Name *= ___
+        # General
+        Landscapes =
+            ( ) Tundra
+            ( ) Arctic
+            ( ) Desert
+    """
+
+    new_structure = """
+        # Main
+        Name *= ___
+        # General
+        Landscapes =
+            ( ) Tundra
+            ( ) Arctic
+            ( ) Great Desert
+    """
+
+    directories = DirectoryCollection(session)
+    zoos = directories.add(
+        title='Zoos',
+        lead="The town's zoos",
+        structure=structure,
+        configuration=DirectoryConfiguration(
+            title='[Main/Name]', order=['Main/Name']
+        ),
+    )
+    zoo = zoos.add(
+        values=dict(
+            main_name='Luzerner Zoo',
+            general_landscapes='Desert',
+        )
+    )
+
+    assert zoo.values['general_landscapes'] == 'Desert'
+
+    migration = zoos.migration(new_structure, None)
+    assert migration.changes.renamed_options == [('Desert', 'Great Desert')]
+
+    assert migration.possible
+    migration.execute()
+
+    assert zoo.values['general_landscapes'] == 'Great Desert'
+
+    # two option changes will fail
+    structure = """
+    Name *= ___
+    Animal =
+        ( ) Cat
+        ( ) Dog
+        ( ) Hamster
+    """
+    new_structure = """
+    Name *= ___
+    Animal =
+        ( ) Cat
+        ( ) Doggy
+        ( ) Hamsterli
+    """
+    xxs = directories.add(
+        title='Animals',
+        lead='Our animals',
+        structure=structure,
+        configuration=DirectoryConfiguration(
+            title='[Animal]', order=['Animal']
+        ),
+    )
+    xx = xxs.add(
+        values=dict(
+            name='Corgi',
+            animal='Dog'
+        )
+    )
+
+    assert xx.values['name'] == 'Corgi'
+
+    migration = xxs.migration(new_structure, None)
+    assert migration.changes.renamed_options == [
+        ("Dog", "Doggy"),
+        ("Hamster", "Hamsterli"),
+    ]
+
+    assert not migration.possible
