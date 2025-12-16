@@ -10,8 +10,8 @@ from onegov.form.errors import DuplicateLabelError
 from tempfile import NamedTemporaryFile
 from tests.shared.utils import create_image
 
-
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
@@ -386,3 +386,55 @@ def test_directory_migration(session: Session) -> None:
     assert migration.possible
 
     migration.execute()
+
+
+def test_directory_fieldtype_migrations(session: Session) -> None:
+    """
+    The issue with migrations is that if one directory entry does not specify
+    a value for a field the migration ends up in a `ValidationError`
+    """
+
+    structure = """
+        # Main
+        Name *= ___
+        # General
+        Landscapes =
+            ( ) Tundra
+            ( ) Arctic
+            ( ) Desert
+    """
+
+    new_structure = """
+        # Main
+        Name *= ___
+        # General
+        Landscapes =
+            [ ] Tundra
+            [ ] Arctic
+            [ ] Desert
+    """
+
+    directories = DirectoryCollection(session)
+    zoos = directories.add(
+        title="Zoos",
+        lead="The town's zoos",
+        structure=structure,
+        configuration=DirectoryConfiguration(
+            title="[Main/Name]",
+            order=['Main/Name']
+        )
+    )
+    zoo = zoos.add(values=dict(
+        main_name="Luzerner Zoo",
+        general_landscapes='',  # No value is set
+    ))
+
+    assert zoo.values['general_landscapes'] == ''  # radio
+
+    migration = zoos.migration(new_structure, None)
+    changes = migration.changes
+    assert migration.fieldtype_migrations.possible('radio', 'checkbox')
+
+    migration.execute()
+
+    assert zoo.values['general_landscapes'] == []  # checkbox
