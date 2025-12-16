@@ -32,7 +32,7 @@ class TranslatorAppRequest(TownRequest):
             return True
         return False
 
-    @cached_property
+    @property
     def is_accountant(self) -> bool:
         if not self.current_user:
             return False
