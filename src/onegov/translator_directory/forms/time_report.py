@@ -110,6 +110,13 @@ class TranslatorTimeReportForm(Form):
         default=False,
     )
 
+    skip_travel_calculation = BooleanField(
+        label=_('ohne Wegberechnung'),
+        description=_('No travel compensation will be calculated'),
+        default=False,
+        depends_on=('assignment_type', 'on-site'),
+    )
+
     notes = TextAreaField(
         label=_('Notes'), validators=[Optional()], render_kw={'rows': 3}
     )
@@ -429,6 +436,12 @@ class TranslatorTimeReportForm(Form):
         from translator's address to the assignment location.
         The distance is multiplied by 2 to account for round trip.
         """
+        if (
+            self.skip_travel_calculation.data
+            and self.assignment_type.data == 'on-site'
+        ):
+            return Decimal('0'), 0.0
+
         if self.assignment_type.data in ('telephonic', 'schriftlich'):
             return Decimal('0'), None
 
