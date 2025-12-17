@@ -4,13 +4,14 @@ import math
 
 from functools import cached_property
 from onegov.core.collection import Pagination
+from onegov.core.orm.types import MarkupText
 from onegov.event.models import Event
 from onegov.search import SearchIndex
-from onegov.search.utils import language_from_locale, normalize_text
+from onegov.search.utils import language_from_locale
 from markupsafe import Markup
 from operator import itemgetter
 from sedate import utcnow
-from sqlalchemy import case, func, inspect
+from sqlalchemy import case, func, inspect, type_coerce
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy_utils import escape_like
 
@@ -246,10 +247,15 @@ class Search(Pagination[Any]):
 
         return query
 
+    @cached_property
+    def language(self) -> str:
+        language = self.request.locale
+        if language_from_locale(language) == 'simple':
+            return 'simple'
+        return language or 'simple'
+
     def generic_search(self) -> Query[SearchIndex]:
-        language = language_from_locale(self.request.locale)
-        ts_query = func.websearch_to_tsquery(
-            language, normalize_text(self.query))
+        ts_query = func.websearch_to_tsquery(self.language, self.query)
 
         decay = 0.99
         scale = (90 * 24 * 3600)  # 90 days to reach target decay
@@ -427,3 +433,16 @@ class Search(Pagination[Any]):
                 .order_by(subquery.c.suggestion.asc())
                 .limit(number_of_suggestions)
             )
+
+    def highlight_results(self, markup: Markup) -> Markup:
+        return self.request.session.query(
+            type_coerce(
+                func.ts_headline(
+                    self.language,
+                    markup,
+                    func.websearch_to_tsquery(self.language, self.query),
+                    'HighlightAll=true, StartSel=<em>, StopSel=</em>'
+                ),
+                MarkupText
+            )
+        ).one()[0]

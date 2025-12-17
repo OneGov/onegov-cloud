@@ -23,6 +23,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.orm import Base, SessionManager
     from onegov.core.request import CoreRequest
+    from sqlalchemy.engine import Connection
     from sqlalchemy.orm import Session
 
 
@@ -87,6 +88,10 @@ class SearchApp(morepath.App):
             max_queue_size=max_queue_size
         )
 
+        self.session_manager.on_schema_init.connect(
+            self.fts_create_search_configurations
+        )
+
         self.session_manager.on_insert.connect(
             self.fts_orm_events.on_insert)
 
@@ -100,6 +105,89 @@ class SearchApp(morepath.App):
             self.fts_orm_events.on_transaction_join
         )
 
+    def fts_create_search_configurations(
+        self,
+        schema: str,
+        connection: Connection
+    ) -> None:
+
+        for locale in self.locales:
+            lang = language_from_locale(locale)
+            if lang == 'simple':
+                # we don't change anything for simple
+                continue
+
+            dict_created = False
+            dict_name = 'unaccent'
+            if lang == 'german':
+                # create a dictionary
+                if connection.execute(text("""
+                    SELECT EXISTS (
+                        SELECT 1
+                          FROM pg_ts_dict
+                          JOIN pg_namespace
+                            ON pg_namespace.oid = pg_ts_dict.dictnamespace
+                         WHERE dictname = 'german_unaccent'
+                           AND nspname = :schema
+                    )
+                    FROM pg_ts_config
+                """), schema=schema).scalar():
+                    # the dictionary already exists
+                    dict_name = 'german_unaccent'
+                else:
+                    try:
+                        connection.execute("""
+                            CREATE TEXT SEARCH DICTIONARY german_unaccent (
+                                template = unaccent,
+                                rules = 'german'
+                            )
+                        """)
+                    except Exception:
+                        index_log.exception(
+                            'Failed to create german_unaccent dictionary '
+                            'quality of search results will be lower. '
+                            'Run do/create-unaccent-rules to create the '
+                            'necessary rules file.'
+                        )
+                    else:
+                        index_log.info('Created german_unaccent dictionary')
+                        dict_created = True
+                        dict_name = 'german_unaccent'
+
+            if connection.execute(text("""
+                SELECT EXISTS (
+                    SELECT 1
+                      FROM pg_ts_config
+                      JOIN pg_namespace
+                        ON pg_namespace.oid = pg_ts_config.cfgnamespace
+                     WHERE cfgname = LOWER(:locale)
+                       AND nspname = :schema
+                )
+                FROM pg_ts_config
+            """), locale=locale, schema=schema).scalar():
+                # configuration already exists
+                if dict_created:
+                    # drop the old configuration that isn't yet using
+                    # the dictionary we just created
+                    connection.execute(f"""
+                        DROP TEXT SEARCH CONFIGURATION {locale}
+                    """)
+                else:
+                    continue
+
+            # NOTE: Since we only allow lang != simple these three
+            #       variables can only have very specific safe values
+            #       so we don't need to escape them.
+            connection.execute(f"""
+                CREATE TEXT SEARCH CONFIGURATION {locale} (
+                    COPY = {lang}
+                );
+                ALTER TEXT SEARCH CONFIGURATION {locale}
+                    ALTER MAPPING FOR hword, hword_part, word
+                    WITH {dict_name}, {lang}_stem;
+            """)
+            index_log.info(f'Created {locale} search configuration')
+
     def fts_may_use_private_search(self, request: CoreRequest) -> bool:
         """ Returns True if the given request is allowed to access private
         search results. By default every logged in user has access to those.
@@ -112,7 +200,7 @@ class SearchApp(morepath.App):
     @cached_property
     def fts_languages(self) -> set[str]:
         return {
-            language_from_locale(locale)
+            'simple' if language_from_locale(locale) == 'simple' else locale
             for locale in self.locales
         } or {'simple'}
 

@@ -7,7 +7,7 @@ from onegov.core.utils import is_non_string_iterable
 from onegov.search import index_log, log, Searchable, utils
 from onegov.search.datamanager import IndexerDataManager
 from onegov.search.search_index import SearchIndex
-from onegov.search.utils import language_from_locale, normalize_text
+from onegov.search.utils import language_from_locale
 from operator import itemgetter
 from sqlalchemy import and_, bindparam, func, text, String
 from sqlalchemy.orm import object_session
@@ -139,17 +139,22 @@ class Indexer:
                 else:
                     owner_id_column = _owner_id_column
 
-                detected_language = language_from_locale(task['language'])
+                detected_language = task['language']
+                if language_from_locale(detected_language) == 'simple':
+                    detected_language = 'simple'
+
                 if detected_language not in self.languages:
                     if len(self.languages) == 1:
                         language = next(iter(self.languages))
-                    elif 'german' in self.languages:
-                        language = 'german'
-                    elif 'french' in self.languages:
-                        language = 'french'
                     else:
-                        # HACK: just take one
-                        language = next(iter(self.languages), 'simple')
+                        # prioritize german and then french locales
+                        for locale in ('de_CH', 'de', 'fr_CH', 'fr'):
+                            if locale in self.languages:
+                                language = locale
+                                break
+                        else:
+                            # if there is nothing to prioritize, just pick one
+                            language = next(iter(self.languages), 'simple')
                 else:
                     language = detected_language
                 _properties = task['properties']
@@ -645,7 +650,7 @@ class ORMEventTranslator:
                     )
                 else:
                     value = str(raw)
-                translation['properties'][prop] = normalize_text(value)
+                translation['properties'][prop] = value
 
             suggestion = obj.fts_suggestion
             if suggestion:
