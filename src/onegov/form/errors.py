@@ -2,7 +2,9 @@ from __future__ import annotations
 
 
 class FormError(Exception):
-    pass
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}'
 
 
 class DuplicateLabelError(FormError):

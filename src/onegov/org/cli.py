@@ -30,7 +30,11 @@ from onegov.chat import MessageCollection
 from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.core.crypto import random_token
 from onegov.core.utils import Bunch
-from onegov.directory import DirectoryEntry
+from onegov.directory import (
+    Directory,
+    DirectoryEntry,
+    DirectoryCollection,
+)
 from onegov.directory.models.directory import DirectoryFile
 from onegov.event import Event
 from onegov.event import Occurrence
@@ -39,7 +43,14 @@ from onegov.event import OccurrenceCollection
 from onegov.event.collections.events import EventImportItem
 from onegov.file import File
 from onegov.file.collection import FileCollection
-from onegov.form import FormCollection, FormDefinition
+from onegov.form import (
+    FormCollection,
+    FormDefinition,
+    FormSubmission,
+    FormDefinitionCollection,
+    FormSubmissionCollection,
+)
+from onegov.form.errors import FormError
 from onegov.newsletter.collection import RecipientCollection
 from onegov.org import log
 from onegov.org.formats import DigirezDB
@@ -3169,3 +3180,91 @@ def list_resources(
             click.secho(f'- {res.title}', fg='green')
 
     return list_all_resources
+
+
+@cli.command(name='check-formcode')
+def check_forms(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """Check stored formcode for parseability.
+
+    Scans form definitions, form submissions and directory structures
+    stored in the database and attempts to parse their formcode using
+    `onegov.form.parse_formcode`. This helps detect changes to the
+    parser that would cause existing formcode to fail when loading
+    (`enable_edit_checks=False`).
+
+    NOTE: Currently resource form definition is option input on the form.
+    However this causes an error when parsing the formcode
+
+    Usage:
+        onegov-org --select /onegov_town6/* check-formcode
+
+    """
+    from onegov.form import parse_formcode
+
+    def check_formcode(request: OrgRequest, app: OrgApp) -> None:
+        data_to_parse: list[tuple[str, str]] = []
+        ok_counter = 0
+        notok_counter = 0
+
+        definitions = (
+            FormDefinitionCollection(request.session)
+            .query()
+            .with_entities(
+                FormDefinition.title,
+                FormDefinition.definition
+            )
+        )
+        data_to_parse.extend(
+            (x.title, x.definition) for x in definitions.all()
+        )
+
+        submissions = (
+            FormSubmissionCollection(request.session, None)
+            .query()
+            .with_entities(
+                FormSubmission.title,
+                FormSubmission.definition
+            )
+        )
+        data_to_parse.extend((x.title, x.definition) for x in submissions)
+
+        directories = (
+            DirectoryCollection(request.session)
+            .query()
+            .with_entities(
+                Directory.title,
+                Directory.structure
+            )
+        )
+        data_to_parse.extend((x.title, x.structure) for x in directories.all())
+
+        # NOTE: the formcode for resources can be empty but causing
+        # an InvalidFormSyntax
+        # resources = (
+        #     ResourceCollection(app.libres_context)
+        #     .query()
+        #     .with_entities(Resource.title, Resource.definition)
+        # )
+        # data_to_parse.extend(
+        #     (x.title, x.definition) for x in resources.all()
+        # )
+
+        click.echo(f'\nParsing formcode for "{app.org.name}"')
+        count = len(data_to_parse)
+        for title, formcode in data_to_parse:
+            try:
+                parse_formcode(formcode, enable_edit_checks=False)
+                ok_counter += 1
+            except FormError as e:
+                notok_counter += 1
+                click.secho(
+                    f'Failed parsing formcode for {title}: '
+                    f'{e.__repr__()}', fg='red'
+                )
+
+        click.secho(f'Summary: {ok_counter} of {count} OK, '
+                    f'{notok_counter} of {count} NOK',
+                    fg='yellow' if notok_counter > 0 else 'green')
+
+    return check_formcode

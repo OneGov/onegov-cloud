@@ -258,7 +258,7 @@ class ValidFormDefinition:
             return None
 
         try:
-            parsed_form = self._parse_form(field)
+            parsed_form = self._parse_form(field, enable_edit_checks=True)
         except InvalidFormSyntax as exception:
             field.render_kw = field.render_kw or {}
             field.render_kw['data-highlight-line'] = exception.line
