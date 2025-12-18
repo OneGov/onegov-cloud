@@ -207,10 +207,6 @@ class FieldTypeMigrations:
 
         return getattr(self, explicit, getattr(self, generic, None))
 
-    # FIXME: A lot of these converters currently don't work if the value
-    #        happens to be None, which should be possible for every field
-    #        as long as its optional, or do we skip converting None
-    #        explicitly somewhere?!
     def any_to_text(self, value: Any) -> str:
         return str(value if value is not None else '').strip()
 
@@ -227,13 +223,13 @@ class FieldTypeMigrations:
         return value
 
     def date_to_text(self, value: date) -> str:
-        return '{:%d.%m.%Y}'.format(value)
+        return '{:%d.%m.%Y}'.format(value) if value else ''
 
     def datetime_to_text(self, value: datetime) -> str:
-        return '{:%d.%m.%Y %H:%M}'.format(value)
+        return '{:%d.%m.%Y %H:%M}'.format(value) if value else ''
 
     def time_to_text(self, value: time) -> str:
-        return '{:%H:%M}'.format(value)
+        return '{:%H:%M}'.format(value) if value else ''
 
     def radio_to_checkbox(self, value: str) -> list[str]:
         return [value] if value else []
@@ -407,5 +403,3 @@ class StructuralChanges:
                     for o, n in zip(old_labels, new_labels):
                         if o != n:
                             self.renamed_options.append((o, n))
-
-        print('*** tschupre detect changed options', self.renamed_options)

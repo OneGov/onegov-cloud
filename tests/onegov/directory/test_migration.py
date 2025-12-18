@@ -10,7 +10,7 @@ from onegov.form.errors import DuplicateLabelError
 from tempfile import NamedTemporaryFile
 from tests.shared.utils import create_image
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
@@ -388,31 +388,129 @@ def test_directory_migration(session: Session) -> None:
     migration.execute()
 
 
-def test_directory_field_type_migrations(session: Session) -> None:
+@pytest.mark.parametrize('old,new,label,expected_value', [
+    (  # any to textarea - url
+    """
+        description = http://
+    """,
+    """
+        description = ...[5]
+    """,
+    'description',
+    '',
+    ),
+    (  # textarea to text
+    """
+        description = ...[5]
+    """,
+    """
+        description = ___
+    """,
+    'description',
+    '',
+    ),
+    (  # textarea to code
+    """
+        description = ...[5]
+    """,
+    """
+        description = <markdown>
+    """,
+    'description',
+    '',
+    ),
+    (  # text to code
+    """
+        description = ___
+    """,
+    """
+        description = <markdown>
+    """,
+    'description',
+    '',
+    ),
+    (  # radio to checkbox
+    """
+        Landscapes =
+            ( ) Tundra
+            ( ) Arctic
+            ( ) Desert
+    """,
+    """
+        Landscapes =
+            [ ] Tundra
+            [ ] Arctic
+            [ ] Desert
+    """,
+    'landscapes',
+    [],  # checkbox
+    ),
+    (  # date to text
+    """
+        Date = YYYY.MM.DD
+    """,
+    """
+        Date = ___
+    """,
+    'date',
+    ''
+    ),
+    (  # datetime to text
+    """
+        Date/Time = YYYY.MM.DD HH:MM
+    """,
+    """
+        Date/Time = ___
+    """,
+    'date_time',
+    ''
+    ),
+    (  # time to text
+    """
+        Time = HH:MM
+    """,
+    """
+        Time = ___
+    """,
+    'time',
+    '',
+    ),
+    (  # text to url
+    """
+        my text = ___
+    """,
+    """
+        my text = http://
+    """,
+    'my_text',
+    '',
+    ),
+])
+def test_directory_field_type_migrations(
+    old: str,
+    new: str,
+    label: str,
+    expected_value: Any,
+    session: Session
+) -> None:
     """
     The issue with migrations is that if one directory entry does not specify
     a value for a field the migration ends up in a `ValidationError`
     """
 
-    structure = """
+    structure = textwrap.dedent(f"""
         # Main
         Name *= ___
         # General
-        Landscapes =
-            ( ) Tundra
-            ( ) Arctic
-            ( ) Desert
-    """
+        {old}
+    """)
 
-    new_structure = """
+    new_structure = textwrap.dedent(f"""
         # Main
         Name *= ___
         # General
-        Landscapes =
-            [ ] Tundra
-            [ ] Arctic
-            [ ] Desert
-    """
+        {new}
+    """)
 
     directories = DirectoryCollection(session)
     zoos = directories.add(
@@ -424,21 +522,20 @@ def test_directory_field_type_migrations(session: Session) -> None:
         ),
     )
     zoo = zoos.add(
-        values=dict(
-            main_name='Luzerner Zoo',
-            general_landscapes='',  # No value is set
-        )
+        values={
+            'main_name': 'Luzerner Zoo',
+            f'general_{label}': '',  # No value is set
+        }
     )
 
-    assert zoo.values['general_landscapes'] == ''  # radio
+    assert zoo.values[f'general_{label}'] == ''  # radio
 
     migration = zoos.migration(new_structure, None)
-    changes = migration.changes
-    assert migration.fieldtype_migrations.possible('radio', 'checkbox')
+    assert migration.possible
 
     migration.execute()
 
-    assert zoo.values['general_landscapes'] == []  # checkbox
+    assert zoo.values[f'general_{label}'] == expected_value
 
 
 def test_directory_migration_renaming_select(session: Session) -> None:
@@ -484,7 +581,7 @@ def test_directory_migration_renaming_select(session: Session) -> None:
     assert zoo.values['general_landscapes'] == 'Desert'
 
     migration = zoos.migration(new_structure, None)
-    assert migration.changes.renamed_options == [  # type:ignore[attr-defined]
+    assert migration.changes.renamed_options == [
         ('Desert', 'Great Desert')
     ]
 
@@ -526,7 +623,7 @@ def test_directory_migration_renaming_select(session: Session) -> None:
     assert xx.values['name'] == 'Corgi'
 
     migration = xxs.migration(new_structure, None)
-    assert migration.changes.renamed_options == [  # type:ignore[attr-defined]
+    assert migration.changes.renamed_options == [
         ("Dog", "Doggy"),
         ("Hamster", "Hamsterli"),
     ]
