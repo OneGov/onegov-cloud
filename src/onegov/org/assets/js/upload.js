@@ -41,7 +41,6 @@ var Upload = function(element) {
 
         var data = new FormData();
         data.append('file', file);
-        data.append('file_type', file.type);
 
         xhr.upload.addEventListener('progress', function(e) {
             bar.find('.meter').css('width', (e.loaded / e.total * 100 || 100) + '%');
@@ -61,10 +60,6 @@ var Upload = function(element) {
                 if (xhr.responseText.length !== 0) {
                     processCommonNodes($(xhr.responseText).appendTo(filelist), true);
                 }
-            } else if (xhr.status === 415){  // Unsupported media type
-                // reload page in order to show the request error message
-                window.location.reload();
-                return;
             } else {
                 bar.find('.meter').css('width', '100%');
                 bar.addClass('alert').attr('data-error', xhr.statusText);
