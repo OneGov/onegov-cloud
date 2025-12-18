@@ -112,6 +112,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
     #       string, we know we already have a translation in a different domain
     #       so we just manually specify it for now.
     fts_type_title = TranslationString('Directories', domain='onegov.org')
+    fts_title_property = 'title'
     fts_properties = {
         'title': {'type': 'localized', 'weight': 'A'},
         'lead': {'type': 'localized', 'weight': 'B'}

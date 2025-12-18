@@ -74,6 +74,7 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
     #       so we just manually specify it for now.
     fts_type_title = TranslationString('Agencies', domain='onegov.agency')
     fts_public = True
+    fts_title_property = 'title'
     fts_properties = {
         'title': {'type': 'text', 'weight': 'A'},
         'description': {'type': 'localized', 'weight': 'B'},

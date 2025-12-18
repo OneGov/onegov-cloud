@@ -56,6 +56,7 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
     #       so we just manually specify it for now.
     fts_type_title = TranslationString('Newsletter', domain='onegov.org')
     fts_id = 'name'
+    fts_title_property = 'title'
     fts_properties = {
         'title': {'type': 'localized', 'weight': 'A'},
         'lead': {'type': 'localized', 'weight': 'B'},

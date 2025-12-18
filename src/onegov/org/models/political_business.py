@@ -144,6 +144,7 @@ class PoliticalBusiness(
 
     fts_type_title = _('Political Businesses')
     fts_public = True
+    fts_title_property = 'title'
     fts_properties = {
         'title': {'type': 'text', 'weight': 'A'},
         'number': {'type': 'text', 'weight': 'A'}
@@ -334,7 +335,7 @@ class PoliticalBusinessCollection(
                 SearchIndex,
                 SearchIndex.owner_id_uuid == PoliticalBusiness.id
             )
-            query = query.filter(SearchIndex.fts_idx.op('@@')(
+            query = query.filter(SearchIndex.data_vector.op('@@')(
                 func.websearch_to_tsquery(language, self.term)
             ))
 

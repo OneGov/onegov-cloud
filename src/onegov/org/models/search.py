@@ -262,15 +262,19 @@ class Search(Pagination[Any]):
         offset = (7 * 24 * 3600)  # 7 days without decay
         two_times_variance_squared = -(scale**2 / math.log(decay))
         query = self.request.session.query(SearchIndex).filter(
-            SearchIndex.fts_idx.op('@@')(ts_query)
+            SearchIndex.data_vector.op('@@')(ts_query)
         ).order_by(
             (
-                func.ts_rank_cd(SearchIndex.fts_idx, ts_query, 2 | 4 | 16)
-                # FIXME: Whether or not we apply a time decay should depend
-                #        on the type of content, there's content that remains
-                #        relevant no matter how old it is, e.g. people, but
-                #        there's also content that does get less relevant
-                #        with time e.g. news.
+                (
+                    100.0 * func.ts_rank(
+                        SearchIndex.title_vector,
+                        ts_query,
+                    ) + func.ts_rank_cd(
+                        SearchIndex.data_vector,
+                        ts_query,
+                        2 | 4 | 16
+                    )
+                )
                 # FIXME: We could probably improve performance a lot if
                 #        we stored the time decay in the search table and
                 #        recomputed it once a day in a crobjob

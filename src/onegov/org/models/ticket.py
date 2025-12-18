@@ -1867,7 +1867,7 @@ def apply_search_term(
         language = 'simple'
 
     query = query.join(SearchIndex, SearchIndex.owner_id_uuid == Ticket.id)  # type: ignore[no-untyped-call]
-    query = query.filter(SearchIndex.fts_idx.op('@@')(
+    query = query.filter(SearchIndex.data_vector.op('@@')(
         func.websearch_to_tsquery(language, term)
     ))
     return query
