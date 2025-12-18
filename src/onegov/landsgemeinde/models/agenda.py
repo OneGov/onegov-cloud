@@ -58,6 +58,7 @@ class AgendaItem(
 
     fts_type_title = _('Agenda items')
     fts_public = True
+    fts_title_property = 'title'
     fts_properties = {
         'title': {'type': 'text', 'weight': 'A'},
         'overview': {'type': 'localized', 'weight': 'B'},

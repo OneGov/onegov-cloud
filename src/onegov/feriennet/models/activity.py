@@ -26,6 +26,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
     __mapper_args__ = {'polymorphic_identity': 'vacation'}
 
     fts_type_title = _('Activities')
+    fts_title_property = 'title'
     fts_properties = {
         'title': {'type': 'localized', 'weight': 'A'},
         'lead': {'type': 'localized', 'weight': 'B'},

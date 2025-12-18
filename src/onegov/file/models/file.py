@@ -101,6 +101,7 @@ class SearchableFile(ORMSearchable):
     """
 
     fts_public = True
+    fts_title_property = 'name'
     fts_properties = {
         'name': {'type': 'text', 'weight': 'A'},
         'note': {'type': 'localized', 'weight': 'B'},

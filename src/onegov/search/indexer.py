@@ -40,6 +40,7 @@ if TYPE_CHECKING:
         last_change: datetime | None
         publication_start: datetime | None
         publication_end: datetime | None
+        title: str
         properties: dict[str, str]
 
     class DeleteTask(TypedDict):
@@ -163,7 +164,6 @@ class Indexer:
                 # NOTE: We use a dictionary to avoid duplicate updates for
                 #       the same model, only the latest update will count
                 params_dict[_owner_id] = {
-                    '_data': _properties,
                     '_owner_id': _owner_id,
                     '_owner_type': _owner_type,
                     '_owner_tablename': tablename,
@@ -176,6 +176,7 @@ class Indexer:
                         task.get('publication_start', None),
                     '_publication_end':
                         task.get('publication_end', None),
+                    '_title_string': task['title'],
                     **{
                         f'_lang__{lang}': lang
                         for lang in self.languages
@@ -207,7 +208,22 @@ class Indexer:
 
             assert schema is not None
             assert owner_id_column is not None
-            combined_vector = func.setweight(
+
+            title_vector = None
+            for language in self.languages:
+                title_vector_part = func.setweight(
+                    func.to_tsvector(
+                        bindparam(f'_lang__{language}', type_=String),
+                        bindparam('_title_string', type_=String)
+                    ),
+                    'A'
+                )
+                if title_vector is None:
+                    title_vector = title_vector_part
+                else:
+                    title_vector = title_vector.op('||')(title_vector_part)
+
+            data_vector = func.setweight(
                 func.array_to_tsvector(
                     bindparam('_tags', type_=ARRAY(String))
                 ),
@@ -215,7 +231,7 @@ class Indexer:
             )
             for field in tasks[0]['properties'].keys():
                 for language in self.languages:
-                    combined_vector = combined_vector.op('||')(
+                    data_vector = data_vector.op('||')(
                         func.setweight(
                             func.to_tsvector(
                                 bindparam(f'_lang__{language}', type_=String),
@@ -243,8 +259,8 @@ class Indexer:
                         SearchIndex._tags:
                             bindparam('_tags', type_=ARRAY(String)),
                         SearchIndex.suggestion: bindparam('_suggestion'),
-                        SearchIndex.fts_idx_data: bindparam('_data'),
-                        SearchIndex.fts_idx: combined_vector,
+                        SearchIndex.title_vector: title_vector,
+                        SearchIndex.data_vector: data_vector,
                     }
                 )
                 # we may have already indexed this model
@@ -264,8 +280,8 @@ class Indexer:
                         'last_change': bindparam('_last_change'),
                         'tags': bindparam('_tags', type_=ARRAY(String)),
                         'suggestion': bindparam('_suggestion'),
-                        'fts_idx_data': bindparam('_data'),
-                        'fts_idx': combined_vector,
+                        'title_vector': title_vector,
+                        'data_vector': data_vector,
                     },
                     # since our unique constraints are partial indeces
                     # we need this index_where clause, otherwise postgres
@@ -410,16 +426,18 @@ class Indexer:
 
 
 class TypeMapping:
-    __slots__ = ('name', 'mapping', 'model')
+    __slots__ = ('name', 'mapping', 'title_property', 'model')
 
     def __init__(
         self,
         name: str,
         mapping: dict[str, Any],
+        title_property: str | None = None,
         model: type[Searchable] | None = None
     ) -> None:
         self.name = name
         self.mapping = mapping
+        self.title_property = title_property
         self.model = model
 
 
@@ -442,12 +460,18 @@ class TypeMappingRegistry:
 
         """
         for model in utils.searchable_sqlalchemy_models(base):
-            self.register_type(model.__name__, model.fts_properties, model)
+            self.register_type(
+                model.__name__,
+                model.fts_properties,
+                model.fts_title_property,
+                model
+            )
 
     def register_type(
         self,
         type_name: str,
         mapping: dict[str, Any],
+        title_property: str | None = None,
         model: type[Searchable] | None = None
     ) -> None:
         """ Registers the given type with the given mapping. The mapping is
@@ -467,7 +491,12 @@ class TypeMappingRegistry:
         """
         assert type_name not in self.mappings, (
             f"Type '{type_name}' already registered")
-        self.mappings[type_name] = TypeMapping(type_name, mapping, model)
+        self.mappings[type_name] = TypeMapping(
+            type_name,
+            mapping,
+            title_property,
+            model
+        )
 
     @property
     def registered_fields(self) -> set[str]:
@@ -618,6 +647,7 @@ class ORMEventTranslator:
                 'last_change': obj.fts_last_change,
                 'publication_start': obj.fts_publication_start,
                 'publication_end': obj.fts_publication_end,
+                'title': '',
                 'properties': {},
             }
 
@@ -651,6 +681,33 @@ class ORMEventTranslator:
                 else:
                     value = str(raw)
                 translation['properties'][prop] = value
+
+            if mapping_.title_property is not None:
+                if (existing := translation['properties'].get(
+                    mapping_.title_property
+                )) is not None:
+                    translation['title'] = existing
+                else:
+                    raw = getattr(obj, mapping_.title_property)
+                    if raw is None:
+                        value = ''
+                    elif isinstance(raw, dict):
+                        # FIXME: Do we want to unnest nested structures?
+                        value = ' '.join(
+                            str(value)
+                            for value in raw.values()
+                            if value is not None
+                        )
+                    elif is_non_string_iterable(raw):
+                        # FIXME: Do we want to unnest nested structures?
+                        value = ' '.join(
+                            str(value)
+                            for value in raw
+                            if value is not None
+                        )
+                    else:
+                        value = str(raw)
+                    translation['title'] = value
 
             suggestion = obj.fts_suggestion
             if suggestion:

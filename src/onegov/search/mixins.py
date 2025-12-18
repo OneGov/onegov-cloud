@@ -36,34 +36,30 @@ class Searchable:
     if TYPE_CHECKING:
         # FIXME: Gross classproperty vs. ClassVar is a mess, we should
         #        consistently use one or the other
+        fts_title_property: ClassVar[str | None]
         fts_properties: ClassVar[dict[str, Any]]
         fts_id: ClassVar[str]
         fts_type_title: ClassVar[str | Callable[[AnyRequest], str]]
         __tablename__: ClassVar[str]
 
-    # TODO: rename to fts_properties
+    @classproperty  # type:ignore[no-redef]
+    @classmethod
+    def fts_title_property(cls) -> str | None:
+        """ Returns the name of the title property of this model. The property
+        will be be read from the model instance. The contents of this property
+        should also be available through fts_property. I.e. either the property
+        itself or the properties it's constructed from. Simple search will only
+        use the title index for sorting, not for filtering. But there may be
+        an option eventually to only search in titles.
+
+        """
+        return None
+
     @classproperty  # type:ignore[no-redef]
     @classmethod
     def fts_properties(cls) -> dict[str, Any]:
         """ Returns the type mapping of this model. Each property in the
         mapping will be read from the model instance.
-
-        The returned object needs to be a dict or an object that provides
-        a ``to_dict`` method.
-
-        Internally, onegov.search stores differing languages in different
-        indices. It does this automatically through langauge detection, or
-        by manually specifying a language.
-
-        Note that objects with multiple languages are not supported
-        (each object is supposed to have exactly one language).
-
-        Onegov.search will automatically insert the right analyzer for
-        types like these.
-
-        There's currently only limited support for properties here, namely
-        objects and nested mappings do not work! This is going to be added
-        in the future though.
 
         """
         raise NotImplementedError
@@ -199,6 +195,7 @@ class SearchableContent(ORMSearchable):
 
     """
 
+    fts_title_property = 'title'
     fts_properties = {
         'title': {'type': 'localized', 'weight': 'A'},
         'lead': {'type': 'localized', 'weight': 'B'},

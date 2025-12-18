@@ -36,6 +36,7 @@ class RISCommission(Commission, ORMSearchable):
 
     fts_type_title = _('Commissions')
     fts_public = True
+    fts_title_property = 'name'
     fts_properties = {
         'name': {'type': 'text', 'weight': 'A'},
         'description': {'type': 'text', 'weight': 'B'}
@@ -115,6 +116,7 @@ class RISParliamentarian(Parliamentarian, ORMSearchable):
 
     fts_type_title = _('Parliamentarians')
     fts_public = True
+    fts_title_property = 'title'
     fts_properties = {
         'first_name': {'type': 'text', 'weight': 'A'},
         'last_name': {'type': 'text', 'weight': 'A'},
@@ -219,6 +221,7 @@ class RISParliamentaryGroup(ParliamentaryGroup, ORMSearchable):
 
     fts_type_title = _('Parliamentary groups')
     fts_public = True
+    fts_title_property = 'name'
     fts_properties = {
         'name': {'type': 'text', 'weight': 'A'},
         'description': {'type': 'text', 'weight': 'B'}
