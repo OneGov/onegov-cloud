@@ -42,6 +42,8 @@ from onegov.translator_directory.models.ticket import (
 from onegov.translator_directory.constants import (
     ASSIGNMENT_LOCATIONS,
     FINANZSTELLE,
+    LOHNART_COMPENSATION,
+    LOHNART_EXPENSES,
 )
 from onegov.translator_directory.models.time_report import (
     TranslatorTimeReport,
@@ -305,6 +307,49 @@ def accept_time_report(
     return request.redirect(request.link(self))
 
 
+def calculate_accounting_values(
+    report: TranslatorTimeReport,
+) -> tuple[Decimal, Decimal, Decimal]:
+    """Calculate accounting values for a time report.
+
+    The L001 CSV format supports: hours × rate = compensation
+    But translator compensation is complex:
+      - Night work: +50% surcharge (20:00-06:00)
+      - Weekend/holiday: +25% surcharge (non-night hours only)
+      - Urgent assignments: +25% on all work
+      - Break time: deducted at base rate
+
+    We cannot export the breakdown as separate line items because
+    of break time. Break time is negative numbers which are probably
+    not supported by the accounting system.
+
+    Instead, we back-calculate an effective hourly rate that,
+    when multiplied by total hours, produces the correct total.
+    We have tests that validate the result is the same in both directions.
+
+    Example:
+      8h total (6 day + 2 night), CHF 100/h base, weekend work
+      Actual: 6×100 + 2×150 + 6×25 - 0.5×100 = CHF 1'000
+      Export: 8h × CHF 125/h = CHF 1'000
+
+    Returns:
+        tuple of (duration_hours, effective_rate, recalculated_subtotal)
+        where recalculated_subtotal = duration_hours * effective_rate
+
+    The recalculated_subtotal should match breakdown['adjusted_subtotal']
+    within rounding tolerance.
+    """
+    breakdown = report.calculate_compensation_breakdown()
+    duration_hours = report.duration_hours
+    assert duration_hours > 0
+
+    effective_rate = breakdown['adjusted_subtotal'] / duration_hours
+    effective_rate_rounded = effective_rate.quantize(Decimal('0.01'))
+    recalculated_subtotal = duration_hours * effective_rate_rounded
+
+    return duration_hours, effective_rate_rounded, recalculated_subtotal
+
+
 def generate_accounting_export_rows(
     reports: list[TranslatorTimeReport],
 ) -> Iterator[list[str]]:
@@ -317,31 +362,29 @@ def generate_accounting_export_rows(
         pers_nr = str(translator.pers_id)
         date_str = report.assignment_date.strftime('%d.%m.%Y')
 
-        duration_hours = str(report.duration_hours)
+        duration_hours, effective_rate, _ = calculate_accounting_values(report)
+        duration_hours_str = str(duration_hours)
+        effective_rate_str = str(effective_rate)
 
-        # Calculate effective rate from actual compensation
-        # (since we can't use a simple percentage with partial night work)
-        breakdown = report.calculate_compensation_breakdown()
-        if report.duration_hours > 0:
-            effective_rate = breakdown['subtotal'] / report.duration_hours
-        else:
-            effective_rate = report.hourly_rate
-        effective_rate_str = str(effective_rate.quantize(Decimal('0.01')))
+        finanzstelle_info = FINANZSTELLE.get(report.finanzstelle)
+        if not finanzstelle_info:
+            raise ValueError(f'Unknown finanzstelle: {report.finanzstelle}')
+        kostenstelle = finanzstelle_info.kostenstelle
 
         row_2603 = [
             'L001',
             pers_nr,
             date_str,
             '0',
-            '2603',
+            LOHNART_COMPENSATION,
             '0',
             '',
             'VWG Entschädigung Dolmetscher',
-            duration_hours,
+            duration_hours_str,
             '1',
             effective_rate_str,
             '1',
-            '0',
+            kostenstelle,
             '0',
             '0',
             '0',
@@ -370,7 +413,7 @@ def generate_accounting_export_rows(
                 pers_nr,
                 date_str,
                 '0',
-                '8102',
+                LOHNART_EXPENSES,
                 '0',
                 '',
                 'VWG Reisespesen Dolmetscher',
@@ -378,7 +421,7 @@ def generate_accounting_export_rows(
                 '1',
                 '0',
                 '0',
-                '0',
+                kostenstelle,
                 '0',
                 '0',
                 '0',
@@ -407,7 +450,7 @@ def generate_accounting_export_rows(
                 pers_nr,
                 date_str,
                 '0',
-                '8102',
+                LOHNART_EXPENSES,
                 '0',
                 '',
                 'VWG Reisespesen Dolmetscher',  # Verpflegung
@@ -415,7 +458,7 @@ def generate_accounting_export_rows(
                 '1',
                 '0',
                 '0',
-                '0',
+                kostenstelle,
                 '0',
                 '0',
                 '0',
@@ -493,7 +536,7 @@ def export_accounting_csv(
     output = StringIO()
     writer = csv.writer(output, delimiter=';')
 
-    # Header row MUST NOT be included: the accounting system will reject
+    # Header row must not be included: the accounting system will reject
     # the import if a header is present. Kept here for documentation and
     # debugging purposes.
     # header = [

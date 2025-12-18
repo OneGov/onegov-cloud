@@ -54,6 +54,10 @@ class TranslatorTimeReportForm(Form):
     )
 
     # Used only in edit mode - hidden when creating new reports
+    # If assignment_location_override is set, assignment_location
+    # should be ignored. This allows for the possibility of setting
+    # a location which differs from pre-determined set of possible
+    # locations.
     assignment_location_override = StringField(
         label=_('Location Override (manual entry)'),
         validators=[Optional()],
