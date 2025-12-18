@@ -1391,8 +1391,6 @@ def translate_to_yaml(
     :param text: string to be parsed
     :param enable_edit_checks: bool to activate additional checks after
     editing a form. Should only be active originating from forms.validators.py
-    :param strict: bool to activate strict checks when submitting formcode.
-    False to prevent formcode errors when loading formcode.
     """
 
     lines = ((ix, l) for ix, l in prepare(text))

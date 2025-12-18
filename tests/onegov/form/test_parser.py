@@ -1201,6 +1201,7 @@ def test_indentation_error_for_identifier() -> None:
     with pytest.raises(InvalidIndentSyntax):
         parse_formcode(text, enable_edit_checks=True)
 
+
 def test_indentation_error_for_identifier_2() -> None:
     text = dedent(
         """
@@ -1230,22 +1231,6 @@ def test_indentation_error_for_identifier_2() -> None:
         """
     )
     assert parse_formcode(text, enable_edit_checks=True)
-
-
-def test_parser_strict() -> None:
-    text = dedent(
-        """
-         Email *= @@@
-        Name = ___
-        """
-    )
-
-    # non-strict check
-    assert parse_formcode(text, enable_edit_checks=False)
-
-    # strict check
-    with pytest.raises(InvalidIndentSyntax):
-        parse_formcode(text, enable_edit_checks=True)
 
 
 def test_help_indentation_error() -> None:

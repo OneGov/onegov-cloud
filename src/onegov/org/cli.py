@@ -3185,15 +3185,16 @@ def list_resources(
 @cli.command(name='check-formcode')
 def check_forms(
 ) -> Callable[[OrgRequest, OrgApp], None]:
-    """
-    Pulling up all form definitions, submissions, directories and resources
-    from the database and parse the formcode as we made changes to how we
-    parse formcode.
-    This cli can be used to determine if the changes made to from code
-    parsing might affect current customer form definitions.
+    """Check stored formcode for parseability.
+
+    Scans form definitions, form submissions and directory structures
+    stored in the database and attempts to parse their formcode using
+    `onegov.form.parse_formcode`. This helps detect changes to the
+    parser that would cause existing formcode to fail when loading
+    (`enable_edit_checks=False`).
 
     NOTE: Currently resource form definition is option input on the form.
-    However this causes an error when parsing the formcode.
+    However this causes an error when parsing the formcode
 
     Usage:
         onegov-org --select /onegov_town6/* check-formcode
