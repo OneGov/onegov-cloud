@@ -39,27 +39,58 @@
     margin-bottom: 1.5rem;
 
     .progress {
-        margin-left: 25%;
-        width: 75%;
+        padding: 0.5rem;
+        background: #f6f6f6;
+        position: relative;
+        overflow: visible;
 
-        &::before {
-            content: attr(data-filename);
-            font-size: .875rem;
-            left: 1rem;
-            overflow: hidden;
-            text-align: left;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            width: 22.5%;
+        .progress-main {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
 
-        &.alert::after {
-            color: $white;
-            content: attr(data-error);
-            font-size: .8rem;
-            margin-left: .75ex;
-            margin-top: -1.2rem;
-            position: absolute;
+        .upload-filename {
+            flex: 0 0 auto;
+            font-size: 0.95rem;
+            color: #333;
+            max-width: 50%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .meter {
+            display: inline-block;
+            height: 10px;
+            background: #0b7db1;
+            border-radius: 6px;
+            flex: 1 1 auto;
+            transition: width 150ms linear;
+        }
+
+        .upload-error {
+            margin-top: 0.4rem;
+            color: #842029;
+            background: #f8d7da;
+            padding: 0.4rem 0.6rem;
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        &.has-error {
+            .meter { background: #b02a37; }
+            .upload-error { display: block; }
+        }
+
+        // optional compact mobile layout
+        @media (max-width: 640px) {
+            .progress-main {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+            }
+            .upload-filename { max-width: 100%; }
         }
     }
 }
