@@ -45,6 +45,9 @@
                 <li tal:repeat="field migration.changes.changed_fields">
                     <tal:b i18n:translate>Changed:</tal:b> ${field}
                 </li>
+                <li tal:repeat="pair migration.changes.renamed_options|nothing">
+                    <tal:b i18n:translate>Renamed option:</tal:b> ${pair[0]} -> ${pair[1]}
+                </li>
             </ul>
 
             <div class="button primary" data-submits-form="#confirm-migration form" i18n:translate>

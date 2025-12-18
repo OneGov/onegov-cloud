@@ -229,10 +229,16 @@ def handle_edit_directory(
                 if migration.changes:
                     if not migration.possible:
                         save_changes = False
-                        request.alert(_(
-                            'The requested change cannot be performed, '
-                            'as it is incompatible with existing entries'
-                        ))
+                        if len(migration.changes.renamed_options) > 1:
+                            request.alert(_(
+                                'Please rename only one radio or checkbox '
+                                'label at a time.'
+                            ))
+                        else:
+                            request.alert(_(
+                                'The requested change cannot be performed, '
+                                'as it is incompatible with existing entries'
+                            ))
                     else:
                         if not request.params.get('confirm'):
                             form.action += '&confirm=1'

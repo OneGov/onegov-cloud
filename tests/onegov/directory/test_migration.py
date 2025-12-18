@@ -441,11 +441,9 @@ def test_directory_field_type_migrations(session: Session) -> None:
     assert zoo.values['general_landscapes'] == []  # checkbox
 
 
-def test_directory_migrations_removing_radio(session: Session) -> None:
+def test_directory_migration_renaming_select(session: Session) -> None:
     """
-    Renaming a radio option, (checkbox option?) leads to a `ValidationError`
-    if the renamed option was selected in at least one entry. There is no
-    error for the user on the UI.
+    Renaming a radio option or checkbox option
     """
     structure = """
         # Main
@@ -486,7 +484,9 @@ def test_directory_migrations_removing_radio(session: Session) -> None:
     assert zoo.values['general_landscapes'] == 'Desert'
 
     migration = zoos.migration(new_structure, None)
-    assert migration.changes.renamed_options == [('Desert', 'Great Desert')]
+    assert migration.changes.renamed_options == [  # type:ignore[attr-defined]
+        ('Desert', 'Great Desert')
+    ]
 
     assert migration.possible
     migration.execute()
@@ -526,7 +526,7 @@ def test_directory_migrations_removing_radio(session: Session) -> None:
     assert xx.values['name'] == 'Corgi'
 
     migration = xxs.migration(new_structure, None)
-    assert migration.changes.renamed_options == [
+    assert migration.changes.renamed_options == [  # type:ignore[attr-defined]
         ("Dog", "Doggy"),
         ("Hamster", "Hamsterli"),
     ]

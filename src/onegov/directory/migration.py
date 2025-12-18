@@ -5,11 +5,12 @@ from onegov.form import as_internal_id
 from onegov.form import flatten_fieldsets
 from onegov.form import parse_form
 from onegov.form import parse_formcode
+from onegov.form.parser.core import OptionsField
 from sqlalchemy.orm import object_session, joinedload, undefer
 from sqlalchemy.orm.attributes import get_history
 
-
 from typing import Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
     from datetime import date, datetime, time
@@ -61,11 +62,16 @@ class DirectoryMigration:
         if not self.directory.entries:
             return True
 
+        # tschupre changes to detect renamed options
         if not self.changes:
             return True
 
-        if not self.changes.changed_fields:
+        if (not self.changes.changed_fields and
+                not self.changes.renamed_options):
             return True
+
+        if len(self.changes.renamed_options) > 1:
+            return False
 
         for changed in self.changes.changed_fields:
             old = self.changes.old[changed]
@@ -142,6 +148,7 @@ class DirectoryMigration:
         self.remove_old_fields(values)
         self.rename_fields(values)
         self.convert_fields(values)
+        self.rename_options(values)
 
     def add_new_fields(self, values: dict[str, Any]) -> None:
         for added in self.changes.added_fields:
@@ -169,6 +176,12 @@ class DirectoryMigration:
 
             changed = as_internal_id(changed)
             values[changed] = convert(values[changed])
+
+    def rename_options(self, values: dict[str, Any]) -> None:
+        for old_label, new_label in self.changes.renamed_options:
+            for key, val in list(values.items()):
+                if val == old_label:
+                    values[key] = new_label
 
 
 class FieldTypeMigrations:
@@ -255,6 +268,7 @@ class StructuralChanges:
         self.detect_removed_fields()
         self.detect_renamed_fields()  # modifies added/removed fields
         self.detect_changed_fields()
+        self.detect_changed_options()
 
     def __bool__(self) -> bool:
         return bool(
@@ -262,6 +276,7 @@ class StructuralChanges:
             or self.removed_fields
             or self.renamed_fields
             or self.changed_fields
+            or self.renamed_options  # radio and checkboxes
         )
 
     def detect_removed_fieldsets(self) -> None:
@@ -378,3 +393,19 @@ class StructuralChanges:
             new = self.new[new_id]
             if old.required != new.required or old.type != new.type:
                 self.changed_fields.append(new_id)
+
+    def detect_changed_options(self) -> None:
+        self.renamed_options: list[tuple[str, str]] = []
+
+        for old_id, old_field in self.old.items():
+            if isinstance(old_field, OptionsField) and old_id in self.new:
+                new_field = self.new[old_id]
+                if isinstance(new_field, OptionsField):
+                    old_labels = [r.label for r in old_field.choices]
+                    new_labels = [r.label for r in new_field.choices]
+
+                    for o, n in zip(old_labels, new_labels):
+                        if o != n:
+                            self.renamed_options.append((o, n))
+
+        print('*** tschupre detect changed options', self.renamed_options)
