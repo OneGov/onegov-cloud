@@ -3158,6 +3158,44 @@ def subscribe_parliamentarians_to_newsletter(
     return subscribe_parliamentarians
 
 
+@cli.command(name='wil-rename-imported-meeting-files')
+def wil_rename_imported_meeting_files(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    onegov-org --select /foo/bar wil-rename-imported-meeting-files
+    """
+
+    def rename_imported_meeting_files(
+            request: OrgRequest,
+            app: OrgApp
+    ) -> None:
+        if request.app.org.name != 'Stadt Wil':
+            return
+
+        rename_counter = 0
+        meetings = MeetingCollection(request.session)
+        for meeting in meetings.query().order_by(Meeting.start_datetime):
+            if meeting.start_datetime is None:
+                click.secho(f'{meeting.title} has no start date '
+                            f'time set. end date time {meeting.end_datetime}',
+                            fg='yellow')
+                continue
+
+            if meeting.start_datetime > datetime(
+                    2025, 7, 1, tzinfo=pytz.utc):
+                continue
+
+            for file in meeting.files:
+                if '_' in file.name:
+                    click.secho(f'{file.name}', fg='red')
+                    file.name = file.name.replace('_', ' ')
+                    rename_counter += 1
+
+        click.secho(f'Renamed {rename_counter} files', fg='green')
+
+    return rename_imported_meeting_files
+
+
 @cli.command(name='list-resources')
 def list_resources(
 ) -> Callable[[OrgRequest, OrgApp], None]:
