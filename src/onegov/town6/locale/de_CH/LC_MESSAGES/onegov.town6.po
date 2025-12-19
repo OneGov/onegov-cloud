@@ -375,7 +375,7 @@ msgstr "Möchten Sie diese Fraktion wirklich löschen?"
 msgid "Delete parliamentary group"
 msgstr "Fraktion löschen"
 
-msgid "Parties"
+msgid "Political Parties"
 msgstr "Parteien"
 
 msgid "Political Party"
@@ -2072,7 +2072,7 @@ msgid "Contract number"
 msgstr "Vertragsnummer"
 
 msgid "Party"
-msgstr "Partei"
+msgstr "Party"
 
 msgid "Private address"
 msgstr "Privatadresse"

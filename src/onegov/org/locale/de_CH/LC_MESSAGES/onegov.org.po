@@ -1577,6 +1577,9 @@ msgstr "Beruf"
 msgid "Political Party"
 msgstr "Partei"
 
+msgid "Political Parties"
+msgstr "Parteien"
+
 msgid "Parliamentary Group"
 msgstr "Fraktion"
 

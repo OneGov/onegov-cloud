@@ -375,6 +375,9 @@ msgstr "Elimina gruppo parlamentare"
 msgid "Parties"
 msgstr "Partiti"
 
+msgid "Political Parties"
+msgstr "Partiti politici"
+
 msgid "Political Party"
 msgstr "Partito"
 
