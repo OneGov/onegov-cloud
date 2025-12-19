@@ -4,6 +4,9 @@ import pytest
 
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
+
+from wtforms import Field
+
 from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
 from onegov.form.errors import (
@@ -12,10 +15,20 @@ from onegov.form.errors import (
     InvalidCommentLocationSyntax,
 )
 from onegov.form.fields import (
-    DateTimeLocalField, MultiCheckboxField, TimeField, URLField, VideoURLField)
+    DateTimeLocalField,
+    MultiCheckboxField,
+    TimeField,
+    URLField,
+    VideoURLField,
+)
 from onegov.form.parser.grammar import field_help_identifier
-from onegov.form.validators import LaxDataRequired
-from onegov.form.validators import ValidDateRange
+from onegov.form.validators import (
+    LaxDataRequired,
+    WhitelistedMimeType,
+    FileSizeLimit,
+    StrictOptional,
+    ValidDateRange
+)
 from onegov.pay import Price
 from textwrap import dedent
 from webob.multidict import MultiDict
@@ -28,14 +41,23 @@ from wtforms.validators import Length
 from wtforms.validators import Optional
 from wtforms.validators import Regexp
 
+from typing import TYPE_CHECKING, Any
 
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pyparsing import ParserElement, ParseResults
+
+    from onegov.form.types import Validator
 
 
 def parse(expr: ParserElement, text: str) -> ParseResults:
     return expr.parseString(text)
+
+
+def find_validator(
+    field: Field | FileField,
+    cls: type
+) -> Validator[Any, Any] | None:
+    return next((v for v in field.validators if isinstance(v, cls)), None)
 
 
 @pytest.mark.parametrize('comment,output', [
@@ -345,6 +367,27 @@ def test_parse_fileinput() -> None:
     assert isinstance(form['file'], FileField)
     assert form['file'].widget.multiple is False  # type: ignore[attr-defined]
 
+    # verify attached mime type validator
+    assert find_validator(form['file'], FileSizeLimit)
+    assert form['file'].validators
+    validator = find_validator(form['file'], WhitelistedMimeType)
+    assert validator
+    assert validator.whitelist == {  # type:ignore[attr-defined]
+        'application/msword', 'application/pdf'
+    }
+
+    form = parse_form("File = *.*")()
+    validator = find_validator(form['file'], WhitelistedMimeType)
+    assert validator
+    assert validator.whitelist == WhitelistedMimeType.whitelist  # type:ignore[attr-defined]
+
+    assert find_validator(form['file'], FileSizeLimit)
+
+    # ensure nickname field did not get validators from the upload field
+    form = parse_form("Nickname = ___\nFile = *.pdf|*.doc")()
+    assert find_validator(form['nickname'], StrictOptional)
+    assert not find_validator(form['nickname'], WhitelistedMimeType)
+
 
 def test_parse_multiplefileinput() -> None:
     form = parse_form("Files = *.pdf|*.doc (multiple)")()
@@ -353,9 +396,22 @@ def test_parse_multiplefileinput() -> None:
     assert isinstance(form['files'], FileField)
     assert form['files'].widget.multiple is True  # type: ignore[attr-defined]
 
+    # verify attached mime type validator
+    validator = find_validator(form['files'], WhitelistedMimeType)
+    assert validator
+    assert validator.whitelist == {  # type:ignore[attr-defined]
+        'application/msword', 'application/pdf'
+    }
+
+    form = parse_form("My files = *.* (multiple)")()
+    validator = find_validator(form['my_files'], WhitelistedMimeType)
+    assert validator
+    assert validator.whitelist == WhitelistedMimeType.whitelist  # type:ignore[attr-defined]
+
+    assert find_validator(form['my_files'], FileSizeLimit)
+
 
 def test_parse_radio() -> None:
-
     text = dedent("""
         Gender =
             ( ) Male

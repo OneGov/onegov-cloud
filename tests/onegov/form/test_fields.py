@@ -6,6 +6,7 @@ import tempfile
 from cgi import FieldStorage
 from copy import deepcopy
 from datetime import datetime
+
 from onegov.core.utils import Bunch
 from onegov.core.utils import dictionary_to_binary
 from onegov.form import Form
@@ -22,15 +23,36 @@ from onegov.form.fields import TranslatedSelectField
 from onegov.form.fields import UploadField
 from onegov.form.fields import UploadMultipleField
 from onegov.form.fields import URLField
-from onegov.form.validators import ValidPhoneNumber
+from onegov.form.validators import (
+    ValidPhoneNumber, WhitelistedMimeType, MIME_TYPES_JSON, MIME_TYPES_PDF)
 from unittest.mock import patch
+from wtforms import FileField, Field
 from wtforms.validators import Optional
 from wtforms.validators import URL
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING, Self, Sequence
+
 if TYPE_CHECKING:
     from webob.request import _FieldStorageWithFile
+    from onegov.form.types import (
+        FormT, Validators, Validator)
+
+
+def assert_whitelisted_mimetype_validator(
+    field: UploadField | UploadMultipleField
+) -> None:
+
+    validator = find_validator(field, WhitelistedMimeType)
+    assert validator
+    assert validator.whitelist == WhitelistedMimeType.whitelist  # type:ignore[attr-defined]
+
+
+def find_validator(
+    field: Field | FileField,
+    cls: type
+) -> Validator[Any, Any] | None:
+    return next((v for v in field.validators if isinstance(v, cls)), None)
 
 
 class DummyPostData(dict[str, Any]):
@@ -56,9 +78,15 @@ def create_file(
 
 
 def test_upload_field() -> None:
-    def create_field() -> tuple[Form, UploadField]:
+    def create_field(
+        validators: Validators[FormT, Self] | None = None,  # type:ignore[misc]
+        allowed_mimetypes: Sequence[str] | None = None,
+    ) -> tuple[Form, UploadField]:
         form = Form()
-        field = UploadField()
+        field = UploadField(
+            validators=validators,
+            allowed_mimetypes=allowed_mimetypes,
+        )
         field = field.bind(form, 'upload')  # type: ignore[attr-defined]
         return form, field
 
@@ -68,12 +96,15 @@ def test_upload_field() -> None:
     assert data == {}
     assert field.file is None
     assert field.filename is None
+    assert_whitelisted_mimetype_validator(field)
 
     form, field = create_field()
     data = field.process_fieldstorage('')
     assert data == {}
     assert field.file is None
     assert field.filename is None
+    assert field.validate(form)
+    assert_whitelisted_mimetype_validator(field)
 
     textfile = create_file('text/plain', 'foo.txt', b'foo')
     data = field.process_fieldstorage(textfile)
@@ -84,6 +115,8 @@ def test_upload_field() -> None:
     assert dictionary_to_binary(data) == b'foo'  # type: ignore[arg-type]
     assert field.filename == 'foo.txt'
     assert field.file.read() == b'foo'  # type: ignore[attr-defined]
+    assert field.validate(form)
+    assert_whitelisted_mimetype_validator(field)
 
     form, field = create_field()
     textfile = create_file('text/plain', 'C:/mydata/bar.txt', b'bar')
@@ -95,6 +128,20 @@ def test_upload_field() -> None:
     assert dictionary_to_binary(data) == b'bar'  # type: ignore[arg-type]
     assert field.filename == 'bar.txt'
     assert field.file.read() == b'bar'  # type: ignore[union-attr]
+    assert field.validate(form)
+    assert_whitelisted_mimetype_validator(field)
+
+    # failing mime type validator
+    form, field = create_field(allowed_mimetypes=tuple(MIME_TYPES_PDF))
+    textfile = create_file('text/plain', 'baz.txt', b'baz')
+    data = field.data = field.process_fieldstorage(textfile)
+    assert data['filename'] == 'baz.txt'
+    assert data['mimetype'] == 'text/plain'
+    validator = find_validator(field, WhitelistedMimeType)
+    assert validator
+    assert validator.whitelist == ('application/pdf',)  # type:ignore[attr-defined]
+    assert not field.validate(form)
+    assert 'Files of this type are not supported.' in field.errors
 
     # Test rendering
     form, field = create_field()
@@ -104,6 +151,7 @@ def test_upload_field() -> None:
 
     field.data = field.process_fieldstorage(textfile)
     assert 'without-data' in field(force_simple=True)
+    assert_whitelisted_mimetype_validator(field)
 
     html = field()
     assert 'with-data' in html
@@ -111,6 +159,7 @@ def test_upload_field() -> None:
     assert 'keep' in html
     assert 'type="file"' in html
     assert 'value="baz.txt"' not in html
+    assert_whitelisted_mimetype_validator(field)
 
     html = field(resend_upload=True)
     assert 'with-data' in html
@@ -118,12 +167,14 @@ def test_upload_field() -> None:
     assert 'keep' in html
     assert 'type="file"' in html
     assert 'value="baz.txt"' in html
+    assert_whitelisted_mimetype_validator(field)
 
     # Test submit
     form, field = create_field()
     field.process(DummyPostData({}))
     assert field.validate(form)
     assert field.data == {}
+    assert_whitelisted_mimetype_validator(field)
 
     form, field = create_field()
     field.process(DummyPostData({'upload': 'abcd'}))
@@ -132,6 +183,7 @@ def test_upload_field() -> None:
     assert field.data == {}
     assert field.file is None
     assert field.filename is None
+    assert_whitelisted_mimetype_validator(field)
 
     # ... simple
     form, field = create_field()
@@ -146,6 +198,7 @@ def test_upload_field() -> None:
     assert dictionary_to_binary(field.data) == b'foobar'  # type: ignore[arg-type]
     assert field.filename == 'foobar.txt'
     assert field.file.read() == b'foobar'  # type: ignore[union-attr]
+    assert_whitelisted_mimetype_validator(field)
 
     # ... with select
     form, field = create_field()
@@ -153,6 +206,7 @@ def test_upload_field() -> None:
     field.process(DummyPostData({'upload': ['keep', textfile]}))
     assert field.validate(form)
     assert field.action == 'keep'
+    assert_whitelisted_mimetype_validator(field)
 
     form, field = create_field()
     textfile = create_file('text/plain', 'foobar.txt', b'foobar')
@@ -160,6 +214,7 @@ def test_upload_field() -> None:
     assert field.validate(form)
     assert field.action == 'delete'
     assert field.data == {}
+    assert_whitelisted_mimetype_validator(field)
 
     form, field = create_field()
     textfile = create_file('text/plain', 'foobar.txt', b'foobar')
@@ -173,6 +228,7 @@ def test_upload_field() -> None:
     assert dictionary_to_binary(field.data) == b'foobar'  # type: ignore[arg-type]
     assert field.filename == 'foobar.txt'
     assert field.file.read() == b'foobar'  # type: ignore[union-attr]
+    assert_whitelisted_mimetype_validator(field)
 
     # ... with select and keep upload
     previous = field.data
@@ -191,6 +247,7 @@ def test_upload_field() -> None:
     assert field.data['mimetype'] == 'text/plain'
     assert field.data['size'] == 6
     assert dictionary_to_binary(field.data) == b'foobar'  # type: ignore[arg-type]
+    assert_whitelisted_mimetype_validator(field)
 
     field.process(DummyPostData({'upload': [
         'delete',
@@ -203,6 +260,7 @@ def test_upload_field() -> None:
     assert field2.validate(form)
     assert field2.action == 'delete'
     assert field2.data == {}
+    assert_whitelisted_mimetype_validator(field)
 
     field.process(DummyPostData({'upload': [
         'replace',
@@ -221,14 +279,34 @@ def test_upload_field() -> None:
     assert dictionary_to_binary(field2.data) == b'foobaz'  # type: ignore[arg-type]
     assert field2.filename == 'foobaz.txt'
     assert field2.file.read() == b'foobaz'  # type: ignore[union-attr]
+    assert_whitelisted_mimetype_validator(field)
 
 
 def test_upload_multiple_field() -> None:
-    def create_field() -> tuple[Form, UploadMultipleField]:
+    def create_field(
+        validators: Validators[FormT, Self] | None = None,  # type:ignore[misc]
+        allowed_mimetypes: Sequence[str] | None = None,
+    ) -> tuple[Form, UploadMultipleField]:
         form = Form()
-        field = UploadMultipleField()
+        field = UploadMultipleField(
+            validators=validators,
+            allowed_mimetypes=allowed_mimetypes,
+        )
         field = field.bind(form, 'uploads')  # type: ignore[attr-defined]
         return form, field
+
+    # failing mime type validator
+    form, field = create_field(allowed_mimetypes=tuple(MIME_TYPES_JSON))
+    file1 = create_file('text/plain', 'baz.txt', b'baz')
+    field.process(DummyPostData({'uploads': [file1]}))
+    assert not field.validate(form)
+    assert len(field.data) == 1
+    assert field.data[0]['filename'] == 'baz.txt'
+    assert field.data[0]['mimetype'] == 'text/plain'
+    for subfield in field:
+        validator = find_validator(subfield, WhitelistedMimeType)
+        assert validator
+        assert validator.whitelist == ('application/json',)  # type:ignore[attr-defined]
 
     # Test rendering and initial submit
     form, field = create_field()
@@ -245,6 +323,7 @@ def test_upload_multiple_field() -> None:
     file1 = create_file('text/plain', 'baz.txt', b'baz')
     file2 = create_file('text/plain', 'foobar.txt', b'foobar')
     field.process(DummyPostData({'uploads': [file1, file2]}))
+    assert field.validate(form)
     assert len(field.data) == 2
     assert field.data[0]['filename'] == 'baz.txt'
     assert field.data[0]['mimetype'] == 'text/plain'
@@ -265,8 +344,11 @@ def test_upload_multiple_field() -> None:
     assert dictionary_to_binary(file_field2.data) == b'foobar'  # type: ignore[arg-type]
     assert file_field2.filename == 'foobar.txt'
     assert file_field2.file.read() == b'foobar'  # type: ignore[union-attr]
+    for subfield in field:
+        assert_whitelisted_mimetype_validator(subfield)
 
     html = field(force_simple=True)
+    assert field.validate(form)
     assert 'without-data' in html
     assert 'multiple' in html
     assert 'name="uploads"' in html
@@ -274,6 +356,7 @@ def test_upload_multiple_field() -> None:
     assert 'name="uploads-0"' not in html
 
     html = field()
+    assert field.validate(form)
     assert 'with-data' in html
     assert 'name="uploads-0"' in html
     assert 'Uploaded file: baz.txt (3 Bytes) ✓' in html
@@ -290,6 +373,7 @@ def test_upload_multiple_field() -> None:
     assert 'multiple' in html
 
     html = field(resend_upload=True)
+    assert field.validate(form)
     assert 'with-data' in html
     assert 'Uploaded file: baz.txt (3 Bytes) ✓' in html
     assert 'Uploaded file: foobar.txt (6 Bytes) ✓' in html
