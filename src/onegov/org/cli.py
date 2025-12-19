@@ -3166,8 +3166,8 @@ def wil_rename_imported_meeting_files(
     """
 
     def rename_imported_meeting_files(
-            request: OrgRequest,
-            app: OrgApp
+        request: OrgRequest,
+        app: OrgApp
     ) -> None:
         if request.app.org.name != 'Stadt Wil':
             return
