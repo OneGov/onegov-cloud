@@ -1443,7 +1443,7 @@ class RISPartyCollectionLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _('Parties')
+        return _('Political Parties')
 
     @cached_property
     def og_description(self) -> str:
