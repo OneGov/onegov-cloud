@@ -25,6 +25,7 @@ class MeetingItem(Base, ORMSearchable):
 
     fts_type_title = _('Agenda')
     fts_public = True
+    fts_title_property = 'title'
     fts_properties = {
         'title': {'type': 'text', 'weight': 'A'},
         'number': {'type': 'text', 'weight': 'A'}

@@ -337,6 +337,15 @@ class TimeReportHandler(Handler):
                 ]
             )
 
+        if report.notes:
+            notes_html = linkify(report.notes).replace('\n', Markup('<br>'))
+            summary_parts.extend(
+                [
+                    f"<dt>{request.translate(_('Notes'))}</dt>",
+                    f'<dd>{notes_html}</dd>',
+                ]
+            )
+
         summary_parts.extend(
             [
                 f"<dt>{request.translate(_('Hourly Rate'))}</dt>",

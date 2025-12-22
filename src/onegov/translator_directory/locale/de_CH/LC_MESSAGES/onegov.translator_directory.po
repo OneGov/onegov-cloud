@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-05 13:49+0100\n"
+"POT-Creation-Date: 2025-12-16 17:44+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -565,11 +565,14 @@ msgstr "Endzeit"
 msgid "Break time"
 msgstr "Pausenzeit, in Stunden"
 
-msgid "Case number"
-msgstr "Geschäftsnummer"
-
 msgid "25% surcharge"
 msgstr "25% Zuschlag"
+
+msgid "ohne Wegberechnung"
+msgstr "ohne Wegberechnung"
+
+msgid "No travel compensation will be calculated"
+msgstr "Keine Wegentschädigung wird berechnet"
 
 msgid "Notes"
 msgstr "Notizen"
@@ -763,7 +766,7 @@ msgid "Finanzstelle"
 msgstr "Finanzstelle"
 
 msgid "Case Number"
-msgstr "Geschäftsnummer"
+msgstr "Geschäfts- oder Verfahrensnummer"
 
 msgid "Hourly Rate"
 msgstr "Stundenansatz"
@@ -931,6 +934,12 @@ msgstr "Dolmetscher/in:"
 
 msgid "Time:"
 msgstr "Zeit:"
+
+msgid "Please review the details and process accordingly."
+msgstr "Bitte überprüfen Sie die Details und fahren Sie entsprechend fort."
+
+msgid "A time report has been submitted for you and is now under review."
+msgstr "Eine Zeiterfassung wurde für Sie eingereicht und wird nun geprüft."
 
 msgid "Please carefully review and report any discrepancies immediately."
 msgstr "Bitte sorgfältig überprüfen und Unstimmigkeiten umgehend melden"
@@ -1161,6 +1170,9 @@ msgstr "Übersetzer/in erfolgreich gelöscht"
 msgid "Your data has been confirmed"
 msgstr "Ihre Daten wurden bestätigt"
 
+msgid "A time report has been submitted for you"
+msgstr "Eine Zeiterfassung wurde für Sie eingereicht"
+
 msgid "New time report for review"
 msgstr "Neue Zeiterfassung zur Überprüfung"
 
@@ -1189,3 +1201,14 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 
 msgid "Download"
 msgstr "Herunterladen"
+
+#~ msgid ""
+#~ "Your time report has been successfully submitted and is now under review."
+#~ msgstr ""
+#~ "Ihre Zeiterfassung wurde erfolgreich eingereicht und wird nun geprüft."
+
+#~ msgid "View your time report"
+#~ msgstr "Zeiterfassung anzeigen"
+
+#~ msgid "Your time report has been submitted"
+#~ msgstr "Ihre Zeiterfassung wurde eingereicht"

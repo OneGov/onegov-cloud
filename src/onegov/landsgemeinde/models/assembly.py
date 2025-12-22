@@ -54,6 +54,7 @@ class Assembly(
     __tablename__ = 'landsgemeinde_assemblies'
 
     fts_public = True
+    fts_title_property = None
     fts_properties = {
         'overview': {'type': 'localized', 'weight': 'A'},
     }

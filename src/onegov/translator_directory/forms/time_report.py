@@ -54,6 +54,10 @@ class TranslatorTimeReportForm(Form):
     )
 
     # Used only in edit mode - hidden when creating new reports
+    # If assignment_location_override is set, assignment_location
+    # should be ignored. This allows for the possibility of setting
+    # a location which differs from pre-determined set of possible
+    # locations.
     assignment_location_override = StringField(
         label=_('Location Override (manual entry)'),
         validators=[Optional()],
@@ -100,7 +104,7 @@ class TranslatorTimeReportForm(Form):
     )
 
     case_number = StringField(
-        label=_('Case number'),
+        label=_('Case Number'),
         validators=[InputRequired()],
     )
 
@@ -108,6 +112,13 @@ class TranslatorTimeReportForm(Form):
         label=_('Exceptionally urgent'),
         description=_('25% surcharge'),
         default=False,
+    )
+
+    skip_travel_calculation = BooleanField(
+        label=_('ohne Wegberechnung'),
+        description=_('No travel compensation will be calculated'),
+        default=False,
+        depends_on=('assignment_type', 'on-site'),
     )
 
     notes = TextAreaField(
@@ -429,6 +440,12 @@ class TranslatorTimeReportForm(Form):
         from translator's address to the assignment location.
         The distance is multiplied by 2 to account for round trip.
         """
+        if (
+            self.skip_travel_calculation.data
+            and self.assignment_type.data == 'on-site'
+        ):
+            return Decimal('0'), 0.0
+
         if self.assignment_type.data in ('telephonic', 'schriftlich'):
             return Decimal('0'), None
 

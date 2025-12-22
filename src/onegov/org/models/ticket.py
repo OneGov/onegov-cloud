@@ -19,7 +19,7 @@ from onegov.org.utils import (
 from onegov.pay import ManualPayment
 from onegov.reservation import Allocation, Resource, Reservation
 from onegov.search import SearchIndex
-from onegov.search.utils import language_from_locale, normalize_text
+from onegov.search.utils import language_from_locale
 from onegov.ticket import handlers, Handler, Ticket, TicketInvoice
 from onegov.ticket.collection import TicketCollection, ArchivedTicketCollection
 from onegov.search.utils import extract_hashtags
@@ -1862,12 +1862,13 @@ def apply_search_term(
     if request is None or not term:
         return query
 
+    language = request.locale
+    if language_from_locale(language) == 'simple':
+        language = 'simple'
+
     query = query.join(SearchIndex, SearchIndex.owner_id_uuid == Ticket.id)  # type: ignore[no-untyped-call]
-    query = query.filter(SearchIndex.fts_idx.op('@@')(
-        func.websearch_to_tsquery(
-            language_from_locale(request.locale),
-            normalize_text(term)
-        )
+    query = query.filter(SearchIndex.data_vector.op('@@')(
+        func.websearch_to_tsquery(language, term)
     ))
     return query
 

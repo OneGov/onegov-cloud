@@ -634,6 +634,20 @@ def add_time_report(
             send_self=True,
         )
 
+        if self.email:
+            send_ticket_mail(
+                request=request,
+                template='mail_time_report_created_for_translator.pt',
+                subject=_('A time report has been submitted for you'),
+                receivers=(self.email,),
+                ticket=ticket,
+                content={
+                    'model': ticket,
+                    'translator': self,
+                    'time_report': report,
+                },
+            )
+
         for email in emails_for_new_ticket(request, ticket):
             if email in accountant_emails:
                 send_ticket_mail(
@@ -647,7 +661,7 @@ def add_time_report(
         for accountant_email in accountant_emails:
             send_ticket_mail(
                 request=request,
-                template='mail_time_report_created.pt',
+                template='mail_time_report_created_for_accountant.pt',
                 subject=_('New time report for review'),
                 ticket=ticket,
                 receivers=(accountant_email,),

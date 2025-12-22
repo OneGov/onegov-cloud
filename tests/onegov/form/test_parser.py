@@ -60,7 +60,7 @@ def test_parse_text() -> None:
         << like EUR, CHF >>
     """)
 
-    form_class = parse_form(text)
+    form_class = parse_form(text, enable_edit_checks=True)
     form = form_class()
 
     fields = form._fields.values()
@@ -1136,15 +1136,112 @@ def test_indentation_error(
         assert parse_formcode(text, enable_edit_checks=edit_checks)
 
 
+def test_indentation_error_for_identifier() -> None:
+    text = dedent(
+        """
+        # Wahl 1
+        Auswahl =
+            (x) A
+            ( ) B
+            ( ) C
+        # Wahl 2
+        Auswahl 2 =
+            (x) A
+            ( ) B
+            ( ) C
+        """
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
+
+    text = dedent(
+        """
+        # Wahl mit Unterauswahl
+        Auswahl =
+            (x) A
+            ( ) B
+            ( ) C
+                Auswahl 2 =
+                    (x) A
+                    ( ) B
+                    ( ) C
+        """
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
+
+    # wrong indent
+    text = dedent(
+        """
+        Auswahl =
+            (x) A
+            ( ) B
+            ( ) C
+            Auswahl 2 =
+                (x) A
+                ( ) B
+                ( ) C
+        """
+    )
+
+    with pytest.raises(InvalidIndentSyntax):
+        parse_formcode(text, enable_edit_checks=True)
+
+    text = dedent(
+        """
+            Auswahl =
+                (x) A
+                ( ) B
+                ( ) C
+        Auswahl 2 =
+            (x) A
+            ( ) B
+            ( ) C
+        """
+    )
+
+    with pytest.raises(InvalidIndentSyntax):
+        parse_formcode(text, enable_edit_checks=True)
+
+
+def test_indentation_error_for_identifier_2() -> None:
+    text = dedent(
+        """
+        Vorname *= ___
+
+        Zweite Person anmelden =
+            (x) Nein
+            ( ) Ja
+                Vorname *= ___
+
+                Dritte Person anmelden =
+                    (x) Nein
+                    ( ) Ja
+                        Vorname *= ___
+
+                Vierte Person anmelden =
+                    (x) Nein
+                    ( ) Ja
+                        Vorname *= ___
+
+                Fünfte Person anmelden =
+                    (x) Nein
+                    ( ) Ja
+                        Vorname *= ___
+
+        Bemerkungen = ___
+        """
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
+
+
 def test_help_indentation_error() -> None:
     text = dedent(
         """
         Contact person *= ___
         << Name of the contact person >>
-        Favorit fruit =
+        Favorite fruit =
             ( ) Apple
             ( ) Banana
-        << Please select your favorit fruit >>
+        << Please select your favorite fruit >>
         """
     )
     assert parse_formcode(text, enable_edit_checks=True)

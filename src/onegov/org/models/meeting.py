@@ -45,6 +45,7 @@ class Meeting(
 
     fts_type_title = _('Meetings')
     fts_public = True
+    fts_title_property = 'display_name'
     fts_properties = {
         'title_text': {'type': 'text', 'weight': 'A'},
         'display_name': {'type': 'text', 'weight': 'A'}

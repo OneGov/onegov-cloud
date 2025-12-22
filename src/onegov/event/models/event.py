@@ -191,6 +191,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     #       string, we know we already have a translation in a different domain
     #       so we just manually specify it for now.
     fts_type_title = TranslationString('Events', domain='onegov.org')
+    fts_title_property = 'title'
     fts_properties = {
         'title': {'type': 'localized', 'weight': 'A'},
         'description': {'type': 'localized', 'weight': 'B'},

@@ -6,8 +6,8 @@ from __future__ import annotations
 
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.search.utils import searchable_sqlalchemy_models
-from sqlalchemy import inspect, String
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy import inspect, Column, String
+from sqlalchemy.dialects.postgresql import ARRAY, TSVECTOR
 
 
 @upgrade_task('Remove fts index column from all searchable models')
@@ -53,4 +53,46 @@ def change_tags_from_hstore_to_array(context: UpgradeContext) -> None:
             'tags',
             type_=ARRAY(String),
             postgresql_using='akeys(tags)'
+        )
+
+
+@upgrade_task('Split title and data TSVECTOR')
+def split_title_and_data_tsvector_columns(context: UpgradeContext) -> None:
+    if not context.has_table('search_index'):
+        return
+
+    if context.has_column('search_index', 'fts_idx'):
+        # truncate the search index so we don't have to worry about
+        # new columns that can't be NULL, the search index will be
+        # re-generated after the upgrade steps in production anyways
+        context.operations.execute('TRUNCATE search_index')
+        context.operations.drop_index(
+            'ix_search_index_fts_idx',
+            'search_index'
+        )
+        context.operations.drop_index(
+            'ix_search_index_fts_idx_data',
+            'search_index'
+        )
+        context.operations.drop_column('search_index', 'fts_idx')
+        context.operations.drop_column('search_index', 'fts_idx_data')
+        context.operations.add_column(
+            'search_index',
+             Column('title_vector', TSVECTOR, nullable=False)
+        )
+        context.operations.add_column(
+            'search_index',
+             Column('data_vector', TSVECTOR, nullable=False)
+        )
+        context.operations.create_index(
+            'ix_search_index_title_vector',
+            'search_index',
+            columns=['title_vector'],
+            postgresql_using='gin'
+        )
+        context.operations.create_index(
+            'ix_search_index_data_vector',
+            'search_index',
+            columns=['data_vector'],
+            postgresql_using='gin'
         )
