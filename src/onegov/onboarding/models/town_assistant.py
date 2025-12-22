@@ -90,8 +90,8 @@ class TownAssistant(Assistant):
                 self.app.send_zulip(
                     subject='OneGov Onboarding',
                     content='\n'.join((
-                        f'A new OneGov Cloud instance was started by '
-                        f'{user_name}:',
+                        (f'A new OneGov Cloud instance was started by '
+                        f'{user_name}:'),
                         f"[{name}]({product['url']})",
                         f'Email: {user}',
                         f'Phone: {phone_number}'

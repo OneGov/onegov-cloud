@@ -163,9 +163,9 @@ class VotumForm(NamedFileForm):
         people = PersonCollection(self.request.session).query()
         people_choices: list[_Choice] = [(
             (
-                f'{p.first_name} {p.last_name}, {p.function}, '
+                (f'{p.first_name} {p.last_name}, {p.function}, '
                 f'{p.political_party}, {p.location_code_city}, '
-                f'{p.picture_url}',
+                f'{p.picture_url}'),
                 f'{p.first_name} ' + ', '.join(filter(None, [
                     p.last_name,
                     p.function,
