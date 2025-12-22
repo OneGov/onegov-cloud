@@ -62,16 +62,12 @@ class DirectoryMigration:
         if not self.directory.entries:
             return True
 
-        # tschupre changes to detect renamed options
         if not self.changes:
             return True
 
         if (not self.changes.changed_fields and
                 not self.changes.renamed_options):
             return True
-
-        if len(self.changes.renamed_options) > 1:
-            return False
 
         for changed in self.changes.changed_fields:
             old = self.changes.old[changed]
