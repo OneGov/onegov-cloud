@@ -565,9 +565,6 @@ msgstr "Endzeit"
 msgid "Break time"
 msgstr "Pausenzeit, in Stunden"
 
-msgid "Case number"
-msgstr "Geschäftsnummer"
-
 msgid "25% surcharge"
 msgstr "25% Zuschlag"
 
@@ -769,7 +766,7 @@ msgid "Finanzstelle"
 msgstr "Finanzstelle"
 
 msgid "Case Number"
-msgstr "Geschäftsnummer"
+msgstr "Geschäfts- oder Verfahrensnummer"
 
 msgid "Hourly Rate"
 msgstr "Stundenansatz"

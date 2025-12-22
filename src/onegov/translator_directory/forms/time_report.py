@@ -104,7 +104,7 @@ class TranslatorTimeReportForm(Form):
     )
 
     case_number = StringField(
-        label=_('Case number'),
+        label=_('Case Number'),
         validators=[InputRequired()],
     )
 
