@@ -19,12 +19,15 @@ from onegov.form.display import TimezoneDateTimeFieldRenderer
 from onegov.org.models import ExtendedDirectoryEntry
 from purl import URL
 from pytz import UTC
+from textwrap import dedent
 from sedate import standardize_date, utcnow, to_timezone, replace_timezone
 from tests.shared.utils import (
     create_image, get_meta, extract_filename_from_response)
 from webtest import Upload
 
 from typing import TYPE_CHECKING
+
+
 if TYPE_CHECKING:
     from onegov.org.models import ExtendedDirectory
     from sedate.types import TzInfoOrName
@@ -1061,3 +1064,82 @@ def test_create_directory_accordion_layout(client: Client) -> None:
     q2 = q2.form.submit().follow()
     assert question in q2
     assert answer not in q2
+
+
+def test_directory_migration(client: Client) -> None:
+    # tests changing radio and checkbox options in directory structure
+
+    client.login_admin()
+    page = (client.get('/directories').click('Verzeichnis'))
+    page.form['title'] = 'Order sweets'
+    page.form['structure'] = dedent("""
+        Nickname *= ___
+        Do you want sweets? =
+            (x) Yes
+            ( ) No
+        Choice =
+            [ ] Gummi Bear
+            [ ] Lolipop
+    """)
+    page.form['title_format'] = '[Nickname]'
+    assert page.form.submit()
+
+    page = client.get('/directories/order-sweets')
+    page = page.click('Eintrag')
+    page.form['nickname'] = 'Max'
+    page.form['do_you_want_sweets_'] = 'Yes'
+    page.form['choice'] = ['Lolipop', 'Gummi Bear']
+    assert page.form.submit()
+
+    # get_xxx()
+
+    # add options
+    page = client.get('/directories/order-sweets').click('Konfigurieren')
+    page.form['structure'] = dedent("""
+        Nickname *= ___
+        Do you want sweets? =
+            (x) Yes
+            ( ) No
+            ( ) Not sure
+        Choice =
+            [ ] Donut
+            [ ] Gummi Bear
+            [ ] Chocolate
+            [ ] Lolipop
+            [ ] Ice cream
+    """)
+    assert page.form.submit().follow().status_code == 200
+
+    # rename options
+    page = client.get('/directories/order-sweets').click('Konfigurieren')
+    page.form['structure'] = dedent("""
+        Nickname *= ___
+        Do you want sweets? =
+            ( ) Yes!
+            ( ) No
+            ( ) Not sure. Moom?
+        Choice =
+            [ ] Donut Hole
+            [ ] Gummi Bears
+            [ ] Chocolate
+            [ ] Lolipop
+            [ ] Ice cream
+    """)
+    confirm = page.form.submit()
+    # confirm migration
+    assert confirm.status_code == 200
+    # assert confirm.click('Bestätigen')
+
+    # remove (selected) options
+    page = client.get('/directories/order-sweets').click('Konfigurieren')
+    page.form['structure'] = dedent("""
+        Nickname *= ___
+        Do you want sweets? =
+            ( ) Yes!
+            ( ) Not sure. Moom?
+        Choice =
+            [ ] Donut Hole
+            [ ] Chocolate
+            [ ] Ice cream
+    """)
+    assert page.form.submit()
