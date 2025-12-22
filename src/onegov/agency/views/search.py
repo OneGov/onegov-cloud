@@ -19,7 +19,4 @@ def search(
     request: AgencyRequest
 ) -> RenderData | Response:
 
-    data = search_view(self, request)
-    if isinstance(data, dict):
-        data['layout'] = AgencySearchLayout(self, request)
-    return data
+    return search_view(self, request, AgencySearchLayout(self, request))

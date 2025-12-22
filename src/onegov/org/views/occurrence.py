@@ -224,6 +224,7 @@ def view_occurrences(
         ),
         'header_html': request.app.org.event_header_html,
         'footer_html': request.app.org.event_footer_html,
+        'time_suffix': request.translate(_("o'clock")),
     }
 
 
@@ -260,6 +261,7 @@ def view_occurrence(
         'title': self.title,
         'show_tags': show_tags(request),
         'show_filters': show_filters(request),
+        'time_suffix': request.translate(_("o'clock")),
     }
 
 

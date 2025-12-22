@@ -1593,8 +1593,9 @@
                                     <div class="cell small-1 medium-2">
                                         <i class="fa fa-clock"></i>
                                     </div>
-                                    <div class="cell small-11 medium-10" tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end)">
-                                        <div> ${time[0].upper()}${time[1:]}</div>
+                                    <div class="cell small-11 medium-10" tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end); suffix time_suffix|nothing">
+                                        <div tal:condition="python: '00:00' not in time"> ${time[0].upper()}${time[1:]}${' ' + suffix if suffix else ''}</div>
+                                        <div tal:condition="python: '00:00' in time"> ${time[0].upper()}${time[1:]}</div>
                                     </div>
                                 </div>
                                 <hr/>
@@ -1918,6 +1919,19 @@
         </nav>
     </div>
 </metal:bullets>
+
+<metal:search_results define-macro="search_results" i18n:domain="onegov.town6">
+    <ul class="more-list search-results">
+        <tal:b repeat="result model.load_batch_results">
+            <li class="search-result-${result.__tablename__}" tal:condition="result">
+                <tal:b
+                    define="macro 'search_result_{}'.format(result.__tablename__); tenant_macro 'search_result_{}_{}'.format(result.__tablename__, request.app.application_id.split('/')[-1])"
+                    metal:use-macro="layout.macros[tenant_macro]|layout.macros[macro]|layout.macros['search_result_default']"
+                />
+            </li>
+        </tal:b>
+    </ul>
+</metal:search_results>
 
 <metal:search_result_users define-macro="search_result_users" i18n:domain="onegov.town6">
     <a href="${request.return_here(request.link(result))}" class="list-link">

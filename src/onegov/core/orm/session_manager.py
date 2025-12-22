@@ -164,6 +164,13 @@ class SessionManager:
 
         The session manager supports the following signals:
 
+        ``self.on_schema_init``
+
+        Called with the schema and connection when a schema gets first
+        initialized. This allows things like custom search configurations
+        to be created once per schema on startup, since those are not
+        part of the SQLAlchemy metadata.
+
         ``self.on_transaction_join``
 
         Called with the schema and session each time a new transaction
@@ -243,6 +250,7 @@ class SessionManager:
 
         self._ignore_bulk_updates = False
 
+        self.on_schema_init = Signal()
         self.on_transaction_join = Signal()
         self.on_insert = Signal()
         self.on_update = Signal()
@@ -731,6 +739,9 @@ class SessionManager:
                     base.metadata.create_all(conn)
 
                     declared_classes.update(base._decl_class_registry.values())
+
+                if self.on_schema_init.receivers:
+                    self.on_schema_init.send(schema, connection=conn)
 
                 conn.execute('COMMIT')
             finally:

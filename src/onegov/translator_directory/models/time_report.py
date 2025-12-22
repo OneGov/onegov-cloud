@@ -66,7 +66,7 @@ class TranslatorTimeReport(Base, TimestampMixin):
         nullable=False,
     )
 
-    #: The duration in minutes (total work time excluding breaks)
+    #: The duration in minutes (including break)
     duration: Column[int] = Column(Integer, nullable=False)
 
     #: Break time in minutes

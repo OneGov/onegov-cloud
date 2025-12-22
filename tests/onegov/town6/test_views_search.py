@@ -35,7 +35,7 @@ def test_basic_search(client_with_fts: Client) -> None:
 
     search_page = root_page.form.submit()
     assert "fulltext" in search_page
-    assert "Now supporting fulltext search" in search_page
+    assert "Now supporting <em>fulltext</em> search" in search_page
     assert "It is pretty awesome" in search_page
 
     search_page.form['q'] = "wow"
@@ -308,7 +308,7 @@ def test_search_future_events_are_sorted_by_occurrence_date(
         },
         {
             "email": "test4@example.org",
-            "title": "Forth Concert",
+            "title": "Fourth Concert",
             "location": "Location4",
             "organizer": "Organizer4",
             "start_date": date.today() + timedelta(days=111),
@@ -342,8 +342,8 @@ def test_search_future_events_are_sorted_by_occurrence_date(
         results = current_client.get('/search?q=Concert')
         # Expect future events ordered by occurrence date, far future first.
         # Past events are not sorted by occurrence date.
-        assert [t.text.strip() for t in
-                results.pyquery('li.search-result-events a h5')] == [
-            'Forth Concert', 'Third Concert', 'Second Concert',
+        assert [t.text() for t in
+                results.pyquery('li.search-result-events a h5').items()] == [
+            'Fourth Concert', 'Third Concert', 'Second Concert',
             'First Concert', 'Not sorted Concert'
         ]

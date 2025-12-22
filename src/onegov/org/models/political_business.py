@@ -18,7 +18,7 @@ from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.search import ORMSearchable, SearchIndex
-from onegov.search.utils import language_from_locale, normalize_text
+from onegov.search.utils import language_from_locale
 
 
 from typing import Literal, Self, TypeAlias, TYPE_CHECKING
@@ -144,6 +144,7 @@ class PoliticalBusiness(
 
     fts_type_title = _('Political Businesses')
     fts_public = True
+    fts_title_property = 'title'
     fts_properties = {
         'title': {'type': 'text', 'weight': 'A'},
         'number': {'type': 'text', 'weight': 'A'}
@@ -327,15 +328,15 @@ class PoliticalBusinessCollection(
         query = super().query()
 
         if self.term:
+            language = self.request.locale
+            if language_from_locale(language) == 'simple':
+                language = 'simple'
             query = query.join(
                 SearchIndex,
                 SearchIndex.owner_id_uuid == PoliticalBusiness.id
             )
-            query = query.filter(SearchIndex.fts_idx.op('@@')(
-                func.websearch_to_tsquery(
-                    language_from_locale(self.request.locale),
-                    normalize_text(self.term)
-                )
+            query = query.filter(SearchIndex.data_vector.op('@@')(
+                func.websearch_to_tsquery(language, self.term)
             ))
 
         if self.types:
