@@ -245,9 +245,8 @@ def handle_edit_directory(
                             save_changes = False
 
             if save_changes:
-                form.populate_obj(self.directory)
-
                 try:
+                    form.populate_obj(self.directory)
                     self.session.flush()
                 except ValidationError as e:
                     error = e
