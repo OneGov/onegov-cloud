@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from onegov.core.upgrade import upgrade_task
-from onegov.core.orm.types import JSON, UUID
+from onegov.core.orm.types import JSON, UUID, UTCDateTime
 from onegov.user import User, UserCollection
 from sqlalchemy import Boolean, Column, Text
 from sqlalchemy.sql import text
@@ -301,3 +301,30 @@ def move_group_id_to_association_table(context: UpgradeContext) -> None:
 
     context.session.flush()
     context.operations.drop_column('users', 'group_id')
+
+
+@upgrade_task('Add last_login column')
+def add_last_login_column(context: UpgradeContext) -> None:
+    if not context.has_table('users'):
+        return
+
+    context.operations.add_column(
+        'users', Column('last_login', UTCDateTime, nullable=True)
+    )
+
+
+@upgrade_task('Alter last_login column to UTCDateTime')
+def alter_last_login_to_utcdatetime(context: UpgradeContext) -> None:
+    if not context.has_table('users'):
+        return
+
+    if not context.has_column('users', 'last_login'):
+        return
+
+    context.operations.alter_column(
+        'users',
+        'last_login',
+        type_=UTCDateTime,
+        existing_type=None,
+        existing_nullable=True,
+    )
