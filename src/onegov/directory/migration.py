@@ -149,6 +149,7 @@ class DirectoryMigration:
         self.rename_fields(values)
         self.convert_fields(values)
         self.rename_options(values)
+        self.remove_old_options(values)
 
     def add_new_fields(self, values: dict[str, Any]) -> None:
         for added in self.changes.added_fields:
@@ -178,10 +179,21 @@ class DirectoryMigration:
             values[changed] = convert(values[changed])
 
     def rename_options(self, values: dict[str, Any]) -> None:
-        for old_label, new_label in self.changes.renamed_options:
+        for old_option, new_option in self.changes.renamed_options.items():
+            old_label = old_option[1]
+            new_label = new_option[1]
             for key, val in list(values.items()):
                 if val == old_label:
                     values[key] = new_label
+
+    def remove_old_options(self, values: dict[str, Any]) -> None:
+        for human_id, label in self.changes.removed_options:
+            id = as_internal_id(human_id)
+            if id in values:
+                if isinstance(values[id], list):
+                    values[id] = [v for v in values[id] if v != label]
+                elif values[id] == label:
+                    values[id] = None
 
 
 class FieldTypeMigrations:
@@ -264,7 +276,9 @@ class StructuralChanges:
         self.detect_removed_fields()
         self.detect_renamed_fields()  # modifies added/removed fields
         self.detect_changed_fields()
-        self.detect_changed_options()
+        self.detect_added_options()
+        self.detect_removed_options()
+        self.detect_renamed_options()
 
     def __bool__(self) -> bool:
         return bool(
@@ -390,8 +404,36 @@ class StructuralChanges:
             if old.required != new.required or old.type != new.type:
                 self.changed_fields.append(new_id)
 
-    def detect_changed_options(self) -> None:
-        self.renamed_options: list[tuple[str, str]] = []
+    def detect_added_options(self) -> None:
+        self.added_options = []
+
+        for old_id, old_field in self.old.items():
+            if isinstance(old_field, OptionsField) and old_id in self.new:
+                new_field = self.new[old_id]
+                if isinstance(new_field, OptionsField):
+                    new_labels = [r.label for r in new_field.choices]
+                    old_labels = [r.label for r in old_field.choices]
+
+                    for n in new_labels:
+                        if n not in old_labels:
+                            self.added_options.append((old_id, n))
+
+    def detect_removed_options(self) -> None:
+        self.removed_options = []
+
+        for old_id, old_field in self.old.items():
+            if isinstance(old_field, OptionsField) and old_id in self.new:
+                new_field = self.new[old_id]
+                if isinstance(new_field, OptionsField):
+                    new_labels = [r.label for r in new_field.choices]
+                    old_labels = [r.label for r in old_field.choices]
+
+                    for o in old_labels:
+                        if o not in new_labels:
+                            self.removed_options.append((old_id, o))
+
+    def detect_renamed_options(self) -> None:
+        self.renamed_options = {}
 
         for old_id, old_field in self.old.items():
             if isinstance(old_field, OptionsField) and old_id in self.new:
@@ -400,6 +442,17 @@ class StructuralChanges:
                     old_labels = [r.label for r in old_field.choices]
                     new_labels = [r.label for r in new_field.choices]
 
-                    for o, n in zip(old_labels, new_labels):
-                        if o != n:
-                            self.renamed_options.append((o, n))
+                    if old_labels == new_labels:
+                        continue
+
+                    for r, a in zip(self.removed_options, self.added_options):
+                        self.renamed_options[r] = a
+
+                    self.added_options = [
+                        f for f in self.added_options
+                        if f not in set(self.renamed_options.values())
+                    ]
+                    self.removed_options = [
+                        f for f in self.removed_options
+                        if f not in self.renamed_options
+                    ]

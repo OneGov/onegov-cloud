@@ -45,8 +45,8 @@
                 <li tal:repeat="field migration.changes.changed_fields">
                     <tal:b i18n:translate>Changed:</tal:b> ${field}
                 </li>
-                <li tal:repeat="pair migration.changes.renamed_options|nothing">
-                    <tal:b i18n:translate>Renamed option:</tal:b> ${pair[0]} -> ${pair[1]}
+                <li tal:repeat="(old, new) migration.changes.renamed_options.items()|nothing">
+                    <tal:b i18n:translate>Renamed:</tal:b> ${old[0]}: ${old[1]} -> ${new[0]}: ${new[1]}
                 </li>
             </ul>
 
