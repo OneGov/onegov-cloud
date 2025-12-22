@@ -23,6 +23,7 @@ class LegislativePeriod(Base, TimestampMixin, ORMSearchable):
 
     fts_type_title = _('Legislative periods')
     fts_public = False
+    fts_title_property = 'name'
     fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
 
     @property

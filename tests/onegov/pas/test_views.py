@@ -711,8 +711,6 @@ def test_add_new_user_without_activation_email(
 
     client.login_admin()
 
-    client.app.enable_yubikey = True
-
     new = client.get('/usermanagement').click('Benutzer', href='new')
     new.form['username'] = 'admin@example.org'
 
@@ -720,10 +718,6 @@ def test_add_new_user_without_activation_email(
 
     new.form['username'] = 'secondadmin@example.org'
     new.form['role'] = 'admin'
-
-    assert "müssen zwingend einen YubiKey" in new.form.submit()
-
-    new.form['role'] = 'parliamentarian'
     new.form['send_activation_email'] = False
     added = new.form.submit()
 

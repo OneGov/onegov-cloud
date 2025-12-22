@@ -27,6 +27,7 @@ class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     fts_type_title = _('Parties')
     fts_public = False
+    fts_title_property = 'name'
     fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
 
     #: The polymorphic type of party

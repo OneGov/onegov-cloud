@@ -777,7 +777,7 @@ def test_basic_search(client_with_fts: Client[AgencyApp]) -> None:
     assert 'Nick' in anom.get('/search?q=%2B41234567890')
     assert 'Nick' in anom.get('/search?q=4567890')
     assert 'Nick' in anom.get('/search?q=7890')
-    assert 'Hospital Springfield' in anom.get('/search?q=Hospital')
+    assert '<em>Hospital</em> Springfield' in anom.get('/search?q=Hospital')
     assert 'Nick' in anom.get('/search?q=Anesthetist')
 
     # Test suggestions
@@ -816,8 +816,9 @@ def test_search_recently_published_object(
 
     assert 'Nick' in client.get('/search?q=Rivera')
     assert 'Nick' not in anom.get('/search?q=Rivera')
-    assert 'Hospital Springfield' in client.get('/search?q=Hospital')
-    assert 'Hospital Springfield' not in anom.get('/search?q=Hospital')
+    assert '<em>Hospital</em> Springfield' in client.get('/search?q=Hospital')
+    assert '<em>Hospital</em> Springfield' not in anom.get(
+        '/search?q=Hospital')
     assert 'Nick' in client.get('/search?q=Anesthetist')
     assert 'Nick' not in anom.get('/search?q=Anesthetist')
 
@@ -832,9 +833,10 @@ def test_search_recently_published_object(
     assert 'Nick' in client.get('/search?q=Rivera')
     assert 'Nick' in anom.get('/search?q=Rivera')
     assert 'Nick' in client.spawn().get('/search?q=Rivera')
-    assert 'Hospital Springfield' in client.get('/search?q=Hospital')
-    assert 'Hospital Springfield' in anom.get('/search?q=Hospital')
-    assert 'Hospital Springfield' in client.spawn().get('/search?q=Hospital')
+    assert '<em>Hospital</em> Springfield' in client.get('/search?q=Hospital')
+    assert '<em>Hospital</em> Springfield' in anom.get('/search?q=Hospital')
+    assert '<em>Hospital</em> Springfield' in client.spawn().get(
+        '/search?q=Hospital')
     assert 'Nick' in client.get('/search?q=Anesthetist')
     assert 'Nick' in anom.get('/search?q=Anesthetist')
     assert 'Nick' in client.spawn().get('/search?q=Anesthetist')
@@ -851,8 +853,9 @@ def test_search_recently_published_object(
     assert 'Nick' in client.get('/search?q=Rivera')
     assert 'Nick' not in anom.get('/search?q=Rivera')
     assert 'Nick' not in client.spawn().get('/search?q=Rivera')
-    assert 'Hospital Springfield' in client.get('/search?q=Hospital')
-    assert 'Hospital Springfield' not in anom.get('/search?q=Hospital')
+    assert '<em>Hospital</em> Springfield' in client.get('/search?q=Hospital')
+    assert '<em>Hospital</em> Springfield' not in anom.get(
+        '/search?q=Hospital')
     assert 'Nick' in client.get('/search?q=Anesthetist')
     assert 'Nick' not in anom.get('/search?q=Anesthetist')
 

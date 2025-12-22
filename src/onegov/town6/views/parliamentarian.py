@@ -6,7 +6,7 @@ from onegov.newsletter.collection import RecipientCollection
 from onegov.org.forms import ParliamentarianForm
 from onegov.org.forms import ParliamentarianRoleForm
 from onegov.org.forms.commission_role import ParliamentarianCommissionRoleForm
-from onegov.org.models import RISParliamentarian
+from onegov.org.models import RISParliamentarian, PoliticalBusinessCollection
 from onegov.org.models import RISParliamentarianCollection
 from onegov.org.models import PoliticalBusinessParticipationCollection
 from onegov.parliament.collections import ParliamentarianCollection
@@ -112,9 +112,13 @@ def view_parliamentarian(
     layout: RISParliamentarianLayout | PASParliamentarianLayout
 ) -> RenderData | Response:
 
+    political_businesses = (PoliticalBusinessCollection(request)
+                            .by_parliamentarian(self.id))
+
     return {
         'layout': layout,
         'parliamentarian': self,
+        'political_businesses': political_businesses,
         'title': layout.title,
     }
 

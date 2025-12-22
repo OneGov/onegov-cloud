@@ -3947,6 +3947,13 @@ button {
     Search results
 */
 ul.search-results {
+    em {
+        color: $red !important;
+        font-style: initial;
+        font-weight: bold;
+        text-decoration: underline;
+    }
+
     a {
         display: block;
         font-weight: bold;

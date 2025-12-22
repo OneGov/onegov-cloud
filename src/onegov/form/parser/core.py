@@ -1398,6 +1398,7 @@ def translate_to_yaml(
     actual_fields = 0
     ix = 0
     identifier_indent_stack: list[int] = []
+    option_indent_stack: list[int] = []
     expect_option = False
 
     def escape_single(text: str) -> str:
@@ -1406,18 +1407,32 @@ def translate_to_yaml(
     def escape_double(text: str) -> str:
         return text.replace('"', '\\"')
 
-    def handle_identifier_indent_stack(
-        indent_stack: list[int],
-        ix: int, len_indent: int
+    def handle_indent_stack(
+        stack: list[int],
+        ix: int,
+        current_indent: int,
+        enable_edit_checks: bool = False,
     ) -> list[int]:
-        if not indent_stack or indent_stack[-1] < len_indent:
-            indent_stack.append(len_indent)
-        elif indent_stack[-1] > len_indent:
-            if len_indent not in indent_stack:
+        """ Handle indentation changes and return updated stack. """
+        if not enable_edit_checks:
+            return stack  # skip stack handling
+
+        previous_indent = stack[-1] if stack else -1
+
+        if previous_indent < current_indent:
+            # add new level
+            stack.append(current_indent)
+            return stack
+
+        elif previous_indent > current_indent:
+            # pop back last level
+            if current_indent not in stack:
                 raise errors.InvalidIndentSyntax(line=ix + 1)
-            indent_stack = (
-                indent_stack)[:indent_stack.index(len_indent) + 1]
-        return indent_stack
+            return stack[:stack.index(current_indent) + 1]
+
+        else:
+            # same level, nothing to do
+            return stack
 
     for ix, line in lines:
         len_indent = len(line) - len(line.lstrip())
@@ -1447,28 +1462,33 @@ def translate_to_yaml(
             )
             expect_nested = len(indent) > 4
             actual_fields += 1
-            identifier_indent_stack = handle_identifier_indent_stack(
-                identifier_indent_stack, ix, len_indent
+
+            identifier_indent_stack = handle_indent_stack(
+                identifier_indent_stack, ix, len_indent, enable_edit_checks
             )
             continue
 
         # help descriptions following a field
         parse_result = try_parse(ELEMENTS.help_identifier, line)
         if parse_result is not None:
-            if not identifier_indent_stack:
+            if enable_edit_checks and not identifier_indent_stack:
                 raise errors.InvalidCommentLocationSyntax(line=ix + 1)
 
-            if (not identifier_indent_stack or
+            # check for a valid indentation level
+            if (enable_edit_checks and
                     len_indent not in identifier_indent_stack):
                 raise errors.InvalidCommentIndentSyntax(line=ix + 1)
 
-            if expect_option:
+            if enable_edit_checks and expect_option:
                 raise errors.InvalidCommentLocationSyntax(line=ix + 1)
 
             yield '{indent}"{identifier}": \'{message}\''.format(
                 indent=indent + 2 * ' ',
                 identifier='field_help',
                 message=parse_result.message
+            )
+            identifier_indent_stack = handle_indent_stack(
+                identifier_indent_stack, ix, len_indent, enable_edit_checks
             )
             continue
 
@@ -1485,6 +1505,13 @@ def translate_to_yaml(
                 definition=escape_single(line.strip())
             )
 
+            # check for a valid indentation level
+            if enable_edit_checks and len_indent in identifier_indent_stack:
+                raise errors.InvalidIndentSyntax(line=ix + 1)
+
+            option_indent_stack = handle_indent_stack(
+                option_indent_stack, ix, len_indent, enable_edit_checks
+            )
             expect_option = False
             continue
 
@@ -1501,11 +1528,15 @@ def translate_to_yaml(
             )
 
             expect_nested = True
-            expect_option = True
             actual_fields += 1
-            identifier_indent_stack = handle_identifier_indent_stack(
-                identifier_indent_stack, ix, len_indent
+
+            if enable_edit_checks and len_indent in option_indent_stack:
+                raise errors.InvalidIndentSyntax(line=ix + 1)
+
+            identifier_indent_stack = handle_indent_stack(
+                identifier_indent_stack, ix, len_indent, enable_edit_checks
             )
+            expect_option = True
             continue
 
         raise errors.InvalidFormSyntax(line=ix + 1)

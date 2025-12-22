@@ -6,7 +6,6 @@ import re
 from lingua import IsoCode639_1, LanguageDetectorBuilder
 from onegov.core.orm import find_models
 from sqlalchemy import inspect
-from unidecode import unidecode
 
 
 from typing import Any, Generic, TypeVar, TYPE_CHECKING
@@ -28,6 +27,9 @@ HASHTAG = re.compile(r'(?<![\w/])#\w{3,}')
 LANGUAGE_MAP = {
     'de_CH': 'german',
     'de': 'german',
+    'en_UK': 'english',
+    'en_US': 'english',
+    'en': 'english',
     'fr_CH': 'french',
     'fr': 'french',
     'it_CH': 'italian',
@@ -35,35 +37,12 @@ LANGUAGE_MAP = {
     'rm_CH': 'english',
     'rm': 'english',
 }
-SPECIAL_CHARACTER_TRANS = str.maketrans({
-    'Ä': 'Ae',
-    'Ö': 'Oe',
-    'Ü': 'Ue',
-    'ä': 'ae',
-    'ö': 'oe',
-    'ü': 'ue',
-    # NOTE: While << and >> are more natural translations and is what
-    #       unidecode will do, we will end up with something that is
-    #       interpreted as a HTML tag by Postgres
-    # FIXME: To make this more robust we probably should process
-    #        `Markup` differently from `str`, and for non-`Markup` we
-    #        remove any `<` and `>` from the input.
-    '«': '',
-    '»': '',
-})
 
 
 def language_from_locale(locale: str | None) -> str:
     if locale is None:
         return 'simple'
     return LANGUAGE_MAP.get(locale, 'simple')
-
-
-def normalize_text(text: str) -> str:
-    """ This does the same thing  as unidecode, except it special-cases
-    umlaut translation for German text.
-    """
-    return unidecode(text.translate(SPECIAL_CHARACTER_TRANS))
 
 
 def searchable_sqlalchemy_models(

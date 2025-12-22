@@ -25,6 +25,7 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
     fts_public = True
+    fts_title_property = 'title'
     fts_properties = {
         'title': {'type': 'text', 'weight': 'A'},
         'function': {'type': 'localized', 'weight': 'B'},
