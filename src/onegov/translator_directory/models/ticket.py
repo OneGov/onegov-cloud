@@ -365,13 +365,13 @@ class TimeReportHandler(Handler):
 
             summary_parts.extend(
                 [
-                    f"<dt>{request.translate(_('Day hours'))} "
+                    (f"<dt>{request.translate(_('Day hours'))} "
                     f"({layout.format_currency(report.hourly_rate)} × "
-                    f"{day_hours} h)</dt>",
+                    f"{day_hours} h)</dt>"),
                     f'<dd>{layout.format_currency(breakdown["day_pay"])}</dd>',
-                    f"<dt>{request.translate(_('Night hours 20-06'))} "
+                    (f"<dt>{request.translate(_('Night hours 20-06'))} "
                     f"({layout.format_currency(report.night_hourly_rate)} × "
-                    f"{night_hours} h, +50%)</dt>",
+                    f"{night_hours} h, +50%)</dt>"),
                     f'<dd>{layout.format_currency(breakdown["night_pay"])}</dd>',
                 ]
             )
@@ -379,9 +379,9 @@ class TimeReportHandler(Handler):
             # No night hours - show simple base pay
             summary_parts.extend(
                 [
-                    f"<dt>{request.translate(_('Base pay'))} "
+                    (f"<dt>{request.translate(_('Base pay'))} "
                     f"({layout.format_currency(report.hourly_rate)} × "
-                    f"{report.duration_hours} h)</dt>",
+                    f"{report.duration_hours} h)</dt>"),
                     f'<dd>{layout.format_currency(breakdown["day_pay"])}</dd>',
                 ]
             )
@@ -432,21 +432,21 @@ class TimeReportHandler(Handler):
             break_hours = report.break_time_hours
             summary_parts.extend(
                 [
-                    f"<dt>{request.translate(_('Break time'))} "
+                    (f"<dt>{request.translate(_('Break time'))} "
                     f"({layout.format_currency(report.hourly_rate)} × "
-                    f"-{break_hours} h)</dt>",
+                    f"-{break_hours} h)</dt>"),
                     f'<dd>-{layout.format_currency(breakdown["break_deduction"])}</dd>',
                 ]
             )
 
         summary_parts.extend(
             [
-                f"<dt><strong>"
+                (f"<dt><strong>"
                 f"{request.translate(_('Subtotal (work compensation)'))} "
-                f"</strong></dt>",
-                f'<dd><strong>'
+                f"</strong></dt>"),
+                (f'<dd><strong>'
                 f'{layout.format_currency(breakdown["adjusted_subtotal"])}'
-                f'</strong></dd>',
+                f'</strong></dd>'),
             ]
         )
 
@@ -492,8 +492,8 @@ class TimeReportHandler(Handler):
         summary_parts.extend(
             [
                 f'<dt>{travel_label}</dt>',
-                f'<dd>{layout.format_currency(report.travel_compensation)}'
-                f'</dd>',
+                (f'<dd>{layout.format_currency(report.travel_compensation)}'
+                f'</dd>'),
             ]
         )
 
@@ -523,11 +523,11 @@ class TimeReportHandler(Handler):
 
         summary_parts.extend(
             [
-                f"<dt><strong>{request.translate(_('Total'))}</strong> "
-                f"({calculation_formula})</dt>",
-                f'<dd><strong>'
+                (f"<dt><strong>{request.translate(_('Total'))}</strong> "
+                f"({calculation_formula})</dt>"),
+                (f'<dd><strong>'
                 f'{layout.format_currency(breakdown["total"])}'
-                f'</strong></dd>',
+                f'</strong></dd>'),
                 '</dl>',
             ]
         )
