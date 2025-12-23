@@ -143,6 +143,10 @@ class Server:
             patch_morepath()
             morepath.autoscan()
 
+            # Commit all registered morepath applications
+            for app in self.applications.morepath_applications():
+                morepath.commit(app.application_class)  # type: ignore[arg-type]
+
     def handle_request(
         self,
         environ: WSGIEnvironment,
