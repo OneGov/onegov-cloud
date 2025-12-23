@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-23 16:18+0100\n"
+"POT-Creation-Date: 2025-12-23 16:27+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -587,7 +587,7 @@ msgid "Hide these labels on the main view"
 msgstr "Diese Feldnamen auf der Hauptansicht verstecken"
 
 msgid "Sidebar"
-msgstr ""
+msgstr "Sidebar"
 
 msgid "Filters"
 msgstr "Filter"
@@ -3692,9 +3692,6 @@ msgid ""
 msgstr ""
 "Im Text verlinkte Dateien und hochgeladene Dateien werden nicht mehr in der "
 "Seitenleiste angezeigt, wenn diese Option abgewählt ist."
-
-msgid "Sidebar"
-msgstr "Sidebar"
 
 msgid "Sidebar links"
 msgstr "Links in der Sidebar"
