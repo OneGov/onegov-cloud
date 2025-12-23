@@ -312,19 +312,3 @@ def add_last_login_column(context: UpgradeContext) -> None:
         'users', Column('last_login', UTCDateTime, nullable=True)
     )
 
-
-@upgrade_task('Alter last_login column to UTCDateTime')
-def alter_last_login_to_utcdatetime(context: UpgradeContext) -> None:
-    if not context.has_table('users'):
-        return
-
-    if not context.has_column('users', 'last_login'):
-        return
-
-    context.operations.alter_column(
-        'users',
-        'last_login',
-        type_=UTCDateTime,
-        existing_type=None,
-        existing_nullable=True,
-    )
