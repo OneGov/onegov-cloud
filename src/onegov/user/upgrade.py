@@ -311,4 +311,3 @@ def add_last_login_column(context: UpgradeContext) -> None:
     context.operations.add_column(
         'users', Column('last_login', UTCDateTime, nullable=True)
     )
-
