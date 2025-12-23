@@ -2570,6 +2570,116 @@ def test_time_report_edit_toggle_skip_travel(
     assert breakdown['travel'] == Decimal('0')
 
 
+def extract_total_from_ticket_html(html: str) -> tuple[str, str]:
+    total_match = re.search(
+        r'<dt><strong>Total</strong>\s*\(([^)]+)\)</dt>',
+        html,
+        re.DOTALL
+    )
+    assert total_match is not None, 'Total not found in ticket HTML'
+    calculation_formula = total_match.group(1).strip()
+
+    total_amount_match = re.search(
+        r'<dt><strong>Total</strong>.*?</dt>\s*<dd><strong>([^<]+)',
+        html,
+        re.DOTALL
+    )
+    assert (
+        total_amount_match is not None
+    ), 'Total amount not found in ticket HTML'
+    total_amount = total_amount_match.group(1).strip()
+
+    return calculation_formula, total_amount
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_time_report_skip_travel_ticket_html_unchanged_after_edit(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
+) -> None:
+    """Test that total cost of time report unchanged after empty
+    edit and submit"""
+    session = client.app.session()
+    languages = create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator_id = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+        drive_distance=35.0,
+    ).id
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(
+        name='migrationsamt_und_passbuero'
+    )
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org'],
+    }
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+
+    page.form['assignment_type'] = 'on-site'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-01-11'
+    page.form['start_time'] = '09:00'
+    page.form['end_date'] = '2025-01-11'
+    page.form['end_time'] = '10:30'
+    page.form['case_number'] = 'CASE-123'
+    page.form['is_urgent'] = False
+    page.form['skip_travel_calculation'] = True
+    page = page.form.submit().follow()
+
+    assert 'Zeiterfassung zur Überprüfung eingereicht' in page
+
+    all_emails = []
+    for i in range(10):
+        try:
+            email = client.get_email(i)
+            if email:
+                all_emails.append(email)
+        except IndexError:
+            break
+    client.flush_email_queue()
+
+    accountant_email = get_accountant_email(client)
+    ticket_link = extract_ticket_link_from_email(
+        all_emails, accountant_email
+    )
+
+    client.login_editor()
+    ticket_page = client.get(ticket_link)
+    ticket_page = ticket_page.click('Ticket annehmen').follow()
+
+    initial_html = str(ticket_page)
+    initial_formula, initial_amount = extract_total_from_ticket_html(
+        initial_html
+    )
+
+    edit_page = ticket_page.click('Bearbeiten')
+    page = edit_page.form.submit().follow()
+
+    final_html = str(page)
+    final_formula, final_amount = extract_total_from_ticket_html(final_html)
+
+    assert initial_formula == final_formula, (
+        f'Calculation formula changed: {initial_formula} -> {final_formula}'
+    )
+    assert initial_amount == final_amount, (
+        f'Total amount changed: {initial_amount} -> {final_amount}'
+    )
+    assert final_amount == 'CHF 168.75'
+
+
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
