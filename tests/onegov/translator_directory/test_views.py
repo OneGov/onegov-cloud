@@ -2298,6 +2298,20 @@ def test_time_report_workflow(
         in mail_to_translator['TextBody']
     )
 
+    translator_link_match = re.search(
+        r'<a href="([^"]+)">Zeiterfassung anzeigen</a>',
+        mail_to_translator['HtmlBody'],
+    )
+    assert translator_link_match is not None
+    translator_status_link = translator_link_match.group(1)
+    assert '/status' in translator_status_link
+    assert accountant_email in mail_to_translator['TextBody']
+
+    client.login_translator()
+    status_page = client.get(translator_status_link)
+    assert status_page.status_code == 200
+    assert 'TRP-' in status_page
+
     translator = session.query(Translator).filter_by(id=translator_id).one()
     assert len(translator.time_reports) == 1
     report = translator.time_reports[0]
@@ -2394,6 +2408,14 @@ def test_time_report_workflow(
     assert 'TRANSLATOR, Test' in mail_to_translator['Subject']
     assert 'translator@example.org' in mail_to_translator['To']
     assert 'Zeiterfassung akzeptiert' in mail_to_translator['Subject']
+
+    accepted_link_match = re.search(
+        r'<a href="([^"]+)">Zeiterfassung anzeigen</a>',
+        mail_to_translator['HtmlBody'],
+    )
+    assert accepted_link_match is not None
+    accepted_status_link = accepted_link_match.group(1)
+    assert '/status' in accepted_status_link
 
     attachments = mail_to_translator.get('Attachments', [])
     assert len(attachments) == 1

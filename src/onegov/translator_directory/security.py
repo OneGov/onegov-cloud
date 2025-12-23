@@ -315,6 +315,9 @@ def restrict_translator_time_report_ticket(
                     return group
         return None
 
+    if permission == Public:
+        return True
+
     if (
         identity.role in ('member', 'translator')
         and model.handler

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-16 17:44+0100\n"
+"POT-Creation-Date: 2025-12-23 23:49+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -565,6 +565,9 @@ msgstr "Endzeit"
 msgid "Break time"
 msgstr "Pausenzeit, in Stunden"
 
+msgid "Case Number"
+msgstr "Geschäfts- oder Verfahrensnummer"
+
 msgid "25% surcharge"
 msgstr "25% Zuschlag"
 
@@ -765,9 +768,6 @@ msgstr "Art"
 msgid "Finanzstelle"
 msgstr "Finanzstelle"
 
-msgid "Case Number"
-msgstr "Geschäfts- oder Verfahrensnummer"
-
 msgid "Hourly Rate"
 msgstr "Stundenansatz"
 
@@ -943,6 +943,9 @@ msgstr "Eine Zeiterfassung wurde für Sie eingereicht und wird nun geprüft."
 
 msgid "Please carefully review and report any discrepancies immediately."
 msgstr "Bitte sorgfältig überprüfen und Unstimmigkeiten umgehend melden"
+
+msgid "If you have any questions, please contact:"
+msgstr "Bei Fragen wenden Sie sich bitte an:"
 
 msgid "Time report edited"
 msgstr "Zeiterfassung bearbeitet"
