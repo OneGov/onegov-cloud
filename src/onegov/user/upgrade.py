@@ -308,6 +308,7 @@ def add_last_login_column(context: UpgradeContext) -> None:
     if not context.has_table('users'):
         return
 
-    context.operations.add_column(
-        'users', Column('last_login', UTCDateTime, nullable=True)
-    )
+    if not context.has_column('users', 'last_login'):
+        context.operations.add_column(
+            'users', Column('last_login', UTCDateTime, nullable=True)
+        )
