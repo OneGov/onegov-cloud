@@ -2366,6 +2366,18 @@ def test_time_report_workflow(
     page = client.post(accept_url).follow()
     assert 'Zeiterfassung akzeptiert' in page
 
+    # Verify ticket was closed
+    report = (
+        session.query(Translator)
+        .filter_by(id=translator_id)
+        .one()
+        .time_reports[0]
+    )
+    ticket = report.get_ticket(session)
+    assert ticket is not None
+    assert ticket.state == 'closed'
+    assert ticket.closed_on is not None
+
     # Test that edit is not available after confirmation
     report = (
         session.query(Translator)

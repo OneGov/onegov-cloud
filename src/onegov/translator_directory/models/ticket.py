@@ -230,6 +230,15 @@ class TimeReportHandler(Handler):
         return self.data.get('state')
 
     @property
+    def show_links_when_closed(self) -> bool:
+        """Allow showing handler links even when ticket is closed.
+
+        This allows users to download PDFs and QR bills after the
+        time report has been accepted and the ticket closed.
+        """
+        return True
+
+    @property
     def title(self) -> str:
         return self.translator.title if self.translator else '<Deleted>'
 
