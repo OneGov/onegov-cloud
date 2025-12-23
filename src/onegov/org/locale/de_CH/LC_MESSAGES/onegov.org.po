@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-19 12:13+0100\n"
+"POT-Creation-Date: 2025-12-23 16:18+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -586,8 +586,8 @@ msgstr "Hauptansicht"
 msgid "Hide these labels on the main view"
 msgstr "Diese Feldnamen auf der Hauptansicht verstecken"
 
-msgid "Address"
-msgstr "Adresse"
+msgid "Sidebar"
+msgstr ""
 
 msgid "Filters"
 msgstr "Filter"
@@ -704,6 +704,9 @@ msgstr "Mitteilungen"
 
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Zusätzliche zur E-Mail benötigte Informationen des Antragstellers"
+
+msgid "Address"
+msgstr "Adresse"
 
 msgid "Phone"
 msgstr "Telefon"
@@ -3689,6 +3692,9 @@ msgid ""
 msgstr ""
 "Im Text verlinkte Dateien und hochgeladene Dateien werden nicht mehr in der "
 "Seitenleiste angezeigt, wenn diese Option abgewählt ist."
+
+msgid "Sidebar"
+msgstr "Sidebar"
 
 msgid "Sidebar links"
 msgstr "Links in der Sidebar"

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-12-19 12:13+0100\n"
+"POT-Creation-Date: 2025-12-23 16:18+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -588,8 +588,8 @@ msgstr "Vista principale"
 msgid "Hide these labels on the main view"
 msgstr "Nascondi queste etichette nella vista principale"
 
-msgid "Address"
-msgstr "Indirizzo"
+msgid "Sidebar"
+msgstr "Barra laterale"
 
 msgid "Filters"
 msgstr "Filtri"
@@ -706,6 +706,9 @@ msgstr "Notifiche"
 
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Informazioni da fornire in aggiunta all'e-mail"
+
+msgid "Address"
+msgstr "Indirizzo"
 
 msgid "Phone"
 msgstr "Telefono"
