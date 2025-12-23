@@ -261,7 +261,7 @@ FINANZSTELLE: dict[str, Finanzstelle] = {
         street='Beckenstube 1',
         zip_code='8200',
         city='Schaffhausen',
-        kostenstelle='2550',
+        kostenstelle='2550-DO00',
     ),
     'obergericht': Finanzstelle(
         name='Obergericht',
