@@ -165,8 +165,7 @@ class DirectoryBaseForm(Form):
         fieldset=_('Display'),
         render_kw={'class_': 'formcode-select'})
 
-    contact_fields = TextAreaField(
-        label=_('Address'),
+        label=_('Sidebar'),
         fieldset=_('Display'),
         render_kw={
             'class_': 'formcode-select',
