@@ -369,6 +369,7 @@ class Auth:
         if hasattr(request.app, 'on_login'):
             request.app.on_login(request, user)
 
+        user.last_login = utcnow()
         user.save_current_session(request)
 
         response.completed_login = True  # type:ignore[attr-defined]

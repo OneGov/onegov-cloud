@@ -46,8 +46,8 @@
                         <dt i18n:translate>Created</dt>
                         <dd>${layout.format_date(layout.model.created, 'datetime_long')}</dd>
                         <dt i18n:translate>Last login</dt>
-                        <dd tal:condition="layout.model.modified">${layout.format_date(layout.model.modified, 'datetime_long')}</dd>
-                        <dd tal:condition="not layout.model.modified" i18n:translate>Never</dd>
+                        <dd tal:condition="layout.model.last_login">${layout.format_date(layout.model.last_login, 'datetime_long')}</dd>
+                        <dd tal:condition="not layout.model.last_login" i18n:translate>Never</dd>
                         <tal:b define="sessions layout.model.data.get('sessions', '')">
                             <dt tal:condition="sessions" i18n:translate>Session information</dt>
                             <dd tal:condition="sessions">
