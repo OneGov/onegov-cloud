@@ -31,10 +31,6 @@ def test_finanzstelle_kostenstelle_field() -> None:
             f'Finanzstelle {key} ({finanzstelle.name}) is missing '
             f'kostenstelle field'
         )
-        assert finanzstelle.kostenstelle.isdigit(), (
-            f'Finanzstelle {key} kostenstelle must be numeric, '
-            f'got: {finanzstelle.kostenstelle}'
-        )
 
 
 def test_accounting_export_kostenstelle_mapping(client: Client) -> None:
@@ -55,7 +51,7 @@ def test_accounting_export_kostenstelle_mapping(client: Client) -> None:
         ('migrationsamt_und_passbuero', '2122'),
         ('staatsanwaltschaft', '2466'),
         ('gefaengnisverwaltung', '2472'),
-        ('polizei', '2550'),
+        ('polizei', '2550-DO00'),
         ('obergericht', '3010'),
         ('kantonsgericht', '3030'),
     ]
@@ -168,19 +164,19 @@ def test_accounting_export_all_row_types(client: Client) -> None:
     assert row_2603[0] == 'L001'
     assert row_2603[1] == '12345'
     assert row_2603[4] == '2603'
-    assert row_2603[12] == '2550'
+    assert row_2603[12] == '2550-DO00'
 
     row_8102_travel = rows[1]
     assert row_8102_travel[0] == 'L001'
     assert row_8102_travel[1] == '12345'
     assert row_8102_travel[4] == '8102'
-    assert row_8102_travel[12] == '2550'
+    assert row_8102_travel[12] == '2550-DO00'
 
     row_8102_meal = rows[2]
     assert row_8102_meal[0] == 'L001'
     assert row_8102_meal[1] == '12345'
     assert row_8102_meal[4] == '8102'
-    assert row_8102_meal[12] == '2550'
+    assert row_8102_meal[12] == '2550-DO00'
 
     transaction.commit()
 
