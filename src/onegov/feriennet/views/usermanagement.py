@@ -40,8 +40,12 @@ def view_user(
     request_method='DELETE',
     permission=Secret
 )
-def delete_user_group(self: User, request: FeriennetRequest) -> None:
+def delete_user(self: User, request: FeriennetRequest) -> None:
     request.assert_valid_csrf_token()
+
+    if getattr(self, 'role', None) == 'admin':
+        request.alert(_('Admin accounts cannot be deleted.'))
+        return
 
     session = request.session
     app = request.app
@@ -74,8 +78,8 @@ def delete_user_group(self: User, request: FeriennetRequest) -> None:
     unpaid_finalized_exists = session.query(session.query(BookingPeriodInvoice)
         .join(BookingPeriodInvoice.period)
         .filter(BookingPeriodInvoice.user_id == self.id,
-                BookingPeriodInvoice.paid == False,
-                BookingPeriod.finalized == True)
+                BookingPeriodInvoice.paid.is_(False),
+                BookingPeriod.finalized.is_(True))
         .exists()).scalar()
     if unpaid_finalized_exists:
         request.alert(_(
@@ -116,6 +120,4 @@ def delete_user_group(self: User, request: FeriennetRequest) -> None:
         ))
     except Exception:
         session.rollback()
-        request.alert(_('Could not delete account; try again or contact an '
-                        'administrator.'))
         raise
