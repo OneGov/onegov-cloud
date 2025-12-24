@@ -161,6 +161,10 @@ TIME_REPORT_SURCHARGE_LABELS = {
     'weekend_holiday': 'Zuschlag WE',
     'urgent': _('Exceptionally urgent'),
 }
+
+# Lohnart codes for L001 accounting export
+LOHNART_COMPENSATION = '2603'
+LOHNART_EXPENSES = '8102'
 # ====
 
 TRANSLATOR_FA_ICON = 'translator'
@@ -173,6 +177,7 @@ class Finanzstelle(NamedTuple):
     street: str
     zip_code: str
     city: str
+    kostenstelle: str
 
 
 ASSIGNMENT_LOCATIONS: dict[str, LocationMapping] = {
@@ -228,41 +233,48 @@ ASSIGNMENT_LOCATIONS: dict[str, LocationMapping] = {
     ),
 }
 
+
 FINANZSTELLE: dict[str, Finanzstelle] = {
     'migrationsamt_und_passbuero': Finanzstelle(
         name='Migrationsamt und Passbüro',
         street='Mühlentalstrasse 105',
         zip_code='8200',
         city='Schaffhausen',
+        kostenstelle='2122',
     ),
     'staatsanwaltschaft': Finanzstelle(
         name='Staatsanwaltschaft Allgemeine Abteilung',
         street='Beckenstube 5',
         zip_code='8200',
         city='Schaffhausen',
+        kostenstelle='2466',
     ),
     'gefaengnisverwaltung': Finanzstelle(
         name='Kantonales Gefängnis',
         street='Beckenstube 5',
         zip_code='8200',
         city='Schaffhausen',
+        kostenstelle='2472',
     ),
     'polizei': Finanzstelle(
         name='Schaffhauser Polizei',
         street='Beckenstube 1',
         zip_code='8200',
         city='Schaffhausen',
+        kostenstelle='2550-DO00',
     ),
     'obergericht': Finanzstelle(
         name='Obergericht',
         street='Frauengasse 17',
         zip_code='8200',
         city='Schaffhausen',
+        kostenstelle='3010',
     ),
     'kantonsgericht': Finanzstelle(
         name='Kantonsgericht',
         street='Herrenacker 26',
         zip_code='8200',
         city='Schaffhausen',
+        kostenstelle='3030',
     ),
 }

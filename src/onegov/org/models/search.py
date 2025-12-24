@@ -4,13 +4,14 @@ import math
 
 from functools import cached_property
 from onegov.core.collection import Pagination
+from onegov.core.orm.types import MarkupText
 from onegov.event.models import Event
 from onegov.search import SearchIndex
-from onegov.search.utils import language_from_locale, normalize_text
+from onegov.search.utils import language_from_locale
 from markupsafe import Markup
 from operator import itemgetter
 from sedate import utcnow
-from sqlalchemy import case, func, inspect
+from sqlalchemy import case, func, inspect, type_coerce
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy_utils import escape_like
 
@@ -246,25 +247,34 @@ class Search(Pagination[Any]):
 
         return query
 
+    @cached_property
+    def language(self) -> str:
+        language = self.request.locale
+        if language_from_locale(language) == 'simple':
+            return 'simple'
+        return language or 'simple'
+
     def generic_search(self) -> Query[SearchIndex]:
-        language = language_from_locale(self.request.locale)
-        ts_query = func.websearch_to_tsquery(
-            language, normalize_text(self.query))
+        ts_query = func.websearch_to_tsquery(self.language, self.query)
 
         decay = 0.99
         scale = (90 * 24 * 3600)  # 90 days to reach target decay
         offset = (7 * 24 * 3600)  # 7 days without decay
         two_times_variance_squared = -(scale**2 / math.log(decay))
         query = self.request.session.query(SearchIndex).filter(
-            SearchIndex.fts_idx.op('@@')(ts_query)
+            SearchIndex.data_vector.op('@@')(ts_query)
         ).order_by(
             (
-                func.ts_rank_cd(SearchIndex.fts_idx, ts_query, 2 | 4 | 16)
-                # FIXME: Whether or not we apply a time decay should depend
-                #        on the type of content, there's content that remains
-                #        relevant no matter how old it is, e.g. people, but
-                #        there's also content that does get less relevant
-                #        with time e.g. news.
+                (
+                    100.0 * func.ts_rank(
+                        SearchIndex.title_vector,
+                        ts_query,
+                    ) + func.ts_rank_cd(
+                        SearchIndex.data_vector,
+                        ts_query,
+                        2 | 4 | 16
+                    )
+                )
                 # FIXME: We could probably improve performance a lot if
                 #        we stored the time decay in the search table and
                 #        recomputed it once a day in a crobjob
@@ -427,3 +437,16 @@ class Search(Pagination[Any]):
                 .order_by(subquery.c.suggestion.asc())
                 .limit(number_of_suggestions)
             )
+
+    def highlight_results(self, markup: Markup) -> Markup:
+        return self.request.session.query(
+            type_coerce(
+                func.ts_headline(
+                    self.language,
+                    markup,
+                    func.websearch_to_tsquery(self.language, self.query),
+                    'HighlightAll=true, StartSel=<em>, StopSel=</em>'
+                ),
+                MarkupText
+            )
+        ).one()[0]

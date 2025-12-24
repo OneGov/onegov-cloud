@@ -40,6 +40,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         domain='onegov.org'
     )
     fts_public = False
+    fts_title_property = 'title'
     fts_properties = {
         # FIXME: We may want to include the directory title, so you can
         #        find entries by the kind of directory they are in

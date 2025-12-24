@@ -48,8 +48,8 @@ class SurveySubmissionsExport(SurveySubmissionsExportBase):
 
         self.submission_window.choices = [
             (window.id.hex,
-             f'{layout.format_date_range(window.start, window.end)}, '
-             f'{window.title}')
+             (f'{layout.format_date_range(window.start, window.end)}, '
+             f'{window.title}'))
             for window in windows
         ]
 

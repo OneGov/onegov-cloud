@@ -60,6 +60,7 @@ def test_search_query(postgres_dsn: str) -> None:
         public: Column[bool] = Column(Boolean, nullable=False)
         language: Column[str] = Column(Text, nullable=False)
 
+        fts_title_property = 'title'
         fts_properties = {
             'title': {'type': 'localized', 'weight': 'A'},
             'body': {'type': 'localized', 'weight': 'A'}
@@ -153,6 +154,7 @@ def test_transaction_abort(postgres_dsn: str) -> None:
         title: Column[str] = Column(Text, nullable=False)
 
         fts_public = True
+        fts_title_property = 'title'
         fts_properties = {
             'title': {'type': 'localized', 'weight': 'A'}
         }
@@ -210,6 +212,7 @@ def test_savepoint(postgres_dsn: str) -> None:
         title: Column[str] = Column(Text, nullable=False)
 
         fts_public = True
+        fts_title_property = 'title'
         fts_properties = {
             'title': {'type': 'localized', 'weight': 'A'}
         }
@@ -279,6 +282,7 @@ def test_reindex(postgres_dsn: str) -> None:
         title: Column[str] = Column(Text, nullable=False)
 
         fts_public = True
+        fts_title_property = 'title'
         fts_properties = {
             'title': {'type': 'localized', 'weight': 'A'}
         }
@@ -358,6 +362,7 @@ def test_orm_integration(
 
         fts_public = True
         fts_language = 'en'
+        fts_title_property = 'title'
         fts_properties = {
             'title': {'type': 'localized', 'weight': 'A'},
             'body': {'type': 'localized', 'weight': 'A'}
@@ -377,7 +382,7 @@ def test_orm_integration(
         query = request.GET.get('q')
         if query:
             if query.startswith('#'):
-                search = search.filter(SearchIndex.fts_idx.op('@@')(
+                search = search.filter(SearchIndex.data_vector.op('@@')(
                     func.websearch_to_tsquery('simple', query)
                 ))
             else:
@@ -520,7 +525,7 @@ def test_alternate_id_property(postgres_dsn: str) -> None:
     search = session.query(func.count(SearchIndex.id))
 
     assert search.scalar() == 2
-    assert search.filter(SearchIndex.fts_idx.op('@@')(
+    assert search.filter(SearchIndex.data_vector.op('@@')(
         func.websearch_to_tsquery('english', 'Root')
     )).scalar() == 1
     assert search.filter_by(owner_type='MyUser').scalar() == 2
@@ -602,7 +607,7 @@ def test_orm_polymorphic(postgres_dsn: str) -> None:
 
     newsitem.content = 'Story'
     transaction.commit()
-    assert search.filter(SearchIndex.fts_idx.op('@@')(
+    assert search.filter(SearchIndex.data_vector.op('@@')(
         func.websearch_to_tsquery('simple', 'story')
     )).scalar() == 1
 
@@ -684,10 +689,10 @@ def test_orm_polymorphic_sublcass_only(postgres_dsn: str) -> None:
     transaction.commit()
 
     search = session.query(func.count(SearchIndex.id))
-    assert search.filter(SearchIndex.fts_idx.op('@@')(
+    assert search.filter(SearchIndex.data_vector.op('@@')(
         func.websearch_to_tsquery('english', 'sally')
     )).scalar() == 0
-    assert search.filter(SearchIndex.fts_idx.op('@@')(
+    assert search.filter(SearchIndex.data_vector.op('@@')(
         func.websearch_to_tsquery('english', 'peter')
     )).scalar() == 1
 
@@ -717,6 +722,7 @@ def test_suggestions(postgres_dsn: str) -> None:
         public: Column[bool] = Column(Boolean, nullable=False)
         language: Column[str] = Column(Text, nullable=False)
 
+        fts_title_property = 'title'
         fts_properties = {
             'title': {'type': 'localized', 'weight': 'A'}
         }
@@ -739,6 +745,7 @@ def test_suggestions(postgres_dsn: str) -> None:
         def title(self) -> str:
             return ' '.join((self.first_name, self.last_name))
 
+        fts_title_property = 'title'
         fts_properties = {'title': {'type': 'localized', 'weight': 'A'}}
         fts_public = True
         fts_language = 'en'
@@ -858,6 +865,7 @@ def test_language_detection(postgres_dsn: str) -> None:
         id: Column[int] = Column(Integer, primary_key=True)
         title: Column[str] = Column(Text, nullable=False)
 
+        fts_title_property = 'title'
         fts_properties = {
             'title': {'type': 'localized', 'weight': 'A'}
         }
@@ -928,6 +936,7 @@ def test_language_update(postgres_dsn: str) -> None:
         id: Column[int] = Column(Integer, primary_key=True)
         title: Column[str] = Column(Text, nullable=False)
 
+        fts_title_property = 'title'
         fts_properties = {
             'title': {'type': 'localized', 'weight': 'A'}
         }
@@ -993,6 +1002,7 @@ def test_date_decay(postgres_dsn: str) -> None:
         title: Column[str] = Column(Text, nullable=False)
         body: Column[str] = Column(Text, nullable=False)
 
+        fts_title_property = 'title'
         fts_properties = {'title': {'type': 'localized', 'weight': 'A'}}
         fts_public = True
 
@@ -1026,7 +1036,7 @@ def test_date_decay(postgres_dsn: str) -> None:
         transaction.commit()
 
         search = session.query(SearchIndex.owner_id_int)
-        search = search.filter(SearchIndex.fts_idx.op('@@')(
+        search = search.filter(SearchIndex.data_vector.op('@@')(
             func.websearch_to_tsquery('german', title)
         ))
         decay = 0.75

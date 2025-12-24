@@ -18,12 +18,6 @@ function moveMailTemplateButtonToEnd() {
     }
 }
 
-// fixes tab title containing html
-if (document.body.id.startsWith("page-translator-")) {
-    if (/div class="adjust-font">.*<\/div>/.test(document.title)) {
-        document.title = document.title.replace(/<div class="adjust-font">(.*)<\/div>/, '$1');
-    }
-}
 
 document.addEventListener("DOMContentLoaded", function() {
     moveMailTemplateButtonToEnd();

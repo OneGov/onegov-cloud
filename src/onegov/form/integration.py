@@ -151,3 +151,8 @@ def get_typeahead_asset() -> Iterator[str]:
     yield 'typeahead-standalone.css'
     yield 'typeahead-standalone.js'
     yield 'typeahead-standalone-init.js'
+
+
+@FormApp.webasset('multicheckbox')
+def get_multicheckbox_asset() -> Iterator[str]:
+    yield 'multicheckbox.js'

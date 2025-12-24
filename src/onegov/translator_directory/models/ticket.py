@@ -16,6 +16,7 @@ from onegov.translator_directory.collections.documents import (
     TranslatorDocumentCollection)
 from onegov.translator_directory.constants import (
     TIME_REPORT_INTERPRETING_TYPES,
+    INTERPRETING_TYPES,
     ASSIGNMENT_LOCATIONS,
     FINANZSTELLE
 )
@@ -230,6 +231,15 @@ class TimeReportHandler(Handler):
         return self.data.get('state')
 
     @property
+    def show_links_when_closed(self) -> bool:
+        """Allow showing handler links even when ticket is closed.
+
+        This allows users to download PDFs and QR bills after the
+        time report has been accepted and the ticket closed.
+        """
+        return True
+
+    @property
     def title(self) -> str:
         return self.translator.title if self.translator else '<Deleted>'
 
@@ -278,9 +288,15 @@ class TimeReportHandler(Handler):
         assignment_type_key = report.assignment_type
         assignment_type_translated = '-'
         if assignment_type_key:
-            assignment_type_translated = request.translate(
-                TIME_REPORT_INTERPRETING_TYPES[assignment_type_key]
-            )
+            if assignment_type_key in TIME_REPORT_INTERPRETING_TYPES:
+                assignment_type_translated = request.translate(
+                    TIME_REPORT_INTERPRETING_TYPES[assignment_type_key]
+                )
+                # Be backwards compatible:
+            elif assignment_type_key in INTERPRETING_TYPES:
+                assignment_type_translated = request.translate(
+                    INTERPRETING_TYPES[assignment_type_key]
+                )
 
         assignment_date_formatted = escape(
             layout.format_date(report.assignment_date, 'date')
@@ -337,6 +353,15 @@ class TimeReportHandler(Handler):
                 ]
             )
 
+        if report.notes:
+            notes_html = linkify(report.notes).replace('\n', Markup('<br>'))
+            summary_parts.extend(
+                [
+                    f"<dt>{request.translate(_('Notes'))}</dt>",
+                    f'<dd>{notes_html}</dd>',
+                ]
+            )
+
         summary_parts.extend(
             [
                 f"<dt>{request.translate(_('Hourly Rate'))}</dt>",
@@ -356,13 +381,13 @@ class TimeReportHandler(Handler):
 
             summary_parts.extend(
                 [
-                    f"<dt>{request.translate(_('Day hours'))} "
+                    (f"<dt>{request.translate(_('Day hours'))} "
                     f"({layout.format_currency(report.hourly_rate)} × "
-                    f"{day_hours} h)</dt>",
+                    f"{day_hours} h)</dt>"),
                     f'<dd>{layout.format_currency(breakdown["day_pay"])}</dd>',
-                    f"<dt>{request.translate(_('Night hours 20-06'))} "
+                    (f"<dt>{request.translate(_('Night hours 20-06'))} "
                     f"({layout.format_currency(report.night_hourly_rate)} × "
-                    f"{night_hours} h, +50%)</dt>",
+                    f"{night_hours} h, +50%)</dt>"),
                     f'<dd>{layout.format_currency(breakdown["night_pay"])}</dd>',
                 ]
             )
@@ -370,9 +395,9 @@ class TimeReportHandler(Handler):
             # No night hours - show simple base pay
             summary_parts.extend(
                 [
-                    f"<dt>{request.translate(_('Base pay'))} "
+                    (f"<dt>{request.translate(_('Base pay'))} "
                     f"({layout.format_currency(report.hourly_rate)} × "
-                    f"{report.duration_hours} h)</dt>",
+                    f"{report.duration_hours} h)</dt>"),
                     f'<dd>{layout.format_currency(breakdown["day_pay"])}</dd>',
                 ]
             )
@@ -423,21 +448,21 @@ class TimeReportHandler(Handler):
             break_hours = report.break_time_hours
             summary_parts.extend(
                 [
-                    f"<dt>{request.translate(_('Break time'))} "
+                    (f"<dt>{request.translate(_('Break time'))} "
                     f"({layout.format_currency(report.hourly_rate)} × "
-                    f"-{break_hours} h)</dt>",
+                    f"-{break_hours} h)</dt>"),
                     f'<dd>-{layout.format_currency(breakdown["break_deduction"])}</dd>',
                 ]
             )
 
         summary_parts.extend(
             [
-                f"<dt><strong>"
+                (f"<dt><strong>"
                 f"{request.translate(_('Subtotal (work compensation)'))} "
-                f"</strong></dt>",
-                f'<dd><strong>'
+                f"</strong></dt>"),
+                (f'<dd><strong>'
                 f'{layout.format_currency(breakdown["adjusted_subtotal"])}'
-                f'</strong></dd>',
+                f'</strong></dd>'),
             ]
         )
 
@@ -483,8 +508,8 @@ class TimeReportHandler(Handler):
         summary_parts.extend(
             [
                 f'<dt>{travel_label}</dt>',
-                f'<dd>{layout.format_currency(report.travel_compensation)}'
-                f'</dd>',
+                (f'<dd>{layout.format_currency(report.travel_compensation)}'
+                f'</dd>'),
             ]
         )
 
@@ -514,11 +539,11 @@ class TimeReportHandler(Handler):
 
         summary_parts.extend(
             [
-                f"<dt><strong>{request.translate(_('Total'))}</strong> "
-                f"({calculation_formula})</dt>",
-                f'<dd><strong>'
+                (f"<dt><strong>{request.translate(_('Total'))}</strong> "
+                f"({calculation_formula})</dt>"),
+                (f'<dd><strong>'
                 f'{layout.format_currency(breakdown["total"])}'
-                f'</strong></dd>',
+                f'</strong></dd>'),
                 '</dl>',
             ]
         )

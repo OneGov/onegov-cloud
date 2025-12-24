@@ -47,6 +47,7 @@ class CourseAttendee(Base, ORMSearchable):
 
     fts_type_title = _('Attendees')
     fts_public = False
+    fts_title_property = 'title'
     fts_properties = {
         # NOTE: We use both individual properties and title, it's
         #       probably better to only use the title

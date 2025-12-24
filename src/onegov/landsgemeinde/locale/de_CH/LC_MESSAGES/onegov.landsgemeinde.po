@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-10-23 14:05+0200\n"
+"POT-Creation-Date: 2025-12-22 16:12+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -363,14 +363,23 @@ msgstr "Nächstes Traktandum"
 msgid "Excerpt from the Memorial.pdf"
 msgstr "Auszug aus dem Memorial.pdf"
 
+msgid "Links"
+msgstr "Links"
+
 msgid "No ${assembly} defined yet."
 msgstr "Noch keine ${assembly} erfasst."
 
 msgid "Downloads, Audio & Assembly items"
 msgstr "Downloads, Audio & Traktanden"
 
-msgid "Memorial (PDF)"
-msgstr "Memorial (PDF)"
+msgid "Memorial part 1"
+msgstr "Memorial Teil 1"
+
+msgid "Memorial part 2"
+msgstr "Memorial Teil 2"
+
+msgid "Supplement to the memorial"
+msgstr "Nachtrag zum Memorial"
 
 msgid "Protocol"
 msgstr "Protokoll"
@@ -402,6 +411,9 @@ msgstr ""
 
 msgid "Copied to Clipboard!"
 msgstr "In die Zwischenablage kopiert!"
+
+msgid "Memorial (PDF)"
+msgstr "Memorial (PDF)"
 
 msgid "more"
 msgstr "mehr"

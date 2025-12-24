@@ -30,7 +30,7 @@
         </p>
 
         <p>
-            <a href="${call_to_action_link}" i18n:translate>
+            <a href="${request.link(ticket, 'status')}" i18n:translate>
                 View the time report
             </a>
         </p>

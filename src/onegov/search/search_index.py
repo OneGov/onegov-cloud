@@ -5,7 +5,7 @@ from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID, UTCDateTime
 from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy import CheckConstraint, Index
-from sqlalchemy.dialects.postgresql import ARRAY, JSONB, TSVECTOR
+from sqlalchemy.dialects.postgresql import ARRAY, TSVECTOR
 
 
 from typing import TYPE_CHECKING
@@ -61,11 +61,11 @@ class SearchIndex(Base, UTCPublicationMixin):
     #: Suggestions for search functionality (Searchable::fts_suggestion)
     suggestion: Column[list[str] | None] = Column(ARRAY(String), nullable=True)
 
-    #: Full-text search index data (fts properties)
-    fts_idx_data = Column(JSONB, default={})
+    #: Postgres full-text search (fts) index (title)
+    title_vector = Column(TSVECTOR, nullable=False)
 
-    #: Postgres full-text search (fts) index
-    fts_idx = Column(TSVECTOR)
+    #: Postgres full-text search (fts) index (data)
+    data_vector = Column(TSVECTOR, nullable=False)
 
     __mapper_args__ = {
         'polymorphic_on': owner_type
@@ -154,14 +154,13 @@ class SearchIndex(Base, UTCPublicationMixin):
             postgresql_using='gin'
         ),
         Index(
-            'ix_search_index_fts_idx_data',
-            fts_idx_data,
-            postgresql_using='gin',
-            postgresql_ops={'fts_idx_data': 'jsonb_ops'},
+            'ix_search_index_title_vector',
+            title_vector,
+            postgresql_using='gin'
         ),
         Index(
-            'ix_search_index_fts_idx',
-            fts_idx,
+            'ix_search_index_data_vector',
+            data_vector,
             postgresql_using='gin'
         ),
     )
