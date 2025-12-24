@@ -3556,8 +3556,8 @@ def test_footer_settings_opening_hours_url_label(client: Client) -> None:
         {'title': '2022', 'active': True, 'finalized': False},
         {'username': 'unfinalized_user@example.org', 'role': 'member',
          'complete_profile': True},
-        {'title': 'Yoga', 'state': 'accepted'},
-        {'state': 'accepted', 'cost': 75},
+         None,  # No activity needed
+         None,  # No booking needed
         {'paid': False},
         True,
         'wurde gelöscht, inklusive aller damit verbundenen Daten.'
