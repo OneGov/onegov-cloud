@@ -3397,7 +3397,8 @@ def test_add_child_without_political_municipality(
 
 
 def test_delete_child(client: Client, scenario: Scenario) -> None:
-    scenario.add_period(title="2019", confirmed=True, finalized=True, active=True)
+    scenario.add_period(title="2019", confirmed=True, finalized=True,
+                        active=True)
     scenario.add_activity(title="Drawing", state='accepted')
     scenario.add_occasion(cost=100)
 
