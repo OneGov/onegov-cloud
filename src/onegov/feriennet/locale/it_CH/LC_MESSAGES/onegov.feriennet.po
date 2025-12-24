@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-12-04 11:14+0100\n"
+"POT-Creation-Date: 2025-12-10 15:02+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1508,6 +1508,15 @@ msgstr "Registrazione come aiutante"
 msgid "Sort"
 msgstr "Tipo"
 
+msgid "Delete"
+msgstr "Cancellare"
+
+msgid "Do you really want to delete this user?"
+msgstr "Vuole davvero cancellare questo utente?"
+
+msgid "Delete user"
+msgstr "Cancellare utente"
+
 msgid "Half day"
 msgstr "Mezza giornata"
 
@@ -2067,9 +2076,6 @@ msgstr "Vuole davvero cancellare questa richiesta?"
 
 msgid "Delete need"
 msgstr "Cancellare richiesta"
-
-msgid "Delete"
-msgstr "Cancellare"
 
 msgid "Enroll"
 msgstr "Iscrizione"
@@ -3253,6 +3259,43 @@ msgstr "Prenotazioni ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
+
+msgid ""
+"The user cannot be deleted because they are organizers of existing "
+"activities."
+msgstr ""
+"The user cannot be deleted because they are organizers of existing "
+"activities."
+
+msgid ""
+"The account cannot be deleted because there are attendees with existing "
+"bookings in the current period. Wait for the period to end or delete the "
+"bookings first."
+msgstr ""
+"L'account non può essere cancellato perché ci sono partecipanti con "
+"prenotazioni esistenti nel periodo corrente. Attendere la fine del periodo "
+"o cancellare prima le prenotazioni."
+
+msgid ""
+"The account cannot be deleted because there are unpaid invoices associated "
+"with them. Mark all invoices as paid before deleting the user."
+msgstr ""
+"L'account non può essere cancellato perché ci sono fatture non pagate "
+"associate. Contrassegna tutte le fatture come pagate prima di cancellare "
+"l'utente."
+
+#, python-format
+msgid "${name} has been deleted, including all associated data."
+msgstr "${name} è stato cancellato, inclusi tutti i dati associati."
+
+msgid "Could not delete account; try again or contact an administrator."
+msgstr ""
+"Impossibile cancellare l'account; riprovi o contatti un amministratore."
+
+#~ msgid "Parents can see the contacts of other parents in the same activity"
+#~ msgstr ""
+#~ "I genitori possono vedere i dettagli di contatto di altri genitori della "
+#~ "stessa offerta"
 
 #~ msgid "Dashboard"
 #~ msgstr "Dashboard"

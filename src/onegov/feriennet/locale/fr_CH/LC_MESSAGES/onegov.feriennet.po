@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-04 11:14+0100\n"
+"POT-Creation-Date: 2025-12-10 15:02+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1517,6 +1517,15 @@ msgstr "Inscrivez-vous comme bénévole"
 msgid "Sort"
 msgstr "Trier"
 
+msgid "Delete"
+msgstr "Supprimer"
+
+msgid "Do you really want to delete this user?"
+msgstr "Voulez-vous vraiment supprimer cet·te utilisateur·trice ?"
+
+msgid "Delete user"
+msgstr "Supprimer l'utilisateur·trice"
+
 msgid "Half day"
 msgstr "Demi-journée"
 
@@ -2086,9 +2095,6 @@ msgstr "Voulez-vous vraiment supprimer ce besoin ?"
 
 msgid "Delete need"
 msgstr "Supprimer le besoin"
-
-msgid "Delete"
-msgstr "Supprimer"
 
 msgid "Enroll"
 msgstr "Inscrire"
@@ -3276,6 +3282,45 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+msgid ""
+"The user cannot be deleted because they are organizers of existing "
+"activities."
+msgstr ""
+"L'utilisateur·trice ne peut pas être supprimé·e car il/elle est prestataire "
+"d'activités existantes."
+
+
+msgid ""
+"The account cannot be deleted because there are attendees with existing "
+"bookings in the current period. Wait for the period to end or delete the "
+"bookings first."
+msgstr ""
+"Le compte ne peut pas être supprimé car des participant·e·s ont des "
+"réservations pour la période en cours. Attendez la fin de la période ou "
+"supprimez d'abord les réservations."
+
+msgid ""
+"The account cannot be deleted because there are unpaid invoices associated "
+"with them. Mark all invoices as paid before deleting the user."
+msgstr ""
+"Le compte ne peut pas être supprimé car des factures impayées lui sont "
+"associées. Marquez toutes les factures comme payées avant de supprimer "
+"l'utilisateur·trice."
+
+#, python-format
+msgid "${name} has been deleted, including all associated data."
+msgstr "${name} a été supprimé·e, y compris toutes les données associées."
+
+msgid "Could not delete account; try again or contact an administrator."
+msgstr ""
+"Impossible de supprimer le compte; essayez à nouveau ou contactez un·e "
+"administrateur·trice."
+
+#~ msgid "Parents can see the contacts of other parents in the same activity"
+#~ msgstr ""
+#~ "Les parents peuvent voir les contacts d'autres parents pour la même "
+#~ "activité"
 
 #~ msgid "Dashboard"
 #~ msgstr "Dashboard"
