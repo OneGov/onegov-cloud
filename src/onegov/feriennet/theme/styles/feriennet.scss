@@ -243,6 +243,10 @@ p.tight {
     @include generic-icon('\f044');
 }
 
+.delete-icon {
+    @include generic-icon('\f1f8');
+}
+
 .location-icon {
     @include generic-icon('\f3c5');
 }
@@ -916,7 +920,6 @@ $booking-left-margin: 1.6rem;
                 height: 2rem;
                 line-height: 2rem;
                 margin: 0;
-                padding-left: 2px;
                 text-align: center;
                 transition: background linear .2s;
                 width: 2rem;

@@ -3398,6 +3398,50 @@ def test_add_child_without_political_municipality(
     assert 'war erfolgreich' in page
 
 
+def test_delete_child(client: Client, scenario: Scenario) -> None:
+    scenario.add_period(title="2019", confirmed=True, finalized=True,
+                        active=True)
+    scenario.add_activity(title="Drawing", state='accepted')
+    scenario.add_occasion(cost=100)
+
+    scenario.add_user(username='m1@example.org', role='member', realname="Tom")
+    scenario.add_attendee(name="Dustin", birth_date=date(2000, 1, 1))
+
+    scenario.add_user(username='m2@example.org', role='member', realname="Doc")
+    scenario.add_attendee(name="Mike", birth_date=date(2000, 1, 1))
+
+    # Sign Mike up for the activity
+    scenario.add_booking(
+        user=scenario.users[0],
+        attendee=scenario.attendees[0],
+        occasion=scenario.occasions[0]
+    )
+
+    scenario.commit()
+
+    c1 = client.spawn()
+    c1.login('m1@example.org', 'hunter2')
+
+    c2 = client.spawn()
+    c2.login('m2@example.org', 'hunter2')
+
+    # Dustin cannot be deleted because he has bookings in the current period
+    page = c1.get('/my-bookings')
+    delete_link = page.pyquery('a.delete-icon').attr('ic-delete-from')
+    assert 'Dustin' in page
+    c1.delete(delete_link)
+    page = c1.get('/my-bookings')
+    assert 'Der/die Teilnehmende kann nicht gelöscht werden' in page
+
+    # Mike can be deleted because he has no bookings in the current period
+    page = c2.get('/my-bookings')
+    assert 'Mike' in page
+    delete_link = page.pyquery('a.delete-icon').attr('ic-delete-from')
+    c2.delete(delete_link)
+    page = c2.get('/my-bookings')
+    assert 'Mike und die zugehörigen Buchungen wurden gelöscht.' in page
+
+
 def test_view_dashboard(client: Client, scenario: Scenario) -> None:
     scenario.add_period(title="2019", confirmed=True, finalized=False)
     scenario.add_activity(title="Pet Zoo", state='accepted')

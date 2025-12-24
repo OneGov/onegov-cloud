@@ -2661,6 +2661,17 @@ msgstr "Modifier le·la participant·e"
 msgid "Booking Limit of ${name}"
 msgstr "Limite de réservations de ${name}"
 
+#, python-format
+msgid "${name} and associated bookings were deleted."
+msgstr "${name} et les réservations associées ont été supprimées."
+
+msgid ""
+"The attendee cannot be deleted because there are existing bookings in the "
+"current period."
+msgstr ""
+"L'utilisateur·trice ne peut pas être supprimé·e car il·elle a des "
+"réservations dans la période en cours."
+
 msgid "The user account must be opened by a parent or guardian of full age."
 msgstr ""
 "Le compte utilisateur·trice doit être ouvert par un parent ou une personne "
@@ -2813,6 +2824,18 @@ msgstr "Annuler la réservation"
 #, python-format
 msgid "Do you really want to cancel \"${title}\"?"
 msgstr "Voulez-vous vraiment annuler « ${title} » ?"
+
+msgid "Delete attendee"
+msgstr "Supprimer le·la participant·e"
+
+#, python-format
+msgid "Do you really want to delete \"${name}\" and all associated bookings?"
+msgstr ""
+"Voulez-vous vraiment supprimer « ${name} » et toutes les réservations "
+"associées ?"
+
+msgid "The invoices will not be deleted."
+msgstr "Les factures ne seront pas supprimées."
 
 msgid "Only open, cancelled, denied or blocked bookings may be deleted"
 msgstr ""
