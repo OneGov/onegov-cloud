@@ -15,7 +15,7 @@ repos:
         exclude: .pre-commit-config.yaml
       - id: pt_structure
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.5
+    rev: v0.14.10
     hooks:
       - id: ruff
         args: [ "--fix" ]
@@ -27,7 +27,7 @@ repos:
         additional_dependencies:
         - flake8-type-checking>=3.0.0
   - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-    rev: v16.25.0
+    rev: v16.26.1
     hooks:
     - id: stylelint
       files: '^src/.*\.scss'
@@ -35,14 +35,14 @@ repos:
         - stylelint@16.19.1
         - stylelint-config-standard-scss@15.0.0
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.39.1
+    rev: v10.0.0-beta.0
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'
       additional_dependencies:
       - eslint-react
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.8.6
+    rev: 1.9.2
     hooks:
       - id: bandit
         args: ["-c", "pyproject.toml", "--quiet"]
@@ -70,6 +70,6 @@ repos:
         files:  '^stubs/.*\.pyi$'
         pass_filenames: false
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.29.0
+    rev: v8.30.0
     hooks:
       - id: gitleaks

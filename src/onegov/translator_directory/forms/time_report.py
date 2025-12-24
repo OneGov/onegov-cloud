@@ -405,9 +405,17 @@ class TranslatorTimeReportForm(Form):
                 self.finanzstelle.data = getattr(obj, 'finanzstelle', None)
 
             if hasattr(obj, 'assignment_type'):
-                self.assignment_type.data = getattr(
-                    obj, 'assignment_type', None
-                )
+                assignment_type = getattr(obj, 'assignment_type', None)
+                self.assignment_type.data = assignment_type
+
+                travel_comp = getattr(obj, 'travel_compensation', None)
+                travel_dist = getattr(obj, 'travel_distance', None)
+                if (
+                    assignment_type == 'on-site'
+                    and travel_comp == Decimal('0')
+                    and travel_dist == 0.0
+                ):
+                    self.skip_travel_calculation.data = True
 
             if hasattr(obj, 'assignment_location'):
                 location = getattr(obj, 'assignment_location', None)
