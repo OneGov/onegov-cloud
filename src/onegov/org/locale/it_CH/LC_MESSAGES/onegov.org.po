@@ -7718,9 +7718,6 @@ msgstr "Utente creato correttamente"
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 
-#~ msgid "Sidebar"
-#~ msgstr "Barra laterale"
-
 #~ msgid ""
 #~ "The \"Always send email notifications for new ticket messages\" setting "
 #~ "is enabled. You will receive an email whenever a new message is posted to "
