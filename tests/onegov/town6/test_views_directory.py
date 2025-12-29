@@ -252,6 +252,9 @@ def test_create_directory_accordion_layout(
             assert answer not in page
             assert answer_label not in page
 
+        # test edit link
+        assert page.pyquery('.accordion .edit-link').attr('href')
+
     client.login_admin()
     title = "Questions and Answers about smurfs"
 
