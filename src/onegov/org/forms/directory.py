@@ -165,11 +165,15 @@ class DirectoryBaseForm(Form):
         fieldset=_('Display'),
         render_kw={'class_': 'formcode-select'})
 
-        label=_('Sidebar'),
+    contact_fields = TextAreaField(
+        label=_('Contact Information Sidebar'),
         fieldset=_('Display'),
         render_kw={
             'class_': 'formcode-select',
-            'data-fields-exclude': 'fileinput,radio,checkbox'
+            'data-fields-exclude': 'fileinput,radio,checkbox',
+            'long_description':
+                _('The contact information is displayed in the sidebar '
+                  'without field names.')
         })
 
     keyword_fields = TextAreaField(
