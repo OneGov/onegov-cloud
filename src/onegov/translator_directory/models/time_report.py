@@ -53,7 +53,7 @@ class TranslatorTimeReport(Base, TimestampMixin):
 
     created_by: relationship[User | None] = relationship('User')
 
-    assignment_type: Column[str | None] = Column(Text)
+    assignment_type: Column[str] = Column(Text, nullable=False)
 
     assignment_location: Column[str | None] = Column(
         Text,
@@ -61,7 +61,12 @@ class TranslatorTimeReport(Base, TimestampMixin):
         comment='Key of selected assignment location for on-site work'
     )
 
-    #: The duration in minutes (total work time excluding breaks)
+    finanzstelle: Column[str] = Column(
+        Text,
+        nullable=False,
+    )
+
+    #: The duration in minutes (including break)
     duration: Column[int] = Column(Integer, nullable=False)
 
     #: Break time in minutes
@@ -248,7 +253,7 @@ class TranslatorTimeReport(Base, TimestampMixin):
     @property
     def meal_allowance(self) -> Decimal:
         """Return meal allowance if duration >= 6 hours."""
-        return Decimal('40.0') if self.duration_hours >= 6 else Decimal('0')
+        return Decimal('30.0') if self.duration_hours >= 6 else Decimal('0')
 
     @property
     def title(self) -> str:

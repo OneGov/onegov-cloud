@@ -4,6 +4,7 @@ import morepath
 import transaction
 
 from onegov.core.security import Public
+from onegov.core.templates import render_macro
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.layout import DefaultLayout
@@ -71,6 +72,18 @@ def search(
         csrf_support=False,
     )
 
+    if self.batch:
+        results_html = self.highlight_results(render_macro(
+            layout.macros['search_results'],
+            request,
+            {
+                'model': self,
+                'layout': layout,
+            }
+        ))
+    else:
+        results_html = ''  # type: ignore[assignment]
+
     return {
         'title': _('Search'),
         'form': form,
@@ -79,7 +92,8 @@ def search(
         'hide_search_header': True,
         'searchlabel': searchlabel,
         'resultslabel': resultslabel,
-        'connection': True
+        'connection': True,
+        'results_html': results_html
     }
 
 

@@ -37,6 +37,7 @@ def test_orm_event_translator_properties(object_session: MagicMock) -> None:
         __tablename__ = 'my-pages'
 
         fts_id = 'id'
+        fts_title_property = 'title'
         fts_properties = {
             'title': {'type': 'localized', 'weight': 'A'},
             'body': {'type': 'localized', 'weight': 'B'},
@@ -74,7 +75,11 @@ def test_orm_event_translator_properties(object_session: MagicMock) -> None:
             return self.tags  # type: ignore[attr-defined]
 
     mappings = TypeMappingRegistry()
-    mappings.register_type('Page', Page.fts_properties)
+    mappings.register_type(
+        'Page',
+        Page.fts_properties,
+        Page.fts_title_property
+    )
 
     indexer = Indexer(mappings)
     translator = ORMEventTranslator(indexer)
@@ -105,6 +110,7 @@ def test_orm_event_translator_properties(object_session: MagicMock) -> None:
         'publication_start': None,
         'publication_end': None,
         'last_change': creation_date,
+        'title': 'About',
         'properties': {
             'title': 'About',
             'body': 'We are Pied Piper',
@@ -145,6 +151,7 @@ def test_orm_event_translator_properties(object_session: MagicMock) -> None:
         'publication_start': None,
         'publication_end': None,
         'last_change': creation_date,
+        'title': 'About',
         'properties': {
             'title': 'About',
             'body': 'We are Pied Piper',
@@ -242,7 +249,7 @@ def test_type_mapping_registry() -> None:
     registry = TypeMappingRegistry()
     registry.register_type('Page', {
         'title': {'type': 'text', 'weight': 'A'}
-    })
+    }, 'title')
     registry.register_type('Comment', {
         'comment': {'type': 'text', 'weight': 'A'}
     })
@@ -268,7 +275,7 @@ def test_indexer_process(
     mappings = TypeMappingRegistry()
     mappings.register_type('Page', {
         'title': {'type': 'localized', 'weight': 'A'},
-    })
+    }, 'title')
     indexer = Indexer(mappings)
 
     task: Task = {
@@ -286,6 +293,7 @@ def test_indexer_process(
         'suggestion': [],
         'tags': [],
         'language': 'en',
+        'title': 'Go ahead and jump',
         'properties': {'title': 'Go ahead and jump'},
     }
     assert indexer.process([task], session) == 1
@@ -314,7 +322,7 @@ def test_indexer_process_mid_transaction(
     mappings = TypeMappingRegistry()
     mappings.register_type('Person', {
         'title': {'type': 'text', 'weight': 'A'},
-    })
+    }, 'title')
     engine = session_manager.engine
     indexer = Indexer(mappings)
     tasks: list[Task] = []
@@ -336,6 +344,7 @@ def test_indexer_process_mid_transaction(
         'publication_start': None,
         'publication_end': None,
         'last_change': person1.last_change,
+        'title': person1.title,
         'properties': {'title': person1.title},
     })
     person2 = people.add(first_name='Jane', last_name='Doe')
@@ -354,6 +363,7 @@ def test_indexer_process_mid_transaction(
         'publication_start': None,
         'publication_end': None,
         'last_change': person2.last_change,
+        'title': person2.title,
         'properties': {'title': person2.title}
     })
     indexer.process(tasks, session)
@@ -374,6 +384,7 @@ def test_indexer_process_mid_transaction(
         'publication_start': None,
         'publication_end': None,
         'last_change': person3.last_change,
+        'title': person3.title,
         'properties': {'title': person3.title}
     })
     indexer.process(tasks, session)
@@ -383,7 +394,7 @@ def test_indexer_process_mid_transaction(
     # make sure the people got indexed and therefore exist in `SearchIndex`
     # having their fts_idx column set
     assert (session.query(SearchIndex).
-            filter(SearchIndex.fts_idx.isnot(None)).count() == 3)
+            filter(SearchIndex.data_vector.isnot(None)).count() == 3)
 
 
 def test_tags(
@@ -412,6 +423,7 @@ def test_tags(
         'publication_start': None,
         'publication_end': None,
         'last_change': None,
+        'title': '',
         'properties': {},
     }
     assert indexer.process([task], session)

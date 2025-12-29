@@ -260,6 +260,7 @@ class ImageSet(FileSet, AccessExtension, ORMSearchable):
 
     fts_type_title = _('Photo Albums')
     fts_public = True
+    fts_title_property = 'title'
     fts_properties = {
         'title': {'type': 'localized', 'weight': 'A'},
         'lead': {'type': 'localized', 'weight': 'B'}

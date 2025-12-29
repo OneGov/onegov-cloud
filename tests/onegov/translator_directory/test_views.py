@@ -11,10 +11,12 @@ from datetime import date
 
 from freezegun import freeze_time
 from io import BytesIO
+from onegov.user.models.user import User
 from onegov.core.utils import module_path
 from onegov.translator_directory.models.ticket import (
     AccreditationTicket,
 )
+from onegov.core.crypto.password import hash_password
 from onegov.translator_directory.models.translator import Translator
 from os.path import basename
 from onegov.file import FileCollection
@@ -23,11 +25,10 @@ from tests.onegov.translator_directory.shared import iter_block_items
 from onegov.gis import Coordinates
 from onegov.pdf import Pdf
 from onegov.translator_directory.collections.translator import (
-    TranslatorCollection)
-from onegov.translator_directory.models.time_report import (
-    TranslatorTimeReport
+    TranslatorCollection,
 )
-from onegov.user import UserCollection
+from onegov.translator_directory.models.time_report import TranslatorTimeReport
+from onegov.user import UserCollection, UserGroup, UserGroupCollection
 from openpyxl import load_workbook
 from pdftotext import PDF  # type: ignore[import-not-found]
 from tests.onegov.translator_directory.shared import (
@@ -91,23 +92,30 @@ def upload_file(
 
 
 def get_accountant_email(client: Client) -> str:
-    '''Get the configured accountant email from the app.'''
-    email = client.app.accountant_email
-    assert email is not None, 'Accountant email is not configured'
-    return email
+    """Get accountant email from user group for testing."""
+    session = client.app.session()
+    user_group = (
+        session.query(UserGroup)
+        .filter(UserGroup.meta['finanzstelle'].astext.isnot(None))
+        .first()
+    )
+    assert user_group is not None, 'No user group with finanzstelle found'
+    emails = user_group.meta.get('accountant_emails', [])
+    assert emails, 'No accountant emails in user group'
+    return emails[0]
 
 
 def filter_emails_by_recipient(
     emails: list['EmailJsonDict'], recipient: str
 ) -> list['EmailJsonDict']:
-    '''Filter emails to only those sent to the specified recipient.'''
+    """Filter emails to only those sent to the specified recipient."""
     return [e for e in emails if recipient in e['To']]
 
 
 def extract_ticket_link_from_email(
     emails: list['EmailJsonDict'], recipient: str
 ) -> str:
-    '''Extract ticket link from email sent to recipient.'''
+    """Extract ticket link from email sent to recipient."""
     matching_emails = [e for e in emails if recipient in e['To']]
     assert len(matching_emails) >= 1, f'No email found for {recipient}'
 
@@ -2058,17 +2066,6 @@ def test_basic_search(client_with_fts: Client) -> None:
     assert anom.get('/search/suggest?q=test').json == []
 
 
-def test_add_accountant_email_user_has_to_exist(client: 'Client') -> None:
-    client.login_admin()
-    page = client.get('/directory-settings')
-    page.form['accountant_email'] = 'accountant@example.org'
-    page = page.form.submit()
-    assert 'Es existiert kein Benutzer mit dieser' in page.text
-    page.form['accountant_email'] = 'editor@example.org'
-    page = page.form.submit()
-    assert 'Es existiert kein Benutzer mit dieser' not in page.text
-
-
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
@@ -2181,6 +2178,7 @@ def test_view_time_reports(client: Client) -> None:
     report = TranslatorTimeReport(
         translator_id=translator.id,
         assignment_type='consecutive',
+        finanzstelle='finanzstelle',
         duration=90,
         case_number='CASE-001',
         assignment_date=date(2025, 1, 15),
@@ -2219,14 +2217,14 @@ def test_time_report_workflow(
         email='translator@example.org',
         drive_distance=35.0,
     ).id
-    transaction.commit()
 
-    client.login_admin()
-    page = client.get('/directory-settings')
-    page.form['accountant_email'] = 'editor@example.org'
-    page = page.form.submit()
-    client.logout()
-    assert client.app.accountant_email == 'editor@example.org'
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='migrationsamt_und_passbuero')
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org']
+    }
+    transaction.commit()
 
     client.login_member()
     page = client.get(f'/translator/{translator_id}')
@@ -2234,6 +2232,7 @@ def test_time_report_workflow(
 
     page = page.click('Zeit erfassen')
     page.form['assignment_type'] = 'on-site'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-11'
     page.form['start_time'] = '09:00'
     page.form['end_date'] = '2025-01-11'
@@ -2280,6 +2279,39 @@ def test_time_report_workflow(
     # save ticket link for later
     ticket_link = link_match.group(1)
 
+    translator_emails = filter_emails_by_recipient(
+        all_emails, 'translator@example.org'
+    )
+    assert len(translator_emails) >= 1
+    mail_to_translator = translator_emails[0]
+    assert mail_to_translator['To'] == 'translator@example.org'
+    assert (
+        'Eine Zeiterfassung wurde für Sie eingereicht'
+        in mail_to_translator['Subject']
+    )
+    assert (
+        'Eine Zeiterfassung wurde für Sie eingereicht und wird nun '
+        'geprüft.' in mail_to_translator['TextBody']
+    )
+    assert (
+        'Bitte sorgfältig überprüfen und Unstimmigkeiten umgehend melden'
+        in mail_to_translator['TextBody']
+    )
+
+    translator_link_match = re.search(
+        r'<a href="([^"]+)">Zeiterfassung anzeigen</a>',
+        mail_to_translator['HtmlBody'],
+    )
+    assert translator_link_match is not None
+    translator_status_link = translator_link_match.group(1)
+    assert '/status' in translator_status_link
+    assert accountant_email in mail_to_translator['TextBody']
+
+    client.login_translator()
+    status_page = client.get(translator_status_link)
+    assert status_page.status_code == 200
+    assert 'TRP-' in status_page
+
     translator = session.query(Translator).filter_by(id=translator_id).one()
     assert len(translator.time_reports) == 1
     report = translator.time_reports[0]
@@ -2292,6 +2324,7 @@ def test_time_report_workflow(
 
     client.login_editor()
     ticket_page = client.get(ticket_link)
+    assert 'Test notes' in ticket_page
     # Accept ticket
     ticket_page = ticket_page.click('Ticket annehmen').follow()
 
@@ -2347,6 +2380,18 @@ def test_time_report_workflow(
     page = client.post(accept_url).follow()
     assert 'Zeiterfassung akzeptiert' in page
 
+    # Verify ticket was closed
+    report = (
+        session.query(Translator)
+        .filter_by(id=translator_id)
+        .one()
+        .time_reports[0]
+    )
+    ticket = report.get_ticket(session)
+    assert ticket is not None
+    assert ticket.state == 'closed'
+    assert ticket.closed_on is not None
+
     # Test that edit is not available after confirmation
     report = (
         session.query(Translator)
@@ -2364,6 +2409,14 @@ def test_time_report_workflow(
     assert 'translator@example.org' in mail_to_translator['To']
     assert 'Zeiterfassung akzeptiert' in mail_to_translator['Subject']
 
+    accepted_link_match = re.search(
+        r'<a href="([^"]+)">Zeiterfassung anzeigen</a>',
+        mail_to_translator['HtmlBody'],
+    )
+    assert accepted_link_match is not None
+    accepted_status_link = accepted_link_match.group(1)
+    assert '/status' in accepted_status_link
+
     attachments = mail_to_translator.get('Attachments', [])
     assert len(attachments) == 1
     attachment = attachments[0]
@@ -2375,6 +2428,278 @@ def test_time_report_workflow(
     report = session.query(Translator).filter_by(
         id=translator_id).one().time_reports[0]
     assert report.status == 'confirmed'
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_time_report_skip_travel_calculation(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
+) -> None:
+    """Test skip_travel_calculation checkbox disables travel."""
+    session = client.app.session()
+    languages = create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator_id = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+        drive_distance=35.0,
+    ).id
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='migrationsamt_und_passbuero')
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org'],
+    }
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+
+    page.form['assignment_type'] = 'on-site'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-01-11'
+    page.form['start_time'] = '09:00'
+    page.form['end_date'] = '2025-01-11'
+    page.form['end_time'] = '10:30'
+    page.form['case_number'] = 'CASE-123'
+    page.form['is_urgent'] = False
+    page.form['skip_travel_calculation'] = True
+    page = page.form.submit().follow()
+
+    assert 'Zeiterfassung zur Überprüfung eingereicht' in page
+
+    translator = session.query(Translator).filter_by(id=translator_id).one()
+    assert len(translator.time_reports) == 1
+    report = translator.time_reports[0]
+    assert report.duration == 90
+    assert report.travel_compensation == Decimal('0')
+    assert report.travel_distance == 0.0
+
+    breakdown = report.calculate_compensation_breakdown()
+    assert breakdown['travel'] == Decimal('0')
+    assert breakdown['total'] == breakdown['adjusted_subtotal']
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_time_report_edit_toggle_skip_travel(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
+) -> None:
+    """Test editing time report to toggle skip_travel_calculation."""
+    session = client.app.session()
+    languages = create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator_id = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+        drive_distance=35.0,
+    ).id
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='migrationsamt_und_passbuero')
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org'],
+    }
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+
+    page.form['assignment_type'] = 'on-site'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-01-11'
+    page.form['start_time'] = '09:00'
+    page.form['end_date'] = '2025-01-11'
+    page.form['end_time'] = '10:30'
+    page.form['case_number'] = 'CASE-123'
+    page.form['is_urgent'] = False
+    page = page.form.submit().follow()
+
+    translator = session.query(Translator).filter_by(id=translator_id).one()
+    report = translator.time_reports[0]
+    assert report.travel_compensation == Decimal('100')
+    assert report.travel_distance == 35.0
+
+    all_emails = []
+    for i in range(10):
+        try:
+            email = client.get_email(i)
+            if email:
+                all_emails.append(email)
+        except IndexError:
+            break
+    client.flush_email_queue()
+
+    accountant_email = get_accountant_email(client)
+    accountant_emails = filter_emails_by_recipient(
+        all_emails, accountant_email
+    )
+    assert len(accountant_emails) >= 1
+
+    mail_to_accountant = accountant_emails[0]
+    link_match = re.search(
+        r'<a href="([^"]+)">Zeiterfassung anzeigen</a>',
+        mail_to_accountant['HtmlBody'],
+    )
+    assert link_match is not None
+    ticket_link = link_match.group(1)
+
+    client.login_editor()
+    page = client.get(ticket_link)
+    page = page.click('Ticket annehmen').follow()
+
+    edit_links = [
+        link
+        for link in page.pyquery('a')
+        if 'bearbeiten' in link.text_content().lower()
+    ]
+    assert len(edit_links) > 0
+    edit_url = edit_links[0].attrib['href']
+
+    client.login_member()
+    edit_page = client.get(edit_url)
+    assert edit_page.form['skip_travel_calculation'].checked is False
+    edit_page.form['skip_travel_calculation'] = True
+    edit_page = edit_page.form.submit().follow()
+
+    session.expire_all()
+    report = (
+        session.query(Translator)
+        .filter_by(id=translator_id)
+        .one()
+        .time_reports[0]
+    )
+    assert report.travel_compensation == Decimal('0')
+    assert report.travel_distance == 0.0
+
+    breakdown = report.calculate_compensation_breakdown()
+    assert breakdown['travel'] == Decimal('0')
+
+
+def extract_total_from_ticket_html(html: str) -> tuple[str, str]:
+    total_match = re.search(
+        r'<dt><strong>Total</strong>\s*\(([^)]+)\)</dt>',
+        html,
+        re.DOTALL
+    )
+    assert total_match is not None, 'Total not found in ticket HTML'
+    calculation_formula = total_match.group(1).strip()
+
+    total_amount_match = re.search(
+        r'<dt><strong>Total</strong>.*?</dt>\s*<dd><strong>([^<]+)',
+        html,
+        re.DOTALL
+    )
+    assert (
+        total_amount_match is not None
+    ), 'Total amount not found in ticket HTML'
+    total_amount = total_amount_match.group(1).strip()
+
+    return calculation_formula, total_amount
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_time_report_skip_travel_ticket_html_unchanged_after_edit(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
+) -> None:
+    """Test that total cost of time report unchanged after empty
+    edit and submit"""
+    session = client.app.session()
+    languages = create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator_id = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+        drive_distance=35.0,
+    ).id
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(
+        name='migrationsamt_und_passbuero'
+    )
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org'],
+    }
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+
+    page.form['assignment_type'] = 'on-site'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-01-11'
+    page.form['start_time'] = '09:00'
+    page.form['end_date'] = '2025-01-11'
+    page.form['end_time'] = '10:30'
+    page.form['case_number'] = 'CASE-123'
+    page.form['is_urgent'] = False
+    page.form['skip_travel_calculation'] = True
+    page = page.form.submit().follow()
+
+    assert 'Zeiterfassung zur Überprüfung eingereicht' in page
+
+    all_emails = []
+    for i in range(10):
+        try:
+            email = client.get_email(i)
+            if email:
+                all_emails.append(email)
+        except IndexError:
+            break
+    client.flush_email_queue()
+
+    accountant_email = get_accountant_email(client)
+    ticket_link = extract_ticket_link_from_email(
+        all_emails, accountant_email
+    )
+
+    client.login_editor()
+    ticket_page = client.get(ticket_link)
+    ticket_page = ticket_page.click('Ticket annehmen').follow()
+
+    initial_html = str(ticket_page)
+    initial_formula, initial_amount = extract_total_from_ticket_html(
+        initial_html
+    )
+
+    edit_page = ticket_page.click('Bearbeiten')
+    page = edit_page.form.submit().follow()
+
+    final_html = str(page)
+    final_formula, final_amount = extract_total_from_ticket_html(final_html)
+
+    assert initial_formula == final_formula, (
+        f'Calculation formula changed: {initial_formula} -> {final_formula}'
+    )
+    assert initial_amount == final_amount, (
+        f'Total amount changed: {initial_amount} -> {final_amount}'
+    )
+    assert final_amount == 'CHF 168.75'
 
 
 @patch('onegov.websockets.integration.connect')
@@ -2402,18 +2727,20 @@ def test_time_report_workflow_self_employed(
         zip_code='8000',
         city='Zürich',
     ).id
-    transaction.commit()
 
-    client.login_admin()
-    page = client.get('/directory-settings')
-    page.form['accountant_email'] = 'editor@example.org'
-    page = page.form.submit()
-    client.logout()
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='migrationsamt_und_passbuero')
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org']
+    }
+    transaction.commit()
 
     client.login_member()
     page = client.get(f'/translator/{translator_id}')
     page = page.click('Zeit erfassen')
     page.form['assignment_type'] = 'on-site'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-11'
     page.form['start_time'] = '09:00'
     page.form['end_date'] = '2025-01-11'
@@ -2507,18 +2834,20 @@ def test_time_report_workflow_self_employed_missing_iban(
         zip_code='8000',
         city='Zürich',
     ).id
-    transaction.commit()
 
-    client.login_admin()
-    page = client.get('/directory-settings')
-    page.form['accountant_email'] = 'editor@example.org'
-    page = page.form.submit()
-    client.logout()
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='migrationsamt_und_passbuero')
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org']
+    }
+    transaction.commit()
 
     client.login_member()
     page = client.get(f'/translator/{translator_id}')
     page = page.click('Zeit erfassen')
     page.form['assignment_type'] = 'on-site'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-11'
     page.form['start_time'] = '09:00'
     page.form['end_date'] = '2025-01-11'
@@ -2550,6 +2879,89 @@ def test_time_report_workflow_self_employed_missing_iban(
     accept_url = ticket_page.pyquery('a.accept-link')[0].attrib['ic-post-to']
     page = client.post(accept_url).maybe_follow()
     # It will refuse, as no IBAN was set on translator
-
-    # assert 'müssen eine gültige IBAN haben"' in page
     assert time_report.status == 'pending'
+
+
+def test_user_groups(client: Client) -> None:
+    """Test creating and editing user groups with finanzstelle."""
+
+    transaction.begin()
+    client.app.session().add(
+        User(
+            username='editor2@example.org',
+            password_hash=hash_password('hunter2'),
+            role='editor',
+        )
+    )
+    transaction.commit()
+
+    client.login_admin()
+    page = client.get('/usergroups/new')
+
+    page.form['name'] = 'Accountants'
+    page.form['finanzstelle'] = 'polizei'
+    page.form['users'].select_multiple(texts=['member@example.org'])
+    page.form['accountant_emails'].select_multiple(
+        texts=['editor@example.org']
+    )
+
+    page = page.form.submit().follow()
+    assert 'Accountants' in page
+
+    session = client.app.session()
+    group = session.query(UserGroup).filter_by(name='Accountants').one()
+
+    assert group.meta['finanzstelle'] == 'polizei'
+    assert group.meta['accountant_emails'] == ['editor@example.org']
+
+    page = client.get(f'/user-groups/{str(group.id)}/edit')
+    assert 'Benutzergruppe bearbeiten' in page
+    assert page.form['name'].value == 'Accountants'
+    assert page.form['finanzstelle'].value == 'polizei'
+
+    page.form['finanzstelle'] = 'staatsanwaltschaft'
+    page.form['name'].value = 'Accountants2'
+    page.form['accountant_emails'].select_multiple(
+        texts=['editor2@example.org', 'editor@example.org']
+    )
+    page = page.form.submit().follow()
+
+    session = client.app.session()
+    group = session.query(UserGroup).filter_by(name='Accountants2').one()
+    assert group.meta['finanzstelle'] == 'staatsanwaltschaft'
+    assert set(group.meta['accountant_emails']) == {
+        'editor2@example.org',
+        'editor@example.org',
+    }
+    # empty re-submit
+    # This used to raise 'Uniqueness violation in ticket permissions'
+    page = client.get(f'/user-groups/{str(group.id)}/edit')
+    page = page.form.submit().follow()
+
+    # Create second user group with different finanzstelle
+    page = client.get('/usergroups/new')
+    page.form['name'] = 'Staatsanwaltschaft Group'
+    page.form['finanzstelle'] = 'staatsanwaltschaft'
+    page.form['users'].select_multiple(texts=['editor@example.org'])
+    page.form['accountant_emails'] = ['editor@example.org']
+    page = page.form.submit().follow()
+    assert 'Staatsanwaltschaft Group' in page
+
+    session = client.app.session()
+    group2 = (
+        session.query(UserGroup)
+        .filter_by(name='Staatsanwaltschaft Group')
+        .one()
+    )
+    assert group2.meta['finanzstelle'] == 'staatsanwaltschaft'
+    assert group2.meta['accountant_emails'] == ['editor@example.org']
+
+    # Verify both groups exist with correct permissions
+    all_groups = (
+        session.query(UserGroup)
+        .filter(
+            UserGroup.name.in_(['Accountants2', 'Staatsanwaltschaft Group'])
+        )
+        .all()
+    )
+    assert len(all_groups) == 2

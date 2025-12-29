@@ -138,6 +138,7 @@ jobs:
           libgbm1 \
           libnspr4 \
           libnss3 \
+          libpq-dev \
           libu2f-udev \
           libvulkan1 \
           libx11-xcb1 \
@@ -191,6 +192,9 @@ jobs:
         # add unprivileged test user
         adduser --disabled-password --gecos "" test
         redis-server --daemonize yes
+        PG_DATA_DIR="$(pg_config --sharedir)/tsearch_data"
+        cp "${PG_DATA_DIR}/unaccent.rules" "${PG_DATA_DIR}/german.rules"
+        sed -i 's/^\([ÄÖÜäöü]\t.*\)/\1e/' "${PG_DATA_DIR}/german.rules"
 
     - name: Run tests
       run: |

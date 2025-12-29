@@ -72,7 +72,13 @@ def test_daypass_single_date() -> None:
     assert form.whole_day == True
     assert form.quota == 4
     assert form.quota_limit == 1
-    assert form.data == {'access': 'public'}
+    assert form.data == {
+        'access': 'public',
+        'pricing_method': 'inherit',
+        'price_per_hour': 0.0,
+        'price_per_item': 0.0,
+        'currency': 'CHF',
+    }
 
 
 def test_daypass_multiple_dates() -> None:
@@ -116,7 +122,13 @@ def test_room_single_date() -> None:
     assert form.whole_day == False
     assert form.quota == 1
     assert form.quota_limit == 1
-    assert form.data == {'access': 'public'}
+    assert form.data == {
+        'access': 'public',
+        'pricing_method': 'inherit',
+        'price_per_hour': 0.0,
+        'price_per_item': 0.0,
+        'currency': 'CHF',
+    }
 
 
 def test_room_whole_day() -> None:
@@ -130,7 +142,13 @@ def test_room_whole_day() -> None:
     assert form.whole_day == True
     assert form.quota == 1
     assert form.quota_limit == 1
-    assert form.data == {'access': 'public'}
+    assert form.data == {
+        'access': 'public',
+        'pricing_method': 'inherit',
+        'price_per_hour': 0.0,
+        'price_per_item': 0.0,
+        'currency': 'CHF',
+    }
 
 
 def test_room_access() -> None:
@@ -145,7 +163,80 @@ def test_room_access() -> None:
     assert form.whole_day == True
     assert form.quota == 1
     assert form.quota_limit == 1
-    assert form.data == {'access': 'private'}
+    assert form.data == {
+        'access': 'private',
+        'pricing_method': 'inherit',
+        'price_per_hour': 0.0,
+        'price_per_item': 0.0,
+        'currency': 'CHF',
+    }
+
+
+def test_room_pricing_method_free() -> None:
+    form = RoomAllocationForm(data={
+        'start': date(2015, 8, 4),
+        'end': date(2015, 8, 4),
+        'as_whole_day': 'yes',
+        'pricing_method': 'free'
+    })
+
+    assert form.dates == [(datetime(2015, 8, 4), datetime(2015, 8, 4))]
+    assert form.whole_day == True
+    assert form.quota == 1
+    assert form.quota_limit == 1
+    assert form.data == {
+        'access': 'public',
+        'pricing_method': 'free',
+        'price_per_hour': 0.0,
+        'price_per_item': 0.0,
+        'currency': 'CHF',
+    }
+
+
+def test_room_pricing_method_per_hour() -> None:
+    form = RoomAllocationForm(data={
+        'start': date(2015, 8, 4),
+        'end': date(2015, 8, 4),
+        'as_whole_day': 'yes',
+        'pricing_method': 'per_hour',
+        'price_per_hour': 30.0,
+        'currency': 'USD'
+    })
+
+    assert form.dates == [(datetime(2015, 8, 4), datetime(2015, 8, 4))]
+    assert form.whole_day == True
+    assert form.quota == 1
+    assert form.quota_limit == 1
+    assert form.data == {
+        'access': 'public',
+        'pricing_method': 'per_hour',
+        'price_per_hour': 30.0,
+        'price_per_item': 0.0,
+        'currency': 'USD',
+    }
+
+
+def test_room_pricing_method_per_item() -> None:
+    form = RoomAllocationForm(data={
+        'start': date(2015, 8, 4),
+        'end': date(2015, 8, 4),
+        'as_whole_day': 'yes',
+        'pricing_method': 'per_item',
+        'price_per_item': 50.0,
+        'currency': 'USD'
+    })
+
+    assert form.dates == [(datetime(2015, 8, 4), datetime(2015, 8, 4))]
+    assert form.whole_day == True
+    assert form.quota == 1
+    assert form.quota_limit == 1
+    assert form.data == {
+        'access': 'public',
+        'pricing_method': 'per_item',
+        'price_per_hour': 0.0,
+        'price_per_item': 50.0,
+        'currency': 'USD',
+    }
 
 
 def test_room_multiple_dates() -> None:
@@ -292,6 +383,7 @@ def test_edit_room_allocation_form_whole_day() -> None:
         ('per_time_slot', 1),
         ('start_time', '08:00'),
         ('end_time', '08:00'),
+        ('pricing_method', 'inherit')
     ]))
     assert form.per_time_slot.data == 1
     form.request = Bunch(translate=lambda txt: txt, include=lambda src: None)  # type: ignore[assignment]
@@ -307,6 +399,7 @@ def test_edit_room_allocation_form_whole_day() -> None:
         ('per_time_slot', 1),
         ('start_time', '08:00'),
         ('end_time', '08:00'),
+        ('pricing_method', 'inherit')
     ]))
 
     assert form.validate()

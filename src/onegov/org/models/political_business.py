@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date
 from sqlalchemy import and_, or_, func, case
 from sqlalchemy import Column, Date, Enum, ForeignKey, Text
+from sqlalchemy import Table
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -17,7 +18,7 @@ from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.search import ORMSearchable, SearchIndex
-from onegov.search.utils import language_from_locale, normalize_text
+from onegov.search.utils import language_from_locale
 
 
 from typing import Literal, Self, TypeAlias, TYPE_CHECKING
@@ -95,6 +96,25 @@ POLITICAL_BUSINESS_STATUS: dict[PoliticalBusinessStatus, str] = {
 }
 
 
+# join table between political businesses and parliamentary groups
+par_political_business_parliamentary_groups = Table(
+    'par_political_business_parliamentary_groups',
+    Base.metadata,
+    Column(
+        'political_business_id',
+        UUID(as_uuid=True),
+        ForeignKey('par_political_businesses.id', ondelete='CASCADE'),
+        primary_key=True,
+    ),
+    Column(
+        'parliamentary_group_id',
+        UUID(as_uuid=True),
+        ForeignKey('par_parliamentary_groups.id', ondelete='CASCADE'),
+        primary_key=True,
+    ),
+)
+
+
 class PoliticalBusiness(
     AccessExtension,
     MultiAssociatedFiles,
@@ -124,6 +144,7 @@ class PoliticalBusiness(
 
     fts_type_title = _('Political Businesses')
     fts_public = True
+    fts_title_property = 'title'
     fts_properties = {
         'title': {'type': 'text', 'weight': 'A'},
         'number': {'type': 'text', 'weight': 'A'}
@@ -180,17 +201,13 @@ class PoliticalBusiness(
         order_by='desc(PoliticalBusinessParticipation.participant_type)',
     )
 
-    #: parliamentary group (Fraktion)
-    # FIXME: make multiple groups possible
-    parliamentary_group_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('par_parliamentary_groups.id'),
-        nullable=True,
-    )
-    parliamentary_group: relationship[RISParliamentaryGroup | None]
-    parliamentary_group = relationship(
+    #: parliamentary groups (Fraktionen)
+    parliamentary_groups: relationship[list[RISParliamentaryGroup]]
+    parliamentary_groups = relationship(
         'RISParliamentaryGroup',
-        back_populates='political_businesses'
+        secondary=par_political_business_parliamentary_groups,
+        back_populates='political_businesses',
+        passive_deletes=True
     )
 
     meeting_items: relationship[list[MeetingItem]] = relationship(
@@ -311,15 +328,15 @@ class PoliticalBusinessCollection(
         query = super().query()
 
         if self.term:
+            language = self.request.locale
+            if language_from_locale(language) == 'simple':
+                language = 'simple'
             query = query.join(
                 SearchIndex,
                 SearchIndex.owner_id_uuid == PoliticalBusiness.id
             )
-            query = query.filter(SearchIndex.fts_idx.op('@@')(
-                func.websearch_to_tsquery(
-                    language_from_locale(self.request.locale),
-                    normalize_text(self.term)
-                )
+            query = query.filter(SearchIndex.data_vector.op('@@')(
+                func.websearch_to_tsquery(language, self.term)
             ))
 
         if self.types:
@@ -403,6 +420,25 @@ class PoliticalBusinessCollection(
             self.query()
             .filter(PoliticalBusiness.display_name == display_name)  # type:ignore[comparison-overlap]
             .first()
+        )
+
+    def by_parliamentarian(
+        self,
+        parliamentarian_id: uuid.UUID
+    ) -> Query[PoliticalBusiness]:
+        """ Returns political businesses by given parliamentarian id """
+        return (
+            self.session.query(PoliticalBusiness)
+            .join(PoliticalBusinessParticipation)
+            .filter(
+                PoliticalBusinessParticipation.parliamentarian_id ==
+                parliamentarian_id
+            )
+            .order_by(
+                PoliticalBusiness.entry_date.desc(),
+                PoliticalBusiness.title
+            )
+            .distinct()
         )
 
 

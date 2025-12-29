@@ -7,7 +7,7 @@
             tal:define="item e.model"
             use-macro="layout.macros['access_hint']"
         />
-    </tal:b></a>
+    </tal:b><span tal:condition="not e.text" class="show-for-sr">${e.props.sr_text or ''}</span></a>
 </metal:b>
 
 <!--! An img element -->

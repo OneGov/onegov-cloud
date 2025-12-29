@@ -477,7 +477,7 @@
     <div class="activity-list-item card">
         <a href="${request.link(activity)}">
             <div class="grid-x align-middle">
-                <div tal:condition="activity.thumbnail|nothing" style="width: 100%; padding-bottom: 60%; background-image: url('${activity.thumbnail}'); background-size: cover;"></div>
+                <div class="activity-image" tal:condition="activity.thumbnail|nothing" style="width: 100%; padding-bottom: 60%; background-image: url('${activity.thumbnail}'); background-size: cover;"></div>
                 <div class="cell small-12 card-section">
 
                     <h5>${activity.title}</h5>

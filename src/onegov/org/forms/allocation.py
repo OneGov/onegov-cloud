@@ -8,6 +8,7 @@ from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, DAILY
 from uuid import uuid4
 from wtforms.fields import DateField
+from wtforms.fields import DecimalField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
@@ -16,6 +17,7 @@ from wtforms.validators import DataRequired, NumberRange, InputRequired
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TimeField
+from onegov.form.filters import as_float
 from onegov.org import _
 from onegov.org.forms.util import WEEKDAYS
 
@@ -295,6 +297,50 @@ class AllocationForm(Form, AllocationFormHelpers):
         default='yes',
         fieldset=_('Date'))
 
+    pricing_method = RadioField(
+        label=_('Price'),
+        fieldset=_('Payments'),
+        default='inherit',
+        validators=[InputRequired()],
+        choices=(
+            ('inherit', _('Inherit from resource')),
+            ('free', _('Free of charge')),
+            ('per_item', _('Per item')),
+            ('per_hour', _('Per hour'))
+        )
+    )
+
+    price_per_item = DecimalField(
+        label=_('Price per item'),
+        filters=(as_float,),
+        fieldset=_('Payments'),
+        validators=[InputRequired()],
+        depends_on=('pricing_method', 'per_item')
+    )
+
+    price_per_hour = DecimalField(
+        label=_('Price per hour'),
+        filters=(as_float,),
+        fieldset=_('Payments'),
+        validators=[InputRequired()],
+        depends_on=('pricing_method', 'per_hour')
+    )
+
+    # NOTE: Having a currency field is a little bit suspect, since we can't
+    #       really mix currencies currently anyways. But eventually we might
+    #       need it, so let's just add it now, even if it may cause some
+    #       issues in the mean time.
+    currency = StringField(
+        label=_('Currency'),
+        default='CHF',
+        fieldset=_('Payments'),
+        depends_on=(
+            'pricing_method', '!inherit',
+            'pricing_method', '!free',
+        ),
+        validators=[InputRequired()],
+    )
+
     access = RadioField(
         label=_('Access'),
         choices=(
@@ -392,7 +438,13 @@ class AllocationForm(Form, AllocationFormHelpers):
     @property
     def data(self) -> dict[str, Any]:
         """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
-        return {'access': self.access.data}
+        return {
+            'pricing_method': self.pricing_method.data,
+            'price_per_item': self.price_per_item.data,
+            'price_per_hour': self.price_per_hour.data,
+            'currency': self.currency.data,
+            'access': self.access.data
+        }
 
 
 class AllocationEditForm(Form, AllocationFormHelpers):
@@ -411,6 +463,46 @@ class AllocationEditForm(Form, AllocationFormHelpers):
         fieldset=_('Date')
     )
 
+    pricing_method = RadioField(
+        label=_('Price'),
+        fieldset=_('Payments'),
+        default='inherit',
+        validators=[InputRequired()],
+        choices=(
+            ('inherit', _('Inherit from resource')),
+            ('free', _('Free of charge')),
+            ('per_item', _('Per item')),
+            ('per_hour', _('Per hour'))
+        )
+    )
+
+    price_per_item = DecimalField(
+        label=_('Price per item'),
+        filters=(as_float,),
+        fieldset=_('Payments'),
+        validators=[InputRequired()],
+        depends_on=('pricing_method', 'per_item')
+    )
+
+    price_per_hour = DecimalField(
+        label=_('Price per hour'),
+        filters=(as_float,),
+        fieldset=_('Payments'),
+        validators=[InputRequired()],
+        depends_on=('pricing_method', 'per_hour')
+    )
+
+    currency = StringField(
+        label=_('Currency'),
+        default='CHF',
+        fieldset=_('Payments'),
+        depends_on=(
+            'pricing_method', '!inherit',
+            'pricing_method', '!free',
+        ),
+        validators=[InputRequired()],
+    )
+
     access = RadioField(
         label=_('Access'),
         choices=(
@@ -426,11 +518,27 @@ class AllocationEditForm(Form, AllocationFormHelpers):
     @property
     def data(self) -> dict[str, Any]:
         """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
-        return {'access': self.access.data}
+        return {
+            'pricing_method': self.pricing_method.data,
+            'price_per_item': self.price_per_item.data,
+            'price_per_hour': self.price_per_hour.data,
+            'currency': self.currency.data,
+            'access': self.access.data
+        }
 
     def apply_data(self, data: dict[str, Any] | None) -> None:
-        if data and 'access' in data:
+        if not data:
+            return
+        if 'access' in data:
             self.access.data = data['access']
+        if 'pricing_method' in data:
+            self.pricing_method.data = data['pricing_method']
+        if 'price_per_item' in data:
+            self.price_per_item.data = data['price_per_item']
+        if 'price_per_hour' in data:
+            self.price_per_hour.data = data['price_per_hour']
+        if 'currency' in data:
+            self.currency.data = data['currency']
 
 
 class Daypasses:

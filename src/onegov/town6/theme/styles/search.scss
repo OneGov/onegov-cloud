@@ -145,3 +145,10 @@
 .search-preview {
     color: $jumbo;
 }
+
+.search-results em {
+    color: $red !important;
+    font-style: initial;
+    font-weight: bold;
+    text-decoration: underline;
+}

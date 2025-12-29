@@ -1109,7 +1109,6 @@ class OrgTicketSettingsForm(Form):
     mute_all_tickets = BooleanField(
         label=_('Mute all tickets'),
         fieldset=_('Notifications'),
-
     )
 
     ticket_always_notify = BooleanField(

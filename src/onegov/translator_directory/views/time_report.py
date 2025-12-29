@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import csv
 import json
+from onegov.translator_directory.i18n import _
 from io import StringIO
 from webob import Response
 from datetime import datetime
@@ -20,7 +21,8 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
 )
 
 from onegov.core.security import Private, Personal
-from onegov.translator_directory import TranslatorDirectoryApp, _
+from onegov.translator_directory import TranslatorDirectoryApp
+from onegov.org.cli import close_ticket
 from onegov.org.mail import send_ticket_mail
 from onegov.translator_directory.collections.time_report import (
     TimeReportCollection,
@@ -38,9 +40,17 @@ from onegov.translator_directory.models.ticket import (
     TimeReportTicket,
     TimeReportHandler,
 )
-from onegov.translator_directory.constants import ASSIGNMENT_LOCATIONS
+from onegov.translator_directory.constants import (
+    ASSIGNMENT_LOCATIONS,
+    FINANZSTELLE,
+    LOHNART_COMPENSATION,
+    LOHNART_EXPENSES,
+)
 from onegov.translator_directory.models.time_report import (
     TranslatorTimeReport,
+)
+from onegov.translator_directory.utils import (
+    get_accountant_emails_for_finanzstelle,
 )
 from onegov.org.models.message import TimeReportMessage
 from onegov.user import User
@@ -59,7 +69,7 @@ if TYPE_CHECKING:
 @TranslatorDirectoryApp.html(
     model=TimeReportCollection,
     template='time_reports.pt',
-    permission=Private,
+    permission=Personal,
 )
 def view_time_reports(
     self: TimeReportCollection,
@@ -243,10 +253,10 @@ def accept_time_report(
 
     time_report.status = 'confirmed'
     handler.data['state'] = 'accepted'
+    assert request.current_user is not None
+    close_ticket(self, request.current_user, request)
 
     if translator and translator.email:
-        call_to_action_link = request.link(self)
-
         pdf_bytes = generate_time_report_pdf_bytes(
             time_report, translator, request
         )
@@ -261,6 +271,23 @@ def accept_time_report(
             content_type='application/pdf',
         )
 
+        travel_info = None
+        if (time_report.assignment_location
+                and time_report.travel_distance):
+            location_name, _address = ASSIGNMENT_LOCATIONS.get(
+                time_report.assignment_location,
+                (time_report.assignment_location, '')
+            )
+            translator_address = (
+                f'{translator.address}, '
+                f'{translator.zip_code} {translator.city}'
+            )
+            travel_info = {
+                'from_address': translator_address,
+                'to_location': location_name,
+                'distance': time_report.travel_distance
+            }
+
         send_ticket_mail(
             request=request,
             template='mail_time_report_accepted.pt',
@@ -271,13 +298,56 @@ def accept_time_report(
                 'model': self,
                 'translator': translator,
                 'time_report': time_report,
-                'call_to_action_link': call_to_action_link,
+                'travel_info': travel_info,
             },
             attachments=[pdf_attachment],
         )
 
     request.success(_('Time report accepted'))
     return request.redirect(request.link(self))
+
+
+def calculate_accounting_values(
+    report: TranslatorTimeReport,
+) -> tuple[Decimal, Decimal, Decimal]:
+    """Calculate accounting values for a time report.
+
+    The L001 CSV format supports: hours × rate = compensation
+    But translator compensation is complex:
+      - Night work: +50% surcharge (20:00-06:00)
+      - Weekend/holiday: +25% surcharge (non-night hours only)
+      - Urgent assignments: +25% on all work
+      - Break time: deducted at base rate
+
+    We cannot export the breakdown as separate line items because
+    of break time. Break time is negative numbers which are probably
+    not supported by the accounting system.
+
+    Instead, we back-calculate an effective hourly rate that,
+    when multiplied by total hours, produces the correct total.
+    We have tests that validate the result is the same in both directions.
+
+    Example:
+      8h total (6 day + 2 night), CHF 100/h base, weekend work
+      Actual: 6×100 + 2×150 + 6×25 - 0.5×100 = CHF 1'000
+      Export: 8h × CHF 125/h = CHF 1'000
+
+    Returns:
+        tuple of (duration_hours, effective_rate, recalculated_subtotal)
+        where recalculated_subtotal = duration_hours * effective_rate
+
+    The recalculated_subtotal should match breakdown['adjusted_subtotal']
+    within rounding tolerance.
+    """
+    breakdown = report.calculate_compensation_breakdown()
+    duration_hours = report.duration_hours
+    assert duration_hours > 0
+
+    effective_rate = breakdown['adjusted_subtotal'] / duration_hours
+    effective_rate_rounded = effective_rate.quantize(Decimal('0.01'))
+    recalculated_subtotal = duration_hours * effective_rate_rounded
+
+    return duration_hours, effective_rate_rounded, recalculated_subtotal
 
 
 def generate_accounting_export_rows(
@@ -292,31 +362,29 @@ def generate_accounting_export_rows(
         pers_nr = str(translator.pers_id)
         date_str = report.assignment_date.strftime('%d.%m.%Y')
 
-        duration_hours = str(report.duration_hours)
+        duration_hours, effective_rate, _ = calculate_accounting_values(report)
+        duration_hours_str = str(duration_hours)
+        effective_rate_str = str(effective_rate)
 
-        # Calculate effective rate from actual compensation
-        # (since we can't use a simple percentage with partial night work)
-        breakdown = report.calculate_compensation_breakdown()
-        if report.duration_hours > 0:
-            effective_rate = breakdown['subtotal'] / report.duration_hours
-        else:
-            effective_rate = report.hourly_rate
-        effective_rate_str = str(effective_rate.quantize(Decimal('0.01')))
+        finanzstelle_info = FINANZSTELLE.get(report.finanzstelle)
+        if not finanzstelle_info:
+            raise ValueError(f'Unknown finanzstelle: {report.finanzstelle}')
+        kostenstelle = finanzstelle_info.kostenstelle
 
         row_2603 = [
             'L001',
             pers_nr,
             date_str,
             '0',
-            '2603',
+            LOHNART_COMPENSATION,
             '0',
             '',
             'VWG Entschädigung Dolmetscher',
-            duration_hours,
+            duration_hours_str,
             '1',
             effective_rate_str,
             '1',
-            '0',
+            kostenstelle,
             '0',
             '0',
             '0',
@@ -345,7 +413,7 @@ def generate_accounting_export_rows(
                 pers_nr,
                 date_str,
                 '0',
-                '8102',
+                LOHNART_EXPENSES,
                 '0',
                 '',
                 'VWG Reisespesen Dolmetscher',
@@ -353,7 +421,7 @@ def generate_accounting_export_rows(
                 '1',
                 '0',
                 '0',
-                '0',
+                kostenstelle,
                 '0',
                 '0',
                 '0',
@@ -382,7 +450,7 @@ def generate_accounting_export_rows(
                 pers_nr,
                 date_str,
                 '0',
-                '8102',
+                LOHNART_EXPENSES,
                 '0',
                 '',
                 'VWG Reisespesen Dolmetscher',  # Verpflegung
@@ -390,7 +458,7 @@ def generate_accounting_export_rows(
                 '1',
                 '0',
                 '0',
-                '0',
+                kostenstelle,
                 '0',
                 '0',
                 '0',
@@ -417,7 +485,7 @@ def generate_accounting_export_rows(
 @TranslatorDirectoryApp.view(
     model=TimeReportCollection,
     name='export-accounting',
-    permission=Private,
+    permission=Personal,
     request_method='POST',
 )
 def export_accounting_csv(
@@ -468,7 +536,7 @@ def export_accounting_csv(
     output = StringIO()
     writer = csv.writer(output, delimiter=';')
 
-    # Header row MUST NOT be included: the accounting system will reject
+    # Header row must not be included: the accounting system will reject
     # the import if a header is present. Kept here for documentation and
     # debugging purposes.
     # header = [
@@ -532,6 +600,10 @@ def generate_time_report_pdf_bytes(
     with open(css_path) as f:
         css = CSS(string=f.read(), font_config=font_config)
 
+    # Get ticket number for display
+    ticket = time_report.get_ticket(request.session)
+    ticket_number = ticket.number if ticket else None
+
     assignment_date_display = layout.format_date(
         time_report.assignment_date, 'date'
     )
@@ -573,7 +645,14 @@ def generate_time_report_pdf_bytes(
         else f'{time_report.duration_hours} Stunden'
     )
 
-    logo_url = request.app.org.logo_url if request.app.org.logo_url else None
+    finanzstelle = FINANZSTELLE.get(time_report.finanzstelle)
+    show_logo = (
+        finanzstelle is not None
+        and 'polizei' in finanzstelle.name.lower()
+        and request.app.org.logo_url
+    )
+    logo_url = request.app.org.logo_url if show_logo else None
+
     html_content = """
         <!DOCTYPE html>
         <html>
@@ -596,6 +675,21 @@ def generate_time_report_pdf_bytes(
                 <div class="letter-date">
                     {letter_date}
                 </div>
+            </div>
+
+            <div class="sender-address">
+    """
+
+    if finanzstelle:
+        html_content += f"""
+                <p>
+                    {finanzstelle.name}<br>
+                    {finanzstelle.street}<br>
+                    {finanzstelle.zip_code} {finanzstelle.city}
+                </p>
+    """
+
+    html_content += f"""
             </div>
 
             <div class="translator-info">
@@ -626,7 +720,7 @@ def generate_time_report_pdf_bytes(
 
             <div class="intro-text">
                 <p>
-                    Ihre Rapportierung wurde durch die Rechnungsführerin
+                    Ihre Rapportierung wurde durch das Rechnungswesen
                     bestätigt.
                 </p>
             </div>
@@ -638,8 +732,23 @@ def generate_time_report_pdf_bytes(
                     </strong>
                     {assignment_date_display}
                 </p>
-            </div>
+    """
 
+    if ticket_number:
+        html_content += f"""
+                <p>
+                    <strong>
+                        {request.translate(_('Ticket Number'))}:
+                    </strong>
+                    {ticket_number}
+                </p>
+    """
+
+    html_content += """
+            </div>
+    """
+
+    html_content += f"""
             <div class="compensation">
                 <table class="compensation-table">
                     <tr>
@@ -852,18 +961,22 @@ def generate_time_report_pdf_bytes(
             </div>
     """
 
-    accountant_email = request.app.accountant_email
     accountant_name = ''
-    if (
-        accountant_email
-        and (
-            accountant_user := request.session.query(User)
-            .filter(func.lower(User.username) == accountant_email.lower())
-            .first()
+    try:
+        accountant_emails = get_accountant_emails_for_finanzstelle(
+            request, time_report.finanzstelle
         )
-        and accountant_user.realname
-    ):
-        accountant_name = accountant_user.realname
+        if accountant_emails:
+            first_email = next(iter(accountant_emails))
+            accountant_user = (
+                request.session.query(User)
+                .filter(func.lower(User.username) == first_email.lower())
+                .first()
+            )
+            if accountant_user and accountant_user.realname:
+                accountant_name = accountant_user.realname
+    except ValueError:
+        pass
 
     closing_text = 'Mit freundlichen Grüssen<br><br>Rechnungsbüro'
     if accountant_name:

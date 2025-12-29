@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from onegov.org.models.political_business import (
+    par_political_business_parliamentary_groups
+)
 from onegov.org.i18n import _
 from onegov.parliament.collections import CommissionCollection
 from onegov.parliament.collections import CommissionMembershipCollection
@@ -33,6 +36,7 @@ class RISCommission(Commission, ORMSearchable):
 
     fts_type_title = _('Commissions')
     fts_public = True
+    fts_title_property = 'name'
     fts_properties = {
         'name': {'type': 'text', 'weight': 'A'},
         'description': {'type': 'text', 'weight': 'B'}
@@ -112,6 +116,7 @@ class RISParliamentarian(Parliamentarian, ORMSearchable):
 
     fts_type_title = _('Parliamentarians')
     fts_public = True
+    fts_title_property = 'title'
     fts_properties = {
         'first_name': {'type': 'text', 'weight': 'A'},
         'last_name': {'type': 'text', 'weight': 'A'},
@@ -216,6 +221,7 @@ class RISParliamentaryGroup(ParliamentaryGroup, ORMSearchable):
 
     fts_type_title = _('Parliamentary groups')
     fts_public = True
+    fts_title_property = 'name'
     fts_properties = {
         'name': {'type': 'text', 'weight': 'A'},
         'description': {'type': 'text', 'weight': 'B'}
@@ -234,7 +240,9 @@ class RISParliamentaryGroup(ParliamentaryGroup, ORMSearchable):
     political_businesses: relationship[list[PoliticalBusiness]]
     political_businesses = relationship(
         'PoliticalBusiness',
-        back_populates='parliamentary_group'
+        secondary=par_political_business_parliamentary_groups,
+        back_populates='parliamentary_groups',
+        passive_deletes=True
     )
 
 

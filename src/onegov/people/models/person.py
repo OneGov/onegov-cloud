@@ -55,6 +55,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #       so we just manually specify it for now.
     fts_type_title = TranslationString('People', domain='onegov.org')
     fts_public = True
+    fts_title_property = 'title'
     fts_properties = {
         'title': {'type': 'text', 'weight': 'A'},
         'function': {'type': 'localized', 'weight': 'B'},

@@ -795,20 +795,83 @@ def mute_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
             'number': self.number
         }))
 
-    return morepath.redirect(request.link(self))
+    return request.redirect(request.link(self))
 
 
 @OrgApp.view(model=Ticket, name='unmute', permission=Private)
 def unmute_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
-    self.muted = False
+    # imported events cannot be unmuted
+    if not self.handler.data.get('source'):
+        self.muted = False
 
-    TicketMessage.create(self, request, 'unmuted')
-    request.success(
-        _('You have enabled e-mails for ticket ${number}', mapping={
-            'number': self.number
-        }))
+        TicketMessage.create(self, request, 'unmuted')
+        request.success(
+            _('You have enabled e-mails for ticket ${number}', mapping={
+                'number': self.number
+            }))
 
-    return morepath.redirect(request.link(self))
+    return request.redirect(request.link(self))
+
+
+@OrgApp.view(model=Ticket, name='mute-related', permission=Private)
+def mute_related_tickets(self: Ticket, request: OrgRequest) -> BaseResponse:
+    muted = []
+    if self.order_id is not None:
+        tickets = TicketCollection(request.session)
+        for ticket in request.exclude_invisible(
+            tickets.by_order(self.order_id).filter(
+                Ticket.id != self.id
+            )
+        ):
+            if not ticket.muted:
+                ticket.muted = True
+                TicketMessage.create(ticket, request, 'muted')
+                muted.append(ticket)
+
+    if muted:
+        request.success(
+            _('You have disabled e-mails for tickets ${numbers}', mapping={
+                'numbers': ', '.join(t.number for t in muted)
+            }) if len(muted) > 1 else
+            _('You have disabled e-mails for ticket ${number}', mapping={
+                'number': muted[0].number
+            })
+        )
+    else:
+        request.warning(_('There were no related tickets to mute'))
+
+    return request.redirect(request.link(self))
+
+
+@OrgApp.view(model=Ticket, name='unmute-related', permission=Private)
+def unmute_related_tickets(self: Ticket, request: OrgRequest) -> BaseResponse:
+    unmuted = []
+    if self.order_id is not None:
+        tickets = TicketCollection(request.session)
+        for ticket in request.exclude_invisible(
+            tickets.by_order(self.order_id).filter(
+                Ticket.id != self.id
+            )
+        ):
+            # imported events cannot be unmuted
+            if ticket.muted and not ticket.handler.data.get('source'):
+                ticket.muted = False
+                TicketMessage.create(ticket, request, 'unmuted')
+                unmuted.append(ticket)
+
+    if unmuted:
+        request.success(
+            _('You have enabled e-mails for tickets ${numbers}', mapping={
+                'numbers': ', '.join(t.number for t in unmuted)
+            }) if len(unmuted) > 1 else
+            _('You have enabled e-mails for ticket ${number}', mapping={
+                'number': unmuted[0].number
+            })
+        )
+    else:
+        request.warning(_('There were no related tickets to unmute'))
+
+    return request.redirect(request.link(self))
 
 
 @OrgApp.view(model=Ticket, name='archive', permission=Private)
@@ -1014,7 +1077,7 @@ def message_to_submitter(
                 text=form.text.data,
                 owner=request.current_username,
                 recipient=recipient,
-                notify=form.notify.data,
+                notify=form.notify.data if form.notify is not None else True,
                 origin='internal')
 
             fe = form.email_attachment
@@ -1029,7 +1092,7 @@ def message_to_submitter(
 
             request.success(_('Your message has been sent'))
             return morepath.redirect(request.link(self))
-    elif not request.POST:
+    elif not request.POST and form.notify is not None:
         # show the same notification setting as was selected with the
         # last internal message - otherwise default to False
         last_internal = last_internal_message(request.session, self.number)

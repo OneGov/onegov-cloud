@@ -1,18 +1,16 @@
 from __future__ import annotations
 
-from enum import Enum
 import inspect
-from operator import itemgetter
-
 import phonenumbers
 import sedate
 
 from cssutils.css import CSSStyleSheet  # type:ignore[import-untyped]
 from datetime import timedelta
+from enum import Enum
 from itertools import zip_longest
 from email_validator import validate_email, EmailNotValidError
 from markupsafe import escape, Markup
-
+from onegov.core.custom import json
 from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
 from onegov.core.utils import dictionary_to_binary
@@ -32,9 +30,11 @@ from onegov.form.widgets import PanelWidget
 from onegov.form.widgets import PreviewWidget
 from onegov.form.widgets import TagsWidget
 from onegov.form.widgets import TextAreaWithTextModules
+from onegov.form.widgets import TreeSelectWidget
 from onegov.form.widgets import TypeAheadInput
 from onegov.form.widgets import UploadWidget
 from onegov.form.widgets import UploadMultipleWidget
+from operator import itemgetter
 from webcolors import name_to_hex, normalize_hex
 from werkzeug.datastructures import MultiDict
 from wtforms.fields import DateTimeLocalField as DateTimeLocalFieldBase
@@ -57,15 +57,16 @@ from wtforms.widgets import CheckboxInput, ColorInput, TextInput
 
 from typing import Any, IO, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator, Sequence
+    from collections.abc import Callable, Iterable, Iterator, Sequence
     from datetime import datetime
     from onegov.core.types import FileDict as StrictFileDict, LaxFileDict
     from onegov.file import File
     from onegov.form import Form
     from onegov.form.types import (
         FormT, Filter, PricingRules, RawFormValue, Validators, Widget)
-    from typing import TypedDict, Self
+    from typing import NotRequired, TypedDict, Self
     from webob.request import _FieldStorageWithFile
+    from wtforms.fields.choices import _Choice
     from wtforms.form import BaseForm
     from wtforms.meta import (
         _MultiDictLikeWithGetlist, _SupportsGettextAndNgettext, DefaultMeta)
@@ -76,17 +77,29 @@ if TYPE_CHECKING:
         mimetype: str
         size: int
 
+    class TreeSelectNode(TypedDict):
+        name: str
+        value: str
+        children: Sequence[TreeSelectNode]
+        disabled: NotRequired[bool]
+        isGroupSelectable: NotRequired[bool]
+        htmlAttr: NotRequired[dict[str, str]]
+
     # this is only generic at type checking time
     class UploadMultipleBase(FieldList['UploadField']):
         pass
+
+    _TreeSelectMixinBase = SelectField
 else:
     UploadMultipleBase = FieldList
+    _TreeSelectMixinBase = object
 
 
 FIELDS_NO_RENDERED_PLACEHOLDER = (
     'MultiCheckboxField', 'RadioField', 'OrderedMultiCheckboxField',
     'UploadField', 'ChosenSelectField', 'ChosenSelectMultipleField',
-    'PreviewField', 'PanelField', 'UploadFileWithORMSupport'
+    'PreviewField', 'PanelField', 'UploadFileWithORMSupport',
+    'TreeSelectField', 'TreeSelectMultipleField'
 )
 
 
@@ -760,6 +773,93 @@ class PhoneNumberField(TelField):
             )
         except Exception:
             return self.data
+
+
+class _TreeSelectMixin(_TreeSelectMixinBase):
+
+    def __init__(
+        self,
+        label: str | None = None,
+        validators: Validators[FormT, Self] | None = None,
+        coerce: Callable[[Any], Any] = str,
+        choices: Iterable[TreeSelectNode] | None = None,
+        validate_choice: bool = True,
+        *,
+        filters: Sequence[Filter] = (),
+        description: str = '',
+        id: str | None = None,
+        default: object | None = None,
+        widget: Widget[Self] | None = None,
+        option_widget: Widget[SelectField._Option] | None = None,
+        render_kw: dict[str, Any] | None = None,
+        name: str | None = None,
+        _form: BaseForm | None = None,
+        _prefix: str = '',
+        _translations: _SupportsGettextAndNgettext | None = None,
+        _meta: DefaultMeta | None = None,
+        # onegov specific kwargs that get popped off
+        fieldset: str | None = None,
+        depends_on: Sequence[Any] | None = None,
+        pricing: PricingRules | None = None,
+        discount: dict[str, float] | None = None,
+    ) -> None:
+
+        if not render_kw:
+            render_kw = {}
+
+        if choices is None:
+            choices = []
+        elif not isinstance(choices, (list, tuple)):
+            choices = list(choices)
+
+        render_kw['data-choices'] = json.dumps(choices)
+
+        super().__init__(
+            label=label,
+            validators=validators,
+            coerce=coerce,
+            choices=self.flatten_choices(choices) if choices else None,
+            validate_choice=validate_choice,
+            filters=filters,
+            description=description,
+            id=id,
+            default=default,
+            widget=widget,
+            option_widget=option_widget,
+            render_kw=render_kw,
+            name=name,
+            _form=_form,
+            _prefix=_prefix,
+            _translations=_translations,
+            _meta=_meta,
+        )
+
+    def flatten_choices(
+        self,
+        choices: Iterable[TreeSelectNode]
+    ) -> Iterator[_Choice]:
+        for choice in choices:
+            yield choice['value'], choice['name']
+            yield from self.flatten_choices(choice['children'])
+
+    def set_choices(self, choices: Iterable[TreeSelectNode]) -> None:
+        if not self.render_kw:
+            self.render_kw = {}
+
+        self.render_kw['data-choices'] = json.dumps(choices)
+        self.choices = list(self.flatten_choices(choices))
+
+
+class TreeSelectField(_TreeSelectMixin, SelectField):
+    """ A select field with treeselectjs support. """
+
+    widget = TreeSelectWidget()
+
+
+class TreeSelectMultipleField(_TreeSelectMixin, SelectMultipleField):
+    """ A select field with treeselectjs support. """
+
+    widget = TreeSelectWidget(multiple=True)
 
 
 class ChosenSelectField(SelectField):

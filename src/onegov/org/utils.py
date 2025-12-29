@@ -736,19 +736,28 @@ def event_color(event_name: str) -> str:
 
 class ReservationEventInfo:
 
-    __slots__ = ('resource', 'reservation', 'ticket', 'request', 'translate')
+    __slots__ = (
+        'resource',
+        'reservation',
+        'ticket',
+        'extra',
+        'request',
+        'translate'
+    )
 
     def __init__(
         self,
         resource: Resource,
         reservation: Reservation,
         ticket: Ticket,
+        extra: Sequence[str],
         request: OrgRequest,
     ) -> None:
 
         self.resource = resource
         self.reservation = reservation
         self.ticket = ticket
+        self.extra = extra
         self.request = request
         self.translate = request.translate
 
@@ -757,7 +766,7 @@ class ReservationEventInfo:
         cls,
         request: OrgRequest,
         resource: Resource,
-        reservations: Iterable[tuple[Reservation, Ticket]]
+        reservations: Iterable[tuple[Reservation, Ticket, *tuple[str, ...]]]
     ) -> list[Self]:
 
         return [
@@ -765,26 +774,10 @@ class ReservationEventInfo:
                 resource,
                 reservation,
                 ticket,
+                extra,
                 request
             )
-            for reservation, ticket in reservations
-        ]
-
-    @classmethod
-    def from_resources(
-        cls,
-        request: OrgRequest,
-        reservations: Iterable[tuple[Resource, Reservation, Ticket]]
-    ) -> list[Self]:
-
-        return [
-            cls(
-                resource,
-                reservation,
-                ticket,
-                request
-            )
-            for resource, reservation, ticket in reservations
+            for reservation, ticket, *extra in reservations
         ]
 
     @property
@@ -826,12 +819,13 @@ class ReservationEventInfo:
     @property
     def event_title(self) -> str:
         return '\n'.join(part for part in (
-            self.ticket.number,
+            self.ticket.tag or self.reservation.email,
+            *self.extra,
+            self.reservation.email if self.ticket.tag else '',
             self.event_time,
             f'{self.translate(_("Quota"))}: {self.quota}'
             if getattr(self.resource, 'show_quota', False) else '',
-            self.ticket.tag,
-            self.reservation.email,
+            self.ticket.number,
             self.translate(_('Pending approval')) if not self.accepted else '',
         ) if part)
 

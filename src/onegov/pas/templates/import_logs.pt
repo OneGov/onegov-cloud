@@ -33,11 +33,8 @@
                 </tr>
             </thead>
             <tbody>
-                <tr tal:repeat="log_entry logs"
-                    class="clickable-row"
-                    onclick="window.location.href='${request.link(log_entry.log)}'"
-                    style="cursor: pointer;">
-                    <td>${layout.format_date(log_entry.log.created, 'datetime_long')}</td>
+                <tr tal:repeat="log_entry logs">
+                    <td><a href="${request.link(log_entry.log)}">${layout.format_date(log_entry.log.created, 'datetime_long')}</a></td>
                     <td>${log_entry.log.user.username if log_entry.log.user else request.translate('System')}</td>
                     <td style="display: none;">
                         <span class="import-type ${log_entry.log.import_type}" tal:content="log_entry.translated_import_type"></span>

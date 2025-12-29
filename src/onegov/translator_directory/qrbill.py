@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from io import BytesIO
 from onegov.translator_directory import log
+from onegov.translator_directory.constants import FINANZSTELLE
 from qrbill.bill import QRBill
 from stdnum import iban as iban_validator
 from weasyprint import HTML  # type: ignore[import-untyped]
@@ -61,13 +62,23 @@ def generate_translator_qr_bill(
         'line2': f'{translator.zip_code} {translator.city}',
     }
 
-    # Debtor (organization) - hardcoded for now
-    # TODO: Move to organization settings
+    debtor_name = 'Polizei Schaffhausen'
+    debtor_street = 'Beckenstube 1'
+    debtor_pcode = '8200'
+    debtor_city = 'Schaffhausen'
+
+    if time_report.finanzstelle and time_report.finanzstelle in FINANZSTELLE:
+        finanzstelle = FINANZSTELLE[time_report.finanzstelle]
+        debtor_name = finanzstelle.name
+        debtor_street = finanzstelle.street
+        debtor_pcode = finanzstelle.zip_code
+        debtor_city = finanzstelle.city
+
     debtor = {
-        'name': 'Zentrale Polizeistation',
-        'street': 'Beckstube 1',
-        'pcode': '8200',
-        'city': 'Schaffhausen',
+        'name': debtor_name,
+        'street': debtor_street,
+        'pcode': debtor_pcode,
+        'city': debtor_city,
     }
 
     # Amount

@@ -25,6 +25,7 @@ class PASParliamentarian(Parliamentarian, ORMSearchable):
 
     fts_type_title = _('Parliamentarians')
     fts_public = False
+    fts_title_property = 'title'
     fts_properties = {
         # FIXME: A fullname property may yield better results
         'first_name': {'type': 'text', 'weight': 'A'},

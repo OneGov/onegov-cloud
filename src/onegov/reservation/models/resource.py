@@ -141,6 +141,9 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     #: the cost center / cost unit identifier for this resource
     cost_object: dict_property[str | None] = content_property()
 
+    #: extra field values to include in the occupancy view
+    occupancy_fields: dict_property[list[str]] = content_property(default=list)
+
     #: extra field values to include in the ical event description
     ical_fields: dict_property[list[str]] = content_property(default=list)
 
@@ -152,7 +155,11 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     lead_time: dict_property[int | None] = content_property()
 
     #: the pricing method to use for extras defined in formcode
-    extras_pricing_method: dict_property[str | None] = content_property()
+    extras_pricing_method: dict_property[str]
+    extras_pricing_method = content_property(default='per_item')
+
+    #: the discount method to use
+    discount_method: dict_property[str] = content_property(default='resource')
 
     #: the default view
     default_view: dict_property[str | None] = content_property()
@@ -289,6 +296,10 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         items: list[InvoiceItemMeta] = []
         extras_quantity = Decimal('0')
         for reservation in reservations:
+            # FIXME: We could speed this up by loading all of the
+            #        targeted allocations ahead of time and passing
+            #        the correct allocation here. Right now there's
+            #        a N+1 situation for loading target allocations.
             item = reservation.invoice_item(self)
             if item is not None:
                 items.append(item)
@@ -314,7 +325,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
                             / Decimal('3600')
                         )
 
-                    case 'per_item' | None:
+                    case 'per_item':
                         extras_quantity += Decimal(reservation.quota)
 
                     case _:  # pragma: unreachable
@@ -327,23 +338,31 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         total = InvoiceItemMeta.total(items)
         extras_total = InvoiceItemMeta.total(extras)
 
-        # TODO: Currently discounts only apply to the total before
-        #       the extras are applied, in the future we may have
-        #       discounts that only apply to the extras or both
-        discount_items: list[InvoiceItemMeta] = []
-        if discounts:
-            remainder = total
-            for discount in discounts:
-                item = discount.apply_discount(total, remainder)
-                remainder += item.amount
-                assert remainder >= Decimal('0')
-                discount_items.append(item)
-            total = remainder
+        match self.discount_method:
+            case 'resource':
+                discount_total = total
+            case 'extras':
+                discount_total = extras_total
+            case 'everything':
+                discount_total = total + extras_total
+            case _:  # pragma: unreachable
+                raise ValueError('unhandled extras pricing method')
 
         if extras_total and total:
             total += extras_total
         elif extras_total:
             total = extras_total
+
+        discount_items: list[InvoiceItemMeta] = []
+        if discounts:
+            remainder = discount_total
+            for discount in discounts:
+                item = discount.apply_discount(discount_total, remainder)
+                remainder += item.amount
+                assert remainder >= Decimal('0')
+                # update the total amount
+                total += item.amount
+                discount_items.append(item)
 
         items = items + discount_items + extras
 
