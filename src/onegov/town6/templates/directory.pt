@@ -47,6 +47,13 @@
                                     </li>
                                 </tal:block>
                             </ul>
+                            <ul style="list-style: none; margin-left: 0">
+                                <li>
+                                    <a tal:condition="request.is_manager" class="edit-link" tal:attributes="href request.link(entry)">
+                                        <i class="far fa-edit"></i>
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
                     </li>
                 </ul>
