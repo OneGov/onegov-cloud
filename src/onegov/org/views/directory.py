@@ -237,7 +237,7 @@ def handle_edit_directory(
                             'The requested change cannot be performed, '
                             'as it is incompatible with existing entries'
                         ))
-                        migration.alert_migration_issues(request)
+                        migration.alert_issues(request)
                     else:
                         if not request.params.get('confirm'):
                             form.action += '&confirm=1'

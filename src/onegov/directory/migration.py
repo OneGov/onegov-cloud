@@ -89,7 +89,7 @@ class DirectoryMigration:
 
         return False
 
-    def alert_migration_issues(self, request: OrgRequest) -> None:
+    def alert_issues(self, request: OrgRequest) -> None:
         """ Alerts the user via the request about the migration issues."""
         if self.possible:
             return None
