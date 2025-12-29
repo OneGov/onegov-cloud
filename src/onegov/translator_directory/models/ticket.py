@@ -16,6 +16,7 @@ from onegov.translator_directory.collections.documents import (
     TranslatorDocumentCollection)
 from onegov.translator_directory.constants import (
     TIME_REPORT_INTERPRETING_TYPES,
+    INTERPRETING_TYPES,
     ASSIGNMENT_LOCATIONS,
     FINANZSTELLE
 )
@@ -230,6 +231,15 @@ class TimeReportHandler(Handler):
         return self.data.get('state')
 
     @property
+    def show_links_when_closed(self) -> bool:
+        """Allow showing handler links even when ticket is closed.
+
+        This allows users to download PDFs and QR bills after the
+        time report has been accepted and the ticket closed.
+        """
+        return True
+
+    @property
     def title(self) -> str:
         return self.translator.title if self.translator else '<Deleted>'
 
@@ -278,9 +288,15 @@ class TimeReportHandler(Handler):
         assignment_type_key = report.assignment_type
         assignment_type_translated = '-'
         if assignment_type_key:
-            assignment_type_translated = request.translate(
-                TIME_REPORT_INTERPRETING_TYPES[assignment_type_key]
-            )
+            if assignment_type_key in TIME_REPORT_INTERPRETING_TYPES:
+                assignment_type_translated = request.translate(
+                    TIME_REPORT_INTERPRETING_TYPES[assignment_type_key]
+                )
+                # Be backwards compatible:
+            elif assignment_type_key in INTERPRETING_TYPES:
+                assignment_type_translated = request.translate(
+                    INTERPRETING_TYPES[assignment_type_key]
+                )
 
         assignment_date_formatted = escape(
             layout.format_date(report.assignment_date, 'date')

@@ -22,6 +22,7 @@ from weasyprint.text.fonts import (  # type: ignore[import-untyped]
 
 from onegov.core.security import Private, Personal
 from onegov.translator_directory import TranslatorDirectoryApp
+from onegov.org.cli import close_ticket
 from onegov.org.mail import send_ticket_mail
 from onegov.translator_directory.collections.time_report import (
     TimeReportCollection,
@@ -252,10 +253,10 @@ def accept_time_report(
 
     time_report.status = 'confirmed'
     handler.data['state'] = 'accepted'
+    assert request.current_user is not None
+    close_ticket(self, request.current_user, request)
 
     if translator and translator.email:
-        call_to_action_link = request.link(self)
-
         pdf_bytes = generate_time_report_pdf_bytes(
             time_report, translator, request
         )
@@ -297,7 +298,6 @@ def accept_time_report(
                 'model': self,
                 'translator': translator,
                 'time_report': time_report,
-                'call_to_action_link': call_to_action_link,
                 'travel_info': travel_info,
             },
             attachments=[pdf_attachment],

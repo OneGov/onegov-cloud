@@ -1,8 +1,38 @@
 # Changes
 
+## 2025.71
+
+`2025-12-29` | [23c7322afb...60f3664025](https://github.com/OneGov/onegov-cloud/compare/23c7322afb^...60f3664025)
+
+### Feriennet
+
+##### Hide RSS Feed
+
+`Feature` | [PRO-1458](https://linear.app/projuventute/issue/PRO-1458) | [8cbd225102](https://github.com/onegov/onegov-cloud/commit/8cbd225102b2207d1959b782cb99021f9399801a)
+
+##### "Delete user" button
+
+Deletion of a user in feriennet is now possible under the following conditions:
+-    Has no attendees with bookings in the currently active period
+-    Has no unpaid invoices in any period
+-    Is not an organizer of any activities
+-    Is not an admin
+
+`Feature` | [PRO-987](https://linear.app/projuventute/issue/PRO-987) | [c4a775e09e](https://github.com/onegov/onegov-cloud/commit/c4a775e09e935f39e452ffc7bad4b70be72151ba)
+
+##### Delete attendees
+
+`Feature` | [PRO-1436](https://linear.app/projuventute/issue/PRO-1436) | [1fb8ee16a1](https://github.com/onegov/onegov-cloud/commit/1fb8ee16a18b3b3f2ec81cdf2a4135243226fe4c)
+
+### Pas
+
+##### Gets rid of inline event handler.
+
+`Bugfix` | [OGC-2860](https://linear.app/onegovcloud/issue/OGC-2860) | [dde589d60e](https://github.com/onegov/onegov-cloud/commit/dde589d60eb6c1d7105886234b4f1789545127b9)
+
 ## 2025.70
 
-`2025-12-19` | [7e83cff80c...d5b58c8026](https://github.com/OneGov/onegov-cloud/compare/7e83cff80c^...d5b58c8026)
+`2025-12-19` | [7e83cff80c...2bf159789f](https://github.com/OneGov/onegov-cloud/compare/7e83cff80c^...2bf159789f)
 
 ### Form
 
@@ -2532,20 +2562,4 @@ Refactors capturing of exceptions and re-emitting them as `APIException`
 ##### Copy event button
 
 `Feature` | [OGC-1900](https://linear.app/onegovcloud/issue/OGC-1900) | [a7e570ede0](https://github.com/onegov/onegov-cloud/commit/a7e570ede065c6f56b7e25fa3cb3a5b867fe68d9)
-
-## 2025.21
-
-`2025-04-24` | [6864d7cf50...8b0cd01cc9](https://github.com/OneGov/onegov-cloud/compare/6864d7cf50^...8b0cd01cc9)
-
-### Org
-
-##### Adds integration for dormakaba API
-
-`Feature` | [OGC-2032](https://linear.app/onegovcloud/issue/OGC-2032) | [8268dfadff](https://github.com/onegov/onegov-cloud/commit/8268dfadff4754fddd73d74da5434e9008b4b91d)
-
-### Reservation
-
-##### Fixes upgrade task not running, when it should be run
-
-`Bugfix` | [6864d7cf50](https://github.com/onegov/onegov-cloud/commit/6864d7cf50cd01fa78c71c698cfed93e8f712819)
 

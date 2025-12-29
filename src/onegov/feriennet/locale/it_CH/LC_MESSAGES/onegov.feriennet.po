@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-12-04 11:14+0100\n"
+"POT-Creation-Date: 2025-12-10 15:02+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1508,6 +1508,15 @@ msgstr "Registrazione come aiutante"
 msgid "Sort"
 msgstr "Tipo"
 
+msgid "Delete"
+msgstr "Cancellare"
+
+msgid "Do you really want to delete this user?"
+msgstr "Vuole davvero cancellare questo utente?"
+
+msgid "Delete user"
+msgstr "Cancellare utente"
+
 msgid "Half day"
 msgstr "Mezza giornata"
 
@@ -2067,9 +2076,6 @@ msgstr "Vuole davvero cancellare questa richiesta?"
 
 msgid "Delete need"
 msgstr "Cancellare richiesta"
-
-msgid "Delete"
-msgstr "Cancellare"
 
 msgid "Enroll"
 msgstr "Iscrizione"
@@ -2633,6 +2639,17 @@ msgstr "Modificare partecipante"
 msgid "Booking Limit of ${name}"
 msgstr "Limite di prenotazione di ${name}"
 
+#, python-format
+msgid "${name} and associated bookings were deleted."
+msgstr "${name} e le prenotazioni associate sono state cancellate."
+
+msgid ""
+"The attendee cannot be deleted because there are existing bookings in the "
+"current period."
+msgstr ""
+"L'attendente non può essere cancellato perché ci sono prenotazioni esistenti "
+"nel periodo attuale."
+
 msgid "The user account must be opened by a parent or guardian of full age."
 msgstr ""
 "L'account utente deve essere aperto da una persona maggiorenne con autorità "
@@ -2787,6 +2804,17 @@ msgstr "Cancellare la prenotazione"
 #, python-format
 msgid "Do you really want to cancel \"${title}\"?"
 msgstr "Vuole davvero cancellare \"${title}\"?"
+
+msgid "Delete attendee"
+msgstr "Cancellare partecipante"
+
+#, python-format
+msgid "Do you really want to delete \"${name}\" and all associated bookings?"
+msgstr ""
+"Vuole davvero cancellare \"${name}\" e tutte le prenotazioni associate?"
+
+msgid "The invoices will not be deleted."
+msgstr "Le fatture non saranno cancellate."
 
 msgid "Only open, cancelled, denied or blocked bookings may be deleted"
 msgstr ""
@@ -3231,6 +3259,38 @@ msgstr "Prenotazioni ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
+
+msgid ""
+"The user cannot be deleted because they are organizers of existing "
+"activities."
+msgstr ""
+"The user cannot be deleted because they are organizers of existing "
+"activities."
+
+msgid ""
+"The account cannot be deleted because there are attendees with existing "
+"bookings in the current period. Wait for the period to end or delete the "
+"bookings first."
+msgstr ""
+"L'account non può essere cancellato perché ci sono partecipanti con "
+"prenotazioni esistenti nel periodo corrente. Attendere la fine del periodo "
+"o cancellare prima le prenotazioni."
+
+msgid ""
+"The account cannot be deleted because there are unpaid invoices associated "
+"with them. Mark all invoices as paid before deleting the user."
+msgstr ""
+"L'account non può essere cancellato perché ci sono fatture non pagate "
+"associate. Contrassegna tutte le fatture come pagate prima di cancellare "
+"l'utente."
+
+#, python-format
+msgid "${name} has been deleted, including all associated data."
+msgstr "${name} è stato cancellato, inclusi tutti i dati associati."
+
+msgid "Could not delete account; try again or contact an administrator."
+msgstr ""
+"Impossibile cancellare l'account; riprovi o contatti un amministratore."
 
 #~ msgid "Parents can see the contacts of other parents in the same activity"
 #~ msgstr ""

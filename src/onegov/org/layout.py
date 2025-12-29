@@ -1770,7 +1770,13 @@ class TicketLayout(DefaultLayout):
         if is_manager := self.request.is_manager_for_model(self.model):
 
             # only show the model related links when the ticket is pending
-            if self.model.state == 'pending':
+            # or if the handler explicitly allows it for closed tickets
+            show_links_when_closed = getattr(
+                self.model.handler, 'show_links_when_closed', False
+            )
+            if self.model.state == 'pending' or (
+                self.model.state == 'closed' and show_links_when_closed
+            ):
                 # FIXME: This is a weird discrepancy where we unsafely change
                 #        the API for Handler.get_links inside onegov.org, not
                 #        sure what to do about this. We should probably move
@@ -3160,7 +3166,7 @@ class UserLayout(DefaultLayout):
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
-                ),
+                )
             ]
         return None
 

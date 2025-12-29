@@ -645,6 +645,7 @@ def add_time_report(
                     'model': ticket,
                     'translator': self,
                     'time_report': report,
+                    'accountant_emails': list(accountant_emails),
                 },
             )
 
