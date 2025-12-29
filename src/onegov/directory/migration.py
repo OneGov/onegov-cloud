@@ -6,6 +6,7 @@ from onegov.form import flatten_fieldsets
 from onegov.form import parse_form
 from onegov.form import parse_formcode
 from onegov.form.parser.core import OptionsField
+from onegov.org import _
 from sqlalchemy.orm import object_session, joinedload, undefer
 from sqlalchemy.orm.attributes import get_history
 
@@ -16,6 +17,7 @@ if TYPE_CHECKING:
     from datetime import date, datetime, time
     from onegov.directory.models import Directory
     from onegov.directory.types import DirectoryConfiguration
+    from onegov.org.request import OrgRequest
 
 
 class DirectoryMigration:
@@ -86,6 +88,27 @@ class DirectoryMigration:
             return True
 
         return False
+
+    def alert_migration_issues(self, request: OrgRequest) -> None:
+        """ Alerts the user via the request about the migration issues."""
+        if self.possible:
+            return None
+
+        for changed in self.changes.changed_fields:
+            old = self.changes.old[changed]
+            new = self.changes.new[changed]
+
+            if not self.fieldtype_migrations.possible(old.type, new.type):
+                request.alert(_(
+                    'Cannot convert field "${field}" from type "${old_type}" '
+                    'to "${new_type}".', mapping={
+                        'field': changed,
+                        'old_type': old.type,
+                        'new_type': new.type
+                    }
+                ))
+
+        return None
 
     @property
     def entries(self) -> Iterable[DirectoryEntry]:

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-19 12:13+0100\n"
+"POT-Creation-Date: 2025-12-29 12:23+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -6340,6 +6340,14 @@ msgstr "Ein neues Verzeichnis wurde hinzugefügt"
 
 msgid "New Directory"
 msgstr "Neues Verzeichnis"
+
+#, python-format
+msgid ""
+"Cannot convert field \"${field}\" from type \"${old_type}\" to "
+"\"${new_type}\"."
+msgstr ""
+"Feld \"${field}\" kann nicht von Typ \"${old_type}\" zu Typ \"${new_type}\" "
+"konvertiert werden."
 
 msgid ""
 "The requested change cannot be performed, as it is incompatible with "

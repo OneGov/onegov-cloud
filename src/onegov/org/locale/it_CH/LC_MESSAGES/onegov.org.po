@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-12-19 12:13+0100\n"
+"POT-Creation-Date: 2025-12-29 12:23+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -6329,6 +6329,14 @@ msgstr "Aggiunta una nuova cartella"
 
 msgid "New Directory"
 msgstr "Nuova cartella"
+
+#, python-format
+msgid ""
+"Cannot convert field \"${field}\" from type \"${old_type}\" to "
+"\"${new_type}\"."
+msgstr ""
+"Impossibile convertire il campo \"${field}\" dal tipo \"${old_type}\" a "
+"\"${new_type}\"."
 
 msgid ""
 "The requested change cannot be performed, as it is incompatible with "
