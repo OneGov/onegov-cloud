@@ -377,11 +377,11 @@ def test_directory_migration(session: Session) -> None:
     # First migrates directory, then updates each entry.
     migration.execute()
 
-    new_structure = new_structure.replace("# Cost (A,B;C/D)", "")
+    new_structure = new_structure.replace('# Cost (A,B;C/D)', '')
     migration = zoos.migration(new_structure, None)
     changes = migration.changes
-    assert changes.renamed_fields["Cost (A,B;C/D)/Currency"] == "Main/Currency"
-    assert changes.renamed_fields["Cost (A,B;C/D)/Cost"] == "Main/Cost"
+    assert changes.renamed_fields['Cost (A,B;C/D)/Currency'] == 'Main/Currency'
+    assert changes.renamed_fields['Cost (A,B;C/D)/Cost'] == 'Main/Cost'
     assert not changes.changed_fields
     assert migration.possible
 
