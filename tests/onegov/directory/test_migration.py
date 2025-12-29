@@ -517,28 +517,28 @@ def test_directory_field_type_migrations(
 
     directories = DirectoryCollection(session)
     zoos = directories.add(
-        title="Zoos",
+        title='Zoos',
         lead="The town's zoos",
         structure=structure,
         configuration=DirectoryConfiguration(
-            title="[Main/Name]", order=["Main/Name"]
+            title='[Main/Name]', order=['Main/Name']
         ),
     )
     zoo = zoos.add(
         values={
-            "main_name": "Luzerner Zoo",
-            f"general_{label}": "",  # No value is set
+            'main_name': 'Luzerner Zoo',
+            f'general_{label}': '',  # No value is set
         }
     )
 
-    assert zoo.values[f"general_{label}"] == ""  # radio
+    assert zoo.values[f'general_{label}'] == ''  # radio
 
     migration = zoos.migration(new_structure, None)
     assert migration.possible
 
     migration.execute()
 
-    assert zoo.values[f"general_{label}"] == expected_value
+    assert zoo.values[f'general_{label}'] == expected_value
 
 
 def test_directory_migration_for_select(session: Session) -> None:
@@ -557,18 +557,18 @@ def test_directory_migration_for_select(session: Session) -> None:
 
     directories = DirectoryCollection(session)
     zoos = directories.add(
-        title="Zoos",
+        title='Zoos',
         lead="The town's zoos",
         structure=structure,
         configuration=DirectoryConfiguration(
-            title="[Main/Name]", order=["Main/Name"]
+            title='[Main/Name]', order=['Main/Name']
         ),
     )
     zoo = zoos.add(
         values=dict(
-            main_name="Luzerner Zoo",
-            general_landscapes="Desert",
-            general_animals=["Snakes"],
+            main_name='Luzerner Zoo',
+            general_landscapes='Desert',
+            general_animals=['Snakes'],
         )
     )
 
@@ -587,17 +587,17 @@ def test_directory_migration_for_select(session: Session) -> None:
     assert migration.changes.added_options == []
     assert migration.changes.removed_options == []
     assert migration.changes.renamed_options == {
-        ("General/Landscapes", "Desert"):
-            ("General/Landscapes", "Great Desert")
+        ('General/Landscapes', 'Desert'):
+        ('General/Landscapes', 'Great Desert')
     }
     assert migration.possible
 
     migration.execute()
-    assert zoo.values["general_landscapes"] == "Great Desert"
-    assert zoo.values["general_animals"] == None
+    assert zoo.values['general_landscapes'] == 'Great Desert'
+    assert zoo.values['general_animals'] == None
 
     # add snakes to zoo lucerne
-    zoo.values["general_animals"] = ["Snakes"]
+    zoo.values['general_animals'] = ['Snakes']
     session.flush()
 
     # add 1, 2 or more options
@@ -618,18 +618,18 @@ def test_directory_migration_for_select(session: Session) -> None:
     """
     migration = zoos.migration(new_structure, None)
     assert migration.changes.added_options == [
-        ("General/Landscapes", "Marine"),
-        ("General/Landscapes", "Tropical Rainforest"),
-        ("General/Landscapes", "Grasland"),
-        ("General/Animals", "Gnus"),
+        ('General/Landscapes', 'Marine'),
+        ('General/Landscapes', 'Tropical Rainforest'),
+        ('General/Landscapes', 'Grasland'),
+        ('General/Animals', 'Gnus'),
     ]
     assert migration.changes.removed_options == []
     assert migration.changes.renamed_options == {}
     assert migration.possible
 
     migration.execute()
-    assert zoo.values["general_landscapes"] == "Great Desert"
-    assert zoo.values["general_animals"] == ["Snakes"]
+    assert zoo.values['general_landscapes'] == 'Great Desert'
+    assert zoo.values['general_animals'] == ['Snakes']
 
     # re-order options
     new_structure = """
@@ -654,8 +654,8 @@ def test_directory_migration_for_select(session: Session) -> None:
     assert migration.possible
 
     migration.execute()
-    assert zoo.values["general_landscapes"] == "Great Desert"
-    assert zoo.values["general_animals"] == ["Snakes"]
+    assert zoo.values['general_landscapes'] == 'Great Desert'
+    assert zoo.values['general_animals'] == ['Snakes']
 
     # rename options
     new_structure = """
@@ -677,15 +677,15 @@ def test_directory_migration_for_select(session: Session) -> None:
     assert migration.changes.added_options == []
     assert migration.changes.removed_options == []
     assert migration.changes.renamed_options == {
-        ("General/Landscapes", "Arctic"): ("General/Landscapes", "Arctica"),
-        ("General/Landscapes", "Marine"): ("General/Landscapes", "Marina"),
-        ("General/Animals", "Gnus"): ("General/Animals", "Gnu"),
+        ('General/Landscapes', 'Arctic'): ('General/Landscapes', 'Arctica'),
+        ('General/Landscapes', 'Marine'): ('General/Landscapes', 'Marina'),
+        ('General/Animals', 'Gnus'): ('General/Animals', 'Gnu'),
     }
     assert migration.possible
 
     migration.execute()
-    assert zoo.values["general_landscapes"] == "Great Desert"
-    assert zoo.values["general_animals"] == ["Snakes"]
+    assert zoo.values['general_landscapes'] == 'Great Desert'
+    assert zoo.values['general_animals'] == ['Snakes']
 
     # remove 1, 2 or more options
     new_structure = """
@@ -703,15 +703,55 @@ def test_directory_migration_for_select(session: Session) -> None:
     migration = zoos.migration(new_structure, None)
     assert migration.changes.added_options == []
     assert migration.changes.removed_options == [
-        ("General/Landscapes", "Great Desert"),
-        ("General/Landscapes", "Tropical Rainforest"),
-        ("General/Animals", "Snakes"),
+        ('General/Landscapes', 'Great Desert'),
+        ('General/Landscapes', 'Tropical Rainforest'),
+        ('General/Animals', 'Snakes'),
     ]
     assert migration.changes.renamed_options == {}
     assert migration.possible
 
     migration.execute()
-    assert zoo.values["general_landscapes"] is None
-    assert zoo.values["general_animals"] == []
+    assert zoo.values['general_landscapes'] is None
+    assert zoo.values['general_animals'] == []
 
-    # type change
+    # type change radio -> checkbox
+    new_structure = """
+        # Main
+        Name *= ___
+        # General
+        Landscapes =
+            [ ] Arctica
+            [ ] Grasland
+            [ ] Marina
+            [ ] Tundra
+        Animals =
+            [ ] Gnu
+    """
+    migration = zoos.migration(new_structure, None)
+    assert migration.changes.added_options == []
+    assert migration.changes.removed_options == []
+    assert migration.changes.renamed_options == {}
+    assert migration.possible
+
+    migration.execute()
+    assert zoo.values['general_landscapes'] == []
+    assert zoo.values['general_animals'] == []
+
+    # type change checkbox -> radio not possible
+    new_structure = """
+        # Main
+        Name *= ___
+        # General
+        Landscapes =
+            [ ] Arctica
+            [ ] Grasland
+            [ ] Marina
+            [ ] Tundra
+        Animals =
+            ( ) Gnu
+    """
+    migration = zoos.migration(new_structure, None)
+    assert migration.changes.added_options == []
+    assert migration.changes.removed_options == []
+    assert migration.changes.renamed_options == {}
+    assert not migration.possible

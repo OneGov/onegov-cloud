@@ -1091,8 +1091,6 @@ def test_directory_migration(client: Client) -> None:
     page.form['choice'] = ['Lolipop', 'Gummi Bear']
     assert page.form.submit()
 
-    # get_xxx()
-
     # add options
     page = client.get('/directories/order-sweets').click('Konfigurieren')
     page.form['structure'] = dedent("""
@@ -1125,10 +1123,7 @@ def test_directory_migration(client: Client) -> None:
             [ ] Lolipop
             [ ] Ice cream
     """)
-    confirm = page.form.submit()
-    # confirm migration
-    assert confirm.status_code == 200
-    # assert confirm.click('Bestätigen')
+    assert page.form.submit().status_code == 200
 
     # remove (selected) options
     page = client.get('/directories/order-sweets').click('Konfigurieren')
@@ -1142,4 +1137,4 @@ def test_directory_migration(client: Client) -> None:
             [ ] Chocolate
             [ ] Ice cream
     """)
-    assert page.form.submit()
+    assert page.form.submit().status_code == 200
