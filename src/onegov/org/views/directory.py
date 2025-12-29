@@ -202,6 +202,9 @@ def handle_new_directory(
     }
 
 
+# no op call to make translators aware of this string used in migration.reason
+_('Cannot convert field "${field}" from type "${old_type}" to "${new_type}".')
+
 @OrgApp.form(model=ExtendedDirectoryEntryCollection, name='edit',
              template='directory_form.pt', permission=Secret,
              form=get_directory_form_class)
