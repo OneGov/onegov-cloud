@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-12-23 16:27+0100\n"
+"POT-Creation-Date: 2025-12-29 09:08+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -588,8 +588,11 @@ msgstr "Vista principale"
 msgid "Hide these labels on the main view"
 msgstr "Nascondi queste etichette nella vista principale"
 
-msgid "Sidebar"
-msgstr "Barra laterale"
+msgid "Contact Information Sidebar"
+msgstr "Barra laterale delle informazioni di contatto"
+
+msgid "The contact information is displayed in the sidebar without field names."
+msgstr "Le informazioni di contatto sono visualizzate nella barra laterale senza nomi di campo."
 
 msgid "Filters"
 msgstr "Filtri"
@@ -7714,6 +7717,9 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid "Sidebar"
+#~ msgstr "Barra laterale"
 
 #~ msgid ""
 #~ "The \"Always send email notifications for new ticket messages\" setting "

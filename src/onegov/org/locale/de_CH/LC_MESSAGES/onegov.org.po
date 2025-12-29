@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-23 16:27+0100\n"
+"POT-Creation-Date: 2025-12-29 09:08+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -586,8 +586,11 @@ msgstr "Hauptansicht"
 msgid "Hide these labels on the main view"
 msgstr "Diese Feldnamen auf der Hauptansicht verstecken"
 
-msgid "Sidebar"
-msgstr "Sidebar"
+msgid "Contact Information Sidebar"
+msgstr "Kontaktinformation Sidebar"
+
+msgid "The contact information is displayed in the sidebar without field names."
+msgstr "Die Kontaktinformation wird in der Sidebar ohne Feldnamen angezeigt."
 
 msgid "Filters"
 msgstr "Filter"
