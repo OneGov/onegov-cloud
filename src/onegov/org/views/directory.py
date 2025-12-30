@@ -237,7 +237,21 @@ def handle_edit_directory(
                             'The requested change cannot be performed, '
                             'as it is incompatible with existing entries'
                         ))
-                        # migration.alert_issues(request)
+                        for changed in migration.changes.changed_fields:
+                            old = migration.changes.old[changed]
+                            new = migration.changes.new[changed]
+
+                            if not migration.fieldtype_migrations.possible(
+                                    old.type, new.type):
+                                request.alert(_(
+                                    'Cannot convert field "${field}" from '
+                                    'type "${old_type}" to "${new_type}".',
+                                    mapping={
+                                        'field': changed,
+                                        'old_type': old.type,
+                                        'new_type': new.type
+                                    }
+                                ))
                     else:
                         if not request.params.get('confirm'):
                             form.action += '&confirm=1'

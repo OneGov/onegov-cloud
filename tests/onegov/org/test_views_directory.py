@@ -1082,14 +1082,16 @@ def test_directory_migration(client: Client) -> None:
             [ ] Lolipop
     """)
     page.form['title_format'] = '[Nickname]'
-    assert page.form.submit()
+    page = page.form.submit()
+    assert not page.pyquery('.alert-box')
 
     page = client.get('/directories/order-sweets')
     page = page.click('Eintrag')
     page.form['nickname'] = 'Max'
     page.form['do_you_want_sweets_'] = 'Yes'
     page.form['choice'] = ['Lolipop', 'Gummi Bear']
-    assert page.form.submit()
+    page = page.form.submit()
+    assert not page.pyquery('.alert-box')
 
     # add options
     page = client.get('/directories/order-sweets').click('Konfigurieren')
@@ -1106,7 +1108,8 @@ def test_directory_migration(client: Client) -> None:
             [ ] Lolipop
             [ ] Ice cream
     """)
-    assert page.form.submit().follow().status_code == 200
+    page = page.form.submit().follow()
+    assert page.pyquery('.alert-box')
 
     # rename options
     page = client.get('/directories/order-sweets').click('Konfigurieren')
@@ -1123,7 +1126,8 @@ def test_directory_migration(client: Client) -> None:
             [ ] Lolipop
             [ ] Ice cream
     """)
-    assert page.form.submit().status_code == 200
+    page = page.form.submit()
+    assert not page.pyquery('.alert-box')
 
     # remove (selected) options
     page = client.get('/directories/order-sweets').click('Konfigurieren')
@@ -1137,4 +1141,23 @@ def test_directory_migration(client: Client) -> None:
             [ ] Chocolate
             [ ] Ice cream
     """)
-    assert page.form.submit().status_code == 200
+    page = page.form.submit()
+    assert not page.pyquery('.alert-box')
+
+    # switch checkbox -> radio which is invalid
+    page = client.get('/directories/order-sweets').click('Konfigurieren')
+    page.form['structure'] = dedent("""
+        Nickname *= ___
+        Do you want sweets? =
+            ( ) Yes!
+            ( ) Not sure. Moom?
+        Choice =
+            ( ) Donut Hole
+            ( ) Chocolate
+            ( ) Ice cream
+    """)
+    page = page.form.submit()
+    assert page.pyquery('.alert')
+    assert 'Die verlangte Änderung kann nicht durchgeführt' in page
+    assert ('Feld "Choice" kann nicht von Typ "checkbox" zu Typ "radio" '
+            'konvertiert werden') in page
