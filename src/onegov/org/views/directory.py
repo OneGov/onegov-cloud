@@ -51,6 +51,7 @@ from typing import cast, Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence, Iterator
     from onegov.core.types import JSON_ro, RenderData, EmailJsonDict
+    from onegov.directory.migration import DirectoryMigration
     from onegov.directory.models.directory import DirectoryEntryForm
     from onegov.org.models.directory import ExtendedDirectoryEntryForm
     from onegov.org.request import OrgRequest
@@ -237,21 +238,7 @@ def handle_edit_directory(
                             'The requested change cannot be performed, '
                             'as it is incompatible with existing entries'
                         ))
-                        for changed in migration.changes.changed_fields:
-                            old = migration.changes.old[changed]
-                            new = migration.changes.new[changed]
-
-                            if not migration.fieldtype_migrations.possible(
-                                    old.type, new.type):
-                                request.alert(_(
-                                    'Cannot convert field "${field}" from '
-                                    'type "${old_type}" to "${new_type}".',
-                                    mapping={
-                                        'field': changed,
-                                        'old_type': old.type,
-                                        'new_type': new.type
-                                    }
-                                ))
+                        alert_migration_type_errors(migration, request)
                     else:
                         if not request.params.get('confirm'):
                             form.action += '&confirm=1'
@@ -314,6 +301,25 @@ def handle_edit_directory(
         'error_translate': lambda text: request.translate(_(text)),
         'directory': self.directory,
     }
+
+
+def alert_migration_type_errors(
+    migration: DirectoryMigration,
+    request: OrgRequest
+) -> None:
+    for changed in migration.changes.changed_fields:
+        old = migration.changes.old[changed]
+        new = migration.changes.new[changed]
+
+        if not migration.fieldtype_migrations.possible(old.type, new.type):
+            request.alert(_(
+                'Cannot convert field "${field}" from type "${old_type}" '
+                'to "${new_type}".', mapping={
+                    'field': changed,
+                    'old_type': old.type,
+                    'new_type': new.type
+                }
+            ))
 
 
 @OrgApp.view(
