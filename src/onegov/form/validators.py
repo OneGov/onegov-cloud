@@ -169,7 +169,7 @@ MIME_TYPES_DOCUMENT = {
 
 MIME_TYPES_EXCEL = {
     'application/excel',
-    'application/vnd.ms-excel,'
+    'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'application/vnd.ms-office',
     'application/octet-stream',
