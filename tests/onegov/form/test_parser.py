@@ -368,19 +368,19 @@ def test_parse_fileinput() -> None:
     assert form['file'].widget.multiple is False  # type: ignore[attr-defined]
 
     # verify attached mime type validator
-    assert find_validator(form['file'], FileSizeLimit)
     assert form['file'].validators
     validator = find_validator(form['file'], WhitelistedMimeType)
     assert validator
     assert validator.whitelist == {  # type:ignore[attr-defined]
         'application/msword', 'application/pdf'
     }
+    assert find_validator(form['file'], FileSizeLimit)
 
-    form = parse_form("File = *.*")()
+    form = parse_form("File *= *.*")()
+    assert form['file'].validators
     validator = find_validator(form['file'], WhitelistedMimeType)
     assert validator
     assert validator.whitelist == WhitelistedMimeType.whitelist  # type:ignore[attr-defined]
-
     assert find_validator(form['file'], FileSizeLimit)
 
     # ensure nickname field did not get validators from the upload field
@@ -397,17 +397,19 @@ def test_parse_multiplefileinput() -> None:
     assert form['files'].widget.multiple is True  # type: ignore[attr-defined]
 
     # verify attached mime type validator
+    assert form['files'].validators
     validator = find_validator(form['files'], WhitelistedMimeType)
     assert validator
     assert validator.whitelist == {  # type:ignore[attr-defined]
         'application/msword', 'application/pdf'
     }
+    assert find_validator(form['files'], FileSizeLimit)
 
-    form = parse_form("My files = *.* (multiple)")()
+    form = parse_form("My files *= *.* (multiple)")()
+    assert form['my_files'].validators
     validator = find_validator(form['my_files'], WhitelistedMimeType)
     assert validator
     assert validator.whitelist == WhitelistedMimeType.whitelist  # type:ignore[attr-defined]
-
     assert find_validator(form['my_files'], FileSizeLimit)
 
 

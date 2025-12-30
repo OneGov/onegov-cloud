@@ -96,6 +96,7 @@ def test_upload_field() -> None:
     assert data == {}
     assert field.file is None
     assert field.filename is None
+    assert field.validate(form)
     assert_whitelisted_mimetype_validator(field)
 
     form, field = create_field()
