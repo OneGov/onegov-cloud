@@ -1,0 +1,11 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.agency">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <p tal:condition="not:agencies" i18n:translate="">No agencies added yet.</p>
+        <tal:b tal:condition="agencies" metal:use-macro="layout.macros.agency_interactive_org_chart"/>
+
+    </tal:block>
+</div>
