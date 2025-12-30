@@ -1779,3 +1779,49 @@ a.category-anchor {
         font-weight: bold !important;
     }
 }
+
+// D3 Org Chart customisations
+.d3-orgchart-node {
+    padding: 1rem;
+    font-weight: bold;
+    font-size: 1rem;
+    border: 2px solid rgba(0,0,0,0.04) !important;
+    border-radius: .7rem !important;
+    box-shadow: 0 0 17px 0 rgba(0,0,0,0.07);
+    color: #444;
+    transition: all 200ms linear;
+    background: white;
+
+    &.hyphens {
+        hyphens: auto;
+    }
+
+    &:hover {
+        border: 2px solid $primary-color !important;
+    }
+}
+
+.node-button-div {
+    span {
+        font-size: .8rem !important;
+    }
+
+    > div {
+        padding: .5rem !important;
+        transition: all 200ms linear;
+    }
+}
+
+.node-button-g:hover .node-button-div {
+    span {
+        color: $primary-color !important;
+
+        path {
+            stroke: $primary-color !important;
+       }
+    }
+
+    > div {
+        border: 2px solid $primary-color !important;
+    }
+}

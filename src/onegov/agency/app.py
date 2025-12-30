@@ -192,7 +192,6 @@ def get_people_select_asset() -> Iterator[str]:
 
 @AgencyApp.webasset('sortable-multi-checkbox')
 def get_sortable_multi_checkbox_asset() -> Iterator[str]:
-    yield 'jquery.js'
     yield 'sortable.js'
     yield 'sortable-multi-checkbox.js'
 

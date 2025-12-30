@@ -4,22 +4,24 @@
     </tal:block>
     <tal:block metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
-            <div class="cell medium-8">
+            <div class="cell medium-7">
                 <p tal:condition="not:agencies" i18n:translate="">No agencies added yet.</p>
                 <tal:b tal:condition="agencies" metal:use-macro="layout.macros.agency_nav_tree"/>
             </div>
 
-            <div class="cell medium-4">
-
-                <div tal:condition="pdf_link" class="agency-exports borderless-side-panel">
-                    <h2 i18n:translate>Exports</h2>
-                    <ul class="agency-export-list">
-                        <li tal:condition="pdf_link" class="agency-export-pdf">
-                            <a href="${pdf_link}" target="_blank" i18n:translate>
-                                Export all organisations as PDF
-                            </a>
-                        </li>
-                    </ul>
+            <div class="cell medium-4 medium-offset-1 sidebar">
+                <div class="sidebar-wrapper">
+                    <div tal:condition="pdf_link" class="side-panel">
+                        <h3 i18n:translate>Exports</h3>
+                        <ul class="more-list">
+                            <li tal:condition="pdf_link" class="agency-export-pdf">
+                                <a class="list-link" href="${pdf_link}" target="_blank">
+                                    <i class="far fa-file-pdf" aria-hidden="true"></i>
+                                    <span i18n:translate class="list-title">Export all organisations as PDF</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>

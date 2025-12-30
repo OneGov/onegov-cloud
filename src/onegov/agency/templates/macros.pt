@@ -97,8 +97,24 @@
         </div>
     </metal:agency_card>
 
+    <metal:atoz define-macro="atoz" i18n:domain="onegov.town6">
+        <div class="atoz-block" tal:repeat="item items">
+            <h2>${item[0]}</h2>
+            <div class="subpage-cards">
+                <div class="" tal:repeat="detail item[1]">
+                    <div class="card">
+                        <div metal:define-slot="item-detail">
+                            <a href="${request.link(detail)}">${detail.title}</a>
+                            <metal:hint tal:define="item detail" use-macro="layout.macros['access_hint']" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </metal:atoz>
+
     <metal:person_list_card define-macro="person_list_card" i18n:domain="onegov.agency">
-        <div class="person-card person-list-card" tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)">
+        <div class="person-card person-list-card card-section" tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)">
             <ul>
                 <li class="person-card-title">
                     <a href="${request.link(person)}">${person.title}</a>
@@ -408,5 +424,16 @@
             </dd>
         </div>
     </metal:b>
+
+
+    <metal:agency_interactive_org_chart define-macro="agency_interactive_org_chart" i18n:domain="onegov.agency">
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3-org-chart@3"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3-flextree@2.1.2/build/d3-flextree.js"></script>
+        <div class="chart-container"></div>
+
+        <div class="orgchart" data-url="http://127.0.0.1:8080/onegov_agency/zg/organizations/json"></div>
+
+    </metal:agency_interactive_org_chart>
 
 </body>

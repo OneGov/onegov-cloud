@@ -356,3 +356,9 @@ def get_staff_chat_asset() -> Iterator[str]:
 def get_staff_client_asset() -> Iterator[str]:
     yield 'chat-shared.js'
     yield 'chat-client.js'
+
+
+@TownApp.webasset('d3-charts')
+def get_d3_chart_assets() -> Iterator[str]:
+    yield 'd3-display.js'
+    # yield 'd3-display.scss'

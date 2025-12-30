@@ -89,6 +89,66 @@ def view_agencies(
 
 @AgencyApp.html(
     model=ExtendedAgencyCollection,
+    template='agencies_chart.pt',
+    name='chart',
+    permission=Public
+)
+def view_agencies_chart(
+    self: ExtendedAgencyCollection,
+    request: AgencyRequest
+) -> RenderData:
+
+    layout = AgencyCollectionLayout(self, request)
+    request.include('d3-charts')
+
+    layout.breadcrumbs.append(
+        Link(_('Chart view'), request.link(self, name='chart'))
+    )
+
+    return {
+        'title': _('Agencies'),
+        'agencies': self.roots,
+        'layout': layout
+    }
+
+
+@AgencyApp.json(
+    model=ExtendedAgencyCollection,
+    name='json',
+    permission=Public
+)
+def view_agencies_json(
+    self: ExtendedAgencyCollection,
+    request: AgencyRequest
+) -> RenderData:
+
+    def to_node(agency: ExtendedAgency) -> dict[str, object]:
+        node = {
+            'id': agency.id,
+            'name': agency.title,
+            'url': request.link(agency)
+        }
+        children = [to_node(child) for child in agency.children]
+        if children:
+            node['children'] = children
+        return node
+
+    tree = [to_node(a) for a in self.roots]
+
+    return {
+        'tree': [
+            {
+            'id': 0,
+            'url': request.link(self),
+            'name': _('Agencies'),
+            'children': tree
+            }
+        ]
+    }
+
+
+@AgencyApp.html(
+    model=ExtendedAgencyCollection,
     template='custom_sort.pt',
     name='sort',
     permission=Private

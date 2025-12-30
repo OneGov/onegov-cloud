@@ -211,3 +211,19 @@ ul.agency-nav {
 .row.field-sub_organisation {
     display: none;
 }
+
+/*
+    People view
+*/
+.people-list {
+    margin-bottom: 2rem;
+
+    .subpage-cards {
+        column-count: 2;
+    }
+
+    .card {
+        height: calc(100% - 1.5rem);
+        margin-bottom: 1.5rem;
+    }
+}

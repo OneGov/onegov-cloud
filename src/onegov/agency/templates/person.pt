@@ -17,26 +17,31 @@
 
             </div>
             <div class="cell medium-4">
-
-                <div class="borderless-side-panel" tal:condition="request.app.org.meta.report_changes|True">
-                    <h2 i18n:translate>Changes</h2>
-                    <div class="submit-yours">
+                <div class="sidebar-wrapper">
+                    <div class="side-panel" tal:condition="request.app.org.meta.report_changes|True">
+                        <h3 i18n:translate>Changes</h3>
                         <p i18n:translate>The contact form can be used to report changes to incorrect information of the persons or organizations listed. The form is not intended for contacting or sending messages to the respective persons and organizations.</p>
-                        <a href="${request.link(person, 'report-change')}">
-                           <b i18n:translate>Report change</b>
-                        </a>
+                        <ul class="more-list">
+                            <li><a class="list-link" href="${request.link(person, 'report-change')}">
+                            <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+                            <span i18n:translate class="list-title">Report change</span>
+                            </a></li>
+                        </ul>
                     </div>
-               </div>
 
-               <div class="borderless-side-panel">
-                   <h2 i18n:translate="">Exports</h2>
-                   <ul class="person-export-list">
-                       <li>
-                           <a href="${request.link(person, name='vcard')}" i18n:translate>Export a vCard of this person</a>
-                       </li>
-                   </ul>
-               </div>
-
+                    <div class="side-panel">
+                    
+                        <h3 i18n:translate="">Exports</h3>
+                        <ul class="more-list">
+                            <li>
+                                <a class="list-link" href="${request.link(person, name='vcard')}" i18n:translate>
+                                    <i class="far fa-address-card" aria-hidden="true"></i>
+                                    <span i18n:translate class="list-title">Export a vCard of this person</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </tal:block>
