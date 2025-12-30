@@ -52,6 +52,7 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #       so we just manually specify it for now.
     fts_type_title = TranslationString('Memberships', domain='onegov.agency')
     fts_public = True
+    fts_title_property = 'title'
     fts_properties = {
         'title': {'type': 'localized', 'weight': 'A'},
     }

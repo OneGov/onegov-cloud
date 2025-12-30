@@ -1159,7 +1159,7 @@ def accept_reservation_with_message(
             self,
             request,
             text=form.text.data,
-            notify=form.notify.data,
+            notify=form.notify.data if form.notify is not None else True,
             view_ticket=view_ticket
         )
 
@@ -1467,7 +1467,7 @@ def reject_reservation_with_message(
         return reject_reservation(
             self, request,
             text=form.text.data,
-            notify=form.notify.data,
+            notify=form.notify.data if form.notify is not None else True,
             view_ticket=view_ticket
         )
 
@@ -1506,7 +1506,8 @@ def reject_reservation_with_message_from_ticket(
         self.handler.reservations[0],
         request,
         form,
-        layout or TicketChatMessageLayout(self, request, internal=True)
+        layout or TicketChatMessageLayout(self, request, internal=True),
+        view_ticket=self
     )
 
 

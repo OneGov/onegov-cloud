@@ -1306,8 +1306,12 @@ def wil_daily_event_import(request: OrgRequest) -> None:
             f'status code: {response.status_code}')
         return
 
-    collection = EventCollection(request.session)
-    added, updated, purged = collection.from_minasa(response.content)
-    log.info(f'Wil: Events successfully imported '
-             f'{len(added)} added, {len(updated)} updated, '
-             f'{len(purged)} deleted')
+    try:
+        collection = EventCollection(request.session)
+        added, updated, purged = collection.from_minasa(response.content)
+        log.info(f'Wil: Events successfully imported '
+                 f'{len(added)} added, {len(updated)} updated, '
+                 f'{len(purged)} deleted')
+    except Exception:
+        log.exception('Failed to import Wil events from Minasa.')
+        return

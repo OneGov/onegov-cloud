@@ -7,7 +7,7 @@
 
             <div class="summary-header">
                 <h2 i18n:translate>Summary</h2>
-                <a href="#" i18n:translate onclick="window.print()">
+                <a href="#" i18n:translate data-print-current-page>
                     Print
                 </a>
             </div>

@@ -29,7 +29,6 @@ def get_data_feed_messages(page: ExtendedResponse) -> Any:
 
 def test_tickets(client: Client) -> None:
 
-    # feed = ticket_page.pyquery('div.timeline').attr('data-feed-data')
     assert client.get(
         '/tickets/ALL/open', expect_errors=True).status_code == 403
 
@@ -106,8 +105,10 @@ def test_tickets(client: Client) -> None:
 
     # default is always enable email notifications
     send_msg = ticket_page.request.url + '/message-to-submitter'
-    input_field = client.get(send_msg).pyquery('#notify')
-    assert input_field.attr('disabled') == 'disabled'
+    send_msg_page = client.get(send_msg)
+    assert send_msg_page.pyquery('#notify') == []
+    hint = send_msg_page.pyquery('.field-notify_hint')
+    assert "Die Einstellung" in hint.text()
 
     # Test mail notification on new message
     assert len(os.listdir(client.app.maildir)) == 1
@@ -927,7 +928,6 @@ def test_bcc_field_in_ticket_message(client: Client) -> None:
     page = client.get(ticket_url).click("Nachricht senden")
     page.form['text'] = "'Bcc' — the photo-bomber of the email world."
     page.form['email_bcc'] = ['editor@example.org']
-    page.form.get('notify').checked = True
     page.form.submit()
 
     message = client.get_email(1, flush_queue=True)
@@ -981,7 +981,6 @@ def test_bcc_field_in_ticket_message(client: Client) -> None:
         'editor@example.org',
         'member@example.org'
     ]
-    page.form.get('notify').checked = True
     page.form.submit()
 
     message = client.get_email(1, flush_queue=True)

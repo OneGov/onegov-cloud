@@ -2894,6 +2894,20 @@ $archive-ticket-icon: '\f1c6';
     margin-right: 1ex;
 }
 
+.FRM-option label::before { @include icon($frm-handler-icon); }
+.RSV-option label::before { @include icon($rsv-handler-icon); }
+.EVN-option label::before { @include icon($evn-handler-icon); }
+.DIR-option label::before { @include icon($dir-handler-icon); }
+
+.ALL-option label::before,
+.FRM-option label::before,
+.RSV-option label::before,
+.EVN-option label::before,
+.DIR-option label::before {
+    display: inline-block;
+    margin-right: 1ex;
+}
+
 .ticket-handler-FRM td:first-child::before {
     @include icon($frm-handler-icon);
 }
@@ -3933,6 +3947,13 @@ button {
     Search results
 */
 ul.search-results {
+    em {
+        color: $red !important;
+        font-style: initial;
+        font-weight: bold;
+        text-decoration: underline;
+    }
+
     a {
         display: block;
         font-weight: bold;
@@ -6463,6 +6484,68 @@ h2 + div.timeline {
         font-size: 1rem;
         font-weight: bold;
         margin-top: -1px;
+    }
+
+    a.mute {
+        color: #333;
+        display: inline-block;
+        text-align: center;
+        width: 1.2rem;
+
+        .fa-microphone-slash {
+            display: none;
+        }
+        .fa-microphone {
+            display: inline;
+        }
+
+        &:hover {
+            color: $red;
+
+            .fa-microphone-slash {
+                display: inline;
+            }
+            .fa-microphone {
+                display: none;
+            }
+        }
+    }
+
+    a.unmute {
+        color: $red;
+        display: inline-block;
+        text-align: center;
+        width: 1.2rem;
+
+        .fa-microphone-slash {
+            display: inline;
+        }
+        .fa-microphone {
+            display: none;
+        }
+
+        &:hover {
+            color: #333;
+
+            .fa-microphone-slash {
+                display: none;
+            }
+            .fa-microphone {
+                display: inline;
+            }
+
+            &.disabled {
+                color: $red;
+                cursor: disabled;
+
+                .fa-microphone-slash {
+                    display: inline;
+                }
+                .fa-microphone {
+                    display: none;
+                }
+            }
+        }
     }
 
     .button {

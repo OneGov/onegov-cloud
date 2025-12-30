@@ -67,6 +67,7 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
     #       string, we know we already have a translation in a different domain
     #       so we just manually specify it for now.
     fts_type_title = TranslationString('Attendees', domain='onegov.feriennet')
+    fts_title_property = 'title'
     fts_properties = {
         'username': {'type': 'text', 'weight': 'A'},
         'name': {'type': 'text', 'weight': 'A'},
@@ -77,6 +78,10 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
     @property
     def fts_suggestion(self) -> str:
         return self.name
+
+    @property
+    def title(self) -> str:
+        return f'{self.username} {self.name}'
 
     def __hash__(self) -> int:
         return hash(self.id)

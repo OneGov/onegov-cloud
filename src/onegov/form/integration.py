@@ -135,8 +135,24 @@ def get_chosen_asset() -> Iterator[str]:
     yield 'chosen-init.js'
 
 
+@FormApp.webasset(
+    'treeselect',
+    filters={'css': ['datauri', 'custom-rcssmin']}
+)
+def get_treeselect_asset() -> Iterator[str]:
+    yield 'treeselect.css'
+    yield 'treeselect.fixes.css'
+    yield 'treeselect.js'
+    yield 'treeselect-init.js'
+
+
 @FormApp.webasset('typeahead-standalone')
 def get_typeahead_asset() -> Iterator[str]:
     yield 'typeahead-standalone.css'
     yield 'typeahead-standalone.js'
     yield 'typeahead-standalone-init.js'
+
+
+@FormApp.webasset('multicheckbox')
+def get_multicheckbox_asset() -> Iterator[str]:
+    yield 'multicheckbox.js'

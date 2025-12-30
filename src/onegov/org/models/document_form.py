@@ -44,6 +44,7 @@ class FormDocument(Base, ContentMixin, TimestampMixin, AccessExtension,
     __tablename__ = 'form_documents'
 
     fts_type_title = _('Forms')
+    fts_title_property = 'title'
     fts_properties = {
         'title': {'type': 'localized', 'weight': 'A'},
         'lead': {'type': 'localized', 'weight': 'B'},

@@ -53,6 +53,7 @@ class User(Base, TimestampMixin, ORMSearchable):
     }
 
     fts_type_title = _('Users')
+    fts_title_property = 'title'
     fts_properties = {
         'username': {'type': 'text', 'weight': 'A'},
         'realname': {'type': 'text', 'weight': 'A'},

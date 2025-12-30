@@ -35,13 +35,21 @@
                             <span class="h5">${entry.title}</span>
                         </a>
                         <div class="accordion-content" data-tab-content>
-                            <ul tal:repeat="field directory.fields" style="list-style: none; margin-left: 0">
-                                <li tal:condition="field.type == 'textarea'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: <br>{}').format(key, value)" style="white-space: pre-wrap;"></li>
-                                <li tal:condition="field.type != 'textarea'" tal:define="key field.human_id; value entry.values[field.id]" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
+                            <ul tal:repeat="field directory.fields" tal:define="content_labels entry.content_labels; hidden_labels entry.hidden_label_fields" style="list-style: none; margin-left: 0">
+                                <tal:block tal:condition="field.id in content_labels">
+                                    <li tal:condition="field.type == 'textarea'" tal:define="key field.id; human_id field.human_id; value entry.values[field.id]" style="white-space: pre-wrap;">
+                                        <tal:block tal:condition="key in hidden_labels" tal:content="value" />
+                                        <tal:block tal:condition="not:key in hidden_labels" tal:content="Markup('&lt;strong&gt;{}&lt;/strong&gt;: &lt;br&gt;{}').format(human_id, value)" />
+                                    </li>
+                                    <li tal:condition="field.type != 'textarea'" tal:define="key field.id; human_id field.human_id; value entry.values[field.id]">
+                                        <tal:block tal:condition="key in hidden_labels" tal:content="value" />
+                                        <tal:block tal:condition="not:key in hidden_labels" tal:content="Markup('&lt;strong&gt;{}&lt;/strong&gt;: {}').format(human_id, value)" />
+                                    </li>
+                                </tal:block>
                             </ul>
                             <ul style="list-style: none; margin-left: 0">
                                 <li>
-                                    <a tal:condition="request.is_manager" class="edit-link" tal:attributes="href request.link(entry, 'edit')">
+                                    <a tal:condition="request.is_manager" class="edit-link" tal:attributes="href request.link(entry)">
                                         <i class="far fa-edit"></i>
                                     </a>
                                 </li>

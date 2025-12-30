@@ -49,6 +49,7 @@ class Votum(
 
     fts_type_title = _('Vota')
     fts_public = True
+    fts_title_property = None
     fts_properties = {
         'text': {'type': 'localized', 'weight': 'A'},
         'motion': {'type': 'localized', 'weight': 'A'},

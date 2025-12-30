@@ -6,7 +6,11 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
-from onegov.form.errors import InvalidIndentSyntax
+from onegov.form.errors import (
+    InvalidIndentSyntax,
+    InvalidCommentIndentSyntax,
+    InvalidCommentLocationSyntax,
+)
 from onegov.form.fields import (
     DateTimeLocalField, MultiCheckboxField, TimeField, URLField, VideoURLField)
 from onegov.form.parser.grammar import field_help_identifier
@@ -56,7 +60,7 @@ def test_parse_text() -> None:
         << like EUR, CHF >>
     """)
 
-    form_class = parse_form(text)
+    form_class = parse_form(text, enable_edit_checks=True)
     form = form_class()
 
     fields = form._fields.values()
@@ -1129,10 +1133,315 @@ def test_indentation_error(
 
         assert excinfo.value.line == 6
     else:
-        try:
-            parse_formcode(text, enable_edit_checks=edit_checks)
-        except InvalidIndentSyntax as e:
-            pytest.fail('Unexpected exception {}'.format(type(e).__name__))
+        assert parse_formcode(text, enable_edit_checks=edit_checks)
+
+
+def test_indentation_error_for_identifier() -> None:
+    text = dedent(
+        """
+        # Wahl 1
+        Auswahl =
+            (x) A
+            ( ) B
+            ( ) C
+        # Wahl 2
+        Auswahl 2 =
+            (x) A
+            ( ) B
+            ( ) C
+        """
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
+
+    text = dedent(
+        """
+        # Wahl mit Unterauswahl
+        Auswahl =
+            (x) A
+            ( ) B
+            ( ) C
+                Auswahl 2 =
+                    (x) A
+                    ( ) B
+                    ( ) C
+        """
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
+
+    # wrong indent
+    text = dedent(
+        """
+        Auswahl =
+            (x) A
+            ( ) B
+            ( ) C
+            Auswahl 2 =
+                (x) A
+                ( ) B
+                ( ) C
+        """
+    )
+
+    with pytest.raises(InvalidIndentSyntax):
+        parse_formcode(text, enable_edit_checks=True)
+
+    text = dedent(
+        """
+            Auswahl =
+                (x) A
+                ( ) B
+                ( ) C
+        Auswahl 2 =
+            (x) A
+            ( ) B
+            ( ) C
+        """
+    )
+
+    with pytest.raises(InvalidIndentSyntax):
+        parse_formcode(text, enable_edit_checks=True)
+
+
+def test_indentation_error_for_identifier_2() -> None:
+    text = dedent(
+        """
+        Vorname *= ___
+
+        Zweite Person anmelden =
+            (x) Nein
+            ( ) Ja
+                Vorname *= ___
+
+                Dritte Person anmelden =
+                    (x) Nein
+                    ( ) Ja
+                        Vorname *= ___
+
+                Vierte Person anmelden =
+                    (x) Nein
+                    ( ) Ja
+                        Vorname *= ___
+
+                Fünfte Person anmelden =
+                    (x) Nein
+                    ( ) Ja
+                        Vorname *= ___
+
+        Bemerkungen = ___
+        """
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
+
+
+def test_help_indentation_error() -> None:
+    text = dedent(
+        """
+        Contact person *= ___
+        << Name of the contact person >>
+        Favorite fruit =
+            ( ) Apple
+            ( ) Banana
+        << Please select your favorite fruit >>
+        """
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
+
+    text = dedent(
+        """
+        Contact person = ___
+            << Name of the contact person >>
+        """
+    ).lstrip('\n')
+    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+        assert excinfo.value.line == 2
+
+    text = dedent(
+        """
+        Email *= @@@
+        << Put your personal email >>
+
+        Contact person = ___
+            << Name of the contact person >>
+        """
+    ).lstrip('\n')
+    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+        assert excinfo.value.line == 5
+
+    text = dedent(
+        """
+        Email *= @@@
+        << Put your personal email >>
+        Name = ___
+
+        Terms of Use / User Agreement *=
+            ( ) I accept the Terms of Use / User Agreement
+            << Please find the terms attached below .. >>
+            ( ) I DONT accept the Terms of Use / User Agreement
+        """
+    ).lstrip('\n')
+    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 7
+
+    text = dedent(
+        """
+        Email *= @@@
+
+        Preferred Sports =
+            [ ] Baseball
+            [ ] Football
+            [ ] Skiing
+            << Please select all your preferred sports >>
+        """
+    ).lstrip('\n')
+    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 7
+
+    text = dedent(
+        """
+        Email *= @@@
+        Preferred Sports =
+            [ ] Baseball
+            [ ] Football
+            [ ] Skiing
+        << Please select all your preferred sports >>
+        Name *= ___
+            << Please enter your name >>
+        """
+    ).lstrip('\n')
+    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 8
+
+
+    text = dedent(
+        """
+        Email *= @@@
+        Want Condiments =
+            (x) Yes
+                condiments =
+                    [ ] Relish
+                    [ ] Jalapenos
+                    [ ] Ketchup
+                    [ ] Other
+                        What else? = ___
+                << Choose your favorite condiments >>
+            ( ) No Condiments
+        << Whether or not you want condiments in your hotdog? >>
+        Name *= ___
+            << Please enter your name >>
+        """
+    ).lstrip('\n')
+    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 14
+
+
+    text = dedent(
+        """
+        Email *= @@@
+        Want Condiments =
+            (x) Yes
+                Condiments =
+                    [ ] Relish
+                    [ ] Jalapenios
+                    [ ] Ketchup
+                    [ ] Other
+                        What else? = ___
+                << Choose your favorite condiments >>
+            ( ) No Condiments
+        << Whether or not you want condiments in your hotdog? >>
+        Dessert =
+            ( ) Yes
+                Desserts =
+                    ( ) Ice Cream
+                    ( ) Cookie
+                    << badly indented >>
+        """
+    ).lstrip('\n')
+    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 18
+
+    # wrong indentation but used previous valid indentation depth as
+    # for condiments
+    text = dedent(
+        """
+        Email *= @@@
+        Want Condiments =
+            (x) Yes
+                condiments =
+                    [ ] Relish
+                    [ ] Jalapenos
+                    [ ] Ketchup
+                    [ ] Other
+                        What else? = ___
+                << Choose your favorite condiments >>
+            ( ) No Condiments
+        << Whether or not you want condiments in your hotdog? >>
+        Name *= ___
+                << Please enter your name >>
+        """
+    ).lstrip('\n')
+    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 14
+
+
+def test_help_location_error() -> None:
+    text = dedent(
+        """
+        Email *= @@@
+        << Put your personal email >>
+        Terms of Use / User Agreement *=
+            ( ) I accept the Terms of Use / User Agreement
+        << Please find the terms attached below .. >>
+        """
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
+
+    text = dedent(
+        """
+        # Comment
+        << Put your personal email >>
+        Email *= @@@
+        """
+    ).lstrip('\n')
+    with pytest.raises(InvalidCommentLocationSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 2
+
+    text = dedent(
+        """
+        Email *= @@@
+        << Put your personal email >>
+
+        Terms of Use / User Agreement *=
+        << Please find the terms attached below .. >>
+            ( ) I accept the Terms of Use / User Agreement
+        """
+    ).lstrip('\n')
+    with pytest.raises(InvalidCommentLocationSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 5
+
+    text = dedent(
+        """
+        Email *= @@@
+        << Put your personal email >>
+        Name = ___
+
+        Terms of Use / User Agreement *=
+        << Please find the terms attached below .. >>
+            ( ) I accept the Terms of Use / User Agreement
+        """
+    ).lstrip('\n')
+    with pytest.raises(InvalidCommentLocationSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 6
 
 
 def test_empty_fieldset_error() -> None:

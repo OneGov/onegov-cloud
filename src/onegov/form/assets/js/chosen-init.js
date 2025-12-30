@@ -40,7 +40,7 @@ $(document).ready(function() {
             $(element).find(
                 'input[type="radio"]:checked'
             ).prop('checked', false).trigger('change');
-            $(element).find('select').val('').filter('.chosen-select').trigger('chosen:updated');
+            $(element).find('select').val('').trigger('change').filter('.chosen-select').trigger('chosen:updated');
             $(element).find('input').not(
                 '[type="submit"], [type="radio"], [type="checkbox"], [name="csrf_token"]'
             ).val('').trigger('change');

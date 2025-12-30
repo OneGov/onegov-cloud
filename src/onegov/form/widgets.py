@@ -70,9 +70,19 @@ class MultiCheckboxWidget(ListWidget):
     def __init__(self, html_tag: Literal['ul', 'ol'] = 'ul'):
         super().__init__(html_tag=html_tag, prefix_label=False)
 
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
+        if hasattr(field.meta, 'request'):
+            field.meta.request.include('multicheckbox')
+        return super().__call__(field, **kwargs)
+
 
 class OrderedMultiCheckboxWidget(MultiCheckboxWidget, OrderedListWidget):
     """ The sorted list widget with the label behind the checkbox. """
+
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
+        if hasattr(field.meta, 'request'):
+            field.meta.request.include('multicheckbox')
+        return super().__call__(field, **kwargs)
 
 
 class CoordinateWidget(TextInput):
@@ -465,6 +475,24 @@ class ChosenSelectWidget(Select):
 
     def __call__(self, field: SelectFieldBase, **kwargs: Any) -> Markup:
         kwargs['class_'] = '{} chosen-select'.format(
+            kwargs.get('class_', '')
+        ).strip()
+        kwargs['data-placeholder'] = field.gettext(_('Select an Option'))
+        kwargs['data-no_results_text'] = field.gettext(_('No results match'))
+        if self.multiple:
+            kwargs['data-placeholder'] = field.gettext(
+                _('Select Some Options')
+            )
+
+        return super().__call__(field, **kwargs)
+
+
+class TreeSelectWidget(Select):
+
+    def __call__(self, field: SelectFieldBase, **kwargs: Any) -> Markup:
+        field.meta.request.include('treeselect')
+
+        kwargs['class_'] = '{} treeselect'.format(
             kwargs.get('class_', '')
         ).strip()
         kwargs['data-placeholder'] = field.gettext(_('Select an Option'))

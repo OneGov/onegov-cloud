@@ -36,6 +36,16 @@ body {
     margin-left: 9cm;
 }
 
+.sender-address {
+    margin-bottom: 0.5cm;
+    font-size: 8pt;
+}
+
+.sender-address p {
+    margin: 0;
+    line-height: 1.4;
+}
+
 .translator-info {
     margin-bottom: 1cm;
     font-size: 9pt;

@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import json
-
 from babel import Locale
 from requests.exceptions import JSONDecodeError
 
+from onegov.user import UserGroup, UserGroupCollection
+from onegov.translator_directory.constants import ASSIGNMENT_LOCATIONS
 from onegov.gis import Coordinates
 from onegov.gis.utils import MapboxRequests, outside_bbox
 from onegov.translator_directory import log
@@ -161,29 +162,20 @@ def update_drive_distances(
 def calculate_distance_to_location(
     request: TranslatorAppRequest,
     translator_coordinates: AnyCoordinates,
-    location_key: str
+    location_key: str,
+    custom_address: str | None = None,
 ) -> float | None:
-    """
-    Calculate driving distance from translator's coordinates to a specific
-    assignment location.
 
-    Args:
-        request: The request object with Mapbox token
-        translator_coordinates: The translator's geocoded coordinates
-        location_key: Key from ASSIGNMENT_LOCATIONS dict
-
-    Returns:
-        Distance in kilometers (one-way), or None if calculation fails
-    """
-    from onegov.translator_directory.constants import ASSIGNMENT_LOCATIONS
-
-    if not translator_coordinates or location_key not in ASSIGNMENT_LOCATIONS:
+    if not translator_coordinates:
         return None
 
-    # Get the address for this location
-    _, address = ASSIGNMENT_LOCATIONS[location_key]
+    if custom_address:
+        address = custom_address
+    elif location_key in ASSIGNMENT_LOCATIONS:
+        _, address = ASSIGNMENT_LOCATIONS[location_key]
+    else:
+        return None
 
-    # Geocode the assignment location address
     geocoding_api = MapboxRequests(
         request.app.mapbox_token,
         endpoint='geocoding'
@@ -214,7 +206,8 @@ def calculate_distance_to_location(
 
         response = directions_api.directions([
             to_tuple(translator_coordinates),
-            (location_coords[0], location_coords[1])  # lon, lat
+            # lat, lon (GeoJSON returns [lon, lat])
+            (location_coords[1], location_coords[0])
         ])
 
         if found_route(response):
@@ -328,17 +321,34 @@ def get_custom_text(request: OrgRequest, key: str) -> str:
         key, _(f"Error: No custom text found for '{key}'"))
 
 
-def get_accountant_email(request: TranslatorAppRequest) -> str:
-    """Returns the accountant email or raises an error if not configured."""
-    email = request.app.accountant_email
-    if not email:
-        settings_url = request.link(request.app.org, 'directory-settings')
-        error_msg = request.translate(
-            _(
-                'Accountant email is not configured. '
-                'Please configure it in the settings: ${settings_url}',
-                mapping={'settings_url': settings_url},
+def get_accountant_emails_for_finanzstelle(
+    request: TranslatorAppRequest, finanzstelle_key: str | None
+) -> set[str]:
+    if not finanzstelle_key:
+        raise ValueError(_('No Finanzstelle specified'))
+
+    groups = (
+        request.session.query(UserGroup)
+        .filter(UserGroup.meta['finanzstelle'].astext == finanzstelle_key)
+        .all()
+    )
+
+    emails = set()
+    for group in groups:
+        emails.update(group.meta.get('accountant_emails', []))
+
+    if not emails:
+        raise ValueError(
+            request.translate(
+                _(
+                    'No accountant emails configured for Finanzstelle '
+                    '"${fs}". Please configure user groups: ${url}',
+                    mapping={
+                        'fs': finanzstelle_key,
+                        'url': request.class_link(UserGroupCollection),
+                    },
+                )
             )
         )
-        raise ValueError(error_msg)
-    return email
+
+    return emails

@@ -112,6 +112,7 @@ $frm-handler-icon: '\f044';
 $rsv-handler-icon: '\f073';
 $evn-handler-icon: '\f133';
 $dir-handler-icon: '\f07b';
+$cht-handler-icon: '\f086';
 $pending-ticket-icon: $accept-ticket-icon-hover;
 $my-ticket-icon: '\f2bd';
 $ticket-archive-icon: '\f1c6';
@@ -200,12 +201,30 @@ $all-ticket-icon: '\f055';
 .RSV-link::before { @include icon-bold($rsv-handler-icon); }
 .EVN-link::before { @include icon-bold($evn-handler-icon); }
 .DIR-link::before { @include icon-bold($dir-handler-icon); }
+.CHT-link::before { @include icon-bold($cht-handler-icon); }
 
 .ALL-link::before,
 .FRM-link::before,
 .RSV-link::before,
 .EVN-link::before,
-.DIR-link::before {
+.DIR-link::before,
+.CHT-link::before {
+    display: inline-block;
+    margin-right: 1ex;
+}
+
+.FRM-option label::before { @include icon-bold($frm-handler-icon); }
+.RSV-option label::before { @include icon-bold($rsv-handler-icon); }
+.EVN-option label::before { @include icon-bold($evn-handler-icon); }
+.DIR-option label::before { @include icon-bold($dir-handler-icon); }
+.CHT-option label::before { @include icon-bold($cht-handler-icon); }
+
+.ALL-option label::before,
+.FRM-option label::before,
+.RSV-option label::before,
+.EVN-option label::before,
+.DIR-option label::before,
+.CHT-option label::before {
     display: inline-block;
     margin-right: 1ex;
 }
@@ -225,6 +244,10 @@ $all-ticket-icon: '\f055';
 
 .ticket-handler-DIR td:first-child::before {
     @include icon($dir-handler-icon);
+}
+
+.ticket-handler-CHT td:first-child::before {
+    @include icon($cht-handler-icon);
 }
 
 tr.ticket:hover {
@@ -664,6 +687,68 @@ button {
         font-size: 1rem;
         font-weight: bold;
         margin-top: -1px;
+    }
+
+    a.mute {
+        color: #333;
+        display: inline-block;
+        text-align: center;
+        width: 1.2rem;
+
+        .fa-microphone-slash {
+            display: none;
+        }
+        .fa-microphone {
+            display: inline;
+        }
+
+        &:hover {
+            color: $red;
+
+            .fa-microphone-slash {
+                display: inline;
+            }
+            .fa-microphone {
+                display: none;
+            }
+        }
+    }
+
+    a.unmute {
+        color: $red;
+        display: inline-block;
+        text-align: center;
+        width: 1.2rem;
+
+        .fa-microphone-slash {
+            display: inline;
+        }
+        .fa-microphone {
+            display: none;
+        }
+
+        &:hover {
+            color: #333;
+
+            .fa-microphone-slash {
+                display: none;
+            }
+            .fa-microphone {
+                display: inline;
+            }
+
+            &.disabled {
+                color: $red;
+                cursor: disabled;
+
+                .fa-microphone-slash {
+                    display: inline;
+                }
+                .fa-microphone {
+                    display: none;
+                }
+            }
+        }
     }
 
     .button {

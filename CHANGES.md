@@ -1,8 +1,253 @@
 # Changes
 
+## 2025.71
+
+`2025-12-29` | [23c7322afb...60f3664025](https://github.com/OneGov/onegov-cloud/compare/23c7322afb^...60f3664025)
+
+### Feriennet
+
+##### Hide RSS Feed
+
+`Feature` | [PRO-1458](https://linear.app/projuventute/issue/PRO-1458) | [8cbd225102](https://github.com/onegov/onegov-cloud/commit/8cbd225102b2207d1959b782cb99021f9399801a)
+
+##### "Delete user" button
+
+Deletion of a user in feriennet is now possible under the following conditions:
+-    Has no attendees with bookings in the currently active period
+-    Has no unpaid invoices in any period
+-    Is not an organizer of any activities
+-    Is not an admin
+
+`Feature` | [PRO-987](https://linear.app/projuventute/issue/PRO-987) | [c4a775e09e](https://github.com/onegov/onegov-cloud/commit/c4a775e09e935f39e452ffc7bad4b70be72151ba)
+
+##### Delete attendees
+
+`Feature` | [PRO-1436](https://linear.app/projuventute/issue/PRO-1436) | [1fb8ee16a1](https://github.com/onegov/onegov-cloud/commit/1fb8ee16a18b3b3f2ec81cdf2a4135243226fe4c)
+
+### Pas
+
+##### Gets rid of inline event handler.
+
+`Bugfix` | [OGC-2860](https://linear.app/onegovcloud/issue/OGC-2860) | [dde589d60e](https://github.com/onegov/onegov-cloud/commit/dde589d60eb6c1d7105886234b4f1789545127b9)
+
+## 2025.70
+
+`2025-12-19` | [7e83cff80c...2bf159789f](https://github.com/OneGov/onegov-cloud/compare/7e83cff80c^...2bf159789f)
+
+### Form
+
+##### Adds select all/deselect all buttons for multi checkbox fields
+
+The buttons only get displayed if there are at least five options to
+choose from. This also fixes a small bug with form resets when
+there is a treeselect field present.
+
+`Feature` | [OGC-2369](https://linear.app/onegovcloud/issue/OGC-2369) | [388a69d422](https://github.com/onegov/onegov-cloud/commit/388a69d422f66e76d9d3995bf5c0ba53d7c62560)
+
+##### Identify wrongly indented identifier
+
+But prevent wrongly indentation when loading a form
+
+`Feature` | [OGC-2370](https://linear.app/onegovcloud/issue/OGC-2370) | [2cb04a6c3a](https://github.com/onegov/onegov-cloud/commit/2cb04a6c3a1e04ded187c1b576a506bd9824fbed)
+
+### Org
+
+##### Specify hint for notifications about ticket messages
+
+`Feature` | [OGC-2672](https://linear.app/onegovcloud/issue/OGC-2672) | [7e83cff80c](https://github.com/onegov/onegov-cloud/commit/7e83cff80ce90a15888bd6eb2a0f05028be7be62)
+
+##### Adds additional ways discounts in reservations can be calculated
+
+Previously discounts always applied to the price per item/hour and
+ignored any prices defined through extra fields. Now you can choose
+to apply the discounts to just the extras, or everything at the end
+as well.
+
+`Feature` | [OGC-2263](https://linear.app/onegovcloud/issue/OGC-2263) | [4225ae51ba](https://github.com/onegov/onegov-cloud/commit/4225ae51baa8acd18930c3fb078c7fa11dd3f372)
+
+##### Add o'clock in events time display.
+
+`Feature` | [OGC-2763](https://linear.app/onegovcloud/issue/OGC-2763) | [4fd9547d95](https://github.com/onegov/onegov-cloud/commit/4fd9547d95085f281ce8abf0c4225d1c3902353a)
+
+##### Improves search ranking for records that match with their title
+
+`Feature` | [OGC-2789](https://linear.app/onegovcloud/issue/OGC-2789) | [98151c54a2](https://github.com/onegov/onegov-cloud/commit/98151c54a25327cbd9cdd6973d08051954b44477)
+
+##### Produces smaller query strings for large ticket group filters
+
+This improves compatibility with nginx proxies without having to resort
+to very large buffer sizes.
+
+`Bugfix` | [OGC-2824](https://linear.app/onegovcloud/issue/OGC-2824) | [93858c4997](https://github.com/onegov/onegov-cloud/commit/93858c499716ad86e5eaf8ce7bd5c33dd64b4f52)
+
+### Pas
+
+##### Disable YubiKey.
+
+The two-factor authentication will be handled via a different
+method; therefore, we do not want to use a YubiKey for this
+namespace.
+
+`Bugfix` | [0e6bb6554b](https://github.com/onegov/onegov-cloud/commit/0e6bb6554b7ced8701765630ab50c1c3223e2f6f)
+
+### Ris
+
+##### Fix N+1 Query for Parliamentarian view
+
+`Performance` | [OGC-2876](https://linear.app/onegovcloud/issue/OGC-2876) | [af8e5530c0](https://github.com/onegov/onegov-cloud/commit/af8e5530c051365a1a1eefa152b92dbd601c635a)
+
+### Search
+
+##### Adds basic search result highlighting
+
+This also moves string normalization from the client to the Postgres
+server. This involves a little bit of additional setup on the server
+but provides a better result highlighting experience.
+
+`Feature` | [OGC-2881](https://linear.app/onegovcloud/issue/OGC-2881) | [e3b9d7d410](https://github.com/onegov/onegov-cloud/commit/e3b9d7d410f3dbd277e4c31b430adbb06df2a85c)
+
+### Town6
+
+##### Fix wrong event tag translation for Parties
+
+`Bugfix` | [OGC-2890](https://linear.app/onegovcloud/issue/OGC-2890) | [d5b58c8026](https://github.com/onegov/onegov-cloud/commit/d5b58c8026fc8ec4e3dbbb659c27e8efabeaf8e9)
+
+### Wil
+
+##### Adds cli command to rename meeting files before July 2025
+
+`Feature` | [OGC-2815](https://linear.app/onegovcloud/issue/OGC-2815) | [63e3cca045](https://github.com/onegov/onegov-cloud/commit/63e3cca0457180d30000ae758831faf6c691bcc4)
+
+##### Event import failed due to missing location data
+
+Some events recently do not provide location data which made the nightly import fail.
+
+`Bugfix` | [OGC-2875](https://linear.app/onegovcloud/issue/OGC-2875) | [5506bfbb42](https://github.com/onegov/onegov-cloud/commit/5506bfbb42f53212db20977d198cd231758ca637)
+
+### Winterthur
+
+##### Gets rid of inline JavaScript in templates
+
+`Feature` | [OGC-2859](https://linear.app/onegovcloud/issue/OGC-2859) | [e5df575d22](https://github.com/onegov/onegov-cloud/commit/e5df575d226662fe81a522c3f03e47284788de88)
+
+## 2025.69
+
+`2025-12-09` | [b39432183e...68810065f9](https://github.com/OneGov/onegov-cloud/compare/b39432183e^...68810065f9)
+
+### Directory
+
+##### Accordion mode now reflects the content fields hide labels from configuration
+
+`Feature` | [OGC-2832](https://linear.app/onegovcloud/issue/OGC-2832) | [546a3bd918](https://github.com/onegov/onegov-cloud/commit/546a3bd9188472ab90d1a8088eb5ba11ac52ab3b)
+
+### Feriennet
+
+##### Remove privacy option in general settings and add in export
+
+`Feature` | [OGC-1454](https://linear.app/onegovcloud/issue/OGC-1454) | [4246ff777d](https://github.com/onegov/onegov-cloud/commit/4246ff777d51667de2dac8f11243b136d1943390)
+
+## 2025.68
+
+`2025-12-05` | [5440ea7e83...979b8b8912](https://github.com/OneGov/onegov-cloud/compare/5440ea7e83^...979b8b8912)
+
+### Core
+
+##### Applies a more strict `Cache-Control` setting for logged in users
+
+`Feature` | [OGC-2753](https://linear.app/onegovcloud/issue/OGC-2753) | [7e72534569](https://github.com/onegov/onegov-cloud/commit/7e72534569b7dfbbc2f3245cf3ffe1c9dab3d67b)
+
+### Form
+
+##### Improve error message for comment field indentation errors
+
+`Feature` | [OGC-2311](https://linear.app/onegovcloud/issue/OGC-2311) | [36912ab924](https://github.com/onegov/onegov-cloud/commit/36912ab924f9bad4f3bc88bc39c8a602741e51fb)
+
+### Landsgemeinde
+
+##### Move print button
+
+`Feature` | [OGC-2830](https://linear.app/onegovcloud/issue/OGC-2830) | [7a527a7780](https://github.com/onegov/onegov-cloud/commit/7a527a7780289f3887f582348ce3b37c4569aa18)
+
+##### Removes inline javascript from templates
+
+`Feature` | [OGC-2861](https://linear.app/onegovcloud/issue/OGC-2861) | [34b4446c7b](https://github.com/onegov/onegov-cloud/commit/34b4446c7b856e3c8874176263f64b8288c31ba7)
+
+### Org
+
+##### Allows extra fields to be displayed in occupancy view
+
+Also slightly changes the order of values in the occupancy view so the
+most important information is least likely to be visually cut off.
+
+`Feature` | [OGC-2843](https://linear.app/onegovcloud/issue/OGC-2843) | [e8f1bfd8bf](https://github.com/onegov/onegov-cloud/commit/e8f1bfd8bf58a2eb10c71935a0b38d7605233789)
+
+##### Makes reservation date filtering on payments/invoices more flexible
+
+`Feature` | [OGC-2600](https://linear.app/onegovcloud/issue/OGC-2600) | [3e6cba29b6](https://github.com/onegov/onegov-cloud/commit/3e6cba29b64673c3c0b6d87d0ebf3776c9f0fc04)
+
+##### Allows related tickets to be muted/unmuted from any related ticket
+
+`Feature` | [OGC-2844](https://linear.app/onegovcloud/issue/OGC-2844) | [e2ea34a04b](https://github.com/onegov/onegov-cloud/commit/e2ea34a04b26f1c4f07dbbf862cc0ab1acb965ee)
+
+##### Adds a tree select filter widget for payment/invoices
+
+`Feature` | [OGC-2824](https://linear.app/onegovcloud/issue/OGC-2824) | [0ac1805858](https://github.com/onegov/onegov-cloud/commit/0ac1805858df97dcda18dcbf54c117cb36d3c357)
+
+##### Allows allocations to define their own pricing
+
+This serves use-cases like charging more for reservations on a weekend
+
+`Feature` | [OGC-2768](https://linear.app/onegovcloud/issue/OGC-2768) | [1e50067e5d](https://github.com/onegov/onegov-cloud/commit/1e50067e5d3de845c84b4bd54ef4696d73930d27)
+
+##### Removes inline javascript from the templates
+
+This is preparation work for tightening up our Content-Security-Policy
+
+`Feature` | [OGC-2864](https://linear.app/onegovcloud/issue/OGC-2864) | [ec68f8a057](https://github.com/onegov/onegov-cloud/commit/ec68f8a0570b0e143480bfb502b5f3e1be160574)
+
+##### Video iFrame error
+
+`Bugfix` | [OGC-2837](https://linear.app/onegovcloud/issue/OGC-2837) | [ae0da86876](https://github.com/onegov/onegov-cloud/commit/ae0da86876e95009f8369c9f9da2d3cad8ab71f5)
+
+##### Fix bad redirect when rejecting reservation with comment
+
+`Bugfix` | [OGC-2786](https://linear.app/onegovcloud/issue/OGC-2786) | [b54f36cf36](https://github.com/onegov/onegov-cloud/commit/b54f36cf360dffdcb2ba7ab23d89e3140460c285)
+
+### Pas
+
+##### Fixes by-effect of RIS refactoring on PAS.
+
+Fixes commission edit form not having a save button.
+
+`Bugfix` | [OGC-2847](https://linear.app/onegovcloud/issue/OGC-2847) | [9e98b030b6](https://github.com/onegov/onegov-cloud/commit/9e98b030b60ef9b73e39566b72a71302c80a186a)
+
+##### Fixes dropdown syncing for commission presidents.
+
+`Bugfix` | [OGC-2846](https://linear.app/onegovcloud/issue/OGC-2846) | [a42fd32358](https://github.com/onegov/onegov-cloud/commit/a42fd3235844b39968b570b84394b0faa9004274)
+
+##### Fixes dropdown syncing for parliamentarians.
+
+`Bugfix` | [OGC-2846](https://linear.app/onegovcloud/issue/OGC-2846) | [fc831a5829](https://github.com/onegov/onegov-cloud/commit/fc831a582977276ab99894fb9cbc59a13bae25c4)
+
+### Ris
+
+##### Multiple parliamentary groups can now be linked to a political business
+
+`Feature` | [OGC-2816](https://linear.app/onegovcloud/issue/OGC-2816) | [fffb5c21b2](https://github.com/onegov/onegov-cloud/commit/fffb5c21b2c5a6324ca9e56b46c6a92603b46e4a)
+
+##### Improve filename extraction, extension and file icon determination
+
+`Bugfix` | [OGC-2813](https://linear.app/onegovcloud/issue/OGC-2813) | [eb0b0a9942](https://github.com/onegov/onegov-cloud/commit/eb0b0a9942992ccb8f7501360db3101ca90ed078)
+
+### Town6
+
+##### Adds a search field to the list of political businesses
+
+`Feature` | [OGC-2836](https://linear.app/onegovcloud/issue/OGC-2836) | [5440ea7e83](https://github.com/onegov/onegov-cloud/commit/5440ea7e83618533c8380c394e55b98c0f85c980)
+
 ## 2025.67
 
-`2025-11-27` | [98c33a124a...e50fd42a9d](https://github.com/OneGov/onegov-cloud/compare/98c33a124a^...e50fd42a9d)
+`2025-11-27` | [98c33a124a...c4d2fbf0ed](https://github.com/OneGov/onegov-cloud/compare/98c33a124a^...c4d2fbf0ed)
 
 ### Feriennet
 
@@ -2317,115 +2562,4 @@ Refactors capturing of exceptions and re-emitting them as `APIException`
 ##### Copy event button
 
 `Feature` | [OGC-1900](https://linear.app/onegovcloud/issue/OGC-1900) | [a7e570ede0](https://github.com/onegov/onegov-cloud/commit/a7e570ede065c6f56b7e25fa3cb3a5b867fe68d9)
-
-## 2025.21
-
-`2025-04-24` | [6864d7cf50...8b0cd01cc9](https://github.com/OneGov/onegov-cloud/compare/6864d7cf50^...8b0cd01cc9)
-
-### Org
-
-##### Adds integration for dormakaba API
-
-`Feature` | [OGC-2032](https://linear.app/onegovcloud/issue/OGC-2032) | [8268dfadff](https://github.com/onegov/onegov-cloud/commit/8268dfadff4754fddd73d74da5434e9008b4b91d)
-
-### Reservation
-
-##### Fixes upgrade task not running, when it should be run
-
-`Bugfix` | [6864d7cf50](https://github.com/onegov/onegov-cloud/commit/6864d7cf50cd01fa78c71c698cfed93e8f712819)
-
-## 2025.20
-
-`2025-04-22` | [196ff526a9...3c6edf9228](https://github.com/OneGov/onegov-cloud/compare/196ff526a9^...3c6edf9228)
-
-### Pas
-
-##### Import data.
-
-`Feature` | [OGC-2091](https://linear.app/onegovcloud/issue/OGC-2091) | [196ff526a9](https://github.com/onegov/onegov-cloud/commit/196ff526a9e3744fa7f3a64a9e0ffacc4ac93927)
-
-## 2025.19
-
-`2025-04-22` | [0e2daaf130...0515b72f63](https://github.com/OneGov/onegov-cloud/compare/0e2daaf130^...0515b72f63)
-
-### Feriennet
-
-##### Cancellation conditions in booking mail
-
-`Feature` | [PRO1375](#PRO1375) | [0e2daaf130](https://github.com/onegov/onegov-cloud/commit/0e2daaf1309b7059ba2a781ebe7f11a7730fa9c3)
-
-### Form
-
-##### Increases default filesize for Upload to 100MB.
-
-The comment regarding the filesize was referring to an
-earlier implementation and probably no longer valid.
-
-`Bugfix` | [OGC-2177](https://linear.app/onegovcloud/issue/OGC-2177) | [24ee549f89](https://github.com/onegov/onegov-cloud/commit/24ee549f892c8414c7070349c2c7fac04d438aea)
-
-### Landsgemeinde
-
-##### Navigation between assembly items
-
-Add buttons for navigating between assembly items
-
-`Feature` | [OGC-2198](https://linear.app/onegovcloud/issue/OGC-2198) | [f69359a71f](https://github.com/onegov/onegov-cloud/commit/f69359a71fcd27121caaccd89348c46a8df54b30)
-
-### Org
-
-##### Adds ticket tags with optional attached meta data
-
-`Feature` | [OGC-2186](https://linear.app/onegovcloud/issue/OGC-2186) | [278928a937](https://github.com/onegov/onegov-cloud/commit/278928a937d7ff30df505e87428b11e53ba071af)
-
-##### Adds copy/paste functionality for availability periods
-
-`Feature` | [OGC-2202](https://linear.app/onegovcloud/issue/OGC-2202) | [f663a72fd4](https://github.com/onegov/onegov-cloud/commit/f663a72fd4ba5de225e277808b45c9122a6265d6)
-
-##### Fixes crash when event filters are enabled without defining any
-
-`Bugfix` | [ea5aafc7bb](https://github.com/onegov/onegov-cloud/commit/ea5aafc7bbfd4b3f6d559d67e3b54e440fc33fac)
-
-## test
-
-`2025-04-17` | [9c3aee5da3...c5f31f5611](https://github.com/OneGov/onegov-cloud/compare/9c3aee5da3^...c5f31f5611)
-
-### Core
-
-##### Switches Redis cache serialization over to MessagePack
-
-`Feature` | [OGC-1893](https://linear.app/onegovcloud/issue/OGC-1893) | [b33e6c99a9](https://github.com/onegov/onegov-cloud/commit/b33e6c99a98040b05efc03099532f483a519a8b3)
-
-### Feriennet
-
-##### Display quotes in mail subjects correctly
-
-`Bugfix` | [PRO-1297](https://linear.app/projuventute/issue/PRO-1297) | [9eb742296b](https://github.com/onegov/onegov-cloud/commit/9eb742296b21b8bcdb0c421a0e4b4a40bd9c3aaf)
-
-### Intranet
-
-##### Fixes anonymous user permissions
-
-`Bugfix` | [SEA-1790](https://linear.app/seantis/issue/SEA-1790) | [c935dc299f](https://github.com/onegov/onegov-cloud/commit/c935dc299f47fbf332e3a682de3b81ae2b5563cd)
-
-### Landsgemeinde
-
-##### Change Label for audio
-
-`Feature` | [OGC-2194](https://linear.app/onegovcloud/issue/OGC-2194) | [aa1339ba34](https://github.com/onegov/onegov-cloud/commit/aa1339ba34a0a7057e2f53215615d373a5b3f2ed)
-
-### Org
-
-##### Fixes potential `request_cached` issues in hourly maintenance tasks
-
-Modifying `app.org` without immediate `flush` means `maybe_merge` can
-fail. So it is more robust to factor the update to the end of the
-cronjob after all the other things have been done.
-
-`Bugfix` | [03d275054d](https://github.com/onegov/onegov-cloud/commit/03d275054d8c41bdcb40c45739ac46d4f2f25448)
-
-### Town6
-
-##### Option to display breadcrumbs via parameters in iframe
-
-`Feature` | [OGC-2175](https://linear.app/onegovcloud/issue/OGC-2175) | [72113ad510](https://github.com/onegov/onegov-cloud/commit/72113ad510e1c71cec926498bb7cec0a86c8ec2c)
 

@@ -777,8 +777,8 @@ class ColumnMapperMetadata:
             ('t:t:title', 'Titel des Dokuments'),
             ('t:t:position', 'Position zur Vorlage'),
             ('t:t:author', 'AutorIn (Nachname Vorname) des Dokuments'),
-            ('t:t:editor', 'AuftraggeberIn/HerausgeberIn des Dokuments '
-                           '(typischerweise Komitee/Verband/Partei)'),
+            ('t:t:editor', ('AuftraggeberIn/HerausgeberIn des Dokuments '
+                           '(typischerweise Komitee/Verband/Partei)')),
             ('i:t:date_year', 'Datum Jahr'),
             ('i:t:date_month', 'Datum Monat'),
             ('i:t:date_day', 'Datum Tag'),

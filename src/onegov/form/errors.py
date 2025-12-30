@@ -2,7 +2,9 @@ from __future__ import annotations
 
 
 class FormError(Exception):
-    pass
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}'
 
 
 class DuplicateLabelError(FormError):
@@ -28,6 +30,16 @@ class InvalidFormSyntax(FormError):
 
 
 class InvalidIndentSyntax(FormError):
+    def __init__(self, line: int):
+        self.line = line
+
+
+class InvalidCommentIndentSyntax(FormError):
+    def __init__(self, line: int):
+        self.line = line
+
+
+class InvalidCommentLocationSyntax(FormError):
     def __init__(self, line: int):
         self.line = line
 

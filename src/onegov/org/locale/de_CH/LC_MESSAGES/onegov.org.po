@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-27 14:12+0100\n"
+"POT-Creation-Date: 2025-12-19 12:13+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -394,6 +394,27 @@ msgstr "An Feiertagen"
 msgid "During school holidays"
 msgstr "Während Schulferien"
 
+msgid "Price"
+msgstr "Preis"
+
+msgid "Inherit from resource"
+msgstr "Von der Reservations-Ressource übernehmen"
+
+msgid "Free of charge"
+msgstr "Kostenlos"
+
+msgid "Per item"
+msgstr "Pro Eintrag"
+
+msgid "Per hour"
+msgstr "Pro Stunde"
+
+msgid "Price per item"
+msgstr "Preis pro Eintrag"
+
+msgid "Price per hour"
+msgstr "Preis pro Stunde"
+
 msgid "Public"
 msgstr "Öffentlich"
 
@@ -645,12 +666,6 @@ msgstr "Neue Einträge"
 
 msgid "Guideline"
 msgstr "Wegleitung"
-
-msgid "Price"
-msgstr "Preis"
-
-msgid "Free of charge"
-msgstr "Kostenlos"
 
 msgid "Price per submission"
 msgstr "Preis pro Eingabe"
@@ -1526,6 +1541,15 @@ msgstr "Nach Reservationsdatum filtern"
 msgid "To reservation date"
 msgstr "Bis Datum — Reservation"
 
+msgid "Reference date"
+msgstr "Referenzdatum"
+
+msgid "Final reservation date"
+msgstr "Nur letzte Reservation"
+
+msgid "Any reservation date"
+msgstr "Alle Reservationen"
+
 msgid "Filter Payments"
 msgstr "Zahlungen filtern"
 
@@ -1695,6 +1719,21 @@ msgstr ""
 msgid "Extra Fields Definition"
 msgstr "Extra-Felder Definition"
 
+msgid "Extra Field values to include in occupancy"
+msgstr "Extra-Feld Eingaben in der Belegungsansicht"
+
+msgid ""
+"By default the occupancy view displays the tag, e-mail, time slot and ticket "
+"number. Any fields selected would be included directly after the first line "
+"which contains either the tag or the e-mail."
+msgstr ""
+"Standardmässig wird das Schlagwort, die E-Mail, der Zeitraum und die "
+"Ticketnummer angezeigt. Ausgewählte Felder werden direkt nach der ersten "
+"Zeile angezeigt welche entweder das Schlagwort oder die E-Mail enthält."
+
+msgid "Occupancy"
+msgstr "Belegung"
+
 msgid "Extra Field values to include in calendar subscription"
 msgstr "Extra-Feld Eingaben im Kalender-Abonnement"
 
@@ -1791,18 +1830,6 @@ msgstr ""
 "Wird bei allen Rechnugnspositionen angezeigt, die direkt mit der Reservation "
 "von diesem Objekt im Zusammenhang stehen."
 
-msgid "Per item"
-msgstr "Pro Eintrag"
-
-msgid "Per hour"
-msgstr "Pro Stunde"
-
-msgid "Price per item"
-msgstr "Preis pro Eintrag"
-
-msgid "Price per hour"
-msgstr "Preis pro Stunde"
-
 msgid "Prices in extra fields are"
 msgstr "Preise in Extra-Felder gelten"
 
@@ -1815,6 +1842,18 @@ msgstr ""
 
 msgid "One-off"
 msgstr "Einmalig"
+
+msgid "Discounts in extra fields apply to"
+msgstr "Prozentuale Rabatte in Extra-Feldern gelten für"
+
+msgid "Just the price per item/hour"
+msgstr "Nur den Preis pro Eintrag/Stunde"
+
+msgid "Just the prices in extra fields"
+msgstr "Nur den Preis der ausgewählten Extra-Felder"
+
+msgid "The total price at the end"
+msgstr "Den gesamten Totalbetrag am Ende"
 
 msgid ""
 "Failed to retrieve the doors from the dormakaba API please make sure your "
@@ -2910,11 +2949,21 @@ msgstr "Nachricht"
 msgid "The message is empty"
 msgstr "Die Nachricht ist leer"
 
+msgid "Notify about replies hint"
+msgstr "Hinweis zur Benachrichtigung über Antworten"
+
+msgid ""
+"The \"Always send email notifications for new ticket messages\" setting is "
+"enabled. You will receive an email whenever theres a reply to your messages. "
+"You can change this behaviour in the general ticket settings."
+msgstr ""
+"Die Einstellung \"Immer E-Mail-Benachrichtigungen für neue Ticket-"
+"Nachrichten senden\" ist aktiviert. Sie erhalten eine E-Mail, sobald es eine "
+"Antwort auf Ihre Nachrichten gibt. Sie können dieses Verhalten in den "
+"allgemeinen Ticket-Einstellungen ändern."
+
 msgid "Notify me about replies"
 msgstr "Ich möchte eine Benachrichtigung bei Antworten"
-
-msgid "Setting \"Always notify\" is active"
-msgstr "Einstellung \"Immer benachrichtigen\" ist eingeschaltet"
 
 msgid "BCC"
 msgstr "BCC"
@@ -3334,9 +3383,6 @@ msgstr ""
 
 msgid "Clean up"
 msgstr "Aufräumen"
-
-msgid "Occupancy"
-msgstr "Belegung"
 
 msgid "Subscribe"
 msgstr "Abonnieren"
@@ -5859,6 +5905,12 @@ msgstr "Schlagwort ändern"
 msgid "Related Tickets"
 msgstr "Verknüpfte Tickets"
 
+msgid "Disable E-Mails for all related tickets"
+msgstr "E-Mails für alle verknüpften Tickets deaktivieren"
+
+msgid "Enable E-Mails for all related tickets"
+msgstr "E-Mails für alle verknüpften Tickets aktivieren"
+
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
 "will become the author of the whole note."
@@ -6866,6 +6918,9 @@ msgstr "Dieses Wochenende"
 msgid "This week"
 msgstr "Diese Woche"
 
+msgid "o'clock"
+msgstr "Uhr"
+
 msgid "Event Export"
 msgstr "Veranstaltungs-Export"
 
@@ -7511,6 +7566,23 @@ msgstr "Sie haben E-Mails für das Ticket ${number} deaktiviert"
 msgid "You have enabled e-mails for ticket ${number}"
 msgstr "Sie haben E-Mails für das Ticket ${number} aktiviert"
 
+#, python-format
+msgid "You have disabled e-mails for tickets ${numbers}"
+msgstr "Sie haben E-Mails für die Tickets ${numbers} deaktiviert"
+
+msgid "There were no related tickets to mute"
+msgstr ""
+"Es gab keine verknüpften Tickets für welche E-Mails deaktiviert werden "
+"konnten"
+
+#, python-format
+msgid "You have enabled e-mails for tickets ${numbers}"
+msgstr "Sie haben E-Mails für die Tickets ${numbers} aktiviert"
+
+msgid "There were no related tickets to unmute"
+msgstr ""
+"Es gab keine verknüpften Tickets für welche E-Mails aktiviert werden konnten"
+
 msgid "The ticket cannot be archived because it's not closed"
 msgstr "Das Ticket kann nicht archiviert werden, da es nicht geschlossen ist"
 
@@ -7654,6 +7726,41 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid "Political Parties"
+#~ msgstr "Parteien"
+
+#~ msgid ""
+#~ "The \"Always send email notifications for new ticket messages\" setting "
+#~ "is enabled. You will receive an email whenever a new message is posted to "
+#~ "this ticket. You can change this behaviour in the general ticket settings."
+#~ msgstr ""
+#~ "Die Einstellung \"Immer E-Mail-Benachrichtigungen für neue Ticket-"
+#~ "Nachrichten senden\" ist aktiviert. Sie erhalten eine E-Mail, sobald eine "
+#~ "neue Nachricht zu diesem Ticket gesendet wird. Sie können dieses "
+#~ "Verhalten in den allgemeinen Ticket-Einstellungen ändern."
+
+#~ msgid ""
+#~ "Setting \"Always send email notification if a new ticket message is "
+#~ "sent\" is active. You can change this behaviour in the general ticket "
+#~ "settings."
+#~ msgstr ""
+#~ "Die Einstellung \"Immer eine E-Mail-Benachrichtigung senden, wenn eine "
+#~ "neue Ticket-Nachricht gesendet wird\" ist aktiv. Sie können dieses "
+#~ "Verhalten in den allgemeinen Ticket-Einstellungen ändern."
+
+#~ msgid ""
+#~ "Setting \"Always send email notification if a new ticket message is "
+#~ "sent\" is active. You will always be notified about replies to this "
+#~ "ticket. You can change this behaviour in the general ticket settings."
+#~ msgstr ""
+#~ "Die Einstellung \"E-Mail-Benachrichtigung immer senden, wenn eine neue "
+#~ "Ticket-Nachricht gesendet wird\" ist aktiv. Sie werden immer über "
+#~ "Antworten zu diesem Ticket benachrichtigt. Sie können dieses Verhalten in "
+#~ "den allgemeinen Ticket-Einstellungen ändern."
+
+#~ msgid "Setting \"Always notify\" is active"
+#~ msgstr "Einstellung \"Immer benachrichtigen\" ist eingeschaltet"
 
 #~ msgid "Dashboard"
 #~ msgstr "Dashboard"

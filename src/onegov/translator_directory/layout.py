@@ -412,7 +412,6 @@ class TranslatorCollectionLayout(DefaultLayout):
                         ),
                     )
                 ),
-                # Link removed from here
                 Link(
                     _('Mail to all translators'),
                     url=self.request.app.mailto_link,

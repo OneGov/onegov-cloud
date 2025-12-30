@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-11-12 10:03+0100\n"
+"POT-Creation-Date: 2025-12-10 15:02+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -288,6 +288,9 @@ msgstr "Benutzer Status E-Mail"
 
 msgid "User TOS Accepted"
 msgstr "Benutzer AGB akzeptiert"
+
+msgid "User Allow contact for carpooling"
+msgstr "Benutzer Kontakt für Fahrgemeinschaft erlauben"
 
 msgid "Invoice Item Group"
 msgstr "Rechnungsposition Gruppe"
@@ -1505,6 +1508,15 @@ msgstr "Registration als Hilfsperson"
 msgid "Sort"
 msgstr "Sortieren"
 
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Do you really want to delete this user?"
+msgstr "Möchten Sie diesen Benutzer wirklich löschen?"
+
+msgid "Delete user"
+msgstr "Benutzer löschen"
+
 msgid "Half day"
 msgstr "Halbtägig"
 
@@ -2070,9 +2082,6 @@ msgstr "Möchten Sie diesen Bedarf wirklich löschen?"
 msgid "Delete need"
 msgstr "Bedarf löschen"
 
-msgid "Delete"
-msgstr "Löschen"
-
 msgid "Enroll"
 msgstr "Anmelden"
 
@@ -2634,6 +2643,17 @@ msgstr "Teilnehmende bearbeiten"
 msgid "Booking Limit of ${name}"
 msgstr "Buchungslimite von ${name}"
 
+#, python-format
+msgid "${name} and associated bookings were deleted."
+msgstr "${name} und die zugehörigen Buchungen wurden gelöscht."
+
+msgid ""
+"The attendee cannot be deleted because there are existing bookings in the "
+"current period."
+msgstr ""
+"Der/die Teilnehmende kann nicht gelöscht werden, da es im aktuellen Zeitraum "
+"bestehende Buchungen gibt."
+
 msgid "The user account must be opened by a parent or guardian of full age."
 msgstr ""
 "Das Benutzerkonto muss durch eine erziehungsberechtigte, volljährige Person "
@@ -2788,6 +2808,17 @@ msgstr "Buchung stornieren"
 #, python-format
 msgid "Do you really want to cancel \"${title}\"?"
 msgstr "Möchten Sie \"${title}\" wirklich stornieren?"
+
+msgid "Delete attendee"
+msgstr "Teilnehmende löschen"
+
+#, python-format
+msgid "Do you really want to delete \"${name}\" and all associated bookings?"
+msgstr ""
+"Möchten Sie \"${name}\" und alle zugehörigen Buchungen wirklich löschen?"
+
+msgid "The invoices will not be deleted."
+msgstr "Die Rechnungen werden nicht gelöscht."
 
 msgid "Only open, cancelled, denied or blocked bookings may be deleted"
 msgstr ""
@@ -3157,11 +3188,6 @@ msgstr ""
 "Der Text wird unter dem Bestätigungstext für ein Angebot in der E-Mail "
 "angezeigt"
 
-msgid "Parents can see the contacts of other parents in the same activity"
-msgstr ""
-"Mitglieder können die Kontaktdaten anderer Mitglieder des gleichen Angebots "
-"sehen"
-
 msgid "Public organiser data"
 msgstr "Öffentliche Daten Veranstaltende"
 
@@ -3238,6 +3264,43 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+msgid ""
+"The user cannot be deleted because they are organizers of existing "
+"activities."
+msgstr ""
+"Der Benutzer kann nicht gelöscht werden, da er Veranstalter von bestehenden "
+"Angeboten ist."
+
+msgid ""
+"The account cannot be deleted because there are attendees with existing "
+"bookings in the current period. Wait for the period to end or delete the "
+"bookings first."
+msgstr ""
+"Das Konto kann nicht gelöscht werden, da es Teilnehmende mit bestehenden "
+"Buchungen im aktuellen Zeitraum gibt. Warten Sie bis der Zeitraum endet oder "
+"löschen Sie zuerst die Buchungen."
+
+msgid ""
+"The account cannot be deleted because there are unpaid invoices associated "
+"with them. Mark all invoices as paid before deleting the user."
+msgstr ""
+"Das Konto kann nicht gelöscht werden, da es unbezahlte Rechnungen gibt. "
+"Markieren Sie alle Rechnungen als bezahlt bevor Sie den Benutzer löschen."
+
+#, python-format
+msgid "${name} has been deleted, including all associated data."
+msgstr "${name} wurde gelöscht, inklusive aller damit verbundenen Daten."
+
+msgid "Could not delete account; try again or contact an administrator."
+msgstr ""
+"Konnte das Konto nicht löschen; versuchen Sie es erneut oder kontaktieren "
+"Sie einen Administrator."
+
+#~ msgid "Parents can see the contacts of other parents in the same activity"
+#~ msgstr ""
+#~ "Mitglieder können die Kontaktdaten anderer Mitglieder des gleichen "
+#~ "Angebots sehen"
 
 #~ msgid "Dashboard"
 #~ msgstr "Übersicht"

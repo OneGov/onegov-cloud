@@ -123,6 +123,18 @@ class ResourceBaseForm(Form):
         render_kw={'rows': 32, 'data-editor': 'form'}
     )
 
+    occupancy_fields = TextAreaField(
+        label=_('Extra Field values to include in occupancy'),
+        description=_(
+            'By default the occupancy view displays the tag, e-mail, '
+            'time slot and ticket number. Any fields selected would be '
+            'included directly after the first line which contains '
+            'either the tag or the e-mail.'
+        ),
+        fieldset=_('Occupancy'),
+        render_kw={'class_': 'formcode-select'}
+    )
+
     ical_fields = TextAreaField(
         label=_('Extra Field values to include in calendar subscription'),
         description=_(
@@ -327,6 +339,18 @@ class ResourceBaseForm(Form):
         )
     )
 
+    discount_method = RadioField(
+        label=_('Discounts in extra fields apply to'),
+        fieldset=_('Payments'),
+        default='resource',
+        validators=[InputRequired()],
+        choices=(
+            ('resource', _('Just the price per item/hour')),
+            ('extras', _('Just the prices in extra fields')),
+            ('everything', _('The total price at the end'))
+        ),
+    )
+
     def on_request(self) -> None:
         if hasattr(self.model, 'type'):
             if self.model.type == 'daypass':
@@ -508,6 +532,7 @@ class ResourceBaseForm(Form):
             'deadline_unit',
             'deadline_days',
             'deadline_hours',
+            'occupancy_fields',
             'ical_fields',
             'lead_time',
             'lead_time_unit',
@@ -521,6 +546,8 @@ class ResourceBaseForm(Form):
         obj.deadline = self.deadline
         obj.lead_time = self.lead_time
         obj.zipcode_block = self.zipcode_block
+        obj.occupancy_fields = list(self.extract_field_ids(
+            self.occupancy_fields))
         obj.ical_fields = list(self.extract_field_ids(self.ical_fields))
 
     def process_obj(self, obj: Resource) -> None:  # type:ignore
@@ -528,6 +555,7 @@ class ResourceBaseForm(Form):
         self.deadline = obj.deadline
         self.lead_time = obj.lead_time
         self.zipcode_block = obj.zipcode_block
+        self.occupancy_fields.data = '\n'.join(obj.occupancy_fields)
         self.ical_fields.data = '\n'.join(obj.ical_fields)
 
 

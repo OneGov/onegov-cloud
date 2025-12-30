@@ -56,6 +56,7 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     fts_type_title = _('Translators')
     fts_public = False
+    fts_title_property = '_title'
     fts_properties = {
         # TODO: We may get better results if we use the fullname
         #       although we may have to supply the fullname without
@@ -240,6 +241,11 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     # If entry was imported, for the form and the expertise fields
     imported: Column[bool] = Column(Boolean, default=False, nullable=False)
+
+    @property
+    def _title(self) -> str:
+        """ The title used for searching. """
+        return f'{self.first_name} {self.last_name}'
 
     @property
     def title(self) -> str:
