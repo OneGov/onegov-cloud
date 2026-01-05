@@ -601,6 +601,59 @@ def test_dependent_validation() -> None:
         )
     )
 
+    # dependency with upload field
+    text = dedent("""
+            method *=
+                (x) Drop off
+                    Estimated drop off time = HH:MM
+                ( ) Upload
+                    Attachment *= *.pdf|*.doc
+        """)
+
+    form_class = parse_form(text)
+
+    # drop off: no file required
+    form = form_class(MultiDict([('method', 'Drop off')]))
+    assert form.validate()
+    assert not form.errors
+
+    # upload selected but no file provided
+    form = form_class(MultiDict([('method', 'Upload')]))
+    assert not form.validate()
+    assert form.errors == {'method_attachment': ['This field is required.']}
+
+    # upload selected with large attachment and wrong type
+    from io import BytesIO
+    from werkzeug.datastructures import FileStorage
+
+    fs_text = FileStorage(
+        stream=BytesIO(b'Hello, this is plain text\n' +
+                       b'A' * 101 * 1000 ** 2),
+        filename='test.txt',
+        content_type='text/plain'
+    )
+    form = form_class(
+        MultiDict([('method', 'Upload'), ('method_attachment', fs_text)]))
+    assert not form.validate()
+    assert form.errors == {
+        'method_attachment': [
+            'Files of this type are not supported.',
+            'The file is too large, please provide a file smaller '
+            'than 100.0 MB.'
+        ]
+    }
+
+    # upload selected with large attachment and wrong type
+    fs_pdf = FileStorage(
+        stream=BytesIO(b'%PDF-1.4\n%'),
+        filename='test.pdf',
+        content_type='application/pdf'
+    )
+    form = form_class(
+        MultiDict([('method', 'Upload'), ('method_attachment', fs_pdf)]))
+    assert form.validate()
+    assert not form.errors
+
 
 def test_nested_regression() -> None:
 
