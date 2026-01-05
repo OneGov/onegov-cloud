@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-12-19 12:13+0100\n"
+"POT-Creation-Date: 2025-12-29 09:08+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -584,8 +584,11 @@ msgstr "Affichage principal"
 msgid "Hide these labels on the main view"
 msgstr "Cacher ces noms de champs dans la vue principale"
 
-msgid "Address"
-msgstr "Adresse"
+msgid "Contact Information Sidebar"
+msgstr "Barre latérale des informations de contact"
+
+msgid "The contact information is displayed in the sidebar without field names."
+msgstr "Les informations de contact sont affichées dans la barre latérale sans noms de champs."
 
 msgid "Filters"
 msgstr "Filtres"
@@ -703,6 +706,9 @@ msgstr "Notifications"
 
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Informations complémentaires du demandeur requises à l'e-mail"
+
+msgid "Address"
+msgstr "Adresse"
 
 msgid "Phone"
 msgstr "Téléphone"
