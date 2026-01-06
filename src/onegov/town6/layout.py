@@ -77,14 +77,18 @@ from onegov.org.models import RISParliamentarianCollection
 from onegov.org.models import RISParliamentaryGroupCollection
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.page import PageCollection
+from onegov.people import Person
 from onegov.stepsequence import step_sequences
 from onegov.stepsequence.extension import StepsLayoutExtension
+from onegov.user import User
 from onegov.town6 import _
 from onegov.town6.theme import user_options
 from onegov.town6 import TownApp
 
 
 from typing import Any, NamedTuple, TypeVar, TYPE_CHECKING
+
+
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.event import Event
@@ -424,6 +428,7 @@ class PersonCollectionLayout(OrgPersonCollectionLayout, DefaultLayout):
     request: TownRequest
 
 
+@TownApp.layout(model=Person)
 class PersonLayout(OrgPersonLayout, DefaultLayout):
 
     app: TownApp
@@ -716,6 +721,7 @@ class UserManagementLayout(OrgUserManagementLayout, DefaultLayout):
     request: TownRequest
 
 
+@TownApp.layout(model=User)
 class UserLayout(OrgUserLayout, DefaultLayout):
 
     app: TownApp

@@ -1933,15 +1933,27 @@
     </ul>
 </metal:search_results>
 
+<metal:search_breadcrumbs define-macro="search_breadcrumbs" i18n:domain="onegov.town6">
+    <tal:b tal:condition="layout and len(layout.breadcrumbs) > 1" tal:define="links layout.breadcrumbs">
+        <ul class="breadcrumbs" style="padding-left: .5rem; margin-bottom: 0.25rem">
+            <tal:b repeat="link links">
+                <li class="breadcrumbs-item" tal:content="link(layout)" style="padding: .3rem 0 0 .2rem;"></li>
+            </tal:b>
+        </ul>
+    </tal:b>
+</metal:search_breadcrumbs>
+
 <metal:search_result_users define-macro="search_result_users" i18n:domain="onegov.town6">
     <a href="${request.return_here(request.link(result))}" class="list-link">
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
-    <p class="search-preview">
+    <div class="search-preview">
         ${translate(result.role.capitalize())}
-    </p>
+    </div>
+    <div tal:condition="request.get_layout(result)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
 </metal:search_result_users>
-
 
 <metal:search_result_files define-macro="search_result_files" i18n:domain="onegov.town6">
     <a class="list-link" href="${request.return_here(request.link(result))}">
@@ -2033,8 +2045,11 @@
     <a href="${request.link(result)}" class="list-link">
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
-        <p class="search-preview" tal:condition="result.function|nothing">${result.function}</p>
-        <p class="search-preview" tal:condition="not:result.function|nothing" i18n:translate>People</p>
+    <div class="search-preview" tal:condition="result.function|nothing">${result.function}</div>
+    <div class="search-preview" tal:condition="not:result.function|nothing" i18n:translate>People</div>
+    <div tal:condition="request.get_layout(result)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
 </metal:search_result_people>
 
 
