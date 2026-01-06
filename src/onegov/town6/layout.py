@@ -42,7 +42,7 @@ from onegov.org.layout import (
     MessageCollectionLayout as OrgMessageCollectionLayout,
     NewsLayout as OrgNewsLayout,
     NewsletterLayout as OrgNewsletterLayout,
-    PageLayout as OrgPageLayout,
+    TopicLayout as OrgTopicLayout,
     PaymentCollectionLayout as OrgPaymentCollectionLayout,
     PaymentProviderLayout as OrgPaymentProviderLayout,
     PersonCollectionLayout as OrgPersonCollectionLayout,
@@ -69,7 +69,7 @@ from onegov.org.layout import (
     UserGroupLayout as OrgUserGroupLayout,
     UserGroupCollectionLayout as OrgUserGroupCollectionLayout,
     UserManagementLayout as OrgUserManagementLayout)
-from onegov.org.models import MeetingCollection
+from onegov.org.models import MeetingCollection, Topic, News
 from onegov.org.models import PageMove
 from onegov.org.models import PoliticalBusinessCollection
 from onegov.org.models import RISCommissionCollection
@@ -81,6 +81,7 @@ from onegov.stepsequence import step_sequences
 from onegov.stepsequence.extension import StepsLayoutExtension
 from onegov.town6 import _
 from onegov.town6.theme import user_options
+from onegov.town6 import TownApp
 
 
 from typing import Any, NamedTuple, TypeVar, TYPE_CHECKING
@@ -272,7 +273,8 @@ class SettingsLayout(OrgSettingsLayout, DefaultLayout):
     request: TownRequest
 
 
-class PageLayout(OrgPageLayout, AdjacencyListLayout):
+@TownApp.layout(model=Topic)
+class PageLayout(OrgTopicLayout, AdjacencyListLayout):
 
     app: TownApp
     request: TownRequest
@@ -284,6 +286,7 @@ class PageLayout(OrgPageLayout, AdjacencyListLayout):
         )
 
 
+@TownApp.layout(model=News)
 class NewsLayout(OrgNewsLayout, AdjacencyListLayout):
 
     app: TownApp

@@ -17,7 +17,7 @@ from onegov.core.security import Private
 from onegov.org import _
 from onegov.org.layout import AdjacencyListLayout
 from onegov.org.layout import DefaultLayout
-from onegov.org.layout import PageLayout as OrgPageLayout
+from onegov.org.layout import TopicLayout as OrgPageLayout
 from onegov.org.layout import PersonCollectionLayout
 from onegov.org.layout import PersonLayout as OrgPersonLayout
 
@@ -33,7 +33,7 @@ if TYPE_CHECKING:
     from onegov.org.elements import Trait
 
 
-class PageLayout(OrgPageLayout):
+class TopicLayout(OrgPageLayout):
 
     @cached_property
     def sidebar_links(self) -> None:  # type:ignore[override]

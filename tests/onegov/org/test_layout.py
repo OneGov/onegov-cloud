@@ -12,7 +12,7 @@ from onegov.org import OrgApp
 from onegov.core.elements import Link
 from onegov.org.layout import (
     DefaultLayout,
-    PageLayout
+    TopicLayout
 )
 from onegov.page import Page
 from webtest import TestApp as Client
@@ -92,7 +92,7 @@ def test_page_layout_sidebar(session: Session) -> None:
     )
     session.add(page)
 
-    layout = PageLayout(page, MockRequest())  # type: ignore[arg-type]
+    layout = TopicLayout(page, MockRequest())  # type: ignore[arg-type]
     layout.homepage_url = 'http://nohost'
 
     assert len(layout.sidebar_links) == 1
@@ -104,7 +104,7 @@ def test_page_layout_sidebar(session: Session) -> None:
         ),
     )
 
-    layout = PageLayout(page.children[0], MockRequest())  # type: ignore[arg-type]
+    layout = TopicLayout(page.children[0], MockRequest())  # type: ignore[arg-type]
 
     assert len(layout.sidebar_links) == 1
     assert layout.sidebar_links[0].title == 'Ma'
@@ -116,7 +116,7 @@ def test_page_layout_sidebar(session: Session) -> None:
         ),
     )
 
-    layout = PageLayout(page.children[0].children[0], MockRequest())  # type: ignore[arg-type]
+    layout = TopicLayout(page.children[0].children[0], MockRequest())  # type: ignore[arg-type]
 
     assert len(layout.sidebar_links) == 1
     assert layout.sidebar_links[0].title == 'Ada'
@@ -143,7 +143,7 @@ def test_page_layout_breadcrumbs(session: Session) -> None:
     )
     session.add(page)
 
-    layout = PageLayout(page, MockRequest())  # type: ignore[arg-type]
+    layout = TopicLayout(page, MockRequest())  # type: ignore[arg-type]
     layout.homepage_url = 'http://nohost'
 
     links = layout.breadcrumbs
@@ -153,7 +153,7 @@ def test_page_layout_breadcrumbs(session: Session) -> None:
     assert links[1].text == 'Grandma'
     assert links[1].attrs['href'] == 'grandma'
 
-    layout = PageLayout(page.children[0], MockRequest())  # type: ignore[arg-type]
+    layout = TopicLayout(page.children[0], MockRequest())  # type: ignore[arg-type]
     layout.homepage_url = 'http://nohost'
 
     links = layout.breadcrumbs

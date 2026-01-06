@@ -146,9 +146,9 @@
     color: $jumbo;
 }
 
-.search-results em {
+.search-preview em {
     color: $red !important;
-    font-style: initial;
+    font-style: inherit;
     font-weight: bold;
     text-decoration: underline;
 }

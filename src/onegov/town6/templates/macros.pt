@@ -2056,10 +2056,17 @@
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
     <a tal:condition="result.lead|None" href="${request.link(result)}">
-        <p class="search-preview">
+        <div class="search-preview">
             ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
-        </p>
+        </div>
     </a>
+    <div tal:condition="request.get_layout(type(result))">
+        <ul class="breadcrumbs" tal:condition="len(layout.breadcrumbs) > 1" tal:define="layout request.get_layout(result)" style="padding-left: .5rem; margin-bottom: 0.25rem">
+            <tal:b repeat="link layout.breadcrumbs">
+                <li class="breadcrumbs-item" tal:content="link(layout)" style="padding: .3rem 0 0 .2rem;"></li>
+            </tal:b>
+        </ul>
+    </div>
 </metal:search_result_default>
 
 

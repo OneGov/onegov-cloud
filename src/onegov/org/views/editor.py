@@ -8,7 +8,7 @@ from onegov.core.elements import BackLink, Link
 from onegov.core.security import Private
 from onegov.org import _, OrgApp
 from onegov.org.forms.page import MovePageForm, PageUrlForm, PageForm
-from onegov.org.layout import EditorLayout, PageLayout
+from onegov.org.layout import EditorLayout, TopicLayout
 from onegov.org.management import PageNameChange
 from onegov.org.models import Clipboard, Editor
 from onegov.org.models.organisation import Organisation
@@ -57,7 +57,7 @@ def handle_page_form(
     request: OrgRequest,
     form: Form,
     # FIXME: This is really bad, they should all use the same layout
-    layout: EditorLayout | PageLayout | None = None
+    layout: EditorLayout | TopicLayout | None = None
 ) -> RenderData | Response:
     if self.action == 'new':
         return handle_new_page(self, request, form, layout=layout)
@@ -85,7 +85,7 @@ def handle_new_page(
     request: OrgRequest,
     form: Form,
     src: object | None = None,
-    layout: EditorLayout | PageLayout | None = None
+    layout: EditorLayout | TopicLayout | None = None
 ) -> RenderData | Response:
     assert self.page is not None
     page = cast('Topic | News', self.page)
@@ -129,7 +129,7 @@ def handle_new_root_page(
     self: Editor,
     request: OrgRequest,
     form: Form,
-    layout: EditorLayout | PageLayout | None = None
+    layout: EditorLayout | TopicLayout | None = None
 ) -> RenderData | Response:
     site_title = _('New Topic')
 
@@ -171,7 +171,7 @@ def handle_edit_page(
     self: Editor,
     request: OrgRequest,
     form: Form,
-    layout: EditorLayout | PageLayout | None = None
+    layout: EditorLayout | TopicLayout | None = None
 ) -> RenderData | Response:
     assert self.page is not None
     site_title = self.page.trait_messages[self.trait]['edit_page_title']
@@ -217,11 +217,11 @@ def handle_move_page(
     self: Editor,
     request: OrgRequest,
     form: Form,
-    layout: EditorLayout | PageLayout | None = None
+    layout: EditorLayout | TopicLayout | None = None
 ) -> RenderData | Response:
 
     assert self.page is not None
-    layout = layout or PageLayout(self.page, request)
+    layout = layout or TopicLayout(self.page, request)
     site_title = self.page.trait_messages[self.trait]['move_page_title']
     layout.site_title = site_title  # type:ignore[union-attr]
 
@@ -244,7 +244,7 @@ def handle_change_page_url(
     self: Editor,
     request: OrgRequest,
     form: Form,
-    layout: EditorLayout | PageLayout | None = None
+    layout: EditorLayout | TopicLayout | None = None
 ) -> RenderData | Response:
 
     if not request.is_admin:

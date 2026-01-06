@@ -13,7 +13,7 @@ from onegov.core.utils import append_query_param
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.homepage_widgets import get_lead
-from onegov.org.layout import PageLayout, NewsLayout
+from onegov.org.layout import TopicLayout, NewsLayout
 from onegov.org.models import News, NewsCollection, Topic
 from onegov.org.models.editor import Editor
 from onegov.page import PageCollection
@@ -50,7 +50,7 @@ def delete_page(self: Topic | News, request: OrgRequest) -> None:
 def view_topic(
     self: Topic,
     request: OrgRequest,
-    layout: PageLayout | None = None
+    layout: TopicLayout | None = None
 ) -> RenderData | Response:
 
     assert self.trait in {'link', 'page', 'iframe'}
@@ -63,7 +63,7 @@ def view_topic(
         if self.trait == 'link':
             return morepath.redirect(self.content['url'])
 
-    layout = layout or PageLayout(self, request)
+    layout = layout or TopicLayout(self, request)
     if self.photo_album_id:
         request.include('photoswipe')
 
