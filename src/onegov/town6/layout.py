@@ -69,7 +69,7 @@ from onegov.org.layout import (
     UserGroupLayout as OrgUserGroupLayout,
     UserGroupCollectionLayout as OrgUserGroupCollectionLayout,
     UserManagementLayout as OrgUserManagementLayout)
-from onegov.org.models import MeetingCollection, Topic, News
+from onegov.org.models import MeetingCollection, Topic, News, GeneralFile
 from onegov.org.models import PageMove
 from onegov.org.models import PoliticalBusinessCollection
 from onegov.org.models import RISCommissionCollection
@@ -88,9 +88,8 @@ from onegov.town6 import TownApp
 
 from typing import Any, NamedTuple, TypeVar, TYPE_CHECKING
 
-
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Iterator, Sequence
     from onegov.event import Event
     from onegov.form import FormDefinition, FormSubmission
     from onegov.form.models.definition import SurveyDefinition
@@ -941,6 +940,7 @@ class DashboardLayout(OrgDashboardLayout, DefaultLayout):
     request: TownRequest
 
 
+@TownApp.layout(model=GeneralFile)
 class GeneralFileCollectionLayout(DefaultLayout):
 
     def __init__(self, model: Any, request: TownRequest) -> None:
@@ -952,6 +952,18 @@ class GeneralFileCollectionLayout(DefaultLayout):
         super().__init__(model, request)
         request.include('upload')
         request.include('prompt')
+
+    @cached_property
+    def breadcrumbs(self) -> Sequence[Link]:
+        name = self.model.name[:40]
+        if len(name) == 40:
+            name = name[:37] + '...'
+
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Files'), self.files_url),
+            Link(name, self.files_url_with_anchor(self.model)),
+        ]
 
 
 class ImageFileCollectionLayout(DefaultLayout):

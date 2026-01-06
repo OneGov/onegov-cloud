@@ -1962,7 +1962,7 @@
         </h5>
     </a>
     <a href="${request.return_here(request.link(result))}">
-        <p class="search-preview">
+        <div class="search-preview">
             <tal:b condition="result.signed">
                 <span i18n:translate>Has a digital seal</span>,
             </tal:b>
@@ -1975,10 +1975,12 @@
                     <tal:b i18n:name="count">${result.stats.get('pages', 0)}</tal:b> pages
                 </tal:b>
             </span>
-        </p>
+        </div>
     </a>
+    <div tal:condition="request.get_layout(result) and request.is_manager">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
 </metal:search_result_files>
-
 
 <metal:search_result_tickets define-macro="search_result_tickets" i18n:domain="onegov.town6">
     <a class="list-link" href="${request.link(result)}">
@@ -2072,15 +2074,11 @@
     </a>
     <a tal:condition="result.lead|None" href="${request.link(result)}">
         <div class="search-preview">
-            ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
+            ${result.lead[:260]}<tal:b condition="len(result.lead) > 260">…</tal:b>
         </div>
     </a>
-    <div tal:condition="request.get_layout(type(result))">
-        <ul class="breadcrumbs" tal:condition="len(layout.breadcrumbs) > 1" tal:define="layout request.get_layout(result)" style="padding-left: .5rem; margin-bottom: 0.25rem">
-            <tal:b repeat="link layout.breadcrumbs">
-                <li class="breadcrumbs-item" tal:content="link(layout)" style="padding: .3rem 0 0 .2rem;"></li>
-            </tal:b>
-        </ul>
+    <div tal:condition="request.get_layout(result)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
     </div>
 </metal:search_result_default>
 
@@ -2819,7 +2817,7 @@
         file_upload file.upload_date|file.created;
         file_publish_end file.publish_end_date|None;
     ">
-        <tr class="file-info ${'signed' if file.signed else ''}">
+        <tr class="file-info ${'signed' if file.signed else ''}" id="${file.name}">
             <td>
                 ${file.name}
             </td>

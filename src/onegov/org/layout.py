@@ -36,7 +36,7 @@ from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
 from onegov.org.exports.base import OrgExport
-from onegov.org.models import CitizenDashboard
+from onegov.org.models import CitizenDashboard, GeneralFile
 from onegov.org.models import ExportCollection, Editor
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile
@@ -288,6 +288,21 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             (get_name(locale), get_link(locale))
             for locale in sorted(self.app.locales)
         ]
+
+    @cached_property
+    def files_url(self) -> str:
+        """ Returns the url to the files view. """
+        url = self.request.link(
+            GeneralFileCollection(self.request.session)
+        )
+        return self.csrf_protected_url(url)
+
+    def files_url_with_anchor(self, file: GeneralFile | None) -> str:
+        """ Returns the url to the files view including anchor. """
+        if file is None:
+            return self.files_url
+
+        return self.files_url + f'#{file.name}'
 
     @cached_property
     def file_upload_url(self) -> str:
