@@ -2543,7 +2543,7 @@ def test_reservation_export_all_with_no_resources(client: Client) -> None:
 
 
 @freeze_time("2016-04-28", tick=True)
-def test_reserve_session_separation(client: Client) -> None:
+def test_reserve_related_tickets_session_separation(client: Client) -> None:
     c1 = client.spawn()
     c1.login_admin()
 
@@ -2621,6 +2621,14 @@ def test_reserve_session_separation(client: Client) -> None:
     result = c2.get('/resource/gym/reservations').json
     assert len(result['reservations']) == 1
 
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
+    assert message is not None
+    assert 'Headers' in message
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    assert 'Message-ID' in headers
+    message_id1 = headers['Message-ID']
+
     # next_form should now be gym, since we had another pending
     # reservation in the same group (no group i.e. general)
     assert 'Bitte fahren Sie fort mit Ihrer Reservation für gym' in next_form
@@ -2639,6 +2647,17 @@ def test_reserve_session_separation(client: Client) -> None:
     result = c2.get('/resource/gym/reservations').json
     assert len(result['reservations']) == 1
 
+    assert len(os.listdir(client.app.maildir)) == 2
+    message = client.get_email(1)
+    assert message is not None
+    assert 'Headers' in message
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    assert 'Message-ID' in headers
+    message_id2 = headers['Message-ID']
+    assert message_id2 > message_id1
+    assert headers['In-Reply-To'] == message_id1
+    assert headers['References'] == message_id1
+
     # we should have a ticket for each room we reserved
     assert 'Eingereichte Anfragen' in tickets
     assert 'meeting-room' in tickets
@@ -2655,6 +2674,18 @@ def test_reserve_session_separation(client: Client) -> None:
     ticket = ticket.click(href='/mute-related').follow()
     # and then unmute all the related tickets
     ticket = ticket.click(href='/unmute-related').follow()
+
+    # trigger a third email in the thread
+    ticket = ticket.click('Alle Reservationen annehmen').follow()
+    assert len(os.listdir(client.app.maildir)) == 3
+    message = client.get_email(2)
+    assert 'Headers' in message
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    assert 'Message-ID' in headers
+    message_id3 = headers['Message-ID']
+    assert message_id3 > message_id2
+    assert headers['In-Reply-To'] == message_id2
+    assert headers['References'] == f'{message_id1} {message_id2}'
 
 
 def test_reserve_reservation_prediction(client: Client) -> None:
