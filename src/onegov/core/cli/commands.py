@@ -33,6 +33,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm.session import close_all_sessions
 from time import sleep
 from transaction import commit
+from urllib.parse import urlparse
 from uuid import uuid4
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
@@ -498,8 +499,15 @@ def transfer(
     def transfer_database(
         remote_db: str,
         local_db: str,
+        local_dsn: str,
         schema_glob: str = '*'
     ) -> tuple[str, ...]:
+
+        parsed = urlparse(local_dsn)
+        local_host = parsed.hostname or 'localhost'
+        local_port = str(parsed.port or 5432)
+        local_user = parsed.username or 'postgres'
+        local_password = parsed.password or ''
 
         # Get available schemas
         query = 'SELECT schema_name FROM information_schema.schemata'
@@ -561,20 +569,20 @@ def transfer(
         # Prepare receive command
         recv_parts = [
             'psql',
+            '-h',
+            local_host,
+            '-p',
+            local_port,
+            '-U',
+            local_user,
             '-d',
             local_db,
             '-v',
             'ON_ERROR_STOP=1',
         ]
-        if platform.system() == 'Linux':
-            recv_parts = [
-                'sudo',
-                '-u',
-                'postgres',
-                *recv_parts,
-            ]
 
-        recv = shlex.join(recv_parts)
+        recv_cmd_prefix = f'PGPASSWORD={shlex.quote(local_password)} '
+        recv = recv_cmd_prefix + shlex.join(recv_parts)
 
         # Drop existing schemas
         for schema in schemas:
@@ -662,11 +670,14 @@ def transfer(
         mgr = SessionManager(local_cfg.configuration['dsn'], Base)
         mgr.create_required_extensions()
 
-        local_db = local_cfg.configuration['dsn'].split('/')[-1]
+        local_dsn = local_cfg.configuration['dsn']
+        local_db = local_dsn.split('/')[-1]
         remote_db = remote_cfg.configuration['dsn'].split('/')[-1]
 
         schema_glob = transfer_schema or f'{local_cfg.namespace}*'
-        return transfer_database(remote_db, local_db, schema_glob=schema_glob)
+        return transfer_database(
+            remote_db, local_db, local_dsn, schema_glob=schema_glob
+        )
 
     def do_add_admins(local_cfg: ApplicationConfig, schema: str) -> None:
         id_ = str(uuid4())
@@ -678,17 +689,29 @@ def transfer(
             f"VALUES ('generic', '{id_}', 'admin@example.org', "
             f"'{password_hash}', 'admin', true, 'John Doe');"
         )
-        local_db = local_cfg.configuration['dsn'].split('/')[-1]
+        local_dsn = local_cfg.configuration['dsn']
+        local_db = local_dsn.split('/')[-1]
+
+        parsed = urlparse(local_dsn)
+        local_host = parsed.hostname or 'localhost'
+        local_port = str(parsed.port or 5432)
+        local_user = parsed.username or 'postgres'
+        local_password = parsed.password or ''
+
         command = shlex.join([
-            'sudo',
-            '-u',
-            'postgres',
             'psql',
+            '-h',
+            local_host,
+            '-p',
+            local_port,
+            '-U',
+            local_user,
             '-d',
             local_db,
             '-c',
             query,
         ])
+        command = f'PGPASSWORD={shlex.quote(local_password)} {command}'
         # NOTE: We took extra care that this is safe with shlex.join
         subprocess.check_call(  # nosec:B602
             command,
