@@ -312,3 +312,27 @@ def add_last_login_column(context: UpgradeContext) -> None:
         context.operations.add_column(
             'users', Column('last_login', UTCDateTime, nullable=True)
         )
+
+        # Pre-populate last_login from existing session data
+        context.operations.execute(
+            """
+            UPDATE users
+            SET last_login = subquery.max_timestamp::timestamp
+            FROM (
+                SELECT
+                    id,
+                    MAX(
+                        (session_value->>'timestamp')::timestamp
+                    ) as max_timestamp
+                FROM
+                    users,
+                    LATERAL jsonb_each(data->'sessions')
+                        AS session_entries(session_key, session_value)
+                WHERE
+                    data->'sessions' IS NOT NULL
+                    AND jsonb_typeof(data->'sessions') = 'object'
+                GROUP BY id
+            ) AS subquery
+            WHERE users.id = subquery.id;
+        """
+        )
