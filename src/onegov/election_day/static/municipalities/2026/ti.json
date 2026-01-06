@@ -43,10 +43,6 @@
         "district": "Leventina",
         "name": "Bedretto"
     },
-    "5064": {
-        "district": "Leventina",
-        "name": "Bodio"
-    },
     "5071": {
         "district": "Leventina",
         "name": "Dalpe"
@@ -66,10 +62,6 @@
     "5077": {
         "district": "Leventina",
         "name": "Pollegio"
-    },
-    "5078": {
-        "district": "Leventina",
-        "name": "Prato (Leventina)"
     },
     "5079": {
         "district": "Leventina",
@@ -147,17 +139,9 @@
         "district": "Lugano",
         "name": "Arogno"
     },
-    "5146": {
-        "district": "Lugano",
-        "name": "Astano"
-    },
     "5148": {
         "district": "Lugano",
         "name": "Bedano"
-    },
-    "5149": {
-        "district": "Lugano",
-        "name": "Bedigliora"
     },
     "5151": {
         "district": "Lugano",
@@ -195,10 +179,6 @@
         "district": "Lugano",
         "name": "Cureglia"
     },
-    "5181": {
-        "district": "Lugano",
-        "name": "Curio"
-    },
     "5186": {
         "district": "Lugano",
         "name": "Grancia"
@@ -235,10 +215,6 @@
         "district": "Lugano",
         "name": "Mezzovico-Vira"
     },
-    "5200": {
-        "district": "Lugano",
-        "name": "Miglieglia"
-    },
     "5203": {
         "district": "Lugano",
         "name": "Morcote"
@@ -250,10 +226,6 @@
     "5206": {
         "district": "Lugano",
         "name": "Neggio"
-    },
-    "5207": {
-        "district": "Lugano",
-        "name": "Novaggio"
     },
     "5208": {
         "district": "Lugano",
@@ -406,6 +378,10 @@
     "5324": {
         "district": "Vallemaggia",
         "name": "Avegno Gordevio"
+    },
+    "5395": {
+        "district": "Lugano",
+        "name": "Lema"
     },
     "5396": {
         "district": "Locarno",
