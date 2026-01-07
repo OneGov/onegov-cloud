@@ -15,16 +15,19 @@ from onegov.core.templates import render_macro
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
+from onegov.form.core import FieldDependency
 from onegov.form.fields import (ChosenSelectField, URLPanelField,
                                 ChosenSelectMultipleEmailField)
 from onegov.form.fields import ColorField
 from onegov.form.fields import CssField
-from onegov.form.fields import MarkupField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
+from onegov.form.fields import TranslatedSelectField
 from onegov.form.fields import URLField
+from onegov.form.validators import If
 from onegov.form.validators import StrictOptional
+from onegov.form.validators import ValidHostname
 from onegov.gis import CoordinatesField
 from onegov.org import _, log
 from onegov.org.forms.fields import (
@@ -55,6 +58,7 @@ from wtforms.utils import unset_value
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
+from wtforms.validators import Regexp
 from wtforms.validators import URL as URLValidator
 from wtforms.validators import ValidationError
 
@@ -800,10 +804,49 @@ class MapSettingsForm(Form):
 
 class AnalyticsSettingsForm(Form):
 
-    analytics_code = MarkupField(
-        label=_('Analytics Code'),
-        description=_('JavaScript for web statistics support'),
-        render_kw={'rows': 10, 'data-editor': 'html'})
+    analytics_provider_name = TranslatedSelectField(
+        label=_('Analytics Provider'),
+        choices=(),
+    )
+
+    # NOTE: We will set up field dependencies for the following provider
+    #       specific fields in `on_request` based on the registered
+    #       providers, we may also remove completely unused fields.
+    plausible_domain = StringField(
+        label=_('Domain name'),
+        description=_(
+            'This should match the domain defined in plausible '
+            'you may also leave this empty, in which case we '
+            'will submit the domain of the current request.'
+        ),
+        validators=[Optional(), ValidHostname()],
+    )
+
+    matomo_site_id = IntegerField(
+        label=_('Matomo Site ID'),
+        validators=[InputRequired(), NumberRange(min=1)],
+    )
+
+    siteimprove_site_id = IntegerField(
+        label=_('Siteimprove Site ID'),
+        validators=[InputRequired(), NumberRange(min=1)],
+    )
+
+    google_tag_id = StringField(
+        label=_('Google Tag ID'),
+        description=_(
+            'This should match the domain defined in plausible '
+            'you may also leave this empty, in which case we '
+            'will submit the domain of the current request.'
+        ),
+        validators=[
+            InputRequired(),
+            Regexp(
+                r'^[A-Z]{1,3}-[A-Z0-9-]+$',
+                message=_('Not a valid Google Tag ID')
+            )
+        ],
+    )
 
     # Points the user to the analytics url e.g. matomo or plausible
     analytics_url = URLPanelField(
@@ -816,24 +859,59 @@ class AnalyticsSettingsForm(Form):
         hide_label=False
     )
 
-    def derive_analytics_url(self) -> str:
-        analytics_code = self.analytics_code.data or ''
+    def on_request(self) -> None:
+        available = self.request.app.available_analytics_providers
+        choices = self.analytics_provider_name.choices = [
+            (name, provider.display_name)
+            for name, provider in available.items()
+        ]
+        choices.insert(0, ('', _('None')))
+        for provider_name, dependent_fields in (
+            ('plausible', ['plausible_domain']),
+            ('matomo', ['matomo_site_id']),
+            ('siteimprove', ['siteimprove_site_id']),
+            ('google_analytics', ['google_tag_id']),
+        ):
+            providers = {
+                name
+                for name, provider in available.items()
+                if provider.name == provider_name
+            }
+            if not providers:
+                for field_name in dependent_fields:
+                    self.delete_field(field_name)
+                continue
 
-        if 'analytics.seantis.ch' in analytics_code:
-            data_domain = analytics_code.split(
-                'data-domain="', 1)[1].split('"', 1)[0]
-            return f'https://analytics.seantis.ch/{data_domain}'
-        elif 'matomo' in analytics_code:
-            return 'https://stats.seantis.ch'
-        else:
-            return ''
-
-    def populate_obj(self, model: Organisation) -> None:  # type:ignore
-        super().populate_obj(model)
+            # NOTE: In order to get an OR we need to use the AND
+            #       of all the choices it can't be instead.
+            dependency = FieldDependency(*(  # type: ignore[misc]
+                arg
+                for name, _ in choices
+                if name not in providers
+                for arg in ('analytics_provider_name', f'!{name}')
+            ))
+            for field_name in dependent_fields:
+                field = self[field_name]
+                field.validators = (
+                    If(
+                        dependency.fulfilled,
+                        *field.validators
+                    ),
+                    If(
+                        dependency.unfulfilled,
+                        StrictOptional()
+                    ),
+                )
+                if field.render_kw:
+                    field.render_kw = field.render_kw.copy()
+                else:
+                    field.render_kw = {}
+                field.render_kw.update(dependency.html_data(self._prefix))
 
     def process_obj(self, model: Organisation) -> None:  # type:ignore
         super().process_obj(model)
-        self.analytics_url.text = self.derive_analytics_url()
+        if provider := self.request.analytics_provider:
+            self.analytics_url.text = provider.url(self.request) or ''
 
 
 class HolidaySettingsForm(Form):
