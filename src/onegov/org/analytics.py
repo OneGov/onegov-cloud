@@ -66,7 +66,7 @@ class Matomo(AnalyticsProvider):
         'var _paq = window._paq = window._paq || [];\n'
         "_paq.push(['trackPageView']);\n"
         "_paq.push(['enableLinkTracking']);\n"
-        '(function() { \n'
+        '(function() {{ \n'
         '  var u="{matomo_url}";\n'
         "  _paq.push(['setTrackerUrl', u+'piwik.php']);\n"
         "  _paq.push(['setSiteId', '{site_id}']);\n"
@@ -74,7 +74,7 @@ class Matomo(AnalyticsProvider):
             "s=d.getElementsByTagName('script')[0];\n"
         "  g.type='text/javascript'; g.async=true; g.defer=true; "
             "g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);\n"
-        '})();\n'
+        '}})();\n'
         '</script>'
     )
 

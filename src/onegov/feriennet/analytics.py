@@ -22,7 +22,7 @@ class GoogleAnalytics(AnalyticsProvider):
         'gtag/js?id={google_tag_id}"></script>\n'
         '<script nonce="{csp_nonce}">\n'
         '  window.dataLayer = window.dataLayer || [];\n'
-        '  function gtag(){dataLayer.push(arguments);}\n'
+        '  function gtag(){{dataLayer.push(arguments);}}\n'
         "  gtag('js', new Date());\n"
         "  gtag('config', '{google_tag_id}');\n"
         '</script>'

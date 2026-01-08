@@ -95,7 +95,8 @@ def test_analytics_settings(client: Client) -> None:
     settings.form.submit()
 
     settings = client.get('/analytics-settings')
-    assert 'https://dummy-plausible.test/govikon.ch' in settings
+    assert 'src="https://dummy-plausible.test/script.js"' in settings
+    assert 'href="https://dummy-plausible.test/govikon.ch"' in settings
 
     # matomo
     settings = client.get('/analytics-settings')
@@ -104,7 +105,8 @@ def test_analytics_settings(client: Client) -> None:
     settings.form.submit()
 
     settings = client.get('/analytics-settings')
-    assert 'https://dummy-matomo.test/' in settings
+    assert 'var u="https://dummy-matomo.test/";' in settings
+    assert 'href="https://dummy-matomo.test/"' in settings
 
     # siteimprove
     settings = client.get('/analytics-settings')
@@ -113,7 +115,7 @@ def test_analytics_settings(client: Client) -> None:
     settings.form.submit()
 
     settings = client.get('/analytics-settings')
-    assert 'https://www.siteimprove.com/' in settings
+    assert 'href="https://www.siteimprove.com/"' in settings
     assert (
         'src="https://siteimproveanalytics.com/js/siteanalyze_5775.js"'
     ) in settings
