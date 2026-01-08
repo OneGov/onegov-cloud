@@ -89,39 +89,34 @@ def test_analytics_settings(client: Client) -> None:
     # plausible
     client.login_admin()
 
-    code = ('<script defer data-domain="govikon.ch" '
-            'src="https://analytics.seantis.ch/js/script.js"></script>')
     settings = client.get('/analytics-settings')
-    settings.form['analytics_code'] = code
+    settings.form['analytics_provider_name'] = 'plausible'
+    settings.form['plausible_domain'] = 'govikon.ch'
     settings.form.submit()
 
     settings = client.get('/analytics-settings')
-    assert 'https://analytics.seantis.ch/govikon.ch' in settings
+    assert 'https://dummy-plausible.test/govikon.ch' in settings
 
     # matomo
-    code = """
-<!-- Matomo -->
-<script>
-  var _paq = window._paq = window._paq || [];
-  _paq.push(['trackPageView']);
-  _paq.push(['enableLinkTracking']);
-  (function() {
-    var u="//stats.seantis.ch/";
-    _paq.push(['setTrackerUrl', u+'matomo.php']);
-    _paq.push(['setSiteId', '28']);
-    var d=document, g=d.createElement('script');
-    var s=d.getElementsByTagName('script')[0];
-    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-  })();
-</script>
-<!-- End Matomo Code -->
-"""
     settings = client.get('/analytics-settings')
-    settings.form['analytics_code'] = code
+    settings.form['analytics_provider_name'] = 'matomo'
+    settings.form['matomo_site_id'] = '28'
     settings.form.submit()
 
     settings = client.get('/analytics-settings')
-    assert 'https://stats.seantis.ch' in settings
+    assert 'https://dummy-matomo.test/' in settings
+
+    # siteimprove
+    settings = client.get('/analytics-settings')
+    settings.form['analytics_provider_name'] = 'siteimprove'
+    settings.form['siteimprove_site_id'] = '5775'
+    settings.form.submit()
+
+    settings = client.get('/analytics-settings')
+    assert 'https://www.siteimprove.com/' in settings
+    assert (
+        'src="https://siteimproveanalytics.com/js/siteanalyze_5775.js"'
+    ) in settings
 
 
 

@@ -98,12 +98,12 @@ class Matomo(AnalyticsProvider):
             return None
 
         return super().configure(
-            script_src=matomo_url,
+            matomo_url=matomo_url,
             title=title,
         )
 
     def template_variables(self, request: OrgRequest) -> RenderData | None:
-        if site_id := request.app.org.matomo_site_id:
+        if isinstance(site_id := request.app.org.matomo_site_id, int):
             matomo_url = self.configuration['matomo_url']
             request.content_security_policy.script_src.add(matomo_url)
             return {
@@ -118,8 +118,11 @@ class Matomo(AnalyticsProvider):
 class SiteimproveAnalytics(AnalyticsProvider):
     template = Markup('<script async src="{script_src}"></script>')
 
+    def url(self, request: OrgRequest) -> str:
+        return 'https://www.siteimprove.com/'
+
     def template_variables(self, request: OrgRequest) -> RenderData | None:
-        if site_id := request.app.org.siteimprove_site_id:
+        if isinstance(site_id := request.app.org.siteimprove_site_id, int):
             script_src = (
                 f'https://siteimproveanalytics.com/js/'
                 f'siteanalyze_{site_id}.js'
