@@ -586,8 +586,11 @@ msgstr "Hauptansicht"
 msgid "Hide these labels on the main view"
 msgstr "Diese Feldnamen auf der Hauptansicht verstecken"
 
-msgid "Address"
-msgstr "Adresse"
+msgid "Contact Information Sidebar"
+msgstr "Kontaktinformation Seitenleiste"
+
+msgid "The contact information is displayed in the sidebar without field names."
+msgstr "Die Kontaktinformation wird in der Seitenleiste ohne Feldnamen angezeigt."
 
 msgid "Filters"
 msgstr "Filter"
@@ -704,6 +707,9 @@ msgstr "Mitteilungen"
 
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Zusätzliche zur E-Mail benötigte Informationen des Antragstellers"
+
+msgid "Address"
+msgstr "Adresse"
 
 msgid "Phone"
 msgstr "Telefon"
@@ -3642,10 +3648,10 @@ msgid "Topic to inherit from"
 msgstr "Adresse aus diesem Thema übernehmen"
 
 msgid "Hide contact info in sidebar"
-msgstr "Kontaktinformationen in Sidebar ausblenden"
+msgstr "Kontaktinformationen in der Seitenleiste ausblenden"
 
 msgid "Show people on bottom of main page (instead of sidebar)"
-msgstr "Personen am unteren Rand der Hauptseite anzeigen (statt in Sidebar)"
+msgstr "Personen am unteren Rand der Hauptseite anzeigen (statt in in der Seitenleiste)"
 
 msgid "Select additional person"
 msgstr "Zusätzliche Person auswählen"
@@ -3691,13 +3697,13 @@ msgstr ""
 "Seitenleiste angezeigt, wenn diese Option abgewählt ist."
 
 msgid "Sidebar links"
-msgstr "Links in der Sidebar"
+msgstr "Links in der Seitenleiste"
 
 msgid "Contact link"
 msgstr "Kontaktlink"
 
 msgid "Sidebar contact"
-msgstr "Kontakt in der Sidebar"
+msgstr "Kontakt in der Seitenleiste"
 
 msgid "Please provide a URL if contact link text is set"
 msgstr "Bitte geben Sie eine URL an, wenn der Kontaktlink-Text gesetzt ist"

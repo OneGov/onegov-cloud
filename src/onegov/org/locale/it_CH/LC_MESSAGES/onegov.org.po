@@ -588,8 +588,11 @@ msgstr "Vista principale"
 msgid "Hide these labels on the main view"
 msgstr "Nascondi queste etichette nella vista principale"
 
-msgid "Address"
-msgstr "Indirizzo"
+msgid "Contact Information Sidebar"
+msgstr "Barra laterale delle informazioni di contatto"
+
+msgid "The contact information is displayed in the sidebar without field names."
+msgstr "Le informazioni di contatto sono visualizzate nella barra laterale senza nomi di campo."
 
 msgid "Filters"
 msgstr "Filtri"
@@ -706,6 +709,9 @@ msgstr "Notifiche"
 
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Informazioni da fornire in aggiunta all'e-mail"
+
+msgid "Address"
+msgstr "Indirizzo"
 
 msgid "Phone"
 msgstr "Telefono"
