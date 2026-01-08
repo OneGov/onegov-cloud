@@ -581,8 +581,7 @@ def transfer(
             'ON_ERROR_STOP=1',
         ]
 
-        recv_cmd_prefix = f'PGPASSWORD={shlex.quote(local_password)} '
-        recv = recv_cmd_prefix + shlex.join(recv_parts)
+        recv = shlex.join(recv_parts)
 
         # Drop existing schemas
         for schema in schemas:
@@ -595,7 +594,8 @@ def transfer(
                 drop,
                 shell=True,
                 stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
+                stderr=subprocess.DEVNULL,
+                env={**os.environ, 'PGPASSWORD': local_password}
             )
 
         # Transfer
@@ -610,7 +610,11 @@ def transfer(
             ])
             recv = f'{track_progress} | {recv}'
         # NOTE: We took extra care that this is safe with shlex.join
-        subprocess.check_output(f'{send} | {recv}', shell=True)  # nosec:B602
+        subprocess.check_output(
+            f'{send} | {recv}',
+            shell=True,  # nosec:B602
+            env={**os.environ, 'PGPASSWORD': local_password}
+        )
 
         return schemas
 
@@ -711,13 +715,13 @@ def transfer(
             '-c',
             query,
         ])
-        command = f'PGPASSWORD={shlex.quote(local_password)} {command}'
         # NOTE: We took extra care that this is safe with shlex.join
         subprocess.check_call(  # nosec:B602
             command,
             shell=True,
             stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
+            stderr=subprocess.DEVNULL,
+            env={**os.environ, 'PGPASSWORD': local_password}
         )
 
     # transfer the data
