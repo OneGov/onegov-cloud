@@ -2040,6 +2040,9 @@
                 </div></li>
         </ul>
     </tal:b>
+    <div tal:condition="request.get_layout(result)">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result.latest_occurrence)" />
+    </div>
 </metal:search_result_events>
 
 

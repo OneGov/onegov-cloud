@@ -9,7 +9,8 @@ from onegov.core.utils import append_query_param, to_html_ul
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.directory import DirectoryCollection
-from onegov.event import OccurrenceCollection
+from onegov.event import Event
+from onegov.event import OccurrenceCollection, Occurrence
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.org.layout import (
     Layout as OrgLayout,
@@ -96,7 +97,6 @@ from typing import Any, NamedTuple, TypeVar, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
-    from onegov.event import Event
     from onegov.form import FormSubmission
     from onegov.form.models.definition import SurveyDefinition
     from onegov.form.models.submission import SurveySubmission
@@ -647,6 +647,7 @@ class OccurrencesLayout(OrgOccurrencesLayout, DefaultLayout):
         return links
 
 
+@TownApp.layout(model=Occurrence)
 class OccurrenceLayout(OrgOccurrenceLayout, DefaultLayout):
 
     app: TownApp
@@ -677,6 +678,7 @@ class OccurrenceLayout(OrgOccurrenceLayout, DefaultLayout):
     cls_before='EventLayout',
     cls_after='TicketChatMessageLayout'
 )
+@TownApp.layout(model=Event)
 class EventLayout(StepsLayoutExtension, OrgEventLayout, DefaultLayout):
 
     app: TownApp
