@@ -29,11 +29,11 @@ from onegov.core.upgrade import get_upgrade_modules
 from onegov.core.upgrade import RawUpgradeRunner
 from onegov.core.upgrade import UpgradeRunner
 from onegov.server.config import Config
+from pydantic import PostgresDsn
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import close_all_sessions
 from time import sleep
 from transaction import commit
-from urllib.parse import urlparse
 from uuid import uuid4
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
@@ -497,17 +497,23 @@ def transfer(
         subprocess.check_output(send, shell=True)  # nosec:B602
 
     def transfer_database(
-        remote_db: str,
-        local_db: str,
-        local_dsn: str,
-        schema_glob: str = '*'
+        remote_db: str, local_dsn: PostgresDsn, schema_glob: str = '*'
     ) -> tuple[str, ...]:
 
-        parsed = urlparse(local_dsn)
-        local_host = parsed.hostname or 'localhost'
-        local_port = str(parsed.port or 5432)
-        local_user = parsed.username or 'postgres'
-        local_password = parsed.password or ''
+        # Extract connection parameters from PostgresDsn
+        hosts = local_dsn._url.hosts()
+        if hosts:
+            host_info = hosts[0]
+            local_host = host_info.get('host') or 'localhost'
+            local_port = str(host_info.get('port') or 5432)
+            local_user = host_info.get('username') or 'postgres'
+            local_password = host_info.get('password') or ''
+        else:
+            local_host = 'localhost'
+            local_port = '5432'
+            local_user = 'postgres'
+            local_password = ''  # nosec: B105
+        local_db = (local_dsn.path or '/').lstrip('/')
 
         # Get available schemas
         query = 'SELECT schema_name FROM information_schema.schemata'
@@ -674,16 +680,13 @@ def transfer(
         mgr = SessionManager(local_cfg.configuration['dsn'], Base)
         mgr.create_required_extensions()
 
-        local_dsn = local_cfg.configuration['dsn']
-        local_db = local_dsn.split('/')[-1]
+        local_dsn = PostgresDsn(local_cfg.configuration['dsn'])
         remote_db = remote_cfg.configuration['dsn'].split('/')[-1]
 
         schema_glob = transfer_schema or f'{local_cfg.namespace}*'
-        return transfer_database(
-            remote_db, local_db, local_dsn, schema_glob=schema_glob
-        )
+        return transfer_database(remote_db, local_dsn, schema_glob=schema_glob)
 
-    def do_add_admins(local_cfg: ApplicationConfig, schema: str) -> None:
+    def do_add_admins(local_dsn: PostgresDsn, schema: str) -> None:
         id_ = str(uuid4())
         password_hash = hash_password('test')
         assert '"' not in schema and "'" not in schema
@@ -693,28 +696,37 @@ def transfer(
             f"VALUES ('generic', '{id_}', 'admin@example.org', "
             f"'{password_hash}', 'admin', true, 'John Doe');"
         )
-        local_dsn = local_cfg.configuration['dsn']
-        local_db = local_dsn.split('/')[-1]
 
-        parsed = urlparse(local_dsn)
-        local_host = parsed.hostname or 'localhost'
-        local_port = str(parsed.port or 5432)
-        local_user = parsed.username or 'postgres'
-        local_password = parsed.password or ''
+        # Extract connection parameters from PostgresDsn
+        hosts = local_dsn.hosts()
+        if hosts:
+            host_info = hosts[0]
+            local_host = host_info.get('host') or 'localhost'
+            local_port = str(host_info.get('port') or 5432)
+            local_user = host_info.get('username') or 'postgres'
+            local_password = host_info.get('password') or ''
+        else:
+            local_host = 'localhost'
+            local_port = '5432'
+            local_user = 'postgres'
+            local_password = ''  # nosec: B105
+        local_db = (local_dsn.path or '/').lstrip('/')
 
-        command = shlex.join([
-            'psql',
-            '-h',
-            local_host,
-            '-p',
-            local_port,
-            '-U',
-            local_user,
-            '-d',
-            local_db,
-            '-c',
-            query,
-        ])
+        command = shlex.join(
+            [
+                'psql',
+                '-h',
+                local_host,
+                '-p',
+                local_port,
+                '-U',
+                local_user,
+                '-d',
+                local_db,
+                '-c',
+                query,
+            ]
+        )
         # NOTE: We took extra care that this is safe with shlex.join
         subprocess.check_call(  # nosec:B602
             command,
@@ -757,6 +769,7 @@ def transfer(
             )
 
     if add_admins:
+        local_dsn = PostgresDsn(local_appcfg.configuration['dsn'])
         for schema in schemas:
             click.echo(f'Adding admin@example:test to {schema}')
             # FIXME: This is a bit sus, it works because we only access
@@ -764,7 +777,7 @@ def transfer(
             #        the app configs, we should be a bit more explicit that
             #        we are passing a shared configuration value, rather
             #        than an application specific one
-            do_add_admins(local_appcfg, schema)
+            do_add_admins(local_dsn, schema)
 
 
 @cli.command(context_settings={'default_selector': '*'})
