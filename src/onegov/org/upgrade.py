@@ -763,13 +763,14 @@ def migrate_analytics_code(context: UpgradeContext) -> None:
         r'data-domain="([^"]+)" src="https://analytics\.seantis\.ch'
     )
     matomo_re = re.compile(
-        r"""var u="([^"]+)";.*?'setSiteId', '([0-9]+)'"""
+        r"""var u="([^"]+)";.*?'setSiteId', '([0-9]+)'""",
+        flags=re.DOTALL
     )
     siteimprove_re = re.compile(
-        r'https://siteimproveanalytics\.com/js/siteanalyze_([0-9]+)\.js'
+        r'siteimproveanalytics\.com/js/siteanalyze_([0-9]+)\.js'
     )
     google_analytics_re = re.compile(
-        r'"https://www\.googletagmanager\.com/gtag/js\?id=([^"]+)"'
+        r'"www\.googletagmanager\.com/gtag/js\?id=([^"]+)"'
     )
 
     code = org.meta.pop('analytics_code')
@@ -787,7 +788,7 @@ def migrate_analytics_code(context: UpgradeContext) -> None:
         else:
             click.secho(
                 f'Dropped unknown matomo analytics instance {matomo_url}',
-                fg='red'
+                fg='yellow'
             )
             return
         org.matomo_site_id = int(match.group(2))
@@ -798,5 +799,5 @@ def migrate_analytics_code(context: UpgradeContext) -> None:
         org.analytics_provider_name = 'siteimprove'
         org.siteimprove_site_id = int(match.group(1))
     else:
-        click.secho('Dropped unrecognized analytics code:')
+        click.secho('Dropped unrecognized analytics code:', fg='yellow')
         click.echo(code)

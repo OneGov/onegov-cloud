@@ -61,6 +61,7 @@ from wtforms.validators import Optional
 from wtforms.validators import Regexp
 from wtforms.validators import URL as URLValidator
 from wtforms.validators import ValidationError
+from wtforms.widgets import TextInput
 
 from typing import Any, TYPE_CHECKING
 
@@ -825,11 +826,21 @@ class AnalyticsSettingsForm(Form):
     matomo_site_id = IntegerField(
         label=_('Matomo Site ID'),
         validators=[InputRequired(), NumberRange(min=1)],
+        widget=TextInput(),
+        render_kw={
+            'inputmode': 'numeric',
+            'pattern': r'[1-9][0-9]*'
+        }
     )
 
     siteimprove_site_id = IntegerField(
         label=_('Siteimprove Site ID'),
         validators=[InputRequired(), NumberRange(min=1)],
+        widget=TextInput(),
+        render_kw={
+            'inputmode': 'numeric',
+            'pattern': r'[1-9][0-9]*'
+        }
     )
 
     google_tag_id = StringField(

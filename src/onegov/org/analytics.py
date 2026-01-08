@@ -106,6 +106,7 @@ class Matomo(AnalyticsProvider):
         if isinstance(site_id := request.app.org.matomo_site_id, int):
             matomo_url = self.configuration['matomo_url']
             request.content_security_policy.script_src.add(matomo_url)
+            request.content_security_policy.connect_src.add(matomo_url)
             return {
                 'csp_nonce': request.content_security_policy_nonce('script'),
                 'matomo_url': matomo_url,
