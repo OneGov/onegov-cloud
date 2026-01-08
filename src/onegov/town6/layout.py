@@ -69,7 +69,7 @@ from onegov.org.layout import (
     UserGroupLayout as OrgUserGroupLayout,
     UserGroupCollectionLayout as OrgUserGroupCollectionLayout,
     UserManagementLayout as OrgUserManagementLayout)
-from onegov.org.models import CustomFormDefinition
+from onegov.org.models import CustomFormDefinition, ImageSet
 from onegov.org.models import GeneralFile
 from onegov.org.models import MeetingCollection
 from onegov.org.models import News
@@ -716,6 +716,7 @@ class ImageSetCollectionLayout(OrgImageSetCollectionLayout, DefaultLayout):
     request: TownRequest
 
 
+@TownApp.layout(model=ImageSet)
 class ImageSetLayout(OrgImageSetLayout, DefaultLayout):
 
     app: TownApp
