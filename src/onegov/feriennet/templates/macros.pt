@@ -1034,7 +1034,7 @@
         </div>
 
         <div class="grid-x align-center">
-            <button ic-select-from-response="#activities" ic-target="#activities" ic-get-from="${request.url.replace('/filters','',1)}" class="button apply-filters" type="button" i18n:translate data-close>Apply filters</button>
+            <button ic-select-from-response="#content" ic-target="#content" ic-get-from="${request.url.replace('/filters','',1)}" class="button apply-filters" type="button" i18n:translate data-close>Apply filters</button>
         </div>
     </div>
 
