@@ -87,7 +87,7 @@ var VolunteerCart = React.createClass({
                 <div className="volunteer-cart-container">
                     <div className="volunteer-cart">
                         <button className={`button ${self.state.items.length === 0 ? 'hollow' : ''}`} type="button" data-toggle="my-list">
-                            <i className="fa fa-chevron-down"></i>{self.props.listLabel} ({self.state.items.length})
+                            <i className="fa fa-chevron-down"/>{self.props.listLabel} ({self.state.items.length})
                         </button>
                         <div className="dropdown-pane" id="my-list" data-dropdown data-auto-focus="true">
                             {volunteerCartList}
@@ -102,7 +102,7 @@ var VolunteerCart = React.createClass({
 jQuery.fn.volunteerCart = function() {
 
     var container = $(this);
-    if (!container.get(0)) return
+    if (!container.get(0)) { return; }
     var el = container.get(0);
 
     var cart = ReactDOM.render(
@@ -127,9 +127,27 @@ jQuery.fn.volunteerCart = function() {
 
 $(document).ready(function() {
     $('.volunteer-cart-widget').volunteerCart();
+    $('#activities .needs a').click(function() {
+        var btn = $(this);
+        var need = btn.data('need');
+        var error_container = btn.data('error-container');
+        if (need && error_container) {
+            window.volunteerCart.append(need, error_container);
+        }
+        return false;
+    });
 });
 
 Intercooler.ready((elt) => {
-    $('.volunteer-cart-widget').volunteerCart();
+    $(elt).find('.volunteer-cart-widget').volunteerCart();
+    $(elt).find('#activities .needs a').click(function() {
+        var btn = $(this);
+        var need = btn.data('need');
+        var error_container = btn.data('error-container');
+        if (need && error_container) {
+            window.volunteerCart.append(need, error_container);
+        }
+        return false;
+    });
 });
 
