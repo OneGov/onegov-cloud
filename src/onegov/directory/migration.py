@@ -446,7 +446,7 @@ class StructuralChanges:
 
                     self.added_options = [
                         f for f in self.added_options
-                        if f not in set(self.renamed_options.values())
+                        if f not in self.renamed_options.values()
                     ]
                     self.removed_options = [
                         f for f in self.removed_options
