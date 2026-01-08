@@ -319,5 +319,4 @@ class Layout(Action):
         layout: Layout,
         layout_registry: dict[type, Layout]
     ) -> None:
-        print('*** tschupre register layout for model', self.model, layout)
         layout_registry[self.model] = layout
