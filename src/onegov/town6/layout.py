@@ -87,6 +87,7 @@ from onegov.people import Person
 from onegov.reservation import Resource
 from onegov.stepsequence import step_sequences
 from onegov.stepsequence.extension import StepsLayoutExtension
+from onegov.ticket import Ticket
 from onegov.user import User
 from onegov.town6 import _
 from onegov.town6.theme import user_options
@@ -103,7 +104,6 @@ if TYPE_CHECKING:
     from onegov.org.models import ExtendedDirectoryEntry
     from onegov.org.request import PageMeta
     from onegov.page import Page
-    from onegov.ticket import Ticket
     from onegov.town6.app import TownApp
     from onegov.town6.request import TownRequest
     from typing import TypeAlias
@@ -454,6 +454,7 @@ class ArchivedTicketsLayout(OrgArchivedTicketsLayout, DefaultLayout):
     request: TownRequest
 
 
+@TownApp.layout(model=Ticket)
 class TicketLayout(OrgTicketLayout, DefaultLayout):
 
     app: TownApp
