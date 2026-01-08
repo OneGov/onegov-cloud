@@ -8,7 +8,7 @@ from onegov.core.static import StaticFile
 from onegov.core.utils import append_query_param, to_html_ul
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
-from onegov.directory import DirectoryCollection
+from onegov.directory import DirectoryCollection, DirectoryEntry, Directory
 from onegov.event import Event
 from onegov.event import OccurrenceCollection, Occurrence
 from onegov.org.elements import QrCodeLink, IFrameLink
@@ -22,6 +22,7 @@ from onegov.org.layout import (
     ArchivedTicketsLayout as OrgArchivedTicketsLayout,
     DashboardLayout as OrgDashboardLayout,
     DirectoryCollectionLayout as OrgDirectoryCollectionLayout,
+    DirectoryLayout as OrgDirectoryLayout,
     DirectoryEntryCollectionLayout as OrgDirectoryEntryCollectionLayout,
     DirectoryEntryLayout as OrgDirectoryEntryLayout,
     EditorLayout as OrgEditorLayout,
@@ -791,6 +792,13 @@ class DirectoryCollectionLayout(OrgDirectoryCollectionLayout, DefaultLayout):
     request: TownRequest
 
 
+@TownApp.layout(model=Directory)
+class DirectoryLayout(OrgDirectoryLayout, DefaultLayout):
+
+    app: TownApp
+    request: TownRequest
+
+
 @step_sequences.registered_step(
     1, _('Form'), cls_after='FormSubmissionLayout'
 )
@@ -918,6 +926,7 @@ class DirectoryEntryCollectionLayout(
 
 
 @step_sequences.registered_step(1, _('Form'), cls_after='FormSubmissionLayout')
+@TownApp.layout(model=DirectoryEntry)
 class DirectoryEntryLayout(
     StepsLayoutExtension,
     OrgDirectoryEntryLayout,

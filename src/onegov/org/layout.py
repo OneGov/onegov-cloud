@@ -3458,7 +3458,9 @@ class DirectoryCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Directories'), '#')
+            Link(_('Directories'), self.request.class_link(
+                DirectoryCollection
+            )),
         ]
 
     @cached_property
@@ -3480,6 +3482,19 @@ class DirectoryCollectionLayout(DefaultLayout):
                 ),
             ]
         return None
+
+
+class DirectoryLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Directories'), self.request.class_link(
+                DirectoryCollection
+            )),
+            Link(_(self.model.title), self.request.link(self.model))
+        ]
 
 
 class DirectoryEntryMixin:
