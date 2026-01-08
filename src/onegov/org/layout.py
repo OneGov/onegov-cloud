@@ -1344,6 +1344,21 @@ class FormCollectionLayout(DefaultLayout):
         return None
 
 
+class FormDefinitionLayout(DefaultLayout):
+
+    @property
+    def forms_url(self) -> str:
+        return self.request.class_link(FormCollection)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Forms'), self.forms_url),
+            Link(self.model.title, self.request.link(self.model))
+        ]
+
+
 class SurveySubmissionWindowLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:

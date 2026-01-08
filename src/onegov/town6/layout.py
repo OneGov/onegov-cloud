@@ -10,7 +10,6 @@ from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
-from onegov.form import FormCollection
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.org.layout import (
     Layout as OrgLayout,
@@ -30,6 +29,7 @@ from onegov.org.layout import (
     ExternalLinkLayout as OrgExternalLinkLayout,
     FindYourSpotLayout as OrgFindYourSpotLayout,
     FormCollectionLayout as OrgFormCollectionLayout,
+    FormDefinitionLayout as OrgFormDefinitionLayout,
     SurveyCollectionLayout as OrgSurveyCollectionLayout,
     FormEditorLayout as OrgFormEditorLayout,
     FormSubmissionLayout as OrgFormSubmissionLayout,
@@ -69,12 +69,16 @@ from onegov.org.layout import (
     UserGroupLayout as OrgUserGroupLayout,
     UserGroupCollectionLayout as OrgUserGroupCollectionLayout,
     UserManagementLayout as OrgUserManagementLayout)
-from onegov.org.models import MeetingCollection, Topic, News, GeneralFile
+from onegov.org.models import CustomFormDefinition
+from onegov.org.models import GeneralFile
+from onegov.org.models import MeetingCollection
+from onegov.org.models import News
 from onegov.org.models import PageMove
 from onegov.org.models import PoliticalBusinessCollection
 from onegov.org.models import RISCommissionCollection
 from onegov.org.models import RISParliamentarianCollection
 from onegov.org.models import RISParliamentaryGroupCollection
+from onegov.org.models import Topic
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.page import PageCollection
 from onegov.people import Person
@@ -91,7 +95,8 @@ from typing import Any, NamedTuple, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
     from onegov.event import Event
-    from onegov.form import FormDefinition, FormSubmission
+    from onegov.form import FormSubmission
+    from onegov.form import FormDefinition
     from onegov.form.models.definition import SurveyDefinition
     from onegov.form.models.submission import SurveySubmission
     from onegov.org.models import ExtendedDirectoryEntry
@@ -403,9 +408,12 @@ class FormCollectionLayout(OrgFormCollectionLayout, DefaultLayout):
     app: TownApp
     request: TownRequest
 
-    @property
-    def forms_url(self) -> str:
-        return self.request.class_link(FormCollection)
+
+@TownApp.layout(model=CustomFormDefinition)
+class FormDefinitionLayout(OrgFormDefinitionLayout, DefaultLayout):
+
+    app: TownApp
+    request: TownRequest
 
 
 class SurveySubmissionWindowLayout(OrgSurveySubmissionWindowLayout,
