@@ -125,19 +125,6 @@ jQuery.fn.volunteerCart = function() {
     window.volunteerCart = cart;
 };
 
-$(document).ready(function() {
-    $('.volunteer-cart-widget').volunteerCart();
-    $('#activities .needs a').click(function() {
-        var btn = $(this);
-        var need = btn.data('need');
-        var error_container = btn.data('error-container');
-        if (need && error_container) {
-            window.volunteerCart.append(need, error_container);
-        }
-        return false;
-    });
-});
-
 Intercooler.ready((elt) => {
     $(elt).find('.volunteer-cart-widget').volunteerCart();
     $(elt).find('#activities .needs a').click(function() {
