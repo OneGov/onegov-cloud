@@ -1996,6 +1996,9 @@
             <tal:b tal:content="result.subtitle"></tal:b>
         </p>
     </a>
+    <div tal:condition="request.get_layout(result) and request.is_manager">
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="layout request.get_layout(result)" />
+    </div>
 </metal:search_result_tickets>
 
 

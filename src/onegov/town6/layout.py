@@ -72,18 +72,23 @@ from onegov.org.layout import (
     UserGroupCollectionLayout as OrgUserGroupCollectionLayout,
     UserManagementLayout as OrgUserManagementLayout)
 from onegov.form import FormDefinition
-from onegov.org.models import ImageSet
 from onegov.org.models import GeneralFile
+from onegov.org.models import ImageSet
+from onegov.org.models import Meeting
 from onegov.org.models import MeetingCollection
 from onegov.org.models import News
 from onegov.org.models import PageMove
+from onegov.org.models import PoliticalBusiness
 from onegov.org.models import PoliticalBusinessCollection
 from onegov.org.models import RISCommissionCollection
 from onegov.org.models import RISParliamentarianCollection
+from onegov.org.models import RISParliamentaryGroup
 from onegov.org.models import RISParliamentaryGroupCollection
 from onegov.org.models import Topic
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.page import PageCollection
+from onegov.parliament.models import Commission
+from onegov.parliament.models import Parliamentarian
 from onegov.people import Person
 from onegov.reservation import Resource
 from onegov.stepsequence import step_sequences
@@ -1140,6 +1145,7 @@ class MeetingCollectionLayout(DefaultLayout):
         return None
 
 
+@TownApp.layout(model=Meeting)
 class MeetingLayout(DefaultLayout):
 
     @cached_property
@@ -1156,11 +1162,18 @@ class MeetingLayout(DefaultLayout):
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
+        title = (
+            self.title + ' - ' +
+            self.format_date(self.model.start_datetime, 'date')
+            if self.model.start_datetime
+            else self.title
+        )
+
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(_('RIS Settings'), self.ris_overview_url),
             Link(_('Meetings'), self.request.class_link(MeetingCollection)),
-            Link(self.title, self.request.link(self.model)),
+            Link(title, self.request.link(self.model)),
         ]
 
     @cached_property
@@ -1238,6 +1251,7 @@ class RISParliamentarianCollectionLayout(DefaultLayout):
         return None
 
 
+@TownApp.layout(model=Parliamentarian)
 class RISParliamentarianLayout(DefaultLayout):
 
     @cached_property
@@ -1419,6 +1433,7 @@ class RISParliamentaryGroupCollectionLayout(DefaultLayout):
         return None
 
 
+@TownApp.layout(model=RISParliamentaryGroup)
 class RISParliamentaryGroupLayout(DefaultLayout):
 
     @cached_property
@@ -1554,6 +1569,7 @@ class RISCommissionCollectionLayout(DefaultLayout):
         return None
 
 
+@TownApp.layout(model=Commission)
 class RISCommissionLayout(DefaultLayout):
 
     @cached_property
@@ -1646,6 +1662,7 @@ class PoliticalBusinessCollectionLayout(DefaultLayout):
         return None
 
 
+@TownApp.layout(model=PoliticalBusiness)
 class PoliticalBusinessLayout(DefaultLayout):
 
     @cached_property
