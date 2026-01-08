@@ -30,6 +30,7 @@ from wtforms import DateField, DateTimeLocalField, RadioField, TimeField
 from wtforms.fields import SelectField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
+from wtforms.validators import HostnameValidation
 from wtforms.validators import Length
 from wtforms.validators import Optional
 from wtforms.validators import StopValidation
@@ -723,3 +724,20 @@ class ValidDateRange:
             raise ValidationError(
                 field.gettext(self.message).format(date=max_str)
             )
+
+
+class ValidHostname(HostnameValidation):
+    """ Makes sure the given input is a valid hostname.
+
+    Expects an :class:`wtforms.StringField` instance.
+
+    """
+
+    message = _('Not a valid domain.')
+
+    def __call__(self, form: Form, field: Field) -> None:  # type: ignore[override]
+        if not field.data:
+            return
+
+        if not super().__call__(field.data):
+            raise ValidationError(self.message)

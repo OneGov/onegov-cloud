@@ -6,13 +6,13 @@ from onegov.activity import BookingPeriodMeta
 from onegov.activity import BookingPeriodCollection
 from onegov.activity import BookingPeriodInvoiceCollection
 from onegov.core import utils
-from onegov.org.app import org_content_security_policy
 from onegov.core.orm import orm_cached
 from onegov.feriennet.const import DEFAULT_DONATION_AMOUNTS
 from onegov.feriennet.initial_content import create_new_organisation
 from onegov.feriennet.request import FeriennetRequest
 from onegov.feriennet.sponsors import load_sponsors
 from onegov.feriennet.theme import FeriennetTheme
+from onegov.org.app import org_content_security_policy
 from onegov.town6 import TownApp
 from onegov.town6.app import get_common_asset as default_common_asset
 from onegov.town6.app import get_i18n_localedirs as get_town6_i18n_localedirs
@@ -351,5 +351,12 @@ def get_common_asset() -> Iterator[str]:
 @FeriennetApp.setting(section='content_security_policy', name='default')
 def feriennet_content_security_policy() -> ContentSecurityPolicy:
     policy = org_content_security_policy()
-    policy.connect_src.add('https://*.piwik.pro')
+    policy.connect_src.add('https://*.projuventute.ch')
+    policy.connect_src.add('https://*.googletagmanager.com')
+    policy.connect_src.add('https://*.analytics.google.com')
+    policy.connect_src.add('https://*.google-analytics.com')
+    policy.connect_src.add('https://*.usercentrics.eu')
+    # NOTE: This one may be out of date, but until somebody complains
+    #       we won't worry about it.
+    policy.connect_src.add('https://stats.g.doubleclick.net')
     return policy
