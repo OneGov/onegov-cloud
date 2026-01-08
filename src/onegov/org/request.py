@@ -283,6 +283,14 @@ class OrgRequest(CoreRequest):
         """
         layout_registry = self.app.config.layout_registry
         model_type = model if isinstance(model, type) else type(model)
-        layout_class = layout_registry.get(model_type, DefaultLayout)
-        print('*** tschupre returning', layout_class)
+
+        layout_class = None
+        for cls in model_type.mro():
+            layout_class = layout_registry.get(cls)
+            if layout_class:
+                break
+
+        if layout_class is None:
+            layout_class = DefaultLayout
+
         return layout_class(model, self)

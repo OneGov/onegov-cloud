@@ -69,7 +69,8 @@ from onegov.org.layout import (
     UserGroupLayout as OrgUserGroupLayout,
     UserGroupCollectionLayout as OrgUserGroupCollectionLayout,
     UserManagementLayout as OrgUserManagementLayout)
-from onegov.org.models import CustomFormDefinition, ImageSet
+from onegov.form import FormDefinition
+from onegov.org.models import ImageSet
 from onegov.org.models import GeneralFile
 from onegov.org.models import MeetingCollection
 from onegov.org.models import News
@@ -82,6 +83,7 @@ from onegov.org.models import Topic
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.page import PageCollection
 from onegov.people import Person
+from onegov.reservation import Resource
 from onegov.stepsequence import step_sequences
 from onegov.stepsequence.extension import StepsLayoutExtension
 from onegov.user import User
@@ -96,13 +98,11 @@ if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
     from onegov.event import Event
     from onegov.form import FormSubmission
-    from onegov.form import FormDefinition
     from onegov.form.models.definition import SurveyDefinition
     from onegov.form.models.submission import SurveySubmission
     from onegov.org.models import ExtendedDirectoryEntry
     from onegov.org.request import PageMeta
     from onegov.page import Page
-    from onegov.reservation import Resource
     from onegov.ticket import Ticket
     from onegov.town6.app import TownApp
     from onegov.town6.request import TownRequest
@@ -409,7 +409,7 @@ class FormCollectionLayout(OrgFormCollectionLayout, DefaultLayout):
     request: TownRequest
 
 
-@TownApp.layout(model=CustomFormDefinition)
+@TownApp.layout(model=FormDefinition)
 class FormDefinitionLayout(OrgFormDefinitionLayout, DefaultLayout):
 
     app: TownApp
@@ -566,6 +566,7 @@ class ResourceRecipientsFormLayout(
     request: TownRequest
 
 
+@TownApp.layout(model=Resource)
 class ResourceLayout(OrgResourceLayout, DefaultLayout):
 
     app: TownApp
