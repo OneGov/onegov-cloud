@@ -9,10 +9,10 @@ from onegov.core.orm.types import JSON, UTCDateTime, UUID
 from onegov.core.upgrade import upgrade_task
 from onegov.pay import PaymentProvider
 from onegov.ticket import Ticket, TicketInvoice
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, Text, Enum
+from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy import column, update, func, and_, true, false, Numeric
 from sqlalchemy.orm import load_only, selectinload
-from sqlalchemy.dialects.postgresql import HSTORE
+from sqlalchemy.dialects.postgresql import ARRAY, HSTORE
 from uuid import uuid4
 
 from typing import TYPE_CHECKING
@@ -452,4 +452,14 @@ def add_order_id_to_ticket(context: UpgradeContext) -> None:
 
     context.operations.create_index(
         'ix_tickets_order_id', 'tickets', ['order_id']
+    )
+
+
+@upgrade_task('Add customer_message_ids to ticket')
+def add_customer_message_ids_to_ticket(context: UpgradeContext) -> None:
+    if context.has_column('tickets', 'customer_message_ids'):
+        return
+
+    context.operations.add_column(
+        'tickets', Column('customer_message_ids', ARRAY(String), nullable=True)
     )

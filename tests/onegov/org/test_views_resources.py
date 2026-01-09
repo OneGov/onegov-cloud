@@ -2598,7 +2598,7 @@ def test_reserve_session_separation(client: Client) -> None:
     formular.form['email'] = 'info@example.org'
     formular.form.submit()
 
-    # we should get the same formular by following the group link
+    # we should get the same form by following the group link
     group_formular = c1.get('/find-your-spot/form').follow()
     assert 'meeting-room' in group_formular
 
@@ -2644,8 +2644,74 @@ def test_reserve_session_separation(client: Client) -> None:
     assert 'meeting-room' in tickets
     assert 'gym' in tickets
 
-    # the two tickets should be linked
+
+@freeze_time("2016-04-28", tick=True)
+def test_reserve_related_tickets_email_threading(client: Client) -> None:
     client.login_admin()
+
+    reserve = []
+
+    # check both for separation by resource and by client
+    for room in ('meeting-room', 'gym'):
+        new = client.get('/resources').click('Raum')
+        new.form['title'] = room
+        new.form.submit()
+
+        resource = client.app.libres_resources.by_name(room)
+        assert resource is not None
+        allocations = resource.scheduler.allocate(
+            dates=(datetime(2016, 4, 28, 12, 0), datetime(2016, 4, 28, 13, 0)),
+            whole_day=False
+        )
+
+        reserve.append(client.bound_reserve(allocations[0]))
+        transaction.commit()
+
+    reserve_room, reserve_gym = reserve
+
+    assert reserve_room().json == {'success': True}
+    assert reserve_gym().json == {'success': True}
+
+    formular = client.get('/resource/meeting-room/form')
+    formular.form['email'] = 'info@example.org'
+    formular.form.submit()
+
+    # we should get the same form by following the group link
+    group_formular = client.get('/find-your-spot/form').follow()
+    assert 'meeting-room' in group_formular
+
+    # confirm the first reservation
+    next_form = formular.form.submit().follow().form.submit().follow()
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
+    assert message is not None
+    assert 'Headers' in message
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    assert 'Message-ID' in headers
+    message_id1 = headers['Message-ID']
+
+    # confirm the second reservation
+    assert 'Bitte fahren Sie fort mit Ihrer Reservation für gym' in next_form
+    # but e-mail shoud be pre-filled so we can just submit twice to reserve
+    tickets = next_form.form.submit().follow().form.submit().follow()
+
+    assert len(os.listdir(client.app.maildir)) == 2
+    message = client.get_email(1)
+    assert message is not None
+    assert 'Headers' in message
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    assert 'Message-ID' in headers
+    message_id2 = headers['Message-ID']
+    assert message_id2 > message_id1
+    assert headers['In-Reply-To'] == message_id1
+    assert headers['References'] == message_id1
+
+    # we should have a ticket for each room we reserved
+    assert 'Eingereichte Anfragen' in tickets
+    assert 'meeting-room' in tickets
+    assert 'gym' in tickets
+
+    # the two tickets should be linked
     open_tickets = client.get('/tickets/ALL/open')
     ticket = open_tickets.click('Annehmen', index=0).follow()
     assert 'Verknüpfte Tickets' in ticket
@@ -2655,6 +2721,18 @@ def test_reserve_session_separation(client: Client) -> None:
     ticket = ticket.click(href='/mute-related').follow()
     # and then unmute all the related tickets
     ticket = ticket.click(href='/unmute-related').follow()
+
+    # trigger a third email in the thread
+    ticket = ticket.click('Alle Reservationen annehmen').follow()
+    assert len(os.listdir(client.app.maildir)) == 3
+    message = client.get_email(2)
+    assert 'Headers' in message
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    assert 'Message-ID' in headers
+    message_id3 = headers['Message-ID']
+    assert message_id3 > message_id2
+    assert headers['In-Reply-To'] == message_id2
+    assert headers['References'] == f'{message_id1} {message_id2}'
 
 
 def test_reserve_reservation_prediction(client: Client) -> None:

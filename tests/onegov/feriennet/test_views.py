@@ -3513,6 +3513,41 @@ def test_view_volunteer_activities(
     assert "Pet Zoo" not in page
 
 
+def test_analytics_settings(client: Client) -> None:
+    # plausible
+    client.login_admin()
+
+    settings = client.get('/analytics-settings')
+    settings.form['analytics_provider_name'] = 'plausible'
+    settings.form['plausible_domain'] = 'govikon.ch'
+    settings.form.submit()
+
+    settings = client.get('/analytics-settings')
+    assert 'src="https://dummy-plausible.test/script.js"' in settings
+    assert 'href="https://dummy-plausible.test/govikon.ch"' in settings
+
+    # matomo
+    settings = client.get('/analytics-settings')
+    settings.form['analytics_provider_name'] = 'matomo'
+    settings.form['matomo_site_id'] = '28'
+    settings.form.submit()
+
+    settings = client.get('/analytics-settings')
+    assert 'var u="https://dummy-matomo.test/";' in settings
+    assert 'href="https://dummy-matomo.test/"' in settings
+
+    # google analytics
+    settings = client.get('/analytics-settings')
+    settings.form['analytics_provider_name'] = 'google_analytics'
+    settings.form['google_tag_id'] = 'G-DEADBEEF'
+    settings.form.submit()
+
+    settings = client.get('/analytics-settings')
+    assert (
+        'src="https://www.googletagmanager.com/gtag/js?id=G-DEADBEEF"'
+    ) in settings
+
+
 def test_footer_settings_contact_url_label(client: Client) -> None:
     client.login_admin()
 

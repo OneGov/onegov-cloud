@@ -17,6 +17,7 @@ from sqlalchemy.orm import noload
 from typing import Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Generator, Iterable
+    from onegov.core.analytics import AnalyticsProvider
     from onegov.org.app import OrgApp
     from onegov.ticket import Ticket
 
@@ -276,6 +277,13 @@ class OrgRequest(CoreRequest):
             )
 
         return result
+
+    @property
+    def analytics_provider(self) -> AnalyticsProvider | None:
+        """ Returns the active analytics provider. """
+        if name := self.app.org.analytics_provider_name:
+            return self.app.available_analytics_providers.get(name)
+        return None
 
     def get_layout(self, model: object) -> Layout | DefaultLayout:
         """
