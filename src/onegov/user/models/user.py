@@ -3,7 +3,7 @@ from __future__ import annotations
 from onegov.core.crypto import hash_password, verify_password
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import data_property, dict_property, TimestampMixin
-from onegov.core.orm.types import JSON, UUID, LowercaseText
+from onegov.core.orm.types import JSON, UUID, LowercaseText, UTCDateTime
 from onegov.core.security import forget, remembered
 from onegov.core.utils import is_valid_yubikey_format
 from onegov.core.utils import remove_repeated_dots
@@ -23,6 +23,7 @@ from uuid import uuid4, UUID as UUIDType
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
+    from datetime import datetime
     from onegov.core.framework import Framework
     from onegov.core.request import CoreRequest
     from onegov.core.types import AppenderQuery
@@ -156,6 +157,11 @@ class User(Base, TimestampMixin, ORMSearchable):
 
     #: true if the user is active
     active: Column[bool] = Column(Boolean, nullable=False, default=True)
+
+    #: timestamp of the last successful login
+    last_login: Column[datetime | None] = Column(
+        UTCDateTime, nullable=True, default=None
+    )
 
     #: the signup token used by the user
     signup_token: Column[str | None] = Column(

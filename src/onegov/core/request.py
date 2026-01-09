@@ -50,6 +50,7 @@ if TYPE_CHECKING:
     from wtforms import Form
     from uuid import UUID
 
+    from .analytics import AnalyticsProvider
     from .templates import TemplateLoader
 
     _BaseRequest = morepath.Request
@@ -883,6 +884,20 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         """ Returns the chameleon template loader. """
         registry = self.app.config.template_engine_registry
         return registry._template_loaders['.pt']
+
+    @property
+    def analytics_provider(self) -> AnalyticsProvider | None:
+        """ Returns the active analytics provider. """
+        return None
+
+    @property
+    def analytics_code(self) -> Markup | None:
+        """ Return the embeddable code for the active analytics provider. """
+        provider = self.analytics_provider
+        if provider is None:
+            return None
+
+        return provider.code(self)
 
     # NOTE: We override this so we pass an instance of ourselves
     #       to resolve_model, rather than a base Request instance

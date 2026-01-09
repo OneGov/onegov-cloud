@@ -541,9 +541,21 @@ class TicketsPdf(TicketPdf):
                 value: label
                 for value, label, *__ in form.ticket_group.iter_choices()
             }
+            # NOTE: For a reasonable number of selections we would like to
+            #       to have each selection on a separate line, but we can't
+            #       afford to do so for an arbitrary number of selections
+            #       since the filter info will no longer fit on a single
+            #       page. There's technically still a hard limit with comma
+            #       separated groups, but you will probably run into issues
+            #       with the nginx proxy before you manage to exceed a page's
+            #       worth of filter groups.
+            if len(form.ticket_group.data) < 20:
+                separator = Markup('<br/>')
+            else:
+                separator = Markup(', ')
             data.append([
                 self.translate(form.ticket_group.label.text),
-                MarkupParagraph(Markup('<br/>').join(
+                MarkupParagraph(separator.join(
                     label_dict.get(choice, choice)
                     for choice in form.ticket_group.data
                 ))

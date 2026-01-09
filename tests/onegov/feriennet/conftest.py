@@ -121,6 +121,21 @@ def create_feriennet_app(
             'manage_token': 'super-super-secret-token'
         }
     )
+    app.configure_analytics_providers(
+        analytics_providers={
+            'plausible': {
+                'provider': 'plausible',
+                'title': 'Dummy',
+                'script_src': 'https://dummy-plausible.test/script.js',
+            },
+            'matomo': {
+                'provider': 'matomo',
+                'title': 'Matomo',
+                'matomo_url': 'https://dummy-matomo.test/',
+            },
+            'google_analytics': None,
+        }
+    )
     app.configure_payment_providers(
         payment_providers_enabled=True,
         payment_provider_defaults={

@@ -21,4 +21,9 @@ function moveMailTemplateButtonToEnd() {
 
 document.addEventListener("DOMContentLoaded", function() {
     moveMailTemplateButtonToEnd();
+
+    // Auto-submit time reports filter form when month or year changes
+    $('#time-reports-filter select[name="month"], #time-reports-filter select[name="year"]').on('change', function() {
+        $(this).closest('form').submit();
+    });
 });

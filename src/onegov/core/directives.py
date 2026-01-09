@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from webob import Response
     from wtforms import Form
 
+    from .analytics import AnalyticsProvider
     from .request import CoreRequest
 
 
@@ -218,6 +219,38 @@ class CronjobAction(Action):
             minute=self.minute,
             timezone=self.timezone,
             once=self.once)
+
+
+class AnalyticsProviderAction(Action):
+    """ Register an analytics provider. """
+
+    config = {
+        'analytics_provider_registry': dict
+    }
+
+    def __init__(self, name: str, title: str) -> None:
+        self.name = name
+        self.title = title
+
+    def identifier(  # type:ignore[override]
+        self,
+        analytics_provider_registry: dict[str, AnalyticsProvider]
+    ) -> str:
+        return self.name
+
+    def perform(  # type:ignore[override]
+        self,
+        func: type[AnalyticsProvider],
+        analytics_provider_registry: dict[str, type[AnalyticsProvider]]
+    ) -> None:
+
+        # NOTE: We assume that this decorator will be directly used
+        #       at the class definition site, otherwise it would be
+        #       unsafe to set attributes on the class
+        func.name = self.name
+        func.title = self.title
+
+        analytics_provider_registry[self.name] = func
 
 
 class StaticDirectoryAction(Action):
