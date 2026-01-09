@@ -72,7 +72,7 @@ from onegov.org.layout import (
     UserGroupCollectionLayout as OrgUserGroupCollectionLayout,
     UserManagementLayout as OrgUserManagementLayout)
 from onegov.form import FormDefinition
-from onegov.org.models import GeneralFile
+from onegov.org.models import GeneralFile, RISCommission, RISParliamentarian
 from onegov.org.models import ImageSet
 from onegov.org.models import Meeting
 from onegov.org.models import MeetingCollection
@@ -87,8 +87,6 @@ from onegov.org.models import RISParliamentaryGroupCollection
 from onegov.org.models import Topic
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.page import PageCollection
-from onegov.parliament.models import Commission
-from onegov.parliament.models import Parliamentarian
 from onegov.people import Person
 from onegov.reservation import Resource
 from onegov.stepsequence import step_sequences
@@ -1251,7 +1249,7 @@ class RISParliamentarianCollectionLayout(DefaultLayout):
         return None
 
 
-@TownApp.layout(model=Parliamentarian)
+@TownApp.layout(model=RISParliamentarian)
 class RISParliamentarianLayout(DefaultLayout):
 
     @cached_property
@@ -1569,7 +1567,7 @@ class RISCommissionCollectionLayout(DefaultLayout):
         return None
 
 
-@TownApp.layout(model=Commission)
+@TownApp.layout(model=RISCommission)
 class RISCommissionLayout(DefaultLayout):
 
     @cached_property
