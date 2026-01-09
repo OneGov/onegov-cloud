@@ -238,7 +238,7 @@ def handle_edit_directory(
                             'The requested change cannot be performed, '
                             'as it is incompatible with existing entries'
                         ))
-                        alert_migration_type_errors(migration, request)
+                        alert_migration_errors(migration, request)
                     else:
                         if not request.params.get('confirm'):
                             form.action += '&confirm=1'
@@ -303,10 +303,28 @@ def handle_edit_directory(
     }
 
 
-def alert_migration_type_errors(
+def alert_migration_errors(
     migration: DirectoryMigration,
     request: OrgRequest
 ) -> None:
+    if migration.multiple_option_changes_in_one_step():
+        request.alert(
+            _(
+                'Do not mix adding, removing, and renaming options in the '
+                'same migration. Please use separate migrations for each '
+                'option.'
+            )
+        )
+
+    if len(migration.changes.renamed_options) > 1:
+        request.alert(
+            _(
+                'Renaming multiple options in the same migration is not '
+                'supported. Please use separate migrations for each option.'
+            )
+        )
+
+    # check for incompatible type changes
     for changed in migration.changes.changed_fields:
         old = migration.changes.old[changed]
         new = migration.changes.new[changed]

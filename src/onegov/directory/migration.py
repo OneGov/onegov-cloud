@@ -59,15 +59,18 @@ class DirectoryMigration:
 
     @property
     def possible(self) -> bool:
+        """ Returns True if the migration is possible, False otherwise. """
         if not self.directory.entries:
             return True
 
         if not self.changes:
             return True
 
-        if (not self.changes.changed_fields and
-                not self.changes.renamed_options):
-            return True
+        if len(self.changes.renamed_options) > 1:
+            return False
+
+        if self.multiple_option_changes_in_one_step():
+            return False
 
         for changed in self.changes.changed_fields:
             old = self.changes.old[changed]
@@ -179,7 +182,12 @@ class DirectoryMigration:
             old_label = old_option[1]
             new_label = new_option[1]
             for key, val in list(values.items()):
-                if val == old_label:
+                if isinstance(val, list):
+                    values[key] = [
+                        new_label if v == old_label else v for v in val
+                    ]
+
+                elif val == old_label:
                     values[key] = new_label
 
     def remove_old_options(self, values: dict[str, Any]) -> None:
@@ -190,6 +198,20 @@ class DirectoryMigration:
                     values[id] = [v for v in values[id] if v != label]
                 elif values[id] == label:
                     values[id] = None
+
+    def multiple_option_changes_in_one_step(self) -> bool:
+        """
+        Returns True if there are multiple changes e.g. added and
+        removed options.
+        """
+
+        if (
+            (self.changes.added_options and self.changes.removed_options)
+            or (self.changes.added_options and self.changes.renamed_options)
+            or (self.changes.removed_options and self.changes.renamed_options)
+        ):
+            return True
+        return False
 
 
 class FieldTypeMigrations:
@@ -282,6 +304,8 @@ class StructuralChanges:
             or self.removed_fields
             or self.renamed_fields
             or self.changed_fields
+            or self.added_options
+            or self.removed_options
             or self.renamed_options  # radio and checkboxes
         )
 
@@ -441,14 +465,27 @@ class StructuralChanges:
                     if old_labels == new_labels:
                         continue
 
-                    for r, a in zip(self.removed_options, self.added_options):
-                        self.renamed_options[r] = a
+                    # test if re-ordered
+                    if set(old_labels) == set(new_labels):
+                        continue
 
-                    self.added_options = [
-                        f for f in self.added_options
-                        if f not in self.renamed_options.values()
-                    ]
-                    self.removed_options = [
-                        f for f in self.removed_options
-                        if f not in self.renamed_options
-                    ]
+                    # only consider renames if the number of options
+                    # remains the same
+                    if len(old_labels) != len(new_labels):
+                        continue
+
+                    for o_label, n_label in zip(old_labels, new_labels):
+                        if o_label != n_label:
+                            self.renamed_options[(old_id, o_label)] = (
+                                old_id,
+                                n_label
+                            )
+
+                        self.added_options = [
+                            ao for ao in self.added_options
+                            if ao not in self.renamed_options.values()
+                        ]
+                        self.removed_options = [
+                            ro for ro in self.removed_options
+                            if ro not in self.renamed_options.keys()
+                        ]

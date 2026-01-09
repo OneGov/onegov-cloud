@@ -657,7 +657,7 @@ def test_directory_migration_for_select(session: Session) -> None:
     assert zoo.values['general_landscapes'] == 'Great Desert'
     assert zoo.values['general_animals'] == ['Snakes']
 
-    # rename options
+    # rename options multiple -> not possible
     new_structure = """
         # Main
         Name *= ___
@@ -670,16 +670,33 @@ def test_directory_migration_for_select(session: Session) -> None:
             ( ) Tropical Rainforest
             ( ) Tundra
         Animals =
-            [ ] Gnu
+            [ ] Gnus
+            [ ] Snakes
+    """
+    migration = zoos.migration(new_structure, None)
+    assert not migration.possible
+
+    # rename
+    new_structure = """
+        # Main
+        Name *= ___
+        # General
+        Landscapes =
+            ( ) Arctic
+            ( ) Grasland
+            ( ) Great Desert
+            ( ) Marina
+            ( ) Tropical Rainforest
+            ( ) Tundra
+        Animals =
+            [ ] Gnus
             [ ] Snakes
     """
     migration = zoos.migration(new_structure, None)
     assert migration.changes.added_options == []
     assert migration.changes.removed_options == []
     assert migration.changes.renamed_options == {
-        ('General/Landscapes', 'Arctic'): ('General/Landscapes', 'Arctica'),
         ('General/Landscapes', 'Marine'): ('General/Landscapes', 'Marina'),
-        ('General/Animals', 'Gnus'): ('General/Animals', 'Gnu'),
     }
     assert migration.possible
 
@@ -693,12 +710,12 @@ def test_directory_migration_for_select(session: Session) -> None:
         Name *= ___
         # General
         Landscapes =
-            ( ) Arctica
+            ( ) Arctic
             ( ) Grasland
             ( ) Marina
             ( ) Tundra
         Animals =
-            [ ] Gnu
+            [ ] Gnus
     """
     migration = zoos.migration(new_structure, None)
     assert migration.changes.added_options == []
@@ -720,12 +737,12 @@ def test_directory_migration_for_select(session: Session) -> None:
         Name *= ___
         # General
         Landscapes =
-            [ ] Arctica
+            [ ] Arctic
             [ ] Grasland
             [ ] Marina
             [ ] Tundra
         Animals =
-            [ ] Gnu
+            [ ] Gnus
     """
     migration = zoos.migration(new_structure, None)
     assert migration.changes.added_options == []
@@ -743,12 +760,12 @@ def test_directory_migration_for_select(session: Session) -> None:
         Name *= ___
         # General
         Landscapes =
-            [ ] Arctica
+            [ ] Arctic
             [ ] Grasland
             [ ] Marina
             [ ] Tundra
         Animals =
-            ( ) Gnu
+            ( ) Gnus
     """
     migration = zoos.migration(new_structure, None)
     assert migration.changes.added_options == []
