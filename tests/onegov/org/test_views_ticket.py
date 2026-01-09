@@ -310,7 +310,7 @@ def test_ticket_states_idempotent(client: Client) -> None:
 def test_ticket_states_directory_entry(client: Client) -> None:
     client.login_admin()
 
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Vereinsverzeichnis"
     page.form['structure'] = "Vereinsname *= ___"
     page.form['title_format'] = "[Vereinsname]"
