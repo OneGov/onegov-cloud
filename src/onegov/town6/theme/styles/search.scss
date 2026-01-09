@@ -144,6 +144,7 @@
 
 .search-preview {
     color: $jumbo;
+    margin-bottom: .5rem;
 }
 
 .search-preview em {
@@ -151,4 +152,24 @@
     font-style: inherit;
     font-weight: bold;
     text-decoration: underline;
+}
+
+.breadcrumbs {
+    padding-left: .5rem;
+    padding-top: .75rem;
+    padding-right: 0;
+    padding-bottom: .8rem;
+
+    margin-bottom: 0 !important;
+
+    .breadcrumb-item {
+        a {
+            color: $primary-color !important;
+        }
+
+        padding-left: 0;
+        padding-top: 0;
+        padding-right: 0;
+        padding-bottom: 0.2rem !important;
+    }
 }

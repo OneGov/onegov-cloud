@@ -1935,9 +1935,9 @@
 
 <metal:search_breadcrumbs define-macro="search_breadcrumbs" i18n:domain="onegov.town6">
     <tal:b tal:condition="layout and len(layout.breadcrumbs) > 1" tal:define="links layout.breadcrumbs">
-        <ul class="breadcrumbs" style="padding-left: .5rem; margin-bottom: 0.25rem">
+        <ul class="breadcrumbs">
             <tal:b repeat="link links">
-                <li class="breadcrumbs-item" tal:content="link(layout)" style="padding: .3rem 0 0 .2rem;"></li>
+                <li class="breadcrumb-item" tal:content="link(layout)"></li>
             </tal:b>
         </ul>
     </tal:b>
