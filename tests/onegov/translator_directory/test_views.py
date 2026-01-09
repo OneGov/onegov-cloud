@@ -105,6 +105,20 @@ def get_accountant_email(client: Client) -> str:
     return emails[0]
 
 
+def collect_emails(client: Client) -> list['EmailJsonDict']:
+    """Collect all emails from client and flush the queue."""
+    all_emails = []
+    for i in range(10):
+        try:
+            email = client.get_email(i)
+            if email:
+                all_emails.append(email)
+        except IndexError:
+            break
+    # client.flush_email_queue()
+    return all_emails
+
+
 def filter_emails_by_recipient(
     emails: list['EmailJsonDict'], recipient: str
 ) -> list['EmailJsonDict']:
@@ -2232,6 +2246,7 @@ def test_time_report_workflow(
 
     page = page.click('Zeit erfassen')
     page.form['assignment_type'] = 'on-site'
+    page.form['assignment_location'] = 'obergericht'
     page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-11'
     page.form['start_time'] = '09:00'
@@ -2248,19 +2263,9 @@ def test_time_report_workflow(
     mail_to_submitter = client.get_email(0)
     assert 'TRANSLATOR, Test' in mail_to_submitter['Subject']
 
-    all_emails = []
-    for i in range(10):
-        try:
-            email = client.get_email(i)
-            if email:
-                all_emails.append(email)
-        except IndexError:
-            break
-    client.flush_email_queue()
-
     accountant_email = get_accountant_email(client)
     accountant_emails = filter_emails_by_recipient(
-        all_emails, accountant_email
+        collect_emails(client), accountant_email
     )
     assert len(accountant_emails) >= 1
 
@@ -2280,7 +2285,7 @@ def test_time_report_workflow(
     ticket_link = link_match.group(1)
 
     translator_emails = filter_emails_by_recipient(
-        all_emails, 'translator@example.org'
+        collect_emails(client), 'translator@example.org'
     )
     assert len(translator_emails) >= 1
     mail_to_translator = translator_emails[0]
@@ -2464,6 +2469,7 @@ def test_time_report_skip_travel_calculation(
     page = page.click('Zeit erfassen')
 
     page.form['assignment_type'] = 'on-site'
+    page.form['assignment_location'] = 'obergericht'
     page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-11'
     page.form['start_time'] = '09:00'
@@ -2522,6 +2528,7 @@ def test_time_report_edit_toggle_skip_travel(
     page = page.click('Zeit erfassen')
 
     page.form['assignment_type'] = 'on-site'
+    page.form['assignment_location'] = 'obergericht'
     page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-11'
     page.form['start_time'] = '09:00'
@@ -2536,19 +2543,9 @@ def test_time_report_edit_toggle_skip_travel(
     assert report.travel_compensation == Decimal('100')
     assert report.travel_distance == 35.0
 
-    all_emails = []
-    for i in range(10):
-        try:
-            email = client.get_email(i)
-            if email:
-                all_emails.append(email)
-        except IndexError:
-            break
-    client.flush_email_queue()
-
     accountant_email = get_accountant_email(client)
     accountant_emails = filter_emails_by_recipient(
-        all_emails, accountant_email
+        collect_emails(client), accountant_email
     )
     assert len(accountant_emails) >= 1
 
@@ -2651,6 +2648,7 @@ def test_time_report_skip_travel_ticket_html_unchanged_after_edit(
     page = page.click('Zeit erfassen')
 
     page.form['assignment_type'] = 'on-site'
+    page.form['assignment_location'] = 'obergericht'
     page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-11'
     page.form['start_time'] = '09:00'
@@ -2663,19 +2661,9 @@ def test_time_report_skip_travel_ticket_html_unchanged_after_edit(
 
     assert 'Zeiterfassung zur Überprüfung eingereicht' in page
 
-    all_emails = []
-    for i in range(10):
-        try:
-            email = client.get_email(i)
-            if email:
-                all_emails.append(email)
-        except IndexError:
-            break
-    client.flush_email_queue()
-
     accountant_email = get_accountant_email(client)
     ticket_link = extract_ticket_link_from_email(
-        all_emails, accountant_email
+        collect_emails(client), accountant_email
     )
 
     client.login_editor()
@@ -2740,6 +2728,7 @@ def test_time_report_workflow_self_employed(
     page = client.get(f'/translator/{translator_id}')
     page = page.click('Zeit erfassen')
     page.form['assignment_type'] = 'on-site'
+    page.form['assignment_location'] = 'obergericht'
     page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-11'
     page.form['start_time'] = '09:00'
@@ -2751,18 +2740,10 @@ def test_time_report_workflow_self_employed(
     page = page.form.submit().follow()
     assert 'Zeiterfassung zur Überprüfung eingereicht' in page
 
-    all_emails = []
-    for i in range(10):
-        try:
-            email = client.get_email(i)
-            if email:
-                all_emails.append(email)
-        except IndexError:
-            break
-    client.flush_email_queue()
-
     accountant_email = get_accountant_email(client)
-    ticket_link = extract_ticket_link_from_email(all_emails, accountant_email)
+    ticket_link = extract_ticket_link_from_email(
+        collect_emails(client), accountant_email
+    )
 
     session = client.app.session()
     translator = session.query(Translator).filter_by(id=translator_id).one()
@@ -2847,6 +2828,7 @@ def test_time_report_workflow_self_employed_missing_iban(
     page = client.get(f'/translator/{translator_id}')
     page = page.click('Zeit erfassen')
     page.form['assignment_type'] = 'on-site'
+    page.form['assignment_location'] = 'obergericht'
     page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-11'
     page.form['start_time'] = '09:00'
@@ -2856,18 +2838,10 @@ def test_time_report_workflow_self_employed_missing_iban(
     page.form['is_urgent'] = False
     page = page.form.submit().follow()
 
-    all_emails = []
-    for i in range(10):
-        try:
-            email = client.get_email(i)
-            if email:
-                all_emails.append(email)
-        except IndexError:
-            break
-    client.flush_email_queue()
-
     accountant_email = get_accountant_email(client)
-    ticket_link = extract_ticket_link_from_email(all_emails, accountant_email)
+    ticket_link = extract_ticket_link_from_email(
+        collect_emails(client), accountant_email
+    )
 
     session = client.app.session()
     translator = session.query(Translator).filter_by(id=translator_id).one()
@@ -2965,3 +2939,76 @@ def test_user_groups(client: Client) -> None:
         .all()
     )
     assert len(all_groups) == 2
+
+
+def test_time_report_telephonic_no_location(client: Client) -> None:
+    """Test that telephonic time reports have no assignment_location."""
+    session = client.app.session()
+    create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator_id = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+        drive_distance=35.0,
+    ).id
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='test_group')
+    user_group.meta = {
+        'finanzstelle': 'polizei',
+        'accountant_emails': ['editor@example.org'],
+    }
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+
+    # Side quest: verify location field is required
+    # (Pretend we forgot to set  set location (real use case))
+    page.form['assignment_type'] = 'on-site'
+    page.form['finanzstelle'] = 'polizei'
+    page.form['start_date'] = '2025-01-15'
+    page.form['start_time'] = '10:00'
+    page.form['end_date'] = '2025-01-15'
+    page.form['end_time'] = '11:30'
+    page.form['case_number'] = 'PHONE-123'
+    page.form['notes'] = 'Telephonic interpretation'
+    page = page.form.submit()
+    assert 'Bitte wählen Sie einen Standort' in page
+
+    # proceed testing
+    page.form['assignment_type'] = 'telephonic'
+    page.form['assignment_location'] = 'Römerswil'
+    page.form['finanzstelle'] = 'polizei'
+    page.form['start_date'] = '2025-01-15'
+    page.form['start_time'] = '10:00'
+    page.form['end_date'] = '2025-01-15'
+    page.form['end_time'] = '11:30'
+    page.form['case_number'] = 'PHONE-123'
+    page.form['notes'] = 'Telephonic interpretation'
+    page = page.form.submit().follow()
+
+    assert 'Zeiterfassung zur Überprüfung eingereicht' in page
+
+    time_report = (
+        session.query(TranslatorTimeReport)
+        .filter_by(translator_id=translator_id)
+        .first()
+    )
+    assert time_report is not None
+    assert time_report.assignment_type == 'telephonic'
+    assert time_report.assignment_location is None
+
+    accountant_email = get_accountant_email(client)
+    ticket_link = extract_ticket_link_from_email(
+        collect_emails(client), accountant_email
+    )
+
+    client.login_editor()
+    ticket_page = client.get(ticket_link)
+    ticket_page = ticket_page.click('Ticket annehmen').follow()
+    # Einsatzort should be hidden as there it has not been set
+    assert 'Einsatzort' not in ticket_page
