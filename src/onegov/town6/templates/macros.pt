@@ -1786,7 +1786,7 @@
                         <div class="cell small-12 medium-6 large-5">
                             <form class="searchbox slider-searchbox" action="${layout.search_url}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
                                 <div class="input-group">
-                                    <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="Search term" i18n:attributes="placeholder">
+                                    <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="What are you searching for?" i18n:attributes="placeholder">
                                     <div class="typeahead">
                                         <div class="cell small-12" data-typeahead-container>
                                         </div>
@@ -1849,11 +1849,11 @@
                     <figure class="orbit-figure">
                         <div class="orbit-image" style="background-image:url(${image.src})" data-image-url="${image.src}"></div>
                         <div class="dark-overlay" tal:condition="image.note"></div>
-                        <div class="grid-container" tal:condition="image.note">
+                        <div class="grid-container text-container" tal:condition="image.note">
                             <div class="text">
                                 <span>${image.note}</span>
                             </div>
-                        </div>
+                      </div>
                     </figure>
                 </li>
             </ul>
@@ -1861,10 +1861,10 @@
         <div class="searchbox-wrapper ${searchbox_position|''}" tal:condition="searchbox == 'true'|False">
             <div class="grid-container">
                 <div class="grid-x grid-padding-x">
-                    <div class="cell small-12 medium-6 large-5">
+                    <div class="cell small-12 medium-6 large-7">
                         <form class="searchbox slider-searchbox" action="${layout.search_url}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
                             <div class="input-group">
-                                <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="Search term" i18n:attributes="placeholder">
+                                <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="What are you searching for?" i18n:attributes="placeholder">
                                 <div class="typeahead">
                                     <div class="cell small-12" data-typeahead-container>
                                     </div>

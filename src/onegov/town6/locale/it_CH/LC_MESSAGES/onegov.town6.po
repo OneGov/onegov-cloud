@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-12-19 12:13+0100\n"
+"POT-Creation-Date: 2026-01-07 10:07+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1095,6 +1095,9 @@ msgstr "Ingrandisci/riduci"
 msgid "Show more"
 msgstr "Mostra di più"
 
+msgid "What are you searching for?"
+msgstr "Cosa stai cercando?"
+
 msgid ""
 "This space holds images from your photo-albums. To show photos add a few "
 "photos to an album and mark it as available for the homepage."
@@ -1451,8 +1454,8 @@ msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} ha scritto"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 

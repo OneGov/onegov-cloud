@@ -86,7 +86,6 @@ class AutoplayVideoWidget:
             link_webm '{@link_webm}'; button_url '{@button_url}';
             link_webm_low_res '{@link_webm_low_res}'; text '{@text}';
             button_text '{@button_text}'; searchbox '{@searchbox}';
-            searchbox_position '{@searchbox-position}'"
             />
         </xsl:template>
     """
