@@ -349,7 +349,7 @@ class SliderWidget:
         <xsl:template match="slider">
             <div metal:use-macro="layout.macros['slider']"
             tal:define="height_m '{@height-m}';
-            height_d '{@height-d}'; searchbox '{@searchbox}';
+            height_d '{@height-d}'; searchbox '{@searchbox}';"
             />
         </xsl:template>
     """

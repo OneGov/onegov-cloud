@@ -1838,7 +1838,7 @@
 </metal:icon_links>
 
 <metal:slider define-macro="slider" i18n:domain="onegov.town6">
-    <div tal:condition="images" class="orbit slider homepage-image-slider" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200" tal:define="height height|None;">
+    <div tal:condition="images" class="orbit slider homepage-image-slider ${'with-searchbox' if searchbox == 'true' else ''}" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200" tal:define="height height|None;">
         <div class="orbit-wrapper">
             <div tal:condition="images and len(images) > 1" class="orbit-controls show-for-medium">
                 <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
@@ -1858,7 +1858,7 @@
                 </li>
             </ul>
         </div>
-        <div class="searchbox-wrapper ${searchbox_position|''}" tal:condition="searchbox == 'true'|False">
+        <div class="searchbox-wrapper" tal:condition="searchbox == 'true'|False">
             <div class="grid-container">
                 <div class="grid-x grid-padding-x">
                     <div class="cell small-12 medium-6 large-7">

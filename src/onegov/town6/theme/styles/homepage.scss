@@ -59,10 +59,6 @@
                 bottom: 3rem;
             }
 
-            &.top {
-                top: 32%;
-            }
-
             .searchbox {
                 margin-bottom: 0;
             }
@@ -141,7 +137,7 @@
                 position: relative;
                 color: $white;
                 height: fit-content !important;
-                margin-bottom: 15rem;
+                margin-bottom: 7rem;
                 text-shadow: 0 0 2em $black;
 
                 a {
@@ -194,6 +190,16 @@
         .orbit-container * {
             height: 100%;
             max-height: 100%;
+        }
+
+        &.with-searchbox {
+            .grid-container.text-container .text {
+                margin-bottom: 15rem;
+            }
+
+            // @media #{$small-only} {
+            //     height: calc(100vh - 5rem);
+            // }
         }
     }
 
