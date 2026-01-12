@@ -1108,17 +1108,17 @@ def test_directory_migration(client: Client) -> None:
             [ ] Lolipop
             [ ] Ice cream
     """)
-    page = page.form.submit().follow()
-    assert page.pyquery('.alert-box')
+    page = page.form.submit()
+    page.forms['main-form'].submit()  # confirm migration
 
-    # rename options
+    # rename multiple options
     page = client.get('/directories/order-sweets').click('Konfigurieren')
     page.form['structure'] = dedent("""
         Nickname *= ___
         Do you want sweets? =
-            ( ) Yes!
+            (x) Yes
             ( ) No
-            ( ) Not sure. Moom?
+            ( ) Not sure
         Choice =
             [ ] Donut Hole
             [ ] Gummi Bears
@@ -1127,30 +1127,51 @@ def test_directory_migration(client: Client) -> None:
             [ ] Ice cream
     """)
     page = page.form.submit()
-    assert not page.pyquery('.alert-box')
+    assert page.pyquery('.alert-box')
+    assert 'Die verlangte Änderung kann nicht durchgeführt werden' in page
+    assert 'Das Umbenennen mehrerer Optionen in derselben Migration wird nicht unterstützt' in page
+
+    # rename single options
+    page = client.get('/directories/order-sweets').click('Konfigurieren')
+    page.form['structure'] = dedent("""
+        Nickname *= ___
+        Do you want sweets? =
+            ( ) Yes
+            ( ) No
+            ( ) Not sure
+        Choice =
+            [ ] Donut Hole
+            [ ] Gummi Bear
+            [ ] Chocolate
+            [ ] Lolipop
+            [ ] Ice cream
+    """)
+    page = page.form.submit()
+    page.forms['main-form'].submit()  # confirm migration
 
     # remove (selected) options
     page = client.get('/directories/order-sweets').click('Konfigurieren')
     page.form['structure'] = dedent("""
         Nickname *= ___
         Do you want sweets? =
-            ( ) Yes!
-            ( ) Not sure. Moom?
+            ( ) Yes
+            ( ) No
+            ( ) Not sure
         Choice =
             [ ] Donut Hole
             [ ] Chocolate
             [ ] Ice cream
     """)
     page = page.form.submit()
-    assert not page.pyquery('.alert-box')
+    page.forms['main-form'].submit()  # confirm migration
 
     # switch checkbox -> radio which is invalid
     page = client.get('/directories/order-sweets').click('Konfigurieren')
     page.form['structure'] = dedent("""
         Nickname *= ___
         Do you want sweets? =
-            ( ) Yes!
-            ( ) Not sure. Moom?
+            ( ) Yes
+            ( ) Not sure
         Choice =
             ( ) Donut Hole
             ( ) Chocolate
@@ -1159,5 +1180,5 @@ def test_directory_migration(client: Client) -> None:
     page = page.form.submit()
     assert page.pyquery('.alert')
     assert 'Die verlangte Änderung kann nicht durchgeführt' in page
-    assert ('Feld "Choice" kann nicht von Typ "checkbox" zu Typ "radio" '
+    assert ('Feld "Choice" kann nicht von Typ "checkbox" zu "radio" '
             'konvertiert werden') in page
