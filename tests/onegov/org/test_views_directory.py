@@ -1129,7 +1129,8 @@ def test_directory_migration(client: Client) -> None:
     page = page.form.submit()
     assert page.pyquery('.alert-box')
     assert 'Die verlangte Änderung kann nicht durchgeführt werden' in page
-    assert 'Das Umbenennen mehrerer Optionen in derselben Migration wird nicht unterstützt' in page
+    assert ('Das Umbenennen mehrerer Optionen in derselben Migration '
+            'wird nicht unterstützt') in page
 
     # rename single options
     page = client.get('/directories/order-sweets').click('Konfigurieren')
