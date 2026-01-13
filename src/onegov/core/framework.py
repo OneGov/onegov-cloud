@@ -40,7 +40,7 @@ from libres.db.models import ORMBase
 from morepath.publish import resolve_model, get_view_name
 from more.content_security import ContentSecurityApp
 from more.content_security import ContentSecurityPolicy
-from more.content_security import NONE, SELF, UNSAFE_INLINE, UNSAFE_EVAL
+from more.content_security import NONE, SELF, UNSAFE_INLINE
 from more.transaction import TransactionApp
 from more.transaction.main import transaction_tween_factory
 from more.webassets import WebassetsApp
@@ -1655,17 +1655,21 @@ def default_content_security_policy() -> ContentSecurityPolicy:
         # enable inline styles and external stylesheets
         style_src={SELF, 'https:', UNSAFE_INLINE},
 
-        # enable inline scripts, eval and external scripts
+        # enable inline scripts and external scripts for sentry
         script_src={
             SELF,
             'https://browser.sentry-cdn.com',
             'https://js.sentry-cdn.com',
-            UNSAFE_INLINE,
-            UNSAFE_EVAL
         },
 
         # by default limit to self (allow pdf viewer etc)
         object_src={NONE},
+
+        # disable <base> element support
+        base_uri={NONE},
+
+        # only allow submitting forms to self
+        form_action={SELF},
 
         # disable all mixed content (https -> http)
         block_all_mixed_content=True,
