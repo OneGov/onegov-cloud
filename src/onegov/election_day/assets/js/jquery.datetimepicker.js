@@ -1,6 +1,6 @@
 /*!
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2014 - 2016
- * @version 2.5.21
+ * @version 1.3.4
  *
  * Date formatter utility library that allows formatting date/time variables or Date objects using PHP DateTime format.
  * @see http://php.net/manual/en/function.date.php
@@ -11,6 +11,7 @@
  * @preserve jQuery DateTimePicker
  * @homepage http://xdsoft.net/jqplugins/datetimepicker/
  * @author Chupurnov Valeriy (<chupurnov@gmail.com>)
+ * @version 2.5.21
  */
 
 /**
