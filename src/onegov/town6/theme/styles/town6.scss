@@ -858,6 +858,12 @@ $pageref-color-hover: $iron;
             }
         }
 
+        &:target,
+        &:has(:target) {
+            background-color: rgba($primary-color, 0.2);
+            transition: background-color 0.5s ease;
+        }
+
         &.more-list-level-2 {
             padding-bottom: 0;
 

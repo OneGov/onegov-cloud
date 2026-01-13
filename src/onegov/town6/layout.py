@@ -1235,11 +1235,7 @@ class MeetingItemLayout(DefaultLayout):
                 _('Meetings'),
                 self.request.class_link(MeetingCollection)
             ),
-            Link(
-                self.model.meeting.title,
-                self.request.link(self.model.meeting)
-            ),
-            Link(title, self.request.link(self.model))
+            Link(title, self.request.link(self.model) + f'#{self.model.title}')
         ]
 
 
