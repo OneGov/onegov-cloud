@@ -15,7 +15,7 @@ from itsdangerous import (
     URLSafeSerializer,
     URLSafeTimedSerializer
 )
-from more.content_security import ContentSecurityRequest
+from more.content_security import ContentSecurityRequest, UNSAFE_EVAL
 from more.webassets.core import IncludeRequest
 from morepath.authentication import NO_IDENTITY
 from morepath.error import LinkError
@@ -898,6 +898,12 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             return None
 
         return provider.code(self)
+
+    def require_unsafe_eval(self) -> None:
+        # FIXME: We currently use some intercooler features in some views
+        #        that require unsafe-eval, we should try to get rid of them
+        #        by writing some custom JavaScript handlers (ic-on-XXX).
+        self.content_security_policy.script_src.add(UNSAFE_EVAL)
 
     # NOTE: We override this so we pass an instance of ourselves
     #       to resolve_model, rather than a base Request instance

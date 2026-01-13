@@ -11,6 +11,8 @@
             <p i18n:translate>There are currently <tal:b i18n:name="count">${count}</tal:b> recipients registered.</p>
         </tal:b>
 
+        <!--! FIXME: Make this work without ic-on-success -->
+        <?python request.require_unsafe_eval() ?>
         <tal:b tal:repeat="letter by_letter">
             <h2>${letter}</h2>
 
