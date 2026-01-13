@@ -210,7 +210,7 @@ footer {
 .contact-panel,
 .organiser-panel,
 .occasions {
-    a:not(.button) {
+    a:not(.button .breadcrumbs) {
         position: relative;
         transition: all 250ms;
         z-index: 2;
