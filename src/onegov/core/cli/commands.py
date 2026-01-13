@@ -501,10 +501,11 @@ def transfer(
     ) -> tuple[str, ...]:
 
         # Extract connection parameters from PostgresDsn
-        local_host = local_dsn.host or 'localhost'
-        local_port = str(local_dsn.port or 5432)  # type: ignore[attr-defined]
-        local_user = local_dsn.username or 'postgres'  # type: ignore[attr-defined]
-        local_password = local_dsn.password or ''  # type: ignore[attr-defined]
+        host_info = local_dsn.hosts()[0]
+        local_host = host_info.get('host') or 'localhost'
+        local_port = str(host_info.get('port') or 5432)
+        local_user = host_info.get('username') or 'postgres'
+        local_password = host_info.get('password') or ''
         local_db = (local_dsn.path or '/').lstrip('/')
 
         # Get available schemas
@@ -690,10 +691,11 @@ def transfer(
         )
 
         # Extract connection parameters from PostgresDsn
-        local_host = local_dsn.host or 'localhost'
-        local_port = str(local_dsn.port or 5432)  # type: ignore[attr-defined]
-        local_user = local_dsn.username or 'postgres'  # type: ignore[attr-defined]
-        local_password = local_dsn.password or ''  # type: ignore[attr-defined]
+        host_info = local_dsn.hosts()[0]
+        local_host = host_info.get('host') or 'localhost'
+        local_port = str(host_info.get('port') or 5432)
+        local_user = host_info.get('username') or 'postgres'
+        local_password = host_info.get('password') or ''
         local_db = (local_dsn.path or '/').lstrip('/')
 
         command = shlex.join(
