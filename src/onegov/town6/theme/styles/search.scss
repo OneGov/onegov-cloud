@@ -147,14 +147,19 @@
     margin-bottom: .5rem;
 }
 
+.list-title em,
 .search-preview em {
+    background-color: rgba($primary-color, .05);
     color: $primary-color !important;
     font-style: italic;
     font-weight: bold;
+    border-radius: .8rem;
+    padding: 3px;
     text-decoration: underline;
 }
 
 .breadcrumbs {
+    background-color: rgba(128, 128, 128, .03);
     border-radius: .7rem;
     padding: .1rem .5rem;
     white-space: normal;
