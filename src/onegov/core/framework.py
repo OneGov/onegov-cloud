@@ -1665,8 +1665,8 @@ def default_content_security_policy() -> ContentSecurityPolicy:
         # by default limit to self (allow pdf viewer etc)
         object_src={NONE},
 
-        # disable <base> element support
-        base_uri={NONE},
+        # only allow setting <base> to self
+        base_uri={SELF},
 
         # only allow submitting forms to self
         form_action={SELF},

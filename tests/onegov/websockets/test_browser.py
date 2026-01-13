@@ -21,7 +21,7 @@ async def test_browser_integration(browser: WebsocketBrowser) -> None:
         <!doctype html>
         <html>
             <body>
-                <script>
+                <script nonce="${{nonce}}">
                     window.addEventListener("DOMContentLoaded", function() {{
                         domLoaded = true;
                         openWebsocket(
