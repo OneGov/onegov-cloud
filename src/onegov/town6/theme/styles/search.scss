@@ -155,21 +155,18 @@
 }
 
 .breadcrumbs {
-    padding-left: .5rem;
-    padding-top: .75rem;
-    padding-right: 0;
-    padding-bottom: .8rem;
-
-    margin-bottom: 0 !important;
+    border-radius: .7rem;
+    padding: .1rem .5rem;
+    white-space: normal;
+    width: fit-content;
+    margin: .4rem .4rem !important;
+    z-index: auto !important;
 
     .breadcrumb-item {
         a {
             color: $primary-color !important;
         }
 
-        padding-left: 0;
-        padding-top: 0;
-        padding-right: 0;
-        padding-bottom: 0.2rem !important;
+        padding: 0 0 .2rem 0 !important;
     }
 }
