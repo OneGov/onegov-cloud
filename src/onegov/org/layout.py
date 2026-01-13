@@ -3493,7 +3493,7 @@ class DirectoryLayout(DefaultLayout):
             Link(_('Directories'), self.request.class_link(
                 DirectoryCollection
             )),
-            Link(_(self.model.title), self.request.link(self.model))
+            Link(self.model.title, self.request.link(self.model))
         ]
 
 
