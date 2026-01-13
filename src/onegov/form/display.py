@@ -1,6 +1,7 @@
 """ Contains renderers to display form fields. """
 from __future__ import annotations
 
+from datetime import datetime, date
 import humanize
 import re
 
@@ -191,7 +192,10 @@ class DateFieldRenderer(BaseRenderer):
     date_format = '%d.%m.%Y'
 
     def __call__(self, field: Field) -> Markup:
-        return self.escape(field.data.strftime(self.date_format))
+        if isinstance(field.data, (date, datetime)):
+            return self.escape(field.data.strftime(self.date_format))
+        else:
+            return self.escape(field.data)
 
 
 @registry.register_for('DateTimeLocalField')
