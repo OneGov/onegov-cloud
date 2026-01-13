@@ -2409,7 +2409,18 @@ def test_time_report_workflow(
     edit_links = ticket_page.pyquery('a.edit-link')
     assert len(edit_links) == 0
 
-    mail_to_translator = client.get_email(0, flush_queue=True)
+    emails = collect_emails(client)
+    translator_emails = filter_emails_by_recipient(
+        emails, 'translator@example.org'
+    )
+    acceptance_emails = [
+        e
+        for e in translator_emails
+        if 'Zeiterfassung akzeptiert' in e['Subject']
+    ]
+    assert len(acceptance_emails) > 0
+    mail_to_translator = acceptance_emails[0]
+
     assert 'TRANSLATOR, Test' in mail_to_translator['Subject']
     assert 'translator@example.org' in mail_to_translator['To']
     assert 'Zeiterfassung akzeptiert' in mail_to_translator['Subject']
@@ -2738,6 +2749,7 @@ def test_time_report_workflow_self_employed(
     page.form['is_urgent'] = False
     page.form['notes'] = 'Test notes'
     page = page.form.submit().follow()
+
     assert 'Zeiterfassung zur Überprüfung eingereicht' in page
 
     accountant_email = get_accountant_email(client)
@@ -2763,7 +2775,18 @@ def test_time_report_workflow_self_employed(
     page = client.post(accept_url).follow()
     assert 'Zeiterfassung akzeptiert' in page
 
-    mail_to_translator = client.get_email(0, flush_queue=True)
+    emails = collect_emails(client)
+    translator_emails = filter_emails_by_recipient(
+        emails, 'self-employed@example.org'
+    )
+    acceptance_emails = [
+        e
+        for e in translator_emails
+        if 'Zeiterfassung akzeptiert' in e['Subject']
+    ]
+    assert len(acceptance_emails) > 0
+    mail_to_translator = acceptance_emails[0]
+
     assert 'MUSTER, Hans' in mail_to_translator['Subject']
     assert 'self-employed@example.org' in mail_to_translator['To']
     assert 'Zeiterfassung akzeptiert' in mail_to_translator['Subject']
@@ -2957,7 +2980,7 @@ def test_time_report_telephonic_no_location(client: Client) -> None:
     user_group_collection = UserGroupCollection(session)
     user_group = user_group_collection.add(name='test_group')
     user_group.meta = {
-        'finanzstelle': 'polizei',
+        'finanzstelle': 'migrationsamt_und_passbuero',
         'accountant_emails': ['editor@example.org'],
     }
     transaction.commit()
@@ -2981,8 +3004,8 @@ def test_time_report_telephonic_no_location(client: Client) -> None:
 
     # proceed testing
     page.form['assignment_type'] = 'telephonic'
-    page.form['assignment_location'] = 'Römerswil'
-    page.form['finanzstelle'] = 'polizei'
+    page.form['assignment_location'] = 'migrationsamt'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
     page.form['start_date'] = '2025-01-15'
     page.form['start_time'] = '10:00'
     page.form['end_date'] = '2025-01-15'
