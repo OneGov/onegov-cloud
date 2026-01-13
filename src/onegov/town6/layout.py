@@ -72,15 +72,18 @@ from onegov.org.layout import (
     UserGroupCollectionLayout as OrgUserGroupCollectionLayout,
     UserManagementLayout as OrgUserManagementLayout)
 from onegov.form import FormDefinition
-from onegov.org.models import GeneralFile, RISCommission, RISParliamentarian
+from onegov.org.models import GeneralFile
 from onegov.org.models import ImageSet
 from onegov.org.models import Meeting
 from onegov.org.models import MeetingCollection
+from onegov.org.models import MeetingItem
 from onegov.org.models import News
 from onegov.org.models import PageMove
 from onegov.org.models import PoliticalBusiness
 from onegov.org.models import PoliticalBusinessCollection
+from onegov.org.models import RISCommission
 from onegov.org.models import RISCommissionCollection
+from onegov.org.models import RISParliamentarian
 from onegov.org.models import RISParliamentarianCollection
 from onegov.org.models import RISParliamentaryGroup
 from onegov.org.models import RISParliamentaryGroupCollection
@@ -1211,6 +1214,33 @@ class MeetingLayout(DefaultLayout):
                 )
             ]
         return None
+
+
+@TownApp.layout(model=MeetingItem)
+class MeetingItemLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        title = (
+            self.model.meeting.title + ' - ' +
+            self.format_date(self.model.meeting.start_datetime, 'date')
+            if self.model.meeting.start_datetime
+            else self.model.meeting.title
+        )
+
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('RIS Settings'), self.ris_overview_url),
+            Link(
+                _('Meetings'),
+                self.request.class_link(MeetingCollection)
+            ),
+            Link(
+                self.model.meeting.title,
+                self.request.link(self.model.meeting)
+            ),
+            Link(title, self.request.link(self.model))
+        ]
 
 
 class RISParliamentarianCollectionLayout(DefaultLayout):
