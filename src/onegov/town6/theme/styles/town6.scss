@@ -210,7 +210,7 @@ footer {
 .contact-panel,
 .organiser-panel,
 .occasions {
-    a:not(.button .breadcrumbs) {
+    a:not(.button) {
         position: relative;
         transition: all 250ms;
         z-index: 2;
@@ -239,6 +239,15 @@ footer {
     .video-link a::before {
         display: none;
     }
+}
+
+/*
+   Reset z-index for breadcrumbs links so earlier `.occasions/... a:not(.button)` rule
+   doesn't force stacking.
+*/
+.breadcrumbs a,
+.breadcrumbs .breadcrumb-item a {
+    z-index: auto !important;
 }
 
 /*
