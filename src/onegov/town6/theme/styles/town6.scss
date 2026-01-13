@@ -242,12 +242,12 @@ footer {
 }
 
 /*
-   Reset z-index for breadcrumbs links so earlier `.occasions/... a:not(.button)` rule
-   doesn't force stacking.
+   Reset z-index for breadcrumbs links so earlier to prevent breadcrumbs
+    from overlapping search results
 */
 .breadcrumbs a,
 .breadcrumbs .breadcrumb-item a {
-    z-index: auto !important;
+    z-index: 0;
 }
 
 /*
