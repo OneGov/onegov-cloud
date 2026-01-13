@@ -36,7 +36,7 @@ _T = TypeVar('_T')
 
 
 # we want newlines to be significant
-ParserElement.setDefaultWhitespaceChars(' \t')
+ParserElement.set_default_whitespace_chars(' \t')
 
 printables = pyparsing_unicode.Latin1.printables
 text = Word(printables)
