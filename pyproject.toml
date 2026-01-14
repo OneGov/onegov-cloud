@@ -206,6 +206,8 @@ ignore = [
     "RUF031",
     "RUF052",
     "RUF056",
+    # TODO: Brings lots of violations, needs cleanup in all __init__.py files
+    "RUF067",
     # TODO: We would like to enable SIM102, but it has a ton of
     #       violations, so it's a big job to clean it up
     "SIM102",

@@ -33,7 +33,7 @@
                     <tal:b condition="request.is_admin">
                         <div class="filter-panel side-panel">
                             <h3 class="filter-title" i18n:translate>User</h3>
-                            <select onchange="location = this.value;">
+                            <select data-auto-redirect>
                                 <option tal:repeat="user users" value="${form.for_username(user.username)}" tal:attributes="selected user.username == form.username">
                                     ${user.title}
                                 </option>

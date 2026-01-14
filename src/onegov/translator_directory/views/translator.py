@@ -581,11 +581,20 @@ def add_time_report(
 
         # Create report with all fields except total_compensation
         assert form.assignment_type.data is not None
+
+        if form.assignment_type.data == 'on-site':
+            location = (
+                form.assignment_location_override.data
+                or form.assignment_location.data
+            )
+        else:
+            location = None
+
         report = TranslatorTimeReport(
             translator=self,
             created_by=current_user,
             assignment_type=form.assignment_type.data,
-            assignment_location=form.assignment_location.data or None,
+            assignment_location=location,
             finanzstelle=form.finanzstelle.data,
             duration=duration_minutes,
             break_time=break_minutes,

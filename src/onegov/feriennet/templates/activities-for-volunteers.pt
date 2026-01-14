@@ -49,7 +49,7 @@
                                                                 <li tal:condition="need.accept_signups" tal:condition="wants_more_volunteers(need)">
                                                                     <span>${need.name}</span>
 
-                                                                    <a class="button narrow" onclick="volunteerCart.append('${need.id.hex}', '#error-for-${occasion.id.hex}')">
+                                                                    <a class="button narrow" data-need="${need.id.hex}" data-error-container="#error-for-${occasion.id.hex}">
                                                                         <i class="fa fa-plus" aria-hidden="true"></i>
                                                                         <span><tal:b i18n:translate>To my list</tal:b></span>
                                                                     </a>
