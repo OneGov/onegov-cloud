@@ -1824,7 +1824,18 @@ def adjust_reservation(
         .filter(Reservation.id == reservation_id)
         .one_or_none()
     )
-    if reservation is None or not reservation.is_adjustable:
+    if (
+        reservation is None
+        or not reservation.is_adjustable
+        or (
+            # NOTE: Only managers may adjust accepted reservations and only
+            #       through the form, not through dragging the event in the
+            #       calendar.
+            (not request.is_manager or request.headers.get('X-IC-Request'))
+            and reservation.data
+            and reservation.data.get('accepted')
+        )
+    ):
         if request.headers.get('X-IC-Request'):
             error = request.translate(_('Reservation not adjustable'))
             ic_data = {'message': error, 'success': False}
@@ -1852,6 +1863,13 @@ def adjust_reservation(
         if not request.POST:
             form.start_time.data = reservation.display_start().time()
             form.end_time.data = reservation.display_end().time()
+        if reservation.data and reservation.data.get('accepted'):
+            request.warning(_(
+                'This reservation has already been accepted, but '
+                'changes will not lead to a new confirmation e-mail '
+                'so please make sure you inform the customer of the '
+                'performed changes, so they have a record of it.'
+            ))
         return {
             'title': _('Adjust reservation'),
             'layout': layout or ReservationLayout(resource, request),
@@ -1898,6 +1916,9 @@ def adjust_reservation(
                 'the switch from standard time to daylight saving time.'
             ))
             return show_form()
+
+    if min(new_start, new_end) < sedate.utcnow():
+        return show_error(_('Cannot move reservation into the past'))
 
     savepoint = transaction.savepoint()
     try:
