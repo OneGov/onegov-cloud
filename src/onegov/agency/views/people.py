@@ -238,7 +238,7 @@ def view_sort_person(
         'items': (
             (
                 _('Memberships'),
-                layout.move_membership_within_person_url_template,
+                layout.move_membership_url_template,
                 (
                     (
                         membership.id,

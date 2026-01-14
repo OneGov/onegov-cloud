@@ -218,7 +218,7 @@ def view_agency_sort(
             ),
             (
                 _('Memberships'),
-                layout.move_membership_within_agency_url_template,
+                layout.move_membership_url_template,
                 (
                     (
                         membership.id,

@@ -376,7 +376,7 @@ class AgencyLayout(
         return None
 
     @cached_property
-    def move_membership_within_agency_url_template(self) -> str:
+    def move_membership_url_template(self) -> str:
         return self.csrf_protected_url(
             self.request.class_link(
                 AgencyMembershipMoveWithinAgency,
@@ -510,7 +510,7 @@ class ExtendedPersonLayout(PersonLayout, AgencyPathMixin):
         return ExtendedPersonCollection(self.request.session)
 
     @cached_property
-    def move_membership_within_person_url_template(self) -> str:
+    def move_membership_url_template(self) -> str:
         return self.csrf_protected_url(
             self.request.class_link(
                 AgencyMembershipMoveWithinPerson,

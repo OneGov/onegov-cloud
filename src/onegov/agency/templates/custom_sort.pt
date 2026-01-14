@@ -11,9 +11,9 @@
                 <dl tal:repeat="item items">
                     <dt>${item[0]}</dt>
                     <dd>
-                        <ul data-sortable data-sortable-url="${item[1]}">
+                        <ul class="sort-items" data-sortable data-sortable-url="${item[1]}">
                             <li tal:repeat="subitem item[2]" data-sortable-id="${subitem[0]}">
-                                <strong>${subitem[1]}</strong>
+                                <span>${subitem[1]}</span>
                             </li>
                         </ul>
                     </dd>

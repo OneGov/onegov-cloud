@@ -209,7 +209,9 @@ footer {
 .breadcrumbs,
 .contact-panel,
 .organiser-panel,
-.occasions {
+.occasions,
+.agency-card,
+.membership-card {
     a:not(.button) {
         position: relative;
         transition: all 250ms;
