@@ -865,6 +865,8 @@ class ReservationEventInfo:
     def editable(self) -> bool:
         if self.reservation.display_start() < sedate.utcnow():
             return False
+        # NOTE: We don't allow adjusting already accepted reservations
+        #       in this view, since it's easier to happen by accident.
         return not self.accepted
 
     def as_dict(self) -> dict[str, Any]:

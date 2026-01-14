@@ -280,7 +280,7 @@ def code() -> ParserElement:
     """
 
     code = choices_enclosed_in('<>', ('markdown', ))('syntax')
-    code.addParseAction(tag(type='code'))
+    code.add_parse_action(tag(type='code'))
 
     return code
 
@@ -514,7 +514,7 @@ def range_field(
 
     r = (value_expression + Suppress('..') + value_expression)
     r = r.set_parse_action(parse_action)
-    r = r.addParseAction(tag(type=type))
+    r = r.add_parse_action(tag(type=type))
 
     return r
 
@@ -646,7 +646,7 @@ def fieldset_title() -> ParserElement:
 
     """
 
-    label = with_whitespace_inside(text).setResultsName('label')
+    label = with_whitespace_inside(text).set_results_name('label')
 
     fieldset_title = Suppress('#') + (Suppress('...') | label)
     fieldset_title = fieldset_title.set_parse_action(tag(type='fieldset'))

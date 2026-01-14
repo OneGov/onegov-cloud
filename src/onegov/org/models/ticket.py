@@ -1021,7 +1021,11 @@ class ReservationHandler(Handler):
             )
         ))
 
-        if reservation.is_adjustable:
+        if reservation.is_adjustable and (
+            # NOTE: Only managers may adjust accepted reservations
+            request.is_manager
+            or not (reservation.data and reservation.data.get('accepted'))
+        ):
             url_obj = URL(request.link(self.ticket, 'adjust-reservation'))
             url_obj = url_obj.query_param(
                 'reservation-id', str(reservation.id))

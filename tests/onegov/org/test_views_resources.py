@@ -1415,7 +1415,8 @@ def test_reserve_allocation_change_email(client: Client) -> None:
         'new@example.org')
 
 
-@freeze_time("2015-08-28", tick=True)
+# NOTE: We're at UTC+2 in summertime in Europe/Zurich
+@freeze_time("2015-08-28 07:15:00", tick=True)
 def test_reserve_allocation_adjustment_pre_acceptance(client: Client) -> None:
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
@@ -1424,7 +1425,7 @@ def test_reserve_allocation_adjustment_pre_acceptance(client: Client) -> None:
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
-        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+        dates=(datetime(2015, 8, 28, 9), datetime(2015, 8, 28, 13)),
         whole_day=False,
         partly_available=True
     )
@@ -1456,9 +1457,15 @@ def test_reserve_allocation_adjustment_pre_acceptance(client: Client) -> None:
 
     # try an invalid adjustment
     adjust = ticket.click('Anpassen', index=0)
-    adjust.form['start_time'] = '09:00'
+    adjust.form['end_time'] = '13:05'
     adjust = adjust.form.submit()
     assert 'Zeitraum liegt ausserhalb' in adjust
+
+    # try another invalid adjustment
+    adjust.form['start_time'] = '09:00'
+    adjust.form['end_time'] = '12:00'
+    adjust = adjust.form.submit()
+    assert 'kann nicht in die Vergangenheit verschoben werden' in adjust
 
     # adjust it (valid this time)
     adjust.form['start_time'] = '10:00'
@@ -1479,7 +1486,9 @@ def test_reserve_allocation_adjustment_pre_acceptance(client: Client) -> None:
     # see if the slots are partitioned correctly
     url = '/resource/tageskarte/slots?start=2015-08-01&end=2015-08-30'
     slots = client.get(url).json
-    assert slots[0]['partitions'] == [[25.0, True], [75.0, False]]
+    assert slots[0]['partitions'] == [
+        [25.0, False], [25.0, True], [50.0, False]
+    ]
 
 
 @freeze_time("2015-08-28", tick=True)
@@ -1524,8 +1533,21 @@ def test_reserve_allocation_adjustment_post_acceptance(client: Client) -> None:
     # accept it
     ticket = ticket.click('Alle Reservationen annehmen').follow()
 
-    # it can't be adjusted
-    assert 'Anpassen' not in ticket
+    # it can still be adjusted
+    assert 'Anpassen' in ticket
+    adjust = ticket.click('Anpassen', index=0)
+    # but there is a warning
+    assert 'Diese Reservation wurde bereits angenommen' in adjust
+    adjust.form['start_time'] = '10:00'
+    adjust.form['end_time'] = '11:00'
+    ticket = adjust.form.submit().follow()
+    assert "10:00" in ticket
+    assert "11:00" in ticket
+
+    # see if the slots are partitioned correctly
+    url = '/resource/tageskarte/slots?start=2015-08-01&end=2015-08-30'
+    slots = client.get(url).json
+    assert slots[0]['partitions'] == [[25.0, True], [75.0, False]]
 
 
 @freeze_time("2015-08-28", tick=True)
