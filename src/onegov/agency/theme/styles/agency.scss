@@ -1,4 +1,4 @@
-$sort-icon: '\f074';
+$sort-icon: '\f0dc';
 $caret-right: '\f0da';
 $caret-down: '\f0d7';
 $building-icon: '\f0f7';
@@ -57,12 +57,12 @@ $arrow-right: '\f061';
 .edit-bar {
     .create-pdf::before { @include icon('\f1c1'); }
     .create-excel::before { @include icon('\f1c3'); }
-    .move::before { @include icon('\f047'); }
-    .new-agency::before { @include icon('\f0e8'); }
-    .sort-alphabetically::before { @include icon('\f15d'); }
+    .move::before { @include icon-bold('\f0b2'); }
+    .new-agency::before { @include icon-bold('\f0e8'); }
+    .sort-alphabetically::before { @include icon-bold('\f15d'); }
     .view-hidden::before { @include icon('\f070'); }
-    .sort::before { @include icon($sort-icon); }
-    .change-url::before { @include icon('\f0c1'); }
+    .sort::before { @include icon-bold($sort-icon); }
+    .change-url::before { @include icon-bold('\f0c1'); }
 }
 
 

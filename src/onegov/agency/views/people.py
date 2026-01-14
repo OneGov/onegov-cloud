@@ -65,10 +65,6 @@ def view_people(
     request: AgencyRequest
 ) -> RenderData:
 
-    request.include('common')
-    request.include('chosen')
-    request.include('people-select')
-
     people_xlsx_link = None
     last_modified = request.app.people_xlsx_modified
     if last_modified is not None:

@@ -470,6 +470,10 @@ class ExtendedPersonCollectionLayout(
 
     request: AgencyRequest
 
+    def __init__(self, model: Any, request: AgencyRequest) -> None:
+        super().__init__(model, request)
+        request.include('people-select')
+
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
