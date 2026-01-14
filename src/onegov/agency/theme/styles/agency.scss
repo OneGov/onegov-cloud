@@ -1,6 +1,6 @@
 $sort-icon: '\f0dc';
-$caret-right: '\f0da';
-$caret-down: '\f0d7';
+$chevron-up: '\f077';
+$chevron-down: '\f078';
 $building-icon: '\f0f7';
 $person-icon: '\f2bd';
 $arrow-right: '\f061';
@@ -134,7 +134,7 @@ ul.agency-nav {
         margin-left: 1rem;
     }
 
-    .memberships {
+    .memberships:has(li) {
         margin-bottom: 1rem;
         margin-left: 2.4rem;
     }
@@ -155,25 +155,36 @@ ul.agency-nav {
     .details {
         display: flex;
         justify-content: flex-end;
-        margin-top: .5rem;
+
+        .button {
+            margin-bottom: 0;
+            position: absolute;
+            margin-top: -2.15rem;
+            padding-top: 0.4rem !important;
+            padding-bottom: 0.4rem !important;
+        }
     }
 
     .collapsible {
 
         @include hairline;
         cursor: pointer;
-        padding-bottom: .25rem;
-        padding-top: .25rem;
+        padding: .5rem;
+        height: 2.5rem;
+        transition: background .3s;
 
         &::before {
-            @include icon($caret-right);
+            @include icon-bold($chevron-down);
             color: $anchor-font-color;
         }
 
-        &:hover::before,
         &.active::before {
-            @include icon($caret-down);
+            @include icon-bold($chevron-up);
             color: $anchor-font-color-hover;
+        }
+
+        &:hover {
+            background: $vapor;
         }
     }
 

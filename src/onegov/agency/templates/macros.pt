@@ -348,7 +348,7 @@
     <metal:agency_nav_item_content define-macro="agency_nav_item_content" i18n:domain="onegov.agency">
           <tal:b tal:define="memberships agency.memberships; children agency.children">
             <div class="details">
-                <a href="${request.link(agency)}" i18n:translate="">Show agency</a>
+                <a class="button hollow narrow" href="${request.link(agency)}" i18n:translate>Show agency</a>
             </div>
             <ul class="memberships fa-ul" tal:condition="memberships">
                 <tal:block tal:repeat="membership memberships" >
