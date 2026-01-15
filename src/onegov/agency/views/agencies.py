@@ -81,6 +81,7 @@ def view_agencies(
 
     return {
         'title': _('Agencies'),
+        'agencies_collection': self,
         'agencies': self.roots,
         'pdf_link': pdf_link,
         'layout': layout
@@ -107,6 +108,7 @@ def view_agencies_chart(
 
     return {
         'title': _('Agencies'),
+        'agencies_collection': self,
         'agencies': self.roots,
         'layout': layout
     }

@@ -181,15 +181,6 @@ ul.agency-nav {
     }
 }
 
-/*
-    Breadcrumbs
-*/
-
-.breadcrumbs {
-    text-overflow: clip;
-    white-space: normal;
-}
-
 
 /*
     Agency Form
@@ -211,8 +202,11 @@ ul.agency-nav {
 .people-list {
     margin-bottom: 2rem;
 
-    .subpage-cards {
-        column-count: 2;
+    @media #{$medium-up} {
+        .subpage-cards {
+            column-count: 2;
+            column-gap: 1.5rem;
+        }
     }
 
     .card {

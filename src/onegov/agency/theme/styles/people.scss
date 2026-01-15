@@ -20,6 +20,8 @@
     }
 
     a:not(:last-child):not(:nth-last-child(-n+2))::after {
-        content: ' > ';
+        @include icon-bold('\f054');
+        margin-left: .5rem;
+        margin-right: .2rem;
     }
 }

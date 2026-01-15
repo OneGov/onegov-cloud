@@ -101,14 +101,14 @@
         <div class="atoz-block" tal:repeat="item items">
             <h2>${item[0]}</h2>
             <div class="subpage-cards">
-                <div class="" tal:repeat="detail item[1]">
+                <tal:b tal:repeat="detail item[1]">
                     <div class="card">
                         <div metal:define-slot="item-detail">
                             <a href="${request.link(detail)}">${detail.title}</a>
                             <metal:hint tal:define="item detail" use-macro="layout.macros['access_hint']" />
                         </div>
                     </div>
-                </div>
+                </tal:b>
             </div>
         </div>
     </metal:atoz>

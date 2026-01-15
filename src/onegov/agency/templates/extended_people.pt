@@ -10,7 +10,7 @@
                 <div tal:condition="people" class="people-list">
                     <div metal:use-macro="layout.macros['atoz']" tal:define="items people">
                         <tal:block metal:fill-slot="item-detail">
-                            <div metal:use-macro="layout.macros['person_list_card']" tal:define="person detail"/>
+                            <tal:bl metal:use-macro="layout.macros['person_list_card']" tal:define="person detail"/>
                         </tal:block>
                     </div>
                 </div>
