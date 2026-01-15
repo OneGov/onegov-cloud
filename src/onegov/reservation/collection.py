@@ -6,12 +6,12 @@ from onegov.core.utils import normalize_for_url
 from onegov.reservation.models import Resource
 from uuid import uuid4, UUID
 
-from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
 
+from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from libres.context.core import Context
-    from libres.db.models import Allocation, Reservation
+    from libres.db.models import Allocation, Reservation, ReservationBlocker
     from libres.db.scheduler import Scheduler
 
     from sqlalchemy.orm import Query, Session
@@ -123,6 +123,9 @@ class ResourceCollection:
 
     def by_reservation(self, reservation: Reservation) -> Resource | None:
         return self.by_id(reservation.resource)
+
+    def by_blocker(self, blocker: ReservationBlocker) -> Resource | None:
+        return self.by_id(blocker.resource)
 
     def ordered_by_type(self) -> Query[Resource]:
         return self.query().order_by(Resource.type, Resource.title)
