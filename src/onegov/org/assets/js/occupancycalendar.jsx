@@ -79,7 +79,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
             snapDuration: '00:15',
             editable: ocOptions.editable,
             eventResizableFromStart: ocOptions.editable,
-            selectable: ocOptions.add_blocker_url !== null && ocOptions.editable,
+            selectable: ocOptions.editable,
             initialView: ocOptions.view,
             locale: window.locale.language,
             multiMonthMaxColumns: 1
@@ -245,7 +245,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
         if (event.display === 'background') {
             return null;
         }
-        if (event.extendedProps.kind == 'blocker') {
+        if (event.extendedProps.kind === 'blocker') {
             return h('div', {title: event.title}, [
                 event.title,
                 h('div', {class: 'delete-blocker', title: locale('Delete')}, [
