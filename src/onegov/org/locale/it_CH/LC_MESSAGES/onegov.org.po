@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-01-14 08:42+0100\n"
+"POT-Creation-Date: 2026-01-15 17:20+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -6087,6 +6087,9 @@ msgstr ""
 "Per eliminare questa allocazione, è necessario prima annullare tutte le "
 "prenotazioni esistenti."
 
+msgid "Blocker"
+msgstr "Bloccante"
+
 msgid "A conflicting allocation exists for the requested time period."
 msgstr "Esiste un'allocazione in conflitto per il periodo di tempo richiesto."
 
@@ -7300,6 +7303,15 @@ msgstr "La prenotazione è rimasta invariata"
 
 msgid "There are no future reservations"
 msgstr "Non ci sono prenotazioni future"
+
+msgid "Blocker not adjustable"
+msgstr "Bloccante non regolabile"
+
+msgid "Cannot move blocker into the past"
+msgstr "Impossibile spostare il bloccante nel passato"
+
+msgid "Blocker no longer exists"
+msgstr "Il bloccante non esiste più"
 
 msgid "Added a new daypass"
 msgstr "Aggiunto un nuovo biglietto giornaliero"

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-01-14 08:42+0100\n"
+"POT-Creation-Date: 2026-01-15 17:20+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -6093,6 +6093,9 @@ msgstr ""
 "Um die Verfügbarkeit zu löschen, müssen zuerst alle bestehenden "
 "Reservationen abgesagt werden."
 
+msgid "Blocker"
+msgstr "Sperrzeit"
+
 msgid "A conflicting allocation exists for the requested time period."
 msgstr "Es besteht bereits eine Verfügbarkeit im gewünschten Zeitraum."
 
@@ -7313,6 +7316,15 @@ msgstr "Die Reservation ist unverändert geblieben"
 
 msgid "There are no future reservations"
 msgstr "Es gibt keine zukünftige Reservationen"
+
+msgid "Blocker not adjustable"
+msgstr "Dieser Sperrzeit kann nicht mehr angepasst werden"
+
+msgid "Cannot move blocker into the past"
+msgstr "Eine Sperrzeit kann nicht in die Vergangenheit verschoben werden"
+
+msgid "Blocker no longer exists"
+msgstr "Diese Sperrzeit existiert nicht mehr"
 
 msgid "Added a new daypass"
 msgstr "Eine neue Tageskarte wurde hinzugefügt"
