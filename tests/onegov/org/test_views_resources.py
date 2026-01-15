@@ -13,11 +13,12 @@ import transaction
 import warnings
 
 from base64 import b64decode
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from decimal import Decimal
 from freezegun import freeze_time
 from io import BytesIO
 from libres.db.models import Reservation
+from urllib.parse import quote
 
 from onegov.core.utils import module_path, normalize_for_url
 from onegov.file import FileCollection
@@ -1087,6 +1088,66 @@ def test_auto_accept_reservations(client: Client) -> None:
     # Generic message, shown when ticket is open or closed
     assert 'Ihre Anfrage wurde erfolgreich abgeschlossen' not in page
     assert 'You can pick it up at the counter' in page
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_blocker_views(client: Client) -> None:
+    # prepare the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.definition = 'Note = ___'
+    resource.pick_up = 'You can pick it up at the counter'
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 29), datetime(2015, 8, 29)),
+        whole_day=True,
+        partly_available=True
+    )
+
+    add_blocker = client.bound_add_blocker(allocations[0])
+    transaction.commit()
+
+    client.login_admin()
+
+    # create a blocker
+    result = add_blocker(whole_day=True, reason='Cleaning')
+    assert result.json == {'success': True}
+
+    blocker = scheduler.managed_blockers().one()
+    assert blocker.reason == 'Cleaning'
+
+    # change the reason
+    client.post(
+        f'/reservation-blocker/{blocker.resource}/{blocker.id}/set-reason'
+        f'?blocker-id={blocker.id}&reason=No+reason'
+        f'&csrf-token={client.csrf_token}'
+    )
+
+    blocker = scheduler.managed_blockers().one()
+    assert blocker.reason == 'No reason'
+
+    # adjust the time
+    new_start = blocker.display_start() + timedelta(hours=1)
+    new_end = blocker.display_end() - timedelta(hours=1)
+    result = client.post(
+        f'/reservation-blocker/{blocker.resource}/{blocker.id}/adjust'
+        f'?blocker-id={blocker.id}&start={quote(new_start.isoformat())}'
+        f'&end={quote(new_end.isoformat())}&csrf-token={client.csrf_token}'
+    )
+    assert result.json == {'success': True}
+
+    blocker = scheduler.managed_blockers().one()
+    assert blocker.display_start() == new_start
+    assert blocker.display_end() == new_end
+
+    # delete the blocker
+    client.delete(
+        f'/reservation-blocker/{blocker.resource}/{blocker.id}'
+        f'?csrf-token={client.csrf_token}'
+    )
+    assert scheduler.managed_blockers().one_or_none() is None
 
 
 @pytest.mark.parametrize(
