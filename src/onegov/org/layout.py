@@ -302,7 +302,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         if file is None:
             return self.files_url
 
-        return self.files_url + f'#{file.name}'
+        return f'{self.files_url}#{file.name}'
 
     @cached_property
     def file_upload_url(self) -> str:
