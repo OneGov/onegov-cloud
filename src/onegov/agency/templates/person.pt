@@ -34,7 +34,7 @@
                         <h3 i18n:translate="">Exports</h3>
                         <ul class="more-list">
                             <li>
-                                <a class="list-link" href="${request.link(person, name='vcard')}" i18n:translate>
+                                <a class="list-link" href="${request.link(person, name='vcard')}">
                                     <i class="far fa-address-card" aria-hidden="true"></i>
                                     <span i18n:translate class="list-title">Export a vCard of this person</span>
                                 </a>

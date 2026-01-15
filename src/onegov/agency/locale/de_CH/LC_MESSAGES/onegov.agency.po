@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-07-29 00:11+0200\n"
+"POT-Creation-Date: 2026-01-15 14:28+0100\n"
 "PO-Revision-Date: 2021-01-27 13:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -424,6 +424,9 @@ msgstr "Elektronische Visitenkarte (vCard)"
 
 msgid "Proposed changes applied."
 msgstr "Vorgeschlagene Änderungen übernommen."
+
+msgid "Chart view"
+msgstr "Organigrammansicht"
 
 msgid "Added a new agency"
 msgstr "Eine neue Organisation wurde hinzufügt"
