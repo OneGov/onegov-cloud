@@ -44,7 +44,7 @@ from onegov.org.layout import (
     MessageCollectionLayout as OrgMessageCollectionLayout,
     NewsLayout as OrgNewsLayout,
     NewsletterLayout as OrgNewsletterLayout,
-    TopicLayout as OrgTopicLayout,
+    PageLayout as OrgTopicLayout,
     PaymentCollectionLayout as OrgPaymentCollectionLayout,
     PaymentProviderLayout as OrgPaymentProviderLayout,
     PersonCollectionLayout as OrgPersonCollectionLayout,

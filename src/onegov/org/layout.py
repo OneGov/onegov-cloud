@@ -1062,7 +1062,7 @@ class SettingsLayout(DefaultLayout):
         return bc
 
 
-class TopicLayout(AdjacencyListLayout):
+class PageLayout(AdjacencyListLayout):
 
     @cached_property
     def og_image_source(self) -> str | None:
