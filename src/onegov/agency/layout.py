@@ -33,7 +33,7 @@ if TYPE_CHECKING:
     from onegov.org.elements import Trait
 
 
-class TopicLayout(OrgPageLayout):
+class PageLayout(OrgPageLayout):
 
     @cached_property
     def sidebar_links(self) -> None:  # type:ignore[override]
