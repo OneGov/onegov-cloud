@@ -294,6 +294,18 @@ applications:
     configuration:
       <<: *global-config
 
+  - path: /agency_with_msal/*
+    application: onegov.agency.AgencyApp
+    namespace: agency_with_msal
+    configuration:
+      <<: *global-config
+
+  - path: /agency_with_oidc/*
+    application: onegov.agency.AgencyApp
+    namespace: agency_with_oidc
+    configuration:
+      <<: *global-config
+
   - path: /onegov_org/*
     application: onegov.org.OrgApp
     namespace: onegov_org
