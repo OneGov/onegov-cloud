@@ -12,7 +12,7 @@ from more.content_security import SELF
 from more.content_security import NONE
 from more.content_security.core import content_security_policy_tween_factory
 from onegov.core import Framework, utils
-from onegov.core.framework import default_content_security_policy
+from onegov.core.framework import default_content_security_policy, model_predicate
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.orm.cache import orm_cached, request_cached
 from onegov.core.templates import PageTemplate, render_template
@@ -24,6 +24,7 @@ from onegov.org import _, directives
 from onegov.org.auth import MTANAuth
 from onegov.org.exceptions import MTANAccessLimitExceeded
 from onegov.org.initial_content import create_new_organisation
+from onegov.org.layout import Layout, DefaultLayout
 from onegov.org.models import Dashboard, Organisation, PublicationCollection
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
@@ -489,6 +490,12 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
             return None
 
         return URL(request.link(dashboard)).path()
+
+
+@OrgApp.predicate_fallback(OrgApp.get_layout_class, model_predicate)
+def model_not_found(self, model: object) -> type[Layout]:
+    print('*** tschupre using DEFAULTLAYOUT ORG for model', model)
+    return DefaultLayout
 
 
 @OrgApp.webasset_path()

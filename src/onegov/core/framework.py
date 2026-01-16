@@ -37,6 +37,7 @@ from dectate import directive
 from functools import cached_property, wraps
 from itsdangerous import BadSignature, Signer
 from libres.db.models import ORMBase
+from morepath import dispatch_method
 from morepath.publish import resolve_model, get_view_name
 from more.content_security import ContentSecurityApp
 from more.content_security import ContentSecurityPolicy
@@ -46,6 +47,8 @@ from more.transaction.main import transaction_tween_factory
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
+from reg import ClassIndex
+
 from onegov.core import cache, log, utils
 from onegov.core import directives
 from onegov.core.crypto import stored_random_token
@@ -68,6 +71,7 @@ from webob.exc import HTTPConflict, HTTPServiceUnavailable
 
 
 from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from _typeshed.wsgi import WSGIApplication, WSGIEnvironment, StartResponse
@@ -1551,6 +1555,18 @@ class Framework(
         return Fernet(
             self.hashed_identity_key
         ).decrypt(cyphertext).decode('utf-8')
+
+    @dispatch_method('model')
+    def get_layout_class(self, model: object) -> type | None:
+        return None
+
+
+@Framework.predicate(Framework.get_layout_class, name='model', default=None, index=ClassIndex)
+def model_predicate(self, model: object) -> type:
+    # return model if isinstance(model, type) else model.__class__
+    retval = model if isinstance(model, type) else model.__class__
+    print('*** tschupre model predicate called for object:', model, 'retval:', retval)
+    return retval
 
 
 @Framework.webasset_url()

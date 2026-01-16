@@ -3,6 +3,7 @@ from __future__ import annotations
 import secrets
 from functools import cached_property
 
+from onegov.core import Framework
 from onegov.core.elements import Confirm, Intercooler, Link, LinkGroup
 from onegov.core.static import StaticFile
 from onegov.core.utils import append_query_param, to_html_ul
@@ -1668,7 +1669,21 @@ class PoliticalBusinessCollectionLayout(DefaultLayout):
         return None
 
 
-@TownApp.layout(model=PoliticalBusiness)
+def register_layout_for(model):
+    def decorator(cls):
+        @TownApp.get_layout_class.register(model=model)
+        def _factory(self, model: object):
+            print(f'*** tschupre matched! Returning {cls.__name} for {model}')
+            return cls
+
+        # Debug: verify registration happened
+        print(f'*** tschupre registered {cls.__name__} for {model}')
+
+        return cls
+    return decorator
+
+
+@register_layout_for(PoliticalBusiness)
 class PoliticalBusinessLayout(DefaultLayout):
 
     @cached_property
