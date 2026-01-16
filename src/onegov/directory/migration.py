@@ -72,6 +72,9 @@ class DirectoryMigration:
         if self.multiple_option_changes_in_one_step():
             return False
 
+        if self.added_required_fields():
+            return False
+
         for changed in self.changes.changed_fields:
             old = self.changes.old[changed]
             new = self.changes.new[changed]
@@ -213,6 +216,19 @@ class DirectoryMigration:
             return True
         return False
 
+    def added_required_fields(self) -> bool:
+        """
+        Identify newly added fields that are set to be required. Newly added
+        fields shall not be required if entries exist, make them required
+        in a separate migration step.
+        """
+        if self.directory.entries:
+            return any(
+                f.required for f in self.changes.new.values()
+                if f.human_id in self.changes.added_fields
+            )
+
+        return False
 
 class FieldTypeMigrations:
     """ Contains methods to migrate fields from one type to another. """
