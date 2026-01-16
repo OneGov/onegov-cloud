@@ -69,7 +69,6 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
     event_search_widget = directive(directives.EventSearchWidgetAction)
     settings_view = directive(directives.SettingsView)
     boardlet = directive(directives.Boardlet)
-    layout = directive(directives.Layout)
 
     #: cronjob settings
     send_ticket_statistics = True

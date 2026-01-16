@@ -293,30 +293,3 @@ class Boardlet(Action):
             'order': self.order,
             'icon': self.icon,
         }
-
-
-class Layout(Action):
-    """
-    Registers a layout for a model. This is used to show breadcrumbs
-    for search results.
-    """
-
-    config = {
-        'layout_registry': dict
-    }
-
-    def __init__(self, model: type) -> None:
-        self.model = model
-
-    def identifier(  # type:ignore[override]
-        self,
-        layout_registry: dict[type, Layout]
-    ) -> str:
-        return str(self.model)
-
-    def perform(  # type:ignore[override]
-        self,
-        layout: Layout,
-        layout_registry: dict[type, Layout]
-    ) -> None:
-        layout_registry[self.model] = layout
