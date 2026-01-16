@@ -316,6 +316,12 @@ def alert_migration_errors(
             )
         )
 
+    if migration.added_required_fields():
+        request.alert(
+            _('New fields cannot be required initially. Require '
+              'them in a separate migration step.')
+        )
+
     if len(migration.changes.renamed_options) > 1:
         request.alert(
             _(
