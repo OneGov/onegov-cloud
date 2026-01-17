@@ -729,6 +729,9 @@ msgstr ""
 "ihre Anwesenheit noch nicht abgeschlossen haben, sind unter jeder Kommission "
 "aufgelistet."
 
+msgid "✓ Complete"
+msgstr "✓ Abgeschlossen"
+
 msgid "⚠ Incomplete"
 msgstr "⚠ Unvollständig"
 
