@@ -24,8 +24,7 @@
                                             <span i18n:translate="">
                                                 Month
                                             </span>
-                                            <select name="month"
-                                                    onchange="this.form.submit()">
+                                            <select name="month">
                                                 <option
                                                     tal:repeat="month_item months"
                                                     value="${month_item[0]}"
@@ -40,8 +39,7 @@
                                             <span i18n:translate="">
                                                 Year
                                             </span>
-                                            <select name="year"
-                                                    onchange="this.form.submit()">
+                                            <select name="year">
                                                 <option
                                                     tal:repeat="year_item years"
                                                     value="${year_item}"

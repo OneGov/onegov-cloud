@@ -190,73 +190,94 @@ configuration: &global-config
       # the client-specific secret that is used to authenticate the
       oauth_gateway_secret: barfoo
 
+  # Analytics providers
+  analytics_providers:
+    analytics.seantis.ch:
+      provider: plausible
+      title: Plausible (https://analytics.seantis.ch/)
+      script_src: https://analytics.seantis.ch/js/script.js
+    stats.seantis.ch:
+      provider: matomo
+      title: Matomo (https://stats.seantis.ch/)
+      matomo_url: https://stats.seantis.ch/
+    matomo.zug.ch:
+      provider: matomo
+      title: Matomo (https://matomo.zug.ch/)
+      matomo_url: https://matomo.zug.ch/
+    webcloud7.opsone-analytics.ch:
+      provider: matomo
+      title: Matomo (https://webcloud7.opsone-analytics.ch/)
+      matomo_url: https://webcloud7.opsone-analytics.ch/
+    siteimprove:
+    google_analytics:
+
   # Alternative login providers
   # authentication_providers:
-#     msal:
-#           tenants:
-#             "onegov_agency/bs":
-#               tenant_id: ''
-#               client_id: ''
-#               client_secret: ''
-#             attributes:
-#               source_id: 'sub'
-#               username: 'email'
-#               groups: 'groups'
-#               first_name: 'given_name'
-#               last_name: 'family_name'
-#           roles:
-#             "onegov_agency/bs":
-#               admins: ''
-#               editors: ''
-#               members: ''
-
-#    # Login with LDAP, using Kerberos as authentication
-#    ldap_kerberos:
-#
-#      # If set to true, the provider will automatically log in users that
-#      # hit the root page (/) if they have an account
-#      auto_login: true
-#
-#      # Kerberos configuration
-#      kerberos_keytab: /etc/keytab
-#      kerberos_hostname: ogc.example.org
-#      kerberos_service: HTTP
-#
-#      # LDAP configuration (TLS is required!)
-#      ldap_url: ldaps://ldap.example.org
-#      ldap_username: 'cn=service,ou=service,dc=seantis,dc=ch'
-#      ldap_password: 'hunter2'
-#
-#      # LDAP attributes
-#      name_attribute: cn
-#      mails_attribute: mail
-#      groups_attribute: memberOf
-#
-#      # This suffix is stripped from all user names if found.
-#      # For example, if Kerberos returns foo@example.org, but LDAP only
-#      # contains, 'foo', then setting the suffix to '@example.org' will help.
-#      suffix: '@example.org'
-#
-#      # Role mapping
-#      roles:
-#
-#        # For all applications
-#        "__default__":
-#          admin: admins
-#          editor: editors
-#          member: members
-#
-#        # For applications of a specific namespace
-#        "onegov_org":
-#          admin: admins
-#          editor: editors
-#          member: members
-#
-#        # For applications of a specific application id
-#        "onegov_org/govikon":
-#          admin: admins
-#          editor: editors
-#          member: members
+  #   msal:
+  #     tenants:
+  #       "onegov_agency/bs":
+  #         tenant_id: ''
+  #         client_id: ''
+  #         client_secret: ''
+  #       attributes:
+  #         source_id: 'sub'
+  #         username: 'email'
+  #         groups: 'groups'
+  #         first_name: 'given_name'
+  #         last_name: 'family_name'
+  #     roles:
+  #       "onegov_agency/bs":
+  #         admins: ''
+  #         editors: ''
+  #         members: ''
+  #
+  #  # Login with LDAP, using Kerberos as authentication
+  #  ldap_kerberos:
+  #
+  #    # If set to true, the provider will automatically log in users that
+  #    # hit the root page (/) if they have an account
+  #    auto_login: true
+  #
+  #    # Kerberos configuration
+  #    kerberos_keytab: /etc/keytab
+  #    kerberos_hostname: ogc.example.org
+  #    kerberos_service: HTTP
+  #
+  #    # LDAP configuration (TLS is required!)
+  #    ldap_url: ldaps://ldap.example.org
+  #    ldap_username: 'cn=service,ou=service,dc=seantis,dc=ch'
+  #    ldap_password: 'hunter2'
+  #
+  #    # LDAP attributes
+  #    name_attribute: cn
+  #    mails_attribute: mail
+  #    groups_attribute: memberOf
+  #
+  #    # This suffix is stripped from all user names if found.
+  #    # For example, if Kerberos returns foo@example.org, but LDAP only
+  #    # contains, 'foo', then setting the suffix to '@example.org' will help.
+  #    suffix: '@example.org'
+  #
+  #    # Role mapping
+  #    roles:
+  #
+  #      # For all applications
+  #      "__default__":
+  #        admin: admins
+  #        editor: editors
+  #        member: members
+  #
+  #      # For applications of a specific namespace
+  #      "onegov_org":
+  #        admin: admins
+  #        editor: editors
+  #        member: members
+  #
+  #      # For applications of a specific application id
+  #      "onegov_org/govikon":
+  #        admin: admins
+  #        editor: editors
+  #        member: members
 
 # All supported applications
 applications:
@@ -270,6 +291,18 @@ applications:
   - path: /onegov_agency/*
     application: onegov.agency.AgencyApp
     namespace: onegov_agency
+    configuration:
+      <<: *global-config
+
+  - path: /agency_with_msal/*
+    application: onegov.agency.AgencyApp
+    namespace: agency_with_msal
+    configuration:
+      <<: *global-config
+
+  - path: /agency_with_oidc/*
+    application: onegov.agency.AgencyApp
+    namespace: agency_with_oidc
     configuration:
       <<: *global-config
 

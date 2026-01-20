@@ -33,6 +33,7 @@
     <tal:b metal:use-macro="layout.macros.open_graph_tags" />
     <script tal:condition="layout.app.sentry_dsn" src="https://browser.sentry-cdn.com/7.54.0/bundle.min.js" integrity="sha384-EmlJLN9Q0yu0/2UUCIYnEM88jpQ7xUhtNI2ZeXb/ci3cwoAoIQl350N4PQPlMbP5" crossorigin="anonymous"></script>
     <script tal:condition="layout.app.sentry_dsn" src="${layout.sentry_init_path}"></script>
+    <tal:b tal:content="request.analytics_code|nothing" />
 </head>
 
 <body id="${layout.page_id}" class="${' '.join(cls for cls in layout.body_classes)} town-6" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}" tal:attributes="layout.custom_body_attributes">
@@ -257,7 +258,6 @@
             </div>
             <metal:footer use-macro="layout.macros['footer']" />
         </main>
-        <tal:b tal:content="layout.org.analytics_code|nothing" />
         <div id="clipboard-copy" class="flash-message hidden" i18n:translate>Copied to Clipboard!</div>
     </div>
 

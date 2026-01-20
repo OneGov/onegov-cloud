@@ -43,9 +43,6 @@ class CustomReservation(Reservation, ModelBase, Payable):
         if self.display_start() < utcnow():
             return False
 
-        if self.data and self.data.get('accepted'):
-            return False
-
         return object_session(self).query(
             self
             ._target_allocations()

@@ -2501,6 +2501,8 @@
 </metal:resource_subgroup>
 
 <metal:file_details define-macro="file-details" i18n:domain="onegov.town6">
+    <!--! FIXME: Make this work without ic-on-success -->
+    <?python request.require_unsafe_eval() ?>
     <div class="file-details">
         <a class="file-preview" href="${request.link(file)}" tal:condition="extension == 'pdf'">
             <img class="pdf-preview" src="${request.link(file, name='medium')}">
@@ -2836,6 +2838,8 @@
 </metal:signature_status>
 
 <metal:file_info define-macro="file-info" i18n:domain="onegov.town6">
+    <!--! FIXME: Make file-details work without ic-on-success -->
+    <?python request.require_unsafe_eval() ?>
     <tal:b define="
         file_number file.number|file.id;
         file_upload file.upload_date|file.created;
@@ -2875,6 +2879,8 @@
 </metal:file_info>
 
 <metal:uploaded_image define-macro="uploaded_image" i18n:domain="onegov.town6">
+    <!--! FIXME: Make this work without ic-on-success -->
+    <?python request.require_unsafe_eval() ?>
     <div id="image-${index}" class="image-container">
         <a href="${image.url}" tal:condition="image" class="editable-alt" data-note-update-url="${image.extra}">
             <img tal:condition="image.alt" data-src="${image.src}" class="lazyload static-alt" alt="${image.alt}" width="${image.width}" height="${image.height}" />

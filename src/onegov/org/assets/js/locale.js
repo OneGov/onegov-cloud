@@ -1,7 +1,12 @@
 var locales = {
     de: {
         "Allocation": "Verfügbarkeit",
+        "Blocker": "Sperrzeit",
+        "Reason": "Grund für Sperrung",
         "Add": "Hinzufügen",
+        "Update": "Aktualisieren",
+        "Delete": "Löschen",
+        "Failed to delete": "Löschen fehlgeschlagen",
         "Count": "Anzahl",
         "Dates": "Termine",
         "From": "Von",
@@ -34,7 +39,12 @@ var locales = {
     },
     fr: {
         "Allocation": "Allocation",
+        "Blocker": "Bloqueur",
+        "Reason": "Raison",
         "Add": "Ajouter",
+        "Update": "Actualiser",
+        "Delete": "Supprimer",
+        "Failed to delete": "Impossible de supprimer",
         "Count": "Nombre",
         "Dates": "Dates",
         "From": "De",
@@ -67,7 +77,12 @@ var locales = {
     },
     it: {
         "Allocation": "Allocazione",
+        "Blocker": "Bloccante",
+        "Reason": "Motivo",
         "Add": "Aggiungi",
+        "Update": "Aggiorna",
+        "Delete": "Elimina",
+        "Failed to delete": "Impossibile eliminare",
         "Count": "Conta",
         "Dates": "Date",
         "From": "A partire dal",

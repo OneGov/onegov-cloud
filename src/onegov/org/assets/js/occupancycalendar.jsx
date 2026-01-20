@@ -53,6 +53,8 @@ oc.events = [
     'oc-reservations-changed'
 ];
 
+oc.overlappingEvents = {};
+
 oc.passEventsToCalendar = function(calendar, target) {
     var cal = $(calendar);
 
@@ -77,7 +79,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
             snapDuration: '00:15',
             editable: ocOptions.editable,
             eventResizableFromStart: ocOptions.editable,
-            selectable: false,
+            selectable: ocOptions.editable,
             initialView: ocOptions.view,
             locale: window.locale.language,
             multiMonthMaxColumns: 1
@@ -143,21 +145,81 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
 
     // implements editing
     if (ocOptions.editable) {
+        // add blockers on selection
+        fcOptions.selectMirror = true;
+        fcOptions.unselectCancel = '.popup';
+        fcOptions.selectOverlap = function(event) {
+            if (event.display === 'background') {
+                oc.overlappingEvents[event.id] = event;
+                return true;
+            } else {
+                oc.overlappingEvents = {};
+                return false;
+            }
+        };
+        fcOptions.selectAllow = function(info) {
+            // we only know what to do if we overlap a single valid allocation
+            // we only allow to add blockers in the future
+            var keys = Object.keys(oc.overlappingEvents);
+            if (
+                keys.length === 1
+                && oc.overlappingEvents[keys[0]].extendedProps.blockable
+                && oc.overlappingEvents[keys[0]].extendedProps.blockurl
+                && info.start >= Date.now()
+            ) {
+                return true;
+            } else {
+                oc.overlappingEvents = {};
+                return false;
+            }
+        }
+        // add blockers on selection
+        fcOptions.select = function(info) {
+            var keys = Object.keys(oc.overlappingEvents);
+            if (keys.length !== 1) {
+                // this shouldn't happen, but when it does just cancel
+                oc.overlappingEvents = {};
+                info.view.calendar.unselect();
+                return;
+            }
+            var event = oc.overlappingEvents[keys[0]];
+            oc.overlappingEvents = {};
+            var view = info.view;
+            var start = moment(info.start);
+            var end = moment(info.end);
+            var wholeDay = false;
+            if (view.type === "dayGridMonth" || view.type === "multiMonthYear") {
+                end = end.subtract(1, 'days');
+                wholeDay = true;
+            }
+            oc.showBlockerPopup(view.calendar, $(view.calendar.el).find('.event-' + event.id).get(0) || view.calendar.el, start, end, wholeDay, event);
+        }
 
+        // edit blocker reason on click
+        fcOptions.eventClick = function(info) {
+            if (info.event.extendedProps.kind !== 'blocker') {
+                return;
+            }
+            if (!info.event.extendedProps.seturl) {
+                return;
+            }
+            oc.showBlockerEditPopup(info.view.calendar, info.el, info.event);
+        };
+
+        // edit events on drag&drop, resize
         fcOptions.eventOverlap = function(stillEvent, _movingEvent) {
             return stillEvent.display === 'background';
         };
 
-        // edit events on drag&drop, resize
         fcOptions.eventDrop = fcOptions.eventResize = function(info) {
             var event = info.event;
             var url = new Url(event.extendedProps.editurl);
             url.query.start = event.startStr;
             url.query.end = event.endStr;
-            var calendar = $(info.el).closest('.fc');
+            var calendar = $(info.el).closest('.fc').get(0) || $('.fc').get(0);
             oc.post(calendar, url.toString(), function(_evt, _elt, _status, str, _xhr) {
                 info.revert();
-                oc.showErrorPopup(calendar, calendar.find('.event-' + event.id), str);
+                oc.showErrorPopup(calendar, $(calendar).find('.event-' + event.id), str);
             });
         };
 
@@ -170,12 +232,26 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
     // after event rendering
     options.eventRenderers.push(oc.highlightEvents);
     options.eventRenderers.push(oc.addEventBackground);
+    options.eventRenderers.push(oc.addDeleteBlockerHandler);
+
+    // add id to class names so we can easily find the element
+    fcOptions.eventClassNames = function(info) {
+        return 'event-' + info.event.id;
+    }
 
     // render additional content lines
     fcOptions.eventContent = function(info, h) {
         var event = info.event;
         if (event.display === 'background') {
             return null;
+        }
+        if (event.extendedProps.kind === 'blocker') {
+            return h('div', {title: event.title}, [
+                event.title,
+                h('div', {class: 'delete-blocker', title: locale('Delete')}, [
+                    h('i', {class: 'fa fas fa-times'})
+                ])
+            ]);
         }
         var lines = event.title.split('\n');
         var attrs = {class: 'fc-title'};
@@ -401,7 +477,7 @@ oc.setupViewNavigation = function(calendar, element, views, pdf_url) {
                 }
             );
 
-            rc.showPopup(calendar, pdf_btn, wrapper);
+            oc.showPopup(calendar, pdf_btn, wrapper);
         });
 
         pdf_btn.appendTo(view_group);
@@ -431,7 +507,7 @@ oc.highlightEvents = function(event, element, view) {
 
 // adds a fc-bg div to the views where we need it
 oc.addEventBackground = function(event, element, view) {
-    if (event.display === 'background') {
+    if (event.extendedProps.kind !== 'reservation') {
         return;
     }
 
@@ -441,9 +517,29 @@ oc.addEventBackground = function(event, element, view) {
     $('<div class="fc-bg"></div>').insertAfter($('.fc-content', element));
 };
 
+// adds a click handler to the delete button
+oc.addDeleteBlockerHandler = function(event, element, view) {
+    if (event.extendedProps.kind !== 'blocker' || !event.extendedProps.deleteurl) {
+        return;
+    }
+
+    $(element).find('.delete-blocker').click(function(ev) {
+        ev.stopPropagation();
+        $.ajax(
+            event.extendedProps.deleteurl,
+            {method: 'DELETE'}
+        ).done(function() {
+            view.calendar.refetchEvents();
+        }).fail(function() {
+            oc.showErrorPopup($(element).closest('.fc'), element, locale('Failed to delete'));
+        });
+    });
+};
+
 oc.setupReservationsRefetch = function(calendar) {
     $(window).on('oc-reservations-changed', function() {
         calendar.refetchEvents();
+        calendar.unselect();
     });
 };
 
@@ -477,6 +573,74 @@ oc.request = function(calendar, url, attribute, onerror) {
 
 oc.post = function(calendar, url, onerror) {
     oc.request(calendar, url, 'ic-post-to', onerror);
+};
+
+oc.add_blocker = function(calendar, url, start, end, reason, wholeDay) {
+    url = new Url(url);
+    url.query.start = start;
+    url.query.end = end;
+    url.query.reason = reason;
+    url.query.whole_day = wholeDay && '1' || '0';
+
+    oc.post(calendar, url.toString());
+};
+
+oc.edit_blocker = function(calendar, url, reason) {
+    url = new Url(url);
+    url.query.reason = reason;
+
+    oc.post(calendar, url.toString());
+};
+
+// popup handler implementation
+oc.showBlockerPopup = function(calendar, element, start, end, wholeDay, event) {
+    var wrapper = $('<div class="reservation-actions">');
+    var form = $('<div class="reservation-form">').appendTo(wrapper);
+
+    // Render the blocker form
+    oc.BlockerForm.render(
+        form.get(0),
+        start,
+        end,
+        wholeDay,
+        event,
+        function(state) {
+            oc.targetEvent = $(element);
+            oc.add_blocker(
+                calendar,
+                event.extendedProps.blockurl,
+                state.start,
+                state.end,
+                state.reason,
+                state.wholeDay
+            );
+            $(this).closest('.popup').popup('hide');
+        }
+    );
+
+    oc.showPopup(calendar, element, wrapper);
+};
+
+oc.showBlockerEditPopup = function(calendar, element, event) {
+    var wrapper = $('<div class="reservation-actions">');
+    var form = $('<div class="reservation-form">').appendTo(wrapper);
+
+    // Render the blocker form
+    oc.BlockerEditForm.render(
+        form.get(0),
+        event,
+        function(state) {
+            oc.targetEvent = $(element);
+            oc.edit_blocker(
+                calendar,
+                event.extendedProps.seturl,
+                state.reason,
+            );
+            $(this).closest('.popup').popup('hide');
+        }
+    );
+
+    oc.showPopup(calendar, element, wrapper);
 };
 
 oc.showErrorPopup = function(calendar, element, message) {
@@ -631,6 +795,302 @@ oc.bustIECache = function(originalUrl) {
     var url = new Url(originalUrl);
     url.query['ie-cache'] = (new Date()).getTime();
     return url.toString();
+};
+
+
+/*
+    Allows to fine-adjust the reservation blocker before adding it.
+*/
+oc.BlockerForm = React.createClass({
+    getInitialState: function() {
+        var state = {reason: null};
+        if (this.props.wholeDay && this.props.wholeDayDefault && this.props.fullyAvailable) {
+            state.start = "";
+            state.end = "";
+            state.wholeDay = true;
+        } else {
+            state.start = this.props.start.format('HH:mm');
+            state.end = this.props.end.format('HH:mm');
+            state.wholeDay = false;
+        }
+
+        state.end = state.end === '00:00' && '24:00' || state.end;
+
+        return state;
+    },
+    componentDidMount: function() {
+        var node = $(ReactDOM.findDOMNode(this));
+
+        // the timeout is set to 100ms because the popup will do its own focusing
+        // after 50ms (we could use it, but we want to focus AND select)
+        setTimeout(function() {
+            node.find('input:first').focus().select();
+        }, 100);
+    },
+    handleInputChange: function(e) {
+        var state = _.extend({}, this.state);
+        var name = e.target.getAttribute('name');
+
+        switch (name) {
+            case 'reserve-whole-day':
+                state.wholeDay = e.target.value === 'yes';
+                break;
+            case 'start':
+                state.start = e.target.value;
+                break;
+            case 'end':
+                state.end = e.target.value === '00:00' && '24:00' || e.target.value;
+                break;
+            case 'reason':
+                state.reason = e.target.value || null;
+                break;
+            default:
+                throw Error("Unknown input element: " + name);
+        }
+
+        this.setState(state);
+    },
+    handleButton: function(e) {
+        var node = ReactDOM.findDOMNode(this);
+        var self = this;
+
+        $(node).find('input').each(function(_ix, el) {
+            $(el).blur();
+        });
+
+        setTimeout(function() {
+            self.props.onSubmit.call(node, self.state);
+        }, 0);
+
+        e.preventDefault();
+    },
+    handleTimeInputFocus: function(e) {
+        if (!Modernizr.inputtypes.time) {
+            e.target.select();
+            e.preventDefault();
+        }
+    },
+    handleTimeInputMouseUp: function(e) {
+        if (!Modernizr.inputtypes.time) {
+            e.preventDefault();
+        }
+    },
+    handleTimeInputBlur: function(e) {
+        if (!Modernizr.inputtypes.time) {
+            e.target.value = OneGov.utils.inferTime(e.target.value);
+            this.handleInputChange(e);
+        }
+    },
+    parseTime: function(date, time) {
+        time = OneGov.utils.inferTime(time);
+
+        if (!time.match(/^[0-2]{1}[0-9]{1}:?[0-5]{1}[0-9]{1}$/)) {
+            return null;
+        }
+
+        var hour = parseInt(time.split(':')[0], 10);
+        var minute = parseInt(time.split(':')[1], 10);
+
+        if (hour < 0 || 24 < hour) {
+            return null;
+        }
+
+        if (minute < 0 || 60 < minute) {
+            return null;
+        }
+
+        date.hour(hour);
+        date.minute(minute);
+
+        return date;
+    },
+    isValidStart: function(start) {
+        var startdate = this.parseTime(this.props.start.clone(), start);
+        return startdate !== null && this.props.minStart <= startdate;
+    },
+    isValidEnd: function(end) {
+        var enddate = this.parseTime(this.props.start.clone(), end);
+        return enddate !== null && enddate <= this.props.maxEnd;
+    },
+    isValidState: function() {
+        if (this.props.partlyAvailable) {
+            if (this.props.wholeDay && this.state.wholeDay) {
+                return true;
+            } else {
+                return this.isValidStart(this.state.start) && this.isValidEnd(this.state.end);
+            }
+        }
+    },
+    // eslint-disable-next-line complexity
+    render: function() {
+        var buttonEnabled = this.isValidState();
+        var showWholeDay = this.props.partlyAvailable && this.props.wholeDay;
+        var showTimeRange = this.props.partlyAvailable && (!this.props.wholeDay || !this.state.wholeDay);
+
+        return (
+            <form>
+                <h3>{locale("Blocker")}</h3>
+                {showWholeDay && (
+                    <div className="field">
+                        <span className="label-text">{locale("Whole day")}</span>
+
+                        <input id="reserve-whole-day-yes"
+                            name="reserve-whole-day"
+                            type="radio"
+                            value="yes"
+                            checked={this.state.wholeDay}
+                            onChange={this.handleInputChange}
+                        />
+                        <label htmlFor="reserve-whole-day-yes">{locale("Yes")}</label>
+                        <input id="reserve-whole-day-no"
+                            name="reserve-whole-day"
+                            type="radio"
+                            value="no"
+                            checked={!this.state.wholeDay}
+                            onChange={this.handleInputChange}
+                        />
+                        <label htmlFor="reserve-whole-day-no">{locale("No")}</label>
+                    </div>
+                )}
+
+                {showTimeRange && (
+                    <div className="field split">
+                        <div>
+                            <label htmlFor="start">{locale("From")}</label>
+                            <input name="start" type="time" size="4"
+                                defaultValue={this.state.start}
+                                onChange={this.handleInputChange}
+                                onFocus={this.handleTimeInputFocus}
+                                onMouseUp={this.handleTimeInputMouseUp}
+                                onBlur={this.handleTimeInputBlur}
+                                className={this.isValidStart(this.state.start) && 'valid' || 'invalid'}
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="end">{locale("Until")}</label>
+                            <input name="end" type="time" size="4"
+                                defaultValue={this.state.end}
+                                onChange={this.handleInputChange}
+                                onFocus={this.handleTimeInputFocus}
+                                onMouseUp={this.handleTimeInputMouseUp}
+                                onBlur={this.handleTimeInputBlur}
+                                className={this.isValidEnd(this.state.end) && 'valid' || 'invalid'}
+                            />
+                        </div>
+                    </div>
+                )}
+
+                <div className="field">
+                    <div>
+                        <label htmlFor="reason">{locale("Reason")}</label>
+                        <input name="reason" type="text" size="30"
+                            defaultValue={this.state.reason || ''}
+                            onChange={this.handleInputChange}
+                        />
+                    </div>
+                </div>
+
+                <button className={buttonEnabled && "button" || "button secondary"} disabled={!buttonEnabled} onClick={this.handleButton}>{locale("Add")}</button>
+            </form>
+        );
+
+    }
+});
+
+oc.BlockerForm.render = function(element, start, end, wholeDay, event, onSubmit) {
+
+    var partlyAvailable = event.extendedProps.partlyAvailable;
+    var fullyAvailable = event.extendedProps.fullyAvailable;
+    var minStart = moment.max(moment(event.start), moment());
+    var maxEnd = moment(event.end);
+
+    ReactDOM.render(
+        <oc.BlockerForm
+            partlyAvailable={partlyAvailable}
+            fullyAvailable={fullyAvailable}
+            start={wholeDay && minStart || moment.max(start, minStart)}
+            end={wholeDay && maxEnd || moment.min(end, maxEnd)}
+            minStart={minStart}
+            maxEnd={maxEnd}
+            wholeDay={event.extendedProps.wholeDay}
+            wholeDayDefault={wholeDay}
+            onSubmit={onSubmit}
+        />,
+        element);
+};
+
+
+/*
+    Allows to change the properties of an existing blocker.
+*/
+oc.BlockerEditForm = React.createClass({
+    getInitialState: function() {
+        return {reason: this.props.reason};
+    },
+    componentDidMount: function() {
+        var node = $(ReactDOM.findDOMNode(this));
+
+        // the timeout is set to 100ms because the popup will do its own focusing
+        // after 50ms (we could use it, but we want to focus AND select)
+        setTimeout(function() {
+            node.find('input:first').focus().select();
+        }, 100);
+    },
+    handleInputChange: function(e) {
+        var state = _.extend({}, this.state);
+        var name = e.target.getAttribute('name');
+
+        switch (name) {
+            case 'reason':
+                state.reason = e.target.value || null;
+                break;
+            default:
+                throw Error("Unknown input element: " + name);
+        }
+
+        this.setState(state);
+    },
+    handleButton: function(e) {
+        var node = ReactDOM.findDOMNode(this);
+        var self = this;
+
+        $(node).find('input').each(function(_ix, el) {
+            $(el).blur();
+        });
+
+        setTimeout(function() {
+            self.props.onSubmit.call(node, self.state);
+        }, 0);
+
+        e.preventDefault();
+    },
+    render: function() {
+        return (
+            <form>
+                <div className="field">
+                    <div>
+                        <label htmlFor="reason">{locale("Reason")}</label>
+                        <input name="reason" type="text" size="30"
+                            defaultValue={this.state.reason || ''}
+                            onChange={this.handleInputChange}
+                        />
+                    </div>
+                </div>
+
+                <button className="button" onClick={this.handleButton}>{locale("Update")}</button>
+            </form>
+        );
+
+    }
+});
+
+oc.BlockerEditForm.render = function(element, event, onSubmit) {
+    ReactDOM.render(
+        <oc.BlockerEditForm
+            reason={event.title}
+            onSubmit={onSubmit}
+        />,
+        element);
 };
 
 /*

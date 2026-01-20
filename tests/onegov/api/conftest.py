@@ -64,6 +64,14 @@ class Endpoint(ApiEndpoint[Bunch]):  # type: ignore[type-var]
         super().__init__(request, extra_parameters, page)
 
     @property
+    def title(self) -> str:
+        return 'Test Endpoint'
+
+    @property
+    def description(self) -> str:
+        return 'This is just for testing'
+
+    @property
     def collection(self) -> Collection:  # type: ignore[override]
         return self._collection
 

@@ -15,7 +15,7 @@ from itsdangerous import (
     URLSafeSerializer,
     URLSafeTimedSerializer
 )
-from more.content_security import ContentSecurityRequest
+from more.content_security import ContentSecurityRequest, UNSAFE_EVAL
 from more.webassets.core import IncludeRequest
 from morepath.authentication import NO_IDENTITY
 from morepath.error import LinkError
@@ -50,6 +50,7 @@ if TYPE_CHECKING:
     from wtforms import Form
     from uuid import UUID
 
+    from .analytics import AnalyticsProvider
     from .templates import TemplateLoader
 
     _BaseRequest = morepath.Request
@@ -883,6 +884,26 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         """ Returns the chameleon template loader. """
         registry = self.app.config.template_engine_registry
         return registry._template_loaders['.pt']
+
+    @property
+    def analytics_provider(self) -> AnalyticsProvider | None:
+        """ Returns the active analytics provider. """
+        return None
+
+    @property
+    def analytics_code(self) -> Markup | None:
+        """ Return the embeddable code for the active analytics provider. """
+        provider = self.analytics_provider
+        if provider is None:
+            return None
+
+        return provider.code(self)
+
+    def require_unsafe_eval(self) -> None:
+        # FIXME: We currently use some intercooler features in some views
+        #        that require unsafe-eval, we should try to get rid of them
+        #        by writing some custom JavaScript handlers (ic-on-XXX).
+        self.content_security_policy.script_src.add(UNSAFE_EVAL)
 
     # NOTE: We override this so we pass an instance of ourselves
     #       to resolve_model, rather than a base Request instance
