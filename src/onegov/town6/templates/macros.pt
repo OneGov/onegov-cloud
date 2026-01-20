@@ -1752,53 +1752,55 @@
     </div>
 </metal:photoswipe>
 
-<metal:autoplay_video define-macro="autoplay_video" i18n:domain="onegov.town6" tal:define="searchbox searchbox|'true';">
-    <div tal:condition="link_mp4 or link_webm" class="homepage-video" data-max-height="${max_height if max_height else '100vh'}"
-    >
-        <video id="autoplay-video" autoplay playsinline loop muted
-            data-link-mp4="${link_mp4}"
-            data-link-mp4-low-res="${link_mp4_low_res}"
-            data-link-webm="${link_webm}"
-            data-link-webm-low-res="${link_webm_low_res}"
-        >
-            Your browser does not support the video tag.
-        </video>
-        <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer">
-            <div class="dark-overlay" tal:condition="text"></div>
-            <div class="grid-container" tal:condition="text">
-                <div class="text">
-                    <p tal:condition="text and button_url">
-                        <tal:b >
-                            <span>${text}</span>
-                        </tal:b>
-                    </p>
-                    <tal:b tal:condition="text and not button_url">
-                        <span>${text}</span>
-                    </tal:b>
-                    <tal:b tal:condition="button_url|False">
-                        <a class="button" href="${button_url}">${button_text}<tal:b condition="not: button_text" i18n:translate="">Show more</tal:b></a>
-                    </tal:b>
+<metal:autoplay_video define-macro="autoplay_video" i18n:domain="onegov.town6">
+    <div class="homepage-video-container">
+        <div tal:condition="link_mp4 or link_webm" class="homepage-video" data-max-height="${max_height if max_height else '100vh'}" tal:define="searchbox searchbox|'true';">
+            <video id="autoplay-video" autoplay playsinline loop muted
+                data-link-mp4="${link_mp4}"
+                data-link-mp4-low-res="${link_mp4_low_res}"
+                data-link-webm="${link_webm}"
+                data-link-webm-low-res="${link_webm_low_res}"
+            >
+                Your browser does not support the video tag.
+            </video>
+            <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer">
+                <div class="dark-overlay" tal:condition="text">
+                    <div class="grid-container text-container" tal:condition="text">
+                        <div class="text">
+                            <p tal:condition="text and button_url">
+                                <tal:b >
+                                    <span>${text}</span>
+                                </tal:b>
+                            </p>
+                            <tal:b tal:condition="text and not button_url">
+                                <span>${text}</span>
+                            </tal:b>
+                            <tal:b tal:condition="button_url|False">
+                                <a class="button" href="${button_url}">${button_text}<tal:b condition="not: button_text" i18n:translate="">Show more</tal:b></a>
+                            </tal:b>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="searchbox-wrapper ${searchbox_position|''}" tal:condition="searchbox == 'true'|False">
-                <div class="grid-container">
-                    <div class="grid-x grid-padding-x">
-                        <div class="cell small-12 medium-6 large-5">
-                            <form class="searchbox slider-searchbox" action="${layout.search_url}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
-                                <div class="input-group">
-                                    <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="What are you searching for?" i18n:attributes="placeholder">
-                                    <div class="typeahead">
-                                        <div class="cell small-12" data-typeahead-container>
-                                        </div>
-                                    </div>
-                                    <div class="input-group-button">
-                                        <button class="button" type="submit">
-                                            <i class="fa fa-search"></i>
-                                        </button>
+        </div>
+        <div class="homepage-searchbox-wrapper ${searchbox_position|''}" tal:condition="not searchbox == 'false'|True">
+            <div class="grid-container">
+                <div class="grid-x grid-padding-x">
+                    <div class="cell small-12 medium-6 large-5">
+                        <form class="searchbox" action="${layout.search_url}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+                            <div class="input-group">
+                                <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="What are you searching for?" i18n:attributes="placeholder">
+                                <div class="typeahead">
+                                    <div class="cell small-12" data-typeahead-container>
                                     </div>
                                 </div>
-                            </form>
-                        </div>
+                                <div class="input-group-button">
+                                    <button class="button" type="submit">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -1858,28 +1860,6 @@
                 </li>
             </ul>
         </div>
-        <div class="searchbox-wrapper" tal:condition="not searchbox == 'false'|True">
-            <div class="grid-container">
-                <div class="grid-x grid-padding-x">
-                    <div class="cell small-12 medium-6 large-7">
-                        <form class="searchbox slider-searchbox" action="${layout.search_url}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
-                            <div class="input-group">
-                                <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="What are you searching for?" i18n:attributes="placeholder">
-                                <div class="typeahead">
-                                    <div class="cell small-12" data-typeahead-container>
-                                    </div>
-                                </div>
-                                <div class="input-group-button">
-                                    <button class="button" type="submit">
-                                        <i class="fa fa-search"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
         <metal:b tal:condition="images and len(images) > 1" use-macro="layout.macros['orbit-bullets']" />
     </div>
     <div class="slider no-images" tal:condition="not images and request.is_manager">
@@ -1888,6 +1868,28 @@
                 This space holds images from your photo-albums. To show photos add a few
                 photos to an album and mark it as available for the homepage.
             </tal:b>
+        </div>
+    </div>
+    <div class="homepage-searchbox-wrapper" tal:condition="not searchbox == 'false'|True">
+        <div class="grid-container">
+            <div class="grid-x grid-padding-x">
+                <div class="cell small-12 medium-6 large-7">
+                    <form class="searchbox" action="${layout.search_url}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+                        <div class="input-group">
+                            <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="What are you searching for?" i18n:attributes="placeholder">
+                            <div class="typeahead">
+                                <div class="cell small-12" data-typeahead-container>
+                                </div>
+                            </div>
+                            <div class="input-group-button">
+                                <button class="button" type="submit">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </metal:slider>
